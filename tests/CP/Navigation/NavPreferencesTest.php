@@ -216,11 +216,51 @@ class NavPreferencesTest extends TestCase
         ])->get('Content')->map->display()->all());
     }
 
-    // /** @test */
-    // public function it_can_rename_sections()
-    // {
-    //
-    // }
+    /** @test */
+    public function it_can_rename_sections()
+    {
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users'];
+
+        $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
+
+        $renamedSections = ['Top Level', 'Data', 'Fields', 'Tools', 'Pals'];
+
+        // Recommended syntax...
+        $this->assertEquals($renamedSections, $this->buildNavWithPreferences([
+            'content' => [
+                'display' => 'Data',
+            ],
+            'users' => [
+                'display' => 'Pals',
+            ],
+        ])->keys()->all());
+
+        // With nesting...
+        $this->assertEquals($renamedSections, $this->buildNavWithPreferences([
+            'sections' => [
+                'content' => [
+                    'display' => 'Data',
+                ],
+                'users' => [
+                    'display' => 'Pals',
+                ],
+            ],
+        ])->keys()->all());
+
+        // Ensure renamed sections still hold original items...
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'display' => 'Data',
+            ],
+            'users' => [
+                'display' => 'Pals',
+            ],
+        ]);
+        $this->assertNull($nav->get('Content'));
+        $this->assertEquals(['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'], $nav->get('Data')->map->display()->all());
+        $this->assertNull($nav->get('Users'));
+        $this->assertEquals(['Users', 'Groups', 'Permissions'], $nav->get('Pals')->map->display()->all());
+    }
 
     // /** @test */
     // public function it_can_rename_and_modify_items_within_a_section()
