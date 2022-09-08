@@ -25,6 +25,6 @@ trait ContainsSupplementalData
 
     public function hasSupplement($key)
     {
-        return $this->supplements->has($key);
+        return collect($this->supplements)->has($key);
     }
 }
