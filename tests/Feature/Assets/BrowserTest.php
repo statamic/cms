@@ -207,8 +207,14 @@ class BrowserTest extends TestCase
             ->makeAsset('asset-one.txt')
             ->upload(UploadedFile::fake()->create('asset-one.txt'));
         $containerOne
+            ->makeAsset('no-match.txt')
+            ->upload(UploadedFile::fake()->create('no-match.txt'));
+        $containerOne
             ->makeAsset('nested/asset-two.txt')
             ->upload(UploadedFile::fake()->create('asset-two.txt'));
+        $containerOne
+            ->makeAsset('nested/nope.txt')
+            ->upload(UploadedFile::fake()->create('nope.txt'));
         $containerOne
             ->makeAsset('nested/subdirectory/asset-three.txt')
             ->upload(UploadedFile::fake()->create('asset-three.txt'));
@@ -218,7 +224,7 @@ class BrowserTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->getJson('/cp/assets/browse/search/one?asset')
+            ->getJson('/cp/assets/browse/search/one?search=asset')
             ->assertSuccessful()
             ->assertJsonCount(3, 'data.assets')
             ->assertJsonPath('data.assets.0.id', 'one::asset-one.txt')
