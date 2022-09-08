@@ -596,7 +596,84 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_modify_existing_items()
     {
-        $this->markTestSkipped();
+        // It can modify item within a section...
+        $item = $this->buildNavWithPreferences([
+            'top_level' => [
+                'top_level::dashboard' => [
+                    'action' => '@modify',
+                    'display' => 'Dashboard Confessional',
+                    'url' => 'https://dashboardconfessional.com',
+                    'icon' => '<svg>custom</svg>',
+                    'children' => [
+                        'One' => '/one',
+                        'Two' => '/two',
+                    ],
+                ],
+            ],
+        ])->get('Top Level')->keyBy->display()->get('Dashboard Confessional');
+        $this->assertEquals('top_level::dashboard', $item->id());
+        $this->assertEquals('Dashboard Confessional', $item->display());
+        $this->assertEquals('https://dashboardconfessional.com', $item->url());
+        $this->assertEquals('<svg>custom</svg>', $item->icon());
+        $this->assertEquals(['One', 'Two'], $item->children()->map->display()->all());
+        $this->assertEquals(['http://localhost/one', 'http://localhost/two'], $item->children()->map->url()->all());
+
+        // It can modify an aliased item...
+        $item = $this->buildNavWithPreferences([
+            'top_level' => [
+                'fields::blueprints' => [
+                    'action' => '@alias',
+                    'display' => 'Redprints',
+                    'url' => 'https://redprints.com',
+                    'icon' => '<svg>custom</svg>',
+                    'children' => [
+                        'One' => '/one',
+                        'Two' => '/two',
+                    ],
+                ],
+            ],
+        ])->get('Top Level')->keyBy->display()->get('Redprints');
+        $this->assertEquals('fields::blueprints::clone', $item->id());
+        $this->assertEquals('Redprints', $item->display());
+        $this->assertEquals('https://redprints.com', $item->url());
+        $this->assertEquals('<svg>custom</svg>', $item->icon());
+        $this->assertEquals(['One', 'Two'], $item->children()->map->display()->all());
+        $this->assertEquals(['http://localhost/one', 'http://localhost/two'], $item->children()->map->url()->all());
+
+        // It can modify a moved item...
+        $item = $this->buildNavWithPreferences([
+            'top_level' => [
+                'fields::blueprints' => [
+                    'action' => '@move',
+                    'display' => 'Redprints',
+                    'url' => 'https://redprints.com',
+                    'icon' => '<svg>custom</svg>',
+                    'children' => [
+                        'One' => '/one',
+                        'Two' => '/two',
+                    ],
+                ],
+            ],
+        ])->get('Top Level')->keyBy->display()->get('Redprints');
+        $this->assertEquals('fields::blueprints::clone', $item->id());
+        $this->assertEquals('Redprints', $item->display());
+        $this->assertEquals('https://redprints.com', $item->url());
+        $this->assertEquals('<svg>custom</svg>', $item->icon());
+        $this->assertEquals(['One', 'Two'], $item->children()->map->display()->all());
+        $this->assertEquals(['http://localhost/one', 'http://localhost/two'], $item->children()->map->url()->all());
+
+        // It does not modify items from other sections... (instead, use `@alias` or `@move` action as shown above)
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'top_level::dashboard' => [
+                    'action' => '@modify',
+                    'display' => 'Dashboard Confessional',
+                ],
+            ],
+        ]);
+        $this->assertArrayHasKey('Dashboard', $nav->get('Top Level')->keyBy->display()->all());
+        $this->assertArrayNotHasKey('Dashboard Confessional', $nav->get('Top Level')->keyBy->display()->all());
+        $this->assertArrayNotHasKey('Dashboard Confessional', $nav->get('Content')->keyBy->display()->all());
     }
 
     /** @test */
