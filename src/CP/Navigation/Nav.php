@@ -296,6 +296,9 @@ class Nav
             })
             ->each(function ($overrides) {
                 $this->applyPreferenceOverridesForSection($overrides);
+            })
+            ->each(function ($overrides) {
+                $this->applyPreferenceAliasesAndMovesForSection($overrides);
             });
 
         if ($userNav['reorder']) {
@@ -329,16 +332,38 @@ class Nav
                         return $this->userRemoveItem($override['item']);
                     case '@modify':
                         return $this->userModifyItem($override['item'], $override['config'], $section);
-                    case '@alias':
-                        return $this->userAliasItem($override['item'], $override['config'], $section);
-                    case '@move':
-                        return $this->userMoveItem($override['item'], $override['config'], $section);
                 }
             });
 
         if ($sectionNav['reorder']) {
             $this->setSectionItemOrder($section, $sectionNav['items']);
         }
+    }
+
+    /**
+     * Apply user preference aliases and moves for specific section.
+     *
+     * @param  array  $sectionNav
+     */
+    protected function applyPreferenceAliasesAndMovesForSection($sectionNav)
+    {
+        $section = $sectionNav['display'];
+
+        collect($sectionNav['items'])
+            ->map(function ($config, $id) {
+                return [
+                    'item' => $this->findItem($id),
+                    'config' => $config,
+                ];
+            })
+            ->each(function ($override) use ($section) {
+                switch ($override['config']['action']) {
+                    case '@alias':
+                        return $this->userAliasItem($override['item'], $override['config'], $section);
+                    case '@move':
+                        return $this->userMoveItem($override['item'], $override['config'], $section);
+                }
+            });
     }
 
     /**

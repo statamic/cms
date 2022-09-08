@@ -713,13 +713,13 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_alias_an_item_into_the_children_of_another_item()
     {
-        //
+        $this->markTestSkipped();
     }
 
     /** @test */
     public function it_can_move_an_item_into_the_children_of_another_item()
     {
-        //
+        $this->markTestSkipped();
     }
 
     /** @test */
@@ -751,7 +751,6 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('Yaml', $yamlItem->display());
         $this->assertEquals('https://yaml.org', $yamlItem->url());
 
-        ray($nav->get('Top Level')->all());
         $aliasedJsonItem = $nav->get('Top Level')->keyBy->display()->get('Json');
         $this->assertEquals('tools::technologies::json::clone', $aliasedJsonItem->id());
         $this->assertEquals('Json', $aliasedJsonItem->display());
