@@ -18,8 +18,13 @@ trait ContainsSupplementalData
         return $this;
     }
 
-    public function getSupplement($key)
+    public function getSupplement($key, $fallback = null)
     {
-        return $this->supplements[$key] ?? null;
+        return $this->hasSupplement($key) ? $this->supplements[$key] : $fallback;
+    }
+
+    public function hasSupplement($key)
+    {
+        return $this->supplements->has($key);
     }
 }
