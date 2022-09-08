@@ -677,13 +677,31 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_set_children_using_same_modify_setters()
+    public function modifying_an_aliased_item_only_modifies_the_clone_and_not_the_original()
     {
-        $this->markTestSkipped();
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'fields::blueprints' => [
+                    'action' => '@alias',
+                    'display' => 'Redprints',
+                    'url' => 'https://redprints.com',
+                ],
+            ],
+        ]);
+
+        // Assert the cloned item...
+        $this->assertEquals('fields::blueprints::clone', $nav->get('Top Level')->keyBy->display()->get('Redprints')->id());
+        $this->assertEquals('Redprints', $nav->get('Top Level')->keyBy->display()->get('Redprints')->display());
+        $this->assertEquals('https://redprints.com', $nav->get('Top Level')->keyBy->display()->get('Redprints')->url());
+
+        // Assert the original item...
+        $this->assertEquals('fields::blueprints', $nav->get('Fields')->keyBy->display()->get('Blueprints')->id());
+        $this->assertEquals('Blueprints', $nav->get('Fields')->keyBy->display()->get('Blueprints')->display());
+        $this->assertEquals('http://localhost/cp/fields/blueprints', $nav->get('Fields')->keyBy->display()->get('Blueprints')->url());
     }
 
     /** @test */
-    public function modifying_moved_or_aliased_items_only_modifies_the_clone_and_not_the_original()
+    public function it_can_set_item_children_using_same_modify_setters()
     {
         $this->markTestSkipped();
     }
