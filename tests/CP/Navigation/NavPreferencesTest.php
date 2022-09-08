@@ -263,7 +263,7 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_rename_and_modify_items_within_a_section()
+    public function it_can_rename_items_within_a_section()
     {
         $defaultItems = ['Users', 'Groups', 'Permissions'];
 
@@ -392,6 +392,14 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Dashboard', 'Pages'], $nav->get('Top Level')->map->display()->all());
         $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
         $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+
+        // Aliasing in same section should just copy the item...
+        $nav = $this->buildNavWithPreferences([
+            'fields' => [
+                'fields::blueprints' => '@alias',
+            ],
+        ]);
+        $this->assertEquals(['Blueprints', 'Fieldsets', 'Blueprints'], $nav->get('Fields')->map->display()->all());
     }
 
     /** @test */
@@ -450,6 +458,73 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Dashboard', 'Pages'], $nav->get('Top Level')->map->display()->all());
         $this->assertArrayNotHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
         $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+
+        // Move should do nothing if used in same section...
+        $nav = $this->buildNavWithPreferences([
+            'fields' => [
+                'fields::blueprints' => '@move',
+            ],
+        ]);
+        $this->assertEquals(['Blueprints', 'Fieldsets'], $nav->get('Fields')->map->display()->all());
+    }
+
+    /** @test */
+    public function it_can_remove_items_from_a_section()
+    {
+        $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'];
+
+        $this->assertEquals($defaultContentItems, $this->buildDefaultNav()->get('Content')->map->display()->all());
+
+        $itemsAfterRemoving = ['Collections', 'Taxonomies', 'Assets'];
+
+        // Recommended syntax...
+        $this->assertEquals($itemsAfterRemoving, $this->buildNavWithPreferences([
+            'content' => [
+                'content::navigation' => '@remove',
+                'content::globals' => '@remove',
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // With nesting...
+        $this->assertEquals($itemsAfterRemoving, $this->buildNavWithPreferences([
+            'sections' => [
+                'content' => [
+                    'items' => [
+                        'content::navigation' => '@remove',
+                        'content::globals' => '@remove',
+                    ],
+                ],
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // With config array...
+        $this->assertEquals($itemsAfterRemoving, $this->buildNavWithPreferences([
+            'content' => [
+                'content::navigation' => [
+                    'action' => '@remove',
+                ],
+                'content::globals' => '@remove',
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // Remove a child item...
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'content::collections::pages' => '@remove',
+            ],
+        ]);
+        $this->assertArrayNotHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+
+        // Remove should do nothing if used in wrong section...
+        $this->assertEquals($defaultContentItems, $this->buildNavWithPreferences([
+            'fields' => [
+                'content::navigation' => '@remove',
+                'content::globals' => '@remove',
+            ],
+        ])->get('Content')->map->display()->all());
     }
 
     private function buildNavWithPreferences($preferences)
@@ -484,3 +559,20 @@ class FakePreferences
         return $this->preferences;
     }
 }
+
+    // // Recommended syntax...
+    // $usersNav = $this->buildNavWithPreferences([
+    //     'users' => [
+    //         'users::users' => [
+    //             'display' => 'Kids',
+    //             'url' => '/kids',
+    //         ],
+    //         'users::permissions' => [
+    //             'display' => 'Kid Can Haz?',
+    //             'icon' => '<svg>custom</svg>',
+    //         ],
+    //     ],
+    // ])->get('Users');
+    // $this->assertEquals($renamedItems, $usersNav->map->display()->all());
+    // $this->assertEquals('http://localhost/kids', $usersNav->keyBy->display()->get('Kids')->url());
+    // $this->assertEquals('<svg>custom</svg>', $usersNav->keyBy->display()->get('Kid Can Haz?')->icon());
