@@ -227,7 +227,7 @@ class BrowserTest extends TestCase
 
         $this
             ->actingAs($this->userWithPermission())
-            ->getJson('/cp/assets/browse/search/one/nested?asset')
+            ->getJson('/cp/assets/browse/search/one/nested?search=asset')
             ->assertSuccessful()
             ->assertJsonCount(1, 'data.assets')
             ->assertJsonPath('data.assets.0.id', 'one::nested/asset-two.txt');
