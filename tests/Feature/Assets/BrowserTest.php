@@ -219,7 +219,7 @@ class BrowserTest extends TestCase
             ->makeAsset('nested/subdirectory/asset-three.txt')
             ->upload(UploadedFile::fake()->create('asset-three.txt'));
         $containerTwo
-            ->makeAsset('asset-three.txt')
+            ->makeAsset('asset-four.txt')
             ->upload(UploadedFile::fake()->create('asset-four.txt'));
 
         $this
