@@ -711,6 +711,54 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_alias_an_item_into_the_children_of_another_item()
+    {
+        //
+    }
+
+    /** @test */
+    public function it_can_move_an_item_into_the_children_of_another_item()
+    {
+        //
+    }
+
+    /** @test */
+    public function it_can_alias_a_newly_created_item_to_an_earlier_section()
+    {
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'tools::technologies::json' => '@alias',
+            ],
+            'tools' => [
+                'tools::technologies' => [
+                    'action' => '@create',
+                    'display' => 'Technologies',
+                    'children' => [
+                        'Json' => 'https://json.org',
+                        'Yaml' => 'https://yaml.org',
+                    ],
+                ],
+            ],
+        ]);
+
+        $jsonItem = $nav->get('Tools')->keyBy->display()->get('Technologies')->children()->first();
+        $this->assertEquals('tools::technologies::json', $jsonItem->id());
+        $this->assertEquals('Json', $jsonItem->display());
+        $this->assertEquals('https://json.org', $jsonItem->url());
+
+        $yamlItem = $nav->get('Tools')->keyBy->display()->get('Technologies')->children()->last();
+        $this->assertEquals('tools::technologies::yaml', $yamlItem->id());
+        $this->assertEquals('Yaml', $yamlItem->display());
+        $this->assertEquals('https://yaml.org', $yamlItem->url());
+
+        ray($nav->get('Top Level')->all());
+        $aliasedJsonItem = $nav->get('Top Level')->keyBy->display()->get('Json');
+        $this->assertEquals('tools::technologies::json::clone', $aliasedJsonItem->id());
+        $this->assertEquals('Json', $aliasedJsonItem->display());
+        $this->assertEquals('https://json.org', $aliasedJsonItem->url());
+    }
+
+    /** @test */
     public function it_can_handle_a_bunch_of_useless_config_without_erroring()
     {
         $this->markTestSkipped();
@@ -718,12 +766,6 @@ class NavPreferencesTest extends TestCase
 
     /** @test */
     public function it_builds_out_an_example_config()
-    {
-        $this->markTestSkipped();
-    }
-
-    /** @test */
-    public function it_can_alias_a_created_item_to_an_earlier_section()
     {
         $this->markTestSkipped();
     }
