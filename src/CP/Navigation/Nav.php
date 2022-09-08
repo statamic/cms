@@ -316,11 +316,11 @@ class Nav
             });
 
         collect($userNav['sections'])
-            ->reject(function ($overrides) {
-                return is_null($overrides['display_original']);
+            ->reject(function ($overrides, $section) {
+                return $section === NavItem::snakecase($overrides['display']);
             })
-            ->each(function ($overrides) {
-                $this->renameSection($overrides['display_original'], $overrides['display']);
+            ->each(function ($overrides, $section) {
+                $this->renameSection($section, $overrides['display']);
             });
 
         if ($userNav['reorder']) {
@@ -369,13 +369,13 @@ class Nav
     /**
      * Rename section.
      *
-     * @param  string  $displayOriginal
+     * @param  string  $sectionKey
      * @param  string  $displayNew
      */
-    protected function renameSection($displayOriginal, $displayNew)
+    protected function renameSection($sectionKey, $displayNew)
     {
         $this->items
-            ->filter(fn ($item) => $item->section() === $displayOriginal)
+            ->filter(fn ($item) => NavItem::snakeCase($item->section()) === $sectionKey)
             ->each(fn ($item) => $item->section($displayNew));
     }
 
@@ -513,9 +513,7 @@ class Nav
      */
     protected function userRemoveItemFromChildren($item)
     {
-        ray('removing from children', $item->id());
         if ($parent = $this->findParentItem($item->id())) {
-            ray($parent);
             $parent->children(
                 $parent->children()->reject(function ($child) use ($item) {
                     return $child->id() === $item->id();

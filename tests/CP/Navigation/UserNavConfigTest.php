@@ -38,7 +38,6 @@ class UserNavConfigTest extends TestCase
 
         $this->assertFalse(Arr::get($nav, 'sections.content.reorder'));
         $this->assertEquals('Content', Arr::get($nav, 'sections.content.display'));
-        $this->assertNull(Arr::get($nav, 'sections.content.display_original'));
         $this->assertTrue(Arr::has($nav, 'sections.content.items.fields::blueprints'));
     }
 
@@ -106,7 +105,6 @@ class UserNavConfigTest extends TestCase
         ]);
 
         $this->assertEquals('Favourite Content!', Arr::get($nav, 'sections.content.display'));
-        $this->assertEquals('Content', Arr::get($nav, 'sections.content.display_original'));
     }
 
     /** @test */
@@ -411,7 +409,6 @@ class UserNavConfigTest extends TestCase
                 'top_level' => [
                     'reorder' => false,
                     'display' => 'Top Level',
-                    'display_original' => null,
                     'items' => [
                         'top_level::dashboard' => [
                             'action' => '@modify',
@@ -428,7 +425,6 @@ class UserNavConfigTest extends TestCase
                 'content' => [
                     'reorder' => false,
                     'display' => 'Content',
-                    'display_original' => null,
                     'items' => [
                         'fields::blueprints' => [
                             'action' => '@alias',

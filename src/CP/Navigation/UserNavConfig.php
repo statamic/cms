@@ -108,12 +108,9 @@ class UserNavConfig implements ArrayAccess
             $displayOriginal = Str::modifyMultiple($sectionKey, ['deslugify', 'title']))
         );
 
-        $normalized->put('display_original', $display !== $displayOriginal ? $displayOriginal : null);
-
         $items = collect($sectionConfig->get('items') ?? $sectionConfig->except([
             'reorder',
             'display',
-            'display_original',
         ]));
 
         $items = $items
@@ -126,7 +123,7 @@ class UserNavConfig implements ArrayAccess
 
         $normalized->put('items', $items);
 
-        $allowedKeys = ['reorder', 'display', 'display_original', 'items'];
+        $allowedKeys = ['reorder', 'display', 'items'];
 
         return $normalized->only($allowedKeys)->all();
     }
