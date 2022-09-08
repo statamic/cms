@@ -173,8 +173,8 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
         $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
             'alt' => [
                 'type' => 'text',
-                'display' => 'Alt Text',
-                'instructions' => 'Description of the image',
+                'display' => __('Alt Text'),
+                'instructions' => __('Description of the image'),
             ],
         ])->setHandle($this->handle())->setNamespace('assets');
 

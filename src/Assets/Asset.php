@@ -444,6 +444,19 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Is this asset a media file?
+     *
+     * @return bool
+     */
+    public function isMedia()
+    {
+        return $this->isImage()
+                || $this->isSvg()
+                || $this->isVideo()
+                || $this->isAudio();
+    }
+
+    /**
      * Is this asset a PDF?
      *
      * @return bool
