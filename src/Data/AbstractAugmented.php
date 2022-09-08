@@ -85,9 +85,13 @@ abstract class AbstractAugmented implements Augmented
         $value = method_exists($this->data, 'value') ? $this->data->value($handle) : $this->data->get($handle);
 
         if (method_exists($this->data, 'getSupplement')) {
-            $value = $this->data->hasSupplement($handle)
-                ? $this->data->getSupplement($handle)
-                : $value;
+            if (method_exists($this->data, 'hasSupplement')) {
+                $value = $this->data->hasSupplement($handle)
+                    ? $this->data->getSupplement($handle)
+                    : $value;
+            } else {
+                $value = $this->data->getSupplement($handle) ?? $value;
+            }
         }
 
         return $value;
