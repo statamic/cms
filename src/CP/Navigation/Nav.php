@@ -283,7 +283,7 @@ class Nav
 
         collect($userNav['sections'])
             ->reject(function ($overrides, $section) {
-                return $section === NavItem::snakecase($overrides['display']);
+                return $section === NavItem::snakeCase($overrides['display']);
             })
             ->each(function ($overrides, $section) {
                 $this->renameSection($section, $overrides['display']);
@@ -408,9 +408,10 @@ class Nav
             ->values();
 
         // Set an explicit order value on each item...
-        $itemIds->each(function ($id, $index) {
-            $this->findItem($id)->order($index + 1);
-        });
+        $itemIds
+            ->map(fn ($id) => $this->findItem($id))
+            ->filter()
+            ->each(fn ($item, $index) => $item->order($index + 1));
 
         // Inform builder that section items should be ordered...
         $this->sectionsWithReorderedItems[] = $section;
@@ -487,6 +488,10 @@ class Nav
      */
     protected function userRemoveItem($item)
     {
+        if (is_null($item)) {
+            return;
+        }
+
         $item->hidden(true);
 
         $this->userRemoveItemFromChildren($item);
@@ -500,6 +505,10 @@ class Nav
      */
     protected function userModifyItem($item, $config)
     {
+        if (is_null($item)) {
+            return;
+        }
+
         $config = collect($config);
 
         collect(UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)
@@ -516,6 +525,10 @@ class Nav
      */
     protected function userAliasItem($item, $config, $section)
     {
+        if (is_null($item)) {
+            return;
+        }
+
         $clone = clone $item;
 
         $clone->id($clone->id().'::clone');
@@ -536,6 +549,10 @@ class Nav
      */
     protected function userMoveItem($item, $config, $section)
     {
+        if (is_null($item)) {
+            return;
+        }
+
         $this->userAliasItem($item, $config, $section);
 
         $item->hidden(true);
