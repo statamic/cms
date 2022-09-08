@@ -111,6 +111,111 @@ class NavPreferencesTest extends TestCase
         ])->keys()->all());
     }
 
+    /** @test */
+    public function it_can_reorder_items_within_sections()
+    {
+        $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'];
+
+        $this->assertEquals($defaultContentItems, $this->buildDefaultNav()->get('Content')->map->display()->all());
+
+        $reorderedContentItems = ['Globals', 'Taxonomies', 'Collections', 'Navigation', 'Assets'];
+
+        // Recommended syntax...
+        $this->assertEquals($reorderedContentItems, $this->buildNavWithPreferences([
+            'content' => [
+                'reorder' => true,
+                'items' => [
+                    'content::globals' => '@inherit',
+                    'content::taxonomies' => '@inherit',
+                    'content::collections' => '@inherit',
+                    'content::navigation' => '@inherit',
+                    'content::assets' => '@inherit',
+                ],
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // Without nesting items...
+        $this->assertEquals($reorderedContentItems, $this->buildNavWithPreferences([
+            'content' => [
+                'reorder' => true,
+                'content::globals' => '@inherit',
+                'content::taxonomies' => '@inherit',
+                'content::collections' => '@inherit',
+                'content::navigation' => '@inherit',
+                'content::assets' => '@inherit',
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // With full nesting of sections...
+        $this->assertEquals($reorderedContentItems, $this->buildNavWithPreferences([
+            'sections' => [
+                'content' => [
+                    'reorder' => true,
+                    'items' => [
+                        'content::globals' => '@inherit',
+                        'content::taxonomies' => '@inherit',
+                        'content::collections' => '@inherit',
+                        'content::navigation' => '@inherit',
+                        'content::assets' => '@inherit',
+                    ],
+                ],
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // Merge unmentioned items underneath...
+        $this->assertEquals($reorderedContentItems, $this->buildNavWithPreferences([
+            'content' => [
+                'reorder' => true,
+                'items' => [
+                    'content::globals' => '@inherit',
+                    'content::taxonomies' => '@inherit',
+                    'content::collections' => '@inherit',
+                ],
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // Ensure re-ordering items still works when modifying a item...
+        $this->assertEquals($reorderedContentItems, $this->buildNavWithPreferences([
+            'content' => [
+                'reorder' => true,
+                'items' => [
+                    'content::globals' => '@inherit',
+                    'content::taxonomies' => [
+                        'icon' => 'tag',
+                    ],
+                    'content::collections' => '@inherit',
+                ],
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // If `reorder: false`, it should just use default item order...
+        $this->assertEquals($defaultContentItems, $this->buildNavWithPreferences([
+            'content' => [
+                'reorder' => false,
+                'items' => [
+                    'content::globals' => '@inherit',
+                    'content::taxonomies' => '@inherit',
+                    'content::collections' => '@inherit',
+                    'content::navigation' => '@inherit',
+                    'content::assets' => '@inherit',
+                ],
+            ],
+        ])->get('Content')->map->display()->all());
+
+        // If `reorder` is not specified, it should just use default item order...
+        $this->assertEquals($defaultContentItems, $this->buildNavWithPreferences([
+            'content' => [
+                'items' => [
+                    'content::globals' => '@inherit',
+                    'content::taxonomies' => '@inherit',
+                    'content::collections' => '@inherit',
+                    'content::navigation' => '@inherit',
+                    'content::assets' => '@inherit',
+                ],
+            ],
+        ])->get('Content')->map->display()->all());
+    }
+
     private function buildNavWithPreferences($preferences)
     {
         // Swap with fakes instead of using mocks,

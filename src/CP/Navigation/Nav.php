@@ -602,7 +602,7 @@ class Nav
         $built = collect($sections)
             ->map(function ($items, $section) {
                 return collect($this->sectionsWithReorderedItems)->contains($section)
-                    ? collect($items)->sortBy(fn ($item) => $item->order())
+                    ? collect($items)->sortBy(fn ($item) => $item->order())->values()
                     : collect($items);
             });
 
