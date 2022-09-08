@@ -548,19 +548,65 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_create_new_items_on_the_fly()
+    {
+        // It can create item...
+        $item = $this->buildNavWithPreferences([
+            'top_level' => [
+                'favs' => [
+                    'action' => '@create',
+                    'display' => 'Favourites',
+                    'url' => 'https://pinterest.com',
+                    'icon' => '<svg>custom</svg>',
+                    'children' => [
+                        'One' => '/one',
+                        'Two' => '/two',
+                    ],
+                ],
+            ],
+        ])->get('Top Level')->keyBy->display()->get('Favourites');
+        $this->assertEquals('top_level::favourites', $item->id());
+        $this->assertEquals('Favourites', $item->display());
+        $this->assertEquals('https://pinterest.com', $item->url());
+        $this->assertEquals('<svg>custom</svg>', $item->icon());
+        $this->assertEquals(['One', 'Two'], $item->children()->map->display()->all());
+        $this->assertEquals(['http://localhost/one', 'http://localhost/two'], $item->children()->map->url()->all());
+
+        // It can create using `route` setter...
+        $this->assertEquals('http://localhost/cp/dashboard', $this->buildNavWithPreferences([
+            'top_level' => [
+                'favs' => [
+                    'action' => '@create',
+                    'display' => 'Favourites',
+                    'route' => 'dashboard',
+                ],
+            ],
+        ])->get('Top Level')->keyBy->display()->get('Favourites')->url());
+
+        // It won't create without a `display` setter at minimum...
+        $this->assertEquals(['Dashboard'], $this->buildNavWithPreferences([
+            'top_level' => [
+                'favs' => [
+                    'action' => '@create',
+                ],
+            ],
+        ])->get('Top Level')->map->display()->all());
+    }
+
+    /** @test */
     public function it_can_modify_existing_items()
     {
         $this->markTestSkipped();
     }
 
     /** @test */
-    public function modifying_moved_or_aliased_items_only_modifies_the_clone_and_not_the_original()
+    public function it_can_set_children_using_same_modify_setters()
     {
         $this->markTestSkipped();
     }
 
     /** @test */
-    public function it_can_create_new_items_on_the_fly()
+    public function modifying_moved_or_aliased_items_only_modifies_the_clone_and_not_the_original()
     {
         $this->markTestSkipped();
     }
@@ -573,6 +619,12 @@ class NavPreferencesTest extends TestCase
 
     /** @test */
     public function it_builds_out_an_example_config()
+    {
+        $this->markTestSkipped();
+    }
+
+    /** @test */
+    public function it_can_alias_a_created_item_to_an_earlier_section()
     {
         $this->markTestSkipped();
     }
