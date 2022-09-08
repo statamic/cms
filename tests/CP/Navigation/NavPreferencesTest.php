@@ -217,6 +217,26 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_does_nothing_with_inherit_actions_when_not_reordering()
+    {
+        $nav = $this->buildNavWithPreferences([
+            'sections' => [
+                'fields' => '@inherit',
+                'users' => [
+                    'items' => [
+                        'users::users' => '@inherit',
+                        'top_level::dashboard' => '@inherit',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(['Dashboard'], $nav->get('Top Level')->map->display()->all());
+        $this->assertEquals(['Blueprints', 'Fieldsets'], $nav->get('Fields')->map->display()->all());
+        $this->assertEquals(['Users', 'Groups', 'Permissions'], $nav->get('Users')->map->display()->all());
+    }
+
+    /** @test */
     public function it_can_rename_sections()
     {
         $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users'];
@@ -525,6 +545,36 @@ class NavPreferencesTest extends TestCase
                 'content::globals' => '@remove',
             ],
         ])->get('Content')->map->display()->all());
+    }
+
+    /** @test */
+    public function it_can_modify_existing_items()
+    {
+        $this->markTestSkipped();
+    }
+
+    /** @test */
+    public function modifying_moved_or_aliased_items_only_modifies_the_clone_and_not_the_original()
+    {
+        $this->markTestSkipped();
+    }
+
+    /** @test */
+    public function it_can_create_new_items_on_the_fly()
+    {
+        $this->markTestSkipped();
+    }
+
+    /** @test */
+    public function it_can_handle_a_bunch_of_useless_config_without_erroring()
+    {
+        $this->markTestSkipped();
+    }
+
+    /** @test */
+    public function it_builds_out_an_example_config()
+    {
+        $this->markTestSkipped();
     }
 
     private function buildNavWithPreferences($preferences)
