@@ -74,7 +74,6 @@ class UserNavConfig implements ArrayAccess
         $sections = $sections
             ->prepend($sections->pull('top_level') ?? '@inherit', 'top_level')
             ->map(fn ($config, $section) => $this->normalizeSectionConfig($config, $section))
-            ->filter()
             ->reject(fn ($config) => $config === '@inherit' && ! $reorder)
             ->all();
 
@@ -94,13 +93,15 @@ class UserNavConfig implements ArrayAccess
      */
     protected function normalizeSectionConfig($sectionConfig, $sectionKey)
     {
-        if (is_string($sectionConfig)) {
-            return $sectionConfig;
-        }
-
-        $sectionConfig = collect($sectionConfig);
+        $sectionConfig = is_string($sectionConfig)
+            ? collect(['action' => Str::ensureLeft($sectionConfig, '@')])
+            : collect($sectionConfig);
 
         $normalized = collect();
+
+        if (! in_array($sectionConfig->get('action'), ['@inherit', '@modify'])) {
+            $normalized->put('action', '@modify');
+        }
 
         $normalized->put('reorder', $reorder = $sectionConfig->get('reorder', false));
 

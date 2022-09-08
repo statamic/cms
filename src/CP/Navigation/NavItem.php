@@ -21,6 +21,7 @@ class NavItem
     protected $authorization;
     protected $active;
     protected $view;
+    protected $order;
     protected $hidden;
 
     /**
@@ -269,6 +270,17 @@ class NavItem
     }
 
     /**
+     * Get or set nav item order.
+     *
+     * @param  int|null  $order
+     * @return mixed
+     */
+    public function order($order = null)
+    {
+        return $this->fluentlyGetOrSet('order')->value($order);
+    }
+
+    /**
      * Get or set hidden status.
      *
      * @param  bool|null  $hidden
@@ -310,7 +322,7 @@ class NavItem
      * @param  string  $string
      * @return string
      */
-    protected static function snakeCase($string)
+    public static function snakeCase($string)
     {
         $string = Str::modifyMultiple($string, ['lower', 'snake']);
         $string = Str::replace($string, '-', '_');

@@ -14,6 +14,8 @@ class Nav
     protected $extensions = [];
     protected $built;
     protected $withHidden = false;
+    protected $sectionsOrder = [];
+    protected $sectionsWithReorderedItems = [];
 
     /**
      * Register a nav extension closure.
@@ -126,8 +128,7 @@ class Nav
             ->authorizeItems()
             ->authorizeChildren()
             ->applyPreferenceOverrides()
-            ->buildSections()
-            ->getBuiltNav();
+            ->buildSections();
     }
 
     /**
@@ -268,33 +269,6 @@ class Nav
     }
 
     /**
-     * Build sections collection.
-     *
-     * @return $this
-     */
-    protected function buildSections()
-    {
-        $sections = [];
-
-        collect($this->items)
-            ->reject(function ($item) {
-                return $this->withHidden ? false : $item->isHidden();
-            })
-            ->filter(function ($item) {
-                return $item->section();
-            })
-            ->each(function ($item) use (&$sections) {
-                $sections[$item->section()][] = $item;
-            });
-
-        $this->built = collect($sections)->map(function ($items) {
-            return collect($items);
-        });
-
-        return $this;
-    }
-
-    /**
      * Apply overrides from user preferences.
      *
      * @return $this
@@ -308,14 +282,6 @@ class Nav
         $userNav = UserNavConfig::normalize($userNav);
 
         collect($userNav['sections'])
-            ->reject(function ($overrides) {
-                return $overrides === '@inherit';
-            })
-            ->each(function ($overrides) {
-                $this->applyPreferenceOverridesForSection($overrides);
-            });
-
-        collect($userNav['sections'])
             ->reject(function ($overrides, $section) {
                 return $section === NavItem::snakecase($overrides['display']);
             })
@@ -323,8 +289,16 @@ class Nav
                 $this->renameSection($section, $overrides['display']);
             });
 
+        collect($userNav['sections'])
+            ->reject(function ($overrides) {
+                return $overrides === '@inherit';
+            })
+            ->each(function ($overrides) {
+                $this->applyPreferenceOverridesForSection($overrides);
+            });
+
         if ($userNav['reorder']) {
-            // $this->reorderSections();
+            $this->setSectionOrder($userNav['sections']);
         }
 
         return $this;
@@ -362,7 +336,7 @@ class Nav
             });
 
         if ($sectionNav['reorder']) {
-            // $this->reorderItems();
+            $this->setSectionItemOrder($section, $sectionNav['items']);
         }
     }
 
@@ -376,7 +350,70 @@ class Nav
     {
         $this->items
             ->filter(fn ($item) => NavItem::snakeCase($item->section()) === $sectionKey)
-            ->each(fn ($item) => $item->section($displayNew));
+            ->each(function ($item) use ($displayNew) {
+                $item
+                    ->id($item->id()) // Preserve the item's original ID before setting the section.
+                    ->section($displayNew);
+            });
+    }
+
+    /**
+     * Set section order.
+     *
+     * @param  array  $sections
+     */
+    protected function setSectionOrder($sections)
+    {
+        $this->sectionsOrder = collect($sections)
+            ->pluck('display')
+            ->merge($this->items->map->section()->filter()->unique())
+            ->unique()
+            ->values()
+            ->mapWithKeys(fn ($section, $index) => [$section => $index + 1])
+            ->all();
+    }
+
+    /**
+     * Set section item order.
+     *
+     * @param  string  $section
+     * @param  array  $items
+     */
+    protected function setSectionItemOrder($section, $items)
+    {
+        $itemIds = collect($items);
+
+        // Generate IDs for newly created items...
+        $itemIds->transform(function ($item, $id) use ($section, $items) {
+            return $items[$id]['action'] === '@create'
+                ? (new NavItem)->display($items[$id]['display'])->section($section)->id()
+                : $item;
+        });
+
+        // Items that are moved or aliased into this section should have `::clone` appended to their IDs...
+        $itemIds->transform(function ($item, $id) use ($items) {
+            return in_array($items[$id]['action'], ['@move', '@alias'])
+                ? $id.'::clone'
+                : $item;
+        });
+
+        // Ensure the rest of the items are transformed to IDs...
+        $itemIds->transform(fn ($item, $id) => is_array($item) ? $id : $item);
+
+        // Merge any unconfigured section items into the end of the list...
+        $itemIds = $itemIds
+            ->values()
+            ->merge($this->items->filter(fn ($item) => $item->section() === $section)->map->id())
+            ->unique()
+            ->values();
+
+        // Set an explicit order value on each item...
+        $itemIds->each(function ($id, $index) {
+            $this->findItem($id)->order($index + 1);
+        });
+
+        // Inform builder that section items should be ordered...
+        $this->sectionsWithReorderedItems[] = $section;
     }
 
     /**
@@ -523,13 +560,40 @@ class Nav
     }
 
     /**
-     * Get built nav.
+     * Build sections collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return $this
      */
-    protected function getBuiltNav()
+    protected function buildSections()
     {
-        return $this->built;
+        $sections = [];
+
+        // Organize items by section...
+        collect($this->items)
+            ->reject(function ($item) {
+                return $this->withHidden ? false : $item->isHidden();
+            })
+            ->filter(function ($item) {
+                return $item->section();
+            })
+            ->each(function ($item) use (&$sections) {
+                $sections[$item->section()][] = $item;
+            });
+
+        // Collect and order each section's items...
+        $built = collect($sections)
+            ->map(function ($items, $section) {
+                return collect($this->sectionsWithReorderedItems)->contains($section)
+                    ? collect($items)->sortBy(fn ($item) => $item->order())
+                    : collect($items);
+            });
+
+        // Order sections...
+        if ($this->sectionsOrder) {
+            return $built->sortBy(fn ($items, $section) => $this->sectionsOrder[$section]);
+        }
+
+        return $built;
     }
 
     /**
