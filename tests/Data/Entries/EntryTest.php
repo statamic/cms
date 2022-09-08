@@ -519,7 +519,6 @@ class EntryTest extends TestCase
         $this->assertEquals('bar', $entry->getSupplement('foo'));
         $this->assertNull($entry->getSupplement('bar'));
         $this->assertNull($entry->getSupplement('baz'));
-        $this->assertNull($entry->getSupplement('baz', 'quux'));
         $this->assertTrue($entry->hasSupplement('foo'));
         $this->assertFalse($entry->hasSupplement('bar'));
         $this->assertTrue($entry->hasSupplement('baz'));
