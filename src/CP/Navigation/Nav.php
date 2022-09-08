@@ -28,7 +28,7 @@ class Nav
     }
 
     /**
-     * Create nav item.
+     * Create and register nav item.
      *
      * @param  string  $name
      * @return NavItem
@@ -43,9 +43,10 @@ class Nav
     }
 
     /**
-     * Create nav item (an alias that reads a little nicer when creating children).
+     * Create and register nav item (an alias that reads a little nicer when creating children).
      *
-     * @param  mixed  $name
+     * @param  string  $name
+     * @return NavItem
      */
     public function item($name)
     {
@@ -386,7 +387,7 @@ class Nav
         // Generate IDs for newly created items...
         $itemIds->transform(function ($item, $id) use ($section, $items) {
             return $items[$id]['action'] === '@create'
-                ? (new NavItem)->display($items[$id]['display'])->section($section)->id()
+                ? $this->generateNewItemId($section, $items[$id]['display'])
                 : $item;
         });
 
@@ -611,6 +612,18 @@ class Nav
         }
 
         return $built;
+    }
+
+    /**
+     * Use NavItem class to generate a new ID for item without registering it.
+     *
+     * @param  string  $section
+     * @param  string  $name
+     * @return string
+     */
+    protected function generateNewItemId($section, $name)
+    {
+        return (new NavItem)->display($name)->section($section)->id();
     }
 
     /**
