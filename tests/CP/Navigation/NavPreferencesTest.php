@@ -253,6 +253,19 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Dashboard', 'Blueprints'], $nav->get('Top Level')->map->display()->all());
         $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
 
+        // With full nesting of sections...
+        $nav = $this->buildNavWithPreferences([
+            'sections' => [
+                'top_level' => [
+                    'fields::blueprints' => [
+                        'action' => '@alias',
+                    ],
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Dashboard', 'Blueprints'], $nav->get('Top Level')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
         // With config array...
         $nav = $this->buildNavWithPreferences([
             'top_level' => [
@@ -286,6 +299,7 @@ class NavPreferencesTest extends TestCase
 
         // Alias a child item...
         Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
         $nav = $this->buildNavWithPreferences([
             'top_level' => [
                 'content::collections::pages' => '@alias',
@@ -293,13 +307,66 @@ class NavPreferencesTest extends TestCase
         ]);
         $this->assertEquals(['Dashboard', 'Pages'], $nav->get('Top Level')->map->display()->all());
         $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
     }
 
-    // /** @test */
-    // public function it_can_move_items_into_another_section()
-    // {
-    //
-    // }
+    /** @test */
+    public function it_can_move_items_into_another_section()
+    {
+        $this->assertEquals(['Dashboard'], $this->buildDefaultNav()->get('Top Level')->map->display()->all());
+
+        // Recommended syntax...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'fields::blueprints' => '@move',
+            ],
+        ]);
+        $this->assertEquals(['Dashboard', 'Blueprints'], $nav->get('Top Level')->map->display()->all());
+        $this->assertArrayNotHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // With nesting...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'items' => [
+                    'fields::blueprints' => '@move',
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Dashboard', 'Blueprints'], $nav->get('Top Level')->map->display()->all());
+        $this->assertArrayNotHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // With config array...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'fields::blueprints' => [
+                    'action' => '@move',
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Dashboard', 'Blueprints'], $nav->get('Top Level')->map->display()->all());
+        $this->assertArrayNotHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // Move into another section...
+        $nav = $this->buildNavWithPreferences([
+            'fields' => [
+                'content::globals' => '@move',
+            ],
+        ]);
+        $this->assertEquals(['Blueprints', 'Fieldsets', 'Globals'], $nav->get('Fields')->map->display()->all());
+        $this->assertArrayNotHasKey('Globals', $nav->get('Content')->keyBy->display()->all());
+
+        // Move a child item...
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections::pages' => '@move',
+            ],
+        ]);
+        $this->assertEquals(['Dashboard', 'Pages'], $nav->get('Top Level')->map->display()->all());
+        $this->assertArrayNotHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+    }
 
     private function buildNavWithPreferences($preferences)
     {
