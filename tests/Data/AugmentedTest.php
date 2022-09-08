@@ -50,6 +50,21 @@ class AugmentedTest extends TestCase
     }
 
     /** @test */
+    public function it_can_use_null_as_a_supplement_value()
+    {
+        $augmented = new class($this->thing) extends BaseAugmentedThing
+        {
+            //
+        };
+
+        $this->assertEqualsValue('bar', $augmented->get('foo'));
+
+        $this->thing->setSupplement('foo', null);
+
+        $this->assertNullValue($augmented->get('foo'));
+    }
+
+    /** @test */
     public function it_gets_a_single_value_by_key_using_the_value_method_if_it_exists()
     {
         $thingWithValueMethod = new class($this->thing->data()) extends Thing
@@ -318,12 +333,10 @@ class Thing
 {
     use ContainsData;
 
-    public function __construct($data)
+    public function __construct($data, $supplements = ['supplemented' => 'supplemented value'])
     {
         $this->data = $data;
-        $this->supplements = [
-            'supplemented' => 'supplemented value',
-        ];
+        $this->supplements = $supplements;
     }
 
     public function slug()
