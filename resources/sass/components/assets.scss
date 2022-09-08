@@ -87,7 +87,7 @@
     padding: 16px;
 
     .asset-tile {
-        @apply flex items-center w-full flex-col justify-between cursor-pointer border rounded overflow-hidden;
+        @apply flex items-center flex-col justify-between cursor-pointer border rounded overflow-hidden;
 
         .asset-thumb-container {
             @apply flex items-center flex-1 w-full justify-center relative;
