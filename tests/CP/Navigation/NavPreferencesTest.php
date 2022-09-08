@@ -569,6 +569,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('Favourites', $item->display());
         $this->assertEquals('https://pinterest.com', $item->url());
         $this->assertEquals('<svg>custom</svg>', $item->icon());
+        $this->assertEquals(['top_level::favourites::one', 'top_level::favourites::two'], $item->children()->map->id()->all());
         $this->assertEquals(['One', 'Two'], $item->children()->map->display()->all());
         $this->assertEquals(['http://localhost/one', 'http://localhost/two'], $item->children()->map->url()->all());
 
@@ -615,6 +616,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('Dashboard Confessional', $item->display());
         $this->assertEquals('https://dashboardconfessional.com', $item->url());
         $this->assertEquals('<svg>custom</svg>', $item->icon());
+        $this->assertEquals(['top_level::dashboard::one', 'top_level::dashboard::two'], $item->children()->map->id()->all());
         $this->assertEquals(['One', 'Two'], $item->children()->map->display()->all());
         $this->assertEquals(['http://localhost/one', 'http://localhost/two'], $item->children()->map->url()->all());
 
@@ -637,6 +639,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('Redprints', $item->display());
         $this->assertEquals('https://redprints.com', $item->url());
         $this->assertEquals('<svg>custom</svg>', $item->icon());
+        $this->assertEquals(['fields::blueprints::clone::one', 'fields::blueprints::clone::two'], $item->children()->map->id()->all());
         $this->assertEquals(['One', 'Two'], $item->children()->map->display()->all());
         $this->assertEquals(['http://localhost/one', 'http://localhost/two'], $item->children()->map->url()->all());
 
@@ -659,6 +662,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('Redprints', $item->display());
         $this->assertEquals('https://redprints.com', $item->url());
         $this->assertEquals('<svg>custom</svg>', $item->icon());
+        $this->assertEquals(['fields::blueprints::clone::one', 'fields::blueprints::clone::two'], $item->children()->map->id()->all());
         $this->assertEquals(['One', 'Two'], $item->children()->map->display()->all());
         $this->assertEquals(['http://localhost/one', 'http://localhost/two'], $item->children()->map->url()->all());
 
