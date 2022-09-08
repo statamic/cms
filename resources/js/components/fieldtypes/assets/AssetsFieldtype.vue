@@ -69,6 +69,7 @@
                         handle-class="asset-thumb-container"
                         @dragstart="$emit('focus')"
                         @dragend="$emit('blur')"
+                        :constrain-dimensions="true"
                         :disabled="isReadOnly"
                     >
                         <div class="asset-grid-listing border rounded overflow-hidden rounded-t-none" ref="assets">
@@ -89,9 +90,10 @@
                         <table class="table-fixed">
                             <sortable-list
                                 v-model="assets"
-                                :vertical="true"
                                 item-class="asset-row"
                                 handle-class="asset-row"
+                                :vertical="true"
+                                :constrain-dimensions="true"
                                 :disabled="isReadOnly"
                             >
                                 <tbody ref="assets">
