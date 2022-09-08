@@ -262,11 +262,55 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Users', 'Groups', 'Permissions'], $nav->get('Pals')->map->display()->all());
     }
 
-    // /** @test */
-    // public function it_can_rename_and_modify_items_within_a_section()
-    // {
-    //
-    // }
+    /** @test */
+    public function it_can_rename_and_modify_items_within_a_section()
+    {
+        $defaultItems = ['Users', 'Groups', 'Permissions'];
+
+        $this->assertEquals($defaultItems, $this->buildDefaultNav()->get('Users')->map->display()->all());
+
+        $renamedItems = ['Kids', 'Groups', 'Kid Can Haz?'];
+
+        // Recommended syntax...
+        $this->assertEquals($renamedItems, $this->buildNavWithPreferences([
+            'users' => [
+                'users::users' => [
+                    'display' => 'Kids',
+                ],
+                'users::permissions' => [
+                    'display' => 'Kid Can Haz?',
+                ],
+            ],
+        ])->get('Users')->map->display()->all());
+
+        // With nesting...
+        $this->assertEquals($renamedItems, $this->buildNavWithPreferences([
+            'sections' => [
+                'users' => [
+                    'items' => [
+                        'users::users' => [
+                            'display' => 'Kids',
+                        ],
+                        'users::permissions' => [
+                            'display' => 'Kid Can Haz?',
+                        ],
+                    ],
+                ],
+            ],
+        ])->get('Users')->map->display()->all());
+
+        // Ensure renamed items still hold original child items...
+        Facades\Collection::make('articles')->title('Articles')->save();
+        Facades\Collection::make('pages')->title('Pages')->save();
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'content::collections' => [
+                    'display' => 'Things',
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Articles', 'Pages'], $nav->get('Content')->keyBy->display()->get('Things')->resolveChildren()->children()->map->display()->all());
+    }
 
     /** @test */
     public function it_can_alias_items_into_another_section()
