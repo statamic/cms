@@ -3,6 +3,7 @@
 namespace Statamic\CP\Navigation;
 
 use ArrayAccess;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class UserNavConfig implements ArrayAccess
@@ -74,7 +75,8 @@ class UserNavConfig implements ArrayAccess
         $sections = $sections
             ->prepend($sections->pull('top_level') ?? '@inherit', 'top_level')
             ->map(fn ($config, $section) => $this->normalizeSectionConfig($config, $section))
-            ->reject(fn ($config) => $config === '@inherit' && ! $reorder)
+            ->reject(fn ($config) => $config['action'] === '@inherit' && ! $reorder)
+            ->map(fn ($config) => Arr::except($config, 'action'))
             ->all();
 
         $normalized->put('sections', $sections);
@@ -99,15 +101,11 @@ class UserNavConfig implements ArrayAccess
 
         $normalized = collect();
 
-        if (! in_array($sectionConfig->get('action'), ['@inherit', '@modify'])) {
-            $normalized->put('action', '@modify');
-        }
+        $normalized->put('action', $sectionConfig->get('action', false));
+
+        $normalized->put('display', $sectionConfig->get('display', Str::modifyMultiple($sectionKey, ['deslugify', 'title'])));
 
         $normalized->put('reorder', $reorder = $sectionConfig->get('reorder', false));
-
-        $normalized->put('display', $display = $sectionConfig->get('display',
-            $displayOriginal = Str::modifyMultiple($sectionKey, ['deslugify', 'title']))
-        );
 
         $items = collect($sectionConfig->get('items') ?? $sectionConfig->except([
             'reorder',
@@ -124,7 +122,7 @@ class UserNavConfig implements ArrayAccess
 
         $normalized->put('items', $items);
 
-        $allowedKeys = ['reorder', 'display', 'items'];
+        $allowedKeys = ['action', 'reorder', 'display', 'items'];
 
         return $normalized->only($allowedKeys)->all();
     }
