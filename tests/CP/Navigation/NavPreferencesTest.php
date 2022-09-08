@@ -216,6 +216,91 @@ class NavPreferencesTest extends TestCase
         ])->get('Content')->map->display()->all());
     }
 
+    // /** @test */
+    // public function it_can_rename_sections()
+    // {
+    //
+    // }
+
+    // /** @test */
+    // public function it_can_rename_and_modify_items_within_a_section()
+    // {
+    //
+    // }
+
+    /** @test */
+    public function it_can_alias_items_into_another_section()
+    {
+        $this->assertEquals(['Dashboard'], $this->buildDefaultNav()->get('Top Level')->map->display()->all());
+
+        // Recommended syntax...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'fields::blueprints' => '@alias',
+            ],
+        ]);
+        $this->assertEquals(['Dashboard', 'Blueprints'], $nav->get('Top Level')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // With nesting...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'items' => [
+                    'fields::blueprints' => '@alias',
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Dashboard', 'Blueprints'], $nav->get('Top Level')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // With config array...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'fields::blueprints' => [
+                    'action' => '@alias',
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Dashboard', 'Blueprints'], $nav->get('Top Level')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // With implicit action (items from other sections default to `@alias`)...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'fields::blueprints' => [
+                    'action' => [],
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Dashboard', 'Blueprints'], $nav->get('Top Level')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // Alias into another section...
+        $nav = $this->buildNavWithPreferences([
+            'fields' => [
+                'content::globals' => '@alias',
+            ],
+        ]);
+        $this->assertEquals(['Blueprints', 'Fieldsets', 'Globals'], $nav->get('Fields')->map->display()->all());
+        $this->assertArrayHasKey('Globals', $nav->get('Content')->keyBy->display()->all());
+
+        // Alias a child item...
+        Facades\Collection::make('pages')->title('Pages')->save();
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections::pages' => '@alias',
+            ],
+        ]);
+        $this->assertEquals(['Dashboard', 'Pages'], $nav->get('Top Level')->map->display()->all());
+        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+    }
+
+    // /** @test */
+    // public function it_can_move_items_into_another_section()
+    // {
+    //
+    // }
+
     private function buildNavWithPreferences($preferences)
     {
         // Swap with fakes instead of using mocks,
