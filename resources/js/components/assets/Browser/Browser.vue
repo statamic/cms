@@ -185,22 +185,45 @@
                                         <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate">..</div>
                                     </div>
                                     <!-- Sub-Folders -->
-                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
+                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group relative" v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="selectFolder(folder.path)">
                                             <div class="absolute inset-0 flex items-center justify-center">
                                                 <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue"></file-icon>
                                             </div>
                                         </div>
                                         <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate" v-text="folder.basename" :title="folder.basename" />
+                                        <dropdown-list v-if="folderActions(folder).length" class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
+                                            <!-- TODO: Folder edit -->
+                                            <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
+
+                                            <data-list-inline-actions
+                                                :item="folder.path"
+                                                :url="folderActionUrl"
+                                                :actions="folderActions(folder)"
+                                                @started="actionStarted"
+                                                @completed="actionCompleted"
+                                            />
+                                        </dropdown-list>
                                     </div>
                                     <!-- Assets -->
-                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="(asset, index) in assets" :key="asset.id">
+                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group relative" v-for="(asset, index) in assets" :key="asset.id">
                                         <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id, index, $event)" @dblclick="$emit('edit-asset', asset)">
                                             <div class="absolute inset-0 flex items-center justify-center" :class="{ 'selected': isSelected(asset.id) }">
                                                 <asset-thumbnail :asset="asset" class="h-full w-full" />
                                             </div>
                                         </div>
                                         <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate" v-text="asset.basename" :title="asset.basename" />
+                                        <dropdown-list class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
+                                            <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
+                                            <div class="divider" v-if="asset.actions.length" />
+                                            <data-list-inline-actions
+                                                :item="asset.id"
+                                                :url="actionUrl"
+                                                :actions="asset.actions"
+                                                @started="actionStarted"
+                                                @completed="actionCompleted"
+                                            />
+                                        </dropdown-list>
                                     </div>
                                 </div>
                             </div>
