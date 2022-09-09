@@ -211,9 +211,9 @@ export default {
             if (this.inStack) return;
 
             if (window.location.hash.length === 0) return;
-                      
+
             const handle = window.location.hash.substr(1);
-                
+
             const index = this.mainSections.findIndex(section => section.handle === handle);
 
             if (index >= 0 && index < visibleTabs) {
