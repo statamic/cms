@@ -889,7 +889,70 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_builds_out_an_example_config()
     {
-        $this->markTestSkipped();
+        $nav = $this->buildNavWithPreferences([
+            'reorder' => true,
+            'sections' => [
+                'top_level' => [
+                    'content::collections::pages' => '@alias',
+                ],
+                'tools' => '@inherit',
+                'users' => [
+                    'reorder' => true,
+                    'items' => [
+                        'users::permissions' => '@inherit',
+                        'users::groups' => '@inherit',
+                    ],
+                ],
+                'content' => [
+                    'display' => 'Site',
+                    'items' => [
+                        'content::globals' => '@remove',
+                        'fields::blueprints' => '@move',
+                        'flickr' => [
+                            'action' => '@create',
+                            'icon' => 'assets',
+                            'display' => 'Flickr',
+                            'url' => 'https://flickr.com',
+                            'children' => [
+                                'Profile' => '/profile',
+                                'edit' => [
+                                    'action' => '@create',
+                                    'display' => 'Edit',
+                                    'url' => '/edit',
+                                ],
+                            ],
+                        ],
+                        'fields::fieldsets' => '@alias',
+                    ],
+                ],
+            ],
+        ]);
+
+        // Assert section order, with section rename from 'Content' to 'Site'
+        $this->assertEquals(['Top Level', 'Tools', 'Users', 'Site', 'Fields'], $nav->keys()->all());
+
+        // Assert top level items, with aliased 'Pages' item
+        $this->assertEquals(['Dashboard', 'Pages'], $nav->get('Top Level')->map->display()->all());
+
+        // Assert tools items (untouched because `@inherit`)
+        $this->assertEquals(['Forms', 'Updates', 'Addons', 'Utilities', 'GraphQL'], $nav->get('Tools')->map->display()->all());
+
+        // Assert users item order (but each item is untouched because `@inherit`)
+        $this->assertEquals(['Permissions', 'Groups', 'Users'], $nav->get('Users')->map->display()->all());
+
+        // Assert item modifications in renamed 'Site' section
+        $this->assertEquals([
+            'Collections',
+            'Navigation',
+            'Taxonomies',
+            'Assets',
+            'Blueprints',
+            'Flickr',
+            'Fieldsets',
+        ], $nav->get('Site')->map->display()->all());
+
+        // The `Fields` section was not explicitly defined in config, but `Blueprints` should be gone due to `@move`
+        $this->assertEquals(['Fieldsets'], $nav->get('Fields')->map->display()->all());
     }
 
     private function buildNavWithPreferences($preferences)
