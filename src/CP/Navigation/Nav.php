@@ -11,6 +11,7 @@ use Statamic\Support\Str;
 class Nav
 {
     protected $items = [];
+    protected $pendingItems = [];
     protected $extensions = [];
     protected $built;
     protected $withHidden = false;
@@ -96,7 +97,7 @@ class Nav
      */
     public function items()
     {
-        return $this->items; // TODO: sometimes this is a closure though?
+        return $this->items;
     }
 
     /**
@@ -256,7 +257,7 @@ class Nav
      * Filter authorized nav items.
      *
      * @param  mixed  $items
-     * @return \Illuminate\Support\Collection
+     * @return array
      */
     protected function filterAuthorizedNavItems($items)
     {
@@ -266,7 +267,7 @@ class Nav
                     ? User::current()->can($item->can()->ability, $item->can()->arguments)
                     : true;
             })
-            ->values();
+            ->all();
     }
 
     /**
@@ -295,10 +296,10 @@ class Nav
                 return $overrides === '@inherit';
             })
             ->each(function ($overrides) {
-                $this->applyPreferenceOverridesForSection($overrides);
+                $this->createPendingItemsForSection($overrides);
             })
             ->each(function ($overrides) {
-                $this->applyPreferenceAliasesAndMovesForSection($overrides);
+                $this->applyPreferenceOverridesForSection($overrides);
             });
 
         if ($userNav['reorder']) {
@@ -306,6 +307,20 @@ class Nav
         }
 
         return $this;
+    }
+
+    /**
+     * Create pending items for specific section ahead of time, so that they can be aliased, etc. from anywhere in nav.
+     *
+     * @param  array  $sectionNav
+     */
+    protected function createPendingItemsForSection($sectionNav)
+    {
+        $section = $sectionNav['display'];
+
+        collect($sectionNav['items'])
+            ->filter(fn ($config) => $config['action'] === '@create')
+            ->each(fn ($config) => $this->userCreatePendingItem($config, $section));
     }
 
     /**
@@ -327,43 +342,21 @@ class Nav
             ->each(function ($override) use ($section) {
                 switch ($override['config']['action']) {
                     case '@create':
-                        return $this->userCreateItem($override['config'], $section);
+                        return $this->userCreateFromPendingItem($override['config'], $section);
                     case '@remove':
                         return $this->userRemoveItem($override['item']);
                     case '@modify':
                         return $this->userModifyItem($override['item'], $override['config'], $section);
-                }
-            });
-
-        if ($sectionNav['reorder']) {
-            $this->setSectionItemOrder($section, $sectionNav['items']);
-        }
-    }
-
-    /**
-     * Apply user preference aliases and moves for specific section.
-     *
-     * @param  array  $sectionNav
-     */
-    protected function applyPreferenceAliasesAndMovesForSection($sectionNav)
-    {
-        $section = $sectionNav['display'];
-
-        collect($sectionNav['items'])
-            ->map(function ($config, $id) {
-                return [
-                    'item' => $this->findItem($id),
-                    'config' => $config,
-                ];
-            })
-            ->each(function ($override) use ($section) {
-                switch ($override['config']['action']) {
                     case '@alias':
                         return $this->userAliasItem($override['item'], $override['config'], $section);
                     case '@move':
                         return $this->userMoveItem($override['item'], $override['config'], $section);
                 }
             });
+
+        if ($sectionNav['reorder']) {
+            $this->setSectionItemOrder($section, $sectionNav['items']);
+        }
     }
 
     /**
@@ -374,7 +367,7 @@ class Nav
      */
     protected function renameSection($sectionKey, $displayNew)
     {
-        $this->items
+        collect($this->items)
             ->filter(fn ($item) => NavItem::snakeCase($item->section()) === $sectionKey)
             ->each(function ($item) use ($displayNew) {
                 $item
@@ -390,9 +383,13 @@ class Nav
      */
     protected function setSectionOrder($sections)
     {
+        // Get unconfigured sections...
+        $unconfiguredSections = collect($this->items)->map->section()->filter()->unique();
+
+        // Merge unconfigured sections onto the end of the list and map their order...
         $this->sectionsOrder = collect($sections)
             ->pluck('display')
-            ->merge($this->items->map->section()->filter()->unique())
+            ->merge($unconfiguredSections)
             ->unique()
             ->values()
             ->mapWithKeys(fn ($section, $index) => [$section => $index + 1])
@@ -426,10 +423,16 @@ class Nav
         // Ensure the rest of the items are transformed to IDs...
         $itemIds->transform(fn ($item, $id) => is_array($item) ? $id : $item);
 
-        // Merge any unconfigured section items into the end of the list...
+        // Get unconfigured item IDs...
+        $unconfiguredItemIds = collect($this->items)
+            ->filter(fn ($item) => $item->section() === $section)
+            ->map
+            ->id();
+
+        // Merge unconfigured items into the end of the list...
         $itemIds = $itemIds
             ->values()
-            ->merge($this->items->filter(fn ($item) => $item->section() === $section)->map->id())
+            ->merge($unconfiguredItemIds)
             ->unique()
             ->values();
 
@@ -451,7 +454,7 @@ class Nav
      */
     protected function findItem($id)
     {
-        $items = $this->items->keyBy->id();
+        $items = collect($this->items)->keyBy->id();
 
         if ($item = $items->get($id)) {
             return $item;
@@ -475,7 +478,7 @@ class Nav
      */
     protected function findParentItem($id)
     {
-        $items = $this->items->keyBy->id();
+        $items = collect($this->items)->keyBy->id();
 
         $idParts = collect(explode('::', $id));
 
@@ -494,7 +497,7 @@ class Nav
      * @param  array  $config
      * @param  string  $section
      */
-    protected function userCreateItem($config, $section)
+    protected function userCreatePendingItem($config, $section)
     {
         $config = collect($config);
 
@@ -502,9 +505,34 @@ class Nav
             return;
         }
 
-        $item = $this->create($display)->section($section);
+        $item = (new NavItem)->display($display)->section($section);
 
         $this->userModifyItem($item, $config);
+
+        $this->pendingItems[$item->id()] = $item;
+    }
+
+    /**
+     * Create new NavItem from pending created item.
+     *
+     * @param  array  $config
+     * @param  string  $section
+     */
+    protected function userCreateFromPendingItem($config, $section)
+    {
+        $config = collect($config);
+
+        if (! $display = $config->get('display')) {
+            return;
+        }
+
+        $id = $this->generateNewItemId($section, $display);
+
+        if (! $pendingItem = collect($this->pendingItems)->get($id)) {
+            return;
+        }
+
+        $this->items[] = $pendingItem;
     }
 
     /**
