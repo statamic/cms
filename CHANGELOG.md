@@ -26,6 +26,7 @@
 - Fix asset fieldtype drag mirror. [#6671](https://github.com/statamic/cms/issues/6671) by @jackmcdade
 - Fix asset tile controls position. [#6656](https://github.com/statamic/cms/issues/6656) by @jackmcdade
 - Fix date not showing in Safari. [#6651](https://github.com/statamic/cms/issues/6651) by @arthurperton
+- Fix date picker value format. [#6688](https://github.com/statamic/cms/issues/6688) by @jasonvarga
 - Fix augmentation test. [#6676](https://github.com/statamic/cms/issues/6676) by @jasonvarga
 
 
