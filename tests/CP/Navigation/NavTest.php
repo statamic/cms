@@ -65,6 +65,7 @@ class NavTest extends TestCase
         $this->assertEquals(config('app.url').'/wordpress-importer', $item->url());
         $this->assertEquals('view updates', $item->authorization()->ability);
         $this->assertEquals('view updates', $item->can()->ability);
+        $this->assertNull($item->attributes());
         $this->assertFalse($item->isHidden());
     }
 
@@ -94,7 +95,8 @@ class NavTest extends TestCase
             ->active('threepio*')
             ->url('/human-cyborg-relations')
             ->view('cp.nav.importer')
-            ->can('index', 'DroidsClass');
+            ->can('index', 'DroidsClass')
+            ->attributes(['target' => '_blank', 'class' => 'red']);
 
         $item = Nav::build()->get('Droids')->first();
 
@@ -106,6 +108,7 @@ class NavTest extends TestCase
         $this->assertEquals('threepio*', $item->active());
         $this->assertEquals('index', $item->authorization()->ability);
         $this->assertEquals('DroidsClass', $item->authorization()->arguments);
+        $this->assertEquals(' target="_blank" class="red"', $item->attributes());
     }
 
     /** @test */

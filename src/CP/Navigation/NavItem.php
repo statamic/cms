@@ -75,7 +75,7 @@ class NavItem
     }
 
     /**
-     * Get or set url by cp route name.
+     * Set url by cp route name.
      *
      * @param  array|string  $name
      * @param  mixed  $params
@@ -141,12 +141,11 @@ class NavItem
      */
     public function attributes($attrs = null)
     {
-        if (is_array($attrs) && ! empty($attrs)) {
-            $attrs = Html::attributes($attrs);
-        }
-
         return $this
             ->fluentlyGetOrSet('attributes')
+            ->setter(function ($value) {
+                return is_array($value) ? Html::attributes($value) : $value;
+            })
             ->value($attrs);
     }
 
