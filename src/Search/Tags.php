@@ -21,7 +21,7 @@ class Tags extends BaseTags
 
     public function results()
     {
-        if (! $query = request($this->params->get('query', 'q'))) {
+        if (! $query = $this->params->get('value') ?? request($this->params->get('query', 'q'))) {
             return $this->parseNoResults();
         }
 
