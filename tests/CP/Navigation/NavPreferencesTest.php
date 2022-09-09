@@ -937,6 +937,10 @@ class NavPreferencesTest extends TestCase
                     'display' => 'Site',
                     'items' => [
                         'content::globals' => '@remove',
+                        'content::taxonomies' => [
+                            'action' => '@modify',
+                            'display' => 'Categories',
+                        ],
                         'fields::blueprints' => '@move',
                         'flickr' => [
                             'action' => '@create',
@@ -952,7 +956,10 @@ class NavPreferencesTest extends TestCase
                                 ],
                             ],
                         ],
-                        'fields::fieldsets' => '@alias',
+                        'fields::fieldsets' => [
+                            'action' => '@alias',
+                            'url' => '/cp/fields/fieldsets?modified',
+                        ],
                     ],
                 ],
             ],
@@ -962,27 +969,42 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Top Level', 'Tools', 'Users', 'Site', 'Fields'], $nav->keys()->all());
 
         // Assert top level items, with aliased 'Pages' item
-        $this->assertEquals(['Dashboard', 'Pages'], $nav->get('Top Level')->map->display()->all());
+        $this->assertEquals([
+            'Dashboard' => 'http://localhost/cp/dashboard',
+            'Pages' => 'http://localhost/cp/collections/pages',
+        ], $nav->get('Top Level')->mapWithKeys(fn ($i) => [$i->display() => $i->url()])->all());
 
         // Assert tools items (untouched because `@inherit`)
-        $this->assertEquals(['Forms', 'Updates', 'Addons', 'Utilities', 'GraphQL'], $nav->get('Tools')->map->display()->all());
+        $this->assertEquals([
+            'Forms' => 'http://localhost/cp/forms',
+            'Updates' => 'http://localhost/cp/updater',
+            'Addons' => 'http://localhost/cp/addons',
+            'Utilities' => 'http://localhost/cp/utilities',
+            'GraphQL' => 'http://localhost/cp/graphql',
+        ], $nav->get('Tools')->mapWithKeys(fn ($i) => [$i->display() => $i->url()])->all());
 
         // Assert users item order (but each item is untouched because `@inherit`)
-        $this->assertEquals(['Permissions', 'Groups', 'Users'], $nav->get('Users')->map->display()->all());
+        $this->assertEquals([
+            'Permissions' => 'http://localhost/cp/roles',
+            'Groups' => 'http://localhost/cp/user-groups',
+            'Users' => 'http://localhost/cp/users',
+        ], $nav->get('Users')->mapWithKeys(fn ($i) => [$i->display() => $i->url()])->all());
 
         // Assert item modifications in renamed 'Site' section
         $this->assertEquals([
-            'Collections',
-            'Navigation',
-            'Taxonomies',
-            'Assets',
-            'Blueprints',
-            'Flickr',
-            'Fieldsets',
-        ], $nav->get('Site')->map->display()->all());
+            'Collections' => 'http://localhost/cp/collections',
+            'Navigation' => 'http://localhost/cp/navigation',
+            'Categories' => 'http://localhost/cp/taxonomies',
+            'Assets' => 'http://localhost/cp/assets',
+            'Blueprints' => 'http://localhost/cp/fields/blueprints',
+            'Flickr' => 'https://flickr.com',
+            'Fieldsets' => 'http://localhost/cp/fields/fieldsets?modified',
+        ], $nav->get('Site')->mapWithKeys(fn ($i) => [$i->display() => $i->url()])->all());
 
         // The `Fields` section was not explicitly defined in config, but `Blueprints` should be gone due to `@move`
-        $this->assertEquals(['Fieldsets'], $nav->get('Fields')->map->display()->all());
+        $this->assertEquals([
+            'Fieldsets' => 'http://localhost/cp/fields/fieldsets',
+        ], $nav->get('Fields')->mapWithKeys(fn ($i) => [$i->display() => $i->url()])->all());
     }
 
     private function buildNavWithPreferences($preferences, $preBuild = null)
