@@ -705,9 +705,40 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_set_item_children_using_same_modify_setters()
+    public function it_can_create_item_children_using_same_nav_item_setters()
     {
-        $this->markTestSkipped();
+        $children = $this->buildNavWithPreferences([
+            'top_level' => [
+                'top_level::dashboard' => [
+                    'action' => '@modify',
+                    'children' => [
+                        'json' => [
+                            'action' => '@create',
+                            'display' => 'Json',
+                            'url' => 'https://json.org',
+                        ],
+                        'yaml' => [
+                            'action' => '@create',
+                            'display' => 'Yaml',
+                            'url' => 'https://yaml.org',
+                        ],
+                        'toml' => ['action' => '@create'], // This shouldn't be created without `display`
+                    ],
+                ],
+            ],
+        ])->get('Top Level')->keyBy->display()->get('Dashboard')->children();
+
+        $this->assertCount(2, $children);
+
+        $jsonItem = $children->first();
+        $this->assertEquals('top_level::dashboard::json', $jsonItem->id());
+        $this->assertEquals('Json', $jsonItem->display());
+        $this->assertEquals('https://json.org', $jsonItem->url());
+
+        $yamlItem = $children->last();
+        $this->assertEquals('top_level::dashboard::yaml', $yamlItem->id());
+        $this->assertEquals('Yaml', $yamlItem->display());
+        $this->assertEquals('https://yaml.org', $yamlItem->url());
     }
 
     /** @test */

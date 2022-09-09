@@ -567,11 +567,61 @@ class Nav
 
         collect(UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)
             ->filter(fn ($setter) => $config->has($setter))
-            ->each(function ($setter) use ($item, $config) {
+            ->mapWithKeys(fn ($setter) => [$setter => $config->get($setter)])
+            ->map(fn ($value, $setter) => $this->prepareUserItemValue($setter, $value))
+            ->each(function ($value, $setter) use ($item) {
                 $item
                     ->id($item->id()) // Preserve the item's original ID before modifying
-                    ->{$setter}($config->get($setter));
+                    ->{$setter}($value);
             });
+    }
+
+    /**
+     * Prepare user item value.
+     *
+     * @param  string  $setter
+     * @param  string  $value
+     * @return mixed
+     */
+    protected function prepareUserItemValue($setter, $value)
+    {
+        if ($setter === 'children') {
+            return collect($value)
+                ->map(fn ($config) => $this->prepareUserChildItem($config))
+                ->filter();
+        }
+
+        return $value;
+    }
+
+    /**
+     * Prepare user child item.
+     *
+     * @param  array  $config
+     * @return mixed
+     */
+    protected function prepareUserChildItem($config)
+    {
+        if (is_string($config)) {
+            return $config;
+        }
+
+        $config = collect($config);
+
+        if (! $display = $config->get('display')) {
+            return;
+        }
+
+        $config = $config
+            ->filter(fn ($value, $setter) => in_array($setter, UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS))
+            ->reject(fn ($value, $setter) => in_array($setter, ['children']))
+            ->all();
+
+        $item = (new NavItem)->display($display);
+
+        $this->userModifyItem($item, $config);
+
+        return $item;
     }
 
     /**
