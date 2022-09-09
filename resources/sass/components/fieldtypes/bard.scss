@@ -301,6 +301,8 @@
     }
 
     blockquote,
+    blockquote ol li,
+    blockquote ul li,
     ol li,
     ul li {
         > p {
@@ -358,19 +360,32 @@
         margin-top: 0;
     }
 
-    ul {
+    ul, 
+    blockquote ul,
+    .tableWrapper table ul {
         list-style-type: disc;
     }
 
-    ol {
+    ol, 
+    blockquote ol,
+    .tableWrapper table ol {
         list-style-type: decimal;
     }
 
     ol,
-    ul {
+    ul,
+    blockquote ol,
+    blockquote ul {
         padding: 0;
         margin: 0;
         margin-bottom: .85em;
+        padding-left: 2em;
+    }
+
+    .tableWrapper table ol,
+    .tableWrapper table ul {
+        padding: 0;
+        margin: 0;
         padding-left: 2em;
     }
 
