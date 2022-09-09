@@ -358,11 +358,13 @@
         margin-top: 0;
     }
 
-    ul {
+    ul, 
+    .tableWrapper table ul {
         list-style-type: disc;
     }
 
-    ol {
+    ol, 
+    .tableWrapper table ol {
         list-style-type: decimal;
     }
 
@@ -371,6 +373,11 @@
         padding: 0;
         margin: 0;
         margin-bottom: .85em;
+        padding-left: 2em;
+    }
+
+    .tableWrapper table ol,
+    .tableWrapper table ul {
         padding-left: 2em;
     }
 
