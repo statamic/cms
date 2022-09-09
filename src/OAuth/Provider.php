@@ -38,6 +38,10 @@ class Provider
             return $user;
         }
 
+        if ($user = User::findByEmail($socialite->getEmail())) {
+            return $this->mergeUser($socialite, $user);
+        }
+
         return $this->createUser($socialite);
     }
 
@@ -67,6 +71,17 @@ class Provider
         return User::make()
             ->email($socialite->getEmail())
             ->data($this->userData($socialite));
+    }
+
+    public function mergeUser($socialite, $user): StatamicUser
+    {
+        collect($this->userData($socialite))->each(fn ($value, $key) => $user->set($key, $value));
+
+        $user->save();
+
+        $this->setUserProviderId($user, $socialite->getId());
+
+        return $user;
     }
 
     public function userData($socialite)
