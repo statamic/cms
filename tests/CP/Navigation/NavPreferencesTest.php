@@ -13,6 +13,14 @@ class NavPreferencesTest extends TestCase
 
     protected $shouldPreventNavBeingBuilt = false;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+    }
+
     /** @test */
     public function it_can_reorder_sections()
     {
@@ -320,8 +328,6 @@ class NavPreferencesTest extends TestCase
         ])->get('Users')->map->display()->all());
 
         // Ensure renamed items still hold original child items...
-        Facades\Collection::make('articles')->title('Articles')->save();
-        Facades\Collection::make('pages')->title('Pages')->save();
         $nav = $this->buildNavWithPreferences([
             'content' => [
                 'content::collections' => [
@@ -402,8 +408,6 @@ class NavPreferencesTest extends TestCase
         $this->assertArrayHasKey('Globals', $nav->get('Content')->keyBy->display()->all());
 
         // Alias a child item...
-        Facades\Collection::make('pages')->title('Pages')->save();
-        Facades\Collection::make('articles')->title('Articles')->save();
         $nav = $this->buildNavWithPreferences([
             'top_level' => [
                 'content::collections::pages' => '@alias',
@@ -468,8 +472,6 @@ class NavPreferencesTest extends TestCase
         $this->assertArrayNotHasKey('Globals', $nav->get('Content')->keyBy->display()->all());
 
         // Move a child item...
-        Facades\Collection::make('pages')->title('Pages')->save();
-        Facades\Collection::make('articles')->title('Articles')->save();
         $nav = $this->buildNavWithPreferences([
             'top_level' => [
                 'content::collections::pages' => '@move',
@@ -528,8 +530,6 @@ class NavPreferencesTest extends TestCase
         ])->get('Content')->map->display()->all());
 
         // Remove a child item...
-        Facades\Collection::make('pages')->title('Pages')->save();
-        Facades\Collection::make('articles')->title('Articles')->save();
         $nav = $this->buildNavWithPreferences([
             'content' => [
                 'content::collections::pages' => '@remove',
@@ -749,9 +749,6 @@ class NavPreferencesTest extends TestCase
     {
         $this->markTestSkipped();
 
-        Facades\Collection::make('pages')->title('Pages')->save();
-        Facades\Collection::make('articles')->title('Articles')->save();
-
         $nav = $this->buildNavWithPreferences([
             'top_level' => [
                 'top_level::dashboard' => [
@@ -784,9 +781,6 @@ class NavPreferencesTest extends TestCase
     public function it_can_move_items_into_the_children_of_another_item()
     {
         $this->markTestSkipped();
-
-        Facades\Collection::make('pages')->title('Pages')->save();
-        Facades\Collection::make('articles')->title('Articles')->save();
 
         $nav = $this->buildNavWithPreferences([
             'top_level' => [
