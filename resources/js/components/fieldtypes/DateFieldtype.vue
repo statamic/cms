@@ -155,7 +155,7 @@ export default {
         },
 
         datePickerValue() {
-            return new Date(this.value.replace(' ', 'T'));
+            return this.value.replace(' ', 'T');
         },
 
         timeString() {
