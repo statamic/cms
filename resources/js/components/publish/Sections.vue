@@ -238,8 +238,8 @@ export default {
         wangjangleTabVisibility: _.debounce(function () {
             this.$nextTick(() => {
                 if (!this.$refs.tabs) return;
-                
-                let visibleTabs = 0
+
+                let visibleTabs = 0;
 
                 // Leave 40px for the dropdown list.
                 const maxWidth = this.$refs.publishSectionWrapper.offsetWidth - 40;
