@@ -705,7 +705,7 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_create_item_children_using_same_nav_item_setters()
+    public function it_can_create_child_items_using_array_setter_notation()
     {
         $children = $this->buildNavWithPreferences([
             'top_level' => [
@@ -721,8 +721,9 @@ class NavPreferencesTest extends TestCase
                             'action' => '@create',
                             'display' => 'Yaml',
                             'url' => 'https://yaml.org',
+                            'children' => ['One' => '/one'], // Children of children should get filtered out
                         ],
-                        'toml' => ['action' => '@create'], // This shouldn't be created without `display`
+                        'toml' => ['action' => '@create'], // Items without `display` config should get filtered out
                     ],
                 ],
             ],
@@ -734,21 +735,95 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('top_level::dashboard::json', $jsonItem->id());
         $this->assertEquals('Json', $jsonItem->display());
         $this->assertEquals('https://json.org', $jsonItem->url());
+        $this->assertNull($jsonItem->children());
 
         $yamlItem = $children->last();
         $this->assertEquals('top_level::dashboard::yaml', $yamlItem->id());
         $this->assertEquals('Yaml', $yamlItem->display());
         $this->assertEquals('https://yaml.org', $yamlItem->url());
+        $this->assertNull($yamlItem->children());
     }
 
     /** @test */
-    public function it_can_alias_an_item_into_the_children_of_another_item()
+    public function it_can_alias_items_into_the_children_of_another_item()
+    {
+        $this->markTestSkipped();
+
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'top_level::dashboard' => [
+                    'action' => '@modify',
+                    'children' => [
+                        'content::collections::pages' => '@alias',
+                        'content::collections' => [
+                            'action' => '@alias',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertCount(2, $children = $nav->get('Top Level')->keyBy->display()->get('Dashboard')->children());
+
+        $pagesItem = $children->first();
+        $this->assertEquals('content::collections::pages::clone', $pagesItem->id());
+        $this->assertEquals('Pages', $pagesItem->display());
+        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
+
+        $collectionsItem = $children->last();
+        $this->assertEquals('content::collections::clone', $collectionsItem->id());
+        $this->assertEquals('Collections', $collectionsItem->display());
+        $this->assertNull($collectionsItem->children());
+        $this->assertArrayHasKey('Collections', $nav->get('Content')->keyBy->display()->all());
+    }
+
+    /** @test */
+    public function it_can_move_items_into_the_children_of_another_item()
+    {
+        $this->markTestSkipped();
+
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'top_level::dashboard' => [
+                    'action' => '@modify',
+                    'children' => [
+                        'content::collections::pages' => '@move',
+                        'content::collections' => [
+                            'action' => '@move',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertCount(2, $children = $nav->get('Top Level')->keyBy->display()->get('Dashboard')->children());
+
+        $pagesItem = $children->first();
+        $this->assertEquals('content::collections::pages::clone', $pagesItem->id());
+        $this->assertEquals('Pages', $pagesItem->display());
+        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
+
+        $collectionsItem = $children->last();
+        $this->assertEquals('content::collections::clone', $collectionsItem->id());
+        $this->assertEquals('Collections', $collectionsItem->display());
+        $this->assertNull($collectionsItem->children());
+        $this->assertArrayHasKey('Collections', $nav->get('Content')->keyBy->display()->all());
+    }
+
+    /** @test */
+    public function it_can_remove_child_items()
     {
         $this->markTestSkipped();
     }
 
     /** @test */
-    public function it_can_move_an_item_into_the_children_of_another_item()
+    public function it_can_modify_existing_child_items()
     {
         $this->markTestSkipped();
     }
