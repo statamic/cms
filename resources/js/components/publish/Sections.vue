@@ -4,7 +4,7 @@
     <div>
 
         <!-- Tabs -->
-        <div v-if="showTabs" class="tabs-container flex items-center" :class="{ 'offset-for-sidebar': showSidebar }">
+        <div v-if="showTabs" class="tabs-container flex items-center" :class="{ 'offset-for-sidebar': shouldShowSidebar }">
             <div
                 class="publish-tabs tabs flex-shrink"
                 ref="tabs"
@@ -69,16 +69,16 @@
             </div>
 
             <!-- Sidebar(ish) -->
-            <div :class="{ 'publish-sidebar': showSidebar }">
+            <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                 <div class="publish-section">
-                    <div class="publish-section-actions" :class="{ 'as-sidebar': showSidebar }">
-                        <portal :to="actionsPortal" :disabled="showSidebar">
-                            <slot name="actions" :should-show-sidebar="showSidebar" />
+                    <div class="publish-section-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
+                        <portal :to="actionsPortal" :disabled="shouldShowSidebar">
+                            <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
                         </portal>
                     </div>
 
                     <publish-fields
-                        v-if="layoutReady && showSidebar && sidebarSection"
+                        v-if="layoutReady && shouldShowSidebar && sidebarSection"
                         :fields="sidebarSection.fields"
                         :read-only="readOnly"
                         :syncable="syncable"
@@ -123,7 +123,7 @@ export default {
             active: state.blueprint.sections[0].handle,
             visibleTabs: 0,
             layoutReady: false,
-            showSidebar: false,
+            shouldShowSidebar: false,
         }
     },
 
@@ -142,7 +142,7 @@ export default {
         },
 
         mainSections() {
-            if (this.layoutReady && ! this.showSidebar) return this.sections;
+            if (this.layoutReady && ! this.shouldShowSidebar) return this.sections;
 
             return this.sections.filter(section => section.handle !== 'sidebar');
         },
@@ -228,7 +228,7 @@ export default {
 
             // NOTE Using computed properties for these will cause a lot of unnecessary re-renders
             this.layoutReady = (width !== null);
-            this.showSidebar = (this.enableSidebar && width > 920);
+            this.shouldShowSidebar = (this.enableSidebar && width > 920);
 
             if (this.layoutReady) {
                 this.wangjangleTabVisibility();
