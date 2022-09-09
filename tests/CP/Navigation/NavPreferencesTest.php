@@ -881,6 +881,36 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
+    public function preferences_are_applied_after_addon_nav_extensions()
+    {
+        $preBuild = function () {
+            Facades\CP\Nav::extend(function ($nav) {
+                $nav->tools('SEO Pro')
+                    ->url('/cp/seo-pro')
+                    ->children([
+                        'Reports' => '/cp/seo-pro/reports',
+                        'Site Defaults' => '/cp/seo-pro/site-defaults',
+                        'Section Defaults' => '/cp/seo-pro/section-defaults',
+                    ]);
+            });
+        };
+
+        $nav = $this->buildNavWithPreferences([
+            'sections' => [
+                'top_level' => [
+                    'tools::seo_pro' => '@alias',
+                ],
+            ],
+        ], $preBuild);
+
+        // Assert addon successfully added nav item
+        $this->assertEquals(['Forms', 'Updates', 'Addons', 'Utilities', 'GraphQL', 'SEO Pro'], $nav->get('Tools')->map->display()->all());
+
+        // Assert preferences are applied after the fact, and can alias the addon's nav item
+        $this->assertEquals(['Dashboard', 'SEO Pro'], $nav->get('Top Level')->map->display()->all());
+    }
+
+    /** @test */
     public function it_can_handle_a_bunch_of_useless_config_without_erroring()
     {
         $this->markTestSkipped();
@@ -955,7 +985,7 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Fieldsets'], $nav->get('Fields')->map->display()->all());
     }
 
-    private function buildNavWithPreferences($preferences)
+    private function buildNavWithPreferences($preferences, $preBuild = null)
     {
         // Swap with fakes instead of using mocks,
         // because a mock can only set one set of expectations per test method...
@@ -963,6 +993,10 @@ class NavPreferencesTest extends TestCase
         Facades\CP\Nav::swap(new Nav);
 
         $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
+
+        if (is_callable($preBuild)) {
+            $preBuild();
+        }
 
         return Facades\CP\Nav::build();
     }
