@@ -730,7 +730,7 @@ class NavPreferencesTest extends TestCase
                 'tools::technologies::json' => '@alias',
             ],
             'tools' => [
-                'tools::technologies' => [
+                'techs' => [
                     'action' => '@create',
                     'display' => 'Technologies',
                     'children' => [
@@ -755,6 +755,29 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('tools::technologies::json::clone', $aliasedJsonItem->id());
         $this->assertEquals('Json', $aliasedJsonItem->display());
         $this->assertEquals('https://json.org', $aliasedJsonItem->url());
+    }
+
+    /** @test */
+    public function it_respects_order_that_items_are_aliased_and_created()
+    {
+        $items = $this->buildNavWithPreferences([
+            'top_level' => [
+                'fields::blueprints' => '@move',
+                'fields::fieldsets' => '@alias',
+                'tools::technologies' => [
+                    'action' => '@create',
+                    'display' => 'Technologies',
+                    'children' => [
+                        'Json' => 'https://json.org',
+                        'Yaml' => 'https://yaml.org',
+                    ],
+                ],
+            ],
+        ])->get('Top Level')->map->display()->all();
+
+        // Items are created first so that they can be aliased in earlier sections of the menu,
+        // So we want to assert that they still get built in the same order that they are defined...
+        $this->assertEquals(['Dashboard', 'Blueprints', 'Fieldsets', 'Technologies'], $items);
     }
 
     /** @test */
