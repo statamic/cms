@@ -68,7 +68,7 @@ export default {
         },
 
         downloadFile(response) {
-            const attachmentMatch = response.headers['content-disposition'].match(/^attachment.+filename="?([^"]+)"?/i) || [];
+            const attachmentMatch = response.headers['content-disposition'].match(/^attachment.+filename\*?=(?:UTF-8'')?"?([^"]+)"?/i) || [];
 
             if (! attachmentMatch.length) return;
 

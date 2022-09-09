@@ -86,13 +86,17 @@ class BrowserController extends CpController
         return (new FolderAssetsCollection($assets))->folder($folder);
     }
 
-    public function search(Request $request, $container)
+    public function search(Request $request, $container, $path = null)
     {
         $this->authorize('view', $container);
 
         $query = $container->hasSearchIndex()
             ? $container->searchIndex()->ensureExists()->search($request->search)
             : $container->queryAssets()->where('path', 'like', '%'.$request->search.'%');
+
+        if ($path) {
+            $query->where('folder', $path);
+        }
 
         $assets = $query->paginate(request('perPage'));
 

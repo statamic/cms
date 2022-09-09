@@ -5,11 +5,18 @@ namespace Statamic\Listeners;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Statamic\Assets\AssetReferenceUpdater;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetReferencesUpdated;
 use Statamic\Events\AssetSaved;
+use Statamic\Events\Subscriber;
 
-class UpdateAssetReferences implements ShouldQueue
+class UpdateAssetReferences extends Subscriber implements ShouldQueue
 {
     use Concerns\GetsItemsContainingData;
+
+    protected $listeners = [
+        AssetSaved::class => 'handleSaved',
+        AssetDeleted::class => 'handleDeleted',
+    ];
 
     /**
      * Register the listeners for the subscriber.
@@ -22,8 +29,7 @@ class UpdateAssetReferences implements ShouldQueue
             return;
         }
 
-        $events->listen(AssetSaved::class, self::class.'@handleSaved');
-        $events->listen(AssetDeleted::class, self::class.'@handleDeleted');
+        parent::subscribe($events);
     }
 
     /**
@@ -34,12 +40,10 @@ class UpdateAssetReferences implements ShouldQueue
     public function handleSaved(AssetSaved $event)
     {
         $asset = $event->asset;
-
-        $container = $asset->container()->handle();
         $originalPath = $asset->getOriginal('path');
         $newPath = $asset->path();
 
-        $this->replaceReferences($container, $originalPath, $newPath);
+        $this->replaceReferences($asset, $originalPath, $newPath);
     }
 
     /**
@@ -50,31 +54,38 @@ class UpdateAssetReferences implements ShouldQueue
     public function handleDeleted(AssetDeleted $event)
     {
         $asset = $event->asset;
-
-        $container = $asset->container()->handle();
         $originalPath = $asset->getOriginal('path');
         $newPath = null;
 
-        $this->replaceReferences($container, $originalPath, $newPath);
+        $this->replaceReferences($asset, $originalPath, $newPath);
     }
 
     /**
      * Replace asset references.
      *
-     * @param  string  $container
+     * @param  \Statamic\Assets\Asset  $asset
      * @param  string  $originalPath
      * @param  string  $newPath
      */
-    protected function replaceReferences($container, $originalPath, $newPath)
+    protected function replaceReferences($asset, $originalPath, $newPath)
     {
         if (! $originalPath || $originalPath === $newPath) {
             return;
         }
 
-        $this->getItemsContainingData()->each(function ($item) use ($container, $originalPath, $newPath) {
-            AssetReferenceUpdater::item($item)
-                ->filterByContainer($container)
-                ->updateReferences($originalPath, $newPath);
-        });
+        $container = $asset->container()->handle();
+
+        $updatedItems = $this
+            ->getItemsContainingData()
+            ->map(function ($item) use ($container, $originalPath, $newPath) {
+                return AssetReferenceUpdater::item($item)
+                    ->filterByContainer($container)
+                    ->updateReferences($originalPath, $newPath);
+            })
+            ->filter();
+
+        if ($updatedItems->isNotEmpty()) {
+            AssetReferencesUpdated::dispatch($asset);
+        }
     }
 }

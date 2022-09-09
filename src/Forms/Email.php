@@ -28,6 +28,7 @@ class Email extends Mailable
         $this->submission = $submission;
         $this->config = $config;
         $this->site = $site;
+        $this->locale($site->lang());
     }
 
     public function getSubmission()
@@ -49,7 +50,6 @@ class Email extends Mailable
     {
         $this->submissionData = $this->submission->toAugmentedArray();
         $this->config = $this->parseConfig($this->config);
-        $this->locale($this->site->lang());
 
         $this
             ->subject(isset($this->config['subject']) ? __($this->config['subject']) : __('Form Submission'))

@@ -352,20 +352,24 @@ class CollectionTest extends TestCase
 
         BlueprintRepository::shouldReceive('in')->with('collections/articles')->andReturn(collect());
         BlueprintRepository::shouldReceive('find')->with('default')->andReturn(
-            $blueprint = (new Blueprint)
+            $default = (new Blueprint)
+                ->setInitialPath('this/wont/change')
                 ->setHandle('thisll_change')
+                ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
 
+        $blueprint = $collection->entryBlueprint();
+        $this->assertNotEquals($default, $blueprint);
+
         $blueprints = $collection->entryBlueprints();
         $this->assertCount(1, $blueprints);
-        $this->assertEquals([$blueprint], $blueprints->all());
+        $this->assertEquals($blueprint, $blueprints->get(0)->setParent($collection));
 
-        tap($collection->entryBlueprint(), function ($default) use ($blueprint) {
-            $this->assertEquals($blueprint, $default);
-            $this->assertEquals('article', $default->handle());
-            $this->assertEquals('Article', $default->title());
-        });
+        $this->assertEquals('this/wont/change', $blueprint->initialPath());
+        $this->assertEquals('article', $blueprint->handle());
+        $this->assertEquals('collections.articles', $blueprint->namespace());
+        $this->assertEquals('Article', $blueprint->title());
 
         $this->assertEquals($blueprint, $collection->entryBlueprint('article'));
         $this->assertNull($collection->entryBlueprint('two'));

@@ -121,7 +121,7 @@ class AugmentedPageTest extends AugmentedTestCase
 
         $page = Mockery::mock(Page::class);
         $page->shouldReceive('id')->andReturn('page-id');
-        $page->shouldReceive('reference')->andReturnFalse();
+        $page->shouldReceive('reference')->andReturnNull();
         $page->shouldReceive('title')->andReturn('The Page Title');
         $page->shouldReceive('blueprint')->andReturn($blueprint);
         $page->shouldReceive('url')->andReturn('/the-url');
