@@ -122,7 +122,7 @@ class ProviderTest extends TestCase
     /** @test */
     public function it_gets_the_user_by_id_after_merging_data()
     {
-        $provider = $this->provider() ;
+        $provider = $this->provider();
 
         $user = UserFacade::make()->id('foo')->email('foo@bar.com')->data(['name' => 'foo', 'extra' => 'bar'])->save();
 
