@@ -1,32 +1,46 @@
 import Vue from 'vue'
+import uniqid from 'uniqid'
 
 class ModalBus {
     constructor(instance) {
         this.instance = instance;
-        this.modals = instance.$root.modals;
+        this.portals = instance.$root.portals;
     }
 
     count() {
-        return this.modals.length;
+        return this.modals().length;
     }
 
     add(name) {
-        this.modals.push(name);
+        const portal = {
+            type: 'modal',
+            key: uniqid(),
+            name
+        };
+
+        this.portals.push(portal);
+
+        return portal;
     }
 
     open(name) {
-        this.add(name);
+        const portal = this.add(name);
         this.instance.$nextTick(() => this.instance.$modal.show(name));
+        return portal;
     }
 
     remove(name) {
-        const i = this.modals.indexOf(name);
-        this.modals.splice(i, 1);
+        const i = _.findIndex(this.portals, (modal) => modal.name === name);
+        this.portals.splice(i, 1);
     }
 
     close(name) {
         this.remove(name);
         this.instance.$modal.hide(name);
+    }
+
+    modals() {
+        return this.portals.filter(portal => portal.type === 'stack');
     }
 }
 

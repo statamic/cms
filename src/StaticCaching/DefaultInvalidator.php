@@ -5,6 +5,7 @@ namespace Statamic\StaticCaching;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
@@ -39,7 +40,16 @@ class DefaultInvalidator implements Invalidator
             $this->invalidateCollectionUrls($item);
         } elseif ($item instanceof Asset) {
             $this->invalidateAssetUrls($item);
+        } elseif ($item instanceof Form) {
+            $this->invalidateFormUrls($item);
         }
+    }
+
+    protected function invalidateFormUrls($form)
+    {
+        $this->cacher->invalidateUrls(
+            Arr::get($this->rules, "forms.{$form->handle()}.urls")
+        );
     }
 
     protected function invalidateAssetUrls($asset)
@@ -96,6 +106,10 @@ class DefaultInvalidator implements Invalidator
         if ($url = $collection->absoluteUrl()) {
             $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
         }
+
+        $this->cacher->invalidateUrls(
+            Arr::get($this->rules, "collections.{$collection->handle()}.urls")
+        );
     }
 
     private function splitUrlAndDomain(string $url)

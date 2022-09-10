@@ -45,7 +45,7 @@
                     @blur="blurred"
                     @previews-updated="updateSetPreviews(set._id, $event)"
                 >
-                    <template v-slot:picker v-if="index !== value.length-1 && canAddSet">
+                    <template v-slot:picker v-if="canAddSet">
                         <set-picker
                             class="replicator-set-picker-between"
                             :sets="setConfigs"

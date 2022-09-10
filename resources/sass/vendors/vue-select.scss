@@ -176,6 +176,8 @@
 .v-select:not(.vs--single) .vs__selected {
 	@include clickable;
 	@apply flex items-center text-sm rounded py-0 px-1 mr-1;
+
+    &.sortable-item { @apply cursor-grab; }
 }
 
 .vs__deselect {
