@@ -346,7 +346,7 @@ class LocalizedTerm implements
         $route = '/'.str_replace('_', '-', $this->taxonomyHandle()).'/{slug}';
 
         if ($this->collection()) {
-            $collectionUrl = $this->collection()->url() ?? $this->collection()->handle();
+            $collectionUrl = $this->collection()->uri($this->locale()) ?? $this->collection()->handle();
             $route = $collectionUrl.$route;
         }
 
