@@ -187,7 +187,7 @@ export default {
     },
 
     beforeUpdate() {
-        if (this.active === 'sidebar') {
+        if (this.shouldShowSidebar && this.active === 'sidebar') {
             this.active = this.state.blueprint.sections[0].handle
         }
     },
