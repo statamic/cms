@@ -153,9 +153,10 @@ class NavItem
      * Get or set child nav items.
      *
      * @param  array|null  $items
+     * @param  bool  $generateNewIds
      * @return mixed
      */
-    public function children($items = null)
+    public function children($items = null, $generateNewIds = true)
     {
         if (is_null($items)) {
             return $this->children;
@@ -173,9 +174,9 @@ class NavItem
                     ? $value
                     : Nav::item($key)->url($value);
             })
-            ->map(function ($navItem) {
+            ->map(function ($navItem) use ($generateNewIds) {
                 return $navItem
-                    ->id($this->id().'::')
+                    ->id($generateNewIds ? $this->id().'::' : $navItem->id())
                     ->icon($this->icon());
             })
             ->values();

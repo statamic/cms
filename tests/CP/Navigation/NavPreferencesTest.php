@@ -747,15 +747,13 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_alias_items_into_the_children_of_another_item()
     {
-        $this->markTestSkipped();
-
         $nav = $this->buildNavWithPreferences([
             'top_level' => [
                 'top_level::dashboard' => [
                     'action' => '@modify',
                     'children' => [
                         'content::collections::pages' => '@alias',
-                        'content::collections' => [
+                        'tools::utilities::cache' => [
                             'action' => '@alias',
                         ],
                     ],
@@ -770,25 +768,22 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('Pages', $pagesItem->display());
         $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
 
-        $collectionsItem = $children->last();
-        $this->assertEquals('content::collections::clone', $collectionsItem->id());
-        $this->assertEquals('Collections', $collectionsItem->display());
-        $this->assertNull($collectionsItem->children());
-        $this->assertArrayHasKey('Collections', $nav->get('Content')->keyBy->display()->all());
+        $cacheItem = $children->last();
+        $this->assertEquals('tools::utilities::cache::clone', $cacheItem->id());
+        $this->assertEquals('Cache', $cacheItem->display());
+        $this->assertArrayHasKey('Cache', $nav->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->keyBy->display()->all());
     }
 
     /** @test */
     public function it_can_move_items_into_the_children_of_another_item()
     {
-        $this->markTestSkipped();
-
         $nav = $this->buildNavWithPreferences([
             'top_level' => [
                 'top_level::dashboard' => [
                     'action' => '@modify',
                     'children' => [
                         'content::collections::pages' => '@move',
-                        'content::collections' => [
+                        'tools::utilities::cache' => [
                             'action' => '@move',
                         ],
                     ],
@@ -801,13 +796,12 @@ class NavPreferencesTest extends TestCase
         $pagesItem = $children->first();
         $this->assertEquals('content::collections::pages::clone', $pagesItem->id());
         $this->assertEquals('Pages', $pagesItem->display());
-        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
+        $this->assertArrayNotHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
 
-        $collectionsItem = $children->last();
-        $this->assertEquals('content::collections::clone', $collectionsItem->id());
-        $this->assertEquals('Collections', $collectionsItem->display());
-        $this->assertNull($collectionsItem->children());
-        $this->assertArrayHasKey('Collections', $nav->get('Content')->keyBy->display()->all());
+        $cacheItem = $children->last();
+        $this->assertEquals('tools::utilities::cache::clone', $cacheItem->id());
+        $this->assertEquals('Cache', $cacheItem->display());
+        $this->assertArrayNotHasKey('Cache', $nav->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->keyBy->display()->all());
     }
 
     /** @test */
@@ -825,6 +819,8 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_alias_a_newly_created_item_to_an_earlier_section()
     {
+        $this->markTestSkipped();
+
         $nav = $this->buildNavWithPreferences([
             'top_level' => [
                 'tools::technologies::json' => '@alias',

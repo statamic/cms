@@ -339,23 +339,36 @@ class Nav
                     'config' => $config,
                 ];
             })
-            ->each(function ($override) use ($section) {
-                switch ($override['config']['action']) {
-                    case '@create':
-                        return $this->userCreateFromPendingItem($override['config'], $section);
-                    case '@remove':
-                        return $this->userRemoveItem($override['item']);
-                    case '@modify':
-                        return $this->userModifyItem($override['item'], $override['config'], $section);
-                    case '@alias':
-                        return $this->userAliasItem($override['item'], $override['config'], $section);
-                    case '@move':
-                        return $this->userMoveItem($override['item'], $override['config'], $section);
-                }
-            });
+            ->map(fn ($override) => $this->applyPreferenceOverrideForItem($override, $section))
+            ->filter()
+            ->each(fn ($item) => $this->items[] = $item);
 
         if ($sectionNav['reorder']) {
             $this->setSectionItemOrder($section, $sectionNav['items']);
+        }
+    }
+
+    /**
+     * Apply preference overide for specific item.
+     *
+     * @param  mixed  $override
+     * @param  mixed  $section
+     * @param  string|null  $id
+     * @return NavItem|null
+     */
+    protected function applyPreferenceOverrideForItem($override, $section, $id = null)
+    {
+        switch ($override['config']['action']) {
+            case '@create':
+                return $this->userCreateFromPendingItem($override['config'], $section, $id);
+            case '@remove':
+                return $this->userRemoveItem($override['item']);
+            case '@modify':
+                return $this->userModifyItem($override['item'], $override['config'], $section);
+            case '@alias':
+                return $this->userAliasItem($override['item'], $override['config'], $section);
+            case '@move':
+                return $this->userMoveItem($override['item'], $override['config'], $section);
         }
     }
 
@@ -496,8 +509,10 @@ class Nav
      *
      * @param  array  $config
      * @param  string  $section
+     * @param  string  $section
+     * @return NavItem
      */
-    protected function userCreatePendingItem($config, $section)
+    protected function userCreatePendingItem($config, $section, $id = null)
     {
         $config = collect($config);
 
@@ -507,9 +522,15 @@ class Nav
 
         $item = (new NavItem)->display($display)->section($section);
 
-        $this->userModifyItem($item, $config);
+        if ($id) {
+            $item->id($id);
+        }
+
+        $this->userModifyItem($item, $config, $section);
 
         $this->pendingItems[$item->id()] = $item;
+
+        return $item;
     }
 
     /**
@@ -517,8 +538,9 @@ class Nav
      *
      * @param  array  $config
      * @param  string  $section
+     * @param  string  $id
      */
-    protected function userCreateFromPendingItem($config, $section)
+    protected function userCreateFromPendingItem($config, $section, $id = null)
     {
         $config = collect($config);
 
@@ -526,13 +548,13 @@ class Nav
             return;
         }
 
-        $id = $this->generateNewItemId($section, $display);
+        $id = $id ?? $this->generateNewItemId($section, $display);
 
         if (! $pendingItem = collect($this->pendingItems)->get($id)) {
             return;
         }
 
-        $this->items[] = $pendingItem;
+        return $pendingItem;
     }
 
     /**
@@ -556,8 +578,9 @@ class Nav
      *
      * @param  NavItem  $item
      * @param  array  $config
+     * @param  string  $section
      */
-    protected function userModifyItem($item, $config)
+    protected function userModifyItem($item, $config, $section)
     {
         if (is_null($item)) {
             return;
@@ -565,63 +588,66 @@ class Nav
 
         $config = collect($config);
 
+        $item->id($item->id()); // Preserve the item's original ID before modifying
+
         collect(UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)
             ->filter(fn ($setter) => $config->has($setter))
             ->mapWithKeys(fn ($setter) => [$setter => $config->get($setter)])
-            ->map(fn ($value, $setter) => $this->prepareUserItemValue($setter, $value))
+            ->reject(fn ($value, $setter) => $setter === 'children')
             ->each(function ($value, $setter) use ($item) {
-                $item
-                    ->id($item->id()) // Preserve the item's original ID before modifying
-                    ->{$setter}($value);
+                $item->{$setter}($value);
             });
-    }
 
-    /**
-     * Prepare user item value.
-     *
-     * @param  string  $setter
-     * @param  string  $value
-     * @return mixed
-     */
-    protected function prepareUserItemValue($setter, $value)
-    {
-        if ($setter === 'children') {
-            return collect($value)
-                ->map(fn ($config) => $this->prepareUserChildItem($config))
+        if ($children = $config->get('children')) {
+            $children = collect($children)
+                ->map(fn ($childConfig, $key) => $this->prepareUserChildItem($childConfig, $section, $key, $item))
                 ->filter();
-        }
 
-        return $value;
+            $item->children($children, false);
+        }
     }
 
     /**
      * Prepare user child item.
      *
      * @param  array  $config
+     * @param  string  $section
+     * @param  string  $key
+     * @param  NavItem  $parentItem
      * @return mixed
      */
-    protected function prepareUserChildItem($config)
+    protected function prepareUserChildItem($config, $section, $key, $parentItem)
     {
-        if (is_string($config)) {
-            return $config;
+        // TODO: normalize all this better in UserNavConfig
+        if (is_string($config) && ! Str::startsWith($config, '@')) {
+            $config = [
+                'action' => '@create',
+                'display' => $key,
+                'url' => $config,
+            ];
+        } elseif (is_string($config)) {
+            $config = [
+                'action' => $config,
+            ];
         }
 
-        $config = collect($config);
+        // TODO: refactor to separate params
+        $override = [
+            'item' => $this->findItem($key),
+            'config' => collect($config),
+        ];
 
-        if (! $display = $config->get('display')) {
-            return;
+        // TODO: create pending items earlier, like we do with parent pending items
+        if ($config['action'] === '@create' && isset($config['display'])) {
+            $id = $this->generateNewItemId($parentItem->id(), $config['display']);
+            $this->userCreatePendingItem($override['config'], $section, $id);
         }
 
-        $config = $config
-            ->filter(fn ($value, $setter) => in_array($setter, UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS))
-            ->reject(fn ($value, $setter) => in_array($setter, ['children']))
-            ->all();
+        if ($childItem = $this->applyPreferenceOverrideForItem($override, $section, $id ?? null)) {
+            $childItem->children([]);
+        }
 
-        $item = (new NavItem)->display($display);
-
-        $this->userModifyItem($item, $config);
-
-        return $item;
+        return $childItem;
     }
 
     /**
@@ -643,9 +669,9 @@ class Nav
 
         $clone->section($section);
 
-        $this->userModifyItem($clone, $config);
+        $this->userModifyItem($clone, $config, $section);
 
-        $this->items[] = $clone;
+        return $clone;
     }
 
     /**
@@ -661,11 +687,13 @@ class Nav
             return;
         }
 
-        $this->userAliasItem($item, $config, $section);
+        $clone = $this->userAliasItem($item, $config, $section);
 
         $item->hidden(true);
 
         $this->userRemoveItemFromChildren($item);
+
+        return $clone;
     }
 
     /**
