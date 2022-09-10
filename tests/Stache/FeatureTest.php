@@ -209,6 +209,8 @@ class FeatureTest extends TestCase
     /** @test */
     public function it_saves_structures()
     {
+        $this->expectNotToPerformAssertions();
+
         $structure = Structure::find('footer');
 
         $repo = Mockery::mock(StructureRepository::class);
