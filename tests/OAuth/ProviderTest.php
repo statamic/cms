@@ -64,9 +64,9 @@ class ProviderTest extends TestCase
     public function it_makes_a_user()
     {
         $this->assertCount(0, UserFacade::all());
-        
+
         $user = $this->provider()->makeUser($this->socialite());
-        
+
         $this->assertNotNull($user);
         $this->assertEquals('foo@bar.com', $user->email());
         $this->assertEquals('Foo Bar', $user->name());
@@ -78,11 +78,9 @@ class ProviderTest extends TestCase
         $this->assertCount(0, UserFacade::all());
 
         $provider = $this->provider();
-        $provider->withUser(fn ($socialite) =>
-            UserFacade::make()->email($socialite->getEmail())->data(['very' => 'custom'])
-        );
+        $provider->withUser(fn ($socialite) => UserFacade::make()->email($socialite->getEmail())->data(['very' => 'custom']));
         $user = $provider->makeUser($this->socialite());
-        
+
         $this->assertNotNull($user);
         $this->assertEquals('foo@bar.com', $user->email());
         $this->assertEquals(['very' => 'custom'], $user->data()->all());
@@ -92,10 +90,10 @@ class ProviderTest extends TestCase
     public function it_creates_a_user()
     {
         $this->assertCount(0, UserFacade::all());
-        
+
         $provider = $this->provider();
         $provider->createUser($this->socialite());
-        
+
         $this->assertCount(1, UserFacade::all());
         $user = UserFacade::all()->get(0);
         $this->assertNotNull($user);
@@ -124,7 +122,7 @@ class ProviderTest extends TestCase
     /** @test */
     public function it_gets_the_user_by_id_after_merging_data()
     {
-        $provider = $this->provider();
+        $provider = $this->provider() ;
 
         $user = UserFacade::make()->id('foo')->email('foo@bar.com')->data(['name' => 'foo', 'extra' => 'bar'])->save();
 
