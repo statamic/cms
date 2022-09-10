@@ -144,11 +144,9 @@ class AddonTest extends TestCase
     /** @test */
     public function it_writes_file_contents()
     {
-        $this->expectNotToPerformAssertions();
-
         $addon = $this->makeFromPackage();
 
-        File::shouldReceive('put')->with($this->addonFixtureDir.'test.txt', 'the file contents');
+        File::shouldReceive('put')->with($this->addonFixtureDir.'test.txt', 'the file contents')->once();
 
         $addon->putFile('test.txt', 'the file contents');
     }
