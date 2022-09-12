@@ -17,6 +17,32 @@ class AssetFolderPolicy
         return $assetContainer->createFolders();
     }
 
+    public function move($user, $assetFolder)
+    {
+        $user = User::fromUser($user);
+
+        if (! $user->hasPermission("move {$assetFolder->container()->handle()} assets")) {
+            return false;
+        }
+
+        return $assetFolder->assets()->reject(function ($asset) use ($user) {
+            return $user->can('move', $asset);
+        })->isEmpty();
+    }
+
+    public function rename($user, $assetFolder)
+    {
+        $user = User::fromUser($user);
+
+        if (! $user->hasPermission("rename {$assetFolder->container()->handle()} assets")) {
+            return false;
+        }
+
+        return $assetFolder->assets()->reject(function ($asset) use ($user) {
+            return $user->can('rename', $asset);
+        })->isEmpty();
+    }
+
     public function delete($user, $assetFolder)
     {
         $user = User::fromUser($user);
