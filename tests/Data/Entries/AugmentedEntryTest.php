@@ -66,6 +66,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             ->data([
                 'one' => 'the "one" value on the entry',
                 'two' => 'the "two" value on the entry and in the blueprint',
+                'eight' => 'should be immediately overridden by the supplement',
                 'updated_by' => 'test-user',
                 'updated_at' => '1486131000',
             ])
@@ -76,7 +77,8 @@ class AugmentedEntryTest extends AugmentedTestCase
             ->date('2018-01-03-1705')
             ->blueprint('test')
             ->setSupplement('three', 'the "three" value supplemented on the entry')
-            ->setSupplement('four', 'the "four" value supplemented on the entry and in the blueprint');
+            ->setSupplement('four', 'the "four" value supplemented on the entry and in the blueprint')
+            ->setSupplement('eight', null);
 
         $mount = tap(Collection::make('mountable')->mount($entry->id()))->save();
 
@@ -112,6 +114,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             'five'          => ['type' => 'string', 'value' => 'the "five" value from the origin'],
             'six'           => ['type' => 'string', 'value' => 'the "six" value from the origin and in the blueprint'],
             'seven'         => ['type' => 'string', 'value' => 'the "seven" value from the collection'],
+            'eight'         => ['type' => 'null', 'value' => null], // explicitly supplemented null
             'title'         => ['type' => 'string', 'value' => null],
             'unused_in_bp'  => ['type' => 'string', 'value' => null],
         ];

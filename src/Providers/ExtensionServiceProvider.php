@@ -29,6 +29,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\Delete::class,
         Actions\DeleteMultisiteEntry::class,
         Actions\DownloadAsset::class,
+        Actions\DownloadAssetFolder::class,
         Actions\Publish::class,
         Actions\Unpublish::class,
         Actions\SendPasswordReset::class,
