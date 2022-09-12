@@ -19,7 +19,7 @@ class FormExportController extends CpController
             throw new FatalException("Exporter of type [$type] does not exist.");
         }
 
-        $exporter = new $exporter;
+        $exporter = app($exporter);
         $exporter->form($form);
 
         $content = $exporter->export();
