@@ -10,19 +10,26 @@
                 ref="tabs"
                 role="tablist"
                 :aria-label="__('Edit Content')"
+                @keydown.arrow-left="activatePreviousTab"
+                @keydown.arrow-right="activateNextTab"
+                @keydown.arrow-up="activatePreviousTab"
+                @keydown.arrow-down="activateNextTab"
+                @keydown.home="activateFirstTab"
+                @keydown.end="activateLastTab"       
             >
                 <button v-for="(section, index) in mainSections"
                     class="tab-button"
-                    :ref="section.handle + '-tab'"
                     :key="section.handle"
                     :class="{
-                        'active': section.handle == active,
+                        'active': isActive(section.handle),
                         'has-error': sectionHasError(section.handle),
                         'invisible': isTabHidden(index)
                     }"
-                    :aria-controls="section.handle + '-tab'"
-                    :aria-selected="section.handle == active ? true : false"
-                    :id="section.handle + '-tab-control'"
+                    role="tab"
+                    :id="tabId(section.handle)"
+                    :aria-controls="tabPanelId(section.handle)"
+                    :aria-selected="isActive(section.handle)"
+                    :tabindex="isActive(section.handle) ? 0 : -1"
                     @click="setActive(section.handle)"
                     v-text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
                 ></button>
@@ -44,14 +51,15 @@
             <!-- Main -->
             <div ref="publishSectionWrapper" class="publish-section-wrapper w-full min-w-0">
                 <div
-                    role="tabpanel"
                     class="publish-section w-full"
-                    :aria-labeledby="section.display"
-                    :id="section.handle + '-tab'"
-                    :class="{ 'rounded-tl-none' : mainSections.length > 1 }"
+                    :class="showTabs && 'rounded-tl-none'"
+                    :role="showTabs && 'tabpanel'"
+                    :id="showTabs && tabPanelId(section.handle)"
+                    :aria-labelledby="showTabs && tabId(section.handle)"
+                    tabindex="0"
                     :key="section.handle"
                     v-for="section in mainSections"
-                    v-show="section.handle === active"
+                    v-show="isActive(section.handle)"
                 >
                     <publish-fields
                         :fields="section.fields"
@@ -151,12 +159,16 @@ export default {
             return this.sections.find(section => section.handle === 'sidebar');
         },
 
+        numberOfTabs() {
+            return this.mainSections.length;
+        },
+
         showTabs() {
-            return this.layoutReady && this.mainSections.length > 1
+            return this.layoutReady && this.numberOfTabs > 1
         },
 
         showHiddenTabsDropdown() {
-            return this.mainSections.length > this.visibleTabs;
+            return this.numberOfTabs > this.visibleTabs;
         },
 
         errors() {
@@ -187,7 +199,7 @@ export default {
     },
 
     beforeUpdate() {
-        if (this.active === 'sidebar') {
+        if (this.shouldShowSidebar && this.active === 'sidebar') {
             this.active = this.state.blueprint.sections[0].handle
         }
     },
@@ -205,6 +217,22 @@ export default {
             if (! this.inStack) {
                 window.location.hash = tab;
             }
+
+            this.$refs.tabs.childNodes[this.tabIndex(tab)].focus();
+        },
+
+        isActive(tab) {
+            return tab === this.active;
+        },
+
+        tabIndex(tab) {
+            return this.mainSections.findIndex(section => section.handle === (tab || this.active));
+        },
+
+        tabAt(index) {
+            const section = this.mainSections[index];
+
+            return section ? section.handle : undefined;
         },
 
         setActiveTabFromHash() {
@@ -214,13 +242,48 @@ export default {
 
             const handle = window.location.hash.substr(1);
 
-            const index = this.mainSections.findIndex(section => section.handle === handle);
+            const index = this.tabIndex(handle);
 
-            if (index >= 0 && index < visibleTabs) {
+            if (index >= 0 && index < this.visibleTabs) {
                 this.setActive(handle);
             } else {
                 window.location.hash = '';
             }
+        },
+
+        activateNextTab() {
+            this.activateTabAt((this.tabIndex() + 1) % this.visibleTabs);
+        },
+
+        activatePreviousTab() {
+            this.activateTabAt((this.tabIndex() - 1 + this.visibleTabs) % this.visibleTabs);
+        },
+
+        activateFirstTab() {
+            this.activateTabAt(0);
+        },
+
+        activateLastTab() {
+            this.activateTabAt(this.visibleTabs - 1);
+        },
+
+        activateTabAt(index) {
+            this.setActive(this.tabAt(index));
+        },
+
+        tabId(handle) {
+            return `${this.camelCase(handle)}Tab`;
+        },
+
+        tabPanelId(handle) {
+            return `${this.camelCase(handle)}TabPanel`;
+        },
+
+        camelCase(handle) {
+            return handle
+                .split('_')
+                .map(word => word.slice(0, 1).toUpperCase() + word.slice(1))
+                .join('');
         },
 
         containerWasResized($event) {
