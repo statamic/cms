@@ -113,9 +113,7 @@ class UserNavConfig implements ArrayAccess
         ]));
 
         $items = $items
-            ->map(function ($config, $itemId) use ($sectionKey) {
-                return $this->normalizeItemConfig($itemId, $config, $sectionKey);
-            })
+            ->map(fn ($config, $itemId) => $this->normalizeItemConfig($itemId, $config, $sectionKey))
             ->filter()
             ->reject(fn ($config) => $config['action'] === '@inherit' && ! $reorder)
             ->all();
@@ -133,9 +131,10 @@ class UserNavConfig implements ArrayAccess
      * @param  string  $itemId
      * @param  mixed  $itemConfig
      * @param  string  $sectionKey
+     * @param  bool  $removeBadActions
      * @return array
      */
-    protected function normalizeItemConfig($itemId, $itemConfig, $sectionKey)
+    protected function normalizeItemConfig($itemId, $itemConfig, $sectionKey, $removeBadActions = true)
     {
         $normalized = is_string($itemConfig)
             ? collect(['action' => Str::ensureLeft($itemConfig, '@')])
@@ -146,10 +145,12 @@ class UserNavConfig implements ArrayAccess
 
         // Remove item when not properly using section-specific actions, to ensure the JS nav builder doesn't
         // do unexpected things. See comments on `ALLOWED_NAV_ITEM_ACTIONS` constant at top for details.
-        if ($isInOriginalSection && in_array($normalized->get('action'), ['@move'])) {
-            return null;
-        } elseif (! $isInOriginalSection && in_array($normalized->get('action'), ['@remove', '@modify', '@inherit'])) {
-            return null;
+        if ($removeBadActions) {
+            if ($isInOriginalSection && in_array($normalized->get('action'), ['@move'])) {
+                return null;
+            } elseif (! $isInOriginalSection && in_array($normalized->get('action'), ['@remove', '@modify', '@inherit'])) {
+                return null;
+            }
         }
 
         // If action is not set, determine the best default action.
@@ -176,7 +177,7 @@ class UserNavConfig implements ArrayAccess
     }
 
     /**
-     * Normalize item config.
+     * Normalize child item config.
      *
      * @param  string  $itemId
      * @param  mixed  $itemConfig
@@ -197,7 +198,7 @@ class UserNavConfig implements ArrayAccess
             Arr::forget($itemConfig, 'children');
         }
 
-        return $this->normalizeItemConfig($itemId, $itemConfig, $sectionKey);
+        return $this->normalizeItemConfig($itemId, $itemConfig, $sectionKey, false);
     }
 
     /**

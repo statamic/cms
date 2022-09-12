@@ -167,12 +167,8 @@ class Nav
     public function buildChildren()
     {
         collect($this->items)
-            ->filter(function ($item) {
-                return $item->isActive();
-            })
-            ->each(function ($item) {
-                $item->resolveChildren();
-            });
+            ->filter(fn ($item) => $item->isActive())
+            ->each(fn ($item) => $item->resolveChildren());
 
         return $this;
     }
@@ -187,15 +183,9 @@ class Nav
     protected function validateNesting()
     {
         collect($this->items)
-            ->flatMap(function ($item) {
-                return $item->children();
-            })
-            ->reject(function ($item) {
-                return empty($item->children());
-            })
-            ->each(function ($item) {
-                throw new Exception('Nav children have exceeded their nesting limit.');
-            });
+            ->flatMap(fn ($item) => $item->children())
+            ->filter(fn ($item) => $item->children())
+            ->each(fn ($item) => throw new Exception('Nav children have exceeded their nesting limit.'));
 
         return $this;
     }
@@ -210,15 +200,9 @@ class Nav
     protected function validateViews()
     {
         collect($this->items)
-            ->flatMap(function ($item) {
-                return $item->children();
-            })
-            ->reject(function ($item) {
-                return is_null($item->view());
-            })
-            ->each(function ($item) {
-                throw new Exception('Nav children cannot specify views.');
-            });
+            ->flatMap(fn ($item) => $item->children())
+            ->reject(fn ($item) => is_null($item->view()))
+            ->each(fn ($item) => throw new Exception('Nav children cannot specify views.'));
 
         return $this;
     }
@@ -243,12 +227,8 @@ class Nav
     protected function authorizeChildren()
     {
         collect($this->items)
-            ->reject(function ($item) {
-                return is_callable($item->children());
-            })
-            ->each(function ($item) {
-                $item->children($this->filterAuthorizedNavItems($item->children()));
-            });
+            ->reject(fn ($item) => is_callable($item->children()))
+            ->each(fn ($item) => $item->children($this->filterAuthorizedNavItems($item->children())));
 
         return $this;
     }
@@ -284,23 +264,13 @@ class Nav
         $userNav = UserNavConfig::normalize($userNav);
 
         collect($userNav['sections'])
-            ->reject(function ($overrides, $section) {
-                return $section === NavItem::snakeCase($overrides['display']);
-            })
-            ->each(function ($overrides, $section) {
-                $this->renameSection($section, $overrides['display']);
-            });
+            ->reject(fn ($overrides, $section) => $section === NavItem::snakeCase($overrides['display']))
+            ->each(fn ($overrides, $section) => $this->renameSection($section, $overrides['display']));
 
         collect($userNav['sections'])
-            ->reject(function ($overrides) {
-                return $overrides === '@inherit';
-            })
-            ->each(function ($overrides) {
-                $this->createPendingItemsForSection($overrides);
-            })
-            ->each(function ($overrides) {
-                $this->applyPreferenceOverridesForSection($overrides);
-            });
+            ->reject(fn ($overrides) => $overrides === '@inherit')
+            ->each(fn ($overrides) => $this->createPendingItemsForSection($overrides))
+            ->each(fn ($overrides) => $this->applyPreferenceOverridesForSection($overrides));
 
         if ($userNav['reorder']) {
             $this->setSectionOrder($userNav['sections']);
@@ -321,6 +291,39 @@ class Nav
         collect($sectionNav['items'])
             ->filter(fn ($config) => $config['action'] === '@create')
             ->each(fn ($config) => $this->userCreatePendingItem($config, $section));
+
+        collect($sectionNav['items'])
+            ->keyBy(function ($config, $key) {
+                if ($config['action'] === '@create') {
+                    return $config['display'] ?? $key;
+                } elseif ($config['action'] === '@alias' || $config['action'] === '@move') {
+                    return $key.'::clone';
+                } else {
+                    return $key;
+                }
+            })
+            ->map(fn ($config) => $config['children'] ?? null)
+            ->filter()
+            ->each(fn ($children, $parentKey) => $this->createPendingItemsForChildren($children, $section, $parentKey));
+    }
+
+    /**
+     * Create pending items for an item's children ahead of time, so that they can be aliased, etc. from anywhere in nav.
+     *
+     * @param  array  $children
+     * @param  string  $section
+     * @param  string  $parentKey
+     */
+    protected function createPendingItemsForChildren($children, $section, $parentKey)
+    {
+        $parentKey = Str::contains($parentKey, '::')
+            ? $parentKey
+            : $section.'::'.$parentKey;
+
+        collect($children)
+            ->filter(fn ($config) => $config['action'] === '@create' && isset($config['display']))
+            ->keyBy(fn ($config) => $this->generateNewItemId($parentKey, $config['display']))
+            ->each(fn ($config, $id) => $this->userCreatePendingItem($config, $section, $id));
     }
 
     /**
@@ -341,6 +344,7 @@ class Nav
             })
             ->map(fn ($override) => $this->applyPreferenceOverrideForItem($override, $section))
             ->filter()
+            ->reject(fn ($item, $id) => $item->id() === $id)
             ->each(fn ($item) => $this->items[] = $item);
 
         if ($sectionNav['reorder']) {
@@ -382,11 +386,7 @@ class Nav
     {
         collect($this->items)
             ->filter(fn ($item) => NavItem::snakeCase($item->section()) === $sectionKey)
-            ->each(function ($item) use ($displayNew) {
-                $item
-                    ->id($item->id()) // Preserve the item's original ID before setting the section.
-                    ->section($displayNew);
-            });
+            ->each(fn ($item) => $item->preserveCurrentId()->section($displayNew));
     }
 
     /**
@@ -467,6 +467,12 @@ class Nav
      */
     protected function findItem($id)
     {
+        $pendingItems = collect($this->pendingItems);
+
+        if ($item = $pendingItems->get($id)) {
+            return $item;
+        }
+
         $items = collect($this->items)->keyBy->id();
 
         if ($item = $items->get($id)) {
@@ -474,10 +480,9 @@ class Nav
         }
 
         if ($parent = $this->findParentItem($id)) {
-            $parent->resolveChildren();
-            $parent->children()->each(function ($item) use ($items) {
-                $items->put($item->id(), $item);
-            });
+            if ($children = $parent->resolveChildren()->children()) {
+                $children->each(fn ($item) => $items->put($item->id(), $item));
+            }
         }
 
         return $items->get($id);
@@ -524,6 +529,10 @@ class Nav
 
         if ($id) {
             $item->id($id);
+        }
+
+        if ($children = $config->get('children')) {
+            $this->createPendingItemsForChildren($children, $section, $item->id());
         }
 
         $this->userModifyItem($item, $config, $section);
@@ -586,29 +595,48 @@ class Nav
             return;
         }
 
-        $config = collect($config);
+        $item->preserveCurrentId();
 
-        $item->id($item->id()); // Preserve the item's original ID before modifying
+        $config = collect($config);
 
         collect(UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)
             ->filter(fn ($setter) => $config->has($setter))
             ->mapWithKeys(fn ($setter) => [$setter => $config->get($setter)])
             ->reject(fn ($value, $setter) => $setter === 'children')
-            ->each(function ($value, $setter) use ($item) {
-                $item->{$setter}($value);
-            });
+            ->each(fn ($value, $setter) => $item->{$setter}($value));
 
         if ($children = $config->get('children')) {
-            $children = collect($children)
-                ->map(fn ($childConfig, $key) => $this->prepareUserChildItem($childConfig, $section, $key, $item))
-                ->filter();
-
-            $item->children($children, false);
+            $this->userModifyItemChildren($item, $children, $section);
         }
+
+        return $item;
     }
 
     /**
-     * Prepare user child item.
+     * Modify NavItem children.
+     *
+     * @param  NavItem  $item
+     * @param  array  $childrenOverrides
+     * @param  string  $section
+     */
+    protected function userModifyItemChildren($item, $childrenOverrides, $section)
+    {
+        $itemChildren = collect($item->resolveChildren()->children())->keyBy->id();
+
+        $newChildren = collect($childrenOverrides)
+            ->keyBy(fn ($config, $key) => $this->normalizeChildId($item, $key))
+            ->map(fn ($config, $key) => $this->userModifyChild($config, $section, $key, $item))
+            ->each(function ($item, $key) use (&$itemChildren) {
+                $item
+                    ? $itemChildren->put($key, $item)
+                    : $itemChildren->forget($key);
+            });
+
+        $item->children($itemChildren->values(), false);
+    }
+
+    /**
+     * Modify child NavItem.
      *
      * @param  array  $config
      * @param  string  $section
@@ -616,7 +644,7 @@ class Nav
      * @param  NavItem  $parentItem
      * @return mixed
      */
-    protected function prepareUserChildItem($config, $section, $key, $parentItem)
+    protected function userModifyChild($config, $section, $key, $parentItem)
     {
         // TODO: refactor to separate params
         $override = [
@@ -624,10 +652,8 @@ class Nav
             'config' => collect($config),
         ];
 
-        // TODO: create pending items earlier, like we do with parent pending items
         if ($config['action'] === '@create' && isset($config['display'])) {
             $id = $this->generateNewItemId($parentItem->id(), $config['display']);
-            $this->userCreatePendingItem($override['config'], $section, $id);
         }
 
         if ($childItem = $this->applyPreferenceOverrideForItem($override, $section, $id ?? null)) {
@@ -691,10 +717,8 @@ class Nav
     protected function userRemoveItemFromChildren($item)
     {
         if ($parent = $this->findParentItem($item->id())) {
-            $parent->children(
-                $parent->children()->reject(function ($child) use ($item) {
-                    return $child->id() === $item->id();
-                })
+            $parent->resolveChildren()->children(
+                $parent->children()->reject(fn ($child) => $child->id() === $item->id())
             );
         }
     }
@@ -710,12 +734,8 @@ class Nav
 
         // Organize items by section...
         collect($this->items)
-            ->reject(function ($item) {
-                return $this->withHidden ? false : $item->isHidden();
-            })
-            ->filter(function ($item) {
-                return $item->section();
-            })
+            ->reject(fn ($item) => $this->withHidden ? false : $item->isHidden())
+            ->filter(fn ($item) => $item->section())
             ->each(function ($item) use (&$sections) {
                 $sections[$item->section()][] = $item;
             });
@@ -746,6 +766,24 @@ class Nav
     protected function generateNewItemId($section, $name)
     {
         return (new NavItem)->display($name)->section($section)->id();
+    }
+
+    /**
+     * Normalize child ID when parent has been cloned.
+     *
+     * @param  NavItem  $parentItem
+     * @param  string  $childKey
+     * @return string
+     */
+    protected function normalizeChildId($parentItem, $childKey)
+    {
+        if (Str::endsWith($parentItem->id(), '::clone')) {
+            $parts = collect(explode('::', $childKey));
+            $last = $parts->pop();
+            $childKey = $parts->push('clone')->push($last)->implode('::');
+        }
+
+        return $childKey;
     }
 
     /**

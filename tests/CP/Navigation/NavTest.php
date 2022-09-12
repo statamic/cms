@@ -494,6 +494,27 @@ class NavTest extends TestCase
     }
 
     /** @test */
+    public function it_can_preserve_current_id_to_prevent_dynamic_id_generation()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $item = Nav::droids('3PO');
+
+        $this->assertEquals('droids::3po', $item->id());
+
+        $item->section('Droids Preserved')->display('R2');
+
+        // We should see the ID generate dynamically off the section and display
+        $this->assertEquals('droids_preserved::r2', $item->id());
+
+        $final = $item->preserveCurrentId()->section('CHANGED')->display('CHANGED');
+
+        // We should not see the ID generate dynamically, due to the `preserveCurrentId()` call
+        $this->assertSame($final, $item);
+        $this->assertEquals('droids_preserved::r2', $item->id());
+    }
+
+    /** @test */
     public function it_can_call_name_alias_for_backwards_compatibility()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());

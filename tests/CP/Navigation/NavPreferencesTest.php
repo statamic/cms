@@ -550,7 +550,7 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_create_new_items_on_the_fly()
     {
-        // It can create item...
+        // It can create items and child items...
         $item = $this->buildNavWithPreferences([
             'top_level' => [
                 'favs' => [
@@ -560,7 +560,11 @@ class NavPreferencesTest extends TestCase
                     'icon' => '<svg>custom</svg>',
                     'children' => [
                         'One' => '/one',
-                        'Two' => '/two',
+                        'two' => [
+                            'action' => '@create',
+                            'display' => 'Two',
+                            'url' => '/two',
+                        ],
                     ],
                 ],
             ],
@@ -572,6 +576,39 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['top_level::favourites::one', 'top_level::favourites::two'], $item->children()->map->id()->all());
         $this->assertEquals(['One', 'Two'], $item->children()->map->display()->all());
         $this->assertEquals(['http://localhost/one', 'http://localhost/two'], $item->children()->map->url()->all());
+
+        // It can merged created children into existing children...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections' => [
+                    'action' => '@alias',
+                    'children' => [
+                        'Json' => 'https://json.org',
+                        'spaml' => [
+                            'action' => '@create',
+                            'display' => 'Yaml',
+                            'url' => 'https://yaml.org',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
+        $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->name()->all());
+        $this->assertEquals([
+            'content::collections::clone::articles',
+            'content::collections::clone::pages',
+            'content::collections::clone::json',
+            'content::collections::clone::yaml',
+        ], $aliasedItem->children()->map->id()->all());
+        $this->assertEquals(['Articles', 'Pages', 'Json', 'Yaml'], $aliasedItem->children()->map->display()->all());
+        $this->assertEquals([
+            'http://localhost/cp/collections/articles',
+            'http://localhost/cp/collections/pages',
+            'https://json.org',
+            'https://yaml.org',
+        ], $aliasedItem->children()->map->url()->all());
 
         // It can create using `route` setter...
         $this->assertEquals('http://localhost/cp/dashboard', $this->buildNavWithPreferences([
@@ -807,28 +844,195 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_remove_child_items()
     {
-        $this->markTestSkipped();
+        // When modifying parent...
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'content::collections' => [
+                    'action' => '@modify',
+                    'children' => [
+                        'content::collections::pages' => '@remove',
+                    ],
+                ],
+            ],
+        ]);
+        $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles'], $originalItem->resolveChildren()->children()->map->name()->all());
+        $this->assertEquals(['content::collections::articles'], $originalItem->children()->map->id()->all());
+        $this->assertEquals(['Articles'], $originalItem->children()->map->display()->all());
+        $this->assertEquals(['http://localhost/cp/collections/articles'], $originalItem->children()->map->url()->all());
+
+        // When aliasing parent...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections' => [
+                    'action' => '@alias',
+                    'children' => [
+                        'content::collections::pages' => '@remove',
+                    ],
+                ],
+            ],
+        ]);
+        $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->name()->all());
+        $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
+        $this->assertEquals(['content::collections::clone::articles'], $aliasedItem->children()->map->id()->all());
+        $this->assertEquals(['Articles'], $aliasedItem->children()->map->display()->all());
+        $this->assertEquals(['http://localhost/cp/collections/articles'], $aliasedItem->children()->map->url()->all());
+
+        // When moving parent...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections' => [
+                    'action' => '@move',
+                    'children' => [
+                        'content::collections::pages' => '@remove',
+                    ],
+                ],
+            ],
+        ]);
+        $this->assertNull($nav->get('Content')->keyBy->display()->get('Collections'));
+        $movedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
+        $this->assertEquals(['content::collections::clone::articles'], $movedItem->children()->map->id()->all());
+        $this->assertEquals(['Articles'], $movedItem->children()->map->display()->all());
+        $this->assertEquals(['http://localhost/cp/collections/articles'], $movedItem->children()->map->url()->all());
     }
 
     /** @test */
     public function it_can_modify_existing_child_items()
     {
-        $this->markTestSkipped();
+        // When modifying parent...
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'content::collections' => [
+                    'action' => '@modify',
+                    'children' => [
+                        'content::collections::pages' => [
+                            'action' => '@modify',
+                            'display' => 'Pagerinos',
+                        ],
+                        'Json' => 'https://json.org',
+                        'spaml' => [
+                            'action' => '@create',
+                            'display' => 'Yaml',
+                            'url' => 'https://yaml.org',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pagerinos', 'Json', 'Yaml'], $originalItem->children()->map->display()->all());
+        $this->assertEquals([
+            'content::collections::articles',
+            'content::collections::pages',
+            'content::collections::json',
+            'content::collections::yaml',
+        ], $originalItem->children()->map->id()->all());
+        $this->assertEquals([
+            'http://localhost/cp/collections/articles',
+            'http://localhost/cp/collections/pages',
+            'https://json.org',
+            'https://yaml.org',
+        ], $originalItem->children()->map->url()->all());
+
+        // When aliasing parent...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections' => [
+                    'action' => '@alias',
+                    'children' => [
+                        'content::collections::pages' => [
+                            'action' => '@modify',
+                            'display' => 'Pagerinos',
+                        ],
+                        'Json' => 'https://json.org',
+                        'spaml' => [
+                            'action' => '@create',
+                            'display' => 'Yaml',
+                            'url' => 'https://yaml.org',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->display()->all());
+        $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pagerinos', 'Json', 'Yaml'], $aliasedItem->children()->map->display()->all());
+        $this->assertEquals([
+            'content::collections::clone::articles',
+            'content::collections::clone::pages',
+            'content::collections::clone::json',
+            'content::collections::clone::yaml',
+        ], $aliasedItem->children()->map->id()->all());
+        $this->assertEquals([
+            'http://localhost/cp/collections/articles',
+            'http://localhost/cp/collections/pages',
+            'https://json.org',
+            'https://yaml.org',
+        ], $aliasedItem->children()->map->url()->all());
+
+        // When moving parent...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections' => [
+                    'action' => '@alias',
+                    'children' => [
+                        'content::collections::pages' => [
+                            'action' => '@modify',
+                            'display' => 'Pagerinos',
+                        ],
+                        'Json' => 'https://json.org',
+                        'spaml' => [
+                            'action' => '@create',
+                            'display' => 'Yaml',
+                            'url' => 'https://yaml.org',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->display()->all());
+        $movedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pagerinos', 'Json', 'Yaml'], $movedItem->children()->map->display()->all());
+        $this->assertEquals([
+            'content::collections::clone::articles',
+            'content::collections::clone::pages',
+            'content::collections::clone::json',
+            'content::collections::clone::yaml',
+        ], $movedItem->children()->map->id()->all());
+        $this->assertEquals([
+            'http://localhost/cp/collections/articles',
+            'http://localhost/cp/collections/pages',
+            'https://json.org',
+            'https://yaml.org',
+        ], $movedItem->children()->map->url()->all());
     }
 
     /** @test */
-    public function it_can_alias_a_newly_created_item_to_an_earlier_section()
+    public function it_can_alias_newly_created_items_to_an_earlier_section()
     {
-        $this->markTestSkipped();
-
         $nav = $this->buildNavWithPreferences([
             'top_level' => [
-                'tools::technologies::json' => '@alias',
+                'fields::blueprints::non_favourite' => '@alias', // Alias created child from a later modified item
+                'tools::technologies::json' => '@alias', // Alias created child from a later created item
+                'tools::technologies' => '@alias', // Alias later created item
+            ],
+            'fields' => [
+                'fields::blueprints' => [
+                    'action' => '@modify',
+                    'children' => [
+                        'Favourite' => '/fav',
+                        'Non-Favourite' => '/non-fav',
+                    ],
+                ],
             ],
             'tools' => [
                 'techs' => [
                     'action' => '@create',
                     'display' => 'Technologies',
+                    'url' => '/techs',
                     'children' => [
                         'Json' => 'https://json.org',
                         'Yaml' => 'https://yaml.org',
@@ -836,6 +1040,16 @@ class NavPreferencesTest extends TestCase
                 ],
             ],
         ]);
+
+        $favItem = $nav->get('Fields')->keyBy->display()->get('Blueprints')->children()->first();
+        $this->assertEquals('fields::blueprints::favourite', $favItem->id());
+        $this->assertEquals('Favourite', $favItem->display());
+        $this->assertEquals('http://localhost/fav', $favItem->url());
+
+        $nonFavItem = $nav->get('Fields')->keyBy->display()->get('Blueprints')->children()->last();
+        $this->assertEquals('fields::blueprints::non_favourite', $nonFavItem->id());
+        $this->assertEquals('Non-Favourite', $nonFavItem->display());
+        $this->assertEquals('http://localhost/non-fav', $nonFavItem->url());
 
         $jsonItem = $nav->get('Tools')->keyBy->display()->get('Technologies')->children()->first();
         $this->assertEquals('tools::technologies::json', $jsonItem->id());
@@ -847,10 +1061,20 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('Yaml', $yamlItem->display());
         $this->assertEquals('https://yaml.org', $yamlItem->url());
 
+        $aliasedNonFavItem = $nav->get('Top Level')->keyBy->display()->get('Non-Favourite');
+        $this->assertEquals('fields::blueprints::non_favourite::clone', $aliasedNonFavItem->id());
+        $this->assertEquals('Non-Favourite', $aliasedNonFavItem->display());
+        $this->assertEquals('http://localhost/non-fav', $aliasedNonFavItem->url());
+
         $aliasedJsonItem = $nav->get('Top Level')->keyBy->display()->get('Json');
         $this->assertEquals('tools::technologies::json::clone', $aliasedJsonItem->id());
         $this->assertEquals('Json', $aliasedJsonItem->display());
         $this->assertEquals('https://json.org', $aliasedJsonItem->url());
+
+        $aliasedJsonItem = $nav->get('Top Level')->keyBy->display()->get('Technologies');
+        $this->assertEquals('tools::technologies::clone', $aliasedJsonItem->id());
+        $this->assertEquals('Technologies', $aliasedJsonItem->display());
+        $this->assertEquals('http://localhost/techs', $aliasedJsonItem->url());
     }
 
     /** @test */

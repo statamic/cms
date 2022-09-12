@@ -75,6 +75,16 @@ class NavItem
     }
 
     /**
+     * Preserve current ID.
+     *
+     * @return $this
+     */
+    public function preserveCurrentId()
+    {
+        return $this->id($this->id());
+    }
+
+    /**
      * Set url by cp route name.
      *
      * @param  array|string  $name
