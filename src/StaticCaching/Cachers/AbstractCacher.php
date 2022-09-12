@@ -278,7 +278,7 @@ abstract class AbstractCacher implements Cacher
         return $this->getCachedPage($request) !== null;
     }
 
-    private function getPathAndDomain($url)
+    protected function getPathAndDomain($url)
     {
         if (Str::startsWith($url, '/')) {
             return [

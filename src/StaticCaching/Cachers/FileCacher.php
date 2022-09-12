@@ -67,7 +67,7 @@ class FileCacher extends AbstractCacher
             return;
         }
 
-        $this->cacheUrl($this->makeHash($url), $url);
+        $this->cacheUrl($this->makeHash($url), ...$this->getPathAndDomain($url));
     }
 
     /**
