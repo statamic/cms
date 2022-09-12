@@ -70,6 +70,45 @@ class UserNavConfigTest extends TestCase
     }
 
     /** @test */
+    public function it_ensures_normalization_of_children()
+    {
+        $nav = $this->normalize([
+            'content' => [
+                'content::collections' => [
+                    'action' => '@modify',
+                    'children' => [
+                        'Json' => 'https://jsonvarga.net', // inferred action
+                        'fields::blueprints' => '@alias', // action as string
+                        'user::profiles' => [
+                            'action' => '@move', // action in array config
+                        ],
+                        'fields::fieldsets' => [], // inferred action
+                    ],
+                ],
+            ],
+        ]);
+
+        $expected = [
+            'Json' => [
+                'action' => '@create',
+                'display' => 'Json',
+                'url' => 'https://jsonvarga.net',
+            ],
+            'fields::blueprints' => [
+                'action' => '@alias',
+            ],
+            'user::profiles' => [
+                'action' => '@move',
+            ],
+            'fields::fieldsets' => [
+                'action' => '@alias',
+            ],
+        ];
+
+        $this->assertEquals($expected, Arr::get($nav, 'sections.content.items.content::collections.children'));
+    }
+
+    /** @test */
     public function it_ensures_top_level_section_is_always_first_returned_section()
     {
         // Minimal sections config
@@ -282,7 +321,11 @@ class UserNavConfigTest extends TestCase
                     'icon' => 'user',
                     'children' => [
                         'Json' => 'https://jsonvarga.net',
-                        'Yaml' => 'https://spamlyaml.org',
+                        'spaml' => [
+                            'action' => '@create',
+                            'display' => 'Yaml',
+                            'url' => 'https://spamlyaml.org',
+                        ],
                     ],
                     'invalid_nav_item_setter' => 'test', // This should get removed as it's not a valid setter.
                 ],
@@ -295,8 +338,16 @@ class UserNavConfigTest extends TestCase
             'url' => '/profiles',
             'icon' => 'user',
             'children' => [
-                'Json' => 'https://jsonvarga.net',
-                'Yaml' => 'https://spamlyaml.org',
+                'Json' => [
+                    'action' => '@create',
+                    'display' => 'Json',
+                    'url' => 'https://jsonvarga.net',
+                ],
+                'spaml' => [
+                    'action' => '@create',
+                    'display' => 'Yaml',
+                    'url' => 'https://spamlyaml.org',
+                ],
             ],
         ];
 
@@ -314,7 +365,7 @@ class UserNavConfigTest extends TestCase
                     'url' => '/dashboard-confessional',
                     'icon' => 'music',
                     'children' => [
-                        'Statamic Dashboard' => '/dashboard',
+                        'Statamic Dashboard' => '/dashboard', // This should get normalized as well
                     ],
                     'invalid_nav_item_setter' => 'test', // This should get removed as it's not a valid setter.
                 ],
@@ -327,11 +378,52 @@ class UserNavConfigTest extends TestCase
             'url' => '/dashboard-confessional',
             'icon' => 'music',
             'children' => [
-                'Statamic Dashboard' => '/dashboard',
+                'Statamic Dashboard' => [
+                    'action' => '@create',
+                    'display' => 'Statamic Dashboard',
+                    'url' => '/dashboard',
+                ],
             ],
         ];
 
         $this->assertEquals($expected, Arr::get($nav, 'sections.top_level.items.top_level::dashboard'));
+    }
+
+    /** @test */
+    public function it_allows_modifying_of_child_items_using_modify_action()
+    {
+        $nav = $this->normalize([
+            'content' => [
+                'content::collections' => [
+                    'action' => '@modify', // The `@modify` action is required to use the following setters on the original nav item...
+                    'children' => [
+                        'content::collections::pages' => [
+                            'action' => '@modify', // The `@modify` action is required to use the following setters on the original nav item...
+                            'display' => 'Pagerinos',
+                            'url' => '/pagerinos',
+                            'icon' => 'music', // This doesn't matter for the child itself, but it can matter when aliasing from a child to a top level item
+                            'children' => [], // This should get removed as children can't have children
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $expected = [
+            'content::collections' => [
+                'action' => '@modify',
+                'children' => [
+                    'content::collections::pages' => [
+                        'action' => '@modify',
+                        'display' => 'Pagerinos',
+                        'url' => '/pagerinos',
+                        'icon' => 'music',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, Arr::get($nav, 'sections.content.items'));
     }
 
     /** @test */

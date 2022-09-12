@@ -163,9 +163,41 @@ class UserNavConfig implements ArrayAccess
             }
         }
 
+        // If item has children, normalize those items as well.
+        if ($children = $normalized->get('children')) {
+            $normalized->put('children', collect($children)
+                ->map(fn ($childConfig, $childId) => $this->normalizeChildItemConfig($childId, $childConfig, $sectionKey))
+                ->all());
+        }
+
         $allowedKeys = array_merge(['action'], static::ALLOWED_NAV_ITEM_MODIFICATIONS);
 
         return $normalized->only($allowedKeys)->all();
+    }
+
+    /**
+     * Normalize item config.
+     *
+     * @param  string  $itemId
+     * @param  mixed  $itemConfig
+     * @param  string  $sectionKey
+     * @return array
+     */
+    protected function normalizeChildItemConfig($itemId, $itemConfig, $sectionKey)
+    {
+        if (is_string($itemConfig) && ! Str::startsWith($itemConfig, '@')) {
+            $itemConfig = [
+                'action' => '@create',
+                'display' => $itemId,
+                'url' => $itemConfig,
+            ];
+        }
+
+        if (is_array($itemConfig)) {
+            Arr::forget($itemConfig, 'children');
+        }
+
+        return $this->normalizeItemConfig($itemId, $itemConfig, $sectionKey);
     }
 
     /**
