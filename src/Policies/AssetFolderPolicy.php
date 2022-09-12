@@ -26,7 +26,8 @@ class AssetFolderPolicy
         }
 
         return $assetFolder
-            ->assets(true)->reject(fn ($asset) => $user->can('move', $asset))
+            ->assets(true)
+            ->reject(fn ($asset) => $user->can('move', $asset))
             ->isEmpty();
     }
 
