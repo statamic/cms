@@ -155,7 +155,7 @@ export default {
         },
 
         datePickerValue() {
-            return this.value.replace(' ', 'T');
+            return this.isRange ? this.value : this.value.replace(' ', 'T');
         },
 
         timeString() {
