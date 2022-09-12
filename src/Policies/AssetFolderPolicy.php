@@ -25,7 +25,7 @@ class AssetFolderPolicy
             return false;
         }
 
-        return $assetFolder->assets()->reject(function ($asset) use ($user) {
+        return $assetFolder->assets(true)->reject(function ($asset) use ($user) {
             return $user->can('move', $asset);
         })->isEmpty();
     }
@@ -38,7 +38,7 @@ class AssetFolderPolicy
             return false;
         }
 
-        return $assetFolder->assets()->reject(function ($asset) use ($user) {
+        return $assetFolder->assets(true)->reject(function ($asset) use ($user) {
             return $user->can('rename', $asset);
         })->isEmpty();
     }
@@ -51,7 +51,7 @@ class AssetFolderPolicy
             return false;
         }
 
-        return $assetFolder->assets()->reject(function ($asset) use ($user) {
+        return $assetFolder->assets(true)->reject(function ($asset) use ($user) {
             return $user->can('delete', $asset);
         })->isEmpty();
     }
