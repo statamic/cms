@@ -2,11 +2,15 @@
 
 namespace Tests\Tags;
 
+use Illuminate\Cache\Events\CacheHit;
+use Illuminate\Cache\Events\CacheMissed;
+use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Support\Facades\Cache;
-use Mockery;
+use Illuminate\Support\Facades\Event;
 use Statamic\Facades\Config;
-use Statamic\Facades\Endpoint\URL;
 use Statamic\Facades\Parse;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -20,13 +24,11 @@ class CacheTagTest extends TestCase
     {
         $template = '{{ cache }}expensive{{ /cache }}';
 
-        Cache::shouldReceive('store')->andReturn(
-            $this->mock(\Illuminate\Contracts\Cache\Store::class)
-                ->shouldReceive('get')->once()->andReturn(null)
-                ->shouldReceive('put')->once()->with(Mockery::any(), 'expensive', Mockery::any())
-                ->getMock()
-        );
+        Event::fake();
+
         $this->assertEquals('expensive', $this->tag($template));
+
+        $this->assertMissed();
     }
 
     /** @test */
@@ -46,15 +48,17 @@ class CacheTagTest extends TestCase
 
         $this->actingAs(tap(User::make()->id('user1'))->save());
 
-        $this->tag($template);
-
-        Cache::shouldReceive('store')->andReturn(
-            $this->mock(\Illuminate\Contracts\Cache\Store::class)
-                ->shouldReceive('get')->once()->andReturn('expensive')
-                ->getMock()
-        );
+        Event::fake();
 
         $this->tag($template);
+
+        $this->assertMissed();
+
+        Event::fake();
+
+        $this->tag($template);
+
+        $this->assertHit();
     }
 
     /** @test */
@@ -64,18 +68,19 @@ class CacheTagTest extends TestCase
 
         $this->actingAs(tap(User::make()->id('user1'))->save());
 
+        Event::fake();
+
         $this->tag($template);
+
+        $this->assertMissed();
 
         $this->actingAs(tap(User::make()->id('user2'))->save());
 
-        Cache::shouldReceive('store')->andReturn(
-            $this->mock(\Illuminate\Contracts\Cache\Store::class)
-                ->shouldReceive('get')->once()->andReturn(null)
-                ->shouldReceive('put')->once()->with(Mockery::any(), 'expensive', Mockery::any())
-                ->getMock()
-        );
+        Event::fake();
 
         $this->tag($template);
+
+        $this->assertMissed();
     }
 
     /** @test */
@@ -83,17 +88,22 @@ class CacheTagTest extends TestCase
     {
         $template = '{{ cache scope="page" }}expensive{{ /cache }}';
 
-        $this->mock(URL::class)->shouldReceive('getCurrent')->andReturn('/test/url');
+        $mock = \Mockery::mock(URL::getFacadeRoot())->makePartial();
+        URL::swap($mock);
+
+        $mock->shouldReceive('getCurrent')->andReturn('/test/url');
+
+        Event::fake();
 
         $this->tag($template);
 
-        Cache::shouldReceive('store')->andReturn(
-            $this->mock(\Illuminate\Contracts\Cache\Store::class)
-                ->shouldReceive('get')->once()->andReturn('expensive')
-                ->getMock()
-        );
+        $this->assertMissed();
+
+        Event::fake();
 
         $this->tag($template);
+
+        $this->assertHit();
     }
 
     /** @test */
@@ -101,20 +111,24 @@ class CacheTagTest extends TestCase
     {
         $template = '{{ cache scope="page" }}expensive{{ /cache }}';
 
-        $this->mock(URL::class)->shouldReceive('getCurrent')->andReturn('/test/url');
+        $mock = \Mockery::mock(URL::getFacadeRoot())->makePartial();
+        URL::swap($mock);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/test/url');
+
+        Event::fake();
 
         $this->tag($template);
 
-        $this->mock(URL::class)->shouldReceive('getCurrent')->andReturn('/some/other/url');
+        $this->assertMissed();
 
-        Cache::shouldReceive('store')->andReturn(
-            $this->mock(\Illuminate\Contracts\Cache\Store::class)
-                ->shouldReceive('get')->once()->andReturn(null)
-                ->shouldReceive('put')->once()->with(Mockery::any(), 'expensive', Mockery::any())
-                ->getMock()
-        );
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/some/other/url');
+
+        Event::fake();
 
         $this->tag($template);
+
+        $this->assertMissed();
     }
 
     /** @test */
@@ -122,17 +136,27 @@ class CacheTagTest extends TestCase
     {
         $template = '{{ cache scope="site" }}expensive{{ /cache }}';
 
-        $this->mock(Sites::class)->shouldReceive('getCurrent')->andReturn('default');
+        Site::setConfig([
+            'default' => 'default',
+            'sites' => [
+                'default' => [],
+                'other' => [],
+            ],
+        ]);
+
+        Site::setCurrent('default');
+
+        Event::fake();
 
         $this->tag($template);
 
-        Cache::shouldReceive('store')->andReturn(
-            $this->mock(\Illuminate\Contracts\Cache\Store::class)
-                ->shouldReceive('get')->once()->andReturn('expensive')
-                ->getMock()
-        );
+        $this->assertMissed();
+
+        Event::fake();
 
         $this->tag($template);
+
+        $this->assertHit();
     }
 
     /** @test */
@@ -140,20 +164,29 @@ class CacheTagTest extends TestCase
     {
         $template = '{{ cache scope="site" }}expensive{{ /cache }}';
 
-        $this->mock(Sites::class)->shouldReceive('getCurrent')->andReturn('default');
+        Site::setConfig([
+            'default' => 'default',
+            'sites' => [
+                'default' => [],
+                'other' => [],
+            ],
+        ]);
+
+        Site::setCurrent('default');
+
+        Event::fake();
 
         $this->tag($template);
 
-        $this->mock(Sites::class)->shouldReceive('getCurrent')->andReturn('other');
+        $this->assertMissed();
 
-        Cache::shouldReceive('store')->andReturn(
-            $this->mock(\Illuminate\Contracts\Cache\Store::class)
-                ->shouldReceive('get')->once()->andReturn(null)
-                ->shouldReceive('put')->once()->with(Mockery::any(), 'expensive', Mockery::any())
-                ->getMock()
-        );
+        Site::setCurrent('other');
+
+        Event::fake();
 
         $this->tag($template);
+
+        $this->assertMissed();
     }
 
     /** @test */
@@ -163,23 +196,38 @@ class CacheTagTest extends TestCase
 
         $this->mock(Sites::class)->shouldReceive('getCurrent')->andReturn('default');
 
+        Event::fake();
+
         $this->tag($template);
+
+        $this->assertMissed();
 
         $this->mock(Sites::class)->shouldReceive('getCurrent')->andReturn('other');
 
-        Cache::shouldReceive('store')->andReturn(
-            $this->mock(\Illuminate\Contracts\Cache\Store::class)
-                ->shouldReceive('get')->once()->andReturn('expensive')
-                ->getMock()
-        );
+        Event::fake();
 
         $this->tag($template);
+
+        $this->assertHit();
     }
 
-    // Site::setConfig(['sites' => [
-    //     'en' => ['url' => '/'],
-    //     'fr' => ['url' => '/fr'],
-    // ]]);
+    private function assertHit()
+    {
+        Event::assertDispatched(CacheHit::class, function ($event) {
+            return $event->value === 'expensive';
+        });
+        Event::assertNotDispatched(CacheMissed::class);
+        Event::assertNotDispatched(KeyWritten::class);
+    }
+
+    private function assertMissed()
+    {
+        Event::assertNotDispatched(CacheHit::class);
+        Event::assertDispatched(CacheMissed::class);
+        Event::assertDispatched(KeyWritten::class, function ($event) {
+            return $event->value === 'expensive';
+        });
+    }
 
     private function tag($tag, $data = [])
     {
