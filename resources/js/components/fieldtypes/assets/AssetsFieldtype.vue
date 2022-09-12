@@ -19,7 +19,7 @@
                 </div>
 
                 <div
-                    v-if="!isReadOnly"
+                    v-if="!isReadOnly && showPicker"
                     class="assets-fieldtype-picker"
                     :class="{
                         'is-expanded': expanded,
@@ -298,12 +298,40 @@ export default {
             }
         },
 
+        isInGridField() {
+            let vm = this;
+
+            while (true) {
+                let parent = vm.$parent;
+
+                if (! parent) return false;
+
+                if (parent.grid) {
+                    return true;
+                }
+
+                vm = parent;
+            }
+        },
+
         replicatorPreview() {
             return _.map(this.assets, (asset) => {
                 return asset.isImage ?
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
             }).join(', ');
+        },
+
+        showPicker() {
+            if (this.maxFilesReached && ! this.isFullWidth) return false
+
+            if (this.maxFilesReached && this.isInGridField) return false
+
+            return true
+        },
+
+        isFullWidth() {
+            return ! (this.config.width && this.config.width < 100)
         }
 
     },
