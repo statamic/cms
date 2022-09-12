@@ -618,19 +618,6 @@ class Nav
      */
     protected function prepareUserChildItem($config, $section, $key, $parentItem)
     {
-        // TODO: normalize all this better in UserNavConfig
-        if (is_string($config) && ! Str::startsWith($config, '@')) {
-            $config = [
-                'action' => '@create',
-                'display' => $key,
-                'url' => $config,
-            ];
-        } elseif (is_string($config)) {
-            $config = [
-                'action' => $config,
-            ];
-        }
-
         // TODO: refactor to separate params
         $override = [
             'item' => $this->findItem($key),
