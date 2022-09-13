@@ -40,6 +40,15 @@
             bottom: 1px;
         }
     }
+
+    &.invalid {
+        .replicator-set-header-inner {
+            @apply bg-red-lighter;
+            label {
+                @apply text-red;
+            }
+        }
+    }
 }
 
 .replicator-set-body {
