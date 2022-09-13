@@ -6,7 +6,7 @@ export default {
             this.loading = true;
         },
 
-        actionCompleted(successful=null, response) {
+        actionCompleted(successful=null, response={}) {
             this.loading = false;
 
             if (successful === false) return;

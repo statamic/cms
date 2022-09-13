@@ -27,6 +27,7 @@ class Asset extends JsonResource
             'isSvg' => $this->isSvg(),
             'isAudio' => $this->isAudio(),
             'isVideo' => $this->isVideo(),
+            'isMedia' => $this->isMedia(),
             'isPdf' => $this->isPdf(),
             'isPreviewable' => $this->isPreviewable(),
 

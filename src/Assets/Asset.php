@@ -446,6 +446,19 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Is this asset a media file?
+     *
+     * @return bool
+     */
+    public function isMedia()
+    {
+        return $this->isImage()
+                || $this->isSvg()
+                || $this->isVideo()
+                || $this->isAudio();
+    }
+
+    /**
      * Is this asset a PDF?
      *
      * @return bool
@@ -823,6 +836,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     public function download(string $name = null, array $headers = [])
     {
         return $this->disk()->filesystem()->download($this->path(), $name, $headers);
+    }
+
+    /**
+     * Stream a file.
+     *
+     * @return resource
+     */
+    public function stream()
+    {
+        return $this->disk()->filesystem()->readStream($this->path());
     }
 
     private function getSafeFilename($string)
