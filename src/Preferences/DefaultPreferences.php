@@ -45,15 +45,24 @@ class DefaultPreferences
     }
 
     /**
-     * Magically call `setPreferences()` and `mergePreferences()` via `set()` and `merge()`, etc.
+     * Set all the preferences.
      *
-     * @param  mixed  $name
-     * @param  mixed  $arguments
+     * @param  array  $preferences
+     * @return $this
      */
-    public function __call($name, $arguments)
+    public function set($preferences)
     {
-        $method = $name.'Preferences';
+        return $this->setPreferences($preferences);
+    }
 
-        return $this->{$method}(...$arguments);
+    /**
+     * Merge preferences.
+     *
+     * @param  array  $preferences
+     * @return $this
+     */
+    public function merge($preferences)
+    {
+        return $this->mergePreferences($preferences);
     }
 }
