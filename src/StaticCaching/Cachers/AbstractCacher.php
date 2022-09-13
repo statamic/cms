@@ -55,6 +55,9 @@ abstract class AbstractCacher implements Cacher
             return $url;
         }
 
+        // This could potentially just be Site::current()->absoluteUrl() but at the
+        // moment that method gets the URL based on the request. For now, we will
+        // manually get it from the config, as to not break any existing sites.
         return Str::startsWith($url = Site::current()->url(), '/')
             ? Str::removeRight(config('app.url'), '/').$url
             : $url;
