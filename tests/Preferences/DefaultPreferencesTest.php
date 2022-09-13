@@ -107,6 +107,24 @@ EOT
         $this->assertEquals($expected, Preference::default()->all());
     }
 
+    /** @test */
+    public function it_sets_a_single_preference_key()
+    {
+        Preference::default()->set([
+            'foo' => 'bar',
+            'bar' => 'baz',
+        ])->save();
+
+        Preference::default()->set('foo', 'qux')->save();
+
+        $expected = [
+            'foo' => 'qux',
+            'bar' => 'baz',
+        ];
+
+        $this->assertEquals($expected, Preference::default()->all());
+    }
+
     private function cleanup()
     {
         if ($this->files->exists($path = resource_path('preferences.yaml'))) {

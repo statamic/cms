@@ -47,12 +47,15 @@ class DefaultPreferences
     /**
      * Set all the preferences.
      *
-     * @param  array  $preferences
+     * @param  string|array  $key  Either an array to set all preferences at once, or a string key to set a single preference.
+     * @param  mixed  $value  If passing a string key, the value to set.
      * @return $this
      */
-    public function set($preferences)
+    public function set($key, $value = null)
     {
-        return $this->setPreferences($preferences);
+        return func_num_args() === 2
+            ? $this->setPreference($key, $value)
+            : $this->setPreferences($key);
     }
 
     /**
