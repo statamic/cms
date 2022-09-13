@@ -5,7 +5,7 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Request as RequestFacade;
+use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
@@ -50,7 +50,17 @@ abstract class AbstractCacher implements Cacher
      */
     public function getBaseUrl()
     {
-        return $this->config('base_url') ?? RequestFacade::root();
+        // Check 'base_url' for backward compatibility.
+        if ($url = $this->config('base_url')) {
+            return $url;
+        }
+
+        // This could potentially just be Site::current()->absoluteUrl() but at the
+        // moment that method gets the URL based on the request. For now, we will
+        // manually get it from the config, as to not break any existing sites.
+        return Str::startsWith($url = Site::current()->url(), '/')
+            ? Str::removeRight(config('app.url'), '/').$url
+            : $url;
     }
 
     /**
@@ -112,11 +122,11 @@ abstract class AbstractCacher implements Cacher
      *
      * @return void
      */
-    public function cacheDomain()
+    public function cacheDomain($domain = null)
     {
         $domains = $this->getDomains();
 
-        if (! $domains->contains($domain = $this->getBaseUrl())) {
+        if (! $domains->contains($domain = $domain ?? $this->getBaseUrl())) {
             $domains->push($domain);
         }
 
@@ -176,17 +186,19 @@ abstract class AbstractCacher implements Cacher
      * @param  string  $url
      * @return void
      */
-    public function cacheUrl($key, $url)
+    public function cacheUrl($key, $url, $domain = null)
     {
-        $this->cacheDomain();
+        $domain = $domain ?? $this->getBaseUrl();
 
-        $urls = $this->getUrls();
+        $this->cacheDomain($domain);
 
-        $url = Str::removeLeft($url, $this->getBaseUrl());
+        $urls = $this->getUrls($domain);
+
+        $url = Str::removeLeft($url, $domain);
 
         $urls->put($key, $url);
 
-        $this->cache->forever($this->getUrlsCacheKey(), $urls->all());
+        $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
     }
 
     /**
@@ -195,13 +207,13 @@ abstract class AbstractCacher implements Cacher
      * @param  string  $key
      * @return void
      */
-    public function forgetUrl($key)
+    public function forgetUrl($key, $domain = null)
     {
-        $urls = $this->getUrls();
+        $urls = $this->getUrls($domain);
 
         $urls->forget($key);
 
-        $this->cache->forever($this->getUrlsCacheKey(), $urls->all());
+        $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
     }
 
     /**
@@ -214,10 +226,12 @@ abstract class AbstractCacher implements Cacher
         // Remove the asterisk
         $wildcard = substr($wildcard, 0, -1);
 
-        $this->getUrls()->filter(function ($url) use ($wildcard) {
+        [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
+
+        $this->getUrls($domain)->filter(function ($url) use ($wildcard) {
             return Str::startsWith($url, $wildcard);
-        })->each(function ($url) {
-            $this->invalidateUrl($url);
+        })->each(function ($url) use ($domain) {
+            $this->invalidateUrl($url, $domain);
         });
     }
 
@@ -233,7 +247,7 @@ abstract class AbstractCacher implements Cacher
             if (Str::contains($url, '*')) {
                 $this->invalidateWildcardUrl($url);
             } else {
-                $this->invalidateUrl($url);
+                $this->invalidateUrl(...$this->getPathAndDomain($url));
             }
         });
     }
@@ -263,5 +277,22 @@ abstract class AbstractCacher implements Cacher
     public function hasCachedPage(Request $request)
     {
         return $this->getCachedPage($request) !== null;
+    }
+
+    protected function getPathAndDomain($url)
+    {
+        if (Str::startsWith($url, '/')) {
+            return [
+                $url,
+                $this->getBaseUrl(),
+            ];
+        }
+
+        $parsed = parse_url($url);
+
+        return [
+            $parsed['path'] ?? '/',
+            $parsed['scheme'].'://'.$parsed['host'],
+        ];
     }
 }
