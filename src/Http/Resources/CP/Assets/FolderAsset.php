@@ -23,6 +23,7 @@ class FolderAsset extends JsonResource
                 return [
                     'is_image' => true,
                     'thumbnail' => $this->thumbnailUrl('small'),
+                    'alt' => $this->alt,
                 ];
             }),
 
