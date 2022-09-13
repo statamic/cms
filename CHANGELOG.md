@@ -1,5 +1,58 @@
 # Release Notes
 
+## 3.3.35 (2022-09-09)
+
+### What's new
+- Ability to specify `search:results` query value rather than reading from the URL. [#6684](https://github.com/statamic/cms/issues/6684) by @jacksleight
+
+### What's improved
+- Improve performance and readability of publish components. [#6680](https://github.com/statamic/cms/issues/6680) by @arthurperton
+- Grid row controls are hidden when there are no available actions. [#6647](https://github.com/statamic/cms/issues/6647) by @arthurperton
+
+### What's fixed
+- Fix styling of lists inside tables and blockquotes in Bard. [#6685](https://github.com/statamic/cms/issues/6685) by @jacksleight
+- Fix empty live preview fields falling back to original values, by distinguishing supplemented nulls from missing values.  [#6666](https://github.com/statamic/cms/issues/6666) by @arthurperton
+- Fix deleting an entry with children from the collection tree view. [#6644](https://github.com/statamic/cms/issues/6644) by @arthurperton
+- Fix incorrect localized term collection URLs. [#6659](https://github.com/statamic/cms/issues/6659) by @AndrewHaine
+- Fix date field default format not including time when `mode` isn't explicitly set. [#6657](https://github.com/statamic/cms/issues/6657) by @FrittenKeeZ
+- Fix search within the asset browser not restricting to a folder where necessary. [#6673](https://github.com/statamic/cms/issues/6673) by @arthurperton
+- Fix missing view nav authorization. [#6663](https://github.com/statamic/cms/issues/6663) by @ryanmitchell
+- Fix blank URLs being flagged as external. [#6668](https://github.com/statamic/cms/issues/6668) by @arthurperton
+- Fix JS error in Popover when resizing. [#6679](https://github.com/statamic/cms/issues/6679) by @arthurperton
+- Fix JS error when downloading assets. [#6669](https://github.com/statamic/cms/issues/6669) by @jacksleight
+- Fix JS error when resizing edit pages. [#6660](https://github.com/statamic/cms/issues/6660) by @arthurperton
+- Fix 'Add child link to entry' appearing in nav builder when no collection is set. [#6672](https://github.com/statamic/cms/issues/6672) by @jacksleight
+- Fix marking external CP navigation items as current. [#6655](https://github.com/statamic/cms/issues/6655) by @arthurperton
+- Fix asset fieldtype drag mirror. [#6671](https://github.com/statamic/cms/issues/6671) by @jackmcdade
+- Fix asset tile controls position. [#6656](https://github.com/statamic/cms/issues/6656) by @jackmcdade
+- Fix date not showing in Safari. [#6651](https://github.com/statamic/cms/issues/6651) by @arthurperton
+- Fix date picker value format. [#6688](https://github.com/statamic/cms/issues/6688) by @jasonvarga
+- Fix augmentation test. [#6676](https://github.com/statamic/cms/issues/6676) by @jasonvarga
+
+
+
+## 3.3.34 (2022-09-05)
+
+### What's new
+- Add support for downloading multiple assets as a zip. [#6606](https://github.com/statamic/cms/issues/6606) [#6626](https://github.com/statamic/cms/issues/6626) by @jacksleight
+- Add support for filtering entries by taxonomy terms in the REST API. [#6615](https://github.com/statamic/cms/issues/6615) by @arthurperton
+
+### What's improved
+- Asset fieldtype UI/UX improvements such as ability to set missing alt attributes, and better thumbnails. [#6638](https://github.com/statamic/cms/issues/6638) by @jackmcdade
+- Static caching: When saving a collection (or its tree), the configured collection urls will be invalidated. [#6636](https://github.com/statamic/cms/issues/6636) by @arthurperton
+- Static caching excluded URLs treat trailing slashes as optional. [#6633](https://github.com/statamic/cms/issues/6633) by @arthurperton
+
+### What's fixed
+- Exclude `published` from data when saving entries. [#6641](https://github.com/statamic/cms/issues/6641) by @jasonvarga
+- Show placeholder in form select fields. [#6637](https://github.com/statamic/cms/issues/6637) by @fjahn
+- Avoid fieldtypes getting mounted twice. [#6632](https://github.com/statamic/cms/issues/6632) by @arthurperton
+- Fix popper causing overflow. [#6628](https://github.com/statamic/cms/issues/6628) by @jasonvarga
+- Fix missing permission translation keys being shown. [#6624](https://github.com/statamic/cms/issues/6624) by @jasonvarga
+- Fix numeric separators JS error. [#6625](https://github.com/statamic/cms/issues/6625) by @jesseleite
+- Fix asset data handling. [#6591](https://github.com/statamic/cms/issues/6591) by @jesseleite
+
+
+
 ## 3.3.33 (2022-08-31)
 
 ### What's new

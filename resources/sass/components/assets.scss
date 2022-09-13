@@ -78,7 +78,14 @@
 
 
 
-/* Grid Listing
+
+
+/* Fieldtype
+  ========================================================================== */
+
+.assets-fieldtype .draggable-mirror { display: none; }
+
+  /* Grid Listing
   ========================================================================== */
 
 .asset-grid-listing {
@@ -87,7 +94,7 @@
     padding: 16px;
 
     .asset-tile {
-        @apply flex items-center w-full flex-col justify-between cursor-pointer border rounded overflow-hidden;
+        @apply flex items-center flex-col justify-between cursor-pointer border rounded overflow-hidden;
 
         .asset-thumb-container {
             @apply flex items-center flex-1 w-full justify-center relative;
@@ -146,7 +153,7 @@
 
     .asset-thumb {
         @apply flex justify-center items-center;
-        img, svg, .svg-img {
+        > img, > svg, > .svg-img {
             @apply max-h-full max-w-full absolute;
         }
     }

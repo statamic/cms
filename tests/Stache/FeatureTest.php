@@ -2,14 +2,13 @@
 
 namespace Tests\Stache;
 
-use Mockery;
-use Statamic\Contracts\Structures\StructureRepository;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Data;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Nav as NavRepository;
 use Statamic\Facades\Structure;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
@@ -211,9 +210,7 @@ class FeatureTest extends TestCase
     {
         $structure = Structure::find('footer');
 
-        $repo = Mockery::mock(StructureRepository::class);
-        $repo->shouldReceive('save')->with($structure);
-        $this->app->instance(StructureRepository::class, $repo);
+        NavRepository::shouldReceive('save')->with($structure)->once();
 
         $structure->save();
     }

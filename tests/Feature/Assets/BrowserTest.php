@@ -198,6 +198,48 @@ class BrowserTest extends TestCase
     }
 
     /** @test */
+    public function it_searches_for_assets()
+    {
+        $containerOne = AssetContainer::make('one')->disk('test')->save();
+        $containerTwo = AssetContainer::make('two')->disk('test')->save();
+
+        $containerOne
+            ->makeAsset('asset-one.txt')
+            ->upload(UploadedFile::fake()->create('asset-one.txt'));
+        $containerOne
+            ->makeAsset('no-match.txt')
+            ->upload(UploadedFile::fake()->create('no-match.txt'));
+        $containerOne
+            ->makeAsset('nested/asset-two.txt')
+            ->upload(UploadedFile::fake()->create('asset-two.txt'));
+        $containerOne
+            ->makeAsset('nested/nope.txt')
+            ->upload(UploadedFile::fake()->create('nope.txt'));
+        $containerOne
+            ->makeAsset('nested/subdirectory/asset-three.txt')
+            ->upload(UploadedFile::fake()->create('asset-three.txt'));
+        $containerTwo
+            ->makeAsset('asset-four.txt')
+            ->upload(UploadedFile::fake()->create('asset-four.txt'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one?search=asset')
+            ->assertSuccessful()
+            ->assertJsonCount(3, 'data.assets')
+            ->assertJsonPath('data.assets.0.id', 'one::asset-one.txt')
+            ->assertJsonPath('data.assets.1.id', 'one::nested/asset-two.txt')
+            ->assertJsonPath('data.assets.2.id', 'one::nested/subdirectory/asset-three.txt');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one/nested?search=asset')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data.assets')
+            ->assertJsonPath('data.assets.0.id', 'one::nested/asset-two.txt');
+    }
+
+    /** @test */
     public function it_shows_an_assets_edit_page()
     {
         $container = AssetContainer::make('test')->disk('test')->save();
@@ -248,7 +290,7 @@ class BrowserTest extends TestCase
 
     private function userWithPermission()
     {
-        $this->setTestRoles(['test' => ['access cp', 'view test assets']]);
+        $this->setTestRoles(['test' => ['access cp', 'view test assets', 'view one assets', 'view two assets']]);
 
         return User::make()->assignRole('test')->save();
     }

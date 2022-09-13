@@ -29,7 +29,7 @@
                     :popover="{ visibility: 'focus' }"
                     :rows="$screens({ default: 1, lg: config.rows })"
                     :update-on-input="true"
-                    :value="value"
+                    :value="datePickerValue"
                     @input="setDate"
                 >
                     <template v-if="!config.inline" v-slot="{ inputValue, inputEvents }">
@@ -152,6 +152,10 @@ export default {
                 type: 'string',
                 mask: this.format,
             }
+        },
+
+        datePickerValue() {
+            return this.isRange ? this.value : this.value.replace(' ', 'T');
         },
 
         timeString() {

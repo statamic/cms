@@ -3,6 +3,7 @@
 namespace Statamic\Tags;
 
 use Illuminate\Support\Facades\Cache as LaraCache;
+use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 
 class Cache extends Tags
@@ -34,7 +35,7 @@ class Cache extends Tags
             return false;
         }
 
-        // Only get requests. This disables the cache during live preview.
+        // Only GET requests. This disables the cache during live preview.
         return request()->method() === 'GET';
     }
 
@@ -50,6 +51,10 @@ class Cache extends Tags
         ];
 
         $scope = $this->params->get('scope', 'site');
+
+        if ($scope === 'site') {
+            $hash['site'] = Site::current()->handle();
+        }
 
         if ($scope === 'page') {
             $hash['url'] = URL::makeAbsolute(URL::getCurrent());
