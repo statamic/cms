@@ -42,11 +42,11 @@ class CollectionTreeController extends CpController
         Tree::clearAllCachedFlattenedPages();
         $this->validateUniqueUris((clone $tree)->disableUriCache()->tree($contents));
 
+        $this->deleteEntries($request);
+
         // Validate the tree, which will add any missing entries or throw an exception
         // if somehow the root would end up having child pages, which isn't allowed.
         $contents = $structure->validateTree($contents, $request->site);
-
-        $this->deleteEntries($request);
 
         $tree->tree($contents)->save();
     }

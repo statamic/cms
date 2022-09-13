@@ -12,6 +12,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v1
 
+      - name: Install required npm version
+        run: npm -g install npm@8.5.5
+
       - name: Install dependencies
         run: npm ci
 

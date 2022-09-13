@@ -203,6 +203,10 @@ class NavItem
      */
     public function isActive()
     {
+        if (! $this->active) {
+            return false;
+        }
+
         $pattern = preg_quote(config('statamic.cp.route'), '#').'/'.$this->active;
 
         return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;

@@ -5,6 +5,8 @@ namespace Tests\StaticCaching;
 use Illuminate\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Mockery;
+use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
 use Tests\TestCase;
 
@@ -77,11 +79,39 @@ class CacherTest extends TestCase
     }
 
     /** @test */
-    public function gets_the_base_url()
+    public function gets_the_base_url_using_the_deprecated_config_value()
     {
         $cacher = $this->cacher(['base_url' => 'http://example.com']);
 
         $this->assertEquals('http://example.com', $cacher->getBaseUrl());
+    }
+
+    /** @test */
+    public function gets_the_base_url_when_sites_have_absolute_urls()
+    {
+        Site::setConfig(['sites' => [
+            'default' => ['url' => 'http://example.com'],
+            'uk' => ['url' => 'http://example.co.uk'],
+        ]]);
+
+        $cacher = $this->cacher();
+
+        $this->assertEquals('http://example.com', $cacher->getBaseUrl());
+    }
+
+    /** @test */
+    public function gets_the_base_url_when_sites_have_relative_urls()
+    {
+        Site::setConfig(['sites' => [
+            'default' => ['url' => '/default'],
+            'uk' => ['url' => '/uk'],
+        ]]);
+
+        config(['app.url' => 'http://app.com']);
+
+        $cacher = $this->cacher();
+
+        $this->assertEquals('http://app.com/default', $cacher->getBaseUrl());
     }
 
     /** @test */
@@ -105,12 +135,14 @@ class CacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:domains'));
 
         $cacher->cacheUrl('one', 'http://example.com/one');
+        $cacher->cacheUrl('two', '/two');
+        $cacher->cacheUrl('three', 'http://example.org/three', 'http://example.org');
 
         $domains = $cache->get('static-cache:domains');
         $urls = $cache->get('static-cache:'.md5('http://example.com').'.urls');
 
-        $this->assertEquals(['http://example.com'], $domains);
-        $this->assertEquals(['one' => '/one'], $urls);
+        $this->assertEquals(['http://example.com', 'http://example.org'], $domains);
+        $this->assertEquals(['one' => '/one', 'two' => '/two'], $urls);
     }
 
     /** @test */
@@ -140,10 +172,16 @@ class CacherTest extends TestCase
         $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
             'one' => '/one', 'two' => '/two',
         ]);
+        $cache->forever('static-cache:'.md5('http://example.org').'.urls', [
+            'one' => '/one', 'two' => '/two',
+        ]);
 
         $cacher->forgetUrl('one');
+        $cacher->forgetUrl('two', 'http://example.org');
 
         $this->assertEquals(['two' => '/two'], $cacher->getUrls()->all());
+        $this->assertEquals(['two' => '/two'], $cacher->getUrls('http://example.com')->all());
+        $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://example.org')->all());
     }
 
     /** @test */
@@ -175,70 +213,67 @@ class CacherTest extends TestCase
     }
 
     /** @test */
-    public function excludes_urls()
+    public function it_asks_the_url_excluder_if_a_url_should_be_excluder()
     {
-        $cacher = $this->cacher(['exclude' => ['/blog']]);
+        $mock = Mockery::mock(UrlExcluder::class);
+        $mock->shouldReceive('isExcluded')->with('/foo')->andReturnTrue()->once();
+        $mock->shouldReceive('isExcluded')->with('/bar')->andReturnFalse()->once();
+        app()->instance('mock-url-excluder', $mock);
 
-        $this->assertTrue($cacher->isExcluded('/blog'));
-        $this->assertFalse($cacher->isExcluded('/blog/post'));
-    }
-
-    /** @test */
-    public function excludes_wildcard_urls()
-    {
-        $cacher = $this->cacher(['exclude' => [
-            '/blog/*', // The slash indicates "only child pages"
-            '/news*',   // No slash would get the "news" page, child pages, and any page with the substring.
+        config(['statamic.static_caching.exclude' => [
+            'class' => 'mock-url-excluder',
         ]]);
 
-        $this->assertTrue($cacher->isExcluded('/blog/post'));
-        $this->assertFalse($cacher->isExcluded('/blog'));
+        $cacher = $this->cacher();
 
-        $this->assertTrue($cacher->isExcluded('/news'));
-        $this->assertTrue($cacher->isExcluded('/news/article'));
-        $this->assertTrue($cacher->isExcluded('/newspaper'));
+        $this->assertTrue($cacher->isExcluded('/foo'));
+        $this->assertFalse($cacher->isExcluded('/bar'));
     }
 
     /** @test */
-    public function url_exclusions_ignore_query_strings()
+    public function it_invalidates_urls()
     {
-        $cacher = $this->cacher(['exclude' => ['/blog']]);
+        $cache = app(Repository::class);
 
-        $this->assertTrue($cacher->isExcluded('/blog?page=1'));
-    }
+        Site::setConfig(['sites' => [
+            'default' => ['url' => 'http://example.com'],
+            'uk' => ['url' => 'http://example.co.uk'],
+        ]]);
 
-    /** @test */
-    public function url_exclusions_trim_the_base_url()
-    {
-        $cacher = $this->cacher([
-            'base_url' => 'http://example.com',
-            'exclude' => ['/blog'],
+        $cache->forever('static-cache:domains', [
+            'http://example.com',
+            'http://example.co.uk',
         ]);
 
-        $this->assertTrue($cacher->isExcluded('http://example.com/blog'));
+        $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
+            'blog' => '/blog', 'blog-post' => '/blog/post', 'contact' => '/contact',
+        ]);
+        $cache->forever('static-cache:'.md5('http://example.co.uk').'.urls', [
+            'blog' => '/blog', 'blog-post' => '/blog/post', 'contact' => '/contact',
+        ]);
+
+        $cacher = $this->cacher();
+
+        $cacher->shouldReceive('invalidateUrl')->once()->with('/', 'http://example.com');
+        $cacher->shouldReceive('invalidateUrl')->once()->with('/one', 'http://example.com');
+        $cacher->shouldReceive('invalidateUrl')->once()->with('/two', 'http://example.com');
+        $cacher->shouldReceive('invalidateUrl')->once()->with('/three', 'http://example.co.uk');
+        $cacher->shouldReceive('invalidateUrl')->times(2)->with('/blog/post', 'http://example.com');
+        $cacher->shouldReceive('invalidateUrl')->once()->with('/blog/post', 'http://example.co.uk');
+
+        $cacher->invalidateUrls([
+            '/',
+            '/one',
+            'http://example.com/two',
+            'http://example.co.uk/three',
+            '/blog/*',
+            'http://example.com/blog/*',
+            'http://example.co.uk/blog/*',
+        ]);
     }
 
     private function cacher($config = [])
     {
-        return new TestCacher(app(Repository::class), $config);
-    }
-}
-
-class TestCacher extends AbstractCacher
-{
-    public function cachePage(Request $request, $content)
-    {
-    }
-
-    public function getCachedPage(Request $request)
-    {
-    }
-
-    public function flush()
-    {
-    }
-
-    public function invalidateUrl($url)
-    {
+        return Mockery::mock(AbstractCacher::class, [app(Repository::class), $config])->makePartial();
     }
 }

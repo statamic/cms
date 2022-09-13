@@ -28,6 +28,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\CopyPasswordResetLink::class,
         Actions\Delete::class,
         Actions\DeleteMultisiteEntry::class,
+        Actions\DownloadAsset::class,
+        Actions\DownloadAssetFolder::class,
         Actions\Publish::class,
         Actions\Unpublish::class,
         Actions\SendPasswordReset::class,
@@ -78,6 +80,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Terms::class,
         Fieldtypes\Taxonomies::class,
         Fieldtypes\Template::class,
+        Fieldtypes\TemplateFolder::class,
         Fieldtypes\Text::class,
         Fieldtypes\Textarea::class,
         Fieldtypes\Time::class,
@@ -150,6 +153,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Markdown::class,
         Tags\Member::class,
         Tags\Mix::class,
+        Tags\MountUrl::class,
         Tags\Nav::class,
         Tags\NotFound::class,
         Tags\Obfuscate::class,
@@ -172,7 +176,10 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Theme::class,
         Tags\Trans::class,
         Tags\TransChoice::class,
+        Tags\UserGroups::class,
         Tags\Users::class,
+        Tags\UserRoles::class,
+        Tags\Vite::class,
         Tags\Widont::class,
         Tags\Yields::class,
         \Statamic\Forms\Tags::class,
@@ -180,6 +187,7 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Auth\Protect\Tags::class,
         \Statamic\OAuth\Tags::class,
         \Statamic\Search\Tags::class,
+        \Statamic\StaticCaching\NoCache\Tags::class,
     ];
 
     protected $widgets = [
@@ -199,6 +207,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddPerEntryPermissions::class,
         Updates\UseDedicatedTrees::class,
         Updates\AddUniqueSlugValidation::class,
+        Updates\AddGraphQLPermission::class,
     ];
 
     public function register()

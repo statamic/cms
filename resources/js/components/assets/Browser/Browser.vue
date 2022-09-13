@@ -310,8 +310,8 @@ export default {
             page: 1,
             preferencesPrefix: null,
             meta: {},
-            sortColumn: 'basename',
-            sortDirection: 'asc',
+            sortColumn: this.initialContainer.sort_field,
+            sortDirection: this.initialContainer.sort_direction,
             mode: 'table',
             actionUrl: null,
             folderActionUrl: null,
@@ -454,7 +454,7 @@ export default {
             this.loading = true;
 
             const url = this.searchQuery
-                ? cp_url(`assets/browse/search/${this.container.id}`)
+                ? cp_url(`assets/browse/search/${this.container.id}/${this.restrictFolderNavigation ? this.path : ''}`).replace(/\/$/, '')
                 : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
 
             this.$axios.get(url, { params: this.parameters }).then(response => {

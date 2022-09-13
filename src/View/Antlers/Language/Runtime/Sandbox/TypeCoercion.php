@@ -14,4 +14,19 @@ class TypeCoercion
 
         return $value;
     }
+
+    public static function coerceBool($value)
+    {
+        if (is_string($value)) {
+            if ($value === 'true') {
+                return true;
+            }
+
+            if ($value === 'false') {
+                return false;
+            }
+        }
+
+        return (bool) $value;
+    }
 }

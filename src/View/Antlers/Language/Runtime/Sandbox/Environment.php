@@ -1277,7 +1277,7 @@ class Environment
     {
         if ($originalNode instanceof AbstractNode && $originalNode->modifierChain != null) {
             if (! empty($originalNode->modifierChain->modifierChain)) {
-                $value = $this->checkForFieldValue($value, true);
+                $value = $this->checkForFieldValue($value, true, $originalNode->modifierChain->modifierChain);
 
                 return $this->applyModifiers($value, $originalNode->modifierChain);
             }
@@ -1292,17 +1292,19 @@ class Environment
         return $this->checkForFieldValue($value);
     }
 
-    private function checkForFieldValue($value, $hasModifiers = false)
+    private function checkForFieldValue($value, $hasModifiers = false, $modifierChain = null)
     {
         if ($value instanceof Value) {
             GlobalRuntimeState::$isEvaluatingUserData = true;
             if ($value->shouldParseAntlers()) {
-                GlobalRuntimeState::$userContentEvalState = [
-                    $value,
-                    $this->nodeProcessor->getActiveNode(),
-                ];
-                $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
-                GlobalRuntimeState::$userContentEvalState = null;
+                if (! $hasModifiers || ($modifierChain != null && $modifierChain[0]->nameNode->name != 'raw')) {
+                    GlobalRuntimeState::$userContentEvalState = [
+                        $value,
+                        $this->nodeProcessor->getActiveNode(),
+                    ];
+                    $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
+                    GlobalRuntimeState::$userContentEvalState = null;
+                }
             } else {
                 if (! $hasModifiers) {
                     $value = $value->value();
@@ -1536,7 +1538,7 @@ class Environment
 
                 $returnVal = $stringValue;
             } else {
-                $returnVal = $this->applyEscapeSequences($val->value);
+                $returnVal = DocumentParser::applyEscapeSequences($val->value);
             }
         } elseif ($val instanceof NullCoalescenceGroup) {
             $returnVal = $this->evaluateNullCoalescence($val);
@@ -1544,10 +1546,10 @@ class Environment
             $returnVal = $this->evaluateTernaryGroup($val);
         } elseif ($val instanceof ModifierValueNode) {
             if (is_string($val->value) && in_array(trim($val->value), GlobalRuntimeState::$interpolatedVariables)) {
-                return $this->applyEscapeSequences($this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value)));
+                return DocumentParser::applyEscapeSequences($this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value)));
             }
 
-            $returnVal = $this->applyEscapeSequences($val->value);
+            $returnVal = DocumentParser::applyEscapeSequences($val->value);
         } elseif ($val instanceof ArrayNode) {
             $returnVal = $this->resolveArrayValue($val);
         }
@@ -1581,13 +1583,5 @@ class Environment
         }
 
         return $this->adjustValue($returnVal, $val);
-    }
-
-    private function applyEscapeSequences($string)
-    {
-        $string = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $string);
-        $string = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $string);
-
-        return $string;
     }
 }

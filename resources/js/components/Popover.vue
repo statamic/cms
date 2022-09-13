@@ -40,17 +40,23 @@ export default {
 
     data() {
         return {
-            isOpen: false
+            isOpen: false,
+            escBinding: null,
+            popper: null,
         }
     },
 
     mounted() {
-        if (! this.disabled) this.bindPopper()
+        if (! this.disabled) this.bindPopper();
+    },
+
+    beforeDestroy() {
+        this.destroyPopper();
     },
 
     methods: {
         bindPopper() {
-            createPopper(this.$refs.trigger, this.$refs.popover, {
+            this.popper = createPopper(this.$refs.trigger, this.$refs.popover, {
                 placement: this.placement,
                 modifiers: [
                     {
@@ -74,11 +80,20 @@ export default {
         },
         open() {
             this.isOpen = true;
-            this.$keys.bind('esc', e => this.close())
+            this.escBinding = this.$keys.bind('esc', e => this.close())
         },
         close() {
             this.isOpen = false;
-        }
+            if (this.escBinding) {
+                this.escBinding.destroy();
+            }
+        },
+        destroyPopper() {
+            if (this.popper) {
+                this.popper.destroy();
+                this.popper = null;
+            }
+        },
     }
 }
 </script>

@@ -112,7 +112,7 @@ export default {
         },
 
         isReadOnly() {
-            return this.readOnly || this.field.read_only || false;
+            return this.readOnly || this.field.visibility === 'read_only' || false;
         },
 
         classes() {

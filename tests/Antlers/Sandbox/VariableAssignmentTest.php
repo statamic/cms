@@ -1011,4 +1011,55 @@ EOT;
 
         $this->assertSame('<foo><default>', trim($this->renderString($template)));
     }
+
+    public function test_variable_assignments_are_not_reset_when_crossing_parser_boundaries()
+    {
+        $textTemplate = <<<'EOT'
+<count:{{ counter }}>
+
+{{ increment:something_else }}
+{{ increment:something_else }}
+{{ increment:something_else }}
+{{ increment:something_else }}
+{{ increment:something_else }}
+
+{{ bard }}
+{{ partial:echo }}{{ partial:echo }}{{ partial:echo }}{{ partial:echo }}{{ partial:echo }}{{ foreach:array_dynamic }}{{ /foreach:array_dynamic }}{{ /partial:echo }}{{ /partial:echo }}{{ /partial:echo }}{{ /partial:echo }}{{ /partial:echo }}
+{{ /bard }}
+
+{{ increment:something_else }}
+EOT;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('components.text', $textTemplate);
+        $this->viewShouldReturnRaw('echo', '{{ slot }}');
+
+        $this->runFieldTypeTest('replicator_blocks', null, ['bard']);
+    }
+
+    public function test_empty_arrays_can_be_created_and_pushed_to()
+    {
+        $template = <<<'EOT'
+{{ empty_array = [] }}
+{{ empty_array += 'One'; empty_array += 'Two'; }}
+{{ empty_array += 'Three' }}
+{{ empty_array += 'Four'; }}
+{{ empty_array }}<{{ value }}>{{ /empty_array }}
+EOT;
+
+        $this->assertSame('<One><Two><Three><Four>', trim($this->renderString($template)));
+    }
+
+    public function test_arrays_with_data_can_be_created_and_pushed_to()
+    {
+        $template = <<<'EOT'
+{{ the_array = ['Zero'] }}
+{{ the_array += 'One'; the_array += 'Two'; }}
+{{ the_array += 'Three' }}
+{{ the_array += 'Four'; }}
+{{ the_array }}<{{ value }}>{{ /the_array }}
+EOT;
+
+        $this->assertSame('<Zero><One><Two><Three><Four>', trim($this->renderString($template)));
+    }
 }

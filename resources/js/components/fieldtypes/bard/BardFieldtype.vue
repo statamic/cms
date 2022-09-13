@@ -166,6 +166,7 @@ export default {
             previews: this.meta.previews,
             mounted: false,
             pageHeader: null,
+            escBinding: null,
         }
     },
 
@@ -250,7 +251,29 @@ export default {
 
                 return Object.keys(this.storeState.errors).some(key => key.startsWith(prefix));
             })
-        }
+        },
+
+        replicatorPreview() {
+            const stack = JSON.parse(this.value);
+            let text = '';
+            while (stack.length) {
+                const node = stack.shift();
+                if (node.type === 'text') {
+                    text += ` ${node.text || ''}`;
+                } else if (node.type === 'set') {
+                    const handle = node.attrs.values.type;
+                    const set = this.config.sets.find(set => set.handle === handle);
+                    text += ` [${set ? set.display : handle}]`;
+                }
+                if (text.length > 150) {
+                    break;
+                }
+                if (node.content) {
+                    stack.unshift(...node.content);
+                }
+            }
+            return text;
+        },
 
     },
 
@@ -282,7 +305,7 @@ export default {
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.$keys.bind('esc', this.closeFullscreen)
+        this.escBinding = this.$keys.bind('esc', this.closeFullscreen)
 
         this.$nextTick(() => this.mounted = true);
 
@@ -293,6 +316,9 @@ export default {
 
     beforeDestroy() {
         this.editor.destroy();
+        this.escBinding.destroy();
+
+        this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
     },
 
     watch: {
@@ -341,7 +367,12 @@ export default {
                 meta.previews = value;
                 this.updateMeta(meta);
             }
-        }
+        },
+
+        fieldPathPrefix(fieldPathPrefix, oldFieldPathPrefix) {
+            this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, oldFieldPathPrefix);
+            this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+        },
 
     },
 
@@ -360,6 +391,22 @@ export default {
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
                 this.editor.commands.set({ id, values });
+            });
+        },
+
+        duplicateSet(old_id, attrs, pos) {
+            const id = `set-${uniqid()}`;
+            const enabled = attrs.enabled;
+            const values = Object.assign({}, attrs.values);
+
+            let previews = Object.assign({}, this.previews[old_id]);
+            this.previews = Object.assign({}, this.previews, { [id]: previews });
+
+            this.updateSetMeta(id, this.meta.existing[old_id]);
+
+            // Perform this in nextTick because the meta data won't be ready until then.
+            this.$nextTick(() => {
+                this.editor.commands.setAt({ attrs: { id, enabled, values }, pos });
             });
         },
 

@@ -23,11 +23,6 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return parent::where($column, $operator, $value, $boolean);
     }
 
-    public function orWhere($column, $operator = null, $value = null)
-    {
-        return $this->where($column, $operator, $value, 'or');
-    }
-
     public function whereIn($column, $values, $boolean = 'and')
     {
         if (in_array($column, ['collection', 'collections'])) {
@@ -37,11 +32,6 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         }
 
         return parent::whereIn($column, $values, $boolean);
-    }
-
-    public function orWhereIn($column, $values)
-    {
-        return $this->whereIn($column, $values, 'or');
     }
 
     protected function collect($items = [])
