@@ -346,7 +346,7 @@ class Nav
                     'config' => $config,
                 ];
             })
-            ->map(fn ($override) => $this->applyPreferenceOverrideForItem($override, $section))
+            ->map(fn ($override) => $this->applyPreferenceOverrideForItem($override['config'], $section, $override['item']))
             ->filter()
             ->reject(fn ($item, $id) => $item->id() === $id)
             ->each(fn ($item) => $this->items[] = $item);
@@ -359,24 +359,25 @@ class Nav
     /**
      * Apply preference overide for specific item.
      *
-     * @param  mixed  $override
-     * @param  mixed  $section
+     * @param  array  $config
+     * @param  string  $section
+     * @param  NavItem|null  $item
      * @param  string|null  $id
      * @return NavItem|null
      */
-    protected function applyPreferenceOverrideForItem($override, $section, $id = null)
+    protected function applyPreferenceOverrideForItem($config, $section, $item = null, $id = null)
     {
-        switch ($override['config']['action']) {
+        switch ($config['action']) {
             case '@create':
-                return $this->userCreateFromPendingItem($override['config'], $section, $id);
+                return $this->userCreateFromPendingItem($config, $section, $id);
             case '@remove':
-                return $this->userRemoveItem($override['item']);
+                return $this->userRemoveItem($item);
             case '@modify':
-                return $this->userModifyItem($override['item'], $override['config'], $section);
+                return $this->userModifyItem($item, $config, $section);
             case '@alias':
-                return $this->userAliasItem($override['item'], $override['config'], $section);
+                return $this->userAliasItem($item, $config, $section);
             case '@move':
-                return $this->userMoveItem($override['item'], $override['config'], $section);
+                return $this->userMoveItem($item, $config, $section);
         }
     }
 
@@ -650,17 +651,13 @@ class Nav
      */
     protected function userModifyChild($config, $section, $key, $parentItem)
     {
-        // TODO: refactor to separate params
-        $override = [
-            'item' => $this->findItem($key),
-            'config' => collect($config),
-        ];
+        $item = $this->findItem($key);
 
         if ($config['action'] === '@create' && isset($config['display'])) {
             $id = $this->generateNewItemId($parentItem->id(), $config['display']);
         }
 
-        if ($childItem = $this->applyPreferenceOverrideForItem($override, $section, $id ?? null)) {
+        if ($childItem = $this->applyPreferenceOverrideForItem($config, $section, $item, $id ?? null)) {
             $childItem->children([]);
         }
 
