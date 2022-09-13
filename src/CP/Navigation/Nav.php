@@ -185,7 +185,9 @@ class Nav
         collect($this->items)
             ->flatMap(fn ($item) => $item->children())
             ->filter(fn ($item) => $item->children())
-            ->each(fn ($item) => throw new Exception('Nav children have exceeded their nesting limit.'));
+            ->each(function ($item) {
+                throw new Exception('Nav children have exceeded their nesting limit.');
+            });
 
         return $this;
     }
@@ -202,7 +204,9 @@ class Nav
         collect($this->items)
             ->flatMap(fn ($item) => $item->children())
             ->reject(fn ($item) => is_null($item->view()))
-            ->each(fn ($item) => throw new Exception('Nav children cannot specify views.'));
+            ->each(function ($item) {
+                throw new Exception('Nav children cannot specify views.');
+            });
 
         return $this;
     }
