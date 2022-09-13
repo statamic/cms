@@ -6,7 +6,6 @@ use Illuminate\Filesystem\Filesystem;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
-use Statamic\Preferences\DefaultPreferences;
 use Tests\FakesRoles;
 use Tests\TestCase;
 
@@ -90,7 +89,7 @@ class PrecedenceTest extends TestCase
 
         $this->assertEquals([], Preference::all());
 
-        DefaultPreferences::save($preferences = [
+        Preference::default()->set($preferences = [
             'site' => 'english',
             'columns' => [
                 'collections' => [
@@ -100,7 +99,7 @@ class PrecedenceTest extends TestCase
                     ],
                 ],
             ],
-        ]);
+        ])->save();
 
         $this->assertEquals('english', Preference::get('site'));
         $this->assertEquals(['title', 'slug'], Preference::get('columns.collections.blog'));
@@ -164,13 +163,11 @@ class PrecedenceTest extends TestCase
     /** @test */
     public function it_gives_precedence_to_user_and_role_preferences_over_default_preferences()
     {
-        DefaultPreferences::save([
-            'site' => 'english',
+        $this->actingAs(User::make()->assignRole('rabbit')->assignRole('bear')->preferences([
             'actions' => [
-                'eats' => 'pizza',
-                'walks' => true,
+                'hibernates' => false,
             ],
-        ]);
+        ]));
 
         $this->setTestRoles([
             'bear' => Role::make()->permissions('super')->preferences([
@@ -187,11 +184,13 @@ class PrecedenceTest extends TestCase
             ]),
         ]);
 
-        $this->actingAs(User::make()->assignRole('rabbit')->assignRole('bear')->preferences([
+        Preference::default()->set([
+            'site' => 'english',
             'actions' => [
-                'hibernates' => false,
+                'eats' => 'pizza',
+                'walks' => true,
             ],
-        ]));
+        ])->save();
 
         $this->assertEquals('english', Preference::get('site'));
         $this->assertEquals('lettuce', Preference::get('actions.eats'));

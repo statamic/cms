@@ -20,6 +20,16 @@ class Preferences
     }
 
     /**
+     * Get default preferences instance.
+     *
+     * @return DefaultPreferences
+     */
+    public function default()
+    {
+        return app(DefaultPreferences::class);
+    }
+
+    /**
      * Get all preferences, merged in a specific order for precedence.
      *
      * @return array
@@ -100,7 +110,7 @@ class Preferences
      */
     protected function mergeDottedDefaultPreferences()
     {
-        $defaultPreferences = DefaultPreferences::all();
+        $defaultPreferences = $this->default()->all();
 
         $this->dotted += Arr::dot($defaultPreferences);
 

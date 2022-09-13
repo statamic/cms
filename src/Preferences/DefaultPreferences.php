@@ -26,9 +26,9 @@ class DefaultPreferences
      *
      * @return array
      */
-    public static function all()
+    public function all()
     {
-        return (new static)->getPreferences();
+        return $this->getPreferences();
     }
 
     /**
@@ -37,14 +37,23 @@ class DefaultPreferences
      * @param  array  $preferences
      * @return array
      */
-    public static function save($preferences)
+    public function save()
     {
-        $instance = (new static);
-
-        $instance->mergePreferences($preferences);
-
-        File::put($instance->path, YAML::dump($instance->preferences));
+        File::put($this->path, YAML::dump($this->preferences));
 
         return true;
+    }
+
+    /**
+     * Magically call `setPreferences()` and `mergePreferences()` via `set()` and `merge()`, etc.
+     *
+     * @param  mixed  $name
+     * @param  mixed  $arguments
+     */
+    public function __call($name, $arguments)
+    {
+        $method = $name.'Preferences';
+
+        return $this->{$method}(...$arguments);
     }
 }

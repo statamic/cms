@@ -3,7 +3,7 @@
 namespace Tests\Preferences;
 
 use Illuminate\Filesystem\Filesystem;
-use Statamic\Preferences\DefaultPreferences;
+use Statamic\Facades\Preference;
 use Tests\TestCase;
 
 class DefaultPreferencesTest extends TestCase
@@ -28,7 +28,7 @@ class DefaultPreferencesTest extends TestCase
     public function it_gets_empty_array_by_default()
     {
         $this->assertFileNotExists(resource_path('preferences.yaml'));
-        $this->assertEquals([], DefaultPreferences::all());
+        $this->assertEquals([], Preference::default()->all());
     }
 
     /** @test */
@@ -56,7 +56,7 @@ EOT
             ],
         ];
 
-        $this->assertEquals($expected, DefaultPreferences::all());
+        $this->assertEquals($expected, Preference::default()->all());
     }
 
     /** @test */
@@ -64,7 +64,7 @@ EOT
     {
         $this->assertFileNotExists(resource_path('preferences.yaml'));
 
-        DefaultPreferences::save($preferences = [
+        Preference::default()->set($preferences = [
             'collections' => [
                 'posts' => [
                     'columns' => [
@@ -74,11 +74,11 @@ EOT
                     ],
                 ],
             ],
-        ]);
+        ])->save();
 
         $this->assertFileExists(resource_path('preferences.yaml'));
 
-        $this->assertEquals($preferences, DefaultPreferences::all());
+        $this->assertEquals($preferences, Preference::default()->all());
     }
 
     /** @test */
@@ -86,25 +86,25 @@ EOT
     {
         $this->assertFileNotExists(resource_path('preferences.yaml'));
 
-        DefaultPreferences::save($preferences = [
+        Preference::default()->set($preferences = [
             'foo' => 'bar',
             'bar' => 'baz',
-        ]);
+        ])->save();
 
         $this->assertFileExists(resource_path('preferences.yaml'));
 
-        $this->assertEquals($preferences, DefaultPreferences::all());
+        $this->assertEquals($preferences, Preference::default()->all());
 
-        DefaultPreferences::save($preferences = [
+        Preference::default()->merge($preferences = [
             'foo' => 'qux',
-        ]);
+        ])->save();
 
         $expected = [
             'foo' => 'qux',
             'bar' => 'baz',
         ];
 
-        $this->assertEquals($expected, DefaultPreferences::all());
+        $this->assertEquals($expected, Preference::default()->all());
     }
 
     private function cleanup()
