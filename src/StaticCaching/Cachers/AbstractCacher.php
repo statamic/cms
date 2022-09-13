@@ -55,9 +55,7 @@ abstract class AbstractCacher implements Cacher
             return $url;
         }
 
-        $site = app()->runningInConsole() ? Site::default() : Site::current();
-
-        return Str::startsWith($url = $site->url(), '/')
+        return Str::startsWith($url = Site::current()->url(), '/')
             ? Str::removeRight(config('app.url'), '/').$url
             : $url;
     }
