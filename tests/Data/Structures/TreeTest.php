@@ -537,7 +537,7 @@ class TreeTest extends TestCase
      */
     public function it_caches_validated_structures()
     {
-        Config::set(['statamic.structures.cache_ttl' => 10]);
+        Config::set(['statamic.system.structure_cache_ttl' => 10]);
 
         $tree = $this->tree();
 

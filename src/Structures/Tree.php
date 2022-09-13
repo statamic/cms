@@ -71,7 +71,7 @@ abstract class Tree implements Contract, Localization
         return Blink::once($key, function () use ($key) {
             return Cache::remember(
                 $key,
-                now()->addSeconds(Config::get('statamic.structures.cache_ttl')),
+                now()->addSeconds(Config::get('statamic.system.structure_cache_ttl')),
                 function () {
                     return $this->structure()->validateTree($this->tree, $this->locale());
                 },

@@ -98,6 +98,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Structure tree caching
+    |--------------------------------------------------------------------------
+    |
+    | The Structure cache allows Nav and Collection trees to be cached across
+    | page requests, speeding up secondary requests for the tree, which is
+    | really useful when you use {{ nav }} tags across multiple pages.
+    |
+    | This value is defined in seconds. Set to 0 to disable.
+    |
+    */
+
+    'structure_cache_ttl' => env('STATAMIC_STRUCTURE_CACHE', 604_800),
+
+    /*
+    |--------------------------------------------------------------------------
     | Intensive Operations
     |--------------------------------------------------------------------------
     |

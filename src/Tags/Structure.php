@@ -161,7 +161,7 @@ class Structure extends Tags
     {
         return Cache::remember(
             $key,
-            now()->addSeconds(Config::get('statamic.structures.cache_ttl')),
+            now()->addSeconds(Config::get('statamic.system.structure_cache_ttl')),
             $callable
         );
     }
