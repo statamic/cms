@@ -68,7 +68,7 @@ class ReplaceAsset extends Action
                 'max_files' => 1,
                 'validate' => 'required',
                 'mode' => 'list',
-                'restrict' => false,
+                'restrict' => true,
                 'allow_uploads' => true,
                 'show_filename' => true,
             ],
