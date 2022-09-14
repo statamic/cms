@@ -109,7 +109,7 @@ return [
     |
     */
 
-    'structure_cache_ttl' => env('STATAMIC_STRUCTURE_CACHE', 604_800),
+    'structure_cache_ttl' => env('STATAMIC_STRUCTURE_CACHE', 0),
 
     /*
     |--------------------------------------------------------------------------
