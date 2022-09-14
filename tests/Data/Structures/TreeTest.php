@@ -553,6 +553,8 @@ class TreeTest extends TestCase
      */
     public function cached_tree_is_the_new_tree()
     {
+        Config::set('statamic.system.structure_cache_ttl', 1);
+
         $tree = $this->tree();
 
         $originalTree = $tree->build();
