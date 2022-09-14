@@ -87,11 +87,32 @@ class CacherTest extends TestCase
     }
 
     /** @test */
+    public function gets_the_base_url_using_the_deprecated_config_value_with_trailing_slash()
+    {
+        $cacher = $this->cacher(['base_url' => 'http://example.com/']);
+
+        $this->assertEquals('http://example.com', $cacher->getBaseUrl());
+    }
+
+    /** @test */
     public function gets_the_base_url_when_sites_have_absolute_urls()
     {
         Site::setConfig(['sites' => [
             'default' => ['url' => 'http://example.com'],
             'uk' => ['url' => 'http://example.co.uk'],
+        ]]);
+
+        $cacher = $this->cacher();
+
+        $this->assertEquals('http://example.com', $cacher->getBaseUrl());
+    }
+
+    /** @test */
+    public function gets_the_base_url_when_sites_have_absolute_urls_with_trailing_slashes()
+    {
+        Site::setConfig(['sites' => [
+            'default' => ['url' => 'http://example.com/'],
+            'uk' => ['url' => 'http://example.co.uk/'],
         ]]);
 
         $cacher = $this->cacher();
@@ -112,6 +133,36 @@ class CacherTest extends TestCase
         $cacher = $this->cacher();
 
         $this->assertEquals('http://app.com/default', $cacher->getBaseUrl());
+    }
+
+    /** @test */
+    public function gets_the_base_url_when_sites_have_relative_urls_with_trailing_slashes()
+    {
+        Site::setConfig(['sites' => [
+            'default' => ['url' => '/default/'],
+            'uk' => ['url' => '/uk/'],
+        ]]);
+
+        config(['app.url' => 'http://app.com']);
+
+        $cacher = $this->cacher();
+
+        $this->assertEquals('http://app.com/default', $cacher->getBaseUrl());
+    }
+
+    /** @test */
+    public function gets_the_base_url_when_site_is_just_a_slash()
+    {
+        Site::setConfig(['sites' => [
+            'default' => ['url' => '/'],
+            'uk' => ['url' => '/uk/'],
+        ]]);
+
+        config(['app.url' => 'http://app.com']);
+
+        $cacher = $this->cacher();
+
+        $this->assertEquals('http://app.com', $cacher->getBaseUrl());
     }
 
     /** @test */

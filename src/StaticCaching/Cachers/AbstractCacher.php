@@ -51,16 +51,16 @@ abstract class AbstractCacher implements Cacher
     public function getBaseUrl()
     {
         // Check 'base_url' for backward compatibility.
-        if ($url = $this->config('base_url')) {
-            return $url;
+        if (! $baseUrl = $this->config('base_url')) {
+            // This could potentially just be Site::current()->absoluteUrl() but at the
+            // moment that method gets the URL based on the request. For now, we will
+            // manually get it from the config, as to not break any existing sites.
+            $baseUrl = Str::startsWith($url = Site::current()->url(), '/')
+                ? Str::removeRight(config('app.url'), '/').$url
+                : $url;
         }
 
-        // This could potentially just be Site::current()->absoluteUrl() but at the
-        // moment that method gets the URL based on the request. For now, we will
-        // manually get it from the config, as to not break any existing sites.
-        return Str::startsWith($url = Site::current()->url(), '/')
-            ? Str::removeRight(config('app.url'), '/').$url
-            : $url;
+        return rtrim($baseUrl, '/');
     }
 
     /**
