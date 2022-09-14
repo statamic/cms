@@ -44,28 +44,28 @@ export default {
             };
 
             this.$axios.post(this.url, payload, { responseType: 'blob' }).then(response => {
-                response.data.text().then(data => {
-                    response.headers['content-disposition']
-                        ? this.handleFileDownload(response) // Pass blob response for downloads
-                        : this.handleActionSuccess(JSON.parse(data)); // Otherwise convert to JSON and handle as normal
-                });
-            }).catch(error => {
-                error.response.data.text().then(data => {
-                    this.handleActionError(JSON.parse(data), error.response.status);
-                });
-            });
+                response.headers['content-disposition']
+                    ? this.handleFileDownload(response) // Pass blob response for downloads
+                    : this.handleActionSuccess(response); // Otherwise handle as normal, converting from JSON
+            }).catch(error => this.handleActionError(error.response));
         },
 
         handleActionSuccess(response) {
-            if (response.redirect) window.location = response.redirect;
-            if (response.callback) Statamic.$callbacks.call(response.callback[0], ...response.callback.slice(1));
-            this.$emit('completed', true, response);
+            response.data.text().then(data => {
+                data = JSON.parse(data);
+                if (data.redirect) window.location = data.redirect;
+                if (data.callback) Statamic.$callbacks.call(data.callback[0], ...data.callback.slice(1));
+                this.$emit('completed', true, data);
+            });
         },
 
-        handleActionError(response, status) {
-            if (status == 422) this.errors = response.errors;
-            this.$toast.error(response.message);
-            this.$emit('completed', false, response)
+        handleActionError(response) {
+            response.data.text().then(data => {
+                data = JSON.parse(data);
+                if (response.status == 422) this.errors = data.errors;
+                this.$toast.error(data.message);
+                this.$emit('completed', false, data);
+            });
         },
 
         handleFileDownload(response) {
