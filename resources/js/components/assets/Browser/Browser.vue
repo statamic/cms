@@ -192,7 +192,7 @@
                                             </div>
                                         </div>
                                         <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate" v-text="folder.basename" :title="folder.basename" />
-                                        <dropdown-list v-if="folderActions(folder).length" class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
+                                        <dropdown-list v-if="folderActions(folder).length" class="absolute top-1 right-2 opacity-0 group-hover:opacity-100" :autoclose="true">
                                             <!-- TODO: Folder edit -->
                                             <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
 
@@ -213,7 +213,7 @@
                                             </div>
                                         </div>
                                         <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate" v-text="asset.basename" :title="asset.basename" />
-                                        <dropdown-list class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
+                                        <dropdown-list class="absolute top-1 right-2 opacity-0 group-hover:opacity-100" :autoclose="true">
                                             <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                             <div class="divider" v-if="asset.actions.length" />
                                             <data-list-inline-actions
