@@ -35,7 +35,7 @@ class ApplicationCacher extends AbstractCacher
         $key = $this->makeHash($url);
 
         // Keep track of the URL and key the response content is about to be stored within.
-        $this->cacheUrl($key, $url);
+        $this->cacheUrl($key, ...$this->getPathAndDomain($url));
 
         $key = $this->normalizeKey('responses:'.$key);
         $value = $this->normalizeContent($content);

@@ -73,4 +73,6 @@ return [
     'group_misc' => 'Diversen',
     'resolve_duplicate_ids' => 'Los dubbele IDs op',
     'resolve_duplicate_ids_desc' => 'Geeft de mogelijkheid om dubbele IDs te zien en op te lossen.',
+    'view_graphql' => 'Bekijk GraphQL',
+    'view_graphql_desc' => 'Geeft de mogelijkheid om de GraphQL viewer te bekijken',
 ];

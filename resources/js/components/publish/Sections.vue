@@ -132,6 +132,7 @@ export default {
             visibleTabs: 0,
             layoutReady: false,
             shouldShowSidebar: false,
+            initialTabSet: false
         }
     },
 
@@ -192,10 +193,6 @@ export default {
             return `publish-actions-${this.storeName}`;
         }
 
-    },
-
-    mounted() {
-        this.setActiveTabFromHash();
     },
 
     beforeUpdate() {
@@ -317,6 +314,9 @@ export default {
                 })
 
                 this.visibleTabs = visibleTabs;
+
+                if (!this.initialTabSet) this.setActiveTabFromHash();
+                this.initialTabSet = true;
             });
         }, 100),
 
