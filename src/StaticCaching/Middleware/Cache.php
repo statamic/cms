@@ -46,22 +46,17 @@ class Cache
 
         $response = $next($request);
 
-        if ($this->shouldBeCached($request, $response)) {
-            $this->makeReplacementsAndCacheResponse($request, $response);
-
-            $this->nocache->write();
-        }
-
-        return $response;
-    }
-
-    private function makeReplacementsAndCacheResponse($request, $response)
-    {
         $cachedResponse = clone $response;
 
         $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse, $response));
 
-        $this->cacher->cachePage($request, $cachedResponse);
+        $this->nocache->write();
+
+        if ($this->shouldBeCached($request, $response)) {
+            $this->cacher->cachePage($request, $cachedResponse);
+        }
+
+        return $response;
     }
 
     private function getReplacers(): Collection
