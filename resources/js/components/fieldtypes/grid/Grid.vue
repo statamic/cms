@@ -113,6 +113,10 @@ export default {
             return !this.isReadOnly && this.config.reorderable && this.maxRows > 1
         },
 
+        replicatorPreview() {
+            return `${this.value.length} ${this.config.display}`;
+        }
+
     },
 
     reactiveProvide: {
