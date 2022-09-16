@@ -20,9 +20,9 @@ class DeleteTemporaryFileUploads
 
     private function deleteFilesOverAnHourOld()
     {
-        $disk = File::disk();
+        $disk = File::disk('local');
 
-        $dir = storage_path('statamic/file-uploads');
+        $dir = 'statamic/file-uploads';
 
         $disk
             ->getFilesRecursively($dir)

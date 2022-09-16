@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Fieldtypes;
 
 use Illuminate\Http\Request;
-use Statamic\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Statamic\Http\Controllers\CP\CpController;
 
 class FileFieldtypeController extends CpController
@@ -22,16 +22,7 @@ class FileFieldtypeController extends CpController
 
         $path = now()->timestamp.'/'.$file->getClientOriginalName();
 
-        $stream = fopen($file->getRealPath(), 'r');
-
-        File::disk()->put(
-            storage_path('statamic/file-uploads/').$path,
-            $stream,
-        );
-
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
+        Storage::disk('local')->putFileAs('statamic/file-uploads', $file, $path);
 
         return ['data' => ['id' => $path]];
     }
