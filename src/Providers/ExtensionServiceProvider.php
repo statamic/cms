@@ -55,7 +55,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
         Fieldtypes\Entries::class,
-        Fieldtypes\File::class,
+        Fieldtypes\Files::class,
         Fieldtypes\Floatval::class,
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,

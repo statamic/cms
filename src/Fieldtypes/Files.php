@@ -4,7 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
-class File extends Fieldtype
+class Files extends Fieldtype
 {
     protected $defaultValue = [];
 
@@ -23,7 +23,7 @@ class File extends Fieldtype
     public function preload()
     {
         return [
-            'uploadUrl' => cp_route('file.upload'),
+            'uploadUrl' => cp_route('files.upload'),
         ];
     }
 

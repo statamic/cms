@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Http\Controllers\CP\CpController;
 
-class FileFieldtypeController extends CpController
+class FilesFieldtypeController extends CpController
 {
     public function upload(Request $request)
     {

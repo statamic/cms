@@ -8,7 +8,7 @@ use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class FileTest extends TestCase
+class FilesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
