@@ -114,7 +114,7 @@ export default {
         },
 
         replicatorPreview() {
-            return `${this.value.length} ${this.config.display}`;
+            return this.value.length + ' ' + this.config.display;
         }
 
     },
