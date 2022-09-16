@@ -60,6 +60,7 @@ class ImportUsers extends Command
             $this->withProgressBar($users, function ($user) use($eloquentRepository) {
 
                 $data = $user->data();
+                $data->put('stache_user_id', $user->id());
 
                 $eloquentUser = $eloquentRepository->make()
                     //->id($user->id()) - if you are using UUIDs for users, then uncomment this
