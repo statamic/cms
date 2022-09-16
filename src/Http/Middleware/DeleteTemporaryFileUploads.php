@@ -22,10 +22,8 @@ class DeleteTemporaryFileUploads
     {
         $disk = File::disk('local');
 
-        $dir = 'statamic/file-uploads';
-
         $disk
-            ->getFilesRecursively($dir)
+            ->getFilesRecursively($dir = 'statamic/file-uploads')
             ->filter(function ($path) {
                 $bits = explode('/', $path);
                 $timestamp = $bits[count($bits) - 2];
