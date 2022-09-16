@@ -4,8 +4,8 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Statamic\Auth\Eloquent\User as EloquentUser;
-use Statamic\Auth\UserRepositoryManager;
 use Statamic\Auth\File\User as FileUser;
+use Statamic\Auth\UserRepositoryManager;
 use Statamic\Console\RunsInPlease;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Auth\UserRepository as UserRepositoryContract;
