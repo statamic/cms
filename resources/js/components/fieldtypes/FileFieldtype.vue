@@ -16,7 +16,7 @@
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
-                <div class="assets-fieldtype-picker py-2">
+                <div class="assets-fieldtype-picker py-2" :class="{ 'is-expanded': value.length }">
                     <p class="asset-upload-control text-xs text-grey-60 ml-0">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
@@ -30,6 +30,37 @@
                     :uploads="uploads"
                 />
 
+                <div v-if="value.length" class="asset-table-listing">
+                    <table class="table-fixed">
+                        <tbody>
+                            <tr
+                                v-for="(file, i) in value"
+                                :key="file"
+                                class="asset-row bg-white hover:bg-grey-10"
+                            >
+                                <td class="flex items-center">
+                                    <div
+                                        class="w-7 h-7 cursor-pointer whitespace-no-wrap flex items-center justify-center"
+                                    >
+                                        <file-icon :extension="getExtension(file)" />
+                                    </div>
+                                    <div
+                                        class="flex items-center flex-1 ml-1 text-xs text-left truncate"
+                                        v-text="file.slice(11)"
+                                    />
+                                </td>
+                                <td class="p-0 w-8 text-right align-middle">
+                                    <button
+                                        @click="remove(i)"
+                                        class="flex items-center p-1 w-full h-full text-grey-60 hover:text-grey-90"
+                                    >
+                                        <svg-icon name="trash" class="w-6 h-6" />
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </uploader>
     </div>
@@ -85,6 +116,14 @@ export default {
         uploadFile() {
             this.$refs.uploader.browse();
         },
+
+        getExtension(file) {
+            return file.split('.').pop();
+        },
+
+        remove(index) {
+            this.update([...this.value.slice(0, index), ...this.value.slice(index + 1)]);
+        }
     }
 }
 </script>
