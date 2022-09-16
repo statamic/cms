@@ -118,6 +118,10 @@ export default {
 
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
+        },
+
+        replicatorPreview() {
+            return `${this.value.length} ${this.config.display}`;
         }
     },
 
