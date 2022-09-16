@@ -20,7 +20,7 @@ class FilesTest extends TestCase
 
         $this
             ->actingAs(tap(User::make()->makeSuper())->save())
-            ->post('/cp/fieldtypes/file/upload', ['file' => $file])
+            ->post('/cp/fieldtypes/files/upload', ['file' => $file])
             ->assertOk()
             ->assertJson([
                 'data' => [
