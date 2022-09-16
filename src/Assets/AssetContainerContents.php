@@ -3,6 +3,7 @@
 namespace Statamic\Assets;
 
 use Illuminate\Support\Facades\Cache;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 
 class AssetContainerContents
@@ -19,22 +20,25 @@ class AssetContainerContents
 
     public function all()
     {
-        return $this->files = $this->files
-            ?? Cache::remember($this->key(), $this->ttl(), function () {
-                // Use Flysystem directly because it gives us type, timestamps, dirname
-                // and will let us perform more efficient filtering and caching.
-                $files = $this->filesystem()->listContents('/', true);
+        if ($this->files && ! Statamic::isWorker()) {
+            return $this->files;
+        }
 
-                // If Flysystem 3.x, re-apply sorting and return a backwards compatible result set.
-                // See: https://flysystem.thephpleague.com/v2/docs/usage/directory-listings/
-                if (! is_array($files)) {
-                    return collect($files->sortByPath()->toArray())->keyBy('path')->map(function ($file) {
-                        return $this->normalizeFlysystemAttributes($file);
-                    });
-                }
+        return $this->files = Cache::remember($this->key(), $this->ttl(), function () {
+            // Use Flysystem directly because it gives us type, timestamps, dirname
+            // and will let us perform more efficient filtering and caching.
+            $files = $this->filesystem()->listContents('/', true);
 
-                return collect($files)->keyBy('path');
-            });
+            // If Flysystem 3.x, re-apply sorting and return a backwards compatible result set.
+            // See: https://flysystem.thephpleague.com/v2/docs/usage/directory-listings/
+            if (! is_array($files)) {
+                return collect($files->sortByPath()->toArray())->keyBy('path')->map(function ($file) {
+                    return $this->normalizeFlysystemAttributes($file);
+                });
+            }
+
+            return collect($files)->keyBy('path');
+        });
     }
 
     /**
