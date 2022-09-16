@@ -4,26 +4,33 @@
     <div>
 
         <!-- Tabs -->
-        <div v-if="showTabs" class="tabs-container flex items-center" :class="{ 'offset-for-sidebar': shouldShowSidebar }">
+        <div 
+            v-if="showTabs"
+            class="tabs-container flex items-center"
+            :class="{ 'offset-for-sidebar': shouldShowSidebar }"
+        >
             <div
                 class="publish-tabs tabs flex-shrink"
+                :class="{ 'tabs-scrolled': canScrollLeft }"
                 ref="tabs"
                 role="tablist"
                 :aria-label="__('Edit Content')"
-                @keydown.arrow-left="activatePreviousTab"
-                @keydown.arrow-right="activateNextTab"
-                @keydown.arrow-up="activatePreviousTab"
-                @keydown.arrow-down="activateNextTab"
-                @keydown.home="activateFirstTab"
-                @keydown.end="activateLastTab"       
+                @keydown.prevent.arrow-left="activatePreviousTab"
+                @keydown.prevent.arrow-right="activateNextTab"
+                @keydown.prevent.arrow-up="activatePreviousTab"
+                @keydown.prevent.arrow-down="activateNextTab"
+                @keydown.prevent.home="activateFirstTab"
+                @keydown.prevent.end="activateLastTab"
+                @mousewheel.prevent="scrollTabs"
+                @scroll="updateScrollHints"
             >
-                <button v-for="(section, index) in mainSections"
+                <button v-for="section in mainSections"
                     class="tab-button"
+                    :ref="section.handle + '-tab'"
                     :key="section.handle"
                     :class="{
                         'active': isActive(section.handle),
                         'has-error': sectionHasError(section.handle),
-                        'invisible': isTabHidden(index)
                     }"
                     role="tab"
                     :id="tabId(section.handle)"
@@ -32,12 +39,16 @@
                     :tabindex="isActive(section.handle) ? 0 : -1"
                     @click="setActive(section.handle)"
                     v-text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
-                ></button>
+                />
             </div>
+
+            <div class="fade-left" v-if="canScrollLeft" />
+            <div class="fade-right" v-if="canScrollRight" />
+
             <dropdown-list class="ml-1" v-cloak v-if="showHiddenTabsDropdown">
                 <dropdown-item
                     v-for="(section, index) in mainSections"
-                    v-show="isTabHidden(index)"
+                    v-show="shouldShowInDropdown(index)"
                     :key="section.handle"
                     :text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
                     @click.prevent="setActive(section.handle)"
@@ -132,7 +143,10 @@ export default {
             visibleTabs: 0,
             layoutReady: false,
             shouldShowSidebar: false,
-            initialTabSet: false
+            hiddenTabs: [],
+            tabsAreScrolled: false,
+            canScrollLeft: false,
+            canScrollRight: false,
         }
     },
 
@@ -197,8 +211,18 @@ export default {
 
     beforeUpdate() {
         if (this.shouldShowSidebar && this.active === 'sidebar') {
-            this.active = this.state.blueprint.sections[0].handle
+            this.active = this.tabAt(0);
         }
+    },
+
+    watch: {
+
+        layoutReady(ready) {
+            if (ready) {
+                this.$nextTick(() => this.setActiveTabFromHash());
+            }
+        }
+
     },
 
     methods: {
@@ -207,23 +231,33 @@ export default {
             return this.sectionsWithErrors.includes(handle);
         },
 
-        setActive(tab) {
-            this.active = tab;
-            this.$events.$emit('tab-switched', tab);
+        setActive(handle) {
+            this.active = handle;
 
-            if (! this.inStack) {
-                window.location.hash = tab;
+            if (!this.inStack) {
+                window.location.hash = handle;
             }
 
-            this.$refs.tabs.childNodes[this.tabIndex(tab)].focus();
+            const tab = this.getTabNode(handle);
+
+            if (!tab) {
+                console.error(`Tab '${handle}' not found`);
+                return;
+            }
+
+            this.scrollTabIntoView(tab);
+
+            tab.focus();
+
+            this.$events.$emit('tab-switched', handle);
         },
 
-        isActive(tab) {
-            return tab === this.active;
+        isActive(handle) {
+            return handle === this.active;
         },
 
-        tabIndex(tab) {
-            return this.mainSections.findIndex(section => section.handle === (tab || this.active));
+        tabIndex(handle) {
+            return this.mainSections.findIndex(section => section.handle === (handle || this.active));
         },
 
         tabAt(index) {
@@ -241,7 +275,7 @@ export default {
 
             const index = this.tabIndex(handle);
 
-            if (index >= 0 && index < this.visibleTabs) {
+            if (index >= 0) {
                 this.setActive(handle);
             } else {
                 window.location.hash = '';
@@ -249,11 +283,11 @@ export default {
         },
 
         activateNextTab() {
-            this.activateTabAt((this.tabIndex() + 1) % this.visibleTabs);
+            this.activateTabAt((this.tabIndex() + 1) % this.numberOfTabs);
         },
 
         activatePreviousTab() {
-            this.activateTabAt((this.tabIndex() - 1 + this.visibleTabs) % this.visibleTabs);
+            this.activateTabAt((this.tabIndex() - 1 + this.numberOfTabs) % this.numberOfTabs);
         },
 
         activateFirstTab() {
@@ -261,7 +295,7 @@ export default {
         },
 
         activateLastTab() {
-            this.activateTabAt(this.visibleTabs - 1);
+            this.activateTabAt(this.numberOfTabs - 1);
         },
 
         activateTabAt(index) {
@@ -269,18 +303,59 @@ export default {
         },
 
         tabId(handle) {
-            return `${this.camelCase(handle)}Tab`;
+            return `${this.pascalCase(handle)}Tab`;
         },
 
         tabPanelId(handle) {
-            return `${this.camelCase(handle)}TabPanel`;
+            return `${this.pascalCase(handle)}TabPanel`;
         },
 
-        camelCase(handle) {
+        pascalCase(handle) {
             return handle
                 .split('_')
                 .map(word => word.slice(0, 1).toUpperCase() + word.slice(1))
                 .join('');
+        },
+
+        getTabNode(handle) {
+            return this.$refs.tabs.childNodes[this.tabIndex(handle)];
+        },
+
+        scrollTabs(event) {
+            this.$refs.tabs.scrollLeft += event.deltaY;
+
+            this.updateHiddenTabs();
+        },
+
+        scrollTabIntoView(tab) {
+            if (typeof tab === 'string') {
+                tab = this.getTabNode(tab);
+            }
+            if (!tab) {
+                console.error(`Tab '${tab}' not found`);
+                return;
+            }
+
+            const side = this.tabIsOutsideView(tab);
+            if (!side) {
+                return;
+            }
+
+            const offset = 20; // Always show a small part of the next tab
+
+            if (side === 'left') {
+                this.$refs.tabs.scrollLeft = tab.offsetLeft - offset;
+            } 
+            else {
+                this.$refs.tabs.scrollLeft = tab.offsetLeft + tab.offsetWidth - this.$refs.tabs.clientWidth + offset + 8;
+            }
+
+            this.updateHiddenTabs();
+        },
+
+        updateScrollHints() {
+            this.canScrollLeft = (this.$refs.tabs.scrollLeft > 0);
+            this.canScrollRight = (this.$refs.tabs.scrollLeft < (this.$refs.tabs.scrollWidth - this.$refs.tabs.clientWidth));
         },
 
         containerWasResized($event) {
@@ -290,38 +365,47 @@ export default {
             this.layoutReady = (width !== null);
             this.shouldShowSidebar = (this.enableSidebar && width > 920);
 
-            if (this.layoutReady) {
-                this.wangjangleTabVisibility();
+            if (!this.layoutReady) return;
+                
+            this.$nextTick(() => {
+                this.updateScrollHints();
+                this.updateHiddenTabs();
+            });
+        },
+
+        updateHiddenTabs() {
+            if (!this.$refs.tabs) return;
+
+            const hidden = [];
+
+            this.$refs.tabs.childNodes.forEach((tab, index) => {
+                if (this.tabIsOutsideView(tab, 20)) {
+                    hidden.push(index);
+                }
+            });
+
+            if (JSON.stringify(hidden) !== JSON.stringify(this.hiddenTabs)) {
+               this.hiddenTabs = hidden;
             }
         },
 
-        wangjangleTabVisibility: _.debounce(function () {
-            this.$nextTick(() => {
-                if (!this.$refs.tabs) return;
+        tabIsOutsideView(tab, tolerance = 0) {
+            const viewportRect = this.$refs.tabs.getBoundingClientRect();
+            const tabRect = tab.getBoundingClientRect();
 
-                let visibleTabs = 0;
+            if ((viewportRect.left - tabRect.left) > tolerance) {
+                return 'left';
+            } 
+            
+            if ((tabRect.right - viewportRect.right) > tolerance) {
+                return 'right';
+            }
 
-                // Leave 40px for the dropdown list.
-                const maxWidth = this.$refs.publishSectionWrapper.offsetWidth - 40;
-                let tabWidthSum = 0;
+            return false;
+        },
 
-                this.$refs.tabs.childNodes.forEach((tab, index) => {
-                    tabWidthSum += tab.offsetWidth;
-
-                    if (tabWidthSum < maxWidth) {
-                        visibleTabs += 1;
-                    }
-                })
-
-                this.visibleTabs = visibleTabs;
-
-                if (!this.initialTabSet) this.setActiveTabFromHash();
-                this.initialTabSet = true;
-            });
-        }, 100),
-
-        isTabHidden(index) {
-            return index >= this.visibleTabs;
+        shouldShowInDropdown(index) {
+            return this.hiddenTabs.includes(index);
         }
     }
 

@@ -2,13 +2,34 @@
    TABS
    ========================================================================== */
 
-.tabs-container.offset-for-sidebar {
-    width: calc(100% - 320px);
+   
+.tabs-container {
+    @apply relative;
+
+    &.offset-for-sidebar {
+        width: calc(100% - 320px);
+    }
+
+   .fade-left, .fade-right {
+        @apply absolute w-4 inset-y-0 from-grey-30 pointer-events-none z-10;
+    }
+
+    .fade-left {
+        @apply left-0 bg-gradient-to-r;
+    }
+
+    .fade-right {
+        @apply right-4 bg-gradient-to-l;
+    }
 }
 
 .tabs {
     @apply flex items-end overflow-hidden px-1 -ml-1;
     height: 48px;
+
+    &-scrolled {
+        @apply pl-0 ml-0;
+    }
 
     .tab-button {
         @apply whitespace-no-wrap bg-grey-10 py-sm px-2 flex-shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-grey-30 select-none;
