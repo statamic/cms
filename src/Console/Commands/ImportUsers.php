@@ -47,7 +47,6 @@ class ImportUsers extends Command
     private function importUsers()
     {
         if ($this->confirm('This will import all your file users to your database, but it will not update any references to user IDs in your entry data. Do you wish to continue?')) {
-
             app()->bind(UserContract::class, FileUser::class);
             app()->bind(UserRepositoryContract::class, FileRepository::class);
 
@@ -57,8 +56,7 @@ class ImportUsers extends Command
 
             $eloquentRepository = app(UserRepositoryManager::class)->createEloquentDriver([]);
 
-            $this->withProgressBar($users, function ($user) use($eloquentRepository) {
-
+            $this->withProgressBar($users, function ($user) use ($eloquentRepository) {
                 $data = $user->data();
                 $data->put('stache_user_id', $user->id());
 
@@ -86,7 +84,6 @@ class ImportUsers extends Command
 
             $this->newLine();
             $this->info('Users imported');
-
         }
     }
 }
