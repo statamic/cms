@@ -31,4 +31,15 @@ class File extends Fieldtype
     {
         return $this->config('max_files') === 1 ? collect($values)->first() : $values;
     }
+
+    public function rules(): array
+    {
+        $rules = ['array'];
+
+        if ($max = $this->config('max_files')) {
+            $rules[] = 'max:'.$max;
+        }
+
+        return $rules;
+    }
 }
