@@ -9,7 +9,7 @@ class ReplaceAsset extends Action
 {
     public static function title()
     {
-        return __('Replace References');
+        return __('Replace');
     }
 
     public function visibleTo($item)
@@ -36,7 +36,7 @@ class ReplaceAsset extends Action
     public function confirmationText()
     {
         /** @translation */
-        return 'Are you sure you want to replace this asset and all of its references?';
+        return 'statamic::messages.asset_replace_confirmation';
     }
 
     public function run($assets, $values)

@@ -38,7 +38,13 @@ class ReuploadAsset extends Action
     public function confirmationText()
     {
         /** @translation */
-        return 'statamic::messages.replace_asset_preserve_filename_instructions';
+        return 'statamic::messages.asset_reupload_confirmation';
+    }
+
+    public function warningText()
+    {
+        /** @translation */
+        return 'statamic::messages.asset_reupload_warning';
     }
 
     public function run($assets, $values)
