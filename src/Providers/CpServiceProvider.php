@@ -84,6 +84,7 @@ class CpServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\CP\Authorize::class,
             \Statamic\Http\Middleware\CP\Localize::class,
             \Statamic\Http\Middleware\CP\CountUsers::class,
+            \Statamic\Http\Middleware\DeleteTemporaryFileUploads::class,
         ]);
     }
 }

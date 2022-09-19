@@ -106,7 +106,7 @@ return [
     'getting_started_widget_navigation' => 'Mehrstufige Listen mit Links erstellen, die für die Gestaltung von Navbars, Fuszeilen etc. verwendet werden können.',
     'getting_started_widget_pro' => 'Statamic Pro fügt unlimitierte Benutzerkonten, Rollen, Berechtigungen, Git-Integration, Revisionen, Multisite und mehr hinzu!',
     'git_disabled' => 'Die Statamic Git Integration ist zurzeit deaktiviert.',
-    'git_nothing_to_commit' => 'Nichts zu committen, Inhaltspfade sauber!',
+    'git_nothing_to_commit' => 'Nichts zu committen, Inhaltspfade sind sauber!',
     'git_utility_description' => 'Von Git getrackte Inhalte verwalten.',
     'global_search_open_using_slash' => 'Starte die globale Suche mit der Taste <kbd>/</kbd>',
     'global_set_config_intro' => 'Globale Sets verwalten Inhalte, die auf der gesamten Website verfügbar sind, wie z.B. Firmendetails, Kontaktinformationen oder Frontend-Einstellungen.',
