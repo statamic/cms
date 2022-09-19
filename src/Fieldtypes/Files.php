@@ -7,6 +7,7 @@ use Statamic\Fields\Fieldtype;
 class Files extends Fieldtype
 {
     protected $defaultValue = [];
+    protected $selectable = false;
 
     protected function configFieldItems(): array
     {
