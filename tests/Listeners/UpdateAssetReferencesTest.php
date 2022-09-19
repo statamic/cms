@@ -128,21 +128,6 @@ class UpdateAssetReferencesTest extends TestCase
     }
 
     /** @test */
-    public function it_doesnt_update_references_when_replacing_an_asset_and_preserving_original_filename()
-    {
-        $entry = $this->createEntryWithHoffHeroImage();
-
-        $this->assertEquals('hoff.jpg', $entry->get('hero'));
-
-        $this->actuallySaveAssetFileAndMetaToDisk($this->assetNorris);
-
-        // Replace with `$preserveOriginalFilename = true`
-        $this->assetNorris->replace($this->assetHoff, true, true);
-
-        $this->assertEquals('hoff.jpg', $entry->fresh()->get('hero'));
-    }
-
-    /** @test */
     public function it_updates_references_when_deleting_an_asset()
     {
         $entry = $this->createEntryWithHoffHeroImage();

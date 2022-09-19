@@ -19,8 +19,10 @@ use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReplaced;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
+use Statamic\Exceptions\ReplacementFileDoesntMatchExtension;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Image;
@@ -658,10 +660,9 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      *
      * @param  Asset  $originalAsset
      * @param  bool  $deleteOriginal
-     * @param  bool  $preserveOriginalFilename
      * @return $this
      */
-    public function replace(Asset $originalAsset, $deleteOriginal = false, $preserveOriginalFilename = false)
+    public function replace(Asset $originalAsset, $deleteOriginal = false)
     {
         // Temporarily disable the reference updater to avoid triggering reference updates
         // until after the `AssetReplaced` event is fired. We still want to fire events
@@ -671,10 +672,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
         if ($deleteOriginal) {
             $originalAsset->delete();
-        }
-
-        if ($deleteOriginal && $preserveOriginalFilename) {
-            $this->rename($originalAsset->filename());
         }
 
         UpdateAssetReferencesSubscriber::enable();
@@ -824,6 +821,21 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $this->save();
 
         AssetUploaded::dispatch($this);
+
+        return $this;
+    }
+
+    public function reupload(ReplacementFile $file)
+    {
+        if ($file->extension() !== $this->extension()) {
+            throw new ReplacementFileDoesntMatchExtension('The file extension must match the original file.');
+        }
+
+        $file->writeTo($this->disk()->filesystem(), $this->path());
+
+        $this->save();
+
+        AssetReuploaded::dispatch($this);
 
         return $this;
     }

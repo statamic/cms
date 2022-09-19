@@ -9,7 +9,7 @@ class ReplaceAsset extends Action
 {
     public static function title()
     {
-        return __('Replace');
+        return __('Replace References');
     }
 
     public function visibleTo($item)
@@ -42,17 +42,12 @@ class ReplaceAsset extends Action
     public function run($assets, $values)
     {
         $originalAsset = $assets->first();
-        $newAsset = Facades\Asset::find($values['new_asset'][0]);
 
-        $newAsset->replace($originalAsset, $values['delete_original'], $values['preserve_filename']);
+        $newAsset = Facades\Asset::find($this->context['container'].'::'.$values['new_asset']);
 
-        $urls = [
-            $newAsset->thumbnailUrl('small'),
-            $newAsset->absoluteUrl(),
-        ];
+        $newAsset->replace($originalAsset, $values['delete_original']);
 
         return [
-            'callback' => ['bustAndReloadImageCaches', $urls],
             'ids' => [$newAsset->id()],
         ];
     }
@@ -76,15 +71,6 @@ class ReplaceAsset extends Action
                 'display' => __('Delete Original Asset'),
                 'type' => 'toggle',
                 'default' => true,
-            ],
-            'preserve_filename' => [
-                'display' => __('Preserve Original Filename'),
-                'type' => 'toggle',
-                'default' => false,
-                'instructions' => __('statamic::messages.replace_asset_preserve_filename_instructions'),
-                'if' => [
-                    'delete_original' => true,
-                ],
             ],
         ];
     }

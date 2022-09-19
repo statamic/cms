@@ -34,10 +34,10 @@ class EventServiceProvider extends ServiceProvider
 
     protected $subscribe = [
         // \Statamic\Taxonomies\TermTracker::class, // TODO
+        \Statamic\Listeners\ClearAssetGlideCache::class,
         \Statamic\Listeners\GeneratePresetImageManipulations::class,
         \Statamic\Listeners\UpdateAssetReferences::class,
         \Statamic\Listeners\UpdateTermReferences::class,
-        \Statamic\Listeners\ClearAssetGlideCache::class,
     ];
 
     public function boot()

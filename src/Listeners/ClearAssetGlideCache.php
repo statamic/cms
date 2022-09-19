@@ -4,6 +4,7 @@ namespace Statamic\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Facades\Glide;
 
 class ClearAssetGlideCache implements ShouldQueue
@@ -15,6 +16,7 @@ class ClearAssetGlideCache implements ShouldQueue
      */
     public function subscribe($events)
     {
+        $events->listen(AssetReuploaded::class, self::class.'@handle');
         $events->listen(AssetDeleted::class, self::class.'@handle');
     }
 
