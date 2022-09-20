@@ -22,7 +22,7 @@ use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
-use Statamic\Exceptions\ReplacementFileDoesntMatchExtension;
+use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Image;
@@ -828,7 +828,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     public function reupload(ReplacementFile $file)
     {
         if ($file->extension() !== $this->extension()) {
-            throw new ReplacementFileDoesntMatchExtension('The file extension must match the original file.');
+            throw new FileExtensionMismatch('The file extension must match the original file.');
         }
 
         $file->writeTo($this->disk()->filesystem(), $this->path());

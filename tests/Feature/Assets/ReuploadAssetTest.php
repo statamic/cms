@@ -9,7 +9,7 @@ use Statamic\Actions\ReuploadAsset as ReuploadAssetAction;
 use Statamic\Assets\ReplacementFile;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Events\AssetReuploaded;
-use Statamic\Exceptions\ReplacementFileDoesntMatchExtension;
+use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Exceptions\ValidationException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Glide;
@@ -49,7 +49,7 @@ class ReuploadAssetTest extends TestCase
         $asset->shouldReceive('extension')->andReturn('jpg');
         $asset->shouldReceive('reupload')->withArgs(function ($arg) {
             return $arg instanceof ReplacementFile && $arg->path() === 'statamic/file-uploads/timestamp/filename.png';
-        })->once()->andThrow(new ReplacementFileDoesntMatchExtension);
+        })->once()->andThrow(new FileExtensionMismatch);
 
         try {
             (new ReuploadAssetAction)->run(collect([$asset]), ['file' => 'timestamp/filename.png']);

@@ -4,7 +4,7 @@ namespace Statamic\Exceptions;
 
 use Exception;
 
-class ReplacementFileDoesntMatchExtension extends Exception
+class FileExtensionMismatch extends Exception
 {
     //
 }

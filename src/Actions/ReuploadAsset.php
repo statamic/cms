@@ -4,7 +4,7 @@ namespace Statamic\Actions;
 
 use Statamic\Assets\ReplacementFile;
 use Statamic\Contracts\Assets\Asset;
-use Statamic\Exceptions\ReplacementFileDoesntMatchExtension;
+use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Exceptions\ValidationException;
 
 class ReuploadAsset extends Action
@@ -55,7 +55,7 @@ class ReuploadAsset extends Action
 
         try {
             $asset->reupload($file);
-        } catch (ReplacementFileDoesntMatchExtension $e) {
+        } catch (FileExtensionMismatch $e) {
             throw ValidationException::withMessages(['file' => trans('statamic::validation.mimes', ['values' => $asset->extension()])]);
         }
 

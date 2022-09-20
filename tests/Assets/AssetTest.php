@@ -20,7 +20,7 @@ use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
-use Statamic\Exceptions\ReplacementFileDoesntMatchExtension;
+use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\File;
@@ -1699,7 +1699,7 @@ class AssetTest extends TestCase
     /** @test */
     public function cannot_reupload_a_file_with_a_different_extension()
     {
-        $this->expectException(ReplacementFileDoesntMatchExtension::class);
+        $this->expectException(FileExtensionMismatch::class);
         $this->expectExceptionMessage('The file extension must match the original file.');
 
         Event::fake();
