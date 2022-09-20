@@ -2,9 +2,6 @@
 
 namespace Tests\Tags;
 
-use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\Request;
-
 use Statamic\Facades\Antlers;
 use Tests\TestCase;
 
