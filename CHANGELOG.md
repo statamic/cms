@@ -1,5 +1,20 @@
 # Release Notes
 
+## 3.3.37 (2022-09-20)
+
+### What's new
+- Add Portuguese Brazilian translation. [#6739](https://github.com/statamic/cms/issues/6739) by @rodrigomantoan
+
+### What's improved
+- German translations. [#6716](https://github.com/statamic/cms/issues/6716) by @helloDanuk
+
+### What's fixed
+- Fix live preview scroll position handling when url contains a port number. [#6742](https://github.com/statamic/cms/issues/6742) by @o1y
+- Fix plus buttons spacing in Replicator. [#6722](https://github.com/statamic/cms/issues/6722) by @arthurperton
+- Fix static cache invalidation. [#6720](https://github.com/statamic/cms/issues/6720) by @jasonvarga
+
+
+
 ## 3.3.36 (2022-09-13)
 
 ### What's new
