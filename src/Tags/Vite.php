@@ -16,7 +16,7 @@ class Vite extends Tags
         if (! $src = $this->params->explode('src')) {
             throw new \Exception('Please provide a source file.');
         }
-        
+
         $directory = $this->params->get('directory');
         $hot = $this->params->get('hot');
 
