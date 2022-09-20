@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Schema;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\User as FileUser;
 use Statamic\Auth\UserRepositoryManager;
@@ -15,6 +16,8 @@ use Statamic\Stache\Repositories\UserRepository as FileRepository;
 class ImportUsers extends Command
 {
     use RunsInPlease;
+
+    protected $useUUIDs = false;
 
     /**
      * The name and signature of the console command.
@@ -59,16 +62,22 @@ class ImportUsers extends Command
 
         $eloquentRepository = app(UserRepositoryManager::class)->createEloquentDriver([]);
 
+        if (! str_contains(Schema::getColumnType('users', 'id'), 'int')) {
+            $this->useUUIDs = true;
+        }
+
         $this->withProgressBar($users, function ($user) use ($eloquentRepository) {
             $data = $user->data();
-            $data->put('stache_user_id', $user->id());
 
             $eloquentUser = $eloquentRepository->make()
-                //->id($user->id()) - if you are using UUIDs for users, then uncomment this
                 ->email($user->email())
                 ->password($user->password())
                 ->preferences($user->preferences())
                 ->data($data->except(['groups', 'roles']));
+
+            if (! $this->useUUIDs) {
+                $eloquentUser->id($user->id());
+            }
 
             if ($user->isSuper()) {
                 $eloquentUser->makeSuper();
