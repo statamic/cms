@@ -46,44 +46,46 @@ class ImportUsers extends Command
 
     private function importUsers()
     {
-        if ($this->confirm('This will import all your file users to your database, but it will not update any references to user IDs in your entry data. Do you wish to continue?')) {
-            app()->bind(UserContract::class, FileUser::class);
-            app()->bind(UserRepositoryContract::class, FileRepository::class);
-
-            $users = User::all();
-
-            app()->bind(UserContract::class, EloquentUser::class);
-
-            $eloquentRepository = app(UserRepositoryManager::class)->createEloquentDriver([]);
-
-            $this->withProgressBar($users, function ($user) use ($eloquentRepository) {
-                $data = $user->data();
-                $data->put('stache_user_id', $user->id());
-
-                $eloquentUser = $eloquentRepository->make()
-                    //->id($user->id()) - if you are using UUIDs for users, then uncomment this
-                    ->email($user->email())
-                    ->password($user->password())
-                    ->preferences($user->preferences())
-                    ->data($data->except(['groups', 'roles']));
-
-                if ($user->isSuper()) {
-                    $eloquentUser->makeSuper();
-                }
-
-                if (count($data->get('groups', [])) > 0) {
-                    $eloquentUser->groups($data->get('groups'));
-                }
-
-                if (count($data->get('roles', [])) > 0) {
-                    $eloquentUser->roles($data->get('roles'));
-                }
-
-                $eloquentUser->saveToDatabase();
-            });
-
-            $this->newLine();
-            $this->info('Users imported');
+        if (! $this->confirm('This will import all your file users to your database, but it will not update any references to user IDs in your entry data. Do you wish to continue?')) {
+            return;
         }
+
+        app()->bind(UserContract::class, FileUser::class);
+        app()->bind(UserRepositoryContract::class, FileRepository::class);
+
+        $users = User::all();
+
+        app()->bind(UserContract::class, EloquentUser::class);
+
+        $eloquentRepository = app(UserRepositoryManager::class)->createEloquentDriver([]);
+
+        $this->withProgressBar($users, function ($user) use ($eloquentRepository) {
+            $data = $user->data();
+            $data->put('stache_user_id', $user->id());
+
+            $eloquentUser = $eloquentRepository->make()
+                //->id($user->id()) - if you are using UUIDs for users, then uncomment this
+                ->email($user->email())
+                ->password($user->password())
+                ->preferences($user->preferences())
+                ->data($data->except(['groups', 'roles']));
+
+            if ($user->isSuper()) {
+                $eloquentUser->makeSuper();
+            }
+
+            if (count($data->get('groups', [])) > 0) {
+                $eloquentUser->groups($data->get('groups'));
+            }
+
+            if (count($data->get('roles', [])) > 0) {
+                $eloquentUser->roles($data->get('roles'));
+            }
+
+            $eloquentUser->saveToDatabase();
+        });
+
+        $this->newLine();
+        $this->info('Users imported');
     }
 }
