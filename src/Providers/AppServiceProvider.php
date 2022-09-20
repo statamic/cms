@@ -160,7 +160,6 @@ class AppServiceProvider extends ServiceProvider
     protected function registerMiddlewareGroup()
     {
         $this->app->make(Router::class)->middlewareGroup('statamic.web', [
-            \Statamic\Http\Middleware\AddQueuedCookiesToResponse::class,
             \Statamic\Http\Middleware\StacheLock::class,
             \Statamic\Http\Middleware\HandleToken::class,
             \Statamic\Http\Middleware\Localize::class,
