@@ -833,7 +833,8 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
         $file->writeTo($this->disk()->filesystem(), $this->path());
 
-        $this->save();
+        $this->clearCaches();
+        $this->writeMeta($this->generateMeta());
 
         AssetReuploaded::dispatch($this);
 

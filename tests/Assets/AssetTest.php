@@ -1690,7 +1690,7 @@ class AssetTest extends TestCase
         Event::assertDispatched(AssetReuploaded::class, function ($event) use ($asset) {
             return $event->asset->id() === $asset->id();
         });
-        Event::assertDispatched(AssetSaved::class);
+        Event::assertDispatched(AssetSaved::class, 1); // Once during the initial upload, but not again for the reupload.
 
         // Assertions that the Glide cache is cleared and the presets
         // are regenerated for this asset are in ReuploadAssetTest.
