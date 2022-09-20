@@ -199,10 +199,10 @@ class Glide extends Tags
      */
     private function generateGlideDataUri($item)
     {
-        $path = $this->generateImage($item);
         $cache = GlideManager::cacheDisk();
 
         try {
+            $path = $this->generateImage($item);
             $source = $cache->read($path);
             $url = 'data:'.$cache->mimeType($path).';base64,'.base64_encode($source);
         } catch (\Exception $e) {
