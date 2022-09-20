@@ -6,7 +6,9 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Mockery;
 use Statamic\Assets\Asset;
+use Statamic\Assets\ReplacementFile;
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 use Statamic\Events;
 use Statamic\Facades;
@@ -390,6 +392,18 @@ class GitEventTest extends TestCase
         $this->makeAsset()->upload(
             UploadedFile::fake()->create('asset.txt')
         );
+    }
+
+    /** @test */
+    public function it_commits_when_asset_is_reuploaded()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Asset reuploaded')->once();
+
+        $file = Mockery::mock(ReplacementFile::class);
+        $file->shouldReceive('extension')->andReturn('txt');
+        $file->shouldReceive('writeTo');
+
+        $this->makeAsset()->reupload($file);
     }
 
     /** @test */
