@@ -1341,6 +1341,20 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Rekeys an array or collection.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function keyBy($value, $params)
+    {
+        $rekeyed = collect($value)->keyBy(fn ($item) => $item[$params[0]]);
+
+        return is_array($value) ? $rekeyed->all() : $rekeyed;
+    }
+
+    /**
      * Returns the last $params[0] characters of a string, or the last element of an array.
      *
      * @param $value
