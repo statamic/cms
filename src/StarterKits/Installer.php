@@ -480,16 +480,7 @@ final class Installer
             return $this;
         }
 
-        $hook = explode('::', $hook);
-
-        if (count($hook) != 2) {
-            return $this;
-        }
-
-        $class = $hook[0];
-        $method = $hook[1];
-
-        (new $class)->$method($this->console);
+        (new $hook)->handle($this->console);
 
         return $this;
     }
