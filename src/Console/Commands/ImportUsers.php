@@ -75,7 +75,7 @@ class ImportUsers extends Command
                 ->preferences($user->preferences())
                 ->data($data->except(['groups', 'roles']));
 
-            if (! $this->useUUIDs) {
+            if ($this->useUUIDs) {
                 $eloquentUser->id($user->id());
             }
 
