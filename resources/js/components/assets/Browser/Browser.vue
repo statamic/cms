@@ -198,7 +198,7 @@
                                             </button>
                                         </div>
                                         <div class="asset-meta flex items-center">
-                                            <div class="asset-filename text-center w-full px-1 py-sm" v-text="'/'+folder.basename" :title="folder.basename" />
+                                            <div class="asset-filename text-center w-full px-1 py-sm" v-text="folder.basename" :title="folder.basename" />
                                         </div>
                                     </div>
                                     <!-- Assets -->
