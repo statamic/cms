@@ -184,7 +184,9 @@
                                                 </div>
                                             </button>
                                         </div>
-                                        <div class="text-3xs text-center text-grey-70 pt-sm w-full text-truncate">..</div>
+                                        <div class="asset-meta flex items-center">
+                                            <div class="asset-filename text-center w-full px-1 py-sm">..</div>
+                                        </div>
                                     </div>
                                     <!-- Sub-Folders -->
                                     <div class="asset-tile" v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
