@@ -114,7 +114,7 @@ export default {
         },
 
         replicatorPreview() {
-            return this.value.length + ' ' + this.config.display;
+            return `${this.config.display}: ${__n(':count row|:count rows', this.value.length)}`;
         }
 
     },
