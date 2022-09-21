@@ -470,7 +470,7 @@ final class Installer
     }
 
     /**
-     * Run any post install hooks defined in the starter kit
+     * Run any post install hooks defined in the starter kit.
      *
      * @return $this
      */
