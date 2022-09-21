@@ -486,10 +486,10 @@ final class Installer
             return $this;
         }
 
-        $klass = $hook[0];
+        $class = $hook[0];
         $method = $hook[1];
 
-        (new $klass)->$method($this->console);
+        (new $class)->$method($this->console);
 
         return $this;
     }
