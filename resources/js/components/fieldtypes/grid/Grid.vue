@@ -194,10 +194,6 @@ export default {
             this.update(rows);
         },
 
-        getReplicatorPreviewText() {
-            // TODO
-        },
-
         focus() {
             // TODO
         },
