@@ -88,17 +88,29 @@ class Glide extends Tags
     }
 
     /**
-     * Maps to {{ glide:data }}.
+     * Maps to {{ glide:data_url }}.
      *
-     * Converts a Glide image to a data URI.
+     * Converts a Glide image to a data URL.
      *
      * @return string
      */
-    public function data()
+    public function dataUrl()
     {
         $item = $this->params->get(['src', 'id', 'path']);
 
-        return $this->generateGlideDataUri($item);
+        return $this->generateGlideDataUrl($item);
+    }
+
+    /**
+     * Maps to {{ glide:data_uri }}.
+     *
+     * Alias of data_url
+     *
+     * @return string
+     */
+    public function dataUri()
+    {
+        return $this->dataUrl();
     }
 
     /**
@@ -192,12 +204,12 @@ class Glide extends Tags
     }
 
     /**
-     * The data URI generation.
+     * The data URL generation.
      *
      * @param  string  $item  Either the ID or path of the image.
      * @return string
      */
-    private function generateGlideDataUri($item)
+    private function generateGlideDataUrl($item)
     {
         $cache = GlideManager::cacheDisk();
 
