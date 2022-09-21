@@ -140,6 +140,7 @@ final class Installer
             ->installDependencies()
             ->makeSuperUser()
             ->reticulateSplines()
+            ->runAfterInstallHook()
             ->removeStarterKit()
             ->removeRepository()
             ->removeComposerJsonBackup()
@@ -464,6 +465,31 @@ final class Installer
         if (config('app.env') !== 'testing') {
             sleep(2);
         }
+
+        return $this;
+    }
+
+    /**
+     * Run any post install hooks defined in the starter kit
+     *
+     * @return $this
+     */
+    protected function runAfterInstallHook()
+    {
+        if (! $hook = $this->config('after_install_hook')) {
+            return $this;
+        }
+
+        $hook = explode('::', $hook);
+
+        if (count($hook) != 2) {
+            return $this;
+        }
+
+        $klass = $hook[0];
+        $method = $hook[1];
+
+        (new $klass)->$method($this->console);
 
         return $this;
     }
