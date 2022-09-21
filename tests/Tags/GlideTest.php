@@ -51,12 +51,12 @@ class GlideTest extends TestCase
     /**
      * @test
      */
-    public function it_outputs_a_data_uri()
+    public function it_outputs_a_data_url()
     {
         $this->createImageInPublicDirectory();
 
         $tag = <<<'EOT'
-{{ glide:data :src="foo" }}
+{{ glide:data_url :src="foo" }}
 EOT;
 
         $this->assertStringStartsWith('data:image/jpeg;base64', (string) Parse::template($tag, ['foo' => 'bar.jpg']));
