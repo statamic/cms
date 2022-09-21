@@ -356,6 +356,8 @@ export default {
                 this.initializing = false;
                 this.loading = false;
             });
+
+            this.$emit('replicator-preview-updated', this.replicatorPreview);
         },
 
         /**
