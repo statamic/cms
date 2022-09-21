@@ -98,7 +98,7 @@ class Glide extends Tags
     {
         $item = $this->params->get(['src', 'id', 'path']);
 
-        return $this->generateGlideDataUrl($item);
+        return $this->output($this->generateGlideDataUrl($item));
     }
 
     /**
