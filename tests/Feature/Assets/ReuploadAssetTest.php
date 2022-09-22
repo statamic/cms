@@ -65,6 +65,12 @@ class ReuploadAssetTest extends TestCase
     /** @test */
     public function glide_cache_is_cleared_and_presets_are_regenerated_when_reuploading()
     {
+        config(['filesystems.disks.test' => [
+            'driver' => 'local',
+            'root' => __DIR__.'/../../__fixtures__/container',
+            'url' => '/the-url',
+        ]]);
+
         $container = AssetContainer::make('test_container')->disk('test');
         AssetContainer::shouldReceive('find')->with('test_container')->andReturn($container);
         $asset = $container->makeAsset('test.jpg');
