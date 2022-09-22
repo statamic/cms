@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Support\Facades\Schema;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\User as FileUser;
@@ -16,8 +17,6 @@ use Statamic\Stache\Repositories\UserRepository as FileRepository;
 class ImportUsers extends Command
 {
     use RunsInPlease;
-
-    protected $useUUIDs = false;
 
     /**
      * The name and signature of the console command.
@@ -53,6 +52,20 @@ class ImportUsers extends Command
             return;
         }
 
+        $guard = config('statamic.users.guards.cp');
+        $provider = config("auth.guards.$guard.provider");
+        $model = config("auth.providers.$provider.model");
+
+        if (! in_array(HasUuids::class, class_uses_recursive($model))) {
+            $this->error('Your user model must use the HasUUIDs trait for this migration to run');
+            return;
+        }
+
+        if (! str_contains(Schema::getColumnType('users', 'id'), 'uuid')) {
+            $this->error('Your user model must use UUIDs for this migration to run');
+            return;
+        }
+
         app()->bind(UserContract::class, FileUser::class);
         app()->bind(UserRepositoryContract::class, FileRepository::class);
 
@@ -62,21 +75,14 @@ class ImportUsers extends Command
 
         $eloquentRepository = app(UserRepositoryManager::class)->createEloquentDriver([]);
 
-        if (! str_contains(Schema::getColumnType('users', 'id'), 'int')) {
-            $this->useUUIDs = true;
-        }
-
         $this->withProgressBar($users, function ($user) use ($eloquentRepository) {
             $data = $user->data();
 
             $eloquentUser = $eloquentRepository->make()
                 ->email($user->email())
                 ->preferences($user->preferences())
-                ->data($data->except(['groups', 'roles']));
-
-            if ($this->useUUIDs) {
-                $eloquentUser->id($user->id());
-            }
+                ->data($data->except(['groups', 'roles']))
+                ->id($user->id());
 
             if ($user->isSuper()) {
                 $eloquentUser->makeSuper();
