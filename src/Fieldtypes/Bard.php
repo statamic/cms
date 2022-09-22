@@ -29,6 +29,19 @@ class Bard extends Replicator
     protected function configFieldItems(): array
     {
         return [
+            'collapse' => [
+                'display' => __('Collapse'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
+                'type' => 'select',
+                'cast_booleans' => true,
+                'width' => 33,
+                'options' => [
+                    'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
+                    'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
+                    'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+                ],
+                'default' => false,
+            ],
             'always_show_set_button' => [
                 'display' => __('Always Show Set Button'),
                 'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),

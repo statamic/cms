@@ -1,5 +1,75 @@
 # Release Notes
 
+## 3.3.37 (2022-09-20)
+
+### What's new
+- Add Portuguese Brazilian translation. [#6739](https://github.com/statamic/cms/issues/6739) by @rodrigomantoan
+
+### What's improved
+- German translations. [#6716](https://github.com/statamic/cms/issues/6716) by @helloDanuk
+
+### What's fixed
+- Fix live preview scroll position handling when url contains a port number. [#6742](https://github.com/statamic/cms/issues/6742) by @o1y
+- Fix plus buttons spacing in Replicator. [#6722](https://github.com/statamic/cms/issues/6722) by @arthurperton
+- Fix static cache invalidation. [#6720](https://github.com/statamic/cms/issues/6720) by @jasonvarga
+
+
+
+## 3.3.36 (2022-09-13)
+
+### What's new
+- Initial support for default preferences. [#6642](https://github.com/statamic/cms/issues/6642) by @jesseleite
+
+### What's improved
+- Norwegian translations. [#6709](https://github.com/statamic/cms/issues/6709) by @hgrimelid
+- Dutch translations. [#6699](https://github.com/statamic/cms/issues/6699) by @robdekort
+- French translations. [#6690](https://github.com/statamic/cms/issues/6690) by @ebeauchamps
+
+### What's fixed
+- Existing user data gets merged when logging in using OAuth for the first time. [#6692](https://github.com/statamic/cms/issues/6692) by @arthurperton
+- Fix multisite and queue related static caching issues. [#6621](https://github.com/statamic/cms/issues/6621) by @arthurperton
+- Fix publish form tab not being set properly on load. [#6710](https://github.com/statamic/cms/issues/6710) by @jasonvarga
+- Fix date fieldtype in range mode. [#6703](https://github.com/statamic/cms/issues/6703) by @jasonvarga
+- Fix asset folder permissions. [#6698](https://github.com/statamic/cms/issues/6698) by @jasonvarga
+- Don't show the asset picker when squished or inside a Grid. [#6701](https://github.com/statamic/cms/issues/6701) by @jackmcdade
+- The cache tag will properly scope per site. [#6702](https://github.com/statamic/cms/issues/6702) by @arthurperton
+- Fix sidebar on publish form being inaccessible. [#6694](https://github.com/statamic/cms/issues/6694) by @arthurperton
+- Fix negative test assertion counts. [#6689](https://github.com/statamic/cms/issues/6689) by @jasonvarga
+- Fix risky test warnings. [#6691](https://github.com/statamic/cms/issues/6691) by @jesseleite
+
+
+
+## 3.3.35 (2022-09-09)
+
+### What's new
+- Ability to specify `search:results` query value rather than reading from the URL. [#6684](https://github.com/statamic/cms/issues/6684) by @jacksleight
+
+### What's improved
+- Improve performance and readability of publish components. [#6680](https://github.com/statamic/cms/issues/6680) by @arthurperton
+- Grid row controls are hidden when there are no available actions. [#6647](https://github.com/statamic/cms/issues/6647) by @arthurperton
+
+### What's fixed
+- Fix styling of lists inside tables and blockquotes in Bard. [#6685](https://github.com/statamic/cms/issues/6685) by @jacksleight
+- Fix empty live preview fields falling back to original values, by distinguishing supplemented nulls from missing values.  [#6666](https://github.com/statamic/cms/issues/6666) by @arthurperton
+- Fix deleting an entry with children from the collection tree view. [#6644](https://github.com/statamic/cms/issues/6644) by @arthurperton
+- Fix incorrect localized term collection URLs. [#6659](https://github.com/statamic/cms/issues/6659) by @AndrewHaine
+- Fix date field default format not including time when `mode` isn't explicitly set. [#6657](https://github.com/statamic/cms/issues/6657) by @FrittenKeeZ
+- Fix search within the asset browser not restricting to a folder where necessary. [#6673](https://github.com/statamic/cms/issues/6673) by @arthurperton
+- Fix missing view nav authorization. [#6663](https://github.com/statamic/cms/issues/6663) by @ryanmitchell
+- Fix blank URLs being flagged as external. [#6668](https://github.com/statamic/cms/issues/6668) by @arthurperton
+- Fix JS error in Popover when resizing. [#6679](https://github.com/statamic/cms/issues/6679) by @arthurperton
+- Fix JS error when downloading assets. [#6669](https://github.com/statamic/cms/issues/6669) by @jacksleight
+- Fix JS error when resizing edit pages. [#6660](https://github.com/statamic/cms/issues/6660) by @arthurperton
+- Fix 'Add child link to entry' appearing in nav builder when no collection is set. [#6672](https://github.com/statamic/cms/issues/6672) by @jacksleight
+- Fix marking external CP navigation items as current. [#6655](https://github.com/statamic/cms/issues/6655) by @arthurperton
+- Fix asset fieldtype drag mirror. [#6671](https://github.com/statamic/cms/issues/6671) by @jackmcdade
+- Fix asset tile controls position. [#6656](https://github.com/statamic/cms/issues/6656) by @jackmcdade
+- Fix date not showing in Safari. [#6651](https://github.com/statamic/cms/issues/6651) by @arthurperton
+- Fix date picker value format. [#6688](https://github.com/statamic/cms/issues/6688) by @jasonvarga
+- Fix augmentation test. [#6676](https://github.com/statamic/cms/issues/6676) by @jasonvarga
+
+
+
 ## 3.3.34 (2022-09-05)
 
 ### What's new

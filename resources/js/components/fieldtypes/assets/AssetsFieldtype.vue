@@ -19,7 +19,7 @@
                 </div>
 
                 <div
-                    v-if="!isReadOnly"
+                    v-if="!isReadOnly && showPicker"
                     class="assets-fieldtype-picker"
                     :class="{
                         'is-expanded': expanded,
@@ -69,6 +69,7 @@
                         handle-class="asset-thumb-container"
                         @dragstart="$emit('focus')"
                         @dragend="$emit('blur')"
+                        :constrain-dimensions="true"
                         :disabled="isReadOnly"
                     >
                         <div class="asset-grid-listing border rounded overflow-hidden rounded-t-none" ref="assets">
@@ -89,9 +90,10 @@
                         <table class="table-fixed">
                             <sortable-list
                                 v-model="assets"
-                                :vertical="true"
                                 item-class="asset-row"
                                 handle-class="asset-row"
+                                :vertical="true"
+                                :constrain-dimensions="true"
                                 :disabled="isReadOnly"
                             >
                                 <tbody ref="assets">
@@ -296,12 +298,40 @@ export default {
             }
         },
 
+        isInGridField() {
+            let vm = this;
+
+            while (true) {
+                let parent = vm.$parent;
+
+                if (! parent) return false;
+
+                if (parent.grid) {
+                    return true;
+                }
+
+                vm = parent;
+            }
+        },
+
         replicatorPreview() {
             return _.map(this.assets, (asset) => {
                 return asset.isImage ?
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
             }).join(', ');
+        },
+
+        showPicker() {
+            if (this.maxFilesReached && ! this.isFullWidth) return false
+
+            if (this.maxFilesReached && this.isInGridField) return false
+
+            return true
+        },
+
+        isFullWidth() {
+            return ! (this.config.width && this.config.width < 100)
         }
 
     },
@@ -326,6 +356,8 @@ export default {
                 this.initializing = false;
                 this.loading = false;
             });
+
+            this.$emit('replicator-preview-updated', this.replicatorPreview);
         },
 
         /**
