@@ -15,6 +15,7 @@
             :allow-deleting="false"
             @closed="closeEditor"
             @saved="assetSaved"
+            @action-completed="actionCompleted"
         >
         </asset-editor>
 

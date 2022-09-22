@@ -14,8 +14,13 @@ use Mockery;
 use ReflectionClass;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
+use Statamic\Assets\ReplacementFile;
+use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetReplaced;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
+use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\File;
@@ -877,6 +882,7 @@ class AssetTest extends TestCase
     /** @test */
     public function it_deletes()
     {
+        Event::fake();
         Storage::fake('local');
         $disk = Storage::disk('local');
         $disk->put('path/to/asset.txt', '');
@@ -909,14 +915,32 @@ class AssetTest extends TestCase
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
-
         $this->assertEquals([
             'path',
             'path/to',
             'path/to/another-asset.txt',
         ], $container->contents()->cached()->keys()->all());
+        Event::assertDispatched(AssetDeleted::class);
+    }
 
-        // TODO: Assert about event, or convert to a callback
+    /** @test */
+    public function it_clears_asset_glide_cache_when_deleting()
+    {
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('path/to/asset.txt', '');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = (new Asset)->container($container)->path('path/to/asset.txt');
+
+        // Just assert that `Glide::clearAsset()` is called on delete,
+        // since `Imaging\GlideTest.php` covers the actual functionality.
+        Facades\Glide::shouldReceive('clearAsset')->withArgs(function ($arg) use ($asset) {
+            return $arg->id() === $asset->id();
+        })->once();
+
+        $asset->delete();
     }
 
     /** @test */
@@ -1244,6 +1268,112 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_replaces()
+    {
+        $this->fakeEventWithMacros();
+        $disk = Storage::fake('local');
+        $disk->put('some/old-asset.txt', 'Old asset contents');
+        $disk->put('some/new-asset.txt', 'New asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $oldAsset = tap($container->makeAsset('some/old-asset.txt')->data(['foo' => 'bar']))->saveQuietly();
+        $newAsset = tap($container->makeAsset('some/new-asset.txt')->data(['foo' => 'baz']))->saveQuietly();
+        $oldMeta = $disk->get('some/.meta/old-asset.txt.yaml');
+        $newMeta = $disk->get('some/.meta/new-asset.txt.yaml');
+        $disk->assertExists('some/old-asset.txt');
+        $disk->assertExists('some/.meta/old-asset.txt.yaml');
+        $disk->assertExists('some/new-asset.txt');
+        $disk->assertExists('some/.meta/new-asset.txt.yaml');
+        $this->assertEquals([
+            'some/new-asset.txt',
+            'some/old-asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'some/old-asset.txt' => ['foo' => 'bar'],
+            'some/new-asset.txt' => ['foo' => 'baz'],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+
+        $return = $newAsset->replace($oldAsset);
+
+        Event::assertDispatched(AssetDeleted::class, 0); // by default, the original asset is not deleted
+        Event::assertDispatched(AssetSaved::class, 0); // by default, the new asset is not renamed
+        Event::assertDispatched(AssetReplaced::class, 1); // our `UpdateAssetReferencesTest` covers what happens _after_ an asset is replaced
+
+        $this->assertEquals($newAsset, $return);
+        $disk->assertExists('some/old-asset.txt');
+        $disk->assertExists('some/.meta/old-asset.txt.yaml');
+        $disk->assertExists('some/new-asset.txt');
+        $disk->assertExists('some/.meta/new-asset.txt.yaml');
+        $this->assertEquals('Old asset contents', $disk->get('some/old-asset.txt'));
+        $this->assertEquals('New asset contents', $disk->get('some/new-asset.txt'));
+        $this->assertEquals([
+            'some/new-asset.txt',
+            'some/old-asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'some/old-asset.txt' => ['foo' => 'bar'],
+            'some/new-asset.txt' => ['foo' => 'baz'],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+    }
+
+    /** @test */
+    public function it_can_delete_original_asset_when_replacing()
+    {
+        $this->fakeEventWithMacros();
+        $disk = Storage::fake('local');
+        $disk->put('some/old-asset.txt', 'Old asset contents');
+        $disk->put('some/new-asset.txt', 'New asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $oldAsset = tap($container->makeAsset('some/old-asset.txt')->data(['foo' => 'bar']))->saveQuietly();
+        $newAsset = tap($container->makeAsset('some/new-asset.txt')->data(['foo' => 'baz']))->saveQuietly();
+        $oldMeta = $disk->get('some/.meta/old-asset.txt.yaml');
+        $newMeta = $disk->get('some/.meta/new-asset.txt.yaml');
+        $disk->assertExists('some/old-asset.txt');
+        $disk->assertExists('some/.meta/old-asset.txt.yaml');
+        $disk->assertExists('some/new-asset.txt');
+        $disk->assertExists('some/.meta/new-asset.txt.yaml');
+        $this->assertEquals([
+            'some/new-asset.txt',
+            'some/old-asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'some/old-asset.txt' => ['foo' => 'bar'],
+            'some/new-asset.txt' => ['foo' => 'baz'],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+
+        // Replace with `$deleteOriginal = true`
+        $return = $newAsset->replace($oldAsset, true);
+
+        Event::assertDispatched(AssetDeleted::class, 1); // because we passed the flag, the original asset should be deleted
+        Event::assertDispatched(AssetSaved::class, 0); // by default, the new asset is not renamed
+        Event::assertDispatched(AssetReplaced::class, 1); // our `UpdateAssetReferencesTest` covers what happens _after_ an asset is replaced
+
+        $this->assertEquals($newAsset, $return);
+        $disk->assertMissing('some/old-asset.txt');
+        $disk->assertMissing('some/.meta/old-asset.txt.yaml');
+        $disk->assertExists('some/new-asset.txt');
+        $disk->assertExists('some/.meta/new-asset.txt.yaml');
+        $this->assertEquals('New asset contents', $disk->get('some/new-asset.txt'));
+        $this->assertEquals([
+            'some/new-asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'some/new-asset.txt' => ['foo' => 'baz'],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+    }
+
+    /** @test */
     public function it_gets_dimensions()
     {
         $file = UploadedFile::fake()->image('image.jpg', 30, 60);
@@ -1520,6 +1650,71 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function reuploading_will_replace_the_file_with_the_same_filename()
+    {
+        Event::fake();
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
+
+        Storage::disk('test')->assertExists('path/to/asset.jpg');
+        $originalFileContents = Storage::disk('test')->get('path/to/asset.jpg');
+        $this->assertEquals('path/to/asset.jpg', $asset->path());
+        $meta = $asset->meta();
+        $this->assertEquals(13, $meta['width']);
+        $this->assertEquals(15, $meta['height']);
+
+        // Place an image in the filesystem that would have previously been uploaded,
+        // most likely using the files fieldtype in the "replace asset" action modal.
+        $uploadDisk = Storage::fake('local');
+        UploadedFile::fake()->image('', 40, 25)->storeAs('path/to', 'different-filename.jpg', ['disk' => 'local']);
+        $uploadDisk->assertExists('path/to/different-filename.jpg');
+
+        $file = new ReplacementFile('path/to/different-filename.jpg');
+
+        $return = $asset->reupload($file);
+
+        $this->assertEquals($asset, $return);
+        $this->assertEquals('path/to/asset.jpg', $asset->path());
+        $meta = $asset->meta();
+        $this->assertEquals(40, $meta['width']);
+        $this->assertEquals(25, $meta['height']);
+        Storage::disk('test')->assertExists('path/to/asset.jpg');
+        Storage::disk('test')->assertMissing('path/to/different-filename.jpg');
+        $this->assertNotEquals($originalFileContents, Storage::disk('test')->get('path/to/asset.jpg'));
+
+        Event::assertDispatched(AssetUploaded::class, 1); // Once for the initial upload, but not again for the reupload.
+        Event::assertDispatched(AssetReuploaded::class, function ($event) use ($asset) {
+            return $event->asset->id() === $asset->id();
+        });
+        Event::assertDispatched(AssetSaved::class, 1); // Once during the initial upload, but not again for the reupload.
+
+        // Assertions that the Glide cache is cleared and the presets
+        // are regenerated for this asset are in ReuploadAssetTest.
+    }
+
+    /** @test */
+    public function cannot_reupload_a_file_with_a_different_extension()
+    {
+        $this->expectException(FileExtensionMismatch::class);
+        $this->expectExceptionMessage('The file extension must match the original file.');
+
+        Event::fake();
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $replacementFile = new ReplacementFile('path/to/asset.png');
+
+        $asset->reupload($replacementFile);
+
+        Event::assertNotDispatched(AssetReuploaded::class);
+        Event::assertNotDispatched(AssetSaved::class);
+    }
+
+    /** @test */
     public function it_doesnt_lowercase_uploaded_filenames_when_configured()
     {
         config(['statamic.assets.lowercase' => false]);
@@ -1735,5 +1930,13 @@ class AssetTest extends TestCase
 
         // The "asset" Tag will output nothing when an invalid asset src is passed. It doesn't throw an exception.
         $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset]));
+    }
+
+    private function fakeEventWithMacros()
+    {
+        $fake = Event::fake();
+        $mock = \Mockery::mock($fake)->makePartial();
+        $mock->shouldReceive('forgetListener');
+        Event::swap($mock);
     }
 }

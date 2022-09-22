@@ -18,14 +18,18 @@ use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetReplaced;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
+use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -652,6 +656,32 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Replace an asset and/or its references where necessary.
+     *
+     * @param  Asset  $originalAsset
+     * @param  bool  $deleteOriginal
+     * @return $this
+     */
+    public function replace(Asset $originalAsset, $deleteOriginal = false)
+    {
+        // Temporarily disable the reference updater to avoid triggering reference updates
+        // until after the `AssetReplaced` event is fired. We still want to fire events
+        // like `AssetDeleted` and `AssetSaved` though, so that other listeners will
+        // get triggered (for cache invalidation, clearing of glide cache, etc.)
+        UpdateAssetReferencesSubscriber::disable();
+
+        if ($deleteOriginal) {
+            $originalAsset->delete();
+        }
+
+        UpdateAssetReferencesSubscriber::enable();
+
+        AssetReplaced::dispatch($originalAsset, $this);
+
+        return $this;
+    }
+
+    /**
      * Get the asset's dimensions.
      *
      * @return array An array in the [width, height] format
@@ -791,6 +821,22 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $this->save();
 
         AssetUploaded::dispatch($this);
+
+        return $this;
+    }
+
+    public function reupload(ReplacementFile $file)
+    {
+        if ($file->extension() !== $this->extension()) {
+            throw new FileExtensionMismatch('The file extension must match the original file.');
+        }
+
+        $file->writeTo($this->disk()->filesystem(), $this->path());
+
+        $this->clearCaches();
+        $this->writeMeta($this->generateMeta());
+
+        AssetReuploaded::dispatch($this);
 
         return $this;
     }

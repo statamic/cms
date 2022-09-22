@@ -35,6 +35,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\SendPasswordReset::class,
         Actions\MoveAsset::class,
         Actions\RenameAsset::class,
+        Actions\ReplaceAsset::class,
+        Actions\ReuploadAsset::class,
         Actions\MoveAssetFolder::class,
         Actions\RenameAssetFolder::class,
     ];

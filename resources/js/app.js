@@ -215,6 +215,15 @@ Statamic.app({
                 await alert(url);
             }
         });
+
+        Statamic.$callbacks.add('bustAndReloadImageCaches', function (urls) {
+            urls.forEach(async url => {
+                await fetch(url, { cache: 'reload', mode: 'no-cors' });
+                document.body
+                    .querySelectorAll(`img[src='${url}']`)
+                    .forEach(img => img.src = url);
+            });
+        });
     },
 
     methods: {
