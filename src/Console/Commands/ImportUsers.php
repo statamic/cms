@@ -71,7 +71,6 @@ class ImportUsers extends Command
 
             $eloquentUser = $eloquentRepository->make()
                 ->email($user->email())
-                ->password($user->password())
                 ->preferences($user->preferences())
                 ->data($data->except(['groups', 'roles']));
 
@@ -92,6 +91,9 @@ class ImportUsers extends Command
             }
 
             $eloquentUser->saveToDatabase();
+
+            $eloquentUser->model()->forceFill(['password' => $user->password()]);
+            $eloquentUser->model()->saveQuietly();
         });
 
         $this->newLine();
