@@ -14,10 +14,20 @@ use Statamic\Exceptions\ValidationException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Glide;
 use Statamic\Imaging\PresetGenerator;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ReuploadAssetTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
+    public function tearDown(): void
+    {
+        app('files')->deleteDirectory(__DIR__.'/../../__fixtures__/container');
+
+        parent::tearDown();
+    }
+
     /** @test */
     public function it_replaces_the_file_when_reuploading()
     {
