@@ -58,11 +58,13 @@ class ImportUsers extends Command
 
         if (! in_array(HasUuids::class, class_uses_recursive($model))) {
             $this->error('Your user model must use the HasUuids trait for this migration to run');
+
             return;
         }
 
         if (! str_contains(Schema::getColumnType('users', 'id'), 'uuid')) {
             $this->error('Your user model must use UUIDs for this migration to run');
+
             return;
         }
 
