@@ -57,7 +57,7 @@ class ImportUsers extends Command
         $model = config("auth.providers.$provider.model");
 
         if (! in_array(HasUuids::class, class_uses_recursive($model))) {
-            $this->error('Your user model must use the HasUUIDs trait for this migration to run');
+            $this->error('Your user model must use the HasUuids trait for this migration to run');
             return;
         }
 
