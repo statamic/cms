@@ -431,7 +431,7 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
-    public function it_commits_only_once_when_asset_is_replaced_with_newly_uploaded_asset()
+    public function it_commits_only_once_when_asset_is_replaced()
     {
         $originalAsset = tap($this->makeAsset())->saveQuietly();
 
