@@ -130,7 +130,7 @@ export default {
         },
 
         needsAlt() {
-            return this.asset.isImage && !this.asset.values.alt;
+            return (this.asset.isImage || this.asset.isSvg) && !this.asset.values.alt;
         }
     }
 };

@@ -316,7 +316,7 @@ export default {
 
         replicatorPreview() {
             return _.map(this.assets, (asset) => {
-                return asset.isImage ?
+                return (asset.isImage || asset.isSvg) ?
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
             }).join(', ');
