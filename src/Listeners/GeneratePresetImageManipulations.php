@@ -3,6 +3,7 @@
 namespace Statamic\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetUploaded;
 use Statamic\Imaging\PresetGenerator;
 
@@ -28,6 +29,7 @@ class GeneratePresetImageManipulations implements ShouldQueue
      */
     public function subscribe($events)
     {
+        $events->listen(AssetReuploaded::class, self::class.'@handle');
         $events->listen(AssetUploaded::class, self::class.'@handle');
     }
 

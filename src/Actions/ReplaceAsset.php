@@ -36,23 +36,18 @@ class ReplaceAsset extends Action
     public function confirmationText()
     {
         /** @translation */
-        return 'Are you sure you want to replace this asset and all of its references?';
+        return 'statamic::messages.asset_replace_confirmation';
     }
 
     public function run($assets, $values)
     {
         $originalAsset = $assets->first();
-        $newAsset = Facades\Asset::find($values['new_asset'][0]);
 
-        $newAsset->replace($originalAsset, $values['delete_original'], $values['preserve_filename']);
+        $newAsset = Facades\Asset::find($this->context['container'].'::'.$values['new_asset']);
 
-        $urls = [
-            $newAsset->thumbnailUrl('small'),
-            $newAsset->absoluteUrl(),
-        ];
+        $newAsset->replace($originalAsset, $values['delete_original']);
 
         return [
-            'callback' => ['bustAndReloadImageCaches', $urls],
             'ids' => [$newAsset->id()],
         ];
     }
@@ -68,7 +63,7 @@ class ReplaceAsset extends Action
                 'max_files' => 1,
                 'validate' => 'required',
                 'mode' => 'list',
-                'restrict' => false,
+                'restrict' => true,
                 'allow_uploads' => true,
                 'show_filename' => true,
             ],
@@ -76,15 +71,6 @@ class ReplaceAsset extends Action
                 'display' => __('Delete Original Asset'),
                 'type' => 'toggle',
                 'default' => true,
-            ],
-            'preserve_filename' => [
-                'display' => __('Preserve Original Filename'),
-                'type' => 'toggle',
-                'default' => false,
-                'instructions' => __('statamic::messages.replace_asset_preserve_filename_instructions'),
-                'if' => [
-                    'delete_original' => true,
-                ],
             ],
         ];
     }

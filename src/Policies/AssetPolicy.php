@@ -59,7 +59,7 @@ class AssetPolicy
     public function replace($user, $asset)
     {
         return $this->edit($user, $asset)
-            && $this->store($user, $asset)
+            && $this->store($user, $asset->container())
             && $this->delete($user, $asset);
     }
 }

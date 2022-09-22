@@ -219,7 +219,7 @@ class Date extends Fieldtype
 
     private function defaultFormat()
     {
-        if ($this->config('time_enabled') && $this->config('mode') === 'single') {
+        if ($this->config('time_enabled') && $this->config('mode', 'single') === 'single') {
             return $this->config('time_seconds_enabled')
                 ? self::DEFAULT_DATETIME_WITH_SECONDS_FORMAT
                 : self::DEFAULT_DATETIME_FORMAT;

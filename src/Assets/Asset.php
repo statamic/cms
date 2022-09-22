@@ -19,8 +19,10 @@ use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReplaced;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
+use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Image;
@@ -49,17 +51,11 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     protected $container;
-
     protected $path;
-
     protected $meta;
-
-    protected $syncOriginalProperties = ['focus', 'path'];
-
+    protected $syncOriginalProperties = ['path'];
     protected $withEvents = true;
-
     protected $shouldHydrate = true;
-
     protected $removedData = [];
 
     public function __construct()
@@ -452,6 +448,19 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Is this asset a media file?
+     *
+     * @return bool
+     */
+    public function isMedia()
+    {
+        return $this->isImage()
+                || $this->isSvg()
+                || $this->isVideo()
+                || $this->isAudio();
+    }
+
+    /**
      * Is this asset a PDF?
      *
      * @return bool
@@ -651,10 +660,9 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      *
      * @param  Asset  $originalAsset
      * @param  bool  $deleteOriginal
-     * @param  bool  $preserveOriginalFilename
      * @return $this
      */
-    public function replace(Asset $originalAsset, $deleteOriginal = false, $preserveOriginalFilename = false)
+    public function replace(Asset $originalAsset, $deleteOriginal = false)
     {
         // Temporarily disable the reference updater to avoid triggering reference updates
         // until after the `AssetReplaced` event is fired. We still want to fire events
@@ -664,10 +672,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
         if ($deleteOriginal) {
             $originalAsset->delete();
-        }
-
-        if ($deleteOriginal && $preserveOriginalFilename) {
-            $this->rename($originalAsset->filename());
         }
 
         UpdateAssetReferencesSubscriber::enable();
@@ -821,6 +825,22 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         return $this;
     }
 
+    public function reupload(ReplacementFile $file)
+    {
+        if ($file->extension() !== $this->extension()) {
+            throw new FileExtensionMismatch('The file extension must match the original file.');
+        }
+
+        $file->writeTo($this->disk()->filesystem(), $this->path());
+
+        $this->clearCaches();
+        $this->writeMeta($this->generateMeta());
+
+        AssetReuploaded::dispatch($this);
+
+        return $this;
+    }
+
     /**
      * Download a file.
      *
@@ -829,6 +849,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     public function download(string $name = null, array $headers = [])
     {
         return $this->disk()->filesystem()->download($this->path(), $name, $headers);
+    }
+
+    /**
+     * Stream a file.
+     *
+     * @return resource
+     */
+    public function stream()
+    {
+        return $this->disk()->filesystem()->readStream($this->path());
     }
 
     private function getSafeFilename($string)

@@ -6,7 +6,9 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Mockery;
 use Statamic\Assets\Asset;
+use Statamic\Assets\ReplacementFile;
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 use Statamic\Events;
 use Statamic\Facades;
@@ -393,6 +395,18 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
+    public function it_commits_when_asset_is_reuploaded()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Asset reuploaded')->once();
+
+        $file = Mockery::mock(ReplacementFile::class);
+        $file->shouldReceive('extension')->andReturn('txt');
+        $file->shouldReceive('writeTo');
+
+        $this->makeAsset()->reupload($file);
+    }
+
+    /** @test */
     public function it_commits_when_asset_is_moved()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
@@ -417,7 +431,7 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
-    public function it_commits_only_once_when_asset_is_replaced_with_newly_uploaded_asset()
+    public function it_commits_only_once_when_asset_is_replaced()
     {
         $originalAsset = tap($this->makeAsset())->saveQuietly();
 
