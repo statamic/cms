@@ -482,7 +482,7 @@ final class Installer
 
         (new $hook)->handle($this->console);
 
-        $reflector = new ReflectionClass($hook);
+        $reflector = new \ReflectionClass($hook);
         unlink($reflector->getFileName());
 
         return $this;
