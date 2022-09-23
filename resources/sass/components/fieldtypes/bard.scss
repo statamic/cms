@@ -178,9 +178,8 @@
     }
 }
 
-.bard-set {
-    position: relative;
-    z-index: 0;
+.bard-set:active .popover {
+    display: none;
 }
 
 .bard-set.has-error > .replicator-set-header label {
