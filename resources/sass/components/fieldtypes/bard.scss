@@ -178,6 +178,10 @@
     }
 }
 
+.bard-set:active .popover {
+    display: none;
+}
+
 .bard-set.has-error > .replicator-set-header label {
     color: $color_red;
 }
