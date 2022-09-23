@@ -178,6 +178,11 @@
     }
 }
 
+.bard-set {
+    position: relative;
+    z-index: 0;
+}
+
 .bard-set.has-error > .replicator-set-header label {
     color: $color_red;
 }
