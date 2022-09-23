@@ -758,7 +758,6 @@ class AssetTest extends TestCase
 
         // Saving should clear the cache and persist the new meta data to the filesystem...
         $asset->save();
-        $this->assertNull(Cache::get($asset->metaCacheKey()));
         $this->assertEquals($metaWithData, YAML::parse(Storage::disk('test')->get('foo/.meta/image.jpg.yaml')));
 
         // Then if we ask for new meta, it should cache with the newly saved data...
