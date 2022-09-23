@@ -1961,7 +1961,6 @@ class AssetTest extends TestCase
         $relationshipFieldtype = new class extends Fieldtype
         {
             protected static $handle = 'relationship';
-
             protected $relationship = true;
 
             public function augment($values)
