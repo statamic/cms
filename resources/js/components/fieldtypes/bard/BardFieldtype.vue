@@ -77,6 +77,7 @@
                 </div>
             </editor-floating-menu>
 
+            <div class="bard-invalid" v-if="invalid" v-html="__('Invalid content')"></div>
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
@@ -165,6 +166,7 @@ export default {
             collapsed: this.meta.collapsed,
             previews: this.meta.previews,
             mounted: false,
+            invalid: false,
             pageHeader: null,
             escBinding: null,
         }
@@ -280,13 +282,24 @@ export default {
     mounted() {
         this.initToolbarButtons();
 
+        const content = this.valueToContent(clone(this.value));
+
         this.editor = new Editor({
             useBuiltInExtensions: false,
             extensions: this.getExtensions(),
-            content: this.valueToContent(clone(this.value)),
+            content: content,
             editable: !this.readOnly,
             disableInputRules: ! this.config.enable_input_rules,
             disablePasteRules: ! this.config.enable_paste_rules,
+            onInit: ({ state }) => {
+                if (content !== null && typeof content === 'object') {
+                    try {
+                        state.schema.nodeFromJSON(content);
+                    } catch (error) {
+                        this.invalid = true;
+                    }
+                }
+            },
             onFocus: () => this.$emit('focus'),
             onBlur: () => {
                 // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
