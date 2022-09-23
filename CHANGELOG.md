@@ -1,5 +1,16 @@
 # Release Notes
 
+## 3.3.39 (2022-09-23)
+
+### What's new
+- Ability to replace assets by either changing references to another asset, or reuploading a file. [#4832](https://github.com/statamic/cms/issues/4832) by @jesseleite
+
+### What's fixed
+- Improve handling of invalid Replicator and Bard field data [#6708](https://github.com/statamic/cms/issues/6708) by @jacksleight
+- Fix shallow Bard set drag and drop ghost in Chrome [#6776](https://github.com/statamic/cms/issues/6776) by @jacksleight
+
+
+
 ## 3.3.38 (2022-09-22)
 
 ### What's new
