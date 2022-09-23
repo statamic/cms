@@ -59,7 +59,6 @@ class ImportRoles extends Command
         app()->bind(RoleRepositoryContract::class, EloquentRepository::class);
 
         $this->withProgressBar($roles, function ($role) {
-
             $eloquentRole = Role::make($role->handle())
                 ->title($role->title())
                 ->permissions($role->permissions());
