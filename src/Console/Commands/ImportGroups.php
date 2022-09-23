@@ -4,7 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Statamic\Auth\Eloquent\UserGroup as EloquentGroup;
-use Statamic\Auth\Eloquent\UserGroupRepository as EloquentGroupRepository;
+use Statamic\Auth\Eloquent\UserGroupRepository as EloquentRepository;
 use Statamic\Auth\File\UserGroup as FileGroup;
 use Statamic\Auth\File\UserGroupRepository as FileRepository;
 use Statamic\Console\RunsInPlease;
@@ -39,6 +39,7 @@ class ImportGroups extends Command
     {
         if (! config('statamic.users.groups', false)) {
             $this->error('You do not have eloquent driven groups enabled');
+
             return;
         }
 
@@ -55,10 +56,9 @@ class ImportGroups extends Command
         $groups = UserGroup::path(config('statamic.users.paths.groups', resource_path('users/groups.yaml')))->all();
 
         app()->bind(GroupContract::class, EloquentGroup::class);
-        app()->bind(GroupRepositoryContract::class, EloquentGroupRepository::class);
+        app()->bind(GroupRepositoryContract::class, EloquentRepository::class);
 
         $this->withProgressBar($groups, function ($group) {
-
             $eloquentGroup = UserGroup::make($group->handle())
                 ->title($group->title())
                 ->permissions($group->permissions())

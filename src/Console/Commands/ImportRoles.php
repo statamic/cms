@@ -4,7 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Statamic\Auth\Eloquent\Role as EloquentRole;
-use Statamic\Auth\Eloquent\RoleRepository as EloquentRoleRepository;
+use Statamic\Auth\Eloquent\RoleRepository as EloquentRepository;
 use Statamic\Auth\File\Role as FileRole;
 use Statamic\Auth\File\RoleRepository as FileRepository;
 use Statamic\Console\RunsInPlease;
@@ -37,8 +37,9 @@ class ImportRoles extends Command
      */
     public function handle()
     {
-        if (!config('statamic.users.roles', false)) {
+        if (! config('statamic.users.roles', false)) {
             $this->error('You do not have eloquent driven roles enabled');
+
             return;
         }
 
