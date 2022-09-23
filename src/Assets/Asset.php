@@ -51,17 +51,11 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     protected $container;
-
     protected $path;
-
     protected $meta;
-
     protected $syncOriginalProperties = ['focus', 'path'];
-
     protected $withEvents = true;
-
     protected $shouldHydrate = true;
-
     protected $removedData = [];
 
     public function __construct()
