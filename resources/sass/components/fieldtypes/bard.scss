@@ -183,7 +183,7 @@
     }
 }
 
-.bard-set:active .popover {
+.bard-set:active .sortable-handle:hover ~ * .popover {
     display: none;
 }
 
