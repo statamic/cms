@@ -2610,6 +2610,7 @@ class CoreModifiers extends Modifier
      * Let's you add optional parameters to ignore, like abbreviations.
      *
      * @param $value
+     * @param $params
      * @return string
      */
     public function title($value, $params)
