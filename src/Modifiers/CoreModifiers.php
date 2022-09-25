@@ -2607,6 +2607,7 @@ class CoreModifiers extends Modifier
 
     /**
      * Converts the first character of each word in the string to uppercase.
+     * Let's you add optional parameters to ignore, like abbreviations.
      *
      * @param $value
      * @return string
