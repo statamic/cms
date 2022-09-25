@@ -2611,9 +2611,9 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function title($value)
+    public function title($value, $params)
     {
-        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor'];
+        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor', ...$params];
 
         return Stringy::titleize($value, $ignore);
     }
