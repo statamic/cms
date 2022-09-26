@@ -316,6 +316,22 @@ export default {
             }
         },
 
+        isInLinkField() {
+            let vm = this;
+
+            while (true) {
+                let parent = vm.$parent;
+
+                if (! parent) return false;           
+
+                if (parent.config.type === 'link') {
+                    return true;
+                }
+
+                vm = parent;
+            }
+        },
+
         replicatorPreview() {
             return _.map(this.assets, (asset) => {
                 return (asset.isImage || asset.isSvg) ?
@@ -328,6 +344,8 @@ export default {
             if (this.maxFilesReached && ! this.isFullWidth) return false
 
             if (this.maxFilesReached && this.isInGridField) return false
+
+            if (this.maxFilesReached && this.isInLinkField) return false
 
             return true
         },
