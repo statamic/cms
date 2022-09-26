@@ -322,7 +322,7 @@ export default {
             while (true) {
                 let parent = vm.$parent;
 
-                if (! parent) return false;           
+                if (! parent) return false;
 
                 if (parent.config.type === 'link') {
                     return true;
@@ -343,9 +343,7 @@ export default {
         showPicker() {
             if (this.maxFilesReached && ! this.isFullWidth) return false
 
-            if (this.maxFilesReached && this.isInGridField) return false
-
-            if (this.maxFilesReached && this.isInLinkField) return false
+            if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false
 
             return true
         },
