@@ -124,6 +124,10 @@
 }
 
 @screen 2xl {
+    .asset-grid-listing {
+        @apply grid-cols-6;
+    }
+
     .asset-manager .asset-grid-listing {
         @apply grid-cols-8;
     }
