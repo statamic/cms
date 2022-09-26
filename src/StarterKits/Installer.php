@@ -139,6 +139,7 @@ final class Installer
             ->installFiles()
             ->installDependencies()
             ->makeSuperUser()
+            ->runPostInstallHook()
             ->reticulateSplines()
             ->removeStarterKit()
             ->removeRepository()
@@ -448,6 +449,34 @@ final class Installer
         if ($this->console->confirm('Create a super user?', false)) {
             $this->console->call('make:user', ['--super' => true]);
         }
+
+        return $this;
+    }
+
+    /**
+     * Run post install hook, if one exists in the starter kit.
+     *
+     * @return $this
+     */
+    protected function runPostInstallHook()
+    {
+        if ($this->files->exists($path = $this->starterKitPath('StarterKitPostInstall.php'))) {
+            require $path;
+        }
+
+        if (! class_exists(\StarterKitPostInstall::class)) {
+            return $this;
+        }
+
+        $postInstallHook = new \StarterKitPostInstall;
+
+        if (! method_exists($postInstallHook, 'handle')) {
+            return $this;
+        }
+
+        $this->console->info('Running post-install hook...');
+
+        $postInstallHook->handle($this->console);
 
         return $this;
     }
