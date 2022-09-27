@@ -43,6 +43,7 @@ class Exporter
         $this
             ->exportFiles()
             ->exportConfig()
+            ->exportHooks()
             ->exportComposerJson();
     }
 
@@ -186,6 +187,26 @@ class Exporter
         $config = $this->exportDependenciesFromComposerJson($config);
 
         $this->files->put("{$this->exportPath}/starter-kit.yaml", YAML::dump($config->all()));
+
+        return $this;
+    }
+
+    /**
+     * Export starter kit hooks.
+     *
+     * @return $this
+     */
+    protected function exportHooks()
+    {
+        $hooks = ['StarterKitPostInstall.php'];
+
+        collect($hooks)
+            ->filter(function ($hook) {
+                return $this->files->exists(base_path($hook));
+            })
+            ->each(function ($hook) {
+                $this->copyPath($hook);
+            });
 
         return $this;
     }

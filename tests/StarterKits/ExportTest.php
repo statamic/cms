@@ -156,6 +156,35 @@ class ExportTest extends TestCase
     }
 
     /** @test */
+    public function it_copies_post_install_script_hook_when_available()
+    {
+        $this->setExportPaths([
+            'config',
+        ]);
+
+        $this->assertFileNotExists($postInstallHook = $this->exportPath('StarterKitPostInstall.php'));
+
+        $this->files->put(base_path('StarterKitPostInstall.php'), <<<'EOT'
+<?php
+
+class StarterKitPostInstall
+{
+    public function handle($console)
+    {
+        //
+    }
+}
+EOT
+        );
+
+        $this->exportCoolRunnings();
+
+        $this->assertFileExists($postInstallHook);
+        $this->assertFileHasContent('class StarterKitPostInstall', $postInstallHook);
+        $this->assertFileHasContent('public function handle($console)', $postInstallHook);
+    }
+
+    /** @test */
     public function it_exports_all_dependencies_from_versionless_array()
     {
         $this->files->put(base_path('composer.json'), <<<'EOT'
