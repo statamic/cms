@@ -320,6 +320,7 @@ final class Installer
 
         if ($this->withConfig) {
             $this->copyStarterKitConfig();
+            $this->copyStarterKitHooks();
         }
 
         return $this;
@@ -345,6 +346,10 @@ final class Installer
      */
     protected function copyStarterKitConfig()
     {
+        if (! $this->withConfig) {
+            return;
+        }
+
         if ($this->withoutDependencies) {
             return $this->copyFile($this->starterKitPath('starter-kit.yaml'), base_path('starter-kit.yaml'));
         }
@@ -366,6 +371,26 @@ final class Installer
         }
 
         $this->files->put(base_path('starter-kit.yaml'), YAML::dump($config->all()));
+    }
+
+    /**
+     * Copy starter kit hook scripts.
+     */
+    protected function copyStarterKitHooks()
+    {
+        if (! $this->withConfig) {
+            return;
+        }
+
+        $hooks = ['StarterKitPostInstall.php'];
+
+        collect($hooks)
+            ->filter(function ($hook) {
+                return $this->files->exists($this->starterKitPath($hook));
+            })
+            ->each(function ($hook) {
+                $this->copyFile($this->starterKitPath($hook), base_path($hook));
+            });
     }
 
     /**

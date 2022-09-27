@@ -298,6 +298,66 @@ EOT;
     }
 
     /** @test */
+    public function it_copies_starter_kit_post_install_script_hook_when_with_config_option_is_passed()
+    {
+        $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), <<<'EOT'
+<?php
+
+class StarterKitPostInstall
+{
+    public function handle($console)
+    {
+        //
+    }
+}
+EOT
+        );
+
+        $mock = Mockery::mock();
+        $mock->shouldReceive('handle')->once();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn($mock);
+
+        $this->installCoolRunnings(['--with-config' => true]);
+
+        $this->assertFileExists($hookPath = base_path('StarterKitPostInstall.php'));
+        $this->assertFileHasContent('class StarterKitPostInstall', $hookPath);
+        $this->assertFileHasContent('public function handle($console)', $hookPath);
+    }
+
+    /** @test */
+    public function it_doesnt_copy_starter_kit_post_install_script_hook_when_with_config_option_is_not_passed()
+    {
+        $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), <<<'EOT'
+<?php
+
+class StarterKitPostInstall
+{
+    public function handle($console)
+    {
+        //
+    }
+}
+EOT
+        );
+
+        $mock = Mockery::mock();
+        $mock->shouldReceive('handle')->once();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn($mock);
+
+        $this->installCoolRunnings();
+
+        $this->assertFileNotExists(base_path('StarterKitPostInstall.php'));
+    }
+
+    /** @test */
     public function it_overwrites_starter_kit_config_when_option_is_passed()
     {
         $this->files->put($configPath = base_path('starter-kit.yaml'), 'old config');
