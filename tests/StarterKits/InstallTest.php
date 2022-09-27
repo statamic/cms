@@ -558,8 +558,6 @@ EOT;
     /** @test */
     public function it_runs_post_install_script_hook_when_available()
     {
-        $this->assertNull(Blink::get('post-install-hook-successful'));
-
         $mock = Mockery::mock();
         $mock->shouldReceive('handle')->once();
 
