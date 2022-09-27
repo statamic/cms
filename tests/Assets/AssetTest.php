@@ -1911,6 +1911,76 @@ class AssetTest extends TestCase
         $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset]));
     }
 
+    /** @test */
+    public function it_syncs_original_state_with_no_data()
+    {
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+
+        $this->assertEquals([], $asset->getOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [],
+        ], $asset->getOriginal());
+
+        Storage::disk('test')->assertMissing('path/to/.meta/test.txt.yaml');
+    }
+
+    /** @test */
+    public function it_syncs_original_state_with_no_data_but_with_data_in_meta()
+    {
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', "data:\n  foo: bar");
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+
+        $this->assertEquals([], $asset->getOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [
+                'foo' => 'bar',
+            ],
+        ], $asset->getOriginal());
+
+        Storage::disk('test')->assertExists('path/to/.meta/test.txt.yaml');
+    }
+
+    /** @test */
+    public function it_syncs_original_state_with_data()
+    {
+        $yaml = <<<'YAML'
+data:
+  alfa: bravo
+  charlie: delta
+  echo: foxtrot
+YAML;
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', $yaml);
+
+        $asset = (new Asset)
+            ->container($this->container)
+            ->path('path/to/test.txt')
+            ->set('charlie', 'brown')
+            ->remove('echo');
+
+        $this->assertEquals([], $asset->getOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [
+                'alfa' => 'bravo',
+                'charlie' => 'brown',
+            ],
+        ], $asset->getOriginal());
+
+        Storage::disk('test')->assertExists('path/to/.meta/test.txt.yaml');
+        $this->assertEquals($yaml, Storage::disk('test')->get('path/to/.meta/test.txt.yaml'));
+    }
+
     private function fakeEventWithMacros()
     {
         $fake = Event::fake();
