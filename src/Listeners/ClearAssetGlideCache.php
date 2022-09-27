@@ -39,7 +39,7 @@ class ClearAssetGlideCache implements ShouldQueue
      */
     public function handleSaved($event)
     {
-        if ($event->asset->getOriginal('focus') != $event->asset->get('focus')) {
+        if ($event->asset->getOriginal('data.focus') != $event->asset->get('focus')) {
             Glide::clearAsset($event->asset);
         }
     }
