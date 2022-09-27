@@ -3,6 +3,7 @@
 namespace Statamic\StarterKits;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
@@ -460,17 +461,7 @@ final class Installer
      */
     protected function runPostInstallHook()
     {
-        if ($this->files->exists($path = $this->starterKitPath('StarterKitPostInstall.php'))) {
-            require $path;
-        }
-
-        if (! class_exists(\StarterKitPostInstall::class)) {
-            return $this;
-        }
-
-        $postInstallHook = new \StarterKitPostInstall;
-
-        if (! method_exists($postInstallHook, 'handle')) {
+        if (! $postInstallHook = Hook::find($this->starterKitPath('StarterKitPostInstall.php'))) {
             return $this;
         }
 

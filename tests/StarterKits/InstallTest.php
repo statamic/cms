@@ -3,8 +3,10 @@
 namespace Tests\StarterKits;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
+use Mockery;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
 use Statamic\Facades\YAML;
@@ -551,6 +553,22 @@ EOT;
         $this->assertFileNotExists(base_path('composer.json.bak'));
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileNotExists(base_path('copied.md'));
+    }
+
+    /** @test */
+    public function it_runs_post_install_script_hook_when_available()
+    {
+        $this->assertNull(Blink::get('post-install-hook-successful'));
+
+        $mock = Mockery::mock();
+        $mock->shouldReceive('handle')->once();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn($mock);
+
+        $this->installCoolRunnings();
     }
 
     private function kitRepoPath($path = null)
