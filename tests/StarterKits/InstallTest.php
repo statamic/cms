@@ -300,18 +300,7 @@ EOT;
     /** @test */
     public function it_copies_starter_kit_post_install_script_hook_when_with_config_option_is_passed()
     {
-        $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), <<<'EOT'
-<?php
-
-class StarterKitPostInstall
-{
-    public function handle($console)
-    {
-        //
-    }
-}
-EOT
-        );
+        $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), 'php file contents');
 
         $mock = Mockery::mock();
         $mock->shouldReceive('handle')->once();
@@ -324,25 +313,13 @@ EOT
         $this->installCoolRunnings(['--with-config' => true]);
 
         $this->assertFileExists($hookPath = base_path('StarterKitPostInstall.php'));
-        $this->assertFileHasContent('class StarterKitPostInstall', $hookPath);
-        $this->assertFileHasContent('public function handle($console)', $hookPath);
+        $this->assertFileHasContent('php file contents', $hookPath);
     }
 
     /** @test */
     public function it_doesnt_copy_starter_kit_post_install_script_hook_when_with_config_option_is_not_passed()
     {
-        $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), <<<'EOT'
-<?php
-
-class StarterKitPostInstall
-{
-    public function handle($console)
-    {
-        //
-    }
-}
-EOT
-        );
+        $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), 'php file contents');
 
         $mock = Mockery::mock();
         $mock->shouldReceive('handle')->once();
