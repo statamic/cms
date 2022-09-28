@@ -385,12 +385,8 @@ final class Installer
         $hooks = ['StarterKitPostInstall.php'];
 
         collect($hooks)
-            ->filter(function ($hook) {
-                return $this->files->exists($this->starterKitPath($hook));
-            })
-            ->each(function ($hook) {
-                $this->copyFile($this->starterKitPath($hook), base_path($hook));
-            });
+            ->filter(fn ($hook) => $this->files->exists($this->starterKitPath($hook)))
+            ->each(fn ($hook) => $this->copyFile($this->starterKitPath($hook), base_path($hook)));
     }
 
     /**
