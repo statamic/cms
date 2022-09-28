@@ -7,6 +7,7 @@ use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use Mockery;
+use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
 use Statamic\Facades\YAML;
@@ -580,7 +581,9 @@ EOT;
     public function it_runs_post_install_script_hook_when_available()
     {
         $mock = Mockery::mock();
-        $mock->shouldReceive('handle')->once();
+        $mock->shouldReceive('handle')
+            ->withArgs(fn ($arg) => $arg instanceof InstallCommand)
+            ->once();
 
         Hook::shouldReceive('find')
             ->with($this->kitVendorPath('StarterKitPostInstall.php'))
