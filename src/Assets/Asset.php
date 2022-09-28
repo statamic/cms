@@ -253,7 +253,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         return ltrim($path, '/');
     }
 
-    private function metaExists()
+    protected function metaExists()
     {
         return $this->disk()->exists($this->metaPath());
     }
