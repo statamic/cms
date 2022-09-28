@@ -14,20 +14,10 @@ use Statamic\Exceptions\ValidationException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Glide;
 use Statamic\Imaging\PresetGenerator;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ReuploadAssetTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
-
-    public function tearDown(): void
-    {
-        app('files')->deleteDirectory(__DIR__.'/../../__fixtures__/container');
-
-        parent::tearDown();
-    }
-
     /** @test */
     public function it_replaces_the_file_when_reuploading()
     {
@@ -75,12 +65,7 @@ class ReuploadAssetTest extends TestCase
     /** @test */
     public function glide_cache_is_cleared_and_presets_are_regenerated_when_reuploading()
     {
-        config(['filesystems.disks.test' => [
-            'driver' => 'local',
-            'root' => __DIR__.'/../../__fixtures__/container',
-            'url' => '/the-url',
-        ]]);
-
+        Storage::fake('test');
         $container = AssetContainer::make('test_container')->disk('test');
         AssetContainer::shouldReceive('find')->with('test_container')->andReturn($container);
         $asset = $container->makeAsset('test.jpg');
