@@ -13,6 +13,7 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Str;
 
@@ -148,6 +149,7 @@ class CollectionsController extends CpController
             'require_slugs' => $collection->requiresSlugs(),
             'links' => $collection->entryBlueprints()->map->handle()->contains('link'),
             'taxonomies' => $collection->taxonomies()->map->handle()->all(),
+            'revisions' => $collection->revisionsEnabled(),
             'default_publish_state' => $collection->defaultPublishState(),
             'template' => $collection->template(),
             'layout' => $collection->layout(),
@@ -231,6 +233,7 @@ class CollectionsController extends CpController
             ->sortDirection($values['sort_direction'])
             ->ampable($values['amp'])
             ->mount($values['mount'] ?? null)
+            ->revisions($values['revisions'] ?? false)
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
             ->pastDateBehavior(array_get($values, 'past_date_behavior'))
@@ -429,6 +432,7 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collection_configure_template_instructions'),
                         'type' => 'template',
                         'placeholder' => __('System default'),
+                        'blueprint' => true,
                     ],
                     'layout' => [
                         'display' => __('Layout'),
@@ -443,6 +447,19 @@ class CollectionsController extends CpController
                 ],
             ],
         ];
+
+        if (Statamic::pro() && config('statamic.revisions.enabled')) {
+            $fields['revisions'] = [
+                'display' => __('Revisions'),
+                'fields' => [
+                    'revisions' => [
+                        'type' => 'toggle',
+                        'display' => __('Enable Revisions'),
+                        'instructions' => __('statamic::messages.collection_revisions_instructions'),
+                    ],
+                ],
+            ];
+        }
 
         if (Site::hasMultiple()) {
             $fields['sites'] = [

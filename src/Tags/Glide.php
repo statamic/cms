@@ -23,8 +23,8 @@ class Glide extends Tags
      *
      * Where `field` is the variable containing the image ID
      *
-     * @param  $method
-     * @param  $args
+     * @param  string  $method
+     * @param  array  $args
      * @return string
      */
     public function __call($method, $args)
@@ -85,6 +85,32 @@ class Glide extends Tags
         $content = str_replace($matches[0], $matches[1], $content);
 
         return $content;
+    }
+
+    /**
+     * Maps to {{ glide:data_url }}.
+     *
+     * Converts a Glide image to a data URL.
+     *
+     * @return string
+     */
+    public function dataUrl()
+    {
+        $item = $this->params->get(['src', 'id', 'path']);
+
+        return $this->output($this->generateGlideDataUrl($item));
+    }
+
+    /**
+     * Maps to {{ glide:data_uri }}.
+     *
+     * Alias of data_url
+     *
+     * @return string
+     */
+    public function dataUri()
+    {
+        return $this->dataUrl();
     }
 
     /**
@@ -149,11 +175,6 @@ class Glide extends Tags
      */
     private function output($url)
     {
-        if ($this->isPair) {
-            return $this->parse(
-                compact('url', 'width', 'height')
-            );
-        }
         if ($this->params->bool('tag')) {
             return "<img src=\"$url\" alt=\"{$this->params->get('alt')}\" />";
         }
@@ -178,6 +199,29 @@ class Glide extends Tags
         }
 
         $url = ($this->params->bool('absolute', $this->useAbsoluteUrls())) ? URL::makeAbsolute($url) : URL::makeRelative($url);
+
+        return $url;
+    }
+
+    /**
+     * The data URL generation.
+     *
+     * @param  string  $item  Either the ID or path of the image.
+     * @return string
+     */
+    private function generateGlideDataUrl($item)
+    {
+        $cache = GlideManager::cacheDisk();
+
+        try {
+            $path = $this->generateImage($item);
+            $source = $cache->read($path);
+            $url = 'data:'.$cache->mimeType($path).';base64,'.base64_encode($source);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+
+            return;
+        }
 
         return $url;
     }

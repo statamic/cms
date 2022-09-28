@@ -1,7 +1,7 @@
 <template>
 
     <portal :to="portal">
-        <vue-modal v-bind="modalProps" :delay="25" @opened="modalOpened" @closed="modalClosed" :class="{'disable-overflow': overflow === false}">
+        <vue-modal v-bind="modalProps" :delay="25" @opened="modalOpened" @closed="modalClosed" :class="{'disable-overflow': overflow === false}" v-show="isTopmostPortal">
             <slot :close="close" />
         </vue-modal>
     </portal>
@@ -9,10 +9,11 @@
 </template>
 
 <script>
+import uniqid from 'uniqid';
+
 export default {
 
     props: {
-        name: { type: String, required: true },
         adaptive: { type: Boolean, default: true },
         draggable: { type: Boolean, default: false },
         clickToClose: { type: Boolean, default: false },
@@ -25,7 +26,8 @@ export default {
 
     data() {
         return {
-            portal: null,
+            modal: null,
+            name: uniqid(),
         }
     },
 
@@ -42,13 +44,21 @@ export default {
                 width: this.width,
                 scrollable: this.scrollable,
             }
-        }
+        },
+
+        isTopmostPortal() {
+            const portals = this.$root.portals;
+            return portals[portals.length - 1] === this.modal;
+        },
+
+        portal() {
+            return this.modal ? this.modal.key : null;
+        },
 
     },
 
     mounted() {
-        this.portal = `modal-${this.$modals.count()}`;
-        this.$modals.open(this.name);
+        this.modal = this.$modals.open(this.name);
     },
 
     destroyed() {

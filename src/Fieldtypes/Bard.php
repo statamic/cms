@@ -29,11 +29,31 @@ class Bard extends Replicator
     protected function configFieldItems(): array
     {
         return [
+            'collapse' => [
+                'display' => __('Collapse'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
+                'type' => 'select',
+                'cast_booleans' => true,
+                'width' => 33,
+                'options' => [
+                    'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
+                    'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
+                    'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+                ],
+                'default' => false,
+            ],
             'always_show_set_button' => [
                 'display' => __('Always Show Set Button'),
                 'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
                 'type' => 'toggle',
                 'default' => false,
+                'width' => 50,
+            ],
+            'previews' => [
+                'display' => __('Field Previews'),
+                'instructions' => __('statamic::fieldtypes.bard.config.previews'),
+                'type' => 'toggle',
+                'default' => true,
                 'width' => 50,
             ],
             'sets' => [
@@ -154,6 +174,19 @@ class Bard extends Replicator
                 'type' => 'toggle',
                 'width' => 50,
             ],
+            'remove_empty_nodes' => [
+                'display' => __('Remove Empty Nodes'),
+                'instructions' => __('statamic::fieldtypes.bard.config.remove_empty_nodes'),
+                'type' => 'select',
+                'cast_booleans' => true,
+                'options' => [
+                    'false' => __("Don't remove empty nodes"),
+                    'true' => __('Remove all empty nodes'),
+                    'trim' => __('Remove empty nodes at the start and end'),
+                ],
+                'default' => 'false',
+                'width' => 50,
+            ],
         ];
     }
 
@@ -179,6 +212,8 @@ class Bard extends Replicator
     {
         $value = json_decode($value, true);
 
+        $value = $this->removeEmptyNodes($value);
+
         $structure = collect($value)->map(function ($row) {
             if ($row['type'] !== 'set') {
                 return $row;
@@ -200,6 +235,43 @@ class Bard extends Replicator
         }
 
         return $structure;
+    }
+
+    protected function removeEmptyNodes($value)
+    {
+        $value = collect($value);
+
+        if ($this->config('remove_empty_nodes') === true) {
+            $empty = $value->filter(function ($value) {
+                return $this->shouldRemoveNode($value);
+            });
+
+            return $value->diffKeys($empty)->values();
+        }
+
+        if ($this->config('remove_empty_nodes') === 'trim') {
+            if ($this->shouldRemoveNode($value->first())) {
+                $value->shift();
+
+                return $this->removeEmptyNodes($value);
+            }
+
+            if ($this->shouldRemoveNode($value->last())) {
+                $value->pop();
+
+                return $this->removeEmptyNodes($value);
+            }
+        }
+
+        return $value;
+    }
+
+    protected function shouldRemoveNode($value)
+    {
+        $type = Arr::get($value, 'type');
+
+        return in_array($type, ['heading', 'paragraph'])
+            && ! Arr::has($value, 'content');
     }
 
     protected function shouldSaveHtml()

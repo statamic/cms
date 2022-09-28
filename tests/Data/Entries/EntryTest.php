@@ -8,9 +8,11 @@ use Facades\Statamic\Stache\Repositories\CollectionTreeRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Mockery;
+use ReflectionClass;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Entries\AugmentedEntry;
@@ -511,11 +513,16 @@ class EntryTest extends TestCase
         $entry = new Entry;
         $this->assertEquals([], $entry->supplements()->all());
 
-        $return = $entry->setSupplement('foo', 'bar');
+        $return = $entry->setSupplement('foo', 'bar')->setSupplement('baz', null);
 
         $this->assertEquals($entry, $return);
         $this->assertEquals('bar', $entry->getSupplement('foo'));
-        $this->assertEquals(['foo' => 'bar'], $entry->supplements()->all());
+        $this->assertNull($entry->getSupplement('bar'));
+        $this->assertNull($entry->getSupplement('baz'));
+        $this->assertTrue($entry->hasSupplement('foo'));
+        $this->assertFalse($entry->hasSupplement('bar'));
+        $this->assertTrue($entry->hasSupplement('baz'));
+        $this->assertEquals(['foo' => 'bar', 'baz' => null], $entry->supplements()->all());
     }
 
     /** @test */
@@ -904,6 +911,19 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_can_set_a_blueprint_using_an_instance()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'first' => $first = (new Blueprint)->setHandle('first'),
+            'second' => $second = (new Blueprint)->setHandle('second'),
+        ]));
+        Collection::make('blog')->save();
+        $entry = (new Entry)->collection('blog')->blueprint($second);
+
+        $this->assertSame($second, $entry->blueprint());
+    }
+
+    /** @test */
     public function it_gets_the_blueprint_when_defined_in_a_value()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
@@ -1040,6 +1060,23 @@ class EntryTest extends TestCase
         Event::assertNotDispatched(EntrySaving::class);
         Event::assertNotDispatched(EntrySaved::class);
         Event::assertNotDispatched(EntryCreated::class);
+    }
+
+    /** @test */
+    public function when_saving_quietly_the_cached_entrys_withEvents_flag_will_be_set_back_to_true()
+    {
+        config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
+
+        $entry = EntryFactory::collection('blog')->id('1')->create();
+
+        $entry->saveQuietly();
+
+        $cached = Cache::get('stache::items::entries::blog::1');
+        $reflection = new ReflectionClass($cached);
+        $property = $reflection->getProperty('withEvents');
+        $property->setAccessible(true);
+        $withEvents = $property->getValue($cached);
+        $this->assertTrue($withEvents);
     }
 
     /** @test */

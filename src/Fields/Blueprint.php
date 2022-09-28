@@ -13,8 +13,10 @@ use Statamic\CP\Column;
 use Statamic\CP\Columns;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\BlueprintCreated;
 use Statamic\Events\BlueprintDeleted;
 use Statamic\Events\BlueprintSaved;
+use Statamic\Events\BlueprintSaving;
 use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
@@ -35,6 +37,8 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     protected $fieldsCache;
     protected $parent;
     protected $ensuredFields = [];
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function setHandle(string $handle)
     {
@@ -132,6 +136,11 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     private function contentsBlinkKey()
     {
         return "blueprint-contents-{$this->namespace()}-{$this->handle()}";
+    }
+
+    private function fieldsBlinkKey()
+    {
+        return "blueprint-fields-{$this->namespace()}-{$this->handle()}";
     }
 
     private function getContents()
@@ -264,6 +273,8 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     {
         $this->parent = $parent;
 
+        $this->resetFieldsCache();
+
         return $this;
     }
 
@@ -285,9 +296,15 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
             return $this->fieldsCache;
         }
 
-        $this->validateUniqueHandles();
+        $fn = function () {
+            $this->validateUniqueHandles();
 
-        $fields = new Fields($this->sections()->map->fields()->flatMap->items(), $this->parent);
+            return new Fields($this->sections()->map->fields()->flatMap->items());
+        };
+
+        $fields = $this->handle() ? Blink::once($this->fieldsBlinkKey(), $fn) : $fn();
+
+        $fields->setParent($this->parent);
 
         $this->fieldsCache = $fields;
 
@@ -329,8 +346,8 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
                     ->fieldtype($field->fieldtype()->indexComponent())
                     ->label(__($field->display()))
                     ->listable($field->isListable())
-                    ->defaultVisibility($field->isVisible())
-                    ->visible($field->isVisible())
+                    ->defaultVisibility($field->isVisibleOnListing())
+                    ->visible($field->isVisibleOnListing())
                     ->sortable($field->isSortable())
                     ->defaultOrder($index + 1);
             })
@@ -359,11 +376,50 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
         ];
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function save()
     {
+        $name = Str::removeLeft($this->namespace().'.'.$this->handle(), '.');
+        $isNew = is_null(Facades\Blueprint::find($name));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (BlueprintSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         BlueprintRepository::save($this);
 
-        BlueprintSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                BlueprintCreated::dispatch($this);
+            }
+
+            BlueprintSaved::dispatch($this);
+        }
 
         return $this;
     }
@@ -384,7 +440,11 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
 
     public function ensureFieldInSection($handle, $config, $section, $prepend = false)
     {
-        $this->ensuredFields[] = compact('handle', 'section', 'prepend', 'config');
+        if (isset($this->ensuredFields[$handle])) {
+            return $this;
+        }
+
+        $this->ensuredFields[$handle] = compact('handle', 'section', 'prepend', 'config');
 
         $this->resetFieldsCache();
 
@@ -394,10 +454,8 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     public function ensureFieldsInSection($fields, $section, $prepend = false)
     {
         foreach ($fields as $handle => $config) {
-            $this->ensuredFields[] = compact('handle', 'section', 'prepend', 'config');
+            $this->ensureFieldInSection($handle, $config, $section, $prepend);
         }
-
-        $this->resetFieldsCache();
 
         return $this;
     }
@@ -507,6 +565,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
         $this->fieldsCache = null;
 
         Blink::forget($this->contentsBlinkKey());
+        Blink::forget($this->fieldsBlinkKey());
 
         return $this;
     }

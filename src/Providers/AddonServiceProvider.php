@@ -3,40 +3,153 @@
 namespace Statamic\Providers;
 
 use Closure;
+use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Actions\Action;
 use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
+use Statamic\Fields\Fieldtype;
+use Statamic\Forms\JsDrivers\JsDriver;
+use Statamic\Modifiers\Modifier;
+use Statamic\Query\Scopes\Scope;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use Statamic\Tags\Tags;
+use Statamic\UpdateScripts\UpdateScript;
+use Statamic\Widgets\Widget;
 
 abstract class AddonServiceProvider extends ServiceProvider
 {
+    /**
+     * Array of event class => Listener class.
+     *
+     * @var array<class-string, class-string[]>
+     */
     protected $listen = [];
+
+    /**
+     * @var list<class-string>
+     */
     protected $subscribe = [];
+
+    /**
+     * @var list<class-string<Tags>>
+     */
     protected $tags = [];
+
+    /**
+     * @var list<class-string<Scope>>
+     */
     protected $scopes = [];
+
+    /**
+     * @var list<class-string<Action>>
+     */
     protected $actions = [];
+
+    /**
+     * @var list<class-string<Fieldtype>>
+     */
     protected $fieldtypes = [];
+
+    /**
+     * @var list<class-string<Modifier>>
+     */
     protected $modifiers = [];
+
+    /**
+     * @var list<class-string<Widget>>
+     */
     protected $widgets = [];
+
+    /**
+     * @var list<class-string<JsDriver>>
+     */
+    protected $formJsDrivers = [];
+
+    /**
+     * @var array<class-string, string>
+     */
     protected $policies = [];
+
+    /**
+     * @var list<class-string<Command>>
+     */
     protected $commands = [];
+
+    /**
+     * @var list<string> - Paths on disk
+     */
     protected $stylesheets = [];
+
+    /**
+     * @var list<string> - URLs of stylesheets
+     */
     protected $externalStylesheets = [];
+
+    /**
+     * @var list<string> - Paths on disk
+     */
     protected $scripts = [];
+
+    /**
+     * @var list<string> - URLs of scripts
+     */
     protected $externalScripts = [];
+
+    /**
+     * Map of path on disk to name in the public directory. The file will be published
+     * as `vendor/{packageName}/{value}`.
+     *
+     * @var array<string, string>
+     */
     protected $publishables = [];
+
+    /**
+     * Map of type => Path of route PHP file on disk where the key (type) can be one
+     * of `cp`, `web`, `actions`.
+     *
+     * @template TType of 'cp'|'web'|'actions'
+     *
+     * @var array<TType, string>
+     */
     protected $routes = [];
+
+    /**
+     * Map of group name => Middlewares to apply.
+     *
+     * @var array<string, class-string[]>
+     */
     protected $middlewareGroups = [];
+
+    /**
+     * @var list<class-string<UpdateScript>>
+     */
     protected $updateScripts = [];
+
+    /**
+     * @var string
+     */
     protected $viewNamespace;
+
+    /**
+     * @var bool
+     */
     protected $publishAfterInstall = true;
+
+    /**
+     * @var bool
+     */
     protected $config = true;
+
+    /**
+     * @var bool
+     */
     protected $translations = true;
 
     public function boot()
@@ -54,6 +167,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootFieldtypes()
                 ->bootModifiers()
                 ->bootWidgets()
+                ->bootFormJsDrivers()
                 ->bootCommands()
                 ->bootSchedule()
                 ->bootPolicies()
@@ -139,6 +253,15 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootWidgets()
     {
         foreach ($this->widgets as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootFormJsDrivers()
+    {
+        foreach ($this->formJsDrivers as $class) {
             $class::register();
         }
 
@@ -235,7 +358,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom($origin, $slug);
 
         $this->publishes([
-            $origin => app()->langPath("vendor/{$slug}"),
+            $origin => app()->langPath()."/vendor/{$slug}",
         ], "{$slug}-translations");
 
         return $this;
@@ -383,13 +506,14 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerScript(string $path)
     {
         $name = $this->getAddon()->packageName();
+        $version = $this->getAddon()->version();
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([
             $path => public_path("vendor/{$name}/js/{$filename}.js"),
         ], $this->getAddon()->slug());
 
-        Statamic::script($name, $filename);
+        Statamic::script($name, "{$filename}.js?v={$version}");
     }
 
     public function registerExternalScript(string $url)
@@ -400,13 +524,14 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerStylesheet(string $path)
     {
         $name = $this->getAddon()->packageName();
+        $version = $this->getAddon()->version();
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([
             $path => public_path("vendor/{$name}/css/{$filename}.css"),
         ], $this->getAddon()->slug());
 
-        Statamic::style($name, $filename);
+        Statamic::style($name, "{$filename}.css?v={$version}");
     }
 
     public function registerExternalStylesheet(string $url)

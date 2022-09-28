@@ -56,7 +56,7 @@ export default {
 
     computed: {
         instructions() {
-            let url = docs_url('/knowledge-base/localizing-entries#deleting');
+            let url = docs_url('/tips/localizing-entries#deleting');
 
             return `${__('messages.choose_entry_localization_deletion_behavior')} <a href="${url}" target="_blank">${__('Learn more')}</a>`;
         }

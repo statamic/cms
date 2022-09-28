@@ -65,6 +65,8 @@ class NavigationController extends CpController
     {
         abort_if(! $nav = Nav::find($nav), 404);
 
+        $this->authorize('view', $nav, __('You are not authorized to view navs.'));
+
         $site = $request->site ?? Site::selected()->handle();
 
         if (! $nav->existsIn($site)) {

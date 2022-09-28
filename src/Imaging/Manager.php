@@ -79,9 +79,9 @@ class Manager
     public function cpManipulationPresets()
     {
         return [
-            'cp_thumbnail_small_landscape' => ['w' => '400', 'h' => '300', 'fit' => 'crop'],
-            'cp_thumbnail_small_portrait' => ['h' => '300', 'fit' => 'crop'],
-            'cp_thumbnail_small_square' => ['w' => '300', 'h' => '300'],
+            'cp_thumbnail_small_landscape' => ['w' => '400', 'h' => '400', 'fit' => 'contain'],
+            'cp_thumbnail_small_portrait' => ['h' => '400', 'fit' => 'contain'],
+            'cp_thumbnail_small_square' => ['w' => '400', 'h' => '400'],
         ];
     }
 

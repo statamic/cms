@@ -18,14 +18,18 @@ use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetReplaced;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
+use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -43,12 +47,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         get as traitGet;
         remove as traitRemove;
         data as traitData;
+        merge as traitMerge;
     }
 
     protected $container;
     protected $path;
     protected $meta;
     protected $syncOriginalProperties = ['path'];
+    protected $withEvents = true;
+    protected $shouldHydrate = true;
+    protected $removedData = [];
 
     public function __construct()
     {
@@ -80,25 +88,59 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         return $this->hydrate()->traitSet($key, $value);
     }
 
+    public function merge($value)
+    {
+        return $this->hydrate()->traitMerge($value);
+    }
+
     public function remove($key)
     {
-        return $this->hydrate()->traitRemove($key);
+        $this->hydrate();
+
+        $this->removedData[] = $key;
+
+        return $this->traitRemove($key);
     }
 
     public function data($data = null)
     {
         $this->hydrate();
 
+        if (func_get_args()) {
+            $this->removedData = collect($this->meta['data'])
+                ->diffKeys($data)
+                ->keys()
+                ->merge($this->removedKeys)
+                ->all();
+        }
+
         return call_user_func_array([$this, 'traitData'], func_get_args());
     }
 
     public function hydrate()
     {
+        if (! $this->shouldHydrate) {
+            return $this;
+        }
+
         $this->meta = $this->meta();
 
         $this->data = collect($this->meta['data']);
 
+        $this->removedData = [];
+
         return $this;
+    }
+
+    public function withoutHydrating($callback)
+    {
+        $this->shouldHydrate = false;
+
+        $return = $callback($this);
+
+        $this->shouldHydrate = true;
+
+        return $return;
     }
 
     /**
@@ -120,6 +162,11 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         return $this->container()->files()->contains($path);
     }
 
+    public function getRawMeta()
+    {
+        return $this->meta;
+    }
+
     public function meta($key = null)
     {
         if (func_num_args() === 1) {
@@ -131,7 +178,14 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         if ($this->meta) {
-            return array_merge($this->meta, ['data' => $this->data->all()]);
+            $meta = $this->meta;
+
+            $meta['data'] = collect(Arr::get($meta, 'data', []))
+                ->merge($this->data->all())
+                ->except($this->removedData)
+                ->all();
+
+            return $meta;
         }
 
         return $this->meta = Cache::rememberForever($this->metaCacheKey(), function () {
@@ -394,6 +448,19 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Is this asset a media file?
+     *
+     * @return bool
+     */
+    public function isMedia()
+    {
+        return $this->isImage()
+                || $this->isSvg()
+                || $this->isVideo()
+                || $this->isAudio();
+    }
+
+    /**
      * Is this asset a PDF?
      *
      * @return bool
@@ -444,17 +511,34 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Save quietly without firing events.
+     *
+     * @return bool
+     */
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
+    /**
      * Save the asset.
      *
      * @return bool
      */
     public function save()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         Facades\Asset::save($this);
 
         $this->clearCaches();
 
-        AssetSaved::dispatch($this);
+        if ($withEvents) {
+            AssetSaved::dispatch($this);
+        }
 
         $this->syncOriginal();
 
@@ -547,7 +631,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function move($folder, $filename = null)
     {
-        $filename = $filename ?: $this->filename();
+        $filename = $this->getSafeFilename($filename ?: $this->filename());
         $oldPath = $this->path();
         $oldMetaPath = $this->metaPath();
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.'.'.pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
@@ -558,8 +642,41 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
         $this->disk()->rename($oldPath, $newPath);
         $this->path($newPath);
-        $this->disk()->rename($oldMetaPath, $this->metaPath());
         $this->save();
+
+        $isFlysystemV1 = method_exists($this->disk()->filesystem()->getDriver(), 'getTimestamp');
+
+        if ($isFlysystemV1) {
+            $this->disk()->delete($this->metaPath());
+        }
+
+        $this->disk()->rename($oldMetaPath, $this->metaPath());
+
+        return $this;
+    }
+
+    /**
+     * Replace an asset and/or its references where necessary.
+     *
+     * @param  Asset  $originalAsset
+     * @param  bool  $deleteOriginal
+     * @return $this
+     */
+    public function replace(Asset $originalAsset, $deleteOriginal = false)
+    {
+        // Temporarily disable the reference updater to avoid triggering reference updates
+        // until after the `AssetReplaced` event is fired. We still want to fire events
+        // like `AssetDeleted` and `AssetSaved` though, so that other listeners will
+        // get triggered (for cache invalidation, clearing of glide cache, etc.)
+        UpdateAssetReferencesSubscriber::disable();
+
+        if ($deleteOriginal) {
+            $originalAsset->delete();
+        }
+
+        UpdateAssetReferencesSubscriber::enable();
+
+        AssetReplaced::dispatch($originalAsset, $this);
 
         return $this;
     }
@@ -708,6 +825,22 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         return $this;
     }
 
+    public function reupload(ReplacementFile $file)
+    {
+        if ($file->extension() !== $this->extension()) {
+            throw new FileExtensionMismatch('The file extension must match the original file.');
+        }
+
+        $file->writeTo($this->disk()->filesystem(), $this->path());
+
+        $this->clearCaches();
+        $this->writeMeta($this->generateMeta());
+
+        AssetReuploaded::dispatch($this);
+
+        return $this;
+    }
+
     /**
      * Download a file.
      *
@@ -716,6 +849,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     public function download(string $name = null, array $headers = [])
     {
         return $this->disk()->filesystem()->download($this->path(), $name, $headers);
+    }
+
+    /**
+     * Stream a file.
+     *
+     * @return resource
+     */
+    public function stream()
+    {
+        return $this->disk()->filesystem()->readStream($this->path());
     }
 
     private function getSafeFilename($string)
@@ -729,6 +872,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
         foreach ($replacements as $from => $to) {
             $str = $str->replace($from, $to);
+        }
+
+        if (config('statamic.assets.lowercase')) {
+            $str = strtolower($str);
         }
 
         return (string) $str;
@@ -806,7 +953,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     protected function ensureUniqueFilename($folder, $filename, $count = 0)
     {
         $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
-        $suffix = $count ? " ({$count})" : '';
+        $suffix = $count ? "-{$count}" : '';
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.$suffix.'.'.$extension), '/');
 
         if ($this->disk()->exists($newPath)) {

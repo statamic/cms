@@ -64,12 +64,12 @@
 
             <div class="v-select">
                 <sortable-list
-                    item-class="sortable-rule"
-                    handle-class="sortable-rule"
+                    item-class="sortable-item"
+                    handle-class="sortable-item"
                     v-model="rules"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap outline-none">
-                        <span v-for="rule in rules" :key="rule" class="vs__selected mt-1 sortable-rule">
+                        <span v-for="rule in rules" :key="rule" class="vs__selected mt-1 sortable-item">
                             {{ rule }}
                             <button @click="remove(rule)" type="button" :aria-label="__('Delete Rule')" class="vs__deselect">
                                 <span>×</span>

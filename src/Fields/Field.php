@@ -88,6 +88,24 @@ class Field implements Arrayable
         return array_get($this->config, 'instructions');
     }
 
+    public function visibility()
+    {
+        $visibility = Arr::get($this->config, 'visibility');
+
+        $legacyReadOnly = Arr::get($this->config, 'read_only');
+
+        if ($legacyReadOnly && ! $visibility) {
+            return 'read_only';
+        }
+
+        return $visibility ?? 'visible';
+    }
+
+    public function alwaysSave()
+    {
+        return Arr::get($this->config, 'always_save', false);
+    }
+
     public function rules()
     {
         $rules = [$this->handle => $this->addNullableRule(array_merge(
@@ -165,20 +183,28 @@ class Field implements Arrayable
             return true;
         }
 
-        if ($this->config()['type'] === 'section') {
+        if ($this->type() === 'section') {
             return false;
         }
 
         return (bool) $this->get('listable');
     }
 
-    public function isVisible()
+    public function isVisibleOnListing()
     {
         if (is_null($this->get('listable'))) {
             return in_array($this->handle, ['title', 'slug', 'date', 'author']);
         }
 
         return ! in_array($this->get('listable'), [false, 'hidden'], true);
+    }
+
+    /**
+     * @deprecated  Use isVisibleOnListing() instead.
+     */
+    public function isVisible()
+    {
+        return $this->isVisibleOnListing();
     }
 
     public function isSortable()
@@ -208,6 +234,9 @@ class Field implements Arrayable
             'display' => $this->display(),
             'instructions' => $this->instructions(),
             'required' => $this->isRequired(),
+            'visibility' => $this->visibility(),
+            'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
+            'always_save' => $this->alwaysSave(),
         ]);
     }
 

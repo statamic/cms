@@ -98,19 +98,20 @@
                         </button>
 
                         <button v-if="canRunAction('rename_asset')" type="button" class="btn" @click.prevent="runAction('rename_asset')">
-                            {{ __('Rename File') }}
+                            {{ __('Rename') }}
                         </button>
 
                         <button v-if="canRunAction('move_asset')" type="button" class="btn" @click.prevent="runAction('move_asset')">
-                            {{ __('Move File') }}
+                            {{ __('Move') }}
                         </button>
 
-                        <!--
-                        <button
-                            type="button" class="btn"
-                            @click.prevent="replaceFile">Replace File
+                        <button v-if="canRunAction('replace_asset')" type="button" class="btn" @click.prevent="runAction('replace_asset')">
+                            {{ __('Replace') }}
                         </button>
-                        -->
+
+                        <button v-if="canRunAction('reupload_asset')" type="button" class="btn" @click.prevent="runAction('reupload_asset')">
+                            {{ __('Reupload') }}
+                        </button>
                     </div>
 
                 </div>
@@ -406,9 +407,12 @@ export default {
             this.$events.$emit('editor-action-started');
         },
 
-        actionCompleted(event) {
-            this.$events.$emit('editor-action-completed');
-            this.close();
+        actionCompleted(successful, response) {
+            this.$events.$emit('editor-action-completed', successful, response);
+            this.$emit('action-completed', successful, response);
+            if (successful) {
+                this.close();
+            }
         },
     }
 

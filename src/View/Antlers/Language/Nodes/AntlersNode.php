@@ -52,6 +52,8 @@ class AntlersNode extends AbstractNode
      */
     public $runtimeContent = '';
 
+    public $activeDepth = 1;
+
     /**
      * Sets the internal DocumentParser instance.
      *
@@ -364,14 +366,57 @@ class AntlersNode extends AbstractNode
         foreach ($this->parameters as $param) {
             $value = $this->getSingleParameterValue($param, $processor, $data);
 
-            if (is_string($value) && $value == 'void::'.GlobalRuntimeState::$environmentId) {
+            if ($this->isVoidValue($value)) {
                 continue;
+            }
+
+            if (is_string($value)) {
+                $value = DocumentParser::applyEscapeSequences($value);
             }
 
             $values[$param->name] = $value;
         }
 
         return $values;
+    }
+
+    protected function isVoidValue($value)
+    {
+        return is_string($value) && $value == 'void::'.GlobalRuntimeState::$environmentId;
+    }
+
+    /**
+     * Returns the value of a single parameter by name.
+     *
+     * @param $parameterName
+     * @param  NodeProcessor  $processor
+     * @param $data
+     * @param $default
+     * @return array|mixed|\Statamic\Contracts\Query\Builder|string|string[]|null
+     */
+    public function getSingleParameterValueByName($parameterName, NodeProcessor $processor, $data, $default = null)
+    {
+        $result = $default;
+
+        if (empty($this->parameters)) {
+            return $result;
+        }
+
+        foreach ($this->parameters as $param) {
+            if ($param->name == $parameterName) {
+                $value = $this->getSingleParameterValue($param, $processor, $data);
+
+                if ($this->isVoidValue($value)) {
+                    break;
+                }
+
+                $result = $value;
+
+                break;
+            }
+        }
+
+        return $result;
     }
 
     public function getSingleParameterValue(ParameterNode $param, NodeProcessor $processor, $data = [])
@@ -386,14 +431,21 @@ class AntlersNode extends AbstractNode
                 $value = Antlers::parser()->getVariable($pathToParse, $data, null);
             } else {
                 $pathParser = new PathParser();
+                $path = $pathParser->parse($pathToParse);
+                $doIntercept = count($path->pathParts) > 1;
+
                 $retriever = new PathDataManager();
                 $retriever->setIsPaired(false)->setReduceFinal(false)
                     ->cascade($processor->getCascade())
-                    ->setShouldDoValueIntercept(false);
-                $value = $retriever->getData($pathParser->parse($pathToParse), $data);
+                    ->setShouldDoValueIntercept($doIntercept);
+                $value = $retriever->getData($path, $data);
             }
         } else {
             $value = $this->reduceParameterInterpolations($param, $processor, $value, $data);
+        }
+
+        if (is_string($value)) {
+            $value = DocumentParser::applyEscapeSequences($value);
         }
 
         return $value;
@@ -449,12 +501,16 @@ class AntlersNode extends AbstractNode
             $retriever->setIsPaired($this->isClosedBy != null);
             $value = $retriever->getData($pathParser->parse($value), $data);
 
+            if (is_string($value)) {
+                $value = DocumentParser::applyEscapeSequences($value);
+            }
+
             $values[] = $value;
         } else {
             $pipeEscape = DocumentParser::getPipeEscape();
 
             $values = array_map(function ($item) use ($pipeEscape) {
-                return str_replace($pipeEscape, DocumentParser::Punctuation_Pipe, $item);
+                return DocumentParser::applyEscapeSequences(str_replace($pipeEscape, DocumentParser::Punctuation_Pipe, $item));
             }, explode('|', $value));
         }
 

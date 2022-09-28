@@ -41,6 +41,13 @@ export default {
             default: false
         }
     },
+    
+    data() {
+        return {
+            escBinding: null,
+            enterBinding: null,
+        }
+    },
 
     computed: {
         buttonClass() {
@@ -58,8 +65,13 @@ export default {
     },
 
     created() {
-        this.$keys.bind('esc', this.dismiss)
-        this.$keys.bind('enter', this.submit)
+        this.escBinding = this.$keys.bind('esc', this.dismiss)
+        this.enterBinding = this.$keys.bind('enter', this.submit)
+    },
+    
+     beforeDestroy() {
+        this.escBinding.destroy()
+        this.enterBinding.destroy()
     },
 }
 </script>

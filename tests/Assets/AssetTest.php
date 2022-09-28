@@ -11,10 +11,16 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
+use ReflectionClass;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
+use Statamic\Assets\ReplacementFile;
+use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetReplaced;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
+use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\File;
@@ -54,46 +60,293 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    public function it_sets_and_gets_data_values()
+    public function it_gets_data_values()
     {
-        $asset = (new Asset)->path('test.txt')->container($this->container);
-        $this->assertNull($asset->get('foo'));
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
 
-        $return = $asset->set('foo', 'bar');
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertNull($asset->get('one'));
+        });
 
-        $this->assertEquals($asset, $return);
-        $this->assertTrue($asset->has('foo'));
-        $this->assertEquals('bar', $asset->get('foo'));
+        $this->assertEquals('foo', $asset->get('one'));
         $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
     }
 
     /** @test */
-    public function it_removes_data_values()
+    public function it_gets_all_data_at_once()
     {
-        $asset = (new Asset)->path('test.txt')->container($this->container);
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
 
-        $this->assertNull($asset->get('foo'));
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
 
-        $asset->set('foo', 'bar');
+        $data = $asset->data()->all();
 
-        $this->assertEquals('bar', $asset->get('foo'));
+        $this->assertEquals(['one' => 'foo', 'two' => 'bar'], $data);
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
 
-        $return = $asset->remove('foo');
+    /** @test */
+    public function it_sets_data_values()
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
+
+        $asset->set('one', 'new-foo');
+        $return = $asset->set('three', 'qux');
 
         $this->assertEquals($asset, $return);
-        $this->assertNull($asset->get('foo'));
+
+        // Assert data is correct without hydrating, to ensure the hydrate call happened when calling `set()` above
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('new-foo', Arr::get($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+            $this->assertEquals('qux', $asset->get('three'));
+            $this->assertEquals('qux', Arr::get($asset->meta(), 'data.three'));
+            $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
+        });
+
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    /** @test */
+    public function it_merges_data_values()
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
+
+        $return = $asset->merge([
+            'one' => 'new-foo',
+            'three' => 'qux',
+        ]);
+
+        $this->assertEquals($asset, $return);
+
+        // Assert data is correct without hydrating, to ensure the hydrate call happened when calling `merge()` above
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('new-foo', Arr::get($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+            $this->assertEquals('qux', $asset->get('three'));
+            $this->assertEquals('qux', Arr::get($asset->meta(), 'data.three'));
+            $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
+        });
+
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    /** @test */
+    public function it_sets_all_data_at_once()
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
+
+        $return = $asset->data([
+            'three' => 'baz',
+            'four' => 'qux',
+        ]);
+
+        $this->assertEquals($asset, $return);
+
+        // Assert data is correct without hydrating, to ensure the hydrate call happened when setting with `data()` above
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertNull($asset->get('one'));
+            $this->assertFalse(Arr::has($asset->meta(), 'data.one'));
+            $this->assertNull($asset->get('two'));
+            $this->assertFalse(Arr::has($asset->meta(), 'data.two'));
+            $this->assertEquals('baz', $asset->get('three'));
+            $this->assertEquals('baz', Arr::get($asset->meta(), 'data.three'));
+            $this->assertEquals('qux', $asset->get('four'));
+            $this->assertEquals('qux', Arr::get($asset->meta(), 'data.four'));
+        });
+
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
     }
 
     /** @test */
     public function it_sets_data_values_using_magic_properties()
     {
-        $asset = (new Asset)->path('test.txt')->container($this->container);
-        $this->assertNull($asset->get('foo'));
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
 
-        $asset->foo = 'bar';
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
 
-        $this->assertTrue($asset->has('foo'));
-        $this->assertEquals('bar', $asset->get('foo'));
+        $asset->one = 'new-foo';
+        $asset->three = 'qux';
+
+        // Assert data is correct without hydrating, to ensure the hydrate call happened when setting magical property via `__set()`
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('new-foo', Arr::get($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+            $this->assertEquals('qux', $asset->get('three'));
+            $this->assertEquals('qux', Arr::get($asset->meta(), 'data.three'));
+            $this->assertEquals('fallback', $asset->get('unknown', 'fallback'));
+        });
+
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    /** @test */
+    public function it_removes_data_values()
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Ensure nothing is hydrated to the asset's data yet
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals([], $asset->data()->all());
+        });
+
+        // Calling remove should both hydrate and remove from the asset's data,
+        // and this ensures that the removed key isn't re-added from the yaml
+        $return = $asset->remove('one');
+
+        $this->assertEquals($asset, $return);
+
+        // Assert data is correct without hydrating, to ensure the hydrate call happened when calling `remove()` above
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertNull($asset->get('one'));
+            $this->assertFalse(Arr::has($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+        });
+
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    /**
+     * @test
+     * @dataProvider reAddRemovedData
+     **/
+    public function it_doesnt_try_to_re_remove_newly_added_data_from_meta($reAddRemovedData)
+    {
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump([
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+            ],
+            'size' => 123,
+        ]));
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        // Calling `remove()` stores temporary `removedData` state on the asset to prevent it from getting
+        // merged back into the meta. We want to ensure this state gets cleared when subsequently adding
+        // new data, so that Statamic doesn't try to re-remove this key if it's intentionally re-added
+        $return = $asset->remove('one');
+
+        $this->assertEquals($asset, $return);
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertNull($asset->get('one'));
+            $this->assertFalse(Arr::has($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+        });
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+
+        // This is where `removedData` state should be removed
+        $return = $reAddRemovedData($asset);
+
+        // Assert that newly added data isn't affected by lingering `removedData` state
+        $this->assertEquals($asset, $return);
+        $asset->withoutHydrating(function ($asset) {
+            $this->assertEquals('new-foo', $asset->get('one'));
+            $this->assertEquals('new-foo', Arr::get($asset->meta(), 'data.one'));
+            $this->assertEquals('bar', $asset->get('two'));
+            $this->assertEquals('bar', Arr::get($asset->meta(), 'data.two'));
+        });
+        $this->assertEquals(123, $asset->getRawMeta()['size']);
+    }
+
+    public function reAddRemovedData()
+    {
+        return [
+            'by calling set method' => [fn ($asset) => $asset->set('one', 'new-foo')],
+            'by calling data method' => [fn ($asset) => $asset->data(['one' => 'new-foo', 'two' => 'bar', 'three' => 'qux'])],
+            'by calling merge method' => [fn ($asset) => $asset->merge(['one' => 'new-foo', 'three' => 'qux'])],
+            'by calling __set() magically via property' => [function ($asset) {
+                $asset->one = 'new-foo';
+
+                return $asset;
+            }],
+        ];
     }
 
     /** @test */
@@ -170,18 +423,6 @@ class AssetTest extends TestCase
         $this->expectExceptionMessage('Call to undefined method Statamic\Assets\Asset::thisFieldDoesntExist()');
 
         (new Asset)->path('test.txt')->container($this->container)->thisFieldDoesntExist();
-    }
-
-    /** @test */
-    public function it_gets_and_sets_all_data()
-    {
-        $asset = (new Asset)->path('test.txt')->container($this->container);
-        $this->assertEquals([], $asset->data()->all());
-
-        $return = $asset->data(['foo' => 'bar']);
-
-        $this->assertEquals($asset, $return);
-        $this->assertEquals(['foo' => 'bar'], $asset->data()->all());
     }
 
     /** @test */
@@ -440,6 +681,39 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_properly_merges_new_unsaved_data_to_meta()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump($expectedBeforeMerge = [
+            'data' => ['one' => 'foo'],
+            'size' => 123,
+        ]));
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo/test.txt');
+        Facades\Asset::shouldReceive('save')->with($asset);
+        $asset->save();
+
+        $this->assertEquals($expectedBeforeMerge, $asset->meta());
+
+        $asset->merge([
+            'two' => 'bar',
+            'three' => 'baz',
+        ]);
+
+        $expectedAfterMerge = [
+            'data' => [
+                'one' => 'foo',
+                'two' => 'bar',
+                'three' => 'baz',
+            ],
+            'size' => 123,
+        ];
+
+        $this->assertEquals($expectedAfterMerge, $asset->meta());
+    }
+
+    /** @test */
     public function it_generates_meta_on_demand_if_it_doesnt_exist()
     {
         Storage::fake('test');
@@ -560,6 +834,42 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+        Storage::fake('test');
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo.jpg');
+        Facades\Asset::shouldReceive('save')->with($asset);
+
+        $return = $asset->saveQuietly();
+
+        $this->assertTrue($return);
+
+        Event::assertNotDispatched(AssetSaved::class);
+    }
+
+    /** @test */
+    public function when_saving_quietly_the_cached_assetss_withEvents_flag_will_be_set_back_to_true()
+    {
+        Event::fake();
+        Storage::fake('test');
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo.jpg');
+        Facades\Asset::shouldReceive('save')->with($asset);
+
+        $return = $asset->saveQuietly();
+
+        $this->assertTrue($return);
+
+        $reflection = new ReflectionClass($asset);
+        $property = $reflection->getProperty('withEvents');
+        $property->setAccessible(true);
+        $withEvents = $property->getValue($asset);
+        $this->assertTrue($withEvents);
+    }
+
+    /** @test */
     public function it_doesnt_add_path_to_container_listing_if_it_doesnt_exist()
     {
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
@@ -572,6 +882,7 @@ class AssetTest extends TestCase
     /** @test */
     public function it_deletes()
     {
+        Event::fake();
         Storage::fake('local');
         $disk = Storage::disk('local');
         $disk->put('path/to/asset.txt', '');
@@ -604,14 +915,32 @@ class AssetTest extends TestCase
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
-
         $this->assertEquals([
             'path',
             'path/to',
             'path/to/another-asset.txt',
         ], $container->contents()->cached()->keys()->all());
+        Event::assertDispatched(AssetDeleted::class);
+    }
 
-        // TODO: Assert about event, or convert to a callback
+    /** @test */
+    public function it_clears_asset_glide_cache_when_deleting()
+    {
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('path/to/asset.txt', '');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = (new Asset)->container($container)->path('path/to/asset.txt');
+
+        // Just assert that `Glide::clearAsset()` is called on delete,
+        // since `Imaging\GlideTest.php` covers the actual functionality.
+        Facades\Glide::shouldReceive('clearAsset')->withArgs(function ($arg) use ($asset) {
+            return $arg->id() === $asset->id();
+        })->once();
+
+        $asset->delete();
     }
 
     /** @test */
@@ -703,6 +1032,50 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_lowercases_when_moving_to_another_folder_with_a_new_filename()
+    {
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt');
+        $asset->save();
+
+        $return = $asset->move('new', 'lowercase-THIS-file');
+
+        $disk->assertExists('new/lowercase-this-file.txt');
+        $disk->assertExists('new/.meta/lowercase-this-file.txt.yaml');
+        $this->assertEquals([
+            'new/lowercase-this-file.txt',
+        ], $container->assets('/', true)->map->path()->all());
+    }
+
+    /** @test */
+    public function it_doesnt_lowercase_moved_files_when_configured()
+    {
+        config(['statamic.assets.lowercase' => false]);
+
+        Storage::fake('local');
+        $disk = Storage::disk('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt');
+        $asset->save();
+
+        $return = $asset->move('new', 'do-NOT-lowercase-THIS-file');
+
+        $disk->assertExists('new/do-NOT-lowercase-THIS-file.txt');
+        $disk->assertExists('new/.meta/do-NOT-lowercase-THIS-file.txt.yaml');
+        $this->assertEquals([
+            'new/do-NOT-lowercase-THIS-file.txt',
+        ], $container->assets('/', true)->map->path()->all());
+    }
+
+    /** @test */
     public function it_renames()
     {
         Event::fake();
@@ -746,6 +1119,258 @@ class AssetTest extends TestCase
             'old/newfilename.txt',
         ], $container->contents()->cached()->keys()->all());
         Event::assertDispatched(AssetSaved::class);
+    }
+
+    /** @test */
+    public function it_lowercases_when_renaming_by_default()
+    {
+        Event::fake();
+        $disk = Storage::fake('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt');
+        $asset->save();
+
+        $return = $asset->rename('lowercase-THIS-file');
+
+        $disk->assertExists('old/lowercase-this-file.txt');
+        $disk->assertExists('old/.meta/lowercase-this-file.txt.yaml');
+        $this->assertEquals([
+            'old/lowercase-this-file.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'old/lowercase-this-file.txt',
+        ], $container->assets('/', true)->map->path()->all());
+        $this->assertEquals([
+            'old',
+            'old/lowercase-this-file.txt',
+        ], $container->contents()->cached()->keys()->all());
+        Event::assertDispatched(AssetSaved::class);
+    }
+
+    /** @test */
+    public function it_doesnt_lowercase_renamed_files_when_configured()
+    {
+        config(['statamic.assets.lowercase' => false]);
+
+        Event::fake();
+        $disk = Storage::fake('local');
+        $disk->put('old/asset.txt', 'The asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt');
+        $asset->save();
+
+        $return = $asset->rename('do-NOT-lowercase-THIS-file');
+
+        $disk->assertExists('old/do-NOT-lowercase-THIS-file.txt');
+        $disk->assertExists('old/.meta/do-NOT-lowercase-THIS-file.txt.yaml');
+        $this->assertEquals([
+            'old/do-NOT-lowercase-THIS-file.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'old/do-NOT-lowercase-THIS-file.txt',
+        ], $container->assets('/', true)->map->path()->all());
+        $this->assertEquals([
+            'old',
+            'old/do-NOT-lowercase-THIS-file.txt',
+        ], $container->contents()->cached()->keys()->all());
+        Event::assertDispatched(AssetSaved::class);
+    }
+
+    /** @test */
+    public function it_bulk_renames()
+    {
+        Event::fake();
+        $disk = Storage::fake('local');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+
+        foreach (['foo', 'bar', 'baz', 'fraz', 'do-not-touch'] as $filename) {
+            $disk->put("old/{$filename}.txt", 'The asset con ents');
+            $asset = $container->makeAsset("old/{$filename}.txt")->data(['test' => $filename]);
+            $asset->saveQuietly();
+            $oldMeta[$filename] = $disk->get("old/.meta/{$filename}.txt.yaml");
+            $disk->assertExists("old/{$filename}.txt");
+            $disk->assertExists("old/.meta/{$filename}.txt.yaml");
+        }
+        $this->assertEquals([
+            'old/foo.txt',
+            'old/bar.txt',
+            'old/baz.txt',
+            'old/fraz.txt',
+            'old/do-not-touch.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'old/foo.txt' => ['test' => 'foo'],
+            'old/bar.txt' => ['test' => 'bar'],
+            'old/baz.txt' => ['test' => 'baz'],
+            'old/fraz.txt' => ['test' => 'fraz'],
+            'old/do-not-touch.txt' => ['test' => 'do-not-touch'],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+
+        $assets = $container->assets()
+            ->filter(function ($asset) {
+                return $asset->filename() !== 'do-not-touch';
+            })
+            ->each->rename('tokyo', true); // <-- This is how our RenameAsset action bulk renames.
+
+        $expected = [
+            'foo' => 'tokyo',
+            'bar' => 'tokyo-1',
+            'baz' => 'tokyo-2',
+            'fraz' => 'tokyo-3',
+            'do-not-touch' => 'do-not-touch',
+        ];
+
+        Event::assertDispatched(AssetSaved::class, 4);
+        foreach (['foo', 'bar', 'baz', 'fraz'] as $filename) {
+            $disk->assertMissing("old/{$filename}.txt");
+            $disk->assertMissing("old/.meta/{$filename}.txt.yaml");
+        }
+        foreach (array_values($expected) as $filename) {
+            $disk->assertExists("old/{$filename}.txt");
+            $disk->assertExists("old/.meta/{$filename}.txt.yaml");
+        }
+        foreach ($expected as $oldFilename => $newFilename) {
+            $this->assertEquals($oldMeta[$oldFilename], $disk->get("old/.meta/{$newFilename}.txt.yaml"));
+        }
+        $this->assertEquals([
+            'old/do-not-touch.txt',
+            'old/tokyo.txt',
+            'old/tokyo-1.txt',
+            'old/tokyo-2.txt',
+            'old/tokyo-3.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'old/tokyo.txt' => ['test' => 'foo'],
+            'old/tokyo-1.txt' => ['test' => 'bar'],
+            'old/tokyo-2.txt' => ['test' => 'baz'],
+            'old/tokyo-3.txt' => ['test' => 'fraz'],
+            'old/do-not-touch.txt' => ['test' => 'do-not-touch'],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+        $this->assertEquals([
+            'old',
+            'old/do-not-touch.txt',
+            'old/tokyo.txt',
+            'old/tokyo-1.txt',
+            'old/tokyo-2.txt',
+            'old/tokyo-3.txt',
+        ], $container->contents()->cached()->keys()->all());
+    }
+
+    /** @test */
+    public function it_replaces()
+    {
+        $this->fakeEventWithMacros();
+        $disk = Storage::fake('local');
+        $disk->put('some/old-asset.txt', 'Old asset contents');
+        $disk->put('some/new-asset.txt', 'New asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $oldAsset = tap($container->makeAsset('some/old-asset.txt')->data(['foo' => 'bar']))->saveQuietly();
+        $newAsset = tap($container->makeAsset('some/new-asset.txt')->data(['foo' => 'baz']))->saveQuietly();
+        $oldMeta = $disk->get('some/.meta/old-asset.txt.yaml');
+        $newMeta = $disk->get('some/.meta/new-asset.txt.yaml');
+        $disk->assertExists('some/old-asset.txt');
+        $disk->assertExists('some/.meta/old-asset.txt.yaml');
+        $disk->assertExists('some/new-asset.txt');
+        $disk->assertExists('some/.meta/new-asset.txt.yaml');
+        $this->assertEquals([
+            'some/new-asset.txt',
+            'some/old-asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'some/old-asset.txt' => ['foo' => 'bar'],
+            'some/new-asset.txt' => ['foo' => 'baz'],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+
+        $return = $newAsset->replace($oldAsset);
+
+        Event::assertDispatched(AssetDeleted::class, 0); // by default, the original asset is not deleted
+        Event::assertDispatched(AssetSaved::class, 0); // by default, the new asset is not renamed
+        Event::assertDispatched(AssetReplaced::class, 1); // our `UpdateAssetReferencesTest` covers what happens _after_ an asset is replaced
+
+        $this->assertEquals($newAsset, $return);
+        $disk->assertExists('some/old-asset.txt');
+        $disk->assertExists('some/.meta/old-asset.txt.yaml');
+        $disk->assertExists('some/new-asset.txt');
+        $disk->assertExists('some/.meta/new-asset.txt.yaml');
+        $this->assertEquals('Old asset contents', $disk->get('some/old-asset.txt'));
+        $this->assertEquals('New asset contents', $disk->get('some/new-asset.txt'));
+        $this->assertEquals([
+            'some/new-asset.txt',
+            'some/old-asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'some/old-asset.txt' => ['foo' => 'bar'],
+            'some/new-asset.txt' => ['foo' => 'baz'],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+    }
+
+    /** @test */
+    public function it_can_delete_original_asset_when_replacing()
+    {
+        $this->fakeEventWithMacros();
+        $disk = Storage::fake('local');
+        $disk->put('some/old-asset.txt', 'Old asset contents');
+        $disk->put('some/new-asset.txt', 'New asset contents');
+        $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $oldAsset = tap($container->makeAsset('some/old-asset.txt')->data(['foo' => 'bar']))->saveQuietly();
+        $newAsset = tap($container->makeAsset('some/new-asset.txt')->data(['foo' => 'baz']))->saveQuietly();
+        $oldMeta = $disk->get('some/.meta/old-asset.txt.yaml');
+        $newMeta = $disk->get('some/.meta/new-asset.txt.yaml');
+        $disk->assertExists('some/old-asset.txt');
+        $disk->assertExists('some/.meta/old-asset.txt.yaml');
+        $disk->assertExists('some/new-asset.txt');
+        $disk->assertExists('some/.meta/new-asset.txt.yaml');
+        $this->assertEquals([
+            'some/new-asset.txt',
+            'some/old-asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'some/old-asset.txt' => ['foo' => 'bar'],
+            'some/new-asset.txt' => ['foo' => 'baz'],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+
+        // Replace with `$deleteOriginal = true`
+        $return = $newAsset->replace($oldAsset, true);
+
+        Event::assertDispatched(AssetDeleted::class, 1); // because we passed the flag, the original asset should be deleted
+        Event::assertDispatched(AssetSaved::class, 0); // by default, the new asset is not renamed
+        Event::assertDispatched(AssetReplaced::class, 1); // our `UpdateAssetReferencesTest` covers what happens _after_ an asset is replaced
+
+        $this->assertEquals($newAsset, $return);
+        $disk->assertMissing('some/old-asset.txt');
+        $disk->assertMissing('some/.meta/old-asset.txt.yaml');
+        $disk->assertExists('some/new-asset.txt');
+        $disk->assertExists('some/.meta/new-asset.txt.yaml');
+        $this->assertEquals('New asset contents', $disk->get('some/new-asset.txt'));
+        $this->assertEquals([
+            'some/new-asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'some/new-asset.txt' => ['foo' => 'baz'],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
     }
 
     /** @test */
@@ -1009,6 +1634,105 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_lowercases_uploaded_filenames_by_default()
+    {
+        Event::fake();
+        $asset = $this->container->makeAsset('path/to/lowercase-THIS-asset.jpg');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->image('lowercase-THIS-asset.jpg'));
+
+        Storage::disk('test')->assertExists('path/to/lowercase-this-asset.jpg');
+        $this->assertEquals('path/to/lowercase-this-asset.jpg', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+    }
+
+    /** @test */
+    public function reuploading_will_replace_the_file_with_the_same_filename()
+    {
+        Event::fake();
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
+
+        Storage::disk('test')->assertExists('path/to/asset.jpg');
+        $originalFileContents = Storage::disk('test')->get('path/to/asset.jpg');
+        $this->assertEquals('path/to/asset.jpg', $asset->path());
+        $meta = $asset->meta();
+        $this->assertEquals(13, $meta['width']);
+        $this->assertEquals(15, $meta['height']);
+
+        // Place an image in the filesystem that would have previously been uploaded,
+        // most likely using the files fieldtype in the "replace asset" action modal.
+        $uploadDisk = Storage::fake('local');
+        UploadedFile::fake()->image('', 40, 25)->storeAs('path/to', 'different-filename.jpg', ['disk' => 'local']);
+        $uploadDisk->assertExists('path/to/different-filename.jpg');
+
+        $file = new ReplacementFile('path/to/different-filename.jpg');
+
+        $return = $asset->reupload($file);
+
+        $this->assertEquals($asset, $return);
+        $this->assertEquals('path/to/asset.jpg', $asset->path());
+        $meta = $asset->meta();
+        $this->assertEquals(40, $meta['width']);
+        $this->assertEquals(25, $meta['height']);
+        Storage::disk('test')->assertExists('path/to/asset.jpg');
+        Storage::disk('test')->assertMissing('path/to/different-filename.jpg');
+        $this->assertNotEquals($originalFileContents, Storage::disk('test')->get('path/to/asset.jpg'));
+
+        Event::assertDispatched(AssetUploaded::class, 1); // Once for the initial upload, but not again for the reupload.
+        Event::assertDispatched(AssetReuploaded::class, function ($event) use ($asset) {
+            return $event->asset->id() === $asset->id();
+        });
+        Event::assertDispatched(AssetSaved::class, 1); // Once during the initial upload, but not again for the reupload.
+
+        // Assertions that the Glide cache is cleared and the presets
+        // are regenerated for this asset are in ReuploadAssetTest.
+    }
+
+    /** @test */
+    public function cannot_reupload_a_file_with_a_different_extension()
+    {
+        $this->expectException(FileExtensionMismatch::class);
+        $this->expectExceptionMessage('The file extension must match the original file.');
+
+        Event::fake();
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $replacementFile = new ReplacementFile('path/to/asset.png');
+
+        $asset->reupload($replacementFile);
+
+        Event::assertNotDispatched(AssetReuploaded::class);
+        Event::assertNotDispatched(AssetSaved::class);
+    }
+
+    /** @test */
+    public function it_doesnt_lowercase_uploaded_filenames_when_configured()
+    {
+        config(['statamic.assets.lowercase' => false]);
+
+        Event::fake();
+        $asset = $this->container->makeAsset('path/to/do-NOT-lowercase-THIS-asset.jpg');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->image('do-NOT-lowercase-THIS-asset.jpg'));
+
+        Storage::disk('test')->assertExists('path/to/do-NOT-lowercase-THIS-asset.jpg');
+        $this->assertEquals('path/to/do-NOT-lowercase-THIS-asset.jpg', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+    }
+
+    /** @test */
     public function it_gets_the_url_when_the_container_has_a_relative_url()
     {
         $container = $this->mock(AssetContainer::class);
@@ -1206,5 +1930,13 @@ class AssetTest extends TestCase
 
         // The "asset" Tag will output nothing when an invalid asset src is passed. It doesn't throw an exception.
         $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset]));
+    }
+
+    private function fakeEventWithMacros()
+    {
+        $fake = Event::fake();
+        $mock = \Mockery::mock($fake)->makePartial();
+        $mock->shouldReceive('forgetListener');
+        Event::swap($mock);
     }
 }
