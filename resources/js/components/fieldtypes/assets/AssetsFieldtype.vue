@@ -324,7 +324,7 @@ export default {
 
                 if (! parent) return false;
 
-                if (parent.config.type === 'link') {
+                if (parent.$options.name === 'link-fieldtype') {
                     return true;
                 }
 
