@@ -79,7 +79,7 @@ jobs:
           timeout_minutes: 5
           max_attempts: 5
           command: |
-            composer require "laravel/framework:${{ matrix.framework }}" --no-interaction --no-update
+            composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
             composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: Execute tests
