@@ -169,24 +169,12 @@ class ExportTest extends TestCase
 
         $this->assertFileNotExists($postInstallHook = $this->exportPath('StarterKitPostInstall.php'));
 
-        $this->files->put(base_path('StarterKitPostInstall.php'), <<<'EOT'
-<?php
-
-class StarterKitPostInstall
-{
-    public function handle($console)
-    {
-        //
-    }
-}
-EOT
-        );
+        $this->files->put(base_path('StarterKitPostInstall.php'), 'php file contents');
 
         $this->exportCoolRunnings();
 
         $this->assertFileExists($postInstallHook);
-        $this->assertFileHasContent('class StarterKitPostInstall', $postInstallHook);
-        $this->assertFileHasContent('public function handle($console)', $postInstallHook);
+        $this->assertFileHasContent('php file contents', $postInstallHook);
     }
 
     /** @test */
