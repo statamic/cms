@@ -201,12 +201,8 @@ class Exporter
         $hooks = ['StarterKitPostInstall.php'];
 
         collect($hooks)
-            ->filter(function ($hook) {
-                return $this->files->exists(base_path($hook));
-            })
-            ->each(function ($hook) {
-                $this->copyPath($hook);
-            });
+            ->filter(fn ($hook) => $this->files->exists(base_path($hook)))
+            ->each(fn ($hook) => $this->copyPath($hook));
 
         return $this;
     }
