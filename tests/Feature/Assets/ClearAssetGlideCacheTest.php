@@ -18,9 +18,9 @@ class ClearAssetGlideCacheTest extends TestCase
     public function it_subscribes()
     {
         $events = Mockery::mock(Dispatcher::class);
-        $events->shouldReceive('listen')->with(AssetReuploaded::class, ClearAssetGlideCache::class.'@handle')->once();
-        $events->shouldReceive('listen')->with(AssetDeleted::class, ClearAssetGlideCache::class.'@handle')->once();
-        $events->shouldReceive('listen')->with(AssetSaved::class, ClearAssetGlideCache::class.'@handleSaved')->once();
+        $events->shouldReceive('listen')->with(AssetReuploaded::class, [ClearAssetGlideCache::class, 'handleReuploaded'])->once();
+        $events->shouldReceive('listen')->with(AssetDeleted::class, [ClearAssetGlideCache::class, 'handleDeleted'])->once();
+        $events->shouldReceive('listen')->with(AssetSaved::class, [ClearAssetGlideCache::class, 'handleSaved'])->once();
 
         (new ClearAssetGlideCache)->subscribe($events);
     }
@@ -31,7 +31,7 @@ class ClearAssetGlideCacheTest extends TestCase
         $asset = Mockery::mock(Asset::class);
         Glide::shouldReceive('clearAsset')->with($asset)->once();
 
-        (new ClearAssetGlideCache)->handle(new AssetDeleted($asset));
+        (new ClearAssetGlideCache)->handleDeleted(new AssetDeleted($asset));
     }
 
     /** @test */
@@ -40,7 +40,7 @@ class ClearAssetGlideCacheTest extends TestCase
         $asset = Mockery::mock(Asset::class);
         Glide::shouldReceive('clearAsset')->with($asset)->once();
 
-        (new ClearAssetGlideCache)->handle(new AssetReuploaded($asset));
+        (new ClearAssetGlideCache)->handleReuploaded(new AssetReuploaded($asset));
     }
 
     /** @test */
