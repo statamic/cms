@@ -490,8 +490,6 @@ final class Installer
             return $this;
         }
 
-        $this->console->info('Running post-install hook...');
-
         $postInstallHook->handle($this->console);
 
         return $this;
