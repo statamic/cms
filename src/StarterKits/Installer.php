@@ -7,6 +7,7 @@ use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
+use Statamic\Console\Please\Application as PleaseApplication;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
@@ -486,9 +487,35 @@ final class Installer
             return $this;
         }
 
+        if (isset($postInstallHook->registerCommands)) {
+            foreach ($postInstallHook->registerCommands as $command) {
+                $this->registerInstalledCommand($command);
+            }
+        }
+
         $postInstallHook->handle($this->console);
 
         return $this;
+    }
+
+    /**
+     * Register starter kit installed command for post install hook.
+     *
+     * @param  string  $commandClass
+     */
+    protected function registerInstalledCommand($commandClass)
+    {
+        $app = $this->console->getApplication();
+
+        $command = new $commandClass($app);
+
+        if ($app instanceof PleaseApplication) {
+            $command->setRunningInPlease();
+            $command->removeStatamicGrouping();
+            $command->setHiddenInPlease();
+        }
+
+        $app->add($command);
     }
 
     /**
