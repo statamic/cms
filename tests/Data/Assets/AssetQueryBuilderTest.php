@@ -542,7 +542,7 @@ class AssetQueryBuilderTest extends TestCase
             'd.jpg',
             'e.jpg',
             'f.jpg',
-        ], Storage::disk('test')->allFiles());
+        ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
 
         $assets = $this->container->queryAssets()->get();
 
@@ -556,7 +556,7 @@ class AssetQueryBuilderTest extends TestCase
             'd.jpg',
             'e.jpg',
             'f.jpg',
-        ], Storage::disk('test')->allFiles());
+        ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
     }
 
     /** @test */
@@ -576,7 +576,7 @@ class AssetQueryBuilderTest extends TestCase
             'd.jpg',
             'e.jpg',
             'f.jpg',
-        ], Storage::disk('test')->allFiles());
+        ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
 
         $assets = $this->container->queryAssets()->where('foo', 'bar')->get();
 
@@ -596,6 +596,6 @@ class AssetQueryBuilderTest extends TestCase
             'd.jpg',
             'e.jpg',
             'f.jpg',
-        ], Storage::disk('test')->allFiles());
+        ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
     }
 }
