@@ -18,7 +18,7 @@ jobs:
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
         include:
-          - laravel: 8.*
+            - laravel: 8.*
           - laravel: 9.*
           - os: windows-latest
             php: 7.4
@@ -77,6 +77,10 @@ jobs:
           command: |
             composer require "illuminate/contracts:${{ matrix.laravel }}" --dev --no-interaction --no-update
             composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+
+      - name: List Installed Dependencies
+        run: |
+          composer show -D
 
       - name: Execute tests
         run: vendor/bin/phpunit
