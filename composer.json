@@ -39,7 +39,7 @@
         "fakerphp/faker": "~1.10",
         "google/cloud-translate": "^1.6",
         "mockery/mockery": "^1.2.3",
-        "orchestra/testbench": "^6.7.0 || ^7.0"
+        "orchestra/testbench": "^6.18 || ^7.0"
     },
     "config": {
         "optimize-autoloader": true,
