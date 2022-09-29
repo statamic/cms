@@ -29,7 +29,7 @@ class CoreChangelog extends Changelog
     private function canUpdateToVersion($version)
     {
         $currentVersion = Statamic::version();
-        
+
         if ($currentVersion === null) {
             throw new \Exception('Statamic version could not be found. Does the composer.lock file exist?');
         }
