@@ -17,6 +17,10 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
+        if ($request->statamicToken()) {
+            return $next($request);
+        }
+
         $cacher = app(Cacher::class);
 
         if ($response = $cacher->get($request)) {
