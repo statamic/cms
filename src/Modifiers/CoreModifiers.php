@@ -2613,7 +2613,9 @@ class CoreModifiers extends Modifier
      */
     public function title($value)
     {
-        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor'];
+        preg_match_all('/[A-Z]+\b/', $value, $matches);
+
+        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor', ...$matches[0]];
 
         return Stringy::titleize($value, $ignore);
     }
