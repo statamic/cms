@@ -3,30 +3,40 @@
 namespace Statamic\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Contracts\Assets\Asset;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReuploaded;
+use Statamic\Events\AssetSaved;
+use Statamic\Events\Subscriber;
 use Statamic\Facades\Glide;
 
-class ClearAssetGlideCache implements ShouldQueue
+class ClearAssetGlideCache extends Subscriber implements ShouldQueue
 {
-    /**
-     * Register the listeners for the subscriber.
-     *
-     * @param  \Illuminate\Events\Dispatcher  $events
-     */
-    public function subscribe($events)
+    protected $listeners = [
+        AssetSaved::class => 'handleSaved',
+        AssetDeleted::class => 'handleDeleted',
+        AssetReuploaded::class => 'handleReuploaded',
+    ];
+
+    public function handleReuploaded(AssetReuploaded $event)
     {
-        $events->listen(AssetReuploaded::class, self::class.'@handle');
-        $events->listen(AssetDeleted::class, self::class.'@handle');
+        $this->clear($event->asset);
     }
 
-    /**
-     * Handle the events.
-     *
-     * @param  AssetDeleted  $event
-     */
-    public function handle($event)
+    public function handleDeleted(AssetDeleted $event)
     {
-        Glide::clearAsset($event->asset);
+        $this->clear($event->asset);
+    }
+
+    public function handleSaved($event)
+    {
+        if ($event->asset->getOriginal('data.focus') != $event->asset->get('focus')) {
+            $this->clear($event->asset);
+        }
+    }
+
+    private function clear(Asset $asset)
+    {
+        Glide::clearAsset($asset);
     }
 }
