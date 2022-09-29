@@ -2607,15 +2607,15 @@ class CoreModifiers extends Modifier
 
     /**
      * Converts the first character of each word in the string to uppercase.
-     * Let's you add optional parameters to ignore, like abbreviations.
      *
      * @param $value
-     * @param $params
      * @return string
      */
-    public function title($value, $params)
+    public function title($value)
     {
-        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor', ...$params];
+        preg_match_all('/[A-Z]+\b/', $value, $matches);
+
+        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor', ...$matches[0]];
 
         return Stringy::titleize($value, $ignore);
     }
