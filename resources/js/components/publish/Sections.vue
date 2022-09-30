@@ -4,7 +4,7 @@
     <div>
 
         <!-- Tabs -->
-        <div v-if="showTabs" class="tabs-container flex items-center" :class="{ 'offset-for-sidebar': shouldShowSidebar }">
+        <div v-if="showTabs" class="tabs-container flex items-center" ref="tabsContainer">
             <div
                 class="publish-tabs tabs flex-shrink"
                 ref="tabs"
@@ -27,7 +27,13 @@
                     v-text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
                 ></button>
             </div>
-            <dropdown-list class="ml-1" v-cloak v-if="showHiddenTabsDropdown">
+            <dropdown-list v-cloak v-if="showHiddenTabsDropdown" class="h-full">
+                <template slot="trigger">
+                    <button class="h-full flex items-center px-2 text-grey-60">
+                        <span v-text="'+'+ hiddenTabCount + __(' More')" />
+                        <svg-icon name="chevron-down-xs" class="ml-1 w-2" />
+                    </button>
+                </template>
                 <dropdown-item
                     v-for="(section, index) in mainSections"
                     v-show="isTabHidden(index)"
@@ -71,7 +77,7 @@
             <!-- Sidebar(ish) -->
             <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                 <div class="publish-section">
-                    <div class="publish-section-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
+                    <div class="publish-section-actions rounded-t-md" :class="{ 'as-sidebar': shouldShowSidebar }">
                         <portal :to="actionsPortal" :disabled="shouldShowSidebar">
                             <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
                         </portal>
@@ -157,7 +163,11 @@ export default {
         },
 
         showHiddenTabsDropdown() {
-            return this.mainSections.length > this.visibleTabs;
+            return this.mainSections.length > this.visibleTabs && this.initialTabSet;
+        },
+
+        hiddenTabCount() {
+            return this.mainSections.length - this.visibleTabs;
         },
 
         errors() {
@@ -239,7 +249,8 @@ export default {
                 let visibleTabs = 0;
 
                 // Leave 40px for the dropdown list.
-                const maxWidth = this.$refs.publishSectionWrapper.offsetWidth - 40;
+                const maxWidth = this.$refs.tabsContainer.offsetWidth - 120;
+                console.log(maxWidth)
                 let tabWidthSum = 0;
 
                 this.$refs.tabs.childNodes.forEach((tab, index) => {
@@ -249,6 +260,8 @@ export default {
                         visibleTabs += 1;
                     }
                 })
+
+                console.log(tabWidthSum)
 
                 this.visibleTabs = visibleTabs;
 

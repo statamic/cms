@@ -123,9 +123,49 @@ code.parent-url {
 .publish-fields-narrow .publish-field { width: 100%; }
 
 .publish-section:not(:empty) {
-    @apply shadow bg-white rounded-md w-full;
+
+    .publish-field:first-of-type {
+        @apply rounded-t-md;
+        margin-top: 0 !important;
+    }
+
+    .publish-field, .publish-section-actions {
+        @apply bg-white w-full shadow relative;
+    }
+
+    .publish-field:has(+ .publish-field.section-fieldtype) {
+        @apply rounded-b-md;
+    }
+
+    > .publish-field::after {
+        content: '';
+        @apply absolute w-full left-0 right-0 bg-white;
+        height: 1px;
+        top: -2px;
+    }
+
+    .publish-field:first-of-type {
+        @apply rounded-tr-md;
+        &:after {
+            display: none;
+        }
+    }
+
+    .publish-field:last-of-type {
+        @apply rounded-b-md;
+    }
+
+    .publish-field.section-fieldtype {
+        @apply mt-3 rounded-t-md;
+        &:after {
+            display: none;
+        }
+    }
 }
 
+.publish-section-actions-footer {
+    @apply bg-white w-full shadow relative;
+}
 
 
 /* Inline publish form

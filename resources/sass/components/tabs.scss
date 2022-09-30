@@ -2,27 +2,32 @@
    TABS
    ========================================================================== */
 
-.tabs-container.offset-for-sidebar {
-    width: calc(100% - 320px);
+.tabs-container {
+    @apply w-full mb-3 shadow rounded bg-white;
+
+    .dropdown-list button {
+        @apply outline-none;
+    }
 }
 
 .tabs {
-    @apply flex items-end overflow-hidden px-1 -ml-1;
+    @apply flex flex-1 items-end overflow-hidden px-2;
     height: 48px;
 
     .tab-button {
-        @apply whitespace-no-wrap bg-grey-10 py-sm px-2 flex-shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-grey-30 select-none;
-        height: 94%;
-        min-height: 94%;
+        @apply h-full text-grey-60 border-b-2 border-transparent whitespace-no-wrap flex-shrink-0 py-sm px-2 leading-tight text-xs w-auto relative flex items-center justify-center select-none;
+        &:hover {
+            @apply text-black;
+        }
     }
 
     .tab-button.active {
-        @apply bg-white text-blue border-t-2 border-blue relative h-full min-h-full border-b-0 outline-none;
+        @apply text-black border-b-2 border-blue relative h-full min-h-full outline-none;
         z-index: 1;
     }
 
     .tab-button:active, .tab-button:focus {
-        @apply bg-white text-blue border-b-0 outline-none;
+        @apply bg-white text-blue outline-none;
     }
 
     .tab-button.ghost {
@@ -44,7 +49,7 @@
 
 @screen md {
     .tabs .tab-button {
-        min-width: 120px;
+        // min-width: 120px;
     }
 }
 
