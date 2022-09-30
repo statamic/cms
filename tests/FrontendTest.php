@@ -734,22 +734,4 @@ class FrontendTest extends TestCase
             'missing redirect' => [null, 200, null],
         ];
     }
-
-    /** @test */
-    public function redirect_is_404_if_invalid()
-    {
-        $blueprint = Blueprint::makeFromFields([
-            'redirect' => ['type' => 'link'],
-        ])->setHandle('link');
-        Blueprint::shouldReceive('in')->with('collections/pages')->once()->andReturn(collect([$blueprint]));
-
-        $this->createPage('about', [
-            'with' => [
-                'title' => 'About',
-                'redirect' => 'entry::invalid',
-            ],
-        ])->blueprint('link')->save();
-
-        $this->get('/about')->assertNotFound();
-    }
 }
