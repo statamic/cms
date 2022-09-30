@@ -681,58 +681,75 @@ class FrontendTest extends TestCase
         $this->get('/')->assertSee('Home');
     }
 
-    /** @test */
-    public function redirect_is_followed()
+    /**
+     * @test
+     * @dataProvider redirectProvider
+     */
+    public function redirect_is_followed($augmentedValue, $expectedStatus, $expectedLocation)
     {
-        $this->createLink('about', [
+        // Making a fake fieldtype to test that the augmented value is used for the redirect.
+        // The actual redirect resolving logic is already completely under test, and happens
+        // in the "link" fieldtype's augment method.
+
+        app()->bind('test-augmented-value', fn () => $augmentedValue);
+
+        (new class($augmentedValue) extends \Statamic\Fields\Fieldtype
+        {
+            protected static $handle = 'fake_link';
+
+            public function augment($value)
+            {
+                return app('test-augmented-value');
+            }
+        })->register();
+
+        $blueprint = Blueprint::makeFromFields(['redirect' => ['type' => 'fake_link']]);
+        Blueprint::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
+
+        $this->createPage('about', [
             'with' => [
                 'title' => 'About',
-                'redirect' => 'entry::about-us',
+                'redirect' => '/not-where-it-should-go', // this should not be used - the augmented value should.
             ],
-        ]);
-        $this->createPage('about-us', [
-            'with' => [
-                'title' => 'About Us',
-            ],
-        ]);
+        ])->save();
 
-        $this->get('/about')
-            ->assertStatus(302)
-            ->assertHeader('Location', 'http://localhost/about-us');
+        $response = $this->get('/about');
+
+        if ($expectedStatus === 302) {
+            $response->assertRedirect($expectedLocation);
+        } elseif ($expectedStatus === 200) {
+            $response->assertOk();
+        } elseif ($expectedStatus === 404) {
+            $response->assertNotFound();
+        } else {
+            throw new \Exception('Test not set up to handle status code: '.$expectedStatus);
+        }
     }
 
-    /** @test */
-    public function redirect_is_followed_to_child()
+    public function redirectProvider()
     {
-        $this->createLink('about', [
-            'with' => [
-                'title' => 'About',
-                'redirect' => '@child',
-            ],
-        ]);
-        $this->createPage('team', [
-            'with' => [
-                'title' => 'Team',
-                'parent' => 'about', // this isn't right
-            ],
-        ]);
-
-        $this->get('/about')
-            ->assertStatus(302)
-            ->assertHeader('Location', 'http://localhost/about/team');
+        return [
+            'valid redirect' => ['/target', 302, '/target'],
+            'invalid redirect' => [404, 404, null],
+            'missing redirect' => [null, 200, null],
+        ];
     }
 
     /** @test */
     public function redirect_is_404_if_invalid()
     {
+        $blueprint = Blueprint::makeFromFields([
+            'redirect' => ['type' => 'link'],
+        ])->setHandle('link');
+        Blueprint::shouldReceive('in')->with('collections/pages')->once()->andReturn(collect([$blueprint]));
+
         $this->createPage('about', [
             'with' => [
                 'title' => 'About',
                 'redirect' => 'entry::invalid',
             ],
-        ]);
+        ])->blueprint('link')->save();
 
-        $this->get('/about')
-            ->assertStatus(404);
+        $this->get('/about')->assertNotFound();
     }
 }
