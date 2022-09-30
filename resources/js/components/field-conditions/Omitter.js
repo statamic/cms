@@ -42,7 +42,10 @@ export default class {
     }
 
     dottedKeyToJsPath(dottedKey) {
-        return dottedKey.replace(/\.*\.(\d+)\./g, '[$1].');
+        return dottedKey.split('.')
+            .map(key => new RegExp(/^\d+.*/).test(key) ? '["' + key + '"]' : key)
+            .join('.')
+            .replace(/\.\[/g, '[');
     }
 
     missingValue(dottedKey) {
@@ -56,11 +59,11 @@ export default class {
         if (this.missingValue(dottedKey)) return;
 
         let values = clone(this.values);
-        let jsPath = this.dottedKeyToJsPath(dottedKey);
-        let fieldValue = eval('values.' + jsPath);
+        let jsPath = this.dottedKeyToJsPath('values.' + dottedKey);
+        let fieldValue = eval(jsPath);
         let decodedFieldValue = JSON.parse(fieldValue);
 
-        eval('values.' + jsPath + ' = decodedFieldValue');
+        eval(jsPath + ' = decodedFieldValue');
 
         this.values = values;
     }
@@ -69,11 +72,11 @@ export default class {
         if (this.missingValue(dottedKey)) return;
 
         let values = clone(this.values);
-        let jsPath = this.dottedKeyToJsPath(dottedKey);
-        let fieldValue = eval('values.' + jsPath);
+        let jsPath = this.dottedKeyToJsPath('values.' + dottedKey);
+        let fieldValue = eval(jsPath);
         let encodedFieldValue = JSON.stringify(fieldValue);
 
-        eval('values.' + jsPath + ' = encodedFieldValue');
+        eval(jsPath + ' = encodedFieldValue');
 
         this.values = values;
     }
@@ -82,9 +85,9 @@ export default class {
         if (this.missingValue(dottedKey)) return;
 
         let values = clone(this.values);
-        let jsPath = this.dottedKeyToJsPath(dottedKey);
+        let jsPath = this.dottedKeyToJsPath('values.' + dottedKey);
 
-        eval('delete values.' + jsPath);
+        eval('delete ' + jsPath);
 
         this.values = values;
     }

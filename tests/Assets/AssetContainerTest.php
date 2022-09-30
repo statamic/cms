@@ -541,7 +541,7 @@ class AssetContainerTest extends TestCase
     /** @test */
     public function it_makes_an_asset_at_given_path()
     {
-        $container = new AssetContainer;
+        $container = $this->containerWithDisk();
         $asset = $container->makeAsset('path/to/test.txt');
 
         $this->assertInstanceOf(Asset::class, $asset);

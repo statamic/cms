@@ -3,6 +3,7 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
+use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
 use Tests\TestCase;
@@ -39,7 +40,23 @@ class FileCacherTest extends TestCase
     }
 
     /** @test */
-    public function gets_cache_path()
+    public function gets_cache_path_when_multiple_paths_are_provided()
+    {
+        $cacher = $this->fileCacher([
+            'locale' => 'en',
+            'path' => [
+                'en' => 'test/path',
+                'fr' => 'fr/test/path',
+            ],
+        ]);
+
+        $this->assertEquals('test/path', $cacher->getCachePath('en'));
+        $this->assertEquals('fr/test/path', $cacher->getCachePath('fr'));
+        $this->assertEquals('test/path', $cacher->getCachePath());
+    }
+
+    /** @test */
+    public function gets_cache_path_when_a_single_path_is_provided()
     {
         $cacher = $this->fileCacher([
             'path' => 'test/path',
@@ -117,6 +134,11 @@ class FileCacherTest extends TestCase
             'test/path/foo/bar_.html',
             $cacher->getFilePath('http://domain.com/foo/bar')
         );
+
+        $this->assertEquals(
+            'fr/test/path/fr/foo/bar_.html',
+            $cacher->getFilePath('http://domain.com/fr/foo/bar', 'fr')
+        );
     }
 
     /** @test */
@@ -154,21 +176,70 @@ class FileCacherTest extends TestCase
     {
         $writer = \Mockery::spy(Writer::class);
         $cache = app(Repository::class);
-        $cacher = new FileCacher($writer, $cache, ['base_url' => 'http://example.com']);
-        $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
+        $cacher = $this->fileCacher([], $writer, $cache, []);
+
+        $cache->forever($this->cacheKey('http://example.com'), [
             'one' => '/one', 'two' => '/two',
         ]);
 
-        $cacher->invalidateUrl('/one');
+        $cacher->invalidateUrl('/one', 'http://example.com');
 
         $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one'));
-        $this->assertEquals(['two' => '/two'], $cacher->getUrls()->all());
+        $this->assertEquals(['two' => '/two'], $cacher->getUrls('http://example.com')->all());
+
+        // TODO Check fallback to app url.
+        // Config::set('app.url', 'http://example.com');
     }
 
-    private function fileCacher($config = [], $writer = null)
+    /** @test */
+    public function invalidating_a_url_deletes_the_file_and_removes_the_url_when_using_multisite()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.de/'],
+        ]]);
+
+        $writer = \Mockery::spy(Writer::class);
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacher([
+            'path' => [
+                'en' => 'test/path',
+                'fr' => 'test/path/fr',
+                'de' => 'test/path/de',
+            ],
+        ], $writer, $cache);
+
+        $cache->forever($this->cacheKey('http://domain.com'), [
+            'one' => '/one', 'two' => '/two',
+            'un' => '/fr/un', 'deux' => '/fr/deux',
+        ]);
+        $cache->forever($this->cacheKey('http://domain.de'), [
+            'one' => '/one', 'two' => '/two',
+        ]);
+
+        $cacher->invalidateUrl('/one', 'http://domain.com');
+        $cacher->invalidateUrl('/fr/deux', 'http://domain.com');
+        $cacher->invalidateUrl('/two', 'http://domain.de');
+
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one', 'en'));
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/fr/deux', 'fr'));
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/two', 'de'));
+        $this->assertEquals(['two' => '/two', 'un' => '/fr/un'], $cacher->getUrls('http://domain.com')->all());
+        $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://domain.de')->all());
+    }
+
+    private function cacheKey($domain)
+    {
+        return 'static-cache:'.md5($domain).'.urls';
+    }
+
+    private function fileCacher($config = [], $writer = null, $cache = null)
     {
         $writer = $writer ?: \Mockery::mock(Writer::class);
 
-        return new FileCacher($writer, app(Repository::class), $config);
+        $cache = $cache ?: app(Repository::class);
+
+        return new FileCacher($writer, $cache, $config);
     }
 }

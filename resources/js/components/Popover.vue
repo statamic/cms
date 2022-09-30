@@ -1,5 +1,5 @@
 <template>
-    <div class="popover-container" :class="{'popover-open': isOpen}" v-on-clickaway="close">
+    <div class="popover-container" :class="{'popover-open': isOpen}" v-on-clickaway="close" @mouseleave="leave">
         <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$scopedSlots.default">
             <slot name="trigger"></slot>
         </div>
@@ -35,22 +35,32 @@ export default {
         scroll: {
             type: Boolean,
             default: false
+        },
+        autoclose: {
+            type: Boolean,
+            default: false
         }
     },
 
     data() {
         return {
-            isOpen: false
+            isOpen: false,
+            escBinding: null,
+            popper: null,
         }
     },
 
     mounted() {
-        if (! this.disabled) this.bindPopper()
+        if (! this.disabled) this.bindPopper();
+    },
+
+    beforeDestroy() {
+        this.destroyPopper();
     },
 
     methods: {
         bindPopper() {
-            createPopper(this.$refs.trigger, this.$refs.popover, {
+            this.popper = createPopper(this.$refs.trigger, this.$refs.popover, {
                 placement: this.placement,
                 modifiers: [
                     {
@@ -74,11 +84,25 @@ export default {
         },
         open() {
             this.isOpen = true;
-            this.$keys.bind('esc', e => this.close())
+            this.escBinding = this.$keys.bind('esc', e => this.close())
         },
         close() {
             this.isOpen = false;
-        }
+            if (this.escBinding) {
+                this.escBinding.destroy();
+            }
+        },
+        leave() {
+            if (this.autoclose) {
+                this.close();
+            }
+        },
+        destroyPopper() {
+            if (this.popper) {
+                this.popper.destroy();
+                this.popper = null;
+            }
+        },
     }
 }
 </script>

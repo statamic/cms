@@ -134,13 +134,10 @@ export default {
 
         orphanChildren() {
             const store = this.page._vm.store;
-            let children = this.vm.data.children;
-            let length = children.length;
-            for (let index = 0; index < length; index++) {
-                // As the item is moved out, the rest of the items are moved up an index.
-                // We always just want to move the first item.
-                th.appendTo(children[0], this.vm.data.parent);
-            }
+
+            this.vm.data.children.slice().forEach((child) =>
+                th.insertBefore(child, this.vm.data)
+            );
 
             this.$emit('children-orphaned', store);
         }

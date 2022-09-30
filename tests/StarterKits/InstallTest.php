@@ -3,8 +3,11 @@
 namespace Tests\StarterKits;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
+use Mockery;
+use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
 use Statamic\Facades\YAML;
@@ -296,6 +299,27 @@ EOT;
     }
 
     /** @test */
+    public function it_copies_starter_kit_post_install_script_hook_when_with_config_option_is_passed()
+    {
+        $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), '<?php');
+
+        $this->installCoolRunnings(['--with-config' => true]);
+
+        $this->assertFileExists($hookPath = base_path('StarterKitPostInstall.php'));
+        $this->assertFileHasContent('<?php', $hookPath);
+    }
+
+    /** @test */
+    public function it_doesnt_copy_starter_kit_post_install_script_hook_when_with_config_option_is_not_passed()
+    {
+        $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), '<?php');
+
+        $this->installCoolRunnings();
+
+        $this->assertFileNotExists(base_path('StarterKitPostInstall.php'));
+    }
+
+    /** @test */
     public function it_overwrites_starter_kit_config_when_option_is_passed()
     {
         $this->files->put($configPath = base_path('starter-kit.yaml'), 'old config');
@@ -551,6 +575,22 @@ EOT;
         $this->assertFileNotExists(base_path('composer.json.bak'));
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileNotExists(base_path('copied.md'));
+    }
+
+    /** @test */
+    public function it_runs_post_install_script_hook_when_available()
+    {
+        $mock = Mockery::mock();
+        $mock->shouldReceive('handle')
+            ->withArgs(fn ($arg) => $arg instanceof InstallCommand)
+            ->once();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn($mock);
+
+        $this->installCoolRunnings();
     }
 
     private function kitRepoPath($path = null)

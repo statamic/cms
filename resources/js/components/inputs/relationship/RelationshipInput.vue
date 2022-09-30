@@ -74,6 +74,7 @@
                     :max-selections="maxItems"
                     :search="search"
                     :exclusions="exclusions"
+                    :type="config.type"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
@@ -144,6 +145,7 @@ export default {
             initializing: true,
             loading: true,
             inline: false,
+            sortable: null,
         }
     },
 
@@ -181,6 +183,9 @@ export default {
     },
 
     beforeDestroy() {
+        if (this.sortable) {
+            this.sortable.destroy();
+        }
         this.setLoadingProgress(false);
     },
 
@@ -245,7 +250,7 @@ export default {
         },
 
         makeSortable() {
-            new Sortable(this.$refs.items, {
+            this.sortable = new Sortable(this.$refs.items, {
                 draggable: '.item',
                 handle: '.item-move',
                 mirror: { constrainDimensions: true, xAxis: false },

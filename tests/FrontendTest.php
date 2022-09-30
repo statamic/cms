@@ -29,8 +29,8 @@ class FrontendTest extends TestCase
 
     private function withStandardBlueprints()
     {
-        Blueprint::shouldReceive('in')->withAnyArgs()->andReturn(collect([new \Statamic\Fields\Blueprint]));
         $this->addToAssertionCount(-1);
+        Blueprint::shouldReceive('in')->withAnyArgs()->zeroOrMoreTimes()->andReturn(collect([new \Statamic\Fields\Blueprint]));
     }
 
     /** @test */
