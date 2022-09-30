@@ -685,7 +685,7 @@ class FrontendTest extends TestCase
      * @test
      * @dataProvider redirectProvider
      */
-    public function redirect_is_followed($augmentedValue, $expectedStatus, $expectedLocation)
+    public function redirect_is_followed($dataValue, $augmentedValue, $expectedStatus, $expectedLocation)
     {
         // Making a fake fieldtype to test that the augmented value is used for the redirect.
         // The actual redirect resolving logic is already completely under test, and happens
@@ -709,7 +709,7 @@ class FrontendTest extends TestCase
         $this->createPage('about', [
             'with' => [
                 'title' => 'About',
-                'redirect' => '/not-where-it-should-go', // this should not be used - the augmented value should.
+                'redirect' => $dataValue, // this should not be used - the augmented value should.
             ],
         ])->save();
 
@@ -729,9 +729,24 @@ class FrontendTest extends TestCase
     public function redirectProvider()
     {
         return [
-            'valid redirect' => ['/target', 302, '/target'],
-            'invalid redirect' => [404, 404, null],
-            'missing redirect' => [null, 200, null],
+            'valid redirect' => [
+                '/shouldnt-be-used',   // its got a value
+                '/target',             // the fieldtype will augmented to this
+                302,                   // its a redirect
+                '/target',             // to here
+            ],
+            'invalid redirect' => [
+                'something',           // its got a value
+                null,                  // the fieldtype will augment to this because its an invalid reference
+                404,                   // so it should 404
+                null,                  // and not redirect
+            ],
+            'missing redirect' => [
+                null,                  // its got no value
+                null,                  // the fieldtype will augment to this (although it wouldn't even be called)
+                200,                   // since there's no redirect, its a successful response
+                null,                  // and not a redirect
+            ],
         ];
     }
 }
