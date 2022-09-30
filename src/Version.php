@@ -10,8 +10,8 @@ class Version
     {
         $currentVersion = Composer::installedVersion(Statamic::PACKAGE);
 
-        if ($currentVersion === null) {
-            throw new \Exception('Statamic version could not be found. Does the composer.lock file exist?');
+        if (! $currentVersion) {
+            throw new \Exception('Statamic version could not be found. The composer.lock file is missing.');
         }
 
         return $currentVersion;
