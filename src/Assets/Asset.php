@@ -53,10 +53,22 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     protected $container;
     protected $path;
     protected $meta;
-    protected $syncOriginalProperties = ['path'];
     protected $withEvents = true;
     protected $shouldHydrate = true;
     protected $removedData = [];
+
+    public function syncOriginal()
+    {
+        $this->original = [];
+
+        foreach (['path'] as $property) {
+            $this->original[$property] = $this->{$property};
+        }
+
+        $this->original['data'] = $this->metaExists() ? $this->meta('data') : $this->data->all();
+
+        return $this;
+    }
 
     public function __construct()
     {
@@ -239,6 +251,11 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $path = dirname($this->path()).'/.meta/'.$this->basename().'.yaml';
 
         return ltrim($path, '/');
+    }
+
+    protected function metaExists()
+    {
+        return $this->disk()->exists($this->metaPath());
     }
 
     public function writeMeta($meta)
@@ -640,6 +657,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
             return $this;
         }
 
+        $this->hydrate();
         $this->disk()->rename($oldPath, $newPath);
         $this->path($newPath);
         $this->save();

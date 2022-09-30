@@ -758,7 +758,6 @@ class AssetTest extends TestCase
 
         // Saving should clear the cache and persist the new meta data to the filesystem...
         $asset->save();
-        $this->assertNull(Cache::get($asset->metaCacheKey()));
         $this->assertEquals($metaWithData, YAML::parse(Storage::disk('test')->get('foo/.meta/image.jpg.yaml')));
 
         // Then if we ask for new meta, it should cache with the newly saved data...
@@ -921,26 +920,6 @@ class AssetTest extends TestCase
             'path/to/another-asset.txt',
         ], $container->contents()->cached()->keys()->all());
         Event::assertDispatched(AssetDeleted::class);
-    }
-
-    /** @test */
-    public function it_clears_asset_glide_cache_when_deleting()
-    {
-        Storage::fake('local');
-        $disk = Storage::disk('local');
-        $disk->put('path/to/asset.txt', '');
-        $container = Facades\AssetContainer::make('test')->disk('local');
-        Facades\AssetContainer::shouldReceive('save')->with($container);
-        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
-        $asset = (new Asset)->container($container)->path('path/to/asset.txt');
-
-        // Just assert that `Glide::clearAsset()` is called on delete,
-        // since `Imaging\GlideTest.php` covers the actual functionality.
-        Facades\Glide::shouldReceive('clearAsset')->withArgs(function ($arg) use ($asset) {
-            return $arg->id() === $asset->id();
-        })->once();
-
-        $asset->delete();
     }
 
     /** @test */
@@ -1930,6 +1909,76 @@ class AssetTest extends TestCase
 
         // The "asset" Tag will output nothing when an invalid asset src is passed. It doesn't throw an exception.
         $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset]));
+    }
+
+    /** @test */
+    public function it_syncs_original_state_with_no_data()
+    {
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+
+        $this->assertEquals([], $asset->getOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [],
+        ], $asset->getOriginal());
+
+        Storage::disk('test')->assertMissing('path/to/.meta/test.txt.yaml');
+    }
+
+    /** @test */
+    public function it_syncs_original_state_with_no_data_but_with_data_in_meta()
+    {
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', "data:\n  foo: bar");
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+
+        $this->assertEquals([], $asset->getOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [
+                'foo' => 'bar',
+            ],
+        ], $asset->getOriginal());
+
+        Storage::disk('test')->assertExists('path/to/.meta/test.txt.yaml');
+    }
+
+    /** @test */
+    public function it_syncs_original_state_with_data()
+    {
+        $yaml = <<<'YAML'
+data:
+  alfa: bravo
+  charlie: delta
+  echo: foxtrot
+YAML;
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', $yaml);
+
+        $asset = (new Asset)
+            ->container($this->container)
+            ->path('path/to/test.txt')
+            ->set('charlie', 'brown')
+            ->remove('echo');
+
+        $this->assertEquals([], $asset->getOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [
+                'alfa' => 'bravo',
+                'charlie' => 'brown',
+            ],
+        ], $asset->getOriginal());
+
+        Storage::disk('test')->assertExists('path/to/.meta/test.txt.yaml');
+        $this->assertEquals($yaml, Storage::disk('test')->get('path/to/.meta/test.txt.yaml'));
     }
 
     private function fakeEventWithMacros()

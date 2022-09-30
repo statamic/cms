@@ -3,6 +3,7 @@
 namespace Statamic\StarterKits;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
@@ -139,6 +140,7 @@ final class Installer
             ->installFiles()
             ->installDependencies()
             ->makeSuperUser()
+            ->runPostInstallHook()
             ->reticulateSplines()
             ->removeStarterKit()
             ->removeRepository()
@@ -318,6 +320,7 @@ final class Installer
 
         if ($this->withConfig) {
             $this->copyStarterKitConfig();
+            $this->copyStarterKitHooks();
         }
 
         return $this;
@@ -343,6 +346,10 @@ final class Installer
      */
     protected function copyStarterKitConfig()
     {
+        if (! $this->withConfig) {
+            return;
+        }
+
         if ($this->withoutDependencies) {
             return $this->copyFile($this->starterKitPath('starter-kit.yaml'), base_path('starter-kit.yaml'));
         }
@@ -364,6 +371,22 @@ final class Installer
         }
 
         $this->files->put(base_path('starter-kit.yaml'), YAML::dump($config->all()));
+    }
+
+    /**
+     * Copy starter kit hook scripts.
+     */
+    protected function copyStarterKitHooks()
+    {
+        if (! $this->withConfig) {
+            return;
+        }
+
+        $hooks = ['StarterKitPostInstall.php'];
+
+        collect($hooks)
+            ->filter(fn ($hook) => $this->files->exists($this->starterKitPath($hook)))
+            ->each(fn ($hook) => $this->copyFile($this->starterKitPath($hook), base_path($hook)));
     }
 
     /**
@@ -448,6 +471,22 @@ final class Installer
         if ($this->console->confirm('Create a super user?', false)) {
             $this->console->call('make:user', ['--super' => true]);
         }
+
+        return $this;
+    }
+
+    /**
+     * Run post install hook, if one exists in the starter kit.
+     *
+     * @return $this
+     */
+    protected function runPostInstallHook()
+    {
+        if (! $postInstallHook = Hook::find($this->starterKitPath('StarterKitPostInstall.php'))) {
+            return $this;
+        }
+
+        $postInstallHook->handle($this->console);
 
         return $this;
     }
