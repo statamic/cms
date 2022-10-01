@@ -15,6 +15,8 @@
         <div v-for="blueprint in blueprints" :key="blueprint.handle">
             <dropdown-item :text="blueprint.title" @click="select(blueprint.handle, $event)" />
         </div>
+
+        <dropdown-item :text="__('Create Blueprint')" :href="cp_url(`collections/${collection}/blueprints/create`)" />
     </dropdown-list>
 
 </template>
@@ -26,7 +28,8 @@ export default {
         url: String,
         blueprints: Array,
         text: { type: String, default: () => __('Create Entry') },
-        buttonClass: { type: String, default: 'btn' }
+        buttonClass: { type: String, default: 'btn' },
+        collection: String,
     },
 
     computed: {

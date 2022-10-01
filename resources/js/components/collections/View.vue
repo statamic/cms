@@ -79,7 +79,8 @@
                     button-class="btn-primary"
                     :url="createUrl"
                     :blueprints="blueprints"
-                    :text="createLabel" />
+                    :text="createLabel"
+                    :collection="handle" />
             </div>
 
         </header>
