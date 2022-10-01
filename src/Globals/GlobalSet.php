@@ -108,6 +108,8 @@ class GlobalSet implements Contract
 
     public function delete()
     {
+        $this->blueprint()->delete();
+
         Facades\GlobalSet::delete($this);
 
         GlobalSetDeleted::dispatch($this);
