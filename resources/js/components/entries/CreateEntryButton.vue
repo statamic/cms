@@ -16,6 +16,7 @@
             <dropdown-item :text="blueprint.title" @click="select(blueprint.handle, $event)" />
         </div>
 
+        <div class="divider" />
         <dropdown-item :text="__('Create Blueprint')" :href="cp_url(`collections/${collection}/blueprints/create`)" />
     </dropdown-list>
 
