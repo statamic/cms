@@ -18,10 +18,10 @@ export default {
         },
 
         checkMaximumAmountOfItems() {
-          this.sharedState.selections = _.chain(this.sharedState.rows)
-              .map(item => item.id)
-              .first(this.sharedState.maxSelections ?? Infinity)
-              .value()
+            this.sharedState.selections = _.chain(this.sharedState.rows)
+                .map(item => item.id)
+                .first(this.sharedState.maxSelections ?? Infinity)
+                .value()
         },
 
         uncheckAllItems() {
