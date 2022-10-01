@@ -11,6 +11,7 @@
         :can-create="@can('create', ['Statamic\Contracts\Entries\Entry', $collection]) true @else false @endcan"
         create-url="{{ cp_route('collections.entries.create', [$collection->handle(), $site]) }}"
         create-label="{{ $collection->createLabel() }}"
+        :can-create-blueprints="@can('configure fields') true @else false @endcan"
         :blueprints='@json($blueprints)'
         sort-column="{{ $collection->sortField() }}"
         sort-direction="{{ $collection->sortDirection() }}"

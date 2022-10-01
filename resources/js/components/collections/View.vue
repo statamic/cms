@@ -80,7 +80,8 @@
                     :url="createUrl"
                     :blueprints="blueprints"
                     :text="createLabel"
-                    :collection="handle" />
+                    :collection="handle"
+                    :can-create-blueprints="canCreateBlueprints" />
             </div>
 
         </header>
@@ -201,6 +202,7 @@ export default {
         structureMaxDepth: { type: Number, default: Infinity },
         structureExpectsRoot: { type: Boolean },
         structureShowSlugs: { type: Boolean },
+        canCreateBlueprints: { type: Boolean, default: false },
     },
 
     data() {

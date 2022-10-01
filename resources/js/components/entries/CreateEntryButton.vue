@@ -16,8 +16,8 @@
             <dropdown-item :text="blueprint.title" @click="select(blueprint.handle, $event)" />
         </div>
 
-        <div class="divider" />
-        <dropdown-item :text="__('Create Blueprint')" :href="cp_url(`collections/${collection}/blueprints/create`)" />
+        <div v-if="canCreateBlueprints" class="divider" />
+        <dropdown-item v-if="canCreateBlueprints" :text="__('Create Blueprint')" :href="cp_url(`collections/${collection}/blueprints/create`)" />
     </dropdown-list>
 
 </template>
@@ -31,6 +31,7 @@ export default {
         text: { type: String, default: () => __('Create Entry') },
         buttonClass: { type: String, default: 'btn' },
         collection: String,
+        canCreateBlueprints: Boolean,
     },
 
     computed: {
