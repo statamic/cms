@@ -46,6 +46,10 @@ class FieldType extends \Rebing\GraphQL\Support\Type
                     // Only show values that the fieldtype exposes.
                     $fields = $field->fieldtype()->configFields()->all()->keys()->all();
 
+                    if (isset($field->config()['width'])) {
+                        $fields[] = 'width';
+                    }
+
                     return Arr::only($field->config(), $fields);
                 },
             ],
