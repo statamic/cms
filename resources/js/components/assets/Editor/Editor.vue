@@ -294,7 +294,12 @@ export default {
             this.$axios.get(url).then(response => {
                 const data = response.data.data;
                 this.asset = data;
-                this.values = data.values;
+
+                // If empty, `data.values` will be an array, but we need object for `selectFocalPoint` later on
+                if (!_.isEmpty(data.values)) {
+                    this.values = data.values;
+                }
+
                 this.meta = data.meta;
                 this.actionUrl = data.actionUrl;
                 this.actions = data.actions;
