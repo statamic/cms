@@ -128,6 +128,7 @@ export default {
             initialSite: this.site,
         }
     },
+
     computed: {
         actionContext() {
             return {collection: this.collection};
