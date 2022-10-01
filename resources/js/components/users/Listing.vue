@@ -15,8 +15,31 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0 relative">
+                    <data-list-filter-presets
+                        ref="presets"
+                        :active-preset="activePreset"
+                        :preferences-prefix="preferencesPrefix"
+                        @selected="selectPreset"
+                        @reset="filtersReset"
+                    />
                     <div class="data-list-header">
-                        <data-list-search v-model="searchQuery" />
+                        <data-list-filters
+                            :filters="filters"
+                            :active-preset="activePreset"
+                            :active-preset-payload="activePresetPayload"
+                            :active-filters="activeFilters"
+                            :active-filter-badges="activeFilterBadges"
+                            :active-count="activeFilterCount"
+                            :search-query="searchQuery"
+                            :saves-presets="true"
+                            :preferences-prefix="preferencesPrefix"
+                            @filter-changed="filterChanged"
+                            @search-changed="searchChanged"
+                            @saved="$refs.presets.setPreset($event)"
+                            @deleted="$refs.presets.refreshPresets()"
+                            @restore-preset="$refs.presets.viewPreset($event)"
+                            @reset="filtersReset"
+                        />
                     </div>
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
