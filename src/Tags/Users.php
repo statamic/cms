@@ -20,11 +20,21 @@ class Users extends Tags
         $query = $this->query();
 
         if ($group = $this->params->get('group')) {
-            $query->where('group', $group);
+            $groups = explode('|', $group);
+            $query->where(function ($query) use ($groups) {
+                foreach ($groups as $group) {
+                    $query->orWhere('groups', 'like', "%{$group}%");
+                }
+            });
         }
 
         if ($role = $this->params->get('role')) {
-            $query->where('role', $role);
+            $roles = explode('|', $role);
+            $query->where(function ($query) use ($roles) {
+                foreach ($roles as $role) {
+                    $query->orWhere('roles', 'like', "%{$role}%");
+                }
+            });
         }
 
         return $this->output($this->results($query));
