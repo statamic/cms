@@ -20,11 +20,21 @@ class Users extends Tags
         $query = $this->query();
 
         if ($group = $this->params->get('group')) {
-            $query->whereJsonContains('groups', explode('|', $group), 'or');
+            $groups = explode('|', $group);
+            $query->where(function ($query) use ($groups) {
+                foreach ($groups as $group) {
+                    $query->whereJsonContains('groups', $group, 'or');
+                }
+            });
         }
 
         if ($role = $this->params->get('role')) {
-            $query->whereJsonContains('roles', explode('|', $role), 'or');
+            $roles = explode('|', $role);
+            $query->where(function ($query) use ($roles) {
+                foreach ($roles as $role) {
+                    $query->whereJsonContains('roles', $role, 'or');
+                }
+            });
         }
 
         return $this->output($this->results($query));

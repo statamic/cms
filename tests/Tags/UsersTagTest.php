@@ -57,6 +57,24 @@ class UsersTagTest extends TestCase
         $this->assertEquals('baz@bar.com|qux@bar.com|', $this->tag('{{ users group="group1|group2" }}{{ email }}|{{ /users }}'));
     }
 
+    /** @test */
+    public function it_gets_users_by_role_and_group()
+    {
+        $this->setTestRoles([
+            'role1',
+            'role2',
+        ]);
+        $this->setTestUserGroups([
+            'group1',
+        ]);
+
+        User::make()->email('foo@bar.com')->save();
+        User::make()->email('baz@bar.com')->assignRole('role1')->addToGroup('group1')->save();
+        User::make()->email('qux@bar.com')->assignRole('role2')->save();
+
+        $this->assertEquals('baz@bar.com|', $this->tag('{{ users role="role1|role2" group="group1" }}{{ email }}|{{ /users }}'));
+    }
+
     private function tag($tag, $data = [])
     {
         return (string) Parse::template($tag, $data);
