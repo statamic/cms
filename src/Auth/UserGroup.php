@@ -178,4 +178,9 @@ abstract class UserGroup implements UserGroupContract, Augmentable, ArrayAccess,
             'handle' => $this->handle(),
         ];
     }
+
+    public function __toString()
+    {
+        return $this->handle();
+    }
 }

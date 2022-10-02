@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Query;
 
+use Illuminate\Support\Collection;
 use Statamic\Data\DataCollection;
 use Statamic\Query\Builder as BaseBuilder;
 use Statamic\Stache\Stores\Store;
@@ -243,23 +244,23 @@ abstract class Builder extends BaseBuilder
             case '<>':
             case '!=':
                 $method = 'neq';
-            break;
+                break;
 
             case '>':
                 $method = 'gt';
-            break;
+                break;
 
             case '>=':
                 $method = 'gte';
-            break;
+                break;
 
             case '<':
                 $method = 'lt';
-            break;
+                break;
 
             case '<=':
                 $method = 'lte';
-            break;
+                break;
         }
 
         return $method;
@@ -282,6 +283,10 @@ abstract class Builder extends BaseBuilder
     protected function filterWhereJsonContains($values, $where)
     {
         return $values->filter(function ($value) use ($where) {
+            if ($value instanceof Collection) {
+                $value = $value->all();
+            }
+
             if (! is_array($value)) {
                 return false;
             }
@@ -293,6 +298,10 @@ abstract class Builder extends BaseBuilder
     protected function filterWhereJsonDoesntContain($values, $where)
     {
         return $values->filter(function ($value) use ($where) {
+            if ($value instanceof Collection) {
+                $value = $value->all();
+            }
+
             if (! is_array($value)) {
                 return true;
             }
@@ -306,6 +315,10 @@ abstract class Builder extends BaseBuilder
         $method = 'filterTest'.$this->operators[$where['operator']];
 
         return $values->filter(function ($value) use ($method, $where) {
+            if ($value instanceof Collection) {
+                $value = $value->all();
+            }
+
             if (! is_array($value)) {
                 return false;
             }

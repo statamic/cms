@@ -35,4 +35,9 @@ abstract class Role implements RoleContract, Augmentable, ArrayAccess, Arrayable
             'handle' => $this->handle(),
         ];
     }
+
+    public function __toString()
+    {
+        return $this->handle();
+    }
 }
