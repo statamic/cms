@@ -9,6 +9,7 @@ class AssetContainerContents
 {
     protected $container;
     protected $files;
+    protected $metaFiles;
     protected $filteredFiles;
     protected $filteredDirectories;
 
@@ -132,6 +133,36 @@ class AssetContainerContents
     public function directories()
     {
         return $this->all()->where('type', 'dir');
+    }
+
+    public function metaFilesIn($folder, $recursive)
+    {
+        if (isset($this->metaFiles[$key = $folder.($recursive ? '-recursive' : '')])) {
+            return $this->metaFiles[$key];
+        }
+
+        $files = $this->files();
+
+        $files = $files->filter(function ($file, $path) {
+            return Str::startsWith($path, '.meta/')
+                || Str::contains($path, '/.meta/');
+        });
+
+        // Filter by folder and recursiveness. But don't bother if we're
+        // requesting the root recursively as it's already that way.
+        if ($folder === '/' && $recursive) {
+            //
+        } else {
+            $files = $files->filter(function ($file) use ($folder, $recursive) {
+                $dir = $file['dirname'];
+                $dir = substr($dir, 0, -6); // remove .meta/ from the end
+                $dir = $dir ?: '/';
+
+                return $recursive ? Str::startsWith($dir, $folder) : $dir == $folder;
+            });
+        }
+
+        return $this->metaFiles[$key] = $files;
     }
 
     public function filteredFilesIn($folder, $recursive)
