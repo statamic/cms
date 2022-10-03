@@ -62,6 +62,8 @@ export default {
     props: {
         config: Object,
         values: Object,
+        badges: Object,
+        popoverClosed: Function
     },
 
     data() {
@@ -140,6 +142,12 @@ export default {
         this.reset();
 
         this.$refs.fieldSelect.$refs.search.focus();
+
+        this.popoverClosed(() => {
+            if (! this.badges[this.field]) {
+                this.resetAll();
+            }
+        });
     },
 
     methods: {

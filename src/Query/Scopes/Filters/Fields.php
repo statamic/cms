@@ -53,6 +53,7 @@ class Fields extends Filter
 
                 return $filter->badge($values);
             })
+            ->filter()
             ->all();
     }
 
