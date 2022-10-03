@@ -294,6 +294,19 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_all_meta_files_by_default()
+    {
+        $this->assertEquals([
+            '.meta/a.txt.yaml',
+            '.meta/b.txt.yaml',
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+            'nested/double-nested/.meta/double-nested-a.txt.yaml',
+            'nested/double-nested/.meta/double-nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles()->all());
+    }
+
+    /** @test */
     public function it_gets_files_in_a_folder()
     {
         $this->assertEquals([
@@ -305,6 +318,20 @@ class AssetContainerTest extends TestCase
             'nested/nested-a.txt',
             'nested/nested-b.txt',
         ], $this->containerWithDisk()->files('nested')->all());
+    }
+
+    /** @test */
+    public function it_gets_meta_files_in_a_folder()
+    {
+        $this->assertEquals([
+            '.meta/a.txt.yaml',
+            '.meta/b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles('/')->all());
+
+        $this->assertEquals([
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles('nested')->all());
     }
 
     /** @test */
@@ -325,6 +352,26 @@ class AssetContainerTest extends TestCase
             'nested/nested-a.txt',
             'nested/nested-b.txt',
         ], $this->containerWithDisk()->files('nested', true)->all());
+    }
+
+    /** @test */
+    public function it_gets_meta_files_in_a_folder_recursively()
+    {
+        $this->assertEquals([
+            '.meta/a.txt.yaml',
+            '.meta/b.txt.yaml',
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+            'nested/double-nested/.meta/double-nested-a.txt.yaml',
+            'nested/double-nested/.meta/double-nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles('/', true)->all());
+
+        $this->assertEquals([
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+            'nested/double-nested/.meta/double-nested-a.txt.yaml',
+            'nested/double-nested/.meta/double-nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles('nested', true)->all());
     }
 
     /** @test */
@@ -541,7 +588,7 @@ class AssetContainerTest extends TestCase
     /** @test */
     public function it_makes_an_asset_at_given_path()
     {
-        $container = new AssetContainer;
+        $container = $this->containerWithDisk();
         $asset = $container->makeAsset('path/to/test.txt');
 
         $this->assertInstanceOf(Asset::class, $asset);

@@ -513,11 +513,16 @@ class EntryTest extends TestCase
         $entry = new Entry;
         $this->assertEquals([], $entry->supplements()->all());
 
-        $return = $entry->setSupplement('foo', 'bar');
+        $return = $entry->setSupplement('foo', 'bar')->setSupplement('baz', null);
 
         $this->assertEquals($entry, $return);
         $this->assertEquals('bar', $entry->getSupplement('foo'));
-        $this->assertEquals(['foo' => 'bar'], $entry->supplements()->all());
+        $this->assertNull($entry->getSupplement('bar'));
+        $this->assertNull($entry->getSupplement('baz'));
+        $this->assertTrue($entry->hasSupplement('foo'));
+        $this->assertFalse($entry->hasSupplement('bar'));
+        $this->assertTrue($entry->hasSupplement('baz'));
+        $this->assertEquals(['foo' => 'bar', 'baz' => null], $entry->supplements()->all());
     }
 
     /** @test */

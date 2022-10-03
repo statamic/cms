@@ -1341,6 +1341,20 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Rekeys an array or collection.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function keyBy($value, $params)
+    {
+        $rekeyed = collect($value)->keyBy(fn ($item) => $item[$params[0]]);
+
+        return is_array($value) ? $rekeyed->all() : $rekeyed;
+    }
+
+    /**
      * Returns the last $params[0] characters of a string, or the last element of an array.
      *
      * @param $value
@@ -2599,7 +2613,9 @@ class CoreModifiers extends Modifier
      */
     public function title($value)
     {
-        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor'];
+        preg_match_all('/[A-Z]+\b/', $value, $matches);
+
+        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor', ...$matches[0]];
 
         return Stringy::titleize($value, $ignore);
     }

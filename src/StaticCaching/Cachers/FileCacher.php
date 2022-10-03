@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
+use Statamic\Facades\Site;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -66,7 +67,7 @@ class FileCacher extends AbstractCacher
             return;
         }
 
-        $this->cacheUrl($this->makeHash($url), $url);
+        $this->cacheUrl($this->makeHash($url), ...$this->getPathAndDomain($url));
     }
 
     /**
@@ -113,16 +114,18 @@ class FileCacher extends AbstractCacher
      * @param  string  $url
      * @return void
      */
-    public function invalidateUrl($url)
+    public function invalidateUrl($url, $domain = null)
     {
-        if (! $key = $this->getUrls()->flip()->get($url)) {
+        if (! $key = $this->getUrls($domain)->flip()->get($url)) {
             // URL doesn't exist, nothing to invalidate.
             return;
         }
 
-        $this->writer->delete($this->getFilePath($url));
+        $site = optional(Site::findByUrl($domain.$url))->handle();
 
-        $this->forgetUrl($key);
+        $this->writer->delete($this->getFilePath($url, $site));
+
+        $this->forgetUrl($key, $domain);
     }
 
     public function getCachePaths()
@@ -139,18 +142,18 @@ class FileCacher extends AbstractCacher
     /**
      * Get the path where static files are stored.
      *
-     * @param  string|null  $locale  A specific locale's path.
+     * @param  string|null  $site  A specific site's path.
      * @return string
      */
-    public function getCachePath($locale = null)
+    public function getCachePath($site = null)
     {
         $paths = $this->getCachePaths();
 
-        if (! $locale) {
-            $locale = $this->config('locale');
+        if (! $site) {
+            $site = $this->config('locale');
         }
 
-        return $paths[$locale];
+        return $paths[$site];
     }
 
     /**
@@ -159,7 +162,7 @@ class FileCacher extends AbstractCacher
      * @param $url
      * @return string
      */
-    public function getFilePath($url)
+    public function getFilePath($url, $site = null)
     {
         $urlParts = parse_url($url);
         $pathParts = pathinfo($urlParts['path']);
@@ -170,7 +173,7 @@ class FileCacher extends AbstractCacher
             $basename = $slug.'_lqs_'.md5($query).'.html';
         }
 
-        return $this->getCachePath().$pathParts['dirname'].'/'.$basename;
+        return $this->getCachePath($site).$pathParts['dirname'].'/'.$basename;
     }
 
     private function isBasenameTooLong($basename)

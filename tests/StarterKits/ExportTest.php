@@ -20,6 +20,7 @@ class ExportTest extends TestCase
 
         $this->files = app(Filesystem::class);
         $this->configPath = base_path('starter-kit.yaml');
+        $this->postInstallHookPath = base_path('StarterKitPostInstall.php');
         $this->exportPath = base_path('../cool-runnings');
 
         if ($this->files->exists($this->configPath)) {
@@ -38,6 +39,10 @@ class ExportTest extends TestCase
     {
         if ($this->files->exists($this->configPath)) {
             $this->files->delete($this->configPath);
+        }
+
+        if ($this->files->exists($this->postInstallHookPath)) {
+            $this->files->delete($this->postInstallHookPath);
         }
 
         $this->restoreComposerJson();
@@ -153,6 +158,23 @@ class ExportTest extends TestCase
 
         $this->assertFileExists($starterKitConfig);
         $this->assertFileHasContent('export_paths:', $starterKitConfig);
+    }
+
+    /** @test */
+    public function it_copies_post_install_script_hook_when_available()
+    {
+        $this->setExportPaths([
+            'config',
+        ]);
+
+        $this->assertFileNotExists($postInstallHook = $this->exportPath('StarterKitPostInstall.php'));
+
+        $this->files->put(base_path('StarterKitPostInstall.php'), '<?php');
+
+        $this->exportCoolRunnings();
+
+        $this->assertFileExists($postInstallHook);
+        $this->assertFileHasContent('<?php', $postInstallHook);
     }
 
     /** @test */

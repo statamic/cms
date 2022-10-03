@@ -18,14 +18,18 @@ use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetReplaced;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
+use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -49,10 +53,22 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     protected $container;
     protected $path;
     protected $meta;
-    protected $syncOriginalProperties = ['path'];
     protected $withEvents = true;
     protected $shouldHydrate = true;
     protected $removedData = [];
+
+    public function syncOriginal()
+    {
+        $this->original = [];
+
+        foreach (['path'] as $property) {
+            $this->original[$property] = $this->{$property};
+        }
+
+        $this->original['data'] = $this->metaExists() ? $this->meta('data') : $this->data->all();
+
+        return $this;
+    }
 
     public function __construct()
     {
@@ -235,6 +251,11 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $path = dirname($this->path()).'/.meta/'.$this->basename().'.yaml';
 
         return ltrim($path, '/');
+    }
+
+    protected function metaExists()
+    {
+        return $this->container()->metaFiles()->contains($this->metaPath());
     }
 
     public function writeMeta($meta)
@@ -444,6 +465,19 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Is this asset a media file?
+     *
+     * @return bool
+     */
+    public function isMedia()
+    {
+        return $this->isImage()
+                || $this->isSvg()
+                || $this->isVideo()
+                || $this->isAudio();
+    }
+
+    /**
      * Is this asset a PDF?
      *
      * @return bool
@@ -623,6 +657,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
             return $this;
         }
 
+        $this->hydrate();
         $this->disk()->rename($oldPath, $newPath);
         $this->path($newPath);
         $this->save();
@@ -634,6 +669,32 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         $this->disk()->rename($oldMetaPath, $this->metaPath());
+
+        return $this;
+    }
+
+    /**
+     * Replace an asset and/or its references where necessary.
+     *
+     * @param  Asset  $originalAsset
+     * @param  bool  $deleteOriginal
+     * @return $this
+     */
+    public function replace(Asset $originalAsset, $deleteOriginal = false)
+    {
+        // Temporarily disable the reference updater to avoid triggering reference updates
+        // until after the `AssetReplaced` event is fired. We still want to fire events
+        // like `AssetDeleted` and `AssetSaved` though, so that other listeners will
+        // get triggered (for cache invalidation, clearing of glide cache, etc.)
+        UpdateAssetReferencesSubscriber::disable();
+
+        if ($deleteOriginal) {
+            $originalAsset->delete();
+        }
+
+        UpdateAssetReferencesSubscriber::enable();
+
+        AssetReplaced::dispatch($originalAsset, $this);
 
         return $this;
     }
@@ -782,6 +843,22 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         return $this;
     }
 
+    public function reupload(ReplacementFile $file)
+    {
+        if ($file->extension() !== $this->extension()) {
+            throw new FileExtensionMismatch('The file extension must match the original file.');
+        }
+
+        $file->writeTo($this->disk()->filesystem(), $this->path());
+
+        $this->clearCaches();
+        $this->writeMeta($this->generateMeta());
+
+        AssetReuploaded::dispatch($this);
+
+        return $this;
+    }
+
     /**
      * Download a file.
      *
@@ -790,6 +867,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     public function download(string $name = null, array $headers = [])
     {
         return $this->disk()->filesystem()->download($this->path(), $name, $headers);
+    }
+
+    /**
+     * Stream a file.
+     *
+     * @return resource
+     */
+    public function stream()
+    {
+        return $this->disk()->filesystem()->readStream($this->path());
     }
 
     private function getSafeFilename($string)
