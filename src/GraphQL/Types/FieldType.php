@@ -40,15 +40,17 @@ class FieldType extends \Rebing\GraphQL\Support\Type
                     return $field->instructions();
                 },
             ],
+            'width' => [
+                'type' => GraphQL::int(),
+                'resolve' => function ($field) {
+                    return $field->config()['width'] ?? 100;
+                },
+            ],
             'config' => [
                 'type' => GraphQL::type(ArrayType::NAME),
                 'resolve' => function ($field) {
                     // Only show values that the fieldtype exposes.
                     $fields = $field->fieldtype()->configFields()->all()->keys()->all();
-
-                    if (isset($field->config()['width'])) {
-                        $fields[] = 'width';
-                    }
 
                     return Arr::only($field->config(), $fields);
                 },
