@@ -156,7 +156,7 @@ class AssetContainerContents
             $files = $files->filter(function ($file) use ($folder, $recursive) {
                 $dir = $file['dirname'];
                 $dir = substr($dir, 0, -6); // remove .meta/ from the end
-                $dir = $dir === '' ? '/' : $dir;
+                $dir = $dir ?: '/';
 
                 return $recursive ? Str::startsWith($dir, $folder) : $dir == $folder;
             });
