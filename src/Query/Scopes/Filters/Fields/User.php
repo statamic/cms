@@ -2,50 +2,42 @@
 
 namespace Statamic\Query\Scopes\Filters\Fields;
 
-use Statamic\Facades\User as UserFacade;
+use Statamic\Facades\User as Users;
 
 class User extends FieldtypeFilter
 {
     public function fieldItems()
     {
-        $users = UserFacade::all()
-            ->mapWithKeys(function ($user) {
-                return [$user->id() => $user->name()];
-            })
-            ->all();
-
         return [
             'value' => [
-                'type' => 'select',
-                'placeholder' => __('Select User'),
-                'options' => array_merge([
-                    'me' => __('Me'),
-                ], $users),
+                'type' => 'users',
+                'max_items' => 1,
+                'mode' => 'select',
             ],
         ];
     }
 
     public function apply($query, $handle, $values)
     {
-        $value = $values['value'];
-
-        if ($value === 'me') {
-            $value = UserFacade::current()->id();
+        if (! $user = $values['value']) {
+            return;
         }
 
-        $query->where($handle, '=', $value);
+        $this->fieldtype->config('max_items') === 1
+            ? $query->where($handle, $user)
+            : $query->whereJsonContains($handle, $user);
     }
 
     public function badge($values)
     {
-        $field = $this->fieldtype->field()->display();
-        $operator = __('Is');
-        $value = $values['value'];
-
-        if ($value !== 'me') {
-            $value = UserFacade::find($value)->name();
+        if (! $user = $values['value']) {
+            return null;
         }
 
-        return $field.' '.strtolower($operator).' '.$value;
+        $field = $this->fieldtype->field()->display();
+        $operator = __('Is');
+        $user = Users::find($user)->name();
+
+        return $field.' '.strtolower($operator).' '.$user;
     }
 }
