@@ -23,11 +23,12 @@
                 >
                     <!-- TODO: handle showing/hiding of labels more elegantly -->
                     <publish-fields
-                        slot-scope="{ setFieldValue }"
+                        slot-scope="{ setFieldValue, setFieldMeta }"
                         :fields="filter.fields"
                         name-prefix="filter-field"
                         class="w-full no-label"
                         @updated="setFieldValue"
+                        @meta-updated="setFieldMeta"
                     />
                 </publish-container>
 
