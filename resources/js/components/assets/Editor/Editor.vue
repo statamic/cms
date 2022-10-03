@@ -295,10 +295,9 @@ export default {
                 const data = response.data.data;
                 this.asset = data;
 
-                // If empty, `data.values` will be an array, but we need object for `selectFocalPoint` later on
-                if (!_.isEmpty(data.values)) {
-                    this.values = data.values;
-                }
+                // If there are no fields, it will be an empty array when PHP encodes
+                // it into JSON on the server. We'll ensure it's always an object.
+                this.values = _.isArray(data.values) ? {} : data.values;
 
                 this.meta = data.meta;
                 this.actionUrl = data.actionUrl;
