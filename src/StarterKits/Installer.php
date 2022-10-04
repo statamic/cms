@@ -24,6 +24,7 @@ final class Installer
     protected $withConfig;
     protected $withoutDependencies;
     protected $withUser;
+    protected $usingSubProcess;
     protected $force;
     protected $console;
     protected $url;
@@ -105,6 +106,19 @@ final class Installer
     public function withUser($withUser = false)
     {
         $this->withUser = $withUser;
+
+        return $this;
+    }
+
+    /**
+     * Install using sub-process.
+     *
+     * @param  bool  $usingSubProcess
+     * @return $this
+     */
+    public function usingSubProcess($usingSubProcess = false)
+    {
+        $this->usingSubProcess = $usingSubProcess;
 
         return $this;
     }
