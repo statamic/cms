@@ -597,7 +597,7 @@ EOT;
     /** @test */
     public function it_can_register_and_run_newly_installed_command_in_post_install_hook()
     {
-        Hook::swap(new FakeHook);
+        Hook::shouldReceive('find')->andReturn(new StarterKitPostInstall);
 
         $this->assertFalse(Blink::has('starter-kit-command-run'));
 
@@ -846,14 +846,6 @@ class FakeComposer
     public function __call($method, $args)
     {
         return $this;
-    }
-}
-
-class FakeHook
-{
-    public function find()
-    {
-        return new StarterKitPostInstall;
     }
 }
 
