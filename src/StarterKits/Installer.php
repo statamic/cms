@@ -493,13 +493,19 @@ final class Installer
     }
 
     /**
-     * Run post install hook, if one exists in the starter kit.
+     * Run post-install hook, if one exists in the starter kit.
      *
      * @return $this
+     *
+     * @throws StarterKitException
      */
-    protected function runPostInstallHook()
+    public function runPostInstallHook($throwExceptions = false)
     {
-        if (! $postInstallHook = Hook::find($this->starterKitPath('StarterKitPostInstall.php'))) {
+        $postInstallHook = Hook::find($this->starterKitPath('StarterKitPostInstall.php'));
+
+        if ($throwExceptions && ! $postInstallHook) {
+            throw new StarterKitException("Cannot find post-install hook for [$this->package].");
+        } elseif (! $postInstallHook) {
             return $this;
         }
 
