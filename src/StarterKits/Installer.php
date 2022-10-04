@@ -29,6 +29,7 @@ final class Installer
     protected $force;
     protected $console;
     protected $url;
+    protected $disableCleanup;
 
     /**
      * Instantiate starter kit installer.
@@ -534,6 +535,8 @@ EOT;
 
         $this->files->put($path, $instructions);
 
+        $this->disableCleanup = true;
+
         return $this;
     }
 
@@ -580,6 +583,10 @@ EOT;
      */
     protected function removeStarterKit()
     {
+        if ($this->disableCleanup) {
+            return $this;
+        }
+
         $this->console->info('Cleaning up temporary files...');
 
         if (Composer::isInstalled($this->package)) {

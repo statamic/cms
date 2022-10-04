@@ -626,6 +626,10 @@ EOT;
         $this->assertFileExists($cachedInstructionsPath);
         $this->assertFileHasContent('Warning', $cachedInstructionsPath);
         $this->assertFileHasContent('php please starter-kit:run-post-install statamic/cool-runnings', $cachedInstructionsPath);
+
+        // Ensure the starter kit repo is not cleaned up so that `starter-kit:run-post-install` can be run by the
+        // user afterwards. It will be cleaned up after the post-install hook is successfully run instead.
+        $this->assertFileExists(base_path('vendor/statamic/cool-runnings'));
     }
 
     /** @test */
@@ -646,6 +650,7 @@ EOT;
         $this->installCoolRunnings(['--cli-install' => false]);
 
         $this->assertFileNotExists(storage_path('statamic/tmp/cli/post-install-instructions.txt'));
+        $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
     }
 
     private function kitRepoPath($path = null)
