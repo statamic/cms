@@ -35,10 +35,10 @@ final class Installer
      * Instantiate starter kit installer.
      *
      * @param  string  $package
-     * @param  LicenseManager  $licenseManager
      * @param  mixed  $console
+     * @param  LicenseManager|null  $licenseManager
      */
-    public function __construct(string $package, LicenseManager $licenseManager, $console = null)
+    public function __construct(string $package, $console = null, LicenseManager $licenseManager = null)
     {
         $this->package = $package;
         $this->licenseManager = $licenseManager;
@@ -51,13 +51,13 @@ final class Installer
      * Instantiate starter kit installer.
      *
      * @param  string  $package
-     * @param  LicenseManager  $licenseManager
      * @param  mixed  $console
+     * @param  LicenseManager|null  $licenseManager
      * @return static
      */
-    public static function package(string $package, LicenseManager $licenseManager, $console = null)
+    public static function package(string $package, $console = null, LicenseManager $licenseManager = null)
     {
-        return new static($package, $licenseManager, $console);
+        return new static($package, $console, $licenseManager);
     }
 
     /**

@@ -59,7 +59,7 @@ class StarterKitInstall extends Command
             $this->call('statamic:site:clear', ['--no-interaction' => true]);
         }
 
-        $installer = StarterKitInstaller::package($package, $licenseManager, $this)
+        $installer = StarterKitInstaller::package($package, $this, $licenseManager)
             ->fromLocalRepo($this->option('local'))
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
