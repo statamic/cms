@@ -253,7 +253,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
 
         $bardPayload = Arr::get($data, $dottedKey, []);
 
-        if (!$bardPayload) {
+        if (! $bardPayload) {
             return;
         }
 
@@ -301,7 +301,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
 
         $bardPayload = Arr::get($data, $dottedKey, []);
 
-        if (!$bardPayload) {
+        if (! $bardPayload) {
             return;
         }
 
