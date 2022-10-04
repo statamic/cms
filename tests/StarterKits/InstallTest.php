@@ -3,6 +3,7 @@
 namespace Tests\StarterKits;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Facades\Statamic\Console\Processes\TtyDetector;
 use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
@@ -603,6 +604,48 @@ EOT;
         $this->installCoolRunnings();
 
         $this->assertTrue(Blink::has('starter-kit-command-run'));
+    }
+
+    /** @test */
+    public function it_caches_post_install_hook_instructions_when_tty_is_not_available_during_a_cli_install()
+    {
+        $mock = Mockery::mock();
+        $mock->shouldReceive('handle')->never();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn($mock);
+
+        TtyDetector::shouldReceive('isTtySupported')->andReturn(false);
+
+        $this->installCoolRunnings(['--cli-install' => true]);
+
+        $cachedInstructionsPath = storage_path('statamic/tmp/cli/post-install-instructions.txt');
+
+        $this->assertFileExists($cachedInstructionsPath);
+        $this->assertFileHasContent('Warning', $cachedInstructionsPath);
+        $this->assertFileHasContent('php please starter-kit:run-post-install statamic/cool-runnings', $cachedInstructionsPath);
+    }
+
+    /** @test */
+    public function it_doesnt_caches_post_install_hook_instructions_when_not_being_run_as_a_cli_install()
+    {
+        $mock = Mockery::mock();
+        $mock->shouldReceive('handle')
+            ->withArgs(fn ($arg) => $arg instanceof InstallCommand)
+            ->once();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn($mock);
+
+        TtyDetector::shouldReceive('isTtySupported')->andReturn(false);
+
+        $this->installCoolRunnings(['--cli-install' => false]);
+
+        $this->assertFileNotExists(storage_path('statamic/tmp/cli/post-install-instructions.txt'));
     }
 
     private function kitRepoPath($path = null)

@@ -3,6 +3,7 @@
 namespace Statamic\StarterKits;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Facades\Statamic\Console\Processes\TtyDetector;
 use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
@@ -501,6 +502,10 @@ final class Installer
             return $this;
         }
 
+        if ($this->usingSubProcess && ! TtyDetector::isTtySupported()) {
+            return $this->cachePostInstallInstructions();
+        }
+
         if (isset($postInstallHook->registerCommands)) {
             foreach ($postInstallHook->registerCommands as $command) {
                 $this->registerInstalledCommand($command);
@@ -508,6 +513,26 @@ final class Installer
         }
 
         $postInstallHook->handle($this->console);
+
+        return $this;
+    }
+
+    /**
+     * Cache post install instructions for parent process (ie. statamic/cli installer).
+     *
+     * @return $this
+     */
+    protected function cachePostInstallInstructions()
+    {
+        $path = $this->preparePath(storage_path('statamic/tmp/cli/post-install-instructions.txt'));
+
+        $instructions = <<<"EOT"
+Warning: TTY not supported in this environment!
+To complete this installation, run the following command from your new site directory:
+php please starter-kit:run-post-install $this->package
+EOT;
+
+        $this->files->put($path, $instructions);
 
         return $this;
     }
