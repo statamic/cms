@@ -593,6 +593,18 @@ EOT;
         $this->installCoolRunnings();
     }
 
+    /** @test */
+    public function it_can_register_and_run_newly_installed_command_in_post_install_hook()
+    {
+        Hook::swap(new FakeHook);
+
+        $this->assertFalse(Blink::has('starter-kit-command-run'));
+
+        $this->installCoolRunnings();
+
+        $this->assertTrue(Blink::has('starter-kit-command-run'));
+    }
+
     private function kitRepoPath($path = null)
     {
         return collect([base_path('repo/cool-runnings'), $path])->filter()->implode('/');
@@ -791,5 +803,35 @@ class FakeComposer
     public function __call($method, $args)
     {
         return $this;
+    }
+}
+
+class FakeHook
+{
+    public function find()
+    {
+        return new StarterKitPostInstall;
+    }
+}
+
+class StarterKitPostInstall
+{
+    public $registerCommands = [
+        StarterKitTestCommand::class,
+    ];
+
+    public function handle($console)
+    {
+        $console->call('statamic:test:starter-kit-command');
+    }
+}
+
+class StarterKitTestCommand extends \Illuminate\Console\Command
+{
+    protected $name = 'statamic:test:starter-kit-command';
+
+    public function handle()
+    {
+        Blink::put('starter-kit-command-run', true);
     }
 }
