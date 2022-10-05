@@ -65,6 +65,12 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
             $this->original[$property] = $this->{$property};
         }
 
+        // Temporary performance hotfix for when running `stache:refresh` or `stache:warm` with
+        // assets in S3, as we don't need to sync `$this->meta('data')` in those situations.
+        if (Str::startsWith(Arr::get(request()->server(), 'argv.1'), 'stache:')) {
+            return $this;
+        }
+
         $this->original['data'] = $this->metaExists() ? $this->meta('data') : $this->data->all();
 
         return $this;
