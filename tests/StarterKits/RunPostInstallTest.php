@@ -58,7 +58,7 @@ class RunPostInstallTest extends TestCase
             ->artisan('statamic:starter-kit:run-post-install', [
                 'package' => 'statamic/cool-runnings',
             ])
-            ->assertOk();
+            ->assertSuccessful();
 
         // Now we should see that the hook has been run, and the starter kit has been cleaned up from vendor
         $this->assertTrue(Blink::has('post-install-hook-run'));
