@@ -36,6 +36,12 @@ class StarterKitRunPostInstall extends Command
             return;
         }
 
+        if (! app('files')->exists(base_path("vendor/{$package}"))) {
+            $this->error("Cannot find starter kit [{$package}] in vendor.");
+
+            return 1;
+        }
+
         $installer = StarterKitInstaller::package($package, $this);
 
         try {

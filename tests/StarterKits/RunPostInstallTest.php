@@ -4,6 +4,7 @@ namespace Tests\StarterKits;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Console\Processes\TtyDetector;
+use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use Statamic\Facades\Blink;
@@ -50,15 +51,57 @@ class RunPostInstallTest extends TestCase
         $this->assertFileExists(base_path('composer.json'));
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists($this->kitVendorPath());
+        $this->assertFileExists($this->kitVendorPath('StarterKitPostInstall.php'));
         $this->assertFalse(Blink::has('post-install-hook-run'));
 
-        $this->artisan('statamic:starter-kit:run-post-install', [
-            'package' => 'statamic/cool-runnings',
-        ]);
+        $this
+            ->artisan('statamic:starter-kit:run-post-install', [
+                'package' => 'statamic/cool-runnings',
+            ])
+            ->assertOk();
 
         // Now we should see that the hook has been run, and the starter kit has been cleaned up from vendor
         $this->assertTrue(Blink::has('post-install-hook-run'));
         $this->assertFileNotExists($this->kitVendorPath());
+    }
+
+    /** @test */
+    public function it_errors_gracefully_if_post_install_hook_cannot_be_found()
+    {
+        $this->simulateCliInstallWithoutTtySupport();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn(false);
+
+        $this
+            ->artisan('statamic:starter-kit:run-post-install', [
+                'package' => 'statamic/cool-runnings',
+            ])
+            ->expectsOutput('Cannot find post-install hook for [statamic/cool-runnings].')
+            ->assertFailed();
+
+        $this->assertFalse(Blink::has('post-install-hook-run'));
+        $this->assertFileExists($this->kitVendorPath());
+    }
+
+    /** @test */
+    public function it_errors_gracefully_if_starter_kit_package_doesnt_exist_in_vendor()
+    {
+        $this->simulateCliInstallWithoutTtySupport();
+
+        Hook::shouldReceive('find')->never();
+
+        $this
+            ->artisan('statamic:starter-kit:run-post-install', [
+                'package' => 'statamic/non-existent',
+            ])
+            ->expectsOutput('Cannot find starter kit [statamic/non-existent] in vendor.')
+            ->assertFailed();
+
+        $this->assertFalse(Blink::has('post-install-hook-run'));
+        $this->assertFileExists($this->kitVendorPath());
     }
 
     private function kitRepoPath($path = null)
