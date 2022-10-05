@@ -587,7 +587,7 @@ EOT;
      *
      * @return $this
      */
-    protected function removeStarterKit()
+    public function removeStarterKit()
     {
         if ($this->disableCleanup) {
             return $this;

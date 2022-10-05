@@ -39,7 +39,7 @@ class StarterKitRunPostInstall extends Command
         $installer = StarterKitInstaller::package($package, $this);
 
         try {
-            $installer->runPostInstallHook(true);
+            $installer->runPostInstallHook(true)->removeStarterKit();
         } catch (StarterKitException $exception) {
             $this->error($exception->getMessage());
 
