@@ -126,7 +126,7 @@ class RunPostInstallTest extends TestCase
 
     private function simulateCliInstallWithoutTtySupport()
     {
-        Http::fake($customFake ?? [
+        Http::fake([
             'outpost.*' => Http::response(['data' => ['price' => null]], 200),
             'repo.packagist.org/*' => Http::response('', 200),
             '*' => Http::response('', 404),
