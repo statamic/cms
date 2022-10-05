@@ -15,7 +15,7 @@ class TtyDetector
     public function isTtySupported()
     {
         try {
-            (new Process)->setTty(true);
+            (new Process([]))->setTty(true);
         } catch (RuntimeException $exception) {
             return false;
         }
