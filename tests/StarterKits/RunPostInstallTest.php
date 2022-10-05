@@ -58,7 +58,7 @@ class RunPostInstallTest extends TestCase
             ->artisan('statamic:starter-kit:run-post-install', [
                 'package' => 'statamic/cool-runnings',
             ])
-            ->assertSuccessful();
+            ->assertExitCode(0);
 
         // Now we should see that the hook has been run, and the starter kit has been cleaned up from vendor
         $this->assertTrue(Blink::has('post-install-hook-run'));
@@ -80,7 +80,7 @@ class RunPostInstallTest extends TestCase
                 'package' => 'statamic/cool-runnings',
             ])
             ->expectsOutput('Cannot find post-install hook for [statamic/cool-runnings].')
-            ->assertFailed();
+            ->assertExitCode(1);
 
         $this->assertFalse(Blink::has('post-install-hook-run'));
         $this->assertFileExists($this->kitVendorPath());
@@ -98,7 +98,7 @@ class RunPostInstallTest extends TestCase
                 'package' => 'statamic/non-existent',
             ])
             ->expectsOutput('Cannot find starter kit [statamic/non-existent] in vendor.')
-            ->assertFailed();
+            ->assertExitCode(1);
 
         $this->assertFalse(Blink::has('post-install-hook-run'));
         $this->assertFileExists($this->kitVendorPath());
