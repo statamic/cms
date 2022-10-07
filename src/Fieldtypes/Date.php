@@ -197,11 +197,11 @@ class Date extends Fieldtype
             return $start.' - '.$end;
         }
         
-        if(!is_null($this->config('format'))){
-            return Carbon::createFromFormat($this->config('format'), $data)->format($this->indexDisplayFormat());
+        if(is_null($this->config('format'))){
+            return Carbon::parse($data)->format($this->indexDisplayFormat());
         }
 
-        return Carbon::parse($data)->format($this->indexDisplayFormat());
+        return Carbon::createFromFormat($this->config('format'), $data)->format($this->indexDisplayFormat());
     }
 
     private function saveFormat()
