@@ -32,6 +32,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\StacheDoctor::class,
         Commands\StarterKitExport::class,
         Commands\StarterKitInstall::class,
+        Commands\StarterKitRunPostInstall::class,
         Commands\StaticClear::class,
         Commands\StaticWarm::class,
         // Commands\MakeUserMigration::class,

@@ -24,6 +24,10 @@
 	@apply bg-white w-full pt-1 z-10 pl-2 static;
 }
 
+.mode-grid .rotating-dots-button {
+    @apply bg-white;
+}
+
 .data-list-footer {
     @apply py-1.5 pr-2 flex items-center border-t;
 }

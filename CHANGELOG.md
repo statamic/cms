@@ -1,5 +1,112 @@
 # Release Notes
 
+## 3.3.43 (2022-10-05)
+
+### What's improved
+- Command registration in starter kit post-install hooks. [#6807](http://github.com/statamic/cms/issues/6807) by @jesseleite
+
+### What's fixed
+- Fix starter kit post-install for statamic/cli users in Windows. [#6830](http://github.com/statamic/cms/issues/6830) by @jesseleite
+- Fix `stache:warm` and `stache:refresh` performance regression when using S3 assets. [#6835](http://github.com/statamic/cms/issues/6835) by @jesseleite
+
+
+
+## 3.3.42 (2022-10-03)
+
+### What's new
+- Added a filter for the `users` fieldtype. [#6654](https://github.com/statamic/cms/issues/6654) by @jacksleight
+- Add `width` to GraphQL form field type. [#6815](https://github.com/statamic/cms/issues/6815) by @duncanmcclean
+
+### What's improved
+- An exception is thrown if composer.lock is missing when finding the Statamic version. [#6808](https://github.com/statamic/cms/issues/6808) by @flolanger
+- Resolve redirects through fieldtype. [#6562](https://github.com/statamic/cms/issues/6562) by @jacksleight
+- German translations. [#6809](https://github.com/statamic/cms/issues/6809) by @dominikradl
+
+### What's fixed
+- Fix focal point not saving when asset blueprint has no fields [#6814](https://github.com/statamic/cms/issues/6814) by @ncla
+- Fix asset meta bottleneck. [#6822](https://github.com/statamic/cms/issues/6822) by @jasonvarga
+- Avoid prompt to make user when installing starter kit via statamic/cli. [#6810](https://github.com/statamic/cms/issues/6810) by @jesseleite
+
+
+
+## 3.3.41 (2022-09-29)
+
+### What's new
+- Starter kit post-install hooks. [#6792](https://github.com/statamic/cms/issues/6792) by @jesseleite
+
+### What's improved
+- Asset's glide cache is busted when `focus` changes. [#6769](https://github.com/statamic/cms/issues/6769) by @edalzell
+- Dutch translations. [#6805](https://github.com/statamic/cms/issues/6805) by @robdekort
+
+### What's fixed
+- Uppercase acronyms are left alone in the `title` modifier. [#6783](https://github.com/statamic/cms/issues/6783) by @joshuablum
+- Fix `assets` fieldtype error. [#6799](https://github.com/statamic/cms/issues/6799) by @jacksleight
+- Fix GitHub Action workflow to test on multiple Laravel versions. [#6801](https://github.com/statamic/cms/issues/6801) by @crynobone
+
+
+
+## 3.3.40 (2022-09-27)
+
+### What's improved
+- French translations [#6780](https://github.com/statamic/cms/issues/6780) by @ebeauchamps
+
+### What's fixed
+- Fix asset selector grid columns. [#6790](https://github.com/statamic/cms/issues/6790) by @jacksleight
+- Fix asset browse button inside link fieldtype. [#6788](https://github.com/statamic/cms/issues/6788) by @jacksleight
+- Fix Bard set menu options not working. [#6779](https://github.com/statamic/cms/issues/6779) by @jacksleight
+
+
+
+## 3.3.39 (2022-09-23)
+
+### What's new
+- Ability to replace assets by either changing references to another asset, or reuploading a file. [#4832](https://github.com/statamic/cms/issues/4832) by @jesseleite
+
+### What's fixed
+- Improve handling of invalid Replicator and Bard field data [#6708](https://github.com/statamic/cms/issues/6708) by @jacksleight
+- Fix shallow Bard set drag and drop ghost in Chrome [#6776](https://github.com/statamic/cms/issues/6776) by @jacksleight
+
+
+
+## 3.3.38 (2022-09-22)
+
+### What's new
+- Add single asset/folder actions to grid view. [#6677](https://github.com/statamic/cms/issues/6677) by @jacksleight
+- Add `key_by` modifier. [#6763](https://github.com/statamic/cms/issues/6763) by @jasonvarga
+- Add `glide:data_url` tag to generate data URLs. [#6753](https://github.com/statamic/cms/issues/6753) by @jacksleight
+- Add `collapse` option to Bard fieldtype. [#6734](https://github.com/statamic/cms/issues/6734) by @jacksleight
+- Add `cookie` tag [#6748](https://github.com/statamic/cms/issues/6748) by @ryanmitchell
+- Add custom build directory and hot file to `vite` tag. [#6752](https://github.com/statamic/cms/issues/6752) by @joshuablum
+- Add `files` fieldtype. [#6736](https://github.com/statamic/cms/issues/6736) by @jasonvarga
+
+### What's improved
+- Asset Browser thumbnail style now matches the fieldtype. [#6715](https://github.com/statamic/cms/issues/6715) by @jackmcdade
+- Improve display of Grid and Replicator replicator preview. [#6733](https://github.com/statamic/cms/issues/6733) by @jacksleight
+- SVGs get a better replicator preview, and ability to set alt text. [#6765](https://github.com/statamic/cms/issues/6765) by @jacksleight
+- Spanish Translations. [#6761](https://github.com/statamic/cms/issues/6761) by @cesaramirez
+
+### What's fixed
+- Fix asset replicator preview. [#6732](https://github.com/statamic/cms/issues/6732) by @jacksleight
+- Fix using prefixed variables in conditions. [#6760](https://github.com/statamic/cms/issues/6760) by @JohnathonKoster
+- Fix action value processing. [#6754](https://github.com/statamic/cms/issues/6754) by @jasonvarga
+
+
+
+## 3.3.37 (2022-09-20)
+
+### What's new
+- Add Portuguese Brazilian translation. [#6739](https://github.com/statamic/cms/issues/6739) by @rodrigomantoan
+
+### What's improved
+- German translations. [#6716](https://github.com/statamic/cms/issues/6716) by @helloDanuk
+
+### What's fixed
+- Fix live preview scroll position handling when url contains a port number. [#6742](https://github.com/statamic/cms/issues/6742) by @o1y
+- Fix plus buttons spacing in Replicator. [#6722](https://github.com/statamic/cms/issues/6722) by @arthurperton
+- Fix static cache invalidation. [#6720](https://github.com/statamic/cms/issues/6720) by @jasonvarga
+
+
+
 ## 3.3.36 (2022-09-13)
 
 ### What's new

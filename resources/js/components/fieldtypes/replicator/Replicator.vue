@@ -118,6 +118,10 @@ export default {
 
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
+        },
+
+        replicatorPreview() {
+            return `${this.config.display}: ${__n(':count set|:count sets', this.value.length)}`;
         }
     },
 

@@ -16,6 +16,10 @@
     @apply p-1 min-h-48;
 }
 
+.bard-editor .bard-invalid {
+    @apply p-1 bg-red-lighter text-red text-xs whitespace-no-wrap;
+}
+
 // Modes
 .bard-editor.mode\:read-only .ProseMirror {
     @apply bg-grey-30 text-grey-70;
@@ -28,6 +32,7 @@
 // Responive Wangjangling
 @screen md {
     .bard-editor .ProseMirror { @apply p-2; }
+    .bard-editor .bard-invalid { @apply px-2; }
 }
 
 .bard-fixed-toolbar {
@@ -176,6 +181,10 @@
         bottom: 0;
         z-index: 10;
     }
+}
+
+.bard-set:active .sortable-handle:hover ~ * .popover {
+    display: none;
 }
 
 .bard-set.has-error > .replicator-set-header label {

@@ -9,7 +9,7 @@
                         <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>
                 </template>
-                <template #default="{ close: closePopover }">
+                <template #default="{ close: closePopover, afterClosed: afterPopoverClosed }">
                     <div class="flex flex-col text-left w-64">
                         <h6 class="p-2 pb-0" v-text="__('Show everything where:')"/>
                         <div v-if="showFilterSelection" class="p-2 pt-1">
@@ -27,6 +27,8 @@
                                 ref="fieldFilter"
                                 :config="fieldFilter"
                                 :values="activeFilters.fields || {}"
+                                :badges="fieldFilterBadges"
+                                :popover-closed="afterPopoverClosed"
                                 @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
                                 @cleared="creating = false"
                                 @closed="closePopover"

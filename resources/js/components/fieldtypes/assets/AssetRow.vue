@@ -53,6 +53,7 @@
                 :allow-deleting="false"
                 @closed="closeEditor"
                 @saved="assetSaved"
+                @action-completed="actionCompleted"
             >
             </asset-editor>
         </td>
@@ -66,7 +67,7 @@ export default {
 
     computed: {
         needsAlt() {
-            return this.asset.isImage && !this.asset.values.alt;
+            return (this.asset.isImage || this.asset.isSvg) && !this.asset.values.alt;
         }
     }
 };

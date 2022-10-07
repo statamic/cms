@@ -35,7 +35,9 @@ class Fields extends Filter
                 return isset($values[$handle]);
             })
             ->each(function ($field, $handle) use ($query, $values) {
-                $field->fieldtype()->filter()->apply($query, $handle, $values[$handle]);
+                $filter = $field->fieldtype()->filter();
+                $values = $filter->fields()->addValues($values[$handle])->process()->values();
+                $filter->apply($query, $handle, $values);
             });
     }
 
@@ -46,8 +48,12 @@ class Fields extends Filter
                 return isset($values[$handle]);
             })
             ->map(function ($field, $handle) use ($values) {
-                return $field->fieldtype()->filter()->badge($values[$handle]);
+                $filter = $field->fieldtype()->filter();
+                $values = $filter->fields()->addValues($values[$handle])->process()->values();
+
+                return $filter->badge($values);
             })
+            ->filter()
             ->all();
     }
 
