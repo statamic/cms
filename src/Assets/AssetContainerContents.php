@@ -140,7 +140,7 @@ class AssetContainerContents
 
     public function filteredFilesIn($folder, $recursive)
     {
-        if (isset($this->filteredFiles[$key = $folder.($recursive ? '-recursive' : '')])) {
+        if (isset($this->filteredFiles[$key = $folder.($recursive ? '-recursive' : '')]) && ! Statamic::isWorker()) {
             return $this->filteredFiles[$key];
         }
 
@@ -170,7 +170,7 @@ class AssetContainerContents
 
     public function filteredDirectoriesIn($folder, $recursive)
     {
-        if (isset($this->filteredDirectories[$key = $folder.($recursive ? '-recursive' : '')])) {
+        if (isset($this->filteredDirectories[$key = $folder.($recursive ? '-recursive' : '')]) && ! Statamic::isWorker()) {
             return $this->filteredDirectories[$key];
         }
 
