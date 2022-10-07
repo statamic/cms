@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Statamic\Facades\User;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use Tests\Fakes\FakeArtisanRequest;
 
 class StatamicTest extends TestCase
 {
@@ -316,39 +317,19 @@ class StatamicTest extends TestCase
         $this->assertFalse(Statamic::isWorker());
 
         // It should return false when being called from a custom command
-        Request::swap(new FakeRequest('stache:clear'));
+        Request::swap(new FakeArtisanRequest('stache:clear'));
         $this->assertFalse(Statamic::isWorker());
-        Request::swap(new FakeRequest('statamic:install'));
+        Request::swap(new FakeArtisanRequest('statamic:install'));
         $this->assertFalse(Statamic::isWorker());
 
         // It should return true when being called from any command beginning with `queue:`
-        Request::swap(new FakeRequest('queue:listen'));
+        Request::swap(new FakeArtisanRequest('queue:listen'));
         $this->assertTrue(Statamic::isWorker());
-        Request::swap(new FakeRequest('queue:work'));
+        Request::swap(new FakeArtisanRequest('queue:work'));
         $this->assertTrue(Statamic::isWorker());
 
         // It should always return false when not running in console
         App::shouldReceive('runningInConsole')->andReturn(false);
         $this->assertFalse(Statamic::isWorker());
-    }
-}
-
-class FakeRequest extends \Illuminate\Http\Request
-{
-    protected $artisanCommand;
-
-    public function __construct($artisanCommand)
-    {
-        $this->artisanCommand = $artisanCommand;
-    }
-
-    public function server($key = null, $default = null)
-    {
-        return [
-            'argv' => [
-                'artisan',
-                $this->artisanCommand,
-            ],
-        ];
     }
 }
