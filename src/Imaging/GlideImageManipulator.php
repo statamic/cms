@@ -264,6 +264,17 @@ class GlideImageManipulator implements ImageManipulator
      * @param  string  $value
      * @return $this
      */
+    public function flip($value)
+    {
+        $this->params['flip'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param  string  $value
+     * @return $this
+     */
     public function brightness($value)
     {
         $this->params['bri'] = $value;
