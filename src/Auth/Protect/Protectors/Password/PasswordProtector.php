@@ -4,8 +4,6 @@ namespace Statamic\Auth\Protect\Protectors\Password;
 
 use Facades\Statamic\Auth\Protect\Protectors\Password\Token;
 use Statamic\Auth\Protect\Protectors\Protector;
-use Statamic\CP\LivePreview;
-use Statamic\Statamic;
 
 class PasswordProtector extends Protector
 {
