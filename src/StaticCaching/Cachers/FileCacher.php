@@ -225,6 +225,8 @@ fetch('/!/nocache', {
     for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
         meta.content = data.csrf;
     }
+    
+    document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));
 });
 EOT;
 
