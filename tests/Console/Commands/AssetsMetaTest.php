@@ -24,7 +24,7 @@ class AssetsMetaTest extends TestCase
      */
     private $sampleTextFileContentArray = [
         'data' => [
-            'foo' => 'bar'
+            'foo' => 'bar',
         ],
         'size' => 6,
         'last_modified' => 1665086377,
@@ -45,7 +45,7 @@ class AssetsMetaTest extends TestCase
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__ . '/__fixtures__/container',
+            'root' => __DIR__.'/__fixtures__/container',
         ]]);
 
         $container = (new AssetContainer)->handle('test')->disk('test');
