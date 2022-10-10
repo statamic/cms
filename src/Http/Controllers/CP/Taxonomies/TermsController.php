@@ -97,6 +97,7 @@ class TermsController extends CpController
                 'revisions' => $term->revisionsUrl(),
                 'restore' => $term->restoreRevisionUrl(),
                 'createRevision' => $term->createRevisionUrl(),
+                'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $term->id()]),
             'meta' => $meta,
