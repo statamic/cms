@@ -218,11 +218,11 @@ fetch('/!/nocache', {
         if (map[key]) map[key].outerHTML = regions[key];
     }
 
-    for (const input of document.querySelectorAll('input[value=$csrfPlaceholder]')) {
+    for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
         input.value = data.csrf;
     }
 
-    for (const meta of document.querySelectorAll('meta[content=$csrfPlaceholder]')) {
+    for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
         meta.content = data.csrf;
     }
 });
