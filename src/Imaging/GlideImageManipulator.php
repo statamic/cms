@@ -53,6 +53,7 @@ class GlideImageManipulator implements ImageManipulator
         'dpr',
         'filt',
         'fit',
+        'flip',
         'fm',
         'gam',
         'h',
@@ -256,17 +257,6 @@ class GlideImageManipulator implements ImageManipulator
     public function orient($value)
     {
         $this->params['or'] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param  string  $value
-     * @return $this
-     */
-    public function flip($value)
-    {
-        $this->params['flip'] = $value;
 
         return $this;
     }

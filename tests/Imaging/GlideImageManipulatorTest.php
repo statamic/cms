@@ -115,7 +115,6 @@ class GlideImageManipulatorTest extends TestCase
             'height' => ['height', 10, ['h' => 10]],
             'square' => ['square', 50, ['w' => 50, 'h' => 50]],
             'orient' => ['orient', 90, ['or' => 90]],
-            'flip' => ['flip', 'h', ['flip' => 'h']],
             'brightness' => ['brightness', 50, ['bri' => 50]],
             'contrast' => ['contrast', 50, ['con' => 50]],
             'gamma' => ['gamma', 50, ['gam' => 50]],
