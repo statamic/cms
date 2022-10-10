@@ -226,7 +226,7 @@ fetch('/!/nocache', {
         meta.content = data.csrf;
     }
     
-    document.dispatchEvent(new CustomEvent('statamic::nocache-replaced'));
+    document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));
 });
 EOT;
 
