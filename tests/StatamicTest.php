@@ -327,6 +327,8 @@ class StatamicTest extends TestCase
         $this->assertTrue(Statamic::isWorker());
         Request::swap(new FakeArtisanRequest('queue:work'));
         $this->assertTrue(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('horizon:work'));
+        $this->assertTrue(Statamic::isWorker());
 
         // It should always return false when not running in console
         App::shouldReceive('runningInConsole')->andReturn(false);
