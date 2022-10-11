@@ -116,16 +116,15 @@ class FileCacher extends AbstractCacher
      */
     public function invalidateUrl($url, $domain = null)
     {
-        if (! $key = $this->getUrls($domain)->flip()->get($url)) {
-            // URL doesn't exist, nothing to invalidate.
-            return;
-        }
-
         $site = optional(Site::findByUrl($domain.$url))->handle();
 
-        $this->writer->delete($this->getFilePath($url, $site));
-
-        $this->forgetUrl($key, $domain);
+        $this
+            ->getUrls($domain)
+            ->filter(fn ($value) => str_starts_with($value, $url))
+            ->each(function ($value, $key) use ($site, $domain) {
+                $this->writer->delete($this->getFilePath($value, $site));
+                $this->forgetUrl($key, $domain);
+            });
     }
 
     public function getCachePaths()
