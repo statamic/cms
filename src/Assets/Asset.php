@@ -624,7 +624,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      * Get or set the container where this asset is located.
      *
      * @param  string|AssetContainerContract  $container  ID of the container
-     * @return AssetContainerContract|self
+     * @return AssetContainerContract
      */
     public function container($container = null)
     {
