@@ -3,11 +3,13 @@
 namespace Tests;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\User;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use Tests\Fakes\FakeArtisanRequest;
 
 class StatamicTest extends TestCase
 {
@@ -306,5 +308,30 @@ class StatamicTest extends TestCase
     public function useFixtureTranslations($app)
     {
         $app->useLangPath(__DIR__.'/__fixtures__/lang');
+    }
+
+    /** @test */
+    public function it_can_detect_if_running_in_a_queue_worker()
+    {
+        // It should return false by default
+        $this->assertFalse(Statamic::isWorker());
+
+        // It should return false when being called from a custom command
+        Request::swap(new FakeArtisanRequest('stache:clear'));
+        $this->assertFalse(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('statamic:install'));
+        $this->assertFalse(Statamic::isWorker());
+
+        // It should return true when being called from any command beginning with `queue:`
+        Request::swap(new FakeArtisanRequest('queue:listen'));
+        $this->assertTrue(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('queue:work'));
+        $this->assertTrue(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('horizon:work'));
+        $this->assertTrue(Statamic::isWorker());
+
+        // It should always return false when not running in console
+        App::shouldReceive('runningInConsole')->andReturn(false);
+        $this->assertFalse(Statamic::isWorker());
     }
 }

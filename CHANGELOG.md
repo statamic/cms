@@ -1,5 +1,25 @@
 # Release Notes
 
+## 3.3.44 (2022-10-13)
+
+### What's new
+- Added JavaScript event on nocache replacement. [#6828](https://github.com/statamic/cms/issues/6828) by @DanielDarrenJones
+- Added `input_label` field to revealer config. [#6850](https://github.com/statamic/cms/issues/6850) by @jacksleight
+- Added `flip` parameter to `glide` tag. [#6852](https://github.com/statamic/cms/issues/6852) by @jacksleight
+- Added Edit Blueprint option to term publish form. [#6851](https://github.com/statamic/cms/issues/6851) by @jacksleight
+
+### What's improved
+- Auto-focus the field when opening a rename action modal. [#6858](https://github.com/statamic/cms/issues/6858) by @ncla
+- Using `status` for a field handle will now validate as a reserved word. [#6857](https://github.com/statamic/cms/issues/6857) by @jasonvarga
+
+### What's fixed
+- Fixed an asset performance issue (especially when using S3) by waiting to load metadata until necessary. [#6871](https://github.com/statamic/cms/issues/6871) by @jasonvarga
+- Fixed JS error when using nocache tags on full measure static caching and with a CSRF token starting with a number. [#6855](https://github.com/statamic/cms/issues/6855) by @jasonvarga
+- Fix `date` fieldtype format handling in listings. [#6845](https://github.com/statamic/cms/issues/6845) by @granitibrahimi
+- Fix Bard's "Save as HTML" setting label. [#6849](https://github.com/statamic/cms/issues/6849) by @jackmcdade
+
+
+
 ## 3.3.43 (2022-10-05)
 
 ### What's improved
