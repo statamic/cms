@@ -18,7 +18,7 @@ class PasswordProtector extends Protector
             abort(403);
         }
 
-        if (request()->statamicToken()) {
+        if (request()->statamicToken() && request()->statamicToken()->handler() === 'Statamic\Tokens\Handlers\LivePreview') {
             return;
         }
 
