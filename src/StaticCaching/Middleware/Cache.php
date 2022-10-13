@@ -50,7 +50,7 @@ class Cache
             $this->makeReplacementsAndCacheResponse($request, $response);
 
             $this->nocache->write();
-        } elseif ($this->shouldMakeReplacements($response)) {
+        } else {
             $this->makeReplacements($response);
         }
 
@@ -99,7 +99,7 @@ class Cache
         }
 
         // Draft and private pages should not be cached.
-        if ($this->isDraftOrPrivate($response)) {
+        if ($response->headers->has('X-Statamic-Draft') || $response->headers->has('X-Statamic-Private')) {
             return false;
         }
 
@@ -108,15 +108,5 @@ class Cache
         }
 
         return true;
-    }
-
-    private function shouldMakeReplacements($response)
-    {
-        return $this->isDraftOrPrivate($response) || $response->getStatusCode() === 404;
-    }
-
-    private function isDraftOrPrivate($response)
-    {
-        return $response->headers->has('X-Statamic-Draft') || $response->headers->has('X-Statamic-Private');
     }
 }
