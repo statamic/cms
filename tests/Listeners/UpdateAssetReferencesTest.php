@@ -775,12 +775,6 @@ class UpdateAssetReferencesTest extends TestCase
                         'container' => 'test_container',
                     ],
                 ],
-                [
-                    'handle' => 'name',
-                    'field' => [
-                        'type' => 'text',
-                    ],
-                ],
             ],
         ]);
 
