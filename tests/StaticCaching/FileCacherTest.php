@@ -192,6 +192,26 @@ class FileCacherTest extends TestCase
     }
 
     /** @test */
+    public function invalidating_a_url_deletes_the_file_and_removes_the_url_for_query_string_versions_too()
+    {
+        $writer = \Mockery::spy(Writer::class);
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacher([], $writer, $cache, []);
+
+        $cache->forever($this->cacheKey('http://example.com'), [
+            'one' => '/one',
+            'oneqs' => '/one?foo=bar',
+            'two' => '/two',
+        ]);
+
+        $cacher->invalidateUrl('/one', 'http://example.com');
+
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one'));
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one?foo=bar'));
+        $this->assertEquals(['two' => '/two'], $cacher->getUrls('http://example.com')->all());
+    }
+
+    /** @test */
     public function invalidating_a_url_deletes_the_file_and_removes_the_url_when_using_multisite()
     {
         Site::setConfig(['sites' => [
