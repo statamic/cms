@@ -50,7 +50,7 @@ class Cache
             $this->makeReplacementsAndCacheResponse($request, $response);
 
             $this->nocache->write();
-        } else {
+        } elseif (! $response->isRedirect()) {
             $this->makeReplacements($response);
         }
 
