@@ -311,7 +311,7 @@ export default {
             actions: this.initialActions,
             saving: false,
             localizing: false,
-			skipDesync: false,
+            skipDesyncFields: new Set(),
             fieldset: this.initialFieldset,
             title: this.initialTitle,
             values: _.clone(this.initialValues),
@@ -665,7 +665,7 @@ export default {
                 return;
 
             this.localizedFields = this.localizedFields.filter(field => field !== handle);
-            this.skipDesync = handle;
+            this.skipDesync(handle);
             this.$refs.container.setFieldValue(handle, this.originValues[handle]);
 
             // Update the meta for this field. For instance, a relationship field would have its data preloaded into it.
@@ -673,12 +673,15 @@ export default {
             this.meta[handle] = this.originMeta[handle];
         },
 
-        desyncField(handle) {
-            if (handle === this.skipDesync) {
-                this.skipDesync = false;
+        skipDesync(handle) {
+            this.skipDesyncFields.add(handle);
 
+            setTimeout(() => this.skipDesyncFields.delete(handle), 300);
+        },
+
+        desyncField(handle) {
+            if (this.skipDesyncFields.has(handle))
                 return;
-            }
 
             if (!this.localizedFields.includes(handle))
                 this.localizedFields.push(handle);
