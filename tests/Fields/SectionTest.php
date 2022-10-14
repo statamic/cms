@@ -150,6 +150,7 @@ class SectionTest extends TestCase
                     'default' => null,
                     'visibility' => 'visible',
                     'read_only' => false, // deprecated
+                    'always_save' => false,
                 ],
                 [
                     'handle' => 'two',
@@ -166,6 +167,7 @@ class SectionTest extends TestCase
                     'default' => null,
                     'visibility' => 'visible',
                     'read_only' => false, // deprecated
+                    'always_save' => false,
                 ],
             ],
         ], $section->toPublishArray());

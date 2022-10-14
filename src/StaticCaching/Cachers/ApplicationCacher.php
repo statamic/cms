@@ -35,7 +35,7 @@ class ApplicationCacher extends AbstractCacher
         $key = $this->makeHash($url);
 
         // Keep track of the URL and key the response content is about to be stored within.
-        $this->cacheUrl($key, $url);
+        $this->cacheUrl($key, ...$this->getPathAndDomain($url));
 
         $key = $this->normalizeKey('responses:'.$key);
         $value = $this->normalizeContent($content);
@@ -103,13 +103,12 @@ class ApplicationCacher extends AbstractCacher
      */
     public function invalidateUrl($url, $domain = null)
     {
-        if (! $key = $this->getUrls($domain)->flip()->get($url)) {
-            // URL doesn't exist, nothing to invalidate.
-            return;
-        }
-
-        $this->cache->forget($this->normalizeKey('responses:'.$key));
-
-        $this->forgetUrl($key);
+        $this
+            ->getUrls($domain)
+            ->filter(fn ($value) => str_starts_with($value, $url))
+            ->each(function ($value, $key) {
+                $this->cache->forget($this->normalizeKey('responses:'.$key));
+                $this->forgetUrl($key);
+            });
     }
 }

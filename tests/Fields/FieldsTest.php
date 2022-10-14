@@ -424,6 +424,7 @@ class FieldsTest extends TestCase
                 'default' => null,
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
+                'always_save' => false,
             ],
             [
                 'handle' => 'two',
@@ -440,6 +441,7 @@ class FieldsTest extends TestCase
                 'default' => null,
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
+                'always_save' => false,
             ],
         ], $fields->toPublishArray());
     }
@@ -497,6 +499,7 @@ class FieldsTest extends TestCase
                 'default' => null,
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
+                'always_save' => false,
             ],
             [
                 'handle' => 'nested_deeper_two',
@@ -515,6 +518,7 @@ class FieldsTest extends TestCase
                 'default' => null,
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
+                'always_save' => false,
             ],
         ], $fields->toPublishArray());
     }

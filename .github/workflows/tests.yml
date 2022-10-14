@@ -19,18 +19,14 @@ jobs:
         os: [ubuntu-latest]
         include:
           - laravel: 8.*
-            framework: ^8.48.0
           - laravel: 9.*
-            framework: ^9.0
           - os: windows-latest
             php: 7.4
             laravel: 8.*
-            framework: ^8.48.0
             stability: prefer-stable
           - os: windows-latest
             php: 8.1
             laravel: 9.*
-            framework: ^9.0
             stability: prefer-stable
         exclude:
           - laravel: 9.*
@@ -50,21 +46,40 @@ jobs:
           coverage: none
 
       - name: Set PHP 7.4 Mockery
-        run: composer require "mockery/mockery >=1.2.3" --no-interaction --no-update
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "mockery/mockery >=1.2.3" --no-interaction --no-update
         if: matrix.php >= 7.4 && matrix.php <8.0
 
       - name: Set PHP 8 Mockery
-        run: composer require "mockery/mockery >=1.3.3" --no-interaction --no-update
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "mockery/mockery >=1.3.3" --no-interaction --no-update
         if: matrix.php >= 8.0
 
       - name: Set PHP 8.1 Testbench
-        run: composer require "orchestra/testbench ^6.22.0" --no-interaction --no-update
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require "orchestra/testbench ^6.22.0" --no-interaction --no-update
         if: matrix.laravel == '8.*' && matrix.php >= 8.1
 
       - name: Install dependencies
-        run: |
-          composer require "laravel/framework:${{ matrix.framework }}" --no-interaction --no-update
-          composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: |
+            composer require "illuminate/contracts:${{ matrix.laravel }}" --dev --no-interaction --no-update
+            composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+
+      - name: List Installed Dependencies
+        run: composer show -D
 
       - name: Execute tests
         run: vendor/bin/phpunit

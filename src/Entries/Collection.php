@@ -25,6 +25,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayable
@@ -302,9 +303,12 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint;
 
         return Blink::once($blink, function () use ($blueprint) {
-            return is_null($blueprint)
-                ? $this->entryBlueprints()->reject->hidden()->first()
-                : $this->entryBlueprints()->keyBy->handle()->get($blueprint);
+            if (is_null($blueprint)) {
+                return $this->entryBlueprints()->reject->hidden()->first();
+            }
+
+            return $this->entryBlueprints()->keyBy->handle()->get($blueprint)
+                ?? $this->entryBlueprints()->keyBy->handle()->get(Str::singular($blueprint));
         });
     }
 
@@ -321,12 +325,12 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function fallbackEntryBlueprint()
     {
-        $blueprint = Blueprint::find('default')
-            ->setHandle($this->handle())
+        $blueprint = (clone Blueprint::find('default'))
+            ->setHandle(Str::singular($this->handle()))
             ->setNamespace('collections.'.$this->handle());
 
         $contents = $blueprint->contents();
-        $contents['title'] = $this->title();
+        $contents['title'] = Str::singular($this->title());
         $blueprint->setContents($contents);
 
         return $blueprint;
@@ -578,6 +582,16 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->fluentlyGetOrSet('pastDateBehavior')
             ->getter(function ($behavior) {
                 return $behavior ?? 'public';
+            })
+            ->args(func_get_args());
+    }
+
+    public function revisions($enabled = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('revisions')
+            ->getter(function ($behavior) {
+                return $behavior ?? false;
             })
             ->args(func_get_args());
     }

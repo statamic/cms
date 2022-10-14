@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Config;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;
@@ -18,19 +19,38 @@ class Email extends Mailable
     use Queueable, SerializesModels;
 
     protected $submission;
+    protected $submissionData;
     protected $config;
     protected $site;
 
     public function __construct(Submission $submission, array $config, Site $site)
     {
         $this->submission = $submission;
-        $this->config = $this->parseConfig($config);
+        $this->config = $config;
         $this->site = $site;
         $this->locale($site->lang());
     }
 
+    public function getSubmission()
+    {
+        return $this->submission;
+    }
+
+    public function getSite()
+    {
+        return $this->site;
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
     public function build()
     {
+        $this->submissionData = $this->submission->toAugmentedArray();
+        $this->config = $this->parseConfig($this->config);
+
         $this
             ->subject(isset($this->config['subject']) ? __($this->config['subject']) : __('Form Submission'))
             ->addAddresses()
@@ -89,18 +109,16 @@ class Email extends Mailable
             return $this;
         }
 
-        $augmented = $this->submission->toAugmentedArray();
-
-        $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
+        $this->getRenderableFieldData(Arr::except($this->submissionData, ['id', 'date', 'form']))
             ->filter(function ($field) {
                 return $field['fieldtype'] === 'assets';
             })
             ->each(function ($field) {
                 $value = $field['value']->value();
 
-                if (array_get($field, 'config.max_files') === 1) {
-                    $value = collect([$value])->filter();
-                }
+                $value = array_get($field, 'config.max_files') === 1
+                    ? collect([$value])->filter()
+                    : $value->get();
 
                 foreach ($value as $file) {
                     $this->attachFromStorageDisk($file->container()->diskHandle(), $file->path());
@@ -182,10 +200,10 @@ class Email extends Mailable
 
     protected function parseConfig(array $config)
     {
-        $data = $this->submission->toArray();
+        return collect($config)->map(function ($value) {
+            $value = Parse::env($value); // deprecated
 
-        return collect($config)->map(function ($value) use ($data) {
-            return (string) Parse::template(Parse::env($value), $data);
+            return (string) Antlers::parse($value, $this->submissionData);
         });
     }
 }

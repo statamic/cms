@@ -197,7 +197,7 @@ class EntriesController extends CpController
             $entry->blueprint($explicitBlueprint);
         }
 
-        $values = $values->except(['slug', 'date']);
+        $values = $values->except(['slug', 'date', 'published']);
 
         if ($entry->hasOrigin()) {
             $entry->data($values->only($request->input('_localized')));
@@ -340,7 +340,7 @@ class EntriesController extends CpController
                 'site' => $site->handle(),
             ])->validate();
 
-        $values = $fields->process()->values()->except(['slug', 'date', 'blueprint']);
+        $values = $fields->process()->values()->except(['slug', 'date', 'blueprint', 'published']);
 
         $entry = Entry::make()
             ->collection($collection)

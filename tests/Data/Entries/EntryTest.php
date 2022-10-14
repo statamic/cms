@@ -625,11 +625,16 @@ class EntryTest extends TestCase
         $entry = new Entry;
         $this->assertEquals([], $entry->supplements()->all());
 
-        $return = $entry->setSupplement('foo', 'bar');
+        $return = $entry->setSupplement('foo', 'bar')->setSupplement('baz', null);
 
         $this->assertEquals($entry, $return);
         $this->assertEquals('bar', $entry->getSupplement('foo'));
-        $this->assertEquals(['foo' => 'bar'], $entry->supplements()->all());
+        $this->assertNull($entry->getSupplement('bar'));
+        $this->assertNull($entry->getSupplement('baz'));
+        $this->assertTrue($entry->hasSupplement('foo'));
+        $this->assertFalse($entry->hasSupplement('bar'));
+        $this->assertTrue($entry->hasSupplement('baz'));
+        $this->assertEquals(['foo' => 'bar', 'baz' => null], $entry->supplements()->all());
     }
 
     /** @test */
@@ -1015,6 +1020,19 @@ class EntryTest extends TestCase
 
         $this->assertSame($second, $entry->blueprint());
         $this->assertNotSame($first, $second);
+    }
+
+    /** @test */
+    public function it_can_set_a_blueprint_using_an_instance()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'first' => $first = (new Blueprint)->setHandle('first'),
+            'second' => $second = (new Blueprint)->setHandle('second'),
+        ]));
+        Collection::make('blog')->save();
+        $entry = (new Entry)->collection('blog')->blueprint($second);
+
+        $this->assertSame($second, $entry->blueprint());
     }
 
     /** @test */
