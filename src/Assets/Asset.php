@@ -833,7 +833,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function title()
     {
-        return $this->basename();
+        return $this->get('title') ?? $this->basename();
     }
 
     /**

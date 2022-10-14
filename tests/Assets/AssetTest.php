@@ -1433,6 +1433,21 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_title()
+    {
+        $asset = (new Asset)
+            ->path('path/to/asset.jpg')
+            ->container($this->container);
+
+        $this->assertEquals('asset.jpg', $asset->title());
+        $this->assertEquals('asset.jpg', $asset->title);
+
+        $asset->set('title', 'custom title');
+        $this->assertEquals('custom title', $asset->title());
+        $this->assertEquals('custom title', $asset->title);
+    }
+
+    /** @test */
     public function it_compiles_augmented_array_data()
     {
         Facades\Blueprint::shouldReceive('find')
@@ -1442,7 +1457,6 @@ class AssetTest extends TestCase
         $asset = (new Asset)
             ->path('path/to/asset.jpg')
             ->container($this->container)
-            ->set('title', 'test')
             ->setSupplement('foo', 'bar');
 
         $array = $asset->toAugmentedArray();
