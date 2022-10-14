@@ -115,6 +115,7 @@ return [
     'replicator.title' => 'Replicator',
     'revealer.title' => 'Revealer',
     'revealer.config.mode' => 'Choose your preferred layout style.',
+    'revealer.config.input_label' => 'Set a label to be shown in the button or beside the toggle.',
     'section.title' => 'Section',
     'select.config.clearable' => 'Enable to allow deselecting your option.',
     'select.config.multiple' => 'Allow multiple selections.',

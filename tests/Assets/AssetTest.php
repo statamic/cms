@@ -14,6 +14,7 @@ use Mockery;
 use ReflectionClass;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
+use Statamic\Assets\PendingMeta;
 use Statamic\Assets\ReplacementFile;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReplaced;
@@ -1916,14 +1917,22 @@ class AssetTest extends TestCase
     {
         $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
 
-        $this->assertEquals([], $asset->getOriginal());
+        $this->assertEquals([], $asset->getRawOriginal());
 
         $asset->syncOriginal();
 
         $this->assertEquals([
             'path' => 'path/to/test.txt',
+            'data' => new PendingMeta('data'),
+        ], $asset->getRawOriginal());
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
             'data' => [],
         ], $asset->getOriginal());
+
+        // Test that the pending meta was resolved
+        $this->assertSame($asset->getOriginal(), $asset->getRawOriginal());
 
         Storage::disk('test')->assertMissing('path/to/.meta/test.txt.yaml');
     }
@@ -1934,9 +1943,14 @@ class AssetTest extends TestCase
         Storage::disk('test')->put('path/to/.meta/test.txt.yaml', "data:\n  foo: bar");
         $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
 
-        $this->assertEquals([], $asset->getOriginal());
+        $this->assertEquals([], $asset->getRawOriginal());
 
         $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => new PendingMeta('data'),
+        ], $asset->getRawOriginal());
 
         $this->assertEquals([
             'path' => 'path/to/test.txt',
@@ -1944,6 +1958,9 @@ class AssetTest extends TestCase
                 'foo' => 'bar',
             ],
         ], $asset->getOriginal());
+
+        // Test that the pending meta was resolved
+        $this->assertSame($asset->getOriginal(), $asset->getRawOriginal());
 
         Storage::disk('test')->assertExists('path/to/.meta/test.txt.yaml');
     }
@@ -1965,9 +1982,14 @@ YAML;
             ->set('charlie', 'brown')
             ->remove('echo');
 
-        $this->assertEquals([], $asset->getOriginal());
+        $this->assertEquals([], $asset->getRawOriginal());
 
         $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => new PendingMeta('data'),
+        ], $asset->getRawOriginal());
 
         $this->assertEquals([
             'path' => 'path/to/test.txt',
@@ -1977,8 +1999,50 @@ YAML;
             ],
         ], $asset->getOriginal());
 
+        // Test that the pending meta was resolved
+        $this->assertSame($asset->getOriginal(), $asset->getRawOriginal());
+
         Storage::disk('test')->assertExists('path/to/.meta/test.txt.yaml');
         $this->assertEquals($yaml, Storage::disk('test')->get('path/to/.meta/test.txt.yaml'));
+    }
+
+    /** @test */
+    public function it_resolves_pending_original_meta_values_when_hydrating()
+    {
+        $yaml = <<<'YAML'
+data:
+  alfa: bravo
+  charlie: delta
+  echo: foxtrot
+YAML;
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', $yaml);
+
+        $asset = (new Asset)
+            ->container($this->container)
+            ->path('path/to/test.txt')
+            ->set('charlie', 'brown');
+
+        $this->assertEquals([], $asset->getRawOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => new PendingMeta('data'),
+        ], $asset->getRawOriginal());
+
+        // Setting would trigger hydration, which would trigger the pending original values to be resolved.
+        // We should not see this new value in the original state.
+        $asset->set('golf', 'hotel');
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [
+                'alfa' => 'bravo',
+                'charlie' => 'brown',
+                'echo' => 'foxtrot',
+            ],
+        ], $asset->getRawOriginal());
     }
 
     private function fakeEventWithMacros()
