@@ -1,5 +1,24 @@
 # Release Notes
 
+## 3.3.45 (2022-10-14)
+
+### What's new
+- Use a `users` search index in the control panel if one exists. [#6886](https://github.com/statamic/cms/issues/6886) by @jasonvarga
+
+### What's improved
+- French translations [#6881](https://github.com/statamic/cms/issues/6881) by @ebeauchamps
+
+### What's fixed
+- Avoid caching tokenized REST API requests. [#6806](https://github.com/statamic/cms/issues/6806) by @notnek
+- Asset title could use a field named title if one exists. [#6884](https://github.com/statamic/cms/issues/6884) by @jasonvarga
+- Fix error when updating asset references in empty bard fields. [#6825](https://github.com/statamic/cms/issues/6825) by @AndrewHaine
+- Fix nocache placeholder appearing in responses. [#6838](https://github.com/statamic/cms/issues/6838) by @arthurperton
+- Invalidate statically cached urls with query strings. [#6866](https://github.com/statamic/cms/issues/6866) by @jasonvarga
+- Fix dirty state when switching sites in entries. [#6861](https://github.com/statamic/cms/issues/6861) by @arthurperton
+- Fix issue where things wouldn't get updated appropriately when running in a queue. [#6726](https://github.com/statamic/cms/issues/6726) by @jesseleite
+
+
+
 ## 3.3.44 (2022-10-13)
 
 ### What's new
