@@ -2,8 +2,13 @@
 
 namespace Tests\Stache;
 
+use Illuminate\Cache\Events\CacheHit;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Request;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\Store;
+use Tests\Fakes\FakeArtisanRequest;
 use Tests\TestCase;
 
 class StoreTest extends TestCase
@@ -33,11 +38,62 @@ class StoreTest extends TestCase
         $property->setAccessible(true);
         $this->assertEquals('/path/to/directory/', $property->getValue($this->store));
     }
+
+    /** @test */
+    public function it_gets_the_paths_from_the_cache_only_once()
+    {
+        $store = $this->store->directory('/path/to/directory');
+        $cacheKey = "stache::indexes::{$store->key()}::path";
+
+        Cache::put($cacheKey, ['foo', 'bar']);
+
+        $cacheHits = 0;
+        Event::listen(CacheHit::class, function ($event) use (&$cacheHits, $cacheKey) {
+            if ($event->key === $cacheKey) {
+                $cacheHits++;
+            }
+        });
+
+        $expected = collect(['foo', 'bar']);
+        $this->assertEquals($expected, $store->paths());
+        $this->assertEquals(1, $cacheHits);
+        $this->assertEquals($expected, $store->paths());
+        $this->assertEquals(1, $cacheHits);
+    }
+
+    /** @test */
+    public function it_gets_the_paths_from_the_cache_every_time_if_running_in_a_queue_worker()
+    {
+        $store = $this->store->directory('/path/to/directory');
+        $cacheKey = "stache::indexes::{$store->key()}::path";
+
+        Cache::put($cacheKey, ['foo', 'bar']);
+
+        $cacheHits = 0;
+        Event::listen(CacheHit::class, function ($event) use (&$cacheHits, $cacheKey) {
+            if ($event->key === $cacheKey) {
+                $cacheHits++;
+            }
+        });
+
+        Request::swap(new FakeArtisanRequest('queue:listen'));
+
+        $expected = collect(['foo', 'bar']);
+        $this->assertEquals($expected, $store->paths());
+        $this->assertEquals(1, $cacheHits);
+        $this->assertEquals($expected, $store->paths());
+        $this->assertEquals(2, $cacheHits);
+    }
 }
 
 class TestStore extends Store
 {
     public function getItem($key)
     {
+    }
+
+    public function key()
+    {
+        return 'test-store';
     }
 }

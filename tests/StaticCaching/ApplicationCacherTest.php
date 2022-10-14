@@ -69,6 +69,26 @@ class ApplicationCacherTest extends TestCase
     }
 
     /** @test */
+    public function invalidating_a_url_will_invalidate_all_query_string_versions_too()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
+            'one' => '/one',
+            'oneqs' => '/one?foo=bar',
+            'two' => '/two',
+        ]);
+        $cache->forever('static-cache:responses:one', 'html content');
+        $cache->forever('static-cache:responses:oneqs', 'querystring html content');
+
+        $cacher->invalidateUrl('/one');
+
+        $this->assertEquals(['two' => '/two'], $cacher->getUrls()->all());
+        $this->assertNull($cache->get('static-cache:responses:one'));
+        $this->assertNull($cache->get('static-cache:responses:oneqs'));
+    }
+
+    /** @test */
     public function it_flushes()
     {
         $cache = app(Repository::class);

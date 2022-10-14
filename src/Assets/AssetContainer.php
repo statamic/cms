@@ -293,6 +293,16 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
         return $this->contents()->filteredFilesIn($folder, $recursive)->keys();
     }
 
+    public function metaFiles($folder = '/', $recursive = false)
+    {
+        // When requesting files() as-is, we want all of them.
+        if (func_num_args() === 0) {
+            $recursive = true;
+        }
+
+        return $this->contents()->metaFilesIn($folder, $recursive)->keys();
+    }
+
     public function foldersCacheKey($folder = '/', $recursive = false)
     {
         $rec = $recursive ? '-recursive' : '';

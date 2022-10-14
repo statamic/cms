@@ -37,6 +37,10 @@ class Link extends Fieldtype
 
     public function augment($value)
     {
+        if (! $value) {
+            return null;
+        }
+
         $redirect = ResolveRedirect::resolve($value, $this->field->parent());
 
         return $redirect === 404 ? null : $redirect;
