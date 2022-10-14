@@ -113,6 +113,7 @@ return [
     'replicator.config.max_sets' => 'Le nombre maximal d’ensembles.',
     'replicator.config.previews' => 'Affichés quand les ensembles sont réduits.',
     'replicator.title' => 'Replicator',
+    'revealer.config.input_label' => 'Définissez l’étiquette à afficher dans le bouton ou à côté du commutateur.',
     'revealer.config.mode' => 'Choisissez votre disposition préférée.',
     'revealer.title' => 'Revealer',
     'section.title' => 'Section',
