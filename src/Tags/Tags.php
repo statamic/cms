@@ -179,7 +179,7 @@ abstract class Tags
         }
 
         if (! $this->parser) {
-            return $data;
+            return '';
         }
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
