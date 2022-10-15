@@ -5,7 +5,7 @@
             'is-image': isImage && !canShowSvg,
             'is-svg': canShowSvg,
             'is-file': !isImage && !canShowSvg,
-            'col-span-full': isSolo
+            'col-span-2': isSolo
         }"
         :title="asset.filename"
     >
