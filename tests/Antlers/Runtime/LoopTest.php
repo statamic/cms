@@ -189,8 +189,8 @@ EOT;
         $this->createPage('home', [
             'with' => [
                 'title' => 'Home Page',
-                'template' => 'home'
-            ]
+                'template' => 'home',
+            ],
         ]);
 
         $this->createPage('about', ['with' => ['title' => 'About Page']]);
