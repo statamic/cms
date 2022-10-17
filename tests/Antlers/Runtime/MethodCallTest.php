@@ -111,8 +111,6 @@ EOT;
 
     public function test_method_calls_can_have_modifiers_applied()
     {
-        Carbon::setToStringFormat(null);
-
         $data = [
             'date' => Carbon::parse('October 1st, 2012'),
         ];
