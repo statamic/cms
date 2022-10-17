@@ -196,10 +196,10 @@ class FileCacher extends AbstractCacher
 
         $default = <<<EOT
 var els = document.getElementsByClassName('nocache');
-var Statamic = {map: {}};
+var map = {};
 for (var i = 0; i < els.length; i++) {
     var section = els[i].getAttribute('data-nocache');
-    Statamic.map[section] = els[i];
+    map[section] = els[i];
 }
 
 fetch('/!/nocache', {
@@ -207,14 +207,14 @@ fetch('/!/nocache', {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
         url: window.location.href,
-        sections: Object.keys(Statamic.map)
+        sections: Object.keys(map)
     })
 })
 .then((response) => response.json())
 .then((data) => {
     const regions = data.regions;
     for (var key in regions) {
-        if (Statamic.map[key]) Statamic.map[key].outerHTML = regions[key];
+        if (map[key]) map[key].outerHTML = regions[key];
     }
 
     for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
@@ -224,7 +224,7 @@ fetch('/!/nocache', {
     for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
         meta.content = data.csrf;
     }
-
+    
     document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));
 });
 EOT;
