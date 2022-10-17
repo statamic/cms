@@ -59,6 +59,7 @@
             :site="site"
             :localized-fields="localizedFields"
             :is-root="isRoot"
+            :track-dirty-state="trackDirtyState"
             @updated="values = $event"
         >
             <live-preview
@@ -311,6 +312,7 @@ export default {
             actions: this.initialActions,
             saving: false,
             localizing: false,
+            trackDirtyState: true,
             fieldset: this.initialFieldset,
             title: this.initialTitle,
             values: _.clone(this.initialValues),
@@ -574,6 +576,9 @@ export default {
 
         editLocalization(localization) {
             return this.$axios.get(localization.url).then(response => {
+                clearTimeout(this.trackDirtyStateTimeout);
+                this.trackDirtyState = false;
+
                 const data = response.data;
                 this.values = data.values;
                 this.originValues = data.originValues;
@@ -591,7 +596,8 @@ export default {
                 this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
-                setTimeout(() => this.$refs.container.clearDirtyState(), 150); // after any fieldtypes do a debounced update
+
+                this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 300); // after any fieldtypes do a debounced update
             })
         },
 
@@ -698,6 +704,10 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+    },
+
+    unmounted() {
+        clearTimeout(this.trackDirtyStateTimeout);
     },
 
     destroyed() {

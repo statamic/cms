@@ -3,12 +3,14 @@
 namespace Statamic\Assets;
 
 use Illuminate\Support\Facades\Cache;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 
 class AssetContainerContents
 {
     protected $container;
     protected $files;
+    protected $metaFiles;
     protected $filteredFiles;
     protected $filteredDirectories;
 
@@ -19,22 +21,25 @@ class AssetContainerContents
 
     public function all()
     {
-        return $this->files = $this->files
-            ?? Cache::remember($this->key(), $this->ttl(), function () {
-                // Use Flysystem directly because it gives us type, timestamps, dirname
-                // and will let us perform more efficient filtering and caching.
-                $files = $this->filesystem()->listContents('/', true);
+        if ($this->files && ! Statamic::isWorker()) {
+            return $this->files;
+        }
 
-                // If Flysystem 3.x, re-apply sorting and return a backwards compatible result set.
-                // See: https://flysystem.thephpleague.com/v2/docs/usage/directory-listings/
-                if (! is_array($files)) {
-                    return collect($files->sortByPath()->toArray())->keyBy('path')->map(function ($file) {
-                        return $this->normalizeFlysystemAttributes($file);
-                    });
-                }
+        return $this->files = Cache::remember($this->key(), $this->ttl(), function () {
+            // Use Flysystem directly because it gives us type, timestamps, dirname
+            // and will let us perform more efficient filtering and caching.
+            $files = $this->filesystem()->listContents('/', true);
 
-                return collect($files)->keyBy('path');
-            });
+            // If Flysystem 3.x, re-apply sorting and return a backwards compatible result set.
+            // See: https://flysystem.thephpleague.com/v2/docs/usage/directory-listings/
+            if (! is_array($files)) {
+                return collect($files->sortByPath()->toArray())->keyBy('path')->map(function ($file) {
+                    return $this->normalizeFlysystemAttributes($file);
+                });
+            }
+
+            return collect($files)->keyBy('path');
+        });
     }
 
     /**
@@ -134,9 +139,39 @@ class AssetContainerContents
         return $this->all()->where('type', 'dir');
     }
 
+    public function metaFilesIn($folder, $recursive)
+    {
+        if (isset($this->metaFiles[$key = $folder.($recursive ? '-recursive' : '')])) {
+            return $this->metaFiles[$key];
+        }
+
+        $files = $this->files();
+
+        $files = $files->filter(function ($file, $path) {
+            return Str::startsWith($path, '.meta/')
+                || Str::contains($path, '/.meta/');
+        });
+
+        // Filter by folder and recursiveness. But don't bother if we're
+        // requesting the root recursively as it's already that way.
+        if ($folder === '/' && $recursive) {
+            //
+        } else {
+            $files = $files->filter(function ($file) use ($folder, $recursive) {
+                $dir = $file['dirname'];
+                $dir = substr($dir, 0, -6); // remove .meta/ from the end
+                $dir = $dir ?: '/';
+
+                return $recursive ? Str::startsWith($dir, $folder) : $dir == $folder;
+            });
+        }
+
+        return $this->metaFiles[$key] = $files;
+    }
+
     public function filteredFilesIn($folder, $recursive)
     {
-        if (isset($this->filteredFiles[$key = $folder.($recursive ? '-recursive' : '')])) {
+        if (isset($this->filteredFiles[$key = $folder.($recursive ? '-recursive' : '')]) && ! Statamic::isWorker()) {
             return $this->filteredFiles[$key];
         }
 
@@ -166,7 +201,7 @@ class AssetContainerContents
 
     public function filteredDirectoriesIn($folder, $recursive)
     {
-        if (isset($this->filteredDirectories[$key = $folder.($recursive ? '-recursive' : '')])) {
+        if (isset($this->filteredDirectories[$key = $folder.($recursive ? '-recursive' : '')]) && ! Statamic::isWorker()) {
             return $this->filteredDirectories[$key];
         }
 

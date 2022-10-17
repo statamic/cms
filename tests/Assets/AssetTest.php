@@ -14,6 +14,7 @@ use Mockery;
 use ReflectionClass;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
+use Statamic\Assets\PendingMeta;
 use Statamic\Assets\ReplacementFile;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReplaced;
@@ -758,7 +759,6 @@ class AssetTest extends TestCase
 
         // Saving should clear the cache and persist the new meta data to the filesystem...
         $asset->save();
-        $this->assertNull(Cache::get($asset->metaCacheKey()));
         $this->assertEquals($metaWithData, YAML::parse(Storage::disk('test')->get('foo/.meta/image.jpg.yaml')));
 
         // Then if we ask for new meta, it should cache with the newly saved data...
@@ -921,26 +921,6 @@ class AssetTest extends TestCase
             'path/to/another-asset.txt',
         ], $container->contents()->cached()->keys()->all());
         Event::assertDispatched(AssetDeleted::class);
-    }
-
-    /** @test */
-    public function it_clears_asset_glide_cache_when_deleting()
-    {
-        Storage::fake('local');
-        $disk = Storage::disk('local');
-        $disk->put('path/to/asset.txt', '');
-        $container = Facades\AssetContainer::make('test')->disk('local');
-        Facades\AssetContainer::shouldReceive('save')->with($container);
-        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
-        $asset = (new Asset)->container($container)->path('path/to/asset.txt');
-
-        // Just assert that `Glide::clearAsset()` is called on delete,
-        // since `Imaging\GlideTest.php` covers the actual functionality.
-        Facades\Glide::shouldReceive('clearAsset')->withArgs(function ($arg) use ($asset) {
-            return $arg->id() === $asset->id();
-        })->once();
-
-        $asset->delete();
     }
 
     /** @test */
@@ -1453,6 +1433,21 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_title()
+    {
+        $asset = (new Asset)
+            ->path('path/to/asset.jpg')
+            ->container($this->container);
+
+        $this->assertEquals('asset.jpg', $asset->title());
+        $this->assertEquals('asset.jpg', $asset->title);
+
+        $asset->set('title', 'custom title');
+        $this->assertEquals('custom title', $asset->title());
+        $this->assertEquals('custom title', $asset->title);
+    }
+
+    /** @test */
     public function it_compiles_augmented_array_data()
     {
         Facades\Blueprint::shouldReceive('find')
@@ -1462,7 +1457,6 @@ class AssetTest extends TestCase
         $asset = (new Asset)
             ->path('path/to/asset.jpg')
             ->container($this->container)
-            ->set('title', 'test')
             ->setSupplement('foo', 'bar');
 
         $array = $asset->toAugmentedArray();
@@ -1930,6 +1924,139 @@ class AssetTest extends TestCase
 
         // The "asset" Tag will output nothing when an invalid asset src is passed. It doesn't throw an exception.
         $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset]));
+    }
+
+    /** @test */
+    public function it_syncs_original_state_with_no_data()
+    {
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+
+        $this->assertEquals([], $asset->getRawOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => new PendingMeta('data'),
+        ], $asset->getRawOriginal());
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [],
+        ], $asset->getOriginal());
+
+        // Test that the pending meta was resolved
+        $this->assertSame($asset->getOriginal(), $asset->getRawOriginal());
+
+        Storage::disk('test')->assertMissing('path/to/.meta/test.txt.yaml');
+    }
+
+    /** @test */
+    public function it_syncs_original_state_with_no_data_but_with_data_in_meta()
+    {
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', "data:\n  foo: bar");
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+
+        $this->assertEquals([], $asset->getRawOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => new PendingMeta('data'),
+        ], $asset->getRawOriginal());
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [
+                'foo' => 'bar',
+            ],
+        ], $asset->getOriginal());
+
+        // Test that the pending meta was resolved
+        $this->assertSame($asset->getOriginal(), $asset->getRawOriginal());
+
+        Storage::disk('test')->assertExists('path/to/.meta/test.txt.yaml');
+    }
+
+    /** @test */
+    public function it_syncs_original_state_with_data()
+    {
+        $yaml = <<<'YAML'
+data:
+  alfa: bravo
+  charlie: delta
+  echo: foxtrot
+YAML;
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', $yaml);
+
+        $asset = (new Asset)
+            ->container($this->container)
+            ->path('path/to/test.txt')
+            ->set('charlie', 'brown')
+            ->remove('echo');
+
+        $this->assertEquals([], $asset->getRawOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => new PendingMeta('data'),
+        ], $asset->getRawOriginal());
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [
+                'alfa' => 'bravo',
+                'charlie' => 'brown',
+            ],
+        ], $asset->getOriginal());
+
+        // Test that the pending meta was resolved
+        $this->assertSame($asset->getOriginal(), $asset->getRawOriginal());
+
+        Storage::disk('test')->assertExists('path/to/.meta/test.txt.yaml');
+        $this->assertEquals($yaml, Storage::disk('test')->get('path/to/.meta/test.txt.yaml'));
+    }
+
+    /** @test */
+    public function it_resolves_pending_original_meta_values_when_hydrating()
+    {
+        $yaml = <<<'YAML'
+data:
+  alfa: bravo
+  charlie: delta
+  echo: foxtrot
+YAML;
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', $yaml);
+
+        $asset = (new Asset)
+            ->container($this->container)
+            ->path('path/to/test.txt')
+            ->set('charlie', 'brown');
+
+        $this->assertEquals([], $asset->getRawOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => new PendingMeta('data'),
+        ], $asset->getRawOriginal());
+
+        // Setting would trigger hydration, which would trigger the pending original values to be resolved.
+        // We should not see this new value in the original state.
+        $asset->set('golf', 'hotel');
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [
+                'alfa' => 'bravo',
+                'charlie' => 'brown',
+                'echo' => 'foxtrot',
+            ],
+        ], $asset->getRawOriginal());
     }
 
     private function fakeEventWithMacros()

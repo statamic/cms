@@ -295,7 +295,11 @@ export default {
             this.$axios.get(url).then(response => {
                 const data = response.data.data;
                 this.asset = data;
-                this.values = data.values;
+
+                // If there are no fields, it will be an empty array when PHP encodes
+                // it into JSON on the server. We'll ensure it's always an object.
+                this.values = _.isArray(data.values) ? {} : data.values;
+
                 this.meta = data.meta;
                 this.actionUrl = data.actionUrl;
                 this.actions = data.actions;

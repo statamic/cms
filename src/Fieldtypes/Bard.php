@@ -91,7 +91,7 @@ class Bard extends Replicator
                 ],
             ],
             'save_html' => [
-                'display' => __('Display HTML'),
+                'display' => __('Save as HTML'),
                 'instructions' => __('statamic::fieldtypes.bard.config.save_html'),
                 'type' => 'toggle',
             ],

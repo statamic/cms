@@ -762,6 +762,36 @@ class UpdateAssetReferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_fails_gracefully_when_bard_value_is_null()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'bardo',
+                    'field' => [
+                        'type' => 'bard',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        // Though nulls are normally filtered out, they may not be in multisite and/or eloquent situations...
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'bardo' => null,
+        ]))->save();
+
+        $this->assertNull($entry->fresh()->get('bardo'));
+
+        $this->assetHoff->delete();
+        $this->assetNorris->path('content/norris-new.jpg')->save();
+
+        $this->assertNull($entry->fresh()->get('bardo'));
+    }
+
+    /** @test */
     public function it_updates_asset_references_in_bard_field_when_saved_as_html()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
