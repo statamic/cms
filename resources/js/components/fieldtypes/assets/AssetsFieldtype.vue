@@ -1,6 +1,6 @@
 <template>
     <element-container @resized="containerWidth = $event.width">
-    <div :class="{ 'narrow': containerWidth < 500, 'really-narrow': containerWidth < 280 }">
+    <div :class="{ 'narrow': containerWidth < 500, 'really-narrow': containerWidth < 280, 'extremely-narrow': containerWidth < 180 }">
 
         <uploader
             ref="uploader"
