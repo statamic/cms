@@ -89,6 +89,14 @@
     grid-template-columns: 1fr;
 }
 
+.assets-fieldtype .really-narrow .asset-table-listing .asset-filesize {
+    display: none;
+}
+
+.assets-fieldtype .extremely-narrow .asset-table-listing .asset-set-alt {
+    display: none;
+}
+
   /* Grid Listing
   ========================================================================== */
 
