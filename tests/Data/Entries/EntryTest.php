@@ -117,6 +117,27 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function if_the_slug_is_a_function_it_will_only_resolve_it_once()
+    {
+        $count = 0;
+        $slugWithinClosure = 'not yet set';
+        $entry = new Entry;
+        $entry->slug(function ($entry) use (&$count, &$slugWithinClosure) {
+            $count++;
+
+            // Call slug in here again to attempt infinite recursion. This could
+            // happen if something in the closure logic indirectly calls slug again.
+            $slugWithinClosure = $entry->slug();
+
+            return 'the-slug';
+        });
+
+        $this->assertEquals('the-slug', $entry->slug());
+        $this->assertNull($slugWithinClosure);
+        $this->assertEquals(1, $count);
+    }
+
+    /** @test */
     public function it_sets_gets_and_removes_data_values()
     {
         $collection = tap(Collection::make('test'))->save();
