@@ -135,6 +135,9 @@ class EntryTest extends TestCase
         $this->assertEquals('the-slug', $entry->slug());
         $this->assertNull($slugWithinClosure);
         $this->assertEquals(1, $count);
+
+        // Ensure that the temporary null slug is reset back the actual one for subsequent calls.
+        $this->assertEquals('the-slug', $entry->slug());
     }
 
     /** @test */
