@@ -18,7 +18,7 @@ trait StoresScopedComputedFieldCallbacks
     public function getComputedCallbacks(string $scope): Collection
     {
         return collect($this->computedFieldCallbacks)
-            ->filter(fn ($_, $fieldPath) => Str::startsWith($fieldPath, "{$scope}."))
-            ->keyBy(fn ($_, $fieldPath) => collect(explode('.', $fieldPath))->last());
+            ->filter(fn ($_, $key) => Str::startsWith($key, "{$scope}."))
+            ->keyBy(fn ($_, $key) => collect(explode('.', $key))->last());
     }
 }
