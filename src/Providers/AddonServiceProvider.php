@@ -212,7 +212,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
         $tagsPath = $srcPath . '/Tags';
 
-        collect(File::allFiles($tagsPath))
+        collect(File::exists($tagsPath) ? File::allFiles($tagsPath) : [])
             ->map(fn ($tagFile) => $this->namespace() . '\\' . $this->classFromFile($tagFile, $srcPath))
             ->filter(fn ($tagClass) => is_subclass_of($tagClass, \Statamic\Tags\Tags::class))
             ->merge($this->tags)
@@ -224,9 +224,15 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootScopes()
     {
-        foreach ($this->scopes as $class) {
-            $class::register();
-        }
+        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
+        $scopesPath = $srcPath . '/Scopes';
+
+        collect(File::exists($scopesPath) ? File::allFiles($scopesPath) : [])
+            ->map(fn ($scopeFile) => $this->namespace() . '\\' . $this->classFromFile($scopeFile, $srcPath))
+            ->filter(fn ($scopeClass) => is_subclass_of($scopeClass, \Statamic\Query\Scopes\Scope::class))
+            ->merge($this->scopes)
+            ->unique()
+            ->each(fn ($scopeClass) => $scopeClass::register());
 
         return $this;
     }
@@ -236,9 +242,9 @@ abstract class AddonServiceProvider extends ServiceProvider
         $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
         $actionsPath = $srcPath . '/Actions';
 
-        collect(File::allFiles($actionsPath))
+        collect(File::exists($actionsPath) ? File::allFiles($actionsPath) : [])
             ->map(fn ($actionFile) => $this->namespace() . '\\' . $this->classFromFile($actionFile, $srcPath))
-            ->filter(fn ($tagClass) => is_subclass_of($tagClass, \Statamic\Actions\Action::class))
+            ->filter(fn ($actionClass) => is_subclass_of($actionClass, \Statamic\Actions\Action::class))
             ->merge($this->actions)
             ->unique()
             ->each(fn ($actionClass) => $actionClass::register());
