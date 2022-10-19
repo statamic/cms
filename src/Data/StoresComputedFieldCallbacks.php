@@ -25,12 +25,12 @@ trait StoresComputedFieldCallbacks
             : $this->setComputedCallback(...$args);
     }
 
-    protected function setComputedCallback(string $field, Closure $callback)
+    private function setComputedCallback(string $field, Closure $callback)
     {
         $this->computedFieldCallbacks[$field] = $callback;
     }
 
-    protected function setScopedComputedCallback(string $scope, string $field, Closure $callback)
+    private function setScopedComputedCallback(string $scope, string $field, Closure $callback)
     {
         $this->computedFieldCallbacks["$scope.$field"] = $callback;
     }
