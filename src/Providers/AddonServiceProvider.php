@@ -254,9 +254,15 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFieldtypes()
     {
-        foreach ($this->fieldtypes as $class) {
-            $class::register();
-        }
+        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
+        $fieldtypesPath = $srcPath . '/Fieldtypes';
+
+        collect(File::exists($fieldtypesPath) ? File::allFiles($fieldtypesPath) : [])
+            ->map(fn ($fieldtypeFile) => $this->namespace() . '\\' . $this->classFromFile($fieldtypeFile, $srcPath))
+            ->filter(fn ($fieldtypeClass) => is_subclass_of($fieldtypeClass, \Statamic\Fields\Fieldtype::class))
+            ->merge($this->actions)
+            ->unique()
+            ->each(fn ($fieldtypeClass) => $fieldtypeClass::register());
 
         return $this;
     }
