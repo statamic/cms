@@ -534,9 +534,15 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootUpdateScripts()
     {
-        foreach ($this->updateScripts as $class) {
-            $class::register($this->getAddon()->package());
-        }
+        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
+        $updateScriptsPath = $srcPath . '/UpdateScripts';
+
+        collect(File::exists($updateScriptsPath) ? File::allFiles($updateScriptsPath) : [])
+            ->map(fn ($updateScriptFile) => $this->namespace() . '\\' . $this->classFromFile($updateScriptFile, $srcPath))
+            ->filter(fn ($updateScriptClass) => is_subclass_of($updateScriptClass, \Statamic\UpdateScripts\UpdateScript::class))
+            ->merge($this->updateScripts)
+            ->unique()
+            ->each(fn ($updateScriptClass) => $updateScriptClass::register($this->getAddon()->package()));
 
         return $this;
     }
