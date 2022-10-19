@@ -303,6 +303,16 @@ abstract class AddonServiceProvider extends ServiceProvider
             $class::register();
         }
 
+        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
+        $formJsDriversPath = $srcPath . '/Forms/JsDrivers';
+
+        collect(File::exists($formJsDriversPath) ? File::allFiles($formJsDriversPath) : [])
+            ->map(fn ($formJsDriverFile) => $this->namespace() . '\\' . $this->classFromFile($formJsDriverFile, $srcPath))
+            ->filter(fn ($formJsDriverClass) => is_subclass_of($formJsDriverClass, \Statamic\Forms\JsDrivers\AbstractJsDriver::class))
+            ->merge($this->formJsDrivers)
+            ->unique()
+            ->each(fn ($formJsDriverClass) => $formJsDriverClass::register());
+
         return $this;
     }
 
