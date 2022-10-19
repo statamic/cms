@@ -257,7 +257,7 @@ class EntriesController extends CpController
             $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
-        $values = [];
+        $values = Entry::make()->collection($collection)->values()->all();
 
         if ($collection->hasStructure() && $request->parent) {
             $values['parent'] = $request->parent;
