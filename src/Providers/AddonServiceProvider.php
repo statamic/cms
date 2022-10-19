@@ -299,10 +299,6 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFormJsDrivers()
     {
-        foreach ($this->formJsDrivers as $class) {
-            $class::register();
-        }
-
         $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
         $formJsDriversPath = $srcPath . '/Forms/JsDrivers';
 
@@ -430,6 +426,8 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootRoutes()
     {
+
+
         if ($web = array_get($this->routes, 'web')) {
             $this->registerWebRoutes($web);
         }
