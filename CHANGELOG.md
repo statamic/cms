@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.3.47 (2022-10-19)
+
+### What's fixed
+- Fix id being used for slug when creating entries. [#6921](https://github.com/statamic/cms/issues/6921) by @jasonvarga
+
+
+
 ## 3.3.46 (2022-10-19)
 
 ### What's new
