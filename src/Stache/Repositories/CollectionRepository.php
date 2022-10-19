@@ -16,7 +16,6 @@ class CollectionRepository implements RepositoryContract
     protected $stache;
     protected $store;
     protected $additionalPreviewTargets = [];
-    protected $scopeComputedFieldCallbacks = true;
 
     public function __construct(Stache $stache)
     {
