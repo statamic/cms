@@ -260,7 +260,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         collect(File::exists($fieldtypesPath) ? File::allFiles($fieldtypesPath) : [])
             ->map(fn ($fieldtypeFile) => $this->namespace() . '\\' . $this->classFromFile($fieldtypeFile, $srcPath))
             ->filter(fn ($fieldtypeClass) => is_subclass_of($fieldtypeClass, \Statamic\Fields\Fieldtype::class))
-            ->merge($this->actions)
+            ->merge($this->fieldtypes)
             ->unique()
             ->each(fn ($fieldtypeClass) => $fieldtypeClass::register());
 
@@ -275,7 +275,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         collect(File::exists($modifiersPath) ? File::allFiles($modifiersPath) : [])
             ->map(fn ($modifierFile) => $this->namespace() . '\\' . $this->classFromFile($modifierFile, $srcPath))
             ->filter(fn ($modifierClass) => is_subclass_of($modifierClass, \Statamic\Modifiers\Modifier::class))
-            ->merge($this->actions)
+            ->merge($this->modifiers)
             ->unique()
             ->each(fn ($modifierClass) => $modifierClass::register());
 
@@ -290,7 +290,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         collect(File::exists($widgetsPath) ? File::allFiles($widgetsPath) : [])
             ->map(fn ($widgetFile) => $this->namespace() . '\\' . $this->classFromFile($widgetFile, $srcPath))
             ->filter(fn ($widgetClass) => is_subclass_of($widgetClass, \Statamic\Widgets\Widget::class))
-            ->merge($this->actions)
+            ->merge($this->widgets)
             ->unique()
             ->each(fn ($widgetClass) => $widgetClass::register());
 
