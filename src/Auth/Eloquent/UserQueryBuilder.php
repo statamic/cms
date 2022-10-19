@@ -14,4 +14,12 @@ class UserQueryBuilder extends EloquentQueryBuilder
             return User::make()->model($model);
         });
     }
+
+    protected function column($column)
+    {
+        return match ($column) {
+            'id' => User::make()->model()->getKeyName(),
+            default => $column,
+        };
+    }
 }
