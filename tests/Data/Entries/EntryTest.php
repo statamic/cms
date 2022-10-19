@@ -367,6 +367,118 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_custom_computed_data()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry) {
+            return $entry->get('title').' AND MORE!';
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+        $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks']);
+
+        $expectedData = [
+            'title' => 'Pop Rocks',
+        ];
+
+        $expectedComputedData = [
+            'description' => 'Pop Rocks AND MORE!',
+        ];
+
+        $expectedValues = array_merge($expectedData, $expectedComputedData);
+
+        $this->assertArraySubset($expectedData, $entry->data()->all());
+        $this->assertEquals($expectedComputedData, $entry->computedData()->all());
+        $this->assertEquals($expectedValues, $entry->values()->all());
+        $this->assertEquals($expectedValues['title'], $entry->value('title'));
+        $this->assertEquals($expectedValues['description'], $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_gets_empty_computed_data_by_default()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks']);
+
+        $this->assertEquals([], $entry->computedData()->all());
+    }
+
+    /** @test */
+    public function it_doesnt_recursively_get_computed_data_when_callback_uses_value_methods()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry) {
+            return $entry->value('title').' '.$entry->values()->get('suffix');
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+        $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks', 'suffix' => 'AND MORE!']);
+
+        $this->assertEquals('Pop Rocks AND MORE!', $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_can_use_actual_data_to_compose_computed_data()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry, $value) {
+            return $value ?? 'N/A';
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+
+        $entry = (new Entry)->collection($collection);
+
+        $this->assertEquals('N/A', $entry->value('description'));
+
+        $entry->data(['description' => 'Raddest article ever!']);
+
+        $this->assertEquals('Raddest article ever!', $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_can_use_origin_data_to_compose_computed_data()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry, $value) {
+            return $entry->value('description') ?? 'N/A';
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+
+        (new Entry)->collection($collection)->id('origin')->data([
+            'description' => 'Dill Pickles',
+        ])->save();
+
+        $entry = (new Entry)->collection($collection)->origin('origin');
+
+        $this->assertEquals('Dill Pickles', $entry->values()->get('description'));
+        $this->assertEquals('Dill Pickles', $entry->value('description'));
+
+        $entry->data(['description' => 'Raddest article ever!']);
+
+        $this->assertEquals('Raddest article ever!', $entry->values()->get('description'));
+        $this->assertEquals('Raddest article ever!', $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_properly_scopes_custom_computed_data_by_collection_handle()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry) {
+            return $entry->get('title').' AND MORE!';
+        });
+
+        Facades\Collection::computed('events', 'french_description', function ($entry) {
+            return $entry->get('title').' ET PLUS!';
+        });
+
+        $articleEntry = (new Entry)->collection(tap(Collection::make('articles'))->save())->data(['title' => 'Pop Rocks']);
+        $eventEntry = (new Entry)->collection(tap(Collection::make('events'))->save())->data(['title' => 'Jazz Concert']);
+
+        $this->assertEquals('Pop Rocks AND MORE!', $articleEntry->value('description'));
+
+        $this->assertNull($articleEntry->value('french_description'));
+        $this->assertNull($eventEntry->value('description'));
+        $this->assertEquals('Jazz Concert ET PLUS!', $eventEntry->value('french_description'));
+    }
+
+    /** @test */
     public function it_gets_the_url_from_the_collection()
     {
         config(['statamic.amp.enabled' => true]);
