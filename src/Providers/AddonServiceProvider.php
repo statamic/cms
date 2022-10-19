@@ -8,7 +8,9 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
+use SplFileInfo;
 use Statamic\Actions\Action;
 use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
@@ -225,9 +227,14 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootActions()
     {
-        foreach ($this->actions as $class) {
-            $class::register();
-        }
+        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
+        $actionsPath = $srcPath . '/Actions';
+
+        collect(File::allFiles($actionsPath))
+            ->map(fn ($actionFile) => $this->namespace() . '\\' . $this->classFromFile($actionFile, $srcPath))
+            ->merge($this->actions)
+            ->unique()
+            ->each(fn ($actionClass) => $actionClass::register());
 
         return $this;
     }
@@ -588,5 +595,11 @@ abstract class AddonServiceProvider extends ServiceProvider
         });
 
         return $this;
+    }
+
+    protected static function classFromFile(SplFileInfo $file, $basePath)
+    {
+        $class = trim(str_replace($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
+        return str_replace(DIRECTORY_SEPARATOR, '\\', ucfirst(Str::replaceLast('.php', '', $class)));
     }
 }
