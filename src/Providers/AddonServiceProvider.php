@@ -269,18 +269,30 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootModifiers()
     {
-        foreach ($this->modifiers as $class) {
-            $class::register();
-        }
+        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
+        $modifiersPath = $srcPath . '/Modifiers';
+
+        collect(File::exists($modifiersPath) ? File::allFiles($modifiersPath) : [])
+            ->map(fn ($modifierFile) => $this->namespace() . '\\' . $this->classFromFile($modifierFile, $srcPath))
+            ->filter(fn ($modifierClass) => is_subclass_of($modifierClass, \Statamic\Modifiers\Modifier::class))
+            ->merge($this->actions)
+            ->unique()
+            ->each(fn ($modifierClass) => $modifierClass::register());
 
         return $this;
     }
 
     protected function bootWidgets()
     {
-        foreach ($this->widgets as $class) {
-            $class::register();
-        }
+        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
+        $widgetsPath = $srcPath . '/Widgets';
+
+        collect(File::exists($widgetsPath) ? File::allFiles($widgetsPath) : [])
+            ->map(fn ($widgetFile) => $this->namespace() . '\\' . $this->classFromFile($widgetFile, $srcPath))
+            ->filter(fn ($widgetClass) => is_subclass_of($widgetClass, \Statamic\Widgets\Widget::class))
+            ->merge($this->actions)
+            ->unique()
+            ->each(fn ($widgetClass) => $widgetClass::register());
 
         return $this;
     }
