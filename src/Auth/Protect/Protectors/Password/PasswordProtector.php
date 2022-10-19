@@ -4,6 +4,7 @@ namespace Statamic\Auth\Protect\Protectors\Password;
 
 use Facades\Statamic\Auth\Protect\Protectors\Password\Token;
 use Statamic\Auth\Protect\Protectors\Protector;
+use Statamic\Tokens\Handlers\LivePreview;
 
 class PasswordProtector extends Protector
 {
@@ -18,7 +19,7 @@ class PasswordProtector extends Protector
             abort(403);
         }
 
-        if (request()->statamicToken() && request()->statamicToken()->handler() === 'Statamic\Tokens\Handlers\LivePreview') {
+        if (optional(request()->statamicToken())->handler() === LivePreview::class) {
             return;
         }
 
