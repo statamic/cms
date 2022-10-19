@@ -138,7 +138,7 @@ class Users extends Relationship
     {
         $ids = Arr::wrap($values);
 
-        $query = (new OrderedQueryBuilder(User::query(), $ids))->whereIn('id', $ids);
+        $query = (new OrderedQueryBuilder(User::query(), $ids))->whereIn(User::make()->getKeyName(), $ids);
 
         return $this->config('max_items') === 1 ? $query->first() : $query;
     }

@@ -72,6 +72,11 @@ class User extends BaseUser
         return $this->set('id', $id);
     }
 
+    public function getKeyName()
+    {
+        return $this->model()->getKeyName();
+    }
+
     public function email($email = null)
     {
         return $this->getOrSet('email', $email);

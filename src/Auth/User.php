@@ -130,6 +130,11 @@ abstract class User implements
         return $this->id();
     }
 
+    public function getKeyName()
+    {
+        return 'id';
+    }
+
     public function getAuthPassword()
     {
         return $this->password();
