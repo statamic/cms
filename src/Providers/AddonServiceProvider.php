@@ -209,9 +209,15 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootTags()
     {
-        foreach ($this->tags as $class) {
-            $class::register();
-        }
+        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
+        $tagsPath = $srcPath . '/Tags';
+
+        collect(File::allFiles($tagsPath))
+            ->map(fn ($tagFile) => $this->namespace() . '\\' . $this->classFromFile($tagFile, $srcPath))
+            ->filter(fn ($tagClass) => is_subclass_of($tagClass, \Statamic\Tags\Tags::class))
+            ->merge($this->tags)
+            ->unique()
+            ->each(fn ($tagClass) => $tagClass::register());
 
         return $this;
     }
@@ -232,6 +238,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
         collect(File::allFiles($actionsPath))
             ->map(fn ($actionFile) => $this->namespace() . '\\' . $this->classFromFile($actionFile, $srcPath))
+            ->filter(fn ($tagClass) => is_subclass_of($tagClass, \Statamic\Actions\Action::class))
             ->merge($this->actions)
             ->unique()
             ->each(fn ($actionClass) => $actionClass::register());
