@@ -6,9 +6,9 @@ use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 use SplFileInfo;
 use Statamic\Actions\Action;
@@ -209,11 +209,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootTags()
     {
-        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
-        $tagsPath = $srcPath . '/Tags';
+        $srcPath = $this->getAddon()->directory().$this->getAddon()->autoload();
+        $tagsPath = $srcPath.'/Tags';
 
         collect(File::exists($tagsPath) ? File::allFiles($tagsPath) : [])
-            ->map(fn ($tagFile) => $this->namespace() . '\\' . $this->classFromFile($tagFile, $srcPath))
+            ->map(fn ($tagFile) => $this->namespace().'\\'.$this->classFromFile($tagFile, $srcPath))
             ->filter(fn ($tagClass) => is_subclass_of($tagClass, \Statamic\Tags\Tags::class))
             ->merge($this->tags)
             ->unique()
@@ -224,11 +224,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootScopes()
     {
-        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
-        $scopesPath = $srcPath . '/Scopes';
+        $srcPath = $this->getAddon()->directory().$this->getAddon()->autoload();
+        $scopesPath = $srcPath.'/Scopes';
 
         collect(File::exists($scopesPath) ? File::allFiles($scopesPath) : [])
-            ->map(fn ($scopeFile) => $this->namespace() . '\\' . $this->classFromFile($scopeFile, $srcPath))
+            ->map(fn ($scopeFile) => $this->namespace().'\\'.$this->classFromFile($scopeFile, $srcPath))
             ->filter(fn ($scopeClass) => is_subclass_of($scopeClass, \Statamic\Query\Scopes\Scope::class))
             ->merge($this->scopes)
             ->unique()
@@ -239,11 +239,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootActions()
     {
-        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
-        $actionsPath = $srcPath . '/Actions';
+        $srcPath = $this->getAddon()->directory().$this->getAddon()->autoload();
+        $actionsPath = $srcPath.'/Actions';
 
         collect(File::exists($actionsPath) ? File::allFiles($actionsPath) : [])
-            ->map(fn ($actionFile) => $this->namespace() . '\\' . $this->classFromFile($actionFile, $srcPath))
+            ->map(fn ($actionFile) => $this->namespace().'\\'.$this->classFromFile($actionFile, $srcPath))
             ->filter(fn ($actionClass) => is_subclass_of($actionClass, \Statamic\Actions\Action::class))
             ->merge($this->actions)
             ->unique()
@@ -254,11 +254,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFieldtypes()
     {
-        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
-        $fieldtypesPath = $srcPath . '/Fieldtypes';
+        $srcPath = $this->getAddon()->directory().$this->getAddon()->autoload();
+        $fieldtypesPath = $srcPath.'/Fieldtypes';
 
         collect(File::exists($fieldtypesPath) ? File::allFiles($fieldtypesPath) : [])
-            ->map(fn ($fieldtypeFile) => $this->namespace() . '\\' . $this->classFromFile($fieldtypeFile, $srcPath))
+            ->map(fn ($fieldtypeFile) => $this->namespace().'\\'.$this->classFromFile($fieldtypeFile, $srcPath))
             ->filter(fn ($fieldtypeClass) => is_subclass_of($fieldtypeClass, \Statamic\Fields\Fieldtype::class))
             ->merge($this->fieldtypes)
             ->unique()
@@ -269,11 +269,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootModifiers()
     {
-        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
-        $modifiersPath = $srcPath . '/Modifiers';
+        $srcPath = $this->getAddon()->directory().$this->getAddon()->autoload();
+        $modifiersPath = $srcPath.'/Modifiers';
 
         collect(File::exists($modifiersPath) ? File::allFiles($modifiersPath) : [])
-            ->map(fn ($modifierFile) => $this->namespace() . '\\' . $this->classFromFile($modifierFile, $srcPath))
+            ->map(fn ($modifierFile) => $this->namespace().'\\'.$this->classFromFile($modifierFile, $srcPath))
             ->filter(fn ($modifierClass) => is_subclass_of($modifierClass, \Statamic\Modifiers\Modifier::class))
             ->merge($this->modifiers)
             ->unique()
@@ -284,11 +284,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootWidgets()
     {
-        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
-        $widgetsPath = $srcPath . '/Widgets';
+        $srcPath = $this->getAddon()->directory().$this->getAddon()->autoload();
+        $widgetsPath = $srcPath.'/Widgets';
 
         collect(File::exists($widgetsPath) ? File::allFiles($widgetsPath) : [])
-            ->map(fn ($widgetFile) => $this->namespace() . '\\' . $this->classFromFile($widgetFile, $srcPath))
+            ->map(fn ($widgetFile) => $this->namespace().'\\'.$this->classFromFile($widgetFile, $srcPath))
             ->filter(fn ($widgetClass) => is_subclass_of($widgetClass, \Statamic\Widgets\Widget::class))
             ->merge($this->widgets)
             ->unique()
@@ -299,11 +299,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootFormJsDrivers()
     {
-        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
-        $formJsDriversPath = $srcPath . '/Forms/JsDrivers';
+        $srcPath = $this->getAddon()->directory().$this->getAddon()->autoload();
+        $formJsDriversPath = $srcPath.'/Forms/JsDrivers';
 
         collect(File::exists($formJsDriversPath) ? File::allFiles($formJsDriversPath) : [])
-            ->map(fn ($formJsDriverFile) => $this->namespace() . '\\' . $this->classFromFile($formJsDriverFile, $srcPath))
+            ->map(fn ($formJsDriverFile) => $this->namespace().'\\'.$this->classFromFile($formJsDriverFile, $srcPath))
             ->filter(fn ($formJsDriverClass) => is_subclass_of($formJsDriverClass, \Statamic\Forms\JsDrivers\AbstractJsDriver::class))
             ->merge($this->formJsDrivers)
             ->unique()
@@ -428,19 +428,19 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         if ($web = array_get($this->routes, 'web')) {
             $this->registerWebRoutes($web);
-        } elseif (File::exists($web = $this->getAddon()->directory() . '/routes/web.php')) {
+        } elseif (File::exists($web = $this->getAddon()->directory().'/routes/web.php')) {
             $this->registerWebRoutes($web);
         }
 
         if ($cp = array_get($this->routes, 'cp')) {
             $this->registerCpRoutes($cp);
-        } elseif (File::exists($cp = $this->getAddon()->directory() . '/routes/cp.php')) {
+        } elseif (File::exists($cp = $this->getAddon()->directory().'/routes/cp.php')) {
             $this->registerCpRoutes($cp);
         }
 
         if ($actions = array_get($this->routes, 'actions')) {
             $this->registerActionRoutes($actions);
-        } elseif (File::exists($actions = $this->getAddon()->directory() . '/routes/actions.php')) {
+        } elseif (File::exists($actions = $this->getAddon()->directory().'/routes/actions.php')) {
             $this->registerActionRoutes($actions);
         }
 
@@ -534,11 +534,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootUpdateScripts()
     {
-        $srcPath = $this->getAddon()->directory() . $this->getAddon()->autoload();
-        $updateScriptsPath = $srcPath . '/UpdateScripts';
+        $srcPath = $this->getAddon()->directory().$this->getAddon()->autoload();
+        $updateScriptsPath = $srcPath.'/UpdateScripts';
 
         collect(File::exists($updateScriptsPath) ? File::allFiles($updateScriptsPath) : [])
-            ->map(fn ($updateScriptFile) => $this->namespace() . '\\' . $this->classFromFile($updateScriptFile, $srcPath))
+            ->map(fn ($updateScriptFile) => $this->namespace().'\\'.$this->classFromFile($updateScriptFile, $srcPath))
             ->filter(fn ($updateScriptClass) => is_subclass_of($updateScriptClass, \Statamic\UpdateScripts\UpdateScript::class))
             ->merge($this->updateScripts)
             ->unique()
@@ -649,6 +649,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected static function classFromFile(SplFileInfo $file, $basePath)
     {
         $class = trim(str_replace($basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
+
         return str_replace(DIRECTORY_SEPARATOR, '\\', ucfirst(Str::replaceLast('.php', '', $class)));
     }
 }
