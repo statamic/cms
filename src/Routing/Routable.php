@@ -21,6 +21,7 @@ trait Routable
             if ($slug instanceof Closure) {
                 $this->slug = null;
                 $slug = $slug($this);
+                $this->slug = $slug;
             }
 
             if (! $slug) {
