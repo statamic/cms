@@ -1,5 +1,15 @@
 # Release Notes
 
+## 3.3.48 (2022-10-20)
+
+### What's new
+- Add support for computed values. [#6179](https://github.com/statamic/cms/issues/6179) by @jesseleite
+
+### What's fixed
+- Fix overly aggressive static cache invalidation. [#6927](https://github.com/statamic/cms/issues/6927) by @jasonvarga
+
+
+
 ## 3.3.47 (2022-10-19)
 
 ### What's fixed
