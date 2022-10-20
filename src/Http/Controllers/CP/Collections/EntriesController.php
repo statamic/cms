@@ -257,7 +257,7 @@ class EntriesController extends CpController
             $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
-        $values = [];
+        $values = Entry::make()->collection($collection)->values()->all();
 
         if ($collection->hasStructure() && $request->parent) {
             $values['parent'] = $request->parent;
@@ -408,11 +408,11 @@ class EntriesController extends CpController
     {
         // The values should only be data merged with the origin data.
         // We don't want injected collection values, which $entry->values() would have given us.
+        $values = collect();
         $target = $entry;
-        $values = $target->data();
-        while ($target->hasOrigin()) {
+        while ($target) {
+            $values = $target->data()->merge($target->computedData())->merge($values);
             $target = $target->origin();
-            $values = $target->data()->merge($values);
         }
         $values = $values->all();
 
