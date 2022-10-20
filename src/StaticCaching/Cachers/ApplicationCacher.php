@@ -105,7 +105,7 @@ class ApplicationCacher extends AbstractCacher
     {
         $this
             ->getUrls($domain)
-            ->filter(fn ($value) => str_starts_with($value, $url))
+            ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
             ->each(function ($value, $key) {
                 $this->cache->forget($this->normalizeKey('responses:'.$key));
                 $this->forgetUrl($key);

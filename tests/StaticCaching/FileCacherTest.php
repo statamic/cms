@@ -179,13 +179,19 @@ class FileCacherTest extends TestCase
         $cacher = $this->fileCacher([], $writer, $cache, []);
 
         $cache->forever($this->cacheKey('http://example.com'), [
-            'one' => '/one', 'two' => '/two',
+            'one' => '/one',
+            'onemore' => '/onemore',
+            'two' => '/two',
         ]);
 
         $cacher->invalidateUrl('/one', 'http://example.com');
 
-        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one'));
-        $this->assertEquals(['two' => '/two'], $cacher->getUrls('http://example.com')->all());
+        $writer->shouldHaveReceived('delete')->once();
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one'))->once();
+        $this->assertEquals([
+            'onemore' => '/onemore',
+            'two' => '/two',
+        ], $cacher->getUrls('http://example.com')->all());
 
         // TODO Check fallback to app url.
         // Config::set('app.url', 'http://example.com');
@@ -201,14 +207,19 @@ class FileCacherTest extends TestCase
         $cache->forever($this->cacheKey('http://example.com'), [
             'one' => '/one',
             'oneqs' => '/one?foo=bar',
+            'onemore' => '/onemore',
             'two' => '/two',
         ]);
 
         $cacher->invalidateUrl('/one', 'http://example.com');
 
-        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one'));
-        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one?foo=bar'));
-        $this->assertEquals(['two' => '/two'], $cacher->getUrls('http://example.com')->all());
+        $writer->shouldHaveReceived('delete')->times(2);
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one'))->once();
+        $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/one?foo=bar'))->once();
+        $this->assertEquals([
+            'two' => '/two',
+            'onemore' => '/onemore',
+        ], $cacher->getUrls('http://example.com')->all());
     }
 
     /** @test */
