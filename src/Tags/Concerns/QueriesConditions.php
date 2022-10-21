@@ -304,6 +304,10 @@ trait QueriesConditions
             $value = $value->value();
         }
 
+        if ($value instanceof Carbon) {
+            $value = $value->format('Y-m-d H:i:s');
+        }
+
         if (is_array($value)) {
             $value = collect($value);
         }
