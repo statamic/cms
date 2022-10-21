@@ -70,7 +70,7 @@ class ServiceProvider extends LaravelServiceProvider
         });
 
         Blade::directive('nocache', function ($exp) {
-            return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', $__data); ?>';
+            return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>';
         });
     }
 }
