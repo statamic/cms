@@ -153,22 +153,22 @@ class GlobalSet implements Contract
         return $this;
     }
 
-    public function in($locale): ?Variables
+    public function in($locale)
     {
         return $this->localizations[$locale] ?? null;
     }
 
-    public function inSelectedSite(): ?Variables
+    public function inSelectedSite()
     {
         return $this->in(Site::selected()->handle());
     }
 
-    public function inCurrentSite(): ?Variables
+    public function inCurrentSite()
     {
         return $this->in(Site::current()->handle());
     }
 
-    public function inDefaultSite(): ?Variables
+    public function inDefaultSite()
     {
         return $this->in(Site::default()->handle());
     }
