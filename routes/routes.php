@@ -25,6 +25,7 @@ if (config('statamic.cp.enabled')) {
     Route::middleware(SwapCpExceptionHandler::class)->group(function () {
         Route::middleware('statamic.cp')
             ->name('statamic.cp.')
+            ->domain(config('statamic.cp.domain'))
             ->prefix(config('statamic.cp.route'))
             ->namespace('Statamic\Http\Controllers\CP')
             ->group(__DIR__.'/cp.php');
