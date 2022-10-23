@@ -248,6 +248,25 @@
             @saving="saving = true"
             @saved="publishActionCompleted"
         />
+
+        <confirmation-modal
+            v-if="true"
+            :title="__('Create Localization')"
+            :buttonText="__('Create')"
+            
+        >
+        <!-- @confirm="confirm"
+            @cancel="reset" -->
+            <select-input
+                v-model="type"
+                :options="originOptions"
+                :placeholder="false"
+                class="ml-2" 
+            />
+            <!-- TODO set :value to first site -->
+            <!-- TODO @input="..." -->
+
+        </confirmation-modal>
     </div>
 
 </template>
