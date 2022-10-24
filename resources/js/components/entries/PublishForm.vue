@@ -155,24 +155,24 @@
                                 <div class="p-2 border-t" v-if="localizations.length > 1">
                                     <label class="publish-field-label font-medium mb-1" v-text="__('Sites')" />
                                     <div
-                                        v-for="localization in localizations"
-                                        :key="localization.handle"
+                                        v-for="option in localizations"
+                                        :key="option.handle"
                                         class="text-sm flex items-center -mx-2 px-2 py-1 cursor-pointer"
-                                        :class="localization.active ? 'bg-blue-100' : 'hover:bg-grey-20'"
-                                        @click="localizationSelected(localization)"
+                                        :class="option.active ? 'bg-blue-100' : 'hover:bg-grey-20'"
+                                        @click="localizationSelected(option)"
                                     >
-                                        <div class="flex-1 flex items-center" :class="{ 'line-through': !localization.exists }">
+                                        <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
                                             <span class="little-dot mr-1" :class="{
-                                                'bg-green': localization.published,
-                                                'bg-grey-50': !localization.published,
-                                                'bg-red': !localization.exists
+                                                'bg-green': option.published,
+                                                'bg-grey-50': !option.published,
+                                                'bg-red': !option.exists
                                             }" />
-                                            {{ localization.name }}
-                                            <loading-graphic :size="14" text="" class="ml-1" v-if="localization.handle === localizing.handle" />
+                                            {{ option.name }}
+                                            <loading-graphic :size="14" text="" class="ml-1" v-if="option.handle === localizing.handle" />
                                         </div>
-                                        <div class="badge-sm bg-orange" v-if="localization.origin" v-text="__('Origin')" />
-                                        <div class="badge-sm bg-blue" v-if="localization.active" v-text="__('Active')" />
-                                        <div class="badge-sm bg-purple" v-if="localization.root && !localization.origin && !localization.active" v-text="__('Root')" />
+                                        <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
+                                        <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
+                                        <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                                     </div>
                                 </div>
 
