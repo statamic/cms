@@ -76,7 +76,7 @@ return [
     'fields_instructions_instructions' => 'Wird unter der Bezeichnung des Feldes angezeigt, genau wie dieser Text hier. Markdown wird unterstützt.',
     'fields_instructions_position_instructions' => 'Beschreibung über oder unter dem Feld anzeigen.',
     'fields_listable_instructions' => 'Steuert die Darstellung in der Listenansicht.',
-    'fields_visibility_instructions' => 'Die Sichtbarkeit von Eingabefeldern in Formularen steuern.',
+    'fields_visibility_instructions' => 'Steuert die Sichtbarkeit des Feldes in Formularen',
     'fieldset_import_fieldset_instructions' => 'Das zu importierende Fieldset.',
     'fieldset_import_prefix_instructions' => 'Ein Präfix, welches jedem Feld beim Import vorangestellt werden soll (z.B. hero_)',
     'fieldset_intro' => 'Fieldsets sind optionale Ergänzungen zu Blueprints und dienen als wiederverwendbare Partials, die in Blueprints verwendet werden können.',
