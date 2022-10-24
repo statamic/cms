@@ -168,7 +168,11 @@
                                                 'bg-red': !option.exists
                                             }" />
                                             {{ option.name }}
-                                            <loading-graphic :size="14" text="" class="ml-1" v-if="option.handle === localizing.handle" />
+                                            <loading-graphic
+                                                :size="14"
+                                                text=""
+                                                class="ml-1"
+                                                v-if="localizing && localizing.handle === option.handle" />
                                         </div>
                                         <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
                                         <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
