@@ -250,21 +250,21 @@
         />
 
         <confirmation-modal
-            v-if="true"
+            v-if="selectingOrigin"
             :title="__('Create Localization')"
             :buttonText="__('Create')"
             
         >
-        <!-- @confirm="confirm"
-            @cancel="reset" -->
+        <!-- 
+                @confirm="confirm"
+                -->
             <select-input
-                v-model="type"
-                :options="originOptions"
-                :placeholder="false"
                 class="ml-2" 
+                v-model="selectedOrigin"
+                :options="originOptions"
+                @cancel="selectingOrigin = false"
+                @confirm="selectingOrigin = false; createLocalization()"
             />
-            <!-- TODO set :value to first site -->
-            <!-- TODO @input="..." -->
 
         </confirmation-modal>
     </div>
@@ -342,6 +342,8 @@ export default {
             originValues: this.initialOriginValues || {},
             originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
+            selectingOrigin: false,
+            selectedOrigin: this.initialLocalizations[0].handle,
             isWorkingCopy: this.initialIsWorkingCopy,
             error: null,
             errors: {},
@@ -440,6 +442,13 @@ export default {
 
         afterSaveOption() {
             return this.getPreference('after_save');
+        },
+
+        originOptions() {
+            return this.localizations.map(localization => ({
+                value: localization.handle,
+                label: localization.name,
+            }));
         },
 
     },
