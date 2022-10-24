@@ -114,6 +114,7 @@ return [
     'replicator.config.previews' => 'Bei eingeklappten Sets anzeigen.',
     'replicator.title' => 'Replikator',
     'revealer.config.mode' => 'Bevorzugten Layoutstil auswählen.',
+    'revealer.config.input_label' => 'Die auf dem Button oder neben dem Schalter angezeigte Beschriftung festlegen.',
     'revealer.title' => 'Aufdecker',
     'section.title' => 'Abschnitt',
     'select.config.clearable' => 'Option zum Abwählen der Auswahl aktivieren.',
