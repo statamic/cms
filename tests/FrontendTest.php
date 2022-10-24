@@ -679,7 +679,7 @@ class FrontendTest extends TestCase
         // The names are a little different across jobs in the GitHub actions matrix.
         // We'll test against whichever was successfully applied. Finally, we will
         // reset the locale back to the original state to start the test clean.
-        $locales = ['fr_FR', 'fr_FR.utf-8', 'fr_FR.UTF-8', 'frs'];
+        $locales = ['fr_FR', 'fr_FR.utf-8', 'fr_FR.UTF-8', 'fra'];
         $originalLocale = setlocale(LC_TIME, 0);
         setlocale(LC_TIME, $locales);
         $frLocale = setlocale(LC_TIME, 0);
