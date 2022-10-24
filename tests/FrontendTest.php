@@ -680,10 +680,10 @@ class FrontendTest extends TestCase
         // We'll test against whichever was successfully applied. Finally, we will
         // reset the locale back to the original state to start the test clean.
         $locales = ['fr_FR', 'fr_FR.utf-8', 'fr_FR.UTF-8'];
-        $originalLocale = setlocale(LC_ALL, 0);
-        setlocale(LC_ALL, $locales);
-        $frLocale = setlocale(LC_ALL, 0);
-        setlocale(LC_ALL, $originalLocale);
+        $originalLocale = setlocale(LC_TIME, 0);
+        setlocale(LC_TIME, $locales);
+        $frLocale = setlocale(LC_TIME, 0);
+        setlocale(LC_TIME, $originalLocale);
 
         Site::setConfig(['sites' => [
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
@@ -718,7 +718,7 @@ class FrontendTest extends TestCase
         tap($this->makePage('le-about', ['with' => ['template' => 'some_template']])->locale('french'))->save();
 
         $this->assertEquals('en', app()->getLocale());
-        $this->assertEquals($originalLocale, setlocale(LC_ALL, 0));
+        $this->assertEquals($originalLocale, setlocale(LC_TIME, 0));
 
         $this->get('/fr/le-about')->assertSeeInOrder([
             'PHP Locale: '.$frLocale,
@@ -726,7 +726,7 @@ class FrontendTest extends TestCase
         ]);
 
         $this->assertEquals('en', app()->getLocale());
-        $this->assertEquals($originalLocale, setlocale(LC_ALL, 0));
+        $this->assertEquals($originalLocale, setlocale(LC_TIME, 0));
     }
 
     private function assertDefaultCarbonFormat()
