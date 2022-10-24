@@ -40,7 +40,7 @@ jobs:
 
       - name: Install French
         run: sudo apt-get install language-pack-fr
-        if: matrix.os == "ubuntu-latest"
+        if: matrix.os == 'ubuntu-latest'
 
       - name: Check locales again
         run: locale -a
