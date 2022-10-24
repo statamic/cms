@@ -675,15 +675,19 @@ class FrontendTest extends TestCase
     /** @test */
     public function it_sets_the_locale()
     {
+        // You can only set the locale to one that is actually installed on the server.
+        // The names are a little different across jobs in the GitHub actions matrix.
+        // We'll test against whichever was successfully applied. Finally, we will
+        // reset the locale back to the original state to start the test clean.
         $locales = ['fr_FR', 'fr_FR.utf-8', 'fr_FR.UTF-8'];
-        $original = setlocale(LC_ALL, 0);
+        $originalLocale = setlocale(LC_ALL, 0);
         setlocale(LC_ALL, $locales);
-        $fr = setlocale(LC_ALL, 0);
-        setlocale(LC_ALL, $original);
+        $frLocale = setlocale(LC_ALL, 0);
+        setlocale(LC_ALL, $originalLocale);
 
         Site::setConfig(['sites' => [
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
-            'french' => ['url' => 'http://localhost/fr/', 'locale' => $fr],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => $frLocale],
         ]]);
 
         (new class extends Tags
@@ -707,19 +711,22 @@ class FrontendTest extends TestCase
         })->register();
 
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
-        $this->viewShouldReturnRaw('some_template', '<p>{{ php_locale }} {{ laravel_locale }}</p>');
+        $this->viewShouldReturnRaw('some_template', 'PHP Locale: {{ php_locale }} App Locale: {{ laravel_locale }}');
 
         $this->makeCollection()->sites(['english', 'french'])->save();
         tap($this->makePage('about', ['with' => ['template' => 'some_template']])->locale('english'))->save();
         tap($this->makePage('le-about', ['with' => ['template' => 'some_template']])->locale('french'))->save();
 
         $this->assertEquals('en', app()->getLocale());
-        $this->assertEquals($original, setlocale(LC_ALL, 0));
+        $this->assertEquals($originalLocale, setlocale(LC_ALL, 0));
 
-        $this->get('/fr/le-about')->assertSee($fr.' fr');
+        $this->get('/fr/le-about')->assertSeeInOrder([
+            'PHP Locale: '.$frLocale,
+            'App Locale: fr',
+        ]);
 
         $this->assertEquals('en', app()->getLocale());
-        $this->assertEquals($original, setlocale(LC_ALL, 0));
+        $this->assertEquals($originalLocale, setlocale(LC_ALL, 0));
     }
 
     private function assertDefaultCarbonFormat()
