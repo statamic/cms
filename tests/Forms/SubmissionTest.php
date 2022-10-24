@@ -32,13 +32,15 @@ class SubmissionTest extends TestCase
     {
         // this test becomes unnecessary if we ever move away from using microtime for ids.
 
+        // Set the locale and reset it after.
+        $originalLocale = setlocale(LC_ALL, 0);
         setlocale(LC_ALL, 'de_DE');
 
         $submission = Form::make('test')->makeSubmission();
 
         $this->assertStringNotContainsString(',', $submission->id());
 
-        setlocale(LC_ALL, 'en_US');
+        setlocale(LC_ALL, $originalLocale);
     }
 
     /** @test */

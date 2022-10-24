@@ -118,7 +118,7 @@ GQL;
                     'size_kb' => 0.71,
                     'size_mb' => 0,
                     'size_gb' => 0,
-                    'last_modified' => Carbon::parse('2012-01-02 4:57pm')->format('F jS, Y'),
+                    'last_modified' => '2012-01-02 16:57:00',
                     'focus_css' => '50% 50%',
                     'height' => 60,
                     'width' => 30,
