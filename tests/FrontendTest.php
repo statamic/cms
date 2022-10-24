@@ -675,9 +675,15 @@ class FrontendTest extends TestCase
     /** @test */
     public function it_sets_the_locale()
     {
+        $locales = ['fr_FR', 'fr_FR.utf-8', 'fr_FR.UTF-8'];
+        $original = setlocale(LC_ALL, 0);
+        setlocale(LC_ALL, $locales);
+        $fr = setlocale(LC_ALL, 0);
+        setlocale(LC_ALL, $original);
+
         Site::setConfig(['sites' => [
             'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
-            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr_FR'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => $fr],
         ]]);
 
         (new class extends Tags
@@ -710,7 +716,7 @@ class FrontendTest extends TestCase
         $this->assertEquals('en', app()->getLocale());
         $this->assertEquals('C', setlocale(LC_ALL, 0));
 
-        $this->get('/fr/le-about')->assertSee('fr_FR fr');
+        $this->get('/fr/le-about')->assertSee($fr.' fr');
 
         $this->assertEquals('en', app()->getLocale());
         $this->assertEquals('C', setlocale(LC_ALL, 0));
