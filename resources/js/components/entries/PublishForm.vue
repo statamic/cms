@@ -168,7 +168,7 @@
                                                 'bg-red': !localization.exists
                                             }" />
                                             {{ localization.name }}
-                                            <loading-graphic :size="14" text="" class="ml-1" v-if="localizing === localization.handle" />
+                                            <loading-graphic :size="14" text="" class="ml-1" v-if="localization.handle === localizing.handle" />
                                         </div>
                                         <div class="badge-sm bg-orange" v-if="localization.origin" v-text="__('Origin')" />
                                         <div class="badge-sm bg-blue" v-if="localization.active" v-text="__('Active')" />
@@ -253,18 +253,18 @@
             v-if="selectingOrigin"
             :title="__('Create Localization')"
             :buttonText="__('Create')"
-            
+            @cancel="cancelLocalization()"
+            @confirm="createLocalization(localizing)"            
         >
-        <!-- 
-                @confirm="confirm"
-                -->
-            <select-input
-                class="ml-2" 
-                v-model="selectedOrigin"
-                :options="originOptions"
-                @cancel="selectingOrigin = false"
-                @confirm="selectingOrigin = false; createLocalization()"
-            />
+
+            <div class="form-group">
+                <label v-text="__('Origin')" />
+                <select-input
+                    v-model="selectedOrigin"
+                    :options="originOptions"
+                    :placeholder="false"
+                />
+            </div>
 
         </confirmation-modal>
     </div>
@@ -445,10 +445,12 @@ export default {
         },
 
         originOptions() {
-            return this.localizations.map(localization => ({
-                value: localization.handle,
-                label: localization.name,
-            }));
+            return this.localizations
+                .filter(localization => localization.exists)
+                .map(localization => ({
+                    value: localization.handle,
+                    label: localization.name,
+                }));
         },
 
     },
@@ -589,12 +591,12 @@ export default {
 
             this.$dirty.remove(this.publishContainer);
 
-            this.localizing = localization.handle;
+            this.localizing = localization;
 
             if (localization.exists) {
                 this.editLocalization(localization);
             } else {
-                this.createLocalization(localization);
+                this.selectingOrigin = true;
             }
 
             if (this.isBase) {
@@ -630,12 +632,15 @@ export default {
         },
 
         createLocalization(localization) {
+            this.selectingOrigin = false;
+
             if (this.isCreating) {
                 this.$nextTick(() => window.location = localization.url);
                 return;
             }
 
-            const url = this.activeLocalization.url + '/localize';
+            const originLocalization = this.localizations.find(e => e.handle === this.selectedOrigin);
+            const url = originLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then(response => {
                 this.editLocalization(response.data).then(() => {
                     this.$events.$emit('localization.created', { store: this.publishContainer });
@@ -645,6 +650,11 @@ export default {
                     }
                 });
             });
+        },
+
+        cancelLocalization() {
+            this.selectingOrigin = false;
+            this.localizing = false;
         },
 
         localizationStatusText(localization) {
