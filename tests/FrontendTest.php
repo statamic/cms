@@ -714,12 +714,12 @@ class FrontendTest extends TestCase
         tap($this->makePage('le-about', ['with' => ['template' => 'some_template']])->locale('french'))->save();
 
         $this->assertEquals('en', app()->getLocale());
-        $this->assertEquals('C', setlocale(LC_ALL, 0));
+        $this->assertEquals($original, setlocale(LC_ALL, 0));
 
         $this->get('/fr/le-about')->assertSee($fr.' fr');
 
         $this->assertEquals('en', app()->getLocale());
-        $this->assertEquals('C', setlocale(LC_ALL, 0));
+        $this->assertEquals($original, setlocale(LC_ALL, 0));
     }
 
     private function assertDefaultCarbonFormat()
