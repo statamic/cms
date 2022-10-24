@@ -35,15 +35,9 @@ jobs:
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
-      - name: Check locales
-        run: locale -a
-
-      - name: Install French
+      - name: Install French Locale
         run: sudo apt-get install language-pack-fr
         if: matrix.os == 'ubuntu-latest'
-
-      - name: Check locales again
-        run: locale -a
 
       - name: Checkout code
         uses: actions/checkout@v1
