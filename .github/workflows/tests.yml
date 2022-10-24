@@ -39,7 +39,7 @@ jobs:
         run: locale -a
 
       - name: Install French
-        run: apt-get install language-pack-fr
+        run: sudo apt-get install language-pack-fr
 
       - name: Check locales again
         run: locale -a
