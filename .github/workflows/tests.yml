@@ -38,6 +38,12 @@ jobs:
       - name: Check locales
         run: locale -a
 
+      - name: Install French
+        run: apt-get install language-pack-fr
+
+      - name: Check locales again
+        run: locale -a
+
       - name: Checkout code
         uses: actions/checkout@v1
 
