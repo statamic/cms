@@ -17,6 +17,7 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
+use Statamic\Data\ContainsComputedData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
@@ -42,20 +43,29 @@ abstract class User implements
     ArrayAccess,
     Arrayable
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues;
+    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues, ContainsComputedData;
 
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
-    abstract public function get($key, $fallback = null);
+    abstract public function data($data = null);
 
-    abstract public function value($key);
+    abstract public function get($key, $fallback = null);
 
     abstract public function has($key);
 
     abstract public function set($key, $value);
 
     abstract public function remove($key);
+
+    public function value($key)
+    {
+        if ($this->hasComputedCallback($key)) {
+            return $this->getComputed($key);
+        }
+
+        return $this->get($key);
+    }
 
     public function reference()
     {
@@ -284,5 +294,10 @@ abstract class User implements
     public function setPreferredLocale($locale)
     {
         return $this->setPreference('locale', $locale);
+    }
+
+    protected function getComputedCallbacks()
+    {
+        return Facades\User::getComputedCallbacks();
     }
 }

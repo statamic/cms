@@ -175,11 +175,15 @@ class UsersController extends CpController
             $blueprint->ensureField('groups', ['visibility' => 'read_only']);
         }
 
+        $values = $user->data()
+            ->merge($user->computedData())
+            ->merge(['email' => $user->email()]);
+
         $fields = $blueprint
             ->removeField('password')
             ->removeField('password_confirmation')
             ->fields()
-            ->addValues($user->data()->merge(['email' => $user->email()])->all())
+            ->addValues($values->all())
             ->preProcess();
 
         $viewData = [
