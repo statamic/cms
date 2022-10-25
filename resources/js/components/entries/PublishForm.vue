@@ -599,8 +599,10 @@ export default {
 
             if (localization.exists) {
                 this.editLocalization(localization);
-            } else {
+            } else if (this.localizations.length > 2) {
                 this.selectingOrigin = true;
+            } else {
+                this.createLocalization(localization);
             }
 
             if (this.isBase) {
