@@ -688,8 +688,8 @@ class FrontendTest extends TestCase
         dump($frLocale);
 
         Site::setConfig(['sites' => [
-            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
-            'french' => ['url' => 'http://localhost/fr/', 'locale' => $frLocale],
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en', 'lang' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => $frLocale, 'lang' => 'fr'],
         ]]);
 
         (new class extends Tags
