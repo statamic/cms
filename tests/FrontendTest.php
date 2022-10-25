@@ -11,6 +11,7 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
+use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class FrontendTest extends TestCase
@@ -652,6 +653,89 @@ class FrontendTest extends TestCase
 
         $this->get('/about')->assertSee('Hello');
         $this->get('/fr/le-about')->assertSee('Bonjour');
+    }
+
+    /** @test */
+    public function it_sets_the_carbon_to_string_format()
+    {
+        config(['statamic.system.date_format' => 'd/m/Y']);
+        Carbon::setTestNow('October 21st, 2022');
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<p>{{ now }}</p>');
+        $this->makeCollection()->save();
+        tap($this->makePage('about', ['with' => ['template' => 'some_template']]))->save();
+
+        $this->assertDefaultCarbonFormat();
+
+        $this->get('/about')->assertSee('21/10/2022');
+
+        $this->assertDefaultCarbonFormat();
+    }
+
+    /** @test */
+    public function it_sets_the_locale()
+    {
+        // You can only set the locale to one that is actually installed on the server.
+        // The names are a little different across jobs in the GitHub actions matrix.
+        // We'll test against whichever was successfully applied. Finally, we will
+        // reset the locale back to the original state to start the test clean.
+        $locales = ['fr_FR', 'fr_FR.utf-8', 'fr_FR.UTF-8', 'french'];
+        $originalLocale = setlocale(LC_TIME, 0);
+        setlocale(LC_TIME, $locales);
+        $frLocale = setlocale(LC_TIME, 0);
+        setlocale(LC_TIME, $originalLocale);
+
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en', 'lang' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => $frLocale, 'lang' => 'fr'],
+        ]]);
+
+        (new class extends Tags
+        {
+            public static $handle = 'php_locale';
+
+            public function index()
+            {
+                return setlocale(LC_TIME, 0);
+            }
+        })->register();
+
+        (new class extends Tags
+        {
+            public static $handle = 'laravel_locale';
+
+            public function index()
+            {
+                return app()->getLocale();
+            }
+        })->register();
+
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', 'PHP Locale: {{ php_locale }} App Locale: {{ laravel_locale }}');
+
+        $this->makeCollection()->sites(['english', 'french'])->save();
+        tap($this->makePage('about', ['with' => ['template' => 'some_template']])->locale('english'))->save();
+        tap($this->makePage('le-about', ['with' => ['template' => 'some_template']])->locale('french'))->save();
+
+        $this->assertEquals('en', app()->getLocale());
+        $this->assertEquals($originalLocale, setlocale(LC_TIME, 0));
+
+        $this->get('/fr/le-about')->assertSeeInOrder([
+            'PHP Locale: '.$frLocale,
+            'App Locale: fr',
+        ]);
+
+        $this->assertEquals('en', app()->getLocale());
+        $this->assertEquals($originalLocale, setlocale(LC_TIME, 0));
+    }
+
+    private function assertDefaultCarbonFormat()
+    {
+        $this->assertEquals(
+            Carbon::now()->format(Carbon::DEFAULT_TO_STRING_FORMAT),
+            (string) Carbon::now(),
+            'Carbon was not formatted using the default format.'
+        );
     }
 
     /**
