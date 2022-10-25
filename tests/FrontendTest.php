@@ -685,8 +685,6 @@ class FrontendTest extends TestCase
         $frLocale = setlocale(LC_TIME, 0);
         setlocale(LC_TIME, $originalLocale);
 
-        dump($frLocale);
-
         Site::setConfig(['sites' => [
             'english' => ['url' => 'http://localhost/', 'locale' => 'en', 'lang' => 'en'],
             'french' => ['url' => 'http://localhost/fr/', 'locale' => $frLocale, 'lang' => 'fr'],
