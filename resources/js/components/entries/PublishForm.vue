@@ -168,7 +168,11 @@
                                                 'bg-red': !option.exists
                                             }" />
                                             {{ option.name }}
-                                            <loading-graphic :size="14" text="" class="ml-1" v-if="localizing === option.handle" />
+                                            <loading-graphic
+                                                :size="14"
+                                                text=""
+                                                class="ml-1"
+                                                v-if="localizing && localizing.handle === option.handle" />
                                         </div>
                                         <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
                                         <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
@@ -248,6 +252,27 @@
             @saving="saving = true"
             @saved="publishActionCompleted"
         />
+
+        <confirmation-modal
+            v-if="selectingOrigin"
+            :title="__('Create Localization')"
+            :buttonText="__('Create')"
+            @cancel="cancelLocalization()"
+            @confirm="createLocalization(localizing)"
+        >
+            <div class="publish-fields">
+                <div class="form-group publish-field field-w-full">
+                    <label v-text="__('Origin')" />
+                    <div class="help-block -mt-1" v-text="__('messages.entry_origin_instructions')"></div>
+                    <select-input
+                        v-model="selectedOrigin"
+                        :options="originOptions"
+                        :placeholder="false"
+                    />
+                </div>
+            </div>
+
+        </confirmation-modal>
     </div>
 
 </template>
@@ -323,6 +348,8 @@ export default {
             originValues: this.initialOriginValues || {},
             originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
+            selectingOrigin: false,
+            selectedOrigin: this.initialLocalizations[0].handle,
             isWorkingCopy: this.initialIsWorkingCopy,
             error: null,
             errors: {},
@@ -421,6 +448,15 @@ export default {
 
         afterSaveOption() {
             return this.getPreference('after_save');
+        },
+
+        originOptions() {
+            return this.localizations
+                .filter(localization => localization.exists)
+                .map(localization => ({
+                    value: localization.handle,
+                    label: localization.name,
+                }));
         },
 
     },
@@ -561,10 +597,12 @@ export default {
 
             this.$dirty.remove(this.publishContainer);
 
-            this.localizing = localization.handle;
+            this.localizing = localization;
 
             if (localization.exists) {
                 this.editLocalization(localization);
+            } else if (this.localizations.length > 2) {
+                this.selectingOrigin = true;
             } else {
                 this.createLocalization(localization);
             }
@@ -602,21 +640,29 @@ export default {
         },
 
         createLocalization(localization) {
+            this.selectingOrigin = false;
+
             if (this.isCreating) {
                 this.$nextTick(() => window.location = localization.url);
                 return;
             }
 
-            const url = this.activeLocalization.url + '/localize';
+            const originLocalization = this.localizations.find(e => e.handle === this.selectedOrigin);
+            const url = originLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then(response => {
                 this.editLocalization(response.data).then(() => {
-                    this.$events.$emit('localization.created', {store: this.publishContainer});
+                    this.$events.$emit('localization.created', { store: this.publishContainer });
 
                     if (this.originValues.published) {
                         this.setFieldValue('published', true);
                     }
                 });
             });
+        },
+
+        cancelLocalization() {
+            this.selectingOrigin = false;
+            this.localizing = false;
         },
 
         localizationStatusText(localization) {
