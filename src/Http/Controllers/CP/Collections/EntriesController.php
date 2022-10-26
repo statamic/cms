@@ -240,7 +240,14 @@ class EntriesController extends CpController
             $entry->updateLastModified(User::current())->save();
         }
 
-        return new EntryResource($entry->fresh());
+        [$values] = $this->extractFromFields($entry, $blueprint);
+
+        return (new EntryResource($entry->fresh()))
+            ->additional([
+                'data' => [
+                    'values' => $values,
+                ],
+            ]);
     }
 
     public function create(Request $request, $collection, $site)
