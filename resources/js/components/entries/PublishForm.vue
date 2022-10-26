@@ -258,16 +258,18 @@
             :title="__('Create Localization')"
             :buttonText="__('Create')"
             @cancel="cancelLocalization()"
-            @confirm="createLocalization(localizing)"            
+            @confirm="createLocalization(localizing)"
         >
-
-            <div class="form-group">
-                <label v-text="__('Origin')" />
-                <select-input
-                    v-model="selectedOrigin"
-                    :options="originOptions"
-                    :placeholder="false"
-                />
+            <div class="publish-fields">
+                <div class="form-group publish-field field-w-full">
+                    <label v-text="__('Origin')" />
+                    <div class="help-block -mt-1" v-text="__('messages.entry_origin_instructions')"></div>
+                    <select-input
+                        v-model="selectedOrigin"
+                        :options="originOptions"
+                        :placeholder="false"
+                    />
+                </div>
             </div>
 
         </confirmation-modal>
