@@ -1,5 +1,24 @@
 # Release Notes
 
+## 3.3.49 (2022-10-26)
+
+### What's improved
+- Dutch translations. [#6953](https://github.com/statamic/cms/issues/6953) by @robdekort
+- German translations [#6944](https://github.com/statamic/cms/issues/6944) by @helloDanuk
+
+### What's fixed
+- Fix Replicator and Bard collapsed set state issues. [#6902](https://github.com/statamic/cms/issues/6902) by @jesseleite
+- Fix Antlers issue when using nested tag loops in some situations. [#6894](https://github.com/statamic/cms/issues/6894) by @JohnathonKoster
+- Fix shorthand array syntax in Antlers. [#6939](https://github.com/statamic/cms/issues/6939) by @JohnathonKoster
+- Fix leaking of locale and carbon string format outside of requests. [#6945](https://github.com/statamic/cms/issues/6945) by @jasonvarga
+- Added methods to `GlobalSet` contract. [#6938](https://github.com/statamic/cms/issues/6938) by @Z3d0X
+- Fix `@nocache` Blade directive serialization errors. [#6935](https://github.com/statamic/cms/issues/6935) by @jacksleight
+- Fix error when using custom primary key for `users` database table. [#6919](https://github.com/statamic/cms/issues/6919) by @jhhazelaar
+- Swapped forum for GitHub Discussions in the readme. [#6946](https://github.com/statamic/cms/issues/6946) by @robdekort
+- Adjusted grammar in assets config file. [#6936](https://github.com/statamic/cms/issues/6936) by @JohnathonKoster
+
+
+
 ## 3.3.48 (2022-10-20)
 
 ### What's new
