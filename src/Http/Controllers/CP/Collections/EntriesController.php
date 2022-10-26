@@ -245,7 +245,7 @@ class EntriesController extends CpController
         return (new EntryResource($entry->fresh()))
             ->additional([
                 'data' => [
-                    'values' => array_merge($values, ['id' => $entry->id()]),
+                    'values' => $values,
                 ],
             ]);
     }
