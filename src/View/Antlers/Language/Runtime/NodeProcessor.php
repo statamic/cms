@@ -2125,6 +2125,7 @@ class NodeProcessor
                                         }
                                     }
 
+                                    $this->data = $lockData;
                                     $this->processAssignments($runtimeAssignmentsToProcess);
                                     $lockData = $this->data;
 
