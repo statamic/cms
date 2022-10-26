@@ -16,7 +16,7 @@ class BladeDirective
 
     public function handle($expression, array $params, array $data = null)
     {
-        if (! isset($data)) {
+        if (func_num_args() == 2) {
             $data = $params;
             $params = [];
         }
