@@ -78,7 +78,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Enabling this will make Glide automatically crop assets at their focal
-    | point (at at the center if no focal point is defined). Otherwise,
+    | point (which is the center if no focal point is defined). Otherwise,
     | you will need to manually add any crop related parameters.
     |
     */

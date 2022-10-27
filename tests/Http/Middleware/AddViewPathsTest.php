@@ -39,6 +39,28 @@ class AddViewPathsTest extends TestCase
         $this->assertEquals($expectedPaths, view()->getFinder()->getPaths());
     }
 
+    /**
+     * @test
+     * @dataProvider namespacedViewPathProvider
+     */
+    public function adds_namespaced_view_paths($requestUrl, $expectedPaths)
+    {
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
+        view()->getFinder()->replaceNamespace('foo', '/path/to/views');
+
+        $this->setCurrentSiteBasedOnUrl($requestUrl);
+
+        $request = $this->createRequest($requestUrl);
+
+        (new AddViewPaths())->handle($request, fn () => new Response());
+
+        $this->assertEquals($expectedPaths, array_get(view()->getFinder()->getHints(), 'foo'));
+    }
+
     private function setCurrentSiteBasedOnUrl($requestUrl)
     {
         $url = 'http://localhost'.Str::removeLeft($requestUrl, '/amp');
@@ -80,6 +102,26 @@ class AddViewPathsTest extends TestCase
                 '/path/to/other/views/french',
                 '/path/to/other/views',
             ]],
+        ];
+    }
+
+    public function namespacedViewPathProvider()
+    {
+        return [
+            'default site' => [
+                '/test',
+                [
+                    '/path/to/views/english',
+                    '/path/to/views',
+                ],
+            ],
+            'second site' => [
+                '/fr/test',
+                [
+                    '/path/to/views/french',
+                    '/path/to/views',
+                ],
+            ],
         ];
     }
 

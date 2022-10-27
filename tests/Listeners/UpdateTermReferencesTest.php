@@ -29,6 +29,11 @@ class UpdateTermReferencesTest extends TestCase
         $this->termNorris = tap(Facades\Term::make()->taxonomy('topics')->inDefaultLocale()->slug('norris')->data([]))->save();
     }
 
+    protected function disableUpdateReferences($app)
+    {
+        $app['config']->set('statamic.system.update_references', false);
+    }
+
     /** @test */
     public function it_updates_single_term_fields()
     {
@@ -101,6 +106,64 @@ class UpdateTermReferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_nullifies_references_when_deleting_a_term()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+                [
+                    'handle' => 'non_favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => 'hoff',
+            'non_favourite' => 'norris',
+            'favourites' => ['hoff', 'norris'],
+        ]))->save();
+
+        $this->assertEquals('hoff', $entry->get('favourite'));
+        $this->assertEquals('norris', $entry->get('non_favourite'));
+        $this->assertEquals(['hoff', 'norris'], $entry->get('favourites'));
+
+        $this->termHoff->delete();
+
+        $this->assertFalse($entry->fresh()->has('favourite'));
+        $this->assertEquals('norris', $entry->fresh()->get('non_favourite'));
+        $this->assertEquals(['norris'], $entry->fresh()->get('favourites'));
+
+        $this->termNorris->delete();
+
+        $this->assertFalse($entry->fresh()->has('non_favourite'));
+        $this->assertFalse($entry->fresh()->has('favourites'));
+    }
+
+    /** @test */
     public function it_updates_scoped_single_term_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -169,6 +232,118 @@ class UpdateTermReferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_nullifies_references_when_deleting_a_scoped_term()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+                [
+                    'handle' => 'non_favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => 'topics::hoff',
+            'non_favourite' => 'topics::norris',
+            'favourites' => ['topics::hoff', 'topics::norris'],
+        ]))->save();
+
+        $this->assertEquals('topics::hoff', $entry->get('favourite'));
+        $this->assertEquals('topics::norris', $entry->get('non_favourite'));
+        $this->assertEquals(['topics::hoff', 'topics::norris'], $entry->get('favourites'));
+
+        $this->termHoff->delete();
+
+        $this->assertFalse($entry->fresh()->has('favourite'));
+        $this->assertEquals('topics::norris', $entry->fresh()->get('non_favourite'));
+        $this->assertEquals(['topics::norris'], $entry->fresh()->get('favourites'));
+
+        $this->termNorris->delete();
+
+        $this->assertFalse($entry->fresh()->has('non_favourite'));
+        $this->assertFalse($entry->fresh()->has('favourites'));
+    }
+
+    /**
+     * @test
+     * @environment-setup disableUpdateReferences
+     **/
+    public function it_can_be_disabled()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+                [
+                    'handle' => 'non_favourite',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'max_items' => 1,
+                        'mode' => 'select',
+                    ],
+                ],
+                [
+                    'handle' => 'favourites',
+                    'field' => [
+                        'type' => 'terms',
+                        'taxonomies' => ['topics'],
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'favourite' => 'hoff',
+            'non_favourite' => 'norris',
+            'favourites' => ['hoff', 'norris'],
+        ]))->save();
+
+        $this->assertEquals('hoff', $entry->get('favourite'));
+        $this->assertEquals('norris', $entry->get('non_favourite'));
+        $this->assertEquals(['hoff', 'norris'], $entry->get('favourites'));
+
+        $this->termNorris->delete();
+        $this->termHoff->slug('hoff-new')->save();
+
+        $this->assertEquals('hoff', $entry->fresh()->get('favourite'));
+        $this->assertEquals('norris', $entry->fresh()->get('non_favourite'));
+        $this->assertEquals(['hoff', 'norris'], $entry->fresh()->get('favourites'));
+    }
+
+    /** @test */
     public function it_updates_nested_term_fields_within_replicator_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -229,7 +404,7 @@ class UpdateTermReferencesTest extends TestCase
                 [
                     'type' => 'set_one',
                     'favourite' => 'hoff',
-                    'favourites' => ['hoff', 'norris'],
+                    'favourites' => ['hoff', 'norris', 'lee'],
                 ],
             ],
         ]))->save();
@@ -238,15 +413,16 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['hoff', 'norris'], Arr::get($entry->data(), 'reppy.0.favourites'));
         $this->assertEquals('not a term', Arr::get($entry->data(), 'reppy.1.not_term'));
         $this->assertEquals('hoff', Arr::get($entry->data(), 'reppy.2.favourite'));
-        $this->assertEquals(['hoff', 'norris'], Arr::get($entry->data(), 'reppy.2.favourites'));
+        $this->assertEquals(['hoff', 'norris', 'lee'], Arr::get($entry->data(), 'reppy.2.favourites'));
 
         $this->termNorris->slug('norris-new')->save();
+        $this->termHoff->delete();
 
         $this->assertEquals('norris-new', Arr::get($entry->fresh()->data(), 'reppy.0.favourite'));
-        $this->assertEquals(['hoff', 'norris-new'], Arr::get($entry->fresh()->data(), 'reppy.0.favourites'));
+        $this->assertEquals(['norris-new'], Arr::get($entry->fresh()->data(), 'reppy.0.favourites'));
         $this->assertEquals('not a term', Arr::get($entry->fresh()->data(), 'reppy.1.not_term'));
-        $this->assertEquals('hoff', Arr::get($entry->fresh()->data(), 'reppy.2.favourite'));
-        $this->assertEquals(['hoff', 'norris-new'], Arr::get($entry->fresh()->data(), 'reppy.2.favourites'));
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'reppy.2.favourite'));
+        $this->assertEquals(['norris-new', 'lee'], Arr::get($entry->fresh()->data(), 'reppy.2.favourites'));
     }
 
     /** @test */
@@ -290,7 +466,7 @@ class UpdateTermReferencesTest extends TestCase
                 ],
                 [
                     'favourite' => 'hoff',
-                    'favourites' => ['hoff', 'norris'],
+                    'favourites' => ['hoff', 'norris', 'lee'],
                 ],
             ],
         ]))->save();
@@ -298,14 +474,15 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('norris', Arr::get($entry->data(), 'griddy.0.favourite'));
         $this->assertEquals(['hoff', 'norris'], Arr::get($entry->data(), 'griddy.0.favourites'));
         $this->assertEquals('hoff', Arr::get($entry->data(), 'griddy.1.favourite'));
-        $this->assertEquals(['hoff', 'norris'], Arr::get($entry->data(), 'griddy.1.favourites'));
+        $this->assertEquals(['hoff', 'norris', 'lee'], Arr::get($entry->data(), 'griddy.1.favourites'));
 
         $this->termNorris->slug('norris-new')->save();
+        $this->termHoff->delete();
 
         $this->assertEquals('norris-new', Arr::get($entry->fresh()->data(), 'griddy.0.favourite'));
-        $this->assertEquals(['hoff', 'norris-new'], Arr::get($entry->fresh()->data(), 'griddy.0.favourites'));
-        $this->assertEquals('hoff', Arr::get($entry->fresh()->data(), 'griddy.1.favourite'));
-        $this->assertEquals(['hoff', 'norris-new'], Arr::get($entry->fresh()->data(), 'griddy.1.favourites'));
+        $this->assertEquals(['norris-new'], Arr::get($entry->fresh()->data(), 'griddy.0.favourites'));
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'griddy.1.favourite'));
+        $this->assertEquals(['norris-new', 'lee'], Arr::get($entry->fresh()->data(), 'griddy.1.favourites'));
     }
 
     /** @test */
@@ -377,7 +554,7 @@ class UpdateTermReferencesTest extends TestCase
                         'values' => [
                             'type' => 'set_one',
                             'favourite' => 'hoff',
-                            'favourites' => ['hoff', 'norris'],
+                            'favourites' => ['hoff', 'norris', 'lee'],
                         ],
                     ],
                 ],
@@ -388,15 +565,16 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals(['hoff', 'norris'], Arr::get($entry->data(), 'bardo.0.attrs.values.favourites'));
         $this->assertEquals('not a term', Arr::get($entry->data(), 'bardo.1.not_term'));
         $this->assertEquals('hoff', Arr::get($entry->data(), 'bardo.2.attrs.values.favourite'));
-        $this->assertEquals(['hoff', 'norris'], Arr::get($entry->data(), 'bardo.2.attrs.values.favourites'));
+        $this->assertEquals(['hoff', 'norris', 'lee'], Arr::get($entry->data(), 'bardo.2.attrs.values.favourites'));
 
         $this->termNorris->slug('norris-new')->save();
+        $this->termHoff->delete();
 
         $this->assertEquals('norris-new', Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.favourite'));
-        $this->assertEquals(['hoff', 'norris-new'], Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.favourites'));
+        $this->assertEquals(['norris-new'], Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.favourites'));
         $this->assertEquals('not a term', Arr::get($entry->fresh()->data(), 'bardo.1.not_term'));
-        $this->assertEquals('hoff', Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.favourite'));
-        $this->assertEquals(['hoff', 'norris-new'], Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.favourites'));
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'bardo.2.attrs.values.favourite'));
+        $this->assertEquals(['norris-new', 'lee'], Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.favourites'));
     }
 
     /** @test */
@@ -499,7 +677,7 @@ class UpdateTermReferencesTest extends TestCase
                                     'griddy' => [
                                         [
                                             'favourite' => 'norris',
-                                            'favourites' => ['hoff', 'norris'],
+                                            'favourites' => ['hoff', 'norris', 'lee'],
                                         ],
                                     ],
                                 ],
@@ -515,16 +693,17 @@ class UpdateTermReferencesTest extends TestCase
         $this->assertEquals('norris', Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.favourite'));
         $this->assertEquals(['hoff', 'norris'], Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.favourites'));
         $this->assertEquals('norris', Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.favourite'));
-        $this->assertEquals(['hoff', 'norris'], Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.favourites'));
+        $this->assertEquals(['hoff', 'norris', 'lee'], Arr::get($entry->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.favourites'));
 
         $this->termNorris->slug('norris-new')->save();
+        $this->termHoff->delete();
 
         $this->assertEquals('norris-new', Arr::get($entry->fresh()->data(), 'favourite'));
         $this->assertEquals('not a term', Arr::get($entry->fresh()->data(), 'reppy.0.not_term'));
         $this->assertEquals('norris-new', Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.favourite'));
-        $this->assertEquals(['hoff', 'norris-new'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.favourites'));
+        $this->assertEquals(['norris-new'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.favourites'));
         $this->assertEquals('norris-new', Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.favourite'));
-        $this->assertEquals(['hoff', 'norris-new'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.favourites'));
+        $this->assertEquals(['norris-new', 'lee'], Arr::get($entry->fresh()->data(), 'reppy.1.bard_within_reppy.0.attrs.values.griddy.0.favourites'));
     }
 
     /** @test */

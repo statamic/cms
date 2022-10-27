@@ -2,6 +2,8 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Carbon\Carbon;
+use Tests\Antlers\Fixtures\MethodClasses\CallCounter;
 use Tests\Antlers\Fixtures\MethodClasses\ClassOne;
 use Tests\Antlers\Fixtures\MethodClasses\StringLengthObject;
 use Tests\Antlers\ParserTestCase;
@@ -105,5 +107,127 @@ EOT;
 EOT;
 
         $this->assertSame('Yes', $this->renderString($template, $data));
+    }
+
+    public function test_method_calls_can_have_modifiers_applied()
+    {
+        $data = [
+            'date' => Carbon::parse('October 1st, 2012'),
+        ];
+
+        $template = <<<'EOT'
+{{ date }}
+{{ date:copy() | modify_date('+1 weeks') }}
+{{ date:copy() | modify_date('+2 weeks') }}
+{{ date:copy() | modify_date('+3 weeks') }}
+{{ date:copy() | modify_date('+4 weeks') }}
+{{ date:copy() | modify_date('+5 weeks') }}
+
+{{ date }}
+{{ (date:copy()) | modify_date('+1 weeks') }}
+{{ (date:copy()) | modify_date('+2 weeks') }}
+{{ (date:copy()) | modify_date('+3 weeks') }}
+{{ (date:copy()) | modify_date('+4 weeks') }}
+{{ (date:copy()) | modify_date('+5 weeks') }}
+
+{{ date }}
+{{ (((((date:copy()))))) | modify_date('+1 weeks') }}
+{{ (((((date:copy()))))) | modify_date('+2 weeks') }}
+{{ (((((date:copy()))))) | modify_date('+3 weeks') }}
+{{ (((((date:copy()))))) | modify_date('+4 weeks') }}
+{{ (((((date:copy()))))) | modify_date('+5 weeks') }}
+
+{{ date }}
+{{ date:copy().modify('+1 weeks') }}
+{{ date:copy().modify('+2 weeks') }}
+{{ date:copy().modify('+3 weeks') }}
+{{ date:copy().modify('+4 weeks') }}
+{{ date:copy().modify('+5 weeks') }}
+
+{{ date }}
+{{ (date:copy().modify('+1 weeks')) }}
+{{ (date:copy().modify('+2 weeks')) }}
+{{ (date:copy().modify('+3 weeks')) }}
+{{ (date:copy().modify('+4 weeks')) }}
+{{ (date:copy().modify('+5 weeks')) }}
+
+{{ date }}
+{{ (date:copy().modify('+1 weeks')) }}
+{{ (date:copy().modify('+2 weeks')) }}
+{{ (date:copy().modify('+3 weeks')) }}
+{{ (date:copy().modify('+4 weeks')) }}
+{{ (date:copy().modify('+5 weeks')) }}
+
+{{ date }}
+{{ ((((date:copy().modify('+1 weeks'))))) }}
+{{ ((((date:copy().modify('+2 weeks'))))) }}
+{{ ((((date:copy().modify('+3 weeks'))))) }}
+{{ ((((date:copy().modify('+4 weeks'))))) }}
+{{ ((((date:copy().modify('+5 weeks'))))) }}
+EOT;
+
+        $expected = <<<'EOT'
+2012-10-01 00:00:00
+2012-10-08 00:00:00
+2012-10-15 00:00:00
+2012-10-22 00:00:00
+2012-10-29 00:00:00
+2012-11-05 00:00:00
+
+2012-10-01 00:00:00
+2012-10-08 00:00:00
+2012-10-15 00:00:00
+2012-10-22 00:00:00
+2012-10-29 00:00:00
+2012-11-05 00:00:00
+
+2012-10-01 00:00:00
+2012-10-08 00:00:00
+2012-10-15 00:00:00
+2012-10-22 00:00:00
+2012-10-29 00:00:00
+2012-11-05 00:00:00
+
+2012-10-01 00:00:00
+2012-10-08 00:00:00
+2012-10-15 00:00:00
+2012-10-22 00:00:00
+2012-10-29 00:00:00
+2012-11-05 00:00:00
+
+2012-10-01 00:00:00
+2012-10-08 00:00:00
+2012-10-15 00:00:00
+2012-10-22 00:00:00
+2012-10-29 00:00:00
+2012-11-05 00:00:00
+
+2012-10-01 00:00:00
+2012-10-08 00:00:00
+2012-10-15 00:00:00
+2012-10-22 00:00:00
+2012-10-29 00:00:00
+2012-11-05 00:00:00
+
+2012-10-01 00:00:00
+2012-10-08 00:00:00
+2012-10-15 00:00:00
+2012-10-22 00:00:00
+2012-10-29 00:00:00
+2012-11-05 00:00:00
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, $data, true)));
+    }
+
+    public function test_method_calls_not_get_called_more_than_declared()
+    {
+        $counter = new CallCounter();
+
+        $template = <<<'EOT'
+{{ counter:increment():increment():increment() }}
+EOT;
+
+        $this->assertSame('Count: 3', $this->renderString($template, ['counter' => $counter]));
     }
 }

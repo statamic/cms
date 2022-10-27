@@ -1268,13 +1268,20 @@ class NodeProcessor
                                 );
                             }
 
+                            $recursiveParent->activeDepth += 1;
+
                             $rootData = RecursiveNodeManager::getRecursiveRootData($node);
                             $parentParameterValues = array_values($recursiveParent->getParameterValues($this));
-                            $currentDepth = RecursiveNodeManager::getNodeDepth($node);
                             // Substitute the current node with the original parent.
                             foreach ($children as $childData) {
+                                $namedDepthMapping = $node->content.'_depth';
+
                                 $depths = RecursiveNodeManager::getActiveDepthNames();
-                                $depths['depth'] = $currentDepth;
+                                $depths['depth'] = $recursiveParent->activeDepth;
+                                $depths[$namedDepthMapping] = $recursiveParent->activeDepth;
+
+                                // Keep the manager in sync.
+                                RecursiveNodeManager::updateNamedDepth($node, $recursiveParent->activeDepth);
 
                                 $childDataToUse = $depths + $childData;
 
@@ -1301,6 +1308,7 @@ class NodeProcessor
                                 }
                             }
 
+                            $recursiveParent->activeDepth -= 1;
                             RecursiveNodeManager::releaseRecursiveNode($node);
                         }
                         continue;
@@ -2117,6 +2125,7 @@ class NodeProcessor
                                         }
                                     }
 
+                                    $this->data = $lockData;
                                     $this->processAssignments($runtimeAssignmentsToProcess);
                                     $lockData = $this->data;
 

@@ -4,6 +4,7 @@ namespace Statamic;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
@@ -11,6 +12,7 @@ use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;
+use Statamic\Support\Arr;
 use Statamic\Support\DateFormat;
 use Statamic\Support\Str;
 use Statamic\Tags\FluentTag;
@@ -386,6 +388,15 @@ class Statamic
         return $line;
     }
 
+    public static function isWorker()
+    {
+        if (! App::runningInConsole()) {
+            return false;
+        }
+
+        return Str::startsWith(Arr::get(request()->server(), 'argv.1'), ['queue:', 'horizon:']);
+    }
+
     private static function createVersionedAssetPath($name, $path, $extension)
     {
         // If passing a path versioned by laravel mix, it will contain ?id=
@@ -394,8 +405,7 @@ class Statamic
             return (string) $path;
         }
 
-        return Cache::rememberForever("statamic-{$extension}-{$name}", function () use ($path, $extension) {
-
+        return Cache::rememberForever("statamic-{$extension}-{$name}-{md5($path)}", function () use ($path, $extension) {
             // In case a file without any version will be passed,
             // a random version number will be created.
             if (! Str::contains($path, '?v=')) {
