@@ -1379,4 +1379,61 @@ EOT;
 
         $this->assertSame(StringUtilities::normalizeLineEndings($expected), StringUtilities::normalizeLineEndings($results));
     }
+
+    public function test_multiple_navs_on_same_page_inside_conditions_resolve_the_correct_parent()
+    {
+        $this->makeNavTree();
+
+        $template = <<<'EOT'
+{{ nav handle="main" }}
+    {{ if depth == 1 }}
+        <div class="{{ if is_current || is_parent }}active{{ /if }}">
+            <a href="{{ url }}">First: {{ title }}</a>
+            {{ if children }}
+                <ul>
+                    {{ *recursive children* }}
+                </ul>
+            {{ /if }}
+        </div>
+    {{ /if }}
+    {{ if depth == 2 }}
+        <li><a class="{{ if is_current }}active{{ /if }}" href="{{ url }}">First: {{ title }}</a></li>
+    {{ /if }}
+{{ /nav }}
+
+<hr />
+{{ if true }}
+    {{ nav handle="main" }}
+        {{ if depth == 1 }}
+            <div>
+                <a href="{{ url }}">Second: {{ title }}</a>
+                {{ if children }}
+                    <ul>
+                        {{ *recursive children* }}
+                    </ul>
+                {{ /if }}
+            </div>
+        {{ /if }}
+        {{ if depth == 2 }}
+            <li><a class="{{ if is_current }}active{{ /if }}" href="{{ url }}">Second: {{ title }}</a></li>
+        {{ /if }}
+    {{ /nav }}
+{{ /if }}
+EOT;
+
+        $result = $this->renderString($template, [], true);
+        $this->assertStringContainsString('<a href="/">First: Home</a>', $result);
+        $this->assertStringContainsString('<a href="about">First: About</a>', $result);
+        $this->assertStringContainsString('<li><a class="" href="team">First: Team</a></li>', $result);
+        $this->assertStringContainsString('<li><a class="" href="leadership">First: Leadership</a></li>', $result);
+        $this->assertStringContainsString('<a href="projects">First: Projects</a>', $result);
+        $this->assertStringContainsString('<li><a class="" href="project-1">First: Project-1</a></li>', $result);
+        $this->assertStringContainsString('<li><a class="" href="project-2">First: Project-2</a></li>', $result);
+
+        $this->assertStringContainsString('<a href="/">Second: Home</a>', $result);
+        $this->assertStringContainsString('<a href="about">Second: About</a>', $result);
+        $this->assertStringContainsString('<li><a class="" href="leadership">Second: Leadership</a></li>', $result);
+        $this->assertStringContainsString('<a href="projects">Second: Projects</a>', $result);
+        $this->assertStringContainsString('<a href="contact">Second: Contact</a>', $result);
+    }
 }
