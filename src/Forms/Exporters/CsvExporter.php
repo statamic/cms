@@ -18,7 +18,7 @@ class CsvExporter extends AbstractExporter
     public function __construct()
     {
         $this->writer = Writer::createFromFileObject(new SplTempFileObject);
-        $this->writer->setDelimiter(config('statamic.system.csv_delimiter', ','));
+        $this->writer->setDelimiter(config('statamic.forms.csv_delimiter', ','));
     }
 
     /**
