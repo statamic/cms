@@ -80,7 +80,7 @@ class ArithmeticTest extends ParserTestCase
     public function test_subtraction_after_logic_groups()
     {
         $data = [
-            'items' => ['a', 'b', 'c']
+            'items' => ['a', 'b', 'c'],
         ];
 
         $this->assertSame(2, intval($this->renderString('{{ (items|length) - 1 }}', $data, true)));
