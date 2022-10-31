@@ -324,7 +324,7 @@ class Bard extends Replicator
         } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
         }
-        
+
         if ($this->config('input_mode') === 'inline') {
             // Root should be text, if it's not this must be a block field converted
             // to inline. In that instance unwrap the content of the first node.
