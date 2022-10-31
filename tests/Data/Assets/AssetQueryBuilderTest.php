@@ -531,4 +531,71 @@ class AssetQueryBuilderTest extends TestCase
 
         $this->assertEquals(['b.txt', 'c.txt', 'd.jpg'], $query->offset(1)->get()->map->path()->all());
     }
+
+    /** @test */
+    public function querying_doesnt_generate_meta_files_unnecessarily()
+    {
+        $this->assertEquals([
+            'a.jpg',
+            'b.txt',
+            'c.txt',
+            'd.jpg',
+            'e.jpg',
+            'f.jpg',
+        ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
+
+        $assets = $this->container->queryAssets()->get();
+
+        $this->assertCount(6, $assets);
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $assets->map->filename()->all());
+
+        $this->assertEquals([
+            'a.jpg',
+            'b.txt',
+            'c.txt',
+            'd.jpg',
+            'e.jpg',
+            'f.jpg',
+        ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
+    }
+
+    /** @test */
+    public function querying_a_data_field_will_generate_meta_files()
+    {
+        Storage::disk('test')->put('.meta/b.txt.yaml', "data:\n  foo: bar");
+        Storage::disk('test')->put('.meta/d.jpg.yaml', "data:\n  foo: bar");
+        Storage::disk('test')->put('.meta/e.jpg.yaml', "data:\n  foo: notbar");
+
+        $this->assertEquals([
+            '.meta/b.txt.yaml',
+            '.meta/d.jpg.yaml',
+            '.meta/e.jpg.yaml',
+            'a.jpg',
+            'b.txt',
+            'c.txt',
+            'd.jpg',
+            'e.jpg',
+            'f.jpg',
+        ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
+
+        $assets = $this->container->queryAssets()->where('foo', 'bar')->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['b', 'd'], $assets->map->filename()->all());
+
+        $this->assertEquals([
+            '.meta/a.jpg.yaml',
+            '.meta/b.txt.yaml',
+            '.meta/c.txt.yaml',
+            '.meta/d.jpg.yaml',
+            '.meta/e.jpg.yaml',
+            '.meta/f.jpg.yaml',
+            'a.jpg',
+            'b.txt',
+            'c.txt',
+            'd.jpg',
+            'e.jpg',
+            'f.jpg',
+        ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
+    }
 }

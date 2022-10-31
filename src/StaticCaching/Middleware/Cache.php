@@ -39,7 +39,7 @@ class Cache
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
             $response = response($this->cacher->getCachedPage($request));
 
-            $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->replaceInCachedResponse($response));
+            $this->makeReplacements($response);
 
             return $response;
         }
@@ -50,6 +50,8 @@ class Cache
             $this->makeReplacementsAndCacheResponse($request, $response);
 
             $this->nocache->write();
+        } elseif (! $response->isRedirect()) {
+            $this->makeReplacements($response);
         }
 
         return $response;
@@ -62,6 +64,11 @@ class Cache
         $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse, $response));
 
         $this->cacher->cachePage($request, $cachedResponse);
+    }
+
+    private function makeReplacements($response)
+    {
+        $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->replaceInCachedResponse($response));
     }
 
     private function getReplacers(): Collection

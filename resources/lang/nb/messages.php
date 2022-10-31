@@ -71,6 +71,7 @@ return [
     'fields_instructions_instructions' => 'Vises under feltets visningsetikett, slik som denne teksten. Markdown støttes.',
     'fields_instructions_position_instructions' => 'Vis instruksjoner over eller under feltet.',
     'fields_listable_instructions' => 'Styrer om feltet skjules eller vises i lister.',
+    'fields_visibility_instructions' => 'Styrer om feltet vises i publisseringsskjema.',
     'fieldset_import_fieldset_instructions' => 'Feltsettet som skal importeres.',
     'fieldset_import_prefix_instructions' => 'Prefikset som skal brukes på hvert felt når de importeres, for eksempel helt_',
     'fieldset_intro' => 'Feltsett er en valgfri ledsager til blueprint og fungerer som gjenbrukbare delreplikaer som kan brukes i blueprint.',

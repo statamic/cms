@@ -13,6 +13,10 @@
                 </div>
             </h1>
 
+            <dropdown-list class="mr-2" v-if="canEditBlueprint">
+                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            </dropdown-list>
+
             <div class="pt-px text-2xs text-grey-60 flex mr-2" v-if="readOnly">
                 <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
             </div>
@@ -277,6 +281,7 @@ export default {
         initialPermalink: String,
         revisionsEnabled: Boolean,
         preloadedAssets: Array,
+        canEditBlueprint: Boolean,
         createAnotherUrl: String,
         listingUrl: String,
         previewTargets: Array,

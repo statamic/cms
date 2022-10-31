@@ -109,7 +109,7 @@ export default {
     created() {
         let src = this.node.attrs.src;
 
-        if (! src) {
+        if (this.node.isNew) {
             this.openSelector();
         }
 

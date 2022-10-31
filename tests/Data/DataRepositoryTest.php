@@ -22,8 +22,6 @@ class DataRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        static::$functions = Mockery::mock();
-
         $this->data = (new DataRepository);
     }
 
@@ -83,6 +81,8 @@ class DataRepositoryTest extends TestCase
     /** @test */
     public function when_a_repository_key_isnt_provided_it_will_loop_through_repositories()
     {
+        $this->mockMethodExists();
+
         $this->app->instance('FooRepository', Mockery::mock('FooRepository', function ($m) {
             self::$functions->shouldReceive('method_exists')->with('FooRepository', 'find')->once()->andReturnTrue();
             $m->shouldReceive('find')->once()->with('123')->andReturnNull();
@@ -268,7 +268,6 @@ class DataRepositoryTest extends TestCase
 
     private function findByRequestUrlTest($requestUrl, $entryId)
     {
-        self::$functions->shouldReceive('method_exists')->with(EntryRepository::class, 'findByUri')->andReturnTrue();
         $this->data->setRepository('entry', EntryRepository::class);
 
         $c = tap(Collection::make('pages')->sites(['english', 'french'])->routes('{slug}')->structureContents(['root' => true]))->save();
@@ -294,6 +293,11 @@ class DataRepositoryTest extends TestCase
         } else {
             $this->assertNull($found);
         }
+    }
+
+    private function mockMethodExists()
+    {
+        static::$functions = Mockery::mock();
     }
 }
 

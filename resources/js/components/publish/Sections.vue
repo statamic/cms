@@ -2,9 +2,11 @@
 
     <element-container @resized="containerWasResized">
     <div>
-        <div class="tabs-container flex items-center" :class="{ 'offset-for-sidebar': shouldShowSidebar }">
+
+        <!-- Tabs -->
+        <div v-if="showTabs" class="tabs-container flex items-center" :class="{ 'offset-for-sidebar': shouldShowSidebar }">
             <div
-                class="publish-tabs tabs flex-shrink" v-show="mainSections.length > 1"
+                class="publish-tabs tabs flex-shrink"
                 ref="tabs"
                 role="tablist"
                 :aria-label="__('Edit Content')"
@@ -36,7 +38,10 @@
             </dropdown-list>
         </div>
 
+        <!-- Main and Sidebar -->
         <div class="flex justify-between">
+
+            <!-- Main -->
             <div ref="publishSectionWrapper" class="publish-section-wrapper w-full min-w-0">
                 <div
                     role="tabpanel"
@@ -63,6 +68,7 @@
                 </div>
             </div>
 
+            <!-- Sidebar(ish) -->
             <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                 <div class="publish-section">
                     <div class="publish-section-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
@@ -72,7 +78,7 @@
                     </div>
 
                     <publish-fields
-                        v-if="shouldShowSidebar && sidebarSection"
+                        v-if="layoutReady && shouldShowSidebar && sidebarSection"
                         :fields="sidebarSection.fields"
                         :read-only="readOnly"
                         :syncable="syncable"
@@ -115,8 +121,10 @@ export default {
 
         return {
             active: state.blueprint.sections[0].handle,
-            containerWidth: null,
-            visibleTabs: []
+            visibleTabs: 0,
+            layoutReady: false,
+            shouldShowSidebar: false,
+            initialTabSet: false
         }
     },
 
@@ -135,21 +143,21 @@ export default {
         },
 
         mainSections() {
-            if (! this.shouldShowSidebar) return this.sections;
+            if (this.layoutReady && ! this.shouldShowSidebar) return this.sections;
 
-            if (this.active === "sidebar") {
-                this.active = this.state.blueprint.sections[0].handle
-            }
-
-            return _.filter(this.sections, section => section.handle != 'sidebar');
+            return this.sections.filter(section => section.handle !== 'sidebar');
         },
 
         sidebarSection() {
-            return _.find(this.sections, { handle: 'sidebar' });
+            return this.sections.find(section => section.handle === 'sidebar');
         },
 
-        shouldShowSidebar() {
-            return this.enableSidebar && this.containerWidth > 920;
+        showTabs() {
+            return this.layoutReady && this.mainSections.length > 1
+        },
+
+        showHiddenTabsDropdown() {
+            return this.mainSections.length > this.visibleTabs;
         },
 
         errors() {
@@ -171,26 +179,13 @@ export default {
 
         actionsPortal() {
             return `publish-actions-${this.storeName}`;
-        },
-
-        showHiddenTabsDropdown() {
-            return this.mainSections.length > this.visibleTabs.length;
         }
 
     },
 
-    mounted() {
-        if (this.inStack) return;
-
-        // Deep linking/refreshing to a specific #section
-        if (window.location.hash.length > 0) {
-            let hash = window.location.hash.substr(1);
-            // if hash is in this.visibleTabs, make it active.
-            if (_.chain(this.visibleTabs).values().contains(hash)) {
-                this.setActive(hash);
-            } else {
-                window.location.hash = '';
-            }
+    beforeUpdate() {
+        if (this.shouldShowSidebar && this.active === 'sidebar') {
+            this.active = this.state.blueprint.sections[0].handle
         }
     },
 
@@ -209,41 +204,61 @@ export default {
             }
         },
 
-        isTabHidden(section) {
-            return false
+        setActiveTabFromHash() {
+            if (this.inStack) return;
+
+            if (window.location.hash.length === 0) return;
+
+            const handle = window.location.hash.substr(1);
+
+            const index = this.mainSections.findIndex(section => section.handle === handle);
+
+            if (index >= 0 && index < this.visibleTabs) {
+                this.setActive(handle);
+            } else {
+                window.location.hash = '';
+            }
         },
 
         containerWasResized($event) {
-            this.containerWidth = $event.width;
-            this.wangjangleTabVisibility();
+            const { width } = $event;
+
+            // NOTE Using computed properties for these will cause a lot of unnecessary re-renders
+            this.layoutReady = (width !== null);
+            this.shouldShowSidebar = (this.enableSidebar && width > 920);
+
+            if (this.layoutReady) {
+                this.wangjangleTabVisibility();
+            }
         },
 
         wangjangleTabVisibility: _.debounce(function () {
             this.$nextTick(() => {
-                let visibleTabs = []
+                if (!this.$refs.tabs) return;
 
-                // Offset 40px for dropdown list position
-                let maxWidth = this.$refs.publishSectionWrapper.offsetWidth - 40;
+                let visibleTabs = 0;
+
+                // Leave 40px for the dropdown list.
+                const maxWidth = this.$refs.publishSectionWrapper.offsetWidth - 40;
                 let tabWidthSum = 0;
 
                 this.$refs.tabs.childNodes.forEach((tab, index) => {
                     tabWidthSum += tab.offsetWidth;
 
                     if (tabWidthSum < maxWidth) {
-                        visibleTabs.push(this.mainSections[index].handle);
+                        visibleTabs += 1;
                     }
                 })
 
                 this.visibleTabs = visibleTabs;
+
+                if (!this.initialTabSet) this.setActiveTabFromHash();
+                this.initialTabSet = true;
             });
         }, 100),
 
-        isTabVisible(index) {
-            return _.contains(this.visibleTabs, this.mainSections[index].handle);
-        },
-
         isTabHidden(index) {
-            return ! _.contains(this.visibleTabs, this.mainSections[index].handle);
+            return index >= this.visibleTabs;
         }
     }
 
