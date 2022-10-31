@@ -291,7 +291,7 @@ class UserTags extends Tags
 
         $knownParams = ['redirect'];
 
-        $action = route('statamic.password.email');
+        $action = route('statamic.password.reset.action');
         $method = 'POST';
 
         $token = request('token');

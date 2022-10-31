@@ -1341,6 +1341,20 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Rekeys an array or collection.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function keyBy($value, $params)
+    {
+        $rekeyed = collect($value)->keyBy(fn ($item) => $item[$params[0]]);
+
+        return is_array($value) ? $rekeyed->all() : $rekeyed;
+    }
+
+    /**
      * Returns the last $params[0] characters of a string, or the last element of an array.
      *
      * @param $value
@@ -1461,6 +1475,27 @@ class CoreModifiers extends Modifier
         })->reduce(function ($value, $modifier) use ($context) {
             return Modify::value($value)->context($context)->modify($modifier['name'], $modifier['params']);
         }, $value);
+    }
+
+    /**
+     * Wraps matched words with <mark> tags.
+     *
+     * @param $value
+     * @param  array  $params
+     * @return string
+     */
+    public function mark($value, $params, $context)
+    {
+        if (! $words = $params[0] ?? $context['get']['q'] ?? null) {
+            return $value;
+        }
+
+        $params[0] = collect(preg_split('/\s+/', $words))
+            ->map(fn ($word) => preg_quote($word, '/'))
+            ->filter()
+            ->join('|');
+
+        return $this->regexMark($value, $params);
     }
 
     /**
@@ -1847,6 +1882,35 @@ class CoreModifiers extends Modifier
         $words = $this->wordCount(strip_tags($value));
 
         return ceil($words / Arr::get($params, 0, 200));
+    }
+
+    /**
+     * Wraps regex matches with <mark> tags.
+     *
+     * @param $value
+     * @param  array  $params
+     * @return string
+     */
+    public function regexMark($value, $params)
+    {
+        if (! $pattern = array_shift($params)) {
+            return $value;
+        }
+
+        $attributes = $this->buildAttributesFromParameters($params);
+
+        return Html::mapText($value, function ($text) use ($pattern, $attributes) {
+            $text = Html::decode($text);
+
+            return Str::mapRegex($text, "/({$pattern})/is", function ($part, $match) use ($attributes) {
+                $part = Html::entities($part);
+                if ($match) {
+                    $part = '<mark'.Html::attributes($attributes).'>'.$part.'</mark>';
+                }
+
+                return $part;
+            });
+        });
     }
 
     /**
@@ -2549,7 +2613,9 @@ class CoreModifiers extends Modifier
      */
     public function title($value)
     {
-        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor'];
+        preg_match_all('/[A-Z]+\b/', $value, $matches);
+
+        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor', ...$matches[0]];
 
         return Stringy::titleize($value, $ignore);
     }

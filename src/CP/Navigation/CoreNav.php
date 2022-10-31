@@ -200,7 +200,8 @@ class CoreNav
             Nav::tools('GraphQL')
                 ->route('graphql.index')
                 ->icon('array')
-                ->attributes(['target' => '_blank']);
+                ->attributes(['target' => '_blank'])
+                ->can('view graphql');
         }
 
         return $this;

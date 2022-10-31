@@ -14,41 +14,54 @@ class DefaultUrlExcluderTest extends \PHPUnit\Framework\TestCase
     /** @test */
     public function excludes_urls()
     {
-        $cacher = $this->excluder(['/blog']);
+        $excluder = $this->excluder(['/blog', '/events/', '/']);
 
-        $this->assertTrue($cacher->isExcluded('/blog'));
-        $this->assertFalse($cacher->isExcluded('/blog/post'));
+        $this->assertTrue($excluder->isExcluded('/blog'));
+        $this->assertTrue($excluder->isExcluded('/blog/'));
+        $this->assertFalse($excluder->isExcluded('/blog/post'));
+        $this->assertTrue($excluder->isExcluded('/events'));
+        $this->assertTrue($excluder->isExcluded('/events/'));
+        $this->assertFalse($excluder->isExcluded('/events/statameet'));
+        $this->assertTrue($excluder->isExcluded('/'));
+        $this->assertTrue($excluder->isExcluded(''));
     }
 
     /** @test */
     public function excludes_wildcard_urls()
     {
-        $cacher = $this->excluder([
+        $excluder = $this->excluder([
             '/blog/*', // The slash indicates "only child pages"
             '/news*',   // No slash would get the "news" page, child pages, and any page with the substring.
         ]);
 
-        $this->assertTrue($cacher->isExcluded('/blog/post'));
-        $this->assertFalse($cacher->isExcluded('/blog'));
+        $this->assertTrue($excluder->isExcluded('/blog/post'));
+        $this->assertTrue($excluder->isExcluded('/blog/post/'));
+        $this->assertFalse($excluder->isExcluded('/blog'));
+        $this->assertFalse($excluder->isExcluded('/blog/'));
 
-        $this->assertTrue($cacher->isExcluded('/news'));
-        $this->assertTrue($cacher->isExcluded('/news/article'));
-        $this->assertTrue($cacher->isExcluded('/newspaper'));
+        $this->assertTrue($excluder->isExcluded('/news'));
+        $this->assertTrue($excluder->isExcluded('/news/'));
+        $this->assertTrue($excluder->isExcluded('/news/article'));
+        $this->assertTrue($excluder->isExcluded('/news/article/'));
+        $this->assertTrue($excluder->isExcluded('/newspaper'));
+        $this->assertTrue($excluder->isExcluded('/newspaper/'));
     }
 
     /** @test */
     public function url_exclusions_ignore_query_strings()
     {
-        $cacher = $this->excluder(['/blog']);
+        $excluder = $this->excluder(['/blog']);
 
-        $this->assertTrue($cacher->isExcluded('/blog?page=1'));
+        $this->assertTrue($excluder->isExcluded('/blog?page=1'));
+        $this->assertTrue($excluder->isExcluded('/blog/?page=1'));
     }
 
     /** @test */
     public function url_exclusions_trim_the_base_url()
     {
-        $cacher = $this->excluder(['/blog'], 'http://example.com');
+        $excluder = $this->excluder(['/blog'], 'http://example.com');
 
-        $this->assertTrue($cacher->isExcluded('http://example.com/blog'));
+        $this->assertTrue($excluder->isExcluded('http://example.com/blog'));
+        $this->assertTrue($excluder->isExcluded('http://example.com/blog/'));
     }
 }

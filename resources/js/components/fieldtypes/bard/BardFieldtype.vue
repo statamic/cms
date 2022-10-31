@@ -24,7 +24,7 @@
                 <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
                     <svg-icon name="file-code" class="w-4 h-4 "/>
                 </button>
-                <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
+                <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && config.sets.length > 0">
                     <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
                 </button>
                 <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
@@ -61,6 +61,7 @@
                 </dropdown-list>
             </floating-menu>
 
+            <div class="bard-invalid" v-if="invalid" v-html="__('Invalid content')"></div>
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
@@ -151,7 +152,9 @@ export default {
             collapsed: this.meta.collapsed,
             previews: this.meta.previews,
             mounted: false,
+            invalid: false,
             pageHeader: null,
+            escBinding: null,
         }
     },
 
@@ -265,9 +268,11 @@ export default {
     mounted() {
         this.initToolbarButtons();
 
+        const content = this.valueToContent(clone(this.value));
+
         this.editor = new Editor({
             extensions: this.getExtensions(),
-            content: this.valueToContent(clone(this.value)),
+            content: content,
             editable: !this.readOnly,
             enableInputRules: this.config.enable_input_rules,
             enablePasteRules: this.config.enable_paste_rules,
@@ -284,14 +289,27 @@ export default {
                 this.json = this.editor.getJSON().content;
                 this.html = this.editor.getHTML();
             },
+            onCreate: ({ editor }) => {
+                const state = editor.view.state;
+                 if (content !== null && typeof content === 'object') {
+                     try {
+                         state.schema.nodeFromJSON(content);
+                     } catch (error) {
+                         this.invalid = true;
+                     }
+                 }
+            }
         });
 
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.$keys.bind('esc', this.closeFullscreen)
+        this.escBinding = this.$keys.bind('esc', this.closeFullscreen)
 
-        this.$nextTick(() => this.mounted = true);
+        this.$nextTick(() => {
+            this.mounted = true;
+            if (this.config.collapse) this.collapseAll();
+        });
 
         this.pageHeader = document.querySelector('.global-header');
 
@@ -300,6 +318,7 @@ export default {
 
     beforeDestroy() {
         this.editor.destroy();
+        this.escBinding.destroy();
 
         this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
     },
@@ -399,6 +418,11 @@ export default {
         },
 
         expandSet(id) {
+            if (this.config.collapse === 'accordion') {
+                this.collapsed = Object.keys(this.meta.existing).filter(v => v !== id);
+                return;
+            }
+
             if (this.collapsed.includes(id)) {
                 var index = this.collapsed.indexOf(id);
                 this.collapsed.splice(index, 1);

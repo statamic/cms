@@ -62,6 +62,7 @@ export const Image = Node.create({
                 const { selection } = tr;
                 const position = selection.$cursor ? selection.$cursor.pos : selection.$to.pos;
                 const node = this.type.create(attrs);
+                node.isNew = true;
                 if (dispatch) {
                     const transaction = tr.insert(position, node);
                     dispatch(transaction);
