@@ -34,7 +34,7 @@
             </div>
         </div>
 
-        <div class="bard-editor" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar }" tabindex="0">
+        <div class="bard-editor" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }" tabindex="0">
             <bubble-menu class="bard-floating-toolbar" :editor="editor" :tippy-options="{ maxWidth: 'none', zIndex: 1000 }" v-if="editor && toolbarIsFloating && !readOnly">
                 <component
                     v-for="button in visibleButtons(buttons)"
@@ -103,7 +103,7 @@ import Text from '@tiptap/extension-text';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import BardSource from './Source.vue';
-import Document from './Document';
+import { DocumentBlock, DocumentInline } from './Document';
 import { Set } from './Set'
 import { Small } from './Small';
 import { Image } from './Image';
@@ -258,6 +258,10 @@ export default {
                 }
             }
             return text;
+        },
+
+        inputIsInline() {
+            return this.config.input_mode === 'inline';
         },
 
     },
@@ -544,8 +548,7 @@ export default {
         getExtensions() {
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
-                Document,
-                HardBreak,
+                ...(this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak]),
                 History,
                 Paragraph,
                 Placeholder.configure({ placeholder: this.config.placeholder }),

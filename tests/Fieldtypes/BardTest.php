@@ -608,6 +608,81 @@ EOT;
         $this->assertEquals([['foo' => 'bar']], (new Bard)->toQueryableValue([['foo' => 'bar']]));
     }
 
+    /** @test */
+    public function it_augments_inline_value()
+    {
+        $data = [
+            ['type' => 'text', 'text' => 'This is inline text with '],
+            ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
+            ['type' => 'text', 'text' => ' and '],
+            ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
+            ['type' => 'text', 'text' => ' text.'],
+        ];
+
+        $expected = 'This is inline text with <strong>bold</strong> and <em>italic</em> text.';
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'inline', 'sets' => null])->augment($data));
+    }
+
+    /** @test */
+    public function it_processes_inline_value()
+    {
+        $data = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+
+        $expected = [
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'inline', 'sets' => null])->process($data));
+    }
+
+    /** @test */
+    public function it_preprocesses_inline_value()
+    {
+        $data = [
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'inline', 'sets' => null])->preProcess($data));
+    }
+
+    /** @test */
+    public function it_preprocesses_inline_value_to_block_value()
+    {
+        $data = [
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
+    }
+
+    /** @test */
+    public function it_preprocesses_block_value_to_inline_value()
+    {
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'This is block text.'],
+                ],
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'This is some more block text.'],
+                ],
+            ],
+        ];
+
+        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is block text."}]}]';
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'inline', 'sets' => null])->preProcess($data));
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));

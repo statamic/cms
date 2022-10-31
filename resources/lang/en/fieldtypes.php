@@ -31,6 +31,7 @@ return [
     'bard.config.sets' => 'Sets are configurable blocks of fields that can be inserted anywhere in your Bard content.',
     'bard.config.target_blank' => 'Set `target="_blank"` on all links.',
     'bard.config.toolbar_mode' => 'Choose which style of toolbar you prefer.',
+    'bard.config.input_mode' => 'Choose between block or inline text input.',
     'bard.title' => 'Bard',
     'button_group.title' => 'Button Group',
     'checkboxes.config.inline' => 'Show the checkboxes in a row.',
