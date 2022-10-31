@@ -10,7 +10,7 @@ class Token extends AbstractToken
 
     public function path()
     {
-        return storage_path('statamic/tokens/'.$this->token().'.yaml');
+        return config('statamic.system.token_path', 'statamic/tokens').'/'.$this->token().'.yaml';
     }
 
     public function fileData()

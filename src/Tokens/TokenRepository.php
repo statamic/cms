@@ -15,7 +15,7 @@ class TokenRepository
 
     public function find(string $token)
     {
-        $path = storage_path('statamic/tokens/'.$token.'.yaml');
+        $path = $this->path($token);
 
         if (! File::exists($path)) {
             return null;
@@ -26,21 +26,21 @@ class TokenRepository
 
     public function save(Token $token)
     {
-        File::put(storage_path('statamic/tokens/'.$token->token().'.yaml'), $token->fileContents());
+        File::put($this->path($token->token()), $token->fileContents());
 
         return true;
     }
 
     public function delete(Token $token)
     {
-        File::delete(storage_path('statamic/tokens/'.$token->token().'.yaml'));
+        File::delete($this->path($token->token()));
 
         return true;
     }
 
     public function collectGarbage()
     {
-        File::getFilesByType(storage_path('statamic/tokens'), 'yaml')
+        File::getFilesByType($this->path(), 'yaml')
             ->map(fn ($path) => $this->makeFromPath($path))
             ->filter->hasExpired()
             ->each->delete();
@@ -55,5 +55,10 @@ class TokenRepository
         return $this
             ->make($token, $yaml['handler'], $yaml['data'] ?? [])
             ->expireAt(Carbon::createFromTimestamp($yaml['expires_at']));
+    }
+
+    private function path($token = null)
+    {
+        return config('statamic.system.token_path', 'statamic/tokens').($token ? '/'.$token.'.yaml' : '');
     }
 }
