@@ -16,14 +16,14 @@ class Slug extends Text
                 'type' => 'text',
                 'instructions' => __('statamic::fieldtypes.slug.config.from'),
                 'default' => 'title',
-                'width' => 50
+                'width' => 50,
             ],
             'generate' => [
                 'display' => __('Generate'),
                 'type' => 'toggle',
                 'instructions' => __('statamic::fieldtypes.slug.config.generate'),
                 'default' => true,
-                'width' => 50
+                'width' => 50,
             ],
         ];
     }
