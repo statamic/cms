@@ -127,6 +127,8 @@ return [
     'select.title' => 'Select',
     'sites.title' => 'Sites',
     'slug.title' => 'Slug',
+    'slug.config.from' => 'Target field to create a slug from.',
+    'slug.config.generate' => 'Create a slug automatically from target `from` field.',
     'structures.title' => 'Structures',
     'table.title' => 'Table',
     'taggable.title' => 'Taggable',
