@@ -1949,7 +1949,7 @@ class CoreModifiers extends Modifier
     {
         $remove_modifiers = Arr::get($params, 0, false);
 
-        return $this->carbon($value)->diffForHumans(null, in_array($remove_modifiers, [true, 'true', ''], true));
+        return $this->carbon($value)->diffForHumans(null, in_array($remove_modifiers, [true, 'true'], true));
     }
 
     /**
