@@ -1934,7 +1934,6 @@ class CoreModifiers extends Modifier
      */
     public function relative($value, $params)
     {
-        dump($params);
         return $this->diffForHumans($value, $params);
     }
 
