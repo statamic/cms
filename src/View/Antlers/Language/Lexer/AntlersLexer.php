@@ -584,12 +584,22 @@ class AntlersLexer
                         }
                     }
 
-                    $variableRefNode = new VariableNode();
-                    $variableRefNode->name = $parsedValue;
-                    $variableRefNode->startPosition = $startPosition;
-                    $variableRefNode->endPosition = $endPosition;
-                    $this->runtimeNodes[] = $variableRefNode;
-                    $this->lastNode = $variableRefNode;
+                    if ($parsedValue == DocumentParser::Punctuation_Minus) {
+                        $subtractionOperator = new SubtractionOperator();
+                        $subtractionOperator->content = '-';
+                        $subtractionOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $subtractionOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
+
+                        $this->runtimeNodes[] = $subtractionOperator;
+                        $this->lastNode = $subtractionOperator;
+                    } else {
+                        $variableRefNode = new VariableNode();
+                        $variableRefNode->name = $parsedValue;
+                        $variableRefNode->startPosition = $startPosition;
+                        $variableRefNode->endPosition = $endPosition;
+                        $this->runtimeNodes[] = $variableRefNode;
+                        $this->lastNode = $variableRefNode;
+                    }
 
                     continue;
                 }
