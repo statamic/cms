@@ -1934,6 +1934,7 @@ class CoreModifiers extends Modifier
      */
     public function relative($value, $params)
     {
+        dump($params);
         return $this->diffForHumans($value, $params);
     }
 
@@ -1949,7 +1950,7 @@ class CoreModifiers extends Modifier
     {
         $remove_modifiers = Arr::get($params, 0, false);
 
-        return $this->carbon($value)->diffForHumans(null, $remove_modifiers);
+        return $this->carbon($value)->diffForHumans(null, in_array($remove_modifiers, [true, 'true', ''], true));
     }
 
     /**
