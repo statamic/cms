@@ -307,6 +307,7 @@ export default {
         initialTitle: String,
         initialLocalizations: Array,
         initialLocalizedFields: Array,
+        localizationOrigin: String,
         initialHasOrigin: Boolean,
         initialOriginValues: Object,
         initialOriginMeta: Object,
@@ -602,7 +603,7 @@ export default {
 
             if (localization.exists) {
                 this.editLocalization(localization);
-            } else if (this.localizations.length > 2 && Statamic.$config.get('localizeEntriesFrom') === 'select') {
+            } else if (this.localizations.length > 2 && this.localizationOrigin === 'select') {
                 this.selectingOrigin = true;
             } else {
                 this.createLocalization(localization);
@@ -752,7 +753,7 @@ export default {
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
 
-        this.selectedOrigin = Statamic.$config.get('localizeEntriesFrom') === 'active'
+        this.selectedOrigin = this.localizationOrigin === 'active'
             ? this.localizations.find(l => l.active).handle
             : this.localizations.find(l => l.root).handle;
     },

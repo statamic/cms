@@ -51,6 +51,7 @@ class CollectionsStore extends BasicStore
             ->searchIndex(array_get($data, 'search_index'))
             ->revisionsEnabled(array_get($data, 'revisions', false))
             ->defaultPublishState($this->getDefaultPublishState($data))
+            ->defaultLocalizationOrigin(array_get($data, 'default_localization_origin', 'select'))
             ->structureContents(array_get($data, 'structure'))
             ->sortField(array_get($data, 'sort_by'))
             ->sortDirection(array_get($data, 'sort_dir'))

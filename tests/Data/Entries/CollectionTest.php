@@ -512,6 +512,35 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_and_sets_the_default_localization_origin()
+    {
+        $collection = (new Collection)->handle('test');
+        $this->assertEquals('select', $collection->defaultLocalizationOrigin());
+
+        $return = $collection->defaultLocalizationOrigin('active');
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('active', $collection->defaultLocalizationOrigin());
+
+        $return = $collection->defaultLocalizationOrigin('root');
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('root', $collection->defaultLocalizationOrigin());
+
+        $return = $collection->defaultLocalizationOrigin(null);
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('select', $collection->defaultLocalizationOrigin());
+    }
+
+    /** @test */
+    public function it_throw_exception_when_setting_invalid_default_localization_origin()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid localization origin [nope]. Must be "select", "root", or "active".');
+
+        $collection = (new Collection)->handle('test');
+        $collection->defaultLocalizationOrigin('nope');
+    }
+
+    /** @test */
     public function it_sets_and_gets_structure()
     {
         $structure = new CollectionStructure;
