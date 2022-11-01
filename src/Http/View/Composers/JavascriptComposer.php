@@ -50,6 +50,7 @@ class JavascriptComposer
             'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
             'asciiReplaceExtraSymbols' => $replaceSymbols = config('statamic.system.ascii_replace_extra_symbols'),
             'charmap' => ASCII::charsArray($replaceSymbols),
+            'localizeEntriesFrom' => config('statamic.sites.localize_entries_from', 'select'),
         ]);
     }
 
