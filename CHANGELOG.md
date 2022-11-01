@@ -1,5 +1,29 @@
 # Release Notes
 
+## 3.3.50 (2022-11-01)
+
+### What's new
+- Added a confirmation modal for selecting the origin site when creating an entry localization. [#6943](https://github.com/statamic/cms/issues/6943) by @arthurperton
+- Add Turkish translation. [#6963](https://github.com/statamic/cms/issues/6963) by @sineld
+- The delimiter can be configured for Form CSV exports. [#6964](https://github.com/statamic/cms/issues/6964) by @theLeroy
+
+### What's improved
+- Improve configuration options for the `slug` fieldtype. [#6978](https://github.com/statamic/cms/issues/6978) by @jackmcdade
+- The `first` modifier now supports associative arrays. [#6977](https://github.com/statamic/cms/issues/6977) by @royvanv
+
+### What's fixed
+- Clicking the "toggle all" checkbox will select the proper amount of items if max selections have been restricted. [#6816](https://github.com/statamic/cms/issues/6816) by @ncla
+- Prevent the `assets:meta` command from wiping data. [#6854](https://github.com/statamic/cms/issues/6854) by @ncla
+- The `@nocache` Blade directive properly handles additional data passed to it. [#6934](https://github.com/statamic/cms/issues/6934) by @jacksleight
+- Fix compatibility with Laravel's `Str::slug()` method. [#6981](https://github.com/statamic/cms/issues/6981) by @jasonvarga
+- Fix Runtime Antlers issue when using recursion in the `nav` tag. [#6968](https://github.com/statamic/cms/issues/6968) by @JohnathonKoster
+- Fix the `relative` modifier's "extra words" parameter. [#6976](https://github.com/statamic/cms/issues/6976) by @jacksleight
+- Fix subtraction in Antlers. [#6970](https://github.com/statamic/cms/issues/6970) by @JohnathonKoster
+- The entry publish form will be updated with server-side values on save. [#6842](https://github.com/statamic/cms/issues/6842) by @arthurperton
+- Replace deprecated `utf8_encode` method usage. [#6823](https://github.com/statamic/cms/issues/6823) by @krzysztofrewak
+
+
+
 ## 3.3.49 (2022-10-26)
 
 ### What's improved
