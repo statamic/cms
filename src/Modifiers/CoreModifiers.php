@@ -684,7 +684,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns the first $params[0] characters of a string, or the last element of an array.
+     * Returns the first $params[0] characters of a string, or the first element of an array.
      *
      * @param $value
      * @param $params
@@ -693,7 +693,7 @@ class CoreModifiers extends Modifier
     public function first($value, $params)
     {
         if (is_array($value)) {
-            return Arr::get($value, 0);
+            return Arr::first($value);
         }
 
         return Stringy::first($value, Arr::get($params, 0));
@@ -1341,6 +1341,20 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Rekeys an array or collection.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function keyBy($value, $params)
+    {
+        $rekeyed = collect($value)->keyBy(fn ($item) => $item[$params[0]]);
+
+        return is_array($value) ? $rekeyed->all() : $rekeyed;
+    }
+
+    /**
      * Returns the last $params[0] characters of a string, or the last element of an array.
      *
      * @param $value
@@ -1350,7 +1364,7 @@ class CoreModifiers extends Modifier
     public function last($value, $params)
     {
         if (is_array($value)) {
-            return array_pop($value);
+            return Arr::last($value);
         }
 
         return Stringy::last($value, Arr::get($params, 0));
@@ -1935,7 +1949,7 @@ class CoreModifiers extends Modifier
     {
         $remove_modifiers = Arr::get($params, 0, false);
 
-        return $this->carbon($value)->diffForHumans(null, $remove_modifiers);
+        return $this->carbon($value)->diffForHumans(null, in_array($remove_modifiers, [true, 'true'], true));
     }
 
     /**
@@ -2599,7 +2613,9 @@ class CoreModifiers extends Modifier
      */
     public function title($value)
     {
-        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor'];
+        preg_match_all('/[A-Z]+\b/', $value, $matches);
+
+        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor', ...$matches[0]];
 
         return Stringy::titleize($value, $ignore);
     }

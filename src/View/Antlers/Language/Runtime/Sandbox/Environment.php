@@ -1171,12 +1171,12 @@ class Environment
      */
     private function scopeValue($name, $originalNode = null)
     {
+        if (! empty(GlobalRuntimeState::$prefixState)) {
+            $this->dataRetriever->setHandlePrefixes(array_reverse(GlobalRuntimeState::$prefixState));
+        }
+
         if ($name instanceof VariableReference) {
             if (! $this->isEvaluatingTruthValue) {
-                if (! empty(GlobalRuntimeState::$prefixState)) {
-                    $this->dataRetriever->setHandlePrefixes(array_reverse(GlobalRuntimeState::$prefixState));
-                }
-
                 $this->dataRetriever->setReduceFinal(false);
             }
 

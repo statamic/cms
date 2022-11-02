@@ -8,9 +8,14 @@ use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
 use Tests\Antlers\ParserTestCase;
+use Tests\FakesContent;
+use Tests\FakesViews;
 
 class LoopTest extends ParserTestCase
 {
+    use FakesViews,
+        FakesContent;
+
     public function test_non_sequential_numeric_keys_are_not_treated_as_associative_arrays()
     {
         // Non-sequential numeric keys are not treated as associative arrays
@@ -177,5 +182,69 @@ EXPECTED;
 EOT;
 
         $this->assertSame($expected, $this->renderString($template, $data, true));
+    }
+
+    public function test_runtime_maintains_scope_on_nested_loops()
+    {
+        $this->createPage('home', [
+            'with' => [
+                'title' => 'Home Page',
+                'template' => 'home',
+            ],
+        ]);
+
+        $this->createPage('about', ['with' => ['title' => 'About Page']]);
+        $this->createPage('contact', ['with' => ['title' => 'Contact Page']]);
+
+        $template = <<<'TEMPLATE'
+<start:{{ title }}>
+{{ test = -1; }}
+{{ outer = [1] }}
+<outer_start:{{ title }}>{{ test = 0; }}
+{{ pages = {collection:pages} }}
+<inside_loop:{{ title }}>
+{{ partial:test }}{{ test = 1; }}
+{{ /pages }}
+<outer_end:{{ title }}>
+{{ /outer }}
+<end:{{ title }}:{{ test }}>
+TEMPLATE;
+
+        $partial = <<<'PARTIAL'
+<partial:{{ title }}>
+PARTIAL;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('home', $template);
+        $this->viewShouldReturnRaw('test', $partial);
+        $expected = <<<'EXPECTED'
+<start:Home Page>
+
+
+<outer_start:Home Page>
+
+<inside_loop:About Page>
+<partial:About Page>
+
+<inside_loop:Contact Page>
+<partial:Contact Page>
+
+<inside_loop:Home Page>
+<partial:Home Page>
+
+<outer_end:Home Page>
+
+<end:Home Page:1>
+EXPECTED;
+
+        $response = $this->get('/home')
+            ->assertStatus(200);
+
+        $responseContent = trim($response->getContent());
+        $this->assertSame(
+            StringUtilities::normalizeLineEndings($expected),
+            StringUtilities::normalizeLineEndings($responseContent)
+        );
     }
 }

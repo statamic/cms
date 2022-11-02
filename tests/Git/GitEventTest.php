@@ -6,7 +6,9 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Mockery;
 use Statamic\Assets\Asset;
+use Statamic\Assets\ReplacementFile;
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 use Statamic\Events;
 use Statamic\Facades;
@@ -371,6 +373,18 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
+    public function it_commits_when_asset_is_saved_and_deleted()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Asset deleted')->once();
+
+        $asset = $this->makeAsset()->data(['bar' => 'baz']);
+
+        $asset->save();
+        $asset->delete();
+    }
+
+    /** @test */
     public function it_commits_when_asset_is_uploaded()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
@@ -381,35 +395,74 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
-    public function it_commits_when_asset_is_saved()
+    public function it_commits_when_asset_is_reuploaded()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Asset reuploaded')->once();
+
+        $file = Mockery::mock(ReplacementFile::class);
+        $file->shouldReceive('extension')->andReturn('txt');
+        $file->shouldReceive('writeTo');
+
+        $this->makeAsset()->reupload($file);
+    }
+
+    /** @test */
+    public function it_commits_when_asset_is_moved()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
 
-        $this->makeAsset()->data(['bar' => 'baz'])->save();
+        $asset = tap($this->makeAsset()->data(['bar' => 'baz']))->saveQuietly();
+
+        $this->actuallySaveAssetFileAndMetaToDisk($asset);
+
+        $asset->move('new-location');
     }
 
     /** @test */
-    public function it_commits_when_asset_is_deleted()
+    public function it_commits_when_asset_is_renamed()
     {
+        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
+
+        $asset = tap($this->makeAsset()->data(['bar' => 'baz']))->saveQuietly();
+
+        $this->actuallySaveAssetFileAndMetaToDisk($asset);
+
+        $asset->rename('new-name');
+    }
+
+    /** @test */
+    public function it_commits_only_once_when_asset_is_replaced()
+    {
+        $originalAsset = tap($this->makeAsset())->saveQuietly();
+
+        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
+
+        $newAsset = $this->makeAsset()->upload(
+            UploadedFile::fake()->create('asset.txt')
+        );
+
+        $newAsset->replace($originalAsset);
+    }
+
+    /** @test */
+    public function it_commits_when_replaced_asset_is_deleted()
+    {
+        $originalAsset = tap($this->makeAsset())->saveQuietly();
+
+        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
+
+        $newAsset = $this->makeAsset()->upload(
+            UploadedFile::fake()->create('asset.txt')
+        );
+
         Git::shouldReceive('dispatchCommit')->with('Asset deleted')->once();
 
-        $this->makeAsset()->delete();
+        // Replace with `$deleteOriginal = true`
+        $newAsset->replace($originalAsset, true);
     }
 
     /** @test */
-    public function it_commits_when_asset_folder_is_saved()
-    {
-        Git::shouldReceive('dispatchCommit')->with('Asset folder saved')->once();
-
-        $this
-            ->makeAsset()
-            ->container()
-            ->assetFolder('somewhere')
-            ->save();
-    }
-
-    /** @test */
-    public function it_commits_when_asset_folder_is_deleted()
+    public function it_commits_when_asset_folder_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset folder saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Asset folder deleted')->once();
@@ -424,7 +477,7 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
-    public function it_commits_once_when_term_references_are_updated()
+    public function it_batches_term_references_changes_into_one_commit()
     {
         Config::set('statamic.git.ignored_events', [
             Events\TaxonomySaved::class,
@@ -478,14 +531,15 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
-    public function it_commits_once_when_asset_references_are_updated()
+    public function it_batches_asset_references_changes_into_one_commit()
     {
         Config::set('statamic.git.ignored_events', [
             Events\CollectionSaved::class,
             Events\AssetSaved::class,
         ]);
 
-        $asset = tap($this->makeAsset('leia.jpg'))->save();
+        $originalAsset = tap($this->makeAsset('leia.jpg'))->save();
+        $newAsset = tap($this->makeAsset('leia-2.jpg'))->save();
 
         $collection = tap(Facades\Collection::make('pages'))->save();
 
@@ -497,7 +551,7 @@ class GitEventTest extends TestCase
                         'handle' => 'avatar',
                         'field' => [
                             'type' => 'assets',
-                            'container' => $asset->container()->handle(),
+                            'container' => $originalAsset->container()->handle(),
                             'max_files' => 1,
                         ],
                     ],
@@ -518,14 +572,10 @@ class GitEventTest extends TestCase
                 ->saveQuietly();
         }
 
-        Config::set('statamic.git.ignored_events', [
-            Events\AssetSaved::class,
-        ]);
-
         Git::shouldReceive('dispatchCommit')->with('Asset references updated')->once(); // Ensure references updated event gets fired
         Git::shouldReceive('dispatchCommit')->with('Entry saved')->never(); // Ensure individual entry saved events do not get fired
 
-        $asset->path('leia-updated.jpg')->save();
+        $newAsset->replace($originalAsset);
     }
 
     private function makeAsset($path = 'asset.txt')
@@ -539,6 +589,13 @@ class GitEventTest extends TestCase
             ->container($container->handle())
             ->path($path)
             ->data(['foo' => 'bar']);
+    }
+
+    // For Flysystem 1.x
+    protected function actuallySaveAssetFileAndMetaToDisk($asset)
+    {
+        $asset->container->disk()->filesystem()->put($asset->path(), '');
+        $asset->container->disk()->filesystem()->put($asset->metaPath(), '');
     }
 }
 

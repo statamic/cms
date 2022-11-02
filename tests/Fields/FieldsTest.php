@@ -652,6 +652,60 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
+    public function it_doesnt_return_computed_field_values()
+    {
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', ['type' => 'text']);
+        });
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', ['type' => 'text', 'visibility' => 'computed', 'default' => 'gandalf']);
+        });
+        FieldRepository::shouldReceive('find')->with('three')->andReturnUsing(function () {
+            return new Field('three', ['type' => 'text']);
+        });
+
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two'],
+            ['handle' => 'three', 'field' => 'three'],
+        ]);
+
+        $this->assertEquals(['one' => null, 'three' => null], $fields->values()->all());
+        $this->assertEquals(['one' => null, 'three' => null], $fields->process()->values()->all());
+
+        $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+
+        $this->assertEquals(['one' => 'foo', 'three' => 'baz'], $fields->values()->all());
+        $this->assertEquals(['one' => 'foo', 'three' => 'baz'], $fields->process()->values()->all());
+    }
+
+    /** @test */
+    public function it_does_return_computed_field_values_when_pre_processed()
+    {
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', ['type' => 'text']);
+        });
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', ['type' => 'text', 'visibility' => 'computed', 'default' => 'gandalf']);
+        });
+        FieldRepository::shouldReceive('find')->with('three')->andReturnUsing(function () {
+            return new Field('three', ['type' => 'text']);
+        });
+
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two'],
+            ['handle' => 'three', 'field' => 'three'],
+        ]);
+
+        $this->assertEquals(['one' => null, 'two' => 'gandalf', 'three' => null], $fields->preProcess()->values()->all());
+
+        $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+
+        $this->assertEquals(['one' => 'foo', 'two' => 'bar', 'three' => 'baz'], $fields->preProcess()->values()->all());
+    }
+
+    /** @test */
     public function it_preprocesses_each_fields_values_by_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype

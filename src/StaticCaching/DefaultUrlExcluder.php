@@ -33,11 +33,13 @@ class DefaultUrlExcluder implements UrlExcluder
         $url = Str::removeLeft($url, $this->baseUrl);
 
         foreach ($this->exclusions as $excluded) {
-            if (Str::endsWith($excluded, '*') && Str::startsWith($url, substr($excluded, 0, -1))) {
-                return true;
-            }
+            if (Str::endsWith($excluded, '*')) {
+                $prefix = Str::removeRight($excluded, '*');
 
-            if ($url === $excluded) {
+                if (Str::startsWith($url, $prefix) && ! (Str::endsWith($prefix, '/') && $url === $prefix)) {
+                    return true;
+                }
+            } elseif (Str::removeRight($url, '/') === Str::removeRight($excluded, '/')) {
                 return true;
             }
         }

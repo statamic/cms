@@ -134,7 +134,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('assets/actions', 'ActionController@run')->name('assets.actions.run');
         Route::post('assets/actions/list', 'ActionController@bulkActions')->name('assets.actions.bulk');
         Route::get('assets/browse', 'BrowserController@index')->name('assets.browse.index');
-        Route::get('assets/browse/search/{asset_container}', 'BrowserController@search');
+        Route::get('assets/browse/search/{asset_container}/{path?}', 'BrowserController@search');
         Route::post('assets/browse/folders/{asset_container}/actions', 'FolderActionController@run')->name('assets.folders.actions.run');
         Route::get('assets/browse/folders/{asset_container}/{path?}', 'BrowserController@folder')->where('path', '.*');
         Route::get('assets/browse/{asset_container}/{path?}/edit', 'BrowserController@edit')->where('path', '.*')->name('assets.browse.edit');
@@ -220,6 +220,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
         Route::get('relationship/filters', 'RelationshipFieldtypeController@filters')->name('relationship.filters');
         Route::post('markdown', 'MarkdownFieldtypeController@preview')->name('markdown.preview');
+        Route::post('files/upload', 'FilesFieldtypeController@upload')->name('files.upload');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.', 'namespace' => 'API'], function () {

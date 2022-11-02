@@ -16,6 +16,7 @@ trait ListensForContentEvents
         \Statamic\Events\AssetFolderDeleted::class,
         \Statamic\Events\AssetFolderSaved::class,
         \Statamic\Events\AssetSaved::class,
+        \Statamic\Events\AssetReuploaded::class,
         \Statamic\Events\AssetReferencesUpdated::class,
         \Statamic\Events\BlueprintDeleted::class,
         \Statamic\Events\BlueprintSaved::class,
