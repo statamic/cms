@@ -107,7 +107,7 @@ class Entry
     {
         return $this->fluentlyGetOrSet('title')
             ->getter(function ($title) {
-                return Str::title($title) ?: null;
+                return $title ? Str::title($title) : null;
             })
             ->setter(function ($title) {
                 return Str::plural($title);

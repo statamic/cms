@@ -104,7 +104,7 @@ export default {
     created() {
         let src = this.node.attrs.src;
 
-        if (! src) {
+        if (this.node.isNew) {
             this.openSelector();
         }
 
@@ -112,7 +112,8 @@ export default {
             this.assetId = src.substr(7);
         }
 
-        this.loadAsset(this.assetId || src);
+        let id = this.assetId || src;
+        if (id) this.loadAsset(id);
     },
 
     watch: {

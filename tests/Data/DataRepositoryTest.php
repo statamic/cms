@@ -2,20 +2,25 @@
 
 namespace Tests\Data;
 
+use Facades\Tests\Factories\EntryFactory;
 use Mockery;
+use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Data\DataRepository;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class DataRepositoryTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     // Mocking method_exists, courtesy of https://stackoverflow.com/a/37928161
     public static $functions;
 
     public function setUp(): void
     {
         parent::setUp();
-
-        static::$functions = Mockery::mock();
 
         $this->data = (new DataRepository);
     }
@@ -76,6 +81,8 @@ class DataRepositoryTest extends TestCase
     /** @test */
     public function when_a_repository_key_isnt_provided_it_will_loop_through_repositories()
     {
+        $this->mockMethodExists();
+
         $this->app->instance('FooRepository', Mockery::mock('FooRepository', function ($m) {
             self::$functions->shouldReceive('method_exists')->with('FooRepository', 'find')->once()->andReturnTrue();
             $m->shouldReceive('find')->once()->with('123')->andReturnNull();
@@ -100,6 +107,197 @@ class DataRepositoryTest extends TestCase
             ->setRepository('baz', 'BazRepository');
 
         $this->assertEquals('test', $this->data->find('123'));
+    }
+
+    /**
+     * @test
+     * @dataProvider findByRequestUrlAmpDisabledProvider
+     */
+    public function it_finds_by_request_url($requestUrl, $entryId)
+    {
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
+        config([
+            'statamic.amp.enabled' => false,
+            'statamic.amp.route' => 'plop',
+        ]);
+
+        $this->findByRequestUrlTest($requestUrl, $entryId);
+    }
+
+    /**
+     * @test
+     * @dataProvider findByRequestUrlAmpEnabledProvider
+     */
+    public function it_finds_by_request_url_with_amp_enabled($requestUrl, $entryId)
+    {
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
+        config([
+            'statamic.amp.enabled' => true,
+            'statamic.amp.route' => 'plop',
+        ]);
+
+        $this->findByRequestUrlTest($requestUrl, $entryId);
+    }
+
+    /**
+     * @test
+     * @dataProvider findByRequestUrlNoRootSiteProvider
+     */
+    public function it_finds_by_request_url_with_no_root_site($requestUrl, $entryId)
+    {
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/en/', 'locale' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
+        $this->findByRequestUrlTest($requestUrl, $entryId);
+    }
+
+    public function findByRequestUrlAmpDisabledProvider()
+    {
+        return [
+            'root' => ['http://localhost', 'home'],
+            'root with slash' => ['http://localhost/', 'home'],
+            'root with query' => ['http://localhost?a=b', 'home'],
+            'root with query and slash' => ['http://localhost/?a=b', 'home'],
+
+            'dir' => ['http://localhost/foo', 'foo'],
+            'dir with slash' => ['http://localhost/foo/', 'foo'],
+            'dir with query' => ['http://localhost/foo?a=b', 'foo'],
+            'dir with query and slash' => ['http://localhost/foo/?a=b', 'foo'],
+
+            'missing' => ['http://localhost/unknown', null],
+            'missing with slash' => ['http://localhost/unknown/', null],
+            'missing with query' => ['http://localhost/unknown?a=b', null],
+            'missing with query and slash' => ['http://localhost/unknown/?a=b', null],
+
+            'amp, root' => ['http://localhost/plop', null],
+            'amp, root with slash' => ['http://localhost/plop/', null],
+            'amp, root with query' => ['http://localhost/plop?a=b', null],
+            'amp, root with query and slash' => ['http://localhost/plop/?a=b', null],
+
+            'amp, dir' => ['http://localhost/plop/foo', null],
+            'amp, dir with slash' => ['http://localhost/plop/foo/', null],
+            'amp, dir with query' => ['http://localhost/plop/foo?a=b', null],
+            'amp, dir with query and slash' => ['http://localhost/plop/foo/?a=b', null],
+
+            'amp, missing' => ['http://localhost/plop/unknown', null],
+            'amp, missing with slash' => ['http://localhost/plop/unknown/', null],
+            'amp, missing with query' => ['http://localhost/plop/unknown?a=b', null],
+            'amp, missing with query and slash' => ['http://localhost/plop/unknown/?a=b', null],
+        ];
+    }
+
+    public function findByRequestUrlAmpEnabledProvider()
+    {
+        return [
+            'root' => ['http://localhost', 'home'],
+            'root with slash' => ['http://localhost/', 'home'],
+            'root with query' => ['http://localhost?a=b', 'home'],
+            'root with query and slash' => ['http://localhost/?a=b', 'home'],
+
+            'dir' => ['http://localhost/foo', 'foo'],
+            'dir with slash' => ['http://localhost/foo/', 'foo'],
+            'dir with query' => ['http://localhost/foo?a=b', 'foo'],
+            'dir with query and slash' => ['http://localhost/foo/?a=b', 'foo'],
+
+            'missing' => ['http://localhost/unknown', null],
+            'missing with slash' => ['http://localhost/unknown/', null],
+            'missing with query' => ['http://localhost/unknown?a=b', null],
+            'missing with query and slash' => ['http://localhost/unknown/?a=b', null],
+
+            'amp, root' => ['http://localhost/plop', 'home'],
+            'amp, root with slash' => ['http://localhost/plop/', 'home'],
+            'amp, root with query' => ['http://localhost/plop?a=b', 'home'],
+            'amp, root with query and slash' => ['http://localhost/plop/?a=b', 'home'],
+
+            'amp, dir' => ['http://localhost/plop/foo', 'foo'],
+            'amp, dir with slash' => ['http://localhost/plop/foo/', 'foo'],
+            'amp, dir with query' => ['http://localhost/plop/foo?a=b', 'foo'],
+            'amp, dir with query and slash' => ['http://localhost/plop/foo/?a=b', 'foo'],
+
+            'amp, missing' => ['http://localhost/plop/unknown', null],
+            'amp, missing with slash' => ['http://localhost/plop/unknown/', null],
+            'amp, missing with query' => ['http://localhost/plop/unknown?a=b', null],
+            'amp, missing with query and slash' => ['http://localhost/plop/unknown/?a=b', null],
+        ];
+    }
+
+    public function findByRequestUrlNoRootSiteProvider()
+    {
+        return [
+            'root' => ['http://localhost', null],
+            'root with slash' => ['http://localhost/', null],
+            'root with query' => ['http://localhost?a=b', null],
+            'root with query and slash' => ['http://localhost/?a=b', null],
+
+            'missing' => ['http://localhost/unknown', null],
+            'missing with slash' => ['http://localhost/unknown/', null],
+            'missing with query' => ['http://localhost/unknown?a=b', null],
+            'missing with query and slash' => ['http://localhost/unknown/?a=b', null],
+
+            'home' => ['http://localhost/en', 'home'],
+            'home with slash' => ['http://localhost/en/', 'home'],
+            'home with query' => ['http://localhost/en?a=b', 'home'],
+            'home with query and slash' => ['http://localhost/en/?a=b', 'home'],
+
+            'fr home' => ['http://localhost/fr', 'le-home'],
+            'fr home with slash' => ['http://localhost/fr/', 'le-home'],
+            'fr home with query' => ['http://localhost/fr?a=b', 'le-home'],
+            'fr home with query and slash' => ['http://localhost/fr/?a=b', 'le-home'],
+
+            'dir' => ['http://localhost/en/foo', 'foo'],
+            'dir with slash' => ['http://localhost/en/foo/', 'foo'],
+            'dir with query' => ['http://localhost/en/foo?a=b', 'foo'],
+            'dir with query and slash' => ['http://localhost/en/foo/?a=b', 'foo'],
+
+            'fr dir' => ['http://localhost/fr/le-foo', 'le-foo'],
+            'fr dir with slash' => ['http://localhost/fr/le-foo/', 'le-foo'],
+            'fr dir with query' => ['http://localhost/fr/le-foo?a=b', 'le-foo'],
+            'fr dir with query and slash' => ['http://localhost/fr/le-foo/?a=b', 'le-foo'],
+        ];
+    }
+
+    private function findByRequestUrlTest($requestUrl, $entryId)
+    {
+        $this->data->setRepository('entry', EntryRepository::class);
+
+        $c = tap(Collection::make('pages')->sites(['english', 'french'])->routes('{slug}')->structureContents(['root' => true]))->save();
+        EntryFactory::collection('pages')->id('home')->slug('home')->locale('english')->create();
+        EntryFactory::collection('pages')->id('foo')->slug('foo')->locale('english')->create();
+        EntryFactory::collection('pages')->id('le-home')->slug('le-home')->locale('french')->origin('home')->create();
+        EntryFactory::collection('pages')->id('le-foo')->slug('le-foo')->locale('french')->origin('foo')->create();
+
+        $c->structure()->in('english')->tree([
+            ['entry' => 'home'],
+            ['entry' => 'foo'],
+        ])->save();
+        $c->structure()->in('french')->tree([
+            ['entry' => 'le-home'],
+            ['entry' => 'le-foo'],
+        ])->save();
+
+        $found = $this->data->findByRequestUrl($requestUrl);
+
+        if ($entryId) {
+            $this->assertNotNull($found);
+            $this->assertEquals($entryId, $found->id());
+        } else {
+            $this->assertNull($found);
+        }
+    }
+
+    private function mockMethodExists()
+    {
+        static::$functions = Mockery::mock();
     }
 }
 

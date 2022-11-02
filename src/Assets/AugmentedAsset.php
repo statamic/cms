@@ -48,6 +48,7 @@ class AugmentedAsset extends AbstractAugmented
                 'last_modified_timestamp',
                 'last_modified_instance',
                 'focus',
+                'has_focus',
                 'focus_css',
                 'height',
                 'width',
@@ -136,6 +137,11 @@ class AugmentedAsset extends AbstractAugmented
         return $this->data->get('focus', '50-50-1');
     }
 
+    protected function hasFocus()
+    {
+        return $this->data->has('focus');
+    }
+
     protected function focusCss()
     {
         return Modify::value($this->get('focus'))->backgroundPosition()->fetch();
@@ -143,7 +149,7 @@ class AugmentedAsset extends AbstractAugmented
 
     protected function duration()
     {
-        return round($this->data->duration());
+        return round($this->data->duration() ?? 0);
     }
 
     protected function durationSeconds()

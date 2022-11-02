@@ -4,7 +4,7 @@
         <td class="drag-handle" :class="sortableHandleClass" v-if="grid.isReorderable"></td>
         <grid-cell
             v-for="(field, i) in fields"
-            :show-inner="showField(field)"
+            :show-inner="showField(field, fieldPath(field.handle))"
             :key="field.handle"
             :field="field"
             :value="values[field.handle]"
@@ -13,14 +13,14 @@
             :row-index="index"
             :grid-name="name"
             :errors="errors(field.handle)"
-            :error-key="errorKey(field.handle)"
+            :field-path="fieldPath(field.handle)"
             @updated="updated(field.handle, $event)"
             @meta-updated="metaUpdated(field.handle, $event)"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
         />
 
-        <td class="row-controls" v-if="!grid.isReadOnly">
+        <td class="row-controls" v-if="!grid.isReadOnly && (canAddRows || canDelete)">
             <dropdown-list>
                 <dropdown-item :text="__('Duplicate Row')" @click="$emit('duplicate', index)" v-if="canAddRows" />
                 <dropdown-item v-if="canDelete" :text="__('Delete Row')" class="warning" @click="$emit('removed', index)" />
@@ -67,7 +67,7 @@ export default {
             type: String,
             required: true
         },
-        errorKeyPrefix: {
+        fieldPathPrefix: {
             type: String
         },
         canDelete: {
@@ -108,15 +108,16 @@ export default {
             this.$emit('meta-updated', meta);
         },
 
-        errorKey(handle) {
-            return `${this.errorKeyPrefix}.${this.index}.${handle}`;
+        fieldPath(handle) {
+            return `${this.fieldPathPrefix}.${this.index}.${handle}`;
         },
 
         errors(handle) {
             const state = this.$store.state.publish[this.storeName];
             if (! state) return [];
-            return state.errors[this.errorKey(handle)] || [];
-        }
+            return state.errors[this.fieldPath(handle)] || [];
+        },
+
     }
 
 }

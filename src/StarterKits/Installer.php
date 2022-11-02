@@ -3,9 +3,12 @@
 namespace Statamic\StarterKits;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Facades\Statamic\Console\Processes\TtyDetector;
+use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
+use Statamic\Console\Please\Application as PleaseApplication;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
@@ -22,18 +25,20 @@ final class Installer
     protected $withConfig;
     protected $withoutDependencies;
     protected $withUser;
+    protected $usingSubProcess;
     protected $force;
     protected $console;
     protected $url;
+    protected $disableCleanup;
 
     /**
      * Instantiate starter kit installer.
      *
      * @param  string  $package
-     * @param  LicenseManager  $licenseManager
      * @param  mixed  $console
+     * @param  LicenseManager|null  $licenseManager
      */
-    public function __construct(string $package, LicenseManager $licenseManager, $console = null)
+    public function __construct(string $package, $console = null, LicenseManager $licenseManager = null)
     {
         $this->package = $package;
         $this->licenseManager = $licenseManager;
@@ -46,13 +51,13 @@ final class Installer
      * Instantiate starter kit installer.
      *
      * @param  string  $package
-     * @param  LicenseManager  $licenseManager
      * @param  mixed  $console
+     * @param  LicenseManager|null  $licenseManager
      * @return static
      */
-    public static function package(string $package, LicenseManager $licenseManager, $console = null)
+    public static function package(string $package, $console = null, LicenseManager $licenseManager = null)
     {
-        return new static($package, $licenseManager, $console);
+        return new static($package, $console, $licenseManager);
     }
 
     /**
@@ -108,6 +113,19 @@ final class Installer
     }
 
     /**
+     * Install using sub-process.
+     *
+     * @param  bool  $usingSubProcess
+     * @return $this
+     */
+    public function usingSubProcess($usingSubProcess = false)
+    {
+        $this->usingSubProcess = $usingSubProcess;
+
+        return $this;
+    }
+
+    /**
      * Force install and allow dependency errors.
      *
      * @param  bool  $force
@@ -139,6 +157,7 @@ final class Installer
             ->installFiles()
             ->installDependencies()
             ->makeSuperUser()
+            ->runPostInstallHook()
             ->reticulateSplines()
             ->removeStarterKit()
             ->removeRepository()
@@ -292,13 +311,13 @@ final class Installer
             return $this;
         }
 
-        $this->installableDependencies('dependencies')->each(function ($version, $package) {
-            $this->ensureCompatibleDependency($package, $version);
-        });
+        if ($packages = $this->installableDependencies('dependencies')) {
+            $this->ensureCanRequireDependencies($packages);
+        }
 
-        $this->installableDependencies('dependencies_dev')->each(function ($version, $package) {
-            $this->ensureCompatibleDependency($package, $version, true);
-        });
+        if ($packages = $this->installableDependencies('dependencies_dev')) {
+            $this->ensureCanRequireDependencies($packages, true);
+        }
 
         return $this;
     }
@@ -318,6 +337,7 @@ final class Installer
 
         if ($this->withConfig) {
             $this->copyStarterKitConfig();
+            $this->copyStarterKitHooks();
         }
 
         return $this;
@@ -343,6 +363,10 @@ final class Installer
      */
     protected function copyStarterKitConfig()
     {
+        if (! $this->withConfig) {
+            return;
+        }
+
         if ($this->withoutDependencies) {
             return $this->copyFile($this->starterKitPath('starter-kit.yaml'), base_path('starter-kit.yaml'));
         }
@@ -367,6 +391,22 @@ final class Installer
     }
 
     /**
+     * Copy starter kit hook scripts.
+     */
+    protected function copyStarterKitHooks()
+    {
+        if (! $this->withConfig) {
+            return;
+        }
+
+        $hooks = ['StarterKitPostInstall.php'];
+
+        collect($hooks)
+            ->filter(fn ($hook) => $this->files->exists($this->starterKitPath($hook)))
+            ->each(fn ($hook) => $this->copyFile($this->starterKitPath($hook), base_path($hook)));
+    }
+
+    /**
      * Install starter kit dependencies.
      *
      * @return $this
@@ -377,61 +417,60 @@ final class Installer
             return $this;
         }
 
-        $this->installableDependencies('dependencies')->each(function ($version, $package) {
-            $this->installDependency($package, $version);
-        });
+        if ($packages = $this->installableDependencies('dependencies')) {
+            $this->requireDependencies($packages);
+        }
 
-        $this->installableDependencies('dependencies_dev')->each(function ($version, $package) {
-            $this->installDependency($package, $version, true);
-        });
+        if ($packages = $this->installableDependencies('dependencies_dev')) {
+            $this->requireDependencies($packages, true);
+        }
 
         return $this;
     }
 
     /**
-     * Ensure compatible dependency by performing a dry-run.
+     * Ensure dependencies are installable by performing a dry-run.
      *
-     * @param  string  $package
-     * @param  string  $version
+     * @param  array  $packages
      * @param  bool  $dev
      */
-    protected function ensureCompatibleDependency($package, $version, $dev = false)
+    protected function ensureCanRequireDependencies($packages, $dev = false)
     {
-        $requireMethod = $dev ? 'requireDev' : 'require';
+        $requireMethod = $dev ? 'requireMultipleDev' : 'requireMultiple';
 
         try {
-            Composer::withoutQueue()->throwOnFailure()->{$requireMethod}($package, $version, '--dry-run');
+            Composer::withoutQueue()->throwOnFailure()->{$requireMethod}($packages, '--dry-run');
         } catch (ProcessException $exception) {
-            $this->rollbackWithError("Cannot install due to error with [{$package}] dependency.", $exception->getMessage());
+            $this->rollbackWithError('Cannot install due to dependency conflict.', $exception->getMessage());
         }
     }
 
     /**
      * Install starter kit dependency permanently into app.
      *
-     * @param  string  $package
-     * @param  string  $version
+     * @param  array  $packages
      * @param  bool  $dev
      */
-    protected function installDependency($package, $version, $dev = false)
+    protected function requireDependencies($packages, $dev = false)
     {
-        $this->console->info("Installing dependency [{$package}]...");
+        if ($dev) {
+            $this->console->info('Installing development dependencies...');
+        } else {
+            $this->console->info('Installing dependencies...');
+        }
 
-        $args = ['require'];
+        $args = array_merge(['require'], $this->normalizePackagesArrayToRequireArgs($packages));
 
         if ($dev) {
             $args[] = '--dev';
         }
-
-        $args[] = $package;
-        $args[] = $version;
 
         try {
             Composer::withoutQueue()->throwOnFailure()->runAndOperateOnOutput($args, function ($output) {
                 return $this->outputFromSymfonyProcess($output);
             });
         } catch (ProcessException $exception) {
-            $this->console->error("Error installing [{$package}].");
+            $this->console->error('Error installing dependencies.');
         }
     }
 
@@ -451,6 +490,80 @@ final class Installer
         }
 
         return $this;
+    }
+
+    /**
+     * Run post-install hook, if one exists in the starter kit.
+     *
+     * @return $this
+     *
+     * @throws StarterKitException
+     */
+    public function runPostInstallHook($throwExceptions = false)
+    {
+        $postInstallHook = Hook::find($this->starterKitPath('StarterKitPostInstall.php'));
+
+        if ($throwExceptions && ! $postInstallHook) {
+            throw new StarterKitException("Cannot find post-install hook for [$this->package].");
+        } elseif (! $postInstallHook) {
+            return $this;
+        }
+
+        if ($this->usingSubProcess && ! TtyDetector::isTtySupported()) {
+            return $this->cachePostInstallInstructions();
+        }
+
+        if (isset($postInstallHook->registerCommands)) {
+            foreach ($postInstallHook->registerCommands as $command) {
+                $this->registerInstalledCommand($command);
+            }
+        }
+
+        $postInstallHook->handle($this->console);
+
+        return $this;
+    }
+
+    /**
+     * Cache post install instructions for parent process (ie. statamic/cli installer).
+     *
+     * @return $this
+     */
+    protected function cachePostInstallInstructions()
+    {
+        $path = $this->preparePath(storage_path('statamic/tmp/cli/post-install-instructions.txt'));
+
+        $instructions = <<<"EOT"
+Warning: TTY not supported in this environment!
+To complete this installation, run the following command from your new site directory:
+php please starter-kit:run-post-install $this->package
+EOT;
+
+        $this->files->put($path, $instructions);
+
+        $this->disableCleanup = true;
+
+        return $this;
+    }
+
+    /**
+     * Register starter kit installed command for post install hook.
+     *
+     * @param  string  $commandClass
+     */
+    protected function registerInstalledCommand($commandClass)
+    {
+        $app = $this->console->getApplication();
+
+        $command = new $commandClass($app);
+
+        if ($app instanceof PleaseApplication) {
+            $command->setRunningInPlease();
+            $command->removeStatamicGrouping();
+            $command->setHiddenInPlease();
+        }
+
+        $app->add($command);
     }
 
     /**
@@ -474,8 +587,12 @@ final class Installer
      *
      * @return $this
      */
-    protected function removeStarterKit()
+    public function removeStarterKit()
     {
+        if ($this->disableCleanup) {
+            return $this;
+        }
+
         $this->console->info('Cleaning up temporary files...');
 
         if (Composer::isInstalled($this->package)) {
@@ -743,12 +860,30 @@ final class Installer
      * Get installable dependencies from appropriate require key in composer.json.
      *
      * @param  string  $configKey
-     * @return \Illuminate\Support\Collection
+     * @return array
      */
     protected function installableDependencies($configKey)
     {
         return collect($this->config($configKey))->filter(function ($version, $package) {
             return Str::contains($package, '/');
-        });
+        })->all();
+    }
+
+    /**
+     * Normalize packages array to require args, with version handling if `package => version` array structure is passed.
+     *
+     * @param  array  $packages
+     * @return array
+     */
+    private function normalizePackagesArrayToRequireArgs(array $packages)
+    {
+        return collect($packages)
+            ->map(function ($value, $key) {
+                return Str::contains($key, '/')
+                    ? "{$key}:{$value}"
+                    : "{$value}";
+            })
+            ->values()
+            ->all();
     }
 }

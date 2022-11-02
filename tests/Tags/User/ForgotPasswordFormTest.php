@@ -5,6 +5,7 @@ namespace Tests\Tags\User;
 use Illuminate\Support\Facades\Password;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
+use Statamic\Statamic;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -240,5 +241,16 @@ EOT
         };
 
         Password::shouldReceive('broker')->andReturn($success);
+    }
+
+    /** @test */
+    public function it_fetches_form_data()
+    {
+        $form = Statamic::tag('user:forgot_password_form')->fetch();
+
+        $this->assertEquals($form['attrs']['action'], 'http://localhost/!/auth/password/email');
+        $this->assertEquals($form['attrs']['method'], 'POST');
+
+        $this->assertArrayHasKey('_token', $form['params']);
     }
 }

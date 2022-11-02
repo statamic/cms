@@ -12,6 +12,12 @@
     left: auto;
     right: auto;
 
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -10px 0;
+    }
+
     .popover-content {
         min-width: 180px;
         transform-origin: 50% 10%;

@@ -27,7 +27,7 @@ abstract class IteratorBuilder extends Builder
             $items = $items->multisort($sort)->values();
         }
 
-        return $this->limitItems($items);
+        return $this->limitItems($items)->values();
     }
 
     protected function getFilteredItems()

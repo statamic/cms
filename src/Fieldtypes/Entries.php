@@ -180,12 +180,14 @@ class Entries extends Relationship
 
             $blueprints = $collection->entryBlueprints();
 
-            return $blueprints->map(function ($blueprint) use ($collection, $collections, $blueprints) {
-                return [
-                    'title' => $this->getCreatableTitle($collection, $blueprint, count($collections), $blueprints->count()),
-                    'url' => $collection->createEntryUrl(Site::selected()->handle()).'?blueprint='.$blueprint->handle(),
-                ];
-            });
+            return $blueprints
+                ->reject->hidden()
+                ->map(function ($blueprint) use ($collection, $collections, $blueprints) {
+                    return [
+                        'title' => $this->getCreatableTitle($collection, $blueprint, count($collections), $blueprints->count()),
+                        'url' => $collection->createEntryUrl(Site::selected()->handle()).'?blueprint='.$blueprint->handle(),
+                    ];
+                });
         })->all();
     }
 

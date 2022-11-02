@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Grid;
 use Tests\TestCase;
 
 class GridTest extends TestCase
@@ -347,5 +348,13 @@ class GridTest extends TestCase
             ['words' => 'one (augmented)'],
             ['words' => 'two (augmented)'],
         ], collect($augmented)->toArray());
+    }
+
+    /** @test */
+    public function it_converts_a_queryable_value()
+    {
+        $this->assertNull((new Grid)->toQueryableValue(null));
+        $this->assertNull((new Grid)->toQueryableValue([]));
+        $this->assertEquals([['foo' => 'bar']], (new Grid)->toQueryableValue([['foo' => 'bar']]));
     }
 }

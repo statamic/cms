@@ -17,7 +17,7 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->once()->with(null, $entry)->andReturnNull();
+        ResolveRedirect::shouldReceive('resolve')->never();
 
         $this->assertGqlEntryHas('link', ['link' => null]);
     }

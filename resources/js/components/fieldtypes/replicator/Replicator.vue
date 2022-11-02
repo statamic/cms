@@ -30,11 +30,14 @@
                     :sortable-handle-class="sortableHandleClass"
                     :is-read-only="isReadOnly"
                     :collapsed="collapsed.includes(set._id)"
-                    :error-key-prefix="errorKeyPrefix || handle"
+                    :field-path-prefix="fieldPathPrefix || handle"
                     :has-error="setHasError(index)"
                     :previews="previews[set._id]"
+                    :show-field-previews="config.previews"
+                    :can-add-set="canAddSet"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
+                    @duplicated="duplicateSet(set._id)"
                     @updated="updated"
                     @meta-updated="updateSetMeta(set._id, $event)"
                     @removed="removed(set, index)"
@@ -42,7 +45,7 @@
                     @blur="blurred"
                     @previews-updated="updateSetPreviews(set._id, $event)"
                 >
-                    <template v-slot:picker v-if="index !== value.length-1 && canAddSet">
+                    <template v-slot:picker v-if="canAddSet">
                         <set-picker
                             class="replicator-set-picker-between"
                             :sets="setConfigs"
@@ -90,7 +93,7 @@ export default {
     },
 
     computed: {
-        
+
         previews() {
             return this.meta.previews;
         },
@@ -115,6 +118,10 @@ export default {
 
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
+        },
+
+        replicatorPreview() {
+            return `${this.config.display}: ${__n(':count set|:count sets', this.value.length)}`;
         }
     },
 
@@ -154,6 +161,27 @@ export default {
                 ...this.value.slice(0, index),
                 set,
                 ...this.value.slice(index)
+            ]);
+
+            this.expandSet(set._id);
+        },
+
+        duplicateSet(old_id) {
+            const index = this.value.findIndex(v => v._id === old_id);
+            const old = this.value[index];
+            const set = {
+                ...old,
+                _id: `set-${uniqid()}`,
+            };
+
+            this.updateSetPreviews(set._id, {});
+
+            this.updateSetMeta(set._id, this.meta.existing[old_id]);
+
+            this.update([
+                ...this.value.slice(0, index + 1),
+                set,
+                ...this.value.slice(index + 1)
             ]);
 
             this.expandSet(set._id);
@@ -204,7 +232,7 @@ export default {
         },
 
         setHasError(index) {
-            const prefix = `${this.errorKeyPrefix || this.handle}.${index}.`;
+            const prefix = `${this.fieldPathPrefix || this.handle}.${index}.`;
 
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },

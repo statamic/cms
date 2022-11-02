@@ -31,16 +31,14 @@ export default class {
         this.converter = new Converter;
     }
 
-    passesConditions() {
-        let conditions = this.getConditions();
+    passesConditions(specificConditions) {
+        let conditions = specificConditions || this.getConditions();
 
         if (conditions === undefined) {
             return true;
-        } else if (isString(conditions)) {
+        } else if (this.isCustomConditionWithoutTarget(conditions)) {
             return this.passesCustomCondition(this.prepareCondition(conditions));
         }
-
-        conditions = this.converter.fromBlueprint(conditions, this.field.prefix);
 
         let passes = this.passOnAny
             ? this.passesAnyConditions(conditions)
@@ -67,7 +65,15 @@ export default class {
             this.showOnPass = false;
         }
 
-        return this.field[key];
+        let conditions = this.field[key];
+
+        return this.isCustomConditionWithoutTarget(conditions)
+            ? conditions
+            : this.converter.fromBlueprint(conditions, this.field.prefix);
+    }
+
+    isCustomConditionWithoutTarget(conditions) {
+        return isString(conditions);
     }
 
     passesAllConditions(conditions) {
@@ -259,5 +265,31 @@ export default class {
         });
 
         return this.showOnPass ? passes : ! passes;
+    }
+
+    passesNonRevealerConditions(dottedPrefix) {
+        let conditions = this.getConditions();
+
+        if (this.isCustomConditionWithoutTarget(conditions)) {
+            return this.passesConditions(conditions);
+        }
+
+        let revealerFields = data_get(this.store.state.publish[this.storeName], 'revealerFields', []);
+
+        let nonRevealerConditions = chain(this.getConditions())
+            .reject(condition => revealerFields.includes(this.relativeLhsToAbsoluteFieldPath(condition.field, dottedPrefix)))
+            .value();
+
+        return this.passesConditions(nonRevealerConditions);
+    }
+
+    relativeLhsToAbsoluteFieldPath(lhs, dottedPrefix) {
+        if (! dottedPrefix) {
+            return lhs;
+        }
+
+        return lhs.startsWith('root.')
+            ? lhs.replace(/^root\./, '')
+            : dottedPrefix + '.' + lhs;
     }
 }

@@ -7,8 +7,10 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
+use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Uploaders\AssetsUploader;
@@ -28,6 +30,9 @@ class Submission implements SubmissionContract, Augmentable
      * @var Form
      */
     public $form;
+
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -104,19 +109,30 @@ class Submission implements SubmissionContract, Augmentable
     }
 
     /**
-     * Upload files.
+     * Upload files and return asset IDs.
+     *
+     * @param  array  $uploadedFiles
+     * @return array
      */
-    public function uploadFiles()
+    public function uploadFiles($uploadedFiles)
     {
-        collect($this->fields())
-            ->filter(function ($config, $handle) {
-                return Arr::get($config, 'type') === 'assets' && request()->hasFile($handle);
-            })
-            ->each(function ($config, $handle) {
-                Arr::set($this->data, $handle, AssetsUploader::field($config)->upload(request()->file($handle)));
-            });
+        return collect($uploadedFiles)->map(function ($files, $handle) {
+            return AssetsUploader::field($this->fields()->get($handle))->upload($files);
+        })->all();
+    }
+
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
 
         return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
     }
 
     /**
@@ -124,9 +140,33 @@ class Submission implements SubmissionContract, Augmentable
      */
     public function save()
     {
-        File::put($this->getPath(), YAML::dump($this->data()->all()));
+        $isNew = is_null($this->form()->submission($this->id()));
 
-        SubmissionSaved::dispatch($this);
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (SubmissionSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
+        File::put($this->getPath(), YAML::dump(Arr::removeNullValues($this->data()->all())));
+
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                SubmissionCreated::dispatch($this);
+            }
+
+            SubmissionSaved::dispatch($this);
+        }
     }
 
     /**

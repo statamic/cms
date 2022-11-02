@@ -77,10 +77,10 @@
                             </div>
 
                             <!-- Audio -->
-                            <audio v-else-if="asset.isAudio" :src="asset.url" controls preload="auto"></audio>
+                            <div class="w-full shadow-none" v-else-if="asset.isAudio"><audio :src="asset.url" class="w-full" controls preload="auto"></audio></div>
 
                             <!-- Video -->
-                            <video v-else-if="asset.isVideo" :src="asset.url" controls></video>
+                            <div class="w-full shadow-none" v-else-if="asset.isVideo"><video :src="asset.url" class="w-full" controls></video></div>
                         </div>
                     </div>
 
@@ -98,19 +98,20 @@
                         </button>
 
                         <button v-if="canRunAction('rename_asset')" type="button" class="btn" @click.prevent="runAction('rename_asset')">
-                            {{ __('Rename File') }}
+                            {{ __('Rename') }}
                         </button>
 
                         <button v-if="canRunAction('move_asset')" type="button" class="btn" @click.prevent="runAction('move_asset')">
-                            {{ __('Move File') }}
+                            {{ __('Move') }}
                         </button>
 
-                        <!--
-                        <button
-                            type="button" class="btn"
-                            @click.prevent="replaceFile">Replace File
+                        <button v-if="canRunAction('replace_asset')" type="button" class="btn" @click.prevent="runAction('replace_asset')">
+                            {{ __('Replace') }}
                         </button>
-                        -->
+
+                        <button v-if="canRunAction('reupload_asset')" type="button" class="btn" @click.prevent="runAction('reupload_asset')">
+                            {{ __('Reupload') }}
+                        </button>
                     </div>
 
                 </div>
@@ -294,7 +295,11 @@ export default {
             this.$axios.get(url).then(response => {
                 const data = response.data.data;
                 this.asset = data;
-                this.values = data.values;
+
+                // If there are no fields, it will be an empty array when PHP encodes
+                // it into JSON on the server. We'll ensure it's always an object.
+                this.values = _.isArray(data.values) ? {} : data.values;
+
                 this.meta = data.meta;
                 this.actionUrl = data.actionUrl;
                 this.actions = data.actions;
@@ -406,9 +411,12 @@ export default {
             this.$events.$emit('editor-action-started');
         },
 
-        actionCompleted(event) {
-            this.$events.$emit('editor-action-completed');
-            this.close();
+        actionCompleted(successful, response) {
+            this.$events.$emit('editor-action-completed', successful, response);
+            this.$emit('action-completed', successful, response);
+            if (successful) {
+                this.close();
+            }
         },
     }
 

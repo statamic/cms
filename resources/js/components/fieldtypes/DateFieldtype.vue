@@ -17,7 +17,7 @@
                     :attributes="attrs"
                     :class="{ 'w-full': !config.inline }"
                     :columns="$screens({ default: 1, lg: config.columns })"
-                    :input-debounce="500"
+                    :input-debounce="1000"
                     :is-expanded="name === 'date' || config.full_width"
                     :is-range="isRange"
                     :is-required="config.required"
@@ -29,7 +29,7 @@
                     :popover="{ visibility: 'focus' }"
                     :rows="$screens({ default: 1, lg: config.rows })"
                     :update-on-input="true"
-                    :value="value"
+                    :value="datePickerValue"
                     @input="setDate"
                 >
                     <template v-if="!config.inline" v-slot="{ inputValue, inputEvents }">
@@ -154,6 +154,10 @@ export default {
             }
         },
 
+        datePickerValue() {
+            return this.isRange ? this.value : this.value.replace(' ', 'T');
+        },
+
         timeString() {
             return Vue.moment(this.value).format('HH:mm:ss');
         },
@@ -176,6 +180,11 @@ export default {
     methods: {
 
         setDate(date) {
+            if (!date) {
+                this.update(null);
+                return;
+            }
+
             if (this.isRange) {
                 this.setDateRange(date);
             } else {

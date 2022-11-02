@@ -17,7 +17,7 @@
         :initial-values="{{ json_encode($values) }}"
         :meta="{{ json_encode($meta) }}"
         url="{{ cp_route('forms.update', $form->handle()) }}"
-        listing-url="{{ cp_route('forms.index')}}"
+        listing-url="{{ cp_route('forms.index') }}"
     ></collection-edit-form>
 
 @endsection

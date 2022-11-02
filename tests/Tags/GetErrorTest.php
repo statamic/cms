@@ -37,6 +37,19 @@ class GetErrorTest extends TestCase
     }
 
     /** @test */
+    public function it_outputs_nothing_when_there_are_errors_but_not_for_the_given_field_in_a_specific_bag()
+    {
+        view()->share('errors', (new ViewErrorBag())->put('custom', new MessageBag([
+            'name' => ['name is required'],
+        ])));
+
+        $this->assertEquals(
+            '',
+            $this->tag('{{ get_error:email bag="custom" }}before {{ message }} after{{ /get_error:email }}')
+        );
+    }
+
+    /** @test */
     public function it_outputs_nothing_when_the_field_doesnt_have_an_error_for_specific_bag()
     {
         view()->share('errors', (new ViewErrorBag())->put('custom', new MessageBag([])));
@@ -44,6 +57,19 @@ class GetErrorTest extends TestCase
         $this->assertEquals(
             '',
             $this->tag('{{ get_error:email bag="custom" }}before {{ message }} after{{ /get_error:email }}')
+        );
+    }
+
+    /** @test */
+    public function it_outputs_nothing_when_there_are_errors_but_not_for_the_given_field()
+    {
+        view()->share('errors', (new ViewErrorBag())->put('default', new MessageBag([
+            'name' => ['name is required'],
+        ])));
+
+        $this->assertEquals(
+            '',
+            $this->tag('{{ get_error:email }}before {{ message }} after{{ /get_error:email }}')
         );
     }
 

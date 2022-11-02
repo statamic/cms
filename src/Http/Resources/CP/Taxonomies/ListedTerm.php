@@ -42,6 +42,7 @@ class ListedTerm extends JsonResource
 
             'permalink' => $term->absoluteUrl(),
             'edit_url' => $term->editUrl(),
+            'taxonomy' => $term->taxonomy()->toArray(),
             'viewable' => User::current()->can('view', $term),
             'editable' => User::current()->can('edit', $term),
             'actions' => Action::for($term, ['taxonomy' => $taxonomy->handle()]),
@@ -52,6 +53,10 @@ class ListedTerm extends JsonResource
     {
         return $this->columns->mapWithKeys(function ($column) use ($extra) {
             $key = $column->field;
+
+            if ($key == 'taxonomy') {
+                return [$key => $this->resource->taxonomy()->title()];
+            }
 
             $value = $this->blueprint
                 ->field($key)

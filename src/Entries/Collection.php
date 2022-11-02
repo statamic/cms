@@ -4,6 +4,7 @@ namespace Statamic\Entries;
 
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
+use InvalidArgumentException;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
@@ -25,6 +26,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayable
@@ -48,6 +50,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $revisions = false;
     protected $positions;
     protected $defaultPublishState = true;
+    protected $originBehavior = 'select';
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
     protected $structure;
@@ -202,6 +205,17 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function absoluteUrl($site = null)
+    {
+        if (! $mount = $this->mount()) {
+            return null;
+        }
+
+        $site = $site ?? $this->sites()->first();
+
+        return optional($mount->in($site))->absoluteUrl();
+    }
+
     public function url($site = null)
     {
         if (! $mount = $this->mount()) {
@@ -291,9 +305,12 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint;
 
         return Blink::once($blink, function () use ($blueprint) {
-            return is_null($blueprint)
-                ? $this->entryBlueprints()->reject->hidden()->first()
-                : $this->entryBlueprints()->keyBy->handle()->get($blueprint);
+            if (is_null($blueprint)) {
+                return $this->entryBlueprints()->reject->hidden()->first();
+            }
+
+            return $this->entryBlueprints()->keyBy->handle()->get($blueprint)
+                ?? $this->entryBlueprints()->keyBy->handle()->get(Str::singular($blueprint));
         });
     }
 
@@ -310,12 +327,12 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function fallbackEntryBlueprint()
     {
-        $blueprint = Blueprint::find('default')
-            ->setHandle($this->handle())
+        $blueprint = (clone Blueprint::find('default'))
+            ->setHandle(Str::singular($this->handle()))
             ->setNamespace('collections.'.$this->handle());
 
         $contents = $blueprint->contents();
-        $contents['title'] = $this->title();
+        $contents['title'] = Str::singular($this->title());
         $blueprint->setContents($contents);
 
         return $blueprint;
@@ -522,6 +539,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 'future' => $this->futureDateBehavior,
             ],
             'preview_targets' => $this->previewTargetsForFile(),
+            'origin_behavior' => ($ob = $this->originBehavior()) === 'select' ? null : $ob,
         ]));
 
         if (! Site::hasMultiple()) {
@@ -561,12 +579,38 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function originBehavior($origin = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('originBehavior')
+            ->setter(function ($origin) {
+                $origin = $origin ?? 'select';
+
+                if (! in_array($origin, ['select', 'root', 'active'])) {
+                    throw new InvalidArgumentException("Invalid origin behavior [$origin]. Must be \"select\", \"root\", or \"active\".");
+                }
+
+                return $origin;
+            })
+            ->args(func_get_args());
+    }
+
     public function pastDateBehavior($behavior = null)
     {
         return $this
             ->fluentlyGetOrSet('pastDateBehavior')
             ->getter(function ($behavior) {
                 return $behavior ?? 'public';
+            })
+            ->args(func_get_args());
+    }
+
+    public function revisions($enabled = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('revisions')
+            ->getter(function ($behavior) {
+                return $behavior ?? false;
             })
             ->args(func_get_args());
     }
@@ -669,6 +713,13 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return true;
     }
 
+    public function truncate()
+    {
+        $this->queryEntries()->get()->each->delete();
+
+        return true;
+    }
+
     public function mount($page = null)
     {
         return $this
@@ -705,14 +756,31 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     {
         return $this
             ->fluentlyGetOrSet('previewTargets')
-            ->getter(function ($targets) {
-                if (empty($targets)) {
-                    $targets = $this->defaultPreviewTargets();
-                }
-
-                return collect($targets);
+            ->getter(function () {
+                return $this->basePreviewTargets()->merge($this->additionalPreviewTargets());
             })
             ->args(func_get_args());
+    }
+
+    public function basePreviewTargets()
+    {
+        $targets = empty($this->previewTargets)
+            ? $this->defaultPreviewTargets()
+            : $this->previewTargets;
+
+        return collect($targets);
+    }
+
+    public function addPreviewTargets($targets)
+    {
+        Facades\Collection::addPreviewTargets($this->handle, $targets);
+
+        return $this;
+    }
+
+    public function additionalPreviewTargets()
+    {
+        return Facades\Collection::additionalPreviewTargets($this->handle);
     }
 
     private function defaultPreviewTargets()

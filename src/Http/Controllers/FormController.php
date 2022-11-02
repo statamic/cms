@@ -33,15 +33,14 @@ class FormController extends Controller
         $site = Site::findByUrl(URL::previous()) ?? Site::default();
         $fields = $form->blueprint()->fields();
         $this->validateContentType($request, $form);
-        $values = array_merge($request->all(), $this->normalizeAssetsValues($fields, $request));
-
+        $values = array_merge($request->all(), $assets = $this->normalizeAssetsValues($fields, $request));
         $params = collect($request->all())->filter(function ($value, $key) {
             return Str::startsWith($key, '_');
         })->all();
 
         $fields = $fields->addValues($values);
 
-        $submission = $form->makeSubmission()->data($values);
+        $submission = $form->makeSubmission();
 
         try {
             $this->withLocale($site->lang(), function () use ($fields) {
@@ -50,7 +49,11 @@ class FormController extends Controller
 
             throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
 
-            $submission->uploadFiles();
+            $values = array_merge($values, $submission->uploadFiles($assets));
+
+            $submission->data(
+                $fields->addValues($values)->process()->values()
+            );
 
             // If any event listeners return false, we'll do a silent failure.
             // If they want to add validation errors, they can throw an exception.
@@ -63,9 +66,13 @@ class FormController extends Controller
 
         if ($form->store()) {
             $submission->save();
+        } else {
+            // When the submission is saved, this same created event will be dispatched.
+            // We'll also fire it here if submissions are not configured to be stored
+            // so that developers may continue to listen and modify it as needed.
+            SubmissionCreated::dispatch($submission);
         }
 
-        SubmissionCreated::dispatch($submission);
         SendEmails::dispatch($submission, $site);
 
         return $this->formSuccess($params, $submission);
@@ -142,8 +149,7 @@ class FormController extends Controller
         // The assets fieldtype is expecting an array, even for `max_files: 1`, but we don't want to force that on the front end.
         return $fields->all()
             ->filter(function ($field) {
-                return $field->fieldtype()->handle() === 'assets'
-                    && $field->get('max_files') === 1;
+                return $field->fieldtype()->handle() === 'assets' && request()->hasFile($field->handle());
             })
             ->map(function ($field) use ($request) {
                 return Arr::wrap($request->file($field->handle()));

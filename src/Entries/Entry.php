@@ -14,6 +14,7 @@ use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Data\ContainsComputedData;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
@@ -47,7 +48,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified;
+    use ContainsData, ContainsComputedData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified;
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
@@ -136,7 +137,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             ->setter(function ($blueprint) use ($key) {
                 Blink::forget($key);
 
-                return $blueprint;
+                return $blueprint instanceof \Statamic\Fields\Blueprint ? $blueprint->handle() : $blueprint;
             })
             ->args(func_get_args());
     }
@@ -284,20 +285,20 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         $this->withEvents = false;
 
-        $result = $this->save();
-
-        $this->withEvents = true;
-
-        return $result;
+        return $this->save();
     }
 
     public function save()
     {
         $isNew = is_null(Facades\Entry::find($this->id()));
 
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
-        if ($this->withEvents) {
+
+        if ($withEvents) {
             if (EntrySaving::dispatch($this) === false) {
                 return false;
             }
@@ -324,7 +325,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $callback($this);
         }
 
-        if ($this->withEvents) {
+        if ($withEvents) {
             if ($isNew) {
                 EntryCreated::dispatch($this);
             }
@@ -633,6 +634,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             ->collection($this->collection)
             ->origin($this)
             ->locale($site)
+            ->published($this->published)
             ->slug($this->slug())
             ->date($this->date());
     }
@@ -733,9 +735,14 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return Facades\Entry::find($origin);
     }
 
-    public function values()
+    protected function getOriginFallbackValues()
     {
-        return $this->collection()->cascade()->merge($this->originValues());
+        return $this->collection()->cascade();
+    }
+
+    protected function getOriginFallbackValue($key)
+    {
+        return $this->collection()->cascade()->get($key);
     }
 
     public function defaultAugmentedArrayKeys()
@@ -787,7 +794,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
-        return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+        $title = (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+
+        return trim($title);
     }
 
     public function previewTargets()
@@ -835,5 +844,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    protected function getComputedCallbacks()
+    {
+        return Facades\Collection::getComputedCallbacks($this->collection);
     }
 }

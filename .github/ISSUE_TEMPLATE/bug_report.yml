@@ -22,10 +22,11 @@ body:
       render: shell
   - type: textarea
     attributes:
-      label: Versions
+      label: Environment
       description: |
-        The versions of Statamic, PHP, Laravel, and any addons that are installed.
-        (Go ahead and just paste the output of the `php please support:details` command.)
+        Details about your environment. Versions of Statamic, PHP, Laravel, any addons that are installed, etc.
+        (Go ahead and just paste the output of the `php please support:details` command.)    
+      render: yaml # the format of the command is close to yaml and gets highlighted nicely
     validations:
       required: true
   - type: dropdown

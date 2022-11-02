@@ -35,6 +35,7 @@ class AugmentedEntry extends AbstractAugmented
             'order',
             'is_entry',
             'collection',
+            'blueprint',
             'mount',
             'locale',
             'last_modified',

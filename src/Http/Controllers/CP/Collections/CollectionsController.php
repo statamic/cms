@@ -13,6 +13,7 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Str;
 
@@ -148,6 +149,7 @@ class CollectionsController extends CpController
             'require_slugs' => $collection->requiresSlugs(),
             'links' => $collection->entryBlueprints()->map->handle()->contains('link'),
             'taxonomies' => $collection->taxonomies()->map->handle()->all(),
+            'revisions' => $collection->revisionsEnabled(),
             'default_publish_state' => $collection->defaultPublishState(),
             'template' => $collection->template(),
             'layout' => $collection->layout(),
@@ -161,7 +163,8 @@ class CollectionsController extends CpController
             'title_formats' => $collection->titleFormats()->unique()->count() === 1
                 ? $collection->titleFormats()->first()
                 : $collection->titleFormats()->all(),
-            'preview_targets' => $collection->previewTargets(),
+            'preview_targets' => $collection->basePreviewTargets(),
+            'origin_behavior' => $collection->originBehavior(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($collection))
@@ -231,6 +234,7 @@ class CollectionsController extends CpController
             ->sortDirection($values['sort_direction'])
             ->ampable($values['amp'])
             ->mount($values['mount'] ?? null)
+            ->revisions($values['revisions'] ?? false)
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
             ->pastDateBehavior(array_get($values, 'past_date_behavior'))
@@ -241,7 +245,9 @@ class CollectionsController extends CpController
             ->previewTargets($values['preview_targets']);
 
         if ($sites = array_get($values, 'sites')) {
-            $collection->sites($sites);
+            $collection
+                ->sites($sites)
+                ->originBehavior($values['origin_behavior']);
         }
 
         if (! $values['structured']) {
@@ -429,6 +435,7 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collection_configure_template_instructions'),
                         'type' => 'template',
                         'placeholder' => __('System default'),
+                        'blueprint' => true,
                     ],
                     'layout' => [
                         'display' => __('Layout'),
@@ -444,6 +451,19 @@ class CollectionsController extends CpController
             ],
         ];
 
+        if (Statamic::pro() && config('statamic.revisions.enabled')) {
+            $fields['revisions'] = [
+                'display' => __('Revisions'),
+                'fields' => [
+                    'revisions' => [
+                        'type' => 'toggle',
+                        'display' => __('Enable Revisions'),
+                        'instructions' => __('statamic::messages.collection_revisions_instructions'),
+                    ],
+                ],
+            ];
+        }
+
         if (Site::hasMultiple()) {
             $fields['sites'] = [
                 'display' => __('Sites'),
@@ -457,6 +477,17 @@ class CollectionsController extends CpController
                         'type' => 'toggle',
                         'display' => __('Propagate'),
                         'instructions' => __('statamic::messages.collection_configure_propagate_instructions'),
+                    ],
+                    'origin_behavior' => [
+                        'type' => 'select',
+                        'display' => __('Origin Behavior'),
+                        'instructions' => __('statamic::messages.collection_configure_origin_behavior_instructions'),
+                        'default' => 'select',
+                        'options' => [
+                            'select' => __('statamic::messages.collection_configure_origin_behavior_option_select'),
+                            'root' => __('statamic::messages.collection_configure_origin_behavior_option_root'),
+                            'active' => __('statamic::messages.collection_configure_origin_behavior_option_active'),
+                        ],
                     ],
                 ],
             ];

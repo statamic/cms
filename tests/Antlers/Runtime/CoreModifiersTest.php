@@ -3,7 +3,9 @@
 namespace Tests\Antlers\Runtime;
 
 use Carbon\Carbon;
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Tests\Antlers\ParserTestCase;
@@ -217,7 +219,7 @@ EOT;
 
     public function test_word_count()
     {
-        $this->assertSame('2', $this->result('{{  "one two"|word_count }}'));
+        $this->assertSame('8', $this->result('{{  "There are probably seven words in this sentence."|word_count }}'));
     }
 
     public function test_where()
@@ -401,6 +403,26 @@ EOT;
         $this->assertSame('test', $this->renderString('{{ variable | raw }}', ['variable' => $value], true));
     }
 
+    public function test_raw_modifier_returns_raw_value_on_antlers_enabled_field()
+    {
+        // using markdown in this test just because its augmentation is simple.
+        $fieldtype = FieldtypeRepository::find('markdown');
+        $fieldtype->setField(new Field('test', ['antlers' => true]));
+
+        $value = new Value("# heading\nparagraph {{ foo }}", 'test', $fieldtype);
+
+        $vars = [
+            'test' => $value,
+            'foo' => 'bar',
+        ];
+
+        $this->assertSame("<h1>heading</h1>\n<p>paragraph bar</p>\n", $this->renderString('{{ test }}', $vars));
+        $this->assertSame("# heading\nparagraph {{ foo }}", $this->renderString('{{ test | raw }}', $vars));
+        // Ensure other modifiers still work
+        $this->assertSame("<H1>HEADING</H1>\n<P>PARAGRAPH BAR</P>\n", $this->renderString('{{ test | upper }}', $vars));
+        $this->assertSame("# HEADING\nPARAGRAPH {{ FOO }}", $this->renderString('{{ test | raw | upper }}', $vars));
+    }
+
     public function test_explode_on_tag_pairs()
     {
         // Issue: https://github.com/statamic/cms/issues/4979
@@ -509,6 +531,38 @@ EOT;
                 $entryOne, $entryTwo,
             ],
         ], true)));
+    }
+
+    public function test_dynamic_binding_is_resolved_on_modifier_parameters()
+    {
+        $template = <<<'EOT'
+{{ title :ensure_right="title | upper" }}
+EOT;
+
+        $this->assertSame('As the World TurnsAS THE WORLD TURNS', $this->renderString($template, $this->data, true));
+    }
+
+    public function test_null_values_on_count_does_not_trigger_error()
+    {
+        $template = <<<'EOT'
+{{ if variable|count > 0 }}Yes{{ else }}No{{ /if }}
+EOT;
+
+        $this->assertSame('No', $this->renderString($template, [], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => null], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => []], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => collect()], true));
+        $this->assertSame('Yes', $this->renderString($template, ['variable' => ['One']], true));
+
+        $template = <<<'EOT'
+{{ if {variable count="count"} > 0 }}Yes{{ else }}No{{ /if }}
+EOT;
+
+        $this->assertSame('No', $this->renderString($template, [], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => null], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => []], true));
+        $this->assertSame('No', $this->renderString($template, ['variable' => collect()], true));
+        $this->assertSame('Yes', $this->renderString($template, ['variable' => ['One']], true));
     }
 }
 

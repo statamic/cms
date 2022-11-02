@@ -113,11 +113,15 @@ export default {
             return !this.isReadOnly && this.config.reorderable && this.maxRows > 1
         },
 
+        replicatorPreview() {
+            return `${this.config.display}: ${__n(':count row|:count rows', this.value.length)}`;
+        }
+
     },
 
     reactiveProvide: {
         name: 'grid',
-        include: ['config', 'isReorderable', 'isReadOnly', 'handle', 'errorKeyPrefix']
+        include: ['config', 'isReorderable', 'isReadOnly', 'handle', 'fieldPathPrefix']
     },
 
     watch: {
@@ -169,7 +173,7 @@ export default {
 
         removed(index) {
             if (! confirm(__('Are you sure?'))) return;
-                
+
             this.update([
                 ...this.value.slice(0, index),
                 ...this.value.slice(index + 1)
@@ -188,10 +192,6 @@ export default {
 
         sorted(rows) {
             this.update(rows);
-        },
-
-        getReplicatorPreviewText() {
-            // TODO
         },
 
         focus() {
