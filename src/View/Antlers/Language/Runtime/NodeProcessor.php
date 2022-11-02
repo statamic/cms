@@ -740,9 +740,11 @@ class NodeProcessor
      */
     private function guardRuntime(AntlersNode $node, $value)
     {
-        if ($node->isClosedBy != null && ! $this->isInternalTagLike($node) && $this->isLoopable($value) == false) {
-            $varName = $node->name->getContent();
-            Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}");
+        if ($node->isClosedBy != null && $this->isLoopable($value) == false) {
+            if (! $this->isInternalTagLike($node)) {
+                $varName = $node->name->getContent();
+                Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}");
+            }
 
             return false;
         } elseif ($this->isInterpolationProcessor == false && $this->isLoopable($value) && $node->isClosedBy == null) {
