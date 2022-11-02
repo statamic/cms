@@ -164,6 +164,7 @@ class CollectionsController extends CpController
                 ? $collection->titleFormats()->first()
                 : $collection->titleFormats()->all(),
             'preview_targets' => $collection->basePreviewTargets(),
+            'origin_behavior' => $collection->originBehavior(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($collection))
