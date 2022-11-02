@@ -512,32 +512,32 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_and_sets_the_default_localization_origin()
+    public function it_gets_and_sets_the_origin_behavior()
     {
         $collection = (new Collection)->handle('test');
-        $this->assertEquals('select', $collection->defaultLocalizationOrigin());
+        $this->assertEquals('select', $collection->originBehavior());
 
-        $return = $collection->defaultLocalizationOrigin('active');
+        $return = $collection->originBehavior('active');
         $this->assertEquals($collection, $return);
-        $this->assertEquals('active', $collection->defaultLocalizationOrigin());
+        $this->assertEquals('active', $collection->originBehavior());
 
-        $return = $collection->defaultLocalizationOrigin('root');
+        $return = $collection->originBehavior('root');
         $this->assertEquals($collection, $return);
-        $this->assertEquals('root', $collection->defaultLocalizationOrigin());
+        $this->assertEquals('root', $collection->originBehavior());
 
-        $return = $collection->defaultLocalizationOrigin(null);
+        $return = $collection->originBehavior(null);
         $this->assertEquals($collection, $return);
-        $this->assertEquals('select', $collection->defaultLocalizationOrigin());
+        $this->assertEquals('select', $collection->originBehavior());
     }
 
     /** @test */
-    public function it_throw_exception_when_setting_invalid_default_localization_origin()
+    public function it_throw_exception_when_setting_invalid_origin_behavior()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid localization origin [nope]. Must be "select", "root", or "active".');
+        $this->expectExceptionMessage('Invalid origin behavior [nope]. Must be "select", "root", or "active".');
 
         $collection = (new Collection)->handle('test');
-        $collection->defaultLocalizationOrigin('nope');
+        $collection->originBehavior('nope');
     }
 
     /** @test */

@@ -307,7 +307,7 @@ export default {
         initialTitle: String,
         initialLocalizations: Array,
         initialLocalizedFields: Array,
-        localizationOrigin: String,
+        originBehavior: String,
         initialHasOrigin: Boolean,
         initialOriginValues: Object,
         initialOriginMeta: Object,
@@ -603,7 +603,7 @@ export default {
 
             if (localization.exists) {
                 this.editLocalization(localization);
-            } else if (this.localizations.length > 2 && this.localizationOrigin === 'select') {
+            } else if (this.localizations.length > 2 && this.originBehavior === 'select') {
                 this.selectingOrigin = true;
             } else {
                 this.createLocalization(localization);
@@ -753,7 +753,7 @@ export default {
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
 
-        this.selectedOrigin = this.localizationOrigin === 'active'
+        this.selectedOrigin = this.originBehavior === 'active'
             ? this.localizations.find(l => l.active).handle
             : this.localizations.find(l => l.root).handle;
     },

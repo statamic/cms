@@ -50,7 +50,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $revisions = false;
     protected $positions;
     protected $defaultPublishState = true;
-    protected $defaultLocalizationOrigin = 'select';
+    protected $originBehavior = 'select';
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
     protected $structure;
@@ -578,15 +578,15 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
-    public function defaultLocalizationOrigin($origin = null)
+    public function originBehavior($origin = null)
     {
         return $this
-            ->fluentlyGetOrSet('defaultLocalizationOrigin')
+            ->fluentlyGetOrSet('originBehavior')
             ->setter(function ($origin) {
                 $origin = $origin ?? 'select';
 
                 if (! in_array($origin, ['select', 'root', 'active'])) {
-                    throw new InvalidArgumentException("Invalid localization origin [$origin]. Must be \"select\", \"root\", or \"active\".");
+                    throw new InvalidArgumentException("Invalid origin behavior [$origin]. Must be \"select\", \"root\", or \"active\".");
                 }
 
                 return $origin;
