@@ -118,7 +118,10 @@ class Term implements TermContract
 
     public function in($site)
     {
-        return new LocalizedTerm($this, $site);
+        return app()->makeWith(LocalizedTerm::class, [
+            'term' => $this,
+            'locale' => $site,
+        ]);
     }
 
     public function inDefaultLocale()

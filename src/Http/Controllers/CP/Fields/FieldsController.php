@@ -77,6 +77,7 @@ class FieldsController extends CpController
             'length',
             'reference',
             'resource',
+            'status',
             'unless',
             'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
         ];
@@ -134,6 +135,7 @@ class FieldsController extends CpController
                 'options' => [
                     'visible' => __('Visible'),
                     'read_only' => __('Read Only'),
+                    'computed' => __('Computed'),
                     'hidden' => __('Hidden'),
                 ],
                 'default' => 'visible',

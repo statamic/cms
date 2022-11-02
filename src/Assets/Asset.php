@@ -14,7 +14,6 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetDeleted;
@@ -42,7 +41,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 {
     use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
     TracksQueriedRelations,
-    SyncsOriginalState, ContainsData {
+    ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
@@ -56,6 +55,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     protected $withEvents = true;
     protected $shouldHydrate = true;
     protected $removedData = [];
+    protected $original = [];
 
     public function syncOriginal()
     {
@@ -65,9 +65,35 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
             $this->original[$property] = $this->{$property};
         }
 
-        $this->original['data'] = $this->metaExists() ? $this->meta('data') : $this->data->all();
+        $this->original['data'] = new PendingMeta('data');
 
         return $this;
+    }
+
+    public function getOriginal($key = null, $fallback = null)
+    {
+        $this->resolvePendingMetaOriginalValues();
+
+        return Arr::get($this->original, $key, $fallback);
+    }
+
+    private function resolvePendingMetaOriginalValues()
+    {
+        if (empty($this->original)) {
+            $this->syncOriginal();
+        }
+
+        // If it's an array, they've already been resolved.
+        if (is_array($this->original['data'])) {
+            return;
+        }
+
+        $this->original['data'] = $this->metaExists() ? $this->meta('data') : $this->data->all();
+    }
+
+    public function getRawOriginal()
+    {
+        return $this->original;
     }
 
     public function __construct()
@@ -140,6 +166,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $this->data = collect($this->meta['data']);
 
         $this->removedData = [];
+
+        if (! empty($this->original)) {
+            $this->resolvePendingMetaOriginalValues();
+        }
 
         return $this;
     }
@@ -255,7 +285,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
     protected function metaExists()
     {
-        return $this->disk()->exists($this->metaPath());
+        return $this->container()->metaFiles()->contains($this->metaPath());
     }
 
     public function writeMeta($meta)
@@ -803,7 +833,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function title()
     {
-        return $this->basename();
+        return $this->get('title') ?? $this->basename();
     }
 
     /**
