@@ -539,6 +539,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 'future' => $this->futureDateBehavior,
             ],
             'preview_targets' => $this->previewTargetsForFile(),
+            'origin_behavior' => ($ob = $this->originBehavior()) === 'select' ? null : $ob,
         ]));
 
         if (! Site::hasMultiple()) {

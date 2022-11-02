@@ -241,7 +241,8 @@ class CollectionsController extends CpController
             ->propagate(array_get($values, 'propagate'))
             ->titleFormats($values['title_formats'])
             ->requiresSlugs($values['require_slugs'])
-            ->previewTargets($values['preview_targets']);
+            ->previewTargets($values['preview_targets'])
+            ->originBehavior($values['origin_behavior']);
 
         if ($sites = array_get($values, 'sites')) {
             $collection->sites($sites);
@@ -474,6 +475,17 @@ class CollectionsController extends CpController
                         'type' => 'toggle',
                         'display' => __('Propagate'),
                         'instructions' => __('statamic::messages.collection_configure_propagate_instructions'),
+                    ],
+                    'origin_behavior' => [
+                        'type' => 'select',
+                        'display' => __('Origin Behavior'),
+                        'instructions' => __('statamic::messages.collection_configure_origin_behavior_instructions'),
+                        'default' => 'select',
+                        'options' => [
+                            'select' => __('statamic::messages.collection_configure_origin_behavior_option_select'),
+                            'root' => __('statamic::messages.collection_configure_origin_behavior_option_root'),
+                            'active' => __('statamic::messages.collection_configure_origin_behavior_option_active'),
+                        ],
                     ],
                 ],
             ];
