@@ -1,5 +1,15 @@
 # Release Notes
 
+## 3.3.51 (2022-11-02)
+
+### What's new
+- Ability to bypass entry localization confirmation modal. [#6983](https://github.com/statamic/cms/issues/6983) by @jasonvarga
+
+### What's fixed
+- Prevent Antlers logging non-loopable variable warnings for certain tags. [#6989](https://github.com/statamic/cms/issues/6989) by @JohnathonKoster
+
+
+
 ## 3.3.50 (2022-11-01)
 
 ### What's new
