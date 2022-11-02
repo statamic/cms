@@ -709,6 +709,24 @@ class NodeProcessor
     }
 
     /**
+     * Tests if the provided node is internally treated like a tag.
+     *
+     * @param AntlersNode $node The node.
+     * @return bool
+     */
+    protected function isInternalTagLike(AntlersNode $node)
+    {
+        $nodeName = $node->name->name;
+
+        if ($nodeName == 'slot' || $nodeName == 'push' || $nodeName == 'prepend' ||
+            $nodeName == 'stack' || $nodeName == 'once') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Tests if the runtime should continue processing the node/value combination.
      *
      * This method is responsible for ensuring that developers are not
@@ -722,7 +740,7 @@ class NodeProcessor
      */
     private function guardRuntime(AntlersNode $node, $value)
     {
-        if ($node->isClosedBy != null && $this->isLoopable($value) == false) {
+        if ($node->isClosedBy != null && !$this->isInternalTagLike($node) && $this->isLoopable($value) == false) {
             $varName = $node->name->getContent();
             Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}");
 
