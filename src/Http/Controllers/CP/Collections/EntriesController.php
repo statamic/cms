@@ -117,6 +117,7 @@ class EntriesController extends CpController
             'readOnly' => User::current()->cant('edit', $entry),
             'locale' => $entry->locale(),
             'localizedFields' => $entry->data()->keys()->all(),
+            'originBehavior' => $collection->originBehavior(),
             'isRoot' => $entry->isRoot(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,

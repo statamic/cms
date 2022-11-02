@@ -244,7 +244,9 @@ class CollectionsController extends CpController
             ->previewTargets($values['preview_targets']);
 
         if ($sites = array_get($values, 'sites')) {
-            $collection->sites($sites);
+            $collection
+                ->sites($sites)
+                ->originBehavior($values['origin_behavior']);
         }
 
         if (! $values['structured']) {
@@ -474,6 +476,17 @@ class CollectionsController extends CpController
                         'type' => 'toggle',
                         'display' => __('Propagate'),
                         'instructions' => __('statamic::messages.collection_configure_propagate_instructions'),
+                    ],
+                    'origin_behavior' => [
+                        'type' => 'select',
+                        'display' => __('Origin Behavior'),
+                        'instructions' => __('statamic::messages.collection_configure_origin_behavior_instructions'),
+                        'default' => 'select',
+                        'options' => [
+                            'select' => __('statamic::messages.collection_configure_origin_behavior_option_select'),
+                            'root' => __('statamic::messages.collection_configure_origin_behavior_option_root'),
+                            'active' => __('statamic::messages.collection_configure_origin_behavior_option_active'),
+                        ],
                     ],
                 ],
             ];
