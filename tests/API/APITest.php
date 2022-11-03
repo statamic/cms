@@ -7,6 +7,7 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
+use Statamic\Structures\Page;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -206,6 +207,43 @@ class APITest extends TestCase
             ->get('/api/collections/pages/entries/dance')
             ->assertJsonPath('data.api_url', null)
             ->assertJsonPath('data.edit_url', null);
+    }
+
+    /** @test */
+    public function parent_field_are_shallow_augmented()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Config::set('statamic.api.cache', false);
+
+        Facades\Collection::make('some-test')->structureContents(['root' => true])->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'entries_fields' => ['type' => 'entries', 'max_items' => 1],
+        ]);
+        BlueprintRepository::shouldReceive('in')->with('collections/some-test')->andReturn(collect([
+            'page' => $blueprint->setHandle('page'),
+        ]));
+
+        $homePage = new Page;
+        $homePage->setRoot(true);
+        $homeEntry = Facades\Entry::make();
+        $homeEntry->collection('some-test')->id('home')->slug('home')->published(true)->set('entries_fields', 'second')->save();
+        $homePage->setEntry($homeEntry);
+        $secondPage = new Page;
+        $secondEntry = Facades\Entry::make();
+        $secondEntry->collection('some-test')->id('second')->slug('second')->published(true)->save();
+        $secondPage->setEntry($secondEntry);
+        $parent = $secondEntry->parent();
+
+        Facades\Collection::find('some-test')->structure()->makeTree('en', [
+            ['entry' => 'home'],
+            ['entry' => 'second'],
+        ])->save();
+
+        $return = $secondPage->setParent($homePage);
+
+
+        $this->assertEndpointSuccessful('/api/collections/some-test/entries/second');
     }
 
     /** @test */

@@ -5,6 +5,7 @@ namespace Statamic\Data;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Fields\Value;
 use Statamic\Statamic;
+use Statamic\Structures\Page;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -50,6 +51,10 @@ abstract class AbstractAugmented implements Augmented
 
         if ($this->methodExistsOnThisClass($method)) {
             $value = $this->$method();
+
+            if ($value instanceof Page) {
+                return $this->wrapValue($value->id(), $handle);
+            }
 
             return $value instanceof Value
                 ? $value
