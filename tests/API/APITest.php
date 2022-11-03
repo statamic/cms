@@ -242,7 +242,6 @@ class APITest extends TestCase
 
         $return = $secondPage->setParent($homePage);
 
-
         $this->assertEndpointSuccessful('/api/collections/some-test/entries/second');
     }
 
