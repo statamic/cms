@@ -67,7 +67,7 @@ class Replicator extends Fieldtype
 
     protected function processRow($row)
     {
-        $row = array_except($row, '_id');
+        $row['id'] = Arr::pull($row, '_id');
 
         $fields = $this->fields($row['type'])->addValues($row)->process()->values()->all();
 
@@ -87,8 +87,10 @@ class Replicator extends Fieldtype
     {
         $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values()->all();
 
+        $id = Arr::pull($row, 'id') ?? "set-$index";
+
         return array_merge($row, $fields, [
-            '_id' => "set-$index",
+            '_id' => $id,
             'enabled' => $row['enabled'] ?? true,
         ]);
     }

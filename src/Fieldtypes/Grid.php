@@ -77,7 +77,7 @@ class Grid extends Fieldtype
 
     private function processRow($row)
     {
-        $row = array_except($row, '_id');
+        $row['id'] = Arr::pull($row, '_id');
 
         $fields = $this->fields()->addValues($row)->process()->values()->all();
 
@@ -103,8 +103,10 @@ class Grid extends Fieldtype
     {
         $fields = $this->fields()->addValues($row)->preProcess()->values()->all();
 
+        $id = Arr::pull($row, 'id') ?? "row-$index";
+
         return array_merge($row, $fields, [
-            '_id' => "row-$index",
+            '_id' => $id,
         ]);
     }
 
