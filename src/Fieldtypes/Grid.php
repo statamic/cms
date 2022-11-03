@@ -103,7 +103,7 @@ class Grid extends Fieldtype
     {
         $fields = $this->fields()->addValues($row)->preProcess()->values()->all();
 
-        $id = Arr::pull($row, 'id') ?? "row-$index";
+        $id = Arr::pull($row, 'id') ?? str_random(8);
 
         return array_merge($row, $fields, [
             '_id' => $id,

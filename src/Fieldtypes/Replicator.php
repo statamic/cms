@@ -87,7 +87,7 @@ class Replicator extends Fieldtype
     {
         $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values()->all();
 
-        $id = Arr::pull($row, 'id') ?? "set-$index";
+        $id = Arr::pull($row, 'id') ?? str_random(8);
 
         return array_merge($row, $fields, [
             '_id' => $id,

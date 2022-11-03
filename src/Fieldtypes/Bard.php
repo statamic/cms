@@ -328,7 +328,7 @@ class Bard extends Replicator
         return [
             'type' => 'set',
             'attrs' => [
-                'id' => $row['attrs']['id'] ?? "set-$index",
+                'id' => $row['attrs']['id'] ?? str_random(8),
                 'enabled' => $row['attrs']['enabled'] ?? true,
                 'values' => Arr::except($values, 'enabled'),
             ],
