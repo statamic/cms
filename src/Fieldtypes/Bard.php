@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Facades\Statamic\Fieldtypes\RowId;
 use ProseMirrorToHtml\Renderer;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Blink;
@@ -429,7 +430,7 @@ class Bard extends Replicator
                 [
                     'type' => 'set',
                     'attrs' => [
-                        'id' => "set-$i",
+                        'id' => RowId::generate(),
                         'values' => $set,
                     ],
                 ],

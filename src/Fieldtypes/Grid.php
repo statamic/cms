@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
@@ -103,7 +104,7 @@ class Grid extends Fieldtype
     {
         $fields = $this->fields()->addValues($row)->preProcess()->values()->all();
 
-        $id = Arr::pull($row, 'id') ?? str_random(8);
+        $id = Arr::pull($row, 'id') ?? RowId::generate();
 
         return array_merge($row, $fields, [
             '_id' => $id,
