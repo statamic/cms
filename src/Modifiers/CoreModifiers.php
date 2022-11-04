@@ -2061,6 +2061,10 @@ class CoreModifiers extends Modifier
      */
     public function reverse($value)
     {
+        if (Compare::isQueryBuilder($value)) {
+            return $value->get()->reverse()->values()->all();
+        }
+
         if ($value instanceof Collection) {
             return $value->reverse()->values()->all();
         }
