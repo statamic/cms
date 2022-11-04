@@ -126,6 +126,8 @@ return [
     'select.config.taggable' => 'Autorisez l’ajout de nouvelles options en plus des options prédéfinies.',
     'select.title' => 'Select',
     'sites.title' => 'Sites',
+    'slug.config.from' => 'Champ source à partir duquel créer un identifiant.',
+    'slug.config.generate' => 'Créer automatiquement un identifiant en fonction du champ source `A partir de`.',
     'slug.title' => 'Slug',
     'structures.title' => 'Structures',
     'table.title' => 'Table',
