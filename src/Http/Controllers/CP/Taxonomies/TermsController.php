@@ -26,6 +26,7 @@ class TermsController extends CpController
         $query = $this->indexQuery($taxonomy);
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'taxonomy' => $taxonomy->handle(),
             'blueprints' => $taxonomy->termBlueprints()->map->handle(),
         ]);
 

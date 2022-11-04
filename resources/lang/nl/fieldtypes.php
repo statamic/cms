@@ -113,6 +113,7 @@ return [
     'replicator.config.max_sets' => 'Het maximale aantal sets.',
     'replicator.config.previews' => 'Tonen wanneer sets zijn samengevouwen.',
     'replicator.title' => 'Replicator',
+    'revealer.config.input_label' => 'Het label dat getoond moet worden in de knop of naast de toggle.',
     'revealer.config.mode' => 'Kies de layoutstijl van je voorkeur.',
     'revealer.title' => 'Revealer',
     'section.title' => 'Section',

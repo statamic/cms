@@ -73,6 +73,7 @@ class FieldsController extends CpController
             'elseif',
             'endif',
             'endunless',
+            'id',
             'if',
             'length',
             'reference',
@@ -135,6 +136,7 @@ class FieldsController extends CpController
                 'options' => [
                     'visible' => __('Visible'),
                     'read_only' => __('Read Only'),
+                    'computed' => __('Computed'),
                     'hidden' => __('Hidden'),
                 ],
                 'default' => 'visible',

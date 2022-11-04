@@ -84,6 +84,8 @@ class Users extends Relationship
             $query->whereNotIn('id', $request->exclusions);
         }
 
+        $query->orderBy('name');
+
         $userFields = function ($user) {
             return [
                 'id' => $user->id(),
