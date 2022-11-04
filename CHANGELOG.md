@@ -1,5 +1,14 @@
 # Release Notes
 
+## 3.3.52 (2022-11-04)
+
+### What's fixed
+- Add missing validation for `id` being a reserved field handle. [#7005](https://github.com/statamic/cms/issues/7005) by @jasonvarga
+- Fix Replicator/Grid/Bard not displaying newly added items after saving. [#7000](https://github.com/statamic/cms/issues/7000) by @jasonvarga
+- Reset asset pagination when moving to another folder or container. [#6997](https://github.com/statamic/cms/issues/6997) by @jasonvarga
+
+
+
 ## 3.3.51 (2022-11-02)
 
 ### What's new
