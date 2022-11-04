@@ -366,6 +366,10 @@ class EntriesController extends CpController
             $tree = $structure->in($site->handle());
             $parent = $values['parent'] ?? null;
             $entry->afterSave(function ($entry) use ($parent, $tree) {
+                if ($parent && optional($tree->page($parent))->isRoot()) {
+                    $parent = null;
+                }
+
                 $tree->appendTo($parent, $entry)->save();
             });
         }
