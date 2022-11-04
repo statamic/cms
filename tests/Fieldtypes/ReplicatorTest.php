@@ -189,18 +189,18 @@ class ReplicatorTest extends TestCase
 
         $this->assertSame([
             [
+                'id' => '1',
                 'type' => 'one',
                 'numbers' => 2,
                 'words' => 'test',
                 'foo' => 'bar',
-                'id' => '1',
             ],
             [
+                'id' => '2',
                 'type' => 'two',
                 'age' => 13,
                 'food' => 'pizza',
                 'foo' => 'more bar',
-                'id' => '2',
             ],
         ], $field->process()->value());
     }
@@ -256,20 +256,20 @@ class ReplicatorTest extends TestCase
 
         $this->assertSame([
             [
+                'id' => '1',
                 'type' => 'one',
                 'numbers' => 2,
                 'words' => 'test',
                 'foo' => 'bar',
                 'nested_replicator' => [
                     [
+                        'id' => '2',
                         'type' => 'two',
                         'nested_age' => 13,
                         'nested_food' => 'pizza',
                         'nested_foo' => 'more bar',
-                        'id' => '2',
                     ],
                 ],
-                'id' => '1',
             ],
         ], $field->process()->value());
     }

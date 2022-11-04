@@ -78,11 +78,9 @@ class Grid extends Fieldtype
 
     private function processRow($row)
     {
-        $row['id'] = Arr::pull($row, '_id');
-
         $fields = $this->fields()->addValues($row)->process()->values()->all();
 
-        $row = array_merge($row, $fields);
+        $row = array_merge(['id' => Arr::pull($row, '_id')], $row, $fields);
 
         return Arr::removeNullValues($row);
     }

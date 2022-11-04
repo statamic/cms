@@ -201,16 +201,16 @@ class GridTest extends TestCase
 
         $this->assertSame([
             [
+                'id' => 'id-1',
                 'numbers' => 2,
                 'words' => 'test',
                 'foo' => 'bar',
-                'id' => 'id-1',
             ],
             [
+                'id' => 'id-2',
                 'numbers' => 3,
                 'words' => 'more test',
                 'foo' => 'more bar',
-                'id' => 'id-2',
             ],
         ], $field->process()->value());
     }
@@ -279,44 +279,44 @@ class GridTest extends TestCase
 
         $this->assertSame([
             [
+                'id' => 'id-1',
                 'numbers' => 2,
                 'words' => 'test',
                 'foo' => 'bar',
                 'nested_grid' => [
                     [
+                        'id' => 'id-1-1',
                         'nested_numbers' => 3,
                         'nested_words' => 'nested test one',
                         'nested_foo' => 'nested bar one',
-                        'id' => 'id-1-1',
                     ],
                     [
+                        'id' => 'id-1-2',
                         'nested_numbers' => 4,
                         'nested_words' => 'nested test two',
                         'nested_foo' => 'nested bar two',
-                        'id' => 'id-1-2',
                     ],
                 ],
-                'id' => 'id-1',
             ],
             [
+                'id' => 'id-2',
                 'numbers' => 3,
                 'words' => 'more test',
                 'foo' => 'more bar',
                 'nested_grid' => [
                     [
+                        'id' => 'id-2-1',
                         'nested_numbers' => 5,
                         'nested_words' => 'more nested test one',
                         'nested_foo' => 'more nested bar one',
-                        'id' => 'id-2-1',
                     ],
                     [
+                        'id' => 'id-2-2',
                         'nested_numbers' => 6,
                         'nested_words' => 'more nested test two',
                         'nested_foo' => 'more nested bar two',
-                        'id' => 'id-2-2',
                     ],
                 ],
-                'id' => 'id-2',
             ],
         ], $field->process()->value());
     }
