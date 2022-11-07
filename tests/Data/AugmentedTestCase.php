@@ -51,7 +51,7 @@ class AugmentedTestCase extends TestCase
             switch ($expectation['type']) {
                 case Carbon::class:
                     $this->assertTrue(
-                        Carbon::createFromFormat('Y-m-d H:i', $expectation['value'])->eq($actual),
+                        Carbon::createFromFormat(strlen($expectation['value']) === 19 ? 'Y-m-d H:i:s' : 'Y-m-d H:i', $expectation['value'])->eq($actual),
                         "Key '{$key}' does not match the expected date."
                     );
                     break;
