@@ -880,14 +880,14 @@ class EntryTest extends TestCase
 
         // Without explicitly having the date set, it falls back to the last modified date (which if there's no file, is Carbon::now())
         $this->assertInstanceOf(Carbon::class, $entry->date());
-        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-09-24 00:00')->eq($entry->date()));
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i:s', '2015-09-24 00:00:00')->eq($entry->date()));
         $this->assertFalse($entry->hasDate());
 
         // Date can be provided as string without time
         $return = $entry->date('2015-03-05');
         $this->assertEquals($entry, $return);
         $this->assertInstanceOf(Carbon::class, $entry->date());
-        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-03-05 00:00')->eq($entry->date()));
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i:s', '2015-03-05 00:00:00')->eq($entry->date()));
         $this->assertTrue($entry->hasDate());
 
         // Date can be provided as string with time
@@ -896,8 +896,14 @@ class EntryTest extends TestCase
         $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-03-05 13:25')->eq($entry->date()));
         $this->assertTrue($entry->hasDate());
 
+        // Date can be provided as string with time including seconds
+        $entry->date('2015-03-05-132539');
+        $this->assertInstanceOf(Carbon::class, $entry->date());
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i:s', '2015-03-05 13:25:39')->eq($entry->date()));
+        $this->assertTrue($entry->hasDate());
+
         // Date can be provided as carbon instance
-        $carbon = Carbon::createFromFormat('Y-m-d H:i', '2018-05-02 17:32');
+        $carbon = Carbon::createFromFormat('Y-m-d H:i:s', '2018-05-02 17:32:58');
         $entry->date($carbon);
         $this->assertInstanceOf(Carbon::class, $entry->date());
         $this->assertTrue($carbon->eq($entry->date()));
@@ -984,6 +990,11 @@ class EntryTest extends TestCase
 
         $dateEntry->date('2017-01-02-1523');
         $this->assertEquals('2017-01-02 03:23pm', $dateEntry->date()->format('Y-m-d h:ia'));
+        $this->assertTrue($dateEntry->hasDate());
+        $this->assertTrue($dateEntry->hasTime());
+
+        $dateEntry->date('2017-01-02-152301');
+        $this->assertEquals('2017-01-02 03:23:01', $dateEntry->date()->format('Y-m-d h:i:s'));
         $this->assertTrue($dateEntry->hasDate());
         $this->assertTrue($dateEntry->hasTime());
     }

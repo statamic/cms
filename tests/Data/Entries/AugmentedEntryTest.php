@@ -74,7 +74,7 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $entry
             ->origin('origin-id')
-            ->date('2018-01-03-1705')
+            ->date('2018-01-03-170512')
             ->blueprint('test')
             ->setSupplement('three', 'the "three" value supplemented on the entry')
             ->setSupplement('four', 'the "four" value supplemented on the entry and in the blueprint')
@@ -97,7 +97,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             'status'        => ['type' => 'string', 'value' => 'published'],
             'published'     => ['type' => 'bool', 'value' => true],
             'private'       => ['type' => 'bool', 'value' => false],
-            'date'          => ['type' => Carbon::class, 'value' => '2018-01-03 17:05'],
+            'date'          => ['type' => Carbon::class, 'value' => '2018-01-03 17:05:12'],
             'order'         => ['type' => 'null', 'value' => null], // todo: test for when this is an int
             'is_entry'      => ['type' => 'bool', 'value' => true],
             'collection'    => ['type' => CollectionContract::class, 'value' => $collection],
