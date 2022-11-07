@@ -285,7 +285,13 @@ class EntriesController extends CpController
         ])->merge($fields->values());
 
         if ($collection->dated()) {
-            $values['date'] = substr(now()->toDateTimeString(), 0, 10);
+            $timeEnabled = $fields->get('date')->config()['time_enabled'] ?? false;
+            $timeSecondsEnabled = $fields->get('date')->config()['time_seconds_enabled'] ?? false;
+            $values['date'] = substr(
+                now()->toDateTimeString(),
+                0,
+                $timeEnabled ? ($timeSecondsEnabled ? 19 : 16) : 10
+            );
         }
 
         $viewData = [
