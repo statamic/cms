@@ -359,7 +359,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         $prefix = '';
 
         if ($this->hasDate()) {
-            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d').'.';
+            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-His' : 'Y-m-d').'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
@@ -444,7 +444,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
                 }
 
-                return Carbon::createFromFormat('Y-m-d-Hi', $date);
+                return Carbon::createFromFormat('Y-m-d-His', $date);
             })
             ->args(func_get_args());
     }

@@ -435,7 +435,7 @@ class EntriesController extends CpController
         }
 
         if ($entry->collection()->dated()) {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 19);
             $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
             $values['date'] = $datetime;
         }
