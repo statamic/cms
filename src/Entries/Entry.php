@@ -444,6 +444,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
                 }
 
+                if (strlen($date) === 15) {
+                    return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
+                }
+
                 return Carbon::createFromFormat('Y-m-d-His', $date);
             })
             ->args(func_get_args());
