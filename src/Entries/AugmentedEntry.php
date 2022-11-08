@@ -66,7 +66,7 @@ class AugmentedEntry extends AbstractAugmented
 
     protected function parent()
     {
-        return $this->data->parent();
+        return $this->wrapValue(optional($this->data->parent())->id(), 'parent');
     }
 
     protected function mount()
