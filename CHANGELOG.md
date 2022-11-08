@@ -1,5 +1,18 @@
 # Release Notes
 
+## 3.3.53 (2022-11-08)
+
+### What's improved
+- German translations. [#7013](https://github.com/statamic/cms/issues/7013) by @helloDanuk
+- French translations [#7008](https://github.com/statamic/cms/issues/7008) by @ebeauchamps
+
+### What's fixed
+- Fix `parent` and `updated_by` fields not being shallow augmented in API, sometimes causing recursion. [#7025](https://github.com/statamic/cms/issues/7025) by @jasonvarga
+- Fix a couple of "root page cannot have children" issues. [#7007](https://github.com/statamic/cms/issues/7007) by @jasonvarga
+- Fix failing test due to orchestra/testbench update. [#7017](https://github.com/statamic/cms/issues/7017) by @jasonvarga
+
+
+
 ## 3.3.52 (2022-11-04)
 
 ### What's fixed
