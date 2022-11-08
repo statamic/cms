@@ -64,7 +64,7 @@
             @endif
 
             @if (config('statamic.cp.support_url'))
-            <dropdown-item external-link="c" class="flex items-center">
+            <dropdown-item external-link="{{ config('statamic.cp.support_url') }}" class="flex items-center">
                 <span>{{ __('Support') }}</span>
                 <i class="w-3 block ml-1">@cp_svg('external-link')</i>
             </dropdown-item>
