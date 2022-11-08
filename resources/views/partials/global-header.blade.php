@@ -57,14 +57,14 @@
             </template>
 
             @if (config('statamic.cp.link_to_docs'))
-            <dropdown-item external-link="https://statamic.dev" class="flex items-center">
+            <dropdown-item external-link="{{ config('statamic.cp.link_to_docs') }}" class="flex items-center">
                 <span>{{ __('Documentation') }}</span>
                 <i class="w-3 block ml-1">@cp_svg('external-link')</i>
             </dropdown-item>
             @endif
 
             @if (config('statamic.cp.support_url'))
-            <dropdown-item external-link="{{ config('statamic.cp.support_url') }}" class="flex items-center">
+            <dropdown-item external-link="c" class="flex items-center">
                 <span>{{ __('Support') }}</span>
                 <i class="w-3 block ml-1">@cp_svg('external-link')</i>
             </dropdown-item>
