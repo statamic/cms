@@ -4,6 +4,7 @@ namespace Statamic\Entries;
 
 use Statamic\Data\AbstractAugmented;
 use Statamic\Facades\Collection;
+use Statamic\Statamic;
 
 class AugmentedEntry extends AbstractAugmented
 {
@@ -46,7 +47,11 @@ class AugmentedEntry extends AbstractAugmented
 
     protected function updatedBy()
     {
-        return $this->data->lastModifiedBy();
+        $user = $this->data->lastModifiedBy();
+
+        return Statamic::isApiRoute()
+            ? optional($user)->toShallowAugmentedCollection()
+            : $user;
     }
 
     protected function updatedAt()
