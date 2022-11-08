@@ -66,7 +66,11 @@ class AugmentedEntry extends AbstractAugmented
 
     protected function parent()
     {
-        return $this->wrapValue(optional($this->data->parent())->id(), 'parent');
+        $parent = $this->data->parent();
+
+        return Statamic::isApiRoute()
+            ? optional($parent)->toShallowAugmentedCollection()
+            : $parent;
     }
 
     protected function mount()
