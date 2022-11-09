@@ -8,13 +8,40 @@ use Statamic\Statamic;
 
 class AddViewPaths
 {
+    private $paths;
+    private $hints;
+    private $amp;
+    private $site;
+
     public function handle($request, Closure $next)
     {
-        $finder = view()->getFinder();
-        $amp = Statamic::isAmpRequest();
-        $site = Site::current()->handle();
+        $this->update();
 
-        $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site, $amp) {
+        $response = $next($request);
+
+        $this->restore();
+
+        return $response;
+    }
+
+    private function update()
+    {
+        $this->finder = view()->getFinder();
+        $this->amp = Statamic::isAmpRequest();
+        $this->site = Site::current()->handle();
+        $this->paths = $this->finder->getPaths();
+        $this->hints = $this->finder->getHints();
+
+        $this->updatePaths();
+        $this->updateHints();
+    }
+
+    private function updatePaths()
+    {
+        $amp = $this->amp;
+        $site = $this->site;
+
+        $paths = collect($this->paths)->flatMap(function ($path) use ($site, $amp) {
             return [
                 $amp ? $path.'/'.$site.'/amp' : null,
                 $path.'/'.$site,
@@ -23,14 +50,26 @@ class AddViewPaths
             ];
         })->filter()->values()->all();
 
-        $finder->setPaths($paths);
+        $this->finder->setPaths($paths);
+    }
 
-        foreach ($finder->getHints() as $namespace => $paths) {
+    private function updateHints()
+    {
+        foreach ($this->hints as $namespace => $paths) {
             foreach ($paths as $path) {
-                $finder->prependNamespace($namespace, $path.'/'.$site);
+                $this->finder->prependNamespace($namespace, $path.'/'.$this->site);
             }
         }
+    }
 
-        return $next($request);
+    private function restore()
+    {
+        $this->finder->setPaths($this->paths);
+
+        foreach ($this->hints as $namespace => $paths) {
+            foreach ($paths as $path) {
+                $this->finder->replaceNamespace($namespace, $path);
+            }
+        }
     }
 }
