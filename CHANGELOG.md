@@ -1,5 +1,17 @@
 # Release Notes
 
+## 3.3.54 (2022-11-09)
+
+### What's improved
+- Support Query Builder values in reverse modifier [#7006](https://github.com/statamic/cms/issues/7006) by @stvnthomas
+
+### What's fixed
+- Fix root page validation error logic [#7028](https://github.com/statamic/cms/issues/7028) by @jasonvarga
+- Fix handling of last_login when being cast to a Carbon instance on the User model. [#7009](https://github.com/statamic/cms/issues/7009) by @dannydinges
+- Reset additional view paths after request. [#7030](https://github.com/statamic/cms/issues/7030) by @jasonvarga
+
+
+
 ## 3.3.53 (2022-11-08)
 
 ### What's improved
