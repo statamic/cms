@@ -33,12 +33,16 @@ class AddViewPathsTest extends TestCase
         $this->setCurrentSiteBasedOnUrl($requestUrl);
 
         $request = $this->createRequest($requestUrl);
+        $handled = false;
 
-        (new AddViewPaths())->handle($request, function () use ($expectedPaths) {
+        (new AddViewPaths())->handle($request, function () use ($expectedPaths, &$handled) {
             $this->assertEquals($expectedPaths, view()->getFinder()->getPaths());
+            $handled = true;
 
             return new Response;
         });
+
+        $this->assertTrue($handled);
     }
 
     /**
@@ -57,12 +61,16 @@ class AddViewPathsTest extends TestCase
         $this->setCurrentSiteBasedOnUrl($requestUrl);
 
         $request = $this->createRequest($requestUrl);
+        $handled = false;
 
-        (new AddViewPaths())->handle($request, function () use ($expectedPaths) {
+        (new AddViewPaths())->handle($request, function () use ($expectedPaths, &$handled) {
             $this->assertEquals($expectedPaths, array_get(view()->getFinder()->getHints(), 'foo'));
+            $handled = true;
 
             return new Response;
         });
+
+        $this->assertTrue($handled);
     }
 
     private function setCurrentSiteBasedOnUrl($requestUrl)
