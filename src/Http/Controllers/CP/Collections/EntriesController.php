@@ -489,7 +489,7 @@ class EntriesController extends CpController
         // If there's no parent selected, the entry will be at end of the top level, which is fine.
         // If the entry being edited is not the root, then we don't have anything to worry about.
         // If the parent is the root, that's fine, and is handled during the tree update later.
-        if (! $parent || ! $entry->isRoot()) {
+        if (! $parent || ! $entry->page()->isRoot()) {
             return;
         }
 
