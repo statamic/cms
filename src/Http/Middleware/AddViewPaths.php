@@ -13,8 +13,10 @@ class AddViewPaths
         $finder = view()->getFinder();
         $amp = Statamic::isAmpRequest();
         $site = Site::current()->handle();
+        $originalPaths = $finder->getPaths();
+        $originalHints = $finder->getHints();
 
-        $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site, $amp) {
+        $paths = collect($originalPaths)->flatMap(function ($path) use ($site, $amp) {
             return [
                 $amp ? $path.'/'.$site.'/amp' : null,
                 $path.'/'.$site,
@@ -25,12 +27,22 @@ class AddViewPaths
 
         $finder->setPaths($paths);
 
-        foreach ($finder->getHints() as $namespace => $paths) {
+        foreach ($originalHints as $namespace => $paths) {
             foreach ($paths as $path) {
                 $finder->prependNamespace($namespace, $path.'/'.$site);
             }
         }
 
-        return $next($request);
+        $response = $next($request);
+
+        $finder->setPaths($originalPaths);
+
+        foreach ($originalHints as $namespace => $paths) {
+            foreach ($paths as $path) {
+                $finder->replaceNamespace($namespace, $path);
+            }
+        }
+
+        return $response;
     }
 }
