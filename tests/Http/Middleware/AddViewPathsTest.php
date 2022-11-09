@@ -23,7 +23,7 @@ class AddViewPathsTest extends TestCase
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]]);
 
-        view()->getFinder()->setPaths([
+        view()->getFinder()->setPaths($originalPaths = [
             '/path/to/views',
             '/path/to/other/views',
         ]);
@@ -43,6 +43,7 @@ class AddViewPathsTest extends TestCase
         });
 
         $this->assertTrue($handled);
+        $this->assertEquals($originalPaths, view()->getFinder()->getPaths());
     }
 
     /**
@@ -57,6 +58,7 @@ class AddViewPathsTest extends TestCase
         ]]);
 
         view()->getFinder()->replaceNamespace('foo', '/path/to/views');
+        $originalHints = view()->getFinder()->getHints()['foo'];
 
         $this->setCurrentSiteBasedOnUrl($requestUrl);
 
@@ -71,6 +73,7 @@ class AddViewPathsTest extends TestCase
         });
 
         $this->assertTrue($handled);
+        $this->assertEquals($originalHints, array_get(view()->getFinder()->getHints(), 'foo'));
     }
 
     private function setCurrentSiteBasedOnUrl($requestUrl)
