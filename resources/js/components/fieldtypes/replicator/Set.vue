@@ -195,7 +195,7 @@ export default {
             this.updated('enabled', ! this.values.enabled);
         },
 
-        toggleCollapsedState(event) {  
+        toggleCollapsedState() {
             if (this.collapsed) {
                 this.expand();
             } else {

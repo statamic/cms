@@ -186,7 +186,7 @@ export default {
             }, 1);
         },
 
-        toggleCollapsedState(event) {
+         toggleCollapsedState() {
             if (this.collapsed) {
                 this.expand();
             } else {
