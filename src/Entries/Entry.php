@@ -693,6 +693,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         if ($this->hasDate()) {
             $data = $data->merge([
+                'date' => $this->date(),
                 'year' => $this->date()->format('Y'),
                 'month' => $this->date()->format('m'),
                 'day' => $this->date()->format('d'),
