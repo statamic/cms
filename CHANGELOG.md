@@ -1,5 +1,20 @@
 # Release Notes
 
+## 3.3.55 (2022-11-14)
+
+### What's new
+- Support custom date formats in route definitions. [#7043](https://github.com/statamic/cms/issues/7043) by @bencarr
+
+### What's improved
+- Better widget card wrapping on small screens. [#7036](https://github.com/statamic/cms/issues/7036) by @jackmcdade
+- Add an icon to the form widget. [#7034](https://github.com/statamic/cms/issues/7034) by @jackmcdade
+
+### What's fixed
+- Fix namespaced view paths not being reset correctly. [#7051](https://github.com/statamic/cms/issues/7051) by @jasonvarga
+- Use translation for 'All'. [#7040](https://github.com/statamic/cms/issues/7040) by @jasonvarga
+
+
+
 ## 3.3.54 (2022-11-09)
 
 ### What's improved
