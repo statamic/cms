@@ -12,9 +12,9 @@ use Statamic\Support\Str;
 
 class BlueprintRepository
 {
-    private const BLINK_FOUND = 'blueprints.found';
-    private const BLINK_FROM_FILE = 'blueprints.from-file';
-    private const BLINK_NAMESPACE_PATHS = 'blueprints.paths-in-namespace';
+    protected const BLINK_FOUND = 'blueprints.found';
+    protected const BLINK_FROM_FILE = 'blueprints.from-file';
+    protected const BLINK_NAMESPACE_PATHS = 'blueprints.paths-in-namespace';
 
     protected $directory;
     protected $fallbacks = [];
@@ -140,7 +140,7 @@ class BlueprintRepository
             ->keyBy->handle();
     }
 
-    private function filesIn($namespace)
+    protected function filesIn($namespace)
     {
         return Blink::store(self::BLINK_NAMESPACE_PATHS)->once($namespace, function () use ($namespace) {
             $namespace = str_replace('/', '.', $namespace);
@@ -155,7 +155,7 @@ class BlueprintRepository
         });
     }
 
-    private function makeBlueprintFromFile($path)
+    protected function makeBlueprintFromFile($path)
     {
         return Blink::store(self::BLINK_FROM_FILE)->once($path, function () use ($path) {
             [$namespace, $handle] = $this->getNamespaceAndHandle(
@@ -174,7 +174,7 @@ class BlueprintRepository
         });
     }
 
-    private function getNamespaceAndHandle($blueprint)
+    protected function getNamespaceAndHandle($blueprint)
     {
         $blueprint = str_replace('/', '.', $blueprint);
         $parts = explode('.', $blueprint);
