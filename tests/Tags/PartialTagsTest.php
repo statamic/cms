@@ -101,4 +101,15 @@ class PartialTagsTest extends TestCase
             $this->partialTag('mypartial', 'foo="baz"')
         );
     }
+
+    /** @test */
+    public function it_doesnt_render_partial_if_when_condition_is_false()
+    {
+        $this->viewShouldReturnRaw('mypartial', "---\nfoo: bar\n---\nthe partial content with {{ foo }}");
+
+        $this->assertEquals(
+            '',
+            $this->partialTag('mypartial', 'foo="baz" when="false"')
+        );
+    }
 }

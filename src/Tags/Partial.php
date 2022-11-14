@@ -10,7 +10,9 @@ class Partial extends Tags
         // an argument, but fall back to the studly version just in case.
         $partial = $this->params->get('src', $tag);
 
-        return $this->render($partial);
+        if ($this->shouldRender()) {
+            return $this->render($partial);
+        }
     }
 
     protected function render($partial)
@@ -23,6 +25,11 @@ class Partial extends Tags
         return view($this->viewName($partial), $variables)
             ->withoutExtractions()
             ->render();
+    }
+
+    protected function shouldRender(): bool
+    {
+        return $this->params->bool('when', true);
     }
 
     protected function viewName($partial)
