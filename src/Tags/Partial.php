@@ -29,7 +29,15 @@ class Partial extends Tags
 
     protected function shouldRender(): bool
     {
-        return $this->params->bool('when', true);
+        if ($this->params->has('when')) {
+            return $this->params->bool('when');
+        }
+
+        if ($this->params->has('unless')) {
+            return ! $this->params->bool('unless');
+        }
+
+        return true;
     }
 
     protected function viewName($partial)
