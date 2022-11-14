@@ -16,6 +16,8 @@ use Statamic\Contracts\Auth\UserRepository;
  * @method static void save(User $user);
  * @method static void delete(User $user);
  * @method static \Statamic\Fields\Blueprint blueprint();
+ * @method static \Illuminate\Support\Collection getComputedCallbacks()
+ * @method static void computed(string $field, \Closure $callback)
  *
  * @see \Statamic\Contracts\Auth\UserRepository
  */

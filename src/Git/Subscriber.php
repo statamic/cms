@@ -4,22 +4,25 @@ namespace Statamic\Git;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 use Statamic\Events\Concerns\ListensForContentEvents;
+use Statamic\Events\Subscriber as StatamicSubscriber;
 use Statamic\Facades\Git;
 
-class Subscriber
+class Subscriber extends StatamicSubscriber
 {
     use ListensForContentEvents;
 
     /**
-     * Register the listeners for the subscriber.
+     * Map subscribable listeners.
      *
-     * @param  \Illuminate\Events\Dispatcher  $events
+     * @return array
      */
-    public function subscribe($events)
+    protected function getListeners()
     {
-        foreach ($this->events as $event) {
-            $events->listen($event, self::class.'@commit');
-        }
+        return collect($this->events)
+            ->mapWithKeys(function ($event) {
+                return [$event => static::class.'@commit'];
+            })
+            ->all();
     }
 
     /**

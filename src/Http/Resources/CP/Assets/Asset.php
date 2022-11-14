@@ -27,6 +27,7 @@ class Asset extends JsonResource
             'isSvg' => $this->isSvg(),
             'isAudio' => $this->isAudio(),
             'isVideo' => $this->isVideo(),
+            'isMedia' => $this->isMedia(),
             'isPdf' => $this->isPdf(),
             'isPreviewable' => $this->isPreviewable(),
 
@@ -49,7 +50,10 @@ class Asset extends JsonResource
 
             'allowDownloading' => $this->container()->allowDownloading(),
             'actionUrl' => cp_route('assets.actions.run'),
-            'actions' => Action::for($this->resource, ['container' => $this->container()->handle()]),
+            'actions' => Action::for($this->resource, [
+                'container' => $this->container()->handle(),
+                'folder' => $this->folder(),
+            ]),
 
             'blueprint' => $this->blueprint()->toPublishArray(),
         ];

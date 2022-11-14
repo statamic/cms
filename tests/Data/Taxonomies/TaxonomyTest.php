@@ -90,20 +90,24 @@ class TaxonomyTest extends TestCase
 
         BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect());
         BlueprintRepository::shouldReceive('find')->with('default')->andReturn(
-            $blueprint = (new Blueprint)
+            $default = (new Blueprint)
+                ->setInitialPath('this/wont/change')
                 ->setHandle('thisll_change')
+                ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
 
+        $blueprint = $taxonomy->termBlueprint();
+        $this->assertNotEquals($default, $blueprint);
+
         $blueprints = $taxonomy->termBlueprints();
         $this->assertCount(1, $blueprints);
-        $this->assertEquals([$blueprint], $blueprints->all());
+        $this->assertEquals($blueprint, $blueprints->get(0)->setParent($taxonomy));
 
-        tap($taxonomy->termBlueprint(), function ($default) use ($blueprint) {
-            $this->assertEquals($blueprint, $default);
-            $this->assertEquals('tag', $default->handle());
-            $this->assertEquals('Tag', $default->title());
-        });
+        $this->assertEquals('this/wont/change', $blueprint->initialPath());
+        $this->assertEquals('tag', $blueprint->handle());
+        $this->assertEquals('taxonomies.tags', $blueprint->namespace());
+        $this->assertEquals('Tag', $blueprint->title());
 
         $this->assertEquals($blueprint, $taxonomy->termBlueprint('tag'));
         $this->assertNull($taxonomy->termBlueprint('two'));

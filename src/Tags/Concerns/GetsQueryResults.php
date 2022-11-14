@@ -38,7 +38,8 @@ trait GetsQueryResults
             $this->queryPaginationFriendlyOffset($query, $offset);
         }
 
-        $paginator = $query->paginate($perPage);
+        $pageName = $this->params->get('page_name', 'page');
+        $paginator = $query->paginate($perPage, ['*'], $pageName);
 
         Blink::put('tag-paginator', $paginator);
 

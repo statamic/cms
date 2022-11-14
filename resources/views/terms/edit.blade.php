@@ -30,6 +30,7 @@
         :initial-read-only="{{ $str::bool($readOnly) }}"
         :preloaded-assets="{{ json_encode($preloadedAssets) }}"
         :breadcrumbs="{{ $breadcrumbs->toJson() }}"
+        :can-edit-blueprint="{{ $str::bool($user->can('configure fields')) }}"
         create-another-url="{{ cp_route('taxonomies.terms.create', [$taxonomy, $locale]) }}"
         listing-url="{{ cp_route('taxonomies.show', $taxonomy) }}"
         :preview-targets="{{ json_encode($previewTargets) }}"

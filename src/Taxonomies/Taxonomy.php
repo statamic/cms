@@ -140,7 +140,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function fallbackTermBlueprint()
     {
-        $blueprint = Blueprint::find('default')
+        $blueprint = (clone Blueprint::find('default'))
             ->setHandle(Str::singular($this->handle()))
             ->setNamespace('taxonomies.'.$this->handle());
 
