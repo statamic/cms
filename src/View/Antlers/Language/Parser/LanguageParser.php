@@ -1895,7 +1895,7 @@ class LanguageParser
             } elseif ($node instanceof ImplicitArrayEnd && $newNodeCount > 0) {
                 $left = $newNodes[$newNodeCount - 1];
 
-                if ($left instanceof VariableNode && NodeHelpers::distance($left, $node) <= 1) {
+                if ($left instanceof VariableNode && NodeHelpers::distance($left, $node) <= 1 && Str::contains($left->name, '[')) {
                     array_pop($newNodes);
                     NodeHelpers::mergeVarContentLeft($node->content, $node, $left);
                     $newNodes[] = $left;

@@ -14,7 +14,7 @@ export default {
                 return;
             }
 
-            let isSameOrigin = url.startsWith('/') || new URL(url).hostname === window.location.host;
+            let isSameOrigin = url.startsWith('/') || new URL(url).host === window.location.host;
 
             let scroll = isSameOrigin ? [
                 container.firstChild.contentWindow.scrollX ?? 0,

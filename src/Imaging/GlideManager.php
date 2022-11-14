@@ -107,4 +107,21 @@ class GlideManager
 
         return Cache::store('glide');
     }
+
+    public function clearAsset($asset)
+    {
+        $pathPrefix = ImageGenerator::assetCachePathPrefix($asset);
+        $manifestKey = ImageGenerator::assetCacheManifestKey($asset);
+
+        // Delete generated glide cache for asset.
+        $this->server()->deleteCache($pathPrefix.'/'.$asset->path());
+
+        // Use manifest to clear each manipulation key from cache store.
+        collect($this->cacheStore()->get($manifestKey, []))->each(function ($manipulationKey) {
+            $this->cacheStore()->forget($manipulationKey);
+        });
+
+        // Clear manifest itself from cache store.
+        $this->cacheStore()->forget($manifestKey);
+    }
 }

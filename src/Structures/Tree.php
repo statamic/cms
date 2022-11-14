@@ -293,7 +293,7 @@ abstract class Tree implements Contract, Localization
             return $this;
         }
 
-        if ($this->structure()->expectsRoot() && Arr::get($this->tree, '0.id') === $target) {
+        if ($this->structure()->expectsRoot() && Arr::get($this->tree, '0.'.$this->idKey()) === $target) {
             throw new \Exception('Root page cannot have children');
         }
 

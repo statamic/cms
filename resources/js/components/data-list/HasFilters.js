@@ -70,8 +70,8 @@ export default {
         },
 
         unselectAllItems() {
-            if (this.$refs.toggleAll) {
-                this.$refs.toggleAll.uncheckAllItems();
+            if (this.$refs.dataList) {
+                this.$refs.dataList.clearSelections();
             }
         },
 

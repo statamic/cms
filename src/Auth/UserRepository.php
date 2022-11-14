@@ -4,12 +4,15 @@ namespace Statamic\Auth;
 
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Auth\UserRepository as RepositoryContract;
+use Statamic\Data\StoresComputedFieldCallbacks;
 use Statamic\Events\UserBlueprintFound;
 use Statamic\Facades\Blueprint;
 use Statamic\OAuth\Provider;
 
 abstract class UserRepository implements RepositoryContract
 {
+    use StoresComputedFieldCallbacks;
+
     public function create()
     {
         // TODO: Factory?

@@ -364,4 +364,16 @@ EOT;
 
         $this->assertSame('<True Value><False Value><Null Value>', $this->renderString($template, $data));
     }
+
+    public function test_array_shorthand_syntax_can_be_used_without_trailing_spaces()
+    {
+        $template = <<<'EOT'
+{{ keyword1 = 'dance' }}
+{{ keyword2 = 'party' }}
+{{ keywords = [$keyword1, $keyword2] }}
+{{ keywords }}<{{ value }}>{{ /keywords }}
+EOT;
+
+        $this->assertSame('<dance><party>', trim($this->renderString($template)));
+    }
 }

@@ -96,7 +96,16 @@ export default {
         assetSaved(asset) {
             this.$emit('updated', asset);
             this.closeEditor();
-        }
+        },
+
+        actionCompleted(successful, response) {
+            if (successful === false) return;
+            const id = response.ids[0] || null;
+            if (id && id !== this.asset.id) {
+                this.$emit('id-changed', id);
+            }
+            this.closeEditor();
+        },
 
     },
 
