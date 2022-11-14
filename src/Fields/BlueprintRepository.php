@@ -104,7 +104,7 @@ class BlueprintRepository
             return compact('handle', 'field');
         })->values()->all();
 
-        return (new Blueprint)->setContents(['fields' => $fields]);
+        return $this->make()->setContents(['fields' => $fields]);
     }
 
     public function makeFromSections($sections)
@@ -119,7 +119,7 @@ class BlueprintRepository
             return $section;
         })->all();
 
-        return (new Blueprint)->setContents(compact('sections'));
+        return $this->make()->setContents(compact('sections'));
     }
 
     public function in(string $namespace)
@@ -164,11 +164,10 @@ class BlueprintRepository
 
             $contents = YAML::file($path)->parse();
 
-            return (new Blueprint)
+            return $this->make($handle)
                 ->setHidden(Arr::pull($contents, 'hide'))
                 ->setOrder(Arr::pull($contents, 'order'))
                 ->setInitialPath($path)
-                ->setHandle($handle)
                 ->setNamespace($namespace ?? null)
                 ->setContents($contents);
         });
