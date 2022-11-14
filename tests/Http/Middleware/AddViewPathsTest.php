@@ -57,7 +57,10 @@ class AddViewPathsTest extends TestCase
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]]);
 
-        view()->getFinder()->replaceNamespace('foo', '/path/to/views');
+        view()->getFinder()->replaceNamespace('foo', [
+            '/path/to/views',
+            '/path/to/other',
+        ]);
         $originalHints = view()->getFinder()->getHints()['foo'];
 
         $this->setCurrentSiteBasedOnUrl($requestUrl);
@@ -128,6 +131,8 @@ class AddViewPathsTest extends TestCase
                 [
                     '/path/to/views/english',
                     '/path/to/views',
+                    '/path/to/other/english',
+                    '/path/to/other',
                 ],
             ],
             'second site' => [
@@ -135,6 +140,8 @@ class AddViewPathsTest extends TestCase
                 [
                     '/path/to/views/french',
                     '/path/to/views',
+                    '/path/to/other/french',
+                    '/path/to/other',
                 ],
             ],
         ];

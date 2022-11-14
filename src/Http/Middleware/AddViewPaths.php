@@ -56,9 +56,14 @@ class AddViewPaths
     private function updateHints()
     {
         foreach ($this->hints as $namespace => $paths) {
-            foreach ($paths as $path) {
-                $this->finder->prependNamespace($namespace, $path.'/'.$this->site);
-            }
+            $paths = collect($paths)->flatMap(function ($path) {
+                return [
+                    $path.'/'.$this->site,
+                    $path,
+                ];
+            })->values();
+
+            $this->finder->replaceNamespace($namespace, $paths->all());
         }
     }
 
@@ -67,9 +72,7 @@ class AddViewPaths
         $this->finder->setPaths($this->paths);
 
         foreach ($this->hints as $namespace => $paths) {
-            foreach ($paths as $path) {
-                $this->finder->replaceNamespace($namespace, $path);
-            }
+            $this->finder->replaceNamespace($namespace, $paths);
         }
     }
 }
