@@ -54,6 +54,140 @@ class UpdateAssetReferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_updates_references_when_saving_a_new_path_to_an_asset()
+    {
+        $entry = $this->createEntryWithHoffHeroImage();
+
+        $this->assertEquals('hoff.jpg', $entry->get('hero'));
+
+        $this->assetHoff->path('destination/hoff.jpg')->save();
+
+        $this->assertEquals('destination/hoff.jpg', $entry->fresh()->get('hero'));
+    }
+
+    /** @test */
+    public function it_updates_references_when_moving_an_asset()
+    {
+        $entry = $this->createEntryWithHoffHeroImage();
+
+        $this->assertEquals('hoff.jpg', $entry->get('hero'));
+
+        $this->assetHoff->move('destination');
+
+        $this->assertEquals('destination/hoff.jpg', $entry->fresh()->get('hero'));
+    }
+
+    /** @test */
+    public function it_updates_references_when_moving_an_asset_with_new_filename()
+    {
+        $entry = $this->createEntryWithHoffHeroImage();
+
+        $this->assertEquals('hoff.jpg', $entry->get('hero'));
+
+        $this->assetHoff->move('destination', 'new-hoff');
+
+        $this->assertEquals('destination/new-hoff.jpg', $entry->fresh()->get('hero'));
+    }
+
+    /** @test */
+    public function it_updates_references_when_renaming_an_asset()
+    {
+        $entry = $this->createEntryWithHoffHeroImage();
+
+        $this->assertEquals('hoff.jpg', $entry->get('hero'));
+
+        $this->assetHoff->rename('new-hoff');
+
+        $this->assertEquals('new-hoff.jpg', $entry->fresh()->get('hero'));
+    }
+
+    /** @test */
+    public function it_updates_references_when_renaming_an_asset_with_unique_filename_handling()
+    {
+        $entry = $this->createEntryWithHoffHeroImage();
+
+        $this->assertEquals('hoff.jpg', $entry->get('hero'));
+
+        $this->actuallySaveAssetFileAndMetaToDisk($this->assetNorris);
+
+        $this->assetHoff->rename('norris', true);
+
+        $this->assertEquals('norris-1.jpg', $entry->fresh()->get('hero'));
+    }
+
+    /** @test */
+    public function it_updates_references_when_replacing_an_asset()
+    {
+        $entry = $this->createEntryWithHoffHeroImage();
+
+        $this->assertEquals('hoff.jpg', $entry->get('hero'));
+
+        $this->assetNorris->replace($this->assetHoff);
+
+        $this->assertEquals('norris.jpg', $entry->fresh()->get('hero'));
+    }
+
+    /** @test */
+    public function it_updates_references_when_deleting_an_asset()
+    {
+        $entry = $this->createEntryWithHoffHeroImage();
+
+        $this->assertEquals('hoff.jpg', $entry->get('hero'));
+
+        $this->assetHoff->delete();
+
+        $this->assertFalse($entry->fresh()->has('hero'));
+    }
+
+    /** @test */
+    public function it_updates_references_when_moving_an_asset_folder()
+    {
+        $entry = $this->createEntryWithHoffHeroImage('folder/hoff.jpg');
+
+        $folder = (new AssetFolder)
+            ->container($this->container)
+            ->path('folder');
+
+        $this->assertEquals('folder/hoff.jpg', $entry->get('hero'));
+
+        $folder->move('destination');
+
+        $this->assertEquals('destination/folder/hoff.jpg', $entry->fresh()->get('hero'));
+    }
+
+    /** @test */
+    public function it_updates_references_when_renaming_an_asset_folder()
+    {
+        $entry = $this->createEntryWithHoffHeroImage('folder/hoff.jpg');
+
+        $folder = (new AssetFolder)
+            ->container($this->container)
+            ->path('folder');
+
+        $this->assertEquals('folder/hoff.jpg', $entry->get('hero'));
+
+        $folder->rename('folder-new');
+
+        $this->assertEquals('folder-new/hoff.jpg', $entry->fresh()->get('hero'));
+    }
+
+    /** @test */
+    public function it_updates_references_when_deleting_an_asset_folder()
+    {
+        $entry = $this->createEntryWithHoffHeroImage('folder/hoff.jpg');
+
+        $folder = (new AssetFolder)
+            ->container($this->container)
+            ->path('folder');
+
+        $this->assertEquals('folder/hoff.jpg', $entry->get('hero'));
+
+        $folder->delete();
+
+        $this->assertFalse($entry->fresh()->has('hero'));
+    }
+
+    /** @test */
     public function it_updates_single_assets_fields()
     {
         $collection = tap(Facades\Collection::make('articles'))->save();
@@ -625,6 +759,36 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('asset::test_container::content/norris-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.2.content.0.attrs.src'));
         $this->assertEquals('norris', Arr::get($entry->fresh()->data(), 'bardo.2.content.0.attrs.alt'));
         $this->assertEquals('statamic://asset::test_container::content/norris-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.2.content.1.attrs.href'));
+    }
+
+    /** @test */
+    public function it_fails_gracefully_when_bard_value_is_null()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'bardo',
+                    'field' => [
+                        'type' => 'bard',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        // Though nulls are normally filtered out, they may not be in multisite and/or eloquent situations...
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'bardo' => null,
+        ]))->save();
+
+        $this->assertNull($entry->fresh()->get('bardo'));
+
+        $this->assetHoff->delete();
+        $this->assetNorris->path('content/norris-new.jpg')->save();
+
+        $this->assertNull($entry->fresh()->get('bardo'));
     }
 
     /** @test */
@@ -1235,78 +1399,6 @@ EOT;
         $this->assetHoff->path('hoff-new.jpg')->save();
     }
 
-    /** @test */
-    public function it_updates_references_when_moving_an_asset_folder()
-    {
-        $collection = tap(Facades\Collection::make('articles'))->save();
-
-        $this->setInBlueprints('collections/articles', [
-            'fields' => [
-                [
-                    'handle' => 'avatar',
-                    'field' => [
-                        'type' => 'assets',
-                        'container' => 'test_container',
-                        'max_files' => 1,
-                    ],
-                ],
-            ],
-        ]);
-
-        $this->assetHoff->path('folder/hoff.jpg')->save();
-        $this->container->disk()->filesystem()->put('folder/hoff.jpg', '');
-
-        $entry = tap(Facades\Entry::make()->collection($collection)->data([
-            'avatar' => 'folder/hoff.jpg',
-        ]))->save();
-
-        $folder = (new AssetFolder)
-            ->container($this->container)
-            ->path('folder');
-
-        $this->assertEquals('folder/hoff.jpg', $entry->get('avatar'));
-
-        $folder->move('destination');
-
-        $this->assertEquals('destination/folder/hoff.jpg', $entry->fresh()->get('avatar'));
-    }
-
-    /** @test */
-    public function it_updates_references_when_renaming_an_asset_folder()
-    {
-        $collection = tap(Facades\Collection::make('articles'))->save();
-
-        $this->setInBlueprints('collections/articles', [
-            'fields' => [
-                [
-                    'handle' => 'avatar',
-                    'field' => [
-                        'type' => 'assets',
-                        'container' => 'test_container',
-                        'max_files' => 1,
-                    ],
-                ],
-            ],
-        ]);
-
-        $this->assetHoff->path('folder/hoff.jpg')->save();
-        $this->container->disk()->filesystem()->put('folder/hoff.jpg', '');
-
-        $entry = tap(Facades\Entry::make()->collection($collection)->data([
-            'avatar' => 'folder/hoff.jpg',
-        ]))->save();
-
-        $folder = (new AssetFolder)
-            ->container($this->container)
-            ->path('folder');
-
-        $this->assertEquals('folder/hoff.jpg', $entry->get('avatar'));
-
-        $folder->rename('folder-new');
-
-        $this->assertEquals('folder-new/hoff.jpg', $entry->fresh()->get('avatar'));
-    }
-
     protected function setSingleBlueprint($namespace, $blueprintContents)
     {
         $blueprint = tap(Facades\Blueprint::make('single-blueprint')->setContents($blueprintContents))->save();
@@ -1319,5 +1411,40 @@ EOT;
         $blueprint = tap(Facades\Blueprint::make('set-in-blueprints')->setContents($blueprintContents))->save();
 
         Facades\Blueprint::shouldReceive('in')->with($namespace)->andReturn(collect([$blueprint]));
+    }
+
+    protected function createEntryWithHoffHeroImage($assetPath = null)
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'hero',
+                    'field' => [
+                        'type' => 'assets',
+                        'container' => 'test_container',
+                        'max_files' => 1,
+                    ],
+                ],
+            ],
+        ]);
+
+        if ($assetPath) {
+            $this->assetHoff->path($assetPath)->save();
+        }
+
+        $this->actuallySaveAssetFileAndMetaToDisk($this->assetHoff);
+
+        return tap(Facades\Entry::make()->collection($collection)->data([
+            'hero' => $this->assetHoff->path(),
+        ]))->save();
+    }
+
+    // For Flysystem 1.x
+    protected function actuallySaveAssetFileAndMetaToDisk($asset)
+    {
+        $this->container->disk()->filesystem()->put($asset->path(), '');
+        $this->container->disk()->filesystem()->put($asset->metaPath(), '');
     }
 }

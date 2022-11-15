@@ -1,11 +1,11 @@
 <template>
-    <div class="popover-container" :class="{'popover-open': isOpen}" v-on-clickaway="close">
+    <div class="popover-container" :class="{'popover-open': isOpen}" v-on-clickaway="close" @mouseleave="leave">
         <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$scopedSlots.default">
             <slot name="trigger"></slot>
         </div>
         <div ref="popover" class="popover" v-if="!disabled">
             <div class="popover-content bg-white shadow-popover rounded-md">
-                <slot :close="close" />
+                <slot :close="close" :after-closed="afterClosed" />
             </div>
         </div>
     </div>
@@ -35,6 +35,10 @@ export default {
         scroll: {
             type: Boolean,
             default: false
+        },
+        autoclose: {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -43,7 +47,12 @@ export default {
             isOpen: false,
             escBinding: null,
             popper: null,
+            closedCallbacks: []
         }
+    },
+
+    mounted() {
+        if (! this.disabled) this.bindPopper();
     },
 
     beforeDestroy() {
@@ -75,29 +84,31 @@ export default {
             this.isOpen ? this.close() : this.open();
         },
         open() {
-            if (this.popper) return;
-
-            this.bindPopper();
             this.isOpen = true;
             this.escBinding = this.$keys.bind('esc', e => this.close())
         },
         close() {
-            if (!this.popper) return;
-
             this.isOpen = false;
             if (this.escBinding) {
                 this.escBinding.destroy();
             }
-            // timeout so that the fade out animation is still called correctly
-            setTimeout(() => { 
-                this.destroyPopper(); 
-            }, 100);
+        },
+        leave() {
+            if (this.autoclose) {
+                this.close();
+            }
         },
         destroyPopper() {
             if (!this.popper) return;
 
             this.popper.destroy();
-            this.popper = null; 
+            this.popper = null;
+
+            // run any after-closed callbacks
+            this.closedCallbacks.forEach(callback => callback());
+        },
+        afterClosed(callback) {
+            this.closedCallbacks.push(callback);
         },
     }
 }
