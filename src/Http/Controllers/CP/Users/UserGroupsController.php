@@ -86,9 +86,13 @@ class UserGroupsController extends CpController
 
         $group
             ->title($request->title)
-            ->handle($request->handle ?: snake_case($request->title))
-            ->roles($request->roles)
-            ->save();
+            ->handle($request->handle ?: snake_case($request->title));
+
+        if ($request->user()->can('assign roles')) {
+            $group->roles($request->roles);
+        }
+
+        $group->save();
 
         session()->flash('success', __('User group updated'));
 
@@ -114,8 +118,11 @@ class UserGroupsController extends CpController
 
         $group = UserGroup::make()
             ->title($request->title)
-            ->handle($request->handle ?: snake_case($request->title))
-            ->roles($request->roles);
+            ->handle($request->handle ?: snake_case($request->title));
+
+        if ($request->user()->can('assign roles')) {
+            $group->roles($request->roles);
+        }
 
         $group->save();
 
