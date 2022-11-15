@@ -21,7 +21,7 @@ class UpdateRoleTest extends TestCase
     {
         $data = [
             ...['title' => 'Test', 'handle' => 'test'],
-            ...$data
+            ...$data,
         ];
 
         return $this->patch(cp_route('roles.update', $role->handle()), $data);
@@ -134,7 +134,7 @@ class UpdateRoleTest extends TestCase
             ->actingAsUserWithPermissions(['edit roles'])
             ->update($role, [
                 'super' => false,
-                'permissions' => ['super']
+                'permissions' => ['super'],
             ])
             ->assertOk()
             ->assertJson(['redirect' => cp_route('roles.index')]);

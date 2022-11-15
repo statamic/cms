@@ -21,7 +21,7 @@ class StoreRoleTest extends TestCase
     {
         $data = [
             ...['title' => 'Test', 'handle' => 'test'],
-            ...$data
+            ...$data,
         ];
 
         return $this->post(cp_route('roles.store'), $data);
@@ -103,7 +103,7 @@ class StoreRoleTest extends TestCase
             ->actingAsUserWithPermissions(['edit roles'])
             ->store([
                 'super' => false,
-                'permissions' => ['super']
+                'permissions' => ['super'],
             ])
             ->assertOk()
             ->assertJson(['redirect' => cp_route('roles.index')]);

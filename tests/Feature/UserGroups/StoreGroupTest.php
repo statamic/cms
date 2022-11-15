@@ -26,7 +26,7 @@ class StoreGroupTest extends TestCase
     {
         $data = [
             ...['title' => 'Test', 'handle' => 'test'],
-            ...$data
+            ...$data,
         ];
 
         return $this->post(cp_route('user-groups.store'), $data);
