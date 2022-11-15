@@ -44,6 +44,7 @@ class FieldsetRepository
 
         $fieldset = $this
             ->make($handle)
+            ->initialPath($path)
             ->setContents(YAML::file($path)->parse());
 
         $this->fieldsets[$handle] = $fieldset;
@@ -63,7 +64,7 @@ class FieldsetRepository
         return "{$this->directory}/{$path}.yaml";
     }
 
-    private function findStandardFieldsetPath(string $handle)
+    protected function findStandardFieldsetPath(string $handle)
     {
         if (! $path = $this->standardFieldsetPath($handle)) {
             return null;
@@ -127,14 +128,20 @@ class FieldsetRepository
 
     public function all(): Collection
     {
-        $namespaced = collect($this->hints)
+        return $this->getStandardFieldsets()->merge($this->getNamespacedFieldsets());
+    }
+
+    protected function getStandardFieldsets()
+    {
+        return $this->getFieldsetsByDirectory($this->directory);
+    }
+
+    protected function getNamespacedFieldsets()
+    {
+        return collect($this->hints)
             ->flatMap(function (string $directory, string $namespace) {
                 return $this->getFieldsetsByDirectory($directory, $namespace);
             });
-
-        return $this
-            ->getFieldsetsByDirectory($this->directory)
-            ->merge($namespaced);
     }
 
     public function save(Fieldset $fieldset)
@@ -168,7 +175,7 @@ class FieldsetRepository
         $this->hints[$namespace] = $directory;
     }
 
-    private function getFieldsetsByDirectory(string $directory, string $namespace = null): Collection
+    protected function getFieldsetsByDirectory(string $directory, string $namespace = null): Collection
     {
         return File::withAbsolutePaths()
             ->getFilesByTypeRecursively($directory, 'yaml')
@@ -188,6 +195,7 @@ class FieldsetRepository
 
                 return $this
                     ->make($handle)
+                    ->initialPath($file)
                     ->setContents(YAML::file($file)->parse());
             })
             ->keyBy->handle();

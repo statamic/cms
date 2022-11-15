@@ -2,11 +2,11 @@
 
 namespace Tests\Fields;
 
-use Facades\Statamic\Fields\FieldsetRepository;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
