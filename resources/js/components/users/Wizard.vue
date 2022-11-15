@@ -78,7 +78,7 @@
             </div>
 
             <!-- Roles -->
-            <div class="pb-5" v-if="! user.super">
+            <div class="pb-5" v-if="! user.super && canAssignRoles">
                 <label class="font-bold text-base mb-sm" for="role">{{ __('Roles') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
@@ -96,7 +96,7 @@
             </div>
 
             <!-- Groups -->
-            <div class="pb-5" v-if="! user.super">
+            <div class="pb-5" v-if="! user.super && canAssignGroups">
                 <label class="font-bold text-base mb-sm" for="group">{{ __('Groups') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.groups', type: 'user_groups' }"
@@ -206,6 +206,8 @@ export default {
         usersCreateUrl: { type: String },
         usersIndexUrl: { type: String },
         canCreateSupers: { type: Boolean },
+        canAssignRoles: { type: Boolean },
+        canAssignGroups: { type: Boolean },
         activationExpiry: { type: Number },
         separateNameFields: { type: Boolean },
     },
