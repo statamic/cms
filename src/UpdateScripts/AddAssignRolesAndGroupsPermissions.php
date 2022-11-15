@@ -8,7 +8,7 @@ class AddAssignRolesAndGroupsPermissions extends UpdateScript
 {
     public function shouldUpdate($newVersion, $oldVersion)
     {
-        return $this->isUpdatingTo('3.3.34');
+        return $this->isUpdatingTo('3.3.56');
     }
 
     public function update()
