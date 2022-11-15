@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\RequireStatamicPro;
@@ -88,7 +89,7 @@ class UserGroupsController extends CpController
             ->title($request->title)
             ->handle($request->handle ?: snake_case($request->title));
 
-        if ($request->user()->can('assign roles')) {
+        if (User::current()->can('assign roles')) {
             $group->roles($request->roles);
         }
 
@@ -120,7 +121,7 @@ class UserGroupsController extends CpController
             ->title($request->title)
             ->handle($request->handle ?: snake_case($request->title));
 
-        if ($request->user()->can('assign roles')) {
+        if (User::current()->can('assign roles')) {
             $group->roles($request->roles);
         }
 
