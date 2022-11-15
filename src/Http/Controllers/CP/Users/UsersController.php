@@ -136,7 +136,7 @@ class UsersController extends CpController
             $user->groups($request->groups);
         }
 
-        if ($request->super && User::current()->can('assign roles')) {
+        if ($request->super && User::current()->isSuper()) {
             $user->makeSuper();
         }
 
