@@ -223,6 +223,7 @@ class Assets extends Fieldtype
             $arr = [
                 'id' => $asset->id(),
                 'is_image' => $isImage = $asset->isImage(),
+                'is_svg' => $asset->isSvg(),
                 'extension' => $asset->extension(),
                 'url' => $asset->url(),
             ];
