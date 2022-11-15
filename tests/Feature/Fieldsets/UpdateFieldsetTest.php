@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Fieldsets;
 
-use Illuminate\Support\Facades\File;
 use Statamic\Facades;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Fieldset;
