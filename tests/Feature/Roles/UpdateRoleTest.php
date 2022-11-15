@@ -19,10 +19,10 @@ class UpdateRoleTest extends TestCase
 
     private function update($role, $data = [])
     {
-        $data = [
-            ...['title' => 'Test', 'handle' => 'test'],
-            ...$data,
-        ];
+        $data = array_merge(
+            ['title' => 'Test', 'handle' => 'test'],
+            $data,
+        );
 
         return $this->patch(cp_route('roles.update', $role->handle()), $data);
     }

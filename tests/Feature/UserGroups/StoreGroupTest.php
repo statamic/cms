@@ -24,10 +24,10 @@ class StoreGroupTest extends TestCase
 
     private function store($data = [])
     {
-        $data = [
-            ...['title' => 'Test', 'handle' => 'test'],
-            ...$data,
-        ];
+        $data = array_merge(
+            ['title' => 'Test', 'handle' => 'test'],
+            $data,
+        );
 
         return $this->post(cp_route('user-groups.store'), $data);
     }

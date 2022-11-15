@@ -24,10 +24,10 @@ class UpdateGroupTest extends TestCase
 
     private function update($group, $data = [])
     {
-        $data = [
-            ...['title' => 'Test', 'handle' => 'test'],
-            ...$data,
-        ];
+        $data = array_merge(
+            ['title' => 'Test', 'handle' => 'test'],
+            $data,
+        );
 
         return $this->patch(cp_route('user-groups.update', $group->handle()), $data);
     }
