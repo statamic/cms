@@ -35,9 +35,7 @@ class RenameAssetFolder extends Action
 
     public function run($folders, $values)
     {
-        $name = strtolower($values['name']);
-
-        return $folders->each->rename($name, true);
+        return $folders->each->rename($values['name'], true);
     }
 
     protected function fieldItems()
