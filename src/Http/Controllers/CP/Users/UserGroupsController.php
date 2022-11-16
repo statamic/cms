@@ -136,7 +136,7 @@ class UserGroupsController extends CpController
     {
         $this->authorize('edit user groups');
 
-        $blueprint = UserGrup::blueprint();
+        $blueprint = UserGroup::blueprint();
 
         $fields = $blueprint->fields()->addValues($request->all());
 
