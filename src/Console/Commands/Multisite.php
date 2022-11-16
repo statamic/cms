@@ -100,8 +100,8 @@ class Multisite extends Command
         $this->newSiteConfigs = $this->newSites()->mapWithKeys(function ($site) {
             return [$site => [
                 'name' => $site,
-                'locale' => 'en_US',
-                'url' => "/{$site}/",
+                'locale' => config('app.locale'),
+                'url' => config('app.url')."/{$site}/",
             ]];
         });
 
