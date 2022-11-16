@@ -48,10 +48,6 @@ class ImportUsers extends Command
 
     private function importUsers()
     {
-        if (! $this->confirm('This will import all your file users to your database, but it will not update any references to user IDs in your entry data. Do you wish to continue?')) {
-            return;
-        }
-
         $guard = config('statamic.users.guards.cp');
         $provider = config("auth.guards.$guard.provider");
         $model = config("auth.providers.$provider.model");
