@@ -324,6 +324,9 @@ class FieldTest extends TestCase
             'instructions' => 'Test instructions',
             'required' => true,
             'validate' => 'required',
+            'visibility' => 'visible',
+            'read_only' => false, // deprecated
+            'always_save' => false,
             'component' => 'example',
             'a_config_field_with_pre_processing' => 'foo preprocessed',
             'a_config_field_without_pre_processing' => 'foo',
@@ -594,5 +597,23 @@ class FieldTest extends TestCase
         $this->assertEquals(['a'], $top->handlePath());
         $this->assertEquals(['a', 'b'], $second->handlePath());
         $this->assertEquals(['a', 'b', 'c'], $third->handlePath());
+    }
+
+    /** @test */
+    public function it_checks_if_its_a_relationship_through_the_fieldtype()
+    {
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn(new class extends Fieldtype
+            {
+                public function isRelationship(): bool
+                {
+                    return true;
+                }
+            });
+
+        $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
+
+        $this->assertTrue($field->isRelationship());
     }
 }

@@ -5,8 +5,10 @@ namespace Statamic\Taxonomies;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\SyncsOriginalState;
+use Statamic\Events\TermCreated;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
+use Statamic\Events\TermSaving;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
@@ -24,6 +26,8 @@ class Term implements TermContract
     protected $blueprint;
     protected $collection;
     protected $data;
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
     protected $syncOriginalProperties = ['slug'];
 
     public function __construct()
@@ -95,7 +99,9 @@ class Term implements TermContract
     {
         $localizations = clone $this->data;
 
-        $array = $localizations->pull($this->defaultLocale());
+        $array = Arr::removeNullValues(
+            $localizations->pull($this->defaultLocale())->all()
+        );
 
         // todo: add published bool (for each locale?)
 
@@ -104,17 +110,18 @@ class Term implements TermContract
         }
 
         if (! $localizations->isEmpty()) {
-            $array['localizations'] = $localizations->map(function ($item) {
-                return Arr::removeNullValues($item->all());
-            })->all();
+            $array['localizations'] = $localizations->map->all()->all();
         }
 
-        return $array->all();
+        return $array;
     }
 
     public function in($site)
     {
-        return new LocalizedTerm($this, $site);
+        return app()->makeWith(LocalizedTerm::class, [
+            'term' => $this,
+            'locale' => $site,
+        ]);
     }
 
     public function inDefaultLocale()
@@ -170,11 +177,49 @@ class Term implements TermContract
         return $this->inDefaultLocale()->title();
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function save()
     {
+        $isNew = is_null(Facades\Term::find($this->id()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (TermSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         Facades\Term::save($this);
 
-        TermSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                TermCreated::dispatch($this);
+            }
+
+            TermSaved::dispatch($this);
+        }
 
         $this->syncOriginal();
 

@@ -2,6 +2,12 @@ import Vue from 'vue';
 import Toast from './mixins/Toast.js';
 import Statamic from './components/Statamic.js';
 import Alpine from 'alpinejs'
+import * as Globals from './bootstrap/globals'
+import { default as underscore } from 'underscore'
+
+let global_functions = Object.keys(Globals)
+global_functions.forEach(fnName => { global[fnName] = Globals[fnName] })
+global.Cookies = require('cookies-js');
 
 Vue.config.silent = false;
 Vue.config.devtools = true;
@@ -10,11 +16,10 @@ Vue.config.productionTip = false
 window.Alpine = Alpine
 window.Vue = Vue;
 window.Statamic = Statamic;
-window._ = require('underscore');
+window._ = underscore;
 window.$ = window.jQuery = require('jquery');
 window.rangy = require('rangy');
 
-require('./bootstrap/globals');
 require('./bootstrap/polyfills');
 require('./bootstrap/underscore-mixins');
 require('./bootstrap/jquery-plugins');
@@ -139,13 +144,13 @@ Statamic.app({
         NavigationCreateForm: require('./components/navigation/CreateForm.vue').default,
         NavigationEditForm: require('./components/navigation/EditForm.vue').default,
         NavigationView: require('./components/navigation/View.vue').default,
-        Stacks: require('./components/stacks/Stacks.vue').default,
         TaxonomyCreateForm: require('./components/taxonomies/CreateForm.vue').default,
         TaxonomyEditForm: require('./components/taxonomies/EditForm.vue').default,
         TaxonomyBlueprintListing:  require('./components/taxonomies/BlueprintListing.vue').default,
         AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue').default,
         AssetContainerEditForm: require('./components/asset-containers/EditForm.vue').default,
         Updater: require('./components/updater/Updater.vue').default,
+        PortalTargets: require('./components/PortalTargets.vue').default,
     },
 
     data: {
@@ -153,8 +158,7 @@ Statamic.app({
         navOpen: true,
         mobileNavOpen: false,
         showBanner: true,
-        modals: [],
-        stacks: [],
+        portals: [],
         panes: [],
         appendedComponents: []
     },
@@ -202,6 +206,24 @@ Statamic.app({
     created() {
         const state = localStorage.getItem('statamic.nav') || 'open';
         this.navOpen = state === 'open';
+
+        Statamic.$callbacks.add('copyToClipboard', async function (url) {
+            try {
+                await navigator.clipboard.writeText(url);
+                Statamic.$toast.success(__('Copied to clipboard'));
+            } catch (err) {
+                await alert(url);
+            }
+        });
+
+        Statamic.$callbacks.add('bustAndReloadImageCaches', function (urls) {
+            urls.forEach(async url => {
+                await fetch(url, { cache: 'reload', mode: 'no-cors' });
+                document.body
+                    .querySelectorAll(`img[src='${url}']`)
+                    .forEach(img => img.src = url);
+            });
+        });
     },
 
     methods: {

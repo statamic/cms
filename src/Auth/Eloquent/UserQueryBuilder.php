@@ -12,6 +12,15 @@ class UserQueryBuilder extends EloquentQueryBuilder
     {
         return UserCollection::make($items)->map(function ($model) {
             return User::make()->model($model);
-        })->each->selectedQueryColumns($columns);
+        });
+    }
+
+    protected function column($column)
+    {
+        if ($column === 'id') {
+            return User::make()->model()->getKeyName();
+        }
+
+        return $column;
     }
 }

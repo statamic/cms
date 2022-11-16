@@ -5,9 +5,9 @@ namespace Statamic\Http\Controllers\CP\Users;
 use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
-use Statamic\CP\Column;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
+use Statamic\Facades\Search;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
@@ -15,7 +15,6 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
-use Statamic\Statamic;
 
 class UsersController extends CpController
 {
@@ -41,28 +40,36 @@ class UsersController extends CpController
         ]);
     }
 
+    protected function indexQuery()
+    {
+        $query = User::query();
+
+        if ($search = request('search')) {
+            if (Search::indexes()->has('users')) {
+                return Search::index('users')->ensureExists()->search($search);
+            }
+
+            $query->where('email', 'like', '%'.$search.'%')->orWhere('name', 'like', '%'.$search.'%');
+        }
+
+        return $query;
+    }
+
     protected function json($request)
     {
         $query = $request->group
             ? UserGroup::find($request->group)->queryUsers()
-            : User::query();
+            : $this->indexQuery();
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters);
 
         $users = $query
-            ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
+            ->orderBy(request('sort', 'email'), request('order', 'asc'))
             ->paginate(request('perPage'));
 
         return (new Users($users))
-            ->blueprint($blueprint = User::blueprint())
-            ->columns(collect([
-                Column::make('email')->label(__('Email')),
-                $blueprint->hasField('name') ? Column::make('name')->label(__('Name')) : null,
-                $blueprint->hasField('first_name') ? Column::make('first_name')->label(__('First Name')) : null,
-                $blueprint->hasField('last_name') ? Column::make('last_name')->label(__('Last Name')) : null,
-                Statamic::pro() ? Column::make('roles')->label(__('Roles'))->fieldtype('relationship')->sortable(false) : null,
-                Column::make('last_login')->label(__('Last Login'))->sortable(false),
-            ])->filter()->values()->all())
+            ->blueprint(User::blueprint())
+            ->columnPreferenceKey('users.columns')
             ->additional(['meta' => [
                 'activeFilterBadges' => $activeFilterBadges,
             ]]);
@@ -95,6 +102,7 @@ class UsersController extends CpController
             ],
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
+            'canSendInvitation' => config('statamic.users.wizard_invitation'),
         ];
 
         if ($request->wantsJson()) {
@@ -121,15 +129,15 @@ class UsersController extends CpController
             ->email($request->email)
             ->data($values);
 
-        if ($request->roles && User::current()->can('edit roles')) {
+        if ($request->roles && User::current()->can('assign roles')) {
             $user->roles($request->roles);
         }
 
-        if ($request->groups && User::current()->can('edit user groups')) {
+        if ($request->groups && User::current()->can('assign user groups')) {
             $user->groups($request->groups);
         }
 
-        if ($request->super && User::current()->can('edit roles')) {
+        if ($request->super && User::current()->isSuper()) {
             $user->makeSuper();
         }
 
@@ -160,19 +168,23 @@ class UsersController extends CpController
 
         $blueprint = $user->blueprint();
 
-        if (! User::current()->can('edit roles')) {
-            $blueprint->ensureField('roles', ['read_only' => true]);
+        if (! User::current()->can('assign roles')) {
+            $blueprint->ensureField('roles', ['visibility' => 'read_only']);
         }
 
-        if (! User::current()->can('edit user groups')) {
-            $blueprint->ensureField('groups', ['read_only' => true]);
+        if (! User::current()->can('assign user groups')) {
+            $blueprint->ensureField('groups', ['visibility' => 'read_only']);
         }
+
+        $values = $user->data()
+            ->merge($user->computedData())
+            ->merge(['email' => $user->email()]);
 
         $fields = $blueprint
             ->removeField('password')
             ->removeField('password_confirmation')
             ->fields()
-            ->addValues($user->data()->merge(['email' => $user->email()])->all())
+            ->addValues($values->all())
             ->preProcess();
 
         $viewData = [
@@ -213,11 +225,11 @@ class UsersController extends CpController
         }
         $user->email($request->email);
 
-        if (User::current()->can('edit roles')) {
+        if (User::current()->can('assign roles')) {
             $user->roles($request->roles);
         }
 
-        if (User::current()->can('edit user groups')) {
+        if (User::current()->can('assign user groups')) {
             $user->groups($request->groups);
         }
 

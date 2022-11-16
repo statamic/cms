@@ -2,6 +2,7 @@
 
     <stack name="asset-editor"
         :before-close="shouldClose"
+        :full="true"
         @closed="close">
 
     <div class="asset-editor" :class="isImage ? 'is-image' : 'is-file'">
@@ -70,22 +71,21 @@
                                         <img :src="asset.url" class="asset-thumb w-24 h-24" />
                                     </div>
                                 </div>
-                                <div class="min-h-0 p-2 flex items-center justify-center">
+                                <div class="min-h-0 h-full p-2 flex items-center justify-center">
                                     <img :src="asset.url" class="asset-thumb w-2/3 max-w-full max-h-full" />
                                 </div>
                             </div>
 
                             <!-- Audio -->
-                            <audio v-else-if="asset.isAudio" :src="asset.url" controls preload="auto"></audio>
+                            <div class="w-full shadow-none" v-else-if="asset.isAudio"><audio :src="asset.url" class="w-full" controls preload="auto"></audio></div>
 
                             <!-- Video -->
-                            <video v-else-if="asset.isVideo" :src="asset.url" controls></video>
+                            <div class="w-full shadow-none" v-else-if="asset.isVideo"><video :src="asset.url" class="w-full" controls></video></div>
                         </div>
                     </div>
 
-                    <div class="h-full" v-else-if="asset.extension == 'pdf'">
-                        <object :data="asset.url" type="application/pdf" width="100%" height="100%">
-                        </object>
+                    <div class="h-full" v-else-if="asset.isPdf">
+                        <pdf-viewer :src="asset.pdfUrl"></pdf-viewer>
                     </div>
 
                     <div class="h-full" v-else-if="asset.isPreviewable && canUseGoogleDocsViewer">
@@ -98,26 +98,27 @@
                         </button>
 
                         <button v-if="canRunAction('rename_asset')" type="button" class="btn" @click.prevent="runAction('rename_asset')">
-                            {{ __('Rename File') }}
+                            {{ __('Rename') }}
                         </button>
 
                         <button v-if="canRunAction('move_asset')" type="button" class="btn" @click.prevent="runAction('move_asset')">
-                            {{ __('Move File') }}
+                            {{ __('Move') }}
                         </button>
 
-                        <!--
-                        <button
-                            type="button" class="btn"
-                            @click.prevent="replaceFile">Replace File
+                        <button v-if="canRunAction('replace_asset')" type="button" class="btn" @click.prevent="runAction('replace_asset')">
+                            {{ __('Replace') }}
                         </button>
-                        -->
+
+                        <button v-if="canRunAction('reupload_asset')" type="button" class="btn" @click.prevent="runAction('reupload_asset')">
+                            {{ __('Reupload') }}
+                        </button>
                     </div>
 
                 </div>
 
                 <publish-container
                     v-if="fields"
-                    name="publishContainer"
+                    :name="publishContainer"
                     :blueprint="fieldset"
                     :values="values"
                     :meta="meta"
@@ -184,13 +185,20 @@
 <script>
 import EditorActions from './EditorActions.vue';
 import FocalPointEditor from './FocalPointEditor.vue';
+import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
+import HasHiddenFields from '../../data-list/HasHiddenFields';
 
 export default {
+
+    mixins: [
+        HasHiddenFields,
+    ],
 
     components: {
         EditorActions,
         FocalPointEditor,
+        PdfViewer,
         PublishFields,
     },
 
@@ -287,7 +295,11 @@ export default {
             this.$axios.get(url).then(response => {
                 const data = response.data.data;
                 this.asset = data;
-                this.values = data.values;
+
+                // If there are no fields, it will be an empty array when PHP encodes
+                // it into JSON on the server. We'll ensure it's always an object.
+                this.values = _.isArray(data.values) ? {} : data.values;
+
                 this.meta = data.meta;
                 this.actionUrl = data.actionUrl;
                 this.actions = data.actions;
@@ -332,7 +344,7 @@ export default {
             this.saving = true;
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
-            this.$axios.patch(url, this.values).then(response => {
+            this.$axios.patch(url, this.visibleValues).then(response => {
                 this.$emit('saved', response.data.asset);
                 this.$toast.success(__('Saved'));
                 this.saving = false;
@@ -399,11 +411,13 @@ export default {
             this.$events.$emit('editor-action-started');
         },
 
-        actionCompleted(event) {
-            this.$events.$emit('editor-action-completed');
-            this.close();
-        }
-
+        actionCompleted(successful, response) {
+            this.$events.$emit('editor-action-completed', successful, response);
+            this.$emit('action-completed', successful, response);
+            if (successful) {
+                this.close();
+            }
+        },
     }
 
 }

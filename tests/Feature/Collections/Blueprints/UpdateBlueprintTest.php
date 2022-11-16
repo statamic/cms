@@ -49,7 +49,10 @@ class UpdateBlueprintTest extends TestCase
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();
         $collection = tap(Collection::make('test'))->save();
-        $blueprint = (new Blueprint)->setNamespace('collections.test')->setHandle('test')->setContents(['title' => 'Test'])->save();
+        $blueprint = (new Blueprint)->setNamespace('collections.test')->setHandle('test')->setContents([
+            'title' => 'Test',
+            'foo' => 'bar',
+        ])->save();
 
         $fieldset = (new Fieldset)->setContents([
             'fields' => [
@@ -102,6 +105,7 @@ class UpdateBlueprintTest extends TestCase
 
         $this->assertEquals([
             'title' => 'Updated title',
+            'foo' => 'bar',
             'sections' => [
                 'one' => [
                     'display' => 'Section One',
@@ -136,7 +140,6 @@ class UpdateBlueprintTest extends TestCase
                             'field' => [
                                 'type' => 'slug',
                                 'localizable' => true,
-                                'required' => true,
                             ],
                         ],
                     ],
@@ -312,7 +315,6 @@ class UpdateBlueprintTest extends TestCase
                             'field' => [
                                 'type' => 'slug',
                                 'localizable' => true,
-                                'required' => true,
                             ],
                         ],
                     ],
@@ -429,7 +431,6 @@ class UpdateBlueprintTest extends TestCase
                             'field' => [
                                 'type' => 'slug',
                                 'localizable' => true,
-                                'required' => true,
                             ],
                         ],
                     ],

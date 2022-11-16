@@ -2,6 +2,8 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
+use Illuminate\Support\Collection;
+use Statamic\Assets\OrderedQueryBuilder;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -9,6 +11,7 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Assets extends Fieldtype
@@ -38,6 +41,7 @@ class Assets extends Fieldtype
                 'max_items' => 1,
                 'mode' => 'select',
                 'width' => 50,
+                'default' => AssetContainer::all()->count() == 1 ? AssetContainer::all()->first()->handle() : null,
             ],
             'folder' => [
                 'display' => __('Folder'),
@@ -69,6 +73,7 @@ class Assets extends Fieldtype
             'max_files' => [
                 'display' => __('Max Files'),
                 'instructions' => __('statamic::fieldtypes.assets.config.max_files'),
+                'min' => 1,
                 'type' => 'integer',
                 'width' => 50,
             ],
@@ -128,25 +133,36 @@ class Assets extends Fieldtype
         })->filter()->values();
     }
 
-    public function augment($value)
+    public function augment($values)
     {
-        $assets = $this->getAssetsForAugmentation($value);
+        $values = Arr::wrap($values);
 
-        return $this->config('max_files') === 1 ? $assets->first() : $assets;
+        $ids = collect($values)
+            ->map(fn ($value) => $this->container()->handle().'::'.$value)
+            ->all();
+
+        $query = $this->container()->queryAssets()->whereIn('path', $values);
+
+        $query = new OrderedQueryBuilder($query, $ids);
+
+        return $this->config('max_files') === 1 ? $query->first() : $query;
     }
 
-    public function shallowAugment($value)
+    public function shallowAugment($values)
     {
-        $assets = $this->getAssetsForAugmentation($value)->map->toShallowAugmentedCollection();
+        $items = $this->augment($values);
 
-        return $this->config('max_files') === 1 ? $assets->first() : $assets;
-    }
+        if ($this->config('max_files') === 1) {
+            $items = collect([$items]);
+        } else {
+            $items = $items->get();
+        }
 
-    private function getAssetsForAugmentation($value)
-    {
-        return collect($value)->map(function ($path) {
-            return $this->container()->asset($path);
-        })->filter()->values();
+        $items = $items->filter()->map(function ($item) {
+            return $item->toShallowAugmentedCollection();
+        });
+
+        return $this->config('max_files') === 1 ? $items->first() : $items;
     }
 
     protected function container()
@@ -179,24 +195,22 @@ class Assets extends Fieldtype
 
     public function fieldRules()
     {
-        return collect(parent::fieldRules())->map(function ($rule) {
+        $classes = [
+            'dimensions' => DimensionsRule::class,
+            'image' => ImageRule::class,
+            'max_filesize' => MaxRule::class,
+            'mimes' => MimesRule::class,
+            'mimetypes' => MimetypesRule::class,
+            'min_filesize' => MinRule::class,
+        ];
+
+        return collect(parent::fieldRules())->map(function ($rule) use ($classes) {
             $name = Str::before($rule, ':');
-            $parameters = explode(',', Str::after($rule, ':'));
 
-            if ($name === 'dimensions') {
-                return new DimensionsRule($parameters);
-            }
+            if ($class = Arr::get($classes, $name)) {
+                $parameters = explode(',', Str::after($rule, ':'));
 
-            if ($name === 'image') {
-                return new ImageRule();
-            }
-
-            if ($name === 'mimes') {
-                return new MimesRule($parameters);
-            }
-
-            if ($name === 'mimetypes') {
-                return new MimetypesRule($parameters);
+                return new $class($parameters);
             }
 
             return $rule;
@@ -205,18 +219,11 @@ class Assets extends Fieldtype
 
     public function preProcessIndex($data)
     {
-        if (! $assets = $this->augment($data)) {
-            return [];
-        }
-
-        if ($this->config('max_files') === 1) {
-            $assets = collect([$assets]);
-        }
-
-        return $assets->map(function ($asset) {
+        return $this->getItemsForPreProcessIndex($data)->map(function ($asset) {
             $arr = [
                 'id' => $asset->id(),
                 'is_image' => $isImage = $asset->isImage(),
+                'is_svg' => $asset->isSvg(),
                 'extension' => $asset->extension(),
                 'url' => $asset->url(),
             ];
@@ -230,6 +237,15 @@ class Assets extends Fieldtype
 
             return $arr;
         });
+    }
+
+    protected function getItemsForPreProcessIndex($values): Collection
+    {
+        if (! $augmented = $this->augment($values)) {
+            return collect();
+        }
+
+        return $this->config('max_files') === 1 ? collect([$augmented]) : $augmented->get();
     }
 
     public function toGqlType()

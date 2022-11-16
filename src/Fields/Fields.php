@@ -7,6 +7,7 @@ use Facades\Statamic\Fields\FieldsetRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Blink;
+use Statamic\Support\Arr;
 
 class Fields
 {
@@ -14,6 +15,9 @@ class Fields
     protected $fields;
     protected $parent;
     protected $parentField;
+    protected $filled = [];
+    protected $withValidatableValues = false;
+    protected $withComputedValues = false;
 
     public function __construct($items = [], $parent = null, $parentField = null)
     {
@@ -47,12 +51,41 @@ class Fields
     {
         $this->parent = $parent;
 
+        if ($this->fields) {
+            $this->fields->each(fn ($f) => $f->setParent($parent));
+        }
+
         return $this;
     }
 
     public function setParentField($field)
     {
         $this->parentField = $field;
+
+        if ($this->fields) {
+            $this->fields->each(fn ($f) => $f->setParentField($field));
+        }
+
+        return $this;
+    }
+
+    public function setFilled($dottedKeys)
+    {
+        $this->filled = $dottedKeys;
+
+        return $this;
+    }
+
+    public function withValidatableValues()
+    {
+        $this->withValidatableValues = true;
+
+        return $this;
+    }
+
+    public function withComputedValues()
+    {
+        $this->withComputedValues = true;
 
         return $this;
     }
@@ -83,7 +116,8 @@ class Fields
             ->setParent($this->parent)
             ->setParentField($this->parentField)
             ->setItems($this->items)
-            ->setFields($this->fields);
+            ->setFields($this->fields)
+            ->setFilled($this->filled);
     }
 
     public function localizable()
@@ -117,18 +151,31 @@ class Fields
 
     public function addValues(array $values)
     {
+        $filled = array_keys($values);
+
         $fields = $this->fields->map(function ($field) use ($values) {
-            return $field->newInstance()->setValue(array_get($values, $field->handle()));
+            return $field->newInstance()->setValue(Arr::get($values, $field->handle()));
         });
 
-        return $this->newInstance()->setFields($fields);
+        return $this->newInstance()->setFilled($filled)->setFields($fields);
     }
 
     public function values()
     {
-        return $this->fields->mapWithKeys(function ($field) {
-            return [$field->handle() => $field->value()];
-        });
+        return $this->fields
+            ->reject(function ($field) {
+                return $this->withComputedValues === false
+                    ? $field->visibility() === 'computed'
+                    : false;
+            })
+            ->mapWithKeys(function ($field) {
+                return [$field->handle() => $field->value()];
+            })
+            ->filter(function ($field, $handle) {
+                return $this->withValidatableValues
+                    ? in_array($handle, $this->filled)
+                    : true;
+            });
     }
 
     public function process()
@@ -142,14 +189,14 @@ class Fields
     {
         return $this->newInstance()->setFields(
             $this->fields->map->preProcess()
-        );
+        )->withComputedValues();
     }
 
     public function preProcessValidatables()
     {
         return $this->newInstance()->setFields(
             $this->fields->map->preProcessValidatable()
-        );
+        )->withValidatableValues();
     }
 
     public function augment()

@@ -25,6 +25,10 @@ button {
     }
 }
 
+.btn-height {
+    height: 2.375rem; // 38px
+}
+
 // Default, non-primary action button
 .btn, .btn-default {
     @apply text-grey-80 shadow-button;

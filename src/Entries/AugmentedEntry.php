@@ -4,6 +4,7 @@ namespace Statamic\Entries;
 
 use Statamic\Data\AbstractAugmented;
 use Statamic\Facades\Collection;
+use Statamic\Statamic;
 
 class AugmentedEntry extends AbstractAugmented
 {
@@ -20,6 +21,7 @@ class AugmentedEntry extends AbstractAugmented
     {
         return [
             'id',
+            'origin_id',
             'slug',
             'uri',
             'url',
@@ -34,6 +36,7 @@ class AugmentedEntry extends AbstractAugmented
             'order',
             'is_entry',
             'collection',
+            'blueprint',
             'mount',
             'locale',
             'last_modified',
@@ -44,7 +47,11 @@ class AugmentedEntry extends AbstractAugmented
 
     protected function updatedBy()
     {
-        return $this->data->lastModifiedBy();
+        $user = $this->data->lastModifiedBy();
+
+        return Statamic::isApiRoute()
+            ? optional($user)->toShallowAugmentedCollection()
+            : $user;
     }
 
     protected function updatedAt()
@@ -64,7 +71,11 @@ class AugmentedEntry extends AbstractAugmented
 
     protected function parent()
     {
-        return $this->data->parent();
+        $parent = $this->data->parent();
+
+        return Statamic::isApiRoute()
+            ? optional($parent)->toShallowAugmentedCollection()
+            : $parent;
     }
 
     protected function mount()
@@ -75,5 +86,10 @@ class AugmentedEntry extends AbstractAugmented
     public function authors()
     {
         return $this->wrapValue($this->getFromData('authors'), 'authors');
+    }
+
+    public function originId()
+    {
+        return optional($this->data->origin())->id();
     }
 }

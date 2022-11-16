@@ -5,8 +5,10 @@ namespace Statamic\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Facades\GraphQL;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Field implements Arrayable
@@ -17,6 +19,7 @@ class Field implements Arrayable
     protected $value;
     protected $parent;
     protected $parentField;
+    protected $validationContext;
 
     public function __construct($handle, array $config)
     {
@@ -85,6 +88,24 @@ class Field implements Arrayable
         return array_get($this->config, 'instructions');
     }
 
+    public function visibility()
+    {
+        $visibility = Arr::get($this->config, 'visibility');
+
+        $legacyReadOnly = Arr::get($this->config, 'read_only');
+
+        if ($legacyReadOnly && ! $visibility) {
+            return 'read_only';
+        }
+
+        return $visibility ?? 'visible';
+    }
+
+    public function alwaysSave()
+    {
+        return Arr::get($this->config, 'always_save', false);
+    }
+
     public function rules()
     {
         $rules = [$this->handle => $this->addNullableRule(array_merge(
@@ -102,6 +123,10 @@ class Field implements Arrayable
 
     protected function addNullableRule($rules)
     {
+        if (in_array('nullable', $rules)) {
+            return $rules;
+        }
+
         $nullable = true;
 
         foreach ($rules as $rule) {
@@ -123,6 +148,30 @@ class Field implements Arrayable
         return collect($this->rules()[$this->handle])->contains('required');
     }
 
+    public function setValidationContext($context)
+    {
+        $this->validationContext = $context;
+
+        return $this;
+    }
+
+    public function validationContext($key = null)
+    {
+        return func_num_args() === 0 ? $this->validationContext : Arr::get($this->validationContext, $key);
+    }
+
+    public function validationAttributes()
+    {
+        $display = Lang::has($key = 'validation.attributes.'.$this->handle())
+            ? Lang::get($key)
+            : $this->display();
+
+        return array_merge(
+            [$this->handle() => $display],
+            $this->fieldtype()->extraValidationAttributes()
+        );
+    }
+
     public function isLocalizable()
     {
         return (bool) $this->get('localizable');
@@ -134,20 +183,28 @@ class Field implements Arrayable
             return true;
         }
 
-        if ($this->config()['type'] === 'section') {
+        if ($this->type() === 'section') {
             return false;
         }
 
         return (bool) $this->get('listable');
     }
 
-    public function isVisible()
+    public function isVisibleOnListing()
     {
         if (is_null($this->get('listable'))) {
             return in_array($this->handle, ['title', 'slug', 'date', 'author']);
         }
 
         return ! in_array($this->get('listable'), [false, 'hidden'], true);
+    }
+
+    /**
+     * @deprecated  Use isVisibleOnListing() instead.
+     */
+    public function isVisible()
+    {
+        return $this->isVisibleOnListing();
     }
 
     public function isSortable()
@@ -177,6 +234,9 @@ class Field implements Arrayable
             'display' => $this->display(),
             'instructions' => $this->instructions(),
             'required' => $this->isRequired(),
+            'visibility' => $this->visibility(),
+            'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
+            'always_save' => $this->alwaysSave(),
         ]);
     }
 
@@ -304,6 +364,20 @@ class Field implements Arrayable
         return $this->config;
     }
 
+    public function conditions(): array
+    {
+        return collect($this->config)->only([
+            'if',
+            'if_any',
+            'show_when',
+            'show_when_any',
+            'unless',
+            'unless_any',
+            'hide_when',
+            'hide_when_any',
+        ])->all();
+    }
+
     public function get(string $key, $fallback = null)
     {
         return array_get($this->config, $key, $fallback);
@@ -342,5 +416,10 @@ class Field implements Arrayable
         }
 
         return $type;
+    }
+
+    public function isRelationship(): bool
+    {
+        return $this->fieldtype()->isRelationship();
     }
 }

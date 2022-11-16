@@ -16,6 +16,10 @@ class ResolveRedirect
 
     public function resolve($redirect, $parent = null)
     {
+        if (is_null($redirect)) {
+            return null;
+        }
+
         if ($redirect === '@child') {
             $redirect = $this->firstChildUrl($parent);
         }
@@ -23,6 +27,11 @@ class ResolveRedirect
         if (Str::startsWith($redirect, 'entry::')) {
             $id = Str::after($redirect, 'entry::');
             $redirect = optional(Facades\Entry::find($id))->url() ?? 404;
+        }
+
+        if (Str::startsWith($redirect, 'asset::')) {
+            $id = Str::after($redirect, 'asset::');
+            $redirect = optional(Facades\Asset::find($id))->url() ?? 404;
         }
 
         return is_numeric($redirect) ? (int) $redirect : $redirect;

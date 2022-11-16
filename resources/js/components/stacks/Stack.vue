@@ -2,7 +2,7 @@
 
     <portal :to="portal" :order="depth">
         <div class="stack-container"
-            :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering }"
+            :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering, 'p-1 shadow-lg': full }"
             :style="{ zIndex: (depth + 1) * 1000, left: `${leftOffset}px` }"
         >
             <transition name="stack-overlay-fade">
@@ -38,13 +38,15 @@ export default {
         },
         half: {
             type: Boolean
-        }
+        },
+        full: {
+            type: Boolean
+        },
     },
 
     data() {
         return {
-            depth: null,
-            portal: null,
+            stack: null,
             visible: false,
             isHovering: false,
             escBinding: null,
@@ -52,6 +54,14 @@ export default {
     },
 
     computed: {
+
+        portal() {
+            return this.stack ? this.stack.key : null;
+        },
+
+        depth() {
+            return this.stack.depth;
+        },
 
         id() {
             return `${this.name}-${this._uid}`;
@@ -69,6 +79,10 @@ export default {
         },
 
         leftOffset() {
+            if (this.full) {
+                return 0;
+            }
+
             if (this.isTopStack && (this.narrow || this.half)) {
                 return this.offset;
             }
@@ -87,9 +101,7 @@ export default {
     },
 
     created() {
-        this.depth = this.$stacks.count() + 1;
-        this.portal = `stack-${this.depth-1}`;
-        this.$stacks.add(this);
+        this.stack = this.$stacks.add(this);
 
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => this.isHovering = true);
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => this.isHovering = false);

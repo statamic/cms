@@ -2,6 +2,14 @@
 
 namespace Tests\Feature\Entries;
 
+use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Facades\Event;
+use Statamic\Events\EntrySaving;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -14,7 +22,202 @@ class UpdateEntryTest extends TestCase
     /** @test */
     public function it_denies_access_if_you_dont_have_permission()
     {
-        $this->markTestIncomplete();
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $collection = tap(Collection::make('test'))->save();
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry'])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry)
+            ->assertForbidden();
+
+        $this->assertCount(1, Entry::all());
+        $this->assertEquals('Existing Entry', $entry->fresh()->value('title'));
+    }
+
+    /** @test */
+    public function entry_gets_updated()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry'])
+            ->create();
+
+        $this->assertCount(1, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Updated Entry', 'slug' => 'updated-entry'])
+            ->assertOk();
+
+        // todo: assert about response content
+
+        $this->assertCount(1, Entry::all());
+        $entry = $entry->fresh();
+        $this->assertEquals('Updated Entry', $entry->value('title'));
+        $this->assertEquals('updated-entry', $entry->slug());
+    }
+
+    /** @test */
+    public function slug_is_not_required_and_will_get_created_from_the_submitted_title_if_slug_is_in_the_blueprint_and_the_submitted_slug_was_empty()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry'])
+            ->create();
+
+        $this->assertTrue($entry->blueprint()->hasField('slug'));
+        $this->assertCount(1, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Foo Bar Baz', 'slug' => ''])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = $entry->fresh();
+        $this->assertEquals('Foo Bar Baz', $entry->value('title'));
+        $this->assertEquals('foo-bar-baz', $entry->slug());
+        $this->assertEquals('foo-bar-baz.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function slug_is_not_required_and_will_be_null_if_slug_is_not_in_the_blueprint()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->requiresSlugs(false);
+
+        $entry = EntryFactory::collection($collection)
+            ->id('the-id')
+            ->slug(null)
+            ->data(['title' => 'Existing Entry'])
+            ->create();
+
+        $this->assertFalse($entry->blueprint()->hasField('slug'));
+        $this->assertCount(1, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Foo Bar Baz', 'slug' => ''])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = $entry->fresh();
+        $this->assertEquals('Foo Bar Baz', $entry->value('title'));
+        $this->assertNull($entry->slug());
+        $this->assertEquals($entry->id().'.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function slug_is_not_required_and_will_get_created_from_auto_generated_title_when_using_title_format()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->save();
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
+            ->create();
+
+        $this->assertCount(1, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => '', 'slug' => '', 'foo' => 'bar'])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = $entry->fresh();
+        $this->assertEquals('Auto bar', $entry->value('title'));
+        $this->assertEquals('auto-bar', $entry->slug());
+        $this->assertEquals('auto-bar.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function submitted_slug_is_favored_over_auto_generated_title_when_using_title_format()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->save();
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
+            ->create();
+
+        $this->assertCount(1, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => '', 'slug' => 'manually-entered-slug', 'foo' => 'bar'])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = $entry->fresh();
+        $this->assertEquals('Auto bar', $entry->value('title'));
+        $this->assertEquals('manually-entered-slug', $entry->slug());
+        $this->assertEquals('manually-entered-slug.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function slug_and_auto_title_get_generated_after_save()
+    {
+        // We want addons to be able to add/modify data that the auto title could rely on.
+        // Since they only get the change after it's saved, we need to generate the slug and title after that.
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {magic}')->save();
+
+        Event::listen(EntrySaving::class, function (EntrySaving $event) {
+            $event->entry->set('magic', 'Avada Kedavra');
+        });
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'magic' => 'Alakazam'])
+            ->create();
+
+        $this->assertCount(1, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => '', 'slug' => ''])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = $entry->fresh();
+        $this->assertEquals('Avada Kedavra', $entry->value('magic'));
+        $this->assertEquals('Auto Avada Kedavra', $entry->value('title'));
+        $this->assertEquals('auto-avada-kedavra', $entry->slug());
+        $this->assertEquals('auto-avada-kedavra.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function it_can_validate_against_published_value()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $this->seedBlueprintFields($collection, [
+            'test_field' => ['validate' => 'required_if:published,true'],
+        ]);
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Test', 'slug' => 'manually-entered-slug', 'published' => true])
+            ->assertStatus(422);
     }
 
     /** @test */
@@ -41,8 +244,32 @@ class UpdateEntryTest extends TestCase
         $this->markTestIncomplete();
     }
 
-    private function save($entry, $payload)
+    private function seedUserAndCollection()
     {
-        return $this->patch($entry->updateUrl(), $payload);
+        $this->setTestRoles(['test' => ['access cp', 'edit test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $collection = tap(Collection::make('test'))->save();
+
+        return [$user, $collection];
+    }
+
+    private function seedBlueprintFields($collection, $fields)
+    {
+        $blueprint = Blueprint::makeFromFields($fields);
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('in')
+            ->with('collections/'.$collection->handle())
+            ->andReturn(collect([$blueprint]));
+    }
+
+    private function update($entry, $attrs = [])
+    {
+        $payload = array_merge([
+            'title' => 'Updated entry',
+            'slug' => 'updated-entry',
+        ], $attrs);
+
+        return $this->patchJson($entry->updateUrl(), $payload);
     }
 }

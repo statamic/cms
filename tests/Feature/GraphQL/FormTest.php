@@ -78,9 +78,10 @@ GQL;
                 'instructions' => 'Enter your name',
                 'placeholder' => 'Type here...',
                 'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
+                'width' => 50,
             ],
             'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
-            'message' => ['type' => 'textarea'],
+            'message' => ['type' => 'textarea', 'width' => 33],
         ]);
 
         BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
@@ -93,6 +94,7 @@ GQL;
             type
             display
             instructions
+            width
             config
         }
     }
@@ -111,6 +113,7 @@ GQL;
                             'type' => 'text',
                             'display' => 'Your Name',
                             'instructions' => 'Enter your name',
+                            'width' => 50,
                             'config' => [
                                 'placeholder' => 'Type here...',
                             ],
@@ -120,6 +123,7 @@ GQL;
                             'type' => 'select',
                             'display' => 'Subject',
                             'instructions' => null,
+                            'width' => 100,
                             'config' => [
                                 'options' => ['disco' => 'Disco', 'house' => 'House'],
                             ],
@@ -129,8 +133,45 @@ GQL;
                             'type' => 'textarea',
                             'display' => 'Message',
                             'instructions' => null,
+                            'width' => 33,
                             'config' => [],
                         ],
+                    ],
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_queries_the_validation_rules()
+    {
+        Form::make('contact')->title('Contact Us')->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'name' => ['type' => 'text', 'validate' => ['required']],
+            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
+            'message' => ['type' => 'textarea', 'validate' => ['required_if:select_field,disco']],
+        ]);
+
+        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        rules
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'rules' => [
+                        'name' => ['required'],
+                        'subject' => ['nullable'],
+                        'message' => ['required_if:select_field,disco'],
                     ],
                 ],
             ]]);

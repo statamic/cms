@@ -14,7 +14,7 @@ class Parse
     /**
      * Parse a string/template.
      *
-     * @param  $str  String to parse
+     * @param  string  $str  String to parse
      * @param  array  $variables  Variables to use
      * @param  array  $context  Contextual variables to also use
      * @param  bool  $php  Whether PHP should be allowed

@@ -9,6 +9,7 @@ use Statamic\Actions\Action;
 use Statamic\Extend\Manifest;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
+use Statamic\Forms\JsDrivers;
 use Statamic\Modifiers\CoreModifiers;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes;
@@ -23,13 +24,21 @@ use Statamic\Widgets\Widget;
 class ExtensionServiceProvider extends ServiceProvider
 {
     protected $actions = [
+        Actions\CopyAssetUrl::class,
+        Actions\CopyPasswordResetLink::class,
         Actions\Delete::class,
         Actions\DeleteMultisiteEntry::class,
+        Actions\DownloadAsset::class,
+        Actions\DownloadAssetFolder::class,
         Actions\Publish::class,
         Actions\Unpublish::class,
         Actions\SendPasswordReset::class,
         Actions\MoveAsset::class,
         Actions\RenameAsset::class,
+        Actions\ReplaceAsset::class,
+        Actions\ReuploadAsset::class,
+        Actions\MoveAssetFolder::class,
+        Actions\RenameAssetFolder::class,
     ];
 
     protected $fieldtypes = [
@@ -43,10 +52,12 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
         Fieldtypes\CollectionRoutes::class,
+        Fieldtypes\CollectionTitleFormats::class,
         Fieldtypes\Collections::class,
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
         Fieldtypes\Entries::class,
+        Fieldtypes\Files::class,
         Fieldtypes\Floatval::class,
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
@@ -72,6 +83,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Terms::class,
         Fieldtypes\Taxonomies::class,
         Fieldtypes\Template::class,
+        Fieldtypes\TemplateFolder::class,
         Fieldtypes\Text::class,
         Fieldtypes\Textarea::class,
         Fieldtypes\Time::class,
@@ -127,6 +139,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Cache::class,
         Tags\Can::class,
         Tags\Collection\Collection::class,
+        Tags\Cookie::class,
         Tags\Dd::class,
         Tags\Dump::class,
         Tags\GetContent::class,
@@ -144,6 +157,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Markdown::class,
         Tags\Member::class,
         Tags\Mix::class,
+        Tags\MountUrl::class,
         Tags\Nav::class,
         Tags\NotFound::class,
         Tags\Obfuscate::class,
@@ -166,7 +180,10 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Theme::class,
         Tags\Trans::class,
         Tags\TransChoice::class,
+        Tags\UserGroups::class,
         Tags\Users::class,
+        Tags\UserRoles::class,
+        Tags\Vite::class,
         Tags\Widont::class,
         Tags\Yields::class,
         \Statamic\Forms\Tags::class,
@@ -174,6 +191,7 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Auth\Protect\Tags::class,
         \Statamic\OAuth\Tags::class,
         \Statamic\Search\Tags::class,
+        \Statamic\StaticCaching\NoCache\Tags::class,
     ];
 
     protected $widgets = [
@@ -185,16 +203,23 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Forms\Widget::class,
     ];
 
+    protected $formJsDrivers = [
+        JsDrivers\Alpine::class,
+    ];
+
     protected $updateScripts = [
         Updates\AddPerEntryPermissions::class,
         Updates\UseDedicatedTrees::class,
         Updates\AddUniqueSlugValidation::class,
+        Updates\AddGraphQLPermission::class,
+        Updates\AddAssignRolesAndGroupsPermissions::class,
     ];
 
     public function register()
     {
         $this->registerExtensions();
         $this->registerAddonManifest();
+        $this->registerFormJsDrivers();
         $this->registerUpdateScripts();
     }
 
@@ -297,6 +322,15 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app['statamic.extensions'][Modifier::class] = collect()
             ->merge($this->app['statamic.extensions'][Modifier::class] ?? [])
             ->merge($modifiers);
+    }
+
+    protected function registerFormJsDrivers()
+    {
+        $this->app->instance('statamic.form-js-drivers', collect());
+
+        foreach ($this->formJsDrivers as $class) {
+            $class::register();
+        }
     }
 
     protected function registerUpdateScripts()

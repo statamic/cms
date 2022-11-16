@@ -105,8 +105,8 @@ return [
     'getting_started_widget_blueprints' => 'A Blueprintekben határozhatjuk meg a tartalom létrehozásához és tárolásához használt mezőket.',
     'getting_started_widget_collections' => 'A gyűjtemények a webhely különböző típusú tartalmait tartalmazzák.',
     'getting_started_widget_docs' => 'Ismerje meg a Statamic képességeit a leghitelesebb forrásból.',
-    'getting_started_widget_header' => 'A Statamic 3 használatának megkezdése',
-    'getting_started_widget_intro' => 'Az új Statamic 3 webhely felépítésének megkezdéséhez javasoljuk, hogy kezdje ezekkel a lépésekkel.',
+    'getting_started_widget_header' => 'A Statamic használatának megkezdése',
+    'getting_started_widget_intro' => 'Az új Statamic webhely felépítésének megkezdéséhez javasoljuk, hogy kezdje ezekkel a lépésekkel.',
     'getting_started_widget_navigation' => 'Hozzon létre többszintű hivatkozáslistákat, amelyek navigációs sávok, láblécek és hasonlók megjelenítésére használhatóak.',
     'getting_started_widget_pro' => 'A Statamic Pro korlátlan számú felhasználói fiókot, szerepet, engedélyeket, Git-integrációt, revíziókat, több webhely kezelésének lehetőségét, és sok más hasznos funkciót tartalmaz!',
 

@@ -6,12 +6,14 @@ use Illuminate\Http\Request;
 use LogicException;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\CP\Column;
+use Statamic\Exceptions\SiteNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Str;
 
@@ -43,7 +45,7 @@ class CollectionsController extends CpController
             'collections' => $collections,
             'columns' => [
                 Column::make('title')->label(__('Title')),
-                Column::make('entries')->label(__('Entries')),
+                Column::make('entries')->label(__('Entries'))->numeric(true),
             ],
         ]);
     }
@@ -85,8 +87,12 @@ class CollectionsController extends CpController
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'sites' => $collection->sites()->map(function ($site) {
-                $site = Site::get($site);
+            'sites' => $collection->sites()->map(function ($site_handle) {
+                $site = Site::get($site_handle);
+
+                if (! $site) {
+                    throw new SiteNotFoundException($site_handle);
+                }
 
                 return [
                     'handle' => $site->handle(),
@@ -140,8 +146,10 @@ class CollectionsController extends CpController
             'max_depth' => optional($collection->structure())->maxDepth(),
             'expects_root' => optional($collection->structure())->expectsRoot(),
             'show_slugs' => optional($collection->structure())->showSlugs(),
+            'require_slugs' => $collection->requiresSlugs(),
             'links' => $collection->entryBlueprints()->map->handle()->contains('link'),
             'taxonomies' => $collection->taxonomies()->map->handle()->all(),
+            'revisions' => $collection->revisionsEnabled(),
             'default_publish_state' => $collection->defaultPublishState(),
             'template' => $collection->template(),
             'layout' => $collection->layout(),
@@ -152,6 +160,11 @@ class CollectionsController extends CpController
                 ? $collection->routes()->first()
                 : $collection->routes()->all(),
             'mount' => optional($collection->mount())->id(),
+            'title_formats' => $collection->titleFormats()->unique()->count() === 1
+                ? $collection->titleFormats()->first()
+                : $collection->titleFormats()->all(),
+            'preview_targets' => $collection->basePreviewTargets(),
+            'origin_behavior' => $collection->originBehavior(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($collection))
@@ -221,14 +234,20 @@ class CollectionsController extends CpController
             ->sortDirection($values['sort_direction'])
             ->ampable($values['amp'])
             ->mount($values['mount'] ?? null)
+            ->revisions($values['revisions'] ?? false)
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
             ->pastDateBehavior(array_get($values, 'past_date_behavior'))
             ->mount(array_get($values, 'mount'))
-            ->propagate(array_get($values, 'propagate'));
+            ->propagate(array_get($values, 'propagate'))
+            ->titleFormats($values['title_formats'])
+            ->requiresSlugs($values['require_slugs'])
+            ->previewTargets($values['preview_targets']);
 
         if ($sites = array_get($values, 'sites')) {
-            $collection->sites($sites);
+            $collection
+                ->sites($sites)
+                ->originBehavior($values['origin_behavior']);
         }
 
         if (! $values['structured']) {
@@ -241,8 +260,6 @@ class CollectionsController extends CpController
         }
 
         $collection->save();
-
-        return $collection->toArray();
     }
 
     protected function updateLinkBlueprint($shouldExist, $collection)
@@ -418,15 +435,34 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collection_configure_template_instructions'),
                         'type' => 'template',
                         'placeholder' => __('System default'),
+                        'blueprint' => true,
                     ],
                     'layout' => [
                         'display' => __('Layout'),
                         'instructions' => __('statamic::messages.collection_configure_layout_instructions'),
                         'type' => 'template',
                     ],
+                    'title_formats' => [
+                        'display' => __('Title Format'),
+                        'instructions' => __('statamic::messages.collection_configure_title_format_instructions'),
+                        'type' => 'collection_title_formats',
+                    ],
                 ],
             ],
         ];
+
+        if (Statamic::pro() && config('statamic.revisions.enabled')) {
+            $fields['revisions'] = [
+                'display' => __('Revisions'),
+                'fields' => [
+                    'revisions' => [
+                        'type' => 'toggle',
+                        'display' => __('Enable Revisions'),
+                        'instructions' => __('statamic::messages.collection_revisions_instructions'),
+                    ],
+                ],
+            ];
+        }
 
         if (Site::hasMultiple()) {
             $fields['sites'] = [
@@ -442,6 +478,17 @@ class CollectionsController extends CpController
                         'display' => __('Propagate'),
                         'instructions' => __('statamic::messages.collection_configure_propagate_instructions'),
                     ],
+                    'origin_behavior' => [
+                        'type' => 'select',
+                        'display' => __('Origin Behavior'),
+                        'instructions' => __('statamic::messages.collection_configure_origin_behavior_instructions'),
+                        'default' => 'select',
+                        'options' => [
+                            'select' => __('statamic::messages.collection_configure_origin_behavior_option_select'),
+                            'root' => __('statamic::messages.collection_configure_origin_behavior_option_root'),
+                            'active' => __('statamic::messages.collection_configure_origin_behavior_option_active'),
+                        ],
+                    ],
                 ],
             ];
         }
@@ -454,6 +501,11 @@ class CollectionsController extends CpController
                         'display' => __('Route'),
                         'instructions' => __('statamic::messages.collections_route_instructions'),
                         'type' => 'collection_routes',
+                    ],
+                    'require_slugs' => [
+                        'display' => __('Require Slugs'),
+                        'instructions' => __('statamic::messages.collection_configure_require_slugs_instructions'),
+                        'type' => 'toggle',
                     ],
                     'mount' => [
                         'display' => __('Mount'),
@@ -469,6 +521,25 @@ class CollectionsController extends CpController
                         'display' => __('Enable AMP'),
                         'instructions' => __('statamic::messages.collections_amp_instructions'),
                         'type' => 'toggle',
+                    ],
+                    'preview_targets' => [
+                        'display' => __('Preview Targets'),
+                        'instructions' => __('statamic::messages.collections_preview_targets_instructions'),
+                        'type' => 'grid',
+                        'fields' => [
+                            [
+                                'handle' => 'label',
+                                'field' => [
+                                    'type' => 'text',
+                                ],
+                            ],
+                            [
+                                'handle' => 'format',
+                                'field' => [
+                                    'type' => 'text',
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ],

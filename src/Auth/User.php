@@ -2,10 +2,12 @@
 
 namespace Statamic\Auth;
 
+use ArrayAccess;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
@@ -15,10 +17,14 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
+use Statamic\Data\ContainsComputedData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\UserCreated;
 use Statamic\Events\UserDeleted;
 use Statamic\Events\UserSaved;
+use Statamic\Events\UserSaving;
 use Statamic\Facades;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
@@ -33,19 +39,33 @@ abstract class User implements
     Augmentable,
     AuthorizableContract,
     ResolvesValuesContract,
-    HasLocalePreference
+    HasLocalePreference,
+    ArrayAccess,
+    Arrayable
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, HasAvatar, ResolvesValues;
+    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues, ContainsComputedData;
+
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
+
+    abstract public function data($data = null);
 
     abstract public function get($key, $fallback = null);
-
-    abstract public function value($key);
 
     abstract public function has($key);
 
     abstract public function set($key, $value);
 
     abstract public function remove($key);
+
+    public function value($key)
+    {
+        if ($this->hasComputedCallback($key)) {
+            return $this->getComputed($key);
+        }
+
+        return $this->get($key);
+    }
 
     public function reference()
     {
@@ -65,7 +85,7 @@ abstract class User implements
                 [$name, $surname] = explode(' ', $name);
             }
         } else {
-            $name = $this->email();
+            $name = (string) $this->email();
         }
 
         return strtoupper(mb_substr($name, 0, 1).mb_substr($surname, 0, 1));
@@ -136,11 +156,42 @@ abstract class User implements
         return Facades\User::blueprint();
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function save()
     {
+        $isNew = is_null(Facades\User::find($this->id()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (UserSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         Facades\User::save($this);
 
-        UserSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                UserCreated::dispatch($this);
+            }
+
+            UserSaved::dispatch($this);
+        }
 
         return $this;
     }
@@ -225,9 +276,14 @@ abstract class User implements
         return $this->selectedQueryColumns;
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['id', 'name', 'email', 'api_url'];
+    }
+
+    protected function defaultAugmentedRelations()
+    {
+        return $this->selectedQueryRelations;
     }
 
     public function preferredLocale()
@@ -238,5 +294,10 @@ abstract class User implements
     public function setPreferredLocale($locale)
     {
         return $this->setPreference('locale', $locale);
+    }
+
+    protected function getComputedCallbacks()
+    {
+        return Facades\User::getComputedCallbacks();
     }
 }

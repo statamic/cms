@@ -39,6 +39,8 @@ class CollectionsStore extends BasicStore
         $collection = Collection::make($handle)
             ->title(array_get($data, 'title'))
             ->routes(array_get($data, 'route'))
+            ->requiresSlugs(array_get($data, 'slugs', true))
+            ->titleFormats(array_get($data, 'title_format'))
             ->mount(array_get($data, 'mount'))
             ->dated(array_get($data, 'date', false))
             ->ampable(array_get($data, 'amp', false))
@@ -49,11 +51,13 @@ class CollectionsStore extends BasicStore
             ->searchIndex(array_get($data, 'search_index'))
             ->revisionsEnabled(array_get($data, 'revisions', false))
             ->defaultPublishState($this->getDefaultPublishState($data))
+            ->originBehavior(array_get($data, 'origin_behavior', 'select'))
             ->structureContents(array_get($data, 'structure'))
             ->sortField(array_get($data, 'sort_by'))
             ->sortDirection(array_get($data, 'sort_dir'))
             ->taxonomies(array_get($data, 'taxonomies'))
-            ->propagate(array_get($data, 'propagate'));
+            ->propagate(array_get($data, 'propagate'))
+            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])));
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
             $collection
@@ -106,5 +110,15 @@ class CollectionsStore extends BasicStore
                 Stache::store('entries')->store($collection->handle())->index('order')->update();
             }
         }
+    }
+
+    private function normalizePreviewTargets($targets)
+    {
+        return collect($targets)->map(function ($target) {
+            return [
+                'format' => $target['url'],
+                'label' => $target['label'],
+            ];
+        })->all();
     }
 }

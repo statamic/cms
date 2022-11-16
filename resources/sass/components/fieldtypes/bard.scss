@@ -16,6 +16,10 @@
     @apply p-1 min-h-48;
 }
 
+.bard-editor .bard-invalid {
+    @apply p-1 bg-red-lighter text-red text-xs whitespace-no-wrap;
+}
+
 // Modes
 .bard-editor.mode\:read-only .ProseMirror {
     @apply bg-grey-30 text-grey-70;
@@ -28,6 +32,7 @@
 // Responive Wangjangling
 @screen md {
     .bard-editor .ProseMirror { @apply p-2; }
+    .bard-editor .bard-invalid { @apply px-2; }
 }
 
 .bard-fixed-toolbar {
@@ -178,6 +183,13 @@
     }
 }
 
+.bard-set:active .sortable-handle:hover ~ * .popover {
+    display: none;
+}
+
+.bard-set.has-error > .replicator-set-header label {
+    color: $color_red;
+}
 
 /* The set selection options for each text block
   ========================================================================== */
@@ -225,6 +237,11 @@
 
         > p > code, > pre code {
             @apply bg-grey-30;
+        }
+        
+        // To remove min height from nested bard fields inside bard in fullscreen mode.
+        * > .ProseMirror { 
+            min-height: auto;
         }
     }
 
@@ -292,8 +309,12 @@
         }
     }
 
-    blockquote, ol, ul {
-        p {
+    blockquote,
+    blockquote ol li,
+    blockquote ul li,
+    ol li,
+    ul li {
+        > p {
             margin-top: 0;
             margin-bottom: .85em;
         }
@@ -348,19 +369,32 @@
         margin-top: 0;
     }
 
-    ul {
+    ul, 
+    blockquote ul,
+    .tableWrapper table ul {
         list-style-type: disc;
     }
 
-    ol {
+    ol, 
+    blockquote ol,
+    .tableWrapper table ol {
         list-style-type: decimal;
     }
 
     ol,
-    ul {
+    ul,
+    blockquote ol,
+    blockquote ul {
         padding: 0;
         margin: 0;
         margin-bottom: .85em;
+        padding-left: 2em;
+    }
+
+    .tableWrapper table ol,
+    .tableWrapper table ul {
+        padding: 0;
+        margin: 0;
         padding-left: 2em;
     }
 
@@ -378,7 +412,15 @@
     }
 
     ol ol {
-        list-style-type: lower-roman;
+        list-style-type: decimal;
+    }
+
+    ul ol {
+        list-style-type: decimal;
+    }
+
+    ol ul {
+        list-style-type: circle;
     }
 
     blockquote {
@@ -394,7 +436,10 @@
         margin-bottom: 0;
     }
 
-    .tableWrapper table {
+    .tableWrapper table,
+    blockquote > .tableWrapper table,
+    ol li > .tableWrapper table,
+    ul li > .tableWrapper table {
         @apply w-full overflow-hidden m-0 mb-2 bg-white text-sm ;
         border-collapse: collapse;
         table-layout: fixed;

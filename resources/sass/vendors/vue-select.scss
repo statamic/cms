@@ -176,6 +176,8 @@
 .v-select:not(.vs--single) .vs__selected {
 	@include clickable;
 	@apply flex items-center text-sm rounded py-0 px-1 mr-1;
+
+    &.sortable-item { @apply cursor-grab; }
 }
 
 .vs__deselect {
@@ -198,7 +200,10 @@
 }
 
 .vs--single .vs__selected {
-	@apply truncate;
+	overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
 	background-color: transparent;
 	border-color: transparent;
 	padding: 0;

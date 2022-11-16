@@ -12,6 +12,7 @@
                         'current-column': sharedState.sortColumn === column.field,
                         'sortable-column': column.sortable === true,
                         'cursor-not-allowed': !sortable,
+                        'text-right pr-4': column.numeric,
                     }"
                     @click.prevent="changeSortColumn(column.field)"
                 >
@@ -19,6 +20,10 @@
                     <svg v-if="sharedState.sortColumn === column.field" :class="sharedState.sortDirection" height="8" width="8" viewBox="0 0 10 6.5">
                         <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor"/>
                     </svg>
+                </th>
+                <th class="type-column" v-if="type">
+                    <template v-if="type === 'entries'">{{ __('Collection') }}</template>
+                    <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
                 </th>
                 <th class="actions-column">
                     <data-list-column-picker :preferences-key="columnPreferencesKey" v-if="allowColumnPicker" />
@@ -47,7 +52,7 @@
                         @click="checkboxClicked(row, index, $event)"
                     />
                 </td>
-                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width">
+                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width" :class="{'text-right pr-4': column.numeric}">
                     <slot
                         :name="`cell-${column.field}`"
                         :value="row[column.value || column.field]"
@@ -59,6 +64,12 @@
                     >
                         <table-field :handle="column.field" :value="row[column.value || column.field]" :values="row" :fieldtype="column.fieldtype" :key="column.field" />
                     </slot>
+                </td>
+                <td class="type-column" v-if="type">
+                    <span v-if="type === 'entries' || type === 'terms'" class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey">
+                        <template v-if="type === 'entries'">{{ row.collection.title }}</template>
+                        <template v-if="type === 'terms'">{{ row.taxonomy.title }}</template>
+                    </span>
                 </td>
                 <td class="actions-column">
                     <slot
@@ -119,6 +130,9 @@ export default {
         },
         columnPreferencesKey: {
             type: String,
+        },
+        type: {
+            type: String
         },
     },
 

@@ -57,20 +57,6 @@ class User extends BaseUser
         return $this;
     }
 
-    public function value($key)
-    {
-        return $this->get($key);
-    }
-
-    public function __get($key)
-    {
-        if ($key == 'email') {
-            return $this->email();
-        }
-
-        return $this->get($key);
-    }
-
     public function id($id = null)
     {
         return $this->fluentlyGetOrSet('id')->args(func_get_args());
@@ -303,17 +289,6 @@ class User extends BaseUser
         $this->set('super', true);
 
         return $this;
-    }
-
-    public function toCacheableArray()
-    {
-        return [
-            'path' => $this->path(),
-            'email' => $this->email,
-            'password' => $this->password,
-            'data' => $this->data(),
-            'preferences' => $this->preferences(),
-        ];
     }
 
     public function lastLogin()

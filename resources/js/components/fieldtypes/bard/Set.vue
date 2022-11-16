@@ -1,14 +1,14 @@
 <template>
 
     <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow"
-        :class="{ 'border-blue-lighter': selected }"
+        :class="{ 'border-blue-lighter': selected, 'has-error': hasError }"
         contenteditable="false" @copy.stop @paste.stop @cut.stop
     >
         <div ref="content" hidden />
-        <div class="replicator-set-header" :class="{'collapsed': collapsed}">
+        <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
             <div class="item-move sortable-handle" data-drag-handle />
-            <div class="flex-1 p-1" :class="{'flex items-center': collapsed}" @dblclick="toggleCollapsedState">
-                <label v-text="config.display || config.handle" class="text-xs whitespace-no-wrap mr-1"/>
+            <div class="flex-1 p-1 replicator-set-header-inner" :class="{'flex items-center': collapsed}" @dblclick="toggleCollapsedState">
+                <label v-text="display || config.handle" class="text-xs whitespace-no-wrap mr-1"/>
                 <div
                     v-if="config.instructions"
                     v-show="!collapsed"
@@ -29,21 +29,23 @@
                     v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                 <dropdown-list class="-mt-sm">
                     <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
+                    <dropdown-item :text="__('Duplicate Set')" @click="duplicate" />
                     <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>
             </div>
         </div>
-        <div class="replicator-set-body" v-if="!collapsed && index !== undefined">
+        <div class="replicator-set-body" v-show="!collapsed" v-if="index !== undefined">
             <set-field
                 v-for="field in fields"
-                v-show="showField(field)"
+                v-show="showField(field, fieldPath(field))"
                 :key="field.handle"
                 :field="field"
                 :value="values[field.handle]"
                 :meta="meta[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
-                :error-key="errorKey(field)"
+                :field-path="fieldPath(field)"
+                :read-only="isReadOnly"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="focused"
@@ -69,19 +71,23 @@ export default {
         'updateAttrs', // function to update attributes defined in `schema`
         'editable', // global editor prop whether the content can be edited
         'options', // array of extension options
-        `selected`, // whether its selected,
+        'selected', // whether its selected,
     ],
 
     components: { SetField },
 
     mixins: [ValidatesFieldConditions, ManagesPreviewText],
 
-    inject: ['setConfigs'],
+    inject: ['setConfigs', 'isReadOnly'],
 
     computed: {
 
         fields() {
             return this.config.fields;
+        },
+
+        display() {
+            return this.config.display || this.values.type;
         },
 
         values() {
@@ -101,7 +107,7 @@ export default {
         },
 
         config() {
-            return _.findWhere(this.setConfigs, { handle: this.values.type });
+            return _.findWhere(this.setConfigs, { handle: this.values.type }) || {};
         },
 
         enabled: {
@@ -124,6 +130,18 @@ export default {
         instructions() {
             return this.config.instructions ? markdown(this.config.instructions) : null;
         },
+
+        hasError() {
+            return this.options.bard.setsWithErrors.includes(this.index);
+        },
+
+        showFieldPreviews() {
+            return this.options.bard.config.previews;
+        },
+
+        isInvalid() {
+            return Object.keys(this.config).length === 0;
+        }
 
     },
 
@@ -186,10 +204,15 @@ export default {
             this.options.bard.expandSet(this.node.attrs.id);
         },
 
-        errorKey(field) {
-            let prefix = this.options.bard.errorKeyPrefix || this.options.bard.handle;
+        duplicate() {
+            // this.$events.$emit('duplicated', this.node.attrs.id);
+            this.options.bard.duplicateSet(this.node.attrs.id, this.node.attrs, this.getPos() + this.node.nodeSize);
+        },
+
+        fieldPath(field) {
+            let prefix = this.options.bard.fieldPathPrefix || this.options.bard.handle;
             return `${prefix}.${this.index}.attrs.values.${field.handle}`;
-        }
+        },
 
     }
 }

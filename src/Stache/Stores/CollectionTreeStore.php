@@ -38,9 +38,4 @@ class CollectionTreeStore extends NavTreeStore
             ->locale($site)
             ->handle($handle);
     }
-
-    public function getItemKey($item)
-    {
-        return str_replace('collection::', '', parent::getItemKey($item));
-    }
 }

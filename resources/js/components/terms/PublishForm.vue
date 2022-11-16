@@ -13,6 +13,10 @@
                 </div>
             </h1>
 
+            <dropdown-list class="mr-2" v-if="canEditBlueprint">
+                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            </dropdown-list>
+
             <div class="pt-px text-2xs text-grey-60 flex mr-2" v-if="readOnly">
                 <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
             </div>
@@ -65,9 +69,9 @@
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
+                :targets="previewTargets"
                 :values="values"
                 :blueprint="fieldset.handle"
-                :amp="amp"
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
@@ -235,11 +239,13 @@ import PublishActions from './PublishActions.vue';
 import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
+import HasHiddenFields from '../data-list/HasHiddenFields';
 
 export default {
 
     mixins: [
         HasPreferences,
+        HasHiddenFields,
     ],
 
     components: {
@@ -275,8 +281,10 @@ export default {
         initialPermalink: String,
         revisionsEnabled: Boolean,
         preloadedAssets: Array,
+        canEditBlueprint: Boolean,
         createAnotherUrl: String,
         listingUrl: String,
+        previewTargets: Array,
     },
 
     data() {
@@ -310,7 +318,7 @@ export default {
             preferencesPrefix: `taxonomies.${this.taxonomyHandle}`,
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
-            quickSave: false
+            quickSave: false,
         }
     },
 
@@ -419,7 +427,7 @@ export default {
         },
 
         performSaveRequest() {
-            const payload = { ...this.values, ...{
+            const payload = { ...this.visibleValues, ...{
                 _blueprint: this.fieldset.handle,
                 published: this.published,
                 _localized: this.localizedFields,

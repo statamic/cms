@@ -26,6 +26,7 @@ class TermsController extends CpController
         $query = $this->indexQuery($taxonomy);
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'taxonomy' => $taxonomy->handle(),
             'blueprints' => $taxonomy->termBlueprints()->map->handle(),
         ]);
 
@@ -58,6 +59,8 @@ class TermsController extends CpController
     protected function indexQuery($taxonomy)
     {
         $query = $taxonomy->queryTerms();
+
+        $query->where('site', Site::selected());
 
         if ($search = request('search')) {
             if ($taxonomy->hasSearchIndex()) {
@@ -95,6 +98,7 @@ class TermsController extends CpController
                 'revisions' => $term->revisionsUrl(),
                 'restore' => $term->restoreRevisionUrl(),
                 'createRevision' => $term->createRevisionUrl(),
+                'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $term->id()]),
             'meta' => $meta,
@@ -128,6 +132,7 @@ class TermsController extends CpController
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $term->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
+            'previewTargets' => $taxonomy->previewTargets()->all(),
         ];
 
         if ($request->wantsJson()) {
@@ -233,6 +238,7 @@ class TermsController extends CpController
                 ];
             })->all(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
+            'previewTargets' => $taxonomy->previewTargets()->all(),
         ];
 
         if ($request->wantsJson()) {

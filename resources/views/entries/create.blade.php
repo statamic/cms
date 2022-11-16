@@ -19,6 +19,7 @@
         create-another-url="{{ cp_route('collections.entries.create', [$collection, $locale, 'blueprint' => $blueprint['handle'], 'parent' => $values['parent'] ?? null]) }}"
         listing-url="{{ cp_route('collections.show', $collection) }}"
         :can-manage-publish-state="{{ Statamic\Support\Str::bool($canManagePublishState) }}"
+        :preview-targets="{{ json_encode($previewTargets) }}"
     ></base-entry-create-form>
 
 @endsection

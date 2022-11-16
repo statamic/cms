@@ -3,6 +3,7 @@
 namespace Tests\Git;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Queue;
 use Statamic\Console\Processes\Git as GitProcess;
 use Statamic\Console\Processes\Process;
 use Statamic\Facades\Config;
@@ -293,9 +294,11 @@ EOT;
     /** @test */
     public function it_dispatches_commit_job()
     {
-        $this->expectsJobs(\Statamic\Git\CommitJob::class);
+        Queue::fake();
 
         Git::dispatchCommit();
+
+        Queue::assertPushed(\Statamic\Git\CommitJob::class, 1);
     }
 
     /** @test */

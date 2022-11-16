@@ -8,8 +8,8 @@ use Statamic\Auth\Protect\Protection;
 use Statamic\Events\ResponseCreated;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
-use Statamic\Routing\ResolveRedirect;
 use Statamic\Statamic;
+use Statamic\Tokens\Handlers\LivePreview;
 use Statamic\View\View;
 
 class DataResponse implements Responsable
@@ -36,7 +36,6 @@ class DataResponse implements Responsable
             ->protect()
             ->handleDraft()
             ->handlePrivateEntries()
-            ->addViewPaths()
             ->adjustResponseType()
             ->addContentHeaders()
             ->handleAmp();
@@ -84,13 +83,11 @@ class DataResponse implements Responsable
 
     protected function getRedirect()
     {
-        if (! $redirect = $this->data->get('redirect')) {
+        if (! $this->data->get('redirect')) {
             return;
         }
 
-        $redirect = (new ResolveRedirect)($redirect, $this->data);
-
-        if ($redirect == '404') {
+        if (! $redirect = $this->data->redirect) {
             throw new NotFoundHttpException;
         }
 
@@ -142,7 +139,7 @@ class DataResponse implements Responsable
 
     protected function view()
     {
-        return (new View)
+        return app(View::class)
             ->template($this->data->template())
             ->layout($this->data->layout())
             ->with($this->with)
@@ -192,7 +189,7 @@ class DataResponse implements Responsable
 
     protected function isLivePreview()
     {
-        return $this->request->headers->get('X-Statamic-Live-Preview');
+        return optional($this->request->statamicToken())->handler() === LivePreview::class;
     }
 
     protected function versionJavascriptModules($contents)

@@ -47,6 +47,7 @@ export default class ImageNode extends Node {
             const { selection } = state
             const position = selection.$cursor ? selection.$cursor.pos : selection.$to.pos
             const node = type.create(attrs)
+            node.isNew = true;
             const transaction = state.tr.insert(position, node)
             dispatch(transaction)
         }

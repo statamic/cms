@@ -26,7 +26,6 @@ mix.extract([
     'dmuploader',
     'jquery-ui',
     'jquery',
-    'lazysizes',
     'luminous-lightbox',
     'marked-plaintext',
     'marked',
@@ -59,7 +58,6 @@ mix.webpackConfig({
 
         // Our files reference globals too
         new webpack.ProvidePlugin({ Vue: "vue" }),
-        new webpack.ProvidePlugin({ Alpine: "Alpine" }),
-        new webpack.ProvidePlugin({ _: "underscore" })
+        new webpack.ProvidePlugin({ Alpine: "Alpine" })
     ]
 })

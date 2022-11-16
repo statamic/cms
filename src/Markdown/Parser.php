@@ -3,14 +3,16 @@
 namespace Statamic\Markdown;
 
 use Closure;
+use Illuminate\Support\Traits\Macroable;
 use League\CommonMark\CommonMarkConverter;
-use League\CommonMark\Environment;
 use League\CommonMark\Extension\Autolink\AutolinkExtension;
 use League\CommonMark\Extension\SmartPunct\SmartPunctExtension;
 use Statamic\Support\Arr;
 
 class Parser
 {
+    use Macroable;
+
     protected $converter;
     protected $extensions = [];
     protected $config = [];
@@ -22,7 +24,7 @@ class Parser
 
     public function parse(string $markdown): string
     {
-        return $this->converter()->convertToHtml($markdown);
+        return $this->converter()->convert($markdown);
     }
 
     public function converter(): CommonMarkConverter
@@ -31,18 +33,18 @@ class Parser
             return $this->converter;
         }
 
-        $env = Environment::createCommonMarkEnvironment();
+        $converter = new CommonMarkConverter($this->config);
 
-        $env->mergeConfig($this->config);
+        $env = $converter->getEnvironment();
 
         foreach ($this->extensions() as $ext) {
             $env->addExtension($ext);
         }
 
-        return $this->converter = new CommonMarkConverter([], $env);
+        return $this->converter = $converter;
     }
 
-    public function environment(): Environment
+    public function environment()
     {
         return $this->converter()->getEnvironment();
     }
@@ -113,14 +115,20 @@ class Parser
         });
     }
 
-    public function config(): array
+    public function config($key = null)
     {
-        return $this->environment()->getConfig();
+        $config = $this->environment()->getConfiguration();
+
+        if (! is_null($key)) {
+            return $config->get($key);
+        }
+
+        return $config;
     }
 
     public function newInstance(array $config = [])
     {
-        $parser = new self(array_replace_recursive($this->config(), $config));
+        $parser = new self(array_replace_recursive($this->config, $config));
 
         foreach ($this->extensions as $ext) {
             $parser->addExtensions($ext);

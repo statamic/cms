@@ -7,10 +7,10 @@
 }
 
 .replicator-set {
-    @apply mb-5 shadow-set rounded bg-white outline-none relative;
+    @apply mt-5 shadow-set rounded bg-white outline-none relative;
 
-    &:first-child {
-        @apply mt-3;
+    &:last-child {
+        @apply mb-5;
     }
 }
 
@@ -24,7 +24,7 @@
     .sortable-handle {
         @apply w-4 border-r rounded-tl p-1;
         cursor: grab;
-        background: transparent url('../img/drag-dots.svg') center center no-repeat;
+        background: transparent url('../svg/drag-dots.svg') center center no-repeat;
         &:hover { @apply .bg-grey-20; }
     }
 
@@ -40,6 +40,15 @@
             bottom: 1px;
         }
     }
+
+    &.invalid {
+        .replicator-set-header-inner {
+            @apply bg-red-lighter;
+            label {
+                @apply text-red;
+            }
+        }
+    }
 }
 
 .replicator-set-body {
@@ -47,8 +56,7 @@
 }
 
 .replicator-set-picker-between {
-    @apply absolute bottom-0 w-full text-center;
-    margin-bottom: -32px;
+    @apply absolute top-0 -mt-4 w-full text-center;
 }
 
 // Extra contrast when full width
@@ -67,4 +75,12 @@
 // Avoid double borders
 .section-fieldtype ~ .replicator-fieldtype {
     border-top: 0;
+}
+
+.replicator-set.has-error > .replicator-set-header label {
+    color: $color_red;
+}
+
+.replicator-set-body > .has-error > label {
+    color: $color_red;
 }

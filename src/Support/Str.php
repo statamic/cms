@@ -2,8 +2,10 @@
 
 namespace Statamic\Support;
 
+use Closure;
 use Statamic\Facades\Compare;
 use Stringy\StaticStringy;
+use voku\helper\ASCII;
 
 /**
  * Manipulating strings.
@@ -13,6 +15,11 @@ class Str extends \Illuminate\Support\Str
     public static function __callStatic($method, $parameters)
     {
         return call_user_func_array([StaticStringy::class, $method], $parameters);
+    }
+
+    public static function ascii($value, $language = 'en')
+    {
+        return ASCII::to_ascii((string) $value, $language, true, config('statamic.system.ascii_replace_extra_symbols'));
     }
 
     /**
@@ -30,16 +37,16 @@ class Str extends \Illuminate\Support\Str
         switch ($length) {
             case 0:
             case 1:
-                return join('', $list);
+                return implode('', $list);
                 break;
 
             case 2:
-                return join(' '.$glue.' ', $list);
+                return implode(' '.$glue.' ', $list);
                 break;
 
             default:
                 $last = array_pop($list);
-                $sentence = join(', ', $list);
+                $sentence = implode(', ', $list);
                 $sentence .= ($oxford_comma) ? ',' : '';
 
                 return $sentence.' '.$glue.' '.$last;
@@ -75,7 +82,7 @@ class Str extends \Illuminate\Support\Str
             ];
 
             $allowed_tags = array_diff($all_tags, $tags_list);
-            $allowed_tag_string = '<'.join('><', $allowed_tags).'>';
+            $allowed_tag_string = '<'.implode('><', $allowed_tags).'>';
 
             return strip_tags($html, $allowed_tag_string);
         }
@@ -83,12 +90,14 @@ class Str extends \Illuminate\Support\Str
         return strip_tags($html);
     }
 
-    public static function slug($string, $separator = '-', $language = 'en')
+    public static function slug($string, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
     {
+        $string = (string) $string;
+
         // Statamic is a-OK with underscores in slugs.
         $string = str_replace('_', $placeholder = strtolower(str_random(16)), $string);
 
-        $slug = parent::slug($string, $separator, $language);
+        $slug = parent::slug($string, $separator, $language, $dictionary);
 
         return str_replace($placeholder, '_', $slug);
     }
@@ -176,12 +185,17 @@ class Str extends \Illuminate\Support\Str
                 return str_replace(' ', '%###%##%', $matches[0]);
             }, $value);
 
-            // step 2, replace all spaces based on params with &nbsp;
+            // step 2, replace all tabs and spaces based on params with &nbsp;
             $value = preg_replace_callback("/(?<!<[p|li|h1|h2|h3|h4|h5|h6|div|figcaption])([^\s]\s)([^\s]*\s?){{$words}}(<\/(?:p|li|h1|h2|h3|h4|h5|h6|div|figcaption)>)/", function ($matches) {
-                return preg_replace("/([\s])/", '&nbsp;', rtrim($matches[0]));
+                return preg_replace('/([[:blank:]])/', '&nbsp;', rtrim($matches[0]));
             }, $value);
 
-            // step 3, re-replace the code from step 1 with spaces
+            // Step 3, handle potential nested list orphans
+            $value = preg_replace_callback("/(?<!<[li])([^\s]\s)([^\s]*\s?){{$words}}(<(?:ol|ul)>)/", function ($matches) {
+                return preg_replace('/[[:blank:]]/', '&nbsp;', rtrim($matches[0]));
+            }, $value);
+
+            // step 4, re-replace the code from step 1 with spaces
             return str_replace('%###%##%', ' ', $value);
 
         // otherwise
@@ -201,6 +215,24 @@ class Str extends \Illuminate\Support\Str
     public static function compare($str1, $str2)
     {
         return Compare::strings($str1, $str2);
+    }
+
+    /**
+     * Parse each part of a string split with a regex through a callback function.
+     *
+     * @param  string  $value
+     * @param  string  $regex
+     * @param  Closure  $callback
+     * @return string
+     */
+    public static function mapRegex($value, $regex, Closure $callback)
+    {
+        $parts = preg_split($regex, $value, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        foreach ($parts as $i => $part) {
+            $parts[$i] = $callback($part, preg_match($regex, $part));
+        }
+
+        return implode('', $parts);
     }
 
     /**
@@ -262,5 +294,22 @@ class Str extends \Illuminate\Support\Str
     public static function replace($string, $search, $replace)
     {
         return StaticStringy::replace($string, $search, $replace);
+    }
+
+    public static function studly($value)
+    {
+        $key = $value;
+
+        if (isset(parent::$studlyCache[$key])) {
+            return parent::$studlyCache[$key];
+        }
+
+        $words = explode(' ', str_replace(['-', '_'], ' ', $value));
+
+        $studlyWords = array_map(function ($word) {
+            return parent::ucfirst($word);
+        }, $words);
+
+        return parent::$studlyCache[$key] = implode($studlyWords);
     }
 }

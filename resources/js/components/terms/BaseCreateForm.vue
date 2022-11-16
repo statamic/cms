@@ -16,8 +16,10 @@
         :initial-has-origin="false"
         :initial-is-root="true"
         :initial-origin-values="{}"
+        :initial-site="site"
         :create-another-url="createAnotherUrl"
         :listing-url="listingUrl"
+        :preview-targets="previewTargets"
         @saved="saved"
     ></term-publish-form>
 
@@ -35,8 +37,10 @@ export default {
         'meta',
         'published',
         'localizations',
+        'site',
         'createAnotherUrl',
         'listingUrl',
+        'previewTargets',
     ],
 
     methods: {

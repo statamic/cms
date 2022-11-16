@@ -7,6 +7,7 @@
 
         <data-list
             v-if="!initializing"
+            ref="dataList"
             :rows="items"
             :columns="columns"
             :sort="false"
@@ -48,6 +49,7 @@
 
                     <data-list-bulk-actions
                         :url="actionUrl"
+                        :context="actionContext"
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
@@ -94,6 +96,7 @@
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
+                    :show-totals="true"
                     @page-selected="selectPage"
                     @per-page-changed="changePerPage"
                 />
@@ -126,6 +129,12 @@ export default {
             currentSite: this.site,
             initialSite: this.site,
         }
+    },
+
+    computed: {
+        actionContext() {
+            return {collection: this.collection};
+        },
     },
 
     watch: {

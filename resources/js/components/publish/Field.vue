@@ -61,7 +61,7 @@
                 :meta="meta"
                 :handle="config.handle"
                 :name-prefix="namePrefix"
-                :error-key-prefix="errorKeyPrefix"
+                :field-path-prefix="fieldPathPrefix"
                 :read-only="isReadOnly"
                 @input="$emit('input', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
@@ -102,7 +102,7 @@ export default {
         readOnly: Boolean,
         syncable: Boolean,
         namePrefix: String,
-        errorKeyPrefix: String,
+        fieldPathPrefix: String,
         canToggleLabel: Boolean,
     },
 
@@ -139,7 +139,7 @@ export default {
         isReadOnly() {
             if (this.storeState.isRoot === false && !this.config.localizable) return true;
 
-            return this.isLocked || this.readOnly || this.config.read_only || false;
+            return this.isLocked || this.readOnly || this.config.visibility === 'read_only' || false;
         },
 
         isLocalizable() {
@@ -158,7 +158,7 @@ export default {
                 `field-${tailwind_width_class(this.config.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.config.classes || '',
-                { 'has-error': this.hasError }
+                { 'has-error': this.hasError || this.hasNestedError }
             ];
         },
 
@@ -188,6 +188,12 @@ export default {
 
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
+        },
+
+        hasNestedError() {
+            const prefix = `${this.fieldPathPrefix || this.config.handle}.`;
+
+            return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
 
         labelText() {

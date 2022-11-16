@@ -2,10 +2,18 @@
 
 namespace Tests\Auth;
 
+use BadMethodCallException;
+use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Hash;
+use Mockery;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Value;
+use Statamic\Support\Arr;
 
 trait UserContractTests
 {
@@ -13,7 +21,7 @@ trait UserContractTests
 
     public function user()
     {
-        return $this->makeUser()
+        $user = $this->makeUser()
             ->id(123)
             ->email('john@example.com')
             ->data([
@@ -23,10 +31,15 @@ trait UserContractTests
             ])
             ->setPreferredLocale('en')
             ->setSupplement('supplemented', 'qux')
-            ->assignRole($this->createRole('role_one'))
-            ->assignRole($this->createRole('role_two'))
-            ->addToGroup($this->createGroup('group_one'))
-            ->addToGroup($this->createGroup('group_two'));
+            ->assignRole($roleOne = $this->createRole('role_one'))
+            ->assignRole($roleTwo = $this->createRole('role_two'))
+            ->addToGroup($groupOne = $this->createGroup('group_one'))
+            ->addToGroup($groupTwo = $this->createGroup('group_two'));
+
+        Role::shouldReceive('all')->andReturn(collect([$roleOne, $roleTwo]));
+        UserGroup::shouldReceive('all')->andReturn(collect([$groupOne, $groupTwo]));
+
+        return $user;
     }
 
     /** @test */
@@ -69,9 +82,213 @@ trait UserContractTests
         ], $this->additionalDataValues()), $this->user()->data()->all());
     }
 
+    /** @test */
+    public function it_gets_custom_computed_data()
+    {
+        Facades\User::computed('balance', function ($user) {
+            return $user->name().'\'s balance is $25 owing.';
+        });
+
+        $user = $this->makeUser()->data(['name' => 'Han Solo']);
+
+        $expectedData = [
+            'name' => 'Han Solo',
+        ];
+
+        $expectedComputedData = [
+            'balance' => 'Han Solo\'s balance is $25 owing.',
+        ];
+
+        $expectedValues = array_merge($expectedData, $expectedComputedData);
+
+        $this->assertArraySubset($expectedData, $user->data()->all());
+        $this->assertEquals($expectedComputedData, $user->computedData()->all());
+        $this->assertEquals($expectedValues['name'], $user->value('name'));
+        $this->assertEquals($expectedValues['balance'], $user->value('balance'));
+    }
+
+    /** @test */
+    public function it_gets_empty_computed_data_by_default()
+    {
+        $this->assertEquals([], $this->user()->computedData()->all());
+    }
+
+    /** @test */
+    public function it_doesnt_recursively_get_computed_data_when_callback_uses_value_method()
+    {
+        Facades\User::computed('balance', function ($user) {
+            return $user->value('balance') ?? $user->name().'\'s balance is $25 owing.';
+        });
+
+        $user = $this->makeUser()->data(['name' => 'Han Solo']);
+
+        $this->assertEquals('Han Solo\'s balance is $25 owing.', $user->value('balance'));
+    }
+
+    /** @test */
+    public function it_can_use_actual_data_to_compose_computed_data()
+    {
+        Facades\User::computed('nickname', function ($user, $value) {
+            return $value ?? 'Nameless';
+        });
+
+        $user = $this->makeUser();
+
+        $this->assertEquals('Nameless', $user->value('nickname'));
+
+        $user->data(['nickname' => 'The Hoff']);
+
+        $this->assertEquals('The Hoff', $user->value('nickname'));
+    }
+
     public function additionalDataValues()
     {
         return [];
+    }
+
+    /**
+     * @test
+     * @dataProvider queryBuilderProvider
+     **/
+    public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
+    {
+        $builder->shouldReceive('get')->times(2)->andReturn('query builder results');
+        app()->instance('mocked-builder', $builder);
+
+        (new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return app('mocked-builder');
+            }
+        })::register();
+
+        $blueprint = Facades\Blueprint::makeFromFields(['foo' => ['type' => 'test']]);
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $user = $this->user();
+        $user->set('foo', 'delta');
+
+        $this->assertEquals('query builder results', $user->foo);
+        $this->assertEquals('query builder results', $user['foo']);
+        $this->assertSame($builder, $user->foo());
+    }
+
+    public function queryBuilderProvider()
+    {
+        return [
+            'statamic' => [Mockery::mock(\Statamic\Query\Builder::class)],
+            'database' => [Mockery::mock(\Illuminate\Database\Query\Builder::class)],
+            'eloquent' => [Mockery::mock(\Illuminate\Database\Eloquent\Builder::class)],
+        ];
+    }
+
+    /** @test */
+    public function calling_unknown_method_throws_exception()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage(sprintf('Call to undefined method %s::thisFieldDoesntExist()', get_class($this->user())));
+
+        $this->user()->thisFieldDoesntExist();
+    }
+
+    /** @test */
+    public function it_converts_to_an_array()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function augment($value)
+            {
+                return [
+                    new Value('alfa'),
+                    new Value([
+                        new Value('bravo'),
+                        new Value('charlie'),
+                        'delta',
+                    ]),
+                ];
+            }
+        };
+        $fieldtype::register();
+
+        $blueprint = Blueprint::makeFromFields([
+            'baz' => [
+                'type' => 'test',
+            ],
+        ]);
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint->setHandle('post'));
+
+        $user = $this->user()
+            ->set('foo', 'bar')
+            ->set('baz', 'qux');
+
+        $this->assertInstanceOf(Arrayable::class, $user);
+
+        $array = $user->toArray();
+        $this->assertEquals($user->augmented()->keys(), array_keys($array));
+        $this->assertEquals([
+            'alfa',
+            [
+                'bravo',
+                'charlie',
+                'delta',
+            ],
+        ], $array['baz'], 'Value objects are not resolved recursively');
+
+        $array = $user
+            ->selectedQueryColumns($keys = ['id', 'foo', 'baz'])
+            ->toArray();
+
+        $this->assertEquals($keys, array_keys($array), 'toArray keys differ from selectedQueryColumns');
+    }
+
+    /** @test */
+    public function only_requested_relationship_fields_are_included_in_to_array()
+    {
+        $regularFieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'regular';
+
+            public function augment($value)
+            {
+                return 'augmented '.$value;
+            }
+        };
+        $regularFieldtype::register();
+
+        $relationshipFieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'relationship';
+            protected $relationship = true;
+
+            public function augment($values)
+            {
+                return collect($values)->map(fn ($value) => 'augmented '.$value)->all();
+            }
+        };
+        $relationshipFieldtype::register();
+
+        $blueprint = Blueprint::makeFromFields([
+            'alfa' => ['type' => 'regular'],
+            'bravo' => ['type' => 'relationship'],
+            'charlie' => ['type' => 'relationship'],
+        ]);
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint->setHandle('post'));
+
+        $user = $this->user()
+            ->set('alfa', 'one')
+            ->set('bravo', ['a', 'b'])
+            ->set('charlie', ['c', 'd']);
+
+        $this->assertEquals([
+            'alfa' => 'augmented one',
+            'bravo' => ['a', 'b'],
+            'charlie' => ['augmented c', 'augmented d'],
+        ], Arr::only($user->selectedQueryRelations(['charlie'])->toArray(), ['alfa', 'bravo', 'charlie']));
     }
 
     /** @test */

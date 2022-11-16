@@ -7,21 +7,31 @@ use Illuminate\Support\Carbon;
 /** @group graphql */
 class DateFieldtypeTest extends FieldtypeTestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Carbon::macro('getToStringFormat', function () {
+            return static::$toStringFormat;
+        });
+    }
+
     /** @test */
     public function it_gets_dates()
     {
-        // The statamic.system.date_format config will set this
-        // earlier on so we'll override it here for the test.
+        // Set the to string format so can see it uses that rather than a coincidence.
+        // But reset it afterwards.
+        $originalFormat = Carbon::getToStringFormat();
         Carbon::setToStringFormat('Y-m-d g:ia');
 
         $this->createEntryWithFields([
             'filled' => [
                 'value' => '2017-12-25 13:29',
-                'field' => ['type' => 'date'],
+                'field' => ['type' => 'date', 'time_enabled' => true],
             ],
             'undefined' => [
                 'value' => null,
-                'field' => ['type' => 'date'],
+                'field' => ['type' => 'date', 'time_enabled' => true],
             ],
         ]);
 
@@ -36,13 +46,16 @@ GQL;
             'formatted' => '1514208540',
             'undefined' => null,
         ]);
+
+        Carbon::setToStringFormat($originalFormat);
     }
 
     /** @test */
     public function it_gets_date_ranges()
     {
-        // The statamic.system.date_format config will set this
-        // earlier on so we'll override it here for the test.
+        // Set the to string format so can see it uses that rather than a coincidence.
+        // But reset it afterwards.
+        $originalFormat = Carbon::getToStringFormat();
         Carbon::setToStringFormat('Y-m-d g:ia');
 
         $this->createEntryWithFields([
@@ -70,5 +83,7 @@ GQL;
             'formatted' => ['start' => '1514160000', 'end' => '1587945600'],
             'undefined' => null,
         ]);
+
+        Carbon::setToStringFormat($originalFormat);
     }
 }

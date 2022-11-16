@@ -2,26 +2,33 @@
 
 namespace Statamic\Assets;
 
-use Facades\Statamic\Assets\Dimensions;
+use ArrayAccess;
+use Facades\Statamic\Assets\Attributes;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetReplaced;
+use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
+use Statamic\Exceptions\FileExtensionMismatch;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -30,19 +37,64 @@ use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements AssetContract, Augmentable
+class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns, SyncsOriginalState, ContainsData {
+    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
+    TracksQueriedRelations,
+    ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
         data as traitData;
+        merge as traitMerge;
     }
 
     protected $container;
     protected $path;
     protected $meta;
-    protected $syncOriginalProperties = ['path'];
+    protected $withEvents = true;
+    protected $shouldHydrate = true;
+    protected $removedData = [];
+    protected $original = [];
+
+    public function syncOriginal()
+    {
+        $this->original = [];
+
+        foreach (['path'] as $property) {
+            $this->original[$property] = $this->{$property};
+        }
+
+        $this->original['data'] = new PendingMeta('data');
+
+        return $this;
+    }
+
+    public function getOriginal($key = null, $fallback = null)
+    {
+        $this->resolvePendingMetaOriginalValues();
+
+        return Arr::get($this->original, $key, $fallback);
+    }
+
+    private function resolvePendingMetaOriginalValues()
+    {
+        if (empty($this->original)) {
+            $this->syncOriginal();
+        }
+
+        // If it's an array, they've already been resolved.
+        if (is_array($this->original['data'])) {
+            return;
+        }
+
+        $this->original['data'] = $this->metaExists() ? $this->meta('data') : $this->data->all();
+    }
+
+    public function getRawOriginal()
+    {
+        return $this->original;
+    }
 
     public function __construct()
     {
@@ -74,27 +126,63 @@ class Asset implements AssetContract, Augmentable
         return $this->hydrate()->traitSet($key, $value);
     }
 
+    public function merge($value)
+    {
+        return $this->hydrate()->traitMerge($value);
+    }
+
     public function remove($key)
     {
-        unset($this->meta['data'][$key]);
+        $this->hydrate();
 
-        return $this;
+        $this->removedData[] = $key;
+
+        return $this->traitRemove($key);
     }
 
     public function data($data = null)
     {
         $this->hydrate();
 
+        if (func_get_args()) {
+            $this->removedData = collect($this->meta['data'])
+                ->diffKeys($data)
+                ->keys()
+                ->merge($this->removedKeys)
+                ->all();
+        }
+
         return call_user_func_array([$this, 'traitData'], func_get_args());
     }
 
     public function hydrate()
     {
+        if (! $this->shouldHydrate) {
+            return $this;
+        }
+
         $this->meta = $this->meta();
 
         $this->data = collect($this->meta['data']);
 
+        $this->removedData = [];
+
+        if (! empty($this->original)) {
+            $this->resolvePendingMetaOriginalValues();
+        }
+
         return $this;
+    }
+
+    public function withoutHydrating($callback)
+    {
+        $this->shouldHydrate = false;
+
+        $return = $callback($this);
+
+        $this->shouldHydrate = true;
+
+        return $return;
     }
 
     /**
@@ -116,6 +204,11 @@ class Asset implements AssetContract, Augmentable
         return $this->container()->files()->contains($path);
     }
 
+    public function getRawMeta()
+    {
+        return $this->meta;
+    }
+
     public function meta($key = null)
     {
         if (func_num_args() === 1) {
@@ -127,7 +220,14 @@ class Asset implements AssetContract, Augmentable
         }
 
         if ($this->meta) {
-            return array_merge($this->meta, ['data' => $this->data->all()]);
+            $meta = $this->meta;
+
+            $meta['data'] = collect(Arr::get($meta, 'data', []))
+                ->merge($this->data->all())
+                ->except($this->removedData)
+                ->all();
+
+            return $meta;
         }
 
         return $this->meta = Cache::rememberForever($this->metaCacheKey(), function () {
@@ -161,14 +261,15 @@ class Asset implements AssetContract, Augmentable
         $meta = ['data' => $this->data->all()];
 
         if ($this->exists()) {
-            $dimensions = Dimensions::asset($this)->get();
+            $attributes = Attributes::asset($this)->get();
 
             $meta = array_merge($meta, [
                 'size' => $this->disk()->size($this->path()),
                 'last_modified' => $this->disk()->lastModified($this->path()),
-                'width' => $dimensions[0],
-                'height' => $dimensions[1],
+                'width' => Arr::get($attributes, 'width'),
+                'height' => Arr::get($attributes, 'height'),
                 'mime_type' => $this->disk()->mimeType($this->path()),
+                'duration' => Arr::get($attributes, 'duration'),
             ]);
         }
 
@@ -180,6 +281,11 @@ class Asset implements AssetContract, Augmentable
         $path = dirname($this->path()).'/.meta/'.$this->basename().'.yaml';
 
         return ltrim($path, '/');
+    }
+
+    protected function metaExists()
+    {
+        return $this->container()->metaFiles()->contains($this->metaPath());
     }
 
     public function writeMeta($meta)
@@ -288,10 +394,28 @@ class Asset implements AssetContract, Augmentable
 
     public function thumbnailUrl($preset = null)
     {
+        if ($this->isSvg()) {
+            return $this->svgThumbnailUrl();
+        }
+
         return cp_route('assets.thumbnails.show', [
             'encoded_asset' => base64_encode($this->id()),
             'size' => $preset,
         ]);
+    }
+
+    protected function svgThumbnailUrl()
+    {
+        if ($url = $this->url()) {
+            return $url;
+        }
+
+        return cp_route('assets.svgs.show', ['encoded_asset' => base64_encode($this->id())]);
+    }
+
+    public function pdfUrl()
+    {
+        return cp_route('assets.pdfs.show', ['encoded_asset' => base64_encode($this->id())]);
     }
 
     /**
@@ -336,6 +460,7 @@ class Asset implements AssetContract, Augmentable
             'dxf', 'xps',
             'zip', 'rar',
             'xls', 'xlsx',
+            'pdf',
         ]);
     }
 
@@ -367,6 +492,29 @@ class Asset implements AssetContract, Augmentable
     public function isVideo()
     {
         return $this->extensionIsOneOf(['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov']);
+    }
+
+    /**
+     * Is this asset a media file?
+     *
+     * @return bool
+     */
+    public function isMedia()
+    {
+        return $this->isImage()
+                || $this->isSvg()
+                || $this->isVideo()
+                || $this->isAudio();
+    }
+
+    /**
+     * Is this asset a PDF?
+     *
+     * @return bool
+     */
+    public function isPdf()
+    {
+        return $this->extensionIsOneOf(['pdf']);
     }
 
     /**
@@ -410,17 +558,34 @@ class Asset implements AssetContract, Augmentable
     }
 
     /**
+     * Save quietly without firing events.
+     *
+     * @return bool
+     */
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
+    /**
      * Save the asset.
      *
-     * @return void
+     * @return bool
      */
     public function save()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         Facades\Asset::save($this);
 
         $this->clearCaches();
 
-        AssetSaved::dispatch($this);
+        if ($withEvents) {
+            AssetSaved::dispatch($this);
+        }
 
         $this->syncOriginal();
 
@@ -430,7 +595,7 @@ class Asset implements AssetContract, Augmentable
     /**
      * Delete the asset.
      *
-     * @return mixed
+     * @return $this
      */
     public function delete()
     {
@@ -495,7 +660,7 @@ class Asset implements AssetContract, Augmentable
      * Rename the asset.
      *
      * @param  string  $filename
-     * @return void
+     * @return self
      */
     public function rename($filename, $unique = false)
     {
@@ -509,11 +674,11 @@ class Asset implements AssetContract, Augmentable
      *
      * @param  string  $folder  The folder relative to the container.
      * @param  string|null  $filename  The new filename, if renaming.
-     * @return void
+     * @return $this
      */
     public function move($folder, $filename = null)
     {
-        $filename = $filename ?: $this->filename();
+        $filename = $this->getSafeFilename($filename ?: $this->filename());
         $oldPath = $this->path();
         $oldMetaPath = $this->metaPath();
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.'.'.pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
@@ -522,10 +687,44 @@ class Asset implements AssetContract, Augmentable
             return $this;
         }
 
+        $this->hydrate();
         $this->disk()->rename($oldPath, $newPath);
         $this->path($newPath);
-        $this->disk()->rename($oldMetaPath, $this->metaPath());
         $this->save();
+
+        $isFlysystemV1 = method_exists($this->disk()->filesystem()->getDriver(), 'getTimestamp');
+
+        if ($isFlysystemV1) {
+            $this->disk()->delete($this->metaPath());
+        }
+
+        $this->disk()->rename($oldMetaPath, $this->metaPath());
+
+        return $this;
+    }
+
+    /**
+     * Replace an asset and/or its references where necessary.
+     *
+     * @param  Asset  $originalAsset
+     * @param  bool  $deleteOriginal
+     * @return $this
+     */
+    public function replace(Asset $originalAsset, $deleteOriginal = false)
+    {
+        // Temporarily disable the reference updater to avoid triggering reference updates
+        // until after the `AssetReplaced` event is fired. We still want to fire events
+        // like `AssetDeleted` and `AssetSaved` though, so that other listeners will
+        // get triggered (for cache invalidation, clearing of glide cache, etc.)
+        UpdateAssetReferencesSubscriber::disable();
+
+        if ($deleteOriginal) {
+            $originalAsset->delete();
+        }
+
+        UpdateAssetReferencesSubscriber::enable();
+
+        AssetReplaced::dispatch($originalAsset, $this);
 
         return $this;
     }
@@ -537,7 +736,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function dimensions()
     {
-        if (! $this->isImage() && ! $this->isSvg()) {
+        if (! $this->hasDimensions()) {
             return [null, null];
         }
 
@@ -565,6 +764,20 @@ class Asset implements AssetContract, Augmentable
     }
 
     /**
+     * Get the asset's duration.
+     *
+     * @return float|null
+     */
+    public function duration()
+    {
+        if (! $this->hasDuration()) {
+            return null;
+        }
+
+        return $this->meta('duration');
+    }
+
+    /**
      * Get the asset's orientation.
      *
      * @return string|null
@@ -589,7 +802,11 @@ class Asset implements AssetContract, Augmentable
      */
     public function ratio()
     {
-        if (! $this->isImage() && ! $this->isSvg()) {
+        if (! $this->hasDimensions()) {
+            return null;
+        }
+
+        if ($this->height() == 0) {
             return null;
         }
 
@@ -616,20 +833,19 @@ class Asset implements AssetContract, Augmentable
      */
     public function title()
     {
-        return $this->basename();
+        return $this->get('title') ?? $this->basename();
     }
 
     /**
      * Upload a file.
      *
      * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
-     * @return void
+     * @return $this
      */
     public function upload(UploadedFile $file)
     {
         $ext = $file->getClientOriginalExtension();
         $filename = $this->getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
-        $basename = $filename.'.'.$ext;
 
         $directory = $this->folder();
         $directory = ($directory === '.') ? '/' : $directory;
@@ -657,6 +873,22 @@ class Asset implements AssetContract, Augmentable
         return $this;
     }
 
+    public function reupload(ReplacementFile $file)
+    {
+        if ($file->extension() !== $this->extension()) {
+            throw new FileExtensionMismatch('The file extension must match the original file.');
+        }
+
+        $file->writeTo($this->disk()->filesystem(), $this->path());
+
+        $this->clearCaches();
+        $this->writeMeta($this->generateMeta());
+
+        AssetReuploaded::dispatch($this);
+
+        return $this;
+    }
+
     /**
      * Download a file.
      *
@@ -667,6 +899,22 @@ class Asset implements AssetContract, Augmentable
         return $this->disk()->filesystem()->download($this->path(), $name, $headers);
     }
 
+    /**
+     * Stream a file.
+     *
+     * @return resource
+     */
+    public function stream()
+    {
+        return $this->disk()->filesystem()->readStream($this->path());
+    }
+
+    /**
+     * Ensure safe filename string.
+     *
+     * @param  string  $string
+     * @return string
+     */
     private function getSafeFilename($string)
     {
         $replacements = [
@@ -680,7 +928,21 @@ class Asset implements AssetContract, Augmentable
             $str = $str->replace($from, $to);
         }
 
+        if (config('statamic.assets.lowercase')) {
+            $str = strtolower($str);
+        }
+
         return (string) $str;
+    }
+
+    /**
+     * Get the asset file contents.
+     *
+     * @return mixed
+     */
+    public function contents()
+    {
+        return $this->disk()->get($this->path());
     }
 
     /**
@@ -745,7 +1007,7 @@ class Asset implements AssetContract, Augmentable
     protected function ensureUniqueFilename($folder, $filename, $count = 0)
     {
         $extension = pathinfo($this->path(), PATHINFO_EXTENSION);
-        $suffix = $count ? " ({$count})" : '';
+        $suffix = $count ? "-{$count}" : '';
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.$suffix.'.'.$extension), '/');
 
         if ($this->disk()->exists($newPath)) {
@@ -770,8 +1032,38 @@ class Asset implements AssetContract, Augmentable
         return $this->selectedQueryColumns;
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['id', 'url', 'permalink', 'api_url'];
+    }
+
+    protected function defaultAugmentedRelations()
+    {
+        return $this->selectedQueryRelations;
+    }
+
+    private function hasDimensions()
+    {
+        return $this->isImage() || $this->isSvg() || $this->isVideo();
+    }
+
+    private function hasDuration()
+    {
+        return $this->isAudio() || $this->isVideo();
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (method_exists($this, $method = Str::camel($field))) {
+            return $this->{$method}();
+        }
+
+        $value = $this->get($field);
+
+        if (! $field = $this->blueprint()->field($field)) {
+            return $value;
+        }
+
+        return $field->fieldtype()->toQueryableValue($value);
     }
 }

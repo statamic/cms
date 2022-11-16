@@ -30,11 +30,20 @@ export default {
         },
 
         canShowSvg() {
-            return this.asset.extension === 'svg' && ! this.asset.url.includes('::');
+            return this.asset.extension === 'svg';
+        },
+
+        container() {
+            return this.asset.id.substr(0, this.asset.id.indexOf('::'))
         },
 
         canBeTransparent() {
             return ['png', 'svg'].includes(this.asset.extension)
+        },
+
+        canDownload() {
+            return Statamic.$permissions.has('super')
+                || Statamic.$permissions.has(`view ${this.container} assets`)
         },
 
         thumbnail() {
@@ -61,6 +70,14 @@ export default {
             this.$emit('removed', this.asset);
         },
 
+        open() {
+            window.open(this.asset.url, '_blank');
+        },
+
+        download() {
+            window.open(this.asset.downloadUrl);
+        },
+
         makeZoomable() {
             const el = $(this.$el).find('a.zoom')[0];
 
@@ -79,7 +96,16 @@ export default {
         assetSaved(asset) {
             this.$emit('updated', asset);
             this.closeEditor();
-        }
+        },
+
+        actionCompleted(successful, response) {
+            if (successful === false) return;
+            const id = response.ids[0] || null;
+            if (id && id !== this.asset.id) {
+                this.$emit('id-changed', id);
+            }
+            this.closeEditor();
+        },
 
     },
 

@@ -25,7 +25,7 @@
                     <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
                         <svg-icon name="file-code" class="w-4 h-4 "/>
                     </button>
-                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
+                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && config.sets.length > 0">
                         <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
                     </button>
                     <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
@@ -77,6 +77,7 @@
                 </div>
             </editor-floating-menu>
 
+            <div class="bard-invalid" v-if="invalid" v-html="__('Invalid content')"></div>
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
@@ -116,6 +117,7 @@ import Doc from './Doc';
 import BardSource from './Source.vue';
 import Link from './Link';
 import Image from './Image';
+import Small from './Small';
 import Subscript from './Subscript';
 import Superscript from './Superscript';
 import RemoveFormat from './RemoveFormat';
@@ -147,6 +149,7 @@ export default {
     provide() {
         return {
             setConfigs: this.config.sets,
+            isReadOnly: this.readOnly,
         }
     },
 
@@ -163,7 +166,9 @@ export default {
             collapsed: this.meta.collapsed,
             previews: this.meta.previews,
             mounted: false,
+            invalid: false,
             pageHeader: null,
+            escBinding: null,
         }
     },
 
@@ -218,10 +223,14 @@ export default {
             return indexes;
         },
 
-        site() {
-            if (! this.storeName) return this.$config.get('selectedSite');
+        storeState() {
+            if (! this.storeName) return undefined;
 
-            return this.$store.state.publish[this.storeName].site;
+            return this.$store.state.publish[this.storeName];
+        },
+
+        site() {
+            return this.storeState ? this.storeState.site : this.$config.get('selectedSite');
         },
 
         htmlWithReplacedLinks() {
@@ -234,20 +243,63 @@ export default {
 
                 return `"${linkData.permalink}"`;
             });
-        }
+        },
+
+        setsWithErrors() {
+            if (! this.storeState) return [];
+
+            return Object.values(this.setIndexes).filter((setIndex) => {
+                const prefix = `${this.fieldPathPrefix || this.handle}.${setIndex}.`;
+
+                return Object.keys(this.storeState.errors).some(key => key.startsWith(prefix));
+            })
+        },
+
+        replicatorPreview() {
+            const stack = JSON.parse(this.value);
+            let text = '';
+            while (stack.length) {
+                const node = stack.shift();
+                if (node.type === 'text') {
+                    text += ` ${node.text || ''}`;
+                } else if (node.type === 'set') {
+                    const handle = node.attrs.values.type;
+                    const set = this.config.sets.find(set => set.handle === handle);
+                    text += ` [${set ? set.display : handle}]`;
+                }
+                if (text.length > 150) {
+                    break;
+                }
+                if (node.content) {
+                    stack.unshift(...node.content);
+                }
+            }
+            return text;
+        },
 
     },
 
     mounted() {
         this.initToolbarButtons();
 
+        const content = this.valueToContent(clone(this.value));
+
         this.editor = new Editor({
             useBuiltInExtensions: false,
             extensions: this.getExtensions(),
-            content: this.valueToContent(clone(this.value)),
+            content: content,
             editable: !this.readOnly,
             disableInputRules: ! this.config.enable_input_rules,
             disablePasteRules: ! this.config.enable_paste_rules,
+            onInit: ({ state }) => {
+                if (content !== null && typeof content === 'object') {
+                    try {
+                        state.schema.nodeFromJSON(content);
+                    } catch (error) {
+                        this.invalid = true;
+                    }
+                }
+            },
             onFocus: () => this.$emit('focus'),
             onBlur: () => {
                 // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
@@ -266,15 +318,23 @@ export default {
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.$keys.bind('esc', this.closeFullscreen)
+        this.escBinding = this.$keys.bind('esc', this.closeFullscreen)
 
-        this.$nextTick(() => this.mounted = true);
+        this.$nextTick(() => {
+            this.mounted = true;
+            if (this.config.collapse) this.collapseAll();
+        });
 
         this.pageHeader = document.querySelector('.global-header');
+
+        this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
     },
 
     beforeDestroy() {
         this.editor.destroy();
+        this.escBinding.destroy();
+
+        this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
     },
 
     watch: {
@@ -282,7 +342,12 @@ export default {
         json(json) {
             if (!this.mounted) return;
 
-            // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
+            // Prosemirror's JSON will include spaces between tags.
+            // For example (this is not the actual json)...
+            // "<p>One <b>two</b> three</p>" becomes ['OneSPACE', '<b>two</b>', 'SPACEthree']
+            // But, Laravel's TrimStrings middleware would remove them.
+            // Those spaces need to be there, otherwise it would be rendered as <p>One<b>two</b>three</p>
+            // To combat this, we submit the JSON string instead of an object.
             this.updateDebounced(JSON.stringify(json));
         },
 
@@ -318,14 +383,19 @@ export default {
                 meta.previews = value;
                 this.updateMeta(meta);
             }
-        }
+        },
+
+        fieldPathPrefix(fieldPathPrefix, oldFieldPathPrefix) {
+            this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, oldFieldPathPrefix);
+            this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+        },
 
     },
 
     methods: {
 
         addSet(handle) {
-            const id = `set-${uniqid()}`;
+            const id = uniqid();
             const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
 
             let previews = {};
@@ -340,6 +410,22 @@ export default {
             });
         },
 
+        duplicateSet(old_id, attrs, pos) {
+            const id = uniqid();
+            const enabled = attrs.enabled;
+            const values = Object.assign({}, attrs.values);
+
+            let previews = Object.assign({}, this.previews[old_id]);
+            this.previews = Object.assign({}, this.previews, { [id]: previews });
+
+            this.updateSetMeta(id, this.meta.existing[old_id]);
+
+            // Perform this in nextTick because the meta data won't be ready until then.
+            this.$nextTick(() => {
+                this.editor.commands.setAt({ attrs: { id, enabled, values }, pos });
+            });
+        },
+
         collapseSet(id) {
             if (!this.collapsed.includes(id)) {
                 this.collapsed.push(id)
@@ -347,6 +433,11 @@ export default {
         },
 
         expandSet(id) {
+            if (this.config.collapse === 'accordion') {
+                this.collapsed = Object.keys(this.meta.existing).filter(v => v !== id);
+                return;
+            }
+            
             if (this.collapsed.includes(id)) {
                 var index = this.collapsed.indexOf(id);
                 this.collapsed.splice(index, 1);
@@ -492,6 +583,7 @@ export default {
             if (btns.includes('bold')) exts.push(new Bold());
             if (btns.includes('italic')) exts.push(new Italic());
             if (btns.includes('strikethrough')) exts.push(new Strike());
+            if (btns.includes('small')) exts.push(new Small());
             if (btns.includes('underline')) exts.push(new Underline());
             if (btns.includes('subscript')) exts.push(new Subscript());
             if (btns.includes('superscript')) exts.push(new Superscript());

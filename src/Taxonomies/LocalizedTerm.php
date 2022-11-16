@@ -2,21 +2,26 @@
 
 namespace Statamic\Taxonomies;
 
-use Facades\Statamic\View\Cascade;
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Data\TracksQueriedRelations;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\GraphQL\ResolvesValues;
@@ -24,10 +29,19 @@ use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 
-class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, ResolvesValuesContract
+class LocalizedTerm implements
+    Term,
+    Responsable,
+    Augmentable,
+    Protectable,
+    ResolvesValuesContract,
+    ArrayAccess,
+    Arrayable,
+    ContainsQueryableValues
 {
-    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified, ContainsSupplementalData, ResolvesValues;
+    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, ContainsSupplementalData, ResolvesValues;
 
     protected $locale;
     protected $term;
@@ -87,8 +101,11 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
 
     public function value($key)
     {
-        return $this->get($key)
-            ?? $this->inDefaultLocale()->get($key)
+        if ($this->data()->has($key)) {
+            return $this->get($key);
+        }
+
+        return $this->inDefaultLocale()->get($key)
             ?? $this->taxonomy()->cascade($key);
     }
 
@@ -329,7 +346,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
         $route = '/'.str_replace('_', '-', $this->taxonomyHandle()).'/{slug}';
 
         if ($this->collection()) {
-            $collectionUrl = $this->collection()->url() ?? $this->collection()->handle();
+            $collectionUrl = $this->collection()->uri($this->locale()) ?? $this->collection()->handle();
             $route = $collectionUrl.$route;
         }
 
@@ -356,15 +373,6 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
         }
 
         return (new DataResponse($this))->toResponse($request);
-    }
-
-    public function toLivePreviewResponse($request, $extras)
-    {
-        Cascade::hydrated(function ($cascade) use ($extras) {
-            $cascade->set('live_preview', $extras);
-        });
-
-        return $this->toResponse($request);
     }
 
     public function template($template = null)
@@ -435,9 +443,14 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
         return $this->selectedQueryColumns;
     }
 
-    protected function shallowAugmentedArrayKeys()
+    public function shallowAugmentedArrayKeys()
     {
         return ['id', 'title', 'slug', 'url', 'permalink', 'api_url'];
+    }
+
+    protected function defaultAugmentedRelations()
+    {
+        return $this->selectedQueryRelations;
     }
 
     public function lastModified()
@@ -460,5 +473,47 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
     public function fresh()
     {
         return Facades\Term::find($this->id())->in($this->locale);
+    }
+
+    public function previewTargets()
+    {
+        return $this->taxonomy()->previewTargets()->map(function ($target) {
+            return [
+                'label' => $target['label'],
+                'format' => $target['format'],
+                'url' => $this->resolvePreviewTargetUrl($target['format']),
+            ];
+        });
+    }
+
+    private function resolvePreviewTargetUrl($format)
+    {
+        if (! Str::contains($format, '{{')) {
+            $format = preg_replace_callback('/{\s*([a-zA-Z0-9_\-\:\.]+)\s*}/', function ($match) {
+                return "{{ {$match[1]} }}";
+            }, $format);
+        }
+
+        return (string) Antlers::parse($format, $this->augmented()->all());
+    }
+
+    public function repository()
+    {
+        return app(TermRepository::class);
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (method_exists($this, $method = Str::camel($field))) {
+            return $this->{$method}();
+        }
+
+        $value = $this->value($field);
+
+        if (! $field = $this->blueprint()->field($field)) {
+            return $value;
+        }
+
+        return $field->fieldtype()->toQueryableValue($value);
     }
 }
