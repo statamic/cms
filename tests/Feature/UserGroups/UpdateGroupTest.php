@@ -73,7 +73,7 @@ class UpdateGroupTest extends TestCase
                 'handle' => 'changed',
             ])
             ->assertOk()
-            ->assertJson(['redirect' => cp_route('user-groups.show', 'changed')]);
+            ->assertJson(['title' => 'Updated']);
 
         $this->assertNull(UserGroup::find('test'));
         $group = UserGroup::find('changed');
@@ -100,7 +100,7 @@ class UpdateGroupTest extends TestCase
                 'roles' => ['one', 'three'],
             ])
             ->assertOk()
-            ->assertJson(['redirect' => cp_route('user-groups.show', 'test')]);
+            ->assertJson(['title' => 'Test']);
 
         $group = UserGroup::find('test');
         $this->assertEquals([
@@ -125,7 +125,7 @@ class UpdateGroupTest extends TestCase
                 'roles' => ['one', 'three'],
             ])
             ->assertOk()
-            ->assertJson(['redirect' => cp_route('user-groups.show', 'test')]);
+            ->assertJson(['title' => 'Test']);
 
         $group = UserGroup::find('test');
         $this->assertEquals([
