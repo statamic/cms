@@ -146,7 +146,7 @@ class UserGroupsController extends CpController
 
         $group = UserGroup::make()
             ->title($request->title)
-            ->data($values);
+            ->data($values)
             ->handle($request->handle ?: snake_case($request->title));
 
         if (User::current()->can('assign roles')) {
