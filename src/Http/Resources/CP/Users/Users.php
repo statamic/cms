@@ -52,8 +52,7 @@ class Users extends ResourceCollection
         }
 
         // Append last login column
-        $columns->put(
-            'last_login',
+        $columns->put('last_login',
             Column::make('last_login')
                 ->label(__('Last Login'))
                 ->sortable(false)
