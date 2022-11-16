@@ -66,7 +66,7 @@ class Terms extends ResourceCollection
     {
         return [
             'meta' => [
-                 'columns' => $this->visibleColumns(),
+                'columns' => $this->visibleColumns(),
             ],
         ];
     }
