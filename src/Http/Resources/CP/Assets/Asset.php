@@ -10,55 +10,55 @@ class Asset extends JsonResource
 {
     public function toArray($request)
     {
-        return [
-            'data' => [
-                'id' => $this->id(),
-                'path' => $this->path(),
-                'filename' => $this->filename(),
-                'basename' => $this->basename(),
-                'url' => $this->url(),
-                'reference' => $this->reference(),
-                'permalink' => $this->absoluteUrl(),
-                'extension' => $this->extension(),
-                'downloadUrl' => cp_route('assets.download', base64_encode($this->id())),
-                'size' => Str::fileSizeForHumans($this->size()),
-                'lastModified' => $this->lastModified()->inPreferredFormat(),
-                'lastModifiedRelative' => $this->lastModified()->diffForHumans(),
-                'isImage' => $this->isImage(),
-                'isSvg' => $this->isSvg(),
-                'isAudio' => $this->isAudio(),
-                'isVideo' => $this->isVideo(),
-                'isMedia' => $this->isMedia(),
-                'isPdf' => $this->isPdf(),
-                'isPreviewable' => $this->isPreviewable(),
+        $data = [
+            'id' => $this->id(),
+            'path' => $this->path(),
+            'filename' => $this->filename(),
+            'basename' => $this->basename(),
+            'url' => $this->url(),
+            'reference' => $this->reference(),
+            'permalink' => $this->absoluteUrl(),
+            'extension' => $this->extension(),
+            'downloadUrl' => cp_route('assets.download', base64_encode($this->id())),
+            'size' => Str::fileSizeForHumans($this->size()),
+            'lastModified' => $this->lastModified()->inPreferredFormat(),
+            'lastModifiedRelative' => $this->lastModified()->diffForHumans(),
+            'isImage' => $this->isImage(),
+            'isSvg' => $this->isSvg(),
+            'isAudio' => $this->isAudio(),
+            'isVideo' => $this->isVideo(),
+            'isMedia' => $this->isMedia(),
+            'isPdf' => $this->isPdf(),
+            'isPreviewable' => $this->isPreviewable(),
 
-                $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
-                    return [
-                        'width' => $this->width(),
-                        'height' => $this->height(),
-                        'preview' => $this->previewUrl(),
-                        'thumbnail' => $this->thumbnailUrl('small'),
-                    ];
-                }),
+            $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
+                return [
+                    'width' => $this->width(),
+                    'height' => $this->height(),
+                    'preview' => $this->previewUrl(),
+                    'thumbnail' => $this->thumbnailUrl('small'),
+                ];
+            }),
 
-                $this->mergeWhen($this->isPdf(), function () {
-                    return [
-                        'pdfUrl' => $this->pdfUrl(),
-                    ];
-                }),
+            $this->mergeWhen($this->isPdf(), function () {
+                return [
+                    'pdfUrl' => $this->pdfUrl(),
+                ];
+            }),
 
-                $this->merge($this->publishFormData()),
+            $this->merge($this->publishFormData()),
 
-                'allowDownloading' => $this->container()->allowDownloading(),
-                'actionUrl' => cp_route('assets.actions.run'),
-                'actions' => Action::for($this->resource, [
-                    'container' => $this->container()->handle(),
-                    'folder' => $this->folder(),
-                ]),
+            'allowDownloading' => $this->container()->allowDownloading(),
+            'actionUrl' => cp_route('assets.actions.run'),
+            'actions' => Action::for($this->resource, [
+                'container' => $this->container()->handle(),
+                'folder' => $this->folder(),
+            ]),
 
-                'blueprint' => $this->blueprint()->toPublishArray(),
-            ]
+            'blueprint' => $this->blueprint()->toPublishArray(),
         ];
+
+        return ['data' => $data];
     }
 
     protected function previewUrl()
