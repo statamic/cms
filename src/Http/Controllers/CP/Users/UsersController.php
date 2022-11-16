@@ -102,6 +102,7 @@ class UsersController extends CpController
             ],
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
+            'canSendInvitation' => config('statamic.users.wizard_invitation'),
         ];
 
         if ($request->wantsJson()) {

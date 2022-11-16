@@ -1,6 +1,6 @@
 <template>
     <div class="max-w-xl mx-auto rounded shadow bg-white">
-        <div class="max-w-lg mx-auto pt-6 relative">
+        <div v-if="steps.length > 1" class="max-w-lg mx-auto pt-6 relative">
             <div class="wizard-steps">
                 <a class="step" :class="{'complete': currentStep >= index}" v-for="(step, index) in steps" @click="goToStep(index)">
                     <div class="ball">{{ index+1 }}</div>
@@ -9,8 +9,8 @@
             </div>
         </div>
 
-        <!-- Step 1 -->
-        <div v-if="!completed && currentStep === 0">
+        <!-- Step: User Info -->
+        <div v-if="!completed && onUserInfoStep">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Create User') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_intro')" />
@@ -58,8 +58,8 @@
             </div>
         </div>
 
-        <!-- Step 2 -->
-        <div v-if="!completed && currentStep === 1" class="max-w-md mx-auto px-2 pb-2">
+        <!-- Step: Roles & Groups -->
+        <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-2 pb-2">
             <div class="py-6 text-center">
                 <h1 class="mb-3">{{ __('Roles & Groups') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_roles_groups_intro')" />
@@ -114,8 +114,8 @@
             </div>
         </div>
 
-        <!-- Step 3 -->
-        <div v-if="!completed && currentStep === 2">
+        <!-- Step: Invitation -->
+        <div v-if="!completed && onInvitationStep">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Invitation') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_invitation_intro')" />
@@ -159,13 +159,16 @@
             </div>
 
             <!-- Copy Pasta -->
-            <div class="max-w-md mx-auto px-2 pb-7">
+            <div class="max-w-md mx-auto px-2 pb-5">
                 <p class="mb-1" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
-                <textarea readonly class="input-text" v-elastic onclick="this.select()">
-{{ __('Activation URL') }}: {{ activationUrl }}
-
-{{ __('Username') }}: {{ user.email }}
-</textarea>
+            </div>
+            <div class="max-w-md mx-auto px-2 pb-5">
+                <label class="font-bold text-base mb-sm" for="email">{{ __('Activation URL') }}</label>
+                <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" />
+            </div>
+            <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm" for="email">{{ __('Email Address') }}</label>
+                <input type="text" readonly class="input-text" onclick="this.select()" :value="user.email" />
             </div>
         </div>
 
@@ -210,11 +213,11 @@ export default {
         canAssignGroups: { type: Boolean },
         activationExpiry: { type: Number },
         separateNameFields: { type: Boolean },
+        canSendInvitation: { type: Boolean },
     },
 
     data() {
         return {
-            steps: [__('User Information'), __('Roles & Groups'), __('Customize Invitation')],
             user: {
                 email: null,
                 super: this.canCreateSupers,
@@ -222,7 +225,7 @@ export default {
                 groups: []
             },
             invitation: {
-                send: true,
+                send: this.canSendInvitation,
                 subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
                 message: __('messages.user_wizard_invitation_body', { site: window.location.hostname, expiry: this.activationExpiry }),
             },
@@ -234,6 +237,25 @@ export default {
     },
 
     computed: {
+        steps() {
+            let steps = [__('User Information')];
+            if (this.canAssignPermissions) steps.push(__('Roles & Groups'));
+            if (this.canSendInvitation) steps.push(__('Customize Invitation'));
+
+            return steps;
+        },
+        canAssignPermissions() {
+            return this.canAssignRoles || this.canAssignGroups;
+        },
+        onUserInfoStep() {
+            return this.onFirstStep;
+        },
+        onPermissionStep() {
+            return this.canAssignPermissions ? this.currentStep === 1 : false;
+        },
+        onInvitationStep() {
+            return this.canAssignPermissions ? this.currentStep === 2 : this.currentStep === 1;
+        },
         finishButtonText() {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
         },
