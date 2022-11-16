@@ -14,7 +14,7 @@ class Number extends FieldtypeFilter
                 'placeholder' => __('Select Operator'),
                 'options' => [
                     '=' => __('Equals'),
-                    '<>' => __('Doesn\'t equal'),
+                    '<>' => __('Not equals'),
                     '>' => __('Greater than'),
                     '>=' => __('Greater than or equals'),
                     '<' => __('Less than'),
