@@ -1,5 +1,23 @@
 # Release Notes
 
+## 3.3.56 (2022-11-14)
+
+### What's new
+- Split permissions for assigning roles/groups and editing them. [#6614](https://github.com/statamic/cms/issues/6614) by @ryanmitchell
+- User creation wizard can have the email step disabled. [#7062](https://github.com/statamic/cms/issues/7062) by @jasonvarga
+- Allow filtering by blueprints in `entries` fieldtype. [#7047](https://github.com/statamic/cms/issues/7047) by @FrittenKeeZ
+
+### What's improved
+- Dutch Translations [#7053](https://github.com/statamic/cms/issues/7053) by @oakeddev
+
+### What's fixed
+- Fix grid table header position inside stacks. [#7061](https://github.com/statamic/cms/issues/7061) by @jackmcdade
+- Fix empty template fieldtype dropdown style. [#7060](https://github.com/statamic/cms/issues/7060) by @jackmcdade
+- Fix lowercasing of asset folder names to match user's configuration. [#7055](https://github.com/statamic/cms/issues/7055) by @jesseleite
+- Make sure SVGs are rendered in collection listing. [#7059](https://github.com/statamic/cms/issues/7059) by @jackmcdade
+
+
+
 ## 3.3.55 (2022-11-14)
 
 ### What's new
