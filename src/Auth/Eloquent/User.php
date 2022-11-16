@@ -284,11 +284,6 @@ class User extends BaseUser
         return is_null($value) ? $default : $value;
     }
 
-    public function value($key)
-    {
-        return $this->get($key);
-    }
-
     public function set($key, $value)
     {
         if ($key === 'password') {
@@ -328,7 +323,7 @@ class User extends BaseUser
             return null;
         }
 
-        return Carbon::createFromFormat($this->model()->getDateFormat(), $date);
+        return $date instanceof Carbon ? $date : Carbon::createFromFormat($this->model()->getDateFormat(), $date);
     }
 
     public function setLastLogin($time)

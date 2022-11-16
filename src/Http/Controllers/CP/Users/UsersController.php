@@ -7,6 +7,7 @@ use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
+use Statamic\Facades\Search;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
@@ -44,6 +45,10 @@ class UsersController extends CpController
         $query = User::query();
 
         if ($search = request('search')) {
+            if (Search::indexes()->has('users')) {
+                return Search::index('users')->ensureExists()->search($search);
+            }
+
             $query->where('email', 'like', '%'.$search.'%')->orWhere('name', 'like', '%'.$search.'%');
         }
 
@@ -123,15 +128,15 @@ class UsersController extends CpController
             ->email($request->email)
             ->data($values);
 
-        if ($request->roles && User::current()->can('edit roles')) {
+        if ($request->roles && User::current()->can('assign roles')) {
             $user->roles($request->roles);
         }
 
-        if ($request->groups && User::current()->can('edit user groups')) {
+        if ($request->groups && User::current()->can('assign user groups')) {
             $user->groups($request->groups);
         }
 
-        if ($request->super && User::current()->can('edit roles')) {
+        if ($request->super && User::current()->isSuper()) {
             $user->makeSuper();
         }
 
@@ -162,19 +167,23 @@ class UsersController extends CpController
 
         $blueprint = $user->blueprint();
 
-        if (! User::current()->can('edit roles')) {
+        if (! User::current()->can('assign roles')) {
             $blueprint->ensureField('roles', ['visibility' => 'read_only']);
         }
 
-        if (! User::current()->can('edit user groups')) {
+        if (! User::current()->can('assign user groups')) {
             $blueprint->ensureField('groups', ['visibility' => 'read_only']);
         }
+
+        $values = $user->data()
+            ->merge($user->computedData())
+            ->merge(['email' => $user->email()]);
 
         $fields = $blueprint
             ->removeField('password')
             ->removeField('password_confirmation')
             ->fields()
-            ->addValues($user->data()->merge(['email' => $user->email()])->all())
+            ->addValues($values->all())
             ->preProcess();
 
         $viewData = [
@@ -215,11 +224,11 @@ class UsersController extends CpController
         }
         $user->email($request->email);
 
-        if (User::current()->can('edit roles')) {
+        if (User::current()->can('assign roles')) {
             $user->roles($request->roles);
         }
 
-        if (User::current()->can('edit user groups')) {
+        if (User::current()->can('assign user groups')) {
             $user->groups($request->groups);
         }
 

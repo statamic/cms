@@ -20,6 +20,7 @@
         "league/commonmark": "^1.5 || ^2.2",
         "league/csv": "^9.0",
         "league/glide": "^1.1 || ^2.0",
+        "maennchen/zipstream-php": "^2.2",
         "michelf/php-smartypants": "^1.8.1",
         "pixelfear/composer-dist-plugin": "^0.1.4",
         "rebing/graphql-laravel": "^6.5 || ^8.0",
@@ -38,7 +39,7 @@
         "fakerphp/faker": "~1.10",
         "google/cloud-translate": "^1.6",
         "mockery/mockery": "^1.2.3",
-        "orchestra/testbench": "^6.7.0 || ^7.0"
+        "orchestra/testbench": "^6.18 || ^7.0"
     },
     "config": {
         "optimize-autoloader": true,

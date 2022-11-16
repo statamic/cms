@@ -7,7 +7,9 @@
         route="{{ cp_route('users.store') }}"
         users-index-url="{{ cp_route('users.index') }}"
         users-create-url="{{ cp_route('users.create') }}"
-        :can-create-supers="{{ $str::bool($user->can('super')) }}"
+        :can-create-supers="{{ $str::bool($user->isSuper()) }}"
+        :can-assign-roles="{{ $str::bool($user->can('assign roles')) }}"
+        :can-assign-groups="{{ $str::bool($user->can('assign user groups')) }}"
         :activation-expiry="{{ $expiry }}"
         :separate-name-fields="{{ $str::bool($separateNameFields) }}"
     >
