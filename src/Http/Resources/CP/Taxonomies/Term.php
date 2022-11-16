@@ -9,10 +9,12 @@ class Term extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->resource->id(),
-            'title' => $this->resource->value('title'),
-            'permalink' => $this->resource->absoluteUrl(),
-            'edit_url' => $this->resource->editUrl(),
+            'data' => [
+                'id' => $this->resource->id(),
+                'title' => $this->resource->value('title'),
+                'permalink' => $this->resource->absoluteUrl(),
+                'edit_url' => $this->resource->editUrl(),
+            ]
         ];
     }
 }
