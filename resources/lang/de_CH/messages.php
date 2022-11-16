@@ -167,7 +167,7 @@ return [
     'reset_password_notification_body' => 'Du bekommst dieses E-Mail, weil wir für dein Konto eine Anfrage zum Zurücksetzen des Passworts erhalten haben.',
     'reset_password_notification_no_action' => 'Sollte die Anfrage zum Zurücksetzen des Passworts nicht von dir stammen, sind keine weiteren Massnahmen erforderlich.',
     'reset_password_notification_subject' => 'Passwort zurücksetzen',
-    'role_change_handle_warning' => 'Durch das Ändern des Handle werden Verweise darauf in Benutzern und Gruppen nicht aktualisiert.',
+    'role_change_handle_warning' => 'Durch das Ändern des Handle werden Verweise darauf bei Benutzer:innen und Gruppen nicht aktualisiert.',
     'role_handle_instructions' => 'Verweist im Frontend auf diese Rolle. Es ist nicht unproblematisch, dies nachträglich zu ändern.',
     'role_intro' => 'Rollen sind Gruppen von Zugriffs- und Aktionsberechtigungen, die Benutzer:innen und Benutzergruppen zugewiesen werden können.',
     'role_title_instructions' => 'Gewöhnlich ein einzelnes Substantiv, wie Autor:in oder Admin.',
