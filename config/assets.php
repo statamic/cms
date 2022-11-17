@@ -70,6 +70,19 @@ return [
             // 'small' => ['w' => 200, 'h' => 200, 'q' => 75, 'fit' => 'crop'],
         ],
 
+        /*
+        |--------------------------------------------------------------------------
+        | Generate Image Manipulation Presets on upload
+        |--------------------------------------------------------------------------
+        |
+        | By default presets will be automatically generated on upload, ensuring the
+        | cached image is already available on the first page load with the asset.
+        | You can turn off this behaviour (for example if you have a lot of presets and
+        | not all should be applied to every asset).
+        |
+        */
+        'generate_presets_on_upload' => true,
+
     ],
 
     /*
