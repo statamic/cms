@@ -65,6 +65,7 @@ return [
     'collections_taxonomies_instructions' => 'Reliez les entrées de cette collection à des taxonomies. Les champs seront automatiquement ajoutés aux formulaires.',
     'email_utility_configuration_description' => 'Les paramètres de messagerie sont configurés dans <code>:path</code>',
     'email_utility_description' => 'Vérifiez les paramètres de messagerie et envoyez des e-mails de test.',
+    'entry_origin_instructions' => 'La nouvelle traduction héritera des valeurs qu’a l’entrée dans le site sélectionné.',
     'expect_root_instructions' => 'Considérer la première page de l’arborescence comme une page "racine" ou "d’accueil".',
     'field_conditions_instructions' => 'Quand afficher ou masquer ce champ.',
     'field_desynced_from_origin' => 'Désynchronisé de l’origine. Cliquez pour synchroniser et revenir à la valeur d’origine.',
