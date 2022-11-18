@@ -1,5 +1,72 @@
 # Release Notes
 
+## 3.3.56 (2022-11-14)
+
+### What's new
+- Split permissions for assigning roles/groups and editing them. [#6614](https://github.com/statamic/cms/issues/6614) by @ryanmitchell
+- User creation wizard can have the email step disabled. [#7062](https://github.com/statamic/cms/issues/7062) by @jasonvarga
+- Allow filtering by blueprints in `entries` fieldtype. [#7047](https://github.com/statamic/cms/issues/7047) by @FrittenKeeZ
+
+### What's improved
+- Dutch Translations [#7053](https://github.com/statamic/cms/issues/7053) by @oakeddev
+
+### What's fixed
+- Fix grid table header position inside stacks. [#7061](https://github.com/statamic/cms/issues/7061) by @jackmcdade
+- Fix empty template fieldtype dropdown style. [#7060](https://github.com/statamic/cms/issues/7060) by @jackmcdade
+- Fix lowercasing of asset folder names to match user's configuration. [#7055](https://github.com/statamic/cms/issues/7055) by @jesseleite
+- Make sure SVGs are rendered in collection listing. [#7059](https://github.com/statamic/cms/issues/7059) by @jackmcdade
+
+
+
+## 3.3.55 (2022-11-14)
+
+### What's new
+- Support custom date formats in route definitions. [#7043](https://github.com/statamic/cms/issues/7043) by @bencarr
+
+### What's improved
+- Better widget card wrapping on small screens. [#7036](https://github.com/statamic/cms/issues/7036) by @jackmcdade
+- Add an icon to the form widget. [#7034](https://github.com/statamic/cms/issues/7034) by @jackmcdade
+
+### What's fixed
+- Fix namespaced view paths not being reset correctly. [#7051](https://github.com/statamic/cms/issues/7051) by @jasonvarga
+- Use translation for 'All'. [#7040](https://github.com/statamic/cms/issues/7040) by @jasonvarga
+
+
+
+## 3.3.54 (2022-11-09)
+
+### What's improved
+- Support Query Builder values in reverse modifier [#7006](https://github.com/statamic/cms/issues/7006) by @stvnthomas
+
+### What's fixed
+- Fix root page validation error logic [#7028](https://github.com/statamic/cms/issues/7028) by @jasonvarga
+- Fix handling of last_login when being cast to a Carbon instance on the User model. [#7009](https://github.com/statamic/cms/issues/7009) by @dannydinges
+- Reset additional view paths after request. [#7030](https://github.com/statamic/cms/issues/7030) by @jasonvarga
+
+
+
+## 3.3.53 (2022-11-08)
+
+### What's improved
+- German translations. [#7013](https://github.com/statamic/cms/issues/7013) by @helloDanuk
+- French translations [#7008](https://github.com/statamic/cms/issues/7008) by @ebeauchamps
+
+### What's fixed
+- Fix `parent` and `updated_by` fields not being shallow augmented in API, sometimes causing recursion. [#7025](https://github.com/statamic/cms/issues/7025) by @jasonvarga
+- Fix a couple of "root page cannot have children" issues. [#7007](https://github.com/statamic/cms/issues/7007) by @jasonvarga
+- Fix failing test due to orchestra/testbench update. [#7017](https://github.com/statamic/cms/issues/7017) by @jasonvarga
+
+
+
+## 3.3.52 (2022-11-04)
+
+### What's fixed
+- Add missing validation for `id` being a reserved field handle. [#7005](https://github.com/statamic/cms/issues/7005) by @jasonvarga
+- Fix Replicator/Grid/Bard not displaying newly added items after saving. [#7000](https://github.com/statamic/cms/issues/7000) by @jasonvarga
+- Reset asset pagination when moving to another folder or container. [#6997](https://github.com/statamic/cms/issues/6997) by @jasonvarga
+
+
+
 ## 3.3.51 (2022-11-02)
 
 ### What's new

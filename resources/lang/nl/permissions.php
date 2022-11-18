@@ -64,6 +64,8 @@ return [
     'change_passwords' => 'Wijzig wachtwoorden',
     'edit_user_groups' => 'Wijzig groepen',
     'edit_roles' => 'Wijzig rollen',
+    'assign_user_groups' => 'Groepen toekennen aan gebruikers',
+    'assign_roles' => 'Rollen toekennen aan gebruikers',
     'group_updates' => 'Updates',
     'view_updates' => 'Bekijk updates',
     'perform_updates' => 'Voer updates uit',

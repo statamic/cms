@@ -26,7 +26,9 @@ class FoldersController extends CpController
             ]);
         }
 
-        $path = strtolower($path); // Prevent case sensitivity collisions
+        if (config('statamic.assets.lowercase')) {
+            $path = strtolower($path);
+        }
 
         return $container->assetFolder($path)->save();
     }

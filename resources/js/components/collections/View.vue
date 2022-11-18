@@ -96,6 +96,7 @@
             :reordering="reordering"
             :reorder-url="reorderUrl"
             :site="site"
+            :expects-root="structureExpectsRoot"
             @reordered="reordering = false"
             @site-changed="site = $event"
         />

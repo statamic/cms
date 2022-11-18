@@ -909,6 +909,12 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         return $this->disk()->filesystem()->readStream($this->path());
     }
 
+    /**
+     * Ensure safe filename string.
+     *
+     * @param  string  $string
+     * @return string
+     */
     private function getSafeFilename($string)
     {
         $replacements = [

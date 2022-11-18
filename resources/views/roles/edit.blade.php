@@ -6,6 +6,7 @@
     <role-publish-form
         action="{{ cp_route('roles.update', $role->handle()) }}"
         method="patch"
+        :can-assign-super="{{ Statamic\Support\Str::bool($user->isSuper()) }}"
         initial-title="{{ $role->title() }}"
         initial-handle="{{ $role->handle() }}"
         :initial-super="{{ Statamic\Support\Str::bool($super) }}"
