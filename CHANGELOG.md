@@ -1,5 +1,20 @@
 # Release Notes
 
+## 3.3.57 (2022-11-18)
+
+### What's new
+- Ability to add namespaced fieldsets. [#6588](https://github.com/statamic/cms/issues/6588) by @jasonvarga
+
+### What's improved
+- German translations. [#7074](https://github.com/statamic/cms/issues/7074) by @helloDanuk
+- French translations. [#7084](https://github.com/statamic/cms/issues/7084) by @ebeauchamps
+- Dutch translations. [#7073](https://github.com/statamic/cms/issues/7073) by @oakeddev
+
+### What's fixed
+- Fix root page for max depth 1. [#4895](https://github.com/statamic/cms/issues/4895) by @jelleroorda
+
+
+
 ## 3.3.56 (2022-11-14)
 
 ### What's new
