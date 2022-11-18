@@ -52,9 +52,12 @@ class Delete extends Action
     public function run($items, $values)
     {
         $items->each->delete();
+    }
 
-        if ($this->context['edit'] ?? false) {
-            return ['back' => true];
+    public function redirect($items, $values)
+    {
+        if ($this->context['view'] === 'publishForm') {
+            return cp_route('collections.show', $items->first()->collection()->handle());
         }
     }
 }

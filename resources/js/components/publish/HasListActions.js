@@ -21,19 +21,8 @@ export default {
                 this.$toast.success(response.message || __("Action completed"));
             }
 
-            if (response.back) {
-                this.$toast.success(__("Redirecting…"));
-                setTimeout(() => {
-                    window.location.href = this.listingUrl;
-                }, 1000);
-            }
-
-            // this.afterActionSuccessfullyCompleted();
+            this.afterListActionSuccessfullyCompleted(response);
         },
-
-        // afterActionSuccessfullyCompleted() {
-        //     this.request();
-        // }
 
     }
 

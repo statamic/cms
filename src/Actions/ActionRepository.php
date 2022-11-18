@@ -22,6 +22,8 @@ class ActionRepository
 
     public function for($item, $context = [])
     {
+        $context = $context + ['view' => 'listing'];
+
         return $this->all()
             ->each->context($context)
             ->filter->visibleTo($item)
@@ -31,6 +33,8 @@ class ActionRepository
 
     public function forBulk($items, $context = [])
     {
+        $context = $context + ['view' => 'listing'];
+
         return $this->all()
             ->each->context($context)
             ->filter->visibleToBulk($items)

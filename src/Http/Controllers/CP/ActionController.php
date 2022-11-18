@@ -42,10 +42,16 @@ abstract class ActionController extends CpController
         }
 
         if (is_string($response)) {
-            return ['message' => $response];
+            $response = ['message' => $response];
         }
 
-        return $response ?: [];
+        $response = $response ?: [];
+
+        if ($context['view'] === 'publishForm') {
+            $response['data'] = $this->getItemData($items->first());
+        }
+
+        return $response;
     }
 
     public function bulkActions(Request $request)
@@ -63,4 +69,9 @@ abstract class ActionController extends CpController
     }
 
     abstract protected function getSelectedItems($items, $context);
+
+    protected function getItemData($item)
+    {
+        return [];
+    }
 }

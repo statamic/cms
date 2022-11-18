@@ -34,7 +34,7 @@
         create-another-url="{{ cp_route('collections.entries.create', [$collection, $locale]) }}"
         listing-url="{{ cp_route('collections.show', $collection) }}"
         :preview-targets="{{ json_encode($previewTargets) }}"
-        :list-actions="{{ json_encode($listActions) }}"
+        :initial-list-actions="{{ json_encode($listActions) }}"
         list-action-url="{{ cp_route('collections.entries.actions.run', $collection) }}"
     ></entry-publish-form>
 

@@ -314,13 +314,14 @@ export default {
         listingUrl: String,
         collectionHasRoutes: Boolean,
         previewTargets: Array,
-        listActions: Array,
+        initialListActions: Array,
         listActionUrl: String,
     },
 
     data() {
         return {
             actions: this.initialActions,
+            listActions: this.initialListActions,
             saving: false,
             localizing: false,
             fieldset: this.initialFieldset,
@@ -444,6 +445,11 @@ export default {
     },
 
     methods: {
+
+        afterListActionSuccessfullyCompleted(response) {
+            this.values = { ...this.values, ...response.data.values };
+            this.listActions = response.data.listActions;
+        },
 
         clearErrors() {
             this.error = null;
