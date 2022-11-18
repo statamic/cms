@@ -539,7 +539,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         Statamic::externalStyle($url);
     }
 
-    protected function schedule($schedule)
+    protected function schedule(Schedule $schedule)
     {
         //
     }
