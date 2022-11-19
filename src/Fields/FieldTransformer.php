@@ -31,8 +31,11 @@ class FieldTransformer
             unset($field['width']);
         }
 
+        $sites = config('statamic.sites.sites');
+        $multisite = count($sites) > 1;
+
         if (Arr::get($field, 'localizable', false) === false) {
-            unset($field['localizable']);
+            if (!$multisite) unset($field['localizable']);
         }
 
         return array_filter([
