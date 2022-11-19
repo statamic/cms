@@ -47,8 +47,8 @@ abstract class ActionController extends CpController
 
         $response = $response ?: [];
 
-        if ($context['view'] === 'publishForm') {
-            $response['data'] = $this->getItemData($items->first());
+        if (array_get($context, 'publish_form', false)) {
+            $response['data'] = $this->getItemData($items->first(), $context);
         }
 
         return $response;
@@ -70,7 +70,8 @@ abstract class ActionController extends CpController
 
     abstract protected function getSelectedItems($items, $context);
 
-    protected function getItemData($item)
+    // Should be abstract, todo
+    protected function getItemData($item, $context)
     {
         return [];
     }

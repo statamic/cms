@@ -56,8 +56,11 @@ class Delete extends Action
 
     public function redirect($items, $values)
     {
-        if ($this->context['view'] === 'publishForm') {
-            return cp_route('collections.show', $items->first()->collection()->handle());
+        if (! array_get($this->context, 'publish_form', false)) {
+            return;
         }
+
+        // Also need to handle terms etc, todo
+        return cp_route('collections.show', $items->first()->collection()->handle());
     }
 }

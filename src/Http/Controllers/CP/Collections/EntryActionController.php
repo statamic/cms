@@ -15,7 +15,7 @@ class EntryActionController extends ActionController
         });
     }
 
-    protected function getItemData($entry)
+    protected function getItemData($entry, $context)
     {
         $collection = $entry->collection();
 
@@ -25,7 +25,7 @@ class EntryActionController extends ActionController
 
         return [
             'values' => $values,
-            'listActions' => Action::for($entry, ['collection' => $collection->handle(), 'view' => 'publishForm']),
+            'listActions' => Action::for($entry, $context),
         ];
     }
 
