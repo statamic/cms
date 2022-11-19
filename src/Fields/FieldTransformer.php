@@ -35,7 +35,9 @@ class FieldTransformer
         $multisite = count($sites) > 1;
 
         if (Arr::get($field, 'localizable', false) === false) {
-            if (!$multisite) unset($field['localizable']);
+            if (! $multisite) {
+                unset($field['localizable']);
+            }
         }
 
         return array_filter([
