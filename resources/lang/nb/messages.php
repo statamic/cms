@@ -157,7 +157,7 @@ return [
     'password_protect_enter_password' => 'Oppgi passord for å låse opp',
     'password_protect_incorrect_password' => 'Feil passord.',
     'password_protect_token_invalid' => 'Ugyldig eller utløpt token.',
-    'password_protect_token_missing' => 'Sikkerhetsnøkkel mangler. Du må kommer til denne skjermen via den opprinnelige, beskyttede URL-en.',
+    'password_protect_token_missing' => 'Sikkerhetsnøkkel mangler. Du må komme til denne skjermen via den opprinnelige, beskyttede URL-en.',
     'phpinfo_utility_description' => 'Kontroller PHP-konfigurasjonsinnstillinger og installerte moduler.',
     'publish_actions_create_revision' => 'En revisjon opprettes basert på arbeidskopien. Den gjeldende revisjonen endres ikke.',
     'publish_actions_current_becomes_draft_because_scheduled' => 'Siden den gjeldende revisjonen er publisert og du har valgt en dato i fremtiden, vil revisjonen fungere som en kladd frem til valgt dato etter innsendelse.',
