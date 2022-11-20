@@ -131,6 +131,8 @@ return [
     'unique_uri' => 'Denne URI-en er allerede brukt.',
     'duplicate_uri' => 'Duplikat-URI :value',
     'reserved' => 'Dette er et reservert ord.',
+    'parent_causes_root_children' => 'Dette vil føre til at rot-nivå kan ha undersider.',
+    'parent_cannot_be_itself' => 'Kan ikke være ens egen forelder.',
 
     /*
     |--------------------------------------------------------------------------
