@@ -1,5 +1,23 @@
 # Release Notes
 
+## 3.3.58 (2022-11-21)
+
+### What's new
+- Ability to disable generating asset preset manipulations on upload. [#7076](https://github.com/statamic/cms/issues/7076) by @ryanmitchell
+
+### What's improved
+- Norwegian translations. [#7092](https://github.com/statamic/cms/issues/7092) by @espenlg
+
+### What's fixed
+- Prevent error in Static Caching middleware when using JSON responses. [#7075](https://github.com/statamic/cms/issues/7075) by @FrittenKeeZ
+- Prevent dates being added to localized entries in non-dated collections. [#7086](https://github.com/statamic/cms/issues/7086) by @tao
+- Support for JsonResource::withoutWrapping. [#7072](https://github.com/statamic/cms/issues/7072) by @jhhazelaar
+- Prevent error in form route binding when customizing action route. [#7083](https://github.com/statamic/cms/issues/7083) by @julesjanssen
+- Fix incorrect home icon and slug in entry listings. [#7095](https://github.com/statamic/cms/issues/7095) by @jasonvarga
+- Prevent entire `assets:generate-presets` command failing when encountering invalid images. [#7091](https://github.com/statamic/cms/issues/7091) by @ryatkins
+
+
+
 ## 3.3.57 (2022-11-18)
 
 ### What's new
@@ -11,7 +29,7 @@
 - Dutch translations. [#7073](https://github.com/statamic/cms/issues/7073) by @oakeddev
 
 ### What's fixed
-- Fix root page for max depth 1. [#4895](https://github.com/statamic/cms/issues/4895) by @jelleroorda
+- ~~Fix root page for max depth 1.~~ Reverted in 3.3.58 [#4895](https://github.com/statamic/cms/issues/4895) by @jelleroorda
 
 
 
