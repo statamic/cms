@@ -28,13 +28,7 @@ class ResolveRedirect
 
         if (Str::startsWith($redirect, 'entry::')) {
             $id = Str::after($redirect, 'entry::');
-            $entry = Facades\Entry::find($id);
-            if ($localize) {
-                $site = $parent instanceof Localization ? $parent->locale() : Site::current()->handle();
-                $redirect = optional(optional($entry)->in($site) ?? $entry)->url() ?? 404;
-            } else {
-                $redirect = optional($entry)->url() ?? 404;
-            }
+            $redirect = optional($this->findEntry($id, $parent, $localize))->url() ?? 404;
         }
 
         if (Str::startsWith($redirect, 'asset::')) {
@@ -43,6 +37,23 @@ class ResolveRedirect
         }
 
         return is_numeric($redirect) ? (int) $redirect : $redirect;
+    }
+
+    private function findEntry($id, $parent, $localize)
+    {
+        if (! ($entry = Facades\Entry::find($id))) {
+            return null;
+        }
+
+        if (! $localize) {
+            return $entry;
+        }
+
+        $site = $parent instanceof Localization
+            ? $parent->locale()
+            : Site::current()->handle();
+
+        return $entry->in($site) ?? $entry;
     }
 
     private function firstChildUrl($parent)
