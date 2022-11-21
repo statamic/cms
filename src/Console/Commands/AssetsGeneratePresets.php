@@ -113,7 +113,7 @@ class AssetsGeneratePresets extends Command
                     GeneratePresetImageManipulation::$dispatchMethod($asset, $preset);
                 } catch (\Exception $e) {
                     $this->error($asset.' '.$e->getMessage());
-                }    
+                }
 
                 $bar->advance();
             }
