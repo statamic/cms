@@ -10,13 +10,15 @@ class Partial extends Tags
         // an argument, but fall back to the studly version just in case.
         $partial = $this->params->get('src', $tag);
 
-        if ($this->shouldRender()) {
-            return $this->render($partial);
-        }
+        return $this->render($partial);
     }
 
     protected function render($partial)
     {
+        if (! $this->shouldRender()) {
+            return;
+        }
+
         $variables = array_merge($this->context->all(), $this->params->all(), [
             '__frontmatter' => $this->params->all(),
             'slot' => $this->isPair ? trim($this->parse()) : null,
