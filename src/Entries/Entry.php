@@ -641,7 +641,38 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $localization->date($this->date());
         }
 
+        $localization->addToStructure();
+
         return $localization;
+    }
+
+    public function addToStructure()
+    {
+        // If it's orderable (linear - a max depth of 1) then don't add it.
+        if ($this->collection()->orderable()) {
+            return $this;
+        }
+
+        // Collection not structured? Don't add it.
+        if (! $structure = $this->collection()->structure()) {
+            return $this;
+        }
+
+        $tree = $structure->in($this->locale());
+
+        $parent = optional($this->parent())->in($this->locale());
+
+        $this->afterSave(function ($localized) use ($parent, $tree) {
+            if (! $parent || $parent->isRoot()) {
+                $tree->append($localized);
+            } else {
+                $tree->appendTo($parent->id(), $localized);
+            }
+
+            $tree->save();
+        });
+
+        return $this;
     }
 
     public function supplementTaxonomies()
