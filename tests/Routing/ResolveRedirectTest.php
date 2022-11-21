@@ -145,6 +145,19 @@ class ResolveRedirectTest extends TestCase
     }
 
     /** @test */
+    public function it_resolves_references_to_entries_localized()
+    {
+        $resolver = new ResolveRedirect;
+
+        $parentEntry = Mockery::mock(Entry::class);
+        $frenchEntry = Mockery::mock(Entry::class)->shouldReceive('url')->once()->andReturn('/le-entry')->getMock();
+        $defaultEntry = Mockery::mock(Entry::class)->shouldReceive('in')->once()->andReturn($frenchEntry)->getMock();
+        Facades\Entry::shouldReceive('find')->with('123')->once()->andReturn($defaultEntry);
+
+        $this->assertEquals('/le-entry', $resolver('entry::123', $parentEntry, true));
+    }
+
+    /** @test */
     public function it_resolves_references_to_assets()
     {
         $resolver = new ResolveRedirect;
@@ -170,7 +183,7 @@ class ResolveRedirectTest extends TestCase
     {
         $resolve = $this->partialMock(ResolveRedirect::class);
 
-        $resolve->shouldReceive('resolve')->once()->with('foo', 'bar')->andReturn('hello');
+        $resolve->shouldReceive('resolve')->once()->with('foo', 'bar', false)->andReturn('hello');
 
         $this->assertEquals('hello', $resolve('foo', 'bar'));
     }

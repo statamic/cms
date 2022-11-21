@@ -41,7 +41,7 @@ class Link extends Fieldtype
             return null;
         }
 
-        $redirect = ResolveRedirect::resolve($value, $this->field->parent());
+        $redirect = ResolveRedirect::resolve($value, $this->field->parent(), true);
 
         return $redirect === 404 ? null : $redirect;
     }
