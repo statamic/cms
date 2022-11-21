@@ -158,6 +158,20 @@ class ResolveRedirectTest extends TestCase
     }
 
     /** @test */
+    public function it_resolves_references_to_entries_localized_with_fallback()
+    {
+        $resolver = new ResolveRedirect;
+
+        $parentEntry = Mockery::mock(Entry::class);
+        $entry = Mockery::mock(Entry::class);
+        $entry->shouldReceive('in')->once()->andReturn(null);
+        $entry->shouldReceive('url')->once()->andReturn('/the-entry');
+        Facades\Entry::shouldReceive('find')->with('123')->once()->andReturn($entry);
+
+        $this->assertEquals('/the-entry', $resolver('entry::123', $parentEntry, true));
+    }
+
+    /** @test */
     public function it_resolves_references_to_assets()
     {
         $resolver = new ResolveRedirect;
