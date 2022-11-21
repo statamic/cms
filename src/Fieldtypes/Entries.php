@@ -214,7 +214,7 @@ class Entries extends Relationship
             return $this->invalidItemArray($id);
         }
 
-        return (new EntryResource($entry))->resolve();
+        return (new EntryResource($entry))->resolve()['data'];
     }
 
     protected function collect($value)
