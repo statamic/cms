@@ -62,7 +62,7 @@ return [
         |
         | Rather than specifying your manipulation params in your templates with
         | the glide tag, you may define them here and reference their handles.
-        | They will also be automatically generated when you upload assets.
+        | They may also be automatically generated when you upload assets.
         |
         */
 
@@ -72,15 +72,15 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Generate Image Manipulation Presets on upload
+        | Generate Image Manipulation Presets on Upload
         |--------------------------------------------------------------------------
         |
-        | By default presets will be automatically generated on upload, ensuring the
-        | cached image is already available on the first page load with the asset.
-        | You can turn off this behaviour (for example if you have a lot of presets and
-        | not all should be applied to every asset).
+        | By default, presets will be automatically generated on upload, ensuring
+        | the cached images are available when they are first used. You may opt
+        | out of this behavior here and have the presets generated on demand.
         |
         */
+
         'generate_presets_on_upload' => true,
 
     ],
