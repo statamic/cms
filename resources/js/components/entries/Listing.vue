@@ -66,15 +66,14 @@
                         @sorted="sorted"
                         @reordered="reordered"
                     >
-                        <template slot="cell-title" slot-scope="{ row: entry, index, displayIndex }">
+                        <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
                                 <div class="little-dot mr-1" :class="getStatusClass(entry)" />
-                                <svg-icon name="home-page" class="mr-1 h-4 w-4 text-grey-80" v-if="isRoot(index, displayIndex)" v-tooltip="__('This is the root page')" />
                                 <a :href="entry.edit_url" @click.stop>{{ entry.title }}</a>
                             </div>
                         </template>
-                        <template slot="cell-slug" slot-scope="{ row: entry, index, displayIndex }">
-                            <span class="font-mono text-2xs">{{ isRoot(index, displayIndex) ? '/' : entry.slug }}</span>
+                        <template slot="cell-slug" slot-scope="{ row: entry }">
+                            <span class="font-mono text-2xs">{{ entry.slug }}</span>
                         </template>
                         <template slot="actions" slot-scope="{ row: entry, index }">
                             <dropdown-list>
@@ -118,7 +117,6 @@ export default {
         reordering: Boolean,
         reorderUrl: String,
         site: String,
-        expectsRoot: Boolean,
     },
 
     data() {
@@ -163,21 +161,6 @@ export default {
     },
 
     methods: {
-
-        isRoot(index, displayIndex) {
-            if (!this.expectsRoot) {
-                return false;
-            }
-
-            // When in reordering view what matters is which entry is currently on top: displayIndex.
-            // When NOT in reordering view sorting may cause the root to move from the first displayIndex,
-            // which means that the normal view should use the original index of the entry in the list: index.
-            if (this.reordering) {
-                return displayIndex === 0;
-            } else {
-                return index === 0
-            }
-        },
 
         getStatusClass(entry) {
             // TODO: Replace with `entry.status` (will need to pass down)
@@ -224,18 +207,8 @@ export default {
 
             this.$axios.post(this.reorderUrl, payload)
                 .then(response => {
+                    this.$emit('reordered');
                     this.$toast.success(__('Entries successfully reordered'))
-
-                    if (this.expectsRoot) {
-                        // Reload the page so the table list SharedState.originalRows gets refreshed,
-                        // otherwise the root page will not be rendered correctly.
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 500)
-                    } else {
-                        // Root doesn't matter, let the parent handle refreshing of the rows.
-                        this.$emit('reordered');
-                    }
                 })
                 .catch(e => {
                     console.log(e);
