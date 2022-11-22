@@ -52,48 +52,46 @@ class DuplicateEntry extends Action
         collect($items)
             ->each(function ($item) use ($values) {
                 /** @var \Statamic\Entries\Entry $item */
-                if ($item instanceof AnEntry) {
-                    $itemParent = $this->getEntryParentFromStructure($item);
-                    $itemTitleAndSlug = $this->generateTitleAndSlug($item);
+                $itemParent = $this->getEntryParentFromStructure($item);
+                $itemTitleAndSlug = $this->generateTitleAndSlug($item);
 
-                    $entry = Entry::make()
-                        ->collection($item->collection())
-                        ->blueprint($item->blueprint()->handle())
-                        ->locale(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $item->locale())
-                        ->published(false)
-                        ->slug($itemTitleAndSlug['slug'])
-                        ->data(
-                            $item->data()
-                                ->except(config("duplicator.ignored_fields.entries.{$item->collectionHandle()}"))
-                                ->merge([
-                                    'title' => $itemTitleAndSlug['title'],
-                                    'duplicated_from' => $item->id(),
-                                ])
-                                ->toArray()
-                        );
+                $entry = Entry::make()
+                    ->collection($item->collection())
+                    ->blueprint($item->blueprint()->handle())
+                    ->locale(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $item->locale())
+                    ->published(false)
+                    ->slug($itemTitleAndSlug['slug'])
+                    ->data(
+                        $item->data()
+                            ->except(config("duplicator.ignored_fields.entries.{$item->collectionHandle()}"))
+                            ->merge([
+                                'title' => $itemTitleAndSlug['title'],
+                                'duplicated_from' => $item->id(),
+                            ])
+                            ->toArray()
+                    );
 
-                    if ($item->hasDate()) {
-                        $entry->date($item->date());
-                    }
+                if ($item->hasDate()) {
+                    $entry->date($item->date());
+                }
 
-                    $entry->save();
+                $entry->save();
 
-                    if ($itemParent && $itemParent !== $item->id()) {
-                        $entry->structure()
-                            ->in(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $item->locale())
-                            ->appendTo($itemParent->id(), $entry)
-                            ->save();
-                    }
+                if ($itemParent && $itemParent !== $item->id()) {
+                    $entry->structure()
+                        ->in(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $item->locale())
+                        ->appendTo($itemParent->id(), $entry)
+                        ->save();
+                }
 
-                    if (isset($values['site']) && $values['site'] === 'all') {
-                        Site::all()
-                            ->reject(function ($site) use ($entry) {
-                                return $site->handle() === $entry->locale();
-                            })
-                            ->each(function ($site) use ($entry) {
-                                $entry->makeLocalization($site->handle())->save();
-                            });
-                    }
+                if (isset($values['site']) && $values['site'] === 'all') {
+                    Site::all()
+                        ->reject(function ($site) use ($entry) {
+                            return $site->handle() === $entry->locale();
+                        })
+                        ->each(function ($site) use ($entry) {
+                            $entry->makeLocalization($site->handle())->save();
+                        });
                 }
             });
     }
