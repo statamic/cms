@@ -28,25 +28,23 @@ class DuplicateAsset extends Action
     {
         collect($items)
             ->each(function ($item) {
-                if ($item instanceof Asset) {
-                    $duplicatePath = str_replace($item->filename(), "{$item->filename()}-02", $item->path());
+                $duplicatePath = str_replace($item->filename(), "{$item->filename()}-02", $item->path());
 
-                    $assetData = Arr::except(
-                        $item->data(),
-                        config('duplicator.ignored_fields.assets')
-                    );
+                $assetData = Arr::except(
+                    $item->data(),
+                    config('duplicator.ignored_fields.assets')
+                );
 
-                    $assetData['duplicated_from'] = $item->id();
+                $assetData['duplicated_from'] = $item->id();
 
-                    Storage::disk($item->container()->diskHandle())->copy($item->path(), $duplicatePath);
+                Storage::disk($item->container()->diskHandle())->copy($item->path(), $duplicatePath);
 
-                    $asset = AssetAPI::make()
-                        ->container($item->container()->handle())
-                        ->path($duplicatePath)
-                        ->data($assetData);
+                $asset = AssetAPI::make()
+                    ->container($item->container()->handle())
+                    ->path($duplicatePath)
+                    ->data($assetData);
 
-                    $asset->save();
-                }
+                $asset->save();
             });
     }
 }
