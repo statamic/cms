@@ -32,7 +32,7 @@ class DuplicateAsset extends Action
 
                 $assetData = Arr::except(
                     $item->data(),
-                    config('duplicator.ignored_fields.assets')
+                    $item->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys()->all()
                 );
 
                 $assetData['duplicated_from'] = $item->id();

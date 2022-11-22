@@ -35,7 +35,7 @@ class DuplicateTerm extends Action
                     ->slug($itemTitleAndSlug['slug'])
                     ->data(
                         $item->data()
-                            ->except(config("statamic.duplicator.ignored_fields.terms.{$item->taxonomyHandle()}"))
+                            ->except($item->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
                             ->merge([
                                 'title' => $itemTitleAndSlug['title'],
                                 'duplicated_from' => $item->id(),

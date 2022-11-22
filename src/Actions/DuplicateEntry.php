@@ -63,7 +63,7 @@ class DuplicateEntry extends Action
                     ->slug($itemTitleAndSlug['slug'])
                     ->data(
                         $item->data()
-                            ->except(config("duplicator.ignored_fields.entries.{$item->collectionHandle()}"))
+                            ->except($item->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
                             ->merge([
                                 'title' => $itemTitleAndSlug['title'],
                                 'duplicated_from' => $item->id(),
