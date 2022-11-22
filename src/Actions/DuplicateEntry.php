@@ -60,7 +60,7 @@ class DuplicateEntry extends Action
                         ->collection($item->collection())
                         ->blueprint($item->blueprint()->handle())
                         ->locale(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $item->locale())
-                        ->published(config('statamic.duplicator.defaults.published', $item->published()))
+                        ->published(false)
                         ->slug($itemTitleAndSlug['slug'])
                         ->data(
                             $item->data()
