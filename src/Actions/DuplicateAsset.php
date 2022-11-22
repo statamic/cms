@@ -27,7 +27,7 @@ class DuplicateAsset extends Action
     {
         collect($items)
             ->each(function ($item) {
-                $duplicatePath = str_replace($item->filename(), "{$item->filename()}-02", $item->path());
+                $duplicatePath = $this->generatePath($item);
 
                 Storage::disk($item->container()->diskHandle())->copy($item->path(), $duplicatePath);
 
@@ -44,5 +44,18 @@ class DuplicateAsset extends Action
 
                 $asset->save();
             });
+    }
+
+    protected function generatePath(Asset $asset, $attempt = 1)
+    {
+        $path = str_replace($asset->filename(), "{$asset->filename()}-{$attempt}", $asset->path());
+
+        $id = $asset->container()->handle().'::'.$path;
+
+        if (AssetAPI::find($id)) {
+            $path = $this->generatePath($asset, $attempt + 1);
+        }
+
+        return $path;
     }
 }
