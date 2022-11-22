@@ -158,7 +158,7 @@ class FieldsController extends CpController
                 'validate' => 'boolean',
                 'width' => 50,
                 'default' => true,
-            ]
+            ],
         ]);
 
         foreach ($prepends->reverse() as $handle => $prepend) {
