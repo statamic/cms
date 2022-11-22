@@ -36,9 +36,7 @@ class DuplicateAsset extends Action
                         config('duplicator.ignored_fields.assets')
                     );
 
-                    if (config('statamic.duplicator.fingerprint') === true) {
-                        $assetData['is_duplicate'] = true;
-                    }
+                    $assetData['duplicated_from'] = $item->id();
 
                     Storage::disk($item->container()->diskHandle())->copy($item->path(), $duplicatePath);
 

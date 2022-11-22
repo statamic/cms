@@ -67,16 +67,13 @@ class DuplicateEntry extends Action
                                 ->except(config("duplicator.ignored_fields.entries.{$item->collectionHandle()}"))
                                 ->merge([
                                     'title' => $itemTitleAndSlug['title'],
+                                    'duplicated_from' => $item->id(),
                                 ])
                                 ->toArray()
                         );
 
                     if ($item->hasDate()) {
                         $entry->date($item->date());
-                    }
-
-                    if (config('statamic.duplicator.fingerprint') === true) {
-                        $entry->set('is_duplicate', true);
                     }
 
                     $entry->save();

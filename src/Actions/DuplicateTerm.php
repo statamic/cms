@@ -39,13 +39,10 @@ class DuplicateTerm extends Action
                                 ->except(config("statamic.duplicator.ignored_fields.terms.{$item->taxonomyHandle()}"))
                                 ->merge([
                                     'title' => $itemTitleAndSlug['title'],
+                                    'duplicated_from' => $item->id(),
                                 ])
                                 ->toArray()
                         );
-
-                    if (config('statamic.duplicator.fingerprint') === true) {
-                        $term->set('is_duplicate', true);
-                    }
 
                     $term->save();
                 }
