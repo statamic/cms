@@ -170,7 +170,7 @@ class EntryRepositoryTest extends TestCase
         return [
             'case sensitive' => ['/alphabetical/bravo', 'Bravo'],
             'case insensitive' => ['/alphabetical/BrAvO', null],
-            'missing' => ['/unknown', null]
+            'missing' => ['/unknown', null],
         ];
     }
 
