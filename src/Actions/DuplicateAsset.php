@@ -2,7 +2,6 @@
 
 namespace Statamic\Actions;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades\Asset as AssetAPI;
@@ -30,19 +29,18 @@ class DuplicateAsset extends Action
             ->each(function ($item) {
                 $duplicatePath = str_replace($item->filename(), "{$item->filename()}-02", $item->path());
 
-                $assetData = Arr::except(
-                    $item->data(),
-                    $item->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys()->all()
-                );
-
-                $assetData['duplicated_from'] = $item->id();
-
                 Storage::disk($item->container()->diskHandle())->copy($item->path(), $duplicatePath);
 
                 $asset = AssetAPI::make()
                     ->container($item->container()->handle())
                     ->path($duplicatePath)
-                    ->data($assetData);
+                    ->data(
+                        $item
+                            ->data()
+                            ->except($item->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
+                            ->merge(['duplicated_from' => $item->id()])
+                            ->toArray()
+                    );
 
                 $asset->save();
             });
