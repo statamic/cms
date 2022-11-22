@@ -215,6 +215,8 @@ class EntriesController extends CpController
         if ($collection->structure() && ! $collection->orderable()) {
             $tree = $entry->structure()->in($entry->locale());
 
+            $this->validateParent($entry, $tree, $parent);
+
             $entry->afterSave(function ($entry) use ($parent, $tree) {
                 if ($parent && optional($tree->page($parent))->isRoot()) {
                     $parent = null;
@@ -366,6 +368,10 @@ class EntriesController extends CpController
             $tree = $structure->in($site->handle());
             $parent = $values['parent'] ?? null;
             $entry->afterSave(function ($entry) use ($parent, $tree) {
+                if ($parent && optional($tree->page($parent))->isRoot()) {
+                    $parent = null;
+                }
+
                 $tree->appendTo($parent, $entry)->save();
             });
         }
@@ -472,6 +478,27 @@ class EntriesController extends CpController
     {
         // Since assume `Y-m-d ...` format, we can use `parse` here.
         return Carbon::parse($date);
+    }
+
+    private function validateParent($entry, $tree, $parent)
+    {
+        if ($entry->id() == $parent) {
+            throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_cannot_be_itself')]);
+        }
+
+        // If there's no parent selected, the entry will be at end of the top level, which is fine.
+        // If the entry being edited is not the root, then we don't have anything to worry about.
+        // If the parent is the root, that's fine, and is handled during the tree update later.
+        if (! $parent || ! $entry->page()->isRoot()) {
+            return;
+        }
+
+        // There will always be a next page since we couldn't have got this far with a single page.
+        $nextTopLevelPage = $tree->pages()->all()->skip(1)->first();
+
+        if ($nextTopLevelPage->id() === $parent || $nextTopLevelPage->pages()->all()->count() > 0) {
+            throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_causes_root_children')]);
+        }
     }
 
     private function validateUniqueUri($entry, $tree, $parent)

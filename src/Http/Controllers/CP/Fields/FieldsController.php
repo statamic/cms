@@ -73,6 +73,7 @@ class FieldsController extends CpController
             'elseif',
             'endif',
             'endunless',
+            'id',
             'if',
             'length',
             'reference',

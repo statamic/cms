@@ -77,6 +77,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | User Wizard Invitation Email
+    |--------------------------------------------------------------------------
+    |
+    | When creating new users through the wizard in the control panel,
+    | you may choose whether to be able to send an invitation email.
+    | Setting to true will give the user the option. But setting
+    | it to false will disable the invitation option entirely.
+    |
+    */
+
+    'wizard_invitation' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Password Brokers
     |--------------------------------------------------------------------------
     |

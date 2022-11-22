@@ -93,6 +93,8 @@ return [
     'unique_uri' => 'Deze URI is al in gebruik.',
     'duplicate_uri' => 'Dubbele URI voor :value',
     'reserved' => 'Dit is een gereserveerd woord.',
+    'parent_causes_root_children' => 'Dit zou als gevolg hebben dat de hoofdpagina kinderen krijgt.',
+    'parent_cannot_be_itself' => 'Kan geen eigen ouder zijn.',
     'custom.attribute-name.rule-name' => 'aangepast-bericht',
     'attributes' => [],
 ];

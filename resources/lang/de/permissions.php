@@ -64,6 +64,8 @@ return [
     'change_passwords' => 'Passwörter ändern',
     'edit_user_groups' => 'Gruppen bearbeiten',
     'edit_roles' => 'Rollen bearbeiten',
+    'assign_user_groups' => 'Benutzer:innen Gruppen zuweisen',
+    'assign_roles' => 'Benutzer:innen Rollen zuweisen',
     'group_updates' => 'Updates',
     'view_updates' => 'Updates anzeigen',
     'perform_updates' => 'Updates durchführen',

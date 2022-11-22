@@ -216,6 +216,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\UseDedicatedTrees::class,
         Updates\AddUniqueSlugValidation::class,
         Updates\AddGraphQLPermission::class,
+        Updates\AddAssignRolesAndGroupsPermissions::class,
     ];
 
     public function register()

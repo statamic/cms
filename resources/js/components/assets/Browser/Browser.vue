@@ -521,7 +521,7 @@ export default {
         selectFolder(path) {
             // Trigger re-loading of assets in the selected folder.
             this.path = path;
-            this.selectedPage = 1;
+            this.page = 1;
 
             this.$emit('navigated', this.container, this.path);
         },
@@ -529,6 +529,8 @@ export default {
         selectContainer(id) {
             this.container = this.containers[id];
             this.path = '/';
+            this.page = 1;
+
             this.$emit('navigated', this.container, this.path);
         },
 

@@ -13,6 +13,8 @@ use Statamic\Actions\Action;
 use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Fieldset;
+use Statamic\Facades\File;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
@@ -180,6 +182,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootMiddleware()
                 ->bootUpdateScripts()
                 ->bootViews()
+                ->bootFieldsets()
                 ->bootPublishAfterInstall()
                 ->bootAddon();
         });
@@ -586,6 +589,17 @@ abstract class AddonServiceProvider extends ServiceProvider
                 '--force' => true,
             ]);
         });
+
+        return $this;
+    }
+
+    protected function bootFieldsets()
+    {
+        if (! file_exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
+            return $this;
+        }
+
+        Fieldset::addNamespace($this->getAddon()->slug(), $path);
 
         return $this;
     }

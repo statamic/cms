@@ -93,6 +93,8 @@ return [
     'unique_uri' => 'Diese URI ist bereits vergeben.',
     'duplicate_uri' => 'Doppelte URI :value',
     'reserved' => 'Dies ist ein reserviertes Wort.',
+    'parent_causes_root_children' => 'Dadurch würde die Startseite Unterseiten bekommen.',
+    'parent_cannot_be_itself' => 'Kann nicht selbst übergeordnet sein.',
     'custom.attribute-name.rule-name' => 'benutzerdefinierte Nachricht',
     'attributes' => [],
 ];
