@@ -52,14 +52,15 @@ class DuplicateTerm extends Action
     {
         $title = $term->get('title');
         $slug = $term->slug();
+        $suffix = ' ('.__('Duplicated').')';
 
         if ($attempt == 1) {
-            $title = $title.__(' (Duplicated)');
+            $title = $title.$suffix;
         }
 
         if ($attempt !== 1) {
-            if (! Str::contains($title, __(' (Duplicated)'))) {
-                $title .= __(' (Duplicated)');
+            if (! Str::contains($title, $suffix)) {
+                $title .= $suffix;
             }
 
             $title .= ' ('.$attempt.')';
