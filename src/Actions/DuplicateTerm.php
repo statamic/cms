@@ -27,25 +27,23 @@ class DuplicateTerm extends Action
     {
         collect($items)
             ->each(function ($item) {
-                if ($item instanceof Term) {
-                    $itemTitleAndSlug = $this->generateTitleAndSlug($item);
+                $itemTitleAndSlug = $this->generateTitleAndSlug($item);
 
-                    $term = TermAPI::make()
-                        ->taxonomy($item->taxonomy())
-                        ->blueprint($item->blueprint()->handle())
-                        ->slug($itemTitleAndSlug['slug'])
-                        ->data(
-                            $item->data()
-                                ->except(config("statamic.duplicator.ignored_fields.terms.{$item->taxonomyHandle()}"))
-                                ->merge([
-                                    'title' => $itemTitleAndSlug['title'],
-                                    'duplicated_from' => $item->id(),
-                                ])
-                                ->toArray()
-                        );
+                $term = TermAPI::make()
+                    ->taxonomy($item->taxonomy())
+                    ->blueprint($item->blueprint()->handle())
+                    ->slug($itemTitleAndSlug['slug'])
+                    ->data(
+                        $item->data()
+                            ->except(config("statamic.duplicator.ignored_fields.terms.{$item->taxonomyHandle()}"))
+                            ->merge([
+                                'title' => $itemTitleAndSlug['title'],
+                                'duplicated_from' => $item->id(),
+                            ])
+                            ->toArray()
+                    );
 
-                    $term->save();
-                }
+                $term->save();
             });
     }
 
