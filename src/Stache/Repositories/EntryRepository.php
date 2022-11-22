@@ -69,6 +69,10 @@ class EntryRepository implements RepositoryContract
             return null;
         }
 
+        if ($entry->uri() !== $uri) {
+            return null;
+        }
+
         return $entry->hasStructure()
             ? $entry->structure()->in($site)->page($entry->id())
             : $entry;
