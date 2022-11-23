@@ -40,11 +40,6 @@ class DuplicateForm extends Action
         return $item instanceof Form && Statamic::pro();
     }
 
-    public function visibleToBulk($items)
-    {
-        return $this->visibleTo($items->first());
-    }
-
     public function run($items, $values)
     {
         $items->each(function (Form $original) use ($values) {

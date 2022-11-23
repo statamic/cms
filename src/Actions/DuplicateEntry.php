@@ -38,11 +38,6 @@ class DuplicateEntry extends Action
         return $item instanceof Entry;
     }
 
-    public function visibleToBulk($items)
-    {
-        return $this->visibleTo($items->first());
-    }
-
     public function run($items, $values)
     {
         $items->each(function (Entry $original) use ($values) {

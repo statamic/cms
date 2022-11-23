@@ -18,11 +18,6 @@ class DuplicateTerm extends Action
         return $item instanceof Term;
     }
 
-    public function visibleToBulk($items)
-    {
-        return $this->visibleTo($items->first());
-    }
-
     public function run($items, $values)
     {
         $items->each(function (Term $original) {

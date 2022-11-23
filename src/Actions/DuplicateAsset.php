@@ -18,11 +18,6 @@ class DuplicateAsset extends Action
         return $item instanceof Asset;
     }
 
-    public function visibleToBulk($items)
-    {
-        return $this->visibleTo($items->first());
-    }
-
     public function run($items, $values)
     {
         $items->each(function ($item) {
