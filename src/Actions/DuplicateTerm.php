@@ -4,7 +4,7 @@ namespace Statamic\Actions;
 
 use Illuminate\Support\Str;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Facades\Term as TermAPI;
+use Statamic\Facades\Term as Terms;
 
 class DuplicateTerm extends Action
 {
@@ -25,29 +25,26 @@ class DuplicateTerm extends Action
 
     public function run($items, $values)
     {
-        collect($items)
-            ->each(function ($item) {
-                $itemTitleAndSlug = $this->generateTitleAndSlug($item);
+        $items->each(function (Term $original) {
+            [$title, $slug] = $this->generateTitleAndSlug($original);
 
-                $term = TermAPI::make()
-                    ->taxonomy($item->taxonomy())
-                    ->blueprint($item->blueprint()->handle())
-                    ->slug($itemTitleAndSlug['slug'])
-                    ->data(
-                        $item->data()
-                            ->except($item->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
-                            ->merge([
-                                'title' => $itemTitleAndSlug['title'],
-                                'duplicated_from' => $item->id(),
-                            ])
-                            ->toArray()
-                    );
+            $data = $original->data()
+                ->except($original->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
+                ->merge([
+                    'title' => $title,
+                    'duplicated_from' => $original->id(),
+                ])->all();
 
-                $term->save();
-            });
+            $term = Terms::make()
+                ->taxonomy($original->taxonomy())
+                ->blueprint($original->blueprint()->handle())
+                ->slug($slug)
+                ->data($data);
+
+            $term->save();
+        });
     }
 
-    // This method has been copied over from Statamic v2 - it's been updated to work with v3.
     protected function generateTitleAndSlug(Term $term, $attempt = 1)
     {
         $title = $term->get('title');
@@ -69,16 +66,10 @@ class DuplicateTerm extends Action
         $slug .= '-'.$attempt;
 
         // If the slug we've just built already exists, we'll try again, recursively.
-        if (TermAPI::findBySlug($slug, $term->taxonomy()->handle())) {
-            $generate = $this->generateTitleAndSlug($term, $attempt + 1);
-
-            $title = $generate['title'];
-            $slug = $generate['slug'];
+        if ($term->taxonomy()->queryTerms()->where('slug', $slug)->count()) {
+            [$title, $slug] = $this->generateTitleAndSlug($term, $attempt + 1);
         }
 
-        return [
-            'title' => $title,
-            'slug' => $slug,
-        ];
+        return [$title, $slug];
     }
 }
