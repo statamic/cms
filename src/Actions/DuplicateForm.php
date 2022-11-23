@@ -2,9 +2,8 @@
 
 namespace Statamic\Actions;
 
-use Illuminate\Support\Str;
 use Statamic\Contracts\Forms\Form;
-use Statamic\Facades\Form as FormAPI;
+use Statamic\Facades\Form as Forms;
 use Statamic\Statamic;
 
 class DuplicateForm extends Action
@@ -48,21 +47,19 @@ class DuplicateForm extends Action
 
     public function run($items, $values)
     {
-        collect($items)
-            ->each(function ($item) use ($values) {
-                /** @var \Statamic\Forms\Form $item */
-                $itemBlueprintContents = $item->blueprint()->contents();
+        $items->each(function (Form $original) use ($values) {
+            $originalBlueprintContents = $original->blueprint()->contents();
 
-                $form = FormAPI::make()
+            $form = Forms::make()
                 ->handle($values['handle'])
                 ->title($values['title'])
-                    ->honeypot($item->honeypot())
-                    ->store($item->store())
-                    ->email($item->email());
+                ->honeypot($original->honeypot())
+                ->store($original->store())
+                ->email($original->email());
 
-                $form->save();
+            $form->save();
 
-                $form->blueprint()->setContents($itemBlueprintContents)->save();
-            });
+            $form->blueprint()->setContents($originalBlueprintContents)->save();
+        });
     }
 }
