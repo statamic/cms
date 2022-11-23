@@ -14,28 +14,9 @@ class DuplicateEntry extends Action
         return __('Duplicate');
     }
 
-    protected function fieldItems()
-    {
-        if (Site::all()->count() > 1) {
-            return [
-                'site' => [
-                    'type' => 'select',
-                    'instructions' => __('Which site should this entry be duplicated to?'),
-                    'validate' => 'required|in:all,' . Site::all()->keys()->join(','),
-                    'options' => Site::all()->map->name()
-                        ->prepend(__('All Sites'), 'all')
-                        ->all(),
-                    'default' => 'all',
-                ],
-            ];
-        }
-
-        return [];
-    }
-
     public function visibleTo($item)
     {
-        return $item instanceof Entry;
+        return $item instanceof Entry && !Site::hasMultiple();
     }
 
     public function run($items, $values)
@@ -54,7 +35,6 @@ class DuplicateEntry extends Action
             $entry = Entries::make()
                 ->collection($original->collection())
                 ->blueprint($original->blueprint()->handle())
-                ->locale(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $original->locale())
                 ->published(false)
                 ->slug($slug)
                 ->data($data);
@@ -67,19 +47,9 @@ class DuplicateEntry extends Action
 
             if ($originalParent && $originalParent !== $original->id()) {
                 $entry->structure()
-                    ->in(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $original->locale())
+                    ->in($original->locale())
                     ->appendTo($originalParent->id(), $entry)
                     ->save();
-            }
-
-            if (isset($values['site']) && $values['site'] === 'all') {
-                Site::all()
-                    ->reject(function ($site) use ($entry) {
-                        return $site->handle() === $entry->locale();
-                    })
-                    ->each(function ($site) use ($entry) {
-                        $entry->makeLocalization($site->handle())->save();
-                    });
             }
         });
     }
