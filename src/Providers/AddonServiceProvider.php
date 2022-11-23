@@ -137,6 +137,11 @@ abstract class AddonServiceProvider extends ServiceProvider
     /**
      * @var string
      */
+    protected $fieldsetNamespace;
+
+    /**
+     * @var string
+     */
     protected $viewNamespace;
 
     /**
@@ -599,7 +604,10 @@ abstract class AddonServiceProvider extends ServiceProvider
             return $this;
         }
 
-        Fieldset::addNamespace($this->getAddon()->slug(), $path);
+        Fieldset::addNamespace(
+            $this->fieldsetNamespace ?? $this->getAddon()->slug(),
+            $path
+        );
 
         return $this;
     }
