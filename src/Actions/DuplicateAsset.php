@@ -4,7 +4,7 @@ namespace Statamic\Actions;
 
 use Illuminate\Support\Facades\Storage;
 use Statamic\Contracts\Assets\Asset;
-use Statamic\Facades\Asset as AssetAPI;
+use Statamic\Facades\Asset as Assets;
 
 class DuplicateAsset extends Action
 {
@@ -25,25 +25,23 @@ class DuplicateAsset extends Action
 
     public function run($items, $values)
     {
-        collect($items)
-            ->each(function ($item) {
-                $duplicatePath = $this->generatePath($item);
+        $items->each(function ($item) {
+            $path = $this->generatePath($item);
 
-                Storage::disk($item->container()->diskHandle())->copy($item->path(), $duplicatePath);
+            Storage::disk($item->container()->diskHandle())->copy($item->path(), $path);
 
-                $asset = AssetAPI::make()
-                    ->container($item->container()->handle())
-                    ->path($duplicatePath)
-                    ->data(
-                        $item
-                            ->data()
-                            ->except($item->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
-                            ->merge(['duplicated_from' => $item->id()])
-                            ->toArray()
-                    );
+            $data = $item->data()
+                ->except($item->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
+                ->merge(['duplicated_from' => $item->id()])
+                ->all();
 
-                $asset->save();
-            });
+            $asset = Assets::make()
+                ->container($item->container()->handle())
+                ->path($path)
+                ->data($data);
+
+            $asset->save();
+        });
     }
 
     protected function generatePath(Asset $asset, $attempt = 1)
@@ -52,7 +50,7 @@ class DuplicateAsset extends Action
 
         $id = $asset->container()->handle().'::'.$path;
 
-        if (AssetAPI::find($id)) {
+        if (Assets::find($id)) {
             $path = $this->generatePath($asset, $attempt + 1);
         }
 
