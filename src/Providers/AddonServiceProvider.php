@@ -154,6 +154,11 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     protected $translations = true;
 
+    /**
+     * @var string
+     */
+    protected $fieldsetNamespace;
+
     public function boot()
     {
         Statamic::booted(function () {
@@ -599,7 +604,10 @@ abstract class AddonServiceProvider extends ServiceProvider
             return $this;
         }
 
-        Fieldset::addNamespace($this->getAddon()->slug(), $path);
+        Fieldset::addNamespace(
+            $this->fieldsetNamespace ?? $this->getAddon()->slug(),
+            $path
+        );
 
         return $this;
     }
