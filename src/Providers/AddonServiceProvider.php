@@ -137,6 +137,11 @@ abstract class AddonServiceProvider extends ServiceProvider
     /**
      * @var string
      */
+    protected $fieldsetNamespace;
+
+    /**
+     * @var string
+     */
     protected $viewNamespace;
 
     /**
@@ -153,11 +158,6 @@ abstract class AddonServiceProvider extends ServiceProvider
      * @var bool
      */
     protected $translations = true;
-
-    /**
-     * @var string
-     */
-    protected $fieldsetNamespace;
 
     public function boot()
     {
