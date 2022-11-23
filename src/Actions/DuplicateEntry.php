@@ -49,22 +49,21 @@ class DuplicateEntry extends Action
             $originalParent = $this->getEntryParentFromStructure($original);
             $titleAndSlug = $this->generateTitleAndSlug($original);
 
+            $data = $original
+                ->data()
+                ->except($original->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
+                ->merge([
+                    'title' => $titleAndSlug['title'],
+                    'duplicated_from' => $original->id(),
+                ])->all();
+
             $entry = Entries::make()
                 ->collection($original->collection())
                 ->blueprint($original->blueprint()->handle())
                 ->locale(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $original->locale())
                 ->published(false)
                 ->slug($titleAndSlug['slug'])
-                ->data(
-                $original
-                    ->data()
-                    ->except($original->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
-                    ->merge([
-                        'title' => $titleAndSlug['title'],
-                        'duplicated_from' => $original->id(),
-                    ])
-                    ->toArray()
-                );
+                ->data($data);
 
             if ($original->hasDate()) {
                 $entry->date($original->date());
