@@ -14,6 +14,11 @@ class DuplicateForm extends Action
         return __('Duplicate');
     }
 
+    public function confirmationText()
+    {
+        return null;
+    }
+
     protected function fieldItems()
     {
         return [
