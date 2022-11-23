@@ -16,9 +16,7 @@ class DuplicateForm extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof Form
-            && Statamic::pro()
-            && version_compare(Statamic::version(), '3.3.16', '>=');
+        return $item instanceof Form && Statamic::pro();
     }
 
     public function visibleToBulk($items)
