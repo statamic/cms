@@ -14,6 +14,23 @@ class DuplicateForm extends Action
         return __('Duplicate');
     }
 
+    protected function fieldItems()
+    {
+        return [
+            'title' => [
+                'type' => 'text',
+                'instructions' => __('statamic::messages.form_configure_title_instructions'),
+                'validate' => 'required',
+            ],
+            'handle' => [
+                'type' => 'slug',
+                'instructions' => __('statamic::messages.form_configure_handle_instructions'),
+                'separator' => '_',
+                'validate' => 'required|alpha_dash|unique_form_handle',
+            ],
+        ];
+    }
+
     public function visibleTo($item)
     {
         return $item instanceof Form && Statamic::pro();
@@ -27,15 +44,13 @@ class DuplicateForm extends Action
     public function run($items, $values)
     {
         collect($items)
-            ->each(function ($item) {
+            ->each(function ($item) use ($values) {
                 /** @var \Statamic\Forms\Form $item */
                 $itemBlueprintContents = $item->blueprint()->contents();
 
-                $itemTitleAndHandle = $this->generateTitleAndHandle($item);
-
                 $form = FormAPI::make()
-                    ->handle($itemTitleAndHandle['handle'])
-                    ->title($itemTitleAndHandle['title'])
+                ->handle($values['handle'])
+                ->title($values['title'])
                     ->honeypot($item->honeypot())
                     ->store($item->store())
                     ->email($item->email());
@@ -44,43 +59,5 @@ class DuplicateForm extends Action
 
                 $form->blueprint()->setContents($itemBlueprintContents)->save();
             });
-    }
-
-    /**
-     * This method has been copied from the Duplicate Entry code in Statamic v2.
-     * It's been updated to also deal with entry titles.
-     */
-    protected function generateTitleAndHandle(Form $form, $attempt = 1)
-    {
-        $title = $form->title();
-        $handle = $form->handle();
-        $suffix = ' ('.__('Duplicated').')';
-
-        if ($attempt == 1) {
-            $title = $title.$suffix;
-        }
-
-        if ($attempt !== 1) {
-            if (! Str::contains($title, $suffix)) {
-                $title .= $suffix;
-            }
-
-            $title .= ' ('.$attempt.')';
-        }
-
-        $handle .= '-'.$attempt;
-
-        // If the slug we've just built already exists, we'll try again, recursively.
-        if (FormAPI::find($handle)) {
-            $generate = $this->generateTitleAndHandle($form, $attempt + 1);
-
-            $title = $generate['title'];
-            $handle = $generate['handle'];
-        }
-
-        return [
-            'title' => $title,
-            'handle' => $handle,
-        ];
     }
 }
