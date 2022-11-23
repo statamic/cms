@@ -3,10 +3,9 @@
 namespace Statamic\Actions;
 
 use Illuminate\Support\Str;
-use Statamic\Contracts\Entries\Entry as AnEntry;
-use Statamic\Facades\Entry;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades\Entry as Entries;
 use Statamic\Facades\Site;
-use Statamic\Sites\Site as SitesSite;
 
 class DuplicateEntry extends Action
 {
@@ -22,11 +21,8 @@ class DuplicateEntry extends Action
                 'site' => [
                     'type' => 'select',
                     'instructions' => __('Which site should this entry be duplicated to?'),
-                    'validate' => 'required|in:all,'.Site::all()->keys()->join(','),
-                    'options' => Site::all()
-                        ->map(function (SitesSite $site) {
-                            return $site->name();
-                        })
+                    'validate' => 'required|in:all,' . Site::all()->keys()->join(','),
+                    'options' => Site::all()->map->name()
                         ->prepend(__('All Sites'), 'all')
                         ->toArray(),
                     'default' => 'all',
@@ -39,7 +35,7 @@ class DuplicateEntry extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof AnEntry;
+        return $item instanceof Entry;
     }
 
     public function visibleToBulk($items)
@@ -49,54 +45,53 @@ class DuplicateEntry extends Action
 
     public function run($items, $values)
     {
-        collect($items)
-            ->each(function ($item) use ($values) {
-                /** @var \Statamic\Entries\Entry $item */
-                $itemParent = $this->getEntryParentFromStructure($item);
-                $itemTitleAndSlug = $this->generateTitleAndSlug($item);
+        $items->each(function (Entry $original) use ($values) {
+            $originalParent = $this->getEntryParentFromStructure($original);
+            $titleAndSlug = $this->generateTitleAndSlug($original);
 
-                $entry = Entry::make()
-                    ->collection($item->collection())
-                    ->blueprint($item->blueprint()->handle())
-                    ->locale(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $item->locale())
-                    ->published(false)
-                    ->slug($itemTitleAndSlug['slug'])
-                    ->data(
-                        $item->data()
-                            ->except($item->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
-                            ->merge([
-                                'title' => $itemTitleAndSlug['title'],
-                                'duplicated_from' => $item->id(),
-                            ])
-                            ->toArray()
-                    );
+            $entry = Entries::make()
+                ->collection($original->collection())
+                ->blueprint($original->blueprint()->handle())
+                ->locale(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $original->locale())
+                ->published(false)
+                ->slug($titleAndSlug['slug'])
+                ->data(
+                $original
+                    ->data()
+                    ->except($original->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
+                    ->merge([
+                        'title' => $titleAndSlug['title'],
+                        'duplicated_from' => $original->id(),
+                    ])
+                    ->toArray()
+                );
 
-                if ($item->hasDate()) {
-                    $entry->date($item->date());
-                }
+            if ($original->hasDate()) {
+                $entry->date($original->date());
+            }
 
-                $entry->save();
+            $entry->save();
 
-                if ($itemParent && $itemParent !== $item->id()) {
-                    $entry->structure()
-                        ->in(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $item->locale())
-                        ->appendTo($itemParent->id(), $entry)
-                        ->save();
-                }
+            if ($originalParent && $originalParent !== $original->id()) {
+                $entry->structure()
+                    ->in(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $original->locale())
+                    ->appendTo($originalParent->id(), $entry)
+                    ->save();
+            }
 
-                if (isset($values['site']) && $values['site'] === 'all') {
-                    Site::all()
-                        ->reject(function ($site) use ($entry) {
-                            return $site->handle() === $entry->locale();
-                        })
-                        ->each(function ($site) use ($entry) {
-                            $entry->makeLocalization($site->handle())->save();
-                        });
-                }
-            });
+            if (isset($values['site']) && $values['site'] === 'all') {
+                Site::all()
+                    ->reject(function ($site) use ($entry) {
+                        return $site->handle() === $entry->locale();
+                    })
+                    ->each(function ($site) use ($entry) {
+                        $entry->makeLocalization($site->handle())->save();
+                    });
+            }
+        });
     }
 
-    protected function getEntryParentFromStructure(AnEntry $entry)
+    protected function getEntryParentFromStructure(Entry $entry)
     {
         if (! $entry->structure()) {
             return null;
@@ -120,7 +115,7 @@ class DuplicateEntry extends Action
     }
 
     // This method has been copied over from Statamic v2 - it's been updated to work with v3.
-    protected function generateTitleAndSlug(AnEntry $entry, $attempt = 1)
+    protected function generateTitleAndSlug(Entry $entry, $attempt = 1)
     {
         $title = $entry->get('title');
         $slug = $entry->slug();
@@ -141,7 +136,7 @@ class DuplicateEntry extends Action
         $slug .= '-'.$attempt;
 
         // If the slug we've just built already exists, we'll try again, recursively.
-        if (Entry::findBySlug($slug, $entry->collection()->handle())) {
+        if (Entries::findBySlug($slug, $entry->collection()->handle())) {
             $generate = $this->generateTitleAndSlug($entry, $attempt + 1);
 
             $title = $generate['title'];
