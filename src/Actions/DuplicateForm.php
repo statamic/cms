@@ -29,22 +29,20 @@ class DuplicateForm extends Action
         collect($items)
             ->each(function ($item) {
                 /** @var \Statamic\Forms\Form $item */
-                if ($item instanceof Form) {
-                    $itemBlueprintContents = $item->blueprint()->contents();
+                $itemBlueprintContents = $item->blueprint()->contents();
 
-                    $itemTitleAndHandle = $this->generateTitleAndHandle($item);
+                $itemTitleAndHandle = $this->generateTitleAndHandle($item);
 
-                    $form = FormAPI::make()
-                        ->handle($itemTitleAndHandle['handle'])
-                        ->title($itemTitleAndHandle['title'])
-                        ->honeypot($item->honeypot())
-                        ->store($item->store())
-                        ->email($item->email());
+                $form = FormAPI::make()
+                    ->handle($itemTitleAndHandle['handle'])
+                    ->title($itemTitleAndHandle['title'])
+                    ->honeypot($item->honeypot())
+                    ->store($item->store())
+                    ->email($item->email());
 
-                    $form->save();
+                $form->save();
 
-                    $form->blueprint()->setContents($itemBlueprintContents)->save();
-                }
+                $form->blueprint()->setContents($itemBlueprintContents)->save();
             });
     }
 
