@@ -24,7 +24,7 @@ class DuplicateEntry extends Action
                     'validate' => 'required|in:all,' . Site::all()->keys()->join(','),
                     'options' => Site::all()->map->name()
                         ->prepend(__('All Sites'), 'all')
-                        ->toArray(),
+                        ->all(),
                     'default' => 'all',
                 ],
             ];
@@ -47,13 +47,12 @@ class DuplicateEntry extends Action
     {
         $items->each(function (Entry $original) use ($values) {
             $originalParent = $this->getEntryParentFromStructure($original);
-            $titleAndSlug = $this->generateTitleAndSlug($original);
+            [$title, $slug] = $this->generateTitleAndSlug($original);
 
             $data = $original
                 ->data()
                 ->except($original->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
-                ->merge([
-                    'title' => $titleAndSlug['title'],
+                ->merge(['title' => $title,
                     'duplicated_from' => $original->id(),
                 ])->all();
 
@@ -62,7 +61,7 @@ class DuplicateEntry extends Action
                 ->blueprint($original->blueprint()->handle())
                 ->locale(isset($values['site']) && $values['site'] !== 'all' ? $values['site'] : $original->locale())
                 ->published(false)
-                ->slug($titleAndSlug['slug'])
+                ->slug($slug)
                 ->data($data);
 
             if ($original->hasDate()) {
@@ -113,7 +112,6 @@ class DuplicateEntry extends Action
         return $parentEntry;
     }
 
-    // This method has been copied over from Statamic v2 - it's been updated to work with v3.
     protected function generateTitleAndSlug(Entry $entry, $attempt = 1)
     {
         $title = $entry->get('title');
@@ -136,15 +134,9 @@ class DuplicateEntry extends Action
 
         // If the slug we've just built already exists, we'll try again, recursively.
         if (Entries::findBySlug($slug, $entry->collection()->handle())) {
-            $generate = $this->generateTitleAndSlug($entry, $attempt + 1);
-
-            $title = $generate['title'];
-            $slug = $generate['slug'];
+            [$title, $slug] = $this->generateTitleAndSlug($entry, $attempt + 1);
         }
 
-        return [
-            'title' => $title,
-            'slug' => $slug,
-        ];
+        return [$title, $slug];
     }
 }
