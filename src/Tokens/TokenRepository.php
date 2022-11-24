@@ -5,6 +5,7 @@ namespace Statamic\Tokens;
 use Illuminate\Support\Carbon;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
+use Statamic\Exceptions\TokenNotFoundException;
 
 class TokenRepository
 {
@@ -18,7 +19,7 @@ class TokenRepository
         $path = storage_path('statamic/tokens/'.$token.'.yaml');
 
         if (! File::exists($path)) {
-            return null;
+            throw new TokenNotFoundException('The token with the ID `${token}` could not be found.');
         }
 
         return $this->makeFromPath($path);
