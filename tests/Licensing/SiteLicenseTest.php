@@ -21,7 +21,7 @@ class SiteLicenseTest extends TestCase
 
         $this->assertEquals('test-key', $this->license()->key());
     }
-    
+
     /** @test */
     public function it_checks_for_correct_key_format()
     {
