@@ -131,6 +131,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                             : $this->get('blueprint');
                     }
 
+                    // With PHP <= 8.0 the Nullsafe operator could be used instead
+                    if (is_null($this->collection())) {
+                        return null;
+                    }
+
                     return $this->collection()->entryBlueprint($blueprint, $this);
                 });
             })
