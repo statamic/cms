@@ -257,7 +257,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             return null;
         }
 
-        return cp_route($route, [$this->collectionHandle(), $id]);
+        if (! $collectionHandle = $this->collectionHandle()) {
+            return null;
+        }
+
+        return cp_route($route, [$collectionHandle, $id]);
     }
 
     public function apiUrl()
