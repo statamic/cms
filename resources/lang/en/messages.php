@@ -131,6 +131,7 @@ return [
     'licensing_error_outside_license_range' => 'License valid for versions :start and :end',
     'licensing_error_unknown_site' => 'Unknown site',
     'licensing_error_unlicensed' => 'Unlicensed',
+    'licensing_incorrect_key_format' => 'It appears that your site key is not in the correct format. Please check the key and try again. You can grab your site key from your account area on statamic.com. It is alphanumeric and 16 characters long.',
     'licensing_production_alert' => 'This site is using Statamic Pro and commercial addons. Please purchase appropriate licenses.',
     'licensing_production_alert_addons' => 'This site is using commercial addons. Please purchase appropriate licenses.',
     'licensing_production_alert_renew_statamic' => 'Using this version of Statamic Pro requires a license renewal.',
