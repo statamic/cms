@@ -21,6 +21,14 @@ class SiteLicenseTest extends TestCase
 
         $this->assertEquals('test-key', $this->license()->key());
     }
+    
+    /** @test */
+    public function it_checks_for_correct_key_format()
+    {
+        config(['statamic.system.license_key' => 'test-key']);
+
+        $this->assertTrue($this->license()->usesLegacyKey());
+    }
 
     /** @test */
     public function it_gets_the_url_with_a_key()
