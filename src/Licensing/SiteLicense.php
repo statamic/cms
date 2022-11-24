@@ -13,9 +13,7 @@ class SiteLicense extends License
 
     public function usesLegacyKey()
     {
-        if (! preg_match('/^[a-zA-Z0-9]{16}$/', $this->key(), $matches)) {
-            return true;
-        }
+        return ! preg_match('/^[a-zA-Z0-9]{16}$/', $this->key());
     }
 
     public function hasDomains()
