@@ -28,7 +28,7 @@ class StaticWarm extends Command
     use RunsInPlease;
     use EnhancesCommands;
 
-    protected $signature = 'statamic:static:warm {--queue : Queue the requests} {--u=  : HTTP authentication user} {--p=  : HTTP authentication password}';
+    protected $signature = 'statamic:static:warm {--queue : Queue the requests} {--u= : HTTP authentication user} {--p= : HTTP authentication password}';
 
     protected $description = 'Warms the static cache by visiting all URLs';
 
