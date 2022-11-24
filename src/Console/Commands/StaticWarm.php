@@ -68,7 +68,9 @@ class StaticWarm extends Command
     {
         $client = new Client([
             'verify' => ! $this->laravel->isLocal(),
-            'auth' => $this->option('u') && $this->option('p') ? [$this->option('u'), $this->option('p')] : null
+            'auth' => $this->option('u') && $this->option('p')
+                ? [$this->option('u'), $this->option('p')]
+                : null
         ]);
 
         $this->output->newLine();
