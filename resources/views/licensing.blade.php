@@ -38,6 +38,13 @@
            </div>
         @endif
 
+        @if ($site->usesLegacyKey())
+            <div class="text-xs border border-yellow-dark rounded p-2 bg-yellow {{ $configCached ? 'mt-4' : '' }}">
+                <div class="font-bold mb-1">{{ __('Site key uses incorrect format') }}</div>
+                <p>{!! __('statamic::messages.licensing_incorrect_key_format') !!}</p>
+           </div>
+        @endif
+
         <h6 class="mt-4">Site</h6>
         <div class="card p-0 mt-1">
             <table class="data-table">
