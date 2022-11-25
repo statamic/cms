@@ -42,7 +42,7 @@
         z-index: 1;
     }
 
-    tab-button:active {
+    .tab-button:active {
         @apply bg-white text-blue border-b-0 outline-none;
     }
 
