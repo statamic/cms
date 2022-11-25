@@ -899,7 +899,7 @@ class Comb
                 array_push($parts['chunks'], $query);
             }
 
-        // perform a boolean search -- require words, disallow words
+            // perform a boolean search -- require words, disallow words
         } elseif ($this->query_mode === self::QUERY_BOOLEAN) {
             $words = preg_split("/\s+/i", $query);
 
@@ -932,7 +932,7 @@ class Comb
                 array_push($parts['chunks'], $query);
             }
 
-        // search for the entire query as one thing
+            // search for the entire query as one thing
         } else {
             $parts['chunks'] = [strtolower($query)];
         }
@@ -978,34 +978,29 @@ class Comb
         foreach ($words as $word) {
             if (strtolower($word) == 'and') {
                 array_push($output, '&');
-
                 continue;
             }
 
             if ($word == '&') {
                 array_push($output, 'and');
-
                 continue;
             }
 
             if (strpos($word, "'") !== false) {
                 array_push($output, preg_replace("/'/", '‘', $word));
                 array_push($output, preg_replace("/'/", '’', $word));
-
                 continue;
             }
 
             if (strpos($word, '’') !== false) {
                 array_push($output, preg_replace('/’/', '‘', $word));
                 array_push($output, preg_replace('/’/', "'", $word));
-
                 continue;
             }
 
             if (strpos($word, '‘') !== false) {
                 array_push($output, preg_replace('/‘/', "'", $word));
                 array_push($output, preg_replace('/‘/', '’', $word));
-
                 continue;
             }
         }
