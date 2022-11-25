@@ -141,8 +141,17 @@ class ImageGenerator
      */
     public function generateByAsset($asset, array $params)
     {
+        $manipulationCacheKey = 'asset::'.$asset->id().'::'.md5(json_encode($params));
+        $manifestCacheKey = static::assetCacheManifestKey($asset);
+
+        // Store the cache key for this manipulation in a manifest so that we can easily remove when deleting an asset.
+        Glide::cacheStore()->forever(
+            $manifestCacheKey,
+            collect(Glide::cacheStore()->get($manifestCacheKey, []))->push($manipulationCacheKey)->unique()->all()
+        );
+
         return Glide::cacheStore()->rememberForever(
-            'asset::'.$asset->id().'::'.md5(json_encode($params)),
+            $manipulationCacheKey,
             fn () => $this->doGenerateByAsset($asset, $params)
         );
     }
@@ -158,9 +167,19 @@ class ImageGenerator
         $this->server->setSourcePathPrefix($this->asset->folder());
 
         // Set the cache path so files are saved appropriately.
-        $this->server->setCachePathPrefix('containers/'.$this->asset->container()->id().'/'.$this->asset->folder());
+        $this->server->setCachePathPrefix(self::assetCachePathPrefix($this->asset).'/'.$this->asset->folder());
 
         return $this->generate($this->asset->basename());
+    }
+
+    public static function assetCacheManifestKey($asset)
+    {
+        return 'asset::'.$asset->id();
+    }
+
+    public static function assetCachePathPrefix($asset)
+    {
+        return 'containers/'.$asset->container()->id();
     }
 
     /**

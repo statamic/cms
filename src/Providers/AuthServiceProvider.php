@@ -34,6 +34,7 @@ class AuthServiceProvider extends ServiceProvider
         \Statamic\Contracts\Assets\Asset::class => Policies\AssetPolicy::class,
         \Statamic\Contracts\Assets\AssetFolder::class => Policies\AssetFolderPolicy::class,
         \Statamic\Contracts\Assets\AssetContainer::class => Policies\AssetContainerPolicy::class,
+        \Statamic\Fields\Fieldset::class => Policies\FieldsetPolicy::class,
     ];
 
     public function register()

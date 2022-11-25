@@ -178,13 +178,16 @@ export default {
     mounted() {
         this.initializeData().then(() => {
             this.initializing = false;
-            this.$nextTick(() => this.makeSortable());
+            if (this.canReorder) {
+                this.$nextTick(() => this.makeSortable());
+            }
         });
     },
 
     beforeDestroy() {
         if (this.sortable) {
             this.sortable.destroy();
+            this.sortable = null;
         }
         this.setLoadingProgress(false);
     },

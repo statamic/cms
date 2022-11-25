@@ -2,11 +2,11 @@
 
 namespace Tests\Fields;
 
-use Facades\Statamic\Fields\FieldsetRepository;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
@@ -44,22 +44,27 @@ class FieldsetTest extends TestCase
         $this->assertEquals($contents, $fieldset->contents());
     }
 
-    /** @test */
-    public function it_gets_the_title()
+    /**
+     * @test
+     * @dataProvider titleProvider
+     */
+    public function it_gets_the_title($handle, $title, $expectedTitle)
     {
-        $fieldset = (new Fieldset)->setContents([
-            'title' => 'Test',
-        ]);
+        $fieldset = (new Fieldset)->setHandle($handle)->setContents(['title' => $title]);
 
-        $this->assertEquals('Test', $fieldset->title());
+        $this->assertEquals($expectedTitle, $fieldset->title());
     }
 
-    /** @test */
-    public function the_title_falls_back_to_a_humanized_handle()
+    public function titleProvider()
     {
-        $fieldset = (new Fieldset)->setHandle('the_blueprint_handle');
-
-        $this->assertEquals('The blueprint handle', $fieldset->title());
+        return [
+            'title' => ['test_fieldset', 'The Provided Title', 'The Provided Title'],
+            'no title' => ['test_fieldset', null, 'Test fieldset'],
+            'no title in subdirectory' => ['bar.test_fieldset', null, 'Test fieldset'],
+            'namespaced with title' => ['foo::test_fieldset', 'The Provided Title', 'The Provided Title'],
+            'namespaced with no title' => ['foo::test_fieldset', null, 'Test fieldset'],
+            'namespaced with no title in subdirectory' => ['foo::bar.test_fieldset', null, 'Test fieldset'],
+        ];
     }
 
     /** @test */

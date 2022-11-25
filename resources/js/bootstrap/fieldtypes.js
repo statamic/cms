@@ -29,6 +29,7 @@ Vue.component('collection_title_formats-fieldtype', require('../components/colle
 Vue.component('color-fieldtype', require('../components/fieldtypes/ColorFieldtype.vue').default);
 Vue.component('date-fieldtype', require('../components/fieldtypes/DateFieldtype.vue').default);
 Vue.component('fields-fieldtype', require('../components/fieldtypes/grid/FieldsFieldtype.vue').default);
+Vue.component('files-fieldtype', require('../components/fieldtypes/FilesFieldtype.vue').default);
 Vue.component('float-fieldtype', require('../components/fieldtypes/FloatFieldtype.vue').default);
 Vue.component('global_set_sites-fieldtype', require('../components/globals/Sites.vue').default);
 Vue.component('grid-fieldtype', require('../components/fieldtypes/grid/Grid.vue').default);
