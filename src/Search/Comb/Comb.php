@@ -134,6 +134,13 @@ class Comb
      */
     private $group_by_category = false;
 
+    /**
+     * Snippet word on_each_side.
+     *
+     * @var int
+     */
+    private $snippet_on_each_side = 6;
+
     // data
     // ----------------------------------------------------------------------
 
@@ -344,6 +351,11 @@ class Comb
             $this->group_by_category = true;
         }
 
+        // snippet on each side
+        if (isset($settings['snippet_on_each_side']) && ! is_null($settings['snippet_on_each_side'])) {
+            $this->snippet_on_each_side = $settings['snippet_on_each_side'];
+        }
+
         // exclude properties
         if (isset($settings['exclude_properties']) && ! is_null($settings['exclude_properties']) && is_array($settings['exclude_properties'])) {
             $this->exclude_properties = array_merge($this->exclude_properties, $settings['exclude_properties']);
@@ -511,6 +523,9 @@ class Comb
                 'whole' => 0,
             ];
 
+            // snippets
+            $snippets = [];
+
             // loop over each query chunk
             foreach ($params['chunks'] as $chunk) {
                 $escaped_chunk = str_replace('#', '\#', $chunk);
@@ -581,18 +596,53 @@ class Comb
 
                         $i++;
                     }
+
+                    // snippet lookup
+                    $snippet_regex = '#(\S+\s+){0,'.$this->snippet_on_each_side.'}\S*'.$escaped_chunk.'\S*(\s+\S+){0,'.$this->snippet_on_each_side.'}#i';
+                    if (preg_match_all($snippet_regex, $property, $matches)) {
+                        $snippets[$name] = array_merge($snippets[$name] ?? [], $matches[0]);
+                    }
                 }
-
-                // calculate score
-                $score = 0;
-
-                // loop through match weights, taking user-set options if we can
-                foreach ($this->match_weights as $weight_type => $weight) {
-                    $score += $found[$weight_type] * $weight;
-                }
-
-                $this->haystack[$key]['score'] = $score;
             }
+
+            // calculate score
+            $score = 0;
+
+            // loop through match weights, taking user-set options if we can
+            foreach ($this->match_weights as $weight_type => $weight) {
+                $score += $found[$weight_type] * $weight;
+            }
+
+            // rank and filter snippets
+            $escaped_chunks = collect($params['chunks'])
+                ->map(fn ($chunk) => str_replace('#', '\#', $chunk))
+                ->join('|');
+            $rank_regex = '#('.$escaped_chunks.')#';
+            $snippets = collect($snippets)
+                ->map(function ($snippets) use ($rank_regex) {
+                    $stack = [];
+
+                    return collect($snippets)
+                        ->sortByDesc(function ($snippet) use ($rank_regex) {
+                            return preg_match_all($rank_regex, $snippet);
+                        })
+                        ->filter(function ($snippet) use (&$stack) {
+                            foreach ($stack as $compare) {
+                                similar_text($snippet, $compare, $percent);
+                                if ($percent >= 50) {
+                                    return false;
+                                }
+                            }
+                            array_push($stack, $snippet);
+
+                            return true;
+                        })
+                        ->values();
+                })
+                ->all();
+
+            $this->haystack[$key]['score'] = $score;
+            $this->haystack[$key]['snippets'] = $snippets;
         }
 
         // create a clone
@@ -849,7 +899,7 @@ class Comb
                 array_push($parts['chunks'], $query);
             }
 
-            // perform a boolean search -- require words, disallow words
+        // perform a boolean search -- require words, disallow words
         } elseif ($this->query_mode === self::QUERY_BOOLEAN) {
             $words = preg_split("/\s+/i", $query);
 
@@ -882,7 +932,7 @@ class Comb
                 array_push($parts['chunks'], $query);
             }
 
-            // search for the entire query as one thing
+        // search for the entire query as one thing
         } else {
             $parts['chunks'] = [strtolower($query)];
         }
@@ -928,29 +978,34 @@ class Comb
         foreach ($words as $word) {
             if (strtolower($word) == 'and') {
                 array_push($output, '&');
+
                 continue;
             }
 
             if ($word == '&') {
                 array_push($output, 'and');
+
                 continue;
             }
 
             if (strpos($word, "'") !== false) {
                 array_push($output, preg_replace("/'/", '‘', $word));
                 array_push($output, preg_replace("/'/", '’', $word));
+
                 continue;
             }
 
             if (strpos($word, '’') !== false) {
                 array_push($output, preg_replace('/’/', '‘', $word));
                 array_push($output, preg_replace('/’/', "'", $word));
+
                 continue;
             }
 
             if (strpos($word, '‘') !== false) {
                 array_push($output, preg_replace('/‘/', "'", $word));
                 array_push($output, preg_replace('/‘/', '’', $word));
+
                 continue;
             }
         }

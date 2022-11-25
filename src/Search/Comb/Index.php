@@ -34,6 +34,7 @@ class Index extends BaseIndex
         return collect($results)->map(function ($result) {
             $data = $result['data'];
             $data['search_score'] = $result['score'];
+            $data['search_snippets'] = $result['snippets'];
 
             return array_except($data, '_category');
         });
