@@ -38,12 +38,8 @@
     }
 
     .tab-button.active {
-        @apply bg-white text-blue border-t-2 border-blue relative h-full min-h-full border-b-0 outline-none;
+        @apply bg-white text-blue border-t-2 border-blue relative h-full min-h-full border-b-0;
         z-index: 1;
-    }
-
-    .tab-button:active, .tab-button:focus {
-        @apply bg-white text-blue border-b-0 outline-none;
     }
 
     .tab-button.ghost {
