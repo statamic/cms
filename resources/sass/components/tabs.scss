@@ -38,8 +38,16 @@
     }
 
     .tab-button.active {
-        @apply bg-white text-blue border-t-2 border-blue relative h-full min-h-full border-b-0;
+        @apply bg-white text-blue border-t-2 border-blue relative h-full min-h-full border-b-0 outline-none;
         z-index: 1;
+    }
+
+    tab-button:active {
+        @apply bg-white text-blue border-b-0 outline-none;
+    }
+
+    .tab-button:focus {
+        @apply bg-white text-blue border-b-0 focus-outline;
     }
 
     .tab-button.ghost {
@@ -57,6 +65,10 @@
             box-shadow: theme('colors.red') 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
         }
     }
+}
+
+.tab-panel:focus {
+    @apply focus-outline;
 }
 
 @screen md {

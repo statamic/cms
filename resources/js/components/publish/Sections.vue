@@ -62,7 +62,7 @@
             <!-- Main -->
             <div ref="publishSectionWrapper" class="publish-section-wrapper w-full min-w-0">
                 <div
-                    class="publish-section w-full"
+                    class="publish-section tab-panel w-full"
                     :class="showTabs && 'rounded-tl-none'"
                     :role="showTabs && 'tabpanel'"
                     :id="showTabs && tabPanelId(section.handle)"
