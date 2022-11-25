@@ -74,7 +74,7 @@ class StaticWarm extends Command
             'verify' => ! $this->laravel->isLocal(),
             'auth' => $this->option('user') && $this->option('password')
                 ? [$this->option('user'), $this->option('password')]
-                : null
+                : null,
         ]);
 
         $this->output->newLine();
