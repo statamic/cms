@@ -140,7 +140,6 @@ export default {
 
         return {
             active: state.blueprint.sections[0].handle,
-            visibleTabs: 0,
             layoutReady: false,
             shouldShowSidebar: false,
             hiddenTabs: [],
@@ -183,7 +182,7 @@ export default {
         },
 
         showHiddenTabsDropdown() {
-            return this.numberOfTabs > this.visibleTabs;
+            return this.hiddenTabs.length > 0;
         },
 
         errors() {
