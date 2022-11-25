@@ -28,7 +28,11 @@ class StaticWarm extends Command
     use RunsInPlease;
     use EnhancesCommands;
 
-    protected $signature = 'statamic:static:warm {--queue : Queue the requests} {--u= : HTTP authentication user} {--p= : HTTP authentication password}';
+    protected $signature = 'statamic:static:warm
+        {--queue : Queue the requests}
+        {--user= : HTTP authentication user}
+        {--password= : HTTP authentication password}
+    ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
 
@@ -68,8 +72,8 @@ class StaticWarm extends Command
     {
         $client = new Client([
             'verify' => ! $this->laravel->isLocal(),
-            'auth' => $this->option('u') && $this->option('p')
-                ? [$this->option('u'), $this->option('p')]
+            'auth' => $this->option('user') && $this->option('password')
+                ? [$this->option('user'), $this->option('password')]
                 : null
         ]);
 
