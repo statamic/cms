@@ -59,7 +59,7 @@ class AssetsController extends CpController
         return [
             'success' => true,
             'message' => 'Asset updated',
-            'asset' => (new AssetResource($asset))->resolve()['data']
+            'asset' => (new AssetResource($asset))->resolve()['data'],
         ];
     }
 
