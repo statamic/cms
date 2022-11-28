@@ -281,18 +281,18 @@ abstract class AbstractCacher implements Cacher
 
     protected function getPathAndDomain($url)
     {
-        if (Str::startsWith($url, '/')) {
+        $parsed = parse_url($url);
+
+        if (!isset($parsed['scheme']) || !isset($parsed['host'])) {
             return [
-                $url,
+                Str::ensureLeft($url, '/'),
                 $this->getBaseUrl(),
             ];
         }
 
-        $parsed = parse_url($url);
+        $path = $parsed['path'] ?? '/';
 
         $query = isset($parsed['query']) ? '?'.$parsed['query'] : '';
-
-        $path = $parsed['path'] ?? '/';
 
         return [
             $path.$query,
