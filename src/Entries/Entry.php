@@ -714,7 +714,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             return null;
         }
 
-        if ($structure = $this->structure()) {
+        if (($structure = $this->structure()) && ! $this->collection()->orderable()) {
             return $structure->entryUri($this);
         }
 
