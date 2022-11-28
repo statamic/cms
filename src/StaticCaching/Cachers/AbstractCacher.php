@@ -283,7 +283,7 @@ abstract class AbstractCacher implements Cacher
     {
         $parsed = parse_url($url);
 
-        if (! isset($parsed['scheme']) || ! isset($parsed['host'])) {
+        if (! isset($parsed['scheme'])) {
             return [
                 Str::ensureLeft($url, '/'),
                 $this->getBaseUrl(),
