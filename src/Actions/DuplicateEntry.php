@@ -16,12 +16,12 @@ class DuplicateEntry extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof Entry && !Site::hasMultiple();
+        return $item instanceof Entry && ! Site::hasMultiple();
     }
 
     public function run($items, $values)
     {
-        $items->each(function (Entry $original) use ($values) {
+        $items->each(function (Entry $original) {
             $originalParent = $this->getEntryParentFromStructure($original);
             [$title, $slug] = $this->generateTitleAndSlug($original);
 
