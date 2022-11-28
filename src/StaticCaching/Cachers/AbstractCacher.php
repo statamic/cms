@@ -290,9 +290,9 @@ abstract class AbstractCacher implements Cacher
             ];
         }
 
-        $path = $parsed['path'] ?? '/';
-
         $query = isset($parsed['query']) ? '?'.$parsed['query'] : '';
+
+        $path = $parsed['path'] ?? '/';
 
         return [
             $path.$query,
