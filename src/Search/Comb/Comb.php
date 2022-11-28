@@ -7,7 +7,7 @@ use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Statamic\Search\Comb\Exceptions\NotEnoughCharacters;
 use Statamic\Search\Comb\Exceptions\TooManyResults;
-use Stringy\StaticStringy as Stringy;
+use Statamic\Support\Str;
 
 class Comb
 {
@@ -524,13 +524,11 @@ class Comb
                 'whole' => 0,
             ];
 
-            $escaped_chunks = [];
             $snippets = [];
 
             // loop over each query chunk
-            foreach ($params['chunks'] as $chunk) {
+            foreach ($params['chunks'] as $j => $chunk) {
                 $escaped_chunk = str_replace('#', '\#', $chunk);
-                $escaped_chunks[] = $escaped_chunk;
                 $regex = [
                     'whole' => '#^'.$escaped_chunk.'$#i',
                     'partial' => '#'.$escaped_chunk.'#i',
@@ -599,15 +597,9 @@ class Comb
                         $i++;
                     }
                     
-                    // snippet lookup (only run during the last chunk)
-                    if (count($escaped_chunks) === count($params['chunks'])) {
-                        $snippet_regex =
-                            '#(.{0,'.$this->snippet_length.'})('.
-                            implode('|', array_reverse($escaped_chunks)).
-                            ')(.{0,'.$this->snippet_length.'})#i';
-                        if (preg_match_all($snippet_regex, $property, $matches, PREG_SET_ORDER)) {
-                            $snippets[$name] = $this->processSnippets($escaped_chunks, $matches);
-                        }
+                    // snippet extraction (only needs to run during one chunk)
+                    if ($j === 0) {
+                        $snippets[$name] = $this->extractSnippets($property, $params['chunks']);
                     }
                 }
 
@@ -618,7 +610,7 @@ class Comb
                 foreach ($this->match_weights as $weight_type => $weight) {
                     $score += $found[$weight_type] * $weight;
                 }
-    
+
                 $this->haystack[$key]['score'] = $score;
                 $this->haystack[$key]['snippets'] = $snippets;
             }
@@ -1042,46 +1034,41 @@ class Comb
     }
 
     /**
-     * Truncate, trim, rank and filter snippets.
+     * Extract and truncate snippets.
      *
      * @return array
      */
-    private function processSnippets($escaped_chunks, $snippets)
+    private function extractSnippets($value, $chunks)
     {
-        $stack = [];
+        $length = $this->snippet_length;
 
-        return collect($snippets)
-            ->map(function ($snippet) {
-                list(, $before, $chunk, $after) = $snippet;
-                $before = ltrim($before);
-                $after = rtrim($after);
-                $target_length = $this->snippet_length;
-                $chunk_length = strlen($chunk);
-                $half_length = floor(($target_length - $chunk_length) / 2);
-                if (strlen($after) < $half_length) {
-                    $str = $chunk.$after;
-                    $str = strrev(Stringy::safeTruncate(strrev($before), $target_length - strlen($str))).$str;
-                } else {
-                    $str = strrev(Stringy::safeTruncate(strrev($before), $half_length)).$chunk;
-                    $str = $str.Stringy::safeTruncate($after, $target_length - strlen($str));
-                }
-                return trim($str);
-            })
-            ->sortByDesc(function ($snippet) use ($escaped_chunks) {
-                return preg_match_all('#('.implode('|', $escaped_chunks).')#', $snippet);
-            })
-            ->filter(function ($snippet) use (&$stack) {
-                foreach ($stack as $compare) {
-                    similar_text($snippet, $compare, $percent);
-                    if ($percent >= 50) {
-                        return false;
-                    }
-                }
-                array_push($stack, $snippet);
+        $escaped_chunks = collect($chunks)
+            ->reverse()
+            ->map(fn ($chunk) => str_replace('#', '\#', $chunk))
+            ->join('|');
 
-                return true;
-            })
-            ->values()->all();
+        $regex = '#(.{0,'.$length.'})('.$escaped_chunks.')(.{0,'.$length.'})#i';
+        if (! preg_match_all($regex, $value, $matches, PREG_SET_ORDER)) {
+            return [];
+        }
+
+        $snippets = [];
+        foreach ($matches as $match) {
+            list(, $before, $chunk, $after) = $match;
+            $before = ltrim($before);
+            $after = rtrim($after);
+            $half = floor(($length - Str::length($chunk)) / 2);
+            if (Str::length($after) < $half) {
+                $snippet = $chunk.$after;
+                $snippet = Str::safeTruncateReverse($before, $length - Str::length($snippet)).$snippet;
+            } else {
+                $snippet = Str::safeTruncateReverse($before, $half).$chunk;
+                $snippet = $snippet.Str::safeTruncate($after, $length - Str::length($snippet));
+            }
+            $snippets[] = trim($snippet);
+        }
+
+        return $snippets;
     }
 
     // creators for Bloodhound

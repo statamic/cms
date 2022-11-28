@@ -296,6 +296,11 @@ class Str extends \Illuminate\Support\Str
         return StaticStringy::replace($string, $search, $replace);
     }
 
+    public static function safeTruncateReverse($string, $length, $substring = '')
+    {
+        return self::reverse(self::safeTruncate(self::reverse($string), $length, $substring));
+    }
+
     public static function studly($value)
     {
         $key = $value;
