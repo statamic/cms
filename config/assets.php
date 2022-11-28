@@ -57,6 +57,23 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | CP - access the images directly instead of going through the above cache
+        |--------------------------------------------------------------------------
+        |
+        | Override the above SAVED_CACHED_IMAGES setting for the CP and access the
+        | images directly instead of going through the cache.  You will need to
+        | run `php please glide:generate-presets` to generate the images.  Then
+        | symlink the public/img folder to the glide storage folder.  Images are
+        | expected to be to be present in the glide storage folder and will not be
+        | generated on the fly.
+        */
+
+        'image_direct_urls' => false,
+        'image_direct_path' => '/img/',
+
+
+        /*
+        |--------------------------------------------------------------------------
         | Image Manipulation Presets
         |--------------------------------------------------------------------------
         |

@@ -3,39 +3,40 @@
 namespace Statamic\Assets;
 
 use ArrayAccess;
-use Facades\Statamic\Assets\Attributes;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Statamic\Contracts\Assets\Asset as AssetContract;
-use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Data\Augmented;
-use Statamic\Contracts\Query\ContainsQueryableValues;
-use Statamic\Data\ContainsData;
-use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\TracksQueriedColumns;
-use Statamic\Data\TracksQueriedRelations;
-use Statamic\Events\AssetDeleted;
-use Statamic\Events\AssetReplaced;
-use Statamic\Events\AssetReuploaded;
-use Statamic\Events\AssetSaved;
-use Statamic\Events\AssetUploaded;
-use Statamic\Exceptions\FileExtensionMismatch;
+use Stringy\Stringy;
 use Statamic\Facades;
-use Statamic\Facades\AssetContainer as AssetContainerAPI;
-use Statamic\Facades\Image;
-use Statamic\Facades\Path;
-use Statamic\Facades\URL;
-use Statamic\Facades\YAML;
-use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
 use Statamic\Statamic;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Stringy\Stringy;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Statamic\Facades\Path;
+use Statamic\Facades\YAML;
+use Statamic\Facades\Image;
+use Illuminate\Support\Carbon;
+use Statamic\Data\ContainsData;
+use Statamic\Events\AssetSaved;
+use Statamic\Events\AssetDeleted;
+use Statamic\Events\AssetReplaced;
+use Statamic\Events\AssetUploaded;
+use Statamic\Events\AssetReuploaded;
+use Statamic\Imaging\ImageGenerator;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\Mime\MimeTypes;
+use Statamic\Contracts\Data\Augmented;
+use Facades\Statamic\Assets\Attributes;
+use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\TracksQueriedColumns;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\TracksQueriedRelations;
+use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Exceptions\FileExtensionMismatch;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Contracts\Assets\Asset as AssetContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Statamic\Facades\AssetContainer as AssetContainerAPI;
+use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
 
 class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues
 {
@@ -380,6 +381,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
             return null;
         }
 
+        if ($this->isImage() && config('statamic.assets.image_manipulation.direct_image_urls')) {
+            return $this->getImageDirectUrl();
+        }
+
         return URL::assemble($this->container()->url(), $this->path());
     }
 
@@ -398,10 +403,26 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
             return $this->svgThumbnailUrl();
         }
 
+        if ($this->isImage() && config('statamic.assets.image_manipulation.image_direct_urls')) {
+            return $this->getImageDirectUrl($preset);
+        }
+
         return cp_route('assets.thumbnails.show', [
             'encoded_asset' => base64_encode($this->id()),
             'size' => $preset,
         ]);
+    }
+
+    private function getImageDirectUrl($preset = null)
+    {
+        $path = app(ImageGenerator::class)->generateByAsset(
+            $this,
+            ['p' => $preset]
+        );
+        return url(
+            config('statamic.assets.image_manipulation.image_direct_path').
+            $path
+        );
     }
 
     protected function svgThumbnailUrl()
