@@ -30,8 +30,8 @@ class StaticWarm extends Command
 
     protected $signature = 'statamic:static:warm
         {--queue : Queue the requests}
-        {--user= : HTTP authentication user}
-        {--password= : HTTP authentication password}
+        {--u|user= : HTTP authentication user}
+        {--p|password= : HTTP authentication password}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
