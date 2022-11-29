@@ -4,7 +4,6 @@ namespace Statamic\Updater;
 
 use Carbon\Carbon;
 use Facades\Statamic\Marketplace\Marketplace;
-use Statamic\Updater\Presenters\GithubReleasePresenter;
 
 abstract class Changelog
 {
@@ -40,7 +39,7 @@ abstract class Changelog
                 'latest' => $index === 0,
                 'licensed' => $this->isLicensed($release['version']),
                 'date' => Carbon::parse($release['date'])->format(config('statamic.cp.date_format')),
-                'body' => (string) new GithubReleasePresenter($release['changelog']),
+                'body' => $release['changelog'],
             ];
         });
     }
