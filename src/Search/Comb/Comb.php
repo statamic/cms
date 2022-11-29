@@ -1056,7 +1056,7 @@ class Comb
             list(, $before, $chunk, $after) = $match;
             if ($surplus) {
                 $before = $surplus.$before;
-                $surplus = null;
+                $surplus = '';
             }
             $half = floor(($length - Str::length($chunk)) / 2);
             if (Str::length($after) < $half) {
