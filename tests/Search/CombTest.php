@@ -33,7 +33,7 @@ class CombTest extends TestCase
      **/
     public function it_extracts_snippets()
     {
-        $content = <<<EOT
+        $content = <<<'EOT'
 I would choose pizza. I think. But how then would I stream Teenage Mutant Ninja Turtles?
 Perhaps a wired ethernet connection to my Apple TV would be an acceptable loophole. Who
 designed this question anyway? Did they mean to imply all pizza, or just wireless

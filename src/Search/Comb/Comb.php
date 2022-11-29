@@ -596,7 +596,7 @@ class Comb
 
                         $i++;
                     }
-                    
+
                     // snippet extraction (only needs to run during one chunk)
                     if ($j === 0) {
                         $snippets[$name] = $this->extractSnippets($property, $params['chunks']);
@@ -1053,7 +1053,7 @@ class Comb
         $snippets = [];
         $surplus = '';
         foreach ($matches as $i => $match) {
-            list(, $before, $chunk, $after) = $match;
+            [, $before, $chunk, $after] = $match;
             if ($surplus) {
                 $before = $surplus.$before;
                 $surplus = '';
