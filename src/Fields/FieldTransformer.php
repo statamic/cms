@@ -4,6 +4,7 @@ namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Facades\Fieldset;
+use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 
 class FieldTransformer
@@ -31,13 +32,8 @@ class FieldTransformer
             unset($field['width']);
         }
 
-        $sites = config('statamic.sites.sites');
-        $multisite = count($sites) > 1;
-
-        if (Arr::get($field, 'localizable', false) === false) {
-            if (! $multisite) {
-                unset($field['localizable']);
-            }
+        if (Arr::get($field, 'localizable', false) === false && ! Site::hasMultiple()) {
+            unset($field['localizable']);
         }
 
         return array_filter([
