@@ -1486,7 +1486,7 @@ class CoreModifiers extends Modifier
      */
     public function mark($value, $params, $context)
     {
-        if (! $words = $params[0] ?? Html::decode($context['get']['q'] ?? null)) {
+        if (! $words = $params[0] ?? $context['get']['q'] ?? null) {
             return $value;
         }
 
