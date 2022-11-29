@@ -132,11 +132,11 @@
             },
 
             latestVersion() {
-                return this.latestRelease.version;
+                return this.latestRelease && this.latestRelease.version;
             },
 
             canUpdateToLatestVersion() {
-                return this.latestVersion.canUpdate && this.showActions && ! this.onLatestVersion;
+                return this.latestVersion && this.latestVersion.canUpdate && this.showActions && ! this.onLatestVersion;
             }
         },
 
