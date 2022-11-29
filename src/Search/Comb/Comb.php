@@ -1043,29 +1043,35 @@ class Comb
         $length = $this->snippet_length;
 
         $escaped_chunks = collect($chunks)
-            ->reverse()
             ->map(fn ($chunk) => str_replace('#', '\#', $chunk))
             ->join('|');
-
-        $regex = '#(.{0,'.$length.'})('.$escaped_chunks.')(.{0,'.$length.'})#i';
+        $regex = '#(.*?)('.$escaped_chunks.')(.{0,'.$length.'}(?:\s|$))#i';
         if (! preg_match_all($regex, $value, $matches, PREG_SET_ORDER)) {
             return [];
         }
 
         $snippets = [];
-        foreach ($matches as $match) {
+        $surplus = '';
+        foreach ($matches as $i => $match) {
             list(, $before, $chunk, $after) = $match;
-            $before = ltrim($before);
-            $after = rtrim($after);
+            if ($surplus) {
+                $before = $surplus.$before;
+                $surplus = null;
+            }
             $half = floor(($length - Str::length($chunk)) / 2);
             if (Str::length($after) < $half) {
                 $snippet = $chunk.$after;
                 $snippet = Str::safeTruncateReverse($before, $length - Str::length($snippet)).$snippet;
             } else {
                 $snippet = Str::safeTruncateReverse($before, $half).$chunk;
-                $snippet = $snippet.Str::safeTruncate($after, $length - Str::length($snippet));
+                $trimmed = Str::safeTruncate($after, $length - Str::length($snippet));
+                $surplus = Str::substr($after, Str::length($trimmed));
+                $snippet = $snippet.$trimmed;
             }
             $snippets[] = trim($snippet);
+        }
+        if (preg_match('#('.$escaped_chunks.')#i', $surplus)) {
+            $snippets[] = trim($surplus);
         }
 
         return $snippets;
