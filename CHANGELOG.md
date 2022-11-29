@@ -1,5 +1,29 @@
 # Release Notes
 
+## 3.3.59 (2022-11-29)
+
+### What's new
+- Ability to duplicate entries, terms, assets, and forms. [#6307](https://github.com/statamic/cms/issues/6307) by @duncanmcclean
+- Ability to use HTTP auth support to the `static:warm` command. [#7115](https://github.com/statamic/cms/issues/7115) by @moritzlang
+- Ability for addons to set their fieldset namespace. [#7105](https://github.com/statamic/cms/issues/7105) by @edalzell
+
+### What's improved
+- Added a typehint to the `schedule` method in addon service providers. [#7081](https://github.com/statamic/cms/issues/7081) by @robbanl
+- Improve the speed of the updater page. [#7140](https://github.com/statamic/cms/issues/7140) by @arthurperton
+
+### What's fixed
+- Fix invalid slug validation when single-depth orderable collections. [#7134](https://github.com/statamic/cms/issues/7134) by @arthurperton
+- Prevent error when creating entry while using multisite [#7143](https://github.com/statamic/cms/issues/7143) by @jasonvarga
+- The link fieldtype will localize appropriately. [#7093](https://github.com/statamic/cms/issues/7093) by @arthurperton
+- Fix search on users listing when storing users in the database and using separate first/last name fields. [#7138](https://github.com/statamic/cms/issues/7138) by @duncanmcclean
+- Fix static caching error when using exclusion URLs without leading slashes. [#7130](https://github.com/statamic/cms/issues/7130) by @arthurperton
+- Fix issue where it looked like asset fields would disappear. [#7131](https://github.com/statamic/cms/issues/7131) by @arthurperton
+- Fix case insensitive entry URLs. [#7103](https://github.com/statamic/cms/issues/7103) by @jasonvarga
+- Fix super user handling within JavaScript based permission checks. [#7101](https://github.com/statamic/cms/issues/7101) by @jasonvarga
+- Add `psr_autoloading` rule to `pint.json`. [#7142](https://github.com/statamic/cms/issues/7142) by @jasonvarga
+
+
+
 ## 3.3.58 (2022-11-21)
 
 ### What's new
