@@ -19,7 +19,7 @@
             </div>
         </div>
         <div class="card-body">
-            <div v-html="release.body"></div>
+            <div v-html="body"></div>
         </div>
 
         <confirmation-modal
@@ -66,6 +66,14 @@ export default {
             return this.confirmationPrompt.type === 'downgrade'
                 ? __('Are you sure you want to downgrade to :version?', attrs)
                 : __('Are you sure you want to update to :version?', attrs)
+        },
+
+        body() {
+            return markdown(this.release.body)
+                .replaceAll('[new]', '<span class="label" style="background: #5bc0de;">NEW</span>')
+                .replaceAll('[fix]', '<span class="label" style="background: #5cb85c;">FIX</span>')
+                .replaceAll('[break]', '<span class="label" style="background: #d9534f;">BREAK</span>')
+                .replaceAll('[na]', '<span class="label" style="background: #e8e8e8;">N/A</span>')
         }
     },
 
