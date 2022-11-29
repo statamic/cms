@@ -1054,10 +1054,8 @@ class Comb
         $surplus = '';
         foreach ($matches as $i => $match) {
             [, $before, $chunk, $after] = $match;
-            if ($surplus) {
-                $before = $surplus.$before;
-                $surplus = '';
-            }
+            $before = $surplus.$before;
+            $surplus = '';
             $half = floor(($length - Str::length($chunk)) / 2);
             if (Str::length($after) < $half) {
                 $snippet = $chunk.$after;
