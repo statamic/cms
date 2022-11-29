@@ -149,6 +149,15 @@ class FieldsController extends CpController
                 'type' => 'toggle',
                 'validate' => 'boolean',
                 'default' => false,
+                'width' => 50,
+            ],
+            'duplicate' => [
+                'display' => __('Duplicate'),
+                'instructions' => __('statamic::messages.fields_duplicate_instructions'),
+                'type' => 'toggle',
+                'validate' => 'boolean',
+                'width' => 50,
+                'default' => true,
             ],
         ]);
 

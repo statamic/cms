@@ -35,6 +35,10 @@ class FieldTransformer
             unset($field['localizable']);
         }
 
+        if (Arr::get($field, 'duplicate', true) === true) {
+            unset($field['duplicate']);
+        }
+
         return array_filter([
             'handle' => $submitted['handle'],
             'field' => $field,
