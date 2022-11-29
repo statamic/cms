@@ -140,11 +140,8 @@
             }
         },
 
-        mounted() {
-            this.getChangelog();
-        },
-
         created() {
+            this.getChangelog();
             this.$events.$on('composer-finished', this.composerFinished);
         },
 
