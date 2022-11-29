@@ -366,17 +366,17 @@ class EntriesController extends CpController
 
         if ($structure = $collection->structure()) {
             $tree = $structure->in($site->handle());
+        }
 
-            if (! $collection->orderable()) {
-                $parent = $values['parent'] ?? null;
-                $entry->afterSave(function ($entry) use ($parent, $tree) {
-                    if ($parent && optional($tree->page($parent))->isRoot()) {
-                        $parent = null;
-                    }
+        if ($structure && ! $collection->orderable()) {
+            $parent = $values['parent'] ?? null;
+            $entry->afterSave(function ($entry) use ($parent, $tree) {
+                if ($parent && optional($tree->page($parent))->isRoot()) {
+                    $parent = null;
+                }
 
-                    $tree->appendTo($parent, $entry)->save();
-                });
-            }
+                $tree->appendTo($parent, $entry)->save();
+            });
         }
 
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
