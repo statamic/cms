@@ -754,8 +754,8 @@ export default {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
 
         this.selectedOrigin = this.originBehavior === 'active'
-            ? this.localizations.find(l => l.active).handle
-            : this.localizations.find(l => l.root).handle;
+            ? this.localizations.find(l => l.active)?.handle
+            : this.localizations.find(l => l.root)?.handle;
     },
 
     unmounted() {
