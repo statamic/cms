@@ -56,7 +56,8 @@
                     :is-open="item.open"
                     :has-children="item.children.length > 0"
                     :disable-sections="true"
-                    @edit="$emit('edit-page', item, vm, store, $event)"
+                    :top-level="true"
+                    @edit="editItem(item, true)"
                     @toggle-open="store.toggleOpen(item)"
                 >
                     <template #branch-options="{ item, removeBranch, orphanChildren, vm, depth }">
@@ -99,7 +100,7 @@
                     :vm="vm"
                     :is-open="item.open"
                     :has-children="item.children.length > 0"
-                    @edit="$emit('edit-page', item, vm, store, $event)"
+                    @edit="editItem(item)"
                     @toggle-open="store.toggleOpen(item)"
                 >
                     <template #branch-options="{ item, removeBranch, orphanChildren, vm, depth }">
@@ -346,10 +347,9 @@ export default {
         },
 
         itemAdded(createdConfig) {
-            let item = {
-                action: '@create',
-                ...this.normalizeNavConfig(createdConfig),
-            };
+            let item = this.normalizeNavConfig(createdConfig);
+
+            item.manipulations = { action: '@create' };
 
             this.targetDataArray.push(item);
             this.resetItemEditor();
@@ -367,8 +367,8 @@ export default {
             this.changed = true;
         },
 
-        editItem(item) {
-            if (this.isSectionNode(item)) {
+        editItem(item, topLevel) {
+            if (this.isSectionNode(item) && ! topLevel) {
                 this.editingSection = item;
             } else {
                 this.editingItem = item;
