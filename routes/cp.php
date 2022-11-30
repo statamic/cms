@@ -232,5 +232,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::view('/playground', 'statamic::playground')->name('playground');
 
+    Route::get('/nav-preferences', 'NavPreferencesController@edit')->name('nav-preferences');
+    Route::post('/nav-preferences', 'NavPreferencesController@update');
+
     Route::get('{segments}', 'CpController@pageNotFound')->where('segments', '.*')->name('404');
 });
