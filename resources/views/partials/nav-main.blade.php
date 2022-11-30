@@ -3,6 +3,7 @@
 @section('nav-main')
     <nav class="nav-main" v-cloak>
         <div class="nav-main-inner">
+
             @foreach ($nav as $section => $items)
                 @if ($section !== 'Top Level')
                     <h6>{{ __($section) }}</h6>
@@ -30,6 +31,19 @@
                     @endforeach
                 </ul>
             @endforeach
+
+            <div class="opacity-50">
+                <h6>{{ __('Preferences') }}</h6>
+                <ul>
+                    <li>
+                        <a href="{{ cp_route('nav-preferences') }}">
+                            <i>@cp_svg('hammer-wrench')</i>
+                            <span>{{ __('Nav') }}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
         </div>
     </nav>
 @stop
