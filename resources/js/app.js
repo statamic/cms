@@ -149,6 +149,7 @@ Statamic.app({
         TaxonomyBlueprintListing:  require('./components/taxonomies/BlueprintListing.vue').default,
         AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue').default,
         AssetContainerEditForm: require('./components/asset-containers/EditForm.vue').default,
+        NavBuilder: require('./components/nav/Builder.vue').default,
         Updater: require('./components/updater/Updater.vue').default,
         PortalTargets: require('./components/PortalTargets.vue').default,
     },
