@@ -51,4 +51,9 @@ class DuplicateAsset extends Action
 
         return $path;
     }
+
+    public function authorize($user, $item)
+    {
+        return $user->can('store', [Asset::class, $item->container()]);
+    }
 }

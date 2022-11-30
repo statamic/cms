@@ -7,12 +7,15 @@ use Illuminate\Support\Facades\Storage;
 use Statamic\Actions\DuplicateAsset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades\Asset;
+use Statamic\Facades\User;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class DuplicateAssetTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use FakesRoles;
 
     public function setUp(): void
     {
@@ -93,5 +96,29 @@ class DuplicateAssetTest extends TestCase
         $this->assertAssetExistsAndHasData('alfa.jpg', ['alt' => 'The alfa alt text']);
         $this->assertAssetExistsAndHasData('alfa-1.jpg', ['alt' => 'Different alt text']);
         $this->assertAssetExistsAndHasData('alfa-2.jpg', ['alt' => 'The alfa alt text', 'duplicated_from' => 'test_container::path/to/alfa.jpg']);
+    }
+
+    /** @test */
+    public function user_with_create_permission_is_authorized()
+    {
+        $this->setTestRoles([
+            'access' => ['upload test_container assets'],
+            'noaccess' => [],
+        ]);
+
+        $userWithPermission = tap(User::make()->assignRole('access'))->save();
+        $userWithoutPermission = tap(User::make()->assignRole('noaccess'))->save();
+        $this->createAsset('alfa.jpg', 'The alfa alt text');
+        $this->createAsset('bravo.jpg', 'The bravo alt text');
+
+        $items = collect([
+            Asset::find('test_container::path/to/alfa.jpg'),
+            Asset::find('test_container::path/to/bravo.jpg'),
+        ]);
+
+        $this->assertTrue((new DuplicateAsset)->authorize($userWithPermission, $items->first()));
+        $this->assertTrue((new DuplicateAsset)->authorizeBulk($userWithPermission, $items));
+        $this->assertFalse((new DuplicateAsset)->authorize($userWithoutPermission, $items->first()));
+        $this->assertFalse((new DuplicateAsset)->authorizeBulk($userWithoutPermission, $items));
     }
 }

@@ -104,4 +104,9 @@ class DuplicateEntry extends Action
 
         return [$title, $slug];
     }
+
+    public function authorize($user, $item)
+    {
+        return $user->can('create', [Entry::class, $item->collection()]);
+    }
 }
