@@ -25,6 +25,10 @@
     }
 }
 
+.stack-container .grid-table thead th {
+    top: auto;
+}
+
 .grid-table > tbody {
     @apply outline-none;
 

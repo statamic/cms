@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -313,8 +314,6 @@ class Bard extends Replicator
     {
         $row['attrs']['values'] = parent::processRow($row['attrs']['values']);
 
-        unset($row['attrs']['id']);
-
         if (array_get($row, 'attrs.enabled', true) === true) {
             unset($row['attrs']['enabled']);
         }
@@ -371,7 +370,7 @@ class Bard extends Replicator
         return [
             'type' => 'set',
             'attrs' => [
-                'id' => "set-$index",
+                'id' => $row['attrs']['id'] ?? str_random(8),
                 'enabled' => $row['attrs']['enabled'] ?? true,
                 'values' => Arr::except($values, 'enabled'),
             ],
@@ -470,7 +469,7 @@ class Bard extends Replicator
                 [
                     'type' => 'set',
                     'attrs' => [
-                        'id' => "set-$i",
+                        'id' => RowId::generate(),
                         'values' => $set,
                     ],
                 ],

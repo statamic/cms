@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use Facades\Statamic\Fieldtypes\RowId;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -17,6 +18,15 @@ use Tests\TestCase;
 class BardTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    // Mocking method_exists, courtesy of https://stackoverflow.com/a/37928161
+    public static $functions;
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+        static::$functions = null;
+    }
 
     /** @test */
     public function it_augments_prosemirror_structure_to_a_template_friendly_array()
@@ -304,6 +314,8 @@ class BardTest extends TestCase
     /** @test */
     public function it_transforms_v2_formatted_content_into_prosemirror_structure()
     {
+        RowId::shouldReceive('generate')->andReturn('random-string-1');
+
         $data = [
             ['type' => 'text', 'text' => '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>'],
             ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux'],
@@ -330,7 +342,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
-                    'id' => 'set-2',
+                    'id' => 'random-string-1',
                     'enabled' => true,
                     'values' => [
                         'type' => 'myset',
@@ -360,6 +372,8 @@ class BardTest extends TestCase
     /** @test */
     public function it_transforms_v2_formatted_content_with_only_sets_into_prosemirror_structure()
     {
+        RowId::shouldReceive('generate')->andReturn('random-string-1');
+
         $data = [
             ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux'],
         ];
@@ -368,7 +382,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
-                    'id' => 'set-0',
+                    'id' => 'random-string-1',
                     'enabled' => true,
                     'values' => [
                         'type' => 'myset',
@@ -468,6 +482,8 @@ class BardTest extends TestCase
     /** @test */
     public function it_preloads_new_meta_with_preprocessed_values()
     {
+        RowId::shouldReceive('generate')->andReturn('random1', 'random2');
+
         // For this test, use a grid field with min_rows.
         // It doesn't have to be, but it's a fieldtype that would
         // require preprocessed values to be provided down the line.
@@ -503,8 +519,8 @@ class BardTest extends TestCase
                     'one' => null, // meta for the text field
                 ],
                 'existing' => [
-                    'row-0' => ['one' => null],
-                    'row-1' => ['one' => null],
+                    'random1' => ['one' => null],
+                    'random2' => ['one' => null],
                 ],
             ],
         ];
