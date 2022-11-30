@@ -73,10 +73,12 @@ class FieldsController extends CpController
             'elseif',
             'endif',
             'endunless',
+            'id',
             'if',
             'length',
             'reference',
             'resource',
+            'status',
             'unless',
             'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
         ];
@@ -134,6 +136,7 @@ class FieldsController extends CpController
                 'options' => [
                     'visible' => __('Visible'),
                     'read_only' => __('Read Only'),
+                    'computed' => __('Computed'),
                     'hidden' => __('Hidden'),
                 ],
                 'default' => 'visible',
@@ -146,6 +149,15 @@ class FieldsController extends CpController
                 'type' => 'toggle',
                 'validate' => 'boolean',
                 'default' => false,
+                'width' => 50,
+            ],
+            'duplicate' => [
+                'display' => __('Duplicate'),
+                'instructions' => __('statamic::messages.fields_duplicate_instructions'),
+                'type' => 'toggle',
+                'validate' => 'boolean',
+                'width' => 50,
+                'default' => true,
             ],
         ]);
 

@@ -102,7 +102,7 @@ abstract class Action implements Arrayable
             'warningText' => $this->warningText(),
             'dangerous' => $this->dangerous,
             'fields' => $this->fields()->toPublishArray(),
-            'values' => $this->fields()->values(),
+            'values' => $this->fields()->preProcess()->values(),
             'meta' => $this->fields()->meta(),
             'context' => $this->context,
         ];

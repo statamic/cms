@@ -5,7 +5,7 @@
             'is-image': isImage && !canShowSvg,
             'is-svg': canShowSvg,
             'is-file': !isImage && !canShowSvg,
-            'col-span-2 row-span-2': isSolo
+            'col-span-2': isSolo
         }"
         :title="asset.filename"
     >
@@ -15,6 +15,7 @@
             :allow-deleting="false"
             @closed="closeEditor"
             @saved="assetSaved"
+            @action-completed="actionCompleted"
         >
         </asset-editor>
 
@@ -130,7 +131,7 @@ export default {
         },
 
         needsAlt() {
-            return this.asset.isImage && !this.asset.values.alt;
+            return (this.asset.isImage || this.asset.isSvg) && !this.asset.values.alt;
         }
     }
 };

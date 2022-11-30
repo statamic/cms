@@ -124,6 +124,7 @@ export default {
             visibleTabs: 0,
             layoutReady: false,
             shouldShowSidebar: false,
+            initialTabSet: false
         }
     },
 
@@ -182,12 +183,8 @@ export default {
 
     },
 
-    mounted() {
-        this.setActiveTabFromHash();
-    },
-
     beforeUpdate() {
-        if (this.active === 'sidebar') {
+        if (this.shouldShowSidebar && this.active === 'sidebar') {
             this.active = this.state.blueprint.sections[0].handle
         }
     },
@@ -216,7 +213,7 @@ export default {
 
             const index = this.mainSections.findIndex(section => section.handle === handle);
 
-            if (index >= 0 && index < visibleTabs) {
+            if (index >= 0 && index < this.visibleTabs) {
                 this.setActive(handle);
             } else {
                 window.location.hash = '';
@@ -254,6 +251,9 @@ export default {
                 })
 
                 this.visibleTabs = visibleTabs;
+
+                if (!this.initialTabSet) this.setActiveTabFromHash();
+                this.initialTabSet = true;
             });
         }, 100),
 

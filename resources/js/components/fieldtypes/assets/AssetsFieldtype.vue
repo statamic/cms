@@ -1,6 +1,6 @@
 <template>
     <element-container @resized="containerWidth = $event.width">
-    <div :class="{ 'narrow': containerWidth < 500, 'really-narrow': containerWidth < 280 }">
+    <div :class="{ 'narrow': containerWidth < 500, 'really-narrow': containerWidth < 280, 'extremely-narrow': containerWidth < 180 }">
 
         <uploader
             ref="uploader"
@@ -19,7 +19,7 @@
                 </div>
 
                 <div
-                    v-if="!isReadOnly"
+                    v-if="!isReadOnly && showPicker"
                     class="assets-fieldtype-picker"
                     :class="{
                         'is-expanded': expanded,
@@ -81,7 +81,8 @@
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 @updated="assetUpdated"
-                                @removed="assetRemoved">
+                                @removed="assetRemoved"
+                                @id-changed="idChanged(asset.id, $event)">
                             </asset-tile>
                         </div>
                     </sortable-list>
@@ -105,7 +106,8 @@
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
                                         @updated="assetUpdated"
-                                        @removed="assetRemoved">
+                                        @removed="assetRemoved"
+                                        @id-changed="idChanged(asset.id, $event)">
                                     </tr>
                                 </tbody>
                             </sortable-list>
@@ -298,12 +300,56 @@ export default {
             }
         },
 
+        isInGridField() {
+            let vm = this;
+
+            while (true) {
+                let parent = vm.$parent;
+
+                if (! parent) return false;
+
+                if (parent.grid) {
+                    return true;
+                }
+
+                vm = parent;
+            }
+        },
+
+        isInLinkField() {
+            let vm = this;
+
+            while (true) {
+                let parent = vm.$parent;
+
+                if (! parent) return false;
+
+                if (parent.$options.name === 'link-fieldtype') {
+                    return true;
+                }
+
+                vm = parent;
+            }
+        },
+
         replicatorPreview() {
             return _.map(this.assets, (asset) => {
-                return asset.isImage ?
+                return (asset.isImage || asset.isSvg) ?
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
             }).join(', ');
+        },
+
+        showPicker() {
+            if (this.maxFilesReached && ! this.isFullWidth) return false
+
+            if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false
+
+            return true
+        },
+
+        isFullWidth() {
+            return ! (this.config.width && this.config.width < 100)
         }
 
     },
@@ -328,6 +374,8 @@ export default {
                 this.initializing = false;
                 this.loading = false;
             });
+
+            this.$emit('replicator-preview-updated', this.replicatorPreview);
         },
 
         /**
@@ -428,7 +476,12 @@ export default {
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
             }).join(', ');
-        }
+        },
+
+        idChanged(oldId, newId) {
+            const index = this.value.indexOf(oldId);
+            this.update([...this.value.slice(0, index), newId, ...this.value.slice(index + 1)]);
+        },
 
     },
 

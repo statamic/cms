@@ -23,11 +23,13 @@ class FolderAsset extends JsonResource
                 return [
                     'is_image' => true,
                     'thumbnail' => $this->thumbnailUrl('small'),
+                    'alt' => $this->alt,
                 ];
             }),
 
             'actions' => Action::for($this->resource, [
                 'container' => $this->container()->handle(),
+                'folder' => $this->folder(),
             ]),
         ];
     }

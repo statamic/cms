@@ -512,6 +512,35 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_and_sets_the_origin_behavior()
+    {
+        $collection = (new Collection)->handle('test');
+        $this->assertEquals('select', $collection->originBehavior());
+
+        $return = $collection->originBehavior('active');
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('active', $collection->originBehavior());
+
+        $return = $collection->originBehavior('root');
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('root', $collection->originBehavior());
+
+        $return = $collection->originBehavior(null);
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('select', $collection->originBehavior());
+    }
+
+    /** @test */
+    public function it_throw_exception_when_setting_invalid_origin_behavior()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid origin behavior [nope]. Must be "select", "root", or "active".');
+
+        $collection = (new Collection)->handle('test');
+        $collection->originBehavior('nope');
+    }
+
+    /** @test */
     public function it_sets_and_gets_structure()
     {
         $structure = new CollectionStructure;

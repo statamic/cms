@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
@@ -39,7 +40,7 @@ class Cache
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
             $response = response($this->cacher->getCachedPage($request));
 
-            $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->replaceInCachedResponse($response));
+            $this->makeReplacements($response);
 
             return $response;
         }
@@ -50,6 +51,8 @@ class Cache
             $this->makeReplacementsAndCacheResponse($request, $response);
 
             $this->nocache->write();
+        } elseif (! $response->isRedirect()) {
+            $this->makeReplacements($response);
         }
 
         return $response;
@@ -59,9 +62,18 @@ class Cache
     {
         $cachedResponse = clone $response;
 
-        $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse, $response));
+        if ($response instanceof Response) {
+            $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse, $response));
+        }
 
         $this->cacher->cachePage($request, $cachedResponse);
+    }
+
+    private function makeReplacements($response)
+    {
+        if ($response instanceof Response) {
+            $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->replaceInCachedResponse($response));
+        }
     }
 
     private function getReplacers(): Collection

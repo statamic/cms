@@ -7,10 +7,10 @@
 }
 
 .replicator-set {
-    @apply mb-5 shadow-set rounded bg-white outline-none relative;
+    @apply mt-5 shadow-set rounded bg-white outline-none relative;
 
-    &:first-child {
-        @apply mt-3;
+    &:last-child {
+        @apply mb-5;
     }
 }
 
@@ -40,6 +40,15 @@
             bottom: 1px;
         }
     }
+
+    &.invalid {
+        .replicator-set-header-inner {
+            @apply bg-red-lighter;
+            label {
+                @apply text-red;
+            }
+        }
+    }
 }
 
 .replicator-set-body {
@@ -47,8 +56,7 @@
 }
 
 .replicator-set-picker-between {
-    @apply absolute top-0 w-full text-center;
-    margin-top: -32px;
+    @apply absolute top-0 -mt-4 w-full text-center;
 }
 
 // Extra contrast when full width
