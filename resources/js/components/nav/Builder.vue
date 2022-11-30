@@ -490,13 +490,19 @@ export default {
 
             treeItems.forEach(item => {
                 items.push({
-                    'id': item.config.id.replace('::clone', ''),
+                    'id': this.prepareItemIdForSubmission(item),
                     'manipulations': item.manipulations,
                     'children': item.children ? this.prepareItemsForSubmission(item.children) : [],
                 });
             });
 
             return items;
+        },
+
+        prepareItemIdForSubmission(item) {
+            return data_get(item, 'config.id')
+                ? item.config.id.replace('::clone', '')
+                : item.text.toLowerCase().replace(' ', '_');
         },
 
     },
