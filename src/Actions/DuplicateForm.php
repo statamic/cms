@@ -57,4 +57,9 @@ class DuplicateForm extends Action
             $form->blueprint()->setContents($originalBlueprintContents)->save();
         });
     }
+
+    public function authorize($user, $item)
+    {
+        return $user->can('create', Form::class);
+    }
 }
