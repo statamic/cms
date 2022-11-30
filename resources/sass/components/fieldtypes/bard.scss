@@ -29,6 +29,15 @@
     min-height: 80px;
 }
 
+.bard-editor.mode\:inline .ProseMirror {
+    @apply p-1;
+    min-height: 38px;
+    p {
+        margin-bottom: 0;
+        line-height: 1.375; // 22px
+    }
+}
+
 // Responive Wangjangling
 @screen md {
     .bard-editor .ProseMirror { @apply p-2; }

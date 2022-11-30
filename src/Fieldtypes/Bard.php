@@ -107,6 +107,12 @@ class Bard extends Replicator
                 'instructions' => __('statamic::fieldtypes.bard.config.save_html'),
                 'type' => 'toggle',
             ],
+            'inline' => [
+                'display' => __('Inline'),
+                'instructions' => __('statamic::fieldtypes.bard.config.inline'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
             'toolbar_mode' => [
                 'display' => __('Toolbar Mode'),
                 'instructions' => __('statamic::fieldtypes.bard.config.toolbar_mode'),
@@ -226,6 +232,10 @@ class Bard extends Replicator
 
         $value = $this->removeEmptyNodes($value);
 
+        if ($this->config('inline')) {
+            $value = $this->unwrapInlineValue($value);
+        }
+
         $structure = collect($value)->map(function ($row) {
             if ($row['type'] !== 'set') {
                 return $row;
@@ -320,6 +330,21 @@ class Bard extends Replicator
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
+        }
+
+        if ($this->config('inline')) {
+            // Root should be text, if it's not this must be a block field converted
+            // to inline. In that instance unwrap the content of the first node.
+            if ($value[0]['type'] !== 'text') {
+                $value = $this->unwrapInlineValue($value);
+            }
+            $value = $this->wrapInlineValue($value);
+        } else {
+            // Root should not be text, if it is this must be an inline field converted
+            // to block. In that instance wrap the content in a paragraph node.
+            if ($value[0]['type'] === 'text') {
+                $value = $this->wrapInlineValue($value);
+            }
         }
 
         return collect($value)->map(function ($row, $i) {
@@ -621,5 +646,18 @@ class Bard extends Replicator
         }
 
         return [$ref => $data];
+    }
+
+    private function wrapInlineValue($value)
+    {
+        return [[
+            'type' => 'paragraph',
+            'content' => $value,
+        ]];
+    }
+
+    private function unwrapInlineValue($value)
+    {
+        return $value[0]['content'] ?? [];
     }
 }
