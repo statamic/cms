@@ -117,10 +117,15 @@ class Nav
     /**
      * Build navigation.
      *
+     * @param  mixed  $preferences
      * @return \Illuminate\Support\Collection
      */
-    public function build()
+    public function build($preferences = null)
     {
+        if (is_null($preferences)) {
+            $preferences = Preference::get('nav');
+        }
+
         return $this
             ->makeDefaultItems()
             ->cloneNav()
@@ -130,7 +135,7 @@ class Nav
             ->validateViews()
             ->authorizeItems()
             ->authorizeChildren()
-            ->applyPreferenceOverrides()
+            ->applyPreferenceOverrides($preferences)
             ->buildSections();
     }
 
@@ -291,15 +296,16 @@ class Nav
     /**
      * Apply overrides from user preferences.
      *
+     * @param  mixed  $preferences
      * @return $this
      */
-    protected function applyPreferenceOverrides()
+    protected function applyPreferenceOverrides($preferences = null)
     {
-        if (! $userNav = Preference::get('nav')) {
+        if (! $preferences) {
             return $this;
         }
 
-        $userNav = UserNavConfig::normalize($userNav);
+        $userNav = UserNavConfig::normalize($preferences);
 
         collect($userNav['sections'])
             ->reject(fn ($overrides, $section) => $section === NavItem::snakeCase($overrides['display']))

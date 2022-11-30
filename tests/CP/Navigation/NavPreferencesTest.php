@@ -2,7 +2,6 @@
 
 namespace Tests\CP\Navigation;
 
-use Statamic\CP\Navigation\Nav;
 use Statamic\Facades;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -1231,18 +1230,13 @@ class NavPreferencesTest extends TestCase
 
     private function buildNavWithPreferences($preferences, $preBuild = null)
     {
-        // Swap with fakes instead of using mocks,
-        // because a mock can only set one set of expectations per test method...
-        Facades\Preference::swap(new FakePreferences($preferences));
-        Facades\CP\Nav::swap(new Nav);
-
         $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
 
         if (is_callable($preBuild)) {
             $preBuild();
         }
 
-        return Facades\CP\Nav::build();
+        return Facades\CP\Nav::build($preferences);
     }
 
     private function buildDefaultNav()
