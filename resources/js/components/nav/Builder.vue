@@ -442,6 +442,7 @@ export default {
 
             tree.push({
                 'section': 'Top Level',
+                'original': 'Top Level',
                 'manipulations': this.prepareItemsForSubmission(this.topLevelTreeData),
             });
 
