@@ -618,6 +618,8 @@ class Nav
 
         $item->hidden(true);
 
+        $item->manipulations(['action' => '@remove']);
+
         $this->userRemoveItemFromChildren($item);
     }
 
@@ -635,6 +637,8 @@ class Nav
         }
 
         $item->preserveCurrentId();
+
+        $item->manipulations($config);
 
         $config = collect($config);
 
