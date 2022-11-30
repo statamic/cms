@@ -64,7 +64,7 @@ class DuplicateFormTest extends TestCase
         $userWithoutPermission = tap(User::make()->assignRole('noaccess'))->save();
         $items = collect([
             tap(Form::make('a')->title('Original A'))->save(),
-            tap(Form::make('b')->title('Original B'))->save()
+            tap(Form::make('b')->title('Original B'))->save(),
         ]);
 
         $this->assertTrue((new DuplicateForm)->authorize($userWithPermission, $items->first()));
