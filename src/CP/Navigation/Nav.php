@@ -305,19 +305,19 @@ class Nav
             return $this;
         }
 
-        $userNav = UserNavConfig::normalize($preferences);
+        $navPreferencesConfig = NavPreferencesConfig::normalize($preferences);
 
-        collect($userNav['sections'])
+        collect($navPreferencesConfig['sections'])
             ->reject(fn ($overrides, $section) => $section === NavItem::snakeCase($overrides['display']))
             ->each(fn ($overrides, $section) => $this->renameSection($section, $overrides['display']));
 
-        collect($userNav['sections'])
+        collect($navPreferencesConfig['sections'])
             ->reject(fn ($overrides) => $overrides === '@inherit')
             ->each(fn ($overrides) => $this->createPendingItemsForSection($overrides))
             ->each(fn ($overrides) => $this->applyPreferenceOverridesForSection($overrides));
 
-        if ($userNav['reorder']) {
-            $this->setSectionOrder($userNav['sections']);
+        if ($navPreferencesConfig['reorder']) {
+            $this->setSectionOrder($navPreferencesConfig['sections']);
         }
 
         return $this;
@@ -648,7 +648,7 @@ class Nav
 
         $config = collect($config);
 
-        collect(UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)
+        collect(NavPreferencesConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)
             ->filter(fn ($setter) => $config->has($setter))
             ->mapWithKeys(fn ($setter) => [$setter => $config->get($setter)])
             ->reject(fn ($value, $setter) => $setter === 'children')

@@ -3,14 +3,14 @@
 namespace Tests\CP\Navigation;
 
 use Illuminate\Support\Arr;
-use Statamic\CP\Navigation\UserNavConfig;
+use Statamic\CP\Navigation\NavPreferencesConfig;
 use Tests\TestCase;
 
-class UserNavConfigTest extends TestCase
+class NavPreferencesConfigTest extends TestCase
 {
     private function normalize($config)
     {
-        return UserNavConfig::normalize($config)->get();
+        return NavPreferencesConfig::normalize($config)->get();
     }
 
     /** @test */
@@ -261,7 +261,7 @@ class UserNavConfigTest extends TestCase
 
     public function modifiers()
     {
-        return collect(UserNavConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)->map(fn ($key) => [$key]);
+        return collect(NavPreferencesConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)->map(fn ($key) => [$key]);
     }
 
     /** @test */

@@ -6,7 +6,7 @@ use ArrayAccess;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class UserNavConfig implements ArrayAccess
+class NavPreferencesConfig implements ArrayAccess
 {
     protected $config;
 
@@ -28,24 +28,24 @@ class UserNavConfig implements ArrayAccess
     ];
 
     /**
-     * Instantiate user nav config helper.
+     * Instantiate nav preferences config helper.
      *
-     * @param  array  $userNavPreferences
+     * @param  array  $navPreferences
      */
-    public function __construct($userNavPreferences)
+    public function __construct($navPreferences)
     {
-        $this->config = $this->normalizeConfig($userNavPreferences);
+        $this->config = $this->normalizeConfig($navPreferences);
     }
 
     /**
-     * Instantiate user nav config helper.
+     * Instantiate nav preferences config helper.
      *
-     * @param  array  $userNavPreferences
+     * @param  array  $navPreferences
      * @return static
      */
-    public static function normalize($userNavPreferences)
+    public static function normalize($navPreferences)
     {
-        return new static($userNavPreferences);
+        return new static($navPreferences);
     }
 
     /**
