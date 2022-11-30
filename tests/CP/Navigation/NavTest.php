@@ -525,4 +525,22 @@ class NavTest extends TestCase
 
         $this->assertEquals('NOT 3PO', $item->name());
     }
+
+    /** @test */
+    public function it_can_rebuild_from_fresh_slate()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        // Ensure this extension gets applied on top of a fresh core nav state
+        Nav::extend(function ($nav) {
+            $nav->jedi('Yoda '.rand()); // This `rand()` call forces a new nav item to be created
+        });
+
+        $this->assertEmpty(Nav::items());
+
+        Nav::build();
+
+        $this->assertNotEmpty(Nav::items());
+        $this->assertCount(1, Nav::build()->get('Jedi')->map->display());
+    }
 }

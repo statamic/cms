@@ -4,6 +4,7 @@ namespace Statamic\CP\Navigation;
 
 use Closure;
 use Exception;
+use Illuminate\Support\Collection;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
@@ -13,7 +14,6 @@ class Nav
     protected $items = [];
     protected $pendingItems = [];
     protected $extensions = [];
-    protected $built;
     protected $withHidden = false;
     protected $sectionsOrder = [];
     protected $sectionsWithReorderedItems = [];
@@ -123,6 +123,7 @@ class Nav
     {
         return $this
             ->makeDefaultItems()
+            ->cloneNav()
             ->buildExtensions()
             ->buildChildren()
             ->validateNesting()
@@ -143,6 +144,39 @@ class Nav
         CoreNav::make();
 
         return $this;
+    }
+
+    /**
+     * Cloned current instance state so that we can control mutability when rebuilding nav.
+     *
+     * @return $this
+     */
+    protected function cloneNav()
+    {
+        $clone = clone $this;
+
+        $clone->items = collect($this->items)
+            ->map(fn ($item) => $this->cloneNavItem($item))
+            ->all();
+
+        return $clone;
+    }
+
+    /**
+     * Clone nav item and its' children.
+     *
+     * @param  NavItem  $item
+     * @return NavItem
+     */
+    protected function cloneNavItem($item)
+    {
+        $clone = clone $item;
+
+        if ($clone->children() instanceof Collection) {
+            $clone->children($clone->children()->map(fn ($item) => clone $item));
+        }
+
+        return $clone;
     }
 
     /**
