@@ -3,7 +3,9 @@
     <div>
 
         <header class="mb-3">
-            <breadcrumb url="/wot" :title="__('Preferences')" />
+            <!--
+            <breadcrumb url="" :title="__('Preferences')" />
+            -->
 
             <div class="flex items-center">
                 <h1 class="flex-1">{{ __('Nav Preferences') }}</h1>
@@ -173,7 +175,6 @@ import TreeBranch from './Branch.vue';
 import ItemEditor from './ItemEditor.vue';
 import SectionEditor from './SectionEditor.vue';
 import { data_get } from  '../../bootstrap/globals.js'
-// import uniqid from 'uniqid';
 
 export default {
 
