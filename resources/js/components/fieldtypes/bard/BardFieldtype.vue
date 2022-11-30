@@ -264,7 +264,7 @@ export default {
         },
 
         inputIsInline() {
-            return this.config.input_mode === 'inline';
+            return this.config.inline;
         },
 
     },

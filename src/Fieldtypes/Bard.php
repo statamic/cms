@@ -107,15 +107,10 @@ class Bard extends Replicator
                 'instructions' => __('statamic::fieldtypes.bard.config.save_html'),
                 'type' => 'toggle',
             ],
-            'input_mode' => [
-                'display' => __('Input Mode'),
-                'instructions' => __('statamic::fieldtypes.bard.config.input_mode'),
-                'type' => 'select',
-                'default' => 'block',
-                'options' => [
-                    'block' => __('Block'),
-                    'inline' => __('Inline'),
-                ],
+            'inline' => [
+                'display' => __('Inline'),
+                'instructions' => __('statamic::fieldtypes.bard.config.inline'),
+                'type' => 'toggle',
                 'width' => 50,
             ],
             'toolbar_mode' => [
@@ -237,7 +232,7 @@ class Bard extends Replicator
 
         $value = $this->removeEmptyNodes($value);
 
-        if ($this->config('input_mode') === 'inline') {
+        if ($this->config('inline')) {
             $value = $this->unwrapInlineValue($value);
         }
 
@@ -337,7 +332,7 @@ class Bard extends Replicator
             $value = $this->convertLegacyData($value);
         }
 
-        if ($this->config('input_mode') === 'inline') {
+        if ($this->config('inline')) {
             // Root should be text, if it's not this must be a block field converted
             // to inline. In that instance unwrap the content of the first node.
             if ($value[0]['type'] !== 'text') {

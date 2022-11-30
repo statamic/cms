@@ -637,7 +637,7 @@ EOT;
 
         $expected = 'This is inline text with <strong>bold</strong> and <em>italic</em> text.';
 
-        $this->assertEquals($expected, $this->bard(['input_mode' => 'inline', 'sets' => null])->augment($data));
+        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->augment($data));
     }
 
     /** @test */
@@ -649,7 +649,7 @@ EOT;
             ['type' => 'text', 'text' => 'This is inline text.'],
         ];
 
-        $this->assertEquals($expected, $this->bard(['input_mode' => 'inline', 'sets' => null])->process($data));
+        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->process($data));
     }
 
     /** @test */
@@ -661,7 +661,7 @@ EOT;
 
         $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
 
-        $this->assertEquals($expected, $this->bard(['input_mode' => 'inline', 'sets' => null])->preProcess($data));
+        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
     }
 
     /** @test */
@@ -696,7 +696,7 @@ EOT;
 
         $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is block text."}]}]';
 
-        $this->assertEquals($expected, $this->bard(['input_mode' => 'inline', 'sets' => null])->preProcess($data));
+        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
     }
 
     private function bard($config = [])
