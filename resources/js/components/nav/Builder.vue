@@ -10,15 +10,15 @@
             <div class="flex items-center">
                 <h1 class="flex-1">{{ __('Nav Preferences') }}</h1>
 
-                <a @click="$refs.mainTree.cancel" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
+                <dropdown-list class="mr-1">
+                    <dropdown-item :text="__('Reset All Nav Customizations')" @click="resetInitialNav"></dropdown-item>
+                </dropdown-list>
+
+                <a @click="discardChanges" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
 
                 <dropdown-list>
                     <template #trigger>
-                        <button
-                            class="btn"
-                            :class="{ 'flex items-center pr-2': true }"
-                            @click=""
-                        >
+                        <button class="btn" :class="{ 'flex items-center pr-2': true }">
                             {{ __('Add Item') }}
                             <svg-icon name="chevron-down-xs" class="w-2 ml-2" />
                         </button>
@@ -30,7 +30,7 @@
                 <button
                     class="btn-primary ml-2"
                     :class="{ 'disabled': !changed }"
-                    :disabledd="!changed"
+                    :disabled="!changed"
                     @click="save"
                     v-text="__('Save Changes')" />
             </div>
@@ -45,8 +45,8 @@
                 :data="topLevelTreeData"
                 :space="1"
                 :indent="24"
+                @change="changed = true"
                 @drag="topLevelTreeDragStart"
-                @nodeOpenChanged=""
             >
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
@@ -58,8 +58,6 @@
                     :disable-sections="true"
                     @edit="$emit('edit-page', item, vm, store, $event)"
                     @toggle-open="store.toggleOpen(item)"
-                    @removed=""
-                    @children-orphaned=""
                 >
                     <template #branch-options="{ item, removeBranch, orphanChildren, vm, depth }">
                         <dropdown-item
@@ -91,9 +89,8 @@
                 :data="mainTreeData"
                 :space="1"
                 :indent="24"
-                @change=""
+                @change="changed = true"
                 @drag="mainTreeDragStart"
-                @nodeOpenChanged=""
             >
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
@@ -104,8 +101,6 @@
                     :has-children="item.children.length > 0"
                     @edit="$emit('edit-page', item, vm, store, $event)"
                     @toggle-open="store.toggleOpen(item)"
-                    @removed=""
-                    @children-orphaned=""
                 >
                     <template #branch-options="{ item, removeBranch, orphanChildren, vm, depth }">
                         <dropdown-item
@@ -186,9 +181,17 @@ export default {
     },
 
     props: {
-        initialNav: {
+        currentNav: {
+            type: Object,
             required: true,
         },
+        defaultNav: {
+            type: Object,
+            required: true,
+        },
+        // roles: {
+        //     type: Object,
+        // }
     },
 
     data() {
@@ -206,27 +209,43 @@ export default {
     },
 
     mounted() {
-        this.topLevelTreeData = _.chain(this.initialNav['Top Level'].items)
-            .map((section) => this.normalizeNavConfig(section))
-            .values()
-            .value();
-
-        this.mainTreeData = _.chain(this.initialNav)
-            .reject((items, section) => section === 'Top Level')
-            .mapObject((section) => this.normalizeNavConfig(section))
-            .values()
-            .value();
+        this.setInitialNav(this.currentNav);
     },
 
     computed: {
 
         isDirty() {
-            return this.$dirty.has('nav-preferences');
+            return this.changed;
         },
 
     },
 
     methods: {
+
+        setInitialNav(nav) {
+            this.topLevelTreeData = _.chain(nav['Top Level'].items)
+                .map((section) => this.normalizeNavConfig(section))
+                .values()
+                .value();
+
+            this.mainTreeData = _.chain(nav)
+                .reject((items, section) => section === 'Top Level')
+                .mapObject((section) => this.normalizeNavConfig(section))
+                .values()
+                .value();
+        },
+
+        resetInitialNav() {
+            this.setInitialNav(this.defaultNav);
+
+            this.changed = true;
+        },
+
+        discardChanges() {
+            this.setInitialNav(this.currentNav);
+
+            this.changed = false;
+        },
 
         normalizeNavConfig(config) {
             let item = {
@@ -373,6 +392,7 @@ export default {
             sectionItem.text = sectionDisplay;
 
             this.resetSectionEditor();
+            this.changed = true;
         },
 
         resetItemEditor() {
@@ -398,6 +418,8 @@ export default {
             let tree = treeData || item.parent.children;
 
             tree.push(newItem);
+
+            this.changed = true;
         },
 
         itemIsVisible(item) {
@@ -412,12 +434,16 @@ export default {
 
         removeItem(item) {
             item._vm.store.deleteNode(item);
+
+            this.changed = true;
         },
 
         hideItem(item) {
             item.trashedManipulations = item.manipulations;
 
             item.manipulations = { action: '@remove' };
+
+            this.changed = true;
         },
 
         showItem(item) {
@@ -426,6 +452,8 @@ export default {
             if (item.trashedManipulations) {
                 item.manipulations = item.trashedManipulations;
             }
+
+            this.changed = true;
         },
 
         save() {
