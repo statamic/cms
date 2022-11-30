@@ -138,7 +138,7 @@ class AppServiceProvider extends ServiceProvider
                 });
         });
 
-        $this->app->bind(\Statamic\Fields\FieldsetRepository::class, function () {
+        $this->app->singleton(\Statamic\Fields\FieldsetRepository::class, function () {
             return (new \Statamic\Fields\FieldsetRepository)
                 ->setDirectory(resource_path('fieldsets'));
         });

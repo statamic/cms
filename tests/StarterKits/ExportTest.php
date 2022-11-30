@@ -78,7 +78,7 @@ class ExportTest extends TestCase
         $this->assertFileHasContent("'disks' => [", $filesystemsConfig);
 
         $this->assertFileExists($composerJson);
-        $this->assertFileHasContent('<body>', $composerJson);
+        $this->assertFileHasContent('<body', $composerJson);
     }
 
     /** @test */

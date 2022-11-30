@@ -126,6 +126,8 @@ return [
     'select.config.taggable' => 'Das Hinzufügen neuer Optionen zusätzlich zu den vordefinierten zulassen.',
     'select.title' => 'Auswahl',
     'sites.title' => 'Websites',
+    'slug.config.from' => 'Ein Zielfeld, aus dem ein Slug erstellt wird.',
+    'slug.config.generate' => 'Erzeugt automatisch einen Slug aus dem Ziel im `von` Feld.',
     'slug.title' => 'Slug',
     'structures.title' => 'Strukturen',
     'table.title' => 'Tabelle',

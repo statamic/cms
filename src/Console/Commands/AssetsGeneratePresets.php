@@ -109,7 +109,11 @@ class AssetsGeneratePresets extends Command
                     ? 'dispatch'
                     : (method_exists(Dispatcher::class, 'dispatchSync') ? 'dispatchSync' : 'dispatchNow');
 
-                GeneratePresetImageManipulation::$dispatchMethod($asset, $preset);
+                try {
+                    GeneratePresetImageManipulation::$dispatchMethod($asset, $preset);
+                } catch (\Exception $e) {
+                    $this->error($asset.' '.$e->getMessage());
+                }
 
                 $bar->advance();
             }

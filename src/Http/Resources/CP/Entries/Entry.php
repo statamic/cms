@@ -8,7 +8,7 @@ class Entry extends JsonResource
 {
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->resource->id(),
             'title' => $this->resource->value('title'),
             'permalink' => $this->resource->absoluteUrl(),
@@ -21,5 +21,7 @@ class Entry extends JsonResource
                 'handle' => $this->resource->collection()->handle(),
             ],
         ];
+
+        return ['data' => $data];
     }
 }
