@@ -2,8 +2,6 @@
 
 namespace Tests\Antlers\Runtime;
 
-use Exception;
-use Statamic\Tags\Tags;
 use Tests\Antlers\ParserTestCase;
 
 class LogicGroupTest extends ParserTestCase
@@ -13,7 +11,7 @@ class LogicGroupTest extends ParserTestCase
         $template = '{{ thing ?= (stuff = "abc") }}--{{ stuff }}';
 
         $result = $this->renderString($template, [
-            'thing' => false
+            'thing' => false,
         ]);
 
         $this->assertSame('--', $result);
