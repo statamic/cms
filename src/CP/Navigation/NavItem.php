@@ -23,6 +23,7 @@ class NavItem
     protected $view;
     protected $order;
     protected $hidden;
+    protected $manipulations;
 
     /**
      * Get or set display.
@@ -317,6 +318,17 @@ class NavItem
     public function isHidden()
     {
         return $this->hidden();
+    }
+
+    /**
+     * Get or set preferences manipulations.
+     *
+     * @param  string|null  $manipulations
+     * @return mixed
+     */
+    public function manipulations($manipulations = null)
+    {
+        return $this->fluentlyGetOrSet('manipulations')->value($manipulations);
     }
 
     /**
