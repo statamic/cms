@@ -48,7 +48,7 @@ class ActivateAccount extends PasswordReset
     {
         return (new MailMessage)
             ->subject(static::$subject ?? __('statamic::messages.activate_account_notification_subject'))
-            ->greeting(static::$greeting ?? __('Hello!'))
+            ->greeting(static::$greeting)
             ->line(static::$body ?? __('statamic::messages.activate_account_notification_body'))
             ->action(__('Activate Account'), PasswordResetManager::url($this->token, PasswordResetManager::BROKER_ACTIVATIONS));
     }
