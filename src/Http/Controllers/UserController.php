@@ -13,8 +13,6 @@ use Statamic\Events\UserRegistering;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Exceptions\UnauthorizedHttpException;
 use Statamic\Facades\User;
-use Statamic\Forms\Uploaders\AssetsUploader;
-use Statamic\Support\Arr;
 
 class UserController extends Controller
 {
@@ -60,13 +58,13 @@ class UserController extends Controller
         $blueprint = User::blueprint();
 
         $fields = $blueprint->fields();
-        $values = array_merge($request->all(), $this->normalizeAssetValues($fields, $request));
+        $values = $this->valuesWithoutAssetFields($fields, $request);
         $fields = $fields->addValues($values);
 
-        $fieldRules = $fields->validator()->withRules(array_merge([
+        $fieldRules = $fields->validator()->withRules([
             'email' => ['required', 'email', 'unique_user_value'],
             'password' => ['required', 'confirmed', PasswordDefaults::rules()],
-        ], $this->assetRules($fields)))->rules();
+        ])->rules();
 
         $validator = Validator::make($values, $fieldRules);
 
@@ -74,9 +72,9 @@ class UserController extends Controller
             return $this->userRegistrationFailure($validator->errors());
         }
 
-        $values = array_merge($request->all(), $this->uploadAssetFiles($fields));
-        $fields = $fields->addValues($values);
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        $values = $fields->process()->values()
+            ->only(array_keys($values))
+            ->except(['email', 'groups', 'roles']);
 
         $user = User::make()
             ->email($request->email)
@@ -115,12 +113,12 @@ class UserController extends Controller
         $blueprint = User::blueprint();
 
         $fields = $blueprint->fields();
-        $values = array_merge($request->all(), $this->normalizeAssetValues($fields, $request));
+        $values = $this->valuesWithoutAssetFields($fields, $request);
         $fields = $fields->addValues($values);
 
-        $fieldRules = $fields->validator()->withRules(array_merge([
+        $fieldRules = $fields->validator()->withRules([
             'email' => ['required', 'email', 'unique_user_value:'.$user->id()],
-        ], $this->assetRules($fields)))->rules();
+        ])->rules();
 
         $validator = Validator::make($values, $fieldRules);
 
@@ -128,10 +126,9 @@ class UserController extends Controller
             return $this->userProfileFailure($validator->errors());
         }
 
-        $values = array_merge($request->all(), $this->uploadAssetFiles($fields));
-        $fields = $fields->addValues($values);
-        // only() added here to filter out fields that weren't actualy submitted
-        $values = $fields->process()->values()->only(array_keys($values))->except(['email', 'password', 'groups', 'roles']);
+        $values = $fields->process()->values()
+            ->only(array_keys($values))
+            ->except(['email', 'password', 'groups', 'roles']);
 
         if ($request->email) {
             $user->email($request->email);
@@ -223,39 +220,12 @@ class UserController extends Controller
         return $response;
     }
 
-    protected function assetRules($fields)
+    private function valuesWithoutAssetFields($fields, $request)
     {
-        return $fields->all()
-            ->filter(function ($field) {
-                return $field->fieldtype()->handle() === 'assets';
-            })
-            ->mapWithKeys(function ($field) {
-                return [$field->handle().'.*' => 'file'];
-            })
-            ->all();
-    }
+        $assets = $fields->all()
+            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets')
+            ->keys()->all();
 
-    protected function normalizeAssetValues($fields, $request)
-    {
-        return $fields->all()
-            ->filter(function ($field) {
-                return $field->fieldtype()->handle() === 'assets' && $field->get('max_files') === 1;
-            })
-            ->map(function ($field) use ($request) {
-                return Arr::wrap($request->file($field->handle()));
-            })
-            ->all();
-    }
-
-    protected function uploadAssetFiles($fields)
-    {
-        return $fields->all()
-            ->filter(function ($field) {
-                return $field->fieldtype()->handle() === 'assets' && request()->hasFile($field->handle());
-            })
-            ->map(function ($field) {
-                return AssetsUploader::field($field)->upload(request()->file($field->handle()));
-            })
-            ->all();
+        return $request->except($assets);
     }
 }
