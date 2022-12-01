@@ -3,6 +3,7 @@
 namespace Statamic\Taxonomies;
 
 use Statamic\Data\AbstractAugmented;
+use Statamic\Statamic;
 
 class AugmentedTerm extends AbstractAugmented
 {
@@ -38,7 +39,11 @@ class AugmentedTerm extends AbstractAugmented
 
     protected function updatedBy()
     {
-        return $this->data->lastModifiedBy();
+        $user = $this->data->lastModifiedBy();
+
+        return Statamic::isApiRoute()
+            ? optional($user)->toShallowAugmentedCollection()
+            : $user;
     }
 
     protected function updatedAt()

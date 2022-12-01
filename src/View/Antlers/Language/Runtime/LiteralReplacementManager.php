@@ -11,6 +11,14 @@ class LiteralReplacementManager
     protected static $globalReplacement = [];
     protected static $retargeted = [];
 
+    public static function resetLiteralState()
+    {
+        self::$regions = [];
+        self::$replacements = [];
+        self::$globalReplacement = [];
+        self::$retargeted = [];
+    }
+
     public static function registerRegion($name, $section, $default)
     {
         $name = '__literalReplacement::_'.md5($name);
@@ -29,7 +37,7 @@ class LiteralReplacementManager
             return $name;
         }
 
-        self::$regions[$name] = $default;
+        self::$regions[$name] = $default ?? '';
 
         return $name;
     }

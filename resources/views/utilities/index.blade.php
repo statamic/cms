@@ -12,7 +12,7 @@
         @foreach ($utilities as $utility)
             <a href="{{ $utility->url() }}" class="w-full lg:w-1/2 p-2 md:flex items-start hover:bg-grey-20 rounded-md group">
                 <div class="h-8 w-8 mr-2 text-grey-80">
-                    @cp_svg($utility->icon())
+                    {!! $utility->icon() !!}
                 </div>
                 <div class="text-blue flex-1 mb-2 md:mb-0 md:mr-3">
                     <h3>{{ $utility->title() }}</h3>

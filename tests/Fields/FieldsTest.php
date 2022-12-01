@@ -3,10 +3,10 @@
 namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldRepository;
-use Facades\Statamic\Fields\FieldsetRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
@@ -422,6 +422,9 @@ class FieldsTest extends TestCase
                 'append' => null,
                 'antlers' => false,
                 'default' => null,
+                'visibility' => 'visible',
+                'read_only' => false, // deprecated
+                'always_save' => false,
             ],
             [
                 'handle' => 'two',
@@ -436,6 +439,9 @@ class FieldsTest extends TestCase
                 'antlers' => false,
                 'placeholder' => null,
                 'default' => null,
+                'visibility' => 'visible',
+                'read_only' => false, // deprecated
+                'always_save' => false,
             ],
         ], $fields->toPublishArray());
     }
@@ -491,6 +497,9 @@ class FieldsTest extends TestCase
                 'required' => false,
                 'antlers' => false,
                 'default' => null,
+                'visibility' => 'visible',
+                'read_only' => false, // deprecated
+                'always_save' => false,
             ],
             [
                 'handle' => 'nested_deeper_two',
@@ -507,6 +516,9 @@ class FieldsTest extends TestCase
                 'required' => false,
                 'antlers' => false,
                 'default' => null,
+                'visibility' => 'visible',
+                'read_only' => false, // deprecated
+                'always_save' => false,
             ],
         ], $fields->toPublishArray());
     }
@@ -637,6 +649,60 @@ class FieldsTest extends TestCase
             'one' => 'foo processed',
             'two' => 'bar processed',
         ], $processed->values()->all());
+    }
+
+    /** @test */
+    public function it_doesnt_return_computed_field_values()
+    {
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', ['type' => 'text']);
+        });
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', ['type' => 'text', 'visibility' => 'computed', 'default' => 'gandalf']);
+        });
+        FieldRepository::shouldReceive('find')->with('three')->andReturnUsing(function () {
+            return new Field('three', ['type' => 'text']);
+        });
+
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two'],
+            ['handle' => 'three', 'field' => 'three'],
+        ]);
+
+        $this->assertEquals(['one' => null, 'three' => null], $fields->values()->all());
+        $this->assertEquals(['one' => null, 'three' => null], $fields->process()->values()->all());
+
+        $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+
+        $this->assertEquals(['one' => 'foo', 'three' => 'baz'], $fields->values()->all());
+        $this->assertEquals(['one' => 'foo', 'three' => 'baz'], $fields->process()->values()->all());
+    }
+
+    /** @test */
+    public function it_does_return_computed_field_values_when_pre_processed()
+    {
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', ['type' => 'text']);
+        });
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', ['type' => 'text', 'visibility' => 'computed', 'default' => 'gandalf']);
+        });
+        FieldRepository::shouldReceive('find')->with('three')->andReturnUsing(function () {
+            return new Field('three', ['type' => 'text']);
+        });
+
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two'],
+            ['handle' => 'three', 'field' => 'three'],
+        ]);
+
+        $this->assertEquals(['one' => null, 'two' => 'gandalf', 'three' => null], $fields->preProcess()->values()->all());
+
+        $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+
+        $this->assertEquals(['one' => 'foo', 'two' => 'bar', 'three' => 'baz'], $fields->preProcess()->values()->all());
     }
 
     /** @test */
@@ -876,5 +942,41 @@ class FieldsTest extends TestCase
         $this->assertIsArray($types['two']);
         $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $types['two']['type']);
         $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['two']['type']->getWrappedType());
+    }
+
+    /** @test */
+    public function it_sets_the_parent_on_all_fields()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text']],
+        ]);
+
+        $collection = $fields->all();
+        $this->assertNull($collection['one']->parent());
+        $this->assertNull($collection['two']->parent());
+
+        $fields->setParent('foo');
+        $collection = $fields->all();
+        $this->assertEquals('foo', $collection['one']->parent());
+        $this->assertEquals('foo', $collection['two']->parent());
+    }
+
+    /** @test */
+    public function it_sets_the_parentfield_on_all_fields()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text']],
+        ]);
+
+        $collection = $fields->all();
+        $this->assertNull($collection['one']->parentField());
+        $this->assertNull($collection['two']->parentField());
+
+        $fields->setParentField('foo');
+        $collection = $fields->all();
+        $this->assertEquals('foo', $collection['one']->parentField());
+        $this->assertEquals('foo', $collection['two']->parentField());
     }
 }

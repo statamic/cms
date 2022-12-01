@@ -9,7 +9,12 @@ export default {
             lang = lang ?? site?.lang ?? Statamic.$config.get('lang');
             const custom = Statamic.$config.get(`charmap.${lang}`) ?? undefined;
 
-            return getSlug(text, { separator: glue || '-', lang, custom });
+            return getSlug(text, {
+                separator: glue || '-',
+                lang,
+                custom,
+                symbols: true // Use this in 3.4: Statamic.$config.get('asciiReplaceExtraSymbols')
+            });
         };
     }
 };

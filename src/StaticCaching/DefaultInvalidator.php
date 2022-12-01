@@ -2,8 +2,10 @@
 
 namespace Statamic\StaticCaching;
 
+use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
@@ -36,14 +38,34 @@ class DefaultInvalidator implements Invalidator
             $this->invalidateGlobalUrls($item);
         } elseif ($item instanceof Collection) {
             $this->invalidateCollectionUrls($item);
+        } elseif ($item instanceof Asset) {
+            $this->invalidateAssetUrls($item);
+        } elseif ($item instanceof Form) {
+            $this->invalidateFormUrls($item);
         }
+    }
+
+    protected function invalidateFormUrls($form)
+    {
+        $this->cacher->invalidateUrls(
+            Arr::get($this->rules, "forms.{$form->handle()}.urls")
+        );
+    }
+
+    protected function invalidateAssetUrls($asset)
+    {
+        $this->cacher->invalidateUrls(
+            Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls")
+        );
     }
 
     protected function invalidateEntryUrls($entry)
     {
-        if ($url = $entry->url()) {
-            $this->cacher->invalidateUrl($url);
-        }
+        $entry->descendants()->push($entry)->each(function ($entry) {
+            if ($url = $entry->absoluteUrl()) {
+                $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
+            }
+        });
 
         $this->cacher->invalidateUrls(
             Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls")
@@ -52,12 +74,12 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateTermUrls($term)
     {
-        if ($url = $term->url()) {
-            $this->cacher->invalidateUrl($url);
+        if ($url = $term->absoluteUrl()) {
+            $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
 
             $term->taxonomy()->collections()->each(function ($collection) use ($term) {
-                if ($url = $term->collection($collection)->url()) {
-                    $this->cacher->invalidateUrl($url);
+                if ($url = $term->collection($collection)->absoluteUrl()) {
+                    $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
                 }
             });
         }
@@ -83,8 +105,22 @@ class DefaultInvalidator implements Invalidator
 
     protected function invalidateCollectionUrls($collection)
     {
-        if ($url = $collection->url()) {
-            $this->cacher->invalidateUrl($url);
+        if ($url = $collection->absoluteUrl()) {
+            $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
         }
+
+        $this->cacher->invalidateUrls(
+            Arr::get($this->rules, "collections.{$collection->handle()}.urls")
+        );
+    }
+
+    private function splitUrlAndDomain(string $url)
+    {
+        $parsed = parse_url($url);
+
+        return [
+            Arr::get($parsed, 'path', '/'),
+            $parsed['scheme'].'://'.$parsed['host'],
+        ];
     }
 }

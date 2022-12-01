@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use Facades\Statamic\Fieldtypes\RowId;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -16,6 +17,15 @@ use Tests\TestCase;
 class BardTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    // Mocking method_exists, courtesy of https://stackoverflow.com/a/37928161
+    public static $functions;
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+        static::$functions = null;
+    }
 
     /** @test */
     public function it_augments_prosemirror_structure_to_a_template_friendly_array()
@@ -303,6 +313,8 @@ class BardTest extends TestCase
     /** @test */
     public function it_transforms_v2_formatted_content_into_prosemirror_structure()
     {
+        RowId::shouldReceive('generate')->andReturn('random-string-1');
+
         $data = [
             ['type' => 'text', 'text' => '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>'],
             ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux'],
@@ -327,7 +339,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
-                    'id' => 'set-2',
+                    'id' => 'random-string-1',
                     'enabled' => true,
                     'values' => [
                         'type' => 'myset',
@@ -356,6 +368,8 @@ class BardTest extends TestCase
     /** @test */
     public function it_transforms_v2_formatted_content_with_only_sets_into_prosemirror_structure()
     {
+        RowId::shouldReceive('generate')->andReturn('random-string-1');
+
         $data = [
             ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux'],
         ];
@@ -364,7 +378,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
-                    'id' => 'set-0',
+                    'id' => 'random-string-1',
                     'enabled' => true,
                     'values' => [
                         'type' => 'myset',
@@ -397,6 +411,50 @@ class BardTest extends TestCase
     }
 
     /** @test */
+    public function it_removes_empty_nodes()
+    {
+        $content = '[
+            {"type":"paragraph"},
+            {"type":"heading"},
+            {"type":"paragraph", "content": "foo"},
+            {"type":"heading"},
+            {"type":"paragraph"},
+            {"type":"heading", "content": "foo"},
+            {"type":"paragraph"},
+            {"type":"heading"}
+        ]';
+
+        $containsAllEmptyNodes = $this->bard(['remove_empty_nodes' => false])->process($content);
+
+        $this->assertEquals($containsAllEmptyNodes, [
+            ['type' => 'paragraph'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading', 'content' => 'foo'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading'],
+        ]);
+
+        $removedAllEmptyNodes = $this->bard(['remove_empty_nodes' => true])->process($content);
+
+        $this->assertEquals($removedAllEmptyNodes, [
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading', 'content' => 'foo'],
+        ]);
+
+        $trimmedEmptyNodes = $this->bard(['remove_empty_nodes' => 'trim'])->process($content);
+
+        $this->assertEquals($trimmedEmptyNodes, [
+            ['type' => 'paragraph', 'content' => 'foo'],
+            ['type' => 'heading'],
+            ['type' => 'paragraph'],
+            ['type' => 'heading', 'content' => 'foo'],
+        ]);
+    }
+
+    /** @test */
     public function it_preloads_preprocessed_default_values()
     {
         $field = (new Field('test', [
@@ -408,7 +466,7 @@ class BardTest extends TestCase
                     ],
                 ],
             ],
-        ]));
+        ]))->setValue('[]'); // what an empty value would get preprocessed into.
 
         $expected = [
             'things' => [],
@@ -420,6 +478,8 @@ class BardTest extends TestCase
     /** @test */
     public function it_preloads_new_meta_with_preprocessed_values()
     {
+        RowId::shouldReceive('generate')->andReturn('random1', 'random2');
+
         // For this test, use a grid field with min_rows.
         // It doesn't have to be, but it's a fieldtype that would
         // require preprocessed values to be provided down the line.
@@ -443,7 +503,7 @@ class BardTest extends TestCase
                     ],
                 ],
             ],
-        ]));
+        ]))->setValue('[]'); // what an empty value would get preprocessed into.
 
         $expected = [
             '_' => '_',
@@ -455,8 +515,8 @@ class BardTest extends TestCase
                     'one' => null, // meta for the text field
                 ],
                 'existing' => [
-                    'row-0' => ['one' => null],
-                    'row-1' => ['one' => null],
+                    'random1' => ['one' => null],
+                    'random2' => ['one' => null],
                 ],
             ],
         ];
@@ -498,7 +558,23 @@ EOT;
     }
 
     /** @test */
-    public function it_converts_statamic_asset_urls_when_stored_as_html()
+    public function it_doesnt_convert_statamic_asset_urls_when_saving_as_html()
+    {
+        $content = '[
+            {"type":"text","text":"one","marks":[{"type":"link","attrs":{"target":"_blank","href":"http://google.com"}}]},
+            {"type":"text","text":"two","marks":[{"type":"link","attrs":{"href":"entry::8e4b4e60-5dfb-47b0-a2d7-a904d64aeb80"}}]},
+            {"type":"text","text":"three","marks":[{"type":"link","attrs":{"target":"_blank","href":"statamic://asset::assets::myst.jpeg"}}]}
+        ]';
+
+        $expected = <<<'EOT'
+<a target="_blank" href="http://google.com">one</a><a href="entry::8e4b4e60-5dfb-47b0-a2d7-a904d64aeb80">two</a><a target="_blank" href="statamic://asset::assets::myst.jpeg">three</a>
+EOT;
+
+        $this->assertEquals($expected, $this->bard(['save_html' => true, 'sets' => null])->process($content));
+    }
+
+    /** @test */
+    public function it_augments_statamic_asset_urls_when_stored_as_html()
     {
         Storage::fake('test', ['url' => '/assets']);
         $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
@@ -534,6 +610,14 @@ EOT;
 EOT;
 
         $this->assertEquals($expected, $bard->augment($html));
+    }
+
+    /** @test */
+    public function it_converts_a_queryable_value()
+    {
+        $this->assertNull((new Bard)->toQueryableValue(null));
+        $this->assertNull((new Bard)->toQueryableValue([]));
+        $this->assertEquals([['foo' => 'bar']], (new Bard)->toQueryableValue([['foo' => 'bar']]));
     }
 
     private function bard($config = [])

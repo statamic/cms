@@ -19,31 +19,72 @@ class ViewFieldsetListingTest extends TestCase
         Facades\Fieldset::shouldReceive('all')->andReturn(collect([
             'foo' => $fieldsetA = $this->createfieldset('foo'),
             'bar' => $fieldsetB = $this->createFieldset('bar'),
+            'baz::foo' => $this->createFieldset('baz::foo'),
+            'baz::bar' => $this->createFieldset('baz::bar'),
+            'baz::baz' => $this->createFieldset('baz::baz'),
         ]));
 
-        $user = Facades\User::make()->makeSuper()->save();
+        // Custom policy to allow fieldsets to demonstrate how certain fieldset can be restricted
+        app()->bind(\Statamic\Policies\FieldsetPolicy::class, function () {
+            return new class extends \Statamic\Policies\FieldsetPolicy
+            {
+                public function before($user, $ability, $fieldset)
+                {
+                    return $fieldset->handle() === 'baz::baz'
+                        ? false
+                        : parent::before($user, $ability, $fieldset);
+                }
+            };
+        });
+
+        $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
+        $user = Facades\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)
             ->get(cp_route('fieldsets.index'))
             ->assertSuccessful()
             ->assertViewHas('fieldsets', collect([
-                [
-                    'id' => 'foo',
-                    'handle' => 'foo',
-                    'title' => 'Foo',
-                    'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
-                    'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
-                ],
-                [
-                    'id' => 'bar',
-                    'handle' => 'bar',
-                    'title' => 'Bar',
-                    'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fields/fieldsets/bar/edit',
-                    'delete_url' => 'http://localhost/cp/fields/fieldsets/bar',
-                ],
+                'My Fieldsets' => collect([
+                    [
+                        'id' => 'foo',
+                        'handle' => 'foo',
+                        'title' => 'Foo',
+                        'fields' => 0,
+                        'edit_url' => 'http://localhost/cp/fields/fieldsets/foo/edit',
+                        'delete_url' => 'http://localhost/cp/fields/fieldsets/foo',
+                        'is_deletable' => true,
+                    ],
+                    [
+                        'id' => 'bar',
+                        'handle' => 'bar',
+                        'title' => 'Bar',
+                        'fields' => 0,
+                        'edit_url' => 'http://localhost/cp/fields/fieldsets/bar/edit',
+                        'delete_url' => 'http://localhost/cp/fields/fieldsets/bar',
+                        'is_deletable' => true,
+                    ],
+                ]),
+                'Baz' => collect([
+                    [
+                        'id' => 'baz::foo',
+                        'handle' => 'baz::foo',
+                        'title' => 'Foo',
+                        'fields' => 0,
+                        'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::foo/edit',
+                        'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::foo',
+                        'is_deletable' => false,
+                    ],
+                    [
+                        'id' => 'baz::bar',
+                        'handle' => 'baz::bar',
+                        'title' => 'Bar',
+                        'fields' => 0,
+                        'edit_url' => 'http://localhost/cp/fields/fieldsets/baz::bar/edit',
+                        'delete_url' => 'http://localhost/cp/fields/fieldsets/baz::bar',
+                        'is_deletable' => false,
+                    ],
+                ]),
             ]))
             ->assertDontSee('no-results');
     }
@@ -61,7 +102,7 @@ class ViewFieldsetListingTest extends TestCase
             ->assertRedirect('/cp/original');
     }
 
-    private function createFieldset($handle)
+    private function createFieldset($handle): Fieldset
     {
         return tap(new Fieldset)->setHandle($handle);
     }

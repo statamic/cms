@@ -37,6 +37,7 @@ class JavascriptComposer
             'focalPointEditorEnabled' => config('statamic.assets.focal_point_editor'),
             'user' => $this->user($user),
             'paginationSize' => config('statamic.cp.pagination_size'),
+            'paginationSizeOptions' => config('statamic.cp.pagination_size_options'),
             'translationLocale' => app('translator')->locale(),
             'translations' => app('translator')->toJson(),
             'sites' => $this->sites(),
@@ -47,7 +48,8 @@ class JavascriptComposer
             'locale' => config('app.locale'),
             'permissions' => $this->permissions($user),
             'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
-            'charmap' => ASCII::charsArray(),
+            'asciiReplaceExtraSymbols' => $replaceSymbols = config('statamic.system.ascii_replace_extra_symbols'),
+            'charmap' => ASCII::charsArray($replaceSymbols),
         ]);
     }
 
@@ -75,9 +77,9 @@ class JavascriptComposer
             return [];
         }
 
-        return array_merge($user->toAugmentedArray(), [
+        return $user->toAugmentedCollection()->merge([
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
-        ]);
+        ])->toArray();
     }
 }

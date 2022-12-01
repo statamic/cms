@@ -53,6 +53,7 @@ class GlideImageManipulator implements ImageManipulator
         'dpr',
         'filt',
         'fit',
+        'flip',
         'fm',
         'gam',
         'h',

@@ -1,29 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Statamic\Facades\Glide;
 use Statamic\Facades\OAuth;
-use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Statamic;
 
 Route::name('statamic.')->group(function () {
-    /**
-     * Glide
-     * On-the-fly URL-based image transforms.
-     */
-    if (Glide::shouldServeByHttp()) {
-        Site::all()->map(function ($site) {
-            return URL::makeRelative($site->url());
-        })->unique()->each(function ($sitePrefix) {
-            Route::group(['prefix' => $sitePrefix.'/'.Glide::route()], function () {
-                Route::get('/asset/{container}/{path?}', 'GlideController@generateByAsset')->where('path', '.*');
-                Route::get('/http/{url}/{filename?}', 'GlideController@generateByUrl');
-                Route::get('{path}', 'GlideController@generateByPath')->where('path', '.*');
-            });
-        });
-    }
-
     Route::group(['prefix' => config('statamic.routes.action')], function () {
         Route::post('forms/{form}', 'FormController@submit')->name('forms.submit');
 
@@ -49,6 +30,10 @@ Route::name('statamic.')->group(function () {
 
         Statamic::additionalActionRoutes();
     });
+
+    Route::prefix(config('statamic.routes.action'))
+        ->post('nocache', '\Statamic\StaticCaching\NoCache\Controller')
+        ->withoutMiddleware('App\Http\Middleware\VerifyCsrfToken');
 
     if (OAuth::enabled()) {
         Route::get(config('statamic.oauth.routes.login'), 'OAuthController@redirectToProvider')->name('oauth.login');

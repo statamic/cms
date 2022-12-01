@@ -46,6 +46,26 @@ test('it omits nested values', () => {
                 ],
             },
         ],
+        foo123: [
+            {
+                hello: 'alfa',
+                world: 'bravo'
+            },
+            {
+                hello: 'charlie',
+                world: 'delta'
+            }
+        ],
+        foo123bar: [
+            {
+                hello: 'alfa',
+                world: 'bravo'
+            },
+            {
+                hello: 'charlie',
+                world: 'delta'
+            }
+        ],
     };
 
     let omitted = new Omitter(values).omit([
@@ -53,6 +73,8 @@ test('it omits nested values', () => {
         'ship.completed_kessel_run',
         'bffs.0.type',
         'bffs.1.crush.0.name',
+        'foo123.0.hello',
+        'foo123bar.0.hello',
     ]);
 
     let expected = {
@@ -74,6 +96,24 @@ test('it omits nested values', () => {
                     }
                 ],
             },
+        ],
+        foo123: [
+            {
+                world: 'bravo'
+            },
+            {
+                hello: 'charlie',
+                world: 'delta'
+            }
+        ],
+        foo123bar: [
+            {
+                world: 'bravo'
+            },
+            {
+                hello: 'charlie',
+                world: 'delta'
+            }
         ],
     };
 
@@ -201,6 +241,49 @@ test('it gracefully handles errors', () => {
                 type: 'Wookie',
             },
         ]),
+    };
+
+    expect(omitted).toEqual(expected);
+});
+
+test('it properly handles keys that javascript considers having numeric separators', () => {
+    let values = {
+        title: 'Millenium Falcon',
+        '404_text': JSON.stringify('This ship is the fastest hunk of junk in the galaxy!'),
+        page: {
+            title: 'X-Wing',
+            '404_text': JSON.stringify('Permission to jump in an X-Wing and blow something up?'),
+        },
+        '123_key': {
+            '456_key': {
+                'title': 'Y-Wing',
+                '404_text': JSON.stringify('Y-Wings are the BOMB!'),
+            },
+        },
+    };
+
+    let jsonFields = [
+        '404_text', // Field handles like this were causing numeric separator error.
+        'page.404_text',
+        '123_key.456_key.404_text',
+    ];
+
+    let omitted = new Omitter(values, jsonFields).omit([
+        '404_text',
+        '123_key.456_key.404_text',
+    ]);
+
+    let expected = {
+        title: 'Millenium Falcon',
+        page: {
+            title: 'X-Wing',
+            '404_text': JSON.stringify('Permission to jump in an X-Wing and blow something up?'),
+        },
+        '123_key': {
+            '456_key': {
+                'title': 'Y-Wing',
+            },
+        },
     };
 
     expect(omitted).toEqual(expected);

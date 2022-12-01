@@ -42,7 +42,7 @@ class UsersStore extends BasicStore
             ->data($data);
 
         if (array_get($data, 'password') || isset($idGenerated)) {
-            $user->save();
+            $user->writeFile();
         }
 
         // $this->queueGroups($user);

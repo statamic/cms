@@ -8,6 +8,7 @@ use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\UserType;
 use Statamic\Query\OrderedQueryBuilder;
+use Statamic\Query\Scopes\Filters\Fields\User as UserFilter;
 use Statamic\Support\Arr;
 
 class Users extends Relationship
@@ -73,13 +74,35 @@ class Users extends Relationship
 
     public function getIndexItems($request)
     {
-        return User::all()->map(function ($user) {
+        $query = User::query();
+
+        if ($search = $request->search) {
+            $query->where('name', 'like', '%'.$search.'%');
+        }
+
+        if ($request->exclusions) {
+            $query->whereNotIn('id', $request->exclusions);
+        }
+
+        $query->orderBy('name');
+
+        $userFields = function ($user) {
             return [
                 'id' => $user->id(),
                 'title' => $user->name(),
                 'email' => $user->email(),
             ];
-        })->values();
+        };
+
+        if ($request->boolean('paginate', true)) {
+            $users = $query->paginate();
+
+            $users->getCollection()->transform($userFields);
+
+            return $users;
+        }
+
+        return $query->get()->map($userFields);
     }
 
     protected function getColumns()
@@ -151,5 +174,10 @@ class Users extends Relationship
         }
 
         return $type;
+    }
+
+    public function filter()
+    {
+        return new UserFilter($this);
     }
 }

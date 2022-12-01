@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
@@ -26,7 +27,7 @@ class Replicator extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
                 'type' => 'select',
                 'cast_booleans' => true,
-                'width' => 50,
+                'width' => 33,
                 'options' => [
                     'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
                     'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
@@ -34,11 +35,18 @@ class Replicator extends Fieldtype
                 ],
                 'default' => false,
             ],
+            'previews' => [
+                'display' => __('Field Previews'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.previews'),
+                'type' => 'toggle',
+                'width' => 33,
+                'default' => true,
+            ],
             'max_sets' => [
                 'display' => __('Max Sets'),
                 'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
                 'type' => 'integer',
-                'width' => 50,
+                'width' => 33,
             ],
             'sets' => [
                 'type' => 'sets',
@@ -60,11 +68,9 @@ class Replicator extends Fieldtype
 
     protected function processRow($row)
     {
-        $row = array_except($row, '_id');
-
         $fields = $this->fields($row['type'])->addValues($row)->process()->values()->all();
 
-        $row = array_merge($row, $fields);
+        $row = array_merge(['id' => Arr::pull($row, '_id')], $row, $fields);
 
         return Arr::removeNullValues($row);
     }
@@ -80,8 +86,10 @@ class Replicator extends Fieldtype
     {
         $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values()->all();
 
+        $id = Arr::pull($row, 'id') ?? RowId::generate();
+
         return array_merge($row, $fields, [
-            '_id' => "set-$index",
+            '_id' => $id,
             'enabled' => $row['enabled'] ?? true,
         ]);
     }
@@ -258,5 +266,10 @@ class Replicator extends Fieldtype
 
             return array_merge($values, $processed);
         })->all();
+    }
+
+    public function toQueryableValue($value)
+    {
+        return empty($value) ? null : $value;
     }
 }

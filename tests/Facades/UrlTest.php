@@ -59,6 +59,8 @@ class UrlTest extends TestCase
         $this->assertFalse(URL::isExternal('http://this-site.com/some-slug'));
         $this->assertFalse(URL::isExternal('/foo'));
         $this->assertFalse(URL::isExternal('#anchor'));
+        $this->assertFalse(URL::isExternal(''));
+        $this->assertFalse(URL::isExternal(null));
     }
 
     public function testDeterminesExternalUrlWhenUsingRelativeInConfig()
@@ -72,6 +74,8 @@ class UrlTest extends TestCase
         $this->assertFalse(URL::isExternal('http://absolute-url-resolved-from-request.com/some-slug'));
         $this->assertFalse(URL::isExternal('/foo'));
         $this->assertFalse(URL::isExternal('#anchor'));
+        $this->assertFalse(URL::isExternal(''));
+        $this->assertFalse(URL::isExternal(null));
     }
 
     /**

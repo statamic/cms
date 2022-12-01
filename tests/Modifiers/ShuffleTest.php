@@ -2,6 +2,9 @@
 
 namespace Tests\Modifiers;
 
+use Illuminate\Support\Collection;
+use Mockery;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -36,6 +39,22 @@ class ShuffleTest extends TestCase
         ]);
         $modified = $this->modify($orderOfCeremony, [1234]);
         $expected = $this->modify($orderOfCeremony, [1234]);
+        $this->assertEquals($expected, $modified);
+    }
+
+    /** @test */
+    public function it_shuffles_values_from_query_builder()
+    {
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('get')->andReturn(Collection::make([
+            'Sonic',
+            'Knuckles',
+            'Tails',
+        ]));
+
+        $modified = $this->modify($builder, [1234]);
+        $expected = $this->modify($builder, [1234]);
+        $this->assertInstanceOf(Collection::class, $modified);
         $this->assertEquals($expected, $modified);
     }
 

@@ -130,6 +130,7 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
      *
      * @return Traversable
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         $output = $this->fetch();

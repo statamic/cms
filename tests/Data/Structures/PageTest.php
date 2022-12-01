@@ -476,11 +476,12 @@ class PageTest extends TestCase
         $this->assertInstanceOf(Arrayable::class, $page);
 
         collect($arr = $page->toArray())
-            ->except(['collection'])
+            ->except(['collection', 'blueprint'])
             ->each(fn ($value, $key) => $this->assertEquals($value, $page->{$key}))
             ->each(fn ($value, $key) => $this->assertEquals($value, $page[$key]));
 
         $this->assertEquals($page->collection()->toArray(), $arr['collection']);
+        $this->assertEquals($page->blueprint->toArray(), $arr['blueprint']);
     }
 
     protected function newTree()
