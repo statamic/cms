@@ -684,7 +684,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns the first $params[0] characters of a string, or the last element of an array.
+     * Returns the first $params[0] characters of a string, or the first element of an array.
      *
      * @param $value
      * @param $params
@@ -693,7 +693,7 @@ class CoreModifiers extends Modifier
     public function first($value, $params)
     {
         if (is_array($value)) {
-            return Arr::get($value, 0);
+            return Arr::first($value);
         }
 
         return Stringy::first($value, Arr::get($params, 0));
@@ -1364,7 +1364,7 @@ class CoreModifiers extends Modifier
     public function last($value, $params)
     {
         if (is_array($value)) {
-            return array_pop($value);
+            return Arr::last($value);
         }
 
         return Stringy::last($value, Arr::get($params, 0));
@@ -1949,7 +1949,7 @@ class CoreModifiers extends Modifier
     {
         $remove_modifiers = Arr::get($params, 0, false);
 
-        return $this->carbon($value)->diffForHumans(null, $remove_modifiers);
+        return $this->carbon($value)->diffForHumans(null, in_array($remove_modifiers, [true, 'true'], true));
     }
 
     /**
@@ -2061,6 +2061,10 @@ class CoreModifiers extends Modifier
      */
     public function reverse($value)
     {
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
         if ($value instanceof Collection) {
             return $value->reverse()->values()->all();
         }

@@ -93,6 +93,8 @@ return [
     'unique_uri' => 'Cette URI est déjà prise.',
     'duplicate_uri' => 'URI en doublon :value',
     'reserved' => 'Ceci est un mot réservé par le système.',
+    'parent_causes_root_children' => 'Cela ferait en sorte que la page racine ait des enfants.',
+    'parent_cannot_be_itself' => 'Ne peut pas être son propre parent.',
     'custom.attribute-name.rule-name' => 'message personnalisé',
     'attributes' => [],
 ];
