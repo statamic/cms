@@ -9,6 +9,8 @@ use Statamic\Facades\Site;
 
 class DuplicateEntry extends Action
 {
+    protected $entries;
+
     public static function title()
     {
         return __('Duplicate');
@@ -21,7 +23,7 @@ class DuplicateEntry extends Action
 
     public function run($items, $values)
     {
-        $items->each(function (Entry $original) {
+        $this->entries = $items->map(function (Entry $original) {
             $originalParent = $this->getEntryParentFromStructure($original);
             [$title, $slug] = $this->generateTitleAndSlug($original);
 
@@ -51,7 +53,18 @@ class DuplicateEntry extends Action
                     ->appendTo($originalParent->id(), $entry)
                     ->save();
             }
+
+            return $entry;
         });
+    }
+
+    public function redirect($items, $values)
+    {
+        if (! array_get($this->context, 'publish_form', false)) {
+            return;
+        }
+
+        return $this->entries->first()->editUrl();
     }
 
     protected function getEntryParentFromStructure(Entry $entry)
