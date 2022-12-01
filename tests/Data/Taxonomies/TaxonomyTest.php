@@ -4,7 +4,12 @@ namespace Tests\Data\Taxonomies;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Events\TaxonomyCreated;
+use Statamic\Events\TaxonomySaved;
+use Statamic\Events\TaxonomySaving;
+use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -79,28 +84,32 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
-    public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_taxonomy()
+    public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_singular_taxonomy()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
 
         BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect());
         BlueprintRepository::shouldReceive('find')->with('default')->andReturn(
-            $blueprint = (new Blueprint)
+            $default = (new Blueprint)
+                ->setInitialPath('this/wont/change')
                 ->setHandle('thisll_change')
+                ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
 
+        $blueprint = $taxonomy->termBlueprint();
+        $this->assertNotEquals($default, $blueprint);
+
         $blueprints = $taxonomy->termBlueprints();
         $this->assertCount(1, $blueprints);
-        $this->assertEquals([$blueprint], $blueprints->all());
+        $this->assertEquals($blueprint, $blueprints->get(0)->setParent($taxonomy));
 
-        tap($taxonomy->termBlueprint(), function ($default) use ($blueprint) {
-            $this->assertEquals($blueprint, $default);
-            $this->assertEquals('tags', $default->handle());
-            $this->assertEquals('Tags', $default->title());
-        });
+        $this->assertEquals('this/wont/change', $blueprint->initialPath());
+        $this->assertEquals('tag', $blueprint->handle());
+        $this->assertEquals('taxonomies.tags', $blueprint->namespace());
+        $this->assertEquals('Tag', $blueprint->title());
 
-        $this->assertEquals($blueprint, $taxonomy->termBlueprint('tags'));
+        $this->assertEquals($blueprint, $taxonomy->termBlueprint('tag'));
         $this->assertNull($taxonomy->termBlueprint('two'));
     }
 
@@ -230,6 +239,97 @@ class TaxonomyTest extends TestCase
             ['label' => 'Baz', 'format' => '{baz}'],
             ['label' => 'Qux', 'format' => '{qux}'],
         ], $taxonomy->additionalPreviewTargets()->all());
+    }
+
+    /** @test */
+    public function it_trucates_terms()
+    {
+        $taxonomy = tap(Facades\Taxonomy::make('tags'))->save();
+        Facades\Term::make()->taxonomy('tags')->slug('one')->data([])->save();
+        Facades\Term::make()->taxonomy('tags')->slug('two')->data([])->save();
+        Facades\Term::make()->taxonomy('tags')->slug('three')->data([])->save();
+
+        $this->assertCount(3, $taxonomy->queryTerms()->get());
+
+        $taxonomy->truncate();
+
+        $this->assertCount(0, $taxonomy->queryTerms()->get());
+    }
+
+    /** @test */
+    public function it_saves_through_the_api()
+    {
+        Event::fake();
+
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        $return = $taxonomy->save();
+
+        $this->assertTrue($return);
+
+        Event::assertDispatched(TaxonomySaving::class, function ($event) use ($taxonomy) {
+            return $event->taxonomy = $taxonomy;
+        });
+
+        Event::assertDispatched(TaxonomyCreated::class, function ($event) use ($taxonomy) {
+            return $event->taxonomy = $taxonomy;
+        });
+
+        Event::assertDispatched(TaxonomySaved::class, function ($event) use ($taxonomy) {
+            return $event->taxonomy = $taxonomy;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_taxonomy_created_only_once()
+    {
+        Event::fake();
+
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        Facades\Taxonomy::shouldReceive('save')->with($taxonomy);
+        Facades\Taxonomy::shouldReceive('find')->with($taxonomy->id())->times(3)->andReturn(null, $taxonomy, $taxonomy);
+
+        $taxonomy->save();
+        $taxonomy->save();
+        $taxonomy->save();
+
+        Event::assertDispatched(TaxonomySaved::class, 3);
+        Event::assertDispatched(TaxonomyCreated::class, 1);
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        $return = $taxonomy->saveQuietly();
+
+        $this->assertTrue($return);
+
+        Event::assertNotDispatched(TaxonomySaving::class);
+        Event::assertNotDispatched(TaxonomySaved::class);
+        Event::assertNotDispatched(TaxonomyCreated::class);
+    }
+
+    /** @test */
+    public function if_saving_event_returns_false_the_taxonomy_doesnt_save()
+    {
+        Event::fake([TaxonomySaved::class]);
+
+        Event::listen(TaxonomySaving::class, function () {
+            return false;
+        });
+
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        $return = $taxonomy->save();
+
+        $this->assertFalse($return);
+
+        Event::assertNotDispatched(TaxonomySaved::class);
     }
 
     public function additionalPreviewTargetProvider()

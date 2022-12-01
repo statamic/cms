@@ -81,6 +81,10 @@ class Entries extends Relationship
             $query->whereIn('collection', $this->getConfiguredCollections());
         }
 
+        if ($blueprints = $this->config('blueprints')) {
+            $query->whereIn('blueprint', $blueprints);
+        }
+
         $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext());
 
         if ($sort = $this->getSortColumn($request)) {
@@ -180,12 +184,14 @@ class Entries extends Relationship
 
             $blueprints = $collection->entryBlueprints();
 
-            return $blueprints->map(function ($blueprint) use ($collection, $collections, $blueprints) {
-                return [
-                    'title' => $this->getCreatableTitle($collection, $blueprint, count($collections), $blueprints->count()),
-                    'url' => $collection->createEntryUrl(Site::selected()->handle()).'?blueprint='.$blueprint->handle(),
-                ];
-            });
+            return $blueprints
+                ->reject->hidden()
+                ->map(function ($blueprint) use ($collection, $collections, $blueprints) {
+                    return [
+                        'title' => $this->getCreatableTitle($collection, $blueprint, count($collections), $blueprints->count()),
+                        'url' => $collection->createEntryUrl(Site::selected()->handle()).'?blueprint='.$blueprint->handle(),
+                    ];
+                });
         })->all();
     }
 
@@ -208,7 +214,7 @@ class Entries extends Relationship
             return $this->invalidItemArray($id);
         }
 
-        return (new EntryResource($entry))->resolve();
+        return (new EntryResource($entry))->resolve()['data'];
     }
 
     protected function collect($value)

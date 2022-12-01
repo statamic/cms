@@ -5,10 +5,10 @@
         contenteditable="false" @copy.stop @paste.stop @cut.stop
     >
         <div ref="content" hidden />
-        <div class="replicator-set-header" :class="{'collapsed': collapsed}">
+        <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
             <div class="item-move sortable-handle" data-drag-handle />
-            <div class="flex-1 p-1" :class="{'flex items-center': collapsed}" @dblclick="toggleCollapsedState">
-                <label v-text="config.display || config.handle" class="text-xs whitespace-no-wrap mr-1"/>
+            <div class="flex-1 p-1 replicator-set-header-inner" :class="{'flex items-center': collapsed}" @dblclick="toggleCollapsedState">
+                <label v-text="display || config.handle" class="text-xs whitespace-no-wrap mr-1"/>
                 <div
                     v-if="config.instructions"
                     v-show="!collapsed"
@@ -34,7 +34,7 @@
                 </dropdown-list>
             </div>
         </div>
-        <div class="replicator-set-body" v-if="!collapsed && index !== undefined">
+        <div class="replicator-set-body" v-show="!collapsed" v-if="index !== undefined">
             <set-field
                 v-for="field in fields"
                 v-show="showField(field, fieldPath(field))"
@@ -86,6 +86,10 @@ export default {
             return this.config.fields;
         },
 
+        display() {
+            return this.config.display || this.values.type;
+        },
+
         values() {
             return this.node.attrs.values;
         },
@@ -103,7 +107,7 @@ export default {
         },
 
         config() {
-            return _.findWhere(this.setConfigs, { handle: this.values.type });
+            return _.findWhere(this.setConfigs, { handle: this.values.type }) || {};
         },
 
         enabled: {
@@ -129,6 +133,14 @@ export default {
 
         hasError() {
             return this.options.bard.setsWithErrors.includes(this.index);
+        },
+
+        showFieldPreviews() {
+            return this.options.bard.config.previews;
+        },
+
+        isInvalid() {
+            return Object.keys(this.config).length === 0;
         }
 
     },

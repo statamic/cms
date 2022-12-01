@@ -13,6 +13,7 @@ export default class SetNode extends Node {
 
     get schema() {
         return {
+            group: 'root',
             attrs: {
                 id: {},
                 enabled: { default: true },

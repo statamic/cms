@@ -3,8 +3,11 @@
 namespace Tests\StaticCaching;
 
 use Mockery;
+use Statamic\Contracts\Assets\Asset;
+use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Taxonomy;
@@ -31,7 +34,63 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /** @test */
+    public function assets_can_trigger_url_invalidation()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/page/one', '/page/two']);
+        });
+
+        $container = tap(Mockery::mock(AssetContainer::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('main');
+        });
+
+        $asset = tap(Mockery::mock(Asset::class), function ($m) use ($container) {
+            $m->shouldReceive('container')->andReturn($container);
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'assets' => [
+                'main' => [
+                    'urls' => [
+                        '/page/one',
+                        '/page/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($asset));
+    }
+
+    /** @test */
     public function collection_urls_can_be_invalidated()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrl')->with('/my/test/collection', 'http://test.com')->once();
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+        });
+
+        $collection = tap(Mockery::mock(Collection::class), function ($m) {
+            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/collection');
+            $m->shouldReceive('handle')->andReturn('blog');
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($collection));
+    }
+
+    /** @test */
+    public function collection_urls_can_be_invalidated_by_an_entry()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.com')->once();
@@ -41,6 +100,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
             $m->shouldReceive('collectionHandle')->andReturn('blog');
+            $m->shouldReceive('descendants')->andReturn(collect());
         });
 
         $invalidator = new Invalidator($cacher, [
@@ -141,5 +201,30 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->assertNull($invalidator->invalidate($set));
+    }
+
+    /** @test */
+    public function form_urls_can_be_invalidated()
+    {
+        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two']);
+        });
+
+        $form = tap(Mockery::mock(Form::class), function ($m) {
+            $m->shouldReceive('handle')->andReturn('newsletter');
+        });
+
+        $invalidator = new Invalidator($cacher, [
+            'forms' => [
+                'newsletter' => [
+                    'urls' => [
+                        '/one',
+                        '/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertNull($invalidator->invalidate($form));
     }
 }

@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
@@ -84,8 +85,10 @@ class EntriesController extends CpController
             throw new BlueprintNotFoundException($entry->value('blueprint'), 'collections/'.$collection->handle());
         }
 
+        $blueprint->setParent($entry);
+
         if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
+            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
         [$values, $meta] = $this->extractFromFields($entry, $blueprint);
@@ -116,6 +119,7 @@ class EntriesController extends CpController
             'readOnly' => User::current()->cant('edit', $entry),
             'locale' => $entry->locale(),
             'localizedFields' => $entry->data()->keys()->all(),
+            'originBehavior' => $collection->originBehavior(),
             'isRoot' => $entry->isRoot(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
@@ -173,7 +177,11 @@ class EntriesController extends CpController
             $data['author'] = Arr::wrap($entry->value('author'));
         }
 
-        $fields = $entry->blueprint()->fields()->addValues($data);
+        $fields = $entry
+            ->blueprint()
+            ->ensureField('published', ['type' => 'toggle'])
+            ->fields()
+            ->addValues($data);
 
         $fields
             ->validator()
@@ -192,7 +200,7 @@ class EntriesController extends CpController
             $entry->blueprint($explicitBlueprint);
         }
 
-        $values = $values->except(['slug', 'date']);
+        $values = $values->except(['slug', 'date', 'published']);
 
         if ($entry->hasOrigin()) {
             $entry->data($values->only($request->input('_localized')));
@@ -201,13 +209,17 @@ class EntriesController extends CpController
         }
 
         if ($entry->collection()->dated()) {
-            $entry->date($this->formatDateForSaving($request->date));
+            $entry->date($this->toCarbonInstanceForSaving($request->date));
         }
 
         $entry->slug($this->resolveSlug($request));
 
-        if ($collection->structure() && ! $collection->orderable()) {
+        if ($structure = $collection->structure()) {
             $tree = $entry->structure()->in($entry->locale());
+        }
+
+        if ($structure && ! $collection->orderable()) {
+            $this->validateParent($entry, $tree, $parent);
 
             $entry->afterSave(function ($entry) use ($parent, $tree) {
                 if ($parent && optional($tree->page($parent))->isRoot()) {
@@ -235,7 +247,14 @@ class EntriesController extends CpController
             $entry->updateLastModified(User::current())->save();
         }
 
-        return new EntryResource($entry->fresh());
+        [$values] = $this->extractFromFields($entry, $blueprint);
+
+        return (new EntryResource($entry->fresh()))
+            ->additional([
+                'data' => [
+                    'values' => $values,
+                ],
+            ]);
     }
 
     public function create(Request $request, $collection, $site)
@@ -249,10 +268,10 @@ class EntriesController extends CpController
         }
 
         if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
-            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
+            $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
-        $values = [];
+        $values = Entry::make()->collection($collection)->values()->all();
 
         if ($collection->hasStructure() && $request->parent) {
             $values['parent'] = $request->parent;
@@ -322,7 +341,10 @@ class EntriesController extends CpController
             $data['author'] = [User::current()->id()];
         }
 
-        $fields = $blueprint->fields()->addValues($data);
+        $fields = $blueprint
+            ->ensureField('published', ['type' => 'toggle'])
+            ->fields()
+            ->addValues($data);
 
         $fields
             ->validator()
@@ -332,7 +354,7 @@ class EntriesController extends CpController
                 'site' => $site->handle(),
             ])->validate();
 
-        $values = $fields->process()->values()->except(['slug', 'date', 'blueprint']);
+        $values = $fields->process()->values()->except(['slug', 'date', 'blueprint', 'published']);
 
         $entry = Entry::make()
             ->collection($collection)
@@ -343,13 +365,20 @@ class EntriesController extends CpController
             ->data($values);
 
         if ($collection->dated()) {
-            $entry->date($this->formatDateForSaving($request->date));
+            $entry->date($this->toCarbonInstanceForSaving($request->date));
         }
 
-        if (($structure = $collection->structure()) && ! $collection->orderable()) {
+        if ($structure = $collection->structure()) {
             $tree = $structure->in($site->handle());
+        }
+
+        if ($structure && ! $collection->orderable()) {
             $parent = $values['parent'] ?? null;
             $entry->afterSave(function ($entry) use ($parent, $tree) {
+                if ($parent && optional($tree->page($parent))->isRoot()) {
+                    $parent = null;
+                }
+
                 $tree->appendTo($parent, $entry)->save();
             });
         }
@@ -400,11 +429,11 @@ class EntriesController extends CpController
     {
         // The values should only be data merged with the origin data.
         // We don't want injected collection values, which $entry->values() would have given us.
+        $values = collect();
         $target = $entry;
-        $values = $target->data();
-        while ($target->hasOrigin()) {
+        while ($target) {
+            $values = $target->data()->merge($target->computedData())->merge($values);
             $target = $target->origin();
-            $values = $target->data()->merge($values);
         }
         $values = $values->all();
 
@@ -452,15 +481,31 @@ class EntriesController extends CpController
             ->values();
     }
 
-    protected function formatDateForSaving($date)
+    protected function toCarbonInstanceForSaving($date): Carbon
     {
-        // If there's a time, adjust the format into a datetime order string.
-        if (strlen($date) > 10) {
-            $date = str_replace(':', '', $date);
-            $date = str_replace(' ', '-', $date);
+        // Since assume `Y-m-d ...` format, we can use `parse` here.
+        return Carbon::parse($date);
+    }
+
+    private function validateParent($entry, $tree, $parent)
+    {
+        if ($entry->id() == $parent) {
+            throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_cannot_be_itself')]);
         }
 
-        return $date;
+        // If there's no parent selected, the entry will be at end of the top level, which is fine.
+        // If the entry being edited is not the root, then we don't have anything to worry about.
+        // If the parent is the root, that's fine, and is handled during the tree update later.
+        if (! $parent || ! $entry->page()->isRoot()) {
+            return;
+        }
+
+        // There will always be a next page since we couldn't have got this far with a single page.
+        $nextTopLevelPage = $tree->pages()->all()->skip(1)->first();
+
+        if ($nextTopLevelPage->id() === $parent || $nextTopLevelPage->pages()->all()->count() > 0) {
+            throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_causes_root_children')]);
+        }
     }
 
     private function validateUniqueUri($entry, $tree, $parent)

@@ -33,6 +33,7 @@
                     :field-path-prefix="fieldPathPrefix || handle"
                     :has-error="setHasError(index)"
                     :previews="previews[set._id]"
+                    :show-field-previews="config.previews"
                     :can-add-set="canAddSet"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
@@ -44,7 +45,7 @@
                     @blur="blurred"
                     @previews-updated="updateSetPreviews(set._id, $event)"
                 >
-                    <template v-slot:picker v-if="index !== value.length-1 && canAddSet">
+                    <template v-slot:picker v-if="canAddSet">
                         <set-picker
                             class="replicator-set-picker-between"
                             :sets="setConfigs"
@@ -117,6 +118,10 @@ export default {
 
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
+        },
+
+        replicatorPreview() {
+            return `${this.config.display}: ${__n(':count set|:count sets', this.value.length)}`;
         }
     },
 
@@ -143,7 +148,7 @@ export default {
         addSet(handle, index) {
             const set = {
                 ...this.meta.defaults[handle],
-                _id: `set-${uniqid()}`,
+                _id: uniqid(),
                 type: handle,
                 enabled: true,
             };
@@ -166,7 +171,7 @@ export default {
             const old = this.value[index];
             const set = {
                 ...old,
-                _id: `set-${uniqid()}`,
+                _id: uniqid(),
             };
 
             this.updateSetPreviews(set._id, {});
@@ -178,7 +183,7 @@ export default {
                 set,
                 ...this.value.slice(index + 1)
             ]);
-            
+
             this.expandSet(set._id);
         },
 

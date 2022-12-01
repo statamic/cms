@@ -117,14 +117,15 @@ class Theme extends Tags
      */
     public function output()
     {
-        $src = $this->params->get('src');
+        $src = Path::tidy($this->params->get('src'));
+        $disk = File::disk('resources');
 
-        // Output nothing if the file doesn't exist.
-        if (! File::disk('resources')->exists(Path::tidy($src))) {
+        // Output nothing if the file doesn't exist or is outside the resources directory.
+        if (! $disk->exists($src) || ! $disk->isWithinRoot($src)) {
             return '';
         }
 
-        $contents = File::disk('resources')->get($src);
+        $contents = $disk->get($src);
 
         // If its a tag pair, the contents should be inserted into a variable.
         // {{ output_contents }} by default, but can be changed using `as`.

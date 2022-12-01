@@ -58,6 +58,7 @@ class CorePermissions
         });
 
         $this->register('resolve duplicate ids');
+        $this->register('view graphql');
     }
 
     protected function registerCollections()
@@ -167,11 +168,14 @@ class CorePermissions
                     $this->permission('create users'),
                     $this->permission('delete users'),
                     $this->permission('change passwords'),
-                    $this->permission('edit user groups'),
-                    $this->permission('edit roles'),
+                    $this->permission('assign user groups'),
+                    $this->permission('assign roles'),
                 ]),
             ]);
         });
+
+        $this->register('edit user groups');
+        $this->register('edit roles');
     }
 
     protected function registerForms()
@@ -213,11 +217,11 @@ class CorePermissions
             $permission = Permission::make($permission);
         }
 
-        return $permission->label(
-            __('statamic::permissions.'.str_replace(' ', '_', $permission->value()))
-        )->description(
-            __('statamic::permissions.'.str_replace(' ', '_', $permission->value().'_desc'))
-        );
+        $label = __('statamic::permissions.'.str_replace(' ', '_', $permission->value()));
+        $description = __($descKey = 'statamic::permissions.'.str_replace(' ', '_', $permission->value().'_desc'));
+        $description = $description === $descKey ? null : $description;
+
+        return $permission->label($label)->description($description);
     }
 
     protected function group($name, $callback)

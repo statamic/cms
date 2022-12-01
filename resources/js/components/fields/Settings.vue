@@ -55,7 +55,7 @@
                 :is-root="true"
                 @updated="values = $event"
             >
-                <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue }">
+                <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue, setFieldMeta }">
 
                     <publish-fields
                         v-if="blueprint.sections.length"
@@ -65,6 +65,7 @@
                             updateField(handle, value, setFieldValue);
                             if (handle === 'handle') isHandleModified = true
                         }"
+                        @meta-updated="setFieldMeta"
                     />
 
                 </div>
