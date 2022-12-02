@@ -93,13 +93,9 @@ EOT;
         $this->assertEquals($expected, $this->tag->minifyFieldHtml($fields));
     }
 
-    /**
-     * @test
-     * @dataProvider renderTextProvider
-     */
-    public function renders_text_fields($value, $default, $old, $expected)
+    private function createField($type, $value, $default, $old)
     {
-        $config = ['type' => 'text'];
+        $config = ['type' => $type];
 
         if ($default) {
             $config['default'] = $default;
@@ -113,7 +109,16 @@ EOT;
             $this->get('/'); // create a request so the session works.
         }
 
-        $rendered = $this->tag->getRenderableField($field);
+        return $this->tag->getRenderableField($field);
+    }
+
+    /**
+     * @test
+     * @dataProvider renderTextProvider
+     */
+    public function renders_text_fields($value, $default, $old, $expected)
+    {
+        $rendered = $this->createField('text', $value, $default, $old);
 
         $this->assertSame($expected, $rendered['value']);
         $this->assertStringContainsString('value="'.$rendered['value'].'"', $rendered['field']);
@@ -146,21 +151,7 @@ EOT;
      */
     public function renders_toggles($value, $default, $old, $expected)
     {
-        $config = ['type' => 'toggle'];
-
-        if ($default) {
-            $config['default'] = $default;
-        }
-
-        $field = new Field('test', $config);
-        $field->setValue($value);
-
-        if ($old !== self::MISSING) {
-            session()->flashInput(['test' => $old]);
-            $this->get('/'); // create a request so the session works.
-        }
-
-        $rendered = $this->tag->getRenderableField($field);
+        $rendered = $this->createField('toggle', $value, $default, $old);
 
         $this->assertSame($expected, (bool) $rendered['value']);
 
