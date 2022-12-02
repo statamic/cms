@@ -668,7 +668,8 @@ class UserTags extends Tags
 
         return User::blueprint()->fields()->addValues($values)->preProcess()->all()
             ->reject(function ($field) {
-                return in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups']);
+                return in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups'])
+                    || $field->fieldtype()->handle() === 'assets';
             })
             ->map(function ($field) {
                 return $this->getRenderableField($field, 'user.profile');
