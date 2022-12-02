@@ -663,9 +663,8 @@ class UserTags extends Tags
     protected function getProfileFields()
     {
         $user = User::current();
-        $values = $user
-            ? $user->data()->merge(['email' => $user->email()])->all()
-            : [];
+
+        $values = $user->data()->merge(['email' => $user->email()])->all();
 
         return User::blueprint()->fields()->addValues($values)->preProcess()->all()
             ->reject(function ($field) {
