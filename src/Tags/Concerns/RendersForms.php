@@ -129,7 +129,7 @@ trait RendersForms
 
         $data = array_merge($field->toArray(), [
             'error' => $errors->first($field->handle()) ?: null,
-            'default' => $field->value() ?? $field->get('default'),
+            'default' => $field->value() ?? $field->defaultValue(),
             'old' => old($field->handle()),
         ]);
 
