@@ -212,7 +212,7 @@ class ApiController extends Controller
 
         return $query
             ->paginate(request()->input('limit', 25), $columns)
-            ->appends(request()->only(['filter', 'limit', 'page']));
+            ->appends(request()->only(['filter', 'limit', 'page', 'sort']));
     }
 
     /**
