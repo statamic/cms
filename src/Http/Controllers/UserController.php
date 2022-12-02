@@ -128,7 +128,7 @@ class UserController extends Controller
 
         $values = $fields->process()->values()
             ->only(array_keys($values))
-            ->except(['email', 'password', 'groups', 'roles']);
+            ->except(['email', 'password', 'groups', 'roles', 'super']);
 
         if ($request->email) {
             $user->email($request->email);
