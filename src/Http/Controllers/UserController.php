@@ -74,7 +74,7 @@ class UserController extends Controller
 
         $values = $fields->process()->values()
             ->only(array_keys($values))
-            ->except(['email', 'groups', 'roles']);
+            ->except(['email', 'groups', 'roles', 'super']);
 
         $user = User::make()
             ->email($request->email)
