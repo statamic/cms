@@ -209,6 +209,26 @@ class APITest extends TestCase
     }
 
     /** @test */
+    public function next_prev_link_include_original_query_params()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Config::set('statamic.api.cache', false);
+
+        Facades\Collection::make('pages')->save();
+
+        Facades\Entry::make()->collection('pages')->id('dance')->slug('dance')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('swing')->slug('swing')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('jazz')->slug('jazz')->published(true)->save();
+
+        $apiUrl = '/api/collections/pages/entries';
+
+        $this
+            ->get('/api/collections/pages/entries?limit=2&sort=-date')
+            ->assertJsonPath('links.first', 'http://localhost/api/collections/pages/entries?limit=2&sort=-date&page=1')
+            ->assertJsonPath('links.next', 'http://localhost/api/collections/pages/entries?limit=2&sort=-date&page=2');
+    }
+
+    /** @test */
     public function relationships_are_shallow_augmented()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
