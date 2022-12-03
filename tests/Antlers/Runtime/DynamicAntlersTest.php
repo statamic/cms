@@ -298,4 +298,20 @@ EXPECTED;
 
         $this->assertSame($expected, $result);
     }
+
+    public function test_array_variables_are_preserved()
+    {
+        $data = [
+            'one_two_three' => [
+                'one', 'two', 'three',
+            ],
+            'one' => 'one',
+            'two' => 'two',
+            'three' => 'three',
+        ];
+
+        $this->assertSame('one, two, and three', $this->renderString('{{ {one}_{two}_{three} | sentence_list }}', $data, true));
+        $this->assertSame('one, two, and three', $this->renderString('{{ {{one}_{two}_{three}} | sentence_list }}', $data, true));
+        $this->assertSame('one, two, and three', $this->renderString('{{ {{{one}_{two}_{three}}} | sentence_list }}', $data, true));
+    }
 }
