@@ -327,4 +327,20 @@ EXPECTED;
         $this->assertSame('The Title!', $this->renderString('{{ {{do_prefix ?= prefix}title} }}', $data));
         $this->assertSame('', $this->renderString('{{ do_prefix = false; }}{{ {{do_prefix ?= prefix}title} }}', $data));
     }
+
+    public function test_general_dynamic_variable_usage()
+    {
+        $data = [
+            'prefixed_one' => 10,
+            'prefixed_two' => 20,
+            'one' => 1,
+            'two' => 2,
+            'prefix' => 'prefixed',
+        ];
+
+        $this->assertSame('30', $this->renderString("{{ {prefix ?= '{prefix}_'}one + {prefix ?= '{prefix}_'}two }}", $data));
+        $this->assertSame('3', $this->renderString("{{ prefix = null; }}{{ {prefix ?= '{prefix}_'}one + {prefix ?= '{prefix}_'}two }}", $data));
+        $this->assertSame('30', $this->renderString("{{ {{prefix ?= '{prefix}_'}one} + {{{prefix ?= '{prefix}_'}two}} }}", $data));
+        $this->assertSame('3', $this->renderString("{{ prefix = null; }}{{ {{{{{{prefix ?= '{prefix}_'}one}}}}} + {{prefix ?= '{prefix}_'} + 'two'} }}", $data));
+    }
 }
