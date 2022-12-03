@@ -340,7 +340,7 @@ EOT;
 
         $this->assertSame('Yes', $this->renderString($template, [
             'var' => 'the',
-            'the_name' => 'hello'
+            'the_name' => 'hello',
         ]));
     }
 
