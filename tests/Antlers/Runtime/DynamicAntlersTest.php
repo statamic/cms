@@ -314,4 +314,17 @@ EXPECTED;
         $this->assertSame('one, two, and three', $this->renderString('{{ {{one}_{two}_{three}} | sentence_list }}', $data, true));
         $this->assertSame('one, two, and three', $this->renderString('{{ {{{one}_{two}_{three}}} | sentence_list }}', $data, true));
     }
+
+    public function test_strings_are_resolved_in_dynamic_variable_names()
+    {
+        $data = [
+            'prefix' => 'hero_',
+            'hero_title' => 'The Title!',
+            'do_prefix' => true
+        ];
+
+        $this->assertSame('hero_title', $this->renderString("{{ {'{do_prefix ?= prefix}title'} }}", $data));
+        $this->assertSame('The Title!', $this->renderString("{{ {{do_prefix ?= prefix}title} }}", $data));
+        $this->assertSame('', $this->renderString("{{ do_prefix = false; }}{{ {{do_prefix ?= prefix}title} }}", $data));
+    }
 }
