@@ -520,8 +520,9 @@ class NodeProcessor
     }
 
     /**
-     * @param AntlersNode $node
+     * @param  AntlersNode  $node
      * @return AntlersNode
+     *
      * @throws SyntaxErrorException
      */
     private function reevaluateAntlersNode(AntlersNode $node)
@@ -580,7 +581,7 @@ class NodeProcessor
         $node->parsedRuntimeNodes = [];
 
         NodeTypeAnalyzer::analyzeNode($node);
-        
+
         return $node;
     }
 
