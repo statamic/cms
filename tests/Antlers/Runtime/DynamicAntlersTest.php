@@ -224,4 +224,78 @@ EOT;
 EOT;
         $this->assertSame($expected, $this->renderString($template, [], true));
     }
+
+    public function test_dynamic_variables_prefixed_use_case()
+    {
+        $data = [
+            'title' => 'Page Title',
+            'description' => 'Page Description',
+            'image' => 'Page Image',
+            'hero_title' => 'Hero Title',
+            'hero_description' => 'Hero Description',
+        ];
+
+        // The second group of variables are prefixed with "hero_"
+        // and there does not exit a hero_image variable. The
+        // dynamic variables do not "fall back" to a
+        // regular variable with the original name
+        // since the internal variable references
+        // are rewritten and sent to the Runtime.
+
+        // To achieve "fallback", developers may use
+        // normal mechanics such as ternaries,
+        // gatekeeper operators, null coalescence, etc.
+
+        $template = <<<'EOT'
+<title:{{ {prefix}title }} />
+<description:{{ {prefix}description }} />
+<image:{{ {prefix}image }} />
+
+{{ prefix = 'hero_'; }}
+
+<title:{{ {prefix}title }} />
+<description:{{ {prefix}description }} />
+<image:{{ {prefix}image }} />
+
+{{ prefix = 'nothing_'; }}
+
+<title:{{ {prefix}title }} />
+<description:{{ {prefix}description }} />
+<image:{{ {prefix}image }} />
+
+{{ prefix = null; }}
+
+<title:{{ {prefix}title }} />
+<description:{{ {prefix}description }} />
+<image:{{ {prefix}image }} />
+EOT;
+
+        $result = trim($this->renderString($template, $data));
+
+        $expected = <<<'EXPECTED'
+<title:Page Title />
+<description:Page Description />
+<image:Page Image />
+
+
+
+<title:Hero Title />
+<description:Hero Description />
+<image: />
+
+
+
+<title: />
+<description: />
+<image: />
+
+
+
+<title:Page Title />
+<description:Page Description />
+<image:Page Image />
+EXPECTED;
+
+        $this->assertSame($expected, $result);
+    }
 }
