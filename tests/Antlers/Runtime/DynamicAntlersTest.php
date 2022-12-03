@@ -328,6 +328,22 @@ EXPECTED;
         $this->assertSame('', $this->renderString('{{ do_prefix = false; }}{{ {{do_prefix ?= prefix}title} }}', $data));
     }
 
+    public function test_dynamic_variables_inside_conditions()
+    {
+        // Dynamic variable name expressions MUST be wrapped inside curly braces
+        // when used inside conditions. We can get away without them on
+        // "normal" tags/variables because they become the "name" of
+        // that tag/variable. For conditions, the name is always "if".
+        $template = <<<'EOT'
+{{ if {{var}_name} == 'hello' }}Yes{{ else }}No{{ /if }}
+EOT;
+
+        $this->assertSame('Yes', $this->renderString($template, [
+            'var' => 'the',
+            'the_name' => 'hello'
+        ]));
+    }
+
     public function test_general_dynamic_variable_usage()
     {
         $data = [
