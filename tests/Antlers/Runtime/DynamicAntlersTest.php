@@ -320,11 +320,11 @@ EXPECTED;
         $data = [
             'prefix' => 'hero_',
             'hero_title' => 'The Title!',
-            'do_prefix' => true
+            'do_prefix' => true,
         ];
 
         $this->assertSame('hero_title', $this->renderString("{{ {'{do_prefix ?= prefix}title'} }}", $data));
-        $this->assertSame('The Title!', $this->renderString("{{ {{do_prefix ?= prefix}title} }}", $data));
-        $this->assertSame('', $this->renderString("{{ do_prefix = false; }}{{ {{do_prefix ?= prefix}title} }}", $data));
+        $this->assertSame('The Title!', $this->renderString('{{ {{do_prefix ?= prefix}title} }}', $data));
+        $this->assertSame('', $this->renderString('{{ do_prefix = false; }}{{ {{do_prefix ?= prefix}title} }}', $data));
     }
 }
