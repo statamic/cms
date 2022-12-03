@@ -212,7 +212,7 @@ class ApiController extends Controller
 
         return $query
             ->paginate(request()->input('limit', config('statamic.api.pagination_size', 50)), $columns)
-            ->appends(request()->only(['filter', 'limit', 'page']));
+            ->appends(request()->only(['filter', 'limit', 'page', 'sort']));
     }
 
     /**
