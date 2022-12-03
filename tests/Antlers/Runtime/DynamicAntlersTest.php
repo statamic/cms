@@ -359,4 +359,36 @@ EOT;
         $this->assertSame('30', $this->renderString("{{ {{prefix ?= '{prefix}_'}one} + {{{prefix ?= '{prefix}_'}two}} }}", $data));
         $this->assertSame('3', $this->renderString("{{ prefix = null; }}{{ {{{{{{prefix ?= '{prefix}_'}one}}}}} + {{prefix ?= '{prefix}_'} + 'two'} }}", $data));
     }
+
+    public function test_creating_nicer_handles_for_prefixed_variables()
+    {
+        $template = <<<'EOT'
+{{ _prefix = prefix ? '{prefix}_' : null; }}
+{{ {_prefix}title }}
+{{ {_prefix}description }}
+EOT;
+
+        $data = [
+            'title' => 'The Title',
+            'description' => 'The Description',
+            'prefixed_title' => 'Prefixed Title',
+            'prefixed_description' => 'Prefixed Description',
+        ];
+
+        $expected = <<<'EXPECTED'
+The Title
+The Description
+EXPECTED;
+
+        $this->assertSame($expected, trim($this->renderString($template, $data)));
+
+        $data['prefix'] = 'prefixed';
+
+        $expected = <<<'EXPECTED'
+Prefixed Title
+Prefixed Description
+EXPECTED;
+
+        $this->assertSame($expected, trim($this->renderString($template, $data)));
+    }
 }
