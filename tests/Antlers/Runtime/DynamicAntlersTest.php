@@ -391,4 +391,38 @@ EXPECTED;
 
         $this->assertSame($expected, trim($this->renderString($template, $data)));
     }
+
+    public function test_var_exists_language_operator()
+    {
+        // The var_exists language operator will return
+        // true if all the variables in the expression
+        // exist. Null values are considered "true".
+        $data = [
+            'title' => 'The title',
+            'description' => null
+        ];
+
+        $this->assertSame('Yes', $this->renderString('{{ if var_exists(title, description) }}Yes{{ else }}No{{ /if }}', $data));
+        $this->assertSame('Yes', $this->renderString('{{ if var_exists(title) }}Yes{{ else }}No{{ /if }}', $data));
+        $this->assertSame('Yes', $this->renderString('{{ if var_exists(title,) }}Yes{{ else }}No{{ /if }}', $data));
+        $this->assertSame('No', $this->renderString('{{ if var_exists(title,content) }}Yes{{ else }}No{{ /if }}', $data));
+    }
+
+    public function test_var_isset_language_operator()
+    {
+        // The var_isset language operator is similar
+        // to the var_exists operator in that it
+        // ensures that all the variables do
+        // exist. However, if any variable
+        // is set to `null` it will return false.
+
+        $data = [
+            'title' => 'The title',
+            'description' => null
+        ];
+
+        $this->assertSame('Yes', $this->renderString('{{ if var_isset(title) }}Yes{{ else }}No{{ /if }}', $data));
+        $this->assertSame('No', $this->renderString('{{ if var_isset(title, description) }}Yes{{ else }}No{{ /if }}', $data));
+        $this->assertSame('Yes', $this->renderString('{{ if var_isset(title,) }}Yes{{ else }}No{{ /if }}', $data));
+    }
 }
