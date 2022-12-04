@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Errors\TypeLabeler;
+use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Constants\FalseConstant;
 use Statamic\View\Antlers\Language\Nodes\Constants\NullConstant;
 use Statamic\View\Antlers\Language\Nodes\Constants\TrueConstant;
@@ -155,9 +156,9 @@ class LanguageOperatorManager
 
             foreach ($nodeToCheck->nodes as $argNode) {
                 if ($argNode->value instanceof VariableNode) {
-                    $tmpResult = $this->dataManager->getData($argNode->value->variableReference, $context);
+                    $tmpResult = $this->environment->evaluateBool([$argNode->value]);
 
-                    if ($tmpResult == null) {
+                    if ($tmpResult == false) {
                         $allIsset = false;
                         break;
                     }
@@ -179,7 +180,9 @@ class LanguageOperatorManager
 
             foreach ($nodeToCheck->nodes as $argNode) {
                 if ($argNode->value instanceof VariableNode) {
-                    $tmpResult = $this->dataManager->getDataWithExistence($argNode->value->variableReference, $context);
+                    $varReference = $this->getDynamicVariableReference($argNode->value);
+
+                    $tmpResult = $this->dataManager->getDataWithExistence($varReference, $context);
 
                     if ($tmpResult[0] === false) {
                         $allExists = false;
@@ -198,6 +201,25 @@ class LanguageOperatorManager
         }
 
         return $value;
+    }
+
+    private function getDynamicVariableReference(VariableNode $variable)
+    {
+        $varReference = $variable->variableReference;
+
+        if ($variable->isInterpolationReference && count($variable->interpolationNodes) == 1) {
+            /** @var AntlersNode $refNode */
+            $refNode = $variable->interpolationNodes[0];
+
+            if ($refNode->pathReferenceContainsDynamicVariables) {
+                /** @var AntlersNode $refNode */
+                $refNode = $this->hostProcessor->reevaluateAntlersNode($refNode);
+
+                $varReference = $refNode->pathReference;
+            }
+        }
+
+        return $varReference;
     }
 
     protected function getDynamicErrorMessage($operator, $invalidType)

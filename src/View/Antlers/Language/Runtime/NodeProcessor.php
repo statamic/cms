@@ -525,7 +525,7 @@ class NodeProcessor
      *
      * @throws SyntaxErrorException
      */
-    private function reevaluateAntlersNode(AntlersNode $node)
+    public function reevaluateAntlersNode(AntlersNode $node)
     {
         foreach ($node->pathReference->pathParts as $part) {
             if ($part instanceof VariableReference) {
@@ -967,6 +967,15 @@ class NodeProcessor
      */
     public function reduceInterpolatedVariable(VariableNode $node)
     {
+        // Prevent cache of dynamic variables.
+        if (count($node->interpolationNodes) == 1 && $node->interpolationNodes[0] instanceof AntlersNode && $node->interpolationNodes[0]->pathReferenceContainsDynamicVariables) {
+            $interpolationScope = $this->getActiveData();
+
+            return $this->cloneProcessor()
+                ->setIsInterpolationProcessor(true)
+                ->setData($interpolationScope)->reduce($node->interpolationNodes);
+        }
+
         if (! array_key_exists($node->name, $this->interpolationCache)) {
             $interpolationScope = $this->getActiveData();
             $interpolationValue = $this->cloneProcessor()

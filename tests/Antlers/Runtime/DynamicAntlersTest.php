@@ -425,4 +425,20 @@ EXPECTED;
         $this->assertSame('No', $this->renderString('{{ if var_isset(title, description) }}Yes{{ else }}No{{ /if }}', $data));
         $this->assertSame('Yes', $this->renderString('{{ if var_isset(title,) }}Yes{{ else }}No{{ /if }}', $data));
     }
+
+    public function test_dynamic_variables_with_operators()
+    {
+        $data = [
+            'title' => 'The title',
+            'prefix_title' => 'Prefixed title',
+        ];
+
+        $this->assertSame('Yes', $this->renderString('{{ if var_exists({{prefix}title}) }}Yes{{ else }}No{{ /if }}', $data));
+
+        $data['prefix'] = 'nope_';
+        $this->assertSame('No', $this->renderString('{{ if var_exists({{prefix}title}) }}Yes{{ else }}No{{ /if }}', $data));
+
+        $data['prefix'] = 'prefix_';
+        $this->assertSame('Yes', $this->renderString('{{ if var_exists({{prefix}title}) }}Yes{{ else }}No{{ /if }}', $data));
+    }
 }
