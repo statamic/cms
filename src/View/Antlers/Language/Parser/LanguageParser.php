@@ -1159,7 +1159,7 @@ class LanguageParser
                         throw ErrorFactory::makeSyntaxError(
                             AntlersErrorCodes::TYPE_ARR_MAKE_UNEXPECTED_TYPE,
                             $token,
-                            'Unexpected ['.TypeLabeler::getPrettyTypeName($nextToken).'] while parsing ' .$token->content. ' operator arguments.'
+                            'Unexpected ['.TypeLabeler::getPrettyTypeName($nextToken).'] while parsing '.$token->content.' operator arguments.'
                         );
                     }
 
