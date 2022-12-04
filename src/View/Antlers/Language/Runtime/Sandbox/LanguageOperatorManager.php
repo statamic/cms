@@ -202,7 +202,7 @@ class LanguageOperatorManager
 
     protected function getDynamicErrorMessage($operator, $invalidType)
     {
-        return 'Unexpected type [' .TypeLabeler::getPrettyTypeName($invalidType). '] supplied to ' .$operator. ' operator. Expecting a list of variables: {{ '. $operator .' (var1, var2, var3) }}';
+        return 'Unexpected type ['.TypeLabeler::getPrettyTypeName($invalidType).'] supplied to '.$operator.' operator. Expecting a list of variables: {{ '.$operator.' (var1, var2, var3) }}';
     }
 
     protected function unpackQueryLogicGroup(LogicGroup $group)

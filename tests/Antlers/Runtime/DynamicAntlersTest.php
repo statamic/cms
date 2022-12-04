@@ -399,7 +399,7 @@ EXPECTED;
         // exist. Null values are considered "true".
         $data = [
             'title' => 'The title',
-            'description' => null
+            'description' => null,
         ];
 
         $this->assertSame('Yes', $this->renderString('{{ if var_exists(title, description) }}Yes{{ else }}No{{ /if }}', $data));
@@ -418,7 +418,7 @@ EXPECTED;
 
         $data = [
             'title' => 'The title',
-            'description' => null
+            'description' => null,
         ];
 
         $this->assertSame('Yes', $this->renderString('{{ if var_isset(title) }}Yes{{ else }}No{{ /if }}', $data));
