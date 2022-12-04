@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'any.config.antlers' => "Szeretné-e, hogy ezt a mezőt parsolja az Antlers?",
+    'any.config.antlers' => 'Szeretné-e, hogy ezt a mezőt parsolja az Antlers?',
     'any.config.cast_booleans' => 'Az igaz és hamis értékű opciók logikai értékként kerülnek mentésre.',
     'array.config.keys' => 'Állítsa be a tömbkulcsokat (változókat) és az opcionális címkéket.',
     'array.config.mode' => 'A dinamikus mód lehetővé teszi a felhasználó számára az adatok kezelését, míg a kulcsos mód nem.',

@@ -12,7 +12,7 @@ return [
 </code></pre>
 
 <h3>Félkövér és Dőlt</h3>
-<pre class="language-markdown"><code>Szöveges részt *kitudsz emelni*, **vélkövérré tudsz alakítani**, vagy _**mindkettő**_.</code></pre>
+<pre class="language-markdown"><code>Szöveges részt *kitudsz emelni*, **félkövérré tudsz alakítani**, vagy _**mindkettő**_.</code></pre>
 
 <h3>Hivatkozások</h3>
 <pre class="language-markdown"><code>Ez egy [példa hivatkozás](http://example.com).</code></pre>
