@@ -551,8 +551,16 @@ class NodeProcessor
         foreach ($node->processedInterpolationRegions as $regionName => $antlersNode) {
             $tmpValue = $this->evaluateInterpolation($antlersNode);
 
-            // TODO: Make this more robust.
-            if (is_array($tmpValue)) {
+            if ($this->isLoopable($tmpValue)) {
+                return $node;
+            }
+
+            if (is_object($tmpValue) && method_exists($tmpValue, '__toString')) {
+                $tmpValue = $tmpValue->__toString();
+            }
+
+            // If it is still an object, let's return the node.
+            if (is_object($tmpValue)) {
                 return $node;
             }
 
