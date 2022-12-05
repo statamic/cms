@@ -35,6 +35,24 @@ class StoresScopedComputedFieldCallbacksTest extends TestCase
 
         $this->assertEquals([], $repository->getComputedCallbacks('products')->all());
     }
+
+    /** @test */
+    public function it_can_store_scoped_computed_callbacks_for_multiple_scopes()
+    {
+        $repository = new FakeRepositoryWithScopedCallbacks;
+
+        $repository->computed(['events', 'articles'], 'some_field', $closure = function ($item, $value) {
+            //
+        });
+
+        $this->assertEquals([
+            'some_field' => $closure,
+        ], $repository->getComputedCallbacks('events')->all());
+
+        $this->assertEquals([
+            'some_field' => $closure,
+        ], $repository->getComputedCallbacks('articles')->all());
+    }
 }
 
 class FakeRepositoryWithScopedCallbacks
