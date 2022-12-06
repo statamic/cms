@@ -16,7 +16,6 @@ use Statamic\Facades\Form as FormAPI;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
 use Statamic\Facades\Nav as NavAPI;
 use Statamic\Facades\Role as RoleAPI;
-use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\User;
@@ -36,7 +35,8 @@ class CoreNav
             ->makeContentSection()
             ->makeFieldsSection()
             ->makeToolsSection()
-            ->makeUsersSection();
+            ->makeUsersSection()
+            ->makePreferencesSection();
     }
 
     /**
@@ -260,15 +260,15 @@ class CoreNav
     }
 
     /**
-     * @TODO AREAS
+     * Make users section items.
      *
      * @return $this
      */
-    protected function makeUnusedSection()
+    protected function makePreferencesSection()
     {
-        // Nav::site('Preferences')
-        //     ->route('')
-        //     ->icon('hammer-wrench');
+        Nav::preferences('Nav')
+            ->route(User::current()->isSuper() ? 'preferences.nav.index' : 'preferences.nav.edit')
+            ->icon('nav-preferences');
 
         return $this;
     }
