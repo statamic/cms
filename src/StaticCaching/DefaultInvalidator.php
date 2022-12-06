@@ -62,7 +62,7 @@ class DefaultInvalidator implements Invalidator
     protected function invalidateEntryUrls($entry)
     {
         $entry->descendants()->push($entry)->each(function ($entry) {
-            if ($url = $entry->absoluteUrl()) {
+            if (! $entry->isRedirect() && $url = $entry->absoluteUrl()) {
                 $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
             }
         });
