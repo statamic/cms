@@ -199,8 +199,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('account', 'AccountController')->name('account');
         Route::resource('user-groups', 'UserGroupsController');
         Route::resource('roles', 'RolesController');
-        Route::resource('preferences', 'PreferenceController')->except('destroy');
-        Route::post('preferences/{key}/delete', 'PreferenceController@destroy')->name('preferences.destroy');
     });
 
     Route::post('user-exists', 'Users\UserWizardController')->name('user.exists');
@@ -226,6 +224,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::group(['prefix' => 'api', 'as' => 'api.', 'namespace' => 'API'], function () {
         Route::resource('addons', 'AddonsController');
         Route::resource('templates', 'TemplatesController');
+    });
+
+    Route::group(['prefix' => 'preferences', 'as' => 'preferences.', 'namespace' => 'Preferences'], function () {
+        Route::post('/', 'PreferenceController@store')->name('store');
+        Route::delete('{key}', 'PreferenceController@destroy')->name('destroy');
     });
 
     Route::get('session-timeout', 'SessionTimeoutController')->name('session.timeout');

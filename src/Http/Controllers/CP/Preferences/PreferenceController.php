@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Controllers\CP\Users;
+namespace Statamic\Http\Controllers\CP\Preferences;
 
 use Illuminate\Http\Request;
 use Statamic\Facades\Preference;
