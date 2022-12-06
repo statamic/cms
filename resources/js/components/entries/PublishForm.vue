@@ -248,7 +248,6 @@
             :collection="collectionHandle"
             :reference="initialReference"
             :publish-container="publishContainer"
-            :can-manage-publish-state="canManagePublishState"
             @closed="confirmingPublish = false"
             @saving="saving = true"
             @saved="publishActionCompleted"
