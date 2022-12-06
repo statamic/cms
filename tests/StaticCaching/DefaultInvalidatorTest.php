@@ -98,6 +98,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('isRedirect')->andReturn(false);
             $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
             $m->shouldReceive('collectionHandle')->andReturn('blog');
             $m->shouldReceive('descendants')->andReturn(collect());
