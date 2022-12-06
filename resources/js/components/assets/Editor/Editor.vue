@@ -123,7 +123,7 @@
                     :values="values"
                     :meta="meta"
                     :errors="errors"
-                    @updated="values = $event"
+                    @updated="values = { ...values, ...$event }"
                 >
                     <div class="editor-form" slot-scope="{ setFieldValue, setFieldMeta }">
 
