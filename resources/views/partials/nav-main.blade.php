@@ -32,13 +32,13 @@
                 </ul>
             @endforeach
 
-            <div class="opacity-50">
+            <div>
                 <h6>{{ __('Preferences') }}</h6>
                 <ul>
                     <li>
-                        <a href="{{ cp_route('nav-preferences') }}">
-                            <i>@cp_svg('hammer-wrench')</i>
-                            <span>{{ __('Nav') }}</span>
+                        <a href="{{ cp_route('nav-preferences.index') }}">
+                            <i>@cp_svg('nav-preferences')</i>
+                            <span>{{ __('CP Nav') }}</span>
                         </a>
                     </li>
                 </ul>

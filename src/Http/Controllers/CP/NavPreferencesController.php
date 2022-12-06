@@ -13,6 +13,11 @@ use Statamic\Http\Resources\CP\Nav\Nav as NavResource;
 
 class NavPreferencesController extends Controller
 {
+    public function index()
+    {
+        return view('statamic::nav.index');
+    }
+
     public function edit()
     {
         return view('statamic::nav.edit', [
