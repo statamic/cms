@@ -140,6 +140,16 @@ class Nav
     }
 
     /**
+     * Build default navigation (before applying any preferences).
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function buildDefault()
+    {
+        return $this->build(false);
+    }
+
+    /**
      * Make default nav items.
      *
      * @return $this
