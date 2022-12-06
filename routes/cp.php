@@ -229,15 +229,21 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::group(['prefix' => 'preferences', 'as' => 'preferences.', 'namespace' => 'Preferences'], function () {
         Route::post('/', 'PreferenceController@store')->name('store');
         Route::delete('{key}', 'PreferenceController@destroy')->name('destroy');
+
+        Route::group(['prefix' => 'nav', 'as' => 'nav.', 'namespace' => 'Nav'], function () {
+            Route::get('/', 'NavController@index')->name('index');
+            Route::get('edit', 'NavController@edit')->name('edit');
+            Route::patch('/', 'NavController@update')->name('update');
+            Route::get('roles/{role}/edit', 'RoleNavController@edit')->name('role.edit');
+            Route::patch('roles/{role}', 'RoleNavController@update')->name('role.update');
+            Route::get('default/edit', 'DefaultNavController@edit')->name('default.edit');
+            Route::patch('default', 'DefaultNavController@update')->name('default.update');
+        });
     });
 
     Route::get('session-timeout', 'SessionTimeoutController')->name('session.timeout');
 
     Route::view('/playground', 'statamic::playground')->name('playground');
-
-    Route::get('/nav-preferences', 'NavPreferencesController@index')->name('nav-preferences.index');
-    Route::get('/nav-preferences/edit', 'NavPreferencesController@edit')->name('nav-preferences.edit');
-    Route::post('/nav-preferences', 'NavPreferencesController@update');
 
     Route::get('{segments}', 'CpController@pageNotFound')->where('segments', '.*')->name('404');
 });
