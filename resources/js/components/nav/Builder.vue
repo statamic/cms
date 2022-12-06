@@ -3,12 +3,10 @@
     <div>
 
         <header class="mb-3">
-            <!--
-            <breadcrumb url="" :title="__('Preferences')" />
-            -->
+            <breadcrumb v-if="indexUrl" :url="indexUrl" :title="__('Nav Customizer')" />
 
             <div class="flex items-center">
-                <h1 class="flex-1">{{ __('Nav Preferences') }}</h1>
+                <h1 class="flex-1">{{ __(title) }}</h1>
 
                 <dropdown-list class="mr-1">
                     <dropdown-item :text="__('Reset All Nav Customizations')" @click="resetInitialNav"></dropdown-item>
@@ -182,6 +180,10 @@ export default {
     },
 
     props: {
+        title: {
+            type: String,
+            require: true,
+        },
         currentNav: {
             type: Object,
             required: true,
@@ -190,9 +192,13 @@ export default {
             type: Object,
             required: true,
         },
-        // roles: {
-        //     type: Object,
-        // }
+        indexUrl: {
+            type: String,
+        },
+        updateUrl: {
+            type: String,
+            require: true,
+        },
     },
 
     data() {
@@ -460,7 +466,7 @@ export default {
             let tree = this.preparePreferencesSubmission();
 
             this.$axios
-                .post('/cp/nav-preferences', {tree})
+                .patch(this.updateUrl, {tree})
                 .then(response => this.$toast.success(__('Saved')))
                 .catch(error => this.$toast.error(__('Something went wrong')));
         },
