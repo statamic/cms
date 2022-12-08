@@ -7,17 +7,9 @@ use Statamic\Facades\User;
 
 class Preferences
 {
-    protected $user;
     protected $dotted = [];
     protected $preferences = [];
-
-    /**
-     * Instantiate preferences helpers.
-     */
-    public function __construct()
-    {
-        $this->user = User::current();
-    }
+    protected $preventMergingChildren = [];
 
     /**
      * Get default preferences instance.
@@ -27,6 +19,16 @@ class Preferences
     public function default()
     {
         return app(DefaultPreferences::class);
+    }
+
+    /**
+     * Prevent merging child data within a specific dotted preferences key.
+     *
+     * @param  string  $dottedKey
+     */
+    public function preventMergingChildren($dottedKey)
+    {
+        $this->preventMergingChildren[] = $dottedKey;
     }
 
     /**
@@ -84,7 +86,7 @@ class Preferences
      */
     protected function mergeDottedUserPreferences()
     {
-        $this->dotted += Arr::dot($this->user->preferences());
+        $this->dotted += $this->arrayDotPreferences(User::current()->preferences());
 
         return $this;
     }
@@ -96,8 +98,8 @@ class Preferences
      */
     protected function mergeDottedRolePreferences()
     {
-        foreach ($this->user->roles() as $role) {
-            $this->dotted += Arr::dot($role->preferences());
+        foreach (User::current()->roles() as $role) {
+            $this->dotted += $this->arrayDotPreferences($role->preferences());
         }
 
         return $this;
@@ -112,9 +114,28 @@ class Preferences
     {
         $defaultPreferences = $this->default()->all();
 
-        $this->dotted += Arr::dot($defaultPreferences);
+        $this->dotted += $this->arrayDotPreferences($defaultPreferences);
 
         return $this;
+    }
+
+    /**
+     * Array dot preferences array, while respecting `preventMergingChildren` property.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    protected function arrayDotPreferences($array)
+    {
+        $preserve = [];
+
+        foreach ($this->preventMergingChildren as $dottedKey) {
+            if ($childData = Arr::pull($array, $dottedKey)) {
+                $preserve[$dottedKey] = $childData;
+            }
+        }
+
+        return array_merge(Arr::dot($array), $preserve);
     }
 
     /**
