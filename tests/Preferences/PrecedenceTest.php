@@ -83,6 +83,25 @@ class PrecedenceTest extends TestCase
     }
 
     /** @test */
+    public function it_gives_precedence_to_role_order_assigned_on_user()
+    {
+        $this->setTestRoles([
+            'author' => Role::make()->permissions('super')->preferences(['alpha' => 'foo', 'beta' => 'beta']),
+            'pleb' => Role::make()->permissions('super')->preferences(['alpha' => 'bar', 'charlie' => 'charlie']),
+        ]);
+
+        $this->actingAs(User::make()->roles(['author', 'pleb']));
+
+        $expected = [
+            'alpha' => 'foo', // This should be `foo`, because the `author` role is set first
+            'beta' => 'beta',
+            'charlie' => 'charlie',
+        ];
+
+        $this->assertEquals($expected, Preference::all());
+    }
+
+    /** @test */
     public function it_can_get_default_preferences()
     {
         $this->actingAs(User::make()->assignRole('author'));
