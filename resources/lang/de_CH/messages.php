@@ -76,6 +76,7 @@ return [
     'fields_blueprints_description' => 'Blueprints definieren die Felder für den inhaltlichen Aufbau von Sammlungen, Taxonomien, Benutzer:innen und Formularen.',
     'fields_default_instructions' => 'Standardwert festlegen',
     'fields_display_instructions' => 'Name des Feldes im Control Panel.',
+    'fields_duplicate_instructions' => 'Soll dieses Feld beim Duplizieren des Eintrags berücksichtigt werden?',
     'fields_fieldsets_description' => 'Fieldsets sind einfache, flexible und völlig optionale Gruppen von Feldern, mit deren Hilfe wiederverwendbare, vorkonfigurierte Blöcke organisiert werden können.',
     'fields_handle_instructions' => 'Template-Variable des Feldes.',
     'fields_instructions_instructions' => 'Wird unter der Bezeichnung des Feldes angezeigt, genau wie dieser Text hier. Markdown wird unterstützt.',
