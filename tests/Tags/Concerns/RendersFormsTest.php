@@ -186,6 +186,7 @@ EOT;
         $rendered = $this->createField('toggle', $value, $default, $old);
 
         $this->assertSame($expected, (bool) $rendered['value']);
+        $this->assertStringContainsString('<input type="hidden" name="test" value="0">', $rendered['field']);
 
         if ($expected) {
             $this->assertStringContainsString('checked', $rendered['field']);
