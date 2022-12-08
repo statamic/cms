@@ -16,10 +16,12 @@ class RoleNavController extends NavController
 
         abort_unless($role = Role::find($handle), 404);
 
+        $preferences = $role->getPreference('nav');
+
         return $this->navBuilder([
             'title' => $role->title().' Nav',
             'updateUrl' => cp_route('preferences.nav.role.update', $role->handle()),
-            'currentNav' => NavResource::make(Nav::build()),
+            'currentNav' => NavResource::make(Nav::build($preferences)),
         ]);
     }
 
