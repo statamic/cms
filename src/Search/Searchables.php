@@ -167,13 +167,11 @@ class Searchables
 
             return [$field => $value];
         })->flatMap(function ($value, $field) use ($transformers) {
-
             if (! isset($transformers[$field])) {
                 return [$field => $value];
             }
 
             if (! $transformers[$field] instanceof Closure) {
-
                 if (class_exists($transformers[$field])) {
                     return [$field => app()->make($transformers[$field])->handle($field, $value)];
                 }

@@ -371,7 +371,8 @@ class NotSearchable
 
 class SearchTransformerTest
 {
-    public function handle($field, $value) {
+    public function handle($field, $value)
+    {
         return strtoupper($value);
     }
 }
