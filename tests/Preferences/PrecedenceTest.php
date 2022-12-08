@@ -167,6 +167,11 @@ class PrecedenceTest extends TestCase
             'actions' => [
                 'hibernates' => false,
             ],
+            'deeply' => [
+                'nested' => [
+                    'user' => true,
+                ],
+            ],
         ]));
 
         $this->setTestRoles([
@@ -175,11 +180,21 @@ class PrecedenceTest extends TestCase
                     'eats' => 'meat',
                     'hibernates' => true,
                 ],
+                'deeply' => [
+                    'nested' => [
+                        'bear' => true,
+                    ],
+                ],
             ]),
             'rabbit' => Role::make()->permissions('super')->preferences([
                 'actions' => [
                     'eats' => 'lettuce',
                     'hops' => true,
+                ],
+                'deeply' => [
+                    'nested' => [
+                        'rabbit' => true,
+                    ],
                 ],
             ]),
         ]);
@@ -190,6 +205,11 @@ class PrecedenceTest extends TestCase
                 'eats' => 'pizza',
                 'walks' => true,
             ],
+            'deeply' => [
+                'nested' => [
+                    'default' => true,
+                ],
+            ],
         ])->save();
 
         $this->assertEquals('english', Preference::get('site'));
@@ -197,6 +217,64 @@ class PrecedenceTest extends TestCase
         $this->assertFalse(Preference::get('actions.hibernates'));
         $this->assertTrue(Preference::get('actions.hops'));
         $this->assertTrue(Preference::get('actions.walks'));
+        $this->assertTrue(Preference::get('deeply.nested.user'));
+        $this->assertTrue(Preference::get('deeply.nested.bear'));
+        $this->assertTrue(Preference::get('deeply.nested.rabbit'));
+        $this->assertTrue(Preference::get('deeply.nested.default'));
+    }
+
+    /** @test */
+    public function it_merges_preferences_at_every_level_unless_otherwise_configured()
+    {
+        $this->actingAs(User::make()->assignRole('rabbit')->assignRole('bear')->preferences([
+            'actions' => [
+                'hibernates' => false,
+            ],
+            'deeply' => [
+                'nested' => [
+                    'user' => true,
+                ],
+            ],
+        ]));
+
+        $this->setTestRoles([
+            'rabbit' => Role::make()->permissions('super')->preferences([
+                'actions' => [
+                    'eats' => 'lettuce',
+                    'hops' => true,
+                ],
+                'deeply' => [
+                    'nested' => [
+                        'role' => true,
+                    ],
+                ],
+            ]),
+        ]);
+
+        Preference::default()->set([
+            'site' => 'english',
+            'actions' => [
+                'eats' => 'pizza',
+                'walks' => true,
+            ],
+            'deeply' => [
+                'nested' => [
+                    'default' => true,
+                ],
+            ],
+        ])->save();
+
+        Preference::preventMergingChildren('actions');
+        Preference::preventMergingChildren('deeply.nested');
+
+        $this->assertEquals('english', Preference::get('site'));
+        $this->assertFalse(Preference::get('actions.hibernates'));
+        $this->assertNull(Preference::get('actions.eats'));
+        $this->assertNull(Preference::get('actions.hops'));
+        $this->assertNull(Preference::get('actions.walks'));
+        $this->assertTrue(Preference::get('deeply.nested.user'));
+        $this->assertNull(Preference::get('deeply.nested.role'));
+        $this->assertNull(Preference::get('deeply.nested.default'));
     }
 
     private function cleanup()
