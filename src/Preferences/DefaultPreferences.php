@@ -32,6 +32,17 @@ class DefaultPreferences
     }
 
     /**
+     * Get preference (dot notation in key supported).
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function get($key)
+    {
+        return $this->getPreference($key);
+    }
+
+    /**
      * Save preferences to file.
      *
      * @param  array  $preferences

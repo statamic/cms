@@ -60,6 +60,17 @@ EOT
     }
 
     /** @test */
+    public function it_gets_a_preference_by_key()
+    {
+        Preference::default()->set([
+            'foo' => 'bar',
+            'bar' => 'baz',
+        ])->save();
+
+        $this->assertEquals('bar', Preference::default()->get('foo'));
+    }
+
+    /** @test */
     public function it_saves_preferences_to_file()
     {
         $this->assertFileNotExists(resource_path('preferences.yaml'));
