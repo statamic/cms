@@ -1241,8 +1241,8 @@ class NavPreferencesTest extends TestCase
 
     private function buildDefaultNav()
     {
-        // TODO: Should we test this?
-        // return Facades\CP\Nav::buildDefault();
+        // TODO: Should we test with this method instead?
+        // return Facades\CP\Nav::buildWithoutPreferences();
 
         return $this->buildNavWithPreferences([]);
     }

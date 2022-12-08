@@ -140,11 +140,11 @@ class Nav
     }
 
     /**
-     * Build default navigation (before applying any preferences).
+     * Build navigation without applying preferences.
      *
      * @return \Illuminate\Support\Collection
      */
-    public function buildDefault()
+    public function buildWithoutPreferences()
     {
         return $this->build(false);
     }
