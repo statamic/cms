@@ -3,11 +3,9 @@
 return [
     'activate_account_notification_body' => 'Azért kapta ezt az e-mailt, mert jelszó-visszaállítási kérést kaptunk fiókjához.',
     'activate_account_notification_subject' => 'Aktiválja fiókját',
-
     'addon_has_more_releases_beyond_license_body' => 'Lehet frissíteni, de a rendszert is frissítenie kell vagy új licencet kell vásárolnia.',
     'addon_has_more_releases_beyond_license_heading' => 'Ennek az addonnak több kiadása is van az Ön licence által korlátozotton túl.',
     'addon_list_loading_error' => 'Valami hiba történt az addonok betöltése során. Próbálja újra később.',
-
     'asset_container_allow_uploads_instructions' => 'Ha engedélyezve van, a felhasználók fájlokat tölthetnek fel ebbe a Médiatárolóba.',
     'asset_container_blueprint_instructions' => 'A Blueprintek további egyéni mezőket határoznak meg a Médiák szerkesztésekor.',
     'asset_container_create_folder_instructions' => 'Ha engedélyezve van, a felhasználók mappákat hozhatnak létre ebben a Médiatárolóban.',
@@ -22,19 +20,15 @@ return [
     'asset_replace_confirmation' => 'A tartalomban erre az elemre vonatkozó hivatkozások az alábbiakban kiválasztott tartalomra frissülnek.',
     'asset_reupload_confirmation' => 'Biztosan újra fel szeretné tölteni ezt az elemet?',
     'asset_reupload_warning' => 'Böngésző- vagy szerverszintű gyorsítótárazási problémák léphetnek fel. Inkább cserélje le az eszközt.',
-
     'blueprints_hidden_instructions' => 'Elrejti a Blueprintet a létrehozó gomboknál',
     'blueprints_intro' => 'A Blueprintek beviteli mezők segítségével írják le a Gyűjtemények, Űrlapok és egyéb adattípusok adatmodelljeit.',
     'blueprints_title_instructions' => 'Általában egyes számú főnév, például Article (cikk) vagy Product (termék).',
-
     'cache_utility_application_cache_description' => 'A Laravel egyesített gyorsítótára _(unified cache)_, amelyet a Statamic és az addonok mellett a composer csomagok is használnak.',
     'cache_utility_description' => 'Kezelje és tekintse meg a Statamic különféle gyorsítótárazási rétegeivel _(caching layers)_ kapcsolatos fontos információkat.',
     'cache_utility_image_cache_description' => 'A képgyorsítótár az összes átalakított és átméretezett kép másolatát tárolja.',
     'cache_utility_stache_description' => 'A Stache a Statamic „tartalom-gyorsítótára” _(content store)_, amely egy adatbázishoz hasonlóan működik. A rendszer automatikusan generálja a tartalomfájlokból.',
     'cache_utility_static_cache_description' => 'A statikus oldalak teljesen megkerülik a Statamic-ot, és közvetlenül a szerverről kerülnek kiszolgálásra, ezzel maximalizálva a teljesítményt.',
-
     'choose_entry_localization_deletion_behavior' => 'Válassza ki a lokalizált bejegyzéseken végrehajtani kívánt műveletet.',
-
     'collection_configure_date_behavior_private' => 'Privát – a listák elől elrejtve, az URL-ek 404-es hibára futnak',
     'collection_configure_date_behavior_public' => 'Nyilvános – Mindig látható',
     'collection_configure_date_behavior_unlisted' => 'Nem listázott – a listák elől elrejtve, az URL-ek láthatók',
@@ -49,11 +43,10 @@ return [
     'collection_configure_propagate_instructions' => 'Az új bejegyzések automatikus másolása az összes konfigurált oldalra.',
     'collection_configure_require_slugs_instructions' => 'Kötelező-e a bejegyzéseknek "slug"-ot megadni.',
     'collection_configure_template_instructions' => 'Állítsa be a gyűjtemény alapértelmezett sablonját. A bejegyzések felülírhatják ezt a beállítást egy `template` mezővel.',
-    'collection_configure_title_instructions' => 'Javasoljuk a többes számú főnév használatát, például „Articles” (Cikkek) vagy „Products” (Termékek).',
     'collection_configure_title_format_instructions' => 'Állítsa be, hogy a gyűjtemény bejegyzései automatikusan generálják a címüket. Tudjon meg többet a [documentation](https://statamic.dev/collections#titles).',
+    'collection_configure_title_instructions' => 'Javasoljuk a többes számú főnév használatát, például „Articles” (Cikkek) vagy „Products” (Termékek).',
     'collection_next_steps_configure_description' => 'Konfigurálja az URL-eket és útvonalakat (routes), Blueprinteket, sorrendezést és egyéb beállításokat!',
     'collection_next_steps_create_entry_description' => 'Hozza létre az első bejegyzést!',
-    'collection_next_steps_documentation_description' => 'További információ a gyűjteményekről, működésükről és beállítási lehetőségeikről.',
     'collection_next_steps_scaffold_description' => 'Gyorsan generálhat gyűjtő- (index) és részletnézeteket (details) a gyűjtemény nevéből.',
     'collection_revisions_instructions' => 'Verziók engedélyezése ehhez a gyűjteményhez.',
     'collection_scaffold_instructions' => 'Válassza ki, hogy mely üres nézeteket kívánja létrehozni. A meglévő fájlok nem kerülnek felülírásra.',
@@ -69,14 +62,10 @@ return [
     'collections_route_instructions' => 'Az útvonal vezérli a bejegyzések URL-jeit.',
     'collections_sort_direction_instructions' => 'Az alapértelmezett sorrendezési irány.',
     'collections_taxonomies_instructions' => 'Kapcsolja össze a gyűjtemény bejegyzéseit taxonómiákkal. A mezők automatikusan hozzáadódnak az űrlapokhoz.',
-
     'email_utility_configuration_description' => 'A levelezés beállításai itt találhatóak: <code>:path</code>',
     'email_utility_description' => 'Ellenőrizze az e-mail beállításokat, és küldjön teszt e-maileket.',
-
     'entry_origin_instructions' => 'Az új lokalizáció a kiválasztott oldalon lévő bejegyzés értékeit örökli.',
-
     'expect_root_instructions' => 'A fastruktúra első elemét tekintsük Főoldalnak („root” / „home”).',
-
     'field_conditions_instructions' => 'Mikor kell megjeleníteni vagy elrejteni ezt a mezőt.',
     'field_desynced_from_origin' => 'A forrástól deszinkronizálva. Kattintson a szinkronizáláshoz és az eredeti értékéhez való visszatéréshez.',
     'field_synced_with_origin' => 'Szinkronizálva a forrással. Kattintson vagy szerkessze a mezőt a szinkronizálás megszüntetéséhez.',
@@ -98,18 +87,15 @@ return [
     'fieldset_link_fields_prefix_instructions' => 'A hivatkozott Fieldset minden mezőjének ez lesz az előtagja. Hasznos, ha ugyanazokat a mezőket többször szeretné importálni.',
     'fieldsets_handle_instructions' => 'Erre a Fieldsetre való hivatkozásra szolgál. Nem olyan egyszerű később módosítani!',
     'fieldsets_title_instructions' => 'Általában azt írja le, hogy mely mezők lesznek benne, például „Image Block” vagy „Meta Data”',
-
     'focal_point_instructions' => 'A fókuszpont beállítása lehetővé teszi a dinamikus fényképvágást, hogy a kép alanya mindig a látszódjon a képen, akármilyen arányúra is legyen az vágva.',
     'focal_point_previews_are_examples' => 'A vágási előnézetek csak példaként szolgálnak',
-
     'forgot_password_enter_email' => 'Adja meg e-mail címét, hogy el tudjuk küldeni a jelszó-visszaállítási linket.',
-
     'form_configure_blueprint_instructions' => 'Válasszon a meglévő Blueprintek közül, vagy hozzon létre újat.',
+    'form_configure_email_attachments_instructions' => 'A feltöltött elemek csatolása ehhez az e-mailhez.',
     'form_configure_email_from_instructions' => 'Hagyja üresen a webhely alapértelmezettjének használatához',
     'form_configure_email_html_instructions' => 'Az e-mail HTML változatának nézete.',
     'form_configure_email_instructions' => 'Állítsa be az új űrlap beérkezésekor elküldendő e-maileket.',
     'form_configure_email_markdown_instructions' => 'Markdown használata ennek az e-mailnek a HTML változatának létrehozásához.',
-    'form_configure_email_attachments_instructions' => 'A feltöltött elemek csatolása ehhez az e-mailhez.',
     'form_configure_email_reply_to_instructions' => 'Hagyja üresen a „Feladó” használatához.',
     'form_configure_email_subject_instructions' => 'E-mail tárgya.',
     'form_configure_email_text_instructions' => 'Az e-mail szöveges változatának nézete.',
@@ -119,7 +105,6 @@ return [
     'form_configure_intro' => 'Az űrlapok információk gyűjtésére szolgálnak a látogatóktól. Beküldések beérkezésekor értesítések küldésére és belső események küldésére _(event dispatch)_ is lehetőség nyílik.',
     'form_configure_store_instructions' => 'Kapcsolja ki, ha nem szeretné, hogy a beküldéseket tároljuk. Az eseményeket _(events)_ és az e-mailes értesítéseket továbbra is elküldjük.',
     'form_configure_title_instructions' => 'Általában cselekvésre ösztönzés, például „Kapcsolat felvétele”.',
-
     'getting_started_widget_blueprints' => 'A Blueprintekben határozhatjuk meg a tartalom létrehozásához és tárolásához használt mezőket.',
     'getting_started_widget_collections' => 'A gyűjtemények a webhely különböző típusú tartalmait tartalmazzák.',
     'getting_started_widget_docs' => 'Ismerje meg a Statamic képességeit a leghitelesebb forrásból.',
@@ -127,20 +112,16 @@ return [
     'getting_started_widget_intro' => 'Az új Statamic webhely felépítésének megkezdéséhez javasoljuk, hogy kezdje ezekkel a lépésekkel.',
     'getting_started_widget_navigation' => 'Hozzon létre többszintű hivatkozáslistákat, amelyek navigációs sávok, láblécek és hasonlók megjelenítésére használhatóak.',
     'getting_started_widget_pro' => 'A Statamic Pro korlátlan számú felhasználói fiókot, szerepet, engedélyeket, Git-integrációt, revíziókat, több webhely kezelésének lehetőségét, és sok más hasznos funkciót tartalmaz!',
-
     'git_disabled' => 'A Git integráció jelenleg le van tiltva.',
     'git_nothing_to_commit' => 'Nincs mit commitolni.',
     'git_utility_description' => 'A Git által nyomon követett tartalom kezelése.',
-
     'global_search_open_using_slash' => 'A kereső használatához üsse le a <kbd>/</kbd> billentyűt',
     'global_set_config_intro' => 'A Globális Szettek kezelik a teljes webhelyen elérhető tartalmat, például a céges infókat, kapcsolatfelvételi adatokat vagy a kezelőfelület beállításait.',
     'global_set_no_fields_description' => 'Hozzáadhat mezőket a Blueprinthez, vagy manuálisan is hozzáadhat változókat a Szetthez.',
-
     'globals_blueprint_instructions' => 'Szabályozza a változók szerkesztésekor megjelenítendő mezőket.',
     'globals_configure_handle_instructions' => 'Erre a Globálisokra való hivatkozásra szolgál. Nem olyan egyszerű később módosítani!',
     'globals_configure_intro' => 'A Globálisok a webhely egészén, mindenhol elérhető változók csoportja.',
     'globals_configure_title_instructions' => 'Javasoljuk a Globálisok tartalmát képviselő főnevet, például „Brand” (márka) vagy „Company” (vállalat)',
-
     'licensing_config_cached_warning' => 'Az .env vagy egyéb konfigurációs fájlokban végzett módosításokat a rendszer nem észleli, amíg ki nem üríti a gyorsítótárat. Ha váratlan engedélyezési (license) eredményeket lát, ennek lehet ez is az oka. A gyorsítótár újragenerálásához használhatja a <code>php artisan config:cache</code> parancsot.',
     'licensing_error_invalid_domain' => 'Érvénytelen domén',
     'licensing_error_invalid_edition' => 'A licenc a(z) :edition kiadáshoz szól',
@@ -158,10 +139,8 @@ return [
     'licensing_trial_mode_alert_addons' => 'Ez az oldal kereskedelmi kiegészítőket használ. Indítás előtt feltétlenül vásároljon licencet. Köszi!',
     'licensing_trial_mode_alert_statamic' => 'Ez az oldal Statamic Pro-t használ. Indítás előtt feltétlenül vásároljon licencet. Köszi!',
     'licensing_utility_description' => 'Az engedélyezési részletek megtekintése és megoldása.',
-
     'max_depth_instructions' => 'Állítsa be, hogy maximum hány szint mélységig lehessen létrehozni oldalakat. Hagyja üresen, ha nincsen korlátozva.',
     'max_items_instructions' => 'Állítsa be a kiválasztható elemek maximális számát.',
-
     'navigation_configure_blueprint_instructions' => 'Válasszon a meglévő Blueprintek közül, vagy hozzon létre újat.',
     'navigation_configure_collections_instructions' => 'Ezen gyűjtemények bejegyzéseihez való hivatkozás engedélyezése.',
     'navigation_configure_handle_instructions' => 'Erre a navigációra való hivatkozásra szolgál. Nem olyan egyszerű később módosítani!',
@@ -171,38 +150,29 @@ return [
     'navigation_documentation_instructions' => 'További információ a navigációk létrehozásáról, konfigurálásáról és megjelenítéséről.',
     'navigation_link_to_entry_instructions' => 'Hivatkozás hozzáadása egy bejegyzéshez. További gyűjteményekhez való hivatkozás engedélyezése a konfigurációs területen.',
     'navigation_link_to_url_instructions' => 'Adjon hozzá egy hivatkozást bármely belső vagy külső URL-hez. További gyűjteményekhez való hivatkozás engedélyezése a konfigurációs területen.',
-
     'outpost_error_422' => 'Hiba a statamic.com webhelyen való kommunikáció során.',
     'outpost_error_429' => 'Túl sok kérés a statamic.com felé.',
     'outpost_issue_try_later' => 'Hiba történt a statamic.com webhellyel való kommunikáció során. Kérjük, próbálja újra később.',
     'phpinfo_utility_description' => 'Ellenőrizze a PHP konfigurációs beállításait és a telepített modulokat.',
-
     'publish_actions_create_revision' => 'A munkapéldány alapján egy revízió jön létre. A jelenlegi revízió nem változik.',
     'publish_actions_current_becomes_draft_because_scheduled' => 'Mivel az aktuális revízió közzétételre került, és Ön jövőbeli dátumot választott, a beküldés után ez a változat vázlatként fog viselkedni a kiválasztott dátumig.',
     'publish_actions_publish' => 'A munkapéldány módosításai a bejegyzésre alkalmazódnak, és azonnal közzétételre kerülnek.',
     'publish_actions_schedule' => 'A munkapéldány módosításai a bejegyzésre alkalmazódnak, és a kiválasztott napon megjelennek.',
     'publish_actions_unpublish' => 'A jelenlegi revízió közzététele visszavonásra kerül.',
-
     'reset_password_notification_body' => 'Azért kapta ezt az e-mailt, mert jelszó-visszaállítási kérést kaptunk fiókjához.',
     'reset_password_notification_no_action' => 'Ha nem kérte a jelszó visszaállítását, nincs szükség további teendőkre.',
     'reset_password_notification_subject' => 'Jelszó-visszaállítási kérés',
-
     'role_change_handle_warning' => 'A rövid név (handle) megváltoztatása nem frissíti a rá vonatkozó hivatkozásokat a felhasználókban és csoportokban.',
     'role_handle_instructions' => 'A rövid név (handle) erre a szerepre való hivatkozásra szolgál. Nem olyan egyszerű később módosítani!',
     'role_intro' => 'A szerepek hozzáférési és műveleti engedélyek csoportjai, amelyek hozzárendelhetők felhasználókhoz és felhasználói csoportokhoz.',
     'role_title_instructions' => 'Általában egyes számú főnév, például „Editor” vagy „Admin”.',
-
     'search_utility_description' => 'Kezelje és tekintse meg a Statamic keresési indexeivel kapcsolatos fontos információkat.',
-
     'session_expiry_enter_password' => 'Adja meg jelszavát, hogy ott folytassa, ahol abbahagyta',
     'session_expiry_logged_out_for_inactivity' => 'Automatikusan ki lett léptetve, mert egy ideje inaktív volt.',
     'session_expiry_logging_out_in_seconds' => 'Egy ideje inaktív, ezért :seconds másodperc múlva automatikusan kijelentkeztetjük. Ennek elkerüléséhez kattintson ide!',
     'session_expiry_new_window' => 'Új ablakban nyílik meg. Jöjjön vissza, miután bejelentkezett.',
-
     'show_slugs_instructions' => 'Megjelenjenek-e a "slug"-ok a fa nézetben.',
-
     'tab_sections_instructions' => 'Az egyes szekciók mezői fülekbe (tabs) lesznek csoportosítva.',
-
     'taxonomies_blueprints_instructions' => 'A taxonómia kifejezései ezen Blueprintek bármelyikét felhasználhatják.',
     'taxonomies_collections_instructions' => 'Azok a gyűjtemények, amelyek ezt a taxonómiát használják.',
     'taxonomies_preview_targets_instructions' => 'Az élő előnézetben megtekinthető URL-ek. További információ a [dokumentációban](https://statamic.dev/live-preview#preview-targets).',
@@ -212,11 +182,7 @@ return [
     'taxonomy_next_steps_configure_description' => 'Nevezze el a taxonómiákat, társítson hozzájuk gyűjteményeket, definiáljon Blueprinteket stb.',
     'taxonomy_next_steps_create_term_description' => 'Hozza létre az első kifejezést!',
     'taxonomy_next_steps_documentation_description' => 'További információ a taxonómiákról, működésükről és beállítási lehetőségeikről.',
-
     'try_again_in_seconds' => '{0,1}Próbálja újra most.|Próbálja újra :count másodperc múlva.',
-
-    'updates_available' => 'Frissítések elérhetőek!',
-
     'user_groups_handle_instructions' => 'Erre a felhasználói csoportra való hivatkozásra szolgál. Nem olyan egyszerű később módosítani!',
     'user_groups_intro' => 'A felhasználói csoportok lehetővé teszik a felhasználók rendszerezését és az engedélyalapú szerepek összesített alkalmazását.',
     'user_groups_role_instructions' => 'Szerepek hozzárendelésével egyszerűen megadhatja a csoport összes felhasználójának a megfelelő engedélyeket.',
