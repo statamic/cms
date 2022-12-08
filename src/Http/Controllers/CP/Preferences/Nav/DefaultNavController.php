@@ -13,6 +13,11 @@ class DefaultNavController extends Controller
 {
     use Concerns\HasNavBuilder;
 
+    protected function ignoreSaveAsOption()
+    {
+        return 'default';
+    }
+
     public function edit()
     {
         abort_unless(Statamic::pro() && User::current()->isSuper(), 403);

@@ -10,6 +10,11 @@ class UserNavController extends Controller
 {
     use Concerns\HasNavBuilder;
 
+    protected function ignoreSaveAsOption()
+    {
+        return 'user';
+    }
+
     public function edit()
     {
         return $this->navBuilder();

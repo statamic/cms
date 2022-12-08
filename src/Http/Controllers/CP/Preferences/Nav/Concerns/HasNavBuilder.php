@@ -5,7 +5,10 @@ namespace Statamic\Http\Controllers\CP\Preferences\Nav\Concerns;
 use Illuminate\Http\Request;
 use Statamic\CP\Navigation\NavPreferencesConfig;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Role;
+use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Nav\Nav as NavResource;
+use Statamic\Statamic;
 
 trait HasNavBuilder
 {
@@ -15,6 +18,7 @@ trait HasNavBuilder
             'title' => 'My Nav',
             'updateUrl' => cp_route('preferences.nav.user.update'),
             'destroyUrl' => cp_route('preferences.nav.user.destroy'),
+            'saveAsOptions' => $this->getSaveAsOptions()->values()->all(),
             'nav' => NavResource::make($nav ?? Nav::build()),
         ], $props));
     }
@@ -22,5 +26,39 @@ trait HasNavBuilder
     protected function getUpdatedNav(Request $request)
     {
         return NavPreferencesConfig::fromJavascript($request->tree);
+    }
+
+    protected function getSaveAsOptions()
+    {
+        $canSaveAs = Statamic::pro() && User::current()->isSuper();
+
+        $options = collect();
+
+        if (! $canSaveAs) {
+            return $options;
+        }
+
+        $options->put('default', [
+            'label' => 'Save as Global Default Nav',
+            'url' => cp_route('preferences.nav.default.update'),
+        ]);
+
+        Role::all()->each(function ($role) use (&$options) {
+            $options->put($role->handle(), [
+                'label' => 'Save as '.$role->title().' Role Nav',
+                'url' => cp_route('preferences.nav.role.update', $role->handle()),
+            ]);
+        });
+
+        $options->put('user', [
+            'label' => 'Save as My Nav',
+            'url' => cp_route('preferences.nav.user.update'),
+        ]);
+
+        if (method_exists($this, 'ignoreSaveAsOption')) {
+            $options->forget($this->ignoreSaveAsOption());
+        }
+
+        return $options;
     }
 }

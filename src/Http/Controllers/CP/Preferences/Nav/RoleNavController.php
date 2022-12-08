@@ -14,11 +14,20 @@ class RoleNavController extends Controller
 {
     use Concerns\HasNavBuilder;
 
+    protected $currentHandle;
+
+    protected function ignoreSaveAsOption()
+    {
+        return $this->currentHandle;
+    }
+
     public function edit($handle)
     {
         abort_unless(Statamic::pro() && User::current()->isSuper(), 403);
 
         abort_unless($role = Role::find($handle), 404);
+
+        $this->currentHandle = $handle;
 
         $preferences = $role->getPreference('nav') ?? Preference::default()->get('nav');
 
