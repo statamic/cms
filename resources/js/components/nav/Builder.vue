@@ -214,6 +214,7 @@ export default {
 
     data() {
         return {
+            initialNav: clone(this.nav),
             loading: false,
             topLevelTreeData: [],
             mainTreeData: [],
@@ -255,7 +256,7 @@ export default {
         },
 
         discardChanges() {
-            this.setInitialNav(this.nav);
+            this.setInitialNav(this.initialNav);
 
             this.changed = false;
         },
