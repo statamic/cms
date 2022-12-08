@@ -9,7 +9,7 @@
                 <h1 class="flex-1">{{ __(title) }}</h1>
 
                 <dropdown-list class="mr-1">
-                    <dropdown-item :text="__('Reset All Nav Customizations')" @click="reset"></dropdown-item>
+                    <dropdown-item :text="__('Reset Nav Customizations')" @click="confirmingReset = true"></dropdown-item>
                 </dropdown-list>
 
                 <a @click="discardChanges" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
@@ -159,6 +159,17 @@
             @updated="sectionUpdated"
         />
 
+        <confirmation-modal
+            v-if="confirmingReset === true"
+            :title="__('Reset')"
+            :bodyText="__('Are you sure you want to reset nav customizations?')"
+            :buttonText="__('Reset')"
+            :danger="true"
+            @confirm="reset"
+            @cancel="confirmingReset = false"
+        >
+        </confirmation-modal>
+
     </div>
 
 </template>
@@ -212,6 +223,7 @@ export default {
             editingItem: false,
             creatingSection: false,
             editingSection: false,
+            confirmingReset: false,
         }
     },
 
