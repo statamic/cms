@@ -173,7 +173,13 @@ class Searchables
 
             if (! $transformers[$field] instanceof Closure) {
                 if (class_exists($transformers[$field])) {
-                    return [$field => app()->make($transformers[$field])->handle($field, $value)];
+                    $transformedValue = app()->make($transformers[$field])->handle($field, $value);
+
+                    if (is_array($transformedValue)) {
+                        return $transformedValue;
+                    }
+
+                    return [$field => $transformedValue];
                 }
 
                 return;
