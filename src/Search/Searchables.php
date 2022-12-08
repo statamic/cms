@@ -182,7 +182,7 @@ class Searchables
                     return [$field => $transformedValue];
                 }
 
-                return;
+                return [$field => $value];
             }
 
             $transformedValue = $transformers[$field]($value);
