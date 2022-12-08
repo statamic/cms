@@ -4,6 +4,7 @@ namespace Tests\Tags\Concerns;
 
 use Statamic\Facades\Antlers;
 use Statamic\Fields\Field;
+use Statamic\Support\Arr;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
 use Tests\TestCase;
@@ -93,9 +94,9 @@ EOT;
         $this->assertEquals($expected, $this->tag->minifyFieldHtml($fields));
     }
 
-    private function createField($type, $value, $default, $old)
+    private function createField($type, $value, $default, $old, $config = [])
     {
-        $config = ['type' => $type];
+        $config = array_merge($config, ['type' => $type]);
 
         if ($default) {
             $config['default'] = $default;
@@ -118,10 +119,41 @@ EOT;
      */
     public function renders_text_fields($value, $default, $old, $expected)
     {
-        $rendered = $this->createField('text', $value, $default, $old);
+        $this->textFieldtypeTest('text', $value, $default, $old, $expected);
+    }
+
+    private function textFieldtypeTest($fieldtype, $value, $default, $old, $expected)
+    {
+        $rendered = $this->createField($fieldtype, $value, $default, $old);
 
         $this->assertSame($expected, $rendered['value']);
         $this->assertStringContainsString('value="'.$rendered['value'].'"', $rendered['field']);
+    }
+
+    /**
+     * @test
+     * @dataProvider renderTextProvider
+     */
+    public function renders_fallback_fields_as_text_fields($value, $default, $old, $expected)
+    {
+        (new class extends \Statamic\Fields\Fieldtype
+        {
+            protected static $handle = 'testing';
+        })::register();
+
+        $this->textFieldtypeTest('testing', $value, $default, $old, $expected);
+    }
+
+    /**
+     * @test
+     * @dataProvider renderTextProvider
+     */
+    public function renders_textarea_fields($value, $default, $old, $expected)
+    {
+        $rendered = $this->createField('textarea', $value, $default, $old);
+
+        $this->assertSame($expected, $rendered['value']);
+        $this->assertStringContainsString('>'.$rendered['value'].'</textarea', $rendered['field']);
     }
 
     public function renderTextProvider()
@@ -196,6 +228,169 @@ EOT;
             'value false, default true, missing' => ['value' => false, 'default' => true, 'old' => self::MISSING, 'expectedValue' => false],
             'value false, default true, checked' => ['value' => false, 'default' => true, 'old' => '1', 'expectedValue' => true],
             'value false, default true, unchecked' => ['value' => false, 'default' => true, 'old' => '0', 'expectedValue' => false],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider renderSingleSelectProvider
+     */
+    public function renders_single_select_fields($value, $default, $old, $expected)
+    {
+        $rendered = $this->createField('select', $value, $default, $old, [
+            'options' => $options = [
+                'alfa' => 'Alfa',
+                'bravo' => 'Bravo',
+                'charlie' => 'Charlie',
+            ],
+        ]);
+
+        $this->assertStringContainsString('name="test"', $rendered['field']);
+        $this->assertStringNotContainsString('multiple', $rendered['field']);
+
+        if ($expected) {
+            $unexpected = array_keys(Arr::except($options, $expected));
+            $this->assertStringContainsString('value="'.$expected.'" selected', $rendered['field']);
+            foreach ($unexpected as $e) {
+                $this->assertStringNotContainsString('value="'.$e.'" selected', $rendered['field']);
+            }
+        } else {
+            $this->assertStringNotContainsString('selected', $rendered['field']);
+        }
+    }
+
+    /**
+     * @test
+     * @dataProvider renderSingleSelectProvider
+     */
+    public function renders_radio_fields($value, $default, $old, $expected)
+    {
+        $rendered = $this->createField('radio', $value, $default, $old, [
+            'options' => $options = [
+                'alfa' => 'Alfa',
+                'bravo' => 'Bravo',
+                'charlie' => 'Charlie',
+            ],
+        ]);
+
+        if ($expected) {
+            $unexpected = array_keys(Arr::except($options, $expected));
+            $this->assertTrue(
+                (bool) preg_match('/value="'.$expected.'"\s+checked/', $rendered['field']),
+                'The "'.$expected.'" radio button was not checked within '.$rendered['field'],
+            );
+            foreach ($unexpected as $e) {
+                $this->assertFalse(
+                    (bool) preg_match('/value="'.$e.'"\s+checked/', $rendered['field']),
+                    'The "'.$expected.'" radio button was checked within '.$rendered['field'],
+                );
+            }
+        } else {
+            $this->assertStringNotContainsString('checked', $rendered['field'], 'No radio button should be checked within '.$rendered['field']);
+        }
+    }
+
+    public function renderSingleSelectProvider()
+    {
+        return [
+            'no value, no default, missing' => ['value' => null, 'default' => null, 'old' => self::MISSING, 'expectedValue' => null],
+            'no value, no default, selected' => ['value' => null, 'default' => null, 'old' => 'bravo', 'expectedValue' => 'bravo'],
+
+            'value, no default, missing' => ['value' => 'alfa', 'default' => null, 'old' => self::MISSING, 'expectedValue' => 'alfa'],
+            'value, no default, selected' => ['value' => 'alfa', 'default' => null, 'old' => 'bravo', 'expectedValue' => 'bravo'],
+
+            'no value, default, missing' => ['value' => null, 'default' => 'alfa', 'old' => self::MISSING, 'expectedValue' => 'alfa'],
+            'no value, default, selected' => ['value' => null, 'default' => 'alfa', 'old' => 'bravo', 'expectedValue' => 'bravo'],
+
+            'value, default, missing' => ['value' => 'alfa', 'default' => 'bravo', 'old' => self::MISSING, 'expectedValue' => 'alfa'],
+            'value, default, selected' => ['value' => 'alfa', 'default' => 'bravo', 'old' => 'charlie', 'expectedValue' => 'charlie'],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider renderMultipleSelectProvider
+     */
+    public function renders_multiple_select_fields($value, $default, $old, $expected)
+    {
+        $rendered = $this->createField('select', $value, $default, $old, [
+            'multiple' => true,
+            'options' => $options = [
+                'alfa' => 'Alfa',
+                'bravo' => 'Bravo',
+                'charlie' => 'Charlie',
+                'delta' => 'Delta',
+            ],
+        ]);
+
+        $this->assertStringContainsString('name="test[]"', $rendered['field']);
+        $this->assertStringContainsString('multiple', $rendered['field']);
+
+        if ($expected) {
+            $unexpected = array_diff(array_keys($options), $expected);
+            foreach ($expected as $e) {
+                $this->assertStringContainsString('value="'.$e.'" selected', $rendered['field']);
+            }
+            foreach ($unexpected as $e) {
+                $this->assertStringNotContainsString('value="'.$e.'" selected', $rendered['field']);
+            }
+        } else {
+            $this->assertStringNotContainsString('selected', $rendered['field']);
+        }
+    }
+
+    /**
+     * @test
+     * @dataProvider renderMultipleSelectProvider
+     */
+    public function renders_checkboxes_fields($value, $default, $old, $expected)
+    {
+        $rendered = $this->createField('checkboxes', $value, $default, $old, [
+            'options' => $options = [
+                'alfa' => 'Alfa',
+                'bravo' => 'Bravo',
+                'charlie' => 'Charlie',
+                'delta' => 'Delta',
+            ],
+        ]);
+
+        if ($expected) {
+            $unexpected = array_diff(array_keys($options), $expected);
+            foreach ($expected as $e) {
+                $this->assertTrue(
+                    (bool) preg_match('/value="'.$e.'"\s+checked/', $rendered['field']),
+                    'The "'.$e.'" box was not checked within '.$rendered['field'],
+                );
+            }
+            foreach ($unexpected as $e) {
+                $this->assertFalse(
+                    (bool) preg_match('/value="'.$e.'"\s+checked/', $rendered['field']),
+                    'The "'.$e.'" box was checked within '.$rendered['field'],
+                );
+            }
+        } else {
+            $this->assertStringNotContainsString('checked', $rendered['field'], 'No boxes should be checked within '.$rendered['field']);
+        }
+    }
+
+    public function renderMultipleSelectProvider()
+    {
+        return [
+            'no value, no default, missing' => ['value' => null, 'default' => null, 'old' => self::MISSING, 'expectedValue' => null],
+            'no value, no default, selected' => ['value' => null, 'default' => null, 'old' => ['alfa'], 'expectedValue' => ['alfa']],
+            'no value, no default, selected multiple' => ['value' => null, 'default' => null, 'old' => ['alfa', 'bravo'], 'expectedValue' => ['alfa', 'bravo']],
+
+            'value, no default, missing' => ['value' => ['alfa'], 'default' => null, 'old' => self::MISSING, 'expectedValue' => ['alfa']],
+            'value, no default, selected' => ['value' => ['alfa'], 'default' => null, 'old' => ['bravo'], 'expectedValue' => ['bravo']],
+            'value, no default, selected multiple' => ['value' => ['alfa'], 'default' => null, 'old' => ['bravo', 'charlie'], 'expectedValue' => ['bravo', 'charlie']],
+
+            'no value, default, missing' => ['value' => null, 'default' => ['alfa'], 'old' => self::MISSING, 'expectedValue' => ['alfa']],
+            'no value, default, selected' => ['value' => null, 'default' => ['alfa'], 'old' => ['bravo'], 'expectedValue' => ['bravo']],
+            'no value, default, selected multiple' => ['value' => null, 'default' => ['alfa'], 'old' => ['bravo', 'charlie'], 'expectedValue' => ['bravo', 'charlie']],
+
+            'value, default, missing' => ['value' => ['alfa'], 'default' => ['bravo'], 'old' => self::MISSING, 'expectedValue' => ['alfa']],
+            'value, default, selected' => ['value' => ['alfa'], 'default' => ['bravo'], 'old' => ['charlie'], 'expectedValue' => ['charlie']],
+            'value, default, selected multiple' => ['value' => ['alfa'], 'default' => ['bravo'], 'old' => ['charlie', 'delta'], 'expectedValue' => ['charlie', 'delta']],
         ];
     }
 }
