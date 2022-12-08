@@ -267,7 +267,7 @@ class CoreNav
     protected function makePreferencesSection()
     {
         Nav::preferences('Nav')
-            ->route(User::current()->isSuper() ? 'preferences.nav.index' : 'preferences.nav.edit')
+            ->route(Statamic::pro() && User::current()->isSuper() ? 'preferences.nav.index' : 'preferences.nav.edit')
             ->icon('nav-preferences');
 
         return $this;

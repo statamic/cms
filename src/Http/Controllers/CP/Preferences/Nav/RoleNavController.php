@@ -8,6 +8,7 @@ use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Controller;
+use Statamic\Statamic;
 
 class RoleNavController extends Controller
 {
@@ -15,7 +16,7 @@ class RoleNavController extends Controller
 
     public function edit($handle)
     {
-        abort_unless(User::current()->isSuper(), 403);
+        abort_unless(Statamic::pro() && User::current()->isSuper(), 403);
 
         abort_unless($role = Role::find($handle), 404);
 
@@ -34,7 +35,7 @@ class RoleNavController extends Controller
 
     public function update(Request $request, $handle)
     {
-        abort_unless(User::current()->isSuper(), 403);
+        abort_unless(Statamic::pro() && User::current()->isSuper(), 403);
 
         abort_unless($role = Role::find($handle), 404);
 
@@ -47,7 +48,7 @@ class RoleNavController extends Controller
 
     public function destroy($handle)
     {
-        abort_unless(User::current()->isSuper(), 403);
+        abort_unless(Statamic::pro() && User::current()->isSuper(), 403);
 
         abort_unless($role = Role::find($handle), 404);
 
