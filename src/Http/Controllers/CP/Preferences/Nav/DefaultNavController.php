@@ -14,10 +14,12 @@ class DefaultNavController extends NavController
     {
         abort_unless(User::current()->isSuper(), 403);
 
+        $preferences = Preference::default()->get('nav');
+
         return $this->navBuilder([
             'title' => 'Global Default Nav',
             'updateUrl' => cp_route('preferences.nav.default.update'),
-            'currentNav' => NavResource::make(Nav::build()),
+            'currentNav' => NavResource::make(Nav::build($preferences)),
         ]);
     }
 
