@@ -291,9 +291,9 @@ class Date extends Fieldtype
     private function parseSaved($value)
     {
         try {
-            return Carbon::createFromFormat($this->saveFormat(), $value);
+            return Carbon::createFromFormat($this->saveFormat(), $value)->timezone(config('app.timezone'));
         } catch (InvalidFormatException|InvalidArgumentException $e) {
-            return Carbon::parse($value);
+            return Carbon::parse($value)->timezone(config('app.timezone'));
         }
     }
 }
