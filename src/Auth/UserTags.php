@@ -140,10 +140,6 @@ class UserTags extends Tags
      */
     public function registerForm()
     {
-        if (User::current()) {
-            return __('Cannot register while logged in.');
-        }
-
         $data = $this->getFormSession('user.register');
 
         $data['fields'] = $this->getRegistrationFields();
@@ -190,10 +186,6 @@ class UserTags extends Tags
      */
     public function profileForm()
     {
-        if (! User::current()) {
-            return __('Cannot edit profile while logged out.');
-        }
-
         if (session()->has('status')) {
             return $this->parse(['success' => true]);
         }
@@ -234,10 +226,6 @@ class UserTags extends Tags
      */
     public function passwordForm()
     {
-        if (! User::current()) {
-            return __('Cannot change password while logged out.');
-        }
-
         if (session()->has('status')) {
             return $this->parse(['success' => true]);
         }
@@ -664,7 +652,9 @@ class UserTags extends Tags
     {
         $user = User::current();
 
-        $values = $user->data()->merge(['email' => $user->email()])->all();
+        $values = $user
+            ? $user->data()->merge(['email' => $user->email()])->all()
+            : [];
 
         return User::blueprint()->fields()->addValues($values)->preProcess()->all()
             ->reject(function ($field) {

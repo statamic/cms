@@ -281,7 +281,6 @@ EOT
         $expectedRedirect = '<input type="hidden" name="_redirect" value="password-successful" />';
         $expectedErrorRedirect = '<input type="hidden" name="_error_redirect" value="registration-failure" />';
 
-        $this->actingAs(User::make());
         $output = $this->tag('{{ user:password_form }}{{ /user:password_form }}');
 
         $this->assertStringNotContainsString($expectedRedirect, $output);
