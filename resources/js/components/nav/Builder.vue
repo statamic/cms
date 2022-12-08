@@ -9,7 +9,7 @@
                 <h1 class="flex-1">{{ __(title) }}</h1>
 
                 <dropdown-list class="mr-1">
-                    <dropdown-item :text="__('Reset Nav Customizations')" @click="confirmingReset = true"></dropdown-item>
+                    <dropdown-item :text="__('Reset Nav Customizations')" class="warning" @click="confirmingReset = true"></dropdown-item>
                 </dropdown-list>
 
                 <a @click="discardChanges" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
