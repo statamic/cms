@@ -15,5 +15,7 @@
     {{ /unless }}
     {{ foreach:options as="option|label" }}
         <option value="{{ option }}"{{ if multiple }}{{ if value|in_array:option }} selected{{ /if }}{{ else }}{{ if option == value }} selected{{ /if }}{{ /if }}>
+            {{ label !== null ? label : value }}
+        </option>
     {{ /foreach:options }}
 </select>
