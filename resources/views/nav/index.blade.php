@@ -23,7 +23,7 @@
     </div>
 
     @if (Statamic\Facades\Role::all()->isNotEmpty())
-        <h3 class="little-heading pl-0 mb-1">{{ __('Override Per Role') }}</h3>
+        <h3 class="little-heading pl-0 mb-1">{{ __('Override For Role') }}</h3>
         <div class="card p-0 mb-2">
             <table class="data-table">
                 @foreach (Statamic\Facades\Role::all() as $role)
@@ -41,14 +41,14 @@
         </div>
     @endif
 
-    <h3 class="little-heading pl-0 mb-1">{{ __('Override Per User') }}</h3>
+    <h3 class="little-heading pl-0 mb-1">{{ __('Override For User') }}</h3>
     <div class="card p-0 mb-2">
         <table class="data-table">
             <tr>
                 <td>
                     <div class="flex items-center">
                         <div class="w-4 h-4 mr-2">@cp_svg('user')</div>
-                        <a href="{{ cp_route('preferences.nav.user.edit') }}">You</a>
+                    <a href="{{ cp_route('preferences.nav.user.edit') }}">{{ __('My Nav') }}</a>
                     </div>
                 </td>
                 <td class="text-right text-2xs"><a href="{{ cp_route('preferences.nav.user.edit') }}" class="text-blue">Customize</a></td>
