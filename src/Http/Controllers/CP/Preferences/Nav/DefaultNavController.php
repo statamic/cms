@@ -6,20 +6,26 @@ use Illuminate\Http\Request;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
-use Statamic\Http\Resources\CP\Nav\Nav as NavResource;
+use Statamic\Http\Controllers\Controller;
 
-class DefaultNavController extends NavController
+class DefaultNavController extends Controller
 {
-    public function edit($handle = null)
+    use Concerns\HasNavBuilder;
+
+    public function edit()
     {
         abort_unless(User::current()->isSuper(), 403);
 
         $preferences = Preference::default()->get('nav');
 
-        return $this->navBuilder([
+        $nav = $preferences
+            ? Nav::build($preferences)
+            : Nav::buildWithoutPreferences();
+
+        return $this->navBuilder($nav, [
             'title' => 'Global Default Nav',
             'updateUrl' => cp_route('preferences.nav.default.update'),
-            'currentNav' => NavResource::make(Nav::build($preferences)),
+            'destroyUrl' => cp_route('preferences.nav.default.destroy'),
         ]);
     }
 
@@ -30,6 +36,15 @@ class DefaultNavController extends NavController
         $nav = $this->getUpdatedNav($request);
 
         Preference::default()->set('nav', $nav)->save();
+
+        return true;
+    }
+
+    public function destroy()
+    {
+        abort_unless(User::current()->isSuper(), 403);
+
+        Preference::default()->remove('nav')->save();
 
         return true;
     }

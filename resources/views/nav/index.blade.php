@@ -48,10 +48,10 @@
                 <td>
                     <div class="flex items-center">
                         <div class="w-4 h-4 mr-2">@cp_svg('user')</div>
-                        <a href="{{ cp_route('preferences.nav.edit') }}">You</a>
+                        <a href="{{ cp_route('preferences.nav.user.edit') }}">You</a>
                     </div>
                 </td>
-                <td class="text-right text-2xs"><a href="{{ cp_route('preferences.nav.edit') }}" class="text-blue">Customize</a></td>
+                <td class="text-right text-2xs"><a href="{{ cp_route('preferences.nav.user.edit') }}" class="text-blue">Customize</a></td>
             </tr>
         </table>
     </div>

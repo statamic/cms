@@ -4,28 +4,35 @@ namespace Statamic\Http\Controllers\CP\Preferences\Nav;
 
 use Illuminate\Http\Request;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
-use Statamic\Http\Resources\CP\Nav\Nav as NavResource;
+use Statamic\Http\Controllers\Controller;
 
-class RoleNavController extends NavController
+class RoleNavController extends Controller
 {
-    public function edit($handle = null)
+    use Concerns\HasNavBuilder;
+
+    public function edit($handle)
     {
         abort_unless(User::current()->isSuper(), 403);
 
         abort_unless($role = Role::find($handle), 404);
 
-        $preferences = $role->getPreference('nav');
+        $preferences = $role->getPreference('nav') ?? Preference::default()->get('nav');
 
-        return $this->navBuilder([
+        $nav = $preferences
+            ? Nav::build($preferences)
+            : Nav::buildWithoutPreferences();
+
+        return $this->navBuilder($nav, [
             'title' => $role->title().' Nav',
             'updateUrl' => cp_route('preferences.nav.role.update', $role->handle()),
-            'currentNav' => NavResource::make(Nav::build($preferences)),
+            'destroyUrl' => cp_route('preferences.nav.role.destroy', $role->handle()),
         ]);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $handle)
     {
         abort_unless(User::current()->isSuper(), 403);
 
@@ -34,6 +41,17 @@ class RoleNavController extends NavController
         $nav = $this->getUpdatedNav($request);
 
         $role->setPreference('nav', $nav)->save();
+
+        return true;
+    }
+
+    public function destroy($handle)
+    {
+        abort_unless(User::current()->isSuper(), 403);
+
+        abort_unless($role = Role::find($handle), 404);
+
+        $role->removePreference('nav')->save();
 
         return true;
     }

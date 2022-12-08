@@ -232,12 +232,15 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
         Route::group(['prefix' => 'nav', 'as' => 'nav.', 'namespace' => 'Nav'], function () {
             Route::get('/', 'NavController@index')->name('index');
-            Route::get('edit', 'NavController@edit')->name('edit');
-            Route::patch('/', 'NavController@update')->name('update');
+            Route::get('edit', 'UserNavController@edit')->name('user.edit');
+            Route::patch('/', 'UserNavController@update')->name('user.update');
+            Route::delete('/', 'UserNavController@destroy')->name('user.destroy');
             Route::get('roles/{role}/edit', 'RoleNavController@edit')->name('role.edit');
             Route::patch('roles/{role}', 'RoleNavController@update')->name('role.update');
+            Route::delete('roles/{role}', 'RoleNavController@destroy')->name('role.destroy');
             Route::get('default/edit', 'DefaultNavController@edit')->name('default.edit');
             Route::patch('default', 'DefaultNavController@update')->name('default.update');
+            Route::delete('default', 'DefaultNavController@destroy')->name('default.destroy');
         });
     });
 

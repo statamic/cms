@@ -9,7 +9,7 @@
                 <h1 class="flex-1">{{ __(title) }}</h1>
 
                 <dropdown-list class="mr-1">
-                    <dropdown-item :text="__('Reset All Nav Customizations')" @click="resetInitialNav"></dropdown-item>
+                    <dropdown-item :text="__('Reset All Nav Customizations')" @click="reset"></dropdown-item>
                 </dropdown-list>
 
                 <a @click="discardChanges" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
@@ -184,11 +184,7 @@ export default {
             type: String,
             require: true,
         },
-        currentNav: {
-            type: Object,
-            required: true,
-        },
-        defaultNav: {
+        nav: {
             type: Object,
             required: true,
         },
@@ -196,6 +192,10 @@ export default {
             type: String,
         },
         updateUrl: {
+            type: String,
+            require: true,
+        },
+        destroyUrl: {
             type: String,
             require: true,
         },
@@ -216,7 +216,7 @@ export default {
     },
 
     mounted() {
-        this.setInitialNav(this.currentNav);
+        this.setInitialNav(this.nav);
     },
 
     computed: {
@@ -242,14 +242,8 @@ export default {
                 .value();
         },
 
-        resetInitialNav() {
-            this.setInitialNav(this.defaultNav);
-
-            this.changed = true;
-        },
-
         discardChanges() {
-            this.setInitialNav(this.currentNav);
+            this.setInitialNav(this.nav);
 
             this.changed = false;
         },
@@ -462,13 +456,23 @@ export default {
             this.changed = true;
         },
 
+        reset() {
+            this.$axios
+                .delete(this.destroyUrl)
+                .then(() => window.location.reload())
+                .catch(() => this.$toast.error(__('Something went wrong')));
+        },
+
         save() {
             let tree = this.preparePreferencesSubmission();
 
             this.$axios
                 .patch(this.updateUrl, {tree})
-                .then(response => this.$toast.success(__('Saved')))
-                .catch(error => this.$toast.error(__('Something went wrong')));
+                .then(() => {
+                    this.changed = false;
+                    this.$toast.success(__('Saved'));
+                })
+                .catch(() => this.$toast.error(__('Something went wrong')));
         },
 
         preparePreferencesSubmission() {
