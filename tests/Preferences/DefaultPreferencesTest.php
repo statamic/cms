@@ -71,6 +71,19 @@ EOT
     }
 
     /** @test */
+    public function it_removes_a_preference_by_key()
+    {
+        Preference::default()->set([
+            'foo' => 'bar',
+            'bar' => 'baz',
+        ])->save();
+
+        Preference::default()->remove('foo')->save();
+
+        $this->assertEquals(['bar' => 'baz'], Preference::default()->all());
+    }
+
+    /** @test */
     public function it_saves_preferences_to_file()
     {
         $this->assertFileNotExists(resource_path('preferences.yaml'));

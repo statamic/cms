@@ -43,6 +43,17 @@ class DefaultPreferences
     }
 
     /**
+     * Remove preference (dot notation in key supported).
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function remove($key)
+    {
+        return $this->removePreference($key);
+    }
+
+    /**
      * Save preferences to file.
      *
      * @param  array  $preferences
