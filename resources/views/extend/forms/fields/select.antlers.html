@@ -13,9 +13,7 @@
             {{ /if }}
         </option>
     {{ /unless }}
-    {{ foreach:options as="value|label" }}
-        <option value="{{ value }}"{{ if old|in_array:value or old === value }} selected{{ /if }}{{ if ! old && default === value }} selected{{ /if }}>
-            {{ label !== null ? label : value }}
-        </option>
+    {{ foreach:options as="option|label" }}
+        <option value="{{ option }}"{{ if multiple }}{{ if value|in_array:option }} selected{{ /if }}{{ else }}{{ if option == value }} selected{{ /if }}{{ /if }}>
     {{ /foreach:options }}
 </select>
