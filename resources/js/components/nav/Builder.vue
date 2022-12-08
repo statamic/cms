@@ -25,12 +25,23 @@
                     <dropdown-item :text="__('Add Section')" @click="addSection" />
                 </dropdown-list>
 
-                <button
-                    class="btn-primary ml-2"
-                    :class="{ 'disabled': !changed }"
-                    :disabled="!changed"
-                    @click="save"
-                    v-text="__('Save Changes')" />
+                <div class="ml-2 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
+                    <button
+                        class="btn-primary pl-2"
+                        :class="{ 'disabled': !changed }"
+                        :disabled="!changed"
+                        @click="save"
+                        v-text="__('Save Changes')" />
+
+                    <dropdown-list v-if="hasSaveAsOptions" class="ml-0">
+                        <template #trigger>
+                            <button class="btn-primary rounded-l-none flex items-center" :class="{ 'disabled': !changed }">
+                                <svg-icon name="chevron-down-xs" class="w-2" />
+                            </button>
+                        </template>
+                        <dropdown-item v-for="option in saveAsOptions" :text="__(option.label)" @click="saveAs(option.url)" />
+                    </dropdown-list>
+                </div>
             </div>
         </header>
 
@@ -210,6 +221,10 @@ export default {
             type: String,
             require: true,
         },
+        saveAsOptions: {
+            type: Array,
+            default: () => [],
+        },
     },
 
     data() {
@@ -236,6 +251,10 @@ export default {
 
         isDirty() {
             return this.changed;
+        },
+
+        hasSaveAsOptions() {
+            return this.saveAsOptions.length;
         },
 
     },
@@ -477,14 +496,17 @@ export default {
         },
 
         save() {
+            this.saveAs(this.updateUrl);
+
+            this.changed = false;
+        },
+
+        saveAs(url) {
             let tree = this.preparePreferencesSubmission();
 
             this.$axios
-                .patch(this.updateUrl, {tree})
-                .then(() => {
-                    this.changed = false;
-                    this.$toast.success(__('Saved'));
-                })
+                .patch(url, {tree})
+                .then(() => this.$toast.success(__('Saved')))
                 .catch(() => this.$toast.error(__('Something went wrong')));
         },
 
