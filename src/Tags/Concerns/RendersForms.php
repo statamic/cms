@@ -129,8 +129,8 @@ trait RendersForms
 
         $missing = str_random();
         $old = old($field->handle(), $missing);
-        $value = $field->value() ?? $field->defaultValue();
-        $value = $old === $missing ? $value : $old;
+        $default = $field->value() ?? $field->defaultValue();
+        $value = $old === $missing ? $default : $old;
 
         $data = array_merge($field->toArray(), [
             'error' => $errors->first($field->handle()) ?: null,
