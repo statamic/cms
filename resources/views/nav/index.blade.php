@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', __('Nav Customizer'))
+@section('title', __('CP Nav Preferences'))
 
 @section('content')
 

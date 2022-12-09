@@ -3,7 +3,7 @@
     <div>
 
         <header class="mb-3">
-            <breadcrumb v-if="indexUrl" :url="indexUrl" :title="__('Nav Customizer')" />
+            <breadcrumb v-if="indexUrl" :url="indexUrl" :title="__('CP Nav Preferences')" />
 
             <div class="flex items-center">
                 <h1 class="flex-1">{{ __(title) }}</h1>
