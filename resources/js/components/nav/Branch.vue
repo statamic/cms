@@ -47,7 +47,6 @@
                         :item="item"
                         :depth="depth"
                         :remove-branch="remove"
-                        orphan-children=""
                     />
                 </dropdown-list>
             </div>
@@ -130,16 +129,6 @@ export default {
             store.deleteNode(this.item);
             this.$emit('removed', store);
         },
-
-        // orphanChildren() {
-        //     const store = this.item._vm.store;
-
-        //     this.vm.data.children.slice().forEach((child) =>
-        //         th.insertBefore(child, this.vm.data)
-        //     );
-
-        //     this.$emit('children-orphaned', store);
-        // },
 
     }
 

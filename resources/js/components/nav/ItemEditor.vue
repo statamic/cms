@@ -1,6 +1,6 @@
 <template>
 
-    <stack narrow name="nav-item-editor" :before-close="shouldClose" @closed="$emit('closed')">
+    <stack narrow name="nav-item-editor" @closed="$emit('closed')">
         <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
             <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
@@ -66,25 +66,12 @@ export default {
     },
 
     methods: {
+
         createNewItem() {
             return {
                 display: '',
                 url: '',
             };
-        },
-
-        shouldClose() {
-            // if (this.$dirty.has(this.publishContainer)) {
-            //     if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
-            //         return false;
-            //     }
-            // }
-
-            return true;
-        },
-
-        confirmClose(close) {
-            if (this.shouldClose()) close();
         },
 
         save() {

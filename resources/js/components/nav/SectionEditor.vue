@@ -1,6 +1,6 @@
 <template>
 
-    <stack narrow name="nav-item-editor" :before-close="shouldClose" @closed="$emit('closed')">
+    <stack narrow name="nav-item-editor" @closed="$emit('closed')">
         <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
             <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
@@ -58,13 +58,6 @@ export default {
     },
 
     methods: {
-        shouldClose() {
-            return true;
-        },
-
-        confirmClose(close) {
-            if (this.shouldClose()) close();
-        },
 
         save() {
             this.$emit('updated', this.section, this.sectionItem);

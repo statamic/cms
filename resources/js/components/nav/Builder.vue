@@ -69,7 +69,7 @@
                     @edit="editItem(item, true)"
                     @toggle-open="store.toggleOpen(item)"
                 >
-                    <template #branch-options="{ item, removeBranch, orphanChildren, vm, depth }">
+                    <template #branch-options="{ item, vm }">
                         <dropdown-item
                             :text="__('Edit')"
                             @click="editingItem = item" />
@@ -112,7 +112,7 @@
                     @edit="editItem(item)"
                     @toggle-open="store.toggleOpen(item)"
                 >
-                    <template #branch-options="{ item, removeBranch, orphanChildren, vm, depth }">
+                    <template #branch-options="{ item }">
                         <dropdown-item
                             :text="__('Add Item')"
                             @click="addItem(item.children)" />
