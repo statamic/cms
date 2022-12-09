@@ -6,12 +6,15 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Actions\DuplicateEntry;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\User;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class DuplicateEntryTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use FakesRoles;
 
     /** @test */
     public function it_duplicates_an_entry()
@@ -57,6 +60,28 @@ class DuplicateEntryTest extends TestCase
             ['slug' => 'alfa-1', 'published' => true, 'data' => ['title' => 'Alfa (Duplicated)']],
             ['slug' => 'alfa-2', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated) (2)', 'duplicated_from' => 'alfa-id']],
         ], $this->entryData());
+    }
+
+    /** @test */
+    public function user_with_create_permission_is_authorized()
+    {
+        $this->setTestRoles([
+            'access' => ['create test entries'],
+            'noaccess' => [],
+        ]);
+
+        Collection::make('test')->save();
+        $userWithPermission = tap(User::make()->assignRole('access'))->save();
+        $userWithoutPermission = tap(User::make()->assignRole('noaccess'))->save();
+        $items = collect([
+            EntryFactory::collection('test')->slug('alfa')->create(),
+            EntryFactory::collection('test')->slug('bravo')->create(),
+        ]);
+
+        $this->assertTrue((new DuplicateEntry)->authorize($userWithPermission, $items->first()));
+        $this->assertTrue((new DuplicateEntry)->authorizeBulk($userWithPermission, $items));
+        $this->assertFalse((new DuplicateEntry)->authorize($userWithoutPermission, $items->first()));
+        $this->assertFalse((new DuplicateEntry)->authorizeBulk($userWithoutPermission, $items));
     }
 
     private function entryData()

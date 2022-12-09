@@ -67,4 +67,9 @@ class DuplicateTerm extends Action
 
         return [$title, $slug];
     }
+
+    public function authorize($user, $item)
+    {
+        return $user->can('create', [Term::class, $item->taxonomy()]);
+    }
 }

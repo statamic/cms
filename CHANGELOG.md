@@ -1,5 +1,28 @@
 # Release Notes
 
+## 3.3.60 (2022-12-02)
+
+### What's new
+- Add `when` and `unless` to `partial` tag. [#7054](https://github.com/statamic/cms/issues/7054) by @edalzell
+- Ability to override greeting in activation mail. [#7154](https://github.com/statamic/cms/issues/7154) by @ruslansteiger
+
+### What's improved
+- Replicator and Bard sets can be toggled with a single click. [#7037](https://github.com/statamic/cms/issues/7037) by @jacksleight
+- Improve accessibility for tabs. [#6704](https://github.com/statamic/cms/issues/6704) by @arthurperton
+- Show YouTube Shorts in `video` fieldtype preview. [#7153](https://github.com/statamic/cms/issues/7153) by @duncanmcclean
+- German translations. [#7157](https://github.com/statamic/cms/issues/7157) by @helloDanuk
+- Dutch translations. [#7152](https://github.com/statamic/cms/issues/7152) by @oakeddev
+
+### What's fixed
+- Maintain `sort` parameter in REST API links. [#7158](https://github.com/statamic/cms/issues/7158) by @edalzell
+- Make Antlers value resolution "lazy", and make pluck operator work with nulls. [#7151](https://github.com/statamic/cms/issues/7151) by @JohnathonKoster
+- Prevent deprecation warning when using `yield` tag with no matching section and no fallback. [#7149](https://github.com/statamic/cms/issues/7149) by @xuneXTW
+- Add authorization to "duplicate" actions. [#7150](https://github.com/statamic/cms/issues/7150) by @jasonvarga
+- Avoid wrapping of date fields in listings. [#7146](https://github.com/statamic/cms/issues/7146) by @jackmcdade
+- Allows localization variable to be saved as false. [#7087](https://github.com/statamic/cms/issues/7087) by @tao
+
+
+
 ## 3.3.59 (2022-11-29)
 
 ### What's new
