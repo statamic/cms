@@ -86,7 +86,7 @@ class StaticWarm extends Command
 
         if ($this->shouldQueue) {
             $staticWarmQueue = env('STATAMIC_STATIC_WARM_QUEUE', 'default');
-            $this->line('Adding '.count($requests).' requests on queue "' . $staticWarmQueue . '"...');
+            $this->line('Adding '.count($requests).' requests on queue "'.$staticWarmQueue.'"...');
 
             foreach ($requests as $request) {
                 StaticWarmJob::dispatch($request)->onQueue($staticWarmQueue);
