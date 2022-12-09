@@ -3,14 +3,14 @@
 namespace Statamic\Fieldtypes\Bard;
 
 use ProseMirrorToHtml\Marks\Link as DefaultLinkMark;
-use ProseMirrorToHtml\Nodes\Image as DefaultImageNode;
 use ProseMirrorToHtml\Nodes\Heading as DefaultHeadingNode;
+use ProseMirrorToHtml\Nodes\Image as DefaultImageNode;
 use ProseMirrorToHtml\Renderer;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
-use Statamic\Fieldtypes\Bard\ImageNode as CustomImageNode;
 use Statamic\Fieldtypes\Bard\HeadingNode as CustomHeadingNode;
+use Statamic\Fieldtypes\Bard\ImageNode as CustomImageNode;
 use Statamic\Fieldtypes\Bard\LinkMark as CustomLinkMark;
 use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
