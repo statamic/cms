@@ -91,6 +91,11 @@ class Cache
             return false;
         }
 
+        $query = $request->query();
+        if (isset($query['live-preview'], $query['token'])) {
+            return false;
+        }
+
         return true;
     }
 
