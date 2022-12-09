@@ -86,5 +86,8 @@
     "roots": [
       "<rootDir>/resources/assets/js"
     ]
+  },
+  "overrides": {
+    "prosemirror-tables": "1.2.5"
   }
 }
