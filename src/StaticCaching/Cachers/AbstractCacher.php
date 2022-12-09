@@ -141,9 +141,11 @@ abstract class AbstractCacher implements Cacher
      */
     public function getUrl(Request $request)
     {
+        $query = $request->query();
         $url = $request->getUri();
 
-        if ($this->config('ignore_query_strings')) {
+        // Ensure Live Preview query params are passed along so we can exclude the URL later on.
+        if ($this->config('ignore_query_strings') && !isset($query['live-preview'], $query['token'])) {
             $url = explode('?', $url)[0];
         }
 

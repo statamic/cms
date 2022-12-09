@@ -27,6 +27,11 @@ class DefaultUrlExcluder implements UrlExcluder
 
     public function isExcluded(string $url): bool
     {
+        // Live Preview should always be excluded.
+        if (Str::containsAll($url, ['live-preview=', 'token='])) {
+            return true;
+        }
+
         // Query strings should be ignored.
         $url = explode('?', $url)[0];
 
