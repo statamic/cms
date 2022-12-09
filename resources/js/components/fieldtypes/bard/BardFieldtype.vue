@@ -95,7 +95,6 @@ import {
     Blockquote,
     CodeBlock,
     HardBreak,
-    Heading,
     HorizontalRule,
     OrderedList,
     BulletList,
@@ -116,6 +115,7 @@ import Set from './Set';
 import Doc from './Doc';
 import BardSource from './Source.vue';
 import Link from './Link';
+import Heading from './Heading';
 import Image from './Image';
 import Small from './Small';
 import Subscript from './Subscript';
