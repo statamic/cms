@@ -65,10 +65,10 @@ class Site implements Augmentable
         return $this->config['attributes'] ?? [];
     }
 
-    public function absoluteUrl()
+    public function absoluteUrl(string $defaultHost = null)
     {
         if (Str::startsWith($url = $this->url(), '/')) {
-            $url = Str::ensureLeft($url, request()->getSchemeAndHttpHost());
+            $url = Str::ensureLeft($url, $defaultHost ?? request()->getSchemeAndHttpHost());
         }
 
         return Str::removeRight($url, '/');
