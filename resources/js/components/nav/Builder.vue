@@ -39,7 +39,7 @@
                                 <svg-icon name="chevron-down-xs" class="w-2" />
                             </button>
                         </template>
-                        <dropdown-item v-for="option in saveAsOptions" :text="__(option.label)" @click="saveAs(option.url)" />
+                        <dropdown-item v-for="option in saveAsOptions" :text="__(option.label)" :key="option.url" @click="saveAs(option.url)" />
                     </dropdown-list>
                 </div>
             </div>
