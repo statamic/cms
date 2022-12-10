@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Preferences\Nav\Concerns;
 
 use Illuminate\Http\Request;
-use Statamic\CP\Navigation\NavPreferencesConfig;
+use Statamic\CP\Navigation\NavTransformer;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
@@ -25,7 +25,7 @@ trait HasNavBuilder
 
     protected function getUpdatedNav(Request $request)
     {
-        return NavPreferencesConfig::fromJavascript($request->tree);
+        return NavTransformer::fromVue($request->tree);
     }
 
     protected function getSaveAsOptions()
