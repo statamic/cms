@@ -12,7 +12,7 @@
             class="asset-thumbnail h-8 max-w-full mx-auto rounded"
             loading="lazy"
             />
-        <file-icon v-else :extension="asset.extension" class="p-px asset-thumbnail rounded w-full h-full" />
+        <file-icon v-else :extension="asset.extension" class="p-px asset-thumbnail rounded w-8 h-8" />
     </div>
 
 </template>
