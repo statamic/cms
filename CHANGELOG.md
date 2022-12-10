@@ -1,5 +1,85 @@
 # Release Notes
 
+## 3.3.60 (2022-12-02)
+
+### What's new
+- Add `when` and `unless` to `partial` tag. [#7054](https://github.com/statamic/cms/issues/7054) by @edalzell
+- Ability to override greeting in activation mail. [#7154](https://github.com/statamic/cms/issues/7154) by @ruslansteiger
+
+### What's improved
+- Replicator and Bard sets can be toggled with a single click. [#7037](https://github.com/statamic/cms/issues/7037) by @jacksleight
+- Improve accessibility for tabs. [#6704](https://github.com/statamic/cms/issues/6704) by @arthurperton
+- Show YouTube Shorts in `video` fieldtype preview. [#7153](https://github.com/statamic/cms/issues/7153) by @duncanmcclean
+- German translations. [#7157](https://github.com/statamic/cms/issues/7157) by @helloDanuk
+- Dutch translations. [#7152](https://github.com/statamic/cms/issues/7152) by @oakeddev
+
+### What's fixed
+- Maintain `sort` parameter in REST API links. [#7158](https://github.com/statamic/cms/issues/7158) by @edalzell
+- Make Antlers value resolution "lazy", and make pluck operator work with nulls. [#7151](https://github.com/statamic/cms/issues/7151) by @JohnathonKoster
+- Prevent deprecation warning when using `yield` tag with no matching section and no fallback. [#7149](https://github.com/statamic/cms/issues/7149) by @xuneXTW
+- Add authorization to "duplicate" actions. [#7150](https://github.com/statamic/cms/issues/7150) by @jasonvarga
+- Avoid wrapping of date fields in listings. [#7146](https://github.com/statamic/cms/issues/7146) by @jackmcdade
+- Allows localization variable to be saved as false. [#7087](https://github.com/statamic/cms/issues/7087) by @tao
+
+
+
+## 3.3.59 (2022-11-29)
+
+### What's new
+- Ability to duplicate entries, terms, assets, and forms. [#6307](https://github.com/statamic/cms/issues/6307) by @duncanmcclean
+- Ability to use HTTP auth support to the `static:warm` command. [#7115](https://github.com/statamic/cms/issues/7115) by @moritzlang
+- Ability for addons to set their fieldset namespace. [#7105](https://github.com/statamic/cms/issues/7105) by @edalzell
+
+### What's improved
+- Added a typehint to the `schedule` method in addon service providers. [#7081](https://github.com/statamic/cms/issues/7081) by @robbanl
+- Improve the speed of the updater page. [#7140](https://github.com/statamic/cms/issues/7140) by @arthurperton
+
+### What's fixed
+- Fix invalid slug validation when single-depth orderable collections. [#7134](https://github.com/statamic/cms/issues/7134) by @arthurperton
+- Prevent error when creating entry while using multisite [#7143](https://github.com/statamic/cms/issues/7143) by @jasonvarga
+- The link fieldtype will localize appropriately. [#7093](https://github.com/statamic/cms/issues/7093) by @arthurperton
+- Fix search on users listing when storing users in the database and using separate first/last name fields. [#7138](https://github.com/statamic/cms/issues/7138) by @duncanmcclean
+- Fix static caching error when using exclusion URLs without leading slashes. [#7130](https://github.com/statamic/cms/issues/7130) by @arthurperton
+- Fix issue where it looked like asset fields would disappear. [#7131](https://github.com/statamic/cms/issues/7131) by @arthurperton
+- Fix case insensitive entry URLs. [#7103](https://github.com/statamic/cms/issues/7103) by @jasonvarga
+- Fix super user handling within JavaScript based permission checks. [#7101](https://github.com/statamic/cms/issues/7101) by @jasonvarga
+- Add `psr_autoloading` rule to `pint.json`. [#7142](https://github.com/statamic/cms/issues/7142) by @jasonvarga
+
+
+
+## 3.3.58 (2022-11-21)
+
+### What's new
+- Ability to disable generating asset preset manipulations on upload. [#7076](https://github.com/statamic/cms/issues/7076) by @ryanmitchell
+
+### What's improved
+- Norwegian translations. [#7092](https://github.com/statamic/cms/issues/7092) by @espenlg
+
+### What's fixed
+- Prevent error in Static Caching middleware when using JSON responses. [#7075](https://github.com/statamic/cms/issues/7075) by @FrittenKeeZ
+- Prevent dates being added to localized entries in non-dated collections. [#7086](https://github.com/statamic/cms/issues/7086) by @tao
+- Support for JsonResource::withoutWrapping. [#7072](https://github.com/statamic/cms/issues/7072) by @jhhazelaar
+- Prevent error in form route binding when customizing action route. [#7083](https://github.com/statamic/cms/issues/7083) by @julesjanssen
+- Fix incorrect home icon and slug in entry listings. [#7095](https://github.com/statamic/cms/issues/7095) by @jasonvarga
+- Prevent entire `assets:generate-presets` command failing when encountering invalid images. [#7091](https://github.com/statamic/cms/issues/7091) by @ryatkins
+
+
+
+## 3.3.57 (2022-11-18)
+
+### What's new
+- Ability to add namespaced fieldsets. [#6588](https://github.com/statamic/cms/issues/6588) by @jasonvarga
+
+### What's improved
+- German translations. [#7074](https://github.com/statamic/cms/issues/7074) by @helloDanuk
+- French translations. [#7084](https://github.com/statamic/cms/issues/7084) by @ebeauchamps
+- Dutch translations. [#7073](https://github.com/statamic/cms/issues/7073) by @oakeddev
+
+### What's fixed
+- ~~Fix root page for max depth 1.~~ Reverted in 3.3.58 [#4895](https://github.com/statamic/cms/issues/4895) by @jelleroorda
+
+
+
 ## 3.3.56 (2022-11-14)
 
 ### What's new

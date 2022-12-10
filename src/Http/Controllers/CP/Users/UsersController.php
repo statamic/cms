@@ -49,7 +49,15 @@ class UsersController extends CpController
                 return Search::index('users')->ensureExists()->search($search);
             }
 
-            $query->where('email', 'like', '%'.$search.'%')->orWhere('name', 'like', '%'.$search.'%');
+            $query
+                ->where('email', 'like', '%'.$search.'%')
+                ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
+                    $query
+                        ->orWhere('first_name', 'like', '%'.$search.'%')
+                        ->orWhere('last_name', 'like', '%'.$search.'%');
+                }, function ($query) use ($search) {
+                    $query->orWhere('name', 'like', '%'.$search.'%');
+                });
         }
 
         return $query;

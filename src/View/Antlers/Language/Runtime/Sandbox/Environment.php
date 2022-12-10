@@ -798,10 +798,7 @@ class Environment
                 $i += 1;
                 continue;
             } elseif ($currentNode instanceof LogicGroup) {
-                $restore = $this->isEvaluatingTruthValue;
-                $this->isEvaluatingTruthValue = false;
-                $stack[] = $this->adjustValue($this->getValue($currentNode), $currentNode);
-                $this->isEvaluatingTruthValue = $restore;
+                $stack[] = $currentNode;
                 continue;
             } elseif ($currentNode instanceof NullCoalescenceGroup) {
                 $stack[] = $this->adjustValue($this->evaluateNullCoalescence($currentNode), $currentNode);
@@ -929,13 +926,12 @@ class Environment
         if (count($stack) == 3) {
             $left = $stack[0];
             $rightNode = $stack[2];
-            $right = $this->getValue($rightNode);
             $operand = $stack[1];
 
             if ($operand instanceof LeftAssignmentOperator) {
                 $varName = $this->nameOf($left);
 
-                $right = $this->checkForFieldValue($right);
+                $right = $this->checkForFieldValue($this->getValue($rightNode));
 
                 $this->dataRetriever->setRuntimeValue($varName, $this->data, $right);
                 $lastPath = $this->dataRetriever->lastPath();
@@ -949,7 +945,7 @@ class Environment
             } elseif ($operand instanceof AdditionAssignmentOperator) {
                 $varName = $this->nameOf($left);
                 $curVal = $this->checkForFieldValue($this->scopeValue($varName));
-                $right = $this->checkForFieldValue($right);
+                $right = $this->checkForFieldValue($this->getValue($rightNode));
 
                 if (is_string($curVal) && is_string($right)) {
                     // Allows for addition assignment to act
@@ -982,7 +978,7 @@ class Environment
             } elseif ($operand instanceof DivisionAssignmentOperator) {
                 $varName = $this->nameOf($left);
                 $curVal = $this->checkForFieldValue($this->numericScopeValue($varName));
-                $right = $this->checkForFieldValue($right);
+                $right = $this->checkForFieldValue($this->getValue($rightNode));
 
                 $this->assertNumericValue($curVal);
                 $this->assertNumericValue($right);
@@ -1001,7 +997,7 @@ class Environment
             } elseif ($operand instanceof ModulusAssignmentOperator) {
                 $varName = $this->nameOf($left);
                 $curVal = $this->checkForFieldValue($this->numericScopeValue($varName));
-                $right = $this->checkForFieldValue($right);
+                $right = $this->checkForFieldValue($this->getValue($rightNode));
 
                 $this->assertNumericValue($curVal);
                 $this->assertNumericValue($right);
@@ -1019,7 +1015,7 @@ class Environment
             } elseif ($operand instanceof MultiplicationAssignmentOperator) {
                 $varName = $this->nameOf($left);
                 $curVal = $this->checkForFieldValue($this->numericScopeValue($varName));
-                $right = $this->checkForFieldValue($right);
+                $right = $this->checkForFieldValue($this->getValue($rightNode));
 
                 $this->assertNumericValue($curVal);
                 $this->assertNumericValue($right);
@@ -1037,7 +1033,7 @@ class Environment
             } elseif ($operand instanceof SubtractionAssignmentOperator) {
                 $varName = $this->nameOf($left);
                 $curVal = $this->checkForFieldValue($this->numericScopeValue($varName));
-                $right = $this->checkForFieldValue($right);
+                $right = $this->checkForFieldValue($this->getValue($rightNode));
 
                 $this->assertNumericValue($curVal);
                 $this->assertNumericValue($right);
@@ -1060,7 +1056,7 @@ class Environment
                 }
 
                 if ($leftValue != false) {
-                    return $this->getValue($right);
+                    return $this->getValue($rightNode);
                 } else {
                     return null;
                 }

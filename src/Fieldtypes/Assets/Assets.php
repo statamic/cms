@@ -128,7 +128,7 @@ class Assets extends Fieldtype
     {
         return collect($items)->map(function ($url) {
             return ($asset = Asset::find($url))
-                ? (new AssetResource($asset))->resolve()
+                ? (new AssetResource($asset))->resolve()['data']
                 : null;
         })->filter()->values();
     }

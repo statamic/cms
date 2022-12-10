@@ -212,9 +212,11 @@ class EntriesController extends CpController
 
         $entry->slug($this->resolveSlug($request));
 
-        if ($collection->structure() && ! $collection->orderable()) {
+        if ($structure = $collection->structure()) {
             $tree = $entry->structure()->in($entry->locale());
+        }
 
+        if ($structure && ! $collection->orderable()) {
             $this->validateParent($entry, $tree, $parent);
 
             $entry->afterSave(function ($entry) use ($parent, $tree) {
@@ -364,8 +366,11 @@ class EntriesController extends CpController
             $entry->date($this->toCarbonInstanceForSaving($request->date));
         }
 
-        if (($structure = $collection->structure()) && ! $collection->orderable()) {
+        if ($structure = $collection->structure()) {
             $tree = $structure->in($site->handle());
+        }
+
+        if ($structure && ! $collection->orderable()) {
             $parent = $values['parent'] ?? null;
             $entry->afterSave(function ($entry) use ($parent, $tree) {
                 if ($parent && optional($tree->page($parent))->isRoot()) {

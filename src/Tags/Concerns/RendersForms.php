@@ -127,9 +127,15 @@ trait RendersForms
     {
         $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
 
+        $missing = str_random();
+        $old = old($field->handle(), $missing);
+        $default = $field->value() ?? $field->defaultValue();
+        $value = $old === $missing ? $default : $old;
+
         $data = array_merge($field->toArray(), [
             'error' => $errors->first($field->handle()) ?: null,
             'old' => old($field->handle()),
+            'value' => $value,
         ]);
 
         if ($manipulateDataCallback instanceof Closure) {
