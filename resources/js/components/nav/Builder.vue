@@ -381,7 +381,11 @@ export default {
         itemAdded(createdConfig) {
             let item = this.normalizeNavConfig(createdConfig);
 
-            item.manipulations = { action: '@create' };
+            item.manipulations = {
+                action: '@create',
+                display: createdConfig.display,
+                url: createdConfig.url,
+            };
 
             this.targetDataArray.push(item);
             this.resetItemEditor();
