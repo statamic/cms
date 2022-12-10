@@ -465,7 +465,7 @@ export default {
         isHideable(item) {
             let action = data_get(item.manipulations, 'action');
 
-            return action !== '@alias' && action !== '@move';
+            return ! ['@alias', '@move', '@create'].includes(action);
         },
 
         removeItem(item) {
