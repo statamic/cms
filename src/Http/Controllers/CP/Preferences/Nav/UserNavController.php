@@ -24,6 +24,10 @@ class UserNavController extends Controller
     {
         $nav = $this->getUpdatedNav($request);
 
+        if (is_null($nav)) {
+            return $this->destroy();
+        }
+
         User::current()->setPreference('nav', $nav)->save();
 
         return true;

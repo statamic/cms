@@ -50,6 +50,10 @@ class RoleNavController extends Controller
 
         $nav = $this->getUpdatedNav($request);
 
+        if (is_null($nav)) {
+            return $this->destroy($handle);
+        }
+
         $role->setPreference('nav', $nav)->save();
 
         return true;

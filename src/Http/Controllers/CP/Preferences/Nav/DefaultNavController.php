@@ -41,6 +41,10 @@ class DefaultNavController extends Controller
 
         $nav = $this->getUpdatedNav($request);
 
+        if (is_null($nav)) {
+            return $this->destroy();
+        }
+
         Preference::default()->set('nav', $nav)->save();
 
         return true;
