@@ -531,7 +531,15 @@ export default {
                 });
             });
 
-            return tree;
+            return tree.filter(section => this.isNotEmptyCustomSection(section));
+        },
+
+        isNotEmptyCustomSection(section) {
+            if (section.original !== false) {
+                return true;
+            }
+
+            return ! _.isEmpty(section.manipulations);
         },
 
         prepareItemsForSubmission(treeItems) {
