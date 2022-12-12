@@ -243,6 +243,13 @@ export default {
         }
     },
 
+    created() {
+        this.$keys.bindGlobal(['mod+s'], e => {
+            e.preventDefault();
+            this.save();
+        });
+    },
+
     mounted() {
         this.setInitialNav(this.nav);
     },
@@ -500,6 +507,10 @@ export default {
         },
 
         save() {
+            if (! this.changed) {
+                return;
+            }
+
             this.saveAs(this.updateUrl);
 
             this.changed = false;

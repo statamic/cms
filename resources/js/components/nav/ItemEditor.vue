@@ -55,6 +55,7 @@ export default {
     data() {
         return {
             config: data_get(this.item, 'config', this.createNewItem()),
+            saveKeyBinding: null,
         }
     },
 
@@ -63,6 +64,10 @@ export default {
             e.preventDefault();
             this.save();
         });
+    },
+
+    destroyed() {
+        this.saveKeyBinding.destroy();
     },
 
     methods: {

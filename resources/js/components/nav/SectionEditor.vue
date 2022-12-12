@@ -42,6 +42,7 @@ export default {
     props: {
         creating: false,
         sectionItem: {},
+        saveKeyBinding: null,
     },
 
     data() {
@@ -55,6 +56,10 @@ export default {
             e.preventDefault();
             this.save();
         });
+    },
+
+    destroyed() {
+        this.saveKeyBinding.destroy();
     },
 
     methods: {
