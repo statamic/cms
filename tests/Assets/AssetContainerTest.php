@@ -442,11 +442,11 @@ class AssetContainerTest extends TestCase
             ->with('/', true)
             ->once()
             ->andReturn([
-                '.meta/one.jpg.yaml' => ['type' => 'file', 'path' => '.meta/one.jpg.yaml', 'basename' => 'one.jpg.yaml'],
-                '.DS_Store' => ['type' => 'file', 'path' => '.DS_Store', 'basename' => '.DS_Store'],
-                '.gitignore' => ['type' => 'file', 'path' => '.gitignore', 'basename' => '.gitignore'],
-                'one.jpg' => ['type' => 'file', 'path' => 'one.jpg', 'basename' => 'one.jpg'],
-                'two.jpg' => ['type' => 'file', 'path' => 'two.jpg', 'basename' => 'two.jpg'],
+                '.meta/one.jpg.yaml' => ['type' => 'file', 'path' => '.meta/one.jpg.yaml', 'basename' => 'one.jpg.yaml', 'dirname' => '.meta'],
+                '.DS_Store' => ['type' => 'file', 'path' => '.DS_Store', 'basename' => '.DS_Store', 'dirname' => ''],
+                '.gitignore' => ['type' => 'file', 'path' => '.gitignore', 'basename' => '.gitignore', 'dirname' => ''],
+                'one.jpg' => ['type' => 'file', 'path' => 'one.jpg', 'basename' => 'one.jpg', 'dirname' => ''],
+                'two.jpg' => ['type' => 'file', 'path' => 'two.jpg', 'basename' => 'two.jpg', 'dirname' => ''],
             ]);
 
         File::shouldReceive('disk')->with('test')->andReturn($disk);
