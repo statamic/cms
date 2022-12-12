@@ -147,6 +147,22 @@ class NavPreferencesConfigTest extends TestCase
     }
 
     /** @test */
+    public function it_returns_section_action_when_removing()
+    {
+        $nav = $this->normalize([
+            'content' => [
+                'action' => '@remove',
+            ],
+            'fields' => [
+                'display' => 'Favourite Fields!',
+            ],
+        ]);
+
+        $this->assertEquals('@remove', Arr::get($nav, 'sections.content.action'));
+        $this->assertFalse(Arr::get($nav, 'sections.fields.action'));
+    }
+
+    /** @test */
     public function it_removes_inherit_action_sections_when_not_reordering()
     {
         $this->assertEquals(['users'], array_keys($this->normalize([
@@ -493,12 +509,16 @@ class NavPreferencesConfigTest extends TestCase
                     'icon' => 'user',
                 ],
             ],
+            'fields' => [
+                'action' => '@remove',
+            ],
         ]);
 
         $expected = [
             'reorder' => false,
             'sections' => [
                 'top_level' => [
+                    'action' => false,
                     'reorder' => false,
                     'display' => 'Top Level',
                     'items' => [
@@ -515,6 +535,7 @@ class NavPreferencesConfigTest extends TestCase
                     ],
                 ],
                 'content' => [
+                    'action' => false,
                     'reorder' => false,
                     'display' => 'Content',
                     'items' => [
@@ -528,6 +549,12 @@ class NavPreferencesConfigTest extends TestCase
                             'icon' => 'user',
                         ],
                     ],
+                ],
+                'fields' => [
+                    'action' => '@remove',
+                    'reorder' => false,
+                    'display' => 'Fields',
+                    'items' => [],
                 ],
             ],
         ];

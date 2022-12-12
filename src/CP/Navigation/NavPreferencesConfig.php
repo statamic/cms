@@ -76,7 +76,6 @@ class NavPreferencesConfig implements ArrayAccess
             ->prepend($sections->pull('top_level') ?? '@inherit', 'top_level')
             ->map(fn ($config, $section) => $this->normalizeSectionConfig($config, $section))
             ->reject(fn ($config) => $config['action'] === '@inherit' && ! $reorder)
-            ->map(fn ($config) => Arr::except($config, 'action'))
             ->all();
 
         $normalized->put('sections', $sections);
@@ -108,8 +107,9 @@ class NavPreferencesConfig implements ArrayAccess
         $normalized->put('reorder', $reorder = $sectionConfig->get('reorder', false));
 
         $items = collect($sectionConfig->get('items') ?? $sectionConfig->except([
-            'reorder',
+            'action',
             'display',
+            'reorder',
         ]));
 
         $items = $items
