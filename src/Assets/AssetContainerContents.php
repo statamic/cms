@@ -33,12 +33,37 @@ class AssetContainerContents
             // If Flysystem 3.x, re-apply sorting and return a backwards compatible result set.
             // See: https://flysystem.thephpleague.com/v2/docs/usage/directory-listings/
             if (! is_array($files)) {
-                return collect($files->sortByPath()->toArray())->keyBy('path')->map(function ($file) {
+                $files = collect($files->sortByPath()->toArray())->keyBy('path')->map(function ($file) {
                     return $this->normalizeFlysystemAttributes($file);
                 });
+            } else {
+                // Flysystem 1.x
+                $files = collect($files)->keyBy('path');
             }
 
-            return collect($files)->keyBy('path');
+            $files
+                ->filter(fn ($item) => $item['type'] === 'file')
+                ->each(function ($file) use ($files) {
+                    $dirname = $file['dirname'];
+
+                    while ($dirname !== '') {
+                        $parentDir = pathinfo($dirname, PATHINFO_DIRNAME);
+                        $parentDir = $parentDir === '.' ? '' : $parentDir;
+
+                        $files->put($dirname, [
+                            'type' => 'dir',
+                            'path' => $dirname,
+                            'basename' => $basename = pathinfo($dirname, PATHINFO_BASENAME),
+                            'filename' => $basename,
+                            'timestamp' => null,
+                            'dirname' => $parentDir
+                        ]);
+
+                        $dirname = $parentDir;
+                    }
+                });
+
+            return $files;
         });
     }
 

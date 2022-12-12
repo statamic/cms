@@ -564,6 +564,34 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_folders_even_if_some_folders_are_missing()
+    {
+        // For example, S3 may not not return a directory as part of the listing in
+        // some situations, even though there may be a file in those directories.
+
+        $disk = $this->mock(Filesystem::class);
+        $disk->shouldReceive('filesystem->getDriver->listContents')
+            ->with('/', true)
+            ->once()
+            ->andReturn([
+                'alfa' => ['type' => 'dir', 'path' => 'alfa', 'basename' => 'alfa'],
+                'bravo' => ['type' => 'dir', 'path' => 'bravo', 'basename' => 'bravo'],
+                'charlie/delta.jpg' => ['type' => 'file', 'path' => 'charlie/delta.jpg', 'basename' => 'delta', 'dirname' => 'charlie'],
+                'echo/foxtrot/golf.jpg' => ['type' => 'file', 'path' => 'echo/foxtrot/golf.jpg', 'basename' => 'golf', 'dirname' => 'echo/foxtrot'],
+            ]);
+
+        File::shouldReceive('disk')->with('test')->andReturn($disk);
+
+        $this->assertFalse(Cache::has($cacheKey = 'asset-list-contents-test'));
+        $this->assertFalse(Blink::has($cacheKey));
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        $expected = ['alfa', 'bravo', 'charlie', 'echo/foxtrot', 'echo'];
+        $this->assertEquals($expected, $container->folders()->all());
+    }
+
+    /** @test */
     public function it_gets_the_folders_from_the_cache_and_blink_only_once()
     {
         $cacheKey = 'asset-list-contents-test';
