@@ -56,7 +56,7 @@ class AssetContainerContents
                             'basename' => $basename = pathinfo($dirname, PATHINFO_BASENAME),
                             'filename' => $basename,
                             'timestamp' => null,
-                            'dirname' => $parentDir
+                            'dirname' => $parentDir,
                         ]);
 
                         $dirname = $parentDir;
