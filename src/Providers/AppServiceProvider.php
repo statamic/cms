@@ -182,7 +182,7 @@ class AppServiceProvider extends ServiceProvider
             'Antlers' => config('statamic.antlers.version'),
             'Addons' => $addons->count(),
             'Stache Watcher' => config('statamic.stache.watcher') ? 'Enabled' : 'Disabled',
-            'Static Caching' => config('statamic.static_caching.strategy') ?: 'None',
+            'Static Caching' => config('statamic.static_caching.strategy') ?: 'Disabled',
         ]);
 
         foreach ($addons as $addon) {

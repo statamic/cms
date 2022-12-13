@@ -29,7 +29,7 @@ class SupportDetails extends Command
         $this->line('<info>Laravel</info> '.Application::VERSION);
         $this->line('<info>PHP</info> '.phpversion());
         $this->line(sprintf('<info>Stache Watcher</info> %s', config('statamic.stache.watcher') ? 'Enabled' : 'Disabled'));
-        $this->line(sprintf('<info>Static Caching</info> %s', config('statamic.static_caching.strategy') ?: 'None'));
+        $this->line(sprintf('<info>Static Caching</info> %s', config('statamic.static_caching.strategy') ?: 'Disabled'));
         $this->addons();
 
         return static::SUCCESS;
