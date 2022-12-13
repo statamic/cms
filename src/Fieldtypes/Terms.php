@@ -380,10 +380,8 @@ class Terms extends Relationship
             ? Site::get($parent->locale())->lang()
             : Site::default()->lang();
 
-        $slug = Str::slug($string, '-', $lang);
-
         $term = Facades\Term::make()
-            ->slug($slug)
+            ->slug(Str::slug($string, '-', $lang))
             ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
             ->set('title', $string);
 
