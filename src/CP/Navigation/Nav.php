@@ -322,7 +322,6 @@ class Nav
             ->each(fn ($overrides, $section) => $this->renameSection($section, $overrides['display']));
 
         collect($navPreferencesConfig['sections'])
-            ->reject(fn ($overrides) => $overrides === '@inherit')
             ->each(fn ($overrides) => $this->createPendingItemsForSection($overrides))
             ->each(fn ($overrides) => $this->applyPreferenceOverridesForSection($overrides));
 
