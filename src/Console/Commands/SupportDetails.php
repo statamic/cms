@@ -31,7 +31,7 @@ class SupportDetails extends Command
         $this->line(sprintf('<info>Stache Watcher</info> %s', config('statamic.stache.watcher') ? 'Enabled' : 'Disabled'));
         $this->line(sprintf('<info>Static Caching</info> %s', config('statamic.static_caching.strategy') ?: 'None'));
         $this->addons();
-        
+
         return static::SUCCESS;
     }
 
