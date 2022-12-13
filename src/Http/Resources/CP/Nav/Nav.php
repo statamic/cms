@@ -9,11 +9,10 @@ class Nav extends JsonResource
     public function toArray($request)
     {
         return collect($this->resource)
-            ->map(function ($items, $section) {
-                return [
-                    'display' => $section,
-                    'items' => $items->map(fn ($item) => NavItem::make($item)),
-                ];
+            ->map(function ($section) {
+                return array_merge($section, [
+                    'items' => $section['items']->map(fn ($item) => NavItem::make($item)),
+                ]);
             })
             ->all();
     }
