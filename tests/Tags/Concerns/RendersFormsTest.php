@@ -186,6 +186,7 @@ EOT;
         $rendered = $this->createField('toggle', $value, $default, $old);
 
         $this->assertSame($expected, (bool) $rendered['value']);
+        $this->assertStringContainsString('<input type="hidden" name="test" value="0">', $rendered['field']);
 
         if ($expected) {
             $this->assertStringContainsString('checked', $rendered['field']);
@@ -354,6 +355,8 @@ EOT;
             ],
         ]);
 
+        $this->assertStringContainsString('<input type="hidden" name="test[]">', $rendered['field']);
+
         if ($expected) {
             $unexpected = array_diff(array_keys($options), $expected);
             foreach ($expected as $e) {
@@ -379,18 +382,22 @@ EOT;
             'no value, no default, missing' => ['value' => null, 'default' => null, 'old' => self::MISSING, 'expectedValue' => null],
             'no value, no default, selected' => ['value' => null, 'default' => null, 'old' => ['alfa'], 'expectedValue' => ['alfa']],
             'no value, no default, selected multiple' => ['value' => null, 'default' => null, 'old' => ['alfa', 'bravo'], 'expectedValue' => ['alfa', 'bravo']],
+            'no value, no default, selected none' => ['value' => null, 'default' => null, 'old' => [], 'expectedValue' => []],
 
             'value, no default, missing' => ['value' => ['alfa'], 'default' => null, 'old' => self::MISSING, 'expectedValue' => ['alfa']],
             'value, no default, selected' => ['value' => ['alfa'], 'default' => null, 'old' => ['bravo'], 'expectedValue' => ['bravo']],
             'value, no default, selected multiple' => ['value' => ['alfa'], 'default' => null, 'old' => ['bravo', 'charlie'], 'expectedValue' => ['bravo', 'charlie']],
+            'value, no default, selected none' => ['value' => ['alfa'], 'default' => null, 'old' => [], 'expectedValue' => []],
 
             'no value, default, missing' => ['value' => null, 'default' => ['alfa'], 'old' => self::MISSING, 'expectedValue' => ['alfa']],
             'no value, default, selected' => ['value' => null, 'default' => ['alfa'], 'old' => ['bravo'], 'expectedValue' => ['bravo']],
             'no value, default, selected multiple' => ['value' => null, 'default' => ['alfa'], 'old' => ['bravo', 'charlie'], 'expectedValue' => ['bravo', 'charlie']],
+            'no value, default, selected none' => ['value' => null, 'default' => ['alfa'], 'old' => [], 'expectedValue' => []],
 
             'value, default, missing' => ['value' => ['alfa'], 'default' => ['bravo'], 'old' => self::MISSING, 'expectedValue' => ['alfa']],
             'value, default, selected' => ['value' => ['alfa'], 'default' => ['bravo'], 'old' => ['charlie'], 'expectedValue' => ['charlie']],
             'value, default, selected multiple' => ['value' => ['alfa'], 'default' => ['bravo'], 'old' => ['charlie', 'delta'], 'expectedValue' => ['charlie', 'delta']],
+            'value, default, selected none' => ['value' => ['alfa'], 'default' => ['bravo'], 'old' => [], 'expectedValue' => []],
         ];
     }
 }

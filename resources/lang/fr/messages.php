@@ -76,6 +76,7 @@ return [
     'fields_blueprints_description' => 'Les Blueprints définissent les champs pour les structures de contenu comme les collections, les taxonomies, les utilisateurs et les formulaires.',
     'fields_default_instructions' => 'Définissez la valeur par défaut.',
     'fields_display_instructions' => 'L’étiquette du champ affichée dans le Panneau de configuration.',
+    'fields_duplicate_instructions' => 'S’il faut que ce champ soit inclus lors de la duplication de l’élément.',
     'fields_fieldsets_description' => 'Les jeux de champs sont des groupements simples, flexibles et totalement facultatifs de champs qui aident à organiser des champs réutilisables et préconfigurés.',
     'fields_handle_instructions' => 'La variable de modèle du champ.',
     'fields_instructions_instructions' => 'Texte affiché sous l’étiquette du champ (comme celui-ci). Markdown est pris en compte.',
