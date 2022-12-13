@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Nav
@@ -15,6 +16,7 @@ class Nav
     protected $pendingItems = [];
     protected $extensions = [];
     protected $withHidden = false;
+    protected $sectionsManipulations = [];
     protected $sectionsOrder = [];
     protected $sectionsWithReorderedItems = [];
 
@@ -318,6 +320,7 @@ class Nav
         $navPreferencesConfig = NavPreferencesConfig::normalize($preferences);
 
         collect($navPreferencesConfig['sections'])
+            ->each(fn ($overrides, $section) => $this->trackSectionManipulations($section, $overrides))
             ->reject(fn ($overrides, $section) => $section === NavItem::snakeCase($overrides['display']))
             ->each(fn ($overrides, $section) => $this->renameSection($section, $overrides['display']));
 
@@ -431,6 +434,21 @@ class Nav
     }
 
     /**
+     * Track section manipulations.
+     *
+     * @param  string  $sectionKey
+     * @param  array  $overrides
+     */
+    protected function trackSectionManipulations($sectionKey, $overrides)
+    {
+        $this->sectionsManipulations[$sectionKey] = [
+            'action' => $overrides['action'],
+            'display' => $overrides['display'],
+            'display_original' => null,
+        ];
+    }
+
+    /**
      * Rename section.
      *
      * @param  string  $sectionKey
@@ -438,9 +456,16 @@ class Nav
      */
     protected function renameSection($sectionKey, $displayNew)
     {
+        $displayOriginal = null;
+
         collect($this->items)
             ->filter(fn ($item) => NavItem::snakeCase($item->section()) === $sectionKey)
-            ->each(fn ($item) => $item->preserveCurrentId()->section($displayNew));
+            ->each(function ($item) use (&$displayOriginal, $displayNew) {
+                $displayOriginal = $item->section();
+                $item->preserveCurrentId()->section($displayNew);
+            });
+
+        $this->sectionsManipulations[$sectionKey]['display_original'] = $displayOriginal;
     }
 
     /**
@@ -794,6 +819,11 @@ class Nav
                 $sections[$item->section()][] = $item;
             });
 
+        // Prepare section manipulations...
+        $manipulations = collect($this->sectionsManipulations)
+            ->keyBy('display')
+            ->all();
+
         // Collect and order each section's items...
         $built = collect($sections)
             ->map(function ($items, $section) {
@@ -802,12 +832,22 @@ class Nav
                     : collect($items);
             });
 
+        // Transform sections to include section manipulations...
+        $built->transform(function ($items, $section) use ($manipulations) {
+            return [
+                'display' => $section,
+                'display_original' => Arr::get($manipulations, "{$section}.display_original", $section),
+                'action' => Arr::get($manipulations, "{$section}.action", false),
+                'items' => $items,
+            ];
+        });
+
         // Order sections...
         if ($this->sectionsOrder) {
-            return $built->sortBy(fn ($items, $section) => $this->sectionsOrder[$section]);
+            return $built->sortBy(fn ($items, $section) => $this->sectionsOrder[$section])->values();
         }
 
-        return $built;
+        return $built->values();
     }
 
     /**
