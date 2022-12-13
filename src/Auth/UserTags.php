@@ -178,6 +178,86 @@ class UserTags extends Tags
     }
 
     /**
+     * Output a profile form.
+     *
+     * Maps to {{ user:profile_form }}
+     *
+     * @return string
+     */
+    public function profileForm()
+    {
+        if (session()->has('status')) {
+            return $this->parse(['success' => true]);
+        }
+
+        $data = $this->getFormSession('user.profile');
+
+        $data['fields'] = $this->getProfileFields();
+
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
+
+        $html = $this->formOpen(route('statamic.profile'), 'POST', $knownParams);
+
+        $params = [];
+
+        if ($redirect = $this->getRedirectUrl()) {
+            $params['redirect'] = $this->parseRedirect($redirect);
+        }
+
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
+            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
+        }
+
+        $html .= $this->formMetaFields($params);
+
+        $html .= $this->parse($data);
+
+        $html .= $this->formClose();
+
+        return $html;
+    }
+
+    /**
+     * Output a password change form.
+     *
+     * Maps to {{ user:password_form }}
+     *
+     * @return string
+     */
+    public function passwordForm()
+    {
+        if (session()->has('status')) {
+            return $this->parse(['success' => true]);
+        }
+
+        $data = $this->getFormSession('user.password');
+
+        $data['fields'] = $this->getPasswordFields();
+
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
+
+        $html = $this->formOpen(route('statamic.password'), 'POST', $knownParams);
+
+        $params = [];
+
+        if ($redirect = $this->getRedirectUrl()) {
+            $params['redirect'] = $this->parseRedirect($redirect);
+        }
+
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
+            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
+        }
+
+        $html .= $this->formMetaFields($params);
+
+        $html .= $this->parse($data);
+
+        $html .= $this->formClose();
+
+        return $html;
+    }
+
+    /**
      * Alias of {{ user:register_form }}.
      *
      * @return string
@@ -558,6 +638,61 @@ class UserTags extends Tags
             })
             ->map(function ($field) {
                 return $this->getRenderableField($field, 'user.register');
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Get fields with extra data for looping over and rendering.
+     *
+     * @return array
+     */
+    protected function getProfileFields()
+    {
+        $user = User::current();
+
+        $values = $user
+            ? $user->data()->merge(['email' => $user->email()])->all()
+            : [];
+
+        return User::blueprint()->fields()->addValues($values)->preProcess()->all()
+            ->reject(function ($field) {
+                return in_array($field->handle(), ['password', 'password_confirmation', 'roles', 'groups'])
+                    || $field->fieldtype()->handle() === 'assets';
+            })
+            ->map(function ($field) {
+                return $this->getRenderableField($field, 'user.profile');
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Get fields with extra data for looping over and rendering.
+     *
+     * @return array
+     */
+    protected function getPasswordFields()
+    {
+        return collect()
+            ->put('current_password', new Field('current_password', [
+                'type' => 'text',
+                'input_type' => 'password',
+                'display' => __('Current Password'),
+            ]))
+            ->put('password', new Field('password', [
+                'type' => 'text',
+                'input_type' => 'password',
+                'display' => __('Password'),
+            ]))
+            ->put('password_confirmation', new Field('password_confirmation', [
+                'type' => 'text',
+                'input_type' => 'password',
+                'display' => __('Password Confirmation'),
+            ]))
+            ->map(function ($field) {
+                return $this->getRenderableField($field, 'user.password');
             })
             ->values()
             ->all();
