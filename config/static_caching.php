@@ -113,4 +113,13 @@ return [
         \Statamic\StaticCaching\Replacers\NoCacheReplacer::class,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Queue name
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define what queue should be used when adding warm requests.
+    |
+    */
+    'warm_queue_name' => 'default',
 ];

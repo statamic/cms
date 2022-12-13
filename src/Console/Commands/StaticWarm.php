@@ -85,7 +85,7 @@ class StaticWarm extends Command
         $this->output->newLine();
 
         if ($this->shouldQueue) {
-            $staticWarmQueue = env('STATAMIC_STATIC_WARM_QUEUE', 'default');
+            $staticWarmQueue = config('statamic.static_caching.warm_queue_name', 'default');
             $this->line('Adding '.count($requests).' requests on queue "'.$staticWarmQueue.'"...');
 
             foreach ($requests as $request) {
