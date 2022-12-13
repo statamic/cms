@@ -373,7 +373,7 @@ class Terms extends Relationship
     protected function createTermFromString($string, $taxonomy)
     {
         $term = Facades\Term::make()
-            ->slug(Str::slug($string, '-', Site::selected()->handle()))
+            ->slug(Str::slug($string, '-', Site::selected()->lang()))
             ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
             ->set('title', $string);
 
