@@ -458,7 +458,7 @@ export default {
         },
 
         expandAll() {
-             this.traverseTree(this.mainTreeData, (node, { depth }) => {
+             this.traverseTree(this.mainTreeData, (node) => {
                 if (! this.isSectionNode(node)) {
                     this.$set(node, 'open', true);
                 }
@@ -466,7 +466,7 @@ export default {
         },
 
         collapseAll() {
-            this.traverseTree(this.mainTreeData, (node, { depth }) => {
+            this.traverseTree(this.mainTreeData, (node) => {
                 if (! this.isSectionNode(node)) {
                     this.$set(node, 'open', false);
                 }
