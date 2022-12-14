@@ -13,7 +13,7 @@
             button-class="btn-primary"
             url="{{ $collection->createEntryUrl() }}"
             :blueprints="{{ $blueprints->toJson() }}"
-            text="{{ $createLabel }}"></create-entry-button>
+            text="{{ $button }}"></create-entry-button>
         @endcan
     </div>
     <collection-widget

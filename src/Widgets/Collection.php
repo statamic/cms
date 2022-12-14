@@ -37,7 +37,6 @@ class Collection extends Widget
             'title' => $this->config('title', $collection->title()),
             'button' => $collection->createLabel(),
             'blueprints' => $collection->entryBlueprints(),
-            'createLabel' => $collection->createLabel(),
             'limit' => $this->config('limit', 5),
             'sortColumn' => $sortColumn,
             'sortDirection' => $sortDirection,
