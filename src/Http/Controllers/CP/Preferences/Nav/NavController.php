@@ -10,7 +10,9 @@ class NavController extends Controller
 {
     public function index()
     {
-        abort_unless(Statamic::pro() && User::current()->isSuper(), 403);
+        if (! Statamic::pro() || User::current()->cannot('configure cp nav')) {
+            return redirect(cp_route('preferences.nav.user.edit'));
+        }
 
         return view('statamic::nav.index');
     }
