@@ -95,6 +95,8 @@ class NavTransformer
     {
         $transformed = [];
 
+        $transformed['action'] = $section['action'] ?? '@inherit';
+
         if ($section['display'] !== $section['display_original']) {
             $transformed['display'] = $section['display'];
         }
@@ -258,10 +260,10 @@ class NavTransformer
         $section['items'] = $this->rejectAllInherits($section['items']);
 
         if (isset($section['display'])) {
-            return $section;
+            return collect($section)->except('action')->filter()->all();
         }
 
-        return $section['items'] ?? '@inherit';
+        return $section['items'] ?? $section['action'];
     }
 
     /**
