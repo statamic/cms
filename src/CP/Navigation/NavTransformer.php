@@ -247,6 +247,8 @@ class NavTransformer
      */
     protected function minifySection($section, $sectionKey)
     {
+        $action = Arr::pull($section, 'action');
+
         $section['items'] = collect($section['items'])
             ->map(fn ($item) => $this->minifyItem($item))
             ->all();
@@ -260,10 +262,10 @@ class NavTransformer
         $section['items'] = $this->rejectAllInherits($section['items']);
 
         if (isset($section['display'])) {
-            return collect($section)->except('action')->filter()->all();
+            return collect($section)->filter()->all();
         }
 
-        return $section['items'] ?? $section['action'];
+        return $section['items'] ?? $action;
     }
 
     /**
