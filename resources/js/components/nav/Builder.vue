@@ -45,6 +45,19 @@
             </div>
         </header>
 
+        <div class="mb-1 flex justify-end">
+            <a
+                class="text-2xs text-blue mr-2 underline"
+                v-text="__('Expand All')"
+                @click="expandAll"
+            />
+            <a
+                class="text-2xs text-blue mr-1 underline"
+                v-text="__('Collapse All')"
+                @click="collapseAll"
+            />
+        </div>
+
         <div v-if="!loading" class="page-tree page-tree-with-sections w-full">
             <draggable-tree
                 draggable
@@ -442,6 +455,22 @@ export default {
 
             this.resetSectionEditor();
             this.changed = true;
+        },
+
+        expandAll() {
+             this.traverseTree(this.mainTreeData, (node, { depth }) => {
+                if (! this.isSectionNode(node)) {
+                    this.$set(node, 'open', true);
+                }
+            });
+        },
+
+        collapseAll() {
+            this.traverseTree(this.mainTreeData, (node, { depth }) => {
+                if (! this.isSectionNode(node)) {
+                    this.$set(node, 'open', false);
+                }
+            });
         },
 
         resetItemEditor() {
