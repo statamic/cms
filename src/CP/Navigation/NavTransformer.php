@@ -4,7 +4,6 @@ namespace Statamic\CP\Navigation;
 
 use Statamic\Facades\CP\Nav;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class NavTransformer
 {
@@ -18,11 +17,11 @@ class NavTransformer
      *
      * @param  array  $submitted
      */
-    public function __construct($submitted)
+    public function __construct(array $submitted)
     {
-        $this->submitted = $submitted;
-
         $this->coreNav = Nav::buildWithoutPreferences();
+
+        $this->submitted = $this->removeEmptyCustomSections($submitted);
     }
 
     /**
@@ -40,6 +39,21 @@ class NavTransformer
     }
 
     /**
+     * Remove empty custom sections from submitted payload.
+     *
+     * @param  array  $submitted
+     * @return array
+     */
+    protected function removeEmptyCustomSections($submitted)
+    {
+        $coreSections = $this->coreNav->pluck('display');
+
+        return collect($submitted)
+            ->filter(fn ($section) => $section['items'] || $coreSections->contains($section['display_original']))
+            ->all();
+    }
+
+    /**
      * Transform from payload submitted by `components/nav/Builder.vue`.
      *
      * @return $this
@@ -47,13 +61,13 @@ class NavTransformer
     public function transform()
     {
         $this->config['reorder'] = $this->itemsAreReordered(
-            $this->coreNav->keys(),
-            collect($this->submitted)->pluck('section'),
+            $this->coreNav->pluck('display'),
+            collect($this->submitted)->pluck('display'),
             'sections'
         );
 
         $this->config['sections'] = collect($this->submitted)
-            ->keyBy(fn ($section) => $this->transformSectionKey($section['section']))
+            ->keyBy(fn ($section) => $this->transformSectionKey($section['display_original']))
             ->map(fn ($section) => $this->transformSection($section))
             ->all();
 
@@ -81,17 +95,17 @@ class NavTransformer
     {
         $transformed = [];
 
-        if ($section['section'] !== $section['original']) {
-            $transformed['display'] = $section['section'];
+        if ($section['display'] !== $section['display_original']) {
+            $transformed['display'] = $section['display'];
         }
 
         $transformed['reorder'] = $this->itemsAreReordered(
-            $this->coreNav->get($section['section'], collect())->map->id(),
-            collect($section['manipulations'])->pluck('id'),
-            $this->transformSectionKey($section['section'])
+            $this->coreNav->pluck('items', 'display')->get($section['display'], collect())->map->id(),
+            collect($section['items'])->pluck('id'),
+            $this->transformSectionKey($section['display'])
         );
 
-        $transformed['items'] = collect($section['manipulations'])
+        $transformed['items'] = collect($section['items'])
             ->keyBy('id')
             ->map(fn ($item) => $this->transformItem($item))
             ->all();

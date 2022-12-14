@@ -292,7 +292,6 @@ export default {
         normalizeNavConfig(config) {
             let item = {
                 text: config.display,
-                original: data_get(config, 'original', config.display),
                 config: config,
                 manipulations: config.manipulations || {},
             };
@@ -404,7 +403,7 @@ export default {
         sectionAdded(sectionDisplay) {
             let item = this.normalizeNavConfig({
                 display: sectionDisplay,
-                original: false,
+                display_original: false,
             });
 
             this.mainTreeData.push(item);
@@ -426,6 +425,7 @@ export default {
             item.manipulations = {
                 action: data_get(item.manipulations, 'action', '@modify'),
                 display: updatedConfig.display,
+                display_original: updatedConfig.display_origial,
                 url: updatedConfig.url,
             };
 
@@ -531,28 +531,22 @@ export default {
             let tree = [];
 
             tree.push({
-                'section': 'Top Level',
-                'original': 'Top Level',
-                'manipulations': this.prepareItemsForSubmission(this.topLevelTreeData),
+                'display': 'Top Level',
+                'display_original': 'Top Level',
+                'action': false,
+                'items': this.prepareItemsForSubmission(this.topLevelTreeData),
             });
 
             this.mainTreeData.forEach(section => {
                 tree.push({
-                    'section': section.text,
-                    'original': section.original,
-                    'manipulations': this.prepareItemsForSubmission(section.children),
+                    'display': section.text,
+                    'display_original': section.config.display_original || section.text,
+                    'action': section.action,
+                    'items': this.prepareItemsForSubmission(section.children),
                 });
             });
 
-            return tree.filter(section => this.isNotEmptyCustomSection(section));
-        },
-
-        isNotEmptyCustomSection(section) {
-            if (section.original !== false) {
-                return true;
-            }
-
-            return ! _.isEmpty(section.manipulations);
+            return tree;
         },
 
         prepareItemsForSubmission(treeItems) {
