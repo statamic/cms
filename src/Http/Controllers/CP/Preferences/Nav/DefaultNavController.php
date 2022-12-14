@@ -5,9 +5,7 @@ namespace Statamic\Http\Controllers\CP\Preferences\Nav;
 use Illuminate\Http\Request;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Preference;
-use Statamic\Facades\User;
 use Statamic\Http\Controllers\Controller;
-use Statamic\Statamic;
 
 class DefaultNavController extends Controller
 {
@@ -20,8 +18,6 @@ class DefaultNavController extends Controller
 
     public function edit()
     {
-        abort_unless(Statamic::pro() && User::current()->isSuper(), 403);
-
         $preferences = Preference::default()->get('nav');
 
         $nav = $preferences
@@ -37,8 +33,6 @@ class DefaultNavController extends Controller
 
     public function update(Request $request)
     {
-        abort_unless(Statamic::pro() && User::current()->isSuper(), 403);
-
         $nav = $this->getUpdatedNav($request);
 
         if (is_null($nav)) {
@@ -54,8 +48,6 @@ class DefaultNavController extends Controller
 
     public function destroy()
     {
-        abort_unless(Statamic::pro() && User::current()->isSuper(), 403);
-
         Preference::default()->remove('nav')->save();
 
         return true;

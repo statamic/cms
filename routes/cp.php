@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Utility;
+use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Statamic;
 
 Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
@@ -235,12 +236,15 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::get('edit', 'UserNavController@edit')->name('user.edit');
             Route::patch('/', 'UserNavController@update')->name('user.update');
             Route::delete('/', 'UserNavController@destroy')->name('user.destroy');
-            Route::get('roles/{role}/edit', 'RoleNavController@edit')->name('role.edit');
-            Route::patch('roles/{role}', 'RoleNavController@update')->name('role.update');
-            Route::delete('roles/{role}', 'RoleNavController@destroy')->name('role.destroy');
-            Route::get('default/edit', 'DefaultNavController@edit')->name('default.edit');
-            Route::patch('default', 'DefaultNavController@update')->name('default.update');
-            Route::delete('default', 'DefaultNavController@destroy')->name('default.destroy');
+
+            Route::middleware([RequireStatamicPro::class, 'can:configure cp nav'])->group(function () {
+                Route::get('roles/{role}/edit', 'RoleNavController@edit')->name('role.edit');
+                Route::patch('roles/{role}', 'RoleNavController@update')->name('role.update');
+                Route::delete('roles/{role}', 'RoleNavController@destroy')->name('role.destroy');
+                Route::get('default/edit', 'DefaultNavController@edit')->name('default.edit');
+                Route::patch('default', 'DefaultNavController@update')->name('default.update');
+                Route::delete('default', 'DefaultNavController@destroy')->name('default.destroy');
+            });
         });
     });
 
