@@ -277,7 +277,7 @@ export default {
             let topLevelConfig = navConfig.shift();
 
             this.topLevelTreeData = _.chain(topLevelConfig.items)
-                .map((section) => this.normalizeNavConfig(section))
+                .map((section) => this.normalizeNavConfig(section, false))
                 .values()
                 .value();
 
@@ -293,11 +293,12 @@ export default {
             this.changed = false;
         },
 
-        normalizeNavConfig(config) {
+        normalizeNavConfig(config, isSectionNode = true) {
             let item = {
                 text: config.display,
                 config: config,
                 manipulations: config.manipulations || {},
+                isSection: isSectionNode,
             };
 
             if (config.items) {
@@ -308,6 +309,7 @@ export default {
                         open: false,
                         config: childItem,
                         manipulations: childItem.manipulations || {},
+                        isSection: false,
                     };
                 });
             }
@@ -358,7 +360,7 @@ export default {
         },
 
         isSectionNode(node) {
-            return node.parent.isRoot === true;
+            return node.isSection;
         },
 
         traverseTree(nodes, callback, parentPath = []) {
@@ -391,7 +393,7 @@ export default {
         },
 
         itemAdded(createdConfig) {
-            let item = this.normalizeNavConfig(createdConfig);
+            let item = this.normalizeNavConfig(createdConfig, false);
 
             item.manipulations = {
                 action: '@create',
