@@ -207,7 +207,7 @@ export default {
             require: true,
         },
         nav: {
-            type: Object,
+            type: Array,
             required: true,
         },
         indexUrl: {
@@ -269,13 +269,15 @@ export default {
     methods: {
 
         setInitialNav(nav) {
-            this.topLevelTreeData = _.chain(nav['Top Level'].items)
+            let navConfig = clone(nav);
+            let topLevelConfig = navConfig.shift();
+
+            this.topLevelTreeData = _.chain(topLevelConfig.items)
                 .map((section) => this.normalizeNavConfig(section))
                 .values()
                 .value();
 
-            this.mainTreeData = _.chain(nav)
-                .reject((items, section) => section === 'Top Level')
+            this.mainTreeData = _.chain(navConfig)
                 .mapObject((section) => this.normalizeNavConfig(section))
                 .values()
                 .value();
