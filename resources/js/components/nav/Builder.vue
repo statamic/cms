@@ -89,18 +89,16 @@
                         <dropdown-item
                             :text="__('Duplicate')"
                             @click="aliasItem(item)" />
-                        <template v-if="itemDoesntPreventHiding(item)">
-                            <li class="divider" />
-                            <dropdown-item
-                                v-if="itemIsVisible(item)"
-                                :text="isHideable(item) ? __('Hide') : __('Remove')"
-                                class="warning"
-                                @click="isHideable(item) ? hideItem(item) : removeItem(item, vm)" />
-                            <dropdown-item
-                                v-else
-                                :text="__('Show')"
-                                @click="showItem(item)" />
-                        </template>
+                        <li class="divider" />
+                        <dropdown-item
+                            v-if="itemIsVisible(item)"
+                            :text="isHideable(item) ? __('Hide') : __('Remove')"
+                            class="warning"
+                            @click="isHideable(item) ? hideItem(item) : removeItem(item, vm)" />
+                        <dropdown-item
+                            v-else
+                            :text="__('Show')"
+                            @click="showItem(item)" />
                     </template>
                 </tree-branch>
             </draggable-tree>
@@ -142,18 +140,16 @@
                             v-if="! isSectionNode(item)"
                             :text="__('Duplicate')"
                             @click="aliasItem(item)" />
-                        <template v-if="itemDoesntPreventHiding(item)">
-                            <li class="divider" />
-                            <dropdown-item
-                                v-if="itemIsVisible(item)"
-                                :text="isHideable(item) ? __('Hide') : __('Remove')"
-                                class="warning"
-                                @click="isHideable(item) ? hideItem(item) : removeItem(item)" />
-                            <dropdown-item
-                                v-else
-                                :text="__('Show')"
-                                @click="showItem(item)" />
-                        </template>
+                        <li class="divider" />
+                        <dropdown-item
+                            v-if="itemIsVisible(item)"
+                            :text="isHideable(item) ? __('Hide') : __('Remove')"
+                            class="warning"
+                            @click="isHideable(item) ? hideItem(item) : removeItem(item)" />
+                        <dropdown-item
+                            v-else
+                            :text="__('Show')"
+                            @click="showItem(item)" />
                     </template>
                 </tree-branch>
             </draggable-tree>
@@ -504,21 +500,6 @@ export default {
 
         itemIsVisible(item) {
             return data_get(item.manipulations, 'action') !== '@remove';
-        },
-
-        itemDoesntPreventHiding(item) {
-            if (item.children && item.children.length) {
-                return _.chain(item.children)
-                    .filter(child => {
-                        return child.children && child.children.length
-                            ? ! this.itemDoesntPreventHiding(child)
-                            : data_get(child.config, 'prevent_hiding') === true;
-                    })
-                    .value()
-                    .length === 0;
-            }
-
-            return data_get(item.config, 'prevent_hiding') !== true;
         },
 
         isHideable(item) {

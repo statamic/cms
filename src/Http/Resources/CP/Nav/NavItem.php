@@ -20,7 +20,6 @@ class NavItem extends JsonResource
             'icon' => $this->resource->icon(),
             'manipulations' => $this->resource->manipulations(),
             'children' => $children ?? [],
-            'prevent_hiding' => $this->resource->shouldPreventHiding(),
         ];
     }
 }
