@@ -22,7 +22,7 @@ export default {
     },
 
     mounted() {
-        const pickr = new Pickr ({
+        const pickr = new Pickr({
             el: this.$el,
             disabled: this.isReadOnly,
             lockOpacity: this.config.lock_opacity,
@@ -65,6 +65,7 @@ export default {
                 // Color was manually cleared
                 this.update(null);
             }
+            pickr.hide();
         });
     }
 
