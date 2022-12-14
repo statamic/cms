@@ -42,12 +42,12 @@ export default {
     props: {
         creating: false,
         sectionItem: {},
-        saveKeyBinding: null,
     },
 
     data() {
         return {
             section: data_get(this.sectionItem, 'text') || '',
+            saveKeyBinding: null,
         }
     },
 
