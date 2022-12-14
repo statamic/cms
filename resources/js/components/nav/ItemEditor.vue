@@ -17,7 +17,7 @@
 
                 <div class="publish-field mb-4">
                     <p class="text-sm font-medium mb-1" v-text="__('Display')" />
-                    <text-input v-model="config.display" focus="true" />
+                    <text-input v-model="config.display" :focus="true" />
                 </div>
 
                 <div class="publish-field mb-4">
