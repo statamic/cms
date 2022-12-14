@@ -40,7 +40,7 @@
                 <svg-icon v-else-if="isPinnedAlias" class="inline-block w-4 h-4 text-grey-50" name="pin" v-tooltip="__('Pinned Item')" />
                 <svg-icon v-else-if="isAlias" class="inline-block w-4 h-4 text-grey-50" name="duplicate-ids" v-tooltip="__('Alias Item')" />
                 <svg-icon v-else-if="isModified" class="inline-block w-4 h-4 text-grey-50" name="content-writing" v-tooltip="__('Modified Item')" />
-                <svg-icon v-else-if="isNew" class="inline-block w-4 h-4 text-grey-50" name="add-circle" v-tooltip="__('New Item')" />
+                <svg-icon v-else-if="isCustom" class="inline-block w-4 text-grey-50" name="user-edit" v-tooltip="__('Custom Item')" />
 
                 <dropdown-list class="ml-2">
                     <slot name="branch-options"
@@ -116,7 +116,7 @@ export default {
             return data_get(this.item, 'manipulations.action') === '@modify';
         },
 
-        isNew() {
+        isCustom() {
             return data_get(this.item, 'manipulations.action') === '@create';
         },
 
