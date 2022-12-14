@@ -56,7 +56,7 @@ jobs:
               if (!pullRequest.maintainerCanModify) {
                 console.log('PR not owned by statamic and does not have maintainer edits enabled');
 
-                await github.issues.createComment({
+                await github.rest.issues.createComment({
                   issue_number: pullNumber,
                   owner: 'statamic',
                   repo,
