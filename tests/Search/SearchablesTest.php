@@ -454,7 +454,7 @@ class ArrayTestTransformer
     {
         return [
             $field => $value,
-            $field.'_upper' => strtoupper($value)
+            $field.'_upper' => strtoupper($value),
         ];
     }
 }
