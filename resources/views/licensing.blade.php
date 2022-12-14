@@ -40,8 +40,8 @@
 
         @if ($site->key() && $site->usesIncorrectKeyFormat())
             <div class="text-xs border border-yellow-dark rounded p-2 bg-yellow {{ $configCached ? 'mt-4' : '' }}">
-                <div class="font-bold mb-1">{{ __('Site key uses incorrect format') }}</div>
-                <p>{!! __('statamic::messages.licensing_incorrect_key_format') !!}</p>
+                <div class="font-bold mb-1">{{ __('statamic::messages.licensing_incorrect_key_format_heading') }}</div>
+                <p>{!! __('statamic::messages.licensing_incorrect_key_format_body') !!}</p>
            </div>
         @endif
 
