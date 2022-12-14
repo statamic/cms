@@ -11,7 +11,7 @@ class SiteLicense extends License
         return config('statamic.system.license_key');
     }
 
-    public function usesLegacyKey()
+    public function usesIncorrectKeyFormat()
     {
         return ! preg_match('/^[a-zA-Z0-9]{16}$/', $this->key());
     }

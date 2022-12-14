@@ -38,7 +38,7 @@
            </div>
         @endif
 
-        @if ($site->usesLegacyKey())
+        @if ($site->key() && $site->usesIncorrectKeyFormat())
             <div class="text-xs border border-yellow-dark rounded p-2 bg-yellow {{ $configCached ? 'mt-4' : '' }}">
                 <div class="font-bold mb-1">{{ __('Site key uses incorrect format') }}</div>
                 <p>{!! __('statamic::messages.licensing_incorrect_key_format') !!}</p>

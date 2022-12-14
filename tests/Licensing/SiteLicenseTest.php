@@ -27,7 +27,7 @@ class SiteLicenseTest extends TestCase
     {
         config(['statamic.system.license_key' => 'test-key']);
 
-        $this->assertTrue($this->license()->usesLegacyKey());
+        $this->assertTrue($this->license()->usesIncorrectKeyFormat());
     }
 
     /** @test */
@@ -35,7 +35,7 @@ class SiteLicenseTest extends TestCase
     {
         config(['statamic.system.license_key' => 'aRadLicenseKey42']);
 
-        $this->assertFalse($this->license()->usesLegacyKey());
+        $this->assertFalse($this->license()->usesIncorrectKeyFormat());
     }
 
     /** @test */
