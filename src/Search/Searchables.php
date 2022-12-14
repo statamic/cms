@@ -3,6 +3,7 @@
 namespace Statamic\Search;
 
 use Closure;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Auth\User as UserContract;
@@ -167,31 +168,26 @@ class Searchables
 
             return [$field => $value];
         })->flatMap(function ($value, $field) use ($transformers) {
-            if (! isset($transformers[$field])) {
+            if (! $transformer = $transformers[$field] ?? null) {
                 return [$field => $value];
             }
 
-            if (! $transformers[$field] instanceof Closure) {
-                if (! class_exists($transformers[$field])) {
-                    throw new \LogicException("Search transformer [{$transformers[$field]}] not found.");
-                }
+            $value = $this->transformValue($transformer, $field, $value);
 
-                $transformedValue = app()->make($transformers[$field])->handle($field, $value);
-
-                if (is_array($transformedValue)) {
-                    return $transformedValue;
-                }
-
-                return [$field => $transformedValue];
-            }
-
-            $transformedValue = $transformers[$field]($value);
-
-            if (is_array($transformedValue)) {
-                return $transformedValue;
-            }
-
-            return [$field => $transformedValue];
+            return is_array($value) ? $value : [$field => $value];
         })->all();
+    }
+
+    private function transformValue($transformer, $field, $value)
+    {
+        if ($transformer instanceof Closure) {
+            return $transformer($value);
+        }
+
+        try {
+            return app($transformer)->handle($value, $field);
+        } catch (BindingResolutionException $e) {
+            throw new \LogicException("Search transformer [{$transformer}] not found.");
+        }
     }
 }

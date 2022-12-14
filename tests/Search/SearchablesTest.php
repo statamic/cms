@@ -327,7 +327,7 @@ class SearchablesTest extends TestCase
                 'title',
             ],
             'transformers' => [
-                'title' => SearchTransformerTest::class,
+                'title' => BasicTestTransformer::class,
             ],
         ]);
 
@@ -369,7 +369,7 @@ class SearchablesTest extends TestCase
     }
 
     /** @test */
-    public function if_a_transformer_returns_an_array_it_gets_combined_into_the_results()
+    public function if_a_closure_based_transformer_returns_an_array_it_gets_combined_into_the_results()
     {
         config()->set('statamic.search.indexes.default', [
             'fields' => [
@@ -382,6 +382,32 @@ class SearchablesTest extends TestCase
                         'title_upper' => strtoupper($value),
                     ];
                 },
+            ],
+        ]);
+
+        $index = app(\Statamic\Search\Comb\Index::class, [
+            'name' => 'default',
+            'config' => config('statamic.search.indexes.default'),
+        ]);
+
+        $searchable = EntryFactory::collection('test')->data(['title' => 'Hello'])->make();
+        $searchables = new Searchables($index);
+
+        $this->assertEquals([
+            'title' => 'Hello',
+            'title_upper' => 'HELLO',
+        ], $searchables->fields($searchable));
+    }
+
+    /** @test */
+    public function if_a_class_based_transformer_returns_an_array_it_gets_combined_into_the_results()
+    {
+        config()->set('statamic.search.indexes.default', [
+            'fields' => [
+                'title',
+            ],
+            'transformers' => [
+                'title' => ArrayTestTransformer::class,
             ],
         ]);
 
@@ -414,10 +440,21 @@ class NotSearchable
     //
 }
 
-class SearchTransformerTest
+class BasicTestTransformer
 {
-    public function handle($field, $value)
+    public function handle($value)
     {
         return strtoupper($value);
+    }
+}
+
+class ArrayTestTransformer
+{
+    public function handle($value, $field)
+    {
+        return [
+            $field => $value,
+            $field.'_upper' => strtoupper($value)
+        ];
     }
 }
