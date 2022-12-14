@@ -103,17 +103,15 @@ class Nav
     }
 
     /**
-     * Include hidden items for when customizing nav.
+     * Set `withHidden` flag to include hidden items for when customizing nav.
      *
      * @return $this
      */
     public function withHidden()
     {
-        $clone = clone $this;
+        $this->withHidden = true;
 
-        $clone->withHidden = true;
-
-        return $clone;
+        return $this;
     }
 
     /**
@@ -176,7 +174,17 @@ class Nav
             ->map(fn ($item) => $this->cloneNavItem($item))
             ->all();
 
+        $this->resetFlags();
+
         return $clone;
+    }
+
+    /**
+     * Reset flags for future builds.
+     */
+    public function resetFlags()
+    {
+        $this->withHidden = false;
     }
 
     /**
@@ -844,7 +852,7 @@ class Nav
 
         // Order sections...
         if ($this->sectionsOrder) {
-            return $built->sortBy(fn ($items, $section) => $this->sectionsOrder[$section])->values();
+            $built = $built->sortBy(fn ($items, $section) => $this->sectionsOrder[$section]);
         }
 
         return $built->values();
