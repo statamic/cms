@@ -115,11 +115,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Queue name
+    | Warm Queue
     |--------------------------------------------------------------------------
     |
-    | Here you may define what queue should be used when adding warm requests.
+    | Here you may define the name of the queue that requests will be pushed
+    | onto when warming the static cache using the static:warm command.
     |
     */
-    'warm_queue_name' => 'default',
+
+    'warm_queue' => 'default',
+
 ];

@@ -85,11 +85,11 @@ class StaticWarm extends Command
         $this->output->newLine();
 
         if ($this->shouldQueue) {
-            $staticWarmQueue = config('statamic.static_caching.warm_queue_name', 'default');
-            $this->line('Adding '.count($requests).' requests on queue "'.$staticWarmQueue.'"...');
+            $queue = config('statamic.static_caching.warm_queue', 'default');
+            $this->line('Adding '.count($requests).' requests on queue "'.$queue.'"...');
 
             foreach ($requests as $request) {
-                StaticWarmJob::dispatch($request)->onQueue($staticWarmQueue);
+                StaticWarmJob::dispatch($request)->onQueue($queue);
             }
         } else {
             $this->line('Visiting '.count($requests).' URLs...');
