@@ -836,8 +836,8 @@ class Nav
         $built->transform(function ($items, $section) use ($manipulations) {
             return [
                 'display' => $section,
-                'display_original' => Arr::get($manipulations, "{$section}.display_original", $section),
-                'action' => Arr::get($manipulations, "{$section}.action", false),
+                'display_original' => Arr::get($manipulations, "{$section}.display_original") ?? $section,
+                'action' => Arr::get($manipulations, "{$section}.action") ?? false,
                 'items' => $items,
             ];
         });
