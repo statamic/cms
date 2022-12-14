@@ -227,8 +227,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::group(['prefix' => 'preferences', 'as' => 'preferences.', 'namespace' => 'Preferences'], function () {
-        Route::post('js-api-helper', 'PreferenceController@store')->name('store');
-        Route::delete('js-api-helper/{key}', 'PreferenceController@destroy')->name('destroy');
+        Route::post('js', 'PreferenceController@store')->name('store');
+        Route::delete('js/{key}', 'PreferenceController@destroy')->name('destroy');
 
         Route::group(['prefix' => 'nav', 'as' => 'nav.', 'namespace' => 'Nav'], function () {
             Route::get('/', 'NavController@index')->name('index');

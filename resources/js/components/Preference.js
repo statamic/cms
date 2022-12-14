@@ -3,7 +3,7 @@ import Vue from 'vue';
 class Preference {
     constructor(instance) {
         this.instance = instance;
-        this.url = cp_url('preferences');
+        this.url = cp_url('preferences/js');
     }
 
     all() {
