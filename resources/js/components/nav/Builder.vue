@@ -541,7 +541,7 @@ export default {
                 tree.push({
                     'display': section.text,
                     'display_original': section.config.display_original || section.text,
-                    'action': section.action,
+                    'action': section.manipulations.action || false,
                     'items': this.prepareItemsForSubmission(section.children),
                 });
             });

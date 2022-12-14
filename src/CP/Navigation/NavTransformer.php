@@ -95,7 +95,7 @@ class NavTransformer
     {
         $transformed = [];
 
-        $transformed['action'] = $section['action'] ?? '@inherit';
+        $transformed['action'] = $section['action'] ?: '@inherit';
 
         if ($section['display'] !== $section['display_original']) {
             $transformed['display'] = $section['display'];
