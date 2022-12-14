@@ -172,17 +172,17 @@ class Searchables
             }
 
             if (! $transformers[$field] instanceof Closure) {
-                if (class_exists($transformers[$field])) {
-                    $transformedValue = app()->make($transformers[$field])->handle($field, $value);
-
-                    if (is_array($transformedValue)) {
-                        return $transformedValue;
-                    }
-
-                    return [$field => $transformedValue];
+                if (! class_exists($transformers[$field])) {
+                    throw new \LogicException("Search transformer [{$transformers[$field]}] not found.");
                 }
 
-                return [$field => $value];
+                $transformedValue = app()->make($transformers[$field])->handle($field, $value);
+
+                if (is_array($transformedValue)) {
+                    return $transformedValue;
+                }
+
+                return [$field => $transformedValue];
             }
 
             $transformedValue = $transformers[$field]($value);
