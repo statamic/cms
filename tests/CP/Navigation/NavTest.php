@@ -40,7 +40,7 @@ class NavTest extends TestCase
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
-        $nav = Nav::build();
+        $nav = $this->build();
 
         $this->assertEquals($expected->keys(), $nav->keys());
         $this->assertEquals($expected->get('Content'), $nav->get('Content')->map->display()->all());
@@ -58,7 +58,7 @@ class NavTest extends TestCase
             ->route('wordpress-importer.index')
             ->can('view updates');
 
-        $item = Nav::build()->get('Utilities')->last();
+        $item = $this->build()->get('Utilities')->last();
 
         $this->assertEquals('utilities::wordpress_importer', $item->id());
         $this->assertEquals('Utilities', $item->section());
@@ -79,7 +79,7 @@ class NavTest extends TestCase
             ->section('Droids')
             ->url('/r2');
 
-        $item = Nav::build()->get('Droids')->first();
+        $item = $this->build()->get('Droids')->first();
 
         $this->assertEquals('Droids', $item->section());
         $this->assertEquals('R2-D2', $item->display());
@@ -99,7 +99,7 @@ class NavTest extends TestCase
             ->can('index', 'DroidsClass')
             ->attributes(['target' => '_blank', 'class' => 'red']);
 
-        $item = Nav::build()->get('Droids')->first();
+        $item = $this->build()->get('Droids')->first();
 
         $this->assertEquals('some::custom::id', $item->id());
         $this->assertEquals('Droids', $item->section());
@@ -121,7 +121,7 @@ class NavTest extends TestCase
 
         Nav::utilities('Test')->icon('test');
 
-        $item = Nav::build()->get('Utilities')->last();
+        $item = $this->build()->get('Utilities')->last();
 
         $this->assertEquals('the totally real svg', $item->icon());
 
@@ -136,7 +136,7 @@ class NavTest extends TestCase
         Nav::utilities('Test')
             ->icon('<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>');
 
-        $item = Nav::build()->get('Utilities')->last();
+        $item = $this->build()->get('Utilities')->last();
 
         $this->assertEquals('<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>', $item->icon());
     }
@@ -153,7 +153,7 @@ class NavTest extends TestCase
         Nav::droids('WAC-47')
             ->url('/d-squad');
 
-        $item = Nav::build()->get('Droids')->first();
+        $item = $this->build()->get('Droids')->first();
 
         $this->assertEquals('Droids', $item->section());
         $this->assertEquals('WAC-47', $item->display());
@@ -169,14 +169,14 @@ class NavTest extends TestCase
 
         Nav::theEmpire('Death Star');
 
-        $item = Nav::build()->get('The Empire')->first();
+        $item = $this->build()->get('The Empire')->first();
 
-        $this->assertEquals('Death Star', Nav::build()->get('The Empire')->first()->display());
+        $this->assertEquals('Death Star', $this->build()->get('The Empire')->first()->display());
 
         Nav::theEmpire('Death Star')
             ->can('view death star');
 
-        $this->assertNull(Nav::build()->get('The Empire'));
+        $this->assertNull($this->build()->get('The Empire'));
     }
 
     /** @test */
@@ -192,7 +192,7 @@ class NavTest extends TestCase
                 'HK-47' => '/hk-47', // If only specifying display name and URL, can pass key/value pair as well.
             ]);
 
-        $item = Nav::build()->get('Droids')->first();
+        $item = $this->build()->get('Droids')->first();
 
         $this->assertEquals('Battle Droids', $item->display());
         $this->assertEquals('B1', $item->children()->get(0)->display());
@@ -219,7 +219,7 @@ class NavTest extends TestCase
                 'HK-47' => '/hk-47', // If only specifying name and URL, can pass key/value pair as well.
             ]);
 
-        $item = Nav::build()->get('Droids')->first();
+        $item = $this->build()->get('Droids')->first();
 
         $this->assertEquals('<svg>droid</svg>', $item->icon());
         $this->assertEquals('<svg>droid</svg>', $item->children()->get(0)->icon());
@@ -249,8 +249,8 @@ class NavTest extends TestCase
                 Nav::item('Sith')->url('/b2')->can('view sith logs'),
             ]);
 
-        $diaries = Nav::build()->get('Custom')->first();
-        $logs = Nav::build()->get('Custom')->last();
+        $diaries = $this->build()->get('Custom')->first();
+        $logs = $this->build()->get('Custom')->last();
 
         $this->assertCount(1, $diaries->children());
         $this->assertEquals('Sith', $diaries->children()->get(0)->display());
@@ -281,7 +281,7 @@ class NavTest extends TestCase
         $this->assertEquals('Security Droids', $item->display());
         $this->assertTrue(is_callable($item->children()));
 
-        $item = Nav::build()->get('Droids')->first();
+        $item = $this->build()->get('Droids')->first();
 
         $this->assertEquals('Security Droids', $item->display());
         $this->assertFalse(is_callable($item->children()));
@@ -330,11 +330,11 @@ class NavTest extends TestCase
             ->url('/x-wing')
             ->icon('x-wing');
 
-        $this->assertCount(2, Nav::build()->get('Ships'));
+        $this->assertCount(2, $this->build()->get('Ships'));
 
         Nav::remove('Ships');
 
-        $this->assertNull(Nav::build()->get('Ships'));
+        $this->assertNull($this->build()->get('Ships'));
     }
 
     /** @test */
@@ -350,11 +350,11 @@ class NavTest extends TestCase
             ->url('/a-wing')
             ->icon('a-wing');
 
-        $this->assertCount(2, Nav::build()->get('Ships'));
+        $this->assertCount(2, $this->build()->get('Ships'));
 
         Nav::remove('Ships', 'Y-Wing');
 
-        $this->assertCount(1, $ships = Nav::build()->get('Ships'));
+        $this->assertCount(1, $ships = $this->build()->get('Ships'));
         $this->assertEquals('A-Wing', $ships->first()->display());
     }
 
@@ -369,10 +369,10 @@ class NavTest extends TestCase
 
         $this->assertEmpty(Nav::items());
 
-        $nav = Nav::build();
+        $nav = $this->build();
 
         $this->assertNotEmpty(Nav::items());
-        $this->assertContains('Yoda', Nav::build()->get('Jedi')->map->display());
+        $this->assertContains('Yoda', $this->build()->get('Jedi')->map->display());
     }
 
     /** @test */
@@ -382,13 +382,13 @@ class NavTest extends TestCase
 
         $nav = Nav::build();
 
-        $this->assertContains('Collections', Nav::build()->get('Content')->map->display());
+        $this->assertContains('Collections', $this->build()->get('Content')->map->display());
 
         Nav::extend(function ($nav) {
             $nav->remove('Content', 'Collections');
         });
 
-        $this->assertNotContains('Collections', Nav::build()->get('Content')->map->display());
+        $this->assertNotContains('Collections', $this->build()->get('Content')->map->display());
     }
 
     /** @test */
@@ -463,7 +463,7 @@ class NavTest extends TestCase
 
         Nav::testSection('Hidden Item')->hidden(true);
 
-        $this->assertNull(Nav::build()->get('Test Section'));
+        $this->assertNull($this->build()->get('Test Section'));
     }
 
     /** @test */
@@ -473,7 +473,7 @@ class NavTest extends TestCase
 
         Nav::testSection('Hidden Item')->hidden(true);
 
-        $items = Nav::withHidden()->build()->get('Test Section');
+        $items = Nav::withHidden()->build()->pluck('items', 'display')->get('Test Section');
 
         $this->assertCount(1, $items);
         $this->assertEquals('Hidden Item', $items->first()->display());
@@ -488,10 +488,10 @@ class NavTest extends TestCase
         Nav::testSection('Hidden Item')->hidden(true);
 
         // Calling `withHidden()` should clone the instance, so that we don't update the singleton bound to the facade
-        $this->assertCount(1, Nav::withHidden()->build()->get('Test Section'));
+        $this->assertCount(1, Nav::withHidden()->build()->pluck('items', 'display')->get('Test Section'));
 
         // Which means this should hide the hidden item again
-        $this->assertNull(Nav::build()->get('Test Section'));
+        $this->assertNull($this->build()->get('Test Section'));
     }
 
     /** @test */
@@ -522,7 +522,7 @@ class NavTest extends TestCase
 
         Nav::droids('C-3PO')->name('NOT 3PO');
 
-        $item = Nav::build()->get('Droids')->first();
+        $item = $this->build()->get('Droids')->first();
 
         $this->assertEquals('NOT 3PO', $item->name());
     }
@@ -542,6 +542,11 @@ class NavTest extends TestCase
         Nav::build();
 
         $this->assertNotEmpty(Nav::items());
-        $this->assertCount(1, Nav::build()->get('Jedi')->map->display());
+        $this->assertCount(1, $this->build()->get('Jedi')->map->display());
+    }
+
+    protected function build()
+    {
+        return Nav::build()->pluck('items', 'display');
     }
 }

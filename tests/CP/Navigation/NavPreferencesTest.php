@@ -1236,7 +1236,7 @@ class NavPreferencesTest extends TestCase
             $preBuild();
         }
 
-        return Facades\CP\Nav::build($preferences);
+        return Facades\CP\Nav::build($preferences)->pluck('items', 'display');
     }
 
     private function buildDefaultNav()
