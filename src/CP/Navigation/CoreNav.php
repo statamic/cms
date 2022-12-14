@@ -35,8 +35,7 @@ class CoreNav
             ->makeContentSection()
             ->makeFieldsSection()
             ->makeToolsSection()
-            ->makeUsersSection()
-            ->makePreferencesSection();
+            ->makeUsersSection();
     }
 
     /**
@@ -255,20 +254,6 @@ class CoreNav
                         ->url($role->editUrl());
                 });
             });
-
-        return $this;
-    }
-
-    /**
-     * Make users section items.
-     *
-     * @return $this
-     */
-    protected function makePreferencesSection()
-    {
-        Nav::preferences('CP Nav')
-            ->route(Statamic::pro() && User::current()->isSuper() ? 'preferences.nav.index' : 'preferences.nav.user.edit')
-            ->icon('nav-preferences');
 
         return $this;
     }
