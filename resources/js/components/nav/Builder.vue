@@ -478,7 +478,18 @@ export default {
         },
 
         itemDoesntPreventHiding(item) {
-            return item.config.prevent_hiding !== true;
+            if (item.children && item.children.length) {
+                return _.chain(item.children)
+                    .filter(child => {
+                        return child.children && child.children.length
+                            ? ! this.itemDoesntPreventHiding(child)
+                            : data_get(child.config, 'prevent_hiding') === true;
+                    })
+                    .value()
+                    .length === 0;
+            }
+
+            return data_get(item.config, 'prevent_hiding') !== true;
         },
 
         isHideable(item) {
