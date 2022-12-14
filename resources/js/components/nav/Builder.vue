@@ -514,8 +514,6 @@ export default {
             }
 
             this.saveAs(this.updateUrl);
-
-            this.changed = false;
         },
 
         saveAs(url) {
@@ -523,7 +521,7 @@ export default {
 
             this.$axios
                 .patch(url, {tree})
-                .then(() => this.$toast.success(__('Saved')))
+                .then(() => location.reload())
                 .catch(() => this.$toast.error(__('Something went wrong')));
         },
 

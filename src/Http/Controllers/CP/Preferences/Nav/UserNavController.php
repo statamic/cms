@@ -30,6 +30,8 @@ class UserNavController extends Controller
 
         User::current()->setPreference('nav', $nav)->save();
 
+        $this->success(__('Saved'));
+
         return true;
     }
 

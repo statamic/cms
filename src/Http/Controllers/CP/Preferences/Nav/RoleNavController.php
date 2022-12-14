@@ -56,6 +56,8 @@ class RoleNavController extends Controller
 
         $role->setPreference('nav', $nav)->save();
 
+        $this->success(__('Saved'));
+
         return true;
     }
 

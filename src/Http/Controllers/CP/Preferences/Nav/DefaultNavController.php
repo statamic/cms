@@ -47,6 +47,8 @@ class DefaultNavController extends Controller
 
         Preference::default()->set('nav', $nav)->save();
 
+        $this->success(__('Saved'));
+
         return true;
     }
 
