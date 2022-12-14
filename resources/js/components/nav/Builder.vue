@@ -277,12 +277,12 @@ export default {
             let topLevelConfig = navConfig.shift();
 
             this.topLevelTreeData = _.chain(topLevelConfig.items)
-                .map((section) => this.normalizeNavConfig(section, false))
+                .map(section => this.normalizeNavConfig(section, false))
                 .values()
                 .value();
 
             this.mainTreeData = _.chain(navConfig)
-                .mapObject((section) => this.normalizeNavConfig(section))
+                .mapObject(section => this.normalizeNavConfig(section))
                 .values()
                 .value();
         },
@@ -305,7 +305,7 @@ export default {
                 item.children = config.items.map(childItem => {
                     return {
                         text: childItem.display,
-                        children: childItem.children.map(childChildItem => this.normalizeNavConfig(childChildItem)),
+                        children: childItem.children.map(childChildItem => this.normalizeNavConfig(childChildItem, false)),
                         open: false,
                         config: childItem,
                         manipulations: childItem.manipulations || {},
@@ -474,7 +474,7 @@ export default {
         },
 
         itemIsVisible(item) {
-            return item.manipulations.action !== '@remove';
+            return data_get(item.manipulations, 'action') !== '@remove';
         },
 
         itemDoesntPreventHiding(item) {

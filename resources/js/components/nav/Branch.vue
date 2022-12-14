@@ -93,7 +93,7 @@ export default {
         },
 
         icon() {
-            return this.item.config.icon || 'entries';
+            return data_get(this.item.config, 'icon') || 'entries';
         },
 
         isAlreadySvg() {
