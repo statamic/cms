@@ -61,8 +61,8 @@ class NavTransformer
     public function transform()
     {
         $this->config['reorder'] = $this->itemsAreReordered(
-            $this->coreNav->pluck('display'),
-            collect($this->submitted)->pluck('display'),
+            $this->coreNav->pluck('display_original'),
+            collect($this->submitted)->pluck('display_original'),
             'sections'
         );
 
@@ -102,9 +102,9 @@ class NavTransformer
         }
 
         $transformed['reorder'] = $this->itemsAreReordered(
-            $this->coreNav->pluck('items', 'display')->get($section['display'], collect())->map->id(),
+            $this->coreNav->pluck('items', 'display_original')->get($section['display_original'], collect())->map->id(),
             collect($section['items'])->pluck('id'),
-            $this->transformSectionKey($section['display'])
+            $this->transformSectionKey($section['display_original'])
         );
 
         $transformed['items'] = collect($section['items'])
