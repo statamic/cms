@@ -76,14 +76,16 @@
                         <dropdown-item
                             :text="__('Duplicate')"
                             @click="aliasItem(item)" />
-                        <li class="divider"></li>
+                        <li
+                            v-if="itemDoesntPreventHiding(item)"
+                            class="divider" />
                         <dropdown-item
-                            v-if="itemIsVisible(item)"
+                            v-if="itemIsVisible(item) && itemDoesntPreventHiding(item)"
                             :text="isHideable(item) ? __('Hide') : __('Remove')"
                             class="warning"
                             @click="isHideable(item) ? hideItem(item) : removeItem(item, vm)" />
                         <dropdown-item
-                            v-else
+                            v-else-if="itemDoesntPreventHiding(item)"
                             :text="__('Show')"
                             @click="showItem(item)" />
                     </template>
@@ -127,14 +129,16 @@
                             v-if="! isSectionNode(item)"
                             :text="__('Duplicate')"
                             @click="aliasItem(item)" />
-                        <li class="divider"></li>
+                        <li
+                            v-if="itemDoesntPreventHiding(item)"
+                            class="divider" />
                         <dropdown-item
-                            v-if="itemIsVisible(item)"
+                            v-if="itemIsVisible(item) && itemDoesntPreventHiding(item)"
                             :text="isHideable(item) ? __('Hide') : __('Remove')"
                             class="warning"
                             @click="isHideable(item) ? hideItem(item) : removeItem(item)" />
                         <dropdown-item
-                            v-else
+                            v-else-if="itemDoesntPreventHiding(item)"
                             :text="__('Show')"
                             @click="showItem(item)" />
                     </template>
@@ -469,6 +473,10 @@ export default {
 
         itemIsVisible(item) {
             return item.manipulations.action !== '@remove';
+        },
+
+        itemDoesntPreventHiding(item) {
+            return item.config.prevent_hiding !== true;
         },
 
         isHideable(item) {

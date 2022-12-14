@@ -268,7 +268,8 @@ class CoreNav
     {
         Nav::preferences('CP Nav')
             ->route(Statamic::pro() && User::current()->isSuper() ? 'preferences.nav.index' : 'preferences.nav.user.edit')
-            ->icon('nav-preferences');
+            ->icon('nav-preferences')
+            ->preventHiding();
 
         return $this;
     }

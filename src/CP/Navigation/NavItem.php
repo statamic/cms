@@ -23,6 +23,7 @@ class NavItem
     protected $view;
     protected $order;
     protected $hidden;
+    protected $preventHiding;
     protected $manipulations;
 
     /**
@@ -320,7 +321,35 @@ class NavItem
      */
     public function isHidden()
     {
+        if ($this->preventHiding) {
+            return false;
+        }
+
         return $this->hidden();
+    }
+
+    /**
+     * Prevent users from hiding nav item in actual rendering of nav.
+     *
+     * For example, we now use this on 'Preferences > CP Nav' item so that the user can always access their nav preferences.
+     *
+     * @return $this
+     */
+    public function preventHiding()
+    {
+        $this->preventHiding = true;
+
+        return $this;
+    }
+
+    /**
+     * Check if GUI should prevent hiding of nav item.
+     *
+     * @return bool
+     */
+    public function shouldPreventHiding()
+    {
+        return (bool) $this->preventHiding;
     }
 
     /**
