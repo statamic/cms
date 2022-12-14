@@ -92,7 +92,6 @@
                 </tree-branch>
             </draggable-tree>
 
-
             <draggable-tree
                 draggable
                 cross-tree
@@ -103,6 +102,7 @@
                 :indent="24"
                 @change="changed = true"
                 @drag="mainTreeDragStart"
+                @drop="itemDropped"
             >
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
@@ -586,6 +586,18 @@ export default {
             return data_get(item, 'config.id')
                 ? item.config.id.replace('::clone', '')
                 : item.text.toLowerCase().replace(' ', '_');
+        },
+
+        getParentSectionNode(node) {
+            if (! this.isSectionNode(node)) {
+                return this.getParentSectionNode(node.parent);
+            }
+
+            return node;
+        },
+
+        itemDropped(node) {
+            this.getParentSectionNode(node).manipulations.action = false;
         },
 
     },
