@@ -23,11 +23,11 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_reorder_sections()
     {
-        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'Preferences'];
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users'];
 
         $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
 
-        $reorderedSections = ['Top Level', 'Users', 'Fields', 'Content', 'Tools', 'Preferences'];
+        $reorderedSections = ['Top Level', 'Users', 'Fields', 'Content', 'Tools'];
 
         // Recommended syntax...
         $this->assertEquals($reorderedSections, $this->buildNavWithPreferences([
@@ -246,11 +246,11 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_rename_sections()
     {
-        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'Preferences'];
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users'];
 
         $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
 
-        $renamedSections = ['Top Level', 'Data', 'Fields', 'Tools', 'Pals', 'Preferences'];
+        $renamedSections = ['Top Level', 'Data', 'Fields', 'Tools', 'Pals'];
 
         // Recommended syntax...
         $this->assertEquals($renamedSections, $this->buildNavWithPreferences([
@@ -1187,7 +1187,7 @@ class NavPreferencesTest extends TestCase
         ]);
 
         // Assert section order, with section rename from 'Content' to 'Site'
-        $this->assertEquals(['Top Level', 'Tools', 'Users', 'Site', 'Fields', 'Preferences'], $nav->keys()->all());
+        $this->assertEquals(['Top Level', 'Tools', 'Users', 'Site', 'Fields'], $nav->keys()->all());
 
         // Assert top level items, with aliased 'Pages' item
         $this->assertEquals([

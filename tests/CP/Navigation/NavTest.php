@@ -35,7 +35,6 @@ class NavTest extends TestCase
             'Fields' => ['Blueprints', 'Fieldsets'],
             'Tools' => ['Forms', 'Updates', 'Addons', 'Utilities', 'GraphQL'],
             'Users' => ['Users', 'Groups', 'Permissions'],
-            'Preferences' => ['Nav'],
         ]);
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
