@@ -17,7 +17,7 @@
 
                 <div class="publish-field mb-4">
                     <p class="text-sm font-medium mb-1" v-text="__('Display')" />
-                    <text-input v-model="config.display" />
+                    <text-input v-model="config.display" focus="true" />
                 </div>
 
                 <div class="publish-field mb-4">
@@ -60,7 +60,7 @@ export default {
     },
 
     created() {
-        this.saveKeyBinding = this.$keys.bindGlobal(['mod+enter', 'mod+s'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['enter', 'mod+enter', 'mod+s'], e => {
             e.preventDefault();
             this.save();
         });
