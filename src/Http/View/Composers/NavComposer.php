@@ -16,6 +16,6 @@ class NavComposer
 
     public function compose(View $view)
     {
-        $view->with('nav', self::$nav = self::$nav ?? Nav::build()->pluck('items', 'display'));
+        $view->with('nav', self::$nav = self::$nav ?? Nav::build());
     }
 }
