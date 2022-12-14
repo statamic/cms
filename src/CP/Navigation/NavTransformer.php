@@ -68,7 +68,7 @@ class NavTransformer
      */
     protected function transformSectionKey($sectionDisplay)
     {
-        return Str::snake($sectionDisplay);
+        return NavItem::snakeCase($sectionDisplay);
     }
 
     /**
