@@ -42,7 +42,8 @@ export default {
         action: String,
         method: { type: String, default: 'post' },
         canToggleLabels: { type: Boolean, default: true },
-        readOnly: { type: Boolean, default: false }
+        readOnly: { type: Boolean, default: false },
+        reloadOnSave: { type: Boolean, default: false },
     },
 
     data() {
@@ -68,9 +69,13 @@ export default {
             this.clearErrors();
 
             this.$axios[this.method](this.action, this.currentValues).then(response => {
+                this.$refs.container.saved();
+                if (this.reloadOnSave) {
+                    window.location.reload();
+                    return;
+                }
                 this.saving = false;
                 this.$toast.success(__('Saved'));
-                this.$refs.container.saved();
                 this.$emit('saved', response);
             }).catch(e => this.handleAxiosError(e));
         },
