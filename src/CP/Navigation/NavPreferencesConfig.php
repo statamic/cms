@@ -10,8 +10,20 @@ class NavPreferencesConfig implements ArrayAccess
 {
     protected $config;
 
+    const ALLOWED_NAV_SECTION_ACTIONS = [
+        '@create',   // create custom section
+        '@remove',   // hide section
+        '@inherit',  // inherit section without modification (used for reordering purposes only, when none of the above apply)
+    ];
+
+    const ALLOWED_NAV_SECTION_MODIFICATIONS = [
+        'display',   // change section display text
+        'items',     // modify section items
+        'reorder',   // reorder section items
+    ];
+
     const ALLOWED_NAV_ITEM_ACTIONS = [
-        '@create',   // create new item
+        '@create',   // create custom item
         '@remove',   // hide item (only works if item is in its original section)
         '@modify',   // modify item (only works if item is in its original section)
         '@alias',    // alias into another section (can also modify item)
@@ -20,11 +32,12 @@ class NavPreferencesConfig implements ArrayAccess
     ];
 
     const ALLOWED_NAV_ITEM_MODIFICATIONS = [
-        'display',
-        'url',
-        'route',
-        'icon',
-        'children',
+        'display',   // change item display text
+        'url',       // change item url
+        'route',     // change item route (does not currently support parameters)
+        'icon',      // change item icon
+        'children',  // modify item children
+        'reorder',   // reorder item children
     ];
 
     /**
@@ -100,7 +113,11 @@ class NavPreferencesConfig implements ArrayAccess
 
         $normalized = collect();
 
-        $normalized->put('action', $sectionConfig->get('action', false));
+        $normalized->put('action', $sectionConfig->get('action'));
+
+        if (! in_array($normalized->get('action'), static::ALLOWED_NAV_SECTION_ACTIONS)) {
+            $normalized->put('action', false);
+        }
 
         $normalized->put('display', $sectionConfig->get('display', Str::modifyMultiple($sectionKey, ['deslugify', 'title'])));
 
@@ -120,7 +137,7 @@ class NavPreferencesConfig implements ArrayAccess
 
         $normalized->put('items', $items);
 
-        $allowedKeys = ['action', 'reorder', 'display', 'items'];
+        $allowedKeys = array_merge(['action'], static::ALLOWED_NAV_SECTION_MODIFICATIONS);
 
         return $normalized->only($allowedKeys)->all();
     }
