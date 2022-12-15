@@ -353,9 +353,8 @@ class NavTransformer
 
         $actualMinimum = max($reorderedMinimum, $modifiedMinimum);
 
-        return $keyValuePairs
+        return collect($items)
             ->take($actualMinimum)
-            ->pluck('value', 'key')
             ->all();
     }
 
