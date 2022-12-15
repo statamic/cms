@@ -614,8 +614,8 @@ export default {
 
         prepareItemIdForSubmission(item) {
             return data_get(item, 'config.id')
-                ? item.config.id.replace('::clone', '')
-                : item.text.toLowerCase().replace(' ', '_');
+                ? item.config.id.replaceAll('::clone', '')
+                : item.text.toLowerCase().replaceAll(' ', '_');
         },
 
     },
