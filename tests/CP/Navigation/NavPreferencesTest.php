@@ -490,6 +490,40 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_remove_sections()
+    {
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users'];
+
+        $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
+
+        $sectionsAfterRemoving = ['Top Level', 'Fields', 'Tools'];
+
+        // Recommended syntax...
+        $this->assertEquals($sectionsAfterRemoving, $this->buildNavWithPreferences([
+            'content' => '@remove',
+            'users' => '@remove',
+        ])->keys()->all());
+
+        // With nesting...
+        $this->assertEquals($sectionsAfterRemoving, $this->buildNavWithPreferences([
+            'sections' => [
+                'content' => '@remove',
+                'users' => '@remove',
+            ],
+        ])->keys()->all());
+
+        // With config array...
+        $this->assertEquals($sectionsAfterRemoving, $this->buildNavWithPreferences([
+            'content' => [
+                'action' => '@remove',
+            ],
+            'users' => [
+                'action' => '@remove',
+            ],
+        ])->keys()->all());
+    }
+
+    /** @test */
     public function it_can_remove_items_from_a_section()
     {
         $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'];
