@@ -3,12 +3,43 @@
 namespace Statamic\Http\Controllers\CP\Preferences;
 
 use Illuminate\Http\Request;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
 class PreferenceController extends CpController
 {
+    public function index()
+    {
+        return redirect()->route('statamic.cp.preferences.edit');
+    }
+
+    public function edit()
+    {
+        $blueprint = $this->blueprint();
+
+        $fields = $blueprint->fields()->addValues(Preference::all())->preProcess();
+
+        return view('statamic::preferences.edit', [
+            'blueprint' => $blueprint->toPublishArray(),
+            'values' => $fields->values(),
+            'meta' => $fields->meta(),
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        $fields = $this->blueprint()->fields()->addValues($request->all())->process();
+
+        User::current()->mergePreferences($fields->values()->all())->save();
+    }
+
+    private function blueprint()
+    {
+        return Blueprint::makeFromSections(Preference::sections());
+    }
+
     /**
      * Store a user preference.
      *

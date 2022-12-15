@@ -228,6 +228,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::group(['prefix' => 'preferences', 'as' => 'preferences.', 'namespace' => 'Preferences'], function () {
+        Route::get('/', 'PreferenceController@index')->name('index');
+        Route::get('edit', 'PreferenceController@edit')->name('edit');
+        Route::patch('/', 'PreferenceController@update')->name('update');
         Route::post('js', 'PreferenceController@store')->name('store');
         Route::delete('js/{key}', 'PreferenceController@destroy')->name('destroy');
 
