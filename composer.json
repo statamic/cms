@@ -28,7 +28,7 @@
         "statamic/stringy": "^3.1.2",
         "symfony/http-foundation": "^4.3.3 || ^5.1.4 || ^6.0",
         "symfony/lock": "^5.1",
-        "symfony/var-exporter": "^4.3 || ^5.1",
+        "symfony/var-exporter": "^4.3 || ^5.1 || ^6.0",
         "symfony/yaml": "^4.1 || ^5.1 || ^6.0",
         "ueberdosis/tiptap-php": "^1.1",
         "voku/portable-ascii": "^1.6.1 || ^2.0",
