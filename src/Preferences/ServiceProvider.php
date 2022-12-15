@@ -2,9 +2,9 @@
 
 namespace Statamic\Preferences;
 
+use Facades\Statamic\Preferences\CorePreferences;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Facades\Preference;
-use Facades\Statamic\Preferences\CorePreferences;
 
 class ServiceProvider extends LaravelServiceProvider
 {
