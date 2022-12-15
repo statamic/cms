@@ -1,14 +1,21 @@
 @extends('statamic::layout')
-@section('title', __('Preferences'))
+@section('title', $title)
 
 @section('content')
 
+    @if($showBreadcrumb)
+        @include('statamic::partials.breadcrumb', [
+            'url' => cp_route('preferences.index'),
+            'title' => __('Preferences'),
+        ])
+    @endif
+
     <publish-form
-        :title="__('Preferences')"
+        title="{{ $title }}"
         :blueprint='@json($blueprint)'
         :meta='@json($meta)'
         :values='@json($values)'
-        action="/cp/preferences"
+        action="{{ $actionUrl }}"
         method="patch"
         reload-on-save
     ></publish-form>

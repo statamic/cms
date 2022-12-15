@@ -3,51 +3,20 @@
 namespace Statamic\Http\Controllers\CP\Preferences;
 
 use Illuminate\Http\Request;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Statamic;
 
 class PreferenceController extends CpController
 {
     public function index()
     {
-        return redirect()->route('statamic.cp.preferences.edit');
-    }
+        if (! Statamic::pro() || User::current()->cannot('manage preferences')) {
+            return redirect()->route('statamic.cp.preferences.user.edit');
+        }
 
-    public function edit()
-    {
-        $blueprint = $this->blueprint();
-
-        $fields = $blueprint->fields()->addValues(Preference::all())->preProcess();
-
-        return view('statamic::preferences.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-        ]);
-    }
-
-    public function update(Request $request)
-    {
-        $fields = $this->blueprint()->fields()->addValues($request->all())->process();
-
-        $user = User::current();
-
-        $fields->all()->each(function ($field) use ($user) {
-            if ($field->value() === $field->defaultValue()) {
-                $user->removePreference($field->handle());
-            } else {
-                $user->setPreference($field->handle(), $field->value());
-            }
-        });
-
-        $user->save();
-    }
-
-    private function blueprint()
-    {
-        return Blueprint::makeFromSections(Preference::sections());
+        return view('statamic::preferences.index');
     }
 
     /**

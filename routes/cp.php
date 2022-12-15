@@ -229,8 +229,16 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::group(['prefix' => 'preferences', 'as' => 'preferences.', 'namespace' => 'Preferences'], function () {
         Route::get('/', 'PreferenceController@index')->name('index');
-        Route::get('edit', 'PreferenceController@edit')->name('edit');
-        Route::patch('/', 'PreferenceController@update')->name('update');
+        Route::get('edit', 'UserPreferenceController@edit')->name('user.edit');
+        Route::patch('/', 'UserPreferenceController@update')->name('user.update');
+
+        Route::middleware([RequireStatamicPro::class, 'can:manage preferences'])->group(function () {
+            Route::get('roles/{role}/edit', 'RolePreferenceController@edit')->name('role.edit');
+            Route::patch('roles/{role}', 'RolePreferenceController@update')->name('role.update');
+            Route::get('default/edit', 'DefaultPreferenceController@edit')->name('default.edit');
+            Route::patch('default', 'DefaultPreferenceController@update')->name('default.update');
+        });
+
         Route::post('js', 'PreferenceController@store')->name('store');
         Route::delete('js/{key}', 'PreferenceController@destroy')->name('destroy');
 
