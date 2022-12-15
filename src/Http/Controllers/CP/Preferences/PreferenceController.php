@@ -32,7 +32,17 @@ class PreferenceController extends CpController
     {
         $fields = $this->blueprint()->fields()->addValues($request->all())->process();
 
-        User::current()->mergePreferences($fields->values()->all())->save();
+        $user = User::current();
+
+        $fields->all()->each(function ($field) use ($user) {
+            if ($field->value() === $field->defaultValue()) {
+                $user->removePreference($field->handle());
+            } else {
+                $user->setPreference($field->handle(), $field->value());
+            }
+        });
+
+        $user->save();
     }
 
     private function blueprint()
