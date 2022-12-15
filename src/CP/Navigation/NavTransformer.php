@@ -249,7 +249,7 @@ class NavTransformer
     {
         $action = Arr::get($section, 'action');
 
-        if ($action !== '@remove') {
+        if (! in_array($action, ['@create', '@remove'])) {
             Arr::forget($section, 'action');
         }
 
@@ -265,7 +265,7 @@ class NavTransformer
 
         $section['items'] = $this->rejectAllInherits($section['items']);
 
-        if (isset($section['display'])) {
+        if (isset($section['display']) || isset($section['action'])) {
             return collect($section)->filter()->all();
         }
 
