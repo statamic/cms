@@ -237,7 +237,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
             Route::patch('/', 'UserNavController@update')->name('user.update');
             Route::delete('/', 'UserNavController@destroy')->name('user.destroy');
 
-            Route::middleware([RequireStatamicPro::class, 'can:configure cp nav'])->group(function () {
+            Route::middleware([RequireStatamicPro::class, 'can:manage preferences'])->group(function () {
                 Route::get('roles/{role}/edit', 'RoleNavController@edit')->name('role.edit');
                 Route::patch('roles/{role}', 'RoleNavController@update')->name('role.update');
                 Route::delete('roles/{role}', 'RoleNavController@destroy')->name('role.destroy');
