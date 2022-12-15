@@ -247,7 +247,11 @@ class NavTransformer
      */
     protected function minifySection($section, $sectionKey)
     {
-        $action = Arr::pull($section, 'action');
+        $action = Arr::get($section, 'action');
+
+        if ($action !== '@remove') {
+            Arr::forget($section, 'action');
+        }
 
         $section['items'] = collect($section['items'])
             ->map(fn ($item) => $this->minifyItem($item))
