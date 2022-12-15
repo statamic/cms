@@ -117,6 +117,7 @@
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
                     :item="item"
+                    :parent-section="getParentSectionNode(item)"
                     :depth="vm.level"
                     :vm="vm"
                     :is-open="item.open"
@@ -371,6 +372,14 @@ export default {
             return node.isSection;
         },
 
+        getParentSectionNode(node) {
+            if (! this.isSectionNode(node)) {
+                return this.getParentSectionNode(node.parent);
+            }
+
+            return node;
+        },
+
         traverseTree(nodes, callback, parentPath = []) {
             const nodesArray = Array.isArray(nodes) ? nodes : [nodes];
 
@@ -595,14 +604,6 @@ export default {
             return data_get(item, 'config.id')
                 ? item.config.id.replace('::clone', '')
                 : item.text.toLowerCase().replace(' ', '_');
-        },
-
-        getParentSectionNode(node) {
-            if (! this.isSectionNode(node)) {
-                return this.getParentSectionNode(node.parent);
-            }
-
-            return node;
         },
 
     },

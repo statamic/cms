@@ -3,7 +3,7 @@
     <div class="flex">
         <div class="page-move w-6" />
         <div class="flex items-center flex-1 p-1 ml-1 text-xs leading-normal">
-            <div class="flex items-center flex-1" :class="{ 'opacity-50': isHidden }">
+            <div class="flex items-center flex-1" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
                 <template v-if="! isSection">
                     <i v-if="isAlreadySvg" class="flex items-center w-4 h-4 mr-1" v-html="icon"></i>
                     <svg-icon v-else class="w-4 h-4 mr-1" :name="icon" />
@@ -36,7 +36,7 @@
             <div class="pr-1 flex items-center">
                 <slot name="branch-icon" :branch="item" />
 
-                <svg-icon v-if="isHidden" class="inline-block w-4 h-4 text-grey-50" name="hidden" v-tooltip="__('Hidden Item')" />
+                <svg-icon v-if="isHidden" class="inline-block w-4 h-4 text-grey-50" name="hidden" v-tooltip="isSection ? __('Hidden Section') : __('Hidden Item')" />
                 <svg-icon v-else-if="isPinnedAlias" class="inline-block w-4 h-4 text-grey-50" name="pin" v-tooltip="__('Pinned Item')" />
                 <svg-icon v-else-if="isAlias" class="inline-block w-4 h-4 text-grey-50" name="duplicate-ids" v-tooltip="__('Alias Item')" />
                 <svg-icon v-else-if="isModified" class="inline-block w-4 h-4 text-grey-50" name="content-writing" v-tooltip="__('Modified Item')" />
@@ -63,6 +63,7 @@ export default {
 
     props: {
         item: Object,
+        parentSection: Object,
         depth: Number,
         root: Boolean,
         vm: Object,
@@ -102,6 +103,10 @@ export default {
 
         isHidden() {
             return data_get(this.item, 'manipulations.action') === '@remove';
+        },
+
+        isInHiddenSection() {
+            return data_get(this.parentSection, 'manipulations.action') === '@remove';
         },
 
         isPinnedAlias() {
