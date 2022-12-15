@@ -464,7 +464,13 @@ export default {
         },
 
         expandAll() {
-             this.traverseTree(this.mainTreeData, (node) => {
+            this.traverseTree(this.topLevelTreeData, (node) => {
+                if (! this.isSectionNode(node)) {
+                    this.$set(node, 'open', true);
+                }
+            });
+
+            this.traverseTree(this.mainTreeData, (node) => {
                 if (! this.isSectionNode(node)) {
                     this.$set(node, 'open', true);
                 }
@@ -472,6 +478,12 @@ export default {
         },
 
         collapseAll() {
+            this.traverseTree(this.topLevelTreeData, (node) => {
+                if (! this.isSectionNode(node)) {
+                    this.$set(node, 'open', false);
+                }
+            });
+
             this.traverseTree(this.mainTreeData, (node) => {
                 if (! this.isSectionNode(node)) {
                     this.$set(node, 'open', false);
