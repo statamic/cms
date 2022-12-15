@@ -369,11 +369,11 @@ export default {
         },
 
         isSectionNode(node) {
-            return node.isSection;
+            return data_get(node, 'isSection', false);
         },
 
         getParentSectionNode(node) {
-            if (! this.isSectionNode(node)) {
+            if (! this.isSectionNode(node) && node !== undefined) {
                 return this.getParentSectionNode(node.parent);
             }
 
