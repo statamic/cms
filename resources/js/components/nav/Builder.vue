@@ -306,7 +306,7 @@ export default {
             let item = {
                 text: config.display,
                 config: config,
-                manipulations: config.manipulations || {},
+                manipulations: isSectionNode ? config : config.manipulations || {},
                 isSection: isSectionNode,
             };
 
