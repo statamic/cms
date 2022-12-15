@@ -184,15 +184,24 @@
         />
 
         <confirmation-modal
-            v-if="confirmingReset === true"
+            v-if="confirmingReset"
             :title="__('Reset')"
             :bodyText="__('Are you sure you want to reset nav customizations?')"
             :buttonText="__('Reset')"
             :danger="true"
             @confirm="reset"
             @cancel="confirmingReset = false"
-        >
-        </confirmation-modal>
+        />
+
+        <confirmation-modal
+            v-if="confirmingRemoval"
+            :title="__('Remove')"
+            :bodyText="__('Are you sure you want to remove this section and all of its children?')"
+            :buttonText="__('Remove')"
+            :danger="true"
+            @confirm="removeItem(confirmingRemoval, true)"
+            @cancel="confirmingReset = false"
+        />
 
     </div>
 
@@ -253,6 +262,7 @@ export default {
             creatingSection: false,
             editingSection: false,
             confirmingReset: false,
+            confirmingRemoval: false,
         }
     },
 
@@ -372,6 +382,10 @@ export default {
             return data_get(node, 'isSection', false);
         },
 
+        isCustomSectionNode(node) {
+            return this.isSectionNode(node) && data_get(node, 'manipulations.action') === '@create';
+        },
+
         getParentSectionNode(node) {
             if (! this.isSectionNode(node) && node !== undefined) {
                 return this.getParentSectionNode(node.parent);
@@ -425,6 +439,7 @@ export default {
 
         sectionAdded(sectionDisplay) {
             let item = this.normalizeNavConfig({
+                action: '@create',
                 display: sectionDisplay,
                 display_original: false,
             });
@@ -525,13 +540,22 @@ export default {
         isHideable(item) {
             let action = data_get(item.manipulations, 'action');
 
+            if (this.isSectionNode(item) && action === '@create') {
+                return false;
+            }
+
             return ! ['@alias', '@move', '@create'].includes(action);
         },
 
-        removeItem(item) {
+        removeItem(item, bypassConfirmation = false) {
+            if (this.isCustomSectionNode(item) && item.children.length && ! bypassConfirmation) {
+                return this.confirmingRemoval = item;
+            }
+
             item._vm.store.deleteNode(item);
 
             this.changed = true;
+            this.confirmingRemoval = false;
         },
 
         hideItem(item) {
