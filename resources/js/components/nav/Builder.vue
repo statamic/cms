@@ -113,7 +113,6 @@
                 :indent="24"
                 @change="changed = true"
                 @drag="mainTreeDragStart"
-                @drop="itemDropped"
             >
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
@@ -604,10 +603,6 @@ export default {
             }
 
             return node;
-        },
-
-        itemDropped(node) {
-            this.getParentSectionNode(node).manipulations.action = false;
         },
 
     },
