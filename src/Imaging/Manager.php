@@ -3,6 +3,7 @@
 namespace Statamic\Imaging;
 
 use Statamic\Contracts\Imaging\ImageManipulator;
+use Statamic\Facades\Glide;
 use Statamic\Support\Arr;
 
 class Manager
@@ -54,7 +55,7 @@ class Manager
             $presets = array_merge($presets, $this->cpManipulationPresets());
         }
 
-        return \Statamic\Facades\Glide::normalizeParameters($presets);
+        return Glide::normalizeParameters($presets);
     }
 
     /**
