@@ -10,7 +10,7 @@ class NavController extends Controller
 {
     public function index()
     {
-        if (! Statamic::pro() || User::current()->cannot('configure cp nav')) {
+        if (! Statamic::pro() || User::current()->cannot('manage preferences')) {
             return redirect(cp_route('preferences.nav.user.edit'));
         }
 

@@ -12,8 +12,8 @@ return [
     'configure_fields_desc' => 'Ability to edit blueprints, fieldsets, and their fields.',
     'configure_addons' => 'Configure Addons',
     'configure_addons_desc' => 'Ability to access the addon area to install and uninstall addons.',
-    'configure_cp_nav' => 'Configure CP Nav',
-    'configure_cp_nav_desc' => 'Ability to customize the CP nav for other users.',
+    'manage_preferences' => 'Manage Preferences',
+    'manage_preferences_desc' => 'Ability to customize global and role-specific preferences.',
 
     'group_collections' => 'Collections',
     'configure_collections' => 'Configure Collections',
