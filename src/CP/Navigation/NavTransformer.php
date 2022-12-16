@@ -235,6 +235,14 @@ class NavTransformer
             $this->config = $this->rejectAllInherits($this->config['sections']);
         }
 
+        // If the config is completely null after minifying, ensure `@override` gets saved.
+        // For example, if we're transforming this config for a user's nav preferences,
+        // we don't want it falling back to role or default preferences, unless the
+        // user explicitly 'resets' their nav customizations in the JS builder.
+        if (is_null($this->config)) {
+            $this->config = '@override';
+        }
+
         return $this;
     }
 
