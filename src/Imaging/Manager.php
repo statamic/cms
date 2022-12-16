@@ -55,7 +55,7 @@ class Manager
             $presets = array_merge($presets, $this->cpManipulationPresets());
         }
 
-        return Glide::normalizeParameters($presets);
+        return $presets;
     }
 
     /**
@@ -109,6 +109,6 @@ class Manager
             Arr::forget($preset, 'fit');
         }
 
-        return $preset;
+        return Glide::normalizeParameters($preset);
     }
 }
