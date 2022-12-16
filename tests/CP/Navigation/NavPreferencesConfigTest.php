@@ -151,14 +151,14 @@ class NavPreferencesConfigTest extends TestCase
     {
         $nav = $this->normalize([
             'content' => [
-                'action' => '@remove',
+                'action' => '@hide',
             ],
             'fields' => [
                 'display' => 'Favourite Fields!',
             ],
         ]);
 
-        $this->assertEquals('@remove', Arr::get($nav, 'sections.content.action'));
+        $this->assertEquals('@hide', Arr::get($nav, 'sections.content.action'));
         $this->assertFalse(Arr::get($nav, 'sections.fields.action'));
     }
 
@@ -450,7 +450,7 @@ class NavPreferencesConfigTest extends TestCase
                 'reorder' => true,
                 'items' => [
                     'top_level::create' => '@create',
-                    'top_level::remove' => '@remove',
+                    'top_level::hide' => '@hide',
                     'top_level::modify' => '@modify',
                     'top_level::alias' => '@alias',
                     'top_level::inherit' => '@inherit',
@@ -461,7 +461,7 @@ class NavPreferencesConfigTest extends TestCase
                 'reorder' => true,
                 'items' => [
                     'top_level::create' => '@create',
-                    'top_level::remove' => '@remove', // if removing, put item/action in it's proper section
+                    'top_level::hide' => '@hide', // if hiding, put item/action in it's proper section
                     'top_level::modify' => '@modify', // if you're moving or aliasing into this section, modifying will work with those actions
                     'top_level::alias' => '@alias',
                     'top_level::inherit' => '@inherit', // if you're moving or aliasing into this section, reordering will work with those actions
@@ -472,7 +472,7 @@ class NavPreferencesConfigTest extends TestCase
 
         $expectedTopLevelItems = [
             'top_level::create',
-            'top_level::remove',
+            'top_level::hide',
             'top_level::modify',
             'top_level::alias',
             'top_level::inherit',
@@ -510,7 +510,7 @@ class NavPreferencesConfigTest extends TestCase
                 ],
             ],
             'fields' => [
-                'action' => '@remove',
+                'action' => '@hide',
             ],
         ]);
 
@@ -551,7 +551,7 @@ class NavPreferencesConfigTest extends TestCase
                     ],
                 ],
                 'fields' => [
-                    'action' => '@remove',
+                    'action' => '@hide',
                     'reorder' => false,
                     'display' => 'Fields',
                     'items' => [],

@@ -12,7 +12,7 @@ class NavPreferencesConfig implements ArrayAccess
 
     const ALLOWED_NAV_SECTION_ACTIONS = [
         '@create',   // create custom section
-        '@remove',   // hide section
+        '@hide',     // hide section
         '@inherit',  // inherit section without modification (used for reordering purposes only, when none of the above apply)
     ];
 
@@ -24,7 +24,7 @@ class NavPreferencesConfig implements ArrayAccess
 
     const ALLOWED_NAV_ITEM_ACTIONS = [
         '@create',   // create custom item
-        '@remove',   // hide item (only works if item is in its original section)
+        '@hide',     // hide item (only works if item is in its original section)
         '@modify',   // modify item (only works if item is in its original section)
         '@alias',    // alias into another section (can also modify item)
         '@move',     // move into another section (can also modify item)
@@ -181,7 +181,7 @@ class NavPreferencesConfig implements ArrayAccess
         if ($removeBadActions) {
             if ($isInOriginalSection && in_array($normalized->get('action'), ['@move'])) {
                 return null;
-            } elseif (! $isInOriginalSection && in_array($normalized->get('action'), ['@remove', '@modify', '@inherit'])) {
+            } elseif (! $isInOriginalSection && in_array($normalized->get('action'), ['@hide', '@modify', '@inherit'])) {
                 return null;
             }
         }

@@ -430,8 +430,8 @@ class Nav
         switch ($config['action']) {
             case '@create':
                 return $this->userCreateFromPendingItem($config, $section, $id);
-            case '@remove':
-                return $this->userRemoveItem($item);
+            case '@hide':
+                return $this->userHideItem($item);
             case '@modify':
                 return $this->userModifyItem($item, $config, $section);
             case '@alias':
@@ -654,11 +654,11 @@ class Nav
     }
 
     /**
-     * Remove NavItem.
+     * Hide NavItem.
      *
      * @param  NavItem  $item
      */
-    protected function userRemoveItem($item)
+    protected function userHideItem($item)
     {
         if (is_null($item)) {
             return;
@@ -666,9 +666,9 @@ class Nav
 
         $item->hidden(true);
 
-        $item->manipulations(['action' => '@remove']);
+        $item->manipulations(['action' => '@hide']);
 
-        $this->userRemoveItemFromChildren($item);
+        $this->userHideItemFromChildren($item);
     }
 
     /**
@@ -791,17 +791,17 @@ class Nav
 
         $item->hidden(true);
 
-        $this->userRemoveItemFromChildren($item);
+        $this->userHideItemFromChildren($item);
 
         return $clone;
     }
 
     /**
-     * Remove NavItem from parent's children.
+     * Hide NavItem from parent's children.
      *
      * @param  mixed  $item
      */
-    protected function userRemoveItemFromChildren($item)
+    protected function userHideItemFromChildren($item)
     {
         if ($parent = $this->findParentItem($item->id())) {
             $parent->resolveChildren()->children(
@@ -834,7 +834,7 @@ class Nav
 
         // Collect and order each section's items...
         $built = collect($sections)
-            ->reject(fn ($items, $section) => $this->withHidden ? false : Arr::get($manipulations, "{$section}.action") === '@remove')
+            ->reject(fn ($items, $section) => $this->withHidden ? false : Arr::get($manipulations, "{$section}.action") === '@hide')
             ->map(function ($items, $section) {
                 return collect($this->sectionsWithReorderedItems)->contains($section)
                     ? collect($items)->sortBy(fn ($item) => $item->order())->values()

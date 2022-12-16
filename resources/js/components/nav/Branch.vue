@@ -102,11 +102,11 @@ export default {
         },
 
         isHidden() {
-            return data_get(this.item, 'manipulations.action') === '@remove';
+            return data_get(this.item, 'manipulations.action') === '@hide';
         },
 
         isInHiddenSection() {
-            return data_get(this.parentSection, 'manipulations.action') === '@remove';
+            return data_get(this.parentSection, 'manipulations.action') === '@hide';
         },
 
         isPinnedAlias() {

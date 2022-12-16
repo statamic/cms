@@ -534,7 +534,7 @@ export default {
         },
 
         itemIsVisible(item) {
-            return data_get(item.manipulations, 'action') !== '@remove';
+            return data_get(item.manipulations, 'action') !== '@hide';
         },
 
         isHideable(item) {
@@ -561,7 +561,7 @@ export default {
         hideItem(item) {
             item.trashedManipulations = item.manipulations;
 
-            item.manipulations = { action: '@remove' };
+            item.manipulations = { action: '@hide' };
 
             this.changed = true;
         },

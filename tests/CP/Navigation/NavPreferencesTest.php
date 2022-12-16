@@ -490,92 +490,92 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_remove_sections()
+    public function it_can_hide_sections()
     {
         $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users'];
 
         $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
 
-        $sectionsAfterRemoving = ['Top Level', 'Fields', 'Tools'];
+        $sectionsAfterHiding = ['Top Level', 'Fields', 'Tools'];
 
         // Recommended syntax...
-        $this->assertEquals($sectionsAfterRemoving, $this->buildNavWithPreferences([
-            'content' => '@remove',
-            'users' => '@remove',
+        $this->assertEquals($sectionsAfterHiding, $this->buildNavWithPreferences([
+            'content' => '@hide',
+            'users' => '@hide',
         ])->keys()->all());
 
         // With nesting...
-        $this->assertEquals($sectionsAfterRemoving, $this->buildNavWithPreferences([
+        $this->assertEquals($sectionsAfterHiding, $this->buildNavWithPreferences([
             'sections' => [
-                'content' => '@remove',
-                'users' => '@remove',
+                'content' => '@hide',
+                'users' => '@hide',
             ],
         ])->keys()->all());
 
         // With config array...
-        $this->assertEquals($sectionsAfterRemoving, $this->buildNavWithPreferences([
+        $this->assertEquals($sectionsAfterHiding, $this->buildNavWithPreferences([
             'content' => [
-                'action' => '@remove',
+                'action' => '@hide',
             ],
             'users' => [
-                'action' => '@remove',
+                'action' => '@hide',
             ],
         ])->keys()->all());
     }
 
     /** @test */
-    public function it_can_remove_items_from_a_section()
+    public function it_can_hide_items_from_a_section()
     {
         $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'];
 
         $this->assertEquals($defaultContentItems, $this->buildDefaultNav()->get('Content')->map->display()->all());
 
-        $itemsAfterRemoving = ['Collections', 'Taxonomies', 'Assets'];
+        $itemsAfterHiding = ['Collections', 'Taxonomies', 'Assets'];
 
         // Recommended syntax...
-        $this->assertEquals($itemsAfterRemoving, $this->buildNavWithPreferences([
+        $this->assertEquals($itemsAfterHiding, $this->buildNavWithPreferences([
             'content' => [
-                'content::navigation' => '@remove',
-                'content::globals' => '@remove',
+                'content::navigation' => '@hide',
+                'content::globals' => '@hide',
             ],
         ])->get('Content')->map->display()->all());
 
         // With nesting...
-        $this->assertEquals($itemsAfterRemoving, $this->buildNavWithPreferences([
+        $this->assertEquals($itemsAfterHiding, $this->buildNavWithPreferences([
             'sections' => [
                 'content' => [
                     'items' => [
-                        'content::navigation' => '@remove',
-                        'content::globals' => '@remove',
+                        'content::navigation' => '@hide',
+                        'content::globals' => '@hide',
                     ],
                 ],
             ],
         ])->get('Content')->map->display()->all());
 
         // With config array...
-        $this->assertEquals($itemsAfterRemoving, $this->buildNavWithPreferences([
+        $this->assertEquals($itemsAfterHiding, $this->buildNavWithPreferences([
             'content' => [
                 'content::navigation' => [
-                    'action' => '@remove',
+                    'action' => '@hide',
                 ],
-                'content::globals' => '@remove',
+                'content::globals' => '@hide',
             ],
         ])->get('Content')->map->display()->all());
 
-        // Remove a child item...
+        // Hide a child item...
         $nav = $this->buildNavWithPreferences([
             'content' => [
-                'content::collections::pages' => '@remove',
+                'content::collections::pages' => '@hide',
             ],
         ]);
         $this->assertArrayNotHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
         $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
 
-        // Remove should do nothing if used in wrong section...
+        // Hide should do nothing if used in wrong section...
         $this->assertEquals($defaultContentItems, $this->buildNavWithPreferences([
             'fields' => [
-                'content::navigation' => '@remove',
-                'content::globals' => '@remove',
+                'content::navigation' => '@hide',
+                'content::globals' => '@hide',
             ],
         ])->get('Content')->map->display()->all());
     }
@@ -875,7 +875,7 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_remove_child_items()
+    public function it_can_hide_child_items()
     {
         // When modifying parent...
         $nav = $this->buildNavWithPreferences([
@@ -883,7 +883,7 @@ class NavPreferencesTest extends TestCase
                 'content::collections' => [
                     'action' => '@modify',
                     'children' => [
-                        'content::collections::pages' => '@remove',
+                        'content::collections::pages' => '@hide',
                     ],
                 ],
             ],
@@ -900,7 +900,7 @@ class NavPreferencesTest extends TestCase
                 'content::collections' => [
                     'action' => '@alias',
                     'children' => [
-                        'content::collections::pages' => '@remove',
+                        'content::collections::pages' => '@hide',
                     ],
                 ],
             ],
@@ -918,7 +918,7 @@ class NavPreferencesTest extends TestCase
                 'content::collections' => [
                     'action' => '@move',
                     'children' => [
-                        'content::collections::pages' => '@remove',
+                        'content::collections::pages' => '@hide',
                     ],
                 ],
             ],
@@ -1191,7 +1191,7 @@ class NavPreferencesTest extends TestCase
                 'content' => [
                     'display' => 'Site',
                     'items' => [
-                        'content::globals' => '@remove',
+                        'content::globals' => '@hide',
                         'content::taxonomies' => [
                             'action' => '@modify',
                             'display' => 'Categories',
