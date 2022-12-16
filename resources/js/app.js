@@ -254,9 +254,9 @@ Statamic.app({
                 const inputs = document.querySelectorAll('input[autofocus]');
                 for (let input of inputs) {
                     input.blur();
-                    input.focus();
                 }
-            }, 0);
+                inputs[0].focus();
+            }, 100);
         }
     }
 
