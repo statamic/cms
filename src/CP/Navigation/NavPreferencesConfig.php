@@ -89,6 +89,7 @@ class NavPreferencesConfig implements ArrayAccess
             ->prepend($sections->pull('top_level') ?? '@inherit', 'top_level')
             ->map(fn ($config, $section) => $this->normalizeSectionConfig($config, $section))
             ->reject(fn ($config) => $config['action'] === '@inherit' && ! $reorder)
+            ->map(fn ($config) => $this->removeInheritFromConfig($config))
             ->all();
 
         $normalized->put('sections', $sections);
@@ -140,6 +141,21 @@ class NavPreferencesConfig implements ArrayAccess
         $allowedKeys = array_merge(['action'], static::ALLOWED_NAV_SECTION_MODIFICATIONS);
 
         return $normalized->only($allowedKeys)->all();
+    }
+
+    /**
+     * Remove inherit action from config.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function removeInheritFromConfig($config)
+    {
+        if ($config['action'] === '@inherit') {
+            $config['action'] = false;
+        }
+
+        return $config;
     }
 
     /**
