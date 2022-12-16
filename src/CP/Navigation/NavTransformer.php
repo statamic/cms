@@ -7,8 +7,9 @@ use Statamic\Support\Arr;
 
 class NavTransformer
 {
-    protected $submitted;
     protected $coreNav;
+    protected $submitted;
+    protected $allowOverriding;
     protected $config;
     protected $reorderedMinimums;
 
@@ -17,11 +18,13 @@ class NavTransformer
      *
      * @param  array  $submitted
      */
-    public function __construct(array $submitted)
+    public function __construct(array $submitted, bool $allowOverriding = true)
     {
         $this->coreNav = Nav::buildWithoutPreferences();
 
         $this->submitted = $this->removeEmptyCustomSections($submitted);
+
+        $this->allowOverriding = $allowOverriding;
     }
 
     /**
@@ -30,9 +33,9 @@ class NavTransformer
      * @param  array  $submitted
      * @return array
      */
-    public static function fromVue(array $submitted)
+    public static function fromVue(array $submitted, bool $allowOverriding = true)
     {
-        return (new static($submitted))
+        return (new static($submitted, $allowOverriding))
             ->transform()
             ->minify()
             ->get();
@@ -239,7 +242,7 @@ class NavTransformer
         // For example, if we're transforming this config for a user's nav preferences,
         // we don't want it falling back to role or default preferences, unless the
         // user explicitly 'resets' their nav customizations in the JS builder.
-        if (is_null($this->config)) {
+        if ($this->allowOverriding && is_null($this->config)) {
             $this->config = '@override';
         }
 

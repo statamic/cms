@@ -33,7 +33,7 @@ class DefaultNavController extends Controller
 
     public function update(Request $request)
     {
-        $nav = $this->getUpdatedNav($request);
+        $nav = $this->getUpdatedNav($request, false);
 
         if (is_null($nav)) {
             return $this->destroy();

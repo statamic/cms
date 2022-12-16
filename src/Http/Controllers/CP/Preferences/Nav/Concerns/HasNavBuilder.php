@@ -23,9 +23,9 @@ trait HasNavBuilder
         ], $props));
     }
 
-    protected function getUpdatedNav(Request $request)
+    protected function getUpdatedNav(Request $request, $allowOverriding = true)
     {
-        return NavTransformer::fromVue($request->tree);
+        return NavTransformer::fromVue($request->tree, $allowOverriding);
     }
 
     protected function getSaveAsOptions()
