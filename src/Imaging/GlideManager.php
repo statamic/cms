@@ -143,13 +143,8 @@ class GlideManager
             'watermark' => 'mark',
         ];
 
-        foreach ($params as $key => $value) {
-            if ($legend[$key] ?? false) {
-                $params[$legend[$key]] = $value;
-                unset($params[$key]);
-            }
-        }
-
-        return $params;
+        return collect($params)->mapWithKeys(function ($value, $param) use ($legend) {
+            return [$legend[$param] ?? $param => $value];
+        })->all();
     }
 }
