@@ -281,7 +281,7 @@ class ImageGenerator
         $defaults = Config::get('statamic.assets.image_manipulation.defaults') ?? [];
 
         if (is_array($defaults) && count($defaults) > 0) {
-            $defaults = \Statamic\Facades\Glide::normalizeParameters($defaults);
+            $defaults = Glide::normalizeParameters($defaults);
         }
 
         // Enable automatic cropping
