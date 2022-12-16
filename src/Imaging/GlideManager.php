@@ -20,7 +20,7 @@ class GlideManager
     public function server()
     {
         return ServerFactory::create([
-            'source'   => base_path(), // this gets overriden on the fly by the image generator
+            'source'   => base_path(), // this gets overridden on the fly by the image generator
             'cache'    => $this->cacheDisk()->getDriver(),
             'response' => new LaravelResponseFactory(app('request')),
             'driver'   => Config::get('statamic.assets.image_manipulation.driver'),
@@ -123,5 +123,33 @@ class GlideManager
 
         // Clear manifest itself from cache store.
         $this->cacheStore()->forget($manifestKey);
+    }
+
+    public function normalizeParameters($params)
+    {
+        $legend = [
+            'background' => 'bg',
+            'brightness' => 'bri',
+            'contrast' => 'con',
+            'filter' => 'filt',
+            'format' => 'fm',
+            'gamma' => 'gam',
+            'height' => 'h',
+            'orientation' => 'or',
+            'pixelate' => 'pixel',
+            'quality' => 'q',
+            'sharpen' => 'sharp',
+            'width' => 'w',
+            'watermark' => 'mark',
+        ];
+
+        foreach ($params as $key => $value) {
+            if ($legend[$key] ?? false) {
+                $params[$legend[$key]] = $value;
+                unset($params[$key]);
+            }
+        }
+
+        return $params;
     }
 }

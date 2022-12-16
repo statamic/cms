@@ -281,7 +281,7 @@ class ImageGenerator
         $defaults = Config::get('statamic.assets.image_manipulation.defaults') ?? [];
 
         if (is_array($defaults) && count($defaults) > 0) {
-            $defaults = $this->mapParamsToGlideApi($defaults);
+            $defaults = \Statamic\Facades\Glide::normalizeParameters($defaults);
         }
 
         // Enable automatic cropping
@@ -290,39 +290,6 @@ class ImageGenerator
         }
 
         $this->server->setDefaults($defaults);
-    }
-
-    /**
-     * Remap the params to the Glide API.
-     *
-     * @return array
-     */
-    private function mapParamsToGlideApi($params)
-    {
-        $legend = [
-            'background' => 'bg',
-            'brightness' => 'bri',
-            'contrast' => 'con',
-            'filter' => 'filt',
-            'format' => 'fm',
-            'gamma' => 'gam',
-            'height' => 'h',
-            'orientation' => 'or',
-            'pixelate' => 'pixel',
-            'quality' => 'q',
-            'sharpen' => 'sharp',
-            'width' => 'w',
-            'watermark' => 'mark',
-        ];
-
-        foreach ($params as $key => $value) {
-            if ($legend[$key] ?? false) {
-                $params[$legend[$key]] = $value;
-                unset($params[$key]);
-            }
-        }
-
-        return $params;
     }
 
     /**

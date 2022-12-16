@@ -54,7 +54,7 @@ class Manager
             $presets = array_merge($presets, $this->cpManipulationPresets());
         }
 
-        return $presets;
+        return \Statamic\Facades\Glide::normalizeParameters($presets);
     }
 
     /**
