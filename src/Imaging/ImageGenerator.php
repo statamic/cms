@@ -278,11 +278,9 @@ class ImageGenerator
      */
     private function applyDefaultManipulations()
     {
-        $defaults = Config::get('statamic.assets.image_manipulation.defaults') ?? [];
-
-        if (is_array($defaults) && count($defaults) > 0) {
-            $defaults = Glide::normalizeParameters($defaults);
-        }
+        $defaults = Glide::normalizeParameters(
+            Config::get('statamic.assets.image_manipulation.defaults') ?: []
+        );
 
         // Enable automatic cropping
         if (Config::get('statamic.assets.auto_crop') && $this->asset) {
