@@ -1,5 +1,25 @@
 # Release Notes
 
+## 3.3.62 (2022-12-16)
+
+### What's new
+- Support default manipulations for Glide. Support using aliases in presets. [#7239](https://github.com/statamic/cms/issues/7239) by @jackmcdade
+- Support prepend and append options on the `integer` fieldtype. [#7241](https://github.com/statamic/cms/issues/7241) by @jackmcdade
+- Support for search transformers to be classes. [#7177](https://github.com/statamic/cms/issues/7177) by @ryanmitchell
+
+### What's improved
+- Improve Control Panel's UX when using an invalid site key format. [#7110](https://github.com/statamic/cms/issues/7110) by @joshuablum
+- Links in field instructions will in new windows. [#7223](https://github.com/statamic/cms/issues/7223) by @jackmcdade
+
+### What's fixed
+- Fix asset thumbnails and file icons in entry listings and `assets` field. [#7195](https://github.com/statamic/cms/issues/7195) by @jacksleight
+- Fix autofocusing of the first field in Control Panel forms. [#7242](https://github.com/statamic/cms/issues/7242) by @jackmcdade
+- Fix default preferences not being tracked with the Git integration. [#7230](https://github.com/statamic/cms/issues/7230) by @jesseleite
+- The `color` fieldtype's picker closes when clicking save. [#7219](https://github.com/statamic/cms/issues/7219) by @jacksleight
+- The `collection` widget's "create entry" button works with multiple blueprints. [#7217](https://github.com/statamic/cms/issues/7217) by @jackmcdade
+
+
+
 ## 3.3.61 (2022-12-13)
 
 ### What's new
