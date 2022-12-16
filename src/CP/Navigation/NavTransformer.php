@@ -134,9 +134,9 @@ class NavTransformer
             $transformed['action'] = '@inherit';
         }
 
-        if ($children) {
-            $transformed['children'] = $children;
-        }
+        $transformed['reorder'] = $item['reorder'] ?? false;
+
+        $transformed['children'] = $children ?? [];
 
         return $transformed;
     }
@@ -249,49 +249,64 @@ class NavTransformer
     {
         $action = Arr::get($section, 'action');
 
-        if (! in_array($action, ['@create', '@remove'])) {
-            Arr::forget($section, 'action');
-        }
-
         $section['items'] = collect($section['items'])
-            ->map(fn ($item) => $this->minifyItem($item))
+            ->map(fn ($item, $key) => $this->minifyItem($item, $key))
             ->all();
 
         if ($section['reorder'] === true) {
             $section['items'] = $this->rejectUnessessaryInherits($section['items'], $sectionKey);
-
-            return $section;
+        } else {
+            $section['items'] = $this->rejectAllInherits($section['items']);
+            Arr::forget($section, 'reorder');
         }
 
-        $section['items'] = $this->rejectAllInherits($section['items']);
+        $section = collect($section)->filter();
 
-        if (isset($section['display']) || isset($section['action'])) {
-            return collect($section)->filter()->all();
+        if ($section->count() > 1 && $action === '@inherit') {
+            $section->forget('action');
         }
 
-        return $section['items'] ?? $action;
+        if ($section->count() === 1 && $section->has('action')) {
+            return $section->get('action');
+        }
+
+        if ($section->count() === 1 && $section->has('items')) {
+            return $section->get('items');
+        }
+
+        return $section->all();
     }
 
     /**
      * Minify tranformed item.
      *
      * @param  array  $item
+     * @param  string  $itemKey
      * @return array
      */
-    protected function minifyItem($item)
+    protected function minifyItem($item, $itemKey)
     {
-        $item = collect($item);
+        $action = Arr::get($item, 'action');
 
-        if ($children = $item->get('children')) {
-            $item->put('children', $this->minifyItemChildren($children));
+        $item['children'] = collect($item['children'])
+            ->map(fn ($item, $key) => $this->minifyItem($item, $key))
+            ->all();
+
+        if ($item['reorder'] === true) {
+            $item['children'] = $this->rejectUnessessaryInherits($item['children'], $itemKey);
+        } else {
+            $item['children'] = $this->rejectAllInherits($item['children']);
+            Arr::forget($item, 'children');
         }
 
-        if ($item->get('action') === '@inherit' || $item->count() === 1) {
+        $item = collect($item)->filter();
+
+        if ($item->count() === 1 && $item->has('action')) {
             return $item->get('action');
         }
 
-        if ($item->has('children')) {
-            $item['children'] = $this->rejectAllInherits($item['children']);
+        if ($item->count() === 1 && $item->has('children')) {
+            return $item->get('children');
         }
 
         return $item->all();
