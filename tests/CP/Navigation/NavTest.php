@@ -356,7 +356,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    public function it_can_use_extend_to_defer_the_creation_of_a_nav_item_until_build_time()
+    public function it_can_use_extend_to_defer_until_after_statamic_core_nav_items_are_built()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -370,6 +370,7 @@ class NavTest extends TestCase
 
         $this->assertEmpty(Nav::items());
         $this->assertContains('Yoda', $this->build()->get('Jedi')->map->display());
+        $this->assertEquals('Jedi', $this->build()->keys()->last());
     }
 
     /** @test */
