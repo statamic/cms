@@ -408,7 +408,6 @@ class Nav
             })
             ->map(fn ($override) => $this->applyPreferenceOverrideForItem($override['config'], $section, $override['item']))
             ->filter()
-            ->reject(fn ($item, $id) => $item->id() === $id)
             ->each(fn ($item) => $this->items[] = $item);
 
         if ($sectionNav['reorder']) {

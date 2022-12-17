@@ -463,7 +463,6 @@ export default {
             item.manipulations = {
                 action: data_get(item.manipulations, 'action', '@modify'),
                 display: updatedConfig.display,
-                display_original: updatedConfig.display_origial,
                 url: updatedConfig.url,
             };
 
