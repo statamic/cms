@@ -325,7 +325,7 @@ class Nav
             return $this;
         }
 
-        $navPreferencesConfig = NavPreferencesConfig::normalize($preferences);
+        $navPreferencesConfig = NavPreferencesNormalizer::fromPreferences($preferences);
 
         collect($navPreferencesConfig['sections'])
             ->each(fn ($overrides, $section) => $this->trackSectionManipulations($section, $overrides))
@@ -690,7 +690,7 @@ class Nav
 
         $config = collect($config);
 
-        collect(NavPreferencesConfig::ALLOWED_NAV_ITEM_MODIFICATIONS)
+        collect(NavPreferencesNormalizer::ALLOWED_NAV_ITEM_MODIFICATIONS)
             ->filter(fn ($setter) => $config->has($setter))
             ->mapWithKeys(fn ($setter) => [$setter => $config->get($setter)])
             ->reject(fn ($value, $setter) => $setter === 'children')

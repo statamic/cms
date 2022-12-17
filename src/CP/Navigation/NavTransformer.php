@@ -61,7 +61,7 @@ class NavTransformer
      *
      * @return $this
      */
-    public function transform()
+    protected function transform()
     {
         $this->config['reorder'] = $this->itemsAreReordered(
             $this->coreNav->pluck('display_original'),
@@ -245,7 +245,7 @@ class NavTransformer
      *
      * @return $this
      */
-    public function minify()
+    protected function minify()
     {
         $this->config['sections'] = collect($this->config['sections'])
             ->map(fn ($section, $key) => $this->minifySection($section, $key))
@@ -401,7 +401,7 @@ class NavTransformer
      *
      * @return array
      */
-    public function get()
+    protected function get()
     {
         return $this->config;
     }

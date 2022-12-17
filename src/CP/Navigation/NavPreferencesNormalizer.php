@@ -2,13 +2,13 @@
 
 namespace Statamic\CP\Navigation;
 
-use ArrayAccess;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class NavPreferencesConfig implements ArrayAccess
+class NavPreferencesNormalizer
 {
-    protected $config;
+    protected $preferences;
+    protected $normalized;
 
     const ALLOWED_NAV_SECTION_ACTIONS = [
         '@create',   // create custom section
@@ -47,7 +47,7 @@ class NavPreferencesConfig implements ArrayAccess
      */
     public function __construct($navPreferences)
     {
-        $this->config = $this->normalizeConfig($navPreferences);
+        $this->preferences = $navPreferences;
     }
 
     /**
@@ -56,30 +56,21 @@ class NavPreferencesConfig implements ArrayAccess
      * @param  array  $navPreferences
      * @return static
      */
-    public static function normalize($navPreferences)
+    public static function fromPreferences($navPreferences)
     {
-        return new static($navPreferences);
-    }
-
-    /**
-     * Get normalized config.
-     *
-     * @return array
-     */
-    public function get()
-    {
-        return $this->config;
+        return (new static($navPreferences))
+            ->normalize()
+            ->get();
     }
 
     /**
      * Normalize config.
      *
-     * @param  array  $navConfig
      * @return array
      */
-    protected function normalizeConfig($navConfig)
+    protected function normalize()
     {
-        $navConfig = collect($navConfig);
+        $navConfig = collect($this->preferences);
 
         $normalized = collect()->put('reorder', $reorder = $navConfig->get('reorder', false));
 
@@ -96,7 +87,9 @@ class NavPreferencesConfig implements ArrayAccess
 
         $allowedKeys = ['reorder', 'sections'];
 
-        return $normalized->only($allowedKeys)->all();
+        $this->normalized = $normalized->only($allowedKeys)->all();
+
+        return $this;
     }
 
     /**
@@ -265,27 +258,13 @@ class NavPreferencesConfig implements ArrayAccess
         return Str::startsWith($itemId, "$currentSectionKey::");
     }
 
-    #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    /**
+     * Get normalized preferences.
+     *
+     * @return array
+     */
+    protected function get()
     {
-        return $this->config[$key];
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetSet($key, $value)
-    {
-        throw new \Exception('Method offsetSet is not currently supported.');
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetExists($key)
-    {
-        throw new \Exception('Method offsetExists is not currently supported.');
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($key)
-    {
-        throw new \Exception('Method offsetUnset is not currently supported.');
+        return $this->normalized;
     }
 }
