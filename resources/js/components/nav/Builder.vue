@@ -82,7 +82,11 @@
                     @edit="editItem(item, true)"
                     @toggle-open="store.toggleOpen(item)"
                 >
-                    <template #branch-options="{ item, vm }">
+                    <template #branch-options="{ item }">
+                        <dropdown-item
+                            v-if="vm.level < 2"
+                            :text="__('Add Item')"
+                            @click="addItem(item.children)" />
                         <dropdown-item
                             :text="__('Edit')"
                             @click="editingItem = item" />
@@ -127,6 +131,7 @@
                 >
                     <template #branch-options="{ item }">
                         <dropdown-item
+                            v-if="vm.level < 3"
                             :text="__('Add Item')"
                             @click="addItem(item.children)" />
                         <dropdown-item
