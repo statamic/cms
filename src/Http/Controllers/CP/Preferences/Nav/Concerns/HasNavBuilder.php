@@ -19,7 +19,7 @@ trait HasNavBuilder
             'updateUrl' => cp_route('preferences.nav.user.update'),
             'destroyUrl' => cp_route('preferences.nav.user.destroy'),
             'saveAsOptions' => $this->getSaveAsOptions()->values()->all(),
-            'nav' => NavResource::make($nav ?? Nav::withHidden()->build()),
+            'nav' => NavResource::make($nav ?? Nav::build(true, true)),
         ], $props));
     }
 

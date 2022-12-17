@@ -168,8 +168,6 @@ class NavTest extends TestCase
 
         Nav::theEmpire('Death Star');
 
-        $item = $this->build()->get('The Empire')->first();
-
         $this->assertEquals('Death Star', $this->build()->get('The Empire')->first()->display());
 
         Nav::theEmpire('Death Star')
@@ -370,7 +368,7 @@ class NavTest extends TestCase
 
         $nav = $this->build();
 
-        $this->assertNotEmpty(Nav::items());
+        $this->assertEmpty(Nav::items());
         $this->assertContains('Yoda', $this->build()->get('Jedi')->map->display());
     }
 
@@ -472,7 +470,7 @@ class NavTest extends TestCase
 
         Nav::testSection('Hidden Item')->hidden(true);
 
-        $items = Nav::withHidden()->build()->pluck('items', 'display')->get('Test Section');
+        $items = Nav::build(true, true)->pluck('items', 'display')->get('Test Section');
 
         $this->assertCount(1, $items);
         $this->assertEquals('Hidden Item', $items->first()->display());
@@ -487,7 +485,7 @@ class NavTest extends TestCase
         Nav::testSection('Hidden Item')->hidden(true);
 
         // Calling `withHidden()` should clone the instance, so that we don't update the singleton bound to the facade
-        $this->assertCount(1, Nav::withHidden()->build()->pluck('items', 'display')->get('Test Section'));
+        $this->assertCount(1, Nav::build(true, true)->pluck('items', 'display')->get('Test Section'));
 
         // Which means this should hide the hidden item again
         $this->assertNull($this->build()->get('Test Section'));
@@ -540,7 +538,7 @@ class NavTest extends TestCase
 
         Nav::build();
 
-        $this->assertNotEmpty(Nav::items());
+        $this->assertEmpty(Nav::items());
         $this->assertCount(1, $this->build()->get('Jedi')->map->display());
     }
 
