@@ -236,13 +236,7 @@ class NavBuilder
         $section = $sectionNav['display'];
 
         collect($sectionNav['items'])
-            ->map(function ($config, $id) {
-                return [
-                    'item' => $this->findItem($id),
-                    'config' => $config,
-                ];
-            })
-            ->map(fn ($override) => $this->applyPreferenceOverrideForItem($override['config'], $section, $override['item']))
+            ->map(fn ($config, $id) => $this->applyPreferenceOverrideForItem($config, $section, $this->findItem($id)))
             ->filter()
             ->reject(fn ($item) => $item->manipulations()['action'] === '@modify')
             ->each(fn ($item) => $this->items[] = $item);
@@ -500,9 +494,13 @@ class NavBuilder
             return;
         }
 
-        $item->hidden(true);
-
         $item->manipulations(['action' => '@hide']);
+
+        if ($this->withHidden) {
+            return $item;
+        }
+
+        $item->hidden(true);
 
         $this->userHideItemFromChildren($item);
     }
@@ -529,11 +527,11 @@ class NavBuilder
         collect(NavPreferencesNormalizer::ALLOWED_NAV_ITEM_MODIFICATIONS)
             ->filter(fn ($setter) => $config->has($setter))
             ->mapWithKeys(fn ($setter) => [$setter => $config->get($setter)])
-            ->reject(fn ($value, $setter) => $setter === 'children')
+            ->reject(fn ($value, $setter) => in_array($setter, ['children', 'reorder']))
             ->each(fn ($value, $setter) => $item->{$setter}($value));
 
         if ($children = $config->get('children')) {
-            $this->userModifyItemChildren($item, $children, $section);
+            $this->userModifyItemChildren($item, $children, $section, $config->get('reorder'));
         }
 
         return $item;
@@ -546,20 +544,30 @@ class NavBuilder
      * @param  array  $childrenOverrides
      * @param  string  $section
      */
-    protected function userModifyItemChildren($item, $childrenOverrides, $section)
+    protected function userModifyItemChildren($item, $childrenOverrides, $section, $reorder)
     {
-        $itemChildren = collect($item->resolveChildren()->children())->keyBy->id();
+        $itemChildren = collect($item->resolveChildren()->children())
+            ->each(fn ($item, $index) => $item->order('_'.$index + 1))
+            ->keyBy
+            ->id();
 
-        $newChildren = collect($childrenOverrides)
+        collect($childrenOverrides)
             ->keyBy(fn ($config, $key) => $this->normalizeChildId($item, $key))
             ->map(fn ($config, $key) => $this->userModifyChild($config, $section, $key, $item))
             ->each(function ($item, $key) use (&$itemChildren) {
                 $item
                     ? $itemChildren->put($key, $item)
                     : $itemChildren->forget($key);
-            });
+            })
+            ->filter()
+            ->values()
+            ->each(fn ($item, $index) => $item->order($index + 1));
 
-        $item->children($itemChildren->values(), false);
+        $newChildren = $reorder
+            ? $itemChildren->sortBy(fn ($item) => $item->order())
+            : $itemChildren;
+
+        $item->children($newChildren->values(), false);
     }
 
     /**
@@ -574,6 +582,10 @@ class NavBuilder
     protected function userModifyChild($config, $section, $key, $parentItem)
     {
         $item = $this->findItem($key);
+
+        if ($config['action'] === '@inherit') {
+            return $item;
+        }
 
         if ($config['action'] === '@create' && isset($config['display'])) {
             $id = $this->generateNewItemId($parentItem->id(), $config['display']);
