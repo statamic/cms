@@ -3,7 +3,6 @@
 namespace Statamic\CP\Navigation;
 
 use Exception;
-use Illuminate\Support\Collection;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
@@ -607,8 +606,9 @@ class NavBuilder
      * @param  NavItem  $item
      * @param  array  $config
      * @param  string  $section
+     * @param  bool  $setChildren
      */
-    protected function userAliasItem($item, $config, $section)
+    protected function userAliasItem($item, $config, $section, $setChildren = true)
     {
         if (is_null($item)) {
             return;
@@ -621,7 +621,10 @@ class NavBuilder
         $clone->section($section);
 
         $this->userModifyItem($clone, $config, $section);
-        $this->setChildrenOnAliasedItem($clone, $config, $section);
+
+        if ($setChildren) {
+            $this->setChildrenOnAliasedItem($clone, $config, $section);
+        }
 
         return $clone;
     }
@@ -639,7 +642,7 @@ class NavBuilder
             return;
         }
 
-        $clone = $this->userAliasItem($item, $config, $section);
+        $clone = $this->userAliasItem($item, $config, $section, false);
 
         $this->userRemoveItem($item);
         $this->userRemoveItemFromChildren($item);
@@ -683,7 +686,15 @@ class NavBuilder
     protected function setChildrenOnAliasedItem($item, $config, $section)
     {
         $children = collect(Arr::get($config, 'children', []))
-            ->map(fn ($childConfig, $id) => $this->applyPreferenceOverrideForItem($childConfig, $section, $this->findItem($id)))
+            ->map(function ($childConfig, $id) use ($item, $section) {
+                return $this->applyPreferenceOverrideForItem(
+                    $childConfig,
+                    $section,
+                    $this->findItem($id),
+                    $childConfig['action'] === '@create' ? $this->generateNewItemId($item->id(), $childConfig['display']) : null
+                );
+            })
+            ->filter()
             ->all();
 
         $item->children($children);

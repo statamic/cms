@@ -612,6 +612,31 @@ class NavPreferencesTest extends TestCase
 
         // It can merged created children into existing children...
         $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'content::collections' => [
+                    'action' => '@modify',
+                    'children' => [
+                        'Json' => 'https://json.org',
+                        'spaml' => [
+                            'action' => '@create',
+                            'display' => 'Yaml',
+                            'url' => 'https://yaml.org',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $modifiedItem = $nav->get('Content')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pages', 'Json', 'Yaml'], $modifiedItem->children()->map->display()->all());
+        $this->assertEquals([
+            'http://localhost/cp/collections/articles',
+            'http://localhost/cp/collections/pages',
+            'https://json.org',
+            'https://yaml.org',
+        ], $modifiedItem->children()->map->url()->all());
+
+        // Aliased items don't have children by default, but we can still create child items for them...
+        $nav = $this->buildNavWithPreferences([
             'top_level' => [
                 'content::collections' => [
                     'action' => '@alias',
@@ -630,15 +655,11 @@ class NavPreferencesTest extends TestCase
         $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
         $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->name()->all());
         $this->assertEquals([
-            'content::collections::clone::articles',
-            'content::collections::clone::pages',
-            'content::collections::clone::json',
-            'content::collections::clone::yaml',
-        ], $aliasedItem->children()->map->id()->all());
-        $this->assertEquals(['Articles', 'Pages', 'Json', 'Yaml'], $aliasedItem->children()->map->display()->all());
+            'content::collections::articles',
+            'content::collections::pages',
+        ], $originalItem->children()->map->id()->all());
+        $this->assertEquals(['Json', 'Yaml'], $aliasedItem->children()->map->display()->all());
         $this->assertEquals([
-            'http://localhost/cp/collections/articles',
-            'http://localhost/cp/collections/pages',
             'https://json.org',
             'https://yaml.org',
         ], $aliasedItem->children()->map->url()->all());
@@ -894,23 +915,17 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Articles'], $originalItem->children()->map->display()->all());
         $this->assertEquals(['http://localhost/cp/collections/articles'], $originalItem->children()->map->url()->all());
 
-        // When aliasing parent...
+        // Without explicitly modifying parent...
         $nav = $this->buildNavWithPreferences([
-            'top_level' => [
-                'content::collections' => [
-                    'action' => '@alias',
-                    'children' => [
-                        'content::collections::pages' => '@hide',
-                    ],
-                ],
+            'content' => [
+                'content::collections::pages' => '@hide',
             ],
         ]);
         $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
-        $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->name()->all());
-        $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
-        $this->assertEquals(['content::collections::clone::articles'], $aliasedItem->children()->map->id()->all());
-        $this->assertEquals(['Articles'], $aliasedItem->children()->map->display()->all());
-        $this->assertEquals(['http://localhost/cp/collections/articles'], $aliasedItem->children()->map->url()->all());
+        $this->assertEquals(['Articles'], $originalItem->resolveChildren()->children()->map->name()->all());
+        $this->assertEquals(['content::collections::articles'], $originalItem->children()->map->id()->all());
+        $this->assertEquals(['Articles'], $originalItem->children()->map->display()->all());
+        $this->assertEquals(['http://localhost/cp/collections/articles'], $originalItem->children()->map->url()->all());
 
         // When moving parent...
         $nav = $this->buildNavWithPreferences([
