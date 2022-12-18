@@ -502,7 +502,7 @@ class NavBuilder
 
         $item->hidden(true);
 
-        $this->userHideItemFromChildren($item);
+        $this->userRemoveItemFromChildren($item);
     }
 
     /**
@@ -637,19 +637,30 @@ class NavBuilder
 
         $clone = $this->userAliasItem($item, $config, $section);
 
-        $item->hidden(true);
-
-        $this->userHideItemFromChildren($item);
+        $this->userRemoveItem($item);
+        $this->userRemoveItemFromChildren($item);
 
         return $clone;
     }
 
     /**
-     * Hide NavItem from parent's children.
+     * Remove NavItem completely, so that it's not even visible when the `$withHidden` flag is set.
      *
      * @param  mixed  $item
      */
-    protected function userHideItemFromChildren($item)
+    protected function userRemoveItem($item)
+    {
+        $this->items = collect($this->items)
+            ->reject(fn ($registeredItem) => $registeredItem->id() === $item->id())
+            ->all();
+    }
+
+    /**
+     * Remove NavItem from parent's children.
+     *
+     * @param  mixed  $item
+     */
+    protected function userRemoveItemFromChildren($item)
     {
         if ($parent = $this->findParentItem($item->id())) {
             $parent->resolveChildren()->children(
