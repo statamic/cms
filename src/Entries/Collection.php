@@ -372,6 +372,8 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ], 'sidebar');
         }
 
+        $this->dispatchEntryBlueprintFoundEvent($blueprint, null);
+
         return $blueprint;
     }
 
