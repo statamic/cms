@@ -39,6 +39,7 @@
                 <svg-icon v-if="isHidden" class="inline-block w-4 h-4 text-grey-50" name="hidden" v-tooltip="isSection ? __('Hidden Section') : __('Hidden Item')" />
                 <svg-icon v-else-if="isPinnedAlias" class="inline-block w-4 h-4 text-grey-50" name="pin" v-tooltip="__('Pinned Item')" />
                 <svg-icon v-else-if="isAlias" class="inline-block w-4 h-4 text-grey-50" name="duplicate-ids" v-tooltip="__('Alias Item')" />
+                <svg-icon v-else-if="isMoved" class="inline-block w-4 text-grey-50" name="flip-vertical" v-tooltip="__('Moved Item')" />
                 <svg-icon v-else-if="isModified" class="inline-block w-4 h-4 text-grey-50" name="content-writing" v-tooltip="__('Modified Item')" />
                 <svg-icon v-else-if="isCustom" class="inline-block w-4 text-grey-50" name="user-edit" v-tooltip="isSection ? __('Custom Section') : __('Custom Item')" />
 
@@ -115,6 +116,10 @@ export default {
 
         isAlias() {
             return data_get(this.item, 'manipulations.action') === '@alias';
+        },
+
+        isMoved() {
+            return data_get(this.item, 'manipulations.action') === '@move';
         },
 
         isModified() {
