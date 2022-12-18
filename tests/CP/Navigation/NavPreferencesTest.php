@@ -655,9 +655,9 @@ class NavPreferencesTest extends TestCase
         $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
         $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->name()->all());
         $this->assertEquals([
-            'content::collections::articles',
-            'content::collections::pages',
-        ], $originalItem->children()->map->id()->all());
+            'content::collections::clone::json',
+            'content::collections::clone::yaml',
+        ], $aliasedItem->children()->map->id()->all());
         $this->assertEquals(['Json', 'Yaml'], $aliasedItem->children()->map->display()->all());
         $this->assertEquals([
             'https://json.org',
@@ -983,81 +983,67 @@ class NavPreferencesTest extends TestCase
             'https://yaml.org',
         ], $originalItem->children()->map->url()->all());
 
-        // TODO: Fix rest of this test since adding `clone` to `Nav::build()`
+        // Aliased items don't have children by default, but we can still alias and modify child items for them...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections' => [
+                    'action' => '@alias',
+                    'children' => [
+                        'content::collections::pages' => [
+                            'action' => '@alias',
+                            'display' => 'Pagerinos',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->display()->all());
+        $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Pagerinos'], $aliasedItem->children()->map->display()->all());
+        $this->assertEquals([
+            'content::collections::clone::pagerinos',
+        ], $aliasedItem->children()->map->id()->all());
+        $this->assertEquals([
+            'http://localhost/cp/collections/pages',
+        ], $aliasedItem->children()->map->url()->all());
 
-        // // When aliasing parent...
-        // $nav = $this->buildNavWithPreferences([
-        //     'top_level' => [
-        //         'content::collections' => [
-        //             'action' => '@alias',
-        //             'children' => [
-        //                 'content::collections::pages' => [
-        //                     'action' => '@modify',
-        //                     'display' => 'Pagerinos',
-        //                 ],
-        //                 'Json' => 'https://json.org',
-        //                 'spaml' => [
-        //                     'action' => '@create',
-        //                     'display' => 'Yaml',
-        //                     'url' => 'https://yaml.org',
-        //                 ],
-        //             ],
-        //         ],
-        //     ],
-        // ]);
-        // $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
-        // $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->display()->all());
-        // $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
-        // $this->assertEquals(['Articles', 'Pagerinos', 'Json', 'Yaml'], $aliasedItem->children()->map->display()->all());
-        // $this->assertEquals([
-        //     'content::collections::clone::articles',
-        //     'content::collections::clone::pages',
-        //     'content::collections::clone::json',
-        //     'content::collections::clone::yaml',
-        // ], $aliasedItem->children()->map->id()->all());
-        // $this->assertEquals([
-        //     'http://localhost/cp/collections/articles',
-        //     'http://localhost/cp/collections/pages',
-        //     'https://json.org',
-        //     'https://yaml.org',
-        // ], $aliasedItem->children()->map->url()->all());
-
-        // // When moving parent...
-        // $nav = $this->buildNavWithPreferences([
-        //     'top_level' => [
-        //         'content::collections' => [
-        //             'action' => '@move',
-        //             'children' => [
-        //                 'content::collections::pages' => [
-        //                     'action' => '@modify',
-        //                     'display' => 'Pagerinos',
-        //                 ],
-        //                 'Json' => 'https://json.org',
-        //                 'spaml' => [
-        //                     'action' => '@create',
-        //                     'display' => 'Yaml',
-        //                     'url' => 'https://yaml.org',
-        //                 ],
-        //             ],
-        //         ],
-        //     ],
-        // ]);
-        // $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
-        // $this->assertNull($originalItem);
-        // $movedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
-        // $this->assertEquals(['Articles', 'Pagerinos', 'Json', 'Yaml'], $movedItem->children()->map->display()->all());
-        // $this->assertEquals([
-        //     'content::collections::clone::articles',
-        //     'content::collections::clone::pages',
-        //     'content::collections::clone::json',
-        //     'content::collections::clone::yaml',
-        // ], $movedItem->children()->map->id()->all());
-        // $this->assertEquals([
-        //     'http://localhost/cp/collections/articles',
-        //     'http://localhost/cp/collections/pages',
-        //     'https://json.org',
-        //     'https://yaml.org',
-        // ], $movedItem->children()->map->url()->all());
+        // When moving parent...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections' => [
+                    'action' => '@move',
+                    'children' => [
+                        'content::collections::pages' => [
+                            'action' => '@modify',
+                            'display' => 'Pagerinos',
+                        ],
+                        'Json' => 'https://json.org',
+                        'spaml' => [
+                            'action' => '@create',
+                            'display' => 'Yaml',
+                            'url' => 'https://yaml.org',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
+        $this->assertNull($originalItem);
+        $movedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pagerinos', 'Json', 'Yaml'], $movedItem->children()->map->display()->all());
+        $this->assertEquals([
+            'content::collections::clone::articles',
+            'content::collections::clone::pages',
+            'content::collections::clone::json',
+            'content::collections::clone::yaml',
+        ], $movedItem->children()->map->id()->all());
+        $this->assertEquals([
+            'http://localhost/cp/collections/articles',
+            'http://localhost/cp/collections/pages',
+            'https://json.org',
+            'https://yaml.org',
+        ], $movedItem->children()->map->url()->all());
     }
 
     /** @test */
@@ -1153,17 +1139,15 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function preferences_are_applied_after_addon_nav_extensions()
     {
-        $preBuild = function () {
-            Facades\CP\Nav::extend(function ($nav) {
-                $nav->tools('SEO Pro')
-                    ->url('/cp/seo-pro')
-                    ->children([
-                        'Reports' => '/cp/seo-pro/reports',
-                        'Site Defaults' => '/cp/seo-pro/site-defaults',
-                        'Section Defaults' => '/cp/seo-pro/section-defaults',
-                    ]);
-            });
-        };
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->tools('SEO Pro')
+                ->url('/cp/seo-pro')
+                ->children([
+                    'Reports' => '/cp/seo-pro/reports',
+                    'Site Defaults' => '/cp/seo-pro/site-defaults',
+                    'Section Defaults' => '/cp/seo-pro/section-defaults',
+                ]);
+        });
 
         $nav = $this->buildNavWithPreferences([
             'sections' => [
@@ -1171,7 +1155,7 @@ class NavPreferencesTest extends TestCase
                     'tools::seo_pro' => '@alias',
                 ],
             ],
-        ], $preBuild);
+        ]);
 
         // Assert addon successfully added nav item
         $this->assertEquals(['Forms', 'Updates', 'Addons', 'Utilities', 'GraphQL', 'SEO Pro'], $nav->get('Tools')->map->display()->all());
@@ -1277,37 +1261,17 @@ class NavPreferencesTest extends TestCase
         ], $nav->get('Fields')->mapWithKeys(fn ($i) => [$i->display() => $i->url()])->all());
     }
 
-    private function buildNavWithPreferences($preferences, $preBuild = null)
+    private function buildNavWithPreferences($preferences)
     {
         $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
-
-        if (is_callable($preBuild)) {
-            $preBuild();
-        }
 
         return Facades\CP\Nav::build($preferences)->pluck('items', 'display');
     }
 
     private function buildDefaultNav()
     {
-        // TODO: Should we test with this method instead?
-        // return Facades\CP\Nav::buildWithoutPreferences();
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
 
-        return $this->buildNavWithPreferences([]);
-    }
-}
-
-class FakePreferences
-{
-    private $preferences;
-
-    public function __construct($preferences)
-    {
-        $this->preferences = $preferences;
-    }
-
-    public function get()
-    {
-        return $this->preferences;
+        return Facades\CP\Nav::buildWithoutPreferences()->pluck('items', 'display');
     }
 }
