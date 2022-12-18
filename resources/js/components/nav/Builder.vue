@@ -325,8 +325,10 @@ export default {
                 isSection: isSectionNode,
             };
 
-            if (config.items) {
-                item.children = config.items.map(childItem => {
+            let children = config.items || config.children;
+
+            if (children) {
+                item.children = children.map(childItem => {
                     return {
                         text: childItem.display,
                         children: childItem.children.map(childChildItem => this.normalizeNavConfig(childChildItem, false)),
