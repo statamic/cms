@@ -19,6 +19,12 @@ class NavBuilder
     protected $sectionsWithReorderedItems = [];
     protected $built;
 
+    /**
+     * Instantiate nav builder.
+     *
+     * @param  array  $items
+     * @param  bool  $withHidden
+     */
     public function __construct($items, $withHidden = false)
     {
         $this->items = $items;

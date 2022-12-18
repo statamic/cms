@@ -54,7 +54,7 @@ class NavPreferencesNormalizer
      * Instantiate nav preferences config helper.
      *
      * @param  array  $navPreferences
-     * @return static
+     * @return array
      */
     public static function fromPreferences($navPreferences)
     {
