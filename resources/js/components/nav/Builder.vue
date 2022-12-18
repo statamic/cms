@@ -530,6 +530,8 @@ export default {
 
             newItem.manipulations = { action: '@alias' };
 
+            newItem.children = [];
+
             let tree = treeData || item.parent.children;
 
             tree.push(newItem);

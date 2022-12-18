@@ -543,6 +543,7 @@ class NavBuilder
      * @param  NavItem  $item
      * @param  array  $childrenOverrides
      * @param  string  $section
+     * @return \Illuminate\Support\Collection
      */
     protected function userModifyItemChildren($item, $childrenOverrides, $section, $reorder)
     {
@@ -564,10 +565,12 @@ class NavBuilder
             ->each(fn ($item, $index) => $item->order($index + 1));
 
         $newChildren = $reorder
-            ? $itemChildren->sortBy(fn ($item) => $item->order())
-            : $itemChildren;
+            ? $itemChildren->sortBy(fn ($item) => $item->order())->values()
+            : $itemChildren->values();
 
-        $item->children($newChildren->values(), false);
+        $item->children($newChildren, false);
+
+        return $newChildren;
     }
 
     /**
@@ -618,6 +621,7 @@ class NavBuilder
         $clone->section($section);
 
         $this->userModifyItem($clone, $config, $section);
+        $this->setChildrenOnAliasedItem($clone, $config, $section);
 
         return $clone;
     }
@@ -667,6 +671,22 @@ class NavBuilder
                 $parent->children()->reject(fn ($child) => $child->id() === $item->id())
             );
         }
+    }
+
+    /**
+     * Set children on aliased item.
+     *
+     * @param  NavItem  $item
+     * @param  array  $config
+     * @param  string  $section
+     */
+    protected function setChildrenOnAliasedItem($item, $config, $section)
+    {
+        $children = collect(Arr::get($config, 'children', []))
+            ->map(fn ($childConfig, $id) => $this->applyPreferenceOverrideForItem($childConfig, $section, $this->findItem($id)))
+            ->all();
+
+        $item->children($children);
     }
 
     /**
