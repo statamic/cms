@@ -224,6 +224,111 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_reorder_child_items_within_an_item()
+    {
+        $defaultUtilitiesItems = ['Cache', 'Email', 'Licensing', 'PHP Info', 'Search'];
+
+        $this->assertEquals($defaultUtilitiesItems, $this->buildDefaultNav()->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        $reorderedUtilitiesItems = ['Search', 'Cache', 'Licensing', 'Email', 'PHP Info'];
+
+        // Recommended syntax...
+        $this->assertEquals($reorderedUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => true,
+                    'children' => [
+                        'tools::utilities::search' => '@inherit',
+                        'tools::utilities::cache' => '@inherit',
+                        'tools::utilities::licensing' => '@inherit',
+                        'tools::utilities::email' => '@inherit',
+                        'tools::utilities::php_info' => '@inherit',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // With full nesting of sections...
+        $this->assertEquals($reorderedUtilitiesItems, $this->buildNavWithPreferences([
+            'sections' => [
+                'tools' => [
+                    'tools::utilities' => [
+                        'reorder' => true,
+                        'children' => [
+                            'tools::utilities::search' => '@inherit',
+                            'tools::utilities::cache' => '@inherit',
+                            'tools::utilities::licensing' => '@inherit',
+                            'tools::utilities::email' => '@inherit',
+                            'tools::utilities::php_info' => '@inherit',
+                        ],
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // Merge unmentioned items underneath...
+        $this->assertEquals($reorderedUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => true,
+                    'children' => [
+                        'tools::utilities::search' => '@inherit',
+                        'tools::utilities::cache' => '@inherit',
+                        'tools::utilities::licensing' => '@inherit',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // Ensure re-ordering items still works when modifying a item...
+        $this->assertEquals($reorderedUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => true,
+                    'children' => [
+                        'tools::utilities::search' => '@inherit',
+                        'tools::utilities::cache' => [
+                            'url' => '/cache-money',
+                        ],
+                        'tools::utilities::licensing' => '@inherit',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // If `reorder: false`, it should just use default item order...
+        $this->assertEquals($defaultUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => false,
+                    'children' => [
+                        'tools::utilities::search' => '@inherit',
+                        'tools::utilities::cache' => '@inherit',
+                        'tools::utilities::licensing' => '@inherit',
+                        'tools::utilities::email' => '@inherit',
+                        'tools::utilities::php_info' => '@inherit',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // If `reorder` is not specified, it should just use default item order...
+        $this->assertEquals($defaultUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'children' => [
+                        'tools::utilities::search' => '@inherit',
+                        'tools::utilities::cache' => '@inherit',
+                        'tools::utilities::licensing' => '@inherit',
+                        'tools::utilities::email' => '@inherit',
+                        'tools::utilities::php_info' => '@inherit',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+    }
+
+    /** @test */
     public function it_does_nothing_with_inherit_actions_when_not_reordering()
     {
         $nav = $this->buildNavWithPreferences([
@@ -335,6 +440,79 @@ class NavPreferencesTest extends TestCase
             ],
         ]);
         $this->assertEquals(['Articles', 'Pages'], $nav->get('Content')->keyBy->display()->get('Things')->resolveChildren()->children()->map->display()->all());
+    }
+
+    /** @test */
+    public function it_can_alias_items_within_a_section()
+    {
+        $this->assertEquals(['Blueprints', 'Fieldsets'], $this->buildDefaultNav()->get('Fields')->map->display()->all());
+
+        // Recommended syntax...
+        $nav = $this->buildNavWithPreferences([
+            'fields' => [
+                'fields::blueprints' => '@alias',
+            ],
+        ]);
+        $this->assertEquals(['Blueprints', 'Fieldsets', 'Blueprints'], $nav->get('Fields')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // With nesting...
+        $nav = $this->buildNavWithPreferences([
+            'fields' => [
+                'items' => [
+                    'fields::blueprints' => '@alias',
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Blueprints', 'Fieldsets', 'Blueprints'], $nav->get('Fields')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // With full nesting of sections...
+        $nav = $this->buildNavWithPreferences([
+            'sections' => [
+                'fields' => [
+                    'fields::blueprints' => [
+                        'action' => '@alias',
+                    ],
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Blueprints', 'Fieldsets', 'Blueprints'], $nav->get('Fields')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // With config array...
+        $nav = $this->buildNavWithPreferences([
+            'fields' => [
+                'fields::blueprints' => [
+                    'action' => '@alias',
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Blueprints', 'Fieldsets', 'Blueprints'], $nav->get('Fields')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // Alias a child item...
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'content::collections::pages' => '@alias',
+            ],
+        ]);
+        $this->assertEquals(['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Pages'], $nav->get('Content')->map->display()->all());
+        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+    }
+
+    /** @test */
+    public function aliasing_an_item_does_not_include_its_children()
+    {
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections' => '@alias',
+            ],
+        ]);
+
+        $this->assertNull($nav->get('Top Level')->keyBy->display()->get('Collections')->resolveChildren()->children());
+        $this->assertCount(2, $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->all());
     }
 
     /** @test */
@@ -893,6 +1071,31 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('tools::utilities::cache::clone', $cacheItem->id());
         $this->assertEquals('Cache', $cacheItem->display());
         $this->assertArrayNotHasKey('Cache', $nav->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->keyBy->display()->all());
+    }
+
+    /** @test */
+    public function it_can_move_child_items_into_another_items_children()
+    {
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'content::taxonomies' => [
+                    'action' => '@modify',
+                    'children' => [
+                        'content::collections::pages' => '@move',
+                    ],
+                ],
+            ],
+        ]);
+
+        $collectionsChildren = $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children();
+        $this->assertCount(1, $collectionsChildren);
+        $this->assertEquals('content::collections::articles', $collectionsChildren->first()->id());
+        $this->assertEquals('Articles', $collectionsChildren->first()->display());
+
+        $taxonomiesChildren = $nav->get('Content')->keyBy->display()->get('Taxonomies')->resolveChildren()->children();
+        $this->assertCount(1, $taxonomiesChildren);
+        $this->assertEquals('content::collections::pages::clone', $taxonomiesChildren->first()->id());
+        $this->assertEquals('Pages', $taxonomiesChildren->first()->display());
     }
 
     /** @test */
