@@ -1464,11 +1464,34 @@ class NavPreferencesTest extends TestCase
         ], $nav->get('Fields')->mapWithKeys(fn ($i) => [$i->display() => $i->url()])->all());
     }
 
-    private function buildNavWithPreferences($preferences)
+    /** @test */
+    public function it_can_build_with_hidden_items()
+    {
+        $contentItems = $this->buildNavWithPreferences([
+            'sections' => [
+                'content' => [
+                    'items' => [
+                        'content::navigation' => '@hide',
+                        'content::globals' => [
+                            'action' => '@modify',
+                            'display' => 'Globetrotters',
+                        ],
+                    ],
+                ],
+            ],
+        ], true)->get('Content');
+
+        $this->assertEquals(['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globetrotters'], $contentItems->map->display()->all());
+
+        $this->assertEquals('@hide', $contentItems->keyBy->display()->get('Navigation')->manipulations()['action']);
+        $this->assertEquals('@modify', $contentItems->keyBy->display()->get('Globetrotters')->manipulations()['action']);
+    }
+
+    private function buildNavWithPreferences($preferences, $withHidden = false)
     {
         $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
 
-        return Facades\CP\Nav::build($preferences)->pluck('items', 'display');
+        return Facades\CP\Nav::build($preferences, $withHidden)->pluck('items', 'display');
     }
 
     private function buildDefaultNav()

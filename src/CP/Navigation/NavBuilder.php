@@ -270,7 +270,7 @@ class NavBuilder
             ->map(fn ($config, $id) => $this->applyPreferenceOverrideForItem($config, $section, $this->findItem($id)))
             ->filter()
             ->each(fn ($item) => $item->isChild(false))
-            ->reject(fn ($item) => $item->manipulations()['action'] === '@modify')
+            ->reject(fn ($item) => in_array($item->manipulations()['action'], ['@modify', '@hide']))
             ->each(fn ($item) => $this->items[] = $item);
 
         if ($sectionNav['reorder']) {
