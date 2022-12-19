@@ -36,7 +36,8 @@
             <div class="pr-1 flex items-center">
                 <slot name="branch-icon" :branch="item" />
 
-                <svg-icon v-if="isHidden" class="inline-block w-4 h-4 text-grey-50" name="hidden" v-tooltip="isSection ? __('Hidden Section') : __('Hidden Item')" />
+                <svg-icon v-if="isRenamedSection" class="inline-block w-4 h-4 text-grey-50" name="content-writing" v-tooltip="__('Renamed Section')" />
+                <svg-icon v-else-if="isHidden" class="inline-block w-4 h-4 text-grey-50" name="hidden" v-tooltip="isSection ? __('Hidden Section') : __('Hidden Item')" />
                 <svg-icon v-else-if="isPinnedAlias" class="inline-block w-4 h-4 text-grey-50" name="pin" v-tooltip="__('Pinned Item')" />
                 <svg-icon v-else-if="isAlias" class="inline-block w-4 h-4 text-grey-50" name="duplicate-ids" v-tooltip="__('Alias Item')" />
                 <svg-icon v-else-if="isMoved" class="inline-block w-4 text-grey-50" name="flip-vertical" v-tooltip="__('Moved Item')" />
@@ -100,6 +101,10 @@ export default {
 
         isAlreadySvg() {
             return this.icon.startsWith('<svg');
+        },
+
+        isRenamedSection() {
+            return this.isSection && this.item.text !== this.item.config.display_original;
         },
 
         isHidden() {
