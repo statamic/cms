@@ -334,6 +334,7 @@ export default {
                 original: config.original,
                 manipulations: isSectionNode ? config : config.manipulations || {},
                 isSection: isSectionNode,
+                open: isSectionNode,
             };
 
             let children = config.items || config.children;
