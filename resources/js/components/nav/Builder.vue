@@ -516,6 +516,10 @@ export default {
                 Vue.delete(item.manipulations, 'action');
             }
 
+            if (this.isChildItemNode(item)) {
+                this.updateItemAction(item.parent);
+            }
+
             console.log(data_get(item.manipulations, 'action')); // TODO: remove this
         },
 
@@ -531,6 +535,7 @@ export default {
                 case this.itemIsMovedWithinSection(item):
                     return '@move';
                 case this.itemHasModifiedProperties(item):
+                case this.itemHasModifiedChildren(item):
                     return '@modify';
             }
 
@@ -564,7 +569,13 @@ export default {
         },
 
         itemHasModifiedProperties(item) {
-            return _.chain(item.manipulations).omit('action').keys().value().length > 0;
+            return _.chain(item.manipulations).omit(['action', 'children']).keys().value().length > 0;
+        },
+
+        itemHasModifiedChildren(item) {
+            return item.children.filter(childItem => {
+                return _.chain(childItem.manipulations).keys().value().length > 0;
+            }).length > 0;
         },
 
         expandAll() {

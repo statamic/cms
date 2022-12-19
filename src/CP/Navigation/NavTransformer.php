@@ -161,13 +161,7 @@ class NavTransformer
     {
         $transformed = $item['manipulations'];
 
-        $children = $this->transformItems($item['children'], $parentId);
-
-        $childrenHaveManipulations = $this->itemsHaveManipulations($children);
-
-        if (! isset($transformed['action']) && $childrenHaveManipulations) {
-            $transformed['action'] = '@modify';
-        } elseif (! isset($transformed['action']) && ! $childrenHaveManipulations) {
+        if (! isset($transformed['action'])) {
             $transformed['action'] = '@inherit';
         }
 
@@ -177,7 +171,7 @@ class NavTransformer
 
         $transformed['reorder'] = $item['reorder'] ?? false;
 
-        $transformed['children'] = $children ?? [];
+        $transformed['children'] = $this->transformItems($item['children'], $parentId) ?? [];
 
         return $transformed;
     }
@@ -256,20 +250,6 @@ class NavTransformer
             ->count();
 
         $this->reorderedMinimums[$parentKey] = $minimumItemsCount;
-    }
-
-    /**
-     * Check if items have manipulations.
-     *
-     * @param  array  $items
-     * @return bool
-     */
-    protected function itemsHaveManipulations($items)
-    {
-        return collect($items)
-            ->pluck('action')
-            ->reject(fn ($action) => $action === '@inherit')
-            ->isNotEmpty();
     }
 
     /**
