@@ -657,14 +657,6 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Dashboard', 'Pages'], $nav->get('Top Level')->map->display()->all());
         $this->assertArrayNotHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
         $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
-
-        // Move should do nothing if used in same section...
-        $nav = $this->buildNavWithPreferences([
-            'fields' => [
-                'fields::blueprints' => '@move',
-            ],
-        ]);
-        $this->assertEquals(['Blueprints', 'Fieldsets'], $nav->get('Fields')->map->display()->all());
     }
 
     /** @test */

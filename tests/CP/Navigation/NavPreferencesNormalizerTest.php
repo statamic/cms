@@ -476,6 +476,7 @@ class NavPreferencesNormalizerTest extends TestCase
             'top_level::modify',
             'top_level::alias',
             'top_level::inherit',
+            'top_level::move',
         ];
 
         $expectedContentItems = [

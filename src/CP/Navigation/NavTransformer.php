@@ -175,7 +175,7 @@ class NavTransformer
 
         $children = $this->transformItems($item['children'], $parentId);
 
-        if ($children && $parentItem->children()) {
+        if ($children && optional($parentItem)->children()) {
             $transformed['reorder'] = $this->itemsAreReordered(
                 $parentItem->resolveChildren()->children()->map->id()->all(),
                 collect($children)->keys()->all(),
