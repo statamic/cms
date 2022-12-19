@@ -580,7 +580,7 @@ class NavBuilder
     protected function userModifyItemChildren($item, $childrenOverrides, $section, $reorder)
     {
         $itemChildren = collect($item->resolveChildren()->children())
-            ->each(fn ($item, $index) => $item->order('_'.$index + 1))
+            ->each(fn ($item, $index) => $item->order($index + 1000))
             ->keyBy
             ->id();
 
@@ -599,6 +599,8 @@ class NavBuilder
         $newChildren = $reorder
             ? $itemChildren->sortBy(fn ($item) => $item->order())->values()
             : $itemChildren->values();
+
+        $newChildren->each(fn ($item, $index) => $item->order($index + 1));
 
         $item->children($newChildren, false);
 
