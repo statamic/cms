@@ -199,6 +199,12 @@ class NavTest extends TestCase
         $this->assertEquals('droids::battle_droids::b2', $item->children()->get(1)->id());
         $this->assertEquals('HK-47', $item->children()->get(2)->display());
         $this->assertEquals('droids::battle_droids::hk_47', $item->children()->get(2)->id());
+
+        $this->assertFalse($item->isChild());
+
+        $item->children()->each(function ($item) {
+            $this->assertTrue($item->isChild());
+        });
     }
 
     /** @test */

@@ -18,6 +18,7 @@ class NavItem
     protected $url;
     protected $icon;
     protected $children;
+    protected $isChild;
     protected $authorization;
     protected $active;
     protected $view;
@@ -193,7 +194,8 @@ class NavItem
                 return $navItem
                     ->id($generateNewIds ? $this->id().'::' : $navItem->id())
                     ->icon($this->icon())
-                    ->section($this->section());
+                    ->section($this->section())
+                    ->isChild(true);
             })
             ->values();
 
@@ -202,6 +204,22 @@ class NavItem
         }
 
         return $this;
+    }
+
+    /**
+     * Track if this nav item is a child of another nav item.
+     *
+     * @param  bool|null  $isChild
+     * @return mixed
+     */
+    public function isChild($isChild = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('isChild')
+            ->getter(function ($value) {
+                return (bool) $value;
+            })
+            ->value($isChild);
     }
 
     /**

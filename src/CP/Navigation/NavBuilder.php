@@ -154,7 +154,7 @@ class NavBuilder
      *
      * @return $this
      */
-    public function syncOriginal()
+    protected function syncOriginal()
     {
         collect($this->items)->each(fn ($item) => $item->syncOriginal());
 
@@ -250,6 +250,7 @@ class NavBuilder
         collect($sectionNav['items'])
             ->map(fn ($config, $id) => $this->applyPreferenceOverrideForItem($config, $section, $this->findItem($id)))
             ->filter()
+            ->each(fn ($item) => $item->isChild(false))
             ->reject(fn ($item) => $item->manipulations()['action'] === '@modify')
             ->each(fn ($item) => $this->items[] = $item);
 
@@ -607,6 +608,7 @@ class NavBuilder
         }
 
         if ($childItem = $this->applyPreferenceOverrideForItem($config, $section, $item, $id ?? null)) {
+            $childItem->isChild(true);
             $childItem->children([]);
         }
 
@@ -708,6 +710,7 @@ class NavBuilder
                 );
             })
             ->filter()
+            ->each(fn ($item) => $item->isChild(true))
             ->all();
 
         $item->children($children);
@@ -724,6 +727,7 @@ class NavBuilder
 
         // Organize items by section...
         collect($this->items)
+            ->reject(fn ($item) => $item->isChild())
             ->reject(fn ($item) => $this->withHidden ? false : $item->isHidden())
             ->filter(fn ($item) => $item->section())
             ->each(function ($item) use (&$sections) {
