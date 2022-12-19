@@ -569,7 +569,7 @@ export default {
         },
 
         itemHasModifiedProperties(item) {
-            return _.chain(item.manipulations).omit(['action', 'children']).keys().value().length > 0;
+            return _.chain(item.manipulations).omit(['action', 'reorder', 'children']).keys().value().length > 0;
         },
 
         itemHasModifiedChildren(item) {

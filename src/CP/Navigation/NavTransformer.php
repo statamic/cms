@@ -21,7 +21,7 @@ class NavTransformer
      */
     public function __construct(array $submitted, bool $allowOverriding = true)
     {
-        $this->coreNav = Nav::buildWithoutPreferences();
+        $this->coreNav = Nav::buildWithoutPreferences(true);
 
         $this->submitted = $this->removeEmptyCustomSections($submitted);
 
@@ -169,9 +169,25 @@ class NavTransformer
             $transformed['url'] = $this->transformItemUrl($transformed['url']);
         }
 
-        $transformed['reorder'] = $item['reorder'] ?? false;
+        $transformed['reorder'] = false;
 
-        $transformed['children'] = $this->transformItems($item['children'], $parentId) ?? [];
+        $parentItem = $this->findParentItem($parentId);
+
+        $children = $this->transformItems($item['children'], $parentId);
+
+        if ($children && $parentItem->children()) {
+            $transformed['reorder'] = $this->itemsAreReordered(
+                $parentItem->resolveChildren()->children()->map->id()->all(),
+                collect($children)->keys()->all(),
+                $parentId
+            );
+        }
+
+        if ($transformed['reorder'] && $transformed['action'] === '@inherit') {
+            $transformed['action'] = '@modify';
+        }
+
+        $transformed['children'] = $children;
 
         return $transformed;
     }
@@ -250,6 +266,21 @@ class NavTransformer
             ->count();
 
         $this->reorderedMinimums[$parentKey] = $minimumItemsCount;
+    }
+
+    /**
+     * Find parent item from core nav by ID.
+     *
+     * @param  string  $id
+     * @return NavItem
+     */
+    protected function findParentItem($id)
+    {
+        return $this->coreNav
+            ->flatMap(fn ($section) => $section['items'])
+            ->keyBy
+            ->id()
+            ->get($id);
     }
 
     /**
