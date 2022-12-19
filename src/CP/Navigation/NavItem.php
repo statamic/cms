@@ -210,12 +210,21 @@ class NavItem
      */
     public function resolveChildren()
     {
-        if (is_callable($this->children)) {
-            $this->children($this->children()());
+        if (! is_callable($this->children)) {
+            return $this;
         }
 
-        if ($this->original && is_callable($this->original->children)) {
-            $this->original->children($this->original->children()());
+        // Resolve children closure
+        $this->children($this->children()());
+
+        // Resolve children closure on synced original instance
+        if ($this->original() && is_callable($this->original->children())) {
+            $this->original()->children($this->original->children()());
+        }
+
+        // Sync original on each new child item
+        if ($this->children()) {
+            $this->children()->each(fn ($item) => $item->syncOriginal());
         }
 
         return $this;

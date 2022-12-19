@@ -579,6 +579,10 @@ class NavTest extends TestCase
         $this->assertFalse(is_callable($item->original()->children()));
         $this->assertEquals(['B3', 'B4'], $item->children()->map->display()->all());
         $this->assertEquals(['B1', 'B2'], $item->original()->children()->map->display()->all());
+
+        $item->children()->each(function ($item) {
+            $this->assertInstanceOf(NavItem::class, $item->original());
+        });
     }
 
     /** @test */
