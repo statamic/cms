@@ -104,7 +104,7 @@ export default {
         },
 
         isRenamedSection() {
-            return this.isSection && this.item.text !== this.item.config.display_original;
+            return this.isSection && this.item.text !== data_get(this.item, 'config.display_original');
         },
 
         isHidden() {
