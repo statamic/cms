@@ -4,6 +4,7 @@ namespace Tests\CP\Navigation;
 
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use Statamic\CP\Navigation\NavItem;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
@@ -495,8 +496,6 @@ class NavTest extends TestCase
     /** @test */
     public function it_can_preserve_current_id_to_prevent_dynamic_id_generation()
     {
-        $this->actingAs(tap(User::make()->makeSuper())->save());
-
         $item = Nav::droids('3PO');
 
         $this->assertEquals('droids::3po', $item->id());
@@ -511,6 +510,75 @@ class NavTest extends TestCase
         // We should not see the ID generate dynamically, due to the `preserveCurrentId()` call
         $this->assertSame($final, $item);
         $this->assertEquals('droids_preserved::r2', $item->id());
+    }
+
+    /** @test */
+    public function it_can_sync_original_state_to_original_property()
+    {
+        $item = Nav::droids('C-3PO')
+            ->id('some::custom::id')
+            ->url('/human-cyborg-relations')
+            ->children([
+                Nav::item('B1')->url('/b1'),
+                Nav::item('B2')->url('/b2'),
+            ]);
+
+        $this->assertNull($item->original());
+
+        $item
+            ->syncOriginal()
+            ->display('Changed Display')
+            ->id('changed::id')
+            ->url('/changed-url')
+            ->children([
+                Nav::item('B3')->url('/b3'),
+                Nav::item('B4')->url('/b4'),
+            ]);
+
+        $this->assertInstanceOf(NavItem::class, $item->original());
+
+        $this->assertEquals('Changed Display', $item->display());
+        $this->assertEquals('C-3PO', $item->original()->display());
+
+        $this->assertEquals('changed::id', $item->id());
+        $this->assertEquals('some::custom::id', $item->original()->id());
+
+        $this->assertEquals(['B3', 'B4'], $item->children()->map->display()->all());
+        $this->assertEquals(['B1', 'B2'], $item->original()->children()->map->display()->all());
+    }
+
+    /** @test */
+    public function it_resolves_children_on_synced_original_nav_item()
+    {
+        $item = Nav::droids('C-3PO')->children(function () {
+            return [
+                Nav::item('B1')->url('/b1'),
+                Nav::item('B2')->url('/b2'),
+            ];
+        });
+
+        $this->assertNull($item->original());
+        $this->assertTrue(is_callable($item->children()));
+
+        $item
+            ->syncOriginal()
+            ->children(function () {
+                return [
+                    Nav::item('B3')->url('/b3'),
+                    Nav::item('B4')->url('/b4'),
+                ];
+            });
+
+        $this->assertInstanceOf(NavItem::class, $item->original());
+        $this->assertTrue(is_callable($item->children()));
+        $this->assertTrue(is_callable($item->original()->children()));
+
+        $item->resolveChildren();
+
+        $this->assertFalse(is_callable($item->children()));
+        $this->assertFalse(is_callable($item->original()->children()));
+        $this->assertEquals(['B3', 'B4'], $item->children()->map->display()->all());
+        $this->assertEquals(['B1', 'B2'], $item->original()->children()->map->display()->all());
     }
 
     /** @test */

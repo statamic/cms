@@ -24,6 +24,7 @@ class NavItem
     protected $order;
     protected $hidden;
     protected $manipulations;
+    protected $original;
 
     /**
      * Get or set display.
@@ -213,6 +214,10 @@ class NavItem
             $this->children($this->children()());
         }
 
+        if ($this->original && is_callable($this->original->children)) {
+            $this->original->children($this->original->children()());
+        }
+
         return $this;
     }
 
@@ -332,6 +337,28 @@ class NavItem
     public function manipulations($manipulations = null)
     {
         return $this->fluentlyGetOrSet('manipulations')->value($manipulations);
+    }
+
+    /**
+     * Sync original state.
+     *
+     * @return $this
+     */
+    public function syncOriginal()
+    {
+        $this->original = clone $this;
+
+        return $this;
+    }
+
+    /**
+     * Get original state.
+     *
+     * @return array
+     */
+    public function original()
+    {
+        return $this->original;
     }
 
     /**
