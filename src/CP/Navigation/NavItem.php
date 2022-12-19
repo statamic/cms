@@ -346,6 +346,8 @@ class NavItem
      */
     public function syncOriginal()
     {
+        $this->original = null; // Clear original property so it can never appear in cloned instance.
+
         $this->original = clone $this;
 
         return $this;

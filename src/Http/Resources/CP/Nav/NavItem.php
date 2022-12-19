@@ -20,6 +20,7 @@ class NavItem extends JsonResource
             'icon' => $this->resource->icon(),
             'manipulations' => $this->resource->manipulations(),
             'children' => $children ?? [],
+            'original' => NavItem::make($this->resource->original()),
         ];
     }
 }

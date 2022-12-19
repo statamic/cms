@@ -321,6 +321,7 @@ export default {
             let item = {
                 text: config.display,
                 config: config,
+                original: config.original,
                 manipulations: isSectionNode ? config : config.manipulations || {},
                 isSection: isSectionNode,
             };
@@ -334,6 +335,7 @@ export default {
                         children: childItem.children.map(childChildItem => this.normalizeNavConfig(childChildItem, false)),
                         open: false,
                         config: childItem,
+                        original: childItem.original,
                         manipulations: childItem.manipulations || {},
                         isSection: false,
                     };
