@@ -4,6 +4,7 @@ namespace Statamic\CP\Navigation;
 
 use Statamic\Facades\CP\Nav;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class NavTransformer
 {
@@ -170,11 +171,42 @@ class NavTransformer
             $transformed['action'] = '@inherit';
         }
 
+        if (isset($transformed['url'])) {
+            $transformed['url'] = $this->transformItemUrl($transformed['url']);
+        }
+
         $transformed['reorder'] = $item['reorder'] ?? false;
 
         $transformed['children'] = $children ?? [];
 
         return $transformed;
+    }
+
+    /**
+     * Transform item url to match NavItem `url()` conventions.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function transformItemUrl($url)
+    {
+        if (Str::startsWith($url, url('/'))) {
+            $url = str_replace(url('/'), '', $url);
+        }
+
+        if (Str::startsWith($url, ['http://', 'https://'])) {
+            return $url;
+        }
+
+        $cp = config('statamic.cp.route');
+        $cp = Str::ensureLeft($cp, '/');
+        $cp = Str::ensureRight($cp, '/');
+
+        if (Str::startsWith($url, $cp)) {
+            return str_replace($cp, '', $url);
+        }
+
+        return $url;
     }
 
     /**
