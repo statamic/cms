@@ -13,6 +13,7 @@ class NavBuilder
     protected $items = [];
     protected $pendingItems = [];
     protected $withHidden = false;
+    protected $sectionsOriginalItemIds = [];
     protected $sectionsManipulations = [];
     protected $sectionsOrder = [];
     protected $sectionsWithReorderedItems = [];
@@ -49,6 +50,7 @@ class NavBuilder
             ->authorizeItems()
             ->authorizeChildren()
             ->syncOriginal()
+            ->trackOriginalSectionItems()
             ->applyPreferenceOverrides($preferences)
             ->buildSections()
             ->get();
@@ -157,6 +159,23 @@ class NavBuilder
     protected function syncOriginal()
     {
         collect($this->items)->each(fn ($item) => $item->syncOriginal());
+
+        return $this;
+    }
+
+    /**
+     * Track original section items.
+     *
+     * @return $this
+     */
+    protected function trackOriginalSectionItems()
+    {
+        collect($this->items)
+            ->reject(fn ($item) => $item->isChild())
+            ->filter(fn ($item) => $item->section())
+            ->each(function ($item) use (&$sections) {
+                $this->sectionsOriginalItemIds[$item->section()][] = $item->id();
+            });
 
         return $this;
     }
@@ -752,9 +771,10 @@ class NavBuilder
         $built->transform(function ($items, $section) use ($manipulations) {
             return [
                 'display' => $section,
-                'display_original' => Arr::get($manipulations, "{$section}.display_original") ?? $section,
+                'display_original' => $displayOriginal = Arr::get($manipulations, "{$section}.display_original") ?? $section,
                 'action' => Arr::get($manipulations, "{$section}.action") ?? false,
                 'items' => $items,
+                'items_original' => Arr::get($this->sectionsOriginalItemIds, $displayOriginal),
             ];
         });
 

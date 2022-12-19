@@ -262,6 +262,7 @@ export default {
             loading: false,
             topLevelTreeData: [],
             mainTreeData: [],
+            originalSectionItems: {},
             changed: false,
             targetDataArray: null,
             creatingItem: false,
@@ -300,6 +301,9 @@ export default {
 
         setInitialNav(nav) {
             let navConfig = clone(nav);
+
+            this.setOriginalSectionItems(navConfig);
+
             let topLevelConfig = navConfig.shift();
 
             this.topLevelTreeData = _.chain(topLevelConfig.items)
@@ -311,6 +315,10 @@ export default {
                 .mapObject(section => this.normalizeNavConfig(section))
                 .values()
                 .value();
+        },
+
+        setOriginalSectionItems(nav) {
+            nav.forEach(section => this.originalSectionItems[section.display_original] = section.items_original || []);
         },
 
         discardChanges() {
@@ -405,6 +413,10 @@ export default {
             return node;
         },
 
+        isChildItemNode(node) {
+            return ! this.isSectionNode(node.parent) && ! node.parent.isRoot;
+        },
+
         traverseTree(nodes, callback, parentPath = []) {
             const nodesArray = Array.isArray(nodes) ? nodes : [nodes];
 
@@ -494,7 +506,7 @@ export default {
             }
         },
 
-        updateItemAction(item, wat) {
+        updateItemAction(item) {
             if (['@create', '@alias'].includes(data_get(item.manipulations, 'action'))) {
                 console.log(item.manipulations.action); // TODO: remove this
                 return;
@@ -513,7 +525,15 @@ export default {
                 .children
                 .map(child => child.id);
 
-            if (! parentsOriginalChildIds.includes(item.original.id)) {
+            if (this.isChildItemNode(item) && ! parentsOriginalChildIds.includes(item.original.id)) {
+                item.manipulations.action = '@move';
+                console.log('@move WITHIN section'); // TODO: remove this
+                return;
+            }
+
+            let sectionsOriginalIds = this.originalSectionItems[currentSection];
+
+            if (! this.isChildItemNode(item) && ! sectionsOriginalIds.includes(item.original.id)) {
                 item.manipulations.action = '@move';
                 console.log('@move WITHIN section'); // TODO: remove this
                 return;
