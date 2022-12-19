@@ -123,6 +123,6 @@ return [
     |
     */
 
-    'warm_queue' => 'default',
+    'warm_queue' => null,
 
 ];
