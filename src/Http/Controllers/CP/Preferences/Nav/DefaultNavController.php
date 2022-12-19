@@ -21,8 +21,8 @@ class DefaultNavController extends Controller
         $preferences = Preference::default()->get('nav');
 
         $nav = $preferences
-            ? Nav::withHidden()->build($preferences)
-            : Nav::withHidden()->buildWithoutPreferences();
+            ? Nav::build($preferences, true)
+            : Nav::buildWithoutPreferences(true);
 
         return $this->navBuilder($nav, [
             'title' => 'Global Default Nav',
@@ -33,7 +33,7 @@ class DefaultNavController extends Controller
 
     public function update(Request $request)
     {
-        $nav = $this->getUpdatedNav($request);
+        $nav = $this->getUpdatedNav($request, false);
 
         if (is_null($nav)) {
             return $this->destroy();

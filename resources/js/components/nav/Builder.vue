@@ -69,6 +69,7 @@
                 :indent="24"
                 @change="changed = true"
                 @drag="topLevelTreeDragStart"
+                @drop="updateItemAction"
             >
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
@@ -82,7 +83,11 @@
                     @edit="editItem(item, true)"
                     @toggle-open="store.toggleOpen(item)"
                 >
-                    <template #branch-options="{ item, vm }">
+                    <template #branch-options="{ item }">
+                        <dropdown-item
+                            v-if="vm.level < 2"
+                            :text="__('Add Item')"
+                            @click="addItem(item.children)" />
                         <dropdown-item
                             :text="__('Edit')"
                             @click="editingItem = item" />
@@ -113,6 +118,7 @@
                 :indent="24"
                 @change="changed = true"
                 @drag="mainTreeDragStart"
+                @drop="updateItemAction"
             >
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
@@ -127,6 +133,7 @@
                 >
                     <template #branch-options="{ item }">
                         <dropdown-item
+                            v-if="vm.level < 3"
                             :text="__('Add Item')"
                             @click="addItem(item.children)" />
                         <dropdown-item
@@ -184,15 +191,24 @@
         />
 
         <confirmation-modal
-            v-if="confirmingReset === true"
+            v-if="confirmingReset"
             :title="__('Reset')"
             :bodyText="__('Are you sure you want to reset nav customizations?')"
             :buttonText="__('Reset')"
             :danger="true"
             @confirm="reset"
             @cancel="confirmingReset = false"
-        >
-        </confirmation-modal>
+        />
+
+        <confirmation-modal
+            v-if="confirmingRemoval"
+            :title="__('Remove')"
+            :bodyText="__('Are you sure you want to remove this section and all of its children?')"
+            :buttonText="__('Remove')"
+            :danger="true"
+            @confirm="removeItem(confirmingRemoval, true)"
+            @cancel="confirmingReset = false"
+        />
 
     </div>
 
@@ -246,6 +262,7 @@ export default {
             loading: false,
             topLevelTreeData: [],
             mainTreeData: [],
+            originalSectionItems: {},
             changed: false,
             targetDataArray: null,
             creatingItem: false,
@@ -253,6 +270,7 @@ export default {
             creatingSection: false,
             editingSection: false,
             confirmingReset: false,
+            confirmingRemoval: false,
         }
     },
 
@@ -283,6 +301,9 @@ export default {
 
         setInitialNav(nav) {
             let navConfig = clone(nav);
+
+            this.setOriginalSectionItems(navConfig);
+
             let topLevelConfig = navConfig.shift();
 
             this.topLevelTreeData = _.chain(topLevelConfig.items)
@@ -296,6 +317,10 @@ export default {
                 .value();
         },
 
+        setOriginalSectionItems(nav) {
+            nav.forEach(section => this.originalSectionItems[section.display_original] = section.items_original || []);
+        },
+
         discardChanges() {
             this.setInitialNav(this.initialNav);
 
@@ -306,17 +331,22 @@ export default {
             let item = {
                 text: config.display,
                 config: config,
+                original: config.original,
                 manipulations: isSectionNode ? config : config.manipulations || {},
                 isSection: isSectionNode,
+                open: isSectionNode,
             };
 
-            if (config.items) {
-                item.children = config.items.map(childItem => {
+            let children = config.items || config.children;
+
+            if (children) {
+                item.children = children.map(childItem => {
                     return {
                         text: childItem.display,
                         children: childItem.children.map(childChildItem => this.normalizeNavConfig(childChildItem, false)),
                         open: false,
                         config: childItem,
+                        original: childItem.original,
                         manipulations: childItem.manipulations || {},
                         isSection: false,
                     };
@@ -372,12 +402,20 @@ export default {
             return data_get(node, 'isSection', false);
         },
 
+        isCustomSectionNode(node) {
+            return this.isSectionNode(node) && data_get(node, 'manipulations.action') === '@create';
+        },
+
         getParentSectionNode(node) {
             if (! this.isSectionNode(node) && node !== undefined) {
                 return this.getParentSectionNode(node.parent);
             }
 
             return node;
+        },
+
+        isChildItemNode(node) {
+            return ! this.isSectionNode(node.parent) && ! node.parent.isRoot;
         },
 
         traverseTree(nodes, callback, parentPath = []) {
@@ -425,6 +463,7 @@ export default {
 
         sectionAdded(sectionDisplay) {
             let item = this.normalizeNavConfig({
+                action: '@create',
                 display: sectionDisplay,
                 display_original: false,
             });
@@ -445,12 +484,9 @@ export default {
         itemUpdated(updatedConfig, item) {
             item.text = updatedConfig.display;
 
-            item.manipulations = {
-                action: data_get(item.manipulations, 'action', '@modify'),
-                display: updatedConfig.display,
-                display_original: updatedConfig.display_origial,
-                url: updatedConfig.url,
-            };
+            this.updateItemManipulation(item, 'display', updatedConfig.display);
+            this.updateItemManipulation(item, 'url', updatedConfig.url);
+            this.updateItemAction(item);
 
             this.resetItemEditor();
             this.changed = true;
@@ -461,6 +497,62 @@ export default {
 
             this.resetSectionEditor();
             this.changed = true;
+        },
+
+        updateItemManipulation(item, key, value) {
+            if (value !== data_get(item.original, key)) {
+                item.manipulations[key] = value;
+            } else {
+                Vue.delete(item.manipulations, key);
+            }
+        },
+
+        updateItemAction(item) {
+            if (['@create', '@alias'].includes(data_get(item.manipulations, 'action'))) {
+                console.log(item.manipulations.action); // TODO: remove this
+                return;
+            }
+
+            let originalSection = data_get(item.original, 'section') || data_get(item.parent, 'original.section');
+            let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
+
+            if (currentSection !== originalSection) {
+                item.manipulations.action = '@move';
+                console.log('@move to ANOTHER section'); // TODO: remove this
+                return;
+            }
+
+            let parentsOriginalChildIds = data_get(item.parent, 'original', { children: [] })
+                .children
+                .map(child => child.id);
+
+            if (this.isChildItemNode(item) && ! parentsOriginalChildIds.includes(item.original.id)) {
+                item.manipulations.action = '@move';
+                console.log('@move WITHIN section'); // TODO: remove this
+                return;
+            }
+
+            let sectionsOriginalIds = this.originalSectionItems[currentSection];
+
+            if (! this.isChildItemNode(item) && ! sectionsOriginalIds.includes(item.original.id)) {
+                item.manipulations.action = '@move';
+                console.log('@move WITHIN section'); // TODO: remove this
+                return;
+            }
+
+            let modifiedProperties = _.chain(item.manipulations)
+                .omit('action')
+                .keys()
+                .value();
+
+            if (modifiedProperties.length) {
+                item.manipulations.action = '@modify';
+                console.log('@modify'); // TODO: remove this
+                return;
+            }
+
+            Vue.delete(item.manipulations, 'action');
+            console.log('no action'); // TODO: remove this
         },
 
         expandAll() {
@@ -511,6 +603,8 @@ export default {
 
             newItem.manipulations = { action: '@alias' };
 
+            newItem.children = [];
+
             let tree = treeData || item.parent.children;
 
             tree.push(newItem);
@@ -519,25 +613,34 @@ export default {
         },
 
         itemIsVisible(item) {
-            return data_get(item.manipulations, 'action') !== '@remove';
+            return data_get(item.manipulations, 'action') !== '@hide';
         },
 
         isHideable(item) {
             let action = data_get(item.manipulations, 'action');
 
+            if (this.isSectionNode(item) && action === '@create') {
+                return false;
+            }
+
             return ! ['@alias', '@move', '@create'].includes(action);
         },
 
-        removeItem(item) {
+        removeItem(item, bypassConfirmation = false) {
+            if (this.isCustomSectionNode(item) && item.children.length && ! bypassConfirmation) {
+                return this.confirmingRemoval = item;
+            }
+
             item._vm.store.deleteNode(item);
 
             this.changed = true;
+            this.confirmingRemoval = false;
         },
 
         hideItem(item) {
             item.trashedManipulations = item.manipulations;
 
-            item.manipulations = { action: '@remove' };
+            item.manipulations = { action: '@hide' };
 
             this.changed = true;
         },

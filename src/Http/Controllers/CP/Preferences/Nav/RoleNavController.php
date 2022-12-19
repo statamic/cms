@@ -28,8 +28,8 @@ class RoleNavController extends Controller
         $preferences = $role->getPreference('nav') ?? Preference::default()->get('nav');
 
         $nav = $preferences
-            ? Nav::withHidden()->build($preferences)
-            : Nav::withHidden()->buildWithoutPreferences();
+            ? Nav::build($preferences, true)
+            : Nav::buildWithoutPreferences(true);
 
         return $this->navBuilder($nav, [
             'title' => $role->title().' Nav',
@@ -43,10 +43,6 @@ class RoleNavController extends Controller
         abort_unless($role = Role::find($handle), 404);
 
         $nav = $this->getUpdatedNav($request);
-
-        if (is_null($nav)) {
-            return $this->destroy($handle);
-        }
 
         $role->setPreference('nav', $nav)->save();
 

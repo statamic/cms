@@ -18,12 +18,14 @@ class NavItem
     protected $url;
     protected $icon;
     protected $children;
+    protected $isChild;
     protected $authorization;
     protected $active;
     protected $view;
     protected $order;
     protected $hidden;
     protected $manipulations;
+    protected $original;
 
     /**
      * Get or set display.
@@ -191,7 +193,9 @@ class NavItem
             ->map(function ($navItem) use ($generateNewIds) {
                 return $navItem
                     ->id($generateNewIds ? $this->id().'::' : $navItem->id())
-                    ->icon($this->icon());
+                    ->icon($this->icon())
+                    ->section($this->section())
+                    ->isChild(true);
             })
             ->values();
 
@@ -203,14 +207,43 @@ class NavItem
     }
 
     /**
+     * Track if this nav item is a child of another nav item.
+     *
+     * @param  bool|null  $isChild
+     * @return mixed
+     */
+    public function isChild($isChild = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('isChild')
+            ->getter(function ($value) {
+                return (bool) $value;
+            })
+            ->value($isChild);
+    }
+
+    /**
      * Resolve children closure.
      *
      * @return $this
      */
     public function resolveChildren()
     {
-        if (is_callable($this->children)) {
-            $this->children($this->children()());
+        if (! is_callable($this->children)) {
+            return $this;
+        }
+
+        // Resolve children closure
+        $this->children($this->children()());
+
+        // Resolve children closure on synced original instance
+        if ($this->original() && is_callable($this->original->children())) {
+            $this->original()->children($this->original->children()());
+        }
+
+        // Sync original on each new child item
+        if ($this->children()) {
+            $this->children()->each(fn ($item) => $item->syncOriginal());
         }
 
         return $this;
@@ -332,6 +365,30 @@ class NavItem
     public function manipulations($manipulations = null)
     {
         return $this->fluentlyGetOrSet('manipulations')->value($manipulations);
+    }
+
+    /**
+     * Sync original state.
+     *
+     * @return $this
+     */
+    public function syncOriginal()
+    {
+        $this->original = null; // Clear original property so it can never appear in cloned instance.
+
+        $this->original = clone $this;
+
+        return $this;
+    }
+
+    /**
+     * Get original state.
+     *
+     * @return array
+     */
+    public function original()
+    {
+        return $this->original;
     }
 
     /**

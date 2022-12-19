@@ -2,17 +2,29 @@
 
 namespace Statamic\CP\Navigation;
 
-use ArrayAccess;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class NavPreferencesConfig implements ArrayAccess
+class NavPreferencesNormalizer
 {
-    protected $config;
+    protected $preferences;
+    protected $normalized;
+
+    const ALLOWED_NAV_SECTION_ACTIONS = [
+        '@create',   // create custom section
+        '@hide',     // hide section
+        '@inherit',  // inherit section without modification (used for reordering purposes only, when none of the above apply)
+    ];
+
+    const ALLOWED_NAV_SECTION_MODIFICATIONS = [
+        'display',   // change section display text
+        'items',     // modify section items
+        'reorder',   // reorder section items
+    ];
 
     const ALLOWED_NAV_ITEM_ACTIONS = [
-        '@create',   // create new item
-        '@remove',   // hide item (only works if item is in its original section)
+        '@create',   // create custom item
+        '@hide',     // hide item (only works if item is in its original section)
         '@modify',   // modify item (only works if item is in its original section)
         '@alias',    // alias into another section (can also modify item)
         '@move',     // move into another section (can also modify item)
@@ -20,11 +32,12 @@ class NavPreferencesConfig implements ArrayAccess
     ];
 
     const ALLOWED_NAV_ITEM_MODIFICATIONS = [
-        'display',
-        'url',
-        'route',
-        'icon',
-        'children',
+        'display',   // change item display text
+        'url',       // change item url
+        'route',     // change item route (does not currently support parameters)
+        'icon',      // change item icon
+        'children',  // modify item children
+        'reorder',   // reorder item children
     ];
 
     /**
@@ -34,39 +47,30 @@ class NavPreferencesConfig implements ArrayAccess
      */
     public function __construct($navPreferences)
     {
-        $this->config = $this->normalizeConfig($navPreferences);
+        $this->preferences = $navPreferences;
     }
 
     /**
      * Instantiate nav preferences config helper.
      *
      * @param  array  $navPreferences
-     * @return static
-     */
-    public static function normalize($navPreferences)
-    {
-        return new static($navPreferences);
-    }
-
-    /**
-     * Get normalized config.
-     *
      * @return array
      */
-    public function get()
+    public static function fromPreferences($navPreferences)
     {
-        return $this->config;
+        return (new static($navPreferences))
+            ->normalize()
+            ->get();
     }
 
     /**
      * Normalize config.
      *
-     * @param  array  $navConfig
      * @return array
      */
-    protected function normalizeConfig($navConfig)
+    protected function normalize()
     {
-        $navConfig = collect($navConfig);
+        $navConfig = collect($this->preferences);
 
         $normalized = collect()->put('reorder', $reorder = $navConfig->get('reorder', false));
 
@@ -76,13 +80,16 @@ class NavPreferencesConfig implements ArrayAccess
             ->prepend($sections->pull('top_level') ?? '@inherit', 'top_level')
             ->map(fn ($config, $section) => $this->normalizeSectionConfig($config, $section))
             ->reject(fn ($config) => $config['action'] === '@inherit' && ! $reorder)
+            ->map(fn ($config) => $this->removeInheritFromConfig($config))
             ->all();
 
         $normalized->put('sections', $sections);
 
         $allowedKeys = ['reorder', 'sections'];
 
-        return $normalized->only($allowedKeys)->all();
+        $this->normalized = $normalized->only($allowedKeys)->all();
+
+        return $this;
     }
 
     /**
@@ -100,7 +107,11 @@ class NavPreferencesConfig implements ArrayAccess
 
         $normalized = collect();
 
-        $normalized->put('action', $sectionConfig->get('action', false));
+        $normalized->put('action', $sectionConfig->get('action'));
+
+        if (! in_array($normalized->get('action'), static::ALLOWED_NAV_SECTION_ACTIONS)) {
+            $normalized->put('action', false);
+        }
 
         $normalized->put('display', $sectionConfig->get('display', Str::modifyMultiple($sectionKey, ['deslugify', 'title'])));
 
@@ -120,9 +131,24 @@ class NavPreferencesConfig implements ArrayAccess
 
         $normalized->put('items', $items);
 
-        $allowedKeys = ['action', 'reorder', 'display', 'items'];
+        $allowedKeys = array_merge(['action'], static::ALLOWED_NAV_SECTION_MODIFICATIONS);
 
         return $normalized->only($allowedKeys)->all();
+    }
+
+    /**
+     * Remove inherit action from config.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function removeInheritFromConfig($config)
+    {
+        if ($config['action'] === '@inherit') {
+            $config['action'] = false;
+        }
+
+        return $config;
     }
 
     /**
@@ -148,7 +174,7 @@ class NavPreferencesConfig implements ArrayAccess
         if ($removeBadActions) {
             if ($isInOriginalSection && in_array($normalized->get('action'), ['@move'])) {
                 return null;
-            } elseif (! $isInOriginalSection && in_array($normalized->get('action'), ['@remove', '@modify', '@inherit'])) {
+            } elseif (! $isInOriginalSection && in_array($normalized->get('action'), ['@hide', '@modify', '@inherit'])) {
                 return null;
             }
         }
@@ -232,27 +258,13 @@ class NavPreferencesConfig implements ArrayAccess
         return Str::startsWith($itemId, "$currentSectionKey::");
     }
 
-    #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    /**
+     * Get normalized preferences.
+     *
+     * @return array
+     */
+    protected function get()
     {
-        return $this->config[$key];
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetSet($key, $value)
-    {
-        throw new \Exception('Method offsetSet is not currently supported.');
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetExists($key)
-    {
-        throw new \Exception('Method offsetExists is not currently supported.');
-    }
-
-    #[\ReturnTypeWillChange]
-    public function offsetUnset($key)
-    {
-        throw new \Exception('Method offsetUnset is not currently supported.');
+        return $this->normalized;
     }
 }

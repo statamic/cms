@@ -19,13 +19,13 @@ trait HasNavBuilder
             'updateUrl' => cp_route('preferences.nav.user.update'),
             'destroyUrl' => cp_route('preferences.nav.user.destroy'),
             'saveAsOptions' => $this->getSaveAsOptions()->values()->all(),
-            'nav' => NavResource::make($nav ?? Nav::withHidden()->build()),
+            'nav' => NavResource::make($nav ?? Nav::build(true, true)),
         ], $props));
     }
 
-    protected function getUpdatedNav(Request $request)
+    protected function getUpdatedNav(Request $request, $allowOverriding = true)
     {
-        return NavTransformer::fromVue($request->tree);
+        return NavTransformer::fromVue($request->tree, $allowOverriding);
     }
 
     protected function getSaveAsOptions()

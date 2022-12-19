@@ -49,12 +49,14 @@ class UtilityRepository
             $this->all()->each(function ($utility) {
                 if ($utility->action()) {
                     Route::get($utility->slug(), $utility->action())
+                        ->middleware("can:access {$utility->handle()} utility")
                         ->name($utility->slug());
                 }
 
                 if ($routeClosure = $utility->routes()) {
                     Route::name($utility->slug().'.')
                         ->prefix($utility->slug())
+                        ->middleware("can:access {$utility->handle()} utility")
                         ->group(function () use ($routeClosure) {
                             $routeClosure(Route::getFacadeRoot());
                         });

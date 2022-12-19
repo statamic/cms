@@ -224,6 +224,111 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_reorder_child_items_within_an_item()
+    {
+        $defaultUtilitiesItems = ['Cache', 'Email', 'Licensing', 'PHP Info', 'Search'];
+
+        $this->assertEquals($defaultUtilitiesItems, $this->buildDefaultNav()->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        $reorderedUtilitiesItems = ['Search', 'Cache', 'Licensing', 'Email', 'PHP Info'];
+
+        // Recommended syntax...
+        $this->assertEquals($reorderedUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => true,
+                    'children' => [
+                        'tools::utilities::search' => '@inherit',
+                        'tools::utilities::cache' => '@inherit',
+                        'tools::utilities::licensing' => '@inherit',
+                        'tools::utilities::email' => '@inherit',
+                        'tools::utilities::php_info' => '@inherit',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // With full nesting of sections...
+        $this->assertEquals($reorderedUtilitiesItems, $this->buildNavWithPreferences([
+            'sections' => [
+                'tools' => [
+                    'tools::utilities' => [
+                        'reorder' => true,
+                        'children' => [
+                            'tools::utilities::search' => '@inherit',
+                            'tools::utilities::cache' => '@inherit',
+                            'tools::utilities::licensing' => '@inherit',
+                            'tools::utilities::email' => '@inherit',
+                            'tools::utilities::php_info' => '@inherit',
+                        ],
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // Merge unmentioned items underneath...
+        $this->assertEquals($reorderedUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => true,
+                    'children' => [
+                        'tools::utilities::search' => '@inherit',
+                        'tools::utilities::cache' => '@inherit',
+                        'tools::utilities::licensing' => '@inherit',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // Ensure re-ordering items still works when modifying a item...
+        $this->assertEquals($reorderedUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => true,
+                    'children' => [
+                        'tools::utilities::search' => '@inherit',
+                        'tools::utilities::cache' => [
+                            'url' => '/cache-money',
+                        ],
+                        'tools::utilities::licensing' => '@inherit',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // If `reorder: false`, it should just use default item order...
+        $this->assertEquals($defaultUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'reorder' => false,
+                    'children' => [
+                        'tools::utilities::search' => '@inherit',
+                        'tools::utilities::cache' => '@inherit',
+                        'tools::utilities::licensing' => '@inherit',
+                        'tools::utilities::email' => '@inherit',
+                        'tools::utilities::php_info' => '@inherit',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+
+        // If `reorder` is not specified, it should just use default item order...
+        $this->assertEquals($defaultUtilitiesItems, $this->buildNavWithPreferences([
+            'tools' => [
+                'tools::utilities' => [
+                    'children' => [
+                        'tools::utilities::search' => '@inherit',
+                        'tools::utilities::cache' => '@inherit',
+                        'tools::utilities::licensing' => '@inherit',
+                        'tools::utilities::email' => '@inherit',
+                        'tools::utilities::php_info' => '@inherit',
+                    ],
+                ],
+            ],
+        ])->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->map->display()->all());
+    }
+
+    /** @test */
     public function it_does_nothing_with_inherit_actions_when_not_reordering()
     {
         $nav = $this->buildNavWithPreferences([
@@ -335,6 +440,79 @@ class NavPreferencesTest extends TestCase
             ],
         ]);
         $this->assertEquals(['Articles', 'Pages'], $nav->get('Content')->keyBy->display()->get('Things')->resolveChildren()->children()->map->display()->all());
+    }
+
+    /** @test */
+    public function it_can_alias_items_within_a_section()
+    {
+        $this->assertEquals(['Blueprints', 'Fieldsets'], $this->buildDefaultNav()->get('Fields')->map->display()->all());
+
+        // Recommended syntax...
+        $nav = $this->buildNavWithPreferences([
+            'fields' => [
+                'fields::blueprints' => '@alias',
+            ],
+        ]);
+        $this->assertEquals(['Blueprints', 'Fieldsets', 'Blueprints'], $nav->get('Fields')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // With nesting...
+        $nav = $this->buildNavWithPreferences([
+            'fields' => [
+                'items' => [
+                    'fields::blueprints' => '@alias',
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Blueprints', 'Fieldsets', 'Blueprints'], $nav->get('Fields')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // With full nesting of sections...
+        $nav = $this->buildNavWithPreferences([
+            'sections' => [
+                'fields' => [
+                    'fields::blueprints' => [
+                        'action' => '@alias',
+                    ],
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Blueprints', 'Fieldsets', 'Blueprints'], $nav->get('Fields')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // With config array...
+        $nav = $this->buildNavWithPreferences([
+            'fields' => [
+                'fields::blueprints' => [
+                    'action' => '@alias',
+                ],
+            ],
+        ]);
+        $this->assertEquals(['Blueprints', 'Fieldsets', 'Blueprints'], $nav->get('Fields')->map->display()->all());
+        $this->assertArrayHasKey('Blueprints', $nav->get('Fields')->keyBy->display()->all());
+
+        // Alias a child item...
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'content::collections::pages' => '@alias',
+            ],
+        ]);
+        $this->assertEquals(['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Pages'], $nav->get('Content')->map->display()->all());
+        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+    }
+
+    /** @test */
+    public function aliasing_an_item_does_not_include_its_children()
+    {
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections' => '@alias',
+            ],
+        ]);
+
+        $this->assertNull($nav->get('Top Level')->keyBy->display()->get('Collections')->resolveChildren()->children());
+        $this->assertCount(2, $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->all());
     }
 
     /** @test */
@@ -490,92 +668,92 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_remove_sections()
+    public function it_can_hide_sections()
     {
         $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users'];
 
         $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
 
-        $sectionsAfterRemoving = ['Top Level', 'Fields', 'Tools'];
+        $sectionsAfterHiding = ['Top Level', 'Fields', 'Tools'];
 
         // Recommended syntax...
-        $this->assertEquals($sectionsAfterRemoving, $this->buildNavWithPreferences([
-            'content' => '@remove',
-            'users' => '@remove',
+        $this->assertEquals($sectionsAfterHiding, $this->buildNavWithPreferences([
+            'content' => '@hide',
+            'users' => '@hide',
         ])->keys()->all());
 
         // With nesting...
-        $this->assertEquals($sectionsAfterRemoving, $this->buildNavWithPreferences([
+        $this->assertEquals($sectionsAfterHiding, $this->buildNavWithPreferences([
             'sections' => [
-                'content' => '@remove',
-                'users' => '@remove',
+                'content' => '@hide',
+                'users' => '@hide',
             ],
         ])->keys()->all());
 
         // With config array...
-        $this->assertEquals($sectionsAfterRemoving, $this->buildNavWithPreferences([
+        $this->assertEquals($sectionsAfterHiding, $this->buildNavWithPreferences([
             'content' => [
-                'action' => '@remove',
+                'action' => '@hide',
             ],
             'users' => [
-                'action' => '@remove',
+                'action' => '@hide',
             ],
         ])->keys()->all());
     }
 
     /** @test */
-    public function it_can_remove_items_from_a_section()
+    public function it_can_hide_items_from_a_section()
     {
         $defaultContentItems = ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'];
 
         $this->assertEquals($defaultContentItems, $this->buildDefaultNav()->get('Content')->map->display()->all());
 
-        $itemsAfterRemoving = ['Collections', 'Taxonomies', 'Assets'];
+        $itemsAfterHiding = ['Collections', 'Taxonomies', 'Assets'];
 
         // Recommended syntax...
-        $this->assertEquals($itemsAfterRemoving, $this->buildNavWithPreferences([
+        $this->assertEquals($itemsAfterHiding, $this->buildNavWithPreferences([
             'content' => [
-                'content::navigation' => '@remove',
-                'content::globals' => '@remove',
+                'content::navigation' => '@hide',
+                'content::globals' => '@hide',
             ],
         ])->get('Content')->map->display()->all());
 
         // With nesting...
-        $this->assertEquals($itemsAfterRemoving, $this->buildNavWithPreferences([
+        $this->assertEquals($itemsAfterHiding, $this->buildNavWithPreferences([
             'sections' => [
                 'content' => [
                     'items' => [
-                        'content::navigation' => '@remove',
-                        'content::globals' => '@remove',
+                        'content::navigation' => '@hide',
+                        'content::globals' => '@hide',
                     ],
                 ],
             ],
         ])->get('Content')->map->display()->all());
 
         // With config array...
-        $this->assertEquals($itemsAfterRemoving, $this->buildNavWithPreferences([
+        $this->assertEquals($itemsAfterHiding, $this->buildNavWithPreferences([
             'content' => [
                 'content::navigation' => [
-                    'action' => '@remove',
+                    'action' => '@hide',
                 ],
-                'content::globals' => '@remove',
+                'content::globals' => '@hide',
             ],
         ])->get('Content')->map->display()->all());
 
-        // Remove a child item...
+        // Hide a child item...
         $nav = $this->buildNavWithPreferences([
             'content' => [
-                'content::collections::pages' => '@remove',
+                'content::collections::pages' => '@hide',
             ],
         ]);
         $this->assertArrayNotHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
         $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
 
-        // Remove should do nothing if used in wrong section...
+        // Hide should do nothing if used in wrong section...
         $this->assertEquals($defaultContentItems, $this->buildNavWithPreferences([
             'fields' => [
-                'content::navigation' => '@remove',
-                'content::globals' => '@remove',
+                'content::navigation' => '@hide',
+                'content::globals' => '@hide',
             ],
         ])->get('Content')->map->display()->all());
     }
@@ -612,6 +790,31 @@ class NavPreferencesTest extends TestCase
 
         // It can merged created children into existing children...
         $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'content::collections' => [
+                    'action' => '@modify',
+                    'children' => [
+                        'Json' => 'https://json.org',
+                        'spaml' => [
+                            'action' => '@create',
+                            'display' => 'Yaml',
+                            'url' => 'https://yaml.org',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $modifiedItem = $nav->get('Content')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pages', 'Json', 'Yaml'], $modifiedItem->children()->map->display()->all());
+        $this->assertEquals([
+            'http://localhost/cp/collections/articles',
+            'http://localhost/cp/collections/pages',
+            'https://json.org',
+            'https://yaml.org',
+        ], $modifiedItem->children()->map->url()->all());
+
+        // Aliased items don't have children by default, but we can still create child items for them...
+        $nav = $this->buildNavWithPreferences([
             'top_level' => [
                 'content::collections' => [
                     'action' => '@alias',
@@ -630,15 +833,11 @@ class NavPreferencesTest extends TestCase
         $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
         $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->name()->all());
         $this->assertEquals([
-            'content::collections::clone::articles',
-            'content::collections::clone::pages',
             'content::collections::clone::json',
             'content::collections::clone::yaml',
         ], $aliasedItem->children()->map->id()->all());
-        $this->assertEquals(['Articles', 'Pages', 'Json', 'Yaml'], $aliasedItem->children()->map->display()->all());
+        $this->assertEquals(['Json', 'Yaml'], $aliasedItem->children()->map->display()->all());
         $this->assertEquals([
-            'http://localhost/cp/collections/articles',
-            'http://localhost/cp/collections/pages',
             'https://json.org',
             'https://yaml.org',
         ], $aliasedItem->children()->map->url()->all());
@@ -875,7 +1074,32 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_remove_child_items()
+    public function it_can_move_child_items_into_another_items_children()
+    {
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'content::taxonomies' => [
+                    'action' => '@modify',
+                    'children' => [
+                        'content::collections::pages' => '@move',
+                    ],
+                ],
+            ],
+        ]);
+
+        $collectionsChildren = $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children();
+        $this->assertCount(1, $collectionsChildren);
+        $this->assertEquals('content::collections::articles', $collectionsChildren->first()->id());
+        $this->assertEquals('Articles', $collectionsChildren->first()->display());
+
+        $taxonomiesChildren = $nav->get('Content')->keyBy->display()->get('Taxonomies')->resolveChildren()->children();
+        $this->assertCount(1, $taxonomiesChildren);
+        $this->assertEquals('content::collections::pages::clone', $taxonomiesChildren->first()->id());
+        $this->assertEquals('Pages', $taxonomiesChildren->first()->display());
+    }
+
+    /** @test */
+    public function it_can_hide_child_items()
     {
         // When modifying parent...
         $nav = $this->buildNavWithPreferences([
@@ -883,7 +1107,7 @@ class NavPreferencesTest extends TestCase
                 'content::collections' => [
                     'action' => '@modify',
                     'children' => [
-                        'content::collections::pages' => '@remove',
+                        'content::collections::pages' => '@hide',
                     ],
                 ],
             ],
@@ -894,23 +1118,17 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Articles'], $originalItem->children()->map->display()->all());
         $this->assertEquals(['http://localhost/cp/collections/articles'], $originalItem->children()->map->url()->all());
 
-        // When aliasing parent...
+        // Without explicitly modifying parent...
         $nav = $this->buildNavWithPreferences([
-            'top_level' => [
-                'content::collections' => [
-                    'action' => '@alias',
-                    'children' => [
-                        'content::collections::pages' => '@remove',
-                    ],
-                ],
+            'content' => [
+                'content::collections::pages' => '@hide',
             ],
         ]);
         $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
-        $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->name()->all());
-        $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
-        $this->assertEquals(['content::collections::clone::articles'], $aliasedItem->children()->map->id()->all());
-        $this->assertEquals(['Articles'], $aliasedItem->children()->map->display()->all());
-        $this->assertEquals(['http://localhost/cp/collections/articles'], $aliasedItem->children()->map->url()->all());
+        $this->assertEquals(['Articles'], $originalItem->resolveChildren()->children()->map->name()->all());
+        $this->assertEquals(['content::collections::articles'], $originalItem->children()->map->id()->all());
+        $this->assertEquals(['Articles'], $originalItem->children()->map->display()->all());
+        $this->assertEquals(['http://localhost/cp/collections/articles'], $originalItem->children()->map->url()->all());
 
         // When moving parent...
         $nav = $this->buildNavWithPreferences([
@@ -918,7 +1136,7 @@ class NavPreferencesTest extends TestCase
                 'content::collections' => [
                     'action' => '@move',
                     'children' => [
-                        'content::collections::pages' => '@remove',
+                        'content::collections::pages' => '@hide',
                     ],
                 ],
             ],
@@ -968,81 +1186,67 @@ class NavPreferencesTest extends TestCase
             'https://yaml.org',
         ], $originalItem->children()->map->url()->all());
 
-        // TODO: Fix rest of this test since adding `clone` to `Nav::build()`
+        // Aliased items don't have children by default, but we can still alias and modify child items for them...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections' => [
+                    'action' => '@alias',
+                    'children' => [
+                        'content::collections::pages' => [
+                            'action' => '@alias',
+                            'display' => 'Pagerinos',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->display()->all());
+        $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Pagerinos'], $aliasedItem->children()->map->display()->all());
+        $this->assertEquals([
+            'content::collections::clone::pagerinos',
+        ], $aliasedItem->children()->map->id()->all());
+        $this->assertEquals([
+            'http://localhost/cp/collections/pages',
+        ], $aliasedItem->children()->map->url()->all());
 
-        // // When aliasing parent...
-        // $nav = $this->buildNavWithPreferences([
-        //     'top_level' => [
-        //         'content::collections' => [
-        //             'action' => '@alias',
-        //             'children' => [
-        //                 'content::collections::pages' => [
-        //                     'action' => '@modify',
-        //                     'display' => 'Pagerinos',
-        //                 ],
-        //                 'Json' => 'https://json.org',
-        //                 'spaml' => [
-        //                     'action' => '@create',
-        //                     'display' => 'Yaml',
-        //                     'url' => 'https://yaml.org',
-        //                 ],
-        //             ],
-        //         ],
-        //     ],
-        // ]);
-        // $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
-        // $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->display()->all());
-        // $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
-        // $this->assertEquals(['Articles', 'Pagerinos', 'Json', 'Yaml'], $aliasedItem->children()->map->display()->all());
-        // $this->assertEquals([
-        //     'content::collections::clone::articles',
-        //     'content::collections::clone::pages',
-        //     'content::collections::clone::json',
-        //     'content::collections::clone::yaml',
-        // ], $aliasedItem->children()->map->id()->all());
-        // $this->assertEquals([
-        //     'http://localhost/cp/collections/articles',
-        //     'http://localhost/cp/collections/pages',
-        //     'https://json.org',
-        //     'https://yaml.org',
-        // ], $aliasedItem->children()->map->url()->all());
-
-        // // When moving parent...
-        // $nav = $this->buildNavWithPreferences([
-        //     'top_level' => [
-        //         'content::collections' => [
-        //             'action' => '@move',
-        //             'children' => [
-        //                 'content::collections::pages' => [
-        //                     'action' => '@modify',
-        //                     'display' => 'Pagerinos',
-        //                 ],
-        //                 'Json' => 'https://json.org',
-        //                 'spaml' => [
-        //                     'action' => '@create',
-        //                     'display' => 'Yaml',
-        //                     'url' => 'https://yaml.org',
-        //                 ],
-        //             ],
-        //         ],
-        //     ],
-        // ]);
-        // $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
-        // $this->assertNull($originalItem);
-        // $movedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
-        // $this->assertEquals(['Articles', 'Pagerinos', 'Json', 'Yaml'], $movedItem->children()->map->display()->all());
-        // $this->assertEquals([
-        //     'content::collections::clone::articles',
-        //     'content::collections::clone::pages',
-        //     'content::collections::clone::json',
-        //     'content::collections::clone::yaml',
-        // ], $movedItem->children()->map->id()->all());
-        // $this->assertEquals([
-        //     'http://localhost/cp/collections/articles',
-        //     'http://localhost/cp/collections/pages',
-        //     'https://json.org',
-        //     'https://yaml.org',
-        // ], $movedItem->children()->map->url()->all());
+        // When moving parent...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections' => [
+                    'action' => '@move',
+                    'children' => [
+                        'content::collections::pages' => [
+                            'action' => '@modify',
+                            'display' => 'Pagerinos',
+                        ],
+                        'Json' => 'https://json.org',
+                        'spaml' => [
+                            'action' => '@create',
+                            'display' => 'Yaml',
+                            'url' => 'https://yaml.org',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
+        $this->assertNull($originalItem);
+        $movedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pagerinos', 'Json', 'Yaml'], $movedItem->children()->map->display()->all());
+        $this->assertEquals([
+            'content::collections::clone::articles',
+            'content::collections::clone::pages',
+            'content::collections::clone::json',
+            'content::collections::clone::yaml',
+        ], $movedItem->children()->map->id()->all());
+        $this->assertEquals([
+            'http://localhost/cp/collections/articles',
+            'http://localhost/cp/collections/pages',
+            'https://json.org',
+            'https://yaml.org',
+        ], $movedItem->children()->map->url()->all());
     }
 
     /** @test */
@@ -1138,17 +1342,15 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function preferences_are_applied_after_addon_nav_extensions()
     {
-        $preBuild = function () {
-            Facades\CP\Nav::extend(function ($nav) {
-                $nav->tools('SEO Pro')
-                    ->url('/cp/seo-pro')
-                    ->children([
-                        'Reports' => '/cp/seo-pro/reports',
-                        'Site Defaults' => '/cp/seo-pro/site-defaults',
-                        'Section Defaults' => '/cp/seo-pro/section-defaults',
-                    ]);
-            });
-        };
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->tools('SEO Pro')
+                ->url('/cp/seo-pro')
+                ->children([
+                    'Reports' => '/cp/seo-pro/reports',
+                    'Site Defaults' => '/cp/seo-pro/site-defaults',
+                    'Section Defaults' => '/cp/seo-pro/section-defaults',
+                ]);
+        });
 
         $nav = $this->buildNavWithPreferences([
             'sections' => [
@@ -1156,7 +1358,7 @@ class NavPreferencesTest extends TestCase
                     'tools::seo_pro' => '@alias',
                 ],
             ],
-        ], $preBuild);
+        ]);
 
         // Assert addon successfully added nav item
         $this->assertEquals(['Forms', 'Updates', 'Addons', 'Utilities', 'GraphQL', 'SEO Pro'], $nav->get('Tools')->map->display()->all());
@@ -1191,7 +1393,7 @@ class NavPreferencesTest extends TestCase
                 'content' => [
                     'display' => 'Site',
                     'items' => [
-                        'content::globals' => '@remove',
+                        'content::globals' => '@hide',
                         'content::taxonomies' => [
                             'action' => '@modify',
                             'display' => 'Categories',
@@ -1262,37 +1464,17 @@ class NavPreferencesTest extends TestCase
         ], $nav->get('Fields')->mapWithKeys(fn ($i) => [$i->display() => $i->url()])->all());
     }
 
-    private function buildNavWithPreferences($preferences, $preBuild = null)
+    private function buildNavWithPreferences($preferences)
     {
         $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
-
-        if (is_callable($preBuild)) {
-            $preBuild();
-        }
 
         return Facades\CP\Nav::build($preferences)->pluck('items', 'display');
     }
 
     private function buildDefaultNav()
     {
-        // TODO: Should we test with this method instead?
-        // return Facades\CP\Nav::buildWithoutPreferences();
+        $this->actingAs(tap(Facades\User::make()->makeSuper())->save());
 
-        return $this->buildNavWithPreferences([]);
-    }
-}
-
-class FakePreferences
-{
-    private $preferences;
-
-    public function __construct($preferences)
-    {
-        $this->preferences = $preferences;
-    }
-
-    public function get()
-    {
-        return $this->preferences;
+        return Facades\CP\Nav::buildWithoutPreferences()->pluck('items', 'display');
     }
 }

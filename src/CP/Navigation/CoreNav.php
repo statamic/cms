@@ -68,8 +68,8 @@ class CoreNav
             ->children(function () {
                 return CollectionAPI::all()->sortBy->title()->map(function ($collection) {
                     return Nav::item($collection->title())
-                              ->url($collection->showUrl())
-                              ->can('view', $collection);
+                        ->url($collection->showUrl())
+                        ->can('view', $collection);
                 });
             });
 
@@ -80,8 +80,8 @@ class CoreNav
             ->children(function () {
                 return NavAPI::all()->sortBy->title()->map(function ($nav) {
                     return Nav::item($nav->title())
-                              ->url($nav->showUrl())
-                              ->can('view', $nav);
+                        ->url($nav->showUrl())
+                        ->can('view', $nav);
                 });
             });
 
@@ -92,8 +92,8 @@ class CoreNav
             ->children(function () {
                 return TaxonomyAPI::all()->sortBy->title()->map(function ($taxonomy) {
                     return Nav::item($taxonomy->title())
-                              ->url($taxonomy->showUrl())
-                              ->can('view', $taxonomy);
+                        ->url($taxonomy->showUrl())
+                        ->can('view', $taxonomy);
                 });
             });
 
@@ -122,8 +122,8 @@ class CoreNav
                     }
 
                     return Nav::item($globalSet->title())
-                              ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
-                              ->can('view', $globalSet);
+                        ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
+                        ->can('view', $globalSet);
                 })->filter();
             });
 
@@ -240,7 +240,7 @@ class CoreNav
             ->children(function () {
                 return UserGroupAPI::all()->sortBy->title()->map(function ($userGroup) {
                     return Nav::item($userGroup->title())
-                              ->url($userGroup->showUrl());
+                        ->url($userGroup->showUrl());
                 });
             });
 
