@@ -171,12 +171,8 @@ class NavPreferencesNormalizer
 
         // Remove item when not properly using section-specific actions, to ensure the JS nav builder doesn't
         // do unexpected things. See comments on `ALLOWED_NAV_ITEM_ACTIONS` constant at top for details.
-        if ($removeBadActions) {
-            if ($isInOriginalSection && in_array($normalized->get('action'), ['@move'])) {
-                return null;
-            } elseif (! $isInOriginalSection && in_array($normalized->get('action'), ['@hide', '@modify', '@inherit'])) {
-                return null;
-            }
+        if ($removeBadActions && ! $isInOriginalSection && in_array($normalized->get('action'), ['@hide', '@modify', '@inherit'])) {
+            return null;
         }
 
         // If action is not set, determine the best default action.

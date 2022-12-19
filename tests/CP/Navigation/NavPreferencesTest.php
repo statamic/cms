@@ -1074,6 +1074,23 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_move_items_out_of_the_children_of_an_item_in_the_same_section()
+    {
+        $nav = $this->buildNavWithPreferences([
+            'content' => [
+                'content::collections::pages' => '@move',
+            ],
+        ]);
+
+        $this->assertCount(1, $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->map->display()->all());
+
+        $pagesItem = $nav->get('Content')->last();
+        $this->assertEquals('content::collections::pages::clone', $pagesItem->id());
+        $this->assertEquals('Pages', $pagesItem->display());
+        $this->assertArrayNotHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->map->display()->all());
+    }
+
+    /** @test */
     public function it_can_move_child_items_into_another_items_children()
     {
         $nav = $this->buildNavWithPreferences([
