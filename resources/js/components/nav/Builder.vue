@@ -69,6 +69,7 @@
                 :indent="24"
                 @change="changed = true"
                 @drag="topLevelTreeDragStart"
+                @drop="updateItemAction"
             >
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
@@ -117,6 +118,7 @@
                 :indent="24"
                 @change="changed = true"
                 @drag="mainTreeDragStart"
+                @drop="updateItemAction"
             >
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
@@ -469,11 +471,9 @@ export default {
         itemUpdated(updatedConfig, item) {
             item.text = updatedConfig.display;
 
-            item.manipulations = {
-                action: data_get(item.manipulations, 'action', '@modify'),
-                display: updatedConfig.display,
-                url: updatedConfig.url,
-            };
+            this.updateItemManipulation(item, 'display', updatedConfig.display);
+            this.updateItemManipulation(item, 'url', updatedConfig.url);
+            this.updateItemAction(item);
 
             this.resetItemEditor();
             this.changed = true;
@@ -484,6 +484,54 @@ export default {
 
             this.resetSectionEditor();
             this.changed = true;
+        },
+
+        updateItemManipulation(item, key, value) {
+            if (value !== data_get(item.original, key)) {
+                item.manipulations[key] = value;
+            } else {
+                Vue.delete(item.manipulations, key);
+            }
+        },
+
+        updateItemAction(item, wat) {
+            if (['@create', '@alias'].includes(data_get(item.manipulations, 'action'))) {
+                console.log(item.manipulations.action); // TODO: remove this
+                return;
+            }
+
+            let originalSection = data_get(item.original, 'section') || data_get(item.parent, 'original.section');
+            let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
+
+            if (currentSection !== originalSection) {
+                item.manipulations.action = '@move';
+                console.log('@move to ANOTHER section'); // TODO: remove this
+                return;
+            }
+
+            let parentsOriginalChildIds = data_get(item.parent, 'original', { children: [] })
+                .children
+                .map(child => child.id);
+
+            if (! parentsOriginalChildIds.includes(item.original.id)) {
+                item.manipulations.action = '@move';
+                console.log('@move WITHIN section'); // TODO: remove this
+                return;
+            }
+
+            let modifiedProperties = _.chain(item.manipulations)
+                .omit('action')
+                .keys()
+                .value();
+
+            if (modifiedProperties.length) {
+                item.manipulations.action = '@modify';
+                console.log('@modify'); // TODO: remove this
+                return;
+            }
+
+            Vue.delete(item.manipulations, 'action');
+            console.log('no action'); // TODO: remove this
         },
 
         expandAll() {
