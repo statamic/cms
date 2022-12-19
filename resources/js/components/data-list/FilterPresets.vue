@@ -1,7 +1,7 @@
 <template>
     <div v-if="presets" class="border-b px-2 text-sm">
 
-        <button class="data-list-filter-link" :class="{ active: ! activePreset }" @click="viewAll">All</button>
+        <button class="data-list-filter-link" :class="{ active: ! activePreset }" @click="viewAll" v-text="__('All')" />
 
         <template v-for="(preset, handle) in presets">
             <button class="data-list-filter-link" :class="{ active: handle === activePreset }" @click="viewPreset(handle)">

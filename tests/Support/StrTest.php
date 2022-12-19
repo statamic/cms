@@ -45,10 +45,21 @@ class StrTest extends TestCase
     /** @test */
     public function it_makes_slugs()
     {
-        $this->assertEquals('foo-bar-baz', Str::slug('foo bar baz'));
-        $this->assertEquals('foo-bar-baz', Str::slug('Foo Bar Baz'));
-        $this->assertEquals('foo-bar-baz', Str::slug('foo-bar-baz'));
-        $this->assertEquals('foo_bar-baz', Str::slug('foo_bar baz'));
+        $this->assertEquals('foo-bar-baz', Str::slug('foo bar % baz'));
+        $this->assertEquals('foo-bar-baz', Str::slug('Foo Bar % Baz'));
+        $this->assertEquals('foo-bar-baz', Str::slug('foo-bar-%-baz'));
+        $this->assertEquals('foo_bar-baz', Str::slug('foo_bar % baz'));
+    }
+
+    /** @test */
+    public function it_makes_slugs_and_replaces_extra_symbols()
+    {
+        config(['statamic.system.ascii_replace_extra_symbols' => true]);
+
+        $this->assertEquals('foo-bar-percent-baz', Str::slug('foo bar % baz'));
+        $this->assertEquals('foo-bar-percent-baz', Str::slug('Foo Bar % Baz'));
+        $this->assertEquals('foo-bar-percent-baz', Str::slug('foo-bar-%-baz'));
+        $this->assertEquals('foo_bar-percent-baz', Str::slug('foo_bar % baz'));
     }
 
     /** @test */

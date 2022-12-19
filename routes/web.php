@@ -1,29 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Statamic\Facades\Glide;
 use Statamic\Facades\OAuth;
-use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Statamic;
 
 Route::name('statamic.')->group(function () {
-    /**
-     * Glide
-     * On-the-fly URL-based image transforms.
-     */
-    if (Glide::shouldServeByHttp()) {
-        Site::all()->map(function ($site) {
-            return URL::makeRelative($site->url());
-        })->unique()->each(function ($sitePrefix) {
-            Route::group(['prefix' => $sitePrefix.'/'.Glide::route()], function () {
-                Route::get('/asset/{container}/{path?}', 'GlideController@generateByAsset')->where('path', '.*');
-                Route::get('/http/{url}/{filename?}', 'GlideController@generateByUrl');
-                Route::get('{path}', 'GlideController@generateByPath')->where('path', '.*');
-            });
-        });
-    }
-
     Route::group(['prefix' => config('statamic.routes.action')], function () {
         Route::post('forms/{form}', 'FormController@submit')->name('forms.submit');
 
@@ -34,6 +15,8 @@ Route::name('statamic.')->group(function () {
             Route::post('login', 'UserController@login')->name('login');
             Route::get('logout', 'UserController@logout')->name('logout');
             Route::post('register', 'UserController@register')->name('register');
+            Route::post('profile', 'UserController@profile')->name('profile');
+            Route::post('password', 'UserController@password')->name('password');
 
             Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');
             Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');

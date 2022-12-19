@@ -24,7 +24,7 @@
                 <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
                     <svg-icon name="file-code" class="w-4 h-4 "/>
                 </button>
-                <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
+                <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && config.sets.length > 0">
                     <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
                 </button>
                 <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
@@ -34,7 +34,7 @@
             </div>
         </div>
 
-        <div class="bard-editor" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar }" tabindex="0">
+        <div class="bard-editor" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }" tabindex="0">
             <bubble-menu class="bard-floating-toolbar" :editor="editor" :tippy-options="{ maxWidth: 'none', zIndex: 1000 }" v-if="editor && toolbarIsFloating && !readOnly">
                 <component
                     v-for="button in visibleButtons(buttons)"
@@ -61,11 +61,15 @@
                 </dropdown-list>
             </floating-menu>
 
+            <div class="bard-invalid" v-if="invalid" v-html="__('Invalid content')"></div>
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
-        <div class="bard-footer-toolbar" v-if="config.reading_time">
-            {{ readingTime }} {{ __('Reading Time') }}
+        <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.character_limit)">
+            <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
+            <div v-else />
+
+            <div v-if="config.character_limit">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
         </div>
     </div>
 
@@ -77,6 +81,7 @@ import { BubbleMenu, Editor, EditorContent, FloatingMenu } from '@tiptap/vue-2';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
 import BulletList from '@tiptap/extension-bullet-list';
+import CharacterCount from '@tiptap/extension-character-count';
 import Code from '@tiptap/extension-code';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import HardBreak from '@tiptap/extension-hard-break';
@@ -87,6 +92,7 @@ import Italic from '@tiptap/extension-italic';
 import ListItem from '@tiptap/extension-list-item';
 import OrderedList from '@tiptap/extension-ordered-list';
 import Paragraph from '@tiptap/extension-paragraph';
+import Placeholder from '@tiptap/extension-placeholder';
 import Strike from '@tiptap/extension-strike';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
@@ -95,9 +101,10 @@ import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import Text from '@tiptap/extension-text';
+import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import BardSource from './Source.vue';
-import Document from './Document';
+import { DocumentBlock, DocumentInline } from './Document';
 import { Set } from './Set'
 import { Small } from './Small';
 import { Image } from './Image';
@@ -145,7 +152,9 @@ export default {
             collapsed: this.meta.collapsed,
             previews: this.meta.previews,
             mounted: false,
+            invalid: false,
             pageHeader: null,
+            escBinding: null,
         }
     },
 
@@ -254,14 +263,20 @@ export default {
             return text;
         },
 
+        inputIsInline() {
+            return this.config.inline;
+        },
+
     },
 
     mounted() {
         this.initToolbarButtons();
 
+        const content = this.valueToContent(clone(this.value));
+
         this.editor = new Editor({
             extensions: this.getExtensions(),
-            content: this.valueToContent(clone(this.value)),
+            content: content,
             editable: !this.readOnly,
             enableInputRules: this.config.enable_input_rules,
             enablePasteRules: this.config.enable_paste_rules,
@@ -278,14 +293,27 @@ export default {
                 this.json = this.editor.getJSON().content;
                 this.html = this.editor.getHTML();
             },
+            onCreate: ({ editor }) => {
+                const state = editor.view.state;
+                 if (content !== null && typeof content === 'object') {
+                     try {
+                         state.schema.nodeFromJSON(content);
+                     } catch (error) {
+                         this.invalid = true;
+                     }
+                 }
+            }
         });
 
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.$keys.bind('esc', this.closeFullscreen)
+        this.escBinding = this.$keys.bind('esc', this.closeFullscreen)
 
-        this.$nextTick(() => this.mounted = true);
+        this.$nextTick(() => {
+            this.mounted = true;
+            if (this.config.collapse) this.collapseAll();
+        });
 
         this.pageHeader = document.querySelector('.global-header');
 
@@ -294,6 +322,7 @@ export default {
 
     beforeDestroy() {
         this.editor.destroy();
+        this.escBinding.destroy();
 
         this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
     },
@@ -355,7 +384,7 @@ export default {
 
     methods: {
         addSet(handle) {
-            const id = `set-${uniqid()}`;
+            const id = uniqid();
             const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
 
             let previews = {};
@@ -371,7 +400,7 @@ export default {
         },
 
         duplicateSet(old_id, attrs, pos) {
-            const id = `set-${uniqid()}`;
+            const id = uniqid();
             const enabled = attrs.enabled;
             const values = Object.assign({}, attrs.values);
 
@@ -393,6 +422,11 @@ export default {
         },
 
         expandSet(id) {
+            if (this.config.collapse === 'accordion') {
+                this.collapsed = Object.keys(this.meta.existing).filter(v => v !== id);
+                return;
+            }
+
             if (this.collapsed.includes(id)) {
                 var index = this.collapsed.indexOf(id);
                 this.collapsed.splice(index, 1);
@@ -537,10 +571,11 @@ export default {
 
         getExtensions() {
             let exts = [
-                Document,
-                HardBreak,
+                CharacterCount.configure({ limit: this.config.character_limit }),
+                ...(this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak]),
                 History,
                 Paragraph,
+                Placeholder.configure({ placeholder: this.config.placeholder }),
                 Set.configure({ bard: this }),
                 Text
             ];
@@ -572,6 +607,13 @@ export default {
             if (btns.includes('h5')) levels.push(5);
             if (btns.includes('h6')) levels.push(6);
             if (levels.length) exts.push(Heading.configure({ levels }));
+
+            let alignments = [];
+            if (btns.includes('alignleft')) alignments.push('left');
+            if (btns.includes('aligncenter')) alignments.push('center');
+            if (btns.includes('alignright')) alignments.push('right');
+            if (btns.includes('alignjustify')) alignments.push('justify');
+            if (alignments.length) exts.push(TextAlign.configure({ types: ['heading', 'paragraph'], alignments }));
 
             if (btns.includes('table')) {
                 exts.push(

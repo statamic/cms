@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
+use Closure;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
@@ -16,8 +17,8 @@ class Augmentor
     protected $includeDisabledSets = false;
     protected $augmentSets = true;
     protected $withStatamicImageUrls = false;
-    protected static $replaceExtensions = [];
-    private static $extensions = [];
+    protected static $extensions = [];
+    protected static $extensionReplacements = [];
 
     public function __construct($fieldtype)
     {
@@ -113,9 +114,9 @@ class Augmentor
         static::$extensions[$name] = $extension;
     }
 
-    public static function replaceExtension($search, $replacement)
+    public static function replaceExtension($name, $extension)
     {
-        static::$replaceExtensions[$search] = $replacement;
+        static::$extensionReplacements[$name] = $extension;
     }
 
     protected function convertToSets($html)
@@ -157,22 +158,41 @@ class Augmentor
 
     public function renderHtmlToProsemirror(string $value)
     {
-        return (new Editor(['extensions' => $this->extensions()]))->setContent($value)->getDocument();
+        return $this->editor()->setContent($value)->getDocument();
     }
 
     public function renderProsemirrorToHtml(array $value)
     {
-        return (new Editor(['extensions' => $this->extensions()]))->setContent($value)->getHTML();
+        return $this->editor()->setContent($value)->getHTML();
+    }
+
+    private function editor()
+    {
+        return app()->makeWith(Editor::class, [
+            'configuration' => [
+                'extensions' => $this->extensions(),
+            ],
+        ]);
     }
 
     public function extensions()
     {
-        $this->addExtension('image', $this->withStatamicImageUrls ? new StatamicImageNode : new ImageNode);
+        $extensions = [];
+        $options = ['withStatamicImageUrls' => $this->withStatamicImageUrls];
+        $args = [$this->fieldtype, $options];
 
-        foreach (self::$replaceExtensions as $name => $replacement) {
-            self::$extensions[$name] = $replacement;
+        foreach (static::$extensions as $name => $extension) {
+            $extensions[$name] = $extension instanceof Closure
+                ? $extension(...$args)
+                : $extension;
         }
 
-        return Arr::removeNullValues(self::$extensions);
+        foreach (static::$extensionReplacements as $name => $extension) {
+            $extensions[$name] = $extension instanceof Closure
+                ? $extension($extensions[$name] ?? null, ...$args)
+                : $extension;
+        }
+
+        return Arr::removeNullValues($extensions);
     }
 }

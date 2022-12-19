@@ -73,6 +73,8 @@ return [
     'change_passwords' => 'Change passwords',
     'edit_user_groups' => 'Edit groups',
     'edit_roles' => 'Edit roles',
+    'assign_user_groups' => 'Assign groups to users',
+    'assign_roles' => 'Assign roles to users',
 
     'group_updates' => 'Updates',
     'view_updates' => 'View updates',
@@ -85,5 +87,8 @@ return [
     'group_misc' => 'Miscellaneous',
     'resolve_duplicate_ids' => 'Resolve Duplicate IDs',
     'resolve_duplicate_ids_desc' => 'Grants ability to see and resolve duplicate IDs.',
+
+    'view_graphql' => 'View GraphQL',
+    'view_graphql_desc' => 'Grants ability to access the GraphQL viewer',
 
 ];

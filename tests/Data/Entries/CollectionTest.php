@@ -346,28 +346,32 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_collection()
+    public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_singular_collection()
     {
-        $collection = (new Collection)->handle('blog');
+        $collection = (new Collection)->handle('articles');
 
-        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect());
+        BlueprintRepository::shouldReceive('in')->with('collections/articles')->andReturn(collect());
         BlueprintRepository::shouldReceive('find')->with('default')->andReturn(
-            $blueprint = (new Blueprint)
+            $default = (new Blueprint)
+                ->setInitialPath('this/wont/change')
                 ->setHandle('thisll_change')
+                ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
 
+        $blueprint = $collection->entryBlueprint();
+        $this->assertNotEquals($default, $blueprint);
+
         $blueprints = $collection->entryBlueprints();
         $this->assertCount(1, $blueprints);
-        $this->assertEquals([$blueprint], $blueprints->all());
+        $this->assertEquals($blueprint, $blueprints->get(0)->setParent($collection));
 
-        tap($collection->entryBlueprint(), function ($default) use ($blueprint) {
-            $this->assertEquals($blueprint, $default);
-            $this->assertEquals('blog', $default->handle());
-            $this->assertEquals('Blog', $default->title());
-        });
+        $this->assertEquals('this/wont/change', $blueprint->initialPath());
+        $this->assertEquals('article', $blueprint->handle());
+        $this->assertEquals('collections.articles', $blueprint->namespace());
+        $this->assertEquals('Article', $blueprint->title());
 
-        $this->assertEquals($blueprint, $collection->entryBlueprint('blog'));
+        $this->assertEquals($blueprint, $collection->entryBlueprint('article'));
         $this->assertNull($collection->entryBlueprint('two'));
     }
 
@@ -505,6 +509,35 @@ class CollectionTest extends TestCase
 
         $collection->defaultPublishState(false);
         $this->assertFalse($collection->defaultPublishState());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_origin_behavior()
+    {
+        $collection = (new Collection)->handle('test');
+        $this->assertEquals('select', $collection->originBehavior());
+
+        $return = $collection->originBehavior('active');
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('active', $collection->originBehavior());
+
+        $return = $collection->originBehavior('root');
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('root', $collection->originBehavior());
+
+        $return = $collection->originBehavior(null);
+        $this->assertEquals($collection, $return);
+        $this->assertEquals('select', $collection->originBehavior());
+    }
+
+    /** @test */
+    public function it_throw_exception_when_setting_invalid_origin_behavior()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid origin behavior [nope]. Must be "select", "root", or "active".');
+
+        $collection = (new Collection)->handle('test');
+        $collection->originBehavior('nope');
     }
 
     /** @test */

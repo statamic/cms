@@ -3,15 +3,19 @@
 namespace Tests\Antlers\Runtime;
 
 use Statamic\Facades\Nav;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
+use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class RecursiveNodesTest extends ParserTestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PreventSavingStacheItemsToDisk,
+        FakesViews;
 
-    public function test_recursive_nodes_on_structures()
+    private function makeNavTree()
     {
         $tree = [
             ['id' => 'home', 'title' => 'Home', 'url' => '/'],
@@ -40,6 +44,631 @@ class RecursiveNodesTest extends ParserTestCase
         $nav = Nav::make('main');
         $nav->makeTree('en', $tree)->save();
         $nav->save();
+    }
+
+    public function test_recursive_nodes_dont_reset_towards_the_end()
+    {
+        $tree = [];
+
+        for ($i = 0; $i < 2; $i++) {
+            $tree[] = [
+                'id' => 'home'.$i, 'title' => 'Home.'.$i, 'url' => '/'.$i,
+                'children' => [
+                    ['id' => 'about'.$i, 'title' => 'About.'.$i, 'url' => 'about'.$i],
+                    [
+                        'id' => 'projects'.$i, 'title' => 'Projects.'.$i, 'url' => 'projects'.$i,
+                        'children' => [
+                            ['id' => 'project-1'.$i, 'title' => 'Project-1.'.$i, 'url' => 'project-1'.$i],
+
+                            [
+                                'id' => 'project-2'.$i, 'title' => 'Project-2.'.$i, 'url' => 'project-2'.$i,
+                                'children' => [
+                                    [
+                                        'id' => 'project-2-nested'.$i, 'title' => 'Project 2 Nested.'.$i, 'url' => 'project-2-nested'.$i,
+                                        'children' => [
+                                            ['id' => 'project-2-nested-2'.$i, 'title' => 'Project 2 Nested 2.'.$i, 'url' => 'project-2-nested-2'.$i],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    ['id' => 'contact'.$i, 'title' => 'Contact.'.$i, 'url' => 'contact'.$i],
+                ],
+            ];
+            $tree[] = ['id' => 'root-2'.$i, 'title' => 'Root-2.'.$i, 'url' => '/root-2'.$i];
+            $tree[] = ['id' => 'root-3'.$i, 'title' => 'Root-3.'.$i, 'url' => '/root-3'.$i];
+            $tree[] = ['id' => 'root-4'.$i, 'title' => 'Root-4.'.$i, 'url' => '/root-4'.$i];
+            $tree[] = [
+                'id' => 'fin-child-1.'.$i, 'title' => 'Fin Child 1.'.$i, 'url' => '/fin-child-1'.$i,
+                'children' => [
+                    ['id' => 'fin-child-2.'.$i, 'title' => 'Fin Child 2.'.$i, 'url' => '/fin-child-2'.$i],
+                    ['id' => 'fin-child-3.'.$i, 'title' => 'Fin Child 3.'.$i, 'url' => '/fin-child-3'.$i],
+                ],
+            ];
+            $tree[] = [
+                'id' => 'fin-child-1b.'.$i, 'title' => 'Fin Child B 1.'.$i, 'url' => '/fin-child-1'.$i,
+                'children' => [
+                    ['id' => 'fin-child-2b.'.$i, 'title' => 'Fin Child B 2.'.$i, 'url' => '/fin-child-b-2'.$i],
+                    [
+                        'id' => 'fin-child-3b.'.$i, 'title' => 'Fin Child B 3.'.$i, 'url' => '/fin-child-b-3'.$i,
+                        'children' => [
+                            [
+                                'id' => 'fin-child-3b-2.'.$i, 'title' => 'Fin Child B 3 2.'.$i, 'url' => '/fin-child-b-3-2'.$i,
+                                'children' => [
+                                    [
+                                        'id' => 'fin-child-3b-2-2.'.$i, 'title' => 'Fin Child B 3 2 2.'.$i, 'url' => '/fin-child-b-3-2-2'.$i,
+                                        'children' => [
+                                            [
+                                                'id' => 'fin-child-3b-2-2-2.'.$i, 'title' => 'Fin Child B 3 2 2 2.'.$i, 'url' => '/fin-child-b-3-2-2-2'.$i,
+                                                'children' => [
+                                                    ['id' => 'fin-child-3b-2-2-2-2.'.$i, 'title' => 'Fin Child B 3 2 2 2 2.'.$i, 'url' => '/fin-child-b-3-2-2-2-2'.$i],
+                                                    ['id' => 'fin-child-3b-2-2-2-3.'.$i, 'title' => 'Fin Child B 3 2 2 2 3.'.$i, 'url' => '/fin-child-b-3-2-2-2-3'.$i],
+                                                    ['id' => 'fin-child-3b-2-2-2-4.'.$i, 'title' => 'Fin Child B 3 2 2 2 4.'.$i, 'url' => '/fin-child-b-3-2-2-2-4'.$i],
+                                                    ['id' => 'fin-child-3b-2-2-2-5.'.$i, 'title' => 'Fin Child B 3 2 2 2 5.'.$i, 'url' => '/fin-child-b-3-2-2-2-5'.$i],
+                                                    ['id' => 'fin-child-3b-2-2-2-6.'.$i, 'title' => 'Fin Child B 3 2 2 2 6.'.$i, 'url' => '/fin-child-b-3-2-2-2-6'.$i],
+                                                    ['id' => 'fin-child-3b-2-2-2-7.'.$i, 'title' => 'Fin Child B 3 2 2 2 7.'.$i, 'url' => '/fin-child-b-3-2-2-2-7'.$i],
+                                                    ['id' => 'fin-child-3b-2-2-2-8.'.$i, 'title' => 'Fin Child B 3 2 2 2 8.'.$i, 'url' => '/fin-child-b-3-2-2-2-8'.$i],
+                                                    ['id' => 'fin-child-3b-2-2-2-9.'.$i, 'title' => 'Fin Child B 3 2 2 2 9.'.$i, 'url' => '/fin-child-b-3-2-2-2-9'.$i],
+                                                    ['id' => 'fin-child-3b-2-2-2-10.'.$i, 'title' => 'Fin Child B 3 2 2 2 10.'.$i, 'url' => '/fin-child-b-3-2-2-2-10'.$i],
+                                                    [
+                                                        'id' => 'fin-child-3b-2-2-2-11.'.$i, 'title' => 'Fin Child B 3 2 2 2 11.'.$i, 'url' => '/fin-child-b-3-2-2-2-11'.$i,
+                                                        'children' => [
+                                                            ['id' => 'fin-child-3b-2-2-2-11-2.'.$i, 'title' => 'Fin Child B 3 2 2 2 11 2.'.$i, 'url' => '/fin-child-b-3-2-2-2-11-2'.$i],
+                                                            ['id' => 'fin-child-3b-2-2-2-11-3.'.$i, 'title' => 'Fin Child B 3 2 2 2 11 3.'.$i, 'url' => '/fin-child-b-3-2-2-2-11-3'.$i],
+                                                            ['id' => 'fin-child-3b-2-2-2-11-4.'.$i, 'title' => 'Fin Child B 3 2 2 2 11 4.'.$i, 'url' => '/fin-child-b-3-2-2-2-11-4'.$i],
+                                                            ['id' => 'fin-child-3b-2-2-2-11-5.'.$i, 'title' => 'Fin Child B 3 2 2 2 11 5.'.$i, 'url' => '/fin-child-b-3-2-2-2-11-5'.$i],
+                                                            ['id' => 'fin-child-3b-2-2-2-11-6.'.$i, 'title' => 'Fin Child B 3 2 2 2 11 6.'.$i, 'url' => '/fin-child-b-3-2-2-2-11-6'.$i],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+
+                            ],
+                            ['id' => 'fin-child-3b-2-c.'.$i, 'title' => 'Fin B C3 2.'.$i, 'url' => '/fin-child-b-c-3-2'.$i],
+                        ],
+                    ],
+                ],
+            ];
+            $tree[] = ['id' => 'tree-finish'.$i, 'title' => 'Tree-Finish.'.$i, 'url' => '/tree-finish'.$i];
+        }
+
+        $nav = Nav::make('main');
+        $nav->makeTree('en', $tree)->save();
+        $nav->save();
+
+        $runtimeTree = [];
+
+        // This test uses the {{ ___internal_debug:peek }} tag to help build up an array
+        // based on the current state of the recursive nav tree. We will use this
+        // output later to verify that the tree is built correctly, otherwise the
+        // HTML output of this navigation tree is just insane.
+        GlobalRuntimeState::$peekCallbacks = [];
+        GlobalRuntimeState::$peekCallbacks[] = function (NodeProcessor $processor) use (&$runtimeTree) {
+            $activeData = $processor->getActiveData();
+            $curDepth = $activeData['depth'];
+            $title = $activeData['title'];
+            $branch = $activeData['branch'];
+            $childDepth = null;
+
+            if (array_key_exists('children_depth', $activeData)) {
+                $childDepth = $activeData['children_depth'];
+            }
+
+            $runtimeTree[] = str_repeat(' ', $curDepth - 1).'depth: '.$curDepth.', title: '.$title.', childDepth: '.$childDepth.', branch: '.$branch;
+        };
+
+        $navTemplate = <<<'EOT'
+{{ nav:main include_home="true" }}
+{{ if depth == 1 }}
+<li class="depth-1">
+    {{ title }}
+    {{ branch = 'depth==1' }}
+    {{ ___internal_debug:peek }}
+    {{ if children }}
+    <ul>{{ *recursive children* }}</ul>
+    {{ /if }}
+</li>
+{{ elseif depth == 2 }}
+<li class="depth-2">
+    {{ title }}
+    {{ branch = 'depth==2' }}
+    {{ ___internal_debug:peek }}
+    {{ if children }}
+    <ul>{{ *recursive children* }}</ul>
+    {{ /if }}
+</li>
+{{ else }}
+<li class="other-depth">
+    {{ title }}
+    {{ branch = 'else' }}
+    {{ ___internal_debug:peek }}
+    {{ if children }}
+    <ul>{{ *recursive children* }}</ul>
+    {{ /if }}
+</li>
+{{ /if }}
+{{ /nav:main }}
+
+{{# Ensure that re-used nodes get their initial depth reset correctly. #}}
+{{ loop from="1" to="2" }}
+{{ nav:main include_home="true" }}
+{{ if depth == 1 }}
+<li class="depth-1">
+    {{ title }}
+    {{ branch = 'depth==1' }}
+    {{ ___internal_debug:peek }}
+    {{ if children }}
+    <ul>{{ *recursive children* }}</ul>
+    {{ /if }}
+</li>
+{{ elseif depth == 2 }}
+<li class="depth-2">
+    {{ title }}
+    {{ branch = 'depth==2' }}
+    {{ ___internal_debug:peek }}
+    {{ if children }}
+    <ul>{{ *recursive children* }}</ul>
+    {{ /if }}
+</li>
+{{ else }}
+<li class="other-depth">
+    {{ title }}
+    {{ branch = 'else' }}
+    {{ ___internal_debug:peek }}
+    {{ if children }}
+    <ul>{{ *recursive children* }}</ul>
+    {{ /if }}
+</li>
+{{ /if }}
+{{ /nav:main }}
+{{ /loop }}
+EOT;
+        $this->renderString($navTemplate, [], true);
+
+        $result = implode("\n", $runtimeTree);
+
+        $expected = <<<'EOT'
+depth: 1, title: Home.0, childDepth: , branch: depth==1
+ depth: 2, title: About.0, childDepth: 2, branch: depth==2
+ depth: 2, title: Projects.0, childDepth: 2, branch: depth==2
+  depth: 3, title: Project-1.0, childDepth: 3, branch: else
+  depth: 3, title: Project-2.0, childDepth: 3, branch: else
+   depth: 4, title: Project 2 Nested.0, childDepth: 4, branch: else
+    depth: 5, title: Project 2 Nested 2.0, childDepth: 5, branch: else
+ depth: 2, title: Contact.0, childDepth: 2, branch: depth==2
+depth: 1, title: Root-2.0, childDepth: , branch: depth==1
+depth: 1, title: Root-3.0, childDepth: , branch: depth==1
+depth: 1, title: Root-4.0, childDepth: , branch: depth==1
+depth: 1, title: Fin Child 1.0, childDepth: , branch: depth==1
+ depth: 2, title: Fin Child 2.0, childDepth: 2, branch: depth==2
+ depth: 2, title: Fin Child 3.0, childDepth: 2, branch: depth==2
+depth: 1, title: Fin Child B 1.0, childDepth: , branch: depth==1
+ depth: 2, title: Fin Child B 2.0, childDepth: 2, branch: depth==2
+ depth: 2, title: Fin Child B 3.0, childDepth: 2, branch: depth==2
+  depth: 3, title: Fin Child B 3 2.0, childDepth: 3, branch: else
+   depth: 4, title: Fin Child B 3 2 2.0, childDepth: 4, branch: else
+    depth: 5, title: Fin Child B 3 2 2 2.0, childDepth: 5, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 2.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 3.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 4.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 5.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 6.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 7.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 8.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 9.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 10.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 11.0, childDepth: 6, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 2.0, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 3.0, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 4.0, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 5.0, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 6.0, childDepth: 7, branch: else
+  depth: 3, title: Fin B C3 2.0, childDepth: 3, branch: else
+depth: 1, title: Tree-Finish.0, childDepth: , branch: depth==1
+depth: 1, title: Home.1, childDepth: , branch: depth==1
+ depth: 2, title: About.1, childDepth: 2, branch: depth==2
+ depth: 2, title: Projects.1, childDepth: 2, branch: depth==2
+  depth: 3, title: Project-1.1, childDepth: 3, branch: else
+  depth: 3, title: Project-2.1, childDepth: 3, branch: else
+   depth: 4, title: Project 2 Nested.1, childDepth: 4, branch: else
+    depth: 5, title: Project 2 Nested 2.1, childDepth: 5, branch: else
+ depth: 2, title: Contact.1, childDepth: 2, branch: depth==2
+depth: 1, title: Root-2.1, childDepth: , branch: depth==1
+depth: 1, title: Root-3.1, childDepth: , branch: depth==1
+depth: 1, title: Root-4.1, childDepth: , branch: depth==1
+depth: 1, title: Fin Child 1.1, childDepth: , branch: depth==1
+ depth: 2, title: Fin Child 2.1, childDepth: 2, branch: depth==2
+ depth: 2, title: Fin Child 3.1, childDepth: 2, branch: depth==2
+depth: 1, title: Fin Child B 1.1, childDepth: , branch: depth==1
+ depth: 2, title: Fin Child B 2.1, childDepth: 2, branch: depth==2
+ depth: 2, title: Fin Child B 3.1, childDepth: 2, branch: depth==2
+  depth: 3, title: Fin Child B 3 2.1, childDepth: 3, branch: else
+   depth: 4, title: Fin Child B 3 2 2.1, childDepth: 4, branch: else
+    depth: 5, title: Fin Child B 3 2 2 2.1, childDepth: 5, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 2.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 3.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 4.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 5.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 6.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 7.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 8.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 9.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 10.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 11.1, childDepth: 6, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 2.1, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 3.1, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 4.1, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 5.1, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 6.1, childDepth: 7, branch: else
+  depth: 3, title: Fin B C3 2.1, childDepth: 3, branch: else
+depth: 1, title: Tree-Finish.1, childDepth: , branch: depth==1
+depth: 1, title: Home.0, childDepth: , branch: depth==1
+ depth: 2, title: About.0, childDepth: 2, branch: depth==2
+ depth: 2, title: Projects.0, childDepth: 2, branch: depth==2
+  depth: 3, title: Project-1.0, childDepth: 3, branch: else
+  depth: 3, title: Project-2.0, childDepth: 3, branch: else
+   depth: 4, title: Project 2 Nested.0, childDepth: 4, branch: else
+    depth: 5, title: Project 2 Nested 2.0, childDepth: 5, branch: else
+ depth: 2, title: Contact.0, childDepth: 2, branch: depth==2
+depth: 1, title: Root-2.0, childDepth: , branch: depth==1
+depth: 1, title: Root-3.0, childDepth: , branch: depth==1
+depth: 1, title: Root-4.0, childDepth: , branch: depth==1
+depth: 1, title: Fin Child 1.0, childDepth: , branch: depth==1
+ depth: 2, title: Fin Child 2.0, childDepth: 2, branch: depth==2
+ depth: 2, title: Fin Child 3.0, childDepth: 2, branch: depth==2
+depth: 1, title: Fin Child B 1.0, childDepth: , branch: depth==1
+ depth: 2, title: Fin Child B 2.0, childDepth: 2, branch: depth==2
+ depth: 2, title: Fin Child B 3.0, childDepth: 2, branch: depth==2
+  depth: 3, title: Fin Child B 3 2.0, childDepth: 3, branch: else
+   depth: 4, title: Fin Child B 3 2 2.0, childDepth: 4, branch: else
+    depth: 5, title: Fin Child B 3 2 2 2.0, childDepth: 5, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 2.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 3.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 4.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 5.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 6.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 7.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 8.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 9.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 10.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 11.0, childDepth: 6, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 2.0, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 3.0, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 4.0, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 5.0, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 6.0, childDepth: 7, branch: else
+  depth: 3, title: Fin B C3 2.0, childDepth: 3, branch: else
+depth: 1, title: Tree-Finish.0, childDepth: , branch: depth==1
+depth: 1, title: Home.1, childDepth: , branch: depth==1
+ depth: 2, title: About.1, childDepth: 2, branch: depth==2
+ depth: 2, title: Projects.1, childDepth: 2, branch: depth==2
+  depth: 3, title: Project-1.1, childDepth: 3, branch: else
+  depth: 3, title: Project-2.1, childDepth: 3, branch: else
+   depth: 4, title: Project 2 Nested.1, childDepth: 4, branch: else
+    depth: 5, title: Project 2 Nested 2.1, childDepth: 5, branch: else
+ depth: 2, title: Contact.1, childDepth: 2, branch: depth==2
+depth: 1, title: Root-2.1, childDepth: , branch: depth==1
+depth: 1, title: Root-3.1, childDepth: , branch: depth==1
+depth: 1, title: Root-4.1, childDepth: , branch: depth==1
+depth: 1, title: Fin Child 1.1, childDepth: , branch: depth==1
+ depth: 2, title: Fin Child 2.1, childDepth: 2, branch: depth==2
+ depth: 2, title: Fin Child 3.1, childDepth: 2, branch: depth==2
+depth: 1, title: Fin Child B 1.1, childDepth: , branch: depth==1
+ depth: 2, title: Fin Child B 2.1, childDepth: 2, branch: depth==2
+ depth: 2, title: Fin Child B 3.1, childDepth: 2, branch: depth==2
+  depth: 3, title: Fin Child B 3 2.1, childDepth: 3, branch: else
+   depth: 4, title: Fin Child B 3 2 2.1, childDepth: 4, branch: else
+    depth: 5, title: Fin Child B 3 2 2 2.1, childDepth: 5, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 2.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 3.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 4.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 5.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 6.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 7.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 8.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 9.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 10.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 11.1, childDepth: 6, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 2.1, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 3.1, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 4.1, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 5.1, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 6.1, childDepth: 7, branch: else
+  depth: 3, title: Fin B C3 2.1, childDepth: 3, branch: else
+depth: 1, title: Tree-Finish.1, childDepth: , branch: depth==1
+depth: 1, title: Home.0, childDepth: , branch: depth==1
+ depth: 2, title: About.0, childDepth: 2, branch: depth==2
+ depth: 2, title: Projects.0, childDepth: 2, branch: depth==2
+  depth: 3, title: Project-1.0, childDepth: 3, branch: else
+  depth: 3, title: Project-2.0, childDepth: 3, branch: else
+   depth: 4, title: Project 2 Nested.0, childDepth: 4, branch: else
+    depth: 5, title: Project 2 Nested 2.0, childDepth: 5, branch: else
+ depth: 2, title: Contact.0, childDepth: 2, branch: depth==2
+depth: 1, title: Root-2.0, childDepth: , branch: depth==1
+depth: 1, title: Root-3.0, childDepth: , branch: depth==1
+depth: 1, title: Root-4.0, childDepth: , branch: depth==1
+depth: 1, title: Fin Child 1.0, childDepth: , branch: depth==1
+ depth: 2, title: Fin Child 2.0, childDepth: 2, branch: depth==2
+ depth: 2, title: Fin Child 3.0, childDepth: 2, branch: depth==2
+depth: 1, title: Fin Child B 1.0, childDepth: , branch: depth==1
+ depth: 2, title: Fin Child B 2.0, childDepth: 2, branch: depth==2
+ depth: 2, title: Fin Child B 3.0, childDepth: 2, branch: depth==2
+  depth: 3, title: Fin Child B 3 2.0, childDepth: 3, branch: else
+   depth: 4, title: Fin Child B 3 2 2.0, childDepth: 4, branch: else
+    depth: 5, title: Fin Child B 3 2 2 2.0, childDepth: 5, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 2.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 3.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 4.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 5.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 6.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 7.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 8.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 9.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 10.0, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 11.0, childDepth: 6, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 2.0, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 3.0, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 4.0, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 5.0, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 6.0, childDepth: 7, branch: else
+  depth: 3, title: Fin B C3 2.0, childDepth: 3, branch: else
+depth: 1, title: Tree-Finish.0, childDepth: , branch: depth==1
+depth: 1, title: Home.1, childDepth: , branch: depth==1
+ depth: 2, title: About.1, childDepth: 2, branch: depth==2
+ depth: 2, title: Projects.1, childDepth: 2, branch: depth==2
+  depth: 3, title: Project-1.1, childDepth: 3, branch: else
+  depth: 3, title: Project-2.1, childDepth: 3, branch: else
+   depth: 4, title: Project 2 Nested.1, childDepth: 4, branch: else
+    depth: 5, title: Project 2 Nested 2.1, childDepth: 5, branch: else
+ depth: 2, title: Contact.1, childDepth: 2, branch: depth==2
+depth: 1, title: Root-2.1, childDepth: , branch: depth==1
+depth: 1, title: Root-3.1, childDepth: , branch: depth==1
+depth: 1, title: Root-4.1, childDepth: , branch: depth==1
+depth: 1, title: Fin Child 1.1, childDepth: , branch: depth==1
+ depth: 2, title: Fin Child 2.1, childDepth: 2, branch: depth==2
+ depth: 2, title: Fin Child 3.1, childDepth: 2, branch: depth==2
+depth: 1, title: Fin Child B 1.1, childDepth: , branch: depth==1
+ depth: 2, title: Fin Child B 2.1, childDepth: 2, branch: depth==2
+ depth: 2, title: Fin Child B 3.1, childDepth: 2, branch: depth==2
+  depth: 3, title: Fin Child B 3 2.1, childDepth: 3, branch: else
+   depth: 4, title: Fin Child B 3 2 2.1, childDepth: 4, branch: else
+    depth: 5, title: Fin Child B 3 2 2 2.1, childDepth: 5, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 2.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 3.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 4.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 5.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 6.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 7.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 8.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 9.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 10.1, childDepth: 6, branch: else
+     depth: 6, title: Fin Child B 3 2 2 2 11.1, childDepth: 6, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 2.1, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 3.1, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 4.1, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 5.1, childDepth: 7, branch: else
+      depth: 7, title: Fin Child B 3 2 2 2 11 6.1, childDepth: 7, branch: else
+  depth: 3, title: Fin B C3 2.1, childDepth: 3, branch: else
+depth: 1, title: Tree-Finish.1, childDepth: , branch: depth==1
+EOT;
+
+        $this->assertSame($expected, $result);
+    }
+
+    public function test_recursive_nodes_on_structures_inside_partials()
+    {
+        $this->makeNavTree();
+
+        $this->withFakeViews();
+
+        $navTemplate = <<<'EOT'
+{{ nav:main include_home="true" }}
+<div>{{ depth }} {{ title }}</div>
+{{ if children }}{{ *recursive children* }}{{ /if }}
+{{ /nav:main }}
+EOT;
+
+        $this->viewShouldReturnRaw('nav', $navTemplate);
+
+        $mainTemplate = <<<'EOT'
+{{ partial:nav }}
+{{ partial:nav }}
+--------------------------------------------------------------------------------
+{{ nav:main include_home="true" }}
+<div>{{ depth }} {{ title }}</div>
+{{ if children }}{{ *recursive children* }}{{ /if }}
+{{ /nav:main }}
+--------------------------------------------------------------------------------
+{{ nav:main include_home="true" }}
+<div>{{ depth }} {{ title }}</div>
+{{ if children }}{{ *recursive children* }}{{ /if }}
+{{ /nav:main }}
+--------------------------------------------------------------------------------
+{{ partial:nav }}
+{{ partial:nav }}
+EOT;
+
+        $expected = <<<'EOT'
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+
+
+
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+
+
+--------------------------------------------------------------------------------
+
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+
+
+--------------------------------------------------------------------------------
+
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+
+
+--------------------------------------------------------------------------------
+
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+
+
+
+<div>1 Home</div>
+
+
+<div>1 About</div>
+
+<div>2 Team</div>
+
+
+<div>2 Leadership</div>
+
+
+
+<div>1 Projects</div>
+
+<div>2 Project-1</div>
+
+
+<div>2 Project-2</div>
+
+<div>3 Project 2 Nested</div>
+
+
+
+
+<div>1 Contact</div>
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($mainTemplate, [], true)));
+    }
+
+    public function test_recursive_nodes_on_structures()
+    {
+        $this->makeNavTree();
 
         $template = <<<'EOT'
 {{ nav:main include_home="true" }}
@@ -749,5 +1378,62 @@ EOT;
 EOT;
 
         $this->assertSame(StringUtilities::normalizeLineEndings($expected), StringUtilities::normalizeLineEndings($results));
+    }
+
+    public function test_multiple_navs_on_same_page_inside_conditions_resolve_the_correct_parent()
+    {
+        $this->makeNavTree();
+
+        $template = <<<'EOT'
+{{ nav handle="main" }}
+    {{ if depth == 1 }}
+        <div class="{{ if is_current || is_parent }}active{{ /if }}">
+            <a href="{{ url }}">First: {{ title }}</a>
+            {{ if children }}
+                <ul>
+                    {{ *recursive children* }}
+                </ul>
+            {{ /if }}
+        </div>
+    {{ /if }}
+    {{ if depth == 2 }}
+        <li><a class="{{ if is_current }}active{{ /if }}" href="{{ url }}">First: {{ title }}</a></li>
+    {{ /if }}
+{{ /nav }}
+
+<hr />
+{{ if true }}
+    {{ nav handle="main" }}
+        {{ if depth == 1 }}
+            <div>
+                <a href="{{ url }}">Second: {{ title }}</a>
+                {{ if children }}
+                    <ul>
+                        {{ *recursive children* }}
+                    </ul>
+                {{ /if }}
+            </div>
+        {{ /if }}
+        {{ if depth == 2 }}
+            <li><a class="{{ if is_current }}active{{ /if }}" href="{{ url }}">Second: {{ title }}</a></li>
+        {{ /if }}
+    {{ /nav }}
+{{ /if }}
+EOT;
+
+        $result = $this->renderString($template, [], true);
+        $this->assertStringContainsString('<a href="/">First: Home</a>', $result);
+        $this->assertStringContainsString('<a href="about">First: About</a>', $result);
+        $this->assertStringContainsString('<li><a class="" href="team">First: Team</a></li>', $result);
+        $this->assertStringContainsString('<li><a class="" href="leadership">First: Leadership</a></li>', $result);
+        $this->assertStringContainsString('<a href="projects">First: Projects</a>', $result);
+        $this->assertStringContainsString('<li><a class="" href="project-1">First: Project-1</a></li>', $result);
+        $this->assertStringContainsString('<li><a class="" href="project-2">First: Project-2</a></li>', $result);
+
+        $this->assertStringContainsString('<a href="/">Second: Home</a>', $result);
+        $this->assertStringContainsString('<a href="about">Second: About</a>', $result);
+        $this->assertStringContainsString('<li><a class="" href="leadership">Second: Leadership</a></li>', $result);
+        $this->assertStringContainsString('<a href="projects">Second: Projects</a>', $result);
+        $this->assertStringContainsString('<a href="contact">Second: Contact</a>', $result);
     }
 }

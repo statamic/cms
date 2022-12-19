@@ -19,9 +19,17 @@ class BardServiceProvider extends ServiceProvider
             'hardBreak' => new \Tiptap\Nodes\HardBreak(),
             'heading' => new \Tiptap\Nodes\Heading(),
             'horizontalRule' => new \Tiptap\Nodes\HorizontalRule(),
-            // An 'image' is defined as well. @see Statamic\Fieldtypes\Bard;
+            'image' => function ($bard, $options) {
+                return $options['withStatamicImageUrls']
+                    ? new \Statamic\Fieldtypes\Bard\StatamicImageNode
+                    : new \Statamic\Fieldtypes\Bard\ImageNode;
+            },
             'italic' => new \Tiptap\Marks\Italic(),
-            'link' => new \Statamic\Fieldtypes\Bard\LinkMark(),
+            'link' => function ($bard, $options) {
+                return $options['withStatamicImageUrls']
+                    ? new \Statamic\Fieldtypes\Bard\StatamicLinkMark
+                    : new \Statamic\Fieldtypes\Bard\LinkMark;
+            },
             'listItem' => new \Tiptap\Nodes\ListItem(),
             'orderedList' => new \Tiptap\Nodes\OrderedList(),
             'paragraph' => new \Tiptap\Nodes\Paragraph(),
@@ -35,6 +43,7 @@ class BardServiceProvider extends ServiceProvider
             'tableHeader' => new \Tiptap\Nodes\TableHeader(),
             'tableRow' => new \Tiptap\Nodes\TableRow(),
             'text' => new \Tiptap\Nodes\Text(),
+            'textAlign' => new \Tiptap\Extensions\TextAlign(['types' => ['heading', 'paragraph']]),
         ]);
     }
 }

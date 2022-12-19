@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -28,6 +29,31 @@ class Bard extends Replicator
     protected function configFieldItems(): array
     {
         return [
+            'collapse' => [
+                'display' => __('Collapse'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
+                'type' => 'select',
+                'cast_booleans' => true,
+                'width' => 33,
+                'options' => [
+                    'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
+                    'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
+                    'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+                ],
+                'default' => false,
+            ],
+            'placeholder' => [
+                'display' => __('Placeholder'),
+                'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                'type' => 'text',
+                'width' => 50,
+            ],
+            'character_limit' => [
+                'display' => __('Character Limit'),
+                'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
+                'type' => 'text',
+                'width' => 50,
+            ],
             'always_show_set_button' => [
                 'display' => __('Always Show Set Button'),
                 'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
@@ -77,9 +103,15 @@ class Bard extends Replicator
                 ],
             ],
             'save_html' => [
-                'display' => __('Display HTML'),
+                'display' => __('Save as HTML'),
                 'instructions' => __('statamic::fieldtypes.bard.config.save_html'),
                 'type' => 'toggle',
+            ],
+            'inline' => [
+                'display' => __('Inline'),
+                'instructions' => __('statamic::fieldtypes.bard.config.inline'),
+                'type' => 'toggle',
+                'width' => 50,
             ],
             'toolbar_mode' => [
                 'display' => __('Toolbar Mode'),
@@ -160,6 +192,19 @@ class Bard extends Replicator
                 'type' => 'toggle',
                 'width' => 50,
             ],
+            'remove_empty_nodes' => [
+                'display' => __('Remove Empty Nodes'),
+                'instructions' => __('statamic::fieldtypes.bard.config.remove_empty_nodes'),
+                'type' => 'select',
+                'cast_booleans' => true,
+                'options' => [
+                    'false' => __("Don't remove empty nodes"),
+                    'true' => __('Remove all empty nodes'),
+                    'trim' => __('Remove empty nodes at the start and end'),
+                ],
+                'default' => 'false',
+                'width' => 50,
+            ],
         ];
     }
 
@@ -185,6 +230,12 @@ class Bard extends Replicator
     {
         $value = json_decode($value, true);
 
+        $value = $this->removeEmptyNodes($value);
+
+        if ($this->config('inline')) {
+            $value = $this->unwrapInlineValue($value);
+        }
+
         $structure = collect($value)->map(function ($row) {
             if ($row['type'] !== 'set') {
                 return $row;
@@ -208,6 +259,43 @@ class Bard extends Replicator
         return $structure;
     }
 
+    protected function removeEmptyNodes($value)
+    {
+        $value = collect($value);
+
+        if ($this->config('remove_empty_nodes') === true) {
+            $empty = $value->filter(function ($value) {
+                return $this->shouldRemoveNode($value);
+            });
+
+            return $value->diffKeys($empty)->values();
+        }
+
+        if ($this->config('remove_empty_nodes') === 'trim') {
+            if ($this->shouldRemoveNode($value->first())) {
+                $value->shift();
+
+                return $this->removeEmptyNodes($value);
+            }
+
+            if ($this->shouldRemoveNode($value->last())) {
+                $value->pop();
+
+                return $this->removeEmptyNodes($value);
+            }
+        }
+
+        return $value;
+    }
+
+    protected function shouldRemoveNode($value)
+    {
+        $type = Arr::get($value, 'type');
+
+        return in_array($type, ['heading', 'paragraph'])
+            && ! Arr::has($value, 'content');
+    }
+
     protected function shouldSaveHtml()
     {
         if ($this->config('sets')) {
@@ -220,8 +308,6 @@ class Bard extends Replicator
     protected function processRow($row)
     {
         $row['attrs']['values'] = parent::processRow($row['attrs']['values']);
-
-        unset($row['attrs']['id']);
 
         if (array_get($row, 'attrs.enabled', true) === true) {
             unset($row['attrs']['enabled']);
@@ -246,6 +332,21 @@ class Bard extends Replicator
             $value = $this->convertLegacyData($value);
         }
 
+        if ($this->config('inline')) {
+            // Root should be text, if it's not this must be a block field converted
+            // to inline. In that instance unwrap the content of the first node.
+            if ($value[0]['type'] !== 'text') {
+                $value = $this->unwrapInlineValue($value);
+            }
+            $value = $this->wrapInlineValue($value);
+        } else {
+            // Root should not be text, if it is this must be an inline field converted
+            // to block. In that instance wrap the content in a paragraph node.
+            if ($value[0]['type'] === 'text') {
+                $value = $this->wrapInlineValue($value);
+            }
+        }
+
         return collect($value)->map(function ($row, $i) {
             if ($row['type'] !== 'set') {
                 return $row;
@@ -264,7 +365,7 @@ class Bard extends Replicator
         return [
             'type' => 'set',
             'attrs' => [
-                'id' => "set-$index",
+                'id' => $row['attrs']['id'] ?? str_random(8),
                 'enabled' => $row['attrs']['enabled'] ?? true,
                 'values' => Arr::except($values, 'enabled'),
             ],
@@ -363,7 +464,7 @@ class Bard extends Replicator
                 [
                     'type' => 'set',
                     'attrs' => [
-                        'id' => "set-$i",
+                        'id' => RowId::generate(),
                         'values' => $set,
                     ],
                 ],
@@ -545,5 +646,18 @@ class Bard extends Replicator
         }
 
         return [$ref => $data];
+    }
+
+    private function wrapInlineValue($value)
+    {
+        return [[
+            'type' => 'paragraph',
+            'content' => $value,
+        ]];
+    }
+
+    private function unwrapInlineValue($value)
+    {
+        return $value[0]['content'] ?? [];
     }
 }

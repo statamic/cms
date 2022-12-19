@@ -81,6 +81,10 @@ class Entries extends Relationship
             $query->whereIn('collection', $this->getConfiguredCollections());
         }
 
+        if ($blueprints = $this->config('blueprints')) {
+            $query->whereIn('blueprint', $blueprints);
+        }
+
         $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext());
 
         if ($sort = $this->getSortColumn($request)) {
@@ -210,7 +214,7 @@ class Entries extends Relationship
             return $this->invalidItemArray($id);
         }
 
-        return (new EntryResource($entry))->resolve();
+        return (new EntryResource($entry))->resolve()['data'];
     }
 
     protected function collect($value)

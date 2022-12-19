@@ -37,7 +37,7 @@ class LiteralReplacementManager
             return $name;
         }
 
-        self::$regions[$name] = $default;
+        self::$regions[$name] = $default ?? '';
 
         return $name;
     }

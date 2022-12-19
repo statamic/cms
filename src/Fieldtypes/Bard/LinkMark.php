@@ -44,7 +44,7 @@ class LinkMark extends Link
         ];
     }
 
-    private function convertHref($href)
+    protected function convertHref($href)
     {
         if (! Str::startsWith($href, 'statamic://')) {
             return $href;

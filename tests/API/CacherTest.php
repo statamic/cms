@@ -11,6 +11,7 @@ use Statamic\API\AbstractCacher;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\Event;
 use Statamic\Facades;
+use Statamic\Facades\Token;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -55,6 +56,59 @@ class CacherTest extends TestCase
         $this->get($endpoint)
             ->assertOk()
             ->assertJson(['foo' => 'bar']);
+    }
+
+    /**
+     * @test
+     * @dataProvider bypassCacheProvider
+     */
+    public function it_bypasses_cache_when_using_a_valid_token($endpoint, $headers)
+    {
+        optional(Token::find('test-token'))->delete(); // garbage collection
+        Token::make('test-token', TestTokenHandler::class)->save();
+
+        $this->makeEntry('apple')->save();
+
+        $this->get($endpoint, $headers)
+            ->assertOk()
+            ->assertJson(['data' => [
+                ['id' => 'apple'],
+            ]]);
+
+        $this->assertFalse(Cache::has("api-cache:$endpoint"));
+        $this->assertNull(Cache::get('api-cache:tracked-responses'));
+    }
+
+    /**
+     * @test
+     * @dataProvider bypassCacheProvider
+     */
+    public function it_doesnt_bypass_cache_when_using_an_invalid_token($endpoint, $headers)
+    {
+        // No token should exist, but do garbage collection.
+        // There may be a leftover token from a previous test.
+        optional(Token::find('test-token'))->delete();
+
+        $this->makeEntry('apple')->save();
+
+        $this->get($endpoint, $headers)
+            ->assertOk()
+            ->assertJson(['data' => [
+                ['id' => 'apple'],
+            ]]);
+
+        $this->assertTrue(Cache::has($cacheKey = "api-cache:$endpoint"));
+        $this->assertEquals([$cacheKey], Cache::get('api-cache:tracked-responses'));
+    }
+
+    public function bypassCacheProvider()
+    {
+        $endpoint = '/api/collections/articles/entries';
+
+        return [
+            [$endpoint.'?token=test-token', []],
+            [$endpoint, ['X-Statamic-Token' => 'test-token']],
+        ];
     }
 
     /**
@@ -273,5 +327,13 @@ class CustomCacher extends AbstractCacher
         }
 
         Cache::forget('custom-cache');
+    }
+}
+
+class TestTokenHandler
+{
+    public function handle($token, $request, $next)
+    {
+        return $next($request);
     }
 }

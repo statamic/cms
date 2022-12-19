@@ -28,6 +28,20 @@ class EmbedUrlTest extends TestCase
     }
 
     /** @test */
+    public function it_transforms_private_vimeo_urls()
+    {
+        $embedUrl = 'https://player.vimeo.com/video/735352648?dnt=1&h=fa55a4d0fc';
+
+        $this->assertEquals($embedUrl, $this->embed('https://vimeo.com/735352648/fa55a4d0fc'));
+
+        $this->assertEquals(
+            $embedUrl.'&foo=bar',
+            $this->embed('https://vimeo.com/735352648/fa55a4d0fc?foo=bar'),
+            'It appends the do not track query param if a query string already exists.'
+        );
+    }
+
+    /** @test */
     public function it_transforms_youtube_urls()
     {
         $embedUrl = 'https://www.youtube-nocookie.com/embed/s72r_wu_NVY';

@@ -23,6 +23,8 @@ use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Bard;
+use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -103,6 +105,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Parses the value as an Antlers template.
+     *
+     * @param  mixed  $value
+     * @param  array  $params
+     * @return string
+     */
+    public function antlers($value, $params, $context)
+    {
+        return (string) Antlers::parse($value, $context);
+    }
+
+    /**
      * Alias an array variable.
      *
      * @param $value
@@ -173,6 +187,80 @@ class CoreModifiers extends Modifier
         }
 
         return substr($value, 0, -$params[0]);
+    }
+
+    /**
+     * Converts a bard value to a flat array of nodes and marks.
+     *
+     * @param $value
+     * @return array
+     */
+    public function bardItems($value)
+    {
+        if ($value instanceof Value) {
+            $value = $value->raw();
+        }
+        if (Arr::isAssoc($value)) {
+            $value = [$value];
+        }
+
+        $items = [];
+        while (count($value)) {
+            $items[] = $item = array_shift($value);
+            // Marks are children of the text they apply to, but having access to that node
+            // would be useful when working with marks, so we add the node to the mark data
+            array_unshift($value, ...array_map(fn ($m) => $m + ['node' => $item], $item['marks'] ?? []));
+            array_unshift($value, ...($item['content'] ?? []));
+        }
+
+        return $items;
+    }
+
+    /**
+     * Converts a bard value to plain text (excluding sets).
+     *
+     * @param $value
+     * @return string
+     */
+    public function bardText($value)
+    {
+        if ($value instanceof Value) {
+            $value = $value->raw();
+        }
+        if (Arr::isAssoc($value)) {
+            $value = [$value];
+        }
+
+        $text = '';
+        while (count($value)) {
+            $item = array_shift($value);
+            if ($item['type'] === 'text') {
+                $text .= ' '.($item['text'] ?? '');
+            }
+            array_unshift($value, ...($item['content'] ?? []));
+        }
+
+        return Stringy::collapseWhitespace($text);
+    }
+
+    /**
+     * Converts a bard value to HTML (excluding sets).
+     *
+     * @param $value
+     * @return string
+     */
+    public function bardHtml($value)
+    {
+        if ($value instanceof Value) {
+            $value = $value->raw();
+        }
+        if (Arr::isAssoc($value)) {
+            $value = [$value];
+        }
+
+        $items = array_values(Arr::where($value, fn ($item) => $item['type'] !== 'set'));
+
+        return (new Augmentor(new Bard()))->augment($items);
     }
 
     public function boolString($value)
@@ -596,7 +684,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns the first $params[0] characters of a string, or the last element of an array.
+     * Returns the first $params[0] characters of a string, or the first element of an array.
      *
      * @param $value
      * @param $params
@@ -605,7 +693,7 @@ class CoreModifiers extends Modifier
     public function first($value, $params)
     {
         if (is_array($value)) {
-            return Arr::get($value, 0);
+            return Arr::first($value);
         }
 
         return Stringy::first($value, Arr::get($params, 0));
@@ -670,6 +758,8 @@ class CoreModifiers extends Modifier
 
     /**
      * Converts a string to a Carbon instance and formats it according to the whim of the Overlord.
+     *
+     * @deprecated formatLocalized is deprecated since Carbon 2.55.0. You may want to use isoFormat instead.
      *
      * @param $value
      * @param $params
@@ -1251,6 +1341,20 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Rekeys an array or collection.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function keyBy($value, $params)
+    {
+        $rekeyed = collect($value)->keyBy(fn ($item) => $item[$params[0]]);
+
+        return is_array($value) ? $rekeyed->all() : $rekeyed;
+    }
+
+    /**
      * Returns the last $params[0] characters of a string, or the last element of an array.
      *
      * @param $value
@@ -1260,7 +1364,7 @@ class CoreModifiers extends Modifier
     public function last($value, $params)
     {
         if (is_array($value)) {
-            return array_pop($value);
+            return Arr::last($value);
         }
 
         return Stringy::last($value, Arr::get($params, 0));
@@ -1371,6 +1475,27 @@ class CoreModifiers extends Modifier
         })->reduce(function ($value, $modifier) use ($context) {
             return Modify::value($value)->context($context)->modify($modifier['name'], $modifier['params']);
         }, $value);
+    }
+
+    /**
+     * Wraps matched words with <mark> tags.
+     *
+     * @param $value
+     * @param  array  $params
+     * @return string
+     */
+    public function mark($value, $params, $context)
+    {
+        if (! $words = $params[0] ?? $context['get']['q'] ?? null) {
+            return $value;
+        }
+
+        $params[0] = collect(preg_split('/\s+/', $words))
+            ->map(fn ($word) => preg_quote($word, '/'))
+            ->filter()
+            ->join('|');
+
+        return $this->regexMark($value, $params);
     }
 
     /**
@@ -1760,6 +1885,35 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Wraps regex matches with <mark> tags.
+     *
+     * @param $value
+     * @param  array  $params
+     * @return string
+     */
+    public function regexMark($value, $params)
+    {
+        if (! $pattern = array_shift($params)) {
+            return $value;
+        }
+
+        $attributes = $this->buildAttributesFromParameters($params);
+
+        return Html::mapText($value, function ($text) use ($pattern, $attributes) {
+            $text = Html::decode($text);
+
+            return Str::mapRegex($text, "/({$pattern})/is", function ($part, $match) use ($attributes) {
+                $part = Html::entities($part);
+                if ($match) {
+                    $part = '<mark'.Html::attributes($attributes).'>'.$part.'</mark>';
+                }
+
+                return $part;
+            });
+        });
+    }
+
+    /**
      * Replaces all occurrences of pattern $params[0] with the string $params[1].
      *
      * @param $value
@@ -1795,7 +1949,7 @@ class CoreModifiers extends Modifier
     {
         $remove_modifiers = Arr::get($params, 0, false);
 
-        return $this->carbon($value)->diffForHumans(null, $remove_modifiers);
+        return $this->carbon($value)->diffForHumans(null, in_array($remove_modifiers, [true, 'true'], true));
     }
 
     /**
@@ -1907,6 +2061,10 @@ class CoreModifiers extends Modifier
      */
     public function reverse($value)
     {
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
         if ($value instanceof Collection) {
             return $value->reverse()->values()->all();
         }
@@ -2459,7 +2617,9 @@ class CoreModifiers extends Modifier
      */
     public function title($value)
     {
-        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor'];
+        preg_match_all('/[A-Z]+\b/', $value, $matches);
+
+        $ignore = ['a', 'an', 'the', 'at', 'by', 'for', 'in', 'of', 'on', 'to', 'up', 'and', 'as', 'but', 'or', 'nor', ...$matches[0]];
 
         return Stringy::titleize($value, $ignore);
     }
@@ -2824,7 +2984,7 @@ class CoreModifiers extends Modifier
         // adapted mb_str_word_count from https://stackoverflow.com/a/17725577
         $words = empty($string = trim($value)) ? [] : preg_split('~[^\p{L}\p{N}\']+~u', $value);
 
-        return count($words);
+        return count(array_filter($words));
     }
 
     /**
@@ -2851,10 +3011,17 @@ class CoreModifiers extends Modifier
         if (Str::contains($url, 'vimeo')) {
             $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
 
+            [$url, $hash] = $this->handleUnlistedVimeoUrls($url);
+
+            $paramsToAdd = '?dnt=1';
+            if ($hash) {
+                $paramsToAdd .= '&h='.$hash;
+            }
+
             if (Str::contains($url, '?')) {
-                $url = str_replace('?', '?dnt=1&', $url);
+                $url = str_replace('?', $paramsToAdd.'&', $url);
             } else {
-                $url .= '?dnt=1';
+                $url .= $paramsToAdd;
             }
 
             return $url;
@@ -2995,5 +3162,22 @@ class CoreModifiers extends Modifier
         return $this->usingRuntimeMethodSyntax($context) ?
                 $params[$key] :
                 Arr::get($context, $params[$key], $params[$key]);
+    }
+
+    // unlisted vimeo urls are in the form vimeo.com/id/hash, but embeds pass the hash as a get param
+    private function handleUnlistedVimeoUrls($url)
+    {
+        $hash = '';
+        if (Str::substrCount($url, '/') > 4) {
+            $hash = Str::afterLast($url, '/');
+            $url = Str::beforeLast($url, '/');
+
+            if (Str::contains($hash, '?')) {
+                $url .= '?'.Str::after($hash, '?');
+                $hash = Str::before($hash, '?');
+            }
+        }
+
+        return [$url, $hash];
     }
 }

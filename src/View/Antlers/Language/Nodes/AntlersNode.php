@@ -52,6 +52,8 @@ class AntlersNode extends AbstractNode
      */
     public $runtimeContent = '';
 
+    public $activeDepth = 1;
+
     /**
      * Sets the internal DocumentParser instance.
      *
