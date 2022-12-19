@@ -508,51 +508,63 @@ export default {
         },
 
         updateItemAction(item) {
-            if (['@create', '@alias'].includes(data_get(item.manipulations, 'action'))) {
-                console.log(item.manipulations.action); // TODO: remove this
-                return;
+            let detectedAction = this.detectItemAction(item);
+
+            if (detectedAction) {
+                item.manipulations.action = detectedAction;
+            } else {
+                Vue.delete(item.manipulations, 'action');
             }
 
-            let originalSection = data_get(item.original, 'section') || data_get(item.parent, 'original.section');
+            console.log(data_get(item.manipulations, 'action')); // TODO: remove this
+        },
+
+        detectItemAction(item) {
+            let currentAction = data_get(item.manipulations, 'action');
+
+            switch (true) {
+                case currentAction === '@create':
+                    return '@create';
+                case currentAction === '@alias':
+                    return '@alias';
+                case this.itemIsMovedToAnotherSection(item):
+                case this.itemIsMovedWithinSection(item):
+                    return '@move';
+                case this.itemHasModifiedProperties(item):
+                    return '@modify';
+            }
+
+            return null;
+        },
+
+        itemIsMovedToAnotherSection(item) {
             let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
+            let originalSection = data_get(item.original, 'section') || data_get(item.parent, 'original.section');
 
-            if (currentSection !== originalSection) {
-                item.manipulations.action = '@move';
-                console.log('@move to ANOTHER section'); // TODO: remove this
-                return;
-            }
+            return currentSection !== originalSection;
+        },
 
+        itemIsMovedWithinSection(item) {
             let parentsOriginalChildIds = data_get(item.parent, 'original', { children: [] })
                 .children
                 .map(child => child.id);
 
             if (this.isChildItemNode(item) && ! parentsOriginalChildIds.includes(item.original.id)) {
-                item.manipulations.action = '@move';
-                console.log('@move WITHIN section'); // TODO: remove this
-                return;
+                return true;
             }
 
+            let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
             let sectionsOriginalIds = this.originalSectionItems[currentSection];
 
             if (! this.isChildItemNode(item) && ! sectionsOriginalIds.includes(item.original.id)) {
-                item.manipulations.action = '@move';
-                console.log('@move WITHIN section'); // TODO: remove this
-                return;
+                return true;
             }
 
-            let modifiedProperties = _.chain(item.manipulations)
-                .omit('action')
-                .keys()
-                .value();
+            return false;
+        },
 
-            if (modifiedProperties.length) {
-                item.manipulations.action = '@modify';
-                console.log('@modify'); // TODO: remove this
-                return;
-            }
-
-            Vue.delete(item.manipulations, 'action');
-            console.log('no action'); // TODO: remove this
+        itemHasModifiedProperties(item) {
+            return _.chain(item.manipulations).omit('action').keys().value().length > 0;
         },
 
         expandAll() {
