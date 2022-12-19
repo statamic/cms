@@ -131,6 +131,22 @@ class NavItem
     }
 
     /**
+     * Get editable url for nav builder UI.
+     */
+    public function editableUrl()
+    {
+        if (! $this->url) {
+            return null;
+        }
+
+        if (Str::startsWith($this->url, url('/'))) {
+            return str_replace(url('/'), '', $this->url);
+        }
+
+        return $this->url;
+    }
+
+    /**
      * Get or set icon.
      *
      * @param  string|null  $icon
@@ -347,7 +363,7 @@ class NavItem
     }
 
     /**
-     * Get whether the nav item is to be hidden, but still made available for when customizing nav.
+     * Get whether the nav item is to be hidden, but still made available for nav builder UI.
      *
      * @return bool
      */

@@ -437,7 +437,7 @@ class NavTest extends TestCase
     /** @test */
     public function it_sets_the_url()
     {
-        tap(Nav::create('absolute')->url('http://domain.com'), function ($nav) {
+        tap(Nav::create('external-absolute')->url('http://domain.com'), function ($nav) {
             $this->assertEquals('http://domain.com', $nav->url());
             $this->assertNull($nav->active());
         });
@@ -450,6 +450,22 @@ class NavTest extends TestCase
         tap(Nav::create('cp-relative')->url('foo/bar'), function ($nav) {
             $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
             $this->assertEquals('foo/bar(/(.*)?|$)', $nav->active());
+        });
+    }
+
+    /** @test */
+    public function it_gets_a_cleaner_editable_version_of_the_url()
+    {
+        tap(Nav::create('external-absolute')->url('http://domain.com'), function ($nav) {
+            $this->assertEquals('http://domain.com', $nav->editableUrl());
+        });
+
+        tap(Nav::create('site-relative')->url('/foo/bar'), function ($nav) {
+            $this->assertEquals('/foo/bar', $nav->editableUrl());
+        });
+
+        tap(Nav::create('cp-relative')->url('foo/bar'), function ($nav) {
+            $this->assertEquals('/cp/foo/bar', $nav->editableUrl());
         });
     }
 
