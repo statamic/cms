@@ -48,6 +48,7 @@ class NavBuilder
             ->validateViews()
             ->authorizeItems()
             ->authorizeChildren()
+            ->syncOriginal()
             ->applyPreferenceOverrides($preferences)
             ->buildSections()
             ->get();
@@ -146,6 +147,18 @@ class NavBuilder
                     : true;
             })
             ->all();
+    }
+
+    /**
+     * Sync original state on each item.
+     *
+     * @return $this
+     */
+    public function syncOriginal()
+    {
+        collect($this->items)->each(fn ($item) => $item->syncOriginal());
+
+        return $this;
     }
 
     /**
