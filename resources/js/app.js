@@ -252,10 +252,10 @@ Statamic.app({
             // Fix autofocus issues in Safari and Firefox
             setTimeout(() => {
                 const inputs = document.querySelectorAll('input[autofocus]');
+                for (let input of inputs) {
+                    input.blur();
+                }
                 if (inputs.length) {
-                    for (let input of inputs) {
-                        input.blur();
-                    }
                     inputs[0].focus();
                 }
             }, 100);
