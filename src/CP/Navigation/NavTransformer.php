@@ -231,6 +231,8 @@ class NavTransformer
     protected function itemsAreReordered($originalList, $newList, $parentKey)
     {
         $itemsAreReordered = collect($originalList)
+            ->intersect($newList)
+            ->values()
             ->zip($newList)
             ->reject(fn ($pair) => is_null($pair->first()))
             ->reject(fn ($pair) => $pair->first() === $pair->last())
@@ -266,7 +268,7 @@ class NavTransformer
             })
             ->count();
 
-        $this->reorderedMinimums[$parentKey] = $minimumItemsCount;
+        $this->reorderedMinimums[$parentKey] = max(1, $minimumItemsCount - 1);
     }
 
     /**
