@@ -255,7 +255,9 @@ Statamic.app({
                 for (let input of inputs) {
                     input.blur();
                 }
-                inputs[0].focus();
+                if (inputs.length) {
+                    inputs[0].focus();
+                }
             }, 100);
         }
     }
