@@ -160,16 +160,10 @@ class Uploader
         ]);
 
         try {
-            $server->makeImage($file->getFilename(), $params);
+            return $this->glideTmpPath.'/'.$server->makeImage($file->getFilename(), $params);
         } catch (\Exception $exception) {
             return $file->getRealPath();
         }
-
-        $newFilePath = collect($this->files->files($this->glideTmpPath.'/'.$file->getFilename()))
-            ->first()
-            ->getRealPath();
-
-        return $newFilePath;
     }
 
     /**
