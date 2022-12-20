@@ -176,7 +176,7 @@ class NavTransformer
 
         $transformed['reorder'] = false;
 
-        if ($children && $parentHasChildren && ! in_array($transformed['action'], ['@alias', '@create', '@inherit'])) {
+        if ($children && $parentHasChildren && ! in_array($transformed['action'], ['@alias', '@create'])) {
             $transformed['reorder'] = $this->itemsAreReordered(
                 $parentItem->resolveChildren()->children()->map->id()->all(),
                 collect($children)->keys()->all(),
