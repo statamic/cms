@@ -37,7 +37,7 @@ class ImportRoles extends Command
      */
     public function handle()
     {
-        if (! config('statamic.users.roles', false)) {
+        if (! config('statamic.users.tables.roles', false)) {
             $this->error('You do not have eloquent driven roles enabled');
 
             return;

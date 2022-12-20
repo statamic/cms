@@ -37,7 +37,7 @@ class ImportGroups extends Command
      */
     public function handle()
     {
-        if (! config('statamic.users.groups', false)) {
+        if (! config('statamic.users.tables.groups', false)) {
             $this->error('You do not have eloquent driven groups enabled');
 
             return;
