@@ -169,13 +169,14 @@ class NavTransformer
             $transformed['url'] = $this->transformItemUrl($transformed['url']);
         }
 
-        $transformed['reorder'] = false;
-
-        $parentItem = $this->findParentItem($parentId);
-
         $children = $this->transformItems($item['children'], $parentId);
 
-        if ($children && optional($parentItem)->children()) {
+        $parentItem = $this->findParentItem($parentId);
+        $parentHasChildren = optional($parentItem)->children();
+
+        $transformed['reorder'] = false;
+
+        if ($children && $parentHasChildren && ! in_array($transformed['action'], ['@alias', '@create', '@inherit'])) {
             $transformed['reorder'] = $this->itemsAreReordered(
                 $parentItem->resolveChildren()->children()->map->id()->all(),
                 collect($children)->keys()->all(),

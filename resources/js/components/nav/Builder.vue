@@ -739,9 +739,7 @@ export default {
         },
 
         prepareItemIdForSubmission(item) {
-            return data_get(item, 'config.id')
-                ? item.config.id.replaceAll('::clone', '')
-                : item.text.toLowerCase().replaceAll(' ', '_');
+            return data_get(item, 'original.id', item.text.toLowerCase().replaceAll(' ', '_'));
         },
 
     },
