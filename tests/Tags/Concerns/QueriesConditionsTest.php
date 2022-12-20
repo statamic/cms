@@ -341,12 +341,14 @@ class QueriesConditionsTest extends TestCase
 
         $this->assertCount(2, $this->getEntries(['show_future' => true, 'date:is_after' => true]));
         $this->assertCount(2, $this->getEntries(['show_future' => true, 'date:is_future' => true]));
-        $this->assertCount(2, $this->getEntries(['show_future' => true, 'date:is_after' => now()]));
-        $this->assertCount(2, $this->getEntries(['show_future' => true, 'date:is_future' => now()]));
         $this->assertCount(4, $this->getEntries(['show_future' => true, 'date:is_after' => 'today']));
         $this->assertCount(4, $this->getEntries(['show_future' => true, 'date:is_future' => 'today']));
         $this->assertCount(3, $this->getEntries(['show_future' => true, 'date:is_after' => false]));
         $this->assertCount(3, $this->getEntries(['show_future' => true, 'date:is_future' => false]));
+
+        $time = Carbon::parse('2019-03-10 13:02');
+        $this->assertCount(5, $this->getEntries(['show_future' => true, 'date:is_before' => $time]));
+        $this->assertCount(1, $this->getEntries(['show_future' => true, 'date:is_after' => $time]));
     }
 
     /** @test */
