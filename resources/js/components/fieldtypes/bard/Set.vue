@@ -7,8 +7,8 @@
         <div ref="content" hidden />
         <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
             <div class="item-move sortable-handle" data-drag-handle />
-            <div class="flex-1 p-1 replicator-set-header-inner" :class="{'flex items-center': collapsed}" @dblclick="toggleCollapsedState">
-                <label v-text="display || config.handle" class="text-xs whitespace-no-wrap mr-1"/>
+            <div class="flex-1 p-1 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
+                <label v-text="display || config.handle" class="text-xs whitespace-no-wrap mr-1 cursor-pointer"/>
                 <div
                     v-if="config.instructions"
                     v-show="!collapsed"

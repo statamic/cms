@@ -306,18 +306,20 @@ class CacherTest extends TestCase
         $cacher = $this->cacher();
 
         $cacher->shouldReceive('invalidateUrl')->once()->with('/', 'http://example.com');
-        $cacher->shouldReceive('invalidateUrl')->once()->with('/one', 'http://example.com');
+        $cacher->shouldReceive('invalidateUrl')->twice()->with('/one', 'http://example.com');
         $cacher->shouldReceive('invalidateUrl')->once()->with('/two', 'http://example.com');
         $cacher->shouldReceive('invalidateUrl')->once()->with('/three', 'http://example.co.uk');
-        $cacher->shouldReceive('invalidateUrl')->times(2)->with('/blog/post', 'http://example.com');
+        $cacher->shouldReceive('invalidateUrl')->times(3)->with('/blog/post', 'http://example.com');
         $cacher->shouldReceive('invalidateUrl')->once()->with('/blog/post', 'http://example.co.uk');
 
         $cacher->invalidateUrls([
             '/',
             '/one',
+            'one',
             'http://example.com/two',
             'http://example.co.uk/three',
             '/blog/*',
+            'blog/*',
             'http://example.com/blog/*',
             'http://example.co.uk/blog/*',
         ]);

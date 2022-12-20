@@ -323,7 +323,7 @@ class User extends BaseUser
             return null;
         }
 
-        return Carbon::createFromFormat($this->model()->getDateFormat(), $date);
+        return $date instanceof Carbon ? $date : Carbon::createFromFormat($this->model()->getDateFormat(), $date);
     }
 
     public function setLastLogin($time)

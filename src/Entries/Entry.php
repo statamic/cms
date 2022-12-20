@@ -630,13 +630,18 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function makeLocalization($site)
     {
-        return Facades\Entry::make()
+        $localization = Facades\Entry::make()
             ->collection($this->collection)
             ->origin($this)
             ->locale($site)
             ->published($this->published)
-            ->slug($this->slug())
-            ->date($this->date());
+            ->slug($this->slug());
+
+        if ($this->collection()->dated()) {
+            $localization->date($this->date());
+        }
+
+        return $localization;
     }
 
     public function supplementTaxonomies()
@@ -693,6 +698,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         if ($this->hasDate()) {
             $data = $data->merge([
+                'date' => $this->date(),
                 'year' => $this->date()->format('Y'),
                 'month' => $this->date()->format('m'),
                 'day' => $this->date()->format('d'),

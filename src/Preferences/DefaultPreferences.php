@@ -2,6 +2,7 @@
 
 namespace Statamic\Preferences;
 
+use Statamic\Events\DefaultPreferencesSaved;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 
@@ -40,6 +41,8 @@ class DefaultPreferences
     public function save()
     {
         File::put($this->path, YAML::dump($this->preferences));
+
+        DefaultPreferencesSaved::dispatch();
 
         return true;
     }

@@ -64,6 +64,8 @@ class UrlBuilderTest extends TestCase
     public function it_builds_a_date_url()
     {
         $this->assertEquals('/blog/2015/01/02/post', $this->builder->build('/blog/{{ year }}/{{ month }}/{{ day }}/{{ slug }}'));
+        $this->assertEquals('/blog/1420156800/post', $this->builder->build('/blog/{{ date format="U" }}/{{ slug }}'));
+        $this->assertEquals('/blog/2-jan-15/post', $this->builder->build('/blog/{{ date format="j-M-y" }}/{{ slug }}'));
     }
 
     /** @test */

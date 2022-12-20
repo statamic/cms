@@ -4,7 +4,6 @@ namespace Tests\Fields;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
-use Facades\Statamic\Fields\FieldsetRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
@@ -16,6 +15,7 @@ use Statamic\Events\BlueprintCreated;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\BlueprintSaving;
 use Statamic\Facades;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;

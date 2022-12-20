@@ -57,18 +57,46 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Image Manipulation Defaults
+        |--------------------------------------------------------------------------
+        |
+        | You may define global defaults for all manipulation parameters, such as
+        | quality, format, and sharpness. These can and will be be overwritten
+        | on the tag parameter level as well as the preset level.
+        |
+        */
+
+        'defaults' => [
+            // 'quality' => 50,
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
         | Image Manipulation Presets
         |--------------------------------------------------------------------------
         |
         | Rather than specifying your manipulation params in your templates with
         | the glide tag, you may define them here and reference their handles.
-        | They will also be automatically generated when you upload assets.
+        | They may also be automatically generated when you upload assets.
         |
         */
 
         'presets' => [
             // 'small' => ['w' => 200, 'h' => 200, 'q' => 75, 'fit' => 'crop'],
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Generate Image Manipulation Presets on Upload
+        |--------------------------------------------------------------------------
+        |
+        | By default, presets will be automatically generated on upload, ensuring
+        | the cached images are available when they are first used. You may opt
+        | out of this behavior here and have the presets generated on demand.
+        |
+        */
+
+        'generate_presets_on_upload' => true,
 
     ],
 
@@ -78,7 +106,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Enabling this will make Glide automatically crop assets at their focal
-    | point (at at the center if no focal point is defined). Otherwise,
+    | point (which is the center if no focal point is defined). Otherwise,
     | you will need to manually add any crop related parameters.
     |
     */
