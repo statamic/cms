@@ -420,7 +420,7 @@ class NavTransformer
      */
     protected function rejectUnessessaryInherits($items, $parentKey)
     {
-        if (! $reorderedMinimum = Arr::get($this->reorderedMinimums, $parentKey)) {
+        if (! $reorderedMinimum = $this->reorderedMinimums[$parentKey] ?? false) {
             return $items;
         }
 
