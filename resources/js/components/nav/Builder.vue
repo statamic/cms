@@ -507,7 +507,7 @@ export default {
             }
         },
 
-        updateItemAction(item) {
+        updateItemAction(item, clickEvent, isParent = false) {
             let detectedAction = this.detectItemAction(item);
 
             if (detectedAction) {
@@ -517,10 +517,11 @@ export default {
             }
 
             if (this.isChildItemNode(item)) {
-                this.updateItemAction(item.parent);
+                this.updateItemAction(item.parent, null, true);
             }
 
-            console.log(data_get(item.manipulations, 'action')); // TODO: remove this
+            // TODO: for debugging purposes, remove this later, along with unused function params
+            console.log(isParent ? 'parent item action:' : 'this item action:', data_get(item.manipulations, 'action'));
         },
 
         detectItemAction(item) {
@@ -531,25 +532,40 @@ export default {
                     return '@create';
                 case currentAction === '@alias':
                     return '@alias';
-                case this.itemIsMovedToAnotherSection(item):
-                case this.itemIsMovedWithinSection(item):
+                case this.itemHasMoved(item):
                     return '@move';
-                case this.itemHasModifiedProperties(item):
-                case this.itemHasModifiedChildren(item):
+                case this.itemHasBeenModified(item):
                     return '@modify';
             }
 
             return null;
         },
 
-        itemIsMovedToAnotherSection(item) {
+        itemHasMoved(item) {
+            if (this.itemIsWithinOriginalParentItem(item)) {
+                return false;
+            }
+
+            return this.itemHasMovedWithinSection(item)
+                || this.itemHasMovedToAnotherSection(item);
+        },
+
+        itemIsWithinOriginalParentItem(item) {
+            let parentsOriginalChildIds = data_get(item.parent, 'original', { children: [] })
+                .children
+                .map(child => child.id);
+
+            return this.isChildItemNode(item) && parentsOriginalChildIds.includes(item.original.id);
+        },
+
+        itemHasMovedToAnotherSection(item) {
             let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
             let originalSection = data_get(item.original, 'section') || data_get(item.parent, 'original.section');
 
             return currentSection !== originalSection;
         },
 
-        itemIsMovedWithinSection(item) {
+        itemHasMovedWithinSection(item) {
             let parentsOriginalChildIds = data_get(item.parent, 'original', { children: [] })
                 .children
                 .map(child => child.id);
@@ -566,6 +582,11 @@ export default {
             }
 
             return false;
+        },
+
+        itemHasBeenModified(item) {
+            return this.itemHasModifiedProperties(item)
+                || this.itemHasModifiedChildren(item);
         },
 
         itemHasModifiedProperties(item) {
