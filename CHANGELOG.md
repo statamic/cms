@@ -1,5 +1,23 @@
 # Release Notes
 
+## 3.3.63 (2022-12-21)
+
+### What's new
+- Ability to use separate queue for in the `static:warm` command. [#7184](https://github.com/statamic/cms/issues/7184) by @robbanl
+
+### What's improved
+- Order `collection` and `taxonomy` fieldtype options by title. [#7246](https://github.com/statamic/cms/issues/7246) by @duncanmcclean
+- Order `roles`, `groups`, and `sites` fieldtype options by title. [#7259](https://github.com/statamic/cms/issues/7259) by @j3ll3yfi5h
+- German translations. [#7252](https://github.com/statamic/cms/issues/7252) by @j3ll3yfi5h, [#7260](https://github.com/statamic/cms/issues/7260) by @helloDanuk
+
+### What's fixed
+- Fix duplicate action not respecting entries without slugs. [#7243](https://github.com/statamic/cms/issues/7243) by @duncanmcclean
+- Support `Carbon` values in conditions. [#6931](https://github.com/statamic/cms/issues/6931) by @edalzell
+- Fix focus related JS error when there are no inputs. [#7257](https://github.com/statamic/cms/issues/7257) by @martyf
+- Remove sound effects on tree drag & drop interactions. [#7255](https://github.com/statamic/cms/issues/7255) by @jackmcdade
+
+
+
 ## 3.3.62 (2022-12-16)
 
 ### What's new
