@@ -106,12 +106,14 @@ class DuplicateEntryTest extends TestCase
         $alfaDuplicate = Entry::query()->where('duplicated_from', 'alfa-id')->first();
 
         $this->assertNull($alfaDuplicate->slug());
-        $this->assertStringMatchesFormat('%s-%s-%s-%s-%s.md', basename($alfaDuplicate->initialPath()));
+        $this->assertNotEquals('alfa-id', $id = $alfaDuplicate->id());
+        $this->assertEquals($id.'.md', basename($alfaDuplicate->path()));
 
         $charlieDuplicate = Entry::query()->where('duplicated_from', 'charlie-id')->first();
 
         $this->assertNull($charlieDuplicate->slug());
-        $this->assertStringMatchesFormat('%s-%s-%s-%s-%s.md', basename($charlieDuplicate->initialPath()));
+        $this->assertNotEquals('charlie-id', $id = $charlieDuplicate->id());
+        $this->assertEquals($id.'.md', basename($charlieDuplicate->path()));
     }
 
     private function entryData()
