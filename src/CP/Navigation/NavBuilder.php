@@ -13,6 +13,7 @@ class NavBuilder
     protected $items = [];
     protected $pendingItems = [];
     protected $withHidden = false;
+    protected $sections = [];
     protected $sectionsOriginalItemIds = [];
     protected $sectionsManipulations = [];
     protected $sectionsOrder = [];
@@ -50,6 +51,7 @@ class NavBuilder
             ->authorizeItems()
             ->authorizeChildren()
             ->syncOriginal()
+            ->trackCoreSections()
             ->trackOriginalSectionItems()
             ->applyPreferenceOverrides($preferences)
             ->buildSections()
@@ -61,7 +63,7 @@ class NavBuilder
      *
      * @return $this
      */
-    public function buildChildren()
+    protected function buildChildren()
     {
         collect($this->items)
             ->filter(fn ($item) => $item->isActive() || $this->withHidden)
@@ -159,6 +161,23 @@ class NavBuilder
     protected function syncOriginal()
     {
         collect($this->items)->each(fn ($item) => $item->syncOriginal());
+
+        return $this;
+    }
+
+    /**
+     * Track core section items.
+     *
+     * @return $this
+     */
+    public function trackCoreSections()
+    {
+        $this->sections = collect($this->items)
+            ->reject(fn ($item) => $item->isChild())
+            ->map(fn ($item) => $item->section())
+            ->unique()
+            ->values()
+            ->all();
 
         return $this;
     }
@@ -744,7 +763,10 @@ class NavBuilder
      */
     protected function buildSections()
     {
-        $sections = [];
+        // Create sections...
+        $sections = collect($this->sections)
+            ->mapWithKeys(fn ($section) => [$section => []])
+            ->all();
 
         // Organize items by section...
         collect($this->items)

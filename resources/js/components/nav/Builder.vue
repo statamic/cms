@@ -63,13 +63,14 @@
                 draggable
                 cross-tree
                 class="mb-4"
+                :class="{ 'section-placeholder-inner': showTopLevelSectionPlaceholder }"
                 ref="topLevelTree"
                 :data="topLevelTreeData"
                 :space="1"
                 :indent="24"
                 @change="changed = true"
                 @drag="topLevelTreeDragStart"
-                @drop="updateItemAction"
+                @drop="treeDrop"
             >
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
@@ -118,7 +119,7 @@
                 :indent="24"
                 @change="changed = true"
                 @drag="mainTreeDragStart"
-                @drop="updateItemAction"
+                @drop="treeDrop"
             >
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
@@ -271,6 +272,7 @@ export default {
             editingSection: false,
             confirmingReset: false,
             confirmingRemoval: false,
+            draggingNode: false,
         }
     },
 
@@ -293,6 +295,16 @@ export default {
 
         hasSaveAsOptions() {
             return this.saveAsOptions.length;
+        },
+
+        showTopLevelSectionPlaceholder() {
+            if (! this.topLevelTreeData.length) {
+                return true;
+            }
+
+            return this.draggingNode
+                && this.topLevelTreeData.length === 1
+                && this.topLevelTreeData[0]._id === this.draggingNode._id;
         },
 
     },
@@ -357,6 +369,8 @@ export default {
         },
 
         topLevelTreeDragStart(node) {
+            this.draggingNode = node;
+
             let nodeDepth = 1;
 
             this.traverseTree(node, (_, { depth }) => {
@@ -375,6 +389,8 @@ export default {
         },
 
         mainTreeDragStart(node) {
+            this.draggingNode = node;
+
             let nodeDepth = 1;
 
             this.traverseTree(node, (_, { depth }) => {
@@ -396,6 +412,12 @@ export default {
                     this.$set(childNode, 'droppable', depth <= maxDepth && ! this.isSectionNode(node));
                 }
             });
+        },
+
+        treeDrop(node) {
+            this.draggingNode = false;
+
+            this.updateItemAction(node);
         },
 
         isSectionNode(node) {
@@ -507,7 +529,7 @@ export default {
             }
         },
 
-        updateItemAction(item, clickEvent, isParent = false) {
+        updateItemAction(item, isParent = false) {
             let detectedAction = this.detectItemAction(item);
 
             if (detectedAction) {
@@ -517,7 +539,7 @@ export default {
             }
 
             if (this.isChildItemNode(item)) {
-                this.updateItemAction(item.parent, null, true);
+                this.updateItemAction(item.parent, true);
             }
 
             // TODO: for debugging purposes, remove this later, along with unused function params
