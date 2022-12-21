@@ -407,12 +407,14 @@ export default {
         treeDrop(node) {
             this.updateItemAction(node);
 
-            if (! this.isSectionNode(this.draggingNodeParent)) {
+            if (data_get(this.draggingNodeParent, 'isRoot') !== true) {
                 this.updateItemAction(this.draggingNodeParent);
             }
 
-            this.draggingNode = false;
-            this.draggingNodeParent = false;
+            this.$nextTick(() => {
+                this.draggingNode = false;
+                this.draggingNodeParent = false;
+            });
         },
 
         isSectionNode(node) {
@@ -432,7 +434,11 @@ export default {
         },
 
         isChildItemNode(node) {
-            return ! this.isSectionNode(node.parent) && ! node.parent.isRoot;
+            if (data_get(node, 'parent.isRoot')) {
+                return false;
+            }
+
+            return ! this.isSectionNode(node.parent);
         },
 
         traverseTree(nodes, callback, parentPath = []) {
@@ -525,6 +531,10 @@ export default {
         },
 
         updateItemAction(item, isParent = false) {
+            if (this.isSectionNode(item)) {
+                return;
+            }
+
             let detectedAction = this.detectItemAction(item);
 
             if (detectedAction) {
@@ -572,7 +582,7 @@ export default {
                 .children
                 .map(child => child.id);
 
-            return this.isChildItemNode(item) && parentsOriginalChildIds.includes(item.original.id);
+            return this.isChildItemNode(item) && parentsOriginalChildIds.includes(item.config.id);
         },
 
         itemHasMovedToAnotherSection(item) {
@@ -587,14 +597,14 @@ export default {
                 .children
                 .map(child => child.id);
 
-            if (this.isChildItemNode(item) && ! parentsOriginalChildIds.includes(item.original.id)) {
+            if (this.isChildItemNode(item) && ! parentsOriginalChildIds.includes(item.config.id)) {
                 return true;
             }
 
             let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
             let sectionsOriginalIds = this.originalSectionItems[currentSection];
 
-            if (! this.isChildItemNode(item) && ! sectionsOriginalIds.includes(item.original.id)) {
+            if (! this.isChildItemNode(item) && ! sectionsOriginalIds.includes(item.config.id)) {
                 return true;
             }
 
@@ -665,6 +675,10 @@ export default {
             newItem.manipulations = { action: '@alias' };
 
             newItem.children = [];
+
+            if (newItem.original) {
+                newItem.original.children = [];
+            }
 
             let tree = treeData || item.parent.children;
 
