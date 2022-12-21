@@ -354,6 +354,12 @@ class NavBuilder
                 $item->preserveCurrentId()->section($displayNew);
             });
 
+        $sections = collect($this->sections);
+
+        $sections->put($sections->search($displayOriginal), $displayNew);
+
+        $this->sections = $sections->all();
+
         $this->sectionsManipulations[$sectionKey]['display_original'] = $displayOriginal;
     }
 
