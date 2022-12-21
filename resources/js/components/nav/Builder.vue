@@ -559,6 +559,8 @@ export default {
                     return '@create';
                 case currentAction === '@alias':
                     return '@alias';
+                case currentAction === '@hide':
+                    return '@hide';
                 case this.itemHasMoved(item):
                     return '@move';
                 case this.itemHasBeenModified(item):
@@ -698,7 +700,7 @@ export default {
                 return false;
             }
 
-            return ! ['@alias', '@move', '@create'].includes(action);
+            return ! ['@alias', '@create'].includes(action);
         },
 
         removeItem(item, bypassConfirmation = false) {
@@ -713,9 +715,9 @@ export default {
         },
 
         hideItem(item) {
-            item.trashedManipulations = item.manipulations;
+            Vue.set(item.manipulations, 'action', '@hide');
 
-            item.manipulations = { action: '@hide' };
+            this.updateItemAction(item);
 
             this.changed = true;
         },
@@ -723,9 +725,7 @@ export default {
         showItem(item) {
             Vue.delete(item.manipulations, 'action');
 
-            if (item.trashedManipulations) {
-                item.manipulations = item.trashedManipulations;
-            }
+            this.updateItemAction(item);
 
             this.changed = true;
         },

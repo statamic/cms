@@ -8,7 +8,8 @@ use Tests\TestCase;
 
 class NavPreferencesTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PreventSavingStacheItemsToDisk,
+        Concerns\HashedIdAssertions;
 
     protected $shouldPreventNavBeingBuilt = false;
 
@@ -18,6 +19,9 @@ class NavPreferencesTest extends TestCase
 
         Facades\Collection::make('pages')->title('Pages')->save();
         Facades\Collection::make('articles')->title('Articles')->save();
+
+        // TODO: Other tests are leaving behind forms without titles that are causing failures here?
+        Facades\Form::shouldReceive('all')->andReturn(collect());
     }
 
     /** @test */
@@ -753,7 +757,7 @@ class NavPreferencesTest extends TestCase
     /** @test */
     public function it_can_create_new_items_on_the_fly()
     {
-        // It can create items and child items...
+        // It can create items in child items...
         $item = $this->buildNavWithPreferences([
             'top_level' => [
                 'favs' => [
@@ -805,6 +809,37 @@ class NavPreferencesTest extends TestCase
             'https://yaml.org',
         ], $modifiedItem->children()->map->url()->all());
 
+        // It can merged created children into existing children of a moved item...
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'content::collections' => [
+                    'action' => '@move',
+                    'children' => [
+                        'Json' => 'https://json.org',
+                        'spaml' => [
+                            'action' => '@create',
+                            'display' => 'Yaml',
+                            'url' => 'https://yaml.org',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $movedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
+        $this->assertEquals(['Articles', 'Pages', 'Json', 'Yaml'], $movedItem->resolveChildren()->children()->map->name()->all());
+        $this->assertEquals([
+            'content::collections::articles',
+            'content::collections::pages',
+            'content::collections::json',
+            'content::collections::yaml',
+        ], $movedItem->children()->map->id()->all());
+        $this->assertEquals([
+            'http://localhost/cp/collections/articles',
+            'http://localhost/cp/collections/pages',
+            'https://json.org',
+            'https://yaml.org',
+        ], $movedItem->children()->map->url()->all());
+
         // Aliased items don't have children by default, but we can still create child items for them...
         $nav = $this->buildNavWithPreferences([
             'top_level' => [
@@ -824,9 +859,10 @@ class NavPreferencesTest extends TestCase
         $originalItem = $nav->get('Content')->keyBy->display()->get('Collections');
         $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
         $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->name()->all());
+        $aliasedItemId = $this->assertIsHashedIdFor('content::collections', $aliasedItem->id());
         $this->assertEquals([
-            'content::collections::clone::json',
-            'content::collections::clone::yaml',
+            "{$aliasedItemId}::json",
+            "{$aliasedItemId}::yaml",
         ], $aliasedItem->children()->map->id()->all());
         $this->assertEquals(['Json', 'Yaml'], $aliasedItem->children()->map->display()->all());
         $this->assertEquals([
@@ -896,11 +932,11 @@ class NavPreferencesTest extends TestCase
                 ],
             ],
         ])->get('Top Level')->keyBy->display()->get('Redprints');
-        $this->assertEquals('fields::blueprints::clone', $item->id());
+        $this->assertIsHashedIdFor('fields::blueprints', $blueprintsId = $item->id());
         $this->assertEquals('Redprints', $item->display());
         $this->assertEquals('https://redprints.com', $item->url());
         $this->assertEquals('<svg>custom</svg>', $item->icon());
-        $this->assertEquals(['fields::blueprints::clone::one', 'fields::blueprints::clone::two'], $item->children()->map->id()->all());
+        $this->assertEquals(["{$blueprintsId}::one", "{$blueprintsId}::two"], $item->children()->map->id()->all());
         $this->assertEquals(['One', 'Two'], $item->children()->map->display()->all());
         $this->assertEquals(['http://localhost/one', 'http://localhost/two'], $item->children()->map->url()->all());
 
@@ -919,11 +955,11 @@ class NavPreferencesTest extends TestCase
                 ],
             ],
         ])->get('Top Level')->keyBy->display()->get('Redprints');
-        $this->assertEquals('fields::blueprints::clone', $item->id());
+        $this->assertEquals('fields::blueprints', $item->id());
         $this->assertEquals('Redprints', $item->display());
         $this->assertEquals('https://redprints.com', $item->url());
         $this->assertEquals('<svg>custom</svg>', $item->icon());
-        $this->assertEquals(['fields::blueprints::clone::one', 'fields::blueprints::clone::two'], $item->children()->map->id()->all());
+        $this->assertEquals(['fields::blueprints::one', 'fields::blueprints::two'], $item->children()->map->id()->all());
         $this->assertEquals(['One', 'Two'], $item->children()->map->display()->all());
         $this->assertEquals(['http://localhost/one', 'http://localhost/two'], $item->children()->map->url()->all());
 
@@ -955,7 +991,7 @@ class NavPreferencesTest extends TestCase
         ]);
 
         // Assert the cloned item...
-        $this->assertEquals('fields::blueprints::clone', $nav->get('Top Level')->keyBy->display()->get('Redprints')->id());
+        $this->assertIsHashedIdFor('fields::blueprints', $nav->get('Top Level')->keyBy->display()->get('Redprints')->id());
         $this->assertEquals('Redprints', $nav->get('Top Level')->keyBy->display()->get('Redprints')->display());
         $this->assertEquals('https://redprints.com', $nav->get('Top Level')->keyBy->display()->get('Redprints')->url());
 
@@ -1025,12 +1061,12 @@ class NavPreferencesTest extends TestCase
         $this->assertCount(2, $children = $nav->get('Top Level')->keyBy->display()->get('Dashboard')->children());
 
         $pagesItem = $children->first();
-        $this->assertEquals('content::collections::pages::clone', $pagesItem->id());
+        $this->assertIsHashedIdFor('content::collections::pages', $pagesItem->id());
         $this->assertEquals('Pages', $pagesItem->display());
         $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
 
         $cacheItem = $children->last();
-        $this->assertEquals('tools::utilities::cache::clone', $cacheItem->id());
+        $this->assertIsHashedIdFor('tools::utilities::cache', $cacheItem->id());
         $this->assertEquals('Cache', $cacheItem->display());
         $this->assertArrayHasKey('Cache', $nav->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->keyBy->display()->all());
     }
@@ -1055,12 +1091,12 @@ class NavPreferencesTest extends TestCase
         $this->assertCount(2, $children = $nav->get('Top Level')->keyBy->display()->get('Dashboard')->children());
 
         $pagesItem = $children->first();
-        $this->assertEquals('content::collections::pages::clone', $pagesItem->id());
+        $this->assertEquals('content::collections::pages', $pagesItem->id());
         $this->assertEquals('Pages', $pagesItem->display());
         $this->assertArrayNotHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
 
         $cacheItem = $children->last();
-        $this->assertEquals('tools::utilities::cache::clone', $cacheItem->id());
+        $this->assertEquals('tools::utilities::cache', $cacheItem->id());
         $this->assertEquals('Cache', $cacheItem->display());
         $this->assertArrayNotHasKey('Cache', $nav->get('Tools')->keyBy->display()->get('Utilities')->resolveChildren()->children()->keyBy->display()->all());
     }
@@ -1077,7 +1113,7 @@ class NavPreferencesTest extends TestCase
         $this->assertCount(1, $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->map->display()->all());
 
         $pagesItem = $nav->get('Content')->last();
-        $this->assertEquals('content::collections::pages::clone', $pagesItem->id());
+        $this->assertEquals('content::collections::pages', $pagesItem->id());
         $this->assertEquals('Pages', $pagesItem->display());
         $this->assertArrayNotHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->map->display()->all());
     }
@@ -1103,7 +1139,7 @@ class NavPreferencesTest extends TestCase
 
         $taxonomiesChildren = $nav->get('Content')->keyBy->display()->get('Taxonomies')->resolveChildren()->children();
         $this->assertCount(1, $taxonomiesChildren);
-        $this->assertEquals('content::collections::pages::clone', $taxonomiesChildren->first()->id());
+        $this->assertEquals('content::collections::pages', $taxonomiesChildren->first()->id());
         $this->assertEquals('Pages', $taxonomiesChildren->first()->display());
     }
 
@@ -1152,7 +1188,7 @@ class NavPreferencesTest extends TestCase
         ]);
         $this->assertNull($nav->get('Content')->keyBy->display()->get('Collections'));
         $movedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
-        $this->assertEquals(['content::collections::clone::articles'], $movedItem->children()->map->id()->all());
+        $this->assertEquals(['content::collections::articles'], $movedItem->children()->map->id()->all());
         $this->assertEquals(['Articles'], $movedItem->children()->map->display()->all());
         $this->assertEquals(['http://localhost/cp/collections/articles'], $movedItem->children()->map->url()->all());
     }
@@ -1213,12 +1249,8 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals(['Articles', 'Pages'], $originalItem->resolveChildren()->children()->map->display()->all());
         $aliasedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
         $this->assertEquals(['Pagerinos'], $aliasedItem->children()->map->display()->all());
-        $this->assertEquals([
-            'content::collections::clone::pagerinos',
-        ], $aliasedItem->children()->map->id()->all());
-        $this->assertEquals([
-            'http://localhost/cp/collections/pages',
-        ], $aliasedItem->children()->map->url()->all());
+        $this->assertIsHashedIdFor('content::collections::pages', $aliasedItem->children()->first()->id());
+        $this->assertEquals('http://localhost/cp/collections/pages', $aliasedItem->children()->first()->url());
 
         // When moving parent...
         $nav = $this->buildNavWithPreferences([
@@ -1245,10 +1277,10 @@ class NavPreferencesTest extends TestCase
         $movedItem = $nav->get('Top Level')->keyBy->display()->get('Collections');
         $this->assertEquals(['Articles', 'Pagerinos', 'Json', 'Yaml'], $movedItem->children()->map->display()->all());
         $this->assertEquals([
-            'content::collections::clone::articles',
-            'content::collections::clone::pages',
-            'content::collections::clone::json',
-            'content::collections::clone::yaml',
+            'content::collections::articles',
+            'content::collections::pages',
+            'content::collections::json',
+            'content::collections::yaml',
         ], $movedItem->children()->map->id()->all());
         $this->assertEquals([
             'http://localhost/cp/collections/articles',
@@ -1310,17 +1342,17 @@ class NavPreferencesTest extends TestCase
         $this->assertEquals('https://yaml.org', $yamlItem->url());
 
         $aliasedNonFavItem = $nav->get('Top Level')->keyBy->display()->get('Non-Favourite');
-        $this->assertEquals('fields::blueprints::non_favourite::clone', $aliasedNonFavItem->id());
+        $this->assertIsHashedIdFor('fields::blueprints::non_favourite', $aliasedNonFavItem->id());
         $this->assertEquals('Non-Favourite', $aliasedNonFavItem->display());
         $this->assertEquals('http://localhost/non-fav', $aliasedNonFavItem->url());
 
         $aliasedJsonItem = $nav->get('Top Level')->keyBy->display()->get('Json');
-        $this->assertEquals('tools::technologies::json::clone', $aliasedJsonItem->id());
+        $this->assertIsHashedIdFor('tools::technologies::json', $aliasedJsonItem->id());
         $this->assertEquals('Json', $aliasedJsonItem->display());
         $this->assertEquals('https://json.org', $aliasedJsonItem->url());
 
         $aliasedJsonItem = $nav->get('Top Level')->keyBy->display()->get('Technologies');
-        $this->assertEquals('tools::technologies::clone', $aliasedJsonItem->id());
+        $this->assertIsHashedIdFor('tools::technologies', $aliasedJsonItem->id());
         $this->assertEquals('Technologies', $aliasedJsonItem->display());
         $this->assertEquals('http://localhost/techs', $aliasedJsonItem->url());
     }
@@ -1332,7 +1364,7 @@ class NavPreferencesTest extends TestCase
             'top_level' => [
                 'fields::blueprints' => '@move',
                 'fields::fieldsets' => '@alias',
-                'tools::technologies' => [
+                'technologies' => [
                     'action' => '@create',
                     'display' => 'Technologies',
                     'children' => [

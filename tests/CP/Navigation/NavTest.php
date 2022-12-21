@@ -5,6 +5,7 @@ namespace Tests\CP\Navigation;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Statamic\CP\Navigation\NavItem;
+use Statamic\Facades;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
@@ -25,6 +26,9 @@ class NavTest extends TestCase
 
         Route::any('wordpress-importer', ['as' => 'statamic.cp.wordpress-importer.index']);
         Route::any('security-droids', ['as' => 'statamic.cp.security-droids.index']);
+
+        // TODO: Other tests are leaving behind forms without titles that are causing failures here?
+        Facades\Form::shouldReceive('all')->andReturn(collect());
     }
 
     /** @test */
@@ -484,7 +488,7 @@ class NavTest extends TestCase
 
         Nav::testSection('Hidden Item')->hidden(true);
 
-        $this->assertNull($this->build()->get('Test Section'));
+        $this->assertNull($this->build()->get('Test Section')->first());
     }
 
     /** @test */
@@ -512,7 +516,7 @@ class NavTest extends TestCase
         $this->assertCount(1, Nav::build(true, true)->pluck('items', 'display')->get('Test Section'));
 
         // Which means this should hide the hidden item again
-        $this->assertNull($this->build()->get('Test Section'));
+        $this->assertNull($this->build()->get('Test Section')->first());
     }
 
     /** @test */

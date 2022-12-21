@@ -127,9 +127,9 @@ class NavTransformer
     protected function transformItems($items, $parentId)
     {
         return collect($items)
+            ->map(fn ($item) => array_merge($item, ['id' => $this->transformItemId($item, $item['id'], $parentId, $items)]))
             ->keyBy('id')
-            ->keyBy(fn ($item, $itemId) => $this->transformItemId($item, $itemId, $parentId))
-            ->map(fn ($item, $itemId) => $this->transformItem($item, $itemId))
+            ->map(fn ($item, $itemId) => $this->transformItem($item, $itemId, $parentId))
             ->all();
     }
 
@@ -141,10 +141,24 @@ class NavTransformer
      * @param  string  $parentId
      * @return string
      */
-    protected function transformItemId($item, $id, $parentId)
+    protected function transformItemId($item, $id, $parentId, $items)
     {
-        if (Arr::get($item, 'manipulations.action') === '@create') {
+        $action = Arr::get($item, 'manipulations.action');
+
+        if ($action === '@create') {
             return (new NavItem)->display(Arr::get($item, 'manipulations.display'))->section($parentId)->id();
+        }
+
+        if ($action !== '@alias') {
+            return $id;
+        }
+
+        $itemsWithSameId = collect($items)
+            ->filter(fn ($item) => $item['id'] === $id)
+            ->count();
+
+        if ($itemsWithSameId > 1) {
+            $id = $this->uniqueId($id);
         }
 
         return $id;
@@ -154,10 +168,11 @@ class NavTransformer
      * Transform nav item.
      *
      * @param  array  $item
+     * @param  string  $itemId
      * @param  string  $parentId
      * @return array
      */
-    protected function transformItem($item, $parentId)
+    protected function transformItem($item, $itemId, $parentId)
     {
         $transformed = $item['manipulations'];
 
@@ -169,18 +184,26 @@ class NavTransformer
             $transformed['url'] = $this->transformItemUrl($transformed['url']);
         }
 
-        $children = $this->transformItems($item['children'], $parentId);
+        $children = $this->transformItems($item['children'], $itemId);
 
-        $parentItem = $this->findParentItem($parentId);
-        $parentHasChildren = optional($parentItem)->children();
+        $childrenHaveModifications = collect($children)
+            ->reject(fn ($item) => $item['action'] === '@inherit')
+            ->isNotEmpty();
+
+        if ($childrenHaveModifications && $transformed['action'] === '@inherit') {
+            $transformed['action'] = '@modify';
+        }
+
+        $originalItem = $this->findOriginalItem($itemId);
+        $originalHasChildren = optional($originalItem)->children();
 
         $transformed['reorder'] = false;
 
-        if ($children && $parentHasChildren && ! in_array($transformed['action'], ['@alias', '@create'])) {
+        if ($children && $originalHasChildren && ! in_array($transformed['action'], ['@alias', '@create'])) {
             $transformed['reorder'] = $this->itemsAreReordered(
-                $parentItem->resolveChildren()->children()->map->id()->all(),
+                $originalItem->resolveChildren()->children()->map->id()->all(),
                 collect($children)->keys()->all(),
-                $parentId
+                $itemId
             );
         }
 
@@ -272,12 +295,12 @@ class NavTransformer
     }
 
     /**
-     * Find parent item from core nav by ID.
+     * Find original item from core nav by ID.
      *
      * @param  string  $id
      * @return NavItem
      */
-    protected function findParentItem($id)
+    protected function findOriginalItem($id)
     {
         return $this->coreNav
             ->flatMap(fn ($section) => $section['items'])
@@ -360,14 +383,12 @@ class NavTransformer
      * @param  string  $itemKey
      * @return array
      */
-    protected function minifyItem($item, $itemKey)
+    protected function minifyItem($item, $itemKey, $isChild = false)
     {
         $action = Arr::get($item, 'action');
 
-        $isChild = preg_match('/[^:]*::[^:]*::[^:]*/', $itemKey);
-
         $item['children'] = collect($item['children'] ?? [])
-            ->map(fn ($item, $childId) => $this->minifyItem($item, $childId))
+            ->map(fn ($item, $childId) => $this->minifyItem($item, $childId, true))
             ->all();
 
         if ($item['reorder'] === true) {
@@ -450,5 +471,31 @@ class NavTransformer
     protected function get()
     {
         return $this->config;
+    }
+
+    /**
+     * Helper to add hash to ID.
+     *
+     * @param  string  $id
+     * @return string
+     */
+    public static function uniqueId($id)
+    {
+        if (preg_match('/.*[^\:]:[^\:]{6}$/', $id)) {
+            return $id;
+        }
+
+        return $id.':'.substr(str_shuffle(md5($id)), 0, 6);
+    }
+
+    /**
+     * Remove alias hash from ID.
+     *
+     * @param  string  $id
+     * @return string
+     */
+    public static function removeUniqueIdHash($id)
+    {
+        return preg_replace('/(.*[^\:]):[^\:]{6}(.*)/', '$1$2', $id);
     }
 }

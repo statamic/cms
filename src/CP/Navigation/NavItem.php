@@ -400,7 +400,7 @@ class NavItem
     /**
      * Get original state.
      *
-     * @return array
+     * @return mixed
      */
     public function original()
     {
