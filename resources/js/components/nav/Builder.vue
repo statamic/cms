@@ -69,7 +69,7 @@
                 :space="1"
                 :indent="24"
                 @change="changed = true"
-                @drag="topLevelTreeDragStart"
+                @drag="treeDrag"
                 @drop="treeDrop"
             >
                 <tree-branch
@@ -118,7 +118,7 @@
                 :space="1"
                 :indent="24"
                 @change="changed = true"
-                @drag="mainTreeDragStart"
+                @drag="treeDrag"
                 @drop="treeDrop"
             >
                 <tree-branch
@@ -369,7 +369,7 @@ export default {
             return item;
         },
 
-        topLevelTreeDragStart(node) {
+        treeDrag(node) {
             this.draggingNode = node;
             this.draggingNodeParent = node.parent;
 
@@ -379,40 +379,27 @@ export default {
                 nodeDepth = Math.max(nodeDepth, depth);
             });
 
-            // Hardcode max depth of 2 (nav items, and one level of nav item children)
-            const maxDepth = 2 - nodeDepth;
-
-            // Ensure max depth
-            this.traverseTree(this.topLevelTreeData, (childNode, { depth }) => {
-                if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= maxDepth);
-                }
-            });
-        },
-
-        mainTreeDragStart(node) {
-            this.draggingNode = node;
-            this.draggingNodeParent = node.parent;
-
-            let nodeDepth = 1;
-
-            this.traverseTree(node, (_, { depth }) => {
-                nodeDepth = Math.max(nodeDepth, depth);
-            });
-
-            // Hardcode max depth of 3 (sections, nav items, and one level of nav item children)
-            const maxDepth = 3 - nodeDepth;
-
-            // Ensure you can only drop nav item nodes into top level tree
+            // Ensure you can only drop nav item nodes into top level tree root
             this.$set(this.$refs.topLevelTree.rootData, 'droppable', ! this.isSectionNode(node));
 
             // Ensure you can only drop section nodes to main tree root
             this.$set(this.$refs.mainTree.rootData, 'droppable', this.isSectionNode(node));
 
-            // Ensure nav item nodes can only be dropped within section nodes
+            // Hardcode max depths
+            const topLevelTreeMaxDepth = 2 - nodeDepth; // 2 for nav items, and one level of nav item children
+            const mainTreeMaxDepth = 3 - nodeDepth; // 3 for sections, nav items, and one level of nav item children
+
+            // Ensure max depth for top level tree
+            this.traverseTree(this.topLevelTreeData, (childNode, { depth }) => {
+                if (childNode !== node) {
+                    this.$set(childNode, 'droppable', depth <= topLevelTreeMaxDepth && ! this.isSectionNode(node));
+                }
+            });
+
+            // Ensure max depth for main tree
             this.traverseTree(this.mainTreeData, (childNode, { depth }) => {
                 if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= maxDepth && ! this.isSectionNode(node));
+                    this.$set(childNode, 'droppable', depth <= mainTreeMaxDepth && ! this.isSectionNode(node));
                 }
             });
         },
