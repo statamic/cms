@@ -673,7 +673,7 @@ export default {
         },
 
         aliasItem(item, treeData) {
-            let newItem = this.normalizeNavConfig(clone(item.config));
+            let newItem = this.normalizeNavConfig(clone(item.config), false);
 
             newItem.manipulations = { action: '@alias' };
 
