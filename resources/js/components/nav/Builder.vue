@@ -273,6 +273,7 @@ export default {
             confirmingReset: false,
             confirmingRemoval: false,
             draggingNode: false,
+            draggingNodeParent: false,
         }
     },
 
@@ -370,6 +371,7 @@ export default {
 
         topLevelTreeDragStart(node) {
             this.draggingNode = node;
+            this.draggingNodeParent = node.parent;
 
             let nodeDepth = 1;
 
@@ -390,6 +392,7 @@ export default {
 
         mainTreeDragStart(node) {
             this.draggingNode = node;
+            this.draggingNodeParent = node.parent;
 
             let nodeDepth = 1;
 
@@ -415,9 +418,14 @@ export default {
         },
 
         treeDrop(node) {
-            this.draggingNode = false;
-
             this.updateItemAction(node);
+
+            if (! this.isSectionNode(this.draggingNodeParent)) {
+                this.updateItemAction(this.draggingNodeParent);
+            }
+
+            this.draggingNode = false;
+            this.draggingNodeParent = false;
         },
 
         isSectionNode(node) {
