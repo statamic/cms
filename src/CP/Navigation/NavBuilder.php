@@ -571,7 +571,7 @@ class NavBuilder
 
         $item->preserveCurrentId();
 
-        $item->manipulations($config);
+        $item->manipulations(Arr::except($config, 'children'));
 
         $config = collect($config);
 
