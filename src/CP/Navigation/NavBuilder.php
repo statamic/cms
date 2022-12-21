@@ -64,7 +64,7 @@ class NavBuilder
     public function buildChildren()
     {
         collect($this->items)
-            ->filter(fn ($item) => $item->isActive())
+            ->filter(fn ($item) => $item->isActive() || $this->withHidden)
             ->each(fn ($item) => $item->resolveChildren());
 
         return $this;
