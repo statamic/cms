@@ -15,17 +15,23 @@
             <div class="flex-1 overflow-auto p-3">
                 <div class="publish-fields publish-fields-narrow">
 
-                <div class="publish-field mb-4">
-                    <p class="text-sm font-medium mb-1" v-text="__('Display')" />
-                    <text-input v-model="config.display" :focus="true" />
+                <div class="publish-field mb-4" :class="{ 'has-error': validateDisplay }">
+                    <div class="field-inner">
+                        <label class="text-sm font-medium mb-1">{{ __('Display') }} <span class="text-red">*</span></label>
+                        <text-input v-model="config.display" :focus="true" />
+                        <div v-if="validateDisplay" class="help-block text-red mt-1"><p>{{ __('statamic::validation.required') }}</p></div>
+                    </div>
                 </div>
 
-                <div class="publish-field mb-4">
-                    <p class="text-sm font-medium mb-1" v-text="__('URL')" />
-                    <div class="help-block -mt-1">
-                        <p v-text="__('Enter any internal or external URL.')"></p>
+                <div class="publish-field mb-4" :class="{ 'has-error': validateUrl }">
+                    <div class="field-inner">
+                        <label class="text-sm font-medium mb-1">{{ __('URL') }} <span class="text-red">*</span></label>
+                        <div class="help-block -mt-1">
+                            <p v-text="__('Enter any internal or external URL.')"></p>
+                        </div>
+                        <text-input v-model="config.url" />
+                        <div v-if="validateUrl" class="help-block text-red mt-1"><p>{{ __('statamic::validation.required') }}</p></div>
                     </div>
-                    <text-input v-model="config.url" />
                 </div>
 
                 <button
@@ -56,6 +62,8 @@ export default {
         return {
             config: data_get(this.item, 'config', this.createNewItem()),
             saveKeyBinding: null,
+            validateDisplay: false,
+            validateUrl: false,
         }
     },
 
@@ -80,6 +88,21 @@ export default {
         },
 
         save() {
+            this.validateDisplay = false;
+            this.validateUrl = false;
+
+            if (! this.config.display) {
+                this.validateDisplay = true;
+            }
+
+            if (! this.config.url) {
+                this.validateUrl = true;
+            }
+
+            if (this.validateDisplay || this.validateUrl) {
+                return;
+            }
+
             this.$emit('updated', this.config, this.item);
         },
 

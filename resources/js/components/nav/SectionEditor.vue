@@ -15,9 +15,12 @@
             <div class="flex-1 overflow-auto p-3">
                 <div class="publish-fields publish-fields-narrow">
 
-                <div class="publish-field mb-4">
-                    <p class="text-sm font-medium mb-1" v-text="__('Display')" />
-                    <text-input v-model="section" :focus="true" />
+                <div class="publish-field mb-4" :class="{ 'has-error': validate }">
+                    <div class="field-inner">
+                        <label class="text-sm font-medium mb-1">{{ __('Display') }} <span class="text-red">*</span></label>
+                        <text-input v-model="section" :focus="true" />
+                        <div v-if="validate" class="help-block text-red mt-1"><p>{{ __('statamic::validation.required') }}</p></div>
+                    </div>
                 </div>
 
                 <button
@@ -48,6 +51,7 @@ export default {
         return {
             section: data_get(this.sectionItem, 'text') || '',
             saveKeyBinding: null,
+            validate: false,
         }
     },
 
@@ -65,6 +69,13 @@ export default {
     methods: {
 
         save() {
+            this.validate = false;
+
+            if (! this.section) {
+                this.validate = true;
+                return;
+            }
+
             this.$emit('updated', this.section, this.sectionItem);
         },
 
