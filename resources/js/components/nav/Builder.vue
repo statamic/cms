@@ -530,7 +530,7 @@ export default {
             }
         },
 
-        updateItemAction(item, isParent = false) {
+        updateItemAction(item) {
             if (this.isSectionNode(item)) {
                 return;
             }
@@ -544,11 +544,8 @@ export default {
             }
 
             if (this.isChildItemNode(item)) {
-                this.updateItemAction(item.parent, true);
+                this.updateItemAction(item.parent);
             }
-
-            // TODO: for debugging purposes, remove this later, along with unused function params
-            console.log(isParent ? 'parent item action:' : 'this item action:', data_get(item.manipulations, 'action'));
         },
 
         detectItemAction(item) {
