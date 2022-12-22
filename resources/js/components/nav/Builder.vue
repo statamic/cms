@@ -587,13 +587,6 @@ export default {
             return this.isChildItemNode(item) && parentsOriginalChildIds.includes(item.config.id);
         },
 
-        itemHasMovedToAnotherSection(item) {
-            let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
-            let originalSection = data_get(item.original, 'section') || data_get(item.parent, 'original.section');
-
-            return currentSection !== originalSection;
-        },
-
         itemHasMovedWithinSection(item) {
             let parentsOriginalChildIds = data_get(item.parent, 'original', { children: [] })
                 .children
@@ -606,11 +599,22 @@ export default {
             let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
             let sectionsOriginalIds = this.originalSectionItems[currentSection];
 
+            if (sectionsOriginalIds === undefined) {
+                return false;
+            }
+
             if (! this.isChildItemNode(item) && ! sectionsOriginalIds.includes(item.config.id)) {
                 return true;
             }
 
             return false;
+        },
+
+        itemHasMovedToAnotherSection(item) {
+            let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
+            let originalSection = data_get(item.original, 'section') || data_get(item.parent, 'original.section');
+
+            return currentSection !== originalSection;
         },
 
         itemHasBeenModified(item) {

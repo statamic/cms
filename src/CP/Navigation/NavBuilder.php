@@ -387,17 +387,23 @@ class NavBuilder
      */
     protected function setSectionOrder($sections)
     {
+        // Get conconfigured core sections...
+        $unconfiguredCoreSections = $this->sections;
+
         // Get unconfigured sections...
-        $unconfiguredSections = collect($this->items)->map->section()->filter()->unique();
+        $unconfiguredRegisteredSections = collect($this->items)->map->section()->filter()->unique();
 
         // Merge unconfigured sections onto the end of the list and map their order...
         $this->sectionsOrder = collect($sections)
             ->pluck('display')
-            ->merge($unconfiguredSections)
+            ->merge($unconfiguredRegisteredSections)
+            ->merge($unconfiguredCoreSections)
             ->unique()
             ->values()
             ->mapWithKeys(fn ($section, $index) => [$section => $index + 1])
             ->all();
+
+        ray($this->sectionsOrder);
     }
 
     /**
