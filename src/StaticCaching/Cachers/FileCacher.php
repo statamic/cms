@@ -195,12 +195,13 @@ class FileCacher extends AbstractCacher
         $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
 
         $default = <<<EOT
+ $default = <<<EOT
 (function() {
     var els = document.getElementsByClassName('nocache');
-    var map = {};
+    var nocacheMap = {};
     for (var i = 0; i < els.length; i++) {
         var section = els[i].getAttribute('data-nocache');
-        map[section] = els[i];
+        nocacheMap[section] = els[i];
     }
 
     fetch('/!/nocache', {
@@ -208,14 +209,14 @@ class FileCacher extends AbstractCacher
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             url: window.location.href,
-            sections: Object.keys(map)
+            sections: Object.keys(nocacheMap)
         })
     })
     .then((response) => response.json())
     .then((data) => {
         const regions = data.regions;
         for (var key in regions) {
-            if (map[key]) map[key].outerHTML = regions[key];
+            if (nocacheMap[key]) nocacheMap[key].outerHTML = regions[key];
         }
 
         for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
