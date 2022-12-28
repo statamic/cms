@@ -11,7 +11,7 @@
         <div class="publish-fields p-2 pb-0 w-96">
             <form-group
                 handle="password"
-                :display="__('Password')"
+                :display="__('New Password')"
                 v-model="password"
                 :errors="errors.password"
                 class="p-0 mb-3"
