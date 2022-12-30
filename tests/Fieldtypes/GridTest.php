@@ -347,7 +347,7 @@ class GridTest extends TestCase
 
             public function augment($value)
             {
-                return $value . ' (augmented)';
+                return $value.' (augmented)';
             }
         })::register();
 

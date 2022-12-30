@@ -119,11 +119,11 @@ class Grid extends Fieldtype
         $rules = ['array'];
 
         if ($min = $this->config('min_rows')) {
-            $rules[] = 'min:' . $min;
+            $rules[] = 'min:'.$min;
         }
 
         if ($max = $this->config('max_rows')) {
-            $rules[] = 'max:' . $max;
+            $rules[] = 'max:'.$max;
         }
 
         return $rules;
@@ -145,12 +145,12 @@ class Grid extends Fieldtype
             ->addValues($data)
             ->validator()
             ->withContext([
-                'prefix' => $this->field->validationContext('prefix') . $this->rowRuleFieldPrefix($index) . '.',
+                'prefix' => $this->field->validationContext('prefix').$this->rowRuleFieldPrefix($index).'.',
             ])
             ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
-            return [$this->rowRuleFieldPrefix($index) . '.' . $handle => $rules];
+            return [$this->rowRuleFieldPrefix($index).'.'.$handle => $rules];
         })->all();
     }
 
@@ -165,7 +165,7 @@ class Grid extends Fieldtype
 
         return collect($this->field->value())->map(function ($row, $index) use ($attributes) {
             return collect($attributes)->except('_id')->mapWithKeys(function ($attribute, $handle) use ($index) {
-                return [$this->rowRuleFieldPrefix($index) . '.' . $handle => $attribute];
+                return [$this->rowRuleFieldPrefix($index).'.'.$handle => $attribute];
             });
         })->reduce(function ($carry, $rules) {
             return $carry->merge($rules);
@@ -227,7 +227,7 @@ class Grid extends Fieldtype
 
     private function gqlItemTypeName()
     {
-        return 'GridItem_' . collect($this->field->handlePath())->map(function ($part) {
+        return 'GridItem_'.collect($this->field->handlePath())->map(function ($part) {
             return Str::studly($part);
         })->join('_');
     }
