@@ -347,7 +347,7 @@ class GridTest extends TestCase
 
             public function augment($value)
             {
-                return $value.' (augmented)';
+                return $value . ' (augmented)';
             }
         })::register();
 
@@ -359,14 +359,14 @@ class GridTest extends TestCase
         ]);
 
         $augmented = $field->fieldtype()->augment([
-            ['words' => 'one'],
-            ['words' => 'two'],
+            ['id' => '1', 'words' => 'one'],
+            ['id' => '2', 'words' => 'two'],
         ]);
 
         $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
         $this->assertEquals([
-            ['words' => 'one (augmented)'],
-            ['words' => 'two (augmented)'],
+            ['id' => '1', 'words' => 'one (augmented)'],
+            ['id' => '2', 'words' => 'two (augmented)'],
         ], collect($augmented)->toArray());
     }
 
