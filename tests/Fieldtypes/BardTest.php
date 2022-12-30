@@ -44,6 +44,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
+                    'id' => 'test1',
                     'values' => [
                         'type' => 'image',
                         'image' => 'test.jpg',
@@ -67,6 +68,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
+                    'id' => 'test2',
                     'values' => [
                         'type' => 'image',
                         'image' => 'test.jpg',
@@ -84,6 +86,7 @@ class BardTest extends TestCase
 
         $expected = [
             [
+                'id' => 'test1',
                 'type' => 'image',
                 'image' => 'test.jpg (augmented)',
                 'caption' => 'test (augmented)',
@@ -93,6 +96,7 @@ class BardTest extends TestCase
                 'text' => '<p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text.</p><p></p>',
             ],
             [
+                'id' => 'test2',
                 'type' => 'image',
                 'image' => 'test.jpg (augmented)',
                 'caption' => 'test (augmented)',
@@ -177,6 +181,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
+                    'id' => 'test1',
                     'enabled' => false,
                     'values' => [
                         'type' => 'test',
@@ -187,6 +192,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
+                    'id' => 'test2',
                     'values' => [
                         'type' => 'test',
                         'value' => 'two',
@@ -207,6 +213,7 @@ class BardTest extends TestCase
                 'text' => '<p>This is a paragraph.</p>',
             ],
             [
+                'id' => 'test2',
                 'type' => 'test',
                 'value' => 'two',
             ],

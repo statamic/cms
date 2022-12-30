@@ -95,7 +95,10 @@ class Augmentor
     {
         return collect($value)->map(function ($value, $index) {
             if ($value['type'] == 'set') {
-                $this->sets[$index] = $value['attrs']['values'];
+                $this->sets[$index] = array_merge(
+                    $value['attrs']['values'],
+                    ['id' => $value['attrs']['id']]
+                );
                 $value['index'] = 'index-'.$index;
             }
 
@@ -179,7 +182,7 @@ class Augmentor
 
             $values = $this->fieldtype->fields($set['type'])->addValues($set)->{$augmentMethod}()->values()->all();
 
-            return array_merge($values, ['type' => $set['type']]);
+            return array_merge($values, ['id' => $set['id'], 'type' => $set['type']]);
         })->all();
     }
 }
