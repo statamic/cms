@@ -97,7 +97,7 @@ class Augmentor
             if ($value['type'] == 'set') {
                 $this->sets[$index] = array_merge(
                     $value['attrs']['values'],
-                    ['id' => $value['attrs']['id']]
+                    ['id' => $value['attrs']['id'] ?? null]
                 );
                 $value['index'] = 'index-'.$index;
             }

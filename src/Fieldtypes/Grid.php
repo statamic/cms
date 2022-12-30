@@ -207,7 +207,7 @@ class Grid extends Fieldtype
         return collect($value)->map(function ($row) use ($method) {
             $values = $this->fields()->addValues($row)->{$method}()->values();
 
-            return new Values($values->merge(['id' => $row['id']])->all());
+            return new Values($values->merge(['id' => $row['id'] ?? null])->all());
         })->all();
     }
 
