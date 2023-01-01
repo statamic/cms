@@ -989,7 +989,7 @@ class LanguageParser
 
                             if ($firstNode instanceof  ArrayNode && $firstNode->hasModifiers()) {
                                 $shouldError = false;
-                            } else if ($firstNode instanceof VariableNode) {
+                            } elseif ($firstNode instanceof VariableNode) {
                                 $shouldError = false;
                             }
                         }
