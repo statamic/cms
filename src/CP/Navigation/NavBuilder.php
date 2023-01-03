@@ -402,8 +402,6 @@ class NavBuilder
             ->values()
             ->mapWithKeys(fn ($section, $index) => [$section => $index + 1])
             ->all();
-
-        ray($this->sectionsOrder);
     }
 
     /**
