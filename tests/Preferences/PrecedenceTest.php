@@ -296,6 +296,84 @@ class PrecedenceTest extends TestCase
         $this->assertNull(Preference::get('deeply.nested.default'));
     }
 
+    /** @test */
+    public function it_overrides_preferences_at_role_level_using_an_empty_array()
+    {
+        $this->actingAs(User::make()->assignRole('rabbit')->assignRole('bear'));
+
+        $this->setTestRoles([
+            'rabbit' => Role::make()->permissions('super')->preferences([
+                'actions' => [],
+                'deeply' => [
+                    'nested' => [],
+                ],
+            ]),
+        ]);
+
+        Preference::default()->set([
+            'site' => 'english',
+            'actions' => [
+                'eats' => 'pizza',
+                'walks' => true,
+            ],
+            'deeply' => [
+                'nested' => [
+                    'default' => true,
+                ],
+            ],
+        ])->save();
+
+        Preference::preventMergingChildren('actions');
+        Preference::preventMergingChildren('deeply.nested');
+
+        $this->assertEquals('english', Preference::get('site'));
+        $this->assertEquals([], Preference::get('actions'));
+        $this->assertNull(Preference::get('actions.eats'));
+        $this->assertNull(Preference::get('actions.hops'));
+        $this->assertNull(Preference::get('actions.walks'));
+        $this->assertEquals([], Preference::get('deeply.nested'));
+        $this->assertNull(Preference::get('deeply.nested.user'));
+        $this->assertNull(Preference::get('deeply.nested.role'));
+        $this->assertNull(Preference::get('deeply.nested.default'));
+    }
+
+    /** @test */
+    public function it_overrides_preferences_at_user_level_using_an_empty_array()
+    {
+        $this->actingAs(User::make()->preferences([
+            'actions' => [],
+            'deeply' => [
+                'nested' => [],
+            ],
+        ]));
+
+        Preference::default()->set([
+            'site' => 'english',
+            'actions' => [
+                'eats' => 'pizza',
+                'walks' => true,
+            ],
+            'deeply' => [
+                'nested' => [
+                    'default' => true,
+                ],
+            ],
+        ])->save();
+
+        Preference::preventMergingChildren('actions');
+        Preference::preventMergingChildren('deeply.nested');
+
+        $this->assertEquals('english', Preference::get('site'));
+        $this->assertEquals([], Preference::get('actions'));
+        $this->assertNull(Preference::get('actions.eats'));
+        $this->assertNull(Preference::get('actions.hops'));
+        $this->assertNull(Preference::get('actions.walks'));
+        $this->assertEquals([], Preference::get('deeply.nested'));
+        $this->assertNull(Preference::get('deeply.nested.user'));
+        $this->assertNull(Preference::get('deeply.nested.role'));
+        $this->assertNull(Preference::get('deeply.nested.default'));
+    }
+
     private function cleanup()
     {
         if ($this->files->exists($path = resource_path('preferences.yaml'))) {
