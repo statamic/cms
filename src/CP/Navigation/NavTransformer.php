@@ -10,7 +10,6 @@ class NavTransformer
 {
     protected $coreNav;
     protected $submitted;
-    protected $allowOverriding;
     protected $config;
     protected $reorderedMinimums;
 
@@ -19,13 +18,11 @@ class NavTransformer
      *
      * @param  array  $submitted
      */
-    public function __construct(array $submitted, bool $allowOverriding = true)
+    public function __construct(array $submitted)
     {
         $this->coreNav = Nav::buildWithoutPreferences(true);
 
         $this->submitted = $this->removeEmptyCustomSections($submitted);
-
-        $this->allowOverriding = $allowOverriding;
     }
 
     /**
@@ -34,9 +31,9 @@ class NavTransformer
      * @param  array  $submitted
      * @return array
      */
-    public static function fromVue(array $submitted, bool $allowOverriding = true)
+    public static function fromVue(array $submitted)
     {
-        return (new static($submitted, $allowOverriding))
+        return (new static($submitted))
             ->transform()
             ->minify()
             ->get();
@@ -326,12 +323,12 @@ class NavTransformer
             $this->config = $this->rejectAllInherits($this->config['sections']);
         }
 
-        // If the config is completely null after minifying, ensure `@override` gets saved.
+        // If the config is completely null after minifying, ensure we save an empty array.
         // For example, if we're transforming this config for a user's nav preferences,
         // we don't want it falling back to role or default preferences, unless the
         // user explicitly 'resets' their nav customizations in the JS builder.
-        if ($this->allowOverriding && is_null($this->config)) {
-            $this->config = '@override';
+        if (is_null($this->config)) {
+            $this->config = [];
         }
 
         return $this;
