@@ -523,9 +523,9 @@ export default {
         },
 
         updateItemManipulation(item, key, value) {
-            let action = data_get(item.manipulations, 'action');
+            let currentAction = data_get(item.manipulations, 'action');
 
-            if (action === '@create' || value !== data_get(item.original, key)) {
+            if (currentAction === '@create' || value !== data_get(item.original, key)) {
                 item.manipulations[key] = value;
             } else {
                 Vue.delete(item.manipulations, key);
@@ -675,9 +675,14 @@ export default {
         },
 
         aliasItem(item, treeData) {
+            let currentAction = data_get(item.manipulations, 'action');
             let newItem = this.normalizeNavConfig(clone(item.config), false);
 
-            newItem.manipulations = { action: '@alias' };
+            if (currentAction === '@create') {
+                newItem.manipulations = clone(item.manipulations);
+            } else {
+                newItem.manipulations = { action: '@alias' };
+            }
 
             newItem.children = [];
 
