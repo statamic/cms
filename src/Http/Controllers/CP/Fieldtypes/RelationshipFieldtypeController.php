@@ -42,8 +42,7 @@ class RelationshipFieldtypeController extends CpController
 
     protected function fieldtype($request)
     {
-        $phpVersion = (int) str_replace('.', '', phpversion());
-        if ($phpVersion <= 810) {
+        if (PHP_VERSION_ID < 801020) {
             $config = json_decode(utf8_encode(base64_decode($request->config)), true);
         } else {
             $config = json_decode(mb_convert_encoding(base64_decode($request->config), 'UTF-8', mb_list_encodings()), true);
