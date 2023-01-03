@@ -523,7 +523,9 @@ export default {
         },
 
         updateItemManipulation(item, key, value) {
-            if (value !== data_get(item.original, key)) {
+            let action = data_get(item.manipulations, 'action');
+
+            if (action === '@create' || value !== data_get(item.original, key)) {
                 item.manipulations[key] = value;
             } else {
                 Vue.delete(item.manipulations, key);
