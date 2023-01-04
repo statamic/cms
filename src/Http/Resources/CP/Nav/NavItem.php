@@ -16,7 +16,7 @@ class NavItem extends JsonResource
             'display' => $this->resource->display(),
             'section' => $this->resource->section(),
             'id' => $this->resource->id(),
-            'url' => $this->resource->url(),
+            'url' => $this->resource->editableUrl(),
             'icon' => $this->resource->icon(),
             'manipulations' => $this->resource->manipulations(),
             'children' => $children ?? [],

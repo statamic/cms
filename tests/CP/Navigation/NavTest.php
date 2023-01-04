@@ -5,6 +5,7 @@ namespace Tests\CP\Navigation;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Statamic\CP\Navigation\NavItem;
+use Statamic\Facades;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
@@ -25,6 +26,9 @@ class NavTest extends TestCase
 
         Route::any('wordpress-importer', ['as' => 'statamic.cp.wordpress-importer.index']);
         Route::any('security-droids', ['as' => 'statamic.cp.security-droids.index']);
+
+        // TODO: Other tests are leaving behind forms without titles that are causing failures here?
+        Facades\Form::shouldReceive('all')->andReturn(collect());
     }
 
     /** @test */
@@ -437,7 +441,7 @@ class NavTest extends TestCase
     /** @test */
     public function it_sets_the_url()
     {
-        tap(Nav::create('absolute')->url('http://domain.com'), function ($nav) {
+        tap(Nav::create('external-absolute')->url('http://domain.com'), function ($nav) {
             $this->assertEquals('http://domain.com', $nav->url());
             $this->assertNull($nav->active());
         });
@@ -450,6 +454,22 @@ class NavTest extends TestCase
         tap(Nav::create('cp-relative')->url('foo/bar'), function ($nav) {
             $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
             $this->assertEquals('foo/bar(/(.*)?|$)', $nav->active());
+        });
+    }
+
+    /** @test */
+    public function it_gets_a_cleaner_editable_version_of_the_url()
+    {
+        tap(Nav::create('external-absolute')->url('http://domain.com'), function ($nav) {
+            $this->assertEquals('http://domain.com', $nav->editableUrl());
+        });
+
+        tap(Nav::create('site-relative')->url('/foo/bar'), function ($nav) {
+            $this->assertEquals('/foo/bar', $nav->editableUrl());
+        });
+
+        tap(Nav::create('cp-relative')->url('foo/bar'), function ($nav) {
+            $this->assertEquals('/cp/foo/bar', $nav->editableUrl());
         });
     }
 
@@ -468,7 +488,7 @@ class NavTest extends TestCase
 
         Nav::testSection('Hidden Item')->hidden(true);
 
-        $this->assertNull($this->build()->get('Test Section'));
+        $this->assertNull($this->build()->get('Test Section')->first());
     }
 
     /** @test */
@@ -496,7 +516,7 @@ class NavTest extends TestCase
         $this->assertCount(1, Nav::build(true, true)->pluck('items', 'display')->get('Test Section'));
 
         // Which means this should hide the hidden item again
-        $this->assertNull($this->build()->get('Test Section'));
+        $this->assertNull($this->build()->get('Test Section')->first());
     }
 
     /** @test */

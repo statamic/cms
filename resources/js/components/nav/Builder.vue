@@ -63,13 +63,14 @@
                 draggable
                 cross-tree
                 class="mb-4"
+                :class="{ 'section-placeholder-inner': showTopLevelSectionPlaceholder }"
                 ref="topLevelTree"
                 :data="topLevelTreeData"
                 :space="1"
                 :indent="24"
                 @change="changed = true"
-                @drag="topLevelTreeDragStart"
-                @drop="updateItemAction"
+                @drag="treeDrag"
+                @drop="treeDrop"
             >
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
@@ -117,8 +118,8 @@
                 :space="1"
                 :indent="24"
                 @change="changed = true"
-                @drag="mainTreeDragStart"
-                @drop="updateItemAction"
+                @drag="treeDrag"
+                @drop="treeDrop"
             >
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
@@ -271,6 +272,8 @@ export default {
             editingSection: false,
             confirmingReset: false,
             confirmingRemoval: false,
+            draggingNode: false,
+            draggingNodeParent: false,
         }
     },
 
@@ -293,6 +296,16 @@ export default {
 
         hasSaveAsOptions() {
             return this.saveAsOptions.length;
+        },
+
+        showTopLevelSectionPlaceholder() {
+            if (! this.topLevelTreeData.length) {
+                return true;
+            }
+
+            return this.draggingNode
+                && this.topLevelTreeData.length === 1
+                && this.topLevelTreeData[0]._id === this.draggingNode._id;
         },
 
     },
@@ -356,45 +369,51 @@ export default {
             return item;
         },
 
-        topLevelTreeDragStart(node) {
+        treeDrag(node) {
+            this.draggingNode = node;
+            this.draggingNodeParent = node.parent;
+
             let nodeDepth = 1;
 
             this.traverseTree(node, (_, { depth }) => {
                 nodeDepth = Math.max(nodeDepth, depth);
             });
 
-            // Hardcode max depth of 2 (nav items, and one level of nav item children)
-            const maxDepth = 2 - nodeDepth;
-
-            // Ensure max depth
-            this.traverseTree(this.topLevelTreeData, (childNode, { depth }) => {
-                if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= maxDepth);
-                }
-            });
-        },
-
-        mainTreeDragStart(node) {
-            let nodeDepth = 1;
-
-            this.traverseTree(node, (_, { depth }) => {
-                nodeDepth = Math.max(nodeDepth, depth);
-            });
-
-            // Hardcode max depth of 3 (sections, nav items, and one level of nav item children)
-            const maxDepth = 3 - nodeDepth;
-
-            // Ensure you can only drop nav item nodes into top level tree
+            // Ensure you can only drop nav item nodes into top level tree root
             this.$set(this.$refs.topLevelTree.rootData, 'droppable', ! this.isSectionNode(node));
 
             // Ensure you can only drop section nodes to main tree root
             this.$set(this.$refs.mainTree.rootData, 'droppable', this.isSectionNode(node));
 
-            // Ensure nav item nodes can only be dropped within section nodes
+            // Hardcode max depths
+            const topLevelTreeMaxDepth = 2 - nodeDepth; // 2 for nav items, and one level of nav item children
+            const mainTreeMaxDepth = 3 - nodeDepth; // 3 for sections, nav items, and one level of nav item children
+
+            // Ensure max depth for top level tree
+            this.traverseTree(this.topLevelTreeData, (childNode, { depth }) => {
+                if (childNode !== node) {
+                    this.$set(childNode, 'droppable', depth <= topLevelTreeMaxDepth && ! this.isSectionNode(node));
+                }
+            });
+
+            // Ensure max depth for main tree
             this.traverseTree(this.mainTreeData, (childNode, { depth }) => {
                 if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= maxDepth && ! this.isSectionNode(node));
+                    this.$set(childNode, 'droppable', depth <= mainTreeMaxDepth && ! this.isSectionNode(node));
                 }
+            });
+        },
+
+        treeDrop(node) {
+            this.updateItemAction(node);
+
+            if (data_get(this.draggingNodeParent, 'isRoot') !== true) {
+                this.updateItemAction(this.draggingNodeParent);
+            }
+
+            this.$nextTick(() => {
+                this.draggingNode = false;
+                this.draggingNodeParent = false;
             });
         },
 
@@ -415,7 +434,11 @@ export default {
         },
 
         isChildItemNode(node) {
-            return ! this.isSectionNode(node.parent) && ! node.parent.isRoot;
+            if (data_get(node, 'parent.isRoot')) {
+                return false;
+            }
+
+            return ! this.isSectionNode(node.parent);
         },
 
         traverseTree(nodes, callback, parentPath = []) {
@@ -500,7 +523,9 @@ export default {
         },
 
         updateItemManipulation(item, key, value) {
-            if (value !== data_get(item.original, key)) {
+            let currentAction = data_get(item.manipulations, 'action');
+
+            if (currentAction === '@create' || value !== data_get(item.original, key)) {
                 item.manipulations[key] = value;
             } else {
                 Vue.delete(item.manipulations, key);
@@ -508,51 +533,102 @@ export default {
         },
 
         updateItemAction(item) {
-            if (['@create', '@alias'].includes(data_get(item.manipulations, 'action'))) {
-                console.log(item.manipulations.action); // TODO: remove this
+            if (this.isSectionNode(item)) {
                 return;
             }
 
-            let originalSection = data_get(item.original, 'section') || data_get(item.parent, 'original.section');
-            let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
+            let detectedAction = this.detectItemAction(item);
 
-            if (currentSection !== originalSection) {
-                item.manipulations.action = '@move';
-                console.log('@move to ANOTHER section'); // TODO: remove this
-                return;
+            if (detectedAction) {
+                item.manipulations.action = detectedAction;
+            } else {
+                Vue.delete(item.manipulations, 'action');
             }
 
+            if (this.isChildItemNode(item)) {
+                this.updateItemAction(item.parent);
+            }
+        },
+
+        detectItemAction(item) {
+            let currentAction = data_get(item.manipulations, 'action');
+
+            switch (true) {
+                case currentAction === '@create':
+                    return '@create';
+                case currentAction === '@alias':
+                    return '@alias';
+                case currentAction === '@hide':
+                    return '@hide';
+                case this.itemHasMoved(item):
+                    return '@move';
+                case this.itemHasBeenModified(item):
+                    return '@modify';
+            }
+
+            return null;
+        },
+
+        itemHasMoved(item) {
+            if (this.itemIsWithinOriginalParentItem(item)) {
+                return false;
+            }
+
+            return this.itemHasMovedWithinSection(item)
+                || this.itemHasMovedToAnotherSection(item);
+        },
+
+        itemIsWithinOriginalParentItem(item) {
             let parentsOriginalChildIds = data_get(item.parent, 'original', { children: [] })
                 .children
                 .map(child => child.id);
 
-            if (this.isChildItemNode(item) && ! parentsOriginalChildIds.includes(item.original.id)) {
-                item.manipulations.action = '@move';
-                console.log('@move WITHIN section'); // TODO: remove this
-                return;
+            return this.isChildItemNode(item) && parentsOriginalChildIds.includes(item.config.id);
+        },
+
+        itemHasMovedWithinSection(item) {
+            let parentsOriginalChildIds = data_get(item.parent, 'original', { children: [] })
+                .children
+                .map(child => child.id);
+
+            if (this.isChildItemNode(item) && ! parentsOriginalChildIds.includes(item.config.id)) {
+                return true;
             }
 
+            let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
             let sectionsOriginalIds = this.originalSectionItems[currentSection];
 
-            if (! this.isChildItemNode(item) && ! sectionsOriginalIds.includes(item.original.id)) {
-                item.manipulations.action = '@move';
-                console.log('@move WITHIN section'); // TODO: remove this
-                return;
+            if (sectionsOriginalIds === undefined) {
+                return false;
             }
 
-            let modifiedProperties = _.chain(item.manipulations)
-                .omit('action')
-                .keys()
-                .value();
-
-            if (modifiedProperties.length) {
-                item.manipulations.action = '@modify';
-                console.log('@modify'); // TODO: remove this
-                return;
+            if (! this.isChildItemNode(item) && ! sectionsOriginalIds.includes(item.config.id)) {
+                return true;
             }
 
-            Vue.delete(item.manipulations, 'action');
-            console.log('no action'); // TODO: remove this
+            return false;
+        },
+
+        itemHasMovedToAnotherSection(item) {
+            let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
+            let originalSection = data_get(item.original, 'section') || data_get(item.parent, 'original.section');
+
+            return currentSection !== originalSection;
+        },
+
+        itemHasBeenModified(item) {
+            return this.itemHasModifiedProperties(item)
+                || this.itemHasModifiedChildren(item);
+        },
+
+        itemHasModifiedProperties(item) {
+            return _.chain(item.manipulations).omit(['action', 'reorder', 'children']).keys().value().length > 0;
+        },
+
+        itemHasModifiedChildren(item) {
+            return item.children.filter(childItem => {
+                return _.chain(childItem.manipulations).keys().value().length > 0;
+            }).length > 0;
         },
 
         expandAll() {
@@ -599,11 +675,20 @@ export default {
         },
 
         aliasItem(item, treeData) {
-            let newItem = this.normalizeNavConfig(clone(item.config));
+            let currentAction = data_get(item.manipulations, 'action');
+            let newItem = this.normalizeNavConfig(clone(item.config), false);
 
-            newItem.manipulations = { action: '@alias' };
+            if (currentAction === '@create') {
+                newItem.manipulations = clone(item.manipulations);
+            } else {
+                newItem.manipulations = { action: '@alias' };
+            }
 
             newItem.children = [];
+
+            if (newItem.original) {
+                newItem.original.children = [];
+            }
 
             let tree = treeData || item.parent.children;
 
@@ -623,7 +708,7 @@ export default {
                 return false;
             }
 
-            return ! ['@alias', '@move', '@create'].includes(action);
+            return ! ['@alias', '@create'].includes(action);
         },
 
         removeItem(item, bypassConfirmation = false) {
@@ -638,9 +723,9 @@ export default {
         },
 
         hideItem(item) {
-            item.trashedManipulations = item.manipulations;
+            Vue.set(item.manipulations, 'action', '@hide');
 
-            item.manipulations = { action: '@hide' };
+            this.updateItemAction(item);
 
             this.changed = true;
         },
@@ -648,9 +733,7 @@ export default {
         showItem(item) {
             Vue.delete(item.manipulations, 'action');
 
-            if (item.trashedManipulations) {
-                item.manipulations = item.trashedManipulations;
-            }
+            this.updateItemAction(item);
 
             this.changed = true;
         },
@@ -716,9 +799,7 @@ export default {
         },
 
         prepareItemIdForSubmission(item) {
-            return data_get(item, 'config.id')
-                ? item.config.id.replaceAll('::clone', '')
-                : item.text.toLowerCase().replaceAll(' ', '_');
+            return data_get(item, 'original.id', item.text.toLowerCase().replaceAll(' ', '_'));
         },
 
     },

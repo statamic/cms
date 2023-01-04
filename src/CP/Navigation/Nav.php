@@ -57,7 +57,8 @@ class Nav
     {
         $item = collect($this->items)->first(function ($item) use ($section, $name) {
             return $item->section() === $section
-                && $item->display() === $name;
+                && $item->display() === $name
+                && ! $item->isChild();
         });
 
         return $item ?: $this->create($name)->section($section);

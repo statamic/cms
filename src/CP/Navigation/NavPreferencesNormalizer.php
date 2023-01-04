@@ -125,6 +125,7 @@ class NavPreferencesNormalizer
 
         $items = $items
             ->map(fn ($config, $itemId) => $this->normalizeItemConfig($itemId, $config, $sectionKey))
+            ->keyBy(fn ($config, $itemId) => $this->normalizeItemId($itemId, $config))
             ->filter()
             ->reject(fn ($config) => $config['action'] === '@inherit' && ! $reorder)
             ->all();
@@ -171,12 +172,8 @@ class NavPreferencesNormalizer
 
         // Remove item when not properly using section-specific actions, to ensure the JS nav builder doesn't
         // do unexpected things. See comments on `ALLOWED_NAV_ITEM_ACTIONS` constant at top for details.
-        if ($removeBadActions) {
-            if ($isInOriginalSection && in_array($normalized->get('action'), ['@move'])) {
-                return null;
-            } elseif (! $isInOriginalSection && in_array($normalized->get('action'), ['@hide', '@modify', '@inherit'])) {
-                return null;
-            }
+        if ($removeBadActions && ! $isInOriginalSection && in_array($normalized->get('action'), ['@hide', '@modify', '@inherit'])) {
+            return null;
         }
 
         // If action is not set, determine the best default action.
@@ -194,12 +191,29 @@ class NavPreferencesNormalizer
         if ($children = $normalized->get('children')) {
             $normalized->put('children', collect($children)
                 ->map(fn ($childConfig, $childId) => $this->normalizeChildItemConfig($childId, $childConfig, $sectionKey))
+                ->keyBy(fn ($childConfig, $childId) => $this->normalizeItemId($childId, $childConfig))
                 ->all());
         }
 
         $allowedKeys = array_merge(['action'], static::ALLOWED_NAV_ITEM_MODIFICATIONS);
 
         return $normalized->only($allowedKeys)->all();
+    }
+
+    /**
+     * Normalize item ID.
+     *
+     * @param  string  $id
+     * @param  array  $config
+     * @return string
+     */
+    protected function normalizeItemId($id, $config)
+    {
+        if (Arr::get($config, 'action') === '@alias') {
+            return NavTransformer::uniqueId($id);
+        }
+
+        return $id;
     }
 
     /**

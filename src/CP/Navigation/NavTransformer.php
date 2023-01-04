@@ -4,12 +4,12 @@ namespace Statamic\CP\Navigation;
 
 use Statamic\Facades\CP\Nav;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class NavTransformer
 {
     protected $coreNav;
     protected $submitted;
-    protected $allowOverriding;
     protected $config;
     protected $reorderedMinimums;
 
@@ -18,13 +18,11 @@ class NavTransformer
      *
      * @param  array  $submitted
      */
-    public function __construct(array $submitted, bool $allowOverriding = true)
+    public function __construct(array $submitted)
     {
-        $this->coreNav = Nav::buildWithoutPreferences();
+        $this->coreNav = Nav::buildWithoutPreferences(true);
 
         $this->submitted = $this->removeEmptyCustomSections($submitted);
-
-        $this->allowOverriding = $allowOverriding;
     }
 
     /**
@@ -33,9 +31,9 @@ class NavTransformer
      * @param  array  $submitted
      * @return array
      */
-    public static function fromVue(array $submitted, bool $allowOverriding = true)
+    public static function fromVue(array $submitted)
     {
-        return (new static($submitted, $allowOverriding))
+        return (new static($submitted))
             ->transform()
             ->minify()
             ->get();
@@ -126,9 +124,9 @@ class NavTransformer
     protected function transformItems($items, $parentId)
     {
         return collect($items)
+            ->map(fn ($item) => array_merge($item, ['id' => $this->transformItemId($item, $item['id'], $parentId, $items)]))
             ->keyBy('id')
-            ->keyBy(fn ($item, $itemId) => $this->transformItemId($item, $itemId, $parentId))
-            ->map(fn ($item, $itemId) => $this->transformItem($item, $itemId))
+            ->map(fn ($item, $itemId) => $this->transformItem($item, $itemId, $parentId))
             ->all();
     }
 
@@ -140,10 +138,24 @@ class NavTransformer
      * @param  string  $parentId
      * @return string
      */
-    protected function transformItemId($item, $id, $parentId)
+    protected function transformItemId($item, $id, $parentId, $items)
     {
-        if (Arr::get($item, 'manipulations.action') === '@create') {
+        $action = Arr::get($item, 'manipulations.action');
+
+        if ($action === '@create') {
             return (new NavItem)->display(Arr::get($item, 'manipulations.display'))->section($parentId)->id();
+        }
+
+        if ($action !== '@alias') {
+            return $id;
+        }
+
+        $itemsWithSameId = collect($items)
+            ->filter(fn ($item) => $item['id'] === $id)
+            ->count();
+
+        if ($itemsWithSameId > 1) {
+            $id = $this->uniqueId($id);
         }
 
         return $id;
@@ -153,28 +165,79 @@ class NavTransformer
      * Transform nav item.
      *
      * @param  array  $item
+     * @param  string  $itemId
      * @param  string  $parentId
      * @return array
      */
-    protected function transformItem($item, $parentId)
+    protected function transformItem($item, $itemId, $parentId)
     {
         $transformed = $item['manipulations'];
 
-        $children = $this->transformItems($item['children'], $parentId);
-
-        $childrenHaveManipulations = $this->itemsHaveManipulations($children);
-
-        if (! isset($transformed['action']) && $childrenHaveManipulations) {
-            $transformed['action'] = '@modify';
-        } elseif (! isset($transformed['action']) && ! $childrenHaveManipulations) {
+        if (! isset($transformed['action'])) {
             $transformed['action'] = '@inherit';
         }
 
-        $transformed['reorder'] = $item['reorder'] ?? false;
+        if (isset($transformed['url'])) {
+            $transformed['url'] = $this->transformItemUrl($transformed['url']);
+        }
 
-        $transformed['children'] = $children ?? [];
+        $children = $this->transformItems($item['children'], $itemId);
+
+        $childrenHaveModifications = collect($children)
+            ->reject(fn ($item) => $item['action'] === '@inherit')
+            ->isNotEmpty();
+
+        if ($childrenHaveModifications && $transformed['action'] === '@inherit') {
+            $transformed['action'] = '@modify';
+        }
+
+        $originalItem = $this->findOriginalItem($itemId);
+        $originalHasChildren = optional($originalItem)->children();
+
+        $transformed['reorder'] = false;
+
+        if ($children && $originalHasChildren && ! in_array($transformed['action'], ['@alias', '@create'])) {
+            $transformed['reorder'] = $this->itemsAreReordered(
+                $originalItem->resolveChildren()->children()->map->id()->all(),
+                collect($children)->keys()->all(),
+                $itemId
+            );
+        }
+
+        if ($transformed['reorder'] && $transformed['action'] === '@inherit') {
+            $transformed['action'] = '@modify';
+        }
+
+        $transformed['children'] = $children;
 
         return $transformed;
+    }
+
+    /**
+     * Transform item url to match NavItem `url()` conventions.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function transformItemUrl($url)
+    {
+        if (Str::startsWith($url, url('/'))) {
+            $url = str_replace(url('/'), '', $url);
+        }
+
+        if (Str::startsWith($url, ['http://', 'https://'])) {
+            return $url;
+        }
+
+        $cp = config('statamic.cp.route');
+        $cp = Str::ensureLeft($cp, '/');
+        $cp = Str::ensureRight($cp, '/');
+
+        if (Str::startsWith($url, $cp)) {
+            return str_replace($cp, '', $url);
+        }
+
+        return $url;
     }
 
     /**
@@ -188,6 +251,8 @@ class NavTransformer
     protected function itemsAreReordered($originalList, $newList, $parentKey)
     {
         $itemsAreReordered = collect($originalList)
+            ->intersect($newList)
+            ->values()
             ->zip($newList)
             ->reject(fn ($pair) => is_null($pair->first()))
             ->reject(fn ($pair) => $pair->first() === $pair->last())
@@ -223,21 +288,22 @@ class NavTransformer
             })
             ->count();
 
-        $this->reorderedMinimums[$parentKey] = $minimumItemsCount;
+        $this->reorderedMinimums[$parentKey] = max(1, $minimumItemsCount - 1);
     }
 
     /**
-     * Check if items have manipulations.
+     * Find original item from core nav by ID.
      *
-     * @param  array  $items
-     * @return bool
+     * @param  string  $id
+     * @return NavItem
      */
-    protected function itemsHaveManipulations($items)
+    protected function findOriginalItem($id)
     {
-        return collect($items)
-            ->pluck('action')
-            ->reject(fn ($action) => $action === '@inherit')
-            ->isNotEmpty();
+        return $this->coreNav
+            ->flatMap(fn ($section) => $section['items'])
+            ->keyBy
+            ->id()
+            ->get($id);
     }
 
     /**
@@ -257,12 +323,12 @@ class NavTransformer
             $this->config = $this->rejectAllInherits($this->config['sections']);
         }
 
-        // If the config is completely null after minifying, ensure `@override` gets saved.
+        // If the config is completely null after minifying, ensure we save an empty array.
         // For example, if we're transforming this config for a user's nav preferences,
         // we don't want it falling back to role or default preferences, unless the
         // user explicitly 'resets' their nav customizations in the JS builder.
-        if ($this->allowOverriding && is_null($this->config)) {
-            $this->config = '@override';
+        if (is_null($this->config)) {
+            $this->config = [];
         }
 
         return $this;
@@ -314,14 +380,12 @@ class NavTransformer
      * @param  string  $itemKey
      * @return array
      */
-    protected function minifyItem($item, $itemKey)
+    protected function minifyItem($item, $itemKey, $isChild = false)
     {
         $action = Arr::get($item, 'action');
 
-        $isChild = preg_match('/[^:]*::[^:]*::[^:]*/', $itemKey);
-
         $item['children'] = collect($item['children'] ?? [])
-            ->map(fn ($item, $childId) => $this->minifyItem($item, $childId))
+            ->map(fn ($item, $childId) => $this->minifyItem($item, $childId, true))
             ->all();
 
         if ($item['reorder'] === true) {
@@ -374,7 +438,7 @@ class NavTransformer
      */
     protected function rejectUnessessaryInherits($items, $parentKey)
     {
-        if (! $reorderedMinimum = Arr::get($this->reorderedMinimums, $parentKey)) {
+        if (! $reorderedMinimum = $this->reorderedMinimums[$parentKey] ?? false) {
             return $items;
         }
 
@@ -404,5 +468,31 @@ class NavTransformer
     protected function get()
     {
         return $this->config;
+    }
+
+    /**
+     * Helper to add hash to ID.
+     *
+     * @param  string  $id
+     * @return string
+     */
+    public static function uniqueId($id)
+    {
+        if (preg_match('/.*[^\:]:[^\:]{6}$/', $id)) {
+            return $id;
+        }
+
+        return $id.':'.substr(str_shuffle(md5($id)), 0, 6);
+    }
+
+    /**
+     * Remove alias hash from ID.
+     *
+     * @param  string  $id
+     * @return string
+     */
+    public static function removeUniqueIdHash($id)
+    {
+        return preg_replace('/(.*[^\:]):[^\:]{6}(.*)/', '$1$2', $id);
     }
 }

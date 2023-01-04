@@ -13,6 +13,7 @@ class NavBuilder
     protected $items = [];
     protected $pendingItems = [];
     protected $withHidden = false;
+    protected $sections = [];
     protected $sectionsOriginalItemIds = [];
     protected $sectionsManipulations = [];
     protected $sectionsOrder = [];
@@ -50,6 +51,7 @@ class NavBuilder
             ->authorizeItems()
             ->authorizeChildren()
             ->syncOriginal()
+            ->trackCoreSections()
             ->trackOriginalSectionItems()
             ->applyPreferenceOverrides($preferences)
             ->buildSections()
@@ -61,10 +63,10 @@ class NavBuilder
      *
      * @return $this
      */
-    public function buildChildren()
+    protected function buildChildren()
     {
         collect($this->items)
-            ->filter(fn ($item) => $item->isActive())
+            ->filter(fn ($item) => $item->isActive() || $this->withHidden)
             ->each(fn ($item) => $item->resolveChildren());
 
         return $this;
@@ -164,6 +166,23 @@ class NavBuilder
     }
 
     /**
+     * Track core section items.
+     *
+     * @return $this
+     */
+    public function trackCoreSections()
+    {
+        $this->sections = collect($this->items)
+            ->reject(fn ($item) => $item->isChild())
+            ->map(fn ($item) => $item->section())
+            ->unique()
+            ->values()
+            ->all();
+
+        return $this;
+    }
+
+    /**
      * Track original section items.
      *
      * @return $this
@@ -227,8 +246,6 @@ class NavBuilder
             ->keyBy(function ($config, $key) {
                 if ($config['action'] === '@create') {
                     return $config['display'] ?? $key;
-                } elseif ($config['action'] === '@alias' || $config['action'] === '@move') {
-                    return $key.'::clone';
                 } else {
                     return $key;
                 }
@@ -267,11 +284,9 @@ class NavBuilder
         $section = $sectionNav['display'];
 
         collect($sectionNav['items'])
-            ->map(fn ($config, $id) => $this->applyPreferenceOverrideForItem($config, $section, $this->findItem($id)))
+            ->map(fn ($config, $id) => $this->applyPreferenceOverridesForSectionItem($config, $section, $id))
             ->filter()
-            ->each(fn ($item) => $item->isChild(false))
-            ->reject(fn ($item) => $item->manipulations()['action'] === '@modify')
-            ->each(fn ($item) => $this->items[] = $item);
+            ->each(fn ($item) => $item->isChild(false));
 
         if ($sectionNav['reorder']) {
             $this->setSectionItemOrder($section, $sectionNav['items']);
@@ -279,13 +294,34 @@ class NavBuilder
     }
 
     /**
+     * Apply user preference overrides for specific section.
+     *
+     * @param  array  $config
+     * @param  string  $section
+     * @param  string  $id
+     * @return \Statamic\CP\Navigation\NavItem|null
+     */
+    protected function applyPreferenceOverridesForSectionItem($config, $section, $id)
+    {
+        if (! $item = $this->applyPreferenceOverrideForItem($config, $section, $this->findItem($id), $id)) {
+            return;
+        }
+
+        if (! in_array($item->manipulations()['action'], ['@modify', '@hide'])) {
+            $this->items[] = $item;
+        }
+
+        return $item;
+    }
+
+    /**
      * Apply preference overide for specific item.
      *
      * @param  array  $config
      * @param  string  $section
-     * @param  NavItem|null  $item
+     * @param  \Statamic\CP\Navigation\NavItem|null  $item
      * @param  string|null  $id
-     * @return NavItem|null
+     * @return \Statamic\CP\Navigation\NavItem|null
      */
     protected function applyPreferenceOverrideForItem($config, $section, $item = null, $id = null)
     {
@@ -293,11 +329,11 @@ class NavBuilder
             case '@create':
                 return $this->userCreateFromPendingItem($config, $section, $id);
             case '@hide':
-                return $this->userHideItem($item);
+                return $this->userHideItem($item, $config, $section);
             case '@modify':
                 return $this->userModifyItem($item, $config, $section);
             case '@alias':
-                return $this->userAliasItem($item, $config, $section);
+                return $this->userAliasItem($item, $config, $section, $id);
             case '@move':
                 return $this->userMoveItem($item, $config, $section);
         }
@@ -335,6 +371,12 @@ class NavBuilder
                 $item->preserveCurrentId()->section($displayNew);
             });
 
+        $sections = collect($this->sections);
+
+        $sections->put($sections->search($displayOriginal), $displayNew);
+
+        $this->sections = $sections->all();
+
         $this->sectionsManipulations[$sectionKey]['display_original'] = $displayOriginal;
     }
 
@@ -345,13 +387,17 @@ class NavBuilder
      */
     protected function setSectionOrder($sections)
     {
+        // Get conconfigured core sections...
+        $unconfiguredCoreSections = $this->sections;
+
         // Get unconfigured sections...
-        $unconfiguredSections = collect($this->items)->map->section()->filter()->unique();
+        $unconfiguredRegisteredSections = collect($this->items)->map->section()->filter()->unique();
 
         // Merge unconfigured sections onto the end of the list and map their order...
         $this->sectionsOrder = collect($sections)
             ->pluck('display')
-            ->merge($unconfiguredSections)
+            ->merge($unconfiguredRegisteredSections)
+            ->merge($unconfiguredCoreSections)
             ->unique()
             ->values()
             ->mapWithKeys(fn ($section, $index) => [$section => $index + 1])
@@ -366,24 +412,14 @@ class NavBuilder
      */
     protected function setSectionItemOrder($section, $items)
     {
-        $itemIds = collect($items);
-
         // Generate IDs for newly created items...
-        $itemIds->transform(function ($item, $id) use ($section, $items) {
-            return $items[$id]['action'] === '@create'
-                ? $this->generateNewItemId($section, $items[$id]['display'])
-                : $item;
-        });
-
-        // Items that are moved or aliased into this section should have `::clone` appended to their IDs...
-        $itemIds->transform(function ($item, $id) use ($items) {
-            return in_array($items[$id]['action'], ['@move', '@alias'])
-                ? $id.'::clone'
-                : $item;
-        });
-
-        // Ensure the rest of the items are transformed to IDs...
-        $itemIds->transform(fn ($item, $id) => is_array($item) ? $id : $item);
+        $itemIds = collect($items)
+            ->map(function ($item, $id) use ($section, $items) {
+                return $items[$id]['action'] === '@create'
+                    ? $this->generateNewItemId($section, $items[$id]['display'])
+                    : $id;
+            })
+            ->values();
 
         // Get unconfigured item IDs...
         $unconfiguredItemIds = collect($this->items)
@@ -400,7 +436,7 @@ class NavBuilder
 
         // Set an explicit order value on each item...
         $itemIds
-            ->map(fn ($id) => $this->findItem($id))
+            ->map(fn ($id) => $this->findItem($id, false))
             ->filter()
             ->each(fn ($item, $index) => $item->order($index + 1));
 
@@ -412,13 +448,16 @@ class NavBuilder
      * Find existing nav item by ID.
      *
      * @param  string  $id
-     * @return NavItem|null
+     * @param  bool  $removeAliasHash
+     * @return \Statamic\CP\Navigation\NavItem|null
      */
-    protected function findItem($id)
+    protected function findItem($id, $removeAliasHash = true)
     {
-        $pendingItems = collect($this->pendingItems);
+        if ($removeAliasHash) {
+            $id = NavTransformer::removeUniqueIdHash($id);
+        }
 
-        if ($item = $pendingItems->get($id)) {
+        if ($item = collect($this->pendingItems)->get($id)) {
             return $item;
         }
 
@@ -441,10 +480,15 @@ class NavBuilder
      * Find parent nav item by ID.
      *
      * @param  string  $id
-     * @return NavItem|null
+     * @param  bool  $removeAliasHash
+     * @return \Statamic\CP\Navigation\NavItem|null
      */
-    protected function findParentItem($id)
+    protected function findParentItem($id, $removeAliasHash = true)
     {
+        if ($removeAliasHash) {
+            $id = NavTransformer::removeUniqueIdHash($id);
+        }
+
         $items = collect($this->items)->keyBy->id();
 
         $idParts = collect(explode('::', $id));
@@ -464,7 +508,7 @@ class NavBuilder
      * @param  array  $config
      * @param  string  $section
      * @param  string  $section
-     * @return NavItem
+     * @return \Statamic\CP\Navigation\NavItem
      */
     protected function userCreatePendingItem($config, $section, $id = null)
     {
@@ -484,9 +528,11 @@ class NavBuilder
             $this->createPendingItemsForChildren($children, $section, $item->id());
         }
 
+        $item->syncOriginal();
+
         $this->userModifyItem($item, $config, $section);
 
-        $this->pendingItems[$item->id()] = $item;
+        $this->pendingItems[NavTransformer::removeUniqueIdHash($item->id())] = $item;
 
         return $item;
     }
@@ -497,6 +543,7 @@ class NavBuilder
      * @param  array  $config
      * @param  string  $section
      * @param  string  $id
+     * @return \Statamic\CP\Navigation\NavItem|null
      */
     protected function userCreateFromPendingItem($config, $section, $id = null)
     {
@@ -506,27 +553,27 @@ class NavBuilder
             return;
         }
 
-        $id = $id ?? $this->generateNewItemId($section, $display);
-
-        if (! $pendingItem = collect($this->pendingItems)->get($id)) {
-            return;
+        if ($pendingItem = collect($this->pendingItems)->get($id)) {
+            return $pendingItem;
         }
 
-        return $pendingItem;
+        $id = $this->generateNewItemId($section, $display);
+
+        return collect($this->pendingItems)->get($id);
     }
 
     /**
      * Hide NavItem.
      *
-     * @param  NavItem  $item
+     * @param  \Statamic\CP\Navigation\NavItem  $item
      */
-    protected function userHideItem($item)
+    protected function userHideItem($item, $config, $section)
     {
         if (is_null($item)) {
             return;
         }
 
-        $item->manipulations(['action' => '@hide']);
+        $item->manipulations($config);
 
         if ($this->withHidden) {
             return $item;
@@ -540,7 +587,7 @@ class NavBuilder
     /**
      * Modify NavItem.
      *
-     * @param  NavItem  $item
+     * @param  \Statamic\CP\Navigation\NavItem  $item
      * @param  array  $config
      * @param  string  $section
      */
@@ -552,7 +599,7 @@ class NavBuilder
 
         $item->preserveCurrentId();
 
-        $item->manipulations($config);
+        $item->manipulations(collect($config)->except('children')->all());
 
         $config = collect($config);
 
@@ -572,20 +619,19 @@ class NavBuilder
     /**
      * Modify NavItem children.
      *
-     * @param  NavItem  $item
+     * @param  \Statamic\CP\Navigation\NavItem  $item
      * @param  array  $childrenOverrides
      * @param  string  $section
      * @return \Illuminate\Support\Collection
      */
     protected function userModifyItemChildren($item, $childrenOverrides, $section, $reorder)
     {
-        $itemChildren = collect($item->resolveChildren()->children())
+        $itemChildren = collect($item->original()->resolveChildren()->children())
             ->each(fn ($item, $index) => $item->order($index + 1000))
             ->keyBy
             ->id();
 
         collect($childrenOverrides)
-            ->keyBy(fn ($config, $key) => $this->normalizeChildId($item, $key))
             ->map(fn ($config, $key) => $this->userModifyChild($config, $section, $key, $item))
             ->each(function ($item, $key) use (&$itemChildren) {
                 $item
@@ -613,7 +659,7 @@ class NavBuilder
      * @param  array  $config
      * @param  string  $section
      * @param  string  $key
-     * @param  NavItem  $parentItem
+     * @param  \Statamic\CP\Navigation\NavItem  $parentItem
      * @return mixed
      */
     protected function userModifyChild($config, $section, $key, $parentItem)
@@ -624,8 +670,10 @@ class NavBuilder
             return $item;
         }
 
+        $id = NavTransformer::removeUniqueIdHash($parentItem->id());
+
         if ($config['action'] === '@create' && isset($config['display'])) {
-            $id = $this->generateNewItemId($parentItem->id(), $config['display']);
+            $id = $this->generateNewItemId($id, $config['display']);
         }
 
         if ($childItem = $this->applyPreferenceOverrideForItem($config, $section, $item, $id ?? null)) {
@@ -639,12 +687,13 @@ class NavBuilder
     /**
      * Create alias for NavItem.
      *
-     * @param  NavItem  $item
+     * @param  \Statamic\CP\Navigation\NavItem  $item
      * @param  array  $config
      * @param  string  $section
-     * @param  bool  $setChildren
+     * @param  string  $id
+     * @param  bool  $resetChildren
      */
-    protected function userAliasItem($item, $config, $section, $setChildren = true)
+    protected function userAliasItem($item, $config, $section, $id, $resetChildren = true)
     {
         if (is_null($item)) {
             return;
@@ -652,15 +701,23 @@ class NavBuilder
 
         $clone = clone $item;
 
-        $clone->id($clone->id().'::clone');
+        if ($clone->original()) {
+            $clone->original()->preserveCurrentId();
+        }
 
+        $clone->id(NavTransformer::uniqueId($id ?? $item->id()));
         $clone->section($section);
+        $clone->manipulations($config);
+
+        if ($resetChildren && $clone->original()) {
+            $clone->original()->children([]);
+        }
+
+        if ($resetChildren) {
+            $clone->children([]);
+        }
 
         $this->userModifyItem($clone, $config, $section);
-
-        if ($setChildren) {
-            $this->setChildrenOnAliasedItem($clone, $config, $section);
-        }
 
         return $clone;
     }
@@ -668,7 +725,7 @@ class NavBuilder
     /**
      * Move NavItem to new section.
      *
-     * @param  NavItem  $item
+     * @param  \Statamic\CP\Navigation\NavItem  $item
      * @param  array  $config
      * @param  string  $section
      */
@@ -678,10 +735,11 @@ class NavBuilder
             return;
         }
 
-        $clone = $this->userAliasItem($item, $config, $section, false);
+        $clone = $this->userAliasItem($item, $config, $section, NavTransformer::uniqueId($item->id()), false);
 
         $this->userRemoveItem($item);
-        $this->userRemoveItemFromChildren($item);
+
+        $clone->id($item->id());
 
         return $clone;
     }
@@ -693,6 +751,8 @@ class NavBuilder
      */
     protected function userRemoveItem($item)
     {
+        $this->userRemoveItemFromChildren($item);
+
         $this->items = collect($this->items)
             ->reject(fn ($registeredItem) => $registeredItem->id() === $item->id())
             ->all();
@@ -705,36 +765,20 @@ class NavBuilder
      */
     protected function userRemoveItemFromChildren($item)
     {
-        if ($parent = $this->findParentItem($item->id())) {
-            $parent->resolveChildren()->children(
-                $parent->children()->reject(fn ($child) => $child->id() === $item->id())
+        $parent = $this->findParentItem($item->id(), false);
+
+        if (! $parent) {
+            return;
+        }
+
+        if ($parent->resolveChildren()->children()) {
+            $parent->children(
+                $parent->children()->reject(function ($child) use ($item) {
+                    return $child->id() === $item->id()
+                        && Arr::get($child->manipulations(), 'action') !== '@alias';
+                })
             );
         }
-    }
-
-    /**
-     * Set children on aliased item.
-     *
-     * @param  NavItem  $item
-     * @param  array  $config
-     * @param  string  $section
-     */
-    protected function setChildrenOnAliasedItem($item, $config, $section)
-    {
-        $children = collect(Arr::get($config, 'children', []))
-            ->map(function ($childConfig, $id) use ($item, $section) {
-                return $this->applyPreferenceOverrideForItem(
-                    $childConfig,
-                    $section,
-                    $this->findItem($id),
-                    $childConfig['action'] === '@create' ? $this->generateNewItemId($item->id(), $childConfig['display']) : null
-                );
-            })
-            ->filter()
-            ->each(fn ($item) => $item->isChild(true))
-            ->all();
-
-        $item->children($children);
     }
 
     /**
@@ -744,7 +788,10 @@ class NavBuilder
      */
     protected function buildSections()
     {
-        $sections = [];
+        // Create sections...
+        $sections = collect($this->sections)
+            ->mapWithKeys(fn ($section) => [$section => []])
+            ->all();
 
         // Organize items by section...
         collect($this->items)
@@ -800,24 +847,6 @@ class NavBuilder
     protected function generateNewItemId($section, $name)
     {
         return (new NavItem)->display($name)->section($section)->id();
-    }
-
-    /**
-     * Normalize child ID when parent has been cloned.
-     *
-     * @param  NavItem  $parentItem
-     * @param  string  $childKey
-     * @return string
-     */
-    protected function normalizeChildId($parentItem, $childKey)
-    {
-        if (Str::endsWith($parentItem->id(), '::clone')) {
-            $parts = collect(explode('::', $childKey));
-            $last = $parts->pop();
-            $childKey = $parts->push('clone')->push($last)->implode('::');
-        }
-
-        return $childKey;
     }
 
     /**

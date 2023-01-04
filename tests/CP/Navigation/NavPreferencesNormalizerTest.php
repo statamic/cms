@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class NavPreferencesNormalizerTest extends TestCase
 {
+    use Concerns\HashedIdAssertions;
+
     private function normalize($config)
     {
         return NavPreferencesNormalizer::fromPreferences($config);
@@ -38,7 +40,7 @@ class NavPreferencesNormalizerTest extends TestCase
 
         $this->assertFalse(Arr::get($nav, 'sections.content.reorder'));
         $this->assertEquals('Content', Arr::get($nav, 'sections.content.display'));
-        $this->assertTrue(Arr::has($nav, 'sections.content.items.fields::blueprints'));
+        $this->assertHasHashedIdFor('fields::blueprints', Arr::get($nav, 'sections.content.items'));
     }
 
     /** @test */
@@ -54,14 +56,17 @@ class NavPreferencesNormalizerTest extends TestCase
             ],
         ]);
 
+        $blueprintsId = $this->assertHasHashedIdFor('fields::blueprints', Arr::get($nav, 'sections.content.items'));
+        $phpInfoId = $this->assertHasHashedIdFor('tools::utilities::php_info', Arr::get($nav, 'sections.content.items'));
+
         $expected = [
-            'fields::blueprints' => [
+            $blueprintsId => [
                 'action' => '@alias',
             ],
             'user::profiles' => [
                 'action' => '@move',
             ],
-            'tools::utilities::php_info' => [
+            $phpInfoId => [
                 'action' => '@alias',
             ],
         ];
@@ -88,19 +93,22 @@ class NavPreferencesNormalizerTest extends TestCase
             ],
         ]);
 
+        $blueprintsId = $this->assertHasHashedIdFor('fields::blueprints', Arr::get($nav, 'sections.content.items.content::collections.children'));
+        $fieldsetsId = $this->assertHasHashedIdFor('fields::fieldsets', Arr::get($nav, 'sections.content.items.content::collections.children'));
+
         $expected = [
             'Json' => [
                 'action' => '@create',
                 'display' => 'Json',
                 'url' => 'https://jsonvarga.net',
             ],
-            'fields::blueprints' => [
+            $blueprintsId => [
                 'action' => '@alias',
             ],
             'user::profiles' => [
                 'action' => '@move',
             ],
-            'fields::fieldsets' => [
+            $fieldsetsId => [
                 'action' => '@alias',
             ],
         ];
@@ -311,7 +319,9 @@ class NavPreferencesNormalizerTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals('@alias', Arr::get($nav, 'sections.top_level.items.content::collections::pages.action'));
+        $pagesId = $this->assertHasHashedIdFor('content::collections::pages', Arr::get($nav, 'sections.top_level.items'));
+
+        $this->assertEquals('@alias', Arr::get($nav, "sections.top_level.items.{$pagesId}.action"));
 
         $nav = $this->normalize([
             'top_level' => [
@@ -322,7 +332,9 @@ class NavPreferencesNormalizerTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals('@alias', Arr::get($nav, 'sections.top_level.items.content::collections::pages.action'));
+        $pagesId = $this->assertHasHashedIdFor('content::collections::pages', Arr::get($nav, 'sections.top_level.items'));
+
+        $this->assertEquals('@alias', Arr::get($nav, "sections.top_level.items.{$pagesId}.action"));
     }
 
     /** @test */
@@ -470,17 +482,21 @@ class NavPreferencesNormalizerTest extends TestCase
             ],
         ]);
 
+        $topLevelAliasId = $this->assertHasHashedIdFor('top_level::alias', Arr::get($nav, 'sections.top_level.items'));
+        $contentAliasId = $this->assertHasHashedIdFor('top_level::alias', Arr::get($nav, 'sections.content.items'));
+
         $expectedTopLevelItems = [
             'top_level::create',
             'top_level::hide',
             'top_level::modify',
-            'top_level::alias',
+            $topLevelAliasId,
             'top_level::inherit',
+            'top_level::move',
         ];
 
         $expectedContentItems = [
             'top_level::create',
-            'top_level::alias',
+            $contentAliasId,
             'top_level::move',
         ];
 
@@ -514,6 +530,9 @@ class NavPreferencesNormalizerTest extends TestCase
             ],
         ]);
 
+        $topLevelBlueprintsId = $this->assertHasHashedIdFor('fields::blueprints', Arr::get($nav, 'sections.top_level.items'));
+        $contentBlueprintsId = $this->assertHasHashedIdFor('fields::blueprints', Arr::get($nav, 'sections.content.items'));
+
         $expected = [
             'reorder' => false,
             'sections' => [
@@ -526,7 +545,7 @@ class NavPreferencesNormalizerTest extends TestCase
                             'action' => '@modify',
                             'display' => 'Dashboard Confessional',
                         ],
-                        'fields::blueprints' => [
+                        $topLevelBlueprintsId => [
                             'action' => '@alias',
                         ],
                         'content::collections::pages' => [
@@ -539,7 +558,7 @@ class NavPreferencesNormalizerTest extends TestCase
                     'reorder' => false,
                     'display' => 'Content',
                     'items' => [
-                        'fields::blueprints' => [
+                        $contentBlueprintsId => [
                             'action' => '@alias',
                             'display' => 'Content Blueprints',
                         ],
