@@ -23,4 +23,9 @@ class UserPreferenceController extends CpController
     {
         return $this->updatePreferences($request, User::current());
     }
+
+    private function ignoreSaveAsOption()
+    {
+        return 'user';
+    }
 }

@@ -15,7 +15,22 @@
 
             <div class="flex items-center mb-3">
                 <h1 class="flex-1">{{ title }}</h1>
-                <button v-if="action" type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
+
+                <div class="ml-2 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
+                    <button
+                        class="btn-primary pl-2"
+                        @click="save"
+                        v-text="__('Save')" />
+
+                    <dropdown-list v-if="hasSaveAsOptions" class="ml-0">
+                        <template #trigger>
+                            <button class="btn-primary rounded-l-none flex items-center">
+                                <svg-icon name="chevron-down-xs" class="w-2" />
+                            </button>
+                        </template>
+                        <dropdown-item v-for="option in saveAsOptions" :text="__(option.label)" :key="option.url" @click="saveAs(option.url)" />
+                    </dropdown-list>
+                </div>
             </div>
 
             <publish-sections
@@ -40,18 +55,28 @@ export default {
         name: { type: String, default: 'base' },
         breadcrumbs: Array,
         action: String,
-        method: { type: String, default: 'post' },
         canToggleLabels: { type: Boolean, default: true },
         readOnly: { type: Boolean, default: false },
+        reloadOnSave: { type: Boolean, default: false },
+        saveAsOptions: { type: Array, default: () => [] },
     },
 
     data() {
         return {
+            saving: false,
             currentValues: this.values,
             error: null,
             errors: {},
             hasSidebar: this.blueprint.sections.map(section => section.handle).includes('sidebar'),
         }
+    },
+
+    computed: {
+
+        hasSaveAsOptions() {
+            return this.saveAsOptions.length;
+        }
+
     },
 
     methods: {
@@ -61,18 +86,18 @@ export default {
             this.errors = {};
         },
 
-        submit() {
-            if (!this.action) return;
+        save() {
+            this.saveAs(this.action);
+        },
 
+        saveAs(url) {
             this.saving = true;
             this.clearErrors();
 
-            this.$axios[this.method](this.action, this.currentValues).then(response => {
-                this.saving = false;
-                this.$toast.success(__('Saved'));
-                this.$refs.container.saved();
-                this.$emit('saved', response);
-            }).catch(e => this.handleAxiosError(e));
+            this.$axios
+                .patch(url, this.currentValues)
+                .then(() => location.reload())
+                .catch(e => this.handleAxiosError(e));
         },
 
         handleAxiosError(e) {
@@ -94,8 +119,16 @@ export default {
     created() {
         this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
-            this.submit();
+            this.save();
         });
+    },
+
+    watch: {
+
+        saving(saving) {
+            this.$progress.loading('preferences-edit-form', saving);
+        }
+
     },
 
 }

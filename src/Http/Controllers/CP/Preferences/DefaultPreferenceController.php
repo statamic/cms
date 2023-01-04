@@ -23,4 +23,9 @@ class DefaultPreferenceController extends CpController
     {
         return $this->updatePreferences($request, Preference::default());
     }
+
+    private function ignoreSaveAsOption()
+    {
+        return 'default';
+    }
 }

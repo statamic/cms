@@ -10,14 +10,13 @@
         ])
     @endif
 
-    <publish-form
+    <preferences-edit-form
         title="{{ $title }}"
         :blueprint='@json($blueprint)'
         :meta='@json($meta)'
         :values='@json($values)'
         action="{{ $actionUrl }}"
-        method="patch"
-        reload-on-save
-    ></publish-form>
+        :save-as-options="{{ json_encode($saveAsOptions) }}"
+    ></preferences-edit-form>
 
 @stop

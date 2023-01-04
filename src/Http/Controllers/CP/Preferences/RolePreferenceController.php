@@ -10,11 +10,15 @@ class RolePreferenceController extends CpController
 {
     use ManagesPreferences;
 
+    private $currentHandle;
+
     public function edit($role)
     {
         if (! $role = Role::find($role)) {
             return $this->pageNotFound();
         }
+
+        $this->currentHandle = $role->handle();
 
         return $this->view(
             $role->title().' '.__('Preferences'),
@@ -30,5 +34,10 @@ class RolePreferenceController extends CpController
         }
 
         return $this->updatePreferences($request, $role);
+    }
+
+    private function ignoreSaveAsOption()
+    {
+        return $this->currentHandle;
     }
 }
