@@ -1430,6 +1430,49 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_adds_propagated_entry_to_structure()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->propagate(true)
+            ->sites(['en', 'fr', 'es'])
+            ->save();
+
+        $collection->structureContents(['expects_root' => false])->save();
+        $collection->structure()->in('en')->tree(
+            [
+                [
+                    'entry' => '1',
+                    'children' => [
+                        ['entry' => '2'],
+                    ],
+                ],
+                [
+                    'entry' => '3',
+                ],
+            ]
+        )->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $return = $entry->save();
+    }
+
+    /** @test */
     public function if_saving_event_returns_false_the_entry_doesnt_save()
     {
         Facades\Entry::spy();
