@@ -13,6 +13,7 @@ use Statamic\Facades\Preference;
 use Statamic\Facades\Token;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
+use Statamic\Tokens\Handlers\LivePreview;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -83,6 +84,10 @@ class AppServiceProvider extends ServiceProvider
             if ($token = $this->token ?? $this->header('X-Statamic-Token')) {
                 return Token::find($token);
             }
+        });
+
+        Request::macro('isLivePreview', function () {
+            return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
         $this->addAboutCommandInfo();

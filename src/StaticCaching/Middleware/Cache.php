@@ -91,8 +91,7 @@ class Cache
             return false;
         }
 
-        $query = $request->query();
-        if (isset($query['live-preview'], $query['token'])) {
+        if ($request->isLivePreview()) {
             return false;
         }
 
@@ -117,8 +116,7 @@ class Cache
             return false;
         }
 
-        $query = $request->query();
-        if (isset($query['live-preview'], $query['token'])) {
+        if ($request->isLivePreview()) {
             return false;
         }
 
