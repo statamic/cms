@@ -40,7 +40,7 @@ class ApplicationCacher extends AbstractCacher
 
         // Append query string to URL.
         if (! empty($query)) {
-            $url .= '?' . http_build_query($query);
+            $url .= '?'.http_build_query($query);
         }
 
         return $url;
