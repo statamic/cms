@@ -7,14 +7,13 @@
         <h1>@yield('title')</h1>
     </div>
 
-    <h3 class="little-heading pl-0 mb-1">{{ __('Default') }}</h3>
     <div class="card p-0 mb-2">
         <table class="data-table">
             <tr>
                 <td>
                     <div class="flex items-center">
                         <div class="w-4 h-4 mr-2">@cp_svg('earth')</div>
-                        <a href="{{ cp_route('preferences.default.edit') }}">{{ __('Global Default') }}</a>
+                        <a href="{{ cp_route('preferences.default.edit') }}">{{ __('Default') }}</a>
                     </div>
                 </td>
                 <td class="text-right text-2xs text-grey-50">
