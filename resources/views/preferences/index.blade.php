@@ -17,7 +17,11 @@
                         <a href="{{ cp_route('preferences.default.edit') }}">{{ __('Global Default') }}</a>
                     </div>
                 </td>
-                <td class="text-right text-2xs"><a href="{{ cp_route('preferences.default.edit') }}" class="text-blue">Customize</a></td>
+                <td class="text-right text-2xs text-grey-50">
+                    @if (!empty(Statamic\Facades\Preference::default()->all()))
+                        Modified
+                    @endif
+                </td>
             </tr>
         </table>
     </div>
@@ -34,7 +38,11 @@
                                 <a href="{{ cp_route('preferences.role.edit', [$role->handle()]) }}">{{ __($role->title()) }}</a>
                             </div>
                         </td>
-                        <td class="text-right text-2xs"><a href="{{ cp_route('preferences.role.edit', [$role->handle()]) }}" class="text-blue">Customize</a></td>
+                        <td class="text-right text-2xs text-grey-50">
+                            @if (!empty($role->preferences()))
+                                Modified
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
             </table>
@@ -51,7 +59,11 @@
                         <a href="{{ cp_route('preferences.user.edit') }}">{{ __('My Preferences') }}</a>
                     </div>
                 </td>
-                <td class="text-right text-2xs"><a href="{{ cp_route('preferences.user.edit') }}" class="text-blue">Customize</a></td>
+                <td class="text-right text-2xs text-grey-50">
+                    @if (!empty(auth()->user()->preferences()))
+                        Modified
+                    @endif
+                </td>
             </tr>
         </table>
     </div>
