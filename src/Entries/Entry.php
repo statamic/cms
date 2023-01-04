@@ -337,7 +337,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $this->collection()->sites()
                 ->reject($this->site()->handle())
                 ->each(function ($siteHandle) {
-                    $this->makeLocalization($siteHandle)->save();
+                    $this->makeLocalization($siteHandle)->addToStructure($this->parent())->save();
                 });
         }
 
@@ -642,6 +642,31 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         }
 
         return $localization;
+    }
+
+    public function addToStructure($parent = null) {
+        if ($this->collection()->orderable()) {
+            return $this;
+        }
+
+        if (! $structure = $this->collection()->structure()) {
+            return $this;
+        }
+
+        $tree = $structure->in($this->locale());
+        $parent = optional($parent)->in($this->locale());
+
+        $this->afterSave(function ($entry) use ($parent, $tree) {
+            if (! $parent || $parent->isRoot()) {
+                $tree->append($entry);
+            } else {
+                $tree->appendTo($parent->id(), $entry);
+            }
+
+            $tree->save();
+        });
+
+        return $this;
     }
 
     public function supplementTaxonomies()
