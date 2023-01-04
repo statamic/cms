@@ -13,7 +13,7 @@ class DefaultPreferenceController extends CpController
     public function edit()
     {
         return $this->view(
-            __('Default Preferences'),
+            __('Default'),
             cp_route('preferences.default.update'),
             Preference::default()->all()
         );

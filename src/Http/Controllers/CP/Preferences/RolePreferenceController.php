@@ -21,7 +21,7 @@ class RolePreferenceController extends CpController
         $this->currentHandle = $role->handle();
 
         return $this->view(
-            $role->title().' '.__('Preferences'),
+            $role->title(),
             cp_route('preferences.role.update', $role->handle()),
             $role->preferences(),
         );
