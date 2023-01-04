@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Http\Request;
+use Statamic\Support\Arr;
 
 class ApplicationCacher extends AbstractCacher
 {
@@ -17,10 +18,39 @@ class ApplicationCacher extends AbstractCacher
     private $cached;
 
     /**
+     * {@inheritdoc}
+     */
+    public function getUrl(Request $request)
+    {
+        $url = $request->url();
+        $query = $this->config('ignore_query_strings') ? [] : $request->query();
+
+        // Filter and sort query params for improved caching.
+        if (! empty($query)) {
+            if (! empty($accepted = $this->config('accepted_query_params'))) {
+                $query = Arr::only($query, $accepted);
+            }
+            $query = collect($query)->sortKeys()->all();
+        }
+
+        // Cache Inertia requests separately.
+        if ($request->hasHeader('X-Inertia')) {
+            $query['X-Inertia'] = 'true';
+        }
+
+        // Append query string to URL.
+        if (! empty($query)) {
+            $url .= '?' . http_build_query($query);
+        }
+
+        return $url;
+    }
+
+    /**
      * Cache a page.
      *
      * @param  \Illuminate\Http\Request  $request  Request associated with the page to be cached
-     * @param  string  $content  The response content to be cached
+     * @param  mixed  $content  The response content to be cached
      */
     public function cachePage(Request $request, $content)
     {

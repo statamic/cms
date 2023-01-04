@@ -3,7 +3,6 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
-use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
@@ -40,7 +39,12 @@ class Cache
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
             $response = response($this->cacher->getCachedPage($request));
 
-            $this->makeReplacements($response);
+            if ($request->hasHeader('X-Inertia')) {
+                $response->headers->set('X-Inertia', 'true');
+                $response->setVary('X-Inertia');
+            } else {
+                $this->makeReplacements($response);
+            }
 
             return $response;
         }
@@ -51,7 +55,7 @@ class Cache
             $this->makeReplacementsAndCacheResponse($request, $response);
 
             $this->nocache->write();
-        } elseif (! $response->isRedirect()) {
+        } elseif (! $response->isRedirect() && ! $request->hasHeader('X-Inertia')) {
             $this->makeReplacements($response);
         }
 
@@ -62,7 +66,7 @@ class Cache
     {
         $cachedResponse = clone $response;
 
-        if ($response instanceof Response) {
+        if (! $request->hasHeader('X-Inertia')) {
             $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse, $response));
         }
 
@@ -71,9 +75,7 @@ class Cache
 
     private function makeReplacements($response)
     {
-        if ($response instanceof Response) {
-            $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->replaceInCachedResponse($response));
-        }
+        $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->replaceInCachedResponse($response));
     }
 
     private function getReplacers(): Collection

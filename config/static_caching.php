@@ -31,6 +31,9 @@ return [
         'half' => [
             'driver' => 'application',
             'expiry' => null,
+            'accepted_query_params' => [
+                // 'page',
+            ],
         ],
 
         'full' => [
