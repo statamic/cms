@@ -96,7 +96,10 @@ export default {
 
             this.$axios
                 .patch(url, this.currentValues)
-                .then(() => location.reload())
+                .then(() => {
+                    this.$refs.container.saved();
+                    location.reload();
+                })
                 .catch(e => this.handleAxiosError(e));
         },
 
