@@ -15,7 +15,7 @@ trait HasNavBuilder
     protected function navBuilder($nav = null, $props = [])
     {
         return view('statamic::nav.edit', array_merge([
-            'title' => 'My Nav',
+            'title' => __('My Nav'),
             'updateUrl' => cp_route('preferences.nav.user.update'),
             'destroyUrl' => cp_route('preferences.nav.user.destroy'),
             'saveAsOptions' => $this->getSaveAsOptions()->values()->all(),
@@ -39,20 +39,23 @@ trait HasNavBuilder
         }
 
         $options->put('default', [
-            'label' => 'Save as Global Default Nav',
+            'label' => __('Default'),
             'url' => cp_route('preferences.nav.default.update'),
+            'icon' => 'earth',
         ]);
 
         Role::all()->each(function ($role) use (&$options) {
             $options->put($role->handle(), [
-                'label' => 'Save as '.$role->title().' Role Nav',
+                'label' => $role->title(),
                 'url' => cp_route('preferences.nav.role.update', $role->handle()),
+                'icon' => 'shield-key',
             ]);
         });
 
         $options->put('user', [
-            'label' => 'Save as My Nav',
+            'label' => __('My Nav'),
             'url' => cp_route('preferences.nav.user.update'),
+            'icon' => 'user',
         ]);
 
         if (method_exists($this, 'ignoreSaveAsOption')) {

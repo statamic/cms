@@ -25,7 +25,7 @@ class DefaultNavController extends Controller
             : Nav::buildWithoutPreferences(true);
 
         return $this->navBuilder($nav, [
-            'title' => 'Global Default Nav',
+            'title' => __('Default'),
             'updateUrl' => cp_route('preferences.nav.default.update'),
             'destroyUrl' => cp_route('preferences.nav.default.destroy'),
         ]);
