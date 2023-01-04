@@ -17,7 +17,9 @@
                         <a href="{{ cp_route('preferences.nav.default.edit') }}">{{ __('Global Default') }}</a>
                     </div>
                 </td>
-                <td class="text-right text-2xs"><a href="{{ cp_route('preferences.nav.default.edit') }}" class="text-blue">Customize</a></td>
+                @if (Statamic\Facades\Preference::default()->hasPreference('nav'))
+                    <td class="text-right text-2xs text-grey-50">Modified</td>
+                @endif
             </tr>
         </table>
     </div>
@@ -34,7 +36,9 @@
                                 <a href="{{ cp_route('preferences.nav.role.edit', [$role->handle()]) }}">{{ __($role->title()) }}</a>
                             </div>
                         </td>
-                        <td class="text-right text-2xs"><a href="{{ cp_route('preferences.nav.role.edit', [$role->handle()]) }}" class="text-blue">Customize</a></td>
+                        @if ($role->hasPreference('nav'))
+                            <td class="text-right text-2xs text-grey-50">Modified</td>
+                        @endif
                     </tr>
                 @endforeach
             </table>
@@ -51,7 +55,9 @@
                     <a href="{{ cp_route('preferences.nav.user.edit') }}">{{ __('My Nav') }}</a>
                     </div>
                 </td>
-                <td class="text-right text-2xs"><a href="{{ cp_route('preferences.nav.user.edit') }}" class="text-blue">Customize</a></td>
+                @if (auth()->user()->hasPreference('nav'))
+                    <td class="text-right text-2xs text-grey-50">Modified</td>
+                @endif
             </tr>
         </table>
     </div>
