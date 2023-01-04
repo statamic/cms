@@ -19,7 +19,7 @@
                 </td>
                 <td class="text-right text-2xs text-grey-50">
                     @if (!empty(Statamic\Facades\Preference::default()->all()))
-                        Modified
+                        {{ __('Modified') }}
                     @endif
                 </td>
             </tr>
@@ -40,7 +40,7 @@
                         </td>
                         <td class="text-right text-2xs text-grey-50">
                             @if (!empty($role->preferences()))
-                                Modified
+                                {{ __('Modified') }}
                             @endif
                         </td>
                     </tr>
@@ -61,7 +61,7 @@
                 </td>
                 <td class="text-right text-2xs text-grey-50">
                     @if (!empty(auth()->user()->preferences()))
-                        Modified
+                        {{ __('Modified') }}
                     @endif
                 </td>
             </tr>
