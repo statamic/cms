@@ -7,7 +7,6 @@
         <h1>@yield('title')</h1>
     </div>
 
-    <h3 class="little-heading pl-0 mb-1">{{ __('Default') }}</h3>
     <div class="card p-0 mb-2">
         <table class="data-table">
             <tr>
