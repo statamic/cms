@@ -32,6 +32,8 @@ trait ManagesPreferences
     {
         $fields = $this->blueprint()->fields()->addValues($request->all())->process();
 
+        $fields->validate();
+
         $fields->all()->each(function ($field) use ($item) {
             if ($field->value() === $field->defaultValue()) {
                 $item->removePreference($field->handle());
