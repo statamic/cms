@@ -14,7 +14,7 @@
                 <td>
                     <div class="flex items-center">
                         <div class="w-4 h-4 mr-2">@cp_svg('earth')</div>
-                        <a href="{{ cp_route('preferences.nav.default.edit') }}">{{ __('Global Default') }}</a>
+                        <a href="{{ cp_route('preferences.nav.default.edit') }}">{{ __('Default') }}</a>
                     </div>
                 </td>
                 <td class="text-right text-2xs text-grey-50">
