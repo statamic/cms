@@ -53,12 +53,12 @@ class BardFieldtypeTest extends TestCase
         EntryFactory::collection('blog')->id('1')->data([
             'title' => 'Main Post',
             'things' => [
-                ['type' => 'text', 'text' => 'first text'],
-                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
-                ['type' => 'text', 'text' => 'second text'],
-                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
-                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
-                ['type' => 'text', 'text' => 'last text'],
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'first text']]],
+                ['type' => 'set', 'attrs' => ['values' => ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke']]],
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'second text']]],
+                ['type' => 'set', 'attrs' => ['values' => ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla']]],
+                ['type' => 'set', 'attrs' => ['values' => ['type' => 'meal', 'food' => 'salad', 'drink' => 'water']]],
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'last text']]],
             ],
         ])->create();
 
