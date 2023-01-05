@@ -2,9 +2,10 @@
 
 namespace Statamic\Auth\Protect;
 
-use Illuminate\Support\ViewErrorBag;
+use Statamic\Support\Html;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
+use Illuminate\Support\ViewErrorBag;
 
 class Tags extends BaseTags
 {
@@ -14,7 +15,7 @@ class Tags extends BaseTags
 
     public function passwordForm()
     {
-        if (! $token = request('token')) {
+        if (! $token = Html::entities(request('token'))) {
             $data = [
                 'errors' => [],
                 'no_token' => true,

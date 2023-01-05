@@ -2,12 +2,13 @@
 
 namespace Statamic\Auth;
 
+use Statamic\Tags\Tags;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
-use Statamic\Support\Arr;
+use Statamic\Support\Html;
 use Statamic\Tags\Concerns;
-use Statamic\Tags\Tags;
 
 class UserTags extends Tags
 {
@@ -374,7 +375,7 @@ class UserTags extends Tags
         $action = route('statamic.password.reset.action');
         $method = 'POST';
 
-        $token = request('token');
+        $token = Html::entities(request('token'));
         $redirect = $this->params->get('redirect');
 
         if (! $this->parser) {
