@@ -2,10 +2,10 @@
 
 namespace Statamic\Auth\Protect;
 
+use Illuminate\Support\ViewErrorBag;
 use Statamic\Support\Html;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
-use Illuminate\Support\ViewErrorBag;
 
 class Tags extends BaseTags
 {
