@@ -11,6 +11,7 @@ use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
+use Statamic\Fieldtypes\Bard\Augmentor;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -237,6 +238,7 @@ class BardTest extends TestCase
         $expected = [
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'This is a paragraph with '],
                     ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
@@ -245,6 +247,7 @@ class BardTest extends TestCase
             ],
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'Second '],
                     ['type' => 'text', 'text' => 'paragraph', 'marks' => [
@@ -252,9 +255,7 @@ class BardTest extends TestCase
                     ]],
                     ['type' => 'text', 'text' => '. '],
                     ['type' => 'image', 'attrs' => [
-                        'alt' => null,
                         'src' => 'asset::assets::lagoa.jpg',
-                        'title' => null,
                     ]],
                 ],
             ],
@@ -331,6 +332,7 @@ class BardTest extends TestCase
         $expected = [
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'This is a paragraph with '],
                     ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
@@ -339,6 +341,7 @@ class BardTest extends TestCase
             ],
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'Second paragraph.'],
                 ],
@@ -357,6 +360,7 @@ class BardTest extends TestCase
             ],
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'Another paragraph.'],
                 ],
@@ -555,7 +559,7 @@ class BardTest extends TestCase
 </p>
 EOT;
 
-        $prosemirror = (new \HtmlToProseMirror\Renderer)->render($html)['content'];
+        $prosemirror = (new Augmentor($this))->renderHtmlToProsemirror($html)['content'];
 
         $this->assertEquals([
             'entry::1' => ['title' => 'About', 'permalink' => 'http://localhost/about'],
@@ -625,6 +629,81 @@ EOT;
         $this->assertNull((new Bard)->toQueryableValue(null));
         $this->assertNull((new Bard)->toQueryableValue([]));
         $this->assertEquals([['foo' => 'bar']], (new Bard)->toQueryableValue([['foo' => 'bar']]));
+    }
+
+    /** @test */
+    public function it_augments_inline_value()
+    {
+        $data = [
+            ['type' => 'text', 'text' => 'This is inline text with '],
+            ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
+            ['type' => 'text', 'text' => ' and '],
+            ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
+            ['type' => 'text', 'text' => ' text.'],
+        ];
+
+        $expected = 'This is inline text with <strong>bold</strong> and <em>italic</em> text.';
+
+        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->augment($data));
+    }
+
+    /** @test */
+    public function it_processes_inline_value()
+    {
+        $data = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+
+        $expected = [
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->process($data));
+    }
+
+    /** @test */
+    public function it_preprocesses_inline_value()
+    {
+        $data = [
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+
+        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
+    }
+
+    /** @test */
+    public function it_preprocesses_inline_value_to_block_value()
+    {
+        $data = [
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
+    }
+
+    /** @test */
+    public function it_preprocesses_block_value_to_inline_value()
+    {
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'This is block text.'],
+                ],
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'This is some more block text.'],
+                ],
+            ],
+        ];
+
+        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is block text."}]}]';
+
+        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
     }
 
     private function bard($config = [])
