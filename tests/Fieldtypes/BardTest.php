@@ -68,7 +68,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
-                    'id' => 'test2',
+                    // id intentionally omitted
                     'values' => [
                         'type' => 'image',
                         'image' => 'test.jpg',
@@ -96,7 +96,7 @@ class BardTest extends TestCase
                 'text' => '<p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text.</p><p></p>',
             ],
             [
-                'id' => 'test2',
+                'id' => null,
                 'type' => 'image',
                 'image' => 'test.jpg (augmented)',
                 'caption' => 'test (augmented)',
