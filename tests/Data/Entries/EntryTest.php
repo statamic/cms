@@ -1445,31 +1445,56 @@ class EntryTest extends TestCase
 
         $collection = (new Collection)
             ->handle('pages')
-            ->propagate(true)
             ->sites(['en', 'fr', 'es'])
+            ->propagate(false)
             ->save();
 
+        (new Entry)->locale('en')->id('en-1')->collection($collection)->save();
+        (new Entry)->locale('en')->id('en-2')->collection($collection)->save();
+        (new Entry)->locale('en')->id('en-3')->collection($collection)->save();
+
+        (new Entry)->locale('fr')->id('fr-1')->collection($collection)->origin('en-1')->save();
+        (new Entry)->locale('fr')->id('fr-2')->collection($collection)->origin('en-2')->save();
+
+        (new Entry)->locale('es')->id('es-1')->collection($collection)->origin('en-1')->save();
+        (new Entry)->locale('es')->id('es-3')->collection($collection)->origin('en-3')->save();
+
         $collection->structureContents(['expects_root' => false])->save();
-        $collection->structure()->in('en')->tree(
-            [
-                [
-                    'entry' => '1',
-                    'children' => [
-                        ['entry' => '2'],
-                    ],
-                ],
-                [
-                    'entry' => '3',
-                ],
-            ]
-        )->save();
+        $collection->structure()->in('en')->tree([['entry' => 'en-1'], ['entry' => 'en-2'], ['entry' => 'en-3']])->save();
+        $collection->structure()->in('fr')->tree([['entry' => 'fr-1'], ['entry' => 'fr-2']])->save();
+        $collection->structure()->in('es')->tree([['entry' => 'es-1'], ['entry' => 'es-3']])->save();
 
-        $entry = (new Entry)
-            ->id('a')
+        $collection->propagate(true);
+
+        $en = (new Entry)
+            ->id('en-2-1')
             ->locale('en')
-            ->collection($collection);
+            ->collection($collection)
+            ->afterSave(function ($entry) {
+                $entry->collection()->structure()->in('en')->appendTo('en-2', $entry)->save();
+            });
 
-        $return = $entry->save();
+        $en->save();
+
+        $this->assertIsObject($fr = $en->descendants()->get('fr'));
+        $this->assertIsObject($es = $en->descendants()->get('es'));
+
+        $this->assertEquals([
+            ['entry' => 'en-1'],
+            ['entry' => 'en-2', 'children' => [['entry' => $en->id()]]],
+            ['entry' => 'en-3'],
+        ], $collection->structure()->in('en')->tree());
+
+        $this->assertEquals([
+            ['entry' => 'fr-1'],
+            ['entry' => 'fr-2', 'children' => [['entry' => $fr->id()]]],
+        ], $collection->structure()->in('fr')->tree());
+
+        $this->assertEquals([
+            ['entry' => 'es-1'],
+            ['entry' => 'es-3'],
+            ['entry' => $es->id()],
+        ], $collection->structure()->in('es')->tree());
     }
 
     /** @test */
