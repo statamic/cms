@@ -54,10 +54,10 @@ class BardFieldtypeTest extends TestCase
             'title' => 'Main Post',
             'things' => [
                 ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'first text']]],
-                ['type' => 'set', 'attrs' => ['values' => ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke']]],
+                ['type' => 'set', 'attrs' => ['id' => '1', 'values' => ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke']]],
                 ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'second text']]],
-                ['type' => 'set', 'attrs' => ['values' => ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla']]],
-                ['type' => 'set', 'attrs' => ['values' => ['type' => 'meal', 'food' => 'salad', 'drink' => 'water']]],
+                ['type' => 'set', 'attrs' => ['id' => '2', 'values' => ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla']]],
+                ['type' => 'set', 'attrs' => ['values' => ['type' => 'meal', 'food' => 'salad', 'drink' => 'water']]], // id intentionally omitted
                 ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'last text']]],
             ],
         ])->create();
@@ -73,11 +73,13 @@ class BardFieldtypeTest extends TestCase
                     text
                 }
                 ... on Set_Things_Meal {
+                    id
                     type
                     food
                     drink
                 }
                 ... on Set_Things_Car {
+                    id
                     type
                     make
                     model
@@ -97,10 +99,10 @@ GQL;
                     'title' => 'Main Post',
                     'things' => [
                         ['type' => 'text', 'text' => '<p>first text</p>'],
-                        ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
+                        ['id' => '1', 'type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
                         ['type' => 'text', 'text' => '<p>second text</p>'],
-                        ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
-                        ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
+                        ['id' => '2', 'type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
+                        ['id' => null, 'type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
                         ['type' => 'text', 'text' => '<p>last text</p>'],
                     ],
                 ],

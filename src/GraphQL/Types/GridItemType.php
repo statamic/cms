@@ -22,7 +22,7 @@ class GridItemType extends Type
         return $this->fieldtype->fields()->toGql()
             ->merge([
                 'id' => [
-                    'type' => GraphQL::nonNull(GraphQL::string()),
+                    'type' => GraphQL::string(),
                 ],
             ])
             ->map(function ($field) {

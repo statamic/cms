@@ -23,7 +23,7 @@ class ReplicatorSetType extends \Rebing\GraphQL\Support\Type
         return $this->fieldtype->fields($this->handle)->toGql()
             ->merge([
                 'id' => [
-                    'type' => GraphQL::nonNull(GraphQL::string()),
+                    'type' => GraphQL::string(),
                 ],
                 'type' => [
                     'type' => GraphQL::nonNull(GraphQL::string()),
