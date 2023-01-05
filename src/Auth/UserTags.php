@@ -390,7 +390,7 @@ class UserTags extends Tags
 
         $html = $this->formOpen($action, $method, $knownParams);
 
-        $html .= '<input type="hidden" name="token" value="'.request('token').'" />';
+        $html .= '<input type="hidden" name="token" value="'.$token.'" />';
 
         if ($redirect) {
             $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
