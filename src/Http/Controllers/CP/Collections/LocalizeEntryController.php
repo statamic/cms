@@ -12,7 +12,7 @@ class LocalizeEntryController extends CpController
     {
         $request->validate(['site' => 'required']);
 
-        $localized = $entry->makeLocalization($site = $request->site)->addToStructure($entry->parent());
+        $localized = $entry->makeLocalization($site = $request->site);
 
         $localized->store(['user' => User::fromUser($request->user())]);
 

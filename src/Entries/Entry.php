@@ -337,7 +337,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $this->collection()->sites()
                 ->reject($this->site()->handle())
                 ->each(function ($siteHandle) {
-                    $this->makeLocalization($siteHandle)->addToStructure($this->parent())->save();
+                    $this->makeLocalization($siteHandle)->save();
                 });
         }
 
@@ -635,7 +635,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             ->origin($this)
             ->locale($site)
             ->published($this->published)
-            ->slug($this->slug());
+            ->slug($this->slug())
+            ->addToStructure($this->parent());
 
         if ($this->collection()->dated()) {
             $localization->date($this->date());
