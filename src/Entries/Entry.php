@@ -644,7 +644,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $localization;
     }
 
-    public function addToStructure($parent = null) {
+    public function addToStructure($parent = null)
+    {
         if ($this->collection()->orderable()) {
             return $this;
         }
