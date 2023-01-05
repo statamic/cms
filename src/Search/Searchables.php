@@ -167,25 +167,25 @@ class Searchables
             }
 
             return [$field => $value];
-        })->flatMap(function ($value, $field) use ($transformers) {
+        })->flatMap(function ($value, $field) use ($transformers, $searchable) {
             if (! $transformer = $transformers[$field] ?? null) {
                 return [$field => $value];
             }
 
-            $value = $this->transformValue($transformer, $field, $value);
+            $value = $this->transformValue($transformer, $field, $value, $searchable);
 
             return is_array($value) ? $value : [$field => $value];
         })->all();
     }
 
-    private function transformValue($transformer, $field, $value)
+    private function transformValue($transformer, $field, $value, $searchable)
     {
         if ($transformer instanceof Closure) {
-            return $transformer($value);
+            return $transformer($value, $searchable);
         }
 
         try {
-            return app($transformer)->handle($value, $field);
+            return app($transformer)->handle($value, $field, $searchable);
         } catch (BindingResolutionException $e) {
             throw new \LogicException("Search transformer [{$transformer}] not found.");
         }
