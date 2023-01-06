@@ -64,8 +64,8 @@ class AssetContainersController extends CpController
             'allow_moving' => $container->allowMoving(),
             'create_folders' => $container->createFolders(),
             'source_preset' => $container->sourcePreset(),
-            'warm_intelligent' => $container->warmPresets() === null,
-            'warm_presets' => $container->warmPresets(),
+            'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
+            'warm_presets' => $intelligent ? [] : $container->warmPresets(),
         ];
 
         $fields = ($blueprint = $this->formBlueprint($container))

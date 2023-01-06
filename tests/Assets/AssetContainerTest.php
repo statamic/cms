@@ -242,37 +242,13 @@ class AssetContainerTest extends TestCase
         $this->assertEquals('watermarked', $container->sourcePreset());
     }
 
-    /** @test */
-    public function it_gets_and_sets_explicit_glide_warm_presets_config()
+    /**
+     * @test
+     *
+     * @dataProvider warmPresetProvider
+     */
+    public function it_defines_which_presets_to_warm($source, $presets, $expectedIntelligent, $expectedWarm, $expectedIgnore)
     {
-        $container = new AssetContainer;
-        $this->assertNull($container->warmPresets());
-
-        // Set explicit presets to warm.
-        $return = $container->warmPresets(['small', 'medium']);
-
-        $this->assertEquals($container, $return);
-        $this->assertEquals(['small', 'medium'], $container->warmPresets());
-
-        // Set `false` to disable warming of presets.
-        $return = $container->warmPresets(false);
-
-        $this->assertEquals($container, $return);
-        $this->assertEquals([], $container->warmPresets());
-
-        // Ensure passing `null` properly clears this config, because `null` should
-        // allow for Statamic to intelligently determine which presets to warm.
-        $return = $container->warmPresets(null);
-
-        $this->assertEquals($container, $return);
-        $this->assertNull($container->warmPresets());
-    }
-
-    /** @test */
-    public function it_doesnt_ignore_any_glide_presets_when_warming_by_default()
-    {
-        $container = new AssetContainer;
-
         config(['statamic.assets.image_manipulation.presets' => [
             'small' => ['w' => '15', 'h' => '15'],
             'medium' => ['w' => '500', 'h' => '500'],
@@ -280,62 +256,26 @@ class AssetContainerTest extends TestCase
             'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
         ]]);
 
-        $this->assertEquals([], $container->ignoredPresets());
+        $container = (new AssetContainer)
+            ->sourcePreset($source)
+            ->warmPresets($presets);
+
+        $this->assertEquals($expectedIntelligent, $container->warmsPresetsIntelligently());
+        $this->assertEquals($expectedWarm, $container->warmPresets());
+        $this->assertEquals($expectedIgnore, $container->ignoredPresets());
     }
 
-    /** @test */
-    public function it_ignores_source_preset_when_warming_because_upload_will_already_have_been_processed()
+    public function warmPresetProvider()
     {
-        $container = new AssetContainer;
-
-        config(['statamic.assets.image_manipulation.presets' => [
-            'small' => ['w' => '15', 'h' => '15'],
-            'medium' => ['w' => '500', 'h' => '500'],
-            'large' => ['w' => '1000', 'h' => '1000'],
-            'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
-        ]]);
-
-        $container->sourcePreset('max');
-
-        $this->assertEquals(['max'], $container->ignoredPresets());
-    }
-
-    /** @test */
-    public function it_ignores_presets_based_on_explicitly_configured_presets_setting()
-    {
-        $container = new AssetContainer;
-
-        config(['statamic.assets.image_manipulation.presets' => [
-            'small' => ['w' => '15', 'h' => '15'],
-            'medium' => ['w' => '500', 'h' => '500'],
-            'large' => ['w' => '1000', 'h' => '1000'],
-            'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
-        ]]);
-
-        $container
-            ->sourcePreset('max') // normally we automatically ignore the `max` preset if it's set as the source preset for uploads
-            ->warmPresets(['medium', 'max']); // but this config should override which presets the user wants to warm
-
-        $this->assertEquals(['small', 'large'], $container->ignoredPresets());
-    }
-
-    /** @test */
-    public function it_ignores_all_presets_if_explicitly_configured()
-    {
-        $container = new AssetContainer;
-
-        config(['statamic.assets.image_manipulation.presets' => [
-            'small' => ['w' => '15', 'h' => '15'],
-            'medium' => ['w' => '500', 'h' => '500'],
-            'large' => ['w' => '1000', 'h' => '1000'],
-            'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
-        ]]);
-
-        $container
-            ->sourcePreset('max') // normally we automatically ignore the `max` preset if it's set as the source preset for uploads
-            ->warmPresets(false); // but this config should override to ensure all the above configured presets are ignored
-
-        $this->assertEquals(['small', 'medium', 'large', 'max'], $container->ignoredPresets());
+        return [
+            'no source, no presets' => [null, null, true, ['small', 'medium', 'large', 'max'], []],
+            'no source, with presets' => [null, ['small', 'medium'], false, ['small', 'medium'], ['large', 'max']],
+            'with source, no presets' => ['max', null, true, ['small', 'medium', 'large'], ['max']],
+            'with source, with presets' => ['max', ['small'], false, ['small'], ['medium', 'large', 'max']],
+            'with source, with presets, including source' => ['max', ['small', 'max'], false, ['small', 'max'], ['medium', 'large']],
+            'no source, presets false' => [null, false, false, [], ['small', 'medium', 'large', 'max']],
+            'with source, presets false' => ['max', false, false, [], ['small', 'medium', 'large', 'max']],
+        ];
     }
 
     /** @test */

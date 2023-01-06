@@ -554,12 +554,28 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
         return $this
             ->fluentlyGetOrSet('warmPresets')
             ->getter(function ($presets) {
-                return $presets === false ? [] : $presets;
+                if ($presets === false) {
+                    return [];
+                }
+
+                if ($presets === null) {
+                    return array_diff(
+                        array_keys(Config::get('statamic.assets.image_manipulation.presets', [])),
+                        $this->ignoredPresets()
+                    );
+                }
+
+                return $presets;
             })
             ->setter(function ($presets) {
                 return $presets === [] ? false : $presets;
             })
             ->args(func_get_args());
+    }
+
+    public function warmsPresetsIntelligently()
+    {
+        return $this->warmPresets === null;
     }
 
     /**
