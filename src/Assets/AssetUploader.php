@@ -15,7 +15,6 @@ class AssetUploader extends Uploader
     public function __construct(Asset $asset)
     {
         $this->asset = $asset;
-        parent::__construct();
     }
 
     public static function asset(Asset $asset)

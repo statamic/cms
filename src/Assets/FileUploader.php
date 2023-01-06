@@ -13,7 +13,6 @@ class FileUploader extends Uploader
     public function __construct($container)
     {
         $this->container = $container ? AssetContainer::find($container) : null;
-        parent::__construct();
     }
 
     public static function container(string $container = null)
