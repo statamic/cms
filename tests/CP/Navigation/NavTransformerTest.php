@@ -1142,6 +1142,69 @@ class NavTransformerTest extends TestCase
     {
         $this->assertEquals('test::id', NavTransformer::removeUniqueIdHash('test::id:587bac'));
     }
+
+    /** @test */
+    public function it_intelligently_handles_url_modifications()
+    {
+        $transformed = $this->transform([
+            [
+                'display' => 'Content',
+                'items' => [
+                    [
+                        'id' => 'content::collections',
+                        'manipulations' => [
+                            'action' => '@modify',
+                            'url' => '/absolute-url',
+                        ],
+                    ],
+                    [
+                        'id' => 'content::taxonomies',
+                        'manipulations' => [
+                            'action' => '@modify',
+                            'url' => 'relative-cp-url',
+                        ],
+                    ],
+                    [
+                        'id' => 'content::assets',
+                        'manipulations' => [
+                            'action' => '@modify',
+                            'url' => 'http://localhost/cp/assets/custom-pasted-cp-url',
+                        ],
+                    ],
+                    [
+                        'id' => 'content::globals',
+                        'manipulations' => [
+                            'action' => '@modify',
+                            'url' => 'https://external-url.com',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $expected = [
+            'content' => [
+                'content::collections' => [
+                    'action' => '@modify',
+                    'url' => '/absolute-url',
+                ],
+                'content::taxonomies' => [
+                    'action' => '@modify',
+                    'url' => 'relative-cp-url',
+                ],
+                'content::assets' => [
+                    'action' => '@modify',
+                    'url' => 'assets/custom-pasted-cp-url',
+                ],
+                'content::globals' => [
+                    'action' => '@modify',
+                    'url' => 'https://external-url.com',
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $transformed);
+    }
 }
 
 class IncrementalIdHasher
