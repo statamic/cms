@@ -35,8 +35,15 @@ class FilesTest extends TestCase
      * @test
      * @dataProvider uploadProvider
      */
-    public function it_uploads_a_file($container, $file, $expectedPath, $expectedWidth, $expectedHeight)
+    public function it_uploads_a_file($container, $isImage, $expectedPath, $expectedWidth, $expectedHeight)
     {
+        $glideDir = storage_path('statamic/glide/tmp');
+        app('files')->deleteDirectory($glideDir);
+
+        $file = $isImage
+            ? UploadedFile::fake()->image('test.jpg', 50, 75)
+            : UploadedFile::fake()->create('test.txt');
+
         Carbon::setTestNow(Carbon::createFromTimestamp(1671484636));
 
         $disk = Storage::fake('local');
@@ -61,20 +68,23 @@ class FilesTest extends TestCase
             $this->assertEquals($expectedWidth, $width);
             $this->assertEquals($expectedHeight, $height);
         }
+
+        // When a container with a preset is used, and the file is an image, make sure it's cleaned up.
+        if ($container === 'with_preset' && $isImage) {
+            $this->assertDirectoryExists($glideDir);
+            $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
+        }
     }
 
     public function uploadProvider()
     {
-        $image = UploadedFile::fake()->image('test.jpg', 50, 75);
-        $text = UploadedFile::fake()->create('test.txt');
-
         return [
-            'no container' => [null, $image, '1671484636/test.jpg', 50, 75],
-            'container with no preset' => ['without_preset', $image, '1671484636/test.jpg', 50, 75],
-            'container with preset' => ['with_preset', $image, '1671484636/test.jpg', 15, 20],
-            'non-image with container' => [null, $text, '1671484636/test.txt', null, null],
-            'non-image with container with no preset' => ['without_preset', $text, '1671484636/test.txt', null, null],
-            'non-image with container with preset' => ['with_preset', $text, '1671484636/test.txt', null, null],
+            'no container' => [null, true, '1671484636/test.jpg', 50, 75],
+            'container with no preset' => ['without_preset', true, '1671484636/test.jpg', 50, 75],
+            'container with preset' => ['with_preset', true, '1671484636/test.jpg', 15, 20],
+            'non-image with container' => [null, false, '1671484636/test.txt', null, null],
+            'non-image with container with no preset' => ['without_preset', false, '1671484636/test.txt', null, null],
+            'non-image with container with preset' => ['with_preset', false, '1671484636/test.txt', null, null],
         ];
     }
 }
