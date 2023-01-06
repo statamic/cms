@@ -7,6 +7,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use League\Glide\ServerFactory;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Image;
 use Statamic\Http\Controllers\CP\CpController;
 
 class FilesFieldtypeController extends CpController
@@ -30,12 +31,10 @@ class FilesFieldtypeController extends CpController
         $sourcePath = $file->getRealPath();
 
         if ($request->container) {
-            if ($preset = AssetContainer::find($request->container)->glideSourcePreset()) {
-                $params = config("statamic.assets.image_manipulation.presets.{$preset}", []);
-            }
+            $preset = AssetContainer::find($request->container)->glideSourcePreset();
 
-            $sourcePath = $preset && $params
-                ? $this->glideProcessUploadedFile($file, $params)
+            $sourcePath = $preset
+                ? $this->glideProcessUploadedFile($file, $preset)
                 : $sourcePath;
         }
 
@@ -44,17 +43,18 @@ class FilesFieldtypeController extends CpController
         return ['data' => ['id' => $path]];
     }
 
-    private function glideProcessUploadedFile(UploadedFile $file, $params)
+    private function glideProcessUploadedFile(UploadedFile $file, $preset)
     {
         $server = ServerFactory::create([
             'source' => $file->getPath(),
             'cache' => $this->glideTmpPath,
             'driver' => config('statamic.assets.image_manipulation.driver'),
             'watermarks' => public_path(),
+            'presets' => Image::manipulationPresets(),
         ]);
 
         try {
-            return $this->glideTmpPath.'/'.$server->makeImage($file->getFilename(), $params);
+            return $this->glideTmpPath.'/'.$server->makeImage($file->getFilename(), ['p' => $preset]);
         } catch (\Exception $exception) {
             return $file->getRealPath();
         }

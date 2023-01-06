@@ -5,7 +5,7 @@ namespace Statamic\Assets;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use League\Glide\ServerFactory;
-use Statamic\Facades\Config;
+use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Support\Str;
 use Stringy\Stringy;
@@ -50,12 +50,10 @@ class Uploader
     {
         $path = $this->getSafeUploadPath($file);
 
-        if ($preset = $this->asset->container()->glideSourcePreset()) {
-            $params = Config::get("statamic.assets.image_manipulation.presets.{$preset}", []);
-        }
+        $preset = $this->asset->container()->glideSourcePreset();
 
-        $sourcePath = $preset && $params
-            ? $this->glideProcessUploadedFile($file, $params)
+        $sourcePath = $preset
+            ? $this->glideProcessUploadedFile($file, $preset)
             : $file->getRealPath();
 
         $this->putFileOnDisk($sourcePath, $path);
@@ -147,20 +145,21 @@ class Uploader
      * Process UploadedFile instance using glide and return cached path.
      *
      * @param  UploadedFile  $file
-     * @param  array  $params
+     * @param  string  $preset
      * @param string
      */
-    private function glideProcessUploadedFile(UploadedFile $file, $params)
+    private function glideProcessUploadedFile(UploadedFile $file, $preset)
     {
         $server = ServerFactory::create([
             'source' => $file->getPath(),
             'cache' => $this->glideTmpPath,
             'driver' => config('statamic.assets.image_manipulation.driver'),
             'watermarks' => public_path(),
+            'presets' => Image::manipulationPresets(),
         ]);
 
         try {
-            return $this->glideTmpPath.'/'.$server->makeImage($file->getFilename(), $params);
+            return $this->glideTmpPath.'/'.$server->makeImage($file->getFilename(), ['p' => $preset]);
         } catch (\Exception $exception) {
             return $file->getRealPath();
         }
