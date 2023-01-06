@@ -1,5 +1,25 @@
 # Release Notes
 
+## 3.3.64 (2023-01-06)
+
+### What's new
+- The searchable item is now passed into search transformers. [#7305](https://github.com/statamic/cms/issues/7305) by @okaufmann
+- You are now required to enter your existing password in order to change it, in the CP. [#7287](https://github.com/statamic/cms/issues/7287) by @jasonvarga
+
+### What's improved
+- Danish translations. [#7314](https://github.com/statamic/cms/issues/7314) by @rabol
+- French translations. [#7275](https://github.com/statamic/cms/issues/7275) by @ebeauchamps
+- Switch operator parsing in Antlers. [#7283](https://github.com/statamic/cms/issues/7283) by @JohnathonKoster
+
+### What's fixed
+- Fix asset search in nested subdirectories. [#7313](https://github.com/statamic/cms/issues/7313) by @edalzell
+- Sanitize form tokens. [#7309](https://github.com/statamic/cms/issues/7309) by @jackmcdade
+- Rename filename label to path in the Asset editor. [#7303](https://github.com/statamic/cms/issues/7303) by @jasonvarga
+- Fix YAML facade casing. [#7298](https://github.com/statamic/cms/issues/7298) by @beatwiz
+- Add property to translator to prevent deprecation message. [#7289](https://github.com/statamic/cms/issues/7289) by @jasonvarga
+
+
+
 ## 3.3.63 (2022-12-21)
 
 ### What's new
