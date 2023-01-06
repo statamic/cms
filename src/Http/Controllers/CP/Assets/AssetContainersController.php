@@ -29,8 +29,6 @@ class AssetContainersController extends CpController
                 'allow_renaming' => $container->allowRenaming(),
                 'allow_uploads' => $container->allowUploads(),
                 'create_folders' => $container->createFolders(),
-                'source_preset' => $container->sourcePreset(),
-                'warm_presets' => $container->warmPresets(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
                 'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
