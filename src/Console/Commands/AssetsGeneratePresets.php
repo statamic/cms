@@ -5,7 +5,6 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Statamic\Console\RunsInPlease;
-use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Image;
 use Statamic\Jobs\GeneratePresetImageManipulation;
@@ -50,67 +49,35 @@ class AssetsGeneratePresets extends Command
             $this->shouldQueue = false;
         }
 
-        $this->imageAssets = Asset::all()->filter(function ($asset) {
-            return $asset->isImage();
+        AssetContainer::all()->each(function ($container) {
+            $this->line('Generating presets for <comment>'.$container->title().'</comment>...');
+            $this->generatePresets($container);
+            $this->newLine();
         });
-
-        $this->generateUserPresets();
-
-        $this->generateCpThumbnails();
     }
 
     /**
-     * Generate user provided presets.
+     * Generate presets for a container.
      *
+     * @param  \Statamic\Contracts\Assets\AssetContainer  $container
      * @return void
      */
-    protected function generateUserPresets()
+    private function generatePresets($container)
     {
-        $presets = Image::userManipulationPresets();
+        $assets = $container->assets()->filter->isImage();
 
-        if (empty($presets)) {
-            return $this->line('<fg=red>[✗]</> No user defined presets.');
-        }
+        $cpPresets = config('statamic.cp.enabled') ? array_keys(Image::getCpImageManipulationPresets()) : [];
 
-        $this->generatePresets($presets);
-    }
+        $presets = array_merge($container->warmPresets(), $cpPresets);
 
-    /**
-     * Generate thumbnails required by the control panel.
-     *
-     * @return void
-     */
-    private function generateCpThumbnails()
-    {
-        if (! config('statamic.cp.enabled')) {
-            return;
-        }
-
-        $this->generatePresets(Image::getCpImageManipulationPresets());
-    }
-
-    /**
-     * Generate supplied presets.
-     *
-     * @param  array  $presets
-     * @return void
-     */
-    private function generatePresets($presets)
-    {
-        $ignoredPresetsByContainer = AssetContainer::all()->keyBy->handle()->map->ignoredPresets();
-
-        foreach ($presets as $preset => $params) {
-            $bar = $this->output->createProgressBar($this->imageAssets->count());
+        foreach ($presets as $preset) {
+            $bar = $this->output->createProgressBar($assets->count());
 
             $verb = $this->shouldQueue ? 'Queueing' : 'Generating';
             $bar->setFormat("[%current%/%max%] $verb <comment>$preset</comment>... %filename%");
 
-            foreach ($this->imageAssets as $asset) {
-                $appendStatus = in_array($preset, $ignoredPresetsByContainer->get($asset->containerHandle()))
-                    ? ' (skipping)'
-                    : '';
-
-                $bar->setMessage($asset->basename().$appendStatus, 'filename');
+            foreach ($assets as $asset) {
+                $bar->setMessage($asset->basename(), 'filename');
 
                 $dispatchMethod = $this->shouldQueue
                     ? 'dispatch'
