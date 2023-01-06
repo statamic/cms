@@ -7,13 +7,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Uploader
 {
-    private $glideTmpPath;
-
-    public function __construct()
-    {
-        $this->glideTmpPath = storage_path('statamic/glide/tmp');
-    }
-
     public function upload(UploadedFile $file)
     {
         $source = $this->processSourceFile($file);
@@ -33,12 +26,12 @@ abstract class Uploader
 
         $server = Glide::server([
             'source' => $file->getPath(),
-            'cache' => $this->glideTmpPath,
+            'cache' => $cache = storage_path('statamic/glide/tmp'),
             'cache_with_file_extensions' => false,
         ]);
 
         try {
-            return $this->glideTmpPath.'/'.$server->makeImage($file->getFilename(), ['p' => $preset]);
+            return $cache.'/'.$server->makeImage($file->getFilename(), ['p' => $preset]);
         } catch (\Exception $exception) {
             // Glide can't process the file, ie. it's not an image.
             return $file->getRealPath();
