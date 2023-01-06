@@ -2,18 +2,15 @@
 
 namespace Statamic\Assets;
 
-use Illuminate\Filesystem\Filesystem;
 use Statamic\Facades\Glide;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Uploader
 {
-    private $files;
     private $glideTmpPath;
 
     public function __construct()
     {
-        $this->files = app(Filesystem::class);
         $this->glideTmpPath = storage_path('statamic/glide/tmp');
     }
 
@@ -23,7 +20,7 @@ abstract class Uploader
 
         $this->write($source, $path = $this->uploadPath($file));
 
-        $this->deleteTemporaryFiles();
+        app('files')->delete($source);
 
         return $path;
     }
@@ -56,13 +53,6 @@ abstract class Uploader
 
         if (is_resource($stream)) {
             fclose($stream);
-        }
-    }
-
-    private function deleteTemporaryFiles()
-    {
-        if ($this->files->exists($this->glideTmpPath)) {
-            $this->files->deleteDirectory($this->glideTmpPath);
         }
     }
 
