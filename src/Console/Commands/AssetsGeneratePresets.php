@@ -97,7 +97,7 @@ class AssetsGeneratePresets extends Command
      */
     private function generatePresets($presets)
     {
-        $ignoredPresetsByContainer = AssetContainer::all()->keyBy->handle()->map->glideIgnoredPresets();
+        $ignoredPresetsByContainer = AssetContainer::all()->keyBy->handle()->map->ignoredPresets();
 
         foreach ($presets as $preset => $params) {
             $bar = $this->output->createProgressBar($this->imageAssets->count());

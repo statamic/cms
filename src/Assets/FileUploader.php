@@ -32,7 +32,7 @@ class FileUploader extends Uploader
 
     protected function preset()
     {
-        return optional($this->container)->glideSourcePreset();
+        return optional($this->container)->sourcePreset();
     }
 
     protected function disk()

@@ -43,7 +43,7 @@ class AssetUploader extends Uploader
 
     protected function preset()
     {
-        return $this->asset->container()->glideSourcePreset();
+        return $this->asset->container()->sourcePreset();
     }
 
     protected function disk()

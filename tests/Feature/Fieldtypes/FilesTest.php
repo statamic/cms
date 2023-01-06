@@ -28,7 +28,7 @@ class FilesTest extends TestCase
         Storage::fake('without_preset');
 
         AssetContainer::make('without_preset')->disk('without_preset')->save();
-        AssetContainer::make('with_preset')->disk('with_preset')->glideSourcePreset('upload')->save();
+        AssetContainer::make('with_preset')->disk('with_preset')->sourcePreset('upload')->save();
     }
 
     /**

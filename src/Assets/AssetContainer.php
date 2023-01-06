@@ -39,8 +39,8 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     protected $allowMoving;
     protected $allowRenaming;
     protected $createFolders;
-    protected $glideSourcePreset;
-    protected $glideWarmPresets;
+    protected $sourcePreset;
+    protected $warmPresets;
     protected $searchIndex;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
@@ -536,10 +536,10 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      * @param  string|null  $preset
      * @return string|null|$this
      */
-    public function glideSourcePreset($preset = null)
+    public function sourcePreset($preset = null)
     {
         return $this
-            ->fluentlyGetOrSet('glideSourcePreset')
+            ->fluentlyGetOrSet('sourcePreset')
             ->args(func_get_args());
     }
 
@@ -549,10 +549,10 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      * @param  array|null  $presets
      * @return array|null|$this
      */
-    public function glideWarmPresets($preset = null)
+    public function warmPresets($preset = null)
     {
         return $this
-            ->fluentlyGetOrSet('glideWarmPresets')
+            ->fluentlyGetOrSet('warmPresets')
             ->getter(function ($presets) {
                 return $presets === false ? [] : $presets;
             })
@@ -563,27 +563,27 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     }
 
     /**
-     * Intelligently determine which glide presets to ignore, based on the `glide_warm_presets` configuration.
+     * Intelligently determine which glide presets to ignore, based on the `warm_presets` configuration.
      *
      * @return array
      */
-    public function glideIgnoredPresets()
+    public function ignoredPresets()
     {
         $presets = array_keys(Config::get('statamic.assets.image_manipulation.presets', []));
 
-        // If `glide_warm_presets: false`, ignore all user configured presets.
-        if ($this->glideWarmPresets === false) {
+        // If `warm_presets: false`, ignore all user configured presets.
+        if ($this->warmPresets === false) {
             return $presets;
         }
 
-        // If `glide_warm_presets` is an array, ignore based on explicit container setting.
-        if (is_array($this->glideWarmPresets)) {
-            return array_values(array_diff($presets, $this->glideWarmPresets));
+        // If `warm_presets` is an array, ignore based on explicit container setting.
+        if (is_array($this->warmPresets)) {
+            return array_values(array_diff($presets, $this->warmPresets));
         }
 
-        // If `glide_source_preset` is set, ignore this preset because uploads will already be processed by it.
-        if ($this->glideSourcePreset) {
-            return [$this->glideSourcePreset];
+        // If `source_preset` is set, ignore this preset because uploads will already be processed by it.
+        if ($this->sourcePreset) {
+            return [$this->sourcePreset];
         }
 
         return [];
@@ -600,8 +600,8 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             'allow_renaming' => $this->allowRenaming,
             'allow_moving' => $this->allowMoving,
             'create_folders' => $this->createFolders,
-            'glide_source_preset' => $this->glideSourcePreset,
-            'glide_warm_presets' => $this->glideWarmPresets,
+            'source_preset' => $this->sourcePreset,
+            'warm_presets' => $this->warmPresets,
         ];
 
         $array = Arr::removeNullValues(array_merge($array, [

@@ -234,38 +234,38 @@ class AssetContainerTest extends TestCase
     public function it_gets_and_sets_glide_source_preset_for_upload_processing()
     {
         $container = new AssetContainer;
-        $this->assertNull($container->glideSourcePreset());
+        $this->assertNull($container->sourcePreset());
 
-        $return = $container->glideSourcePreset('watermarked');
+        $return = $container->sourcePreset('watermarked');
 
         $this->assertEquals($container, $return);
-        $this->assertEquals('watermarked', $container->glideSourcePreset());
+        $this->assertEquals('watermarked', $container->sourcePreset());
     }
 
     /** @test */
     public function it_gets_and_sets_explicit_glide_warm_presets_config()
     {
         $container = new AssetContainer;
-        $this->assertNull($container->glideWarmPresets());
+        $this->assertNull($container->warmPresets());
 
         // Set explicit presets to warm.
-        $return = $container->glideWarmPresets(['small', 'medium']);
+        $return = $container->warmPresets(['small', 'medium']);
 
         $this->assertEquals($container, $return);
-        $this->assertEquals(['small', 'medium'], $container->glideWarmPresets());
+        $this->assertEquals(['small', 'medium'], $container->warmPresets());
 
         // Set `false` to disable warming of presets.
-        $return = $container->glideWarmPresets(false);
+        $return = $container->warmPresets(false);
 
         $this->assertEquals($container, $return);
-        $this->assertEquals([], $container->glideWarmPresets());
+        $this->assertEquals([], $container->warmPresets());
 
         // Ensure passing `null` properly clears this config, because `null` should
         // allow for Statamic to intelligently determine which presets to warm.
-        $return = $container->glideWarmPresets(null);
+        $return = $container->warmPresets(null);
 
         $this->assertEquals($container, $return);
-        $this->assertNull($container->glideWarmPresets());
+        $this->assertNull($container->warmPresets());
     }
 
     /** @test */
@@ -280,7 +280,7 @@ class AssetContainerTest extends TestCase
             'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
         ]]);
 
-        $this->assertEquals([], $container->glideIgnoredPresets());
+        $this->assertEquals([], $container->ignoredPresets());
     }
 
     /** @test */
@@ -295,9 +295,9 @@ class AssetContainerTest extends TestCase
             'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
         ]]);
 
-        $container->glideSourcePreset('max');
+        $container->sourcePreset('max');
 
-        $this->assertEquals(['max'], $container->glideIgnoredPresets());
+        $this->assertEquals(['max'], $container->ignoredPresets());
     }
 
     /** @test */
@@ -313,10 +313,10 @@ class AssetContainerTest extends TestCase
         ]]);
 
         $container
-            ->glideSourcePreset('max') // normally we automatically ignore the `max` preset if it's set as the source preset for uploads
-            ->glideWarmPresets(['medium', 'max']); // but this config should override which presets the user wants to warm
+            ->sourcePreset('max') // normally we automatically ignore the `max` preset if it's set as the source preset for uploads
+            ->warmPresets(['medium', 'max']); // but this config should override which presets the user wants to warm
 
-        $this->assertEquals(['small', 'large'], $container->glideIgnoredPresets());
+        $this->assertEquals(['small', 'large'], $container->ignoredPresets());
     }
 
     /** @test */
@@ -332,10 +332,10 @@ class AssetContainerTest extends TestCase
         ]]);
 
         $container
-            ->glideSourcePreset('max') // normally we automatically ignore the `max` preset if it's set as the source preset for uploads
-            ->glideWarmPresets(false); // but this config should override to ensure all the above configured presets are ignored
+            ->sourcePreset('max') // normally we automatically ignore the `max` preset if it's set as the source preset for uploads
+            ->warmPresets(false); // but this config should override to ensure all the above configured presets are ignored
 
-        $this->assertEquals(['small', 'medium', 'large', 'max'], $container->glideIgnoredPresets());
+        $this->assertEquals(['small', 'medium', 'large', 'max'], $container->ignoredPresets());
     }
 
     /** @test */

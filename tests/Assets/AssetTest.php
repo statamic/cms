@@ -1618,7 +1618,7 @@ class AssetTest extends TestCase
             'h' => '15',
         ]]);
 
-        $this->container->glideSourcePreset('small');
+        $this->container->sourcePreset('small');
 
         $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
 
@@ -1652,7 +1652,7 @@ class AssetTest extends TestCase
             'h' => '15',
         ]]);
 
-        $this->container->glideSourcePreset('small');
+        $this->container->sourcePreset('small');
 
         $asset = (new Asset)->container($this->container)->path('path/to/readme.md')->syncOriginal();
 
@@ -1700,7 +1700,7 @@ class AssetTest extends TestCase
      **/
     public function it_generates_glide_cache_for_all_presets_except_configured_source_preset_on_upload()
     {
-        $this->container->glideSourcePreset('max');
+        $this->container->sourcePreset('max');
 
         $cacheFolder = $this->uploadImageAndAssertGlideCache();
 
@@ -1715,8 +1715,8 @@ class AssetTest extends TestCase
     public function it_generates_glide_cache_for_explicitly_set_presets()
     {
         $this->container
-            ->glideSourcePreset('max') // normally we automatically ignore the `max` preset if it's set as the source preset for uploads
-            ->glideWarmPresets(['max']); // but this config should override which presets the user wants to warm
+            ->sourcePreset('max') // normally we automatically ignore the `max` preset if it's set as the source preset for uploads
+            ->warmPresets(['max']); // but this config should override which presets the user wants to warm
 
         $cacheFolder = $this->uploadImageAndAssertGlideCache();
 
@@ -1730,7 +1730,7 @@ class AssetTest extends TestCase
      **/
     public function it_doesnt_generates_glide_cache_for_disabled_user_presets()
     {
-        $this->container->glideSourcePreset('max')->glideWarmPresets(false);
+        $this->container->sourcePreset('max')->warmPresets(false);
 
         $cacheFolder = $this->uploadImageAndAssertGlideCache();
 

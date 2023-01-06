@@ -37,7 +37,7 @@ class PresetGenerator
     {
         $presets = $preset ?: array_keys($this->presets);
 
-        $ignoredPresets = $asset->container()->glideIgnoredPresets();
+        $ignoredPresets = $asset->container()->ignoredPresets();
 
         collect($presets)
             ->reject(function ($preset) use ($ignoredPresets) {
