@@ -55,7 +55,7 @@ class Uploader
             ? $this->glideProcessUploadedFile($file, $preset)
             : $file->getRealPath();
 
-        $this->putFileOnDisk($sourcePath, $path);
+        $this->putFileOnDisk($this->disk(), $sourcePath, $path);
 
         $this->glideClearTmpCache();
 
@@ -126,14 +126,15 @@ class Uploader
     /**
      * Put file on destination disk.
      *
+     * @param  \Illuminate\Filesystem\FilesystemAdapter  $disk
      * @param  string  $sourcePath
      * @param  string  $destinationPath
      */
-    private function putFileOnDisk($sourcePath, $destinationPath)
+    private function putFileOnDisk($disk, $sourcePath, $destinationPath)
     {
         $stream = fopen($sourcePath, 'r');
 
-        $this->disk()->put($destinationPath, $stream);
+        $disk->put($destinationPath, $stream);
 
         if (is_resource($stream)) {
             fclose($stream);

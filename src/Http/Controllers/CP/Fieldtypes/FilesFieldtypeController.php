@@ -37,7 +37,7 @@ class FilesFieldtypeController extends CpController
                 : $sourcePath;
         }
 
-        $this->putFileOnDisk($sourcePath, $path);
+        $this->putFileOnDisk(Storage::disk('local'), $sourcePath, 'statamic/file-uploads/'.$path);
 
         return ['data' => ['id' => $path]];
     }
@@ -57,11 +57,11 @@ class FilesFieldtypeController extends CpController
         }
     }
 
-    private function putFileOnDisk($sourcePath, $destinationPath)
+    private function putFileOnDisk($disk, $sourcePath, $destinationPath)
     {
         $stream = fopen($sourcePath, 'r');
 
-        Storage::disk('local')->put('statamic/file-uploads/'.$destinationPath, $stream);
+        $disk->put($destinationPath, $stream);
 
         if (is_resource($stream)) {
             fclose($stream);
