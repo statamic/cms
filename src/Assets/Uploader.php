@@ -4,8 +4,7 @@ namespace Statamic\Assets;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
-use League\Glide\ServerFactory;
-use Statamic\Facades\Image;
+use Statamic\Facades\Glide;
 use Statamic\Facades\Path;
 use Statamic\Support\Str;
 use Stringy\Stringy;
@@ -150,12 +149,10 @@ class Uploader
      */
     private function glideProcessUploadedFile(UploadedFile $file, $preset)
     {
-        $server = ServerFactory::create([
+        $server = Glide::server([
             'source' => $file->getPath(),
             'cache' => $this->glideTmpPath,
-            'driver' => config('statamic.assets.image_manipulation.driver'),
-            'watermarks' => public_path(),
-            'presets' => Image::manipulationPresets(),
+            'cache_with_file_extensions' => false,
         ]);
 
         try {
