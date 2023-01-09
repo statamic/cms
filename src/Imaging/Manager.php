@@ -72,7 +72,7 @@ class Manager
     }
 
     /**
-     * Get the image manipulation presets required by the control panel.
+     * Get the image manipulation presets used by the control panel.
      *
      * @return array
      */
