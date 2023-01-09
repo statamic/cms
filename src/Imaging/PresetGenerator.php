@@ -12,18 +12,11 @@ class PresetGenerator
     private $generator;
 
     /**
-     * @var array
-     */
-    private $presets;
-
-    /**
      * @param  ImageGenerator  $generator
-     * @param  array  $presets
      */
-    public function __construct(ImageGenerator $generator, array $presets)
+    public function __construct(ImageGenerator $generator)
     {
         $this->generator = $generator;
-        $this->presets = $presets;
     }
 
     /**
@@ -31,20 +24,14 @@ class PresetGenerator
      *
      * @param  Asset  $asset  The asset to use for generating presets
      * @param  string|null  $preset  An optional name for generating a specific preset.
-     *                               If left blank, all the presets will be generated.
+     *                               If left blank, all asset presets will be generated.
      */
     public function generate(Asset $asset, $preset = null)
     {
-        $presets = $preset ?: array_keys($this->presets);
+        $presets = $preset ? [$preset] : $asset->warmPresets();
 
-        $ignoredPresets = $asset->container()->ignoredPresets();
-
-        collect($presets)
-            ->reject(function ($preset) use ($ignoredPresets) {
-                return in_array($preset, $ignoredPresets);
-            })
-            ->each(function ($preset) use ($asset) {
-                $this->generator->generateByAsset($asset, ['p' => $preset]);
-            });
+        collect($presets)->each(function ($preset) use ($asset) {
+            $this->generator->generateByAsset($asset, ['p' => $preset]);
+        });
     }
 }

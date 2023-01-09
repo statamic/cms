@@ -2210,6 +2210,67 @@ YAML;
         ], $asset->getRawOriginal());
     }
 
+    /**
+     * @test
+     *
+     * @dataProvider warmPresetProvider
+     */
+    public function it_gets_which_presets_to_warm($extension, $orientation, $cpEnabled, $expectedWarm)
+    {
+        config(['statamic.cp.enabled' => $cpEnabled]);
+
+        Storage::fake('test');
+
+        if ($orientation === 'landscape') {
+            $width = 20;
+            $height = 10;
+        } elseif ($orientation === 'portrait') {
+            $width = 10;
+            $height = 20;
+        } elseif ($orientation === 'square') {
+            $width = 10;
+            $height = 10;
+        }
+
+        $filename = 'test.'.$extension;
+        Storage::disk('test')->put($filename, '');
+
+        if ($extension === 'jpg') {
+            Storage::disk('test')->put('.meta/'.$filename.'.yaml', YAML::dump([
+                'height' => $height,
+                'width' => $width,
+            ]));
+        }
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $container = Mockery::mock($container)->makePartial();
+        $container->shouldReceive('warmPresets')->andReturn(['one', 'two']);
+
+        $asset = (new Asset)->container($container)->path($filename);
+
+        $this->assertEquals($expectedWarm, $asset->warmPresets());
+    }
+
+    public function warmPresetProvider()
+    {
+        return [
+            'portrait' => ['jpg', 'portrait', true, ['one', 'two', 'cp_thumbnail_small_portrait']],
+            'landscape' => ['jpg', 'landscape', true, ['one', 'two', 'cp_thumbnail_small_landscape']],
+            'square' => ['jpg', 'square', true, ['one', 'two', 'cp_thumbnail_small_square']],
+            'portrait svg' => ['svg', 'portrait', true, []],
+            'landscape svg' => ['svg', 'landscape', true, []],
+            'square svg' => ['svg', 'square', true, []],
+            'non-image' => ['txt', null, true, []],
+            'cp disabled, portrait' => ['jpg', 'portrait', false, ['one', 'two']],
+            'cp disabled, landscape' => ['jpg', 'landscape', false, ['one', 'two']],
+            'cp disabled, square' => ['jpg', 'square', false, ['one', 'two']],
+            'cp disabled, portrait svg' => ['svg', 'portrait', false, []],
+            'cp disabled, landscape svg' => ['svg', 'landscape', false, []],
+            'cp disabled, square svg' => ['svg', 'square', false, []],
+            'cp disabled, non-image' => ['txt', null, false, []],
+        ];
+    }
+
     private function fakeEventWithMacros()
     {
         $fake = Event::fake();

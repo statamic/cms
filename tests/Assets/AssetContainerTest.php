@@ -247,7 +247,7 @@ class AssetContainerTest extends TestCase
      *
      * @dataProvider warmPresetProvider
      */
-    public function it_defines_which_presets_to_warm($source, $presets, $expectedIntelligent, $expectedWarm, $expectedIgnore)
+    public function it_defines_which_presets_to_warm($source, $presets, $expectedIntelligent, $expectedWarm)
     {
         config(['statamic.assets.image_manipulation.presets' => [
             'small' => ['w' => '15', 'h' => '15'],
@@ -262,19 +262,18 @@ class AssetContainerTest extends TestCase
 
         $this->assertEquals($expectedIntelligent, $container->warmsPresetsIntelligently());
         $this->assertEquals($expectedWarm, $container->warmPresets());
-        $this->assertEquals($expectedIgnore, $container->ignoredPresets());
     }
 
     public function warmPresetProvider()
     {
         return [
-            'no source, no presets' => [null, null, true, ['small', 'medium', 'large', 'max'], []],
-            'no source, with presets' => [null, ['small', 'medium'], false, ['small', 'medium'], ['large', 'max']],
-            'with source, no presets' => ['max', null, true, ['small', 'medium', 'large'], ['max']],
-            'with source, with presets' => ['max', ['small'], false, ['small'], ['medium', 'large', 'max']],
-            'with source, with presets, including source' => ['max', ['small', 'max'], false, ['small', 'max'], ['medium', 'large']],
-            'no source, presets false' => [null, false, false, [], ['small', 'medium', 'large', 'max']],
-            'with source, presets false' => ['max', false, false, [], ['small', 'medium', 'large', 'max']],
+            'no source, no presets' => [null, null, true, ['small', 'medium', 'large', 'max']],
+            'no source, with presets' => [null, ['small', 'medium'], false, ['small', 'medium']],
+            'with source, no presets' => ['max', null, true, ['small', 'medium', 'large']],
+            'with source, with presets' => ['max', ['small'], false, ['small']],
+            'with source, with presets, including source' => ['max', ['small', 'max'], false, ['small', 'max']],
+            'no source, presets false' => [null, false, false, []],
+            'with source, presets false' => ['max', false, false, []],
         ];
     }
 

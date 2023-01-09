@@ -18,8 +18,8 @@ use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\Config;
 use Statamic\Facades\File;
+use Statamic\Facades\Image;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
@@ -558,14 +558,15 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
                     return [];
                 }
 
-                if ($presets === null) {
-                    return array_diff(
-                        array_keys(Config::get('statamic.assets.image_manipulation.presets', [])),
-                        $this->ignoredPresets()
-                    );
+                if ($presets !== null) {
+                    return $presets;
                 }
 
-                return $presets;
+                $presets = Image::userManipulationPresets();
+
+                $presets = Arr::except($presets, $this->sourcePreset);
+
+                return array_keys($presets);
             })
             ->setter(function ($presets) {
                 return $presets === [] ? false : $presets;
@@ -576,33 +577,6 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     public function warmsPresetsIntelligently()
     {
         return $this->warmPresets === null;
-    }
-
-    /**
-     * Intelligently determine which glide presets to ignore, based on the `warm_presets` configuration.
-     *
-     * @return array
-     */
-    public function ignoredPresets()
-    {
-        $presets = array_keys(Config::get('statamic.assets.image_manipulation.presets', []));
-
-        // If `warm_presets: false`, ignore all user configured presets.
-        if ($this->warmPresets === false) {
-            return $presets;
-        }
-
-        // If `warm_presets` is an array, ignore based on explicit container setting.
-        if (is_array($this->warmPresets)) {
-            return array_values(array_diff($presets, $this->warmPresets));
-        }
-
-        // If `source_preset` is set, ignore this preset because uploads will already be processed by it.
-        if ($this->sourcePreset) {
-            return [$this->sourcePreset];
-        }
-
-        return [];
     }
 
     public function fileData()

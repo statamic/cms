@@ -1023,4 +1023,17 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
         return $field->fieldtype()->toQueryableValue($value);
     }
+
+    public function warmPresets()
+    {
+        if (! $this->isImage()) {
+            return [];
+        }
+
+        $cpPresets = config('statamic.cp.enabled') ? [
+            'cp_thumbnail_small_'.$this->orientation(),
+        ] : [];
+
+        return array_merge($this->container->warmPresets(), $cpPresets);
+    }
 }
