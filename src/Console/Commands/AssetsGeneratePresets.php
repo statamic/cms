@@ -4,10 +4,11 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Support\Facades\Log;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\AssetContainer;
-use Statamic\Facades\Image;
 use Statamic\Jobs\GeneratePresetImageManipulation;
+use Statamic\Support\Arr;
 
 class AssetsGeneratePresets extends Command
 {
@@ -49,7 +50,7 @@ class AssetsGeneratePresets extends Command
             $this->shouldQueue = false;
         }
 
-        AssetContainer::all()->each(function ($container) {
+        AssetContainer::all()->sortBy('title')->each(function ($container) {
             $this->line('Generating presets for <comment>'.$container->title().'</comment>...');
             $this->generatePresets($container);
             $this->newLine();
@@ -65,19 +66,24 @@ class AssetsGeneratePresets extends Command
     private function generatePresets($container)
     {
         $assets = $container->assets()->filter->isImage();
+        $counts = [];
 
-        $cpPresets = config('statamic.cp.enabled') ? array_keys(Image::getCpImageManipulationPresets()) : [];
+        // The amount of extra cp presets for each asset. The amount will
+        // be consistent across assets, but just not the preset names.
+        $cpPresets = config('statamic.cp.enabled') ? 1 : 0;
 
-        $presets = array_merge($container->warmPresets(), $cpPresets);
+        $steps = (count($container->warmPresets()) + $cpPresets) * count($assets);
+        $bar = $this->output->createProgressBar($steps);
 
-        foreach ($presets as $preset) {
-            $bar = $this->output->createProgressBar($assets->count());
-
+        foreach ($assets as $asset) {
             $verb = $this->shouldQueue ? 'Queueing' : 'Generating';
-            $bar->setFormat("[%current%/%max%] $verb <comment>$preset</comment>... %filename%");
+            $bar->setFormat("[%current%/%max%] $verb %filename% <comment>%preset%</comment>... ");
 
-            foreach ($assets as $asset) {
+            foreach ($asset->warmPresets() as $preset) {
+                $counts[$preset] = ($counts[$preset] ?? 0) + 1;
+                $bar->setMessage($preset, 'preset');
                 $bar->setMessage($asset->basename(), 'filename');
+                $bar->display();
 
                 $dispatchMethod = $this->shouldQueue
                     ? 'dispatch'
@@ -86,18 +92,29 @@ class AssetsGeneratePresets extends Command
                 try {
                     GeneratePresetImageManipulation::$dispatchMethod($asset, $preset);
                 } catch (\Exception $e) {
-                    $this->error($asset.' '.$e->getMessage());
+                    Log::debug($e);
+                    $counts['errors'] = ($counts['errors'] ?? 0) + 1;
                 }
 
                 $bar->advance();
             }
-
-            $verb = $this->shouldQueue ? 'queued' : 'generated';
-            $bar->setFormat("<info>[✓] Images $verb for <comment>$preset</comment>.</info>");
-
-            $bar->finish();
-
-            $this->output->newLine();
         }
+
+        $verb = $this->shouldQueue ? 'queued' : 'generated';
+        $bar->setFormat(sprintf("<info>[✔]</info> %s images $verb for %s assets.", $steps, count($assets)));
+        $bar->finish();
+        $this->newLine(2);
+
+        if (property_exists($this, 'components')) {
+            $errors = Arr::pull($counts, 'errors');
+            collect($counts)
+                ->put('errors', $errors)
+                ->each(function ($count, $preset) {
+                    $preset = $preset === 'errors' ? '<fg=red>errors</>' : $preset;
+                    $this->components->twoColumnDetail($preset, $count);
+                });
+        }
+
+        $this->output->newLine();
     }
 }
