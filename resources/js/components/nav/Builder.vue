@@ -33,7 +33,7 @@
                         @click="save"
                         v-text="__('Save Changes')" />
 
-                    <dropdown-list v-if="hasSaveAsOptions" class="ml-0">
+                    <dropdown-list v-if="hasSaveAsOptions" class="ml-0" :disabled="!changed">
                         <template #trigger>
                             <button class="btn-primary rounded-l-none flex items-center" :class="{ 'disabled': !changed }">
                                 <svg-icon name="chevron-down-xs" class="w-2" />
