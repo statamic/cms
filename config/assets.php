@@ -78,6 +78,7 @@ return [
         | Rather than specifying your manipulation params in your templates with
         | the glide tag, you may define them here and reference their handles.
         | They may also be automatically generated when you upload assets.
+        | Containers can be configured to warm these caches on upload.
         |
         */
 
