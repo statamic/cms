@@ -49,6 +49,7 @@ class UserRolesTagTest extends TestCase
         Role::make()->handle('test3')->title('Test 3')->save();
 
         $this->assertEquals('test2|test3|', $this->tag('{{ user_roles handle="test2|test3" }}{{ handle }}|{{ /user_roles }}'));
+        $this->assertEquals('test2|test3|', $this->tag('{{ user_roles :handle="roles" }}{{ handle }}|{{ /user_roles }}', ['roles' => ['test2', 'test3']]));
     }
 
     /** @test */
