@@ -1672,16 +1672,6 @@ class AssetTest extends TestCase
         Event::assertDispatched(AssetSaved::class);
     }
 
-    protected function configureGlidePresets($app)
-    {
-        $app->config->set('statamic.assets.image_manipulation.presets', [
-            'small' => ['w' => '15', 'h' => '15'],
-            'medium' => ['w' => '500', 'h' => '500'],
-            'large' => ['w' => '1000', 'h' => '1000'],
-            'max' => ['w' => '3000', 'h' => '3000'],
-        ]);
-    }
-
     /** @test */
     public function it_appends_timestamp_to_uploaded_files_filename_if_it_already_exists()
     {
