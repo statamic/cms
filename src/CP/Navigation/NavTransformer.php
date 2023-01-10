@@ -2,6 +2,7 @@
 
 namespace Statamic\CP\Navigation;
 
+use Facades\Statamic\CP\Navigation\NavItemIdHasher;
 use Statamic\Facades\CP\Nav;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -50,7 +51,7 @@ class NavTransformer
         $coreSections = $this->coreNav->pluck('display');
 
         return collect($submitted)
-            ->filter(fn ($section) => $section['items'] || $coreSections->contains($section['display_original']))
+            ->filter(fn ($section) => Arr::get($section, 'items', []) || $coreSections->contains($section['display_original']))
             ->all();
     }
 
@@ -83,7 +84,11 @@ class NavTransformer
      */
     protected function transformSectionKey($section)
     {
-        return NavItem::snakeCase($section['action'] === '@create' ? $section['display'] : $section['display_original']);
+        $action = Arr::get($section, 'action', false);
+        $display = Arr::get($section, 'display');
+        $displayOriginal = Arr::get($section, 'display_original', $display);
+
+        return NavItem::snakeCase($action === '@create' ? $display : $displayOriginal);
     }
 
     /**
@@ -97,19 +102,24 @@ class NavTransformer
     {
         $transformed = [];
 
-        $transformed['action'] = $section['action'] ?: '@inherit';
+        $transformed['action'] = Arr::get($section, 'action', false) ?: '@inherit';
 
-        if ($section['display'] !== $section['display_original']) {
-            $transformed['display'] = $section['display'];
+        $display = Arr::get($section, 'display');
+        $displayOriginal = Arr::get($section, 'display_original', $display);
+
+        if ($display !== $displayOriginal) {
+            $transformed['display'] = $display;
         }
 
+        $items = Arr::get($section, 'items', []);
+
         $transformed['reorder'] = $this->itemsAreReordered(
-            $this->coreNav->pluck('items', 'display_original')->get($section['display_original'], collect())->map->id(),
-            collect($section['items'])->pluck('id'),
+            $this->coreNav->pluck('items', 'display_original')->get($displayOriginal, collect())->map->id(),
+            collect($items)->pluck('id'),
             $sectionKey
         );
 
-        $transformed['items'] = $this->transformItems($section['items'], $sectionKey);
+        $transformed['items'] = $this->transformItems($items, $sectionKey);
 
         return $transformed;
     }
@@ -171,7 +181,7 @@ class NavTransformer
      */
     protected function transformItem($item, $itemId, $parentId)
     {
-        $transformed = $item['manipulations'];
+        $transformed = Arr::get($item, 'manipulations', []);
 
         if (! isset($transformed['action'])) {
             $transformed['action'] = '@inherit';
@@ -181,7 +191,7 @@ class NavTransformer
             $transformed['url'] = $this->transformItemUrl($transformed['url']);
         }
 
-        $children = $this->transformItems($item['children'], $itemId);
+        $children = $this->transformItems(Arr::get($item, 'children', []), $itemId);
 
         $childrenHaveModifications = collect($children)
             ->reject(fn ($item) => $item['action'] === '@inherit')
@@ -482,7 +492,7 @@ class NavTransformer
             return $id;
         }
 
-        return $id.':'.substr(str_shuffle(md5($id)), 0, 6);
+        return NavItemIdHasher::appendHash($id);
     }
 
     /**

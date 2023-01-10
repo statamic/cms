@@ -9,7 +9,6 @@ class Nav
 {
     protected $items = [];
     protected $extensions = [];
-    protected $baseItemsMade = false;
 
     /**
      * Register a nav extension closure.

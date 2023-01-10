@@ -16,7 +16,7 @@
 
                 <dropdown-list>
                     <template #trigger>
-                        <button class="btn" :class="{ 'flex items-center pr-2': true }">
+                        <button class="btn flex items-center pr-2">
                             {{ __('Add Item') }}
                             <svg-icon name="chevron-down-xs" class="w-2 ml-2" />
                         </button>
@@ -40,10 +40,10 @@
                             </button>
                         </template>
                         <h6 class="p-1">{{ __('Save to') }}...</h6>
-                        <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)">
-                            <div class="flex items-center">
-                                <svg-icon :name="option.icon" class="text-grey mr-1 w-4" />
-                                {{ option.label }}
+                        <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)" class="group">
+                            <div class="flex items-start pr-2">
+                                <svg-icon :name="option.icon" class="text-grey flex-shrink-0 mr-1 w-4 group-hover:text-white" />
+                                <span class="whitespace-normal">{{ option.label }}</span>
                             </div>
                         </dropdown-item>
                     </dropdown-list>
@@ -760,6 +760,7 @@ export default {
         },
 
         saveAs(url) {
+
             let tree = this.preparePreferencesSubmission();
 
             this.$axios
