@@ -16,7 +16,7 @@
 
                 <dropdown-list>
                     <template #trigger>
-                        <button class="btn" :class="{ 'flex items-center pr-2': true }">
+                        <button class="btn flex items-center pr-2">
                             {{ __('Add Item') }}
                             <svg-icon name="chevron-down-xs" class="w-2 ml-2" />
                         </button>
