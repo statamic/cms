@@ -8,7 +8,6 @@ use Statamic\Facades\User;
 class Preferences
 {
     protected $dotted = [];
-    protected $preferences = [];
     protected $preventMergingChildren = [];
     protected $fields = [];
     protected $sections = [];
@@ -45,10 +44,6 @@ class Preferences
             return [];
         }
 
-        if ($this->preferences) {
-            return $this->preferences;
-        }
-
         return $this
             ->resetState()
             ->mergeDottedUserPreferences()
@@ -77,7 +72,6 @@ class Preferences
     protected function resetState()
     {
         $this->dotted = [];
-        $this->preferences = [];
 
         return $this;
     }
@@ -150,11 +144,13 @@ class Preferences
      */
     protected function getMultiDimensionalPreferences()
     {
+        $preferences = [];
+
         foreach ($this->dotted as $key => $value) {
-            Arr::set($this->preferences, $key, $value);
+            Arr::set($preferences, $key, $value);
         }
 
-        return $this->preferences;
+        return $preferences;
     }
 
     public function register($handle, $field = [])
