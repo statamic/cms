@@ -29,6 +29,7 @@ return [
     'bard.config.remove_empty_nodes' => 'Choose how to deal with empty nodes.',
     'bard.config.save_html' => 'Save HTML instead of structured data. This simplifies but limits control of your template markup.',
     'bard.config.sets' => 'Sets are configurable blocks of fields that can be inserted anywhere in your Bard content.',
+    'bard.config.smart_typography' => 'Convert common text patterns with the proper typographic characters.',
     'bard.config.target_blank' => 'Set `target="_blank"` on all links.',
     'bard.config.toolbar_mode' => 'Choose which style of toolbar you prefer.',
     'bard.config.inline' => 'Only allow inline elements.',
