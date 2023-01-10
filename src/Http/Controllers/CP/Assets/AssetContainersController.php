@@ -282,13 +282,13 @@ class AssetContainersController extends CpController
                     ],
                     'warm_intelligent' => [
                         'type' => 'toggle',
-                        'display' => __('Intelligently Warm Glide Caches'),
+                        'display' => __('Intelligently Warm Presets'),
                         'instructions' => __('statamic::messages.asset_container_warm_intelligent_instructions'),
                         'default' => true,
                     ],
                     'warm_presets' => [
                         'type' => 'select',
-                        'display' => __('Warm Specific Glide Caches'),
+                        'display' => __('Warm Specific Presets'),
                         'instructions' => __('statamic::messages.asset_container_warm_presets_instructions'),
                         'multiple' => true,
                         'label_html' => true,
