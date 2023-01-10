@@ -752,14 +752,14 @@ export default {
         },
 
         save() {
-            if (! this.changed) {
-                return;
-            }
-
             this.saveAs(this.updateUrl);
         },
 
         saveAs(url) {
+            if (! this.changed) {
+                return;
+            }
+
             let tree = this.preparePreferencesSubmission();
 
             this.$axios
