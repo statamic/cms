@@ -2,14 +2,14 @@
     <div>
         <popover v-if="isNotYetFavorited" ref="popper" placement="auto-end" :offset="[28, 10]">
             <template slot="trigger">
-                <button slot="reference" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-80" v-tooltip="__('Pin to Favorites')" :aria-label="__('Pin to Favorites')">
+                <button @click="shown" slot="reference" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-80" v-tooltip="__('Pin to Favorites')" :aria-label="__('Pin to Favorites')">
                     <svg-icon name="pin"></svg-icon>
                 </button>
             </template>
             <div class="p-2 pb-1">
                 <h6 class="mb-1">{{ __('Pin to Favorites') }}</h6>
                 <div class="flex items-center">
-                    <input type="text" class="input-text w-auto" autofocus ref="fave" v-model="name" @keydown.enter="save">
+                    <input type="text" class="input-text w-auto" ref="fave" v-model="name" @keydown.enter="save" />
                     <button @click="save" class="btn-primary ml-1">{{ __('Save') }}</button>
                 </div>
                 <button @click="makeStartPage" class="mt-1 text-xs text-blue outline-none hover:text-blue-darker">{{ __('Set as start page') }} &rarr;</button>
@@ -59,7 +59,7 @@ export default {
         },
 
         highlight() {
-            setTimeout(() => this.$refs.fave.select(), 20);
+            setTimeout(() => this.$refs.fave.select(), 50);
         },
 
         save() {

@@ -57,6 +57,21 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Image Manipulation Defaults
+        |--------------------------------------------------------------------------
+        |
+        | You may define global defaults for all manipulation parameters, such as
+        | quality, format, and sharpness. These can and will be be overwritten
+        | on the tag parameter level as well as the preset level.
+        |
+        */
+
+        'defaults' => [
+            // 'quality' => 50,
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
         | Image Manipulation Presets
         |--------------------------------------------------------------------------
         |

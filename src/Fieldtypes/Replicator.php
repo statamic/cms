@@ -174,7 +174,7 @@ class Replicator extends Fieldtype
 
             $values = $this->fields($set['type'])->addValues($set)->{$augmentMethod}()->values();
 
-            return new Values($values->merge(['type' => $set['type']])->all());
+            return new Values($values->merge(['id' => $set['id'] ?? null, 'type' => $set['type']])->all());
         })->values()->all();
     }
 
