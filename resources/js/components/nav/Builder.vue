@@ -33,7 +33,7 @@
                         @click="save"
                         v-text="__('Save Changes')" />
 
-                    <dropdown-list v-if="hasSaveAsOptions" class="ml-0" :disabled="!changed">
+                    <dropdown-list v-if="hasSaveAsOptions" class="ml-0">
                         <template #trigger>
                             <button class="btn-primary rounded-l-none flex items-center" :class="{ 'disabled': !changed }">
                                 <svg-icon name="chevron-down-xs" class="w-2" />
@@ -752,13 +752,14 @@ export default {
         },
 
         save() {
+            if (! this.changed) {
+                return;
+            }
+
             this.saveAs(this.updateUrl);
         },
 
         saveAs(url) {
-            if (! this.changed) {
-                return;
-            }
 
             let tree = this.preparePreferencesSubmission();
 
