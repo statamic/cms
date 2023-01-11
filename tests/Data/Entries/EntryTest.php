@@ -22,6 +22,7 @@ use Statamic\Events\EntryCreated;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
+use Statamic\Facades\Stache;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
@@ -364,6 +365,59 @@ class EntryTest extends TestCase
         $this->assertEquals(null, $entry->value('two'));
         $this->assertEquals(null, $entry->value('three'));
         $this->assertEquals('four in entry', $entry->value('four'));
+    }
+
+    /** @test */
+    public function it_updates_the_origin_of_descendants_when_saving_an_entry_with_localizations()
+    {
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('articles')
+            ->propagate(false)
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entryEn = (new Entry)
+            ->id('en')
+            ->locale('en')
+            ->collection($collection)
+            ->data(['description' => 'Description from en']);
+        $entryEn->save();
+
+        $entryFr = $entryEn->makeLocalization('fr');
+        $entryEn->addLocalization($entryFr); // todo: necessary to call this because $entryEn::$localizations is already cached and does not get/recognize new localizations. should be called in Entry::makeLocalization() ?
+        $entryFr->save();
+
+        $entryDe = $entryFr->makeLocalization('de');
+        $entryFr->addLocalization($entryDe);
+        $entryDe->save();
+
+        $this->assertEquals('Description from en', $entryEn->values()->get('description'));
+        $this->assertEquals('Description from en', $entryFr->value('description'));
+        $this->assertEquals('Description from en', $entryDe->value('description'));
+
+        $entryEn->data(['description' => 'Description from en modified'])->save();
+
+        // todo: how to get fresh entry objects from stache so that the origin entries are reloaded from cache as well. warming stache does not work...
+        $this->markTestIncomplete('Incomplete: Reload objects from cache/stache to simulate a new request.');
+
+//        Facades\Stache::warm();
+
+//        $entryEn = Facades\Entry::find($entryEn->id());
+//        $entryFr = Facades\Entry::find($entryFr->id());
+//        $entryDe = Facades\Entry::find($entryDe->id());
+
+//        $this->assertEquals('Description from en modified', $entryEn->values()->get('description'));
+//        $this->assertEquals('Description from en modified', $entryFr->value('description'));
+//        $this->assertEquals('Description from en modified', $entryDe->value('description'));
     }
 
     /** @test */

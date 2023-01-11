@@ -341,7 +341,25 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                 });
         }
 
+        $this->updateCacheOfLocalizedDescendants($this);
+
         return true;
+    }
+
+    private function updateCacheOfLocalizedDescendants(Entry $parent)
+    {
+        if ($parent->descendants()->count() === 0) {
+            return;
+        }
+
+        $directDescendants = $parent->descendants()->filter(function ($descendant) use ($parent) {
+            return $descendant->origin()->id() === $parent->id();
+        });
+        $directDescendants->each(function ($descendant) use ($parent) {
+            $descendant->origin($parent);
+            Facades\Entry::save($descendant);
+            $this->updateCacheOfLocalizedDescendants($descendant);
+        });
     }
 
     public function taxonomize()
