@@ -26,6 +26,11 @@ class StatusQueryBuilder implements Builder
         return $this->builder->get($columns);
     }
 
+    public function first()
+    {
+        return $this->get()->first();
+    }
+
     public function __call($method, $parameters)
     {
         $result = $this->forwardCallTo($this->builder, $method, $parameters);
