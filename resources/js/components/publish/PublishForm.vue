@@ -42,7 +42,7 @@ export default {
         action: String,
         method: { type: String, default: 'post' },
         canToggleLabels: { type: Boolean, default: true },
-        readOnly: { type: Boolean, default: false },
+        readOnly: { type: Boolean, default: false }
     },
 
     data() {
