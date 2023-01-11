@@ -10,7 +10,8 @@ class CorePreferences
     {
         Preference::register('locale', [
             'type' => 'select',
-            'instructions' => 'The preferred language for the control panel.',
+            'display' => __('Locale'),
+            'instructions' => __('statamic::messages.preference_locale_instructions'),
             'clearable' => true,
             'options' => [
                 'da' => 'Danish',
@@ -39,12 +40,14 @@ class CorePreferences
 
         Preference::register('start_page', [
             'type' => 'text',
-            'instructions' => 'The page to be should be shown when logging into the control panel.',
+            'display' => __('Start Page'),
+            'instructions' => __('statamic::messages.preference_start_page_instructions'),
         ]);
 
         Preference::register('favorites', [
             'type' => 'grid',
-            'instructions' => 'Shortcuts that will be shown when opening the global search bar. You may alternatively visit the page and use the pin icon at the top to add it to this list.',
+            'display' => __('Favorites'),
+            'instructions' => __('statamic::messages.preference_favorites_instructions'),
             'fields' => [
                 [
                     'handle' => 'name',
@@ -58,7 +61,6 @@ class CorePreferences
                     'field' => [
                         'display' => 'URL',
                         'type' => 'text',
-                        'instructions' => 'Should be relative to the control panel.',
                     ],
                 ],
             ],
