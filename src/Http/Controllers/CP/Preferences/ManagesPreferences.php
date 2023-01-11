@@ -63,20 +63,23 @@ trait ManagesPreferences
         }
 
         $options->put('default', [
-            'label' => 'Save as Global Default Preferences',
+            'label' => __('Default'),
             'url' => cp_route('preferences.default.update'),
+            'icon' => 'earth',
         ]);
 
         Role::all()->each(function ($role) use (&$options) {
             $options->put($role->handle(), [
-                'label' => 'Save as '.$role->title().' Role Preferences',
+                'label' => $role->title(),
                 'url' => cp_route('preferences.role.update', $role->handle()),
+                'icon' => 'shield-key',
             ]);
         });
 
         $options->put('user', [
-            'label' => 'Save as My Preferences',
+            'label' => __('My Preferences'),
             'url' => cp_route('preferences.user.update'),
+            'icon' => 'user',
         ]);
 
         $options->forget($this->ignoreSaveAsOption());
