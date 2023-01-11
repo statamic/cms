@@ -14,16 +14,20 @@ export default {
                 return;
             }
 
+            let urlHost = new URL(url).host;
+
             let isSameOrigin = url.startsWith('/') || new URL(url).host === window.location.host;
 
-            let scroll = isSameOrigin ? [
+            let preserveScroll = isSameOrigin && urlHost === this.previousHost;
+
+            let scroll = preserveScroll ? [
                 container.firstChild.contentWindow.scrollX ?? 0,
                 container.firstChild.contentWindow.scrollY ?? 0
             ] : null;
 
             container.replaceChild(iframe, container.firstChild);
 
-            if (isSameOrigin) {
+            if (preserveScroll) {
                 let iframeContentWindow = iframe.contentWindow;
                 const iframeScrollUpdate = (event) => {
                     iframeContentWindow.scrollTo(...scroll);
@@ -32,6 +36,8 @@ export default {
                 iframeContentWindow.addEventListener('DOMContentLoaded', iframeScrollUpdate, true);
                 iframeContentWindow.addEventListener('load', iframeScrollUpdate, true);
             }
+
+            this.previousHost = new URL(url).host;
         },
 
         setIframeAttributes(iframe) {
