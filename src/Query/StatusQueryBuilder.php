@@ -57,9 +57,16 @@ class StatusQueryBuilder implements Builder
 
         while (is_null($wheres)) {
             if ($reflector->hasProperty('wheres')) {
-                $wheres = $reflector->getProperty('wheres')->getValue($builder);
+                $wheresProperty = $reflector->getProperty('wheres');
+                $wheresProperty->setAccessible(true);
+
+                $wheres = $wheresProperty->getValue($builder);
             } elseif ($reflector->hasProperty('builder')) {
-                $builder = $reflector->getProperty('builder')->getValue($builder);
+                $builderProperty = $reflector->getProperty('builder');
+                $builderProperty->setAccessible(true);
+
+                $builder = $builderProperty->getValue($builder);
+
                 $reflector = new ReflectionClass($builder);
             } else {
                 return false;
