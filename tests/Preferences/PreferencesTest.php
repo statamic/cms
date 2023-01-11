@@ -2,6 +2,7 @@
 
 namespace Tests\Preferences;
 
+use Facades\Statamic\Preferences\CorePreferences;
 use Statamic\Facades\File;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
@@ -19,6 +20,43 @@ class PreferencesTest extends TestCase
 
         File::delete(resource_path('preferences.yaml'));
         Role::all()->each->delete();
+    }
+
+    /** @test */
+    public function it_defers_registration_until_boot_using_extend_method()
+    {
+        $callbackRan = false;
+
+        Preference::extend(function ($preference) use (&$callbackRan) {
+            $this->assertEquals(Preference::getFacadeRoot(), $preference);
+            $callbackRan = true;
+        });
+
+        $this->assertFalse($callbackRan);
+
+        Preference::boot();
+
+        $this->assertTrue($callbackRan);
+    }
+
+    /** @test */
+    public function it_places_any_preferences_registered_early_without_extend_callback_at_the_end()
+    {
+        // Avoid adding core preferences to make test simpler.
+        CorePreferences::shouldReceive('boot')->andReturnNull();
+
+        Preference::register('one');
+        Preference::register('two');
+
+        Preference::extend(function ($preference) {
+            $preference->register('three');
+        });
+
+        Preference::boot();
+
+        $fields = collect(Preference::sections()->get('general')['fields'])->keys()->all();
+
+        $this->assertEquals(['three', 'one', 'two'], $fields);
     }
 
     /** @test */

@@ -2,6 +2,8 @@
 
 namespace Statamic\Preferences;
 
+use Closure;
+use Facades\Statamic\Preferences\CorePreferences;
 use Illuminate\Support\Arr;
 use Statamic\Facades\User;
 
@@ -12,6 +14,7 @@ class Preferences
     protected $fields = [];
     protected $sections = [];
     protected $pendingSection = null;
+    protected $extensions = [];
 
     /**
      * Get default preferences instance.
@@ -151,6 +154,25 @@ class Preferences
         }
 
         return $preferences;
+    }
+
+    public function extend(Closure $callback)
+    {
+        $this->extensions[] = $callback;
+    }
+
+    public function boot()
+    {
+        $early = $this->fields;
+        $this->fields = [];
+
+        CorePreferences::boot();
+
+        foreach ($this->extensions as $callback) {
+            $callback($this);
+        }
+
+        $this->fields = array_merge($this->fields, $early);
     }
 
     public function register($handle, $field = [])
