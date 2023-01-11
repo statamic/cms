@@ -2,6 +2,7 @@
 
 namespace Tests\Permissions;
 
+use Facades\Statamic\Auth\CorePermissions;
 use Illuminate\Support\Collection;
 use Statamic\Auth\Permissions;
 use Tests\TestCase;
@@ -97,6 +98,45 @@ class PermissionsTest extends TestCase
         $this->assertEquals('foo', $two->group());
         $this->assertEquals('bar', $three->group());
         $this->assertEquals('foo', $four->group());
+    }
+
+    /** @test */
+    public function it_defers_registration_until_boot_using_extend_method()
+    {
+        $permissions = new Permissions;
+        $callbackRan = false;
+
+        $permissions->extend(function ($arg) use ($permissions, &$callbackRan) {
+            $this->assertEquals($permissions, $arg);
+            $callbackRan = true;
+        });
+
+        $this->assertFalse($callbackRan);
+
+        $permissions->boot();
+
+        $this->assertTrue($callbackRan);
+    }
+
+    /** @test */
+    public function it_places_any_permissions_registered_early_without_extend_callback_at_the_end()
+    {
+        // Avoid adding core permissions to make test simpler.
+        CorePermissions::shouldReceive('boot')->andReturnNull();
+
+        $permissions = new Permissions;
+        $permissions->register('one');
+        $permissions->register('two');
+
+        $permissions->extend(function ($preference) {
+            $preference->register('three');
+        });
+
+        $permissions->boot();
+
+        $names = $permissions->all()->keys()->all();
+
+        $this->assertEquals(['three', 'one', 'two'], $names);
     }
 
     /** @test */

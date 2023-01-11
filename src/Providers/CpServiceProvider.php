@@ -83,6 +83,7 @@ class CpServiceProvider extends ServiceProvider
         $router->middlewareGroup('statamic.cp.authenticated', [
             \Statamic\Http\Middleware\CP\Authorize::class,
             \Statamic\Http\Middleware\CP\Localize::class,
+            \Statamic\Http\Middleware\CP\BootPermissions::class,
             \Statamic\Http\Middleware\CP\BootPreferences::class,
             \Statamic\Http\Middleware\CP\CountUsers::class,
             \Statamic\Http\Middleware\DeleteTemporaryFileUploads::class,
