@@ -47,7 +47,7 @@
                     :placeholder="`${__('Add an item')}...`"
                     @keydown.enter.prevent="addItem"
                     @blur="newItemInputBlurred"
-                    @paste="pasteItem"
+                    @paste="newItemInputPaste"
                     @focus="editItem(data.length)"
                     @keyup.up="previousItem"
                 />
@@ -132,7 +132,7 @@ export default {
             });
         },
 
-        pasteItem(event) {
+        newItemInputPaste(event) {
             if (this.newItem !== '') {
                 return;
             }
