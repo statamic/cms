@@ -37,7 +37,7 @@ export default {
                 iframeContentWindow.addEventListener('load', iframeScrollUpdate, true);
             }
 
-            this.previousHost = new URL(url).host;
+            this.previousHost = urlHost;
         },
 
         setIframeAttributes(iframe) {
