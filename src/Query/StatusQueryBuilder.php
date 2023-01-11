@@ -11,6 +11,7 @@ class StatusQueryBuilder implements Builder
     use ForwardsCalls;
 
     protected $builder;
+    protected $anyStatus = false;
 
     public function __construct(Builder $builder)
     {
@@ -19,7 +20,7 @@ class StatusQueryBuilder implements Builder
 
     public function get($columns = ['*'])
     {
-        if (! $this->queriesStatus()) {
+        if (! $this->anyStatus && ! $this->queriesStatus()) {
             $this->builder->where('status', 'published');
         }
 
@@ -40,6 +41,11 @@ class StatusQueryBuilder implements Builder
         }
 
         return $result;
+    }
+
+    public function whereAnyStatus()
+    {
+        $this->anyStatus = true;
     }
 
     private function queriesStatus(): bool
