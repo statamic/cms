@@ -4,13 +4,13 @@ namespace Tests\Data\Taxonomies;
 
 use Carbon\Carbon;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Contracts\Query\Builder as BuilderContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Fields\Value;
-use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Taxonomies\AugmentedTerm;
 use Tests\Data\AugmentedTestCase;
 
@@ -58,7 +58,7 @@ class AugmentedTermTest extends AugmentedTestCase
             'is_term'       => ['type' => 'bool', 'value' => true],
             'taxonomy'      => ['type' => TaxonomyContract::class, 'value' => $taxonomy],
             'entries_count' => ['type' => 'int', 'value' => 0],
-            'entries'       => ['type' => EntryQueryBuilder::class],
+            'entries'       => ['type' => BuilderContract::class],
             'one'           => ['type' => 'string', 'value' => 'the "one" value on the term'],
             'two'           => ['type' => 'string', 'value' => 'the "two" value on the term and in the blueprint'],
             'three'         => ['type' => 'string', 'value' => 'the "three" value from the taxonomy'],
