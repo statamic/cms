@@ -16,7 +16,7 @@
             <div class="editor-meta">
                 <div class="asset-editor-meta-items">
                     <div class="meta-item">
-                        <span class="meta-label">{{ __('Filename') }}</span>
+                        <span class="meta-label">{{ __('Path') }}</span>
                         <span class="meta-value">{{ asset.path }}</span>
                     </div>
                     <div class="meta-item" v-if="isImage">

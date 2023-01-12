@@ -34,7 +34,7 @@ class Bard extends Replicator
                 'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
                 'type' => 'select',
                 'cast_booleans' => true,
-                'width' => 33,
+                'width' => 50,
                 'options' => [
                     'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
                     'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
@@ -66,6 +66,13 @@ class Bard extends Replicator
                 'instructions' => __('statamic::fieldtypes.bard.config.previews'),
                 'type' => 'toggle',
                 'default' => true,
+                'width' => 50,
+            ],
+            'smart_typography' => [
+                'display' => __('Smart Typography'),
+                'instructions' => __('statamic::fieldtypes.bard.config.smart_typography'),
+                'type' => 'toggle',
+                'default' => false,
                 'width' => 50,
             ],
             'sets' => [
@@ -145,18 +152,18 @@ class Bard extends Replicator
                 'width' => 50,
                 'instructions' => __('statamic::fieldtypes.bard.config.target_blank'),
             ],
-            'link_collections' => [
-                'display' => __('Link Collections'),
-                'instructions' => __('statamic::fieldtypes.bard.config.link_collections'),
-                'type' => 'collections',
-                'mode' => 'select',
-            ],
             'reading_time' => [
                 'display' => __('Show Reading Time'),
                 'instructions' => __('statamic::fieldtypes.bard.config.reading_time'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
+            ],
+            'link_collections' => [
+                'display' => __('Link Collections'),
+                'instructions' => __('statamic::fieldtypes.bard.config.link_collections'),
+                'type' => 'collections',
+                'mode' => 'select',
             ],
             'fullscreen' => [
                 'display' => __('Allow Fullscreen Mode'),

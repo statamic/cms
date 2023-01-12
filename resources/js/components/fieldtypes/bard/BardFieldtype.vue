@@ -102,6 +102,7 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import Text from '@tiptap/extension-text';
 import TextAlign from '@tiptap/extension-text-align';
+import Typography from '@tiptap/extension-typography';
 import Underline from '@tiptap/extension-underline';
 import BardSource from './Source.vue';
 import { DocumentBlock, DocumentInline } from './Document';
@@ -579,6 +580,10 @@ export default {
                 Set.configure({ bard: this }),
                 Text
             ];
+
+            if (this.config.smart_typography) {
+                exts.push(Typography);
+            }
 
             let btns = this.buttons.map(button => button.name);
 

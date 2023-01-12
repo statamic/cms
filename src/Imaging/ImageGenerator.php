@@ -278,14 +278,14 @@ class ImageGenerator
      */
     private function applyDefaultManipulations()
     {
-        $defaults = [];
+        $defaults = Glide::normalizeParameters(
+            Config::get('statamic.assets.image_manipulation.defaults') ?: []
+        );
 
         // Enable automatic cropping
         if (Config::get('statamic.assets.auto_crop') && $this->asset) {
             $defaults['fit'] = 'crop-'.$this->asset->get('focus', '50-50');
         }
-
-        // TODO: Allow user defined defaults and merge them in here.
 
         $this->server->setDefaults($defaults);
     }
