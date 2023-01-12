@@ -10,6 +10,7 @@ use Statamic\Facades\Stache;
 use Statamic\Stache\Exceptions\DuplicateKeyException;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 
 abstract class Store
@@ -283,7 +284,7 @@ abstract class Store
     {
         $this->handleFileChanges();
 
-        if ($this->paths) {
+        if ($this->paths && ! Statamic::isWorker()) {
             return $this->paths;
         }
 

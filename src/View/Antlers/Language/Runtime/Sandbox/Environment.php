@@ -798,10 +798,7 @@ class Environment
                 $i += 1;
                 continue;
             } elseif ($currentNode instanceof LogicGroup) {
-                $restore = $this->isEvaluatingTruthValue;
-                $this->isEvaluatingTruthValue = false;
-                $stack[] = $this->adjustValue($this->getValue($currentNode), $currentNode);
-                $this->isEvaluatingTruthValue = $restore;
+                $stack[] = $currentNode;
                 continue;
             } elseif ($currentNode instanceof NullCoalescenceGroup) {
                 $stack[] = $this->adjustValue($this->evaluateNullCoalescence($currentNode), $currentNode);
@@ -929,13 +926,12 @@ class Environment
         if (count($stack) == 3) {
             $left = $stack[0];
             $rightNode = $stack[2];
-            $right = $this->getValue($rightNode);
             $operand = $stack[1];
 
             if ($operand instanceof LeftAssignmentOperator) {
                 $varName = $this->nameOf($left);
 
-                $right = $this->checkForFieldValue($right);
+                $right = $this->checkForFieldValue($this->getValue($rightNode));
 
                 $this->dataRetriever->setRuntimeValue($varName, $this->data, $right);
                 $lastPath = $this->dataRetriever->lastPath();
@@ -949,7 +945,7 @@ class Environment
             } elseif ($operand instanceof AdditionAssignmentOperator) {
                 $varName = $this->nameOf($left);
                 $curVal = $this->checkForFieldValue($this->scopeValue($varName));
-                $right = $this->checkForFieldValue($right);
+                $right = $this->checkForFieldValue($this->getValue($rightNode));
 
                 if (is_string($curVal) && is_string($right)) {
                     // Allows for addition assignment to act
@@ -982,7 +978,7 @@ class Environment
             } elseif ($operand instanceof DivisionAssignmentOperator) {
                 $varName = $this->nameOf($left);
                 $curVal = $this->checkForFieldValue($this->numericScopeValue($varName));
-                $right = $this->checkForFieldValue($right);
+                $right = $this->checkForFieldValue($this->getValue($rightNode));
 
                 $this->assertNumericValue($curVal);
                 $this->assertNumericValue($right);
@@ -1001,7 +997,7 @@ class Environment
             } elseif ($operand instanceof ModulusAssignmentOperator) {
                 $varName = $this->nameOf($left);
                 $curVal = $this->checkForFieldValue($this->numericScopeValue($varName));
-                $right = $this->checkForFieldValue($right);
+                $right = $this->checkForFieldValue($this->getValue($rightNode));
 
                 $this->assertNumericValue($curVal);
                 $this->assertNumericValue($right);
@@ -1019,7 +1015,7 @@ class Environment
             } elseif ($operand instanceof MultiplicationAssignmentOperator) {
                 $varName = $this->nameOf($left);
                 $curVal = $this->checkForFieldValue($this->numericScopeValue($varName));
-                $right = $this->checkForFieldValue($right);
+                $right = $this->checkForFieldValue($this->getValue($rightNode));
 
                 $this->assertNumericValue($curVal);
                 $this->assertNumericValue($right);
@@ -1037,7 +1033,7 @@ class Environment
             } elseif ($operand instanceof SubtractionAssignmentOperator) {
                 $varName = $this->nameOf($left);
                 $curVal = $this->checkForFieldValue($this->numericScopeValue($varName));
-                $right = $this->checkForFieldValue($right);
+                $right = $this->checkForFieldValue($this->getValue($rightNode));
 
                 $this->assertNumericValue($curVal);
                 $this->assertNumericValue($right);
@@ -1060,7 +1056,7 @@ class Environment
                 }
 
                 if ($leftValue != false) {
-                    return $this->getValue($right);
+                    return $this->getValue($rightNode);
                 } else {
                     return null;
                 }
@@ -1171,12 +1167,12 @@ class Environment
      */
     private function scopeValue($name, $originalNode = null)
     {
+        if (! empty(GlobalRuntimeState::$prefixState)) {
+            $this->dataRetriever->setHandlePrefixes(array_reverse(GlobalRuntimeState::$prefixState));
+        }
+
         if ($name instanceof VariableReference) {
             if (! $this->isEvaluatingTruthValue) {
-                if (! empty(GlobalRuntimeState::$prefixState)) {
-                    $this->dataRetriever->setHandlePrefixes(array_reverse(GlobalRuntimeState::$prefixState));
-                }
-
                 $this->dataRetriever->setReduceFinal(false);
             }
 
@@ -1277,7 +1273,7 @@ class Environment
     {
         if ($originalNode instanceof AbstractNode && $originalNode->modifierChain != null) {
             if (! empty($originalNode->modifierChain->modifierChain)) {
-                $value = $this->checkForFieldValue($value, true);
+                $value = $this->checkForFieldValue($value, true, $originalNode->modifierChain->modifierChain);
 
                 return $this->applyModifiers($value, $originalNode->modifierChain);
             }
@@ -1292,17 +1288,19 @@ class Environment
         return $this->checkForFieldValue($value);
     }
 
-    private function checkForFieldValue($value, $hasModifiers = false)
+    private function checkForFieldValue($value, $hasModifiers = false, $modifierChain = null)
     {
         if ($value instanceof Value) {
             GlobalRuntimeState::$isEvaluatingUserData = true;
             if ($value->shouldParseAntlers()) {
-                GlobalRuntimeState::$userContentEvalState = [
-                    $value,
-                    $this->nodeProcessor->getActiveNode(),
-                ];
-                $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
-                GlobalRuntimeState::$userContentEvalState = null;
+                if (! $hasModifiers || ($modifierChain != null && $modifierChain[0]->nameNode->name != 'raw')) {
+                    GlobalRuntimeState::$userContentEvalState = [
+                        $value,
+                        $this->nodeProcessor->getActiveNode(),
+                    ];
+                    $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
+                    GlobalRuntimeState::$userContentEvalState = null;
+                }
             } else {
                 if (! $hasModifiers) {
                     $value = $value->value();
@@ -1536,7 +1534,7 @@ class Environment
 
                 $returnVal = $stringValue;
             } else {
-                $returnVal = $this->applyEscapeSequences($val->value);
+                $returnVal = DocumentParser::applyEscapeSequences($val->value);
             }
         } elseif ($val instanceof NullCoalescenceGroup) {
             $returnVal = $this->evaluateNullCoalescence($val);
@@ -1544,10 +1542,10 @@ class Environment
             $returnVal = $this->evaluateTernaryGroup($val);
         } elseif ($val instanceof ModifierValueNode) {
             if (is_string($val->value) && in_array(trim($val->value), GlobalRuntimeState::$interpolatedVariables)) {
-                return $this->applyEscapeSequences($this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value)));
+                return DocumentParser::applyEscapeSequences($this->nodeProcessor->evaluateDeferredInterpolation(trim($val->value)));
             }
 
-            $returnVal = $this->applyEscapeSequences($val->value);
+            $returnVal = DocumentParser::applyEscapeSequences($val->value);
         } elseif ($val instanceof ArrayNode) {
             $returnVal = $this->resolveArrayValue($val);
         }
@@ -1581,13 +1579,5 @@ class Environment
         }
 
         return $this->adjustValue($returnVal, $val);
-    }
-
-    private function applyEscapeSequences($string)
-    {
-        $string = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $string);
-        $string = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $string);
-
-        return $string;
     }
 }

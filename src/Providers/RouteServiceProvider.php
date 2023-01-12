@@ -45,7 +45,11 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindCollections()
     {
-        Route::bind('collection', function ($handle) {
+        Route::bind('collection', function ($handle, $route = null) {
+            if (! $this->isCpOrApiRoute($route)) {
+                return $handle;
+            }
+
             throw_unless(
                 $collection = Collection::findByHandle($handle),
                 new NotFoundHttpException("Collection [$handle] not found.")
@@ -57,8 +61,8 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindEntries()
     {
-        Route::bind('entry', function ($handle, $route) {
-            if ($this->isApiRoute($route)) {
+        Route::bind('entry', function ($handle, $route = null) {
+            if ($this->isApiRoute($route) || ! $this->isCpRoute($route)) {
                 return $handle;
             }
 
@@ -73,7 +77,11 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindTaxonomies()
     {
-        Route::bind('taxonomy', function ($handle) {
+        Route::bind('taxonomy', function ($handle, $route = null) {
+            if (! $this->isCpOrApiRoute($route)) {
+                return $handle;
+            }
+
             throw_unless(
                 $taxonomy = Taxonomy::findByHandle($handle),
                 new NotFoundHttpException("Taxonomy [$handle] not found.")
@@ -85,8 +93,8 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindTerms()
     {
-        Route::bind('term', function ($handle, $route) {
-            if ($this->isApiRoute($route)) {
+        Route::bind('term', function ($handle, $route = null) {
+            if ($this->isApiRoute($route) || ! $this->isCpRoute($route)) {
                 return $handle;
             }
 
@@ -104,7 +112,11 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindAssetContainers()
     {
-        Route::bind('asset_container', function ($handle) {
+        Route::bind('asset_container', function ($handle, $route = null) {
+            if (! $this->isCpOrApiRoute($route)) {
+                return $handle;
+            }
+
             throw_unless(
                 $container = AssetContainer::findByHandle($handle),
                 new NotFoundHttpException("Asset container [$handle] not found.")
@@ -116,7 +128,11 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindAssets()
     {
-        Route::bind('asset', function ($handle, $route) {
+        Route::bind('asset', function ($handle, $route = null) {
+            if (! $this->isCpOrApiRoute($route)) {
+                return $handle;
+            }
+
             $id = $route->parameter('asset_container')->handle().'::'.$handle;
 
             throw_unless(
@@ -130,7 +146,11 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindGlobalSets()
     {
-        Route::bind('global', function ($handle) {
+        Route::bind('global', function ($handle, $route = null) {
+            if (! $this->isCpOrApiRoute($route)) {
+                return $handle;
+            }
+
             $site = Site::default()->handle();
 
             throw_unless(
@@ -144,7 +164,11 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindSites()
     {
-        Route::bind('site', function ($handle) {
+        Route::bind('site', function ($handle, $route = null) {
+            if (! $this->isCpOrApiRoute($route)) {
+                return $handle;
+            }
+
             throw_unless(
                 $site = Site::get($handle),
                 new NotFoundHttpException("Site [$handle] not found.")
@@ -156,7 +180,11 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindRevisions()
     {
-        Route::bind('revision', function ($reference, $route) {
+        Route::bind('revision', function ($reference, $route = null) {
+            if (! $this->isCpOrApiRoute($route)) {
+                return $reference;
+            }
+
             if ($route->hasParameter('entry')) {
                 $content = $route->parameter('entry');
             } elseif ($route->hasParameter('term')) {
@@ -176,7 +204,12 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindForms()
     {
-        Route::bind('form', function ($handle) {
+        Route::bind('form', function ($handle, $route = null) {
+            if (! $this->isCpOrApiRoute($route)
+                && ! Str::startsWith($route->uri(), config('statamic.routes.action').'/forms/')) {
+                return $handle;
+            }
+
             throw_unless(
                 $form = Form::find($handle),
                 new NotFoundHttpException("Form [$handle] not found.")
@@ -186,8 +219,42 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
-    private function isApiRoute(\Illuminate\Routing\Route $route)
+    private function isApiRoute(\Illuminate\Routing\Route $route = null)
     {
-        return Str::startsWith($route->uri(), config('statamic.api.route').'/');
+        if (is_null($route)) {
+            return false;
+        }
+
+        $api = Str::ensureRight(config('statamic.api.route'), '/');
+
+        if ($api === '/') {
+            return true;
+        }
+
+        return Str::startsWith($route->uri(), $api);
+    }
+
+    private function isCpRoute(\Illuminate\Routing\Route $route = null)
+    {
+        if (is_null($route)) {
+            return false;
+        }
+
+        $cp = Str::ensureRight(config('statamic.cp.route'), '/');
+
+        if ($cp === '/') {
+            return true;
+        }
+
+        return Str::startsWith($route->uri(), $cp);
+    }
+
+    private function isCpOrApiRoute(\Illuminate\Routing\Route $route = null)
+    {
+        if (is_null($route)) {
+            return false;
+        }
+
+        return $this->isCpRoute($route) || $this->isApiRoute($route);
     }
 }

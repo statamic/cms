@@ -3,6 +3,7 @@
 namespace Statamic\Auth\Protect;
 
 use Illuminate\Support\ViewErrorBag;
+use Statamic\Support\Html;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
@@ -14,23 +15,39 @@ class Tags extends BaseTags
 
     public function passwordForm()
     {
-        if (! $token = request('token')) {
-            return $this->parse([
+        if (! $token = Html::entities(request('token'))) {
+            $data = [
                 'errors' => [],
                 'no_token' => true,
-            ]);
+            ];
+
+            return $this->parser ? $this->parse($data) : $data;
         }
-
-        $html = $this->formOpen(route('statamic.protect.password.store'));
-
-        $html .= '<input type="hidden" name="token" value="'.$token.'" />';
 
         $errors = session('errors', new ViewErrorBag)->passwordProtect;
 
-        $html .= $this->parse([
+        $data = [
             'errors' => $errors->toArray(),
             'error' => $errors->first(),
-        ]);
+        ];
+
+        $action = route('statamic.protect.password.store');
+        $method = 'POST';
+
+        if (! $this->parser) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method),
+                'params' => array_merge($this->formMetaPrefix($this->formParams($method)), [
+                    'token' => $token,
+                ]),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method);
+
+        $html .= '<input type="hidden" name="token" value="'.$token.'" />';
+
+        $html .= $this->parse($data);
 
         $html .= $this->formClose();
 

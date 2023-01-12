@@ -330,22 +330,37 @@ class NavTest extends TestCase
     {
         $hello = Nav::create('hello')->url('http://localhost/cp/hello');
         $hell = Nav::create('hell')->url('http://localhost/cp/hell');
+        $localNotCp = Nav::create('hell')->url('/dashboard');
+        $external = Nav::create('hell')->url('http://external.com');
+        $externalSecure = Nav::create('hell')->url('https://external.com');
 
         Request::swap(Request::create('http://localhost/cp/hell'));
         $this->assertFalse($hello->isActive());
         $this->assertTrue($hell->isActive());
+        $this->assertFalse($localNotCp->isActive());
+        $this->assertFalse($external->isActive());
+        $this->assertFalse($externalSecure->isActive());
 
         Request::swap(Request::create('http://localhost/cp/hello'));
         $this->assertTrue($hello->isActive());
         $this->assertFalse($hell->isActive());
+        $this->assertFalse($localNotCp->isActive());
+        $this->assertFalse($external->isActive());
+        $this->assertFalse($externalSecure->isActive());
 
         Request::swap(Request::create('http://localhost/cp/hell/test'));
         $this->assertFalse($hello->isActive());
         $this->assertTrue($hell->isActive());
+        $this->assertFalse($localNotCp->isActive());
+        $this->assertFalse($external->isActive());
+        $this->assertFalse($externalSecure->isActive());
 
         Request::swap(Request::create('http://localhost/cp/hello/test'));
         $this->assertTrue($hello->isActive());
         $this->assertFalse($hell->isActive());
+        $this->assertFalse($localNotCp->isActive());
+        $this->assertFalse($external->isActive());
+        $this->assertFalse($externalSecure->isActive());
     }
 
     /** @test */

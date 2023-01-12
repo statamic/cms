@@ -4,6 +4,7 @@ namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Facades\Fieldset;
+use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 
 class FieldTransformer
@@ -31,8 +32,12 @@ class FieldTransformer
             unset($field['width']);
         }
 
-        if (Arr::get($field, 'localizable', false) === false) {
+        if (Arr::get($field, 'localizable', false) === false && ! Site::hasMultiple()) {
             unset($field['localizable']);
+        }
+
+        if (Arr::get($field, 'duplicate', true) === true) {
+            unset($field['duplicate']);
         }
 
         return array_filter([
@@ -92,6 +97,7 @@ class FieldTransformer
         $config['width'] = $config['width'] ?? 100;
         $config['localizable'] = $config['localizable'] ?? false;
         $config = static::normalizeRequiredValidation($config);
+        $config = static::normalizeVisibility($config);
 
         return [
             'handle' => $field['handle'],
@@ -155,6 +161,19 @@ class FieldTransformer
 
         Arr::forget($config, 'required');
         Arr::set($config, 'validate', $validate->all());
+
+        return $config;
+    }
+
+    protected static function normalizeVisibility($config)
+    {
+        $visibility = Arr::get($config, 'visibility');
+
+        $legacyReadOnly = Arr::pull($config, 'read_only');
+
+        if ($legacyReadOnly && ! $visibility) {
+            $config['visibility'] = 'read_only';
+        }
 
         return $config;
     }

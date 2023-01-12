@@ -8,9 +8,11 @@ use Facades\Statamic\Stache\Repositories\CollectionTreeRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Mockery;
+use ReflectionClass;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Entries\AugmentedEntry;
@@ -112,6 +114,30 @@ class EntryTest extends TestCase
             return $entry->get('title');
         });
         $this->assertEquals('foo-bar', $entry->slug());
+    }
+
+    /** @test */
+    public function if_the_slug_is_a_function_it_will_only_resolve_it_once()
+    {
+        $count = 0;
+        $slugWithinClosure = 'not yet set';
+        $entry = new Entry;
+        $entry->slug(function ($entry) use (&$count, &$slugWithinClosure) {
+            $count++;
+
+            // Call slug in here again to attempt infinite recursion. This could
+            // happen if something in the closure logic indirectly calls slug again.
+            $slugWithinClosure = $entry->slug();
+
+            return 'the-slug';
+        });
+
+        $this->assertEquals('the-slug', $entry->slug());
+        $this->assertNull($slugWithinClosure);
+        $this->assertEquals(1, $count);
+
+        // Ensure that the temporary null slug is reset back the actual one for subsequent calls.
+        $this->assertEquals('the-slug', $entry->slug());
     }
 
     /** @test */
@@ -341,6 +367,118 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_custom_computed_data()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry) {
+            return $entry->get('title').' AND MORE!';
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+        $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks']);
+
+        $expectedData = [
+            'title' => 'Pop Rocks',
+        ];
+
+        $expectedComputedData = [
+            'description' => 'Pop Rocks AND MORE!',
+        ];
+
+        $expectedValues = array_merge($expectedData, $expectedComputedData);
+
+        $this->assertArraySubset($expectedData, $entry->data()->all());
+        $this->assertEquals($expectedComputedData, $entry->computedData()->all());
+        $this->assertEquals($expectedValues, $entry->values()->all());
+        $this->assertEquals($expectedValues['title'], $entry->value('title'));
+        $this->assertEquals($expectedValues['description'], $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_gets_empty_computed_data_by_default()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks']);
+
+        $this->assertEquals([], $entry->computedData()->all());
+    }
+
+    /** @test */
+    public function it_doesnt_recursively_get_computed_data_when_callback_uses_value_methods()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry) {
+            return $entry->value('title').' '.$entry->values()->get('suffix');
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+        $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks', 'suffix' => 'AND MORE!']);
+
+        $this->assertEquals('Pop Rocks AND MORE!', $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_can_use_actual_data_to_compose_computed_data()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry, $value) {
+            return $value ?? 'N/A';
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+
+        $entry = (new Entry)->collection($collection);
+
+        $this->assertEquals('N/A', $entry->value('description'));
+
+        $entry->data(['description' => 'Raddest article ever!']);
+
+        $this->assertEquals('Raddest article ever!', $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_can_use_origin_data_to_compose_computed_data()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry, $value) {
+            return $entry->value('description') ?? 'N/A';
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+
+        (new Entry)->collection($collection)->id('origin')->data([
+            'description' => 'Dill Pickles',
+        ])->save();
+
+        $entry = (new Entry)->collection($collection)->origin('origin');
+
+        $this->assertEquals('Dill Pickles', $entry->values()->get('description'));
+        $this->assertEquals('Dill Pickles', $entry->value('description'));
+
+        $entry->data(['description' => 'Raddest article ever!']);
+
+        $this->assertEquals('Raddest article ever!', $entry->values()->get('description'));
+        $this->assertEquals('Raddest article ever!', $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_properly_scopes_custom_computed_data_by_collection_handle()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry) {
+            return $entry->get('title').' AND MORE!';
+        });
+
+        Facades\Collection::computed('events', 'french_description', function ($entry) {
+            return $entry->get('title').' ET PLUS!';
+        });
+
+        $articleEntry = (new Entry)->collection(tap(Collection::make('articles'))->save())->data(['title' => 'Pop Rocks']);
+        $eventEntry = (new Entry)->collection(tap(Collection::make('events'))->save())->data(['title' => 'Jazz Concert']);
+
+        $this->assertEquals('Pop Rocks AND MORE!', $articleEntry->value('description'));
+
+        $this->assertNull($articleEntry->value('french_description'));
+        $this->assertNull($eventEntry->value('description'));
+        $this->assertEquals('Jazz Concert ET PLUS!', $eventEntry->value('french_description'));
+    }
+
+    /** @test */
     public function it_gets_the_url_from_the_collection()
     {
         config(['statamic.amp.enabled' => true]);
@@ -511,11 +649,16 @@ class EntryTest extends TestCase
         $entry = new Entry;
         $this->assertEquals([], $entry->supplements()->all());
 
-        $return = $entry->setSupplement('foo', 'bar');
+        $return = $entry->setSupplement('foo', 'bar')->setSupplement('baz', null);
 
         $this->assertEquals($entry, $return);
         $this->assertEquals('bar', $entry->getSupplement('foo'));
-        $this->assertEquals(['foo' => 'bar'], $entry->supplements()->all());
+        $this->assertNull($entry->getSupplement('bar'));
+        $this->assertNull($entry->getSupplement('baz'));
+        $this->assertTrue($entry->hasSupplement('foo'));
+        $this->assertFalse($entry->hasSupplement('bar'));
+        $this->assertTrue($entry->hasSupplement('baz'));
+        $this->assertEquals(['foo' => 'bar', 'baz' => null], $entry->supplements()->all());
     }
 
     /** @test */
@@ -904,6 +1047,19 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_can_set_a_blueprint_using_an_instance()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'first' => $first = (new Blueprint)->setHandle('first'),
+            'second' => $second = (new Blueprint)->setHandle('second'),
+        ]));
+        Collection::make('blog')->save();
+        $entry = (new Entry)->collection('blog')->blueprint($second);
+
+        $this->assertSame($second, $entry->blueprint());
+    }
+
+    /** @test */
     public function it_gets_the_blueprint_when_defined_in_a_value()
     {
         BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
@@ -1040,6 +1196,23 @@ class EntryTest extends TestCase
         Event::assertNotDispatched(EntrySaving::class);
         Event::assertNotDispatched(EntrySaved::class);
         Event::assertNotDispatched(EntryCreated::class);
+    }
+
+    /** @test */
+    public function when_saving_quietly_the_cached_entrys_withEvents_flag_will_be_set_back_to_true()
+    {
+        config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
+
+        $entry = EntryFactory::collection('blog')->id('1')->create();
+
+        $entry->saveQuietly();
+
+        $cached = Cache::get('stache::items::entries::blog::1');
+        $reflection = new ReflectionClass($cached);
+        $property = $reflection->getProperty('withEvents');
+        $property->setAccessible(true);
+        $withEvents = $property->getValue($cached);
+        $this->assertTrue($withEvents);
     }
 
     /** @test */

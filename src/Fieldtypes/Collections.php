@@ -29,7 +29,7 @@ class Collections extends Relationship
 
     public function getIndexItems($request)
     {
-        return Collection::all()->map(function ($collection) {
+        return Collection::all()->sortBy('title')->map(function ($collection) {
             return [
                 'id' => $collection->handle(),
                 'title' => $collection->title(),

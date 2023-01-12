@@ -8,14 +8,32 @@ trait HasOrigin
 
     public function values()
     {
+        $originFallbackValues = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues() : collect();
+
         $originValues = $this->hasOrigin() ? $this->origin()->values() : collect();
 
-        return $originValues->merge($this->data);
+        $computedData = method_exists($this, 'computedData') ? $this->computedData() : [];
+
+        return collect()
+            ->merge($originFallbackValues)
+            ->merge($originValues)
+            ->merge($this->data)
+            ->merge($computedData);
     }
 
     public function value($key)
     {
-        return $this->values()->get($key);
+        $originFallbackValue = method_exists($this, 'getOriginFallbackValue') ? $this->getOriginFallbackValue($key) : null;
+
+        $originValue = $this->hasOrigin() ? $this->origin()->value($key) : $originFallbackValue;
+
+        $value = $this->has($key) ? $this->get($key) : $originValue;
+
+        if (method_exists($this, 'hasComputedCallback') && $this->hasComputedCallback($key)) {
+            return $this->getComputed($key) ?? $value;
+        }
+
+        return $value;
     }
 
     public function origin($origin = null)

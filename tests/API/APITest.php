@@ -145,6 +145,34 @@ class APITest extends TestCase
     }
 
     /** @test */
+    public function it_filters_by_taxonomy_terms()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        $this->makeTaxonomy('tags')->save();
+        $this->makeTerm('tags', 'rad')->save();
+        $this->makeTerm('tags', 'meh')->save();
+        $this->makeTerm('tags', 'wow')->save();
+
+        $this->makeCollection('test')->taxonomies(['tags'])->save();
+
+        $this->makeEntry('test', '1')->data(['tags' => ['rad', 'wow']])->save();
+        $this->makeEntry('test', '2')->data(['tags' => ['rad']])->save();
+        $this->makeEntry('test', '3')->data(['tags' => ['meh']])->save();
+
+        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags]=rad', 2);
+        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags]=boring', 0);
+        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:in]=boring', 0);
+        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:in]=boring,rad', 2);
+        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:in]=wow,rad', 2);
+        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:in]=rad,meh', 3);
+        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:not_in]=boring', 3);
+        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:not_in]=rad', 1);
+        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:not_in]=boring,rad', 1);
+        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:not_in]=rad,meh,wow', 0);
+    }
+
+    /** @test */
     public function it_excludes_keys()
     {
         Facades\Config::set('statamic.api.resources.collections', true);
@@ -178,6 +206,24 @@ class APITest extends TestCase
             ->get('/api/collections/pages/entries/dance')
             ->assertJsonPath('data.api_url', null)
             ->assertJsonPath('data.edit_url', null);
+    }
+
+    /** @test */
+    public function next_prev_link_include_original_query_params()
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Config::set('statamic.api.cache', false);
+
+        Facades\Collection::make('pages')->save();
+
+        Facades\Entry::make()->collection('pages')->id('dance')->slug('dance')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('swing')->slug('swing')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('jazz')->slug('jazz')->published(true)->save();
+
+        $this
+            ->get('/api/collections/pages/entries?limit=2&sort=-date&filter[published]=true&unknown=param')
+            ->assertJsonPath('links.first', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&page=1')
+            ->assertJsonPath('links.next', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&page=2');
     }
 
     /** @test */
@@ -340,6 +386,26 @@ class APITest extends TestCase
             'invalid term id' => ['/api/taxonomies/tags/terms/missing', false],
             'valid term id but wrong collection' => ['/api/taxonomies/categories/terms/test', false],
         ];
+    }
+
+    private function makeCollection($handle)
+    {
+        return Facades\Collection::make($handle);
+    }
+
+    private function makeEntry($collection, $slug)
+    {
+        return Facades\Entry::make()->collection($collection)->id($slug)->slug($slug);
+    }
+
+    private function makeTaxonomy($handle)
+    {
+        return Facades\Taxonomy::make($handle);
+    }
+
+    private function makeTerm($taxonomy, $slug, $data = [])
+    {
+        return Facades\Term::make()->taxonomy($taxonomy)->inDefaultLocale()->slug($slug)->data($data);
     }
 
     private function assertEndpointDataCount($endpoint, $count)

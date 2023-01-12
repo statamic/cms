@@ -26,7 +26,7 @@ class Sites extends Relationship
     {
         return SiteFacade::all()->filter(function (Site $site) {
             return User::current()->can('view', $site);
-        })->map(function ($site) {
+        })->sortBy('name')->map(function ($site) {
             return [
                 'id' => $site->handle(),
                 'title' => $site->name(),

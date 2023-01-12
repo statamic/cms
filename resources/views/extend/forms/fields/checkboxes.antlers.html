@@ -1,15 +1,15 @@
-{{ foreach:options as="value|label" }}
+<input type="hidden" name="{{ handle }}[]">
+{{ foreach:options as="option|label" }}
     <label>
         <input
             type="checkbox"
             name="{{ handle }}[]"
-            value="{{ value }}"
+            value="{{ option }}"
             {{ if js_driver }}{{ js_attributes }}{{ /if }}
-            {{ if (old | in_array:value) }}checked{{ /if }}
-            {{ if ! old && value === default }}checked{{ /if }}
+            {{ if value|in_array:option }}checked{{ /if }}
             {{ if validate|contains:required }}required{{ /if }}
         >
-        {{ label !== null ? label : value }}
+        {{ label !== null ? label : option }}
     </label>
     {{ unless inline }}
         <br>

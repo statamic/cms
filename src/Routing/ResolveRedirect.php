@@ -2,27 +2,33 @@
 
 namespace Statamic\Routing;
 
+use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
+use Statamic\Facades\Site;
 use Statamic\Structures\Page;
 use Statamic\Support\Str;
 
 class ResolveRedirect
 {
-    public function __invoke($redirect, $parent = null)
+    public function __invoke($redirect, $parent = null, $localize = false)
     {
-        return $this->resolve($redirect, $parent);
+        return $this->resolve($redirect, $parent, $localize);
     }
 
-    public function resolve($redirect, $parent = null)
+    public function resolve($redirect, $parent = null, $localize = false)
     {
+        if (is_null($redirect)) {
+            return null;
+        }
+
         if ($redirect === '@child') {
             $redirect = $this->firstChildUrl($parent);
         }
 
         if (Str::startsWith($redirect, 'entry::')) {
             $id = Str::after($redirect, 'entry::');
-            $redirect = optional(Facades\Entry::find($id))->url() ?? 404;
+            $redirect = optional($this->findEntry($id, $parent, $localize))->url() ?? 404;
         }
 
         if (Str::startsWith($redirect, 'asset::')) {
@@ -31,6 +37,23 @@ class ResolveRedirect
         }
 
         return is_numeric($redirect) ? (int) $redirect : $redirect;
+    }
+
+    private function findEntry($id, $parent, $localize)
+    {
+        if (! ($entry = Facades\Entry::find($id))) {
+            return null;
+        }
+
+        if (! $localize) {
+            return $entry;
+        }
+
+        $site = $parent instanceof Localization
+            ? $parent->locale()
+            : Site::current()->handle();
+
+        return $entry->in($site) ?? $entry;
     }
 
     private function firstChildUrl($parent)

@@ -20,7 +20,7 @@ class GlideManager
     public function server()
     {
         return ServerFactory::create([
-            'source'   => base_path(), // this gets overriden on the fly by the image generator
+            'source'   => base_path(), // this gets overridden on the fly by the image generator
             'cache'    => $this->cacheDisk()->getDriver(),
             'response' => new LaravelResponseFactory(app('request')),
             'driver'   => Config::get('statamic.assets.image_manipulation.driver'),
@@ -106,5 +106,45 @@ class GlideManager
         }
 
         return Cache::store('glide');
+    }
+
+    public function clearAsset($asset)
+    {
+        $pathPrefix = ImageGenerator::assetCachePathPrefix($asset);
+        $manifestKey = ImageGenerator::assetCacheManifestKey($asset);
+
+        // Delete generated glide cache for asset.
+        $this->server()->deleteCache($pathPrefix.'/'.$asset->path());
+
+        // Use manifest to clear each manipulation key from cache store.
+        collect($this->cacheStore()->get($manifestKey, []))->each(function ($manipulationKey) {
+            $this->cacheStore()->forget($manipulationKey);
+        });
+
+        // Clear manifest itself from cache store.
+        $this->cacheStore()->forget($manifestKey);
+    }
+
+    public function normalizeParameters($params)
+    {
+        $legend = [
+            'background' => 'bg',
+            'brightness' => 'bri',
+            'contrast' => 'con',
+            'filter' => 'filt',
+            'format' => 'fm',
+            'gamma' => 'gam',
+            'height' => 'h',
+            'orientation' => 'or',
+            'pixelate' => 'pixel',
+            'quality' => 'q',
+            'sharpen' => 'sharp',
+            'width' => 'w',
+            'watermark' => 'mark',
+        ];
+
+        return collect($params)->mapWithKeys(function ($value, $param) use ($legend) {
+            return [$legend[$param] ?? $param => $value];
+        })->all();
     }
 }

@@ -506,7 +506,7 @@ class AntlersLexer
                         continue;
                     } elseif ($lowerParsedValue == LanguageKeywords::ConstTrue) {
                         $constTrue = new TrueConstant();
-                        $constTrue->content = LanguageKeywords::ConstNull;
+                        $constTrue->content = LanguageKeywords::ConstTrue;
                         $constTrue->startPosition = $startPosition;
                         $constTrue->endPosition = $endPosition;
 
@@ -584,12 +584,22 @@ class AntlersLexer
                         }
                     }
 
-                    $variableRefNode = new VariableNode();
-                    $variableRefNode->name = $parsedValue;
-                    $variableRefNode->startPosition = $startPosition;
-                    $variableRefNode->endPosition = $endPosition;
-                    $this->runtimeNodes[] = $variableRefNode;
-                    $this->lastNode = $variableRefNode;
+                    if ($parsedValue == DocumentParser::Punctuation_Minus) {
+                        $subtractionOperator = new SubtractionOperator();
+                        $subtractionOperator->content = '-';
+                        $subtractionOperator->startPosition = $node->lexerRelativeOffset($this->currentIndex);
+                        $subtractionOperator->endPosition = $node->lexerRelativeOffset($this->currentIndex + 1);
+
+                        $this->runtimeNodes[] = $subtractionOperator;
+                        $this->lastNode = $subtractionOperator;
+                    } else {
+                        $variableRefNode = new VariableNode();
+                        $variableRefNode->name = $parsedValue;
+                        $variableRefNode->startPosition = $startPosition;
+                        $variableRefNode->endPosition = $endPosition;
+                        $this->runtimeNodes[] = $variableRefNode;
+                        $this->lastNode = $variableRefNode;
+                    }
 
                     continue;
                 }
@@ -668,7 +678,7 @@ class AntlersLexer
                 // -
                 if ($this->isParsingModifierName == false && $this->cur == DocumentParser::Punctuation_Minus) {
                     if (ctype_digit($this->next) && (
-                            ctype_digit($this->prev) == false &&
+                            ctype_digit((string) $this->prev) == false &&
                             $this->prev != DocumentParser::RightParent) && $this->isRightOfInterpolationRegion() == false) {
                         $this->currentContent[] = $this->cur;
                         continue;

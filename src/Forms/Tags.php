@@ -4,6 +4,7 @@ namespace Statamic\Forms;
 
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
+use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
@@ -81,7 +82,7 @@ class Tags extends BaseTags
             'redirect', 'error_redirect', 'allow_request_redirect', 'csrf', 'files', 'js',
         ]);
 
-        $action = $this->params->get('action', route('statamic.forms.submit', $formHandle));
+        $action = $this->params->get('action', $form->actionUrl());
         $method = $this->params->get('method', 'POST');
 
         $attrs = [];
@@ -89,8 +90,6 @@ class Tags extends BaseTags
         if ($jsDriver) {
             $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
         }
-
-        $html = $this->formOpen($action, $method, $knownParams, $attrs);
 
         $params = [];
 
@@ -101,6 +100,15 @@ class Tags extends BaseTags
         if ($errorRedirect = $this->getErrorRedirectUrl()) {
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
+
+        if (! $this->parser) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams, $attrs),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams, $attrs);
 
         $html .= $this->formMetaFields($params);
 
@@ -319,7 +327,15 @@ class Tags extends BaseTags
 
     protected function formHandle()
     {
-        return $this->params->get(static::HANDLE_PARAM, Arr::get($this->context, 'form'));
+        $form = $this->params->get(static::HANDLE_PARAM, Arr::get($this->context, 'form'));
+
+        if ($form instanceof FormContract) {
+            $handle = $form->handle();
+            Blink::put("form-$handle", $form);
+            $form = $handle;
+        }
+
+        return $form;
     }
 
     public function eventUrl($url, $relative = true)

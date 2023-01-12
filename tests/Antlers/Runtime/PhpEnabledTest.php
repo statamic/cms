@@ -508,4 +508,28 @@ EOT;
 
         $this->assertSame($expected, trim($this->renderString($template, $data)));
     }
+
+    public function test_assignments_from_php_nodes()
+    {
+        $template = <<<'EOT'
+{{? 
+    $value_one = 100; 
+    $value_two = 0;
+?}}
+
+{{ loop from="1" to="5" }}
+{{? $value_one += 5; ?}}
+{{? $value_two += 5; ?}}
+{{ /loop }}
+
+{{ value_one += 1000; value_two += 1000; }}
+
+<value_one: {{ value_one }}>
+<value_two: {{ value_two }}>
+EOT;
+
+        $result = $this->renderString($template, [], true);
+        $this->assertStringContainsString('<value_one: 1125>', $result);
+        $this->assertStringContainsString('<value_two: 1025>', $result);
+    }
 }

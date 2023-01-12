@@ -26,6 +26,7 @@ class TermsController extends CpController
         $query = $this->indexQuery($taxonomy);
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'taxonomy' => $taxonomy->handle(),
             'blueprints' => $taxonomy->termBlueprints()->map->handle(),
         ]);
 
@@ -97,6 +98,7 @@ class TermsController extends CpController
                 'revisions' => $term->revisionsUrl(),
                 'restore' => $term->restoreRevisionUrl(),
                 'createRevision' => $term->createRevisionUrl(),
+                'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $term->id()]),
             'meta' => $meta,
