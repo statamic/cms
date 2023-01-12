@@ -55,6 +55,23 @@ class PreferencesTest extends TestCase
             ];
         });
 
+        $preferences->extend(function () {
+            return [
+                'general' => [
+                    'display' => 'Changing the display shouldnt work',
+                    'fields' => [
+                        'bar' => ['type' => 'text'],
+                    ],
+                ],
+                'more' => [
+                    'display' => 'More',
+                    'fields' => [
+                        'baz' => ['type' => 'text'],
+                    ],
+                ],
+            ];
+        });
+
         $this->assertEquals([], $preferences->sections()->all());
 
         $preferences->boot();
@@ -64,6 +81,13 @@ class PreferencesTest extends TestCase
                 'display' => 'general',
                 'fields' => [
                     'foo' => ['type' => 'text'],
+                    'bar' => ['type' => 'text'],
+                ],
+            ],
+            'more' => [
+                'display' => 'More',
+                'fields' => [
+                    'baz' => ['type' => 'text'],
                 ],
             ],
         ], $preferences->sections()->all());

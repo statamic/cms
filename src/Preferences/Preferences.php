@@ -173,7 +173,8 @@ class Preferences
 
             if (is_array($return)) {
                 foreach ($return as $handle => $section) {
-                    $this->section($handle, $section['display'] ?? $handle, function () use ($section) {
+                    $display = $this->sections[$handle] ?? $section['display'] ?? $handle;
+                    $this->section($handle, $display, function () use ($section) {
                         foreach ($section['fields'] as $handle => $field) {
                             $this->register($handle, $field);
                         }
