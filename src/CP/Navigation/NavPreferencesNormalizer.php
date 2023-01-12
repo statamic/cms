@@ -113,7 +113,7 @@ class NavPreferencesNormalizer
             $normalized->put('action', false);
         }
 
-        $normalized->put('display', $sectionConfig->get('display', Str::modifyMultiple($sectionKey, ['deslugify', 'title'])));
+        $normalized->put('display', $sectionConfig->get('display', false));
 
         $normalized->put('reorder', $reorder = $sectionConfig->get('reorder', false));
 
