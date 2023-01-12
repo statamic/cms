@@ -46,6 +46,8 @@ class StatusQueryBuilder implements Builder
     public function whereAnyStatus()
     {
         $this->anyStatus = true;
+
+        return $this;
     }
 
     private function queriesStatus(): bool
