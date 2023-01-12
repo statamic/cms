@@ -24,9 +24,9 @@ class Sites
     public function default()
     {
         if ($user = User::current()) {
-            return $this->sites->filter(function (Site $site) use ($user) {
+            return $this->sites->first(function (Site $site) use ($user) {
                 return $user->can("access {$site->handle()} site");
-            })->first() ?? $this->sites->first();
+            }) ?? $this->sites->first();
         }
 
         return $this->sites->first();
