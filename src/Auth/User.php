@@ -303,8 +303,8 @@ abstract class User implements
     {
         return __('User');
     }
-    
-	protected function getComputedCallbacks()
+
+    protected function getComputedCallbacks()
     {
         return Facades\User::getComputedCallbacks();
     }
