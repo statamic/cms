@@ -26,7 +26,7 @@ class Sites
         if ($user = User::current()) {
             return $this->sites->filter(function (Site $site) use ($user) {
                 return $user->can("access {$site->handle()} site");
-            })->first();
+            })->first() ?? $this->sites->first();
         }
 
         return $this->sites->first();
