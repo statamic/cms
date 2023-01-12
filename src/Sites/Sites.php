@@ -25,7 +25,7 @@ class Sites
     {
         if ($user = User::current()) {
             return $this->sites->filter(function (Site $site) use ($user) {
-                return $user->hasPermission("access {$site->handle()} site");
+                return $user->can("access {$site->handle()} site");
             })->first();
         }
 

@@ -60,7 +60,7 @@ class JavascriptComposer
 
         return SiteFacade::all()->filter(function (Site $site) use ($user) {
             if ($user) {
-                return $user->hasPermission("access {$site->handle()} site");
+                return $user->can("access {$site->handle()} site");
             }
 
             return true;
