@@ -2,9 +2,7 @@
 
 namespace Tests\Preferences;
 
-use Facades\Statamic\Preferences\CorePreferences;
 use Statamic\Facades\File;
-use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
 use Statamic\Preferences\Preferences;
@@ -26,9 +24,10 @@ class PreferencesTest extends TestCase
     /** @test */
     public function it_registers_with_string_and_field_definition()
     {
-        $this->assertEquals([], Preference::sections()->all());
+        $preferences = new Preferences;
+        $this->assertEquals([], $preferences->sections()->all());
 
-        Preference::register('foo', ['type' => 'text']);
+        $preferences->register('foo', ['type' => 'text']);
 
         $this->assertEquals([
             'general' => [
@@ -37,18 +36,16 @@ class PreferencesTest extends TestCase
                     'foo' => ['type' => 'text'],
                 ],
             ],
-        ], Preference::sections()->all());
+        ], $preferences->sections()->all());
     }
 
     /** @test */
     public function it_registers_by_returning_array_from_extend_closure()
     {
-        // Avoid adding core preferences to make test simpler.
-        CorePreferences::shouldReceive('boot')->andReturnNull();
+        $preferences = new Preferences;
+        $this->assertEquals([], $preferences->sections()->all());
 
-        $this->assertEquals([], Preference::sections()->all());
-
-        Preference::extend(function () {
+        $preferences->extend(function () {
             return [
                 'general' => [
                     'fields' => [
@@ -58,9 +55,9 @@ class PreferencesTest extends TestCase
             ];
         });
 
-        $this->assertEquals([], Preference::sections()->all());
+        $this->assertEquals([], $preferences->sections()->all());
 
-        Preference::boot();
+        $preferences->boot();
 
         $this->assertEquals([
             'general' => [
@@ -69,22 +66,23 @@ class PreferencesTest extends TestCase
                     'foo' => ['type' => 'text'],
                 ],
             ],
-        ], Preference::sections()->all());
+        ], $preferences->sections()->all());
     }
 
     /** @test */
     public function it_defers_registration_until_boot_using_extend_method()
     {
+        $preferences = new Preferences;
         $callbackRan = false;
 
-        Preference::extend(function ($preference) use (&$callbackRan) {
-            $this->assertEquals(Preference::getFacadeRoot(), $preference);
+        $preferences->extend(function ($preference) use (&$callbackRan, $preferences) {
+            $this->assertEquals($preferences, $preference);
             $callbackRan = true;
         });
 
         $this->assertFalse($callbackRan);
 
-        Preference::boot();
+        $preferences->boot();
 
         $this->assertTrue($callbackRan);
     }
@@ -92,19 +90,18 @@ class PreferencesTest extends TestCase
     /** @test */
     public function it_places_any_preferences_registered_early_without_extend_callback_at_the_end()
     {
-        // Avoid adding core preferences to make test simpler.
-        CorePreferences::shouldReceive('boot')->andReturnNull();
+        $preferences = new Preferences;
 
-        Preference::register('one');
-        Preference::register('two');
+        $preferences->register('one');
+        $preferences->register('two');
 
-        Preference::extend(function ($preference) {
+        $preferences->extend(function ($preference) {
             $preference->register('three');
         });
 
-        Preference::boot();
+        $preferences->boot();
 
-        $fields = collect(Preference::sections()->get('general')['fields'])->keys()->all();
+        $fields = collect($preferences->sections()->get('general')['fields'])->keys()->all();
 
         $this->assertEquals(['three', 'one', 'two'], $fields);
     }
@@ -112,51 +109,57 @@ class PreferencesTest extends TestCase
     /** @test */
     public function it_uses_fresh_default_preferences()
     {
+        $preferences = new Preferences;
+
         File::put(resource_path('preferences.yaml'), 'alfa: bravo');
 
         $this->actingAs(User::make());
 
-        $this->assertEquals(['alfa' => 'bravo'], Preference::all());
+        $this->assertEquals(['alfa' => 'bravo'], $preferences->all());
 
-        Preference::default()->set('charlie', 'delta')->save();
+        $preferences->default()->set('charlie', 'delta')->save();
 
         $this->assertEquals([
             'alfa' => 'bravo',
             'charlie' => 'delta',
-        ], Preference::all());
+        ], $preferences->all());
     }
 
     /** @test */
     public function it_uses_fresh_role_preferences()
     {
+        $preferences = new Preferences;
+
         $role = tap(Role::make('one')->setPreference('alfa', 'bravo'))->save();
 
         $this->actingAs(User::make()->assignRole('one'));
 
-        $this->assertEquals(['alfa' => 'bravo'], Preference::all());
+        $this->assertEquals(['alfa' => 'bravo'], $preferences->all());
 
         $role->setPreference('charlie', 'delta')->save();
 
         $this->assertEquals([
             'alfa' => 'bravo',
             'charlie' => 'delta',
-        ], Preference::all());
+        ], $preferences->all());
     }
 
     /** @test */
     public function it_uses_fresh_user_preferences()
     {
+        $preferences = new Preferences;
+
         $user = User::make()->setPreference('alfa', 'bravo');
 
         $this->actingAs($user);
 
-        $this->assertEquals(['alfa' => 'bravo'], Preference::all());
+        $this->assertEquals(['alfa' => 'bravo'], $preferences->all());
 
         $user->setPreference('charlie', 'delta')->save();
 
         $this->assertEquals([
             'alfa' => 'bravo',
             'charlie' => 'delta',
-        ], Preference::all());
+        ], $preferences->all());
     }
 }
