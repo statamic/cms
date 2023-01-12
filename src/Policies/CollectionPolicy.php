@@ -2,7 +2,7 @@
 
 namespace Statamic\Policies;
 
-use Statamic\Facades\Collection
+use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
