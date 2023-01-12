@@ -29,6 +29,7 @@ class TermEntriesTest extends TestCase
         EntryFactory::collection('animals')->slug('cheetah')->data(['colors' => ['yellow']])->create();
         EntryFactory::collection('clothes')->slug('red-shirt')->data(['colors' => ['red']])->create();
         EntryFactory::collection('clothes')->slug('black-shirt')->data(['colors' => ['black']])->create();
+        EntryFactory::collection('clothes')->slug('draft')->published(false)->data(['colors' => ['black']])->create();
 
         $this->assertEquals(1, Term::find('colors::red')->entriesCount());
         $this->assertEquals(2, Term::find('colors::black')->entriesCount());
