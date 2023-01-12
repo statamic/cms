@@ -7,6 +7,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
+use Statamic\Preferences\Preferences;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -20,6 +21,55 @@ class PreferencesTest extends TestCase
 
         File::delete(resource_path('preferences.yaml'));
         Role::all()->each->delete();
+    }
+
+    /** @test */
+    public function it_registers_with_string_and_field_definition()
+    {
+        $this->assertEquals([], Preference::sections()->all());
+
+        Preference::register('foo', ['type' => 'text']);
+
+        $this->assertEquals([
+            'general' => [
+                'display' => 'General',
+                'fields' => [
+                    'foo' => ['type' => 'text'],
+                ],
+            ],
+        ], Preference::sections()->all());
+    }
+
+    /** @test */
+    public function it_registers_by_returning_array_from_extend_closure()
+    {
+        // Avoid adding core preferences to make test simpler.
+        CorePreferences::shouldReceive('boot')->andReturnNull();
+
+        $this->assertEquals([], Preference::sections()->all());
+
+        Preference::extend(function () {
+            return [
+                'general' => [
+                    'fields' => [
+                        'foo' => ['type' => 'text'],
+                    ],
+                ],
+            ];
+        });
+
+        $this->assertEquals([], Preference::sections()->all());
+
+        Preference::boot();
+
+        $this->assertEquals([
+            'general' => [
+                'display' => 'general',
+                'fields' => [
+                    'foo' => ['type' => 'text'],
+                ],
+            ],
+        ], Preference::sections()->all());
     }
 
     /** @test */
