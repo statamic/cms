@@ -2,8 +2,7 @@
 
 namespace Statamic\Policies;
 
-use Statamic\Contracts\Entries\Collection;
-use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Collection
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
@@ -26,7 +25,7 @@ class CollectionPolicy
             return true;
         }
 
-        return ! CollectionFacade::all()->filter(function ($collection) use ($user) {
+        return ! Collection::all()->filter(function ($collection) use ($user) {
             return $this->view($user, $collection);
         })->isEmpty();
     }

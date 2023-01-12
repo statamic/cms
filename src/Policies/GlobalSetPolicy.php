@@ -2,14 +2,13 @@
 
 namespace Statamic\Policies;
 
-use Statamic\Contracts\Globals\GlobalSet;
-use Statamic\Facades\GlobalSet as GlobalSetFacade;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
 class GlobalSetPolicy
 {
-    public function before($user, $ability, $set)
+    public function before($user, $ability)
     {
         $user = User::fromUser($user);
         $site = Site::selected();
@@ -27,7 +26,7 @@ class GlobalSetPolicy
             return true;
         }
 
-        return ! GlobalSetFacade::all()->filter(function ($set) use ($user) {
+        return ! GlobalSet::all()->filter(function ($set) use ($user) {
             return $this->view($user, $set);
         })->isEmpty();
     }
