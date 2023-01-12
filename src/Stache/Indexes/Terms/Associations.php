@@ -25,6 +25,7 @@ class Associations extends Index
                                     'entry' => $entry->id(),
                                     'collection' => $entry->collectionHandle(),
                                     'site' => $entry->locale(),
+                                    'status' => $entry->status(),
                                 ];
                             });
                     })->all();

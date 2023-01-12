@@ -131,7 +131,8 @@ class TermRepository implements RepositoryContract
         $items = $this->store->store($term->taxonomyHandle())
             ->index('associations')
             ->items()
-            ->where('value', $term->slug());
+            ->where('value', $term->slug())
+            ->where('status', 'published');
 
         if ($term instanceof LocalizedTerm) {
             $items = $items->where('site', $term->locale());
