@@ -2,7 +2,6 @@
 
 namespace Statamic\Policies;
 
-use Statamic\Contracts\Entries\Collection;
 use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;

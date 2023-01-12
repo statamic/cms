@@ -2,7 +2,6 @@
 
 namespace Statamic\Policies;
 
-use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Facades\GlobalSet as GlobalSetFacade;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
