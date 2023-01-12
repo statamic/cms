@@ -71,6 +71,14 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
+    public function it_includes_drafts_when_pre_processing()
+    {
+        $preProcessed = $this->fieldtype()->preProcessIndex([456, 'invalid', '123', 'draft', 'scheduled', 'expired']);
+
+        $this->assertEquals([456, '123', 'draft', 'scheduled', 'expired'], $preProcessed->map(fn ($entry) => $entry['id'])->all());
+    }
+
+    /** @test */
     public function it_localizes_the_augmented_items_to_the_parent_entrys_locale()
     {
         $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
