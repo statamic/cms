@@ -35,4 +35,26 @@ return [
 
     'email_view_folder' => null,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Send Email Job
+    |--------------------------------------------------------------------------
+    |
+    | The class name of the job that will be used to send an email.
+    |
+    */
+
+    'send_email_job' => \Statamic\Forms\SendEmail::class,
+
+    /*
+    |--------------------------------------------------------------------------
+    | CSV Export Delimiter
+    |--------------------------------------------------------------------------
+    |
+    | Statamic will use this character as delimiter for csv exports.
+    |
+    */
+
+    'csv_delimiter' => ',',
+
 ];

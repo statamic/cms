@@ -9,17 +9,22 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetFolder;
+use Statamic\Events\AssetContainerCreated;
+use Statamic\Events\AssetContainerSaved;
+use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Fields\Blueprint;
 use Statamic\Filesystem\Filesystem;
 use Statamic\Filesystem\FlysystemAdapter;
+use Tests\Fakes\FakeArtisanRequest;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -190,8 +195,92 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_and_sets_whether_renaming_is_allowed()
+    {
+        $container = new AssetContainer;
+        $this->assertTrue($container->allowRenaming());
+
+        $return = $container->allowRenaming(false);
+
+        $this->assertEquals($container, $return);
+        $this->assertFalse($container->allowRenaming());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_whether_moving_is_allowed()
+    {
+        $container = new AssetContainer;
+        $this->assertTrue($container->allowMoving());
+
+        $return = $container->allowMoving(false);
+
+        $this->assertEquals($container, $return);
+        $this->assertFalse($container->allowMoving());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_whether_downloading_is_allowed()
+    {
+        $container = new AssetContainer;
+        $this->assertTrue($container->allowDownloading());
+
+        $return = $container->allowDownloading(false);
+
+        $this->assertEquals($container, $return);
+        $this->assertFalse($container->allowDownloading());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_glide_source_preset_for_upload_processing()
+    {
+        $container = new AssetContainer;
+        $this->assertNull($container->sourcePreset());
+
+        $return = $container->sourcePreset('watermarked');
+
+        $this->assertEquals($container, $return);
+        $this->assertEquals('watermarked', $container->sourcePreset());
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider warmPresetProvider
+     */
+    public function it_defines_which_presets_to_warm($source, $presets, $expectedIntelligent, $expectedWarm)
+    {
+        config(['statamic.assets.image_manipulation.presets' => [
+            'small' => ['w' => '15', 'h' => '15'],
+            'medium' => ['w' => '500', 'h' => '500'],
+            'large' => ['w' => '1000', 'h' => '1000'],
+            'max' => ['w' => '3000', 'h' => '3000', 'mark' => 'watermark.jpg'],
+        ]]);
+
+        $container = (new AssetContainer)
+            ->sourcePreset($source)
+            ->warmPresets($presets);
+
+        $this->assertEquals($expectedIntelligent, $container->warmsPresetsIntelligently());
+        $this->assertEquals($expectedWarm, $container->warmPresets());
+    }
+
+    public function warmPresetProvider()
+    {
+        return [
+            'no source, no presets' => [null, null, true, ['small', 'medium', 'large', 'max']],
+            'no source, with presets' => [null, ['small', 'medium'], false, ['small', 'medium']],
+            'with source, no presets' => ['max', null, true, ['small', 'medium', 'large']],
+            'with source, with presets' => ['max', ['small'], false, ['small']],
+            'with source, with presets, including source' => ['max', ['small', 'max'], false, ['small', 'max']],
+            'no source, presets false' => [null, false, false, []],
+            'with source, presets false' => ['max', false, false, []],
+        ];
+    }
+
+    /** @test */
     public function it_saves_the_container_through_the_api()
     {
+        Event::fake();
         Facades\AssetContainer::spy();
 
         $container = new AssetContainer;
@@ -199,7 +288,73 @@ class AssetContainerTest extends TestCase
         $return = $container->save();
 
         $this->assertEquals($container, $return);
-        Facades\AssetContainer::shouldHaveReceived('save')->with($container)->once();
+
+        Event::assertDispatched(AssetContainerSaving::class, function ($event) use ($container) {
+            return $event->container === $container;
+        });
+
+        Event::assertDispatched(AssetContainerCreated::class, function ($event) use ($container) {
+            return $event->container === $container;
+        });
+
+        Event::assertDispatched(AssetContainerSaved::class, function ($event) use ($container) {
+            return $event->container === $container;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_asset_container_created_only_once()
+    {
+        Event::fake();
+        Facades\AssetContainer::spy();
+
+        $container = new AssetContainer;
+
+        Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('find')->with($container->handle())->times(3)->andReturn(null, $container, $container);
+
+        $container->save();
+        $container->save();
+        $container->save();
+
+        Event::assertDispatched(AssetContainerSaved::class, 3);
+        Event::assertDispatched(AssetContainerCreated::class, 1);
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+        Facades\AssetContainer::spy();
+
+        $container = new AssetContainer;
+
+        $return = $container->saveQuietly();
+
+        $this->assertEquals($container, $return);
+
+        Event::assertNotDispatched(AssetContainerSaving::class);
+        Event::assertNotDispatched(AssetContainerSaved::class);
+        Event::assertNotDispatched(AssetContainerCreated::class);
+    }
+
+    /** @test */
+    public function if_saving_event_returns_false_the_asset_container_doesnt_save()
+    {
+        Event::fake([AssetContainerSaved::class]);
+        Facades\AssetContainer::spy();
+
+        Event::listen(AssetContainerSaving::class, function () {
+            return false;
+        });
+
+        $container = new AssetContainer;
+
+        $return = $container->saveQuietly();
+
+        $this->assertEquals($container, $return);
+
+        Event::assertNotDispatched(AssetContainerSaved::class);
     }
 
     /** @test */
@@ -224,6 +379,19 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_all_meta_files_by_default()
+    {
+        $this->assertEquals([
+            '.meta/a.txt.yaml',
+            '.meta/b.txt.yaml',
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+            'nested/double-nested/.meta/double-nested-a.txt.yaml',
+            'nested/double-nested/.meta/double-nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles()->all());
+    }
+
+    /** @test */
     public function it_gets_files_in_a_folder()
     {
         $this->assertEquals([
@@ -235,6 +403,20 @@ class AssetContainerTest extends TestCase
             'nested/nested-a.txt',
             'nested/nested-b.txt',
         ], $this->containerWithDisk()->files('nested')->all());
+    }
+
+    /** @test */
+    public function it_gets_meta_files_in_a_folder()
+    {
+        $this->assertEquals([
+            '.meta/a.txt.yaml',
+            '.meta/b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles('/')->all());
+
+        $this->assertEquals([
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles('nested')->all());
     }
 
     /** @test */
@@ -255,6 +437,26 @@ class AssetContainerTest extends TestCase
             'nested/nested-a.txt',
             'nested/nested-b.txt',
         ], $this->containerWithDisk()->files('nested', true)->all());
+    }
+
+    /** @test */
+    public function it_gets_meta_files_in_a_folder_recursively()
+    {
+        $this->assertEquals([
+            '.meta/a.txt.yaml',
+            '.meta/b.txt.yaml',
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+            'nested/double-nested/.meta/double-nested-a.txt.yaml',
+            'nested/double-nested/.meta/double-nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles('/', true)->all());
+
+        $this->assertEquals([
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+            'nested/double-nested/.meta/double-nested-a.txt.yaml',
+            'nested/double-nested/.meta/double-nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles('nested', true)->all());
     }
 
     /** @test */
@@ -379,6 +581,37 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_files_from_the_cache_every_time_if_running_in_a_queue_worker()
+    {
+        $cacheKey = 'asset-list-contents-test';
+
+        Cache::put($cacheKey, collect([
+            '.meta/one.jpg.yaml' => ['type' => 'file', 'path' => '.meta/one.jpg.yaml', 'basename' => 'one.jpg.yaml'],
+            '.DS_Store' => ['type' => 'file', 'path' => '.DS_Store', 'basename' => '.DS_Store'],
+            '.gitignore' => ['type' => 'file', 'path' => '.gitignore', 'basename' => '.gitignore'],
+            'one.jpg' => ['type' => 'file', 'path' => 'one.jpg', 'basename' => 'one.jpg'],
+            'two.jpg' => ['type' => 'file', 'path' => 'two.jpg', 'basename' => 'two.jpg'],
+        ]));
+
+        $cacheHits = 0;
+        Event::listen(CacheHit::class, function ($event) use (&$cacheHits, $cacheKey) {
+            if ($event->key === $cacheKey) {
+                $cacheHits++;
+            }
+        });
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        Request::swap(new FakeArtisanRequest('queue:listen'));
+
+        $expected = ['one.jpg', 'two.jpg'];
+        $this->assertEquals($expected, $container->files()->all());
+        $this->assertEquals(1, $cacheHits);
+        $this->assertEquals($expected, $container->files()->all());
+        $this->assertEquals(2, $cacheHits);
+    }
+
+    /** @test */
     public function it_gets_the_folders_from_the_filesystem_only_once()
     {
         Carbon::setTestNow(now()->startOfMinute());
@@ -448,6 +681,40 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_folders_from_the_cache_and_blink_every_time_if_running_in_a_queue_worker()
+    {
+        $cacheKey = 'asset-list-contents-test';
+
+        Cache::put($cacheKey, collect([
+            '.meta' => ['type' => 'dir', 'path' => '.meta', 'basename' => '.meta'],
+            'one' => ['type' => 'dir', 'path' => 'one', 'basename' => 'one'],
+            'one/.meta' => ['type' => 'dir', 'path' => 'one/.meta', 'basename' => '.meta'],
+            'two' => ['type' => 'dir', 'path' => 'two', 'basename' => 'two'],
+        ]));
+
+        $cacheHits = 0;
+        Event::listen(CacheHit::class, function ($event) use (&$cacheHits, $cacheKey) {
+            if ($event->key === $cacheKey) {
+                $cacheHits++;
+            }
+        });
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        Request::swap(new FakeArtisanRequest('queue:listen'));
+
+        $expected = ['one', 'two'];
+        $this->assertEquals($expected, $container->folders()->all());
+        $this->assertEquals(1, $cacheHits);
+        $this->assertEquals($expected, $container->folders()->all());
+        $this->assertEquals(2, $cacheHits);
+
+        $anotherInstanceOfTheContainer = (new AssetContainer)->handle('test')->disk('test');
+        $this->assertEquals($expected, $anotherInstanceOfTheContainer->folders()->all());
+        $this->assertEquals(3, $cacheHits);
+    }
+
+    /** @test */
     public function it_gets_an_asset()
     {
         $asset = $this->containerWithDisk()->asset('a.txt');
@@ -471,7 +738,7 @@ class AssetContainerTest extends TestCase
     /** @test */
     public function it_makes_an_asset_at_given_path()
     {
-        $container = new AssetContainer;
+        $container = $this->containerWithDisk();
         $asset = $container->makeAsset('path/to/test.txt');
 
         $this->assertInstanceOf(Asset::class, $asset);

@@ -24,12 +24,12 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         if ($this->shouldFakeVersion) {
-            \Facades\Statamic\Version::shouldReceive('get')->andReturn('3.0.0-testing');
+            \Facades\Statamic\Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn('3.0.0-testing');
             $this->addToAssertionCount(-1); // Dont want to assert this
         }
 
         if ($this->shouldPreventNavBeingBuilt) {
-            \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn([]);
+            \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn([]);
             $this->addToAssertionCount(-1); // Dont want to assert this
         }
 
@@ -74,8 +74,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         foreach ($configs as $config) {
             $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
         }
-
-        $app['config']->set('statamic.antlers.version', 'runtime');
     }
 
     protected function getEnvironmentSetUp($app)

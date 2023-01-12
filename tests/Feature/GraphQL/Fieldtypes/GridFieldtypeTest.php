@@ -50,8 +50,8 @@ class GridFieldtypeTest extends TestCase
         EntryFactory::collection('blog')->id('1')->data([
             'title' => 'Main Post',
             'meals' => [
-                ['food' => 'burger', 'drink' => 'coke'],
-                ['food' => 'salad', 'drink' => 'water', 'stuff' => ['stuff1']],
+                ['id' => '1', 'food' => 'burger', 'drink' => 'coke'],
+                ['food' => 'salad', 'drink' => 'water', 'stuff' => ['stuff1']], // id intentionally omitted
             ],
         ])->create();
 
@@ -63,6 +63,7 @@ class GridFieldtypeTest extends TestCase
         title
         ... on Entry_Blog_Article {
             meals {
+                id
                 food
                 drink
                 stuff {
@@ -82,8 +83,8 @@ GQL;
                 'entry' => [
                     'title' => 'Main Post',
                     'meals' => [
-                        ['food' => 'burger', 'drink' => 'coke', 'stuff' => []],
-                        ['food' => 'salad', 'drink' => 'water', 'stuff' => [['title' => 'One']]],
+                        ['id' => '1', 'food' => 'burger', 'drink' => 'coke', 'stuff' => []],
+                        ['id' => null, 'food' => 'salad', 'drink' => 'water', 'stuff' => [['title' => 'One']]],
                     ],
                 ],
             ]]);

@@ -3,6 +3,7 @@
 namespace Statamic\Search;
 
 use Closure;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Searchables\Providers;
@@ -75,17 +76,26 @@ class Searchables
         return collect($fields)->mapWithKeys(function ($field) use ($searchable) {
             return [$field => $searchable->getSearchValue($field)];
         })->flatMap(function ($value, $field) use ($transformers) {
-            if (! isset($transformers[$field]) || ! $transformers[$field] instanceof Closure) {
+            if (! $transformer = $transformers[$field] ?? null) {
                 return [$field => $value];
             }
 
-            $transformedValue = $transformers[$field]($value);
+            $value = $this->transformValue($transformer, $field, $value);
 
-            if (is_array($transformedValue)) {
-                return $transformedValue;
-            }
-
-            return [$field => $transformedValue];
+            return is_array($value) ? $value : [$field => $value];
         })->all();
+    }
+
+    private function transformValue($transformer, $field, $value)
+    {
+        if ($transformer instanceof Closure) {
+            return $transformer($value);
+        }
+
+        try {
+            return app($transformer)->handle($value, $field);
+        } catch (BindingResolutionException $e) {
+            throw new \LogicException("Search transformer [{$transformer}] not found.");
+        }
     }
 }

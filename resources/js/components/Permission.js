@@ -10,7 +10,7 @@ class Permission {
     }
 
     has(permission) {
-        return this.all().includes(permission);
+        return this.all().includes(permission) || this.all().includes('super');
     }
 }
 

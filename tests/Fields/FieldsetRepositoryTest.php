@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Illuminate\Support\Collection;
+use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldsetRepository;
@@ -81,9 +82,17 @@ EOT;
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturnTrue();
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/unknown.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/path/to/foo/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('exists')->with('/path/to/foo/unknown.yaml')->once()->andReturnFalse();
+
+        $this->repo->addNamespace('foo', '/path/to/foo');
 
         $this->assertTrue($this->repo->exists('test'));
         $this->assertFalse($this->repo->exists('unknown'));
+        $this->assertTrue($this->repo->exists('foo::test'));
+        $this->assertFalse($this->repo->exists('foo::unknown'));
+        $this->assertFalse($this->repo->exists('unknownnamespace::test'));
+        $this->assertFalse($this->repo->exists('unknownnamespace::unknown'));
     }
 
     /** @test */
@@ -110,42 +119,75 @@ fields:
     type: text
     display: Third Field
 EOT;
+        $firstNamespacedContents = <<<'EOT'
+title: First Namespaced Fieldset
+fields:
+  three:
+    type: text
+    display: Third Field
+EOT;
+        $secondNamespacedContents = <<<'EOT'
+title: Second Namespaced Fieldset
+fields:
+  three:
+    type: text
+    display: Fourth Field
+EOT;
+        $firstOverriddenNamespacedContents = <<<'EOT'
+title: First Namespaced Fieldset (vendor override)
+fields:
+  three:
+    type: text
+    display: Third Field
+EOT;
 
-        File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnTrue();
+        File::shouldReceive('withAbsolutePaths')->times(2)->andReturnSelf();
+        File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/foo', 'yaml')->once()->andReturn(new FileCollection([
+            '/path/to/foo/bar/first.yaml',
+            '/path/to/foo/bar/second.yaml',
+        ]));
         File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/resources/fieldsets', 'yaml')->once()->andReturn(new FileCollection([
             '/path/to/resources/fieldsets/first.yaml',
             '/path/to/resources/fieldsets/second.yaml',
             '/path/to/resources/fieldsets/sub/third.yaml',
+            '/path/to/resources/fieldsets/vendor/foo/bar/first.yaml',
         ]));
         File::shouldReceive('get')->with('/path/to/resources/fieldsets/first.yaml')->once()->andReturn($firstContents);
         File::shouldReceive('get')->with('/path/to/resources/fieldsets/second.yaml')->once()->andReturn($secondContents);
         File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/third.yaml')->once()->andReturn($thirdContents);
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/vendor/foo/bar/first.yaml')->once()->andReturnTrue();
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/vendor/foo/bar/second.yaml')->once()->andReturnFalse();
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/vendor/foo/bar/first.yaml')->once()->andReturn($firstOverriddenNamespacedContents);
+        File::shouldReceive('get')->with('/path/to/foo/bar/second.yaml')->once()->andReturn($secondNamespacedContents);
 
+        $this->repo->addNamespace('foo', '/path/to/foo');
         $all = $this->repo->all();
 
         $this->assertInstanceOf(Collection::class, $all);
-        $this->assertCount(3, $all);
+        $this->assertCount(5, $all);
         $this->assertEveryItemIsInstanceOf(Fieldset::class, $all);
-        $this->assertEquals(['first', 'second', 'sub.third'], $all->keys()->all());
-        $this->assertEquals(['first', 'second', 'sub.third'], $all->map->handle()->values()->all());
-        $this->assertEquals(['First Fieldset', 'Second Fieldset', 'Third Fieldset'], $all->map->title()->values()->all());
+        $this->assertEquals(['first', 'second', 'sub.third', 'foo::bar.first', 'foo::bar.second'], $all->keys()->all());
+        $this->assertEquals(['first', 'second', 'sub.third', 'foo::bar.first', 'foo::bar.second'], $all->map->handle()->values()->all());
+        $this->assertEquals(['First Fieldset', 'Second Fieldset', 'Third Fieldset', 'First Namespaced Fieldset (vendor override)', 'Second Namespaced Fieldset'], $all->map->title()->values()->all());
     }
 
     /** @test */
     public function it_returns_empty_collection_if_fieldset_directory_doesnt_exist()
     {
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnFalse();
-
         $all = $this->repo->all();
 
         $this->assertInstanceOf(Collection::class, $all);
         $this->assertCount(0, $all);
     }
 
-    /** @test */
-    public function it_saves_to_disk()
+    /**
+     * @test
+     * @dataProvider saveProvider
+     */
+    public function it_saves_to_disk($handle, $expectedPath)
     {
+        Facades\Fieldset::addNamespace('foo', '/path/to/foo');
+
         $expectedYaml = <<<'EOT'
 title: 'Test Fieldset'
 fields:
@@ -156,20 +198,95 @@ fields:
       bar: baz
 
 EOT;
-        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnFalse();
-        File::shouldReceive('makeDirectory')->with('/path/to/resources/fieldsets')->once();
-        File::shouldReceive('put')->with('/path/to/resources/fieldsets/the_test_fieldset.yaml', $expectedYaml)->once();
 
-        $fieldset = (new Fieldset)->setHandle('the_test_fieldset')->setContents([
-            'title' => 'Test Fieldset',
-            'fields' => [
-                [
-                    'handle' => 'foo',
-                    'field' => ['type' => 'textarea', 'bar' => 'baz'],
+        File::shouldReceive('put')->with($expectedPath, $expectedYaml)->once();
+
+        $fieldset = (new Fieldset)
+            ->setHandle($handle)
+            ->setContents([
+                'title' => 'Test Fieldset',
+                'fields' => [
+                    [
+                        'handle' => 'foo',
+                        'field' => ['type' => 'textarea', 'bar' => 'baz'],
+                    ],
                 ],
-            ],
-        ]);
+            ]);
 
         $this->repo->save($fieldset);
+    }
+
+    public function saveProvider()
+    {
+        return [
+            'standard' => ['test', '/path/to/resources/fieldsets/test.yaml'],
+            'standard subdir' => ['subdir.test', '/path/to/resources/fieldsets/subdir/test.yaml'],
+            'namespace' => ['foo::test', '/path/to/resources/fieldsets/vendor/foo/test.yaml'],
+            'namespace, subdir' => ['foo::subdir.test', '/path/to/resources/fieldsets/vendor/foo/subdir/test.yaml'],
+        ];
+    }
+
+    /** @test */
+    public function it_deletes_a_fieldset()
+    {
+        File::shouldReceive('delete')->with('/path/to/resources/fieldsets/test.yaml')->once();
+
+        $fieldset = (new Fieldset)->setHandle('test');
+
+        $this->repo->delete($fieldset);
+    }
+
+    /** @test */
+    public function it_doesnt_delete_namespaced_fieldsets()
+    {
+        $this->expectExceptionMessage('Namespaced fieldsets cannot be deleted');
+
+        File::shouldReceive('delete')->never();
+
+        $fieldset = (new Fieldset)->setHandle('foo::test');
+
+        $this->repo->delete($fieldset);
+    }
+
+    /** @test  */
+    public function it_gets_a_namespaced_fieldset()
+    {
+        $contents = <<<'EOT'
+title: Test Fieldset
+fields: []
+EOT;
+        $this->repo->addNamespace('foo', '/path/to/foo');
+
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/vendor/foo/bar/baz/test.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/path/to/foo/bar/baz/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/foo/bar/baz/test.yaml')->once()->andReturn($contents);
+
+        $fieldset = $this->repo->find('foo::bar.baz.test');
+
+        $this->assertInstanceOf(Fieldset::class, $fieldset);
+        $this->assertEquals('Test Fieldset', $fieldset->title());
+        $this->assertEquals('foo::bar.baz.test', $fieldset->handle());
+    }
+
+    /** @test  */
+    public function it_gets_an_overridden_namespaced_fieldset()
+    {
+        $contents = <<<'EOT'
+title: Overridden Fieldset
+fields: []
+EOT;
+        $this->repo->addNamespace('foo', '/path/to/foo');
+
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/vendor/foo/bar/baz/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/vendor/foo/bar/baz/test.yaml')->once()->andReturn($contents);
+
+        $fieldset = $this->repo->find('foo::bar.baz.test');
+
+        $this->assertInstanceOf(Fieldset::class, $fieldset);
+        $this->assertEquals('Overridden Fieldset', $fieldset->title());
+        $this->assertEquals('foo::bar.baz.test', $fieldset->handle());
+
+        $this->assertNull($this->repo->find('vendor.foo.bar.baz.test'));
+        $this->assertFalse($this->repo->exists('vendor.foo.bar.baz.test'));
     }
 }

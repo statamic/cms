@@ -31,6 +31,7 @@ return [
     ],
     'boolean'              => '必須為 true 或 false。',
     'confirmed'            => '確認欄位不相符。',
+    'current_password'     => '密码错误。',
     'date'                 => '不是有效的日期。',
     'date_format'          => '不符合格式 :format。',
     'different'            => '此欄位必須與 :other 不同',

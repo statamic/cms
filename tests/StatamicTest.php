@@ -3,9 +3,13 @@
 namespace Tests;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\User;
 use Statamic\Statamic;
+use Statamic\Support\Str;
+use Tests\Fakes\FakeArtisanRequest;
 
 class StatamicTest extends TestCase
 {
@@ -167,5 +171,167 @@ class StatamicTest extends TestCase
         $this->expectExceptionMessage('Target class [statamic.queries.test] does not exist.');
 
         Statamic::query('test');
+    }
+
+    /** @test */
+    public function scripts_will_automatically_be_versioned()
+    {
+        Statamic::script('test-a', 'test');
+
+        $allScripts = Statamic::availableScripts(Request::create('/'));
+
+        $this->assertArrayHasKey('test-a', $allScripts);
+
+        $testScript = $allScripts['test-a'][0];
+
+        $this->assertTrue(Str::startsWith($testScript, 'test.js?v='));
+        // Check if the version is 16 characters long.
+        $this->assertEquals(16, strlen(Str::of($testScript)->after('.js?v=')));
+    }
+
+    /** @test */
+    public function styles_will_automatically_be_versioned()
+    {
+        Statamic::style('test-b', 'test');
+
+        $allStyles = Statamic::availableStyles(Request::create('/'));
+
+        $this->assertArrayHasKey('test-b', $allStyles);
+
+        $testStyle = $allStyles['test-b'][0];
+
+        $this->assertTrue(Str::startsWith($testStyle, 'test.css?v='));
+        // Check if the version is 16 characters long.
+        $this->assertEquals(16, strlen(Str::of($testStyle)->after('.css?v=')));
+    }
+
+    /** @test */
+    public function scripts_can_be_passed_with_a_laravel_mix_version()
+    {
+        $path = 'test.js?id=some-random-laravel-mix-version';
+
+        // We can't test the mix helper, so we emulate it by adding `?id=`, as this is
+        // the versioning syntax provied by Laravel Mix.
+        // Statamic::script('test', mix('your-path'));
+
+        Statamic::script('test-c', $path);
+
+        $allScripts = Statamic::availableScripts(Request::create('/'));
+
+        $this->assertArrayHasKey('test-c', $allScripts);
+
+        $testScript = $allScripts['test-c'][0];
+
+        $this->assertEquals($testScript, $path);
+    }
+
+    /** @test */
+    public function styles_can_be_passed_with_a_laravel_mix_version()
+    {
+        $path = 'test.css?id=some-random-laravel-mix-version';
+
+        // We can't test the mix helper, so we emulate it by adding `?id=`, as this is
+        // the versioning syntax provied by Laravel Mix.
+        // Statamic::script('test', mix('your-path'));
+
+        Statamic::style('test-d', $path);
+
+        $allStyles = Statamic::availableStyles(Request::create('/'));
+
+        $this->assertArrayHasKey('test-d', $allStyles);
+
+        $testStyle = $allStyles['test-d'][0];
+
+        $this->assertEquals($testStyle, $path);
+    }
+
+    /** @test */
+    public function assets_with_equal_names_will_be_cached_differently()
+    {
+        Statamic::style('test-name', __DIR__.'/../resources/css/test-path-1.css');
+        Statamic::style('test-name', __DIR__.'/../resources/css/test-path-2.css');
+
+        $allStyles = Statamic::availableStyles(Request::create('/'));
+
+        $this->assertNotEquals($allStyles['test-name'][0], $allStyles['test-name'][1]);
+    }
+
+    /**
+     * @test
+     * @dataProvider cpAssetUrlProvider
+     */
+    public function it_gets_a_cp_asset_url($url, $expected)
+    {
+        $this->assertEquals($expected, Statamic::cpAssetUrl($url));
+    }
+
+    public function cpAssetUrlProvider()
+    {
+        return [
+            'slash' => ['/foo/bar.jpg', 'http://localhost/vendor/statamic/cp/foo/bar.jpg'],
+            'no slash' => ['foo/bar.jpg', 'http://localhost/vendor/statamic/cp/foo/bar.jpg'],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider vendorPackageAssetUrlProvider
+     */
+    public function it_gets_the_vendor_package_asset_url($arguments, $expected)
+    {
+        $this->assertEquals($expected, Statamic::vendorPackageAssetUrl(...$arguments));
+    }
+
+    public function vendorPackageAssetUrlProvider()
+    {
+        return [
+            'package' => [['package', 'cp.js'], 'http://localhost/vendor/package/cp.js'],
+            'package with type' => [['package', 'test.jpg', 'images'], 'http://localhost/vendor/package/images/test.jpg'],
+            'statamic cp' => [['statamic/cp', 'cp.js'], 'http://localhost/vendor/statamic/cp/cp.js'],
+            'vendor url no slash' => [['irrelevant', 'vendor/foo/bar.js'], 'http://localhost/vendor/foo/bar.js'],
+            'vendor url with slash' => [['irrelevant', '/vendor/foo/bar.js'], 'http://localhost/vendor/foo/bar.js'],
+        ];
+    }
+
+    /**
+     * @test
+     * @define-env useFixtureTranslations
+     **/
+    public function it_makes_breadcrumbs()
+    {
+        // confirm the fake translations are being loaded
+        $this->assertIsArray(__('messages'));
+
+        $this->assertEquals('one ‹ messages ‹ two', Statamic::crumb('one', 'messages', 'two'));
+    }
+
+    public function useFixtureTranslations($app)
+    {
+        $app->useLangPath(__DIR__.'/__fixtures__/lang');
+    }
+
+    /** @test */
+    public function it_can_detect_if_running_in_a_queue_worker()
+    {
+        // It should return false by default
+        $this->assertFalse(Statamic::isWorker());
+
+        // It should return false when being called from a custom command
+        Request::swap(new FakeArtisanRequest('stache:clear'));
+        $this->assertFalse(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('statamic:install'));
+        $this->assertFalse(Statamic::isWorker());
+
+        // It should return true when being called from any command beginning with `queue:`
+        Request::swap(new FakeArtisanRequest('queue:listen'));
+        $this->assertTrue(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('queue:work'));
+        $this->assertTrue(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('horizon:work'));
+        $this->assertTrue(Statamic::isWorker());
+
+        // It should always return false when not running in console
+        App::shouldReceive('runningInConsole')->andReturn(false);
+        $this->assertFalse(Statamic::isWorker());
     }
 }

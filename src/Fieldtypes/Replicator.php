@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
@@ -67,11 +68,9 @@ class Replicator extends Fieldtype
 
     protected function processRow($row)
     {
-        $row = array_except($row, '_id');
-
         $fields = $this->fields($row['type'])->addValues($row)->process()->values()->all();
 
-        $row = array_merge($row, $fields);
+        $row = array_merge(['id' => Arr::pull($row, '_id')], $row, $fields);
 
         return Arr::removeNullValues($row);
     }
@@ -87,8 +86,10 @@ class Replicator extends Fieldtype
     {
         $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values()->all();
 
+        $id = Arr::pull($row, 'id') ?? RowId::generate();
+
         return array_merge($row, $fields, [
-            '_id' => "set-$index",
+            '_id' => $id,
             'enabled' => $row['enabled'] ?? true,
         ]);
     }
@@ -173,7 +174,7 @@ class Replicator extends Fieldtype
 
             $values = $this->fields($set['type'])->addValues($set)->{$augmentMethod}()->values();
 
-            return new Values($values->merge(['type' => $set['type']])->all());
+            return new Values($values->merge(['id' => $set['id'] ?? null, 'type' => $set['type']])->all());
         })->values()->all();
     }
 
@@ -265,5 +266,10 @@ class Replicator extends Fieldtype
 
             return array_merge($values, $processed);
         })->all();
+    }
+
+    public function toQueryableValue($value)
+    {
+        return empty($value) ? null : $value;
     }
 }

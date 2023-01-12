@@ -13,12 +13,12 @@ export default {
         },
 
         visibleValues() {
-            let hiddenFields = _.chain(this.hiddenFields)
-                .pick(field => field.hidden && field.omitValue)
+            let omittableFields = _.chain(this.hiddenFields)
+                .pick(field => field.omitValue)
                 .keys()
                 .value();
 
-            return new HiddenValuesOmitter(this.values, this.jsonSubmittingFields).omit(hiddenFields);
+            return new HiddenValuesOmitter(this.values, this.jsonSubmittingFields).omit(omittableFields);
         },
 
     }

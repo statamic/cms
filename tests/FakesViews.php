@@ -4,15 +4,21 @@ namespace Tests;
 
 use Illuminate\View\Factory;
 use Illuminate\View\View;
-use InvalidArgumentException;
 
 trait FakesViews
 {
     public function withFakeViews()
     {
+        $originalFactory = $this->app['view'];
+
         $this->fakeView = app(FakeViewEngine::class);
         $this->fakeViewFinder = new FakeViewFinder($this->app['files'], config('view.paths'));
-        $this->fakeViewFactory = new FakeViewFactory($this->app['view.engine.resolver'], $this->app['view.finder'], $this->app['events']);
+
+        $this->fakeViewFactory = new FakeViewFactory($this->app['view.engine.resolver'], $this->fakeViewFinder, $this->app['events']);
+        foreach (array_reverse($originalFactory->getExtensions()) as $ext => $engine) {
+            $this->fakeViewFactory->addExtension($ext, $engine);
+        }
+
         $this->app->instance('FakeViewEngine', $this->fakeView);
         $this->app->instance('view.finder', $this->fakeViewFinder);
         $this->app->instance('view', $this->fakeViewFactory);
@@ -37,32 +43,32 @@ trait FakesViews
     public function viewShouldReturnRaw($view, $contents, $extension = 'antlers.html')
     {
         $this->fakeView->rawContents["$view.$extension"] = $contents;
-        $this->fakeViewFinder->views[$view] = $view;
-        $this->fakeViewFactory->extensions[$view] = $extension;
+        $this->fakeViewFinder->fakeViews[$view] = $view;
+        $this->fakeViewFactory->fileExtensions[$view] = $extension;
     }
 
     public function viewShouldReturnRendered($view, $contents, $extension = 'antlers.html')
     {
         $this->fakeView->renderedContents["$view.$extension"] = $contents;
-        $this->fakeViewFinder->views[$view] = $view;
-        $this->fakeViewFactory->extensions[$view] = $extension;
+        $this->fakeViewFinder->fakeViews[$view] = $view;
+        $this->fakeViewFactory->fileExtensions[$view] = $extension;
     }
 }
 
 class FakeViewFactory extends Factory
 {
-    public $extensions = [];
+    public $fileExtensions = [];
 
     public function make($view, $data = [], $mergeData = [])
     {
         $engine = app('FakeViewEngine');
-        $ext = $this->extensions[$view] ?? 'antlers.html';
+        $ext = $this->fileExtensions[$view] ?? 'antlers.html';
 
-        if (! $engine->exists($view)) {
-            throw new InvalidArgumentException("View [{$view}] not found.");
+        if ($engine->exists($view)) {
+            return new View($this, $engine, $view, "{$view}.{$ext}", $data);
         }
 
-        return new View($this, $engine, $view, "{$view}.{$ext}", $data);
+        return parent::make($view, $data, $mergeData);
     }
 
     public function exists($view)
@@ -102,12 +108,12 @@ class FakeViewEngine extends \Statamic\View\Antlers\Engine
 
 class FakeViewFinder extends \Illuminate\View\FileViewFinder
 {
-    public $views = [];
+    public $fakeViews = [];
 
     public function find($view)
     {
-        if (isset($this->views[$view])) {
-            return $this->views[$view];
+        if (isset($this->fakeViews[$view])) {
+            return $this->fakeViews[$view];
         }
 
         return parent::find($view);
@@ -115,6 +121,6 @@ class FakeViewFinder extends \Illuminate\View\FileViewFinder
 
     public function exists($path)
     {
-        return isset($this->views[$path]);
+        return isset($this->fakeViews[$path]);
     }
 }

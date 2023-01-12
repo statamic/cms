@@ -3,9 +3,11 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldRepository;
+use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Replicator;
 use Tests\TestCase;
 
 class ReplicatorTest extends TestCase
@@ -13,6 +15,8 @@ class ReplicatorTest extends TestCase
     /** @test */
     public function it_preprocesses_the_values()
     {
+        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+
         FieldRepository::shouldReceive('find')
             ->with('testfieldset.numbers')
             ->andReturnUsing(function () {
@@ -56,7 +60,7 @@ class ReplicatorTest extends TestCase
                 'numbers' => 2,
                 'words' => 'test',
                 'foo' => 'bar',
-                '_id' => 'set-0',
+                '_id' => 'random-string-1',
                 'enabled' => true,
             ],
             [
@@ -64,7 +68,7 @@ class ReplicatorTest extends TestCase
                 'age' => 13,
                 'food' => 'pizza',
                 'foo' => 'more bar',
-                '_id' => 'set-1',
+                '_id' => 'random-string-2',
                 'enabled' => true,
             ],
         ], $field->preProcess()->value());
@@ -73,6 +77,8 @@ class ReplicatorTest extends TestCase
     /** @test */
     public function it_preprocesses_the_values_recursively()
     {
+        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+
         FieldRepository::shouldReceive('find')
             ->with('testfieldset.numbers')
             ->andReturnUsing(function () {
@@ -129,11 +135,11 @@ class ReplicatorTest extends TestCase
                         'nested_age' => 13,
                         'nested_food' => 'pizza',
                         'nested_foo' => 'more bar',
-                        '_id' => 'set-0',
+                        '_id' => 'random-string-1',
                         'enabled' => true,
                     ],
                 ],
-                '_id' => 'set-0',
+                '_id' => 'random-string-2',
                 'enabled' => true,
             ],
         ], $field->preProcess()->value());
@@ -183,12 +189,14 @@ class ReplicatorTest extends TestCase
 
         $this->assertSame([
             [
+                'id' => '1',
                 'type' => 'one',
                 'numbers' => 2,
                 'words' => 'test',
                 'foo' => 'bar',
             ],
             [
+                'id' => '2',
                 'type' => 'two',
                 'age' => 13,
                 'food' => 'pizza',
@@ -248,12 +256,14 @@ class ReplicatorTest extends TestCase
 
         $this->assertSame([
             [
+                'id' => '1',
                 'type' => 'one',
                 'numbers' => 2,
                 'words' => 'test',
                 'foo' => 'bar',
                 'nested_replicator' => [
                     [
+                        'id' => '2',
                         'type' => 'two',
                         'nested_age' => 13,
                         'nested_food' => 'pizza',
@@ -288,6 +298,8 @@ class ReplicatorTest extends TestCase
     /** @test */
     public function it_preloads_new_meta_with_preprocessed_values()
     {
+        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+
         // For this test, use a grid field with min_rows.
         // It doesn't have to be, but it's a fieldtype that would
         // require preprocessed values to be provided down the line.
@@ -323,8 +335,8 @@ class ReplicatorTest extends TestCase
                     'one' => null, // meta for the text field
                 ],
                 'existing' => [
-                    'row-0' => ['one' => null],
-                    'row-1' => ['one' => null],
+                    'random-string-1' => ['one' => null],
+                    'random-string-2' => ['one' => null],
                 ],
             ],
         ];
@@ -357,14 +369,22 @@ class ReplicatorTest extends TestCase
         ]);
 
         $augmented = $field->fieldtype()->augment([
-            ['type' => 'a', 'words' => 'one'],
-            ['type' => 'a', 'words' => 'two'],
+            ['id' => '1', 'type' => 'a', 'words' => 'one'],
+            ['type' => 'a', 'words' => 'two'], // id intentionally omitted
         ]);
 
         $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
         $this->assertEquals([
-            ['type' => 'a', 'words' => 'one (augmented)'],
-            ['type' => 'a', 'words' => 'two (augmented)'],
+            ['id' => '1', 'type' => 'a', 'words' => 'one (augmented)'],
+            ['id' => null, 'type' => 'a', 'words' => 'two (augmented)'],
         ], collect($augmented)->toArray());
+    }
+
+    /** @test */
+    public function it_converts_a_queryable_value()
+    {
+        $this->assertNull((new Replicator)->toQueryableValue(null));
+        $this->assertNull((new Replicator)->toQueryableValue([]));
+        $this->assertEquals([['foo' => 'bar']], (new Replicator)->toQueryableValue([['foo' => 'bar']]));
     }
 }

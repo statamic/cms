@@ -709,6 +709,24 @@ class NodeProcessor
     }
 
     /**
+     * Tests if the provided node is internally treated like a tag.
+     *
+     * @param  AntlersNode  $node  The node.
+     * @return bool
+     */
+    protected function isInternalTagLike(AntlersNode $node)
+    {
+        $nodeName = $node->name->name;
+
+        if ($nodeName == 'slot' || $nodeName == 'push' || $nodeName == 'prepend' ||
+            $nodeName == 'stack' || $nodeName == 'once') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Tests if the runtime should continue processing the node/value combination.
      *
      * This method is responsible for ensuring that developers are not
@@ -723,8 +741,10 @@ class NodeProcessor
     private function guardRuntime(AntlersNode $node, $value)
     {
         if ($node->isClosedBy != null && $this->isLoopable($value) == false) {
-            $varName = $node->name->getContent();
-            Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}");
+            if (! $this->isInternalTagLike($node)) {
+                $varName = $node->name->getContent();
+                Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}");
+            }
 
             return false;
         } elseif ($this->isInterpolationProcessor == false && $this->isLoopable($value) && $node->isClosedBy == null) {
@@ -1268,13 +1288,20 @@ class NodeProcessor
                                 );
                             }
 
+                            $recursiveParent->activeDepth += 1;
+
                             $rootData = RecursiveNodeManager::getRecursiveRootData($node);
                             $parentParameterValues = array_values($recursiveParent->getParameterValues($this));
-                            $currentDepth = RecursiveNodeManager::getNodeDepth($node);
                             // Substitute the current node with the original parent.
                             foreach ($children as $childData) {
+                                $namedDepthMapping = $node->content.'_depth';
+
                                 $depths = RecursiveNodeManager::getActiveDepthNames();
-                                $depths['depth'] = $currentDepth;
+                                $depths['depth'] = $recursiveParent->activeDepth;
+                                $depths[$namedDepthMapping] = $recursiveParent->activeDepth;
+
+                                // Keep the manager in sync.
+                                RecursiveNodeManager::updateNamedDepth($node, $recursiveParent->activeDepth);
 
                                 $childDataToUse = $depths + $childData;
 
@@ -1301,6 +1328,7 @@ class NodeProcessor
                                 }
                             }
 
+                            $recursiveParent->activeDepth -= 1;
                             RecursiveNodeManager::releaseRecursiveNode($node);
                         }
                         continue;
@@ -2117,6 +2145,7 @@ class NodeProcessor
                                         }
                                     }
 
+                                    $this->data = $lockData;
                                     $this->processAssignments($runtimeAssignmentsToProcess);
                                     $lockData = $this->data;
 

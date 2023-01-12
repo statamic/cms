@@ -16,7 +16,7 @@
             <div class="editor-meta">
                 <div class="asset-editor-meta-items">
                     <div class="meta-item">
-                        <span class="meta-label">{{ __('Filename') }}</span>
+                        <span class="meta-label">{{ __('Path') }}</span>
                         <span class="meta-value">{{ asset.path }}</span>
                     </div>
                     <div class="meta-item" v-if="isImage">
@@ -98,19 +98,20 @@
                         </button>
 
                         <button v-if="canRunAction('rename_asset')" type="button" class="btn" @click.prevent="runAction('rename_asset')">
-                            {{ __('Rename File') }}
+                            {{ __('Rename') }}
                         </button>
 
                         <button v-if="canRunAction('move_asset')" type="button" class="btn" @click.prevent="runAction('move_asset')">
-                            {{ __('Move File') }}
+                            {{ __('Move') }}
                         </button>
 
-                        <!--
-                        <button
-                            type="button" class="btn"
-                            @click.prevent="replaceFile">Replace File
+                        <button v-if="canRunAction('replace_asset')" type="button" class="btn" @click.prevent="runAction('replace_asset')">
+                            {{ __('Replace') }}
                         </button>
-                        -->
+
+                        <button v-if="canRunAction('reupload_asset')" type="button" class="btn" @click.prevent="runAction('reupload_asset')">
+                            {{ __('Reupload') }}
+                        </button>
                     </div>
 
                 </div>
@@ -122,7 +123,7 @@
                     :values="values"
                     :meta="meta"
                     :errors="errors"
-                    @updated="values = $event"
+                    @updated="values = { ...$event, focus: values.focus }"
                 >
                     <div class="editor-form" slot-scope="{ setFieldValue, setFieldMeta }">
 
@@ -294,7 +295,11 @@ export default {
             this.$axios.get(url).then(response => {
                 const data = response.data.data;
                 this.asset = data;
-                this.values = data.values;
+
+                // If there are no fields, it will be an empty array when PHP encodes
+                // it into JSON on the server. We'll ensure it's always an object.
+                this.values = _.isArray(data.values) ? {} : data.values;
+
                 this.meta = data.meta;
                 this.actionUrl = data.actionUrl;
                 this.actions = data.actions;
@@ -406,9 +411,12 @@ export default {
             this.$events.$emit('editor-action-started');
         },
 
-        actionCompleted(event) {
-            this.$events.$emit('editor-action-completed');
-            this.close();
+        actionCompleted(successful, response) {
+            this.$events.$emit('editor-action-completed', successful, response);
+            this.$emit('action-completed', successful, response);
+            if (successful) {
+                this.close();
+            }
         },
     }
 

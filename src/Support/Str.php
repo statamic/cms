@@ -2,8 +2,10 @@
 
 namespace Statamic\Support;
 
+use Closure;
 use Statamic\Facades\Compare;
 use Stringy\StaticStringy;
+use voku\helper\ASCII;
 
 /**
  * Manipulating strings.
@@ -13,6 +15,11 @@ class Str extends \Illuminate\Support\Str
     public static function __callStatic($method, $parameters)
     {
         return call_user_func_array([StaticStringy::class, $method], $parameters);
+    }
+
+    public static function ascii($value, $language = 'en')
+    {
+        return ASCII::to_ascii((string) $value, $language, true, config('statamic.system.ascii_replace_extra_symbols'));
     }
 
     /**
@@ -83,14 +90,14 @@ class Str extends \Illuminate\Support\Str
         return strip_tags($html);
     }
 
-    public static function slug($string, $separator = '-', $language = 'en')
+    public static function slug($string, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
     {
         $string = (string) $string;
 
         // Statamic is a-OK with underscores in slugs.
         $string = str_replace('_', $placeholder = strtolower(str_random(16)), $string);
 
-        $slug = parent::slug($string, $separator, $language);
+        $slug = parent::slug($string, $separator, $language, $dictionary);
 
         return str_replace($placeholder, '_', $slug);
     }
@@ -208,6 +215,24 @@ class Str extends \Illuminate\Support\Str
     public static function compare($str1, $str2)
     {
         return Compare::strings($str1, $str2);
+    }
+
+    /**
+     * Parse each part of a string split with a regex through a callback function.
+     *
+     * @param  string  $value
+     * @param  string  $regex
+     * @param  Closure  $callback
+     * @return string
+     */
+    public static function mapRegex($value, $regex, Closure $callback)
+    {
+        $parts = preg_split($regex, $value, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        foreach ($parts as $i => $part) {
+            $parts[$i] = $callback($part, preg_match($regex, $part));
+        }
+
+        return implode('', $parts);
     }
 
     /**

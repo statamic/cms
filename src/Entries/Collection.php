@@ -4,6 +4,7 @@ namespace Statamic\Entries;
 
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
+use InvalidArgumentException;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
@@ -25,6 +26,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayable
@@ -48,6 +50,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $revisions = false;
     protected $positions;
     protected $defaultPublishState = true;
+    protected $originBehavior = 'select';
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
     protected $structure;
@@ -56,6 +59,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $requiresSlugs = true;
     protected $titleFormats = [];
     protected $previewTargets = [];
+    protected $autosave;
 
     public function __construct()
     {
@@ -302,9 +306,12 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint;
 
         return Blink::once($blink, function () use ($blueprint) {
-            return is_null($blueprint)
-                ? $this->entryBlueprints()->reject->hidden()->first()
-                : $this->entryBlueprints()->keyBy->handle()->get($blueprint);
+            if (is_null($blueprint)) {
+                return $this->entryBlueprints()->reject->hidden()->first();
+            }
+
+            return $this->entryBlueprints()->keyBy->handle()->get($blueprint)
+                ?? $this->entryBlueprints()->keyBy->handle()->get(Str::singular($blueprint));
         });
     }
 
@@ -321,12 +328,12 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function fallbackEntryBlueprint()
     {
-        $blueprint = Blueprint::find('default')
-            ->setHandle($this->handle())
+        $blueprint = (clone Blueprint::find('default'))
+            ->setHandle(Str::singular($this->handle()))
             ->setNamespace('collections.'.$this->handle());
 
         $contents = $blueprint->contents();
-        $contents['title'] = $this->title();
+        $contents['title'] = Str::singular($this->title());
         $blueprint->setContents($contents);
 
         return $blueprint;
@@ -505,6 +512,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             'taxonomies' => $this->taxonomies,
             'revisions' => $this->revisions,
             'title_format' => $this->titleFormats,
+            'autosave' => $this->autosave,
         ];
 
         $array = Arr::except($formerlyToArray, [
@@ -533,6 +541,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 'future' => $this->futureDateBehavior,
             ],
             'preview_targets' => $this->previewTargetsForFile(),
+            'origin_behavior' => ($ob = $this->originBehavior()) === 'select' ? null : $ob,
         ]));
 
         if (! Site::hasMultiple()) {
@@ -572,12 +581,38 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function originBehavior($origin = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('originBehavior')
+            ->setter(function ($origin) {
+                $origin = $origin ?? 'select';
+
+                if (! in_array($origin, ['select', 'root', 'active'])) {
+                    throw new InvalidArgumentException("Invalid origin behavior [$origin]. Must be \"select\", \"root\", or \"active\".");
+                }
+
+                return $origin;
+            })
+            ->args(func_get_args());
+    }
+
     public function pastDateBehavior($behavior = null)
     {
         return $this
             ->fluentlyGetOrSet('pastDateBehavior')
             ->getter(function ($behavior) {
                 return $behavior ?? 'public';
+            })
+            ->args(func_get_args());
+    }
+
+    public function revisions($enabled = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('revisions')
+            ->getter(function ($behavior) {
+                return $behavior ?? false;
             })
             ->args(func_get_args());
     }
@@ -592,6 +627,20 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 }
 
                 return $enabled;
+            })
+            ->args(func_get_args());
+    }
+
+    public function autosaveInterval($interval = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('autosave')
+            ->getter(function ($interval) {
+                if (! config('statamic.autosave.enabled') || ! Statamic::pro() || ! $interval) {
+                    return null;
+                }
+
+                return is_bool($interval) ? config('statamic.autosave.interval') : $interval;
             })
             ->args(func_get_args());
     }

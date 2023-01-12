@@ -60,9 +60,9 @@ class ReplicatorFieldtypeTest extends TestCase
         EntryFactory::collection('blog')->id('1')->data([
             'title' => 'Main Post',
             'things' => [
-                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
-                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla', 'trims' => ['trim1']],
-                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
+                ['id' => '1', 'type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
+                ['id' => '2', 'type' => 'car', 'make' => 'toyota', 'model' => 'corolla', 'trims' => ['trim1']],
+                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'], // id intentionally omitted
             ],
         ])->create();
 
@@ -75,11 +75,13 @@ class ReplicatorFieldtypeTest extends TestCase
         ... on Entry_Blog_Article {
             things {
                 ... on Set_Things_Meal {
+                    id
                     type
                     food
                     drink
                 }
                 ... on Set_Things_Car {
+                    id
                     type
                     make
                     model
@@ -101,9 +103,9 @@ GQL;
                 'entry' => [
                     'title' => 'Main Post',
                     'things' => [
-                        ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
-                        ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla', 'trims' => [['title' => 'Trim One']]],
-                        ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
+                        ['id' => '1', 'type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
+                        ['id' => '2', 'type' => 'car', 'make' => 'toyota', 'model' => 'corolla', 'trims' => [['title' => 'Trim One']]],
+                        ['id' => null, 'type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
                     ],
                 ],
             ]]);
