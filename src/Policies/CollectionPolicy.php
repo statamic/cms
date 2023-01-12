@@ -16,7 +16,7 @@ class CollectionPolicy
 
         if (
             $collection instanceof Collection &&
-            ! $collection->inSite($site->handle())) {
+            ! $collection->existsIn($site->handle())) {
             return false;
         }
         if ($user->hasPermission('configure collections')) {
@@ -60,7 +60,7 @@ class CollectionPolicy
 
         return ($user->hasPermission('configure collections') || $user->hasPermission("view {$collection->handle()} entries")) &&
                $user->hasPermission("access {$site->handle()} site") &&
-               $collection->inSite($site->handle());
+               $collection->existsIn($site->handle());
     }
 
     public function edit($user, $collection)
