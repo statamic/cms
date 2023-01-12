@@ -9,16 +9,10 @@ use Statamic\Facades\User;
 
 class CollectionPolicy
 {
-    public function before($user, $ability, $collection)
+    public function before($user, $ability)
     {
         $user = User::fromUser($user);
-        $site = Site::selected();
 
-        if (
-            $collection instanceof Collection &&
-            ! $collection->existsIn($site->handle())) {
-            return false;
-        }
         if ($user->hasPermission('configure collections')) {
             return true;
         }

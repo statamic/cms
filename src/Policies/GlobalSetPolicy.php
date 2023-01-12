@@ -14,10 +14,7 @@ class GlobalSetPolicy
         $user = User::fromUser($user);
         $site = Site::selected();
 
-        if ($user->hasPermission('configure globals') &&
-            $user->hasPermission("access {$site->handle()} site") &&
-            $set instanceof GlobalSet &&
-            $set->existsIn($site->handle())) {
+        if ($user->hasPermission('configure globals') && $user->hasPermission("access {$site->handle()} site")) {
             return true;
         }
     }
