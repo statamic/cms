@@ -1,5 +1,43 @@
 # Release Notes
 
+## 3.3.63 (2022-12-21)
+
+### What's new
+- Ability to use separate queue for in the `static:warm` command. [#7184](https://github.com/statamic/cms/issues/7184) by @robbanl
+
+### What's improved
+- Order `collection` and `taxonomy` fieldtype options by title. [#7246](https://github.com/statamic/cms/issues/7246) by @duncanmcclean
+- Order `roles`, `groups`, and `sites` fieldtype options by title. [#7259](https://github.com/statamic/cms/issues/7259) by @j3ll3yfi5h
+- German translations. [#7252](https://github.com/statamic/cms/issues/7252) by @j3ll3yfi5h, [#7260](https://github.com/statamic/cms/issues/7260) by @helloDanuk
+
+### What's fixed
+- Fix duplicate action not respecting entries without slugs. [#7243](https://github.com/statamic/cms/issues/7243) by @duncanmcclean
+- Support `Carbon` values in conditions. [#6931](https://github.com/statamic/cms/issues/6931) by @edalzell
+- Fix focus related JS error when there are no inputs. [#7257](https://github.com/statamic/cms/issues/7257) by @martyf
+- Remove sound effects on tree drag & drop interactions. [#7255](https://github.com/statamic/cms/issues/7255) by @jackmcdade
+
+
+
+## 3.3.62 (2022-12-16)
+
+### What's new
+- Support default manipulations for Glide. Support using aliases in presets. [#7239](https://github.com/statamic/cms/issues/7239) by @jackmcdade
+- Support prepend and append options on the `integer` fieldtype. [#7241](https://github.com/statamic/cms/issues/7241) by @jackmcdade
+- Support for search transformers to be classes. [#7177](https://github.com/statamic/cms/issues/7177) by @ryanmitchell
+
+### What's improved
+- Improve Control Panel's UX when using an invalid site key format. [#7110](https://github.com/statamic/cms/issues/7110) by @joshuablum
+- Links in field instructions will in new windows. [#7223](https://github.com/statamic/cms/issues/7223) by @jackmcdade
+
+### What's fixed
+- Fix asset thumbnails and file icons in entry listings and `assets` field. [#7195](https://github.com/statamic/cms/issues/7195) by @jacksleight
+- Fix autofocusing of the first field in Control Panel forms. [#7242](https://github.com/statamic/cms/issues/7242) by @jackmcdade
+- Fix default preferences not being tracked with the Git integration. [#7230](https://github.com/statamic/cms/issues/7230) by @jesseleite
+- The `color` fieldtype's picker closes when clicking save. [#7219](https://github.com/statamic/cms/issues/7219) by @jacksleight
+- The `collection` widget's "create entry" button works with multiple blueprints. [#7217](https://github.com/statamic/cms/issues/7217) by @jackmcdade
+
+
+
 ## 3.3.61 (2022-12-13)
 
 ### What's new

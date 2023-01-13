@@ -169,7 +169,18 @@ class Preferences
         CorePreferences::boot();
 
         foreach ($this->extensions as $callback) {
-            $callback($this);
+            $return = $callback($this);
+
+            if (is_array($return)) {
+                foreach ($return as $handle => $section) {
+                    $display = $this->sections[$handle] ?? $section['display'] ?? $handle;
+                    $this->section($handle, $display, function () use ($section) {
+                        foreach ($section['fields'] as $handle => $field) {
+                            $this->register($handle, $field);
+                        }
+                    });
+                }
+            }
         }
 
         $this->fields = array_merge($this->fields, $early);

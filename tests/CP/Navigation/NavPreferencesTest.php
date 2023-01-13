@@ -1409,6 +1409,82 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_can_rename_extended_sections_that_dont_follow_title_case_convention()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->name('SEO Settings')
+                ->section('SEO pro') // This being two words with 'pro' not being title case, caused a bug where preferences weren't properly applied
+                ->url('/cp/seo-pro');
+        });
+
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO pro'];
+
+        $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
+
+        $renamedSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO Pro Renamed'];
+
+        $this->assertEquals($renamedSections, $this->buildNavWithPreferences([
+            'seo_pro' => [
+                'display' => 'SEO Pro Renamed',
+            ],
+        ])->keys()->all());
+    }
+
+    /** @test */
+    public function it_can_hide_extended_sections_that_dont_follow_title_case_convention()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->name('SEO Settings')
+                ->section('SEO pro') // This being two words with 'pro' not being title case, caused a bug where preferences weren't properly applied
+                ->url('/cp/seo-pro')
+                ->children([
+                    'Reports' => '/cp/seo-pro/reports',
+                    'Site Defaults' => '/cp/seo-pro/site-defaults',
+                    'Section Defaults' => '/cp/seo-pro/section-defaults',
+                ]);
+        });
+
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO pro'];
+
+        $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
+
+        $renamedSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users'];
+
+        $this->assertEquals($renamedSections, $this->buildNavWithPreferences([
+            'seo_pro' => [
+                'action' => '@hide',
+            ],
+        ])->keys()->all());
+    }
+
+    /** @test */
+    public function it_can_create_new_items_in_extended_sections_that_dont_follow_title_case_convention()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->name('SEO Settings')
+                ->section('SEO pro') // This being two words with 'pro' not being title case, caused a bug where preferences weren't properly applied
+                ->url('/cp/seo-pro');
+        });
+
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO pro'];
+
+        $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
+
+        $nav = $this->buildNavWithPreferences([
+            'seo_pro' => [
+                'seo_pro::new_item' => [
+                    'action' => '@create',
+                    'display' => 'New Item',
+                    'url' => '/new-item',
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO pro'], $nav->keys()->all());
+        $this->assertEquals(['SEO Settings', 'New Item'], $nav->get('SEO pro')->map->display()->all());
+    }
+
+    /** @test */
     public function it_can_handle_a_bunch_of_useless_config_without_erroring()
     {
         $this->markTestSkipped();

@@ -176,7 +176,7 @@ class NavBuilder
             ->reject(fn ($item) => $item->isChild())
             ->map(fn ($item) => $item->section())
             ->unique()
-            ->values()
+            ->keyBy(fn ($section) => NavItem::snakeCase($section))
             ->all();
 
         return $this;
@@ -213,17 +213,20 @@ class NavBuilder
 
         $navPreferencesConfig = NavPreferencesNormalizer::fromPreferences($preferences);
 
-        collect($navPreferencesConfig['sections'])
+        $sections = collect($navPreferencesConfig['sections'])
+            ->map(fn ($overrides, $section) => $this->ensureSectionConfigHasDisplay($section, $overrides));
+
+        $sections
             ->each(fn ($overrides, $section) => $this->trackSectionManipulations($section, $overrides))
-            ->reject(fn ($overrides, $section) => $section === NavItem::snakeCase($overrides['display']))
+            ->filter(fn ($overrides, $section) => $this->isSectionRenamed($section))
             ->each(fn ($overrides, $section) => $this->renameSection($section, $overrides['display']));
 
-        collect($navPreferencesConfig['sections'])
+        $sections
             ->each(fn ($overrides) => $this->createPendingItemsForSection($overrides))
             ->each(fn ($overrides) => $this->applyPreferenceOverridesForSection($overrides));
 
         if ($navPreferencesConfig['reorder']) {
-            $this->setSectionOrder($navPreferencesConfig['sections']);
+            $this->setSectionOrder($sections);
         }
 
         return $this;
@@ -340,6 +343,29 @@ class NavBuilder
     }
 
     /**
+     * Ensure section config has display.
+     *
+     * @param  string  $sectionKey
+     * @param  array  $sectionConfig
+     * @return array
+     */
+    protected function ensureSectionConfigHasDisplay($sectionKey, $sectionConfig)
+    {
+        // If section already has explicit display value...
+        if ($sectionConfig['display'] !== false) {
+            return $sectionConfig;
+        }
+
+        // If section display not being renamed, attempt to find it from registered items...
+        if ($registeredDisplay = collect($this->sections)->get($sectionKey)) {
+            return array_merge($sectionConfig, ['display' => $registeredDisplay]);
+        }
+
+        // Otherwise infer display from section key...
+        return array_merge($sectionConfig, ['display' => Str::modifyMultiple($sectionKey, ['deslugify', 'title'])]);
+    }
+
+    /**
      * Track section manipulations.
      *
      * @param  string  $sectionKey
@@ -355,28 +381,35 @@ class NavBuilder
     }
 
     /**
+     * Check if section is being renamed.
+     *
+     * @param  string  $sectionKey
+     * @return bool
+     */
+    protected function isSectionRenamed($sectionKey)
+    {
+        if (! $displayOriginal = collect($this->sections)->get($sectionKey)) {
+            return false;
+        }
+
+        return $displayOriginal !== $this->sectionsManipulations[$sectionKey]['display'];
+    }
+
+    /**
      * Rename section.
      *
      * @param  string  $sectionKey
-     * @param  string  $displayNew
      */
-    protected function renameSection($sectionKey, $displayNew)
+    protected function renameSection($sectionKey)
     {
-        $displayOriginal = null;
+        $displayOriginal = collect($this->sections)->get($sectionKey);
+        $displayNew = $this->sectionsManipulations[$sectionKey]['display'];
 
         collect($this->items)
-            ->filter(fn ($item) => NavItem::snakeCase($item->section()) === $sectionKey)
-            ->each(function ($item) use (&$displayOriginal, $displayNew) {
-                $displayOriginal = $item->section();
-                $item->preserveCurrentId()->section($displayNew);
-            });
+            ->filter(fn ($item) => $item->section() === $displayOriginal)
+            ->each(fn ($item) => $item->preserveCurrentId()->section($displayNew));
 
-        $sections = collect($this->sections);
-
-        $sections->put($sections->search($displayOriginal), $displayNew);
-
-        $this->sections = $sections->all();
-
+        $this->sections[$sectionKey] = $displayNew;
         $this->sectionsManipulations[$sectionKey]['display_original'] = $displayOriginal;
     }
 
