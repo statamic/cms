@@ -19,6 +19,8 @@
                 <div class="ml-2 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
                         class="btn-primary pl-2"
+                        :class="{ 'disabled': !isDirty }"
+                        :disabled="!isDirty"
                         @click="save"
                         v-text="__('Save')" />
 
@@ -28,6 +30,7 @@
                                 <svg-icon name="chevron-down-xs" class="w-2" />
                             </button>
                         </template>
+                        <h6 class="p-1">{{ __('Save to') }}...</h6>
                         <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)">
                             <div class="flex items-start pr-2">
                                 <svg-icon :name="option.icon" class="text-grey flex-shrink-0 mr-1 w-4 group-hover:text-white" />
@@ -80,6 +83,10 @@ export default {
 
         hasSaveAsOptions() {
             return this.saveAsOptions.length;
+        },
+
+        isDirty() {
+            return this.$dirty.has(this.name);
         }
 
     },
