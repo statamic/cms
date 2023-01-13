@@ -21,9 +21,9 @@ trait HasSelectedSitePolicy
         }
 
         if (($data = $arguments[0] ?? null)
-            && method_exists($data, 'existsIn') 
+            && method_exists($data, 'existsIn')
             && ! $data->existsIn($site->handle())) {
-                return false;
+            return false;
         }
 
         return $user->can("access {$site->handle()} site");
