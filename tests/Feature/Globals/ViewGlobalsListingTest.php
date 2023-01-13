@@ -33,10 +33,10 @@ class ViewGlobalsListingTest extends TestCase
             ->get(cp_route('globals.index'))
             ->assertOk()
             ->assertViewHas('globals', function ($globals) {
-                return Arr::get($globals, '0.handle', 'test_one')
-                    && Arr::get($globals, '0.edit_url', url('/cp/globals/test_one'))
-                    && Arr::get($globals, '1.handle', 'test_three')
-                    && Arr::get($globals, '1.edit_url', url('/cp/globals/test_three'));
+                return Arr::get($globals, '0.handle') === 'test_one'
+                    && Arr::get($globals, '0.edit_url') === url('/cp/globals/test_one')
+                    && Arr::get($globals, '1.handle') === 'test_three'
+                    && Arr::get($globals, '1.edit_url') === url('/cp/globals/test_three');
             });
     }
 
@@ -65,10 +65,10 @@ class ViewGlobalsListingTest extends TestCase
             ->get(cp_route('globals.index'))
             ->assertOk()
             ->assertViewHas('globals', function ($globals) {
-                return Arr::get($globals, '0.handle', 'test_one')
-                    && Arr::get($globals, '0.edit_url', url('/cp/globals/test_one?site=fr'))
-                    && Arr::get($globals, '1.handle', 'test_two')
-                    && Arr::get($globals, '1.edit_url', url('/cp/globals/test_two/edit'));
+                return Arr::get($globals, '0.handle') === 'test_one'
+                    && Arr::get($globals, '0.edit_url') === url('/cp/globals/test_one?site=fr')
+                    && Arr::get($globals, '1.handle') === 'test_two'
+                    && Arr::get($globals, '1.edit_url') === url('/cp/globals/test_two/edit');
             });
     }
 
@@ -102,8 +102,8 @@ class ViewGlobalsListingTest extends TestCase
                 return $globals->count() === 1;
             })
             ->assertViewHas('globals', function ($globals) {
-                return Arr::get($globals, '0.handle', 'test_one')
-                    && Arr::get($globals, '0.edit_url', url('/cp/globals/test_one?site=fr'));
+                return Arr::get($globals, '0.handle') === 'test_one'
+                    && Arr::get($globals, '0.edit_url') === url('/cp/globals/test_one?site=fr');
             });
     }
 }
