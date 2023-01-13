@@ -50,9 +50,9 @@ class ViewGlobalsListingTest extends TestCase
 
         $this->setTestRoles(['test' => [
             'access cp',
-            'configure globals',
             'access en site',
             'access fr site',
+            'configure globals',
         ]]);
         $user = User::make()->assignRole('test')->save();
         $one = GlobalFactory::handle('test_one')->create();

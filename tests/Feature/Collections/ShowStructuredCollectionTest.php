@@ -23,7 +23,7 @@ class ShowStructuredCollectionTest extends ShowCollectionTest
     public function it_shows_the_structure_tree_if_you_have_permission()
     {
         $this->withoutExceptionHandling();
-        $this->setTestRoles(['test' => ['access cp', 'view test entries', 'access en site']]);
+        $this->setTestRoles(['test' => ['access cp', 'access en site', 'view test entries']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $collection = $this->createCollection('test');
         EntryFactory::id('1')->collection($collection)->create();

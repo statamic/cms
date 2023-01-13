@@ -31,7 +31,7 @@ class ConfigureGlobalsTest extends TestCase
     /** @test */
     public function it_shows_the_form()
     {
-        $this->setTestRoles(['test' => ['access cp', 'configure globals', 'access en site']]);
+        $this->setTestRoles(['test' => ['access cp', 'access en site', 'configure globals']]);
         $user = User::make()->assignRole('test')->save();
 
         $global = GlobalFactory::handle('test')->data(['foo' => 'bar'])->create();
