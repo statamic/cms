@@ -2,14 +2,19 @@
 
 namespace Statamic\Preferences;
 
+use Closure;
+use Facades\Statamic\Preferences\CorePreferences;
 use Illuminate\Support\Arr;
 use Statamic\Facades\User;
 
 class Preferences
 {
     protected $dotted = [];
-    protected $preferences = [];
     protected $preventMergingChildren = [];
+    protected $fields = [];
+    protected $sections = [];
+    protected $pendingSection = null;
+    protected $extensions = [];
 
     /**
      * Get default preferences instance.
@@ -42,10 +47,6 @@ class Preferences
             return [];
         }
 
-        if ($this->preferences) {
-            return $this->preferences;
-        }
-
         return $this
             ->resetState()
             ->mergeDottedUserPreferences()
@@ -74,7 +75,6 @@ class Preferences
     protected function resetState()
     {
         $this->dotted = [];
-        $this->preferences = [];
 
         return $this;
     }
@@ -147,10 +147,91 @@ class Preferences
      */
     protected function getMultiDimensionalPreferences()
     {
+        $preferences = [];
+
         foreach ($this->dotted as $key => $value) {
-            Arr::set($this->preferences, $key, $value);
+            Arr::set($preferences, $key, $value);
         }
 
-        return $this->preferences;
+        return $preferences;
+    }
+
+    public function extend(Closure $callback)
+    {
+        $this->extensions[] = $callback;
+    }
+
+    public function boot()
+    {
+        $early = $this->fields;
+        $this->fields = [];
+
+        CorePreferences::boot();
+
+        foreach ($this->extensions as $callback) {
+            $return = $callback($this);
+
+            if (is_array($return)) {
+                foreach ($return as $handle => $section) {
+                    $display = $this->sections[$handle] ?? $section['display'] ?? $handle;
+                    $this->section($handle, $display, function () use ($section) {
+                        foreach ($section['fields'] as $handle => $field) {
+                            $this->register($handle, $field);
+                        }
+                    });
+                }
+            }
+        }
+
+        $this->fields = array_merge($this->fields, $early);
+    }
+
+    public function register($handle, $field = [])
+    {
+        $preference = self::make($handle, $field);
+
+        $this->fields[] = $preference;
+
+        return $preference;
+    }
+
+    public function make(string $handle, array $field = [])
+    {
+        $preference = (new Preference)->handle($handle)->field($field);
+
+        if ($this->pendingSection) {
+            $preference->section($this->pendingSection);
+        }
+
+        return $preference;
+    }
+
+    public function sections()
+    {
+        return collect($this->fields)
+            ->groupBy->section()
+            ->map(fn ($fields, $section) => [
+                'display' => $this->sections[$section] ?? __('General'),
+                'fields' => $fields->keyBy->handle()->map->field()->all(),
+            ]);
+    }
+
+    public function section($handle, $label, $permissions = null)
+    {
+        throw_if($this->pendingSection, new \Exception('Cannot nest preference sections'));
+
+        if (func_num_args() === 3) {
+            $this->sections[$handle] = $label;
+        }
+
+        if (func_num_args() === 2) {
+            $permissions = $label;
+        }
+
+        $this->pendingSection = $handle;
+
+        $permissions();
+
+        $this->pendingSection = null;
     }
 }

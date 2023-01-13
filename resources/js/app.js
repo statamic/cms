@@ -143,6 +143,7 @@ Statamic.app({
         NavigationListing: require('./components/navigation/Listing.vue').default,
         NavigationCreateForm: require('./components/navigation/CreateForm.vue').default,
         NavigationEditForm: require('./components/navigation/EditForm.vue').default,
+        PreferencesEditForm: require('./components/preferences/EditForm.vue').default,
         NavigationView: require('./components/navigation/View.vue').default,
         TaxonomyCreateForm: require('./components/taxonomies/CreateForm.vue').default,
         TaxonomyEditForm: require('./components/taxonomies/EditForm.vue').default,

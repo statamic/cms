@@ -55,6 +55,7 @@
                     @cp_svg('cog')
                 </button>
             </template>
+            <dropdown-item :text="__('Preferences')" redirect="{{ route('statamic.cp.preferences.index') }}"></dropdown-item>
             <dropdown-item :text="__('CP Nav')" redirect="{{ route('statamic.cp.preferences.nav.index') }}"></dropdown-item>
         </dropdown-list>
 
