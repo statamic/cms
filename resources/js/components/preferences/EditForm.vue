@@ -19,6 +19,8 @@
                 <div class="ml-2 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
                         class="btn-primary pl-2"
+                        :class="{ 'disabled': !isDirty }"
+                        :disabled="!isDirty"
                         @click="save"
                         v-text="__('Save')" />
 
@@ -80,6 +82,10 @@ export default {
 
         hasSaveAsOptions() {
             return this.saveAsOptions.length;
+        },
+
+        isDirty() {
+            return this.$dirty.has(this.name);
         }
 
     },
