@@ -56,15 +56,15 @@ class JavascriptComposer
 
     protected function sites()
     {
-        $user = User::current();
+        $sites = SiteFacade::all();
 
-        return SiteFacade::all()->filter(function (Site $site) use ($user) {
-            if ($user) {
-                return $user->can("access {$site->handle()} site");
-            }
+        if (SiteFacade::hasMultiple()) {
+            $user = User::current();
 
-            return true;
-        })->map(function ($site) {
+            $sites = $sites->filter(fn (Site $site) => $user->can("access {$site->handle()} site"));
+        }
+
+        return $sites->map(function ($site) {
             return [
                 'name' => $site->name(),
                 'handle' => $site->handle(),

@@ -10,10 +10,13 @@ class SitePolicy
     public function before($user, $ability)
     {
         $user = User::fromUser($user);
-        $site = Site::selected();
 
-        if (! $user->hasPermission("access {$site->handle()} site")) {
-            return false;
+        if (Site::hasMultiple()) {
+            $site = Site::selected();
+
+            if (! $user->hasPermission("access {$site->handle()} site")) {
+                return false;
+            }
         }
     }
 
@@ -26,6 +29,6 @@ class SitePolicy
     {
         $user = User::fromUser($user);
 
-        return $user->hasPermission("access {$site->handle()} site");
+        return ! Site::hasMultiple() || $user->hasPermission("access {$site->handle()} site");
     }
 }

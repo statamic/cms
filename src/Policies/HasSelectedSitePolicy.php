@@ -8,6 +8,10 @@ trait HasSelectedSitePolicy
 {
     protected function accessInSelectedSite($user, $arguments)
     {
+        if (! Site::hasMultiple()) {
+            return true;
+        }
+
         $site = Site::selected();
 
         // If this first argument is a string, that means they are passing a class name
@@ -16,9 +20,12 @@ trait HasSelectedSitePolicy
             array_shift($arguments);
         }
 
-        $data = $arguments[0] ?? null;
+        if (($data = $arguments[0] ?? null)
+            && method_exists($data, 'existsIn') 
+            && ! $data->existsIn($site->handle())) {
+                return false;
+        }
 
-        return $user->can("access {$site->handle()} site")
-            && (is_null($data) || (method_exists($data, 'existsIn') && $data->existsIn($site->handle())));
+        return $user->can("access {$site->handle()} site");
     }
 }
