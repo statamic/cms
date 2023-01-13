@@ -26,7 +26,7 @@ class PlainResult extends Result
             return $this->data['status'] ?? 'published';
         }
 
-        return $this->data[$field];
+        return $this->data[$field] ?? null;
     }
 
     public function newAugmentedInstance(): Augmented
