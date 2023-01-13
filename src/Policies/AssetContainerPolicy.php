@@ -18,6 +18,8 @@ class AssetContainerPolicy
 
     public function index($user)
     {
+        $user = User::fromUser($user);
+
         return AssetContainer::all()->filter(function ($container) use ($user) {
             return $this->view($user, $container);
         })->isNotEmpty();
@@ -32,7 +34,7 @@ class AssetContainerPolicy
     {
         $user = User::fromUser($user);
 
-        $user->hasPermission("view {$container->handle()} assets");
+        return $user->hasPermission("view {$container->handle()} assets");
     }
 
     public function edit($user, $container)
