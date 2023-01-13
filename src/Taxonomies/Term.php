@@ -2,7 +2,6 @@
 
 namespace Statamic\Taxonomies;
 
-use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\SyncsOriginalState;
@@ -14,14 +13,13 @@ use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Stache;
-use Statamic\Search\Searchable;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Term implements TermContract, SearchableContract
+class Term implements TermContract
 {
-    use ExistsAsFile, FluentlyGetsAndSets, SyncsOriginalState, Searchable;
+    use ExistsAsFile, FluentlyGetsAndSets, SyncsOriginalState;
 
     protected $taxonomy;
     protected $slug;
@@ -272,10 +270,5 @@ class Term implements TermContract, SearchableContract
         $return = $default->$method(...$args);
 
         return ($return == $default) ? $this : $return;
-    }
-
-    public function getCpSearchResultBadge(): string
-    {
-        return $this->taxonomy()->title();
     }
 }
