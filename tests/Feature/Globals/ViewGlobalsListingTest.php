@@ -106,4 +106,37 @@ class ViewGlobalsListingTest extends TestCase
                     && Arr::get($globals, '0.edit_url') === url('/cp/globals/test_one?site=fr');
             });
     }
+
+    /** @test */
+    public function it_filters_out_globals_in_sites_you_dont_have_permission_to_access()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en', 'name' => 'English'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr', 'name' => 'French'],
+        ]]);
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'edit fr globals',
+            'access fr site',
+        ]]);
+        $user = User::make()->assignRole('test')->save();
+        $one = GlobalFactory::handle('en')->site('en')->create();
+        $two = GlobalFactory::handle('fr')->site('fr')->create();
+
+        Site::setSelected('fr');
+
+        $this->actingAs($user)
+            ->get(cp_route('globals.index'))
+            ->assertOk()
+            ->assertViewHas('globals', function ($globals) {
+                return $globals->count() === 1;
+            })
+            ->assertViewHas('globals', function ($globals) {
+                $sorted = $globals->sortBy('handle')->values();
+
+                return (Arr::get($sorted, '0.handle') == 'fr') &&
+                       (Arr::get($sorted, '0.edit_url') == url('/cp/globals/fr?site=fr'));
+            });
+    }
 }
