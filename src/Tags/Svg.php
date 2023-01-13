@@ -41,12 +41,36 @@ class Svg extends Tags
             }
         }
 
-        $attributes = $this->renderAttributesFromParams(['src']);
+        $attributes = $this->renderAttributesFromParams(['src', 'title', 'desc']);
+
+        if ($this->params->get('title') || $this->params->get('desc')) {
+            $svg = $this->setTitleAndDesc($svg);
+        }
 
         return str_replace(
             '<svg',
             collect(['<svg', $attributes])->filter()->implode(' '),
             $svg
         );
+    }
+
+    private function setTitleAndDesc($svg)
+    {
+        $doc = new \DOMDocument;
+        $doc->loadXML($svg);
+
+        if (count($doc->getElementsByTagName('desc')) === 0) {
+            $desc = $doc->createElement('desc', $this->params->get('desc'));
+            $desc->setAttribute('id', 'desc');
+            $doc->firstChild->insertBefore($desc, $doc->firstChild->firstChild);
+        }
+
+        if (count($doc->getElementsByTagName('title')) === 0) {
+            $title = $doc->createElement('title', $this->params->get('title'));
+            $title->setAttribute('id', 'title');
+            $doc->firstChild->insertBefore($title, $doc->firstChild->firstChild);
+        }
+
+        return $doc->saveHTML();
     }
 }
