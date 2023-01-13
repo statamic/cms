@@ -15,7 +15,7 @@ abstract class ShowCollectionTest extends TestCase
     /** @test */
     public function it_shows_the_empty_entry_listing_page_if_you_have_permission_and_there_are_no_entries()
     {
-        $this->setTestRoles(['test' => ['access cp', 'access en site', 'view test entries']]);
+        $this->setTestRoles(['test' => ['access cp', 'view test entries']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $collection = $this->createCollection('test');
 

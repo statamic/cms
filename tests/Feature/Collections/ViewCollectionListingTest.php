@@ -77,7 +77,7 @@ class ViewCollectionListingTest extends TestCase
     {
         $collectionA = $this->createCollection('foo');
         $collectionB = $this->createCollection('bar');
-        $this->setTestRoles(['test' => ['access cp', 'access en site', 'view bar entries']]);
+        $this->setTestRoles(['test' => ['access cp', 'view bar entries']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();
 
         $response = $this
@@ -139,7 +139,7 @@ class ViewCollectionListingTest extends TestCase
     public function create_collection_button_is_not_visible_without_permission_to_configure()
     {
         $collectionA = $this->createCollection('foo');
-        $this->setTestRoles(['test' => ['access cp', 'access en site', 'view foo entries']]);
+        $this->setTestRoles(['test' => ['access cp', 'view foo entries']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();
 
         $response = $this

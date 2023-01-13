@@ -68,6 +68,10 @@ class CorePermissions
 
     protected function registerSites()
     {
+        if (! Site::hasMultiple()) {
+            return;
+        }
+
         $this->register('access {site} site', function ($permission) {
             $permission->replacements('site', function () {
                 return Site::all()->map(function ($site) {

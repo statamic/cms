@@ -19,7 +19,7 @@ class ShowRegularCollectionTest extends ShowCollectionTest
     /** @test */
     public function it_shows_the_entry_listing_page_if_you_have_permission()
     {
-        $this->setTestRoles(['test' => ['access cp', 'access en site', 'view test entries']]);
+        $this->setTestRoles(['test' => ['access cp', 'view test entries']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $collection = $this->createCollection('test');
         EntryFactory::id('1')->collection($collection)->create();
