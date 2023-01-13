@@ -39,7 +39,7 @@ class NavPreferencesNormalizerTest extends TestCase
         ]);
 
         $this->assertFalse(Arr::get($nav, 'sections.content.reorder'));
-        $this->assertEquals('Content', Arr::get($nav, 'sections.content.display'));
+        $this->assertFalse(Arr::get($nav, 'sections.content.display'));
         $this->assertHasHashedIdFor('fields::blueprints', Arr::get($nav, 'sections.content.items'));
     }
 
@@ -539,7 +539,7 @@ class NavPreferencesNormalizerTest extends TestCase
                 'top_level' => [
                     'action' => false,
                     'reorder' => false,
-                    'display' => 'Top Level',
+                    'display' => false,
                     'items' => [
                         'top_level::dashboard' => [
                             'action' => '@modify',
@@ -556,7 +556,7 @@ class NavPreferencesNormalizerTest extends TestCase
                 'content' => [
                     'action' => false,
                     'reorder' => false,
-                    'display' => 'Content',
+                    'display' => false,
                     'items' => [
                         $contentBlueprintsId => [
                             'action' => '@alias',
@@ -572,7 +572,7 @@ class NavPreferencesNormalizerTest extends TestCase
                 'fields' => [
                     'action' => '@hide',
                     'reorder' => false,
-                    'display' => 'Fields',
+                    'display' => false,
                     'items' => [],
                 ],
             ],

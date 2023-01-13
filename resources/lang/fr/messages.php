@@ -132,6 +132,8 @@ return [
     'licensing_error_outside_license_range' => 'Licence valable pour les versions :start et :end',
     'licensing_error_unknown_site' => 'Site inconnu',
     'licensing_error_unlicensed' => 'Sans licence',
+    'licensing_incorrect_key_format_body' => 'Il semble que votre clef de site n’est pas dans le format attendu. Merci de la vérifier et de réessayer. Vous pouvez récupérer votre clef de site dans votre espace "Account" sur statamic.com. Elle consiste en une chaîne de 16 caractères alphanumériques. Vérifiez que vous n’utilisez plus l’ancienne clef de licence qui était un UUID.',
+    'licensing_incorrect_key_format_heading' => 'Format de la clef de site incorrecte',
     'licensing_production_alert' => 'Ce site utilise Statamic Pro et des addons commerciaux. Veuillez acheter les licences appropriées.',
     'licensing_production_alert_addons' => 'Ce site utilise des addons commerciaux. Veuillez acheter les licences appropriées.',
     'licensing_production_alert_renew_statamic' => 'L’utilisation de cette version de Statamic Pro requiert le renouvellement de la licence.',

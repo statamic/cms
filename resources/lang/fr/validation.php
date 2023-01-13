@@ -17,6 +17,7 @@ return [
     'between.array' => 'Doit avoir entre :min et :max éléments.',
     'boolean' => 'Doit être vrai ou faux.',
     'confirmed' => 'La confirmation ne correspond pas.',
+    'current_password' => 'Le mot de passe est incorrect.',
     'date' => 'Date non valide',
     'date_format' => 'Ne correspond pas au format :format.',
     'different' => 'Ce champ et :other doivent être différents.',

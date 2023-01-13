@@ -231,6 +231,20 @@ EOT;
         $this->assertSame('Result: Default', $this->renderString($template, ['value' => 23]));
     }
 
+    public function test_switch_operator_with_simplified_conditions()
+    {
+        $template = <<<'EOT'
+{{
+    switch (
+        (['doc', 'docx'] | in_array(filetype)) => 'word.svg',
+        () => 'default.svg'
+    )
+}}
+EOT;
+
+        $this->assertSame('word.svg', $this->renderString($template, ['filetype' => 'doc']));
+    }
+
     public function test_deferred_expressions_are_evaluated_correctly_from_ternary_conditions_relaxed()
     {
         (new class extends Tags

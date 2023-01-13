@@ -17,6 +17,7 @@ return [
     'between.array' => 'Må ha mellom :min og :max elementer.',
     'boolean' => 'Må være sann eller usann.',
     'confirmed' => 'Bekreftelsen stemmer ikke overens.',
+    'current_password' => 'Oppgitt passord er feil.',
     'date' => 'Datoen er ugyldig.',
     'date_format' => 'Stemmer ikke overens med formatet :format.',
     'different' => 'Dette feltet og :other må være forskjellige.',

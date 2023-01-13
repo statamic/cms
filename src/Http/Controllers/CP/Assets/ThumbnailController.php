@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Cache;
 use League\Glide\Server;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
+use Statamic\Facades\Image;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Statamic;
@@ -103,9 +104,15 @@ class ThumbnailController extends Controller
         Cache::put($this->mutex(), true, now()->addMinutes(5));
 
         try {
+            $preset = $this->getPreset();
+
+            if (! collect(Image::cpManipulationPresets())->has($preset)) {
+                throw new \Exception('Invalid preset');
+            }
+
             $path = $this->generator->generateByAsset(
                 $this->asset,
-                $this->size ? ['p' => $this->getPreset()] : []
+                $this->size ? ['p' => $preset] : []
             );
         } finally {
             Cache::forget($this->mutex());

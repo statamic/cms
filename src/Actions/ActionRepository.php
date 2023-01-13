@@ -23,6 +23,7 @@ class ActionRepository
     public function for($item, $context = [])
     {
         return $this->all()
+            ->each->items([$item])
             ->each->context($context)
             ->filter->visibleTo($item)
             ->filter->authorize(User::current(), $item)
@@ -32,6 +33,7 @@ class ActionRepository
     public function forBulk($items, $context = [])
     {
         return $this->all()
+            ->each->items($items)
             ->each->context($context)
             ->filter->visibleToBulk($items)
             ->filter->authorizeBulk(User::current(), $items)
