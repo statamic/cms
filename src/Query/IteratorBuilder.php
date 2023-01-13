@@ -76,9 +76,11 @@ abstract class IteratorBuilder extends Builder
     protected function filterWhereColumn($entries, $where)
     {
         return $entries->filter(function ($value, $key) use ($where) {
+            $columnOne = $this->getFilterItemValue($value, $where['column']);
+            $columnTwo = $this->getFilterItemValue($value, $where['value']);
             $method = 'filterTest'.$this->operators[$where['operator']];
 
-            return $this->{$method}($value[$where['column']] ?? '', $value[$where['value']] ?? '');
+            return $this->{$method}($columnOne ?? '', $columnTwo ?? '');
         });
     }
 
