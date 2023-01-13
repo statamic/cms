@@ -230,7 +230,7 @@ class Preferences
 
         $this->pendingSection = $handle;
 
-        $permissions();
+        $permissions($this);
 
         $this->pendingSection = null;
     }
