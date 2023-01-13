@@ -9,7 +9,7 @@ class GlobalSetPolicy
 {
     use HasSelectedSitePolicy;
 
-    public function before($user, $ability, $set)
+    public function before($user, $ability, ...$arguments)
     {
         $user = User::fromUser($user);
 
@@ -17,7 +17,7 @@ class GlobalSetPolicy
             return true;
         }
 
-        if (! $this->accessInSelectedSite($user, $set)) {
+        if (! $this->accessInSelectedSite($user, $arguments)) {
             return false;
         }
     }

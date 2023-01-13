@@ -9,7 +9,7 @@ class NavPolicy
 {
     use HasSelectedSitePolicy;
 
-    public function before($user, $ability, $nav)
+    public function before($user, $ability, ...$arguments)
     {
         $user = User::fromUser($user);
 
@@ -17,7 +17,7 @@ class NavPolicy
             return true;
         }
 
-        if (! $this->accessInSelectedSite($user, $nav)) {
+        if (! $this->accessInSelectedSite($user, $arguments)) {
             return false;
         }
     }

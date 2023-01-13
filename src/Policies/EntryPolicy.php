@@ -8,7 +8,7 @@ class EntryPolicy
 {
     use HasSelectedSitePolicy;
 
-    public function before($user, $ability, $entry)
+    public function before($user, $ability, ...$arguments)
     {
         $user = User::fromUser($user);
 
@@ -16,7 +16,7 @@ class EntryPolicy
             return true;
         }
 
-        if (! $this->accessInSelectedSite($user, $entry)) {
+        if (! $this->accessInSelectedSite($user, $arguments)) {
             return false;
         }
     }

@@ -9,7 +9,7 @@ class CollectionPolicy
 {
     use HasSelectedSitePolicy;
 
-    public function before($user, $ability, $collection)
+    public function before($user, $ability, ...$arguments)
     {
         $user = User::fromUser($user);
 
@@ -17,7 +17,7 @@ class CollectionPolicy
             return true;
         }
 
-        if (! $this->accessInSelectedSite($user, $collection)) {
+        if (! $this->accessInSelectedSite($user, $arguments)) {
             return false;
         }
     }

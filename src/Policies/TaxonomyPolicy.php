@@ -9,7 +9,7 @@ class TaxonomyPolicy
 {
     use HasSelectedSitePolicy;
 
-    public function before($user, $ability, $taxonomy)
+    public function before($user, $ability, ...$arguments)
     {
         $user = User::fromUser($user);
 
@@ -17,7 +17,7 @@ class TaxonomyPolicy
             return true;
         }
 
-        if (! $this->accessInSelectedSite($user, $taxonomy)) {
+        if (! $this->accessInSelectedSite($user, $arguments)) {
             return false;
         }
     }
