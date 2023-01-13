@@ -7,12 +7,18 @@ use Statamic\Facades\User;
 
 class NavPolicy
 {
-    public function before($user, $ability)
+    use HasSelectedSitePolicy;
+
+    public function before($user, $ability, $nav)
     {
         $user = User::fromUser($user);
 
         if ($user->hasPermission('configure navs')) {
             return true;
+        }
+
+        if (! $this->accessInSelectedSite($user, $nav)) {
+            return false;
         }
     }
 
@@ -55,8 +61,6 @@ class NavPolicy
 
     public function update($user, $nav)
     {
-        $user = User::fromUser($user);
-
         return $this->edit($user, $nav);
     }
 

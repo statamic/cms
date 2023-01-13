@@ -9,18 +9,18 @@ class AssetContainerPolicy
 {
     public function before($user, $ability)
     {
-        if (User::fromUser($user)->hasPermission('configure asset containers')) {
+        $user = User::fromUser($user);
+
+        if ($user->hasPermission('configure asset containers')) {
             return true;
         }
     }
 
     public function index($user)
     {
-        $user = User::fromUser($user);
-
-        return ! AssetContainer::all()->filter(function ($container) use ($user) {
+        return AssetContainer::all()->filter(function ($container) use ($user) {
             return $this->view($user, $container);
-        })->isEmpty();
+        })->isNotEmpty();
     }
 
     public function create($user)
@@ -30,7 +30,9 @@ class AssetContainerPolicy
 
     public function view($user, $container)
     {
-        return User::fromUser($user)->can("view {$container->handle()} assets");
+        $user = User::fromUser($user);
+
+        $user->hasPermission("view {$container->handle()} assets");
     }
 
     public function edit($user, $container)

@@ -6,12 +6,18 @@ use Statamic\Facades\User;
 
 class EntryPolicy
 {
-    public function before($user, $ability)
+    use HasSelectedSitePolicy;
+
+    public function before($user, $ability, $entry)
     {
         $user = User::fromUser($user);
 
         if ($user->hasPermission('configure collections')) {
             return true;
+        }
+
+        if (! $this->accessInSelectedSite($user, $entry)) {
+            return false;
         }
     }
 
@@ -24,8 +30,11 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
-        return $this->edit($user, $entry)
-            || $user->hasPermission("view {$entry->collectionHandle()} entries");
+        if ($this->edit($user, $entry)) {
+            return true;
+        }
+
+        return $user->hasPermission("view {$entry->collectionHandle()} entries");
     }
 
     public function edit($user, $entry)
@@ -52,8 +61,6 @@ class EntryPolicy
 
     public function update($user, $entry)
     {
-        $user = User::fromUser($user);
-
         return $this->edit($user, $entry);
     }
 

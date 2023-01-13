@@ -7,12 +7,18 @@ use Statamic\Facades\User;
 
 class TaxonomyPolicy
 {
-    public function before($user, $ability)
+    use HasSelectedSitePolicy;
+
+    public function before($user, $ability, $taxonomy)
     {
         $user = User::fromUser($user);
 
         if ($user->hasPermission('configure taxonomies')) {
             return true;
+        }
+
+        if (! $this->accessInSelectedSite($user, $taxonomy)) {
+            return false;
         }
     }
 

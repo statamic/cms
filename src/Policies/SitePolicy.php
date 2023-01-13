@@ -24,6 +24,8 @@ class SitePolicy
 
     public function view($user, $site)
     {
-        return User::fromUser($user)->hasPermission("access {$site->handle()} site");
+        $user = User::fromUser($user);
+
+        return $user->hasPermission("access {$site->handle()} site");
     }
 }

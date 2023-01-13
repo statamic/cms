@@ -3,18 +3,22 @@
 namespace Statamic\Policies;
 
 use Statamic\Facades\GlobalSet;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
 class GlobalSetPolicy
 {
-    public function before($user, $ability)
+    use HasSelectedSitePolicy;
+
+    public function before($user, $ability, $set)
     {
         $user = User::fromUser($user);
-        $site = Site::selected();
 
-        if ($user->hasPermission('configure globals') && $user->hasPermission("access {$site->handle()} site")) {
+        if ($user->hasPermission('configure globals')) {
             return true;
+        }
+
+        if (! $this->accessInSelectedSite($user, $set)) {
+            return false;
         }
     }
 
@@ -26,9 +30,9 @@ class GlobalSetPolicy
             return true;
         }
 
-        return ! GlobalSet::all()->filter(function ($set) use ($user) {
+        return GlobalSet::all()->filter(function ($set) use ($user) {
             return $this->view($user, $set);
-        })->isEmpty();
+        })->isNotEmpty();
     }
 
     public function create($user)

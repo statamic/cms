@@ -3,17 +3,22 @@
 namespace Statamic\Policies;
 
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
 class CollectionPolicy
 {
-    public function before($user, $ability)
+    use HasSelectedSitePolicy;
+
+    public function before($user, $ability, $collection)
     {
         $user = User::fromUser($user);
 
         if ($user->hasPermission('configure collections')) {
             return true;
+        }
+
+        if (! $this->accessInSelectedSite($user, $collection)) {
+            return false;
         }
     }
 
@@ -32,28 +37,19 @@ class CollectionPolicy
 
     public function create($user)
     {
-        $user = User::fromUser($user);
-        $site = Site::selected();
-
-        return  $user->hasPermission('configure collections') && $user->hasPermission("access {$site->handle()} site");
+        // handled by before()
     }
 
     public function store($user)
     {
-        $user = User::fromUser($user);
-        $site = Site::selected();
-
-        return  $user->hasPermission('configure collections') && $user->hasPermission("access {$site->handle()} site");
+        // handled by before()
     }
 
     public function view($user, $collection)
     {
         $user = User::fromUser($user);
-        $site = Site::selected();
 
-        return ($user->hasPermission('configure collections') || $user->hasPermission("view {$collection->handle()} entries")) &&
-               $user->hasPermission("access {$site->handle()} site") &&
-               $collection->existsIn($site->handle());
+        return $user->hasPermission("view {$collection->handle()} entries");
     }
 
     public function edit($user, $collection)
@@ -75,6 +71,7 @@ class CollectionPolicy
     {
         $user = User::fromUser($user);
 
-        return $collection->hasStructure() && $user->hasPermission("reorder {$collection->handle()} entries");
+        return $collection->hasStructure()
+            && $user->hasPermission("reorder {$collection->handle()} entries");
     }
 }

@@ -269,6 +269,11 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             ->args(func_get_args());
     }
 
+    public function existsIn(string $locale): bool
+    {
+        return $this->sites()->contains($locale);
+    }
+
     public function revisionsEnabled($enabled = null)
     {
         return $this
