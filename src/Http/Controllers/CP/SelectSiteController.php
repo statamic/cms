@@ -2,11 +2,13 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Statamic\Facades\Site;
+
 class SelectSiteController extends CpController
 {
     public function select($handle)
     {
-        session()->put('statamic.cp.selected-site', $handle);
+        Site::setSelected($handle);
 
         return back()->with('success', __('Site selected.'));
     }

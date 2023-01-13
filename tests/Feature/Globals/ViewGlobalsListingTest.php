@@ -59,7 +59,7 @@ class ViewGlobalsListingTest extends TestCase
         $one->addLocalization($one->makeLocalization('fr'))->save();
         $two = GlobalFactory::handle('test_two')->create();
 
-        session()->put('statamic.cp.selected-site', 'fr');
+        Site::setSelected('fr');
 
         $this->actingAs($user)
             ->get(cp_route('globals.index'))
@@ -93,7 +93,7 @@ class ViewGlobalsListingTest extends TestCase
         $two = GlobalFactory::handle('test_two')->create();
         $three = GlobalFactory::handle('test_three')->create();
 
-        session()->put('statamic.cp.selected-site', 'fr');
+        Site::setSelected('fr');
 
         $this->actingAs($user)
             ->get(cp_route('globals.index'))

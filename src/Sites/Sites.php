@@ -69,6 +69,11 @@ class Sites
         return $this->get(session('statamic.cp.selected-site', $this->default()->handle()));
     }
 
+    public function setSelected($site)
+    {
+        session()->put('statamic.cp.selected-site', $site);
+    }
+
     public function setConfig($key, $value = null)
     {
         // If no value is provided, then the key must've been the entire config.
