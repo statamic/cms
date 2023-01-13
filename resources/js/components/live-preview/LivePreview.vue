@@ -122,7 +122,7 @@ export default {
             keybinding: null,
             token: null,
             target: 0,
-            previousHost: null
+            previousUrl: null
         }
     },
 
