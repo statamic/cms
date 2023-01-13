@@ -12,10 +12,10 @@ class SitePolicy
         if (! Site::hasMultiple()) {
             return null;
         }
-        
-        $user = User::fromUser($user);   
+
+        $user = User::fromUser($user);
         $site = Site::selected();
-        
+
         if (! $user->hasPermission("access {$site->handle()} site")) {
             return false;
         }
