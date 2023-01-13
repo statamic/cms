@@ -82,6 +82,8 @@ class ViewGlobalsListingTest extends TestCase
 
         $this->setTestRoles(['test' => [
             'access cp',
+            'access en site',
+            'access fr site',
             'edit test_one globals',
             'edit test_three globals',
         ]]);
