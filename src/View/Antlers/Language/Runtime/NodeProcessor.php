@@ -1542,7 +1542,6 @@ class NodeProcessor
 
                             $sectionName = 'section:'.$tagMethod.'__yield'.$activeYield;
 
-
                             $sections = null;
 
                             if ($this->cascade == null && $sections == null) {

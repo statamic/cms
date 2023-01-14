@@ -113,9 +113,9 @@ EOT;
 
         $nav = Nav::make('test');
         $nav->makeTree('en', [
-            [ 'entry' => '1'],
-            [ 'entry' => '2'],
-            [ 'entry' => '3'],
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
         ])->save();
 
         $nav->save();
@@ -141,7 +141,6 @@ About -> /about-old
 
 Contact -> /contact
 EXPECTED;
-
 
         $response = $this->get('/about-old')->assertOk();
 
