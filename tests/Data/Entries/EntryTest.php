@@ -384,39 +384,37 @@ class EntryTest extends TestCase
             ->sites(['en', 'fr', 'de'])
             ->save();
 
-        $entryEn = (new Entry)
+        $root = (new Entry)
             ->id('en')
             ->locale('en')
             ->collection($collection)
             ->data(['description' => 'Description from en']);
-        $entryEn->save();
+        $root->save();
 
-        $entryFr = $entryEn->makeLocalization('fr');
-        $entryEn->addLocalization($entryFr); // todo: necessary to call this because $entryEn::$localizations is already cached and does not get/recognize new localizations. should be called in Entry::makeLocalization() ?
-        $entryFr->save();
+        $localization = $root->makeLocalization('fr');
+        $root->addLocalization($localization); // todo: necessary to call this because $entryEn::$localizations is already cached and does not get/recognize new localizations. should be called in Entry::makeLocalization() ?
+        $localization->save();
 
-        $entryDe = $entryFr->makeLocalization('de');
-        $entryFr->addLocalization($entryDe);
-        $entryDe->save();
+        $deeperLocalization = $localization->makeLocalization('de');
+        $localization->addLocalization($deeperLocalization);
+        $deeperLocalization->save();
 
-        $this->assertEquals('Description from en', $entryEn->values()->get('description'));
-        $this->assertEquals('Description from en', $entryFr->value('description'));
-        $this->assertEquals('Description from en', $entryDe->value('description'));
+        $store = Facades\Stache::store('entries::articles');
 
-        $entryEn->data(['description' => 'Description from en modified'])->save();
+        // re-fetch root from cache to get a fresh object.
+        $store->forgetItem($root->id());
+        $root = $store->getItem($root->id());
 
-        // todo: how to get fresh entry objects from stache so that the origin entries are reloaded from cache as well. warming stache does not work...
-        $this->markTestIncomplete('Incomplete: Reload objects from cache/stache to simulate a new request.');
+        $this->assertEquals('Description from en', $store->getItem($localization->id())->value('description'));
+        $this->assertEquals('Description from en', $store->getItem($deeperLocalization->id())->value('description'));
 
-//        Facades\Stache::warm();
+        $store->forgetItem($root->id());
+        $root = $store->getItem($root->id());
 
-//        $entryEn = Facades\Entry::find($entryEn->id());
-//        $entryFr = Facades\Entry::find($entryFr->id());
-//        $entryDe = Facades\Entry::find($entryDe->id());
+        $root->data(['description' => 'Description from en modified'])->save();
 
-//        $this->assertEquals('Description from en modified', $entryEn->values()->get('description'));
-//        $this->assertEquals('Description from en modified', $entryFr->value('description'));
-//        $this->assertEquals('Description from en modified', $entryDe->value('description'));
+        $this->assertEquals('Description from en modified', $store->getItem($localization->id())->value('description'));
+        $this->assertEquals('Description from en modified', $store->getItem($deeperLocalization->id())->value('description'));
     }
 
     /** @test */

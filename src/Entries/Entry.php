@@ -321,6 +321,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         optional(Collection::findByMount($this))->updateEntryUris();
 
+        if (!$isNew) {
+            $this->updateCacheOfLocalizedDescendants();
+        }
+
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
         }
@@ -341,24 +345,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                 });
         }
 
-        $this->updateCacheOfLocalizedDescendants($this);
-
         return true;
     }
 
-    protected function updateCacheOfLocalizedDescendants(Entry $parent)
+    protected function updateCacheOfLocalizedDescendants()
     {
-        if ($parent->descendants()->count() === 0) {
-            return;
-        }
-
-        $directDescendants = $parent->descendants()->filter(function ($descendant) use ($parent) {
-            return $descendant->origin()->id() === $parent->id();
-        });
-        $directDescendants->each(function ($descendant) use ($parent) {
-            $descendant->origin($parent);
-            Facades\Entry::save($descendant);
-            $this->updateCacheOfLocalizedDescendants($descendant);
+        $this->descendants()->each(function ($descendant) {
+            $collectionHandle = $this->collectionHandle();
+            $store = app('stache')->store("entries::${collectionHandle}");
+            $store->forgetItem($descendant->id());
+            $store->getItem($descendant->id());
         });
     }
 
