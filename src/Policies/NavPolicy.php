@@ -7,7 +7,7 @@ use Statamic\Facades\User;
 
 class NavPolicy
 {
-    use HasSelectedSitePolicy;
+    use HasMultisitePolicy;
 
     public function before($user, $ability, ...$arguments)
     {

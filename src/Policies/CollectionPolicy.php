@@ -7,7 +7,7 @@ use Statamic\Facades\User;
 
 class CollectionPolicy
 {
-    use HasSelectedSitePolicy;
+    use HasMultisitePolicy;
 
     public function before($user, $ability, ...$arguments)
     {

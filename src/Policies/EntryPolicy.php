@@ -6,7 +6,7 @@ use Statamic\Facades\User;
 
 class EntryPolicy
 {
-    use HasSelectedSitePolicy;
+    use HasMultisitePolicy;
 
     public function before($user, $ability, ...$arguments)
     {

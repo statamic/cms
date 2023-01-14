@@ -4,7 +4,7 @@ namespace Statamic\Policies;
 
 use Statamic\Facades\Site;
 
-trait HasSelectedSitePolicy
+trait HasMultisitePolicy
 {
     protected function accessInSelectedSite($user, $arguments)
     {
