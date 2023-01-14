@@ -837,6 +837,7 @@ class NodeProcessor
         if ($this->antlersParser != null) {
             $processor->setAntlersParserInstance($this->antlersParser);
         }
+
         $processor->cascade($this->cascade)->setDoStackIntercept($this->doStackIntercept);
 
         if ($this->runtimeConfiguration != null) {
@@ -1455,7 +1456,10 @@ class NodeProcessor
                         }
 
                         $beforeAssignments = $this->runtimeAssignments;
+                        $currentIsolationState = GlobalRuntimeState::$requiresRuntimeIsolation;
+                        GlobalRuntimeState::$requiresRuntimeIsolation = true;
                         $output = call_user_func([$tag, $methodToCall]);
+                        GlobalRuntimeState::$requiresRuntimeIsolation = $currentIsolationState;
                         $afterAssignments = $this->runtimeAssignments;
 
                         foreach ($afterAssignments as $assignedVar => $val) {
@@ -1538,10 +1542,21 @@ class NodeProcessor
 
                             $sectionName = 'section:'.$tagMethod.'__yield'.$activeYield;
 
+
+                            $sections = null;
+
+                            if ($this->cascade == null && $sections == null) {
+                                // If our current cascade is null (most likely from deep isolation/etc.
+                                // attempt to locate the sections from a global Cascade instance.
+                                $sections = app(Cascade::class)->sections();
+                            } else {
+                                $sections = $this->cascade->sections();
+                            }
+
                             LiteralReplacementManager::registerRegionReplacement(
                                 $sectionName,
                                 $tagMethod,
-                                $this->cascade->sections()->get($tagMethod)
+                                $sections->get($tagMethod)
                             );
 
                             if ($this->isTracingEnabled()) {
