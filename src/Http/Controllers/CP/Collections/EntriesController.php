@@ -286,10 +286,6 @@ class EntriesController extends CpController
             'published' => $collection->defaultPublishState(),
         ])->merge($fields->values());
 
-        if ($collection->dated()) {
-            $values['date'] = substr(now()->toDateTimeString(), 0, 10);
-        }
-
         $viewData = [
             'title' => $collection->createLabel(),
             'actions' => [
