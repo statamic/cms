@@ -1485,6 +1485,39 @@ class NavPreferencesTest extends TestCase
     }
 
     /** @test */
+    public function it_hides_section_when_all_items_are_moved_out_of_section()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->name('SEO Settings')
+                ->section('SEO Pro')
+                ->url('/cp/seo-pro');
+        });
+
+        $defaultSections = ['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO Pro'];
+
+        $this->assertEquals($defaultSections, $this->buildDefaultNav()->keys()->all());
+
+        $nav = $this->buildNavWithPreferences([
+            'top_level' => [
+                'seo_pro::seo_settings' => '@move',
+            ],
+        ]);
+
+        $navWithHidden = $this->buildNavWithPreferences([
+            'top_level' => [
+                'seo_pro::seo_settings' => '@move',
+            ],
+        ], true);
+
+        // Since we moved the SEO item to top level, it should hide SEO section by default...
+        $this->assertEquals(['Top Level', 'Content', 'Fields', 'Tools', 'Users'], $nav->keys()->all());
+
+        // But still show empty section when `withHidden` flag is true, so that user can re-add items to this core/extended section...
+        $this->assertEquals(['Top Level', 'Content', 'Fields', 'Tools', 'Users', 'SEO Pro'], $navWithHidden->keys()->all());
+        $this->assertTrue($navWithHidden->get('SEO Pro')->isEmpty());
+    }
+
+    /** @test */
     public function it_can_handle_a_bunch_of_useless_config_without_erroring()
     {
         $this->markTestSkipped();
