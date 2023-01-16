@@ -486,9 +486,21 @@ class NavTest extends TestCase
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
+        Nav::testSection('Visible Item');
         Nav::testSection('Hidden Item')->hidden(true);
 
-        $this->assertNull($this->build()->get('Test Section')->first());
+        $this->assertCount(1, $this->build()->get('Test Section'));
+        $this->assertEquals('Visible Item', $this->build()->get('Test Section')->first()->display());
+    }
+
+    /** @test */
+    public function it_doesnt_build_sections_containing_only_hidden_items()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::testSection('Hidden Item')->hidden(true);
+
+        $this->assertNull($this->build()->get('Test Section'));
     }
 
     /** @test */
@@ -510,13 +522,15 @@ class NavTest extends TestCase
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
+        Nav::testSection('Visible Item');
         Nav::testSection('Hidden Item')->hidden(true);
 
         // Calling `withHidden()` should clone the instance, so that we don't update the singleton bound to the facade
-        $this->assertCount(1, Nav::build(true, true)->pluck('items', 'display')->get('Test Section'));
+        $this->assertCount(2, Nav::build(true, true)->pluck('items', 'display')->get('Test Section'));
 
         // Which means this should hide the hidden item again
-        $this->assertNull($this->build()->get('Test Section')->first());
+        $this->assertCount(1, $this->build()->get('Test Section'));
+        $this->assertEquals('Visible Item', $this->build()->get('Test Section')->first()->display());
     }
 
     /** @test */
