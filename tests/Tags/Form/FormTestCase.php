@@ -43,6 +43,8 @@ abstract class FormTestCase extends TestCase
         ],
     ];
 
+    private $customFieldBlueprintHandle;
+
     public function setUp(): void
     {
         parent::setUp();

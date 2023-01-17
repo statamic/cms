@@ -7,6 +7,8 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class FluentlyGetsAndSetsTest extends TestCase
 {
+    private $entry;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -89,8 +91,10 @@ class Entry
 {
     use FluentlyGetsAndSets;
 
+    public $title;
+    public $route;
+    public $url;
     protected $blueprint;
-
     protected $publishedBy = 'Jesse';
 
     public function blueprint($blueprint = null)
