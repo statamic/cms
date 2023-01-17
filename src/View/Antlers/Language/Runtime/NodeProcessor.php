@@ -446,6 +446,12 @@ class NodeProcessor
      */
     public function setData($data)
     {
+        if (GlobalRuntimeState::$garbageCollect) {
+            unset($this->data);
+            $this->data = [];
+            GlobalRuntimeState::$garbageCollect = false;
+        }
+
         if ($this->scopeLock) {
             return $this;
         }
