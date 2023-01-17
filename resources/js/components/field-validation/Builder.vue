@@ -27,7 +27,7 @@
                 v-if="!customRule"
                 ref="rulesSelect"
                 name="rules"
-                :options="laravelRules"
+                :options="allRules"
                 :reduce="rule => rule.value"
                 :placeholder="__('Add Rule')"
                 :multiple="false"
@@ -136,6 +136,18 @@ export default {
                     return this.prepareRenderableRule(rule);
                 })
                 .value();
+        },
+
+        customRules() {
+            return _.chain(clone(Statamic.$config.get('customRules')))
+                .map(rule => {
+                    return this.prepareRenderableRule(rule);
+                })
+                .value();
+        },
+
+        allRules() {
+            return _.sortBy([...this.laravelRules, ...this.customRules], 'display');
         },
 
         helpBlock() {
