@@ -4,10 +4,10 @@ namespace Statamic\Http\View\Composers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Statamic\Facades\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 
 class FieldComposer
 {
@@ -45,7 +45,7 @@ class FieldComposer
             ->keys()
             ->map(function ($rule) {
                 return [
-                    'label' => Str::headline($rule),
+                    'label' => Str::title(str_replace('_', ' ', $rule)),
                     'value' => $rule,
                 ];
             })
