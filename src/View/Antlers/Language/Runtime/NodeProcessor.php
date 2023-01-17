@@ -448,7 +448,17 @@ class NodeProcessor
     {
         if (GlobalRuntimeState::$garbageCollect) {
             unset($this->data);
+            unset($this->previousAssignments);
+            unset($this->runtimeAssignments);
+            unset($this->canHandleInterpolations);
+            unset($this->interpolationCache);
+            unset($this->lockedData);
             $this->data = [];
+            $this->previousAssignments = [];
+            $this->runtimeAssignments = [];
+            $this->canHandleInterpolations = [];
+            $this->interpolationCache = [];
+            $this->lockedData = [];
             GlobalRuntimeState::$garbageCollect = false;
         }
 
