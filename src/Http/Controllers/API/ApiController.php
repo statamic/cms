@@ -211,8 +211,8 @@ class ApiController extends Controller
         $columns = explode(',', request()->input('fields', '*'));
 
         return $query
-            ->paginate(request()->input('limit', 25), $columns)
-            ->appends(request()->only(['filter', 'limit', 'page']));
+            ->paginate(request()->input('limit', config('statamic.api.pagination_size')), $columns)
+            ->appends(request()->only(['filter', 'limit', 'page', 'sort']));
     }
 
     /**

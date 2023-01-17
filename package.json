@@ -46,7 +46,7 @@
     "portal-vue": "^1.5.1",
     "pretty": "^2.0.0",
     "pusher-js": "^4.4.0",
-    "qs": "^6.9.1",
+    "qs": "^6.9.7",
     "rangy": "^1.3.0",
     "read-time-estimate": "0.0.2",
     "resize-observer-polyfill": "^1.5.1",
@@ -86,5 +86,8 @@
     "roots": [
       "<rootDir>/resources/assets/js"
     ]
+  },
+  "overrides": {
+    "prosemirror-tables": "1.2.5"
   }
 }

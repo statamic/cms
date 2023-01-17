@@ -395,7 +395,7 @@ export default {
     methods: {
 
         addSet(handle) {
-            const id = `set-${uniqid()}`;
+            const id = uniqid();
             const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
 
             let previews = {};
@@ -411,7 +411,7 @@ export default {
         },
 
         duplicateSet(old_id, attrs, pos) {
-            const id = `set-${uniqid()}`;
+            const id = uniqid();
             const enabled = attrs.enabled;
             const values = Object.assign({}, attrs.values);
 

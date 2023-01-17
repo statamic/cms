@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
@@ -23,6 +24,7 @@ use Statamic\Facades\File;
 use Statamic\Fields\Blueprint;
 use Statamic\Filesystem\Filesystem;
 use Statamic\Filesystem\FlysystemAdapter;
+use Tests\Fakes\FakeArtisanRequest;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -294,6 +296,19 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_all_meta_files_by_default()
+    {
+        $this->assertEquals([
+            '.meta/a.txt.yaml',
+            '.meta/b.txt.yaml',
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+            'nested/double-nested/.meta/double-nested-a.txt.yaml',
+            'nested/double-nested/.meta/double-nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles()->all());
+    }
+
+    /** @test */
     public function it_gets_files_in_a_folder()
     {
         $this->assertEquals([
@@ -305,6 +320,20 @@ class AssetContainerTest extends TestCase
             'nested/nested-a.txt',
             'nested/nested-b.txt',
         ], $this->containerWithDisk()->files('nested')->all());
+    }
+
+    /** @test */
+    public function it_gets_meta_files_in_a_folder()
+    {
+        $this->assertEquals([
+            '.meta/a.txt.yaml',
+            '.meta/b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles('/')->all());
+
+        $this->assertEquals([
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles('nested')->all());
     }
 
     /** @test */
@@ -325,6 +354,26 @@ class AssetContainerTest extends TestCase
             'nested/nested-a.txt',
             'nested/nested-b.txt',
         ], $this->containerWithDisk()->files('nested', true)->all());
+    }
+
+    /** @test */
+    public function it_gets_meta_files_in_a_folder_recursively()
+    {
+        $this->assertEquals([
+            '.meta/a.txt.yaml',
+            '.meta/b.txt.yaml',
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+            'nested/double-nested/.meta/double-nested-a.txt.yaml',
+            'nested/double-nested/.meta/double-nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles('/', true)->all());
+
+        $this->assertEquals([
+            'nested/.meta/nested-a.txt.yaml',
+            'nested/.meta/nested-b.txt.yaml',
+            'nested/double-nested/.meta/double-nested-a.txt.yaml',
+            'nested/double-nested/.meta/double-nested-b.txt.yaml',
+        ], $this->containerWithDisk()->metaFiles('nested', true)->all());
     }
 
     /** @test */
@@ -449,6 +498,37 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_files_from_the_cache_every_time_if_running_in_a_queue_worker()
+    {
+        $cacheKey = 'asset-list-contents-test';
+
+        Cache::put($cacheKey, collect([
+            '.meta/one.jpg.yaml' => ['type' => 'file', 'path' => '.meta/one.jpg.yaml', 'basename' => 'one.jpg.yaml'],
+            '.DS_Store' => ['type' => 'file', 'path' => '.DS_Store', 'basename' => '.DS_Store'],
+            '.gitignore' => ['type' => 'file', 'path' => '.gitignore', 'basename' => '.gitignore'],
+            'one.jpg' => ['type' => 'file', 'path' => 'one.jpg', 'basename' => 'one.jpg'],
+            'two.jpg' => ['type' => 'file', 'path' => 'two.jpg', 'basename' => 'two.jpg'],
+        ]));
+
+        $cacheHits = 0;
+        Event::listen(CacheHit::class, function ($event) use (&$cacheHits, $cacheKey) {
+            if ($event->key === $cacheKey) {
+                $cacheHits++;
+            }
+        });
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        Request::swap(new FakeArtisanRequest('queue:listen'));
+
+        $expected = ['one.jpg', 'two.jpg'];
+        $this->assertEquals($expected, $container->files()->all());
+        $this->assertEquals(1, $cacheHits);
+        $this->assertEquals($expected, $container->files()->all());
+        $this->assertEquals(2, $cacheHits);
+    }
+
+    /** @test */
     public function it_gets_the_folders_from_the_filesystem_only_once()
     {
         Carbon::setTestNow(now()->startOfMinute());
@@ -515,6 +595,40 @@ class AssetContainerTest extends TestCase
         $anotherInstanceOfTheContainer = (new AssetContainer)->handle('test')->disk('test');
         $this->assertEquals($expected, $anotherInstanceOfTheContainer->folders()->all());
         $this->assertEquals(1, $cacheHits);
+    }
+
+    /** @test */
+    public function it_gets_the_folders_from_the_cache_and_blink_every_time_if_running_in_a_queue_worker()
+    {
+        $cacheKey = 'asset-list-contents-test';
+
+        Cache::put($cacheKey, collect([
+            '.meta' => ['type' => 'dir', 'path' => '.meta', 'basename' => '.meta'],
+            'one' => ['type' => 'dir', 'path' => 'one', 'basename' => 'one'],
+            'one/.meta' => ['type' => 'dir', 'path' => 'one/.meta', 'basename' => '.meta'],
+            'two' => ['type' => 'dir', 'path' => 'two', 'basename' => 'two'],
+        ]));
+
+        $cacheHits = 0;
+        Event::listen(CacheHit::class, function ($event) use (&$cacheHits, $cacheKey) {
+            if ($event->key === $cacheKey) {
+                $cacheHits++;
+            }
+        });
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        Request::swap(new FakeArtisanRequest('queue:listen'));
+
+        $expected = ['one', 'two'];
+        $this->assertEquals($expected, $container->folders()->all());
+        $this->assertEquals(1, $cacheHits);
+        $this->assertEquals($expected, $container->folders()->all());
+        $this->assertEquals(2, $cacheHits);
+
+        $anotherInstanceOfTheContainer = (new AssetContainer)->handle('test')->disk('test');
+        $this->assertEquals($expected, $anotherInstanceOfTheContainer->folders()->all());
+        $this->assertEquals(3, $cacheHits);
     }
 
     /** @test */

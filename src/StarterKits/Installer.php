@@ -3,10 +3,12 @@
 namespace Statamic\StarterKits;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Facades\Statamic\Console\Processes\TtyDetector;
 use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
+use Statamic\Console\Please\Application as PleaseApplication;
 use Statamic\Console\Processes\Exceptions\ProcessException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
@@ -23,18 +25,20 @@ final class Installer
     protected $withConfig;
     protected $withoutDependencies;
     protected $withUser;
+    protected $usingSubProcess;
     protected $force;
     protected $console;
     protected $url;
+    protected $disableCleanup;
 
     /**
      * Instantiate starter kit installer.
      *
      * @param  string  $package
-     * @param  LicenseManager  $licenseManager
      * @param  mixed  $console
+     * @param  LicenseManager|null  $licenseManager
      */
-    public function __construct(string $package, LicenseManager $licenseManager, $console = null)
+    public function __construct(string $package, $console = null, LicenseManager $licenseManager = null)
     {
         $this->package = $package;
         $this->licenseManager = $licenseManager;
@@ -47,13 +51,13 @@ final class Installer
      * Instantiate starter kit installer.
      *
      * @param  string  $package
-     * @param  LicenseManager  $licenseManager
      * @param  mixed  $console
+     * @param  LicenseManager|null  $licenseManager
      * @return static
      */
-    public static function package(string $package, LicenseManager $licenseManager, $console = null)
+    public static function package(string $package, $console = null, LicenseManager $licenseManager = null)
     {
-        return new static($package, $licenseManager, $console);
+        return new static($package, $console, $licenseManager);
     }
 
     /**
@@ -104,6 +108,19 @@ final class Installer
     public function withUser($withUser = false)
     {
         $this->withUser = $withUser;
+
+        return $this;
+    }
+
+    /**
+     * Install using sub-process.
+     *
+     * @param  bool  $usingSubProcess
+     * @return $this
+     */
+    public function usingSubProcess($usingSubProcess = false)
+    {
+        $this->usingSubProcess = $usingSubProcess;
 
         return $this;
     }
@@ -476,19 +493,77 @@ final class Installer
     }
 
     /**
-     * Run post install hook, if one exists in the starter kit.
+     * Run post-install hook, if one exists in the starter kit.
      *
      * @return $this
+     *
+     * @throws StarterKitException
      */
-    protected function runPostInstallHook()
+    public function runPostInstallHook($throwExceptions = false)
     {
-        if (! $postInstallHook = Hook::find($this->starterKitPath('StarterKitPostInstall.php'))) {
+        $postInstallHook = Hook::find($this->starterKitPath('StarterKitPostInstall.php'));
+
+        if ($throwExceptions && ! $postInstallHook) {
+            throw new StarterKitException("Cannot find post-install hook for [$this->package].");
+        } elseif (! $postInstallHook) {
             return $this;
+        }
+
+        if ($this->usingSubProcess && ! TtyDetector::isTtySupported()) {
+            return $this->cachePostInstallInstructions();
+        }
+
+        if (isset($postInstallHook->registerCommands)) {
+            foreach ($postInstallHook->registerCommands as $command) {
+                $this->registerInstalledCommand($command);
+            }
         }
 
         $postInstallHook->handle($this->console);
 
         return $this;
+    }
+
+    /**
+     * Cache post install instructions for parent process (ie. statamic/cli installer).
+     *
+     * @return $this
+     */
+    protected function cachePostInstallInstructions()
+    {
+        $path = $this->preparePath(storage_path('statamic/tmp/cli/post-install-instructions.txt'));
+
+        $instructions = <<<"EOT"
+Warning: TTY not supported in this environment!
+To complete this installation, run the following command from your new site directory:
+php please starter-kit:run-post-install $this->package
+EOT;
+
+        $this->files->put($path, $instructions);
+
+        $this->disableCleanup = true;
+
+        return $this;
+    }
+
+    /**
+     * Register starter kit installed command for post install hook.
+     *
+     * @param  string  $commandClass
+     */
+    protected function registerInstalledCommand($commandClass)
+    {
+        $app = $this->console->getApplication();
+
+        $command = new $commandClass($app);
+
+        if ($app instanceof PleaseApplication) {
+            $command->setRunningInPlease();
+            $command->removeStatamicGrouping();
+            $command->setHiddenInPlease();
+        }
+
+        $app->add($command);
     }
 
     /**
@@ -512,8 +587,12 @@ final class Installer
      *
      * @return $this
      */
-    protected function removeStarterKit()
+    public function removeStarterKit()
     {
+        if ($this->disableCleanup) {
+            return $this;
+        }
+
         $this->console->info('Cleaning up temporary files...');
 
         if (Composer::isInstalled($this->package)) {

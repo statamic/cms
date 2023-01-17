@@ -446,6 +446,12 @@ class NodeProcessor
      */
     public function setData($data)
     {
+        if (GlobalRuntimeState::$garbageCollect) {
+            unset($this->data);
+            $this->data = [];
+            GlobalRuntimeState::$garbageCollect = false;
+        }
+
         if ($this->scopeLock) {
             return $this;
         }
@@ -709,6 +715,24 @@ class NodeProcessor
     }
 
     /**
+     * Tests if the provided node is internally treated like a tag.
+     *
+     * @param  AntlersNode  $node  The node.
+     * @return bool
+     */
+    protected function isInternalTagLike(AntlersNode $node)
+    {
+        $nodeName = $node->name->name;
+
+        if ($nodeName == 'slot' || $nodeName == 'push' || $nodeName == 'prepend' ||
+            $nodeName == 'stack' || $nodeName == 'once') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Tests if the runtime should continue processing the node/value combination.
      *
      * This method is responsible for ensuring that developers are not
@@ -723,8 +747,10 @@ class NodeProcessor
     private function guardRuntime(AntlersNode $node, $value)
     {
         if ($node->isClosedBy != null && $this->isLoopable($value) == false) {
-            $varName = $node->name->getContent();
-            Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}");
+            if (! $this->isInternalTagLike($node)) {
+                $varName = $node->name->getContent();
+                Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}");
+            }
 
             return false;
         } elseif ($this->isInterpolationProcessor == false && $this->isLoopable($value) && $node->isClosedBy == null) {
@@ -2125,6 +2151,7 @@ class NodeProcessor
                                         }
                                     }
 
+                                    $this->data = $lockData;
                                     $this->processAssignments($runtimeAssignmentsToProcess);
                                     $lockData = $this->data;
 

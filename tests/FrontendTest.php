@@ -11,6 +11,7 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
+use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
 class FrontendTest extends TestCase
@@ -654,6 +655,89 @@ class FrontendTest extends TestCase
         $this->get('/fr/le-about')->assertSee('Bonjour');
     }
 
+    /** @test */
+    public function it_sets_the_carbon_to_string_format()
+    {
+        config(['statamic.system.date_format' => 'd/m/Y']);
+        Carbon::setTestNow('October 21st, 2022');
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<p>{{ now }}</p>');
+        $this->makeCollection()->save();
+        tap($this->makePage('about', ['with' => ['template' => 'some_template']]))->save();
+
+        $this->assertDefaultCarbonFormat();
+
+        $this->get('/about')->assertSee('21/10/2022');
+
+        $this->assertDefaultCarbonFormat();
+    }
+
+    /** @test */
+    public function it_sets_the_locale()
+    {
+        // You can only set the locale to one that is actually installed on the server.
+        // The names are a little different across jobs in the GitHub actions matrix.
+        // We'll test against whichever was successfully applied. Finally, we will
+        // reset the locale back to the original state to start the test clean.
+        $locales = ['fr_FR', 'fr_FR.utf-8', 'fr_FR.UTF-8', 'french'];
+        $originalLocale = setlocale(LC_TIME, 0);
+        setlocale(LC_TIME, $locales);
+        $frLocale = setlocale(LC_TIME, 0);
+        setlocale(LC_TIME, $originalLocale);
+
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en', 'lang' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => $frLocale, 'lang' => 'fr'],
+        ]]);
+
+        (new class extends Tags
+        {
+            public static $handle = 'php_locale';
+
+            public function index()
+            {
+                return setlocale(LC_TIME, 0);
+            }
+        })->register();
+
+        (new class extends Tags
+        {
+            public static $handle = 'laravel_locale';
+
+            public function index()
+            {
+                return app()->getLocale();
+            }
+        })->register();
+
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', 'PHP Locale: {{ php_locale }} App Locale: {{ laravel_locale }}');
+
+        $this->makeCollection()->sites(['english', 'french'])->save();
+        tap($this->makePage('about', ['with' => ['template' => 'some_template']])->locale('english'))->save();
+        tap($this->makePage('le-about', ['with' => ['template' => 'some_template']])->locale('french'))->save();
+
+        $this->assertEquals('en', app()->getLocale());
+        $this->assertEquals($originalLocale, setlocale(LC_TIME, 0));
+
+        $this->get('/fr/le-about')->assertSeeInOrder([
+            'PHP Locale: '.$frLocale,
+            'App Locale: fr',
+        ]);
+
+        $this->assertEquals('en', app()->getLocale());
+        $this->assertEquals($originalLocale, setlocale(LC_TIME, 0));
+    }
+
+    private function assertDefaultCarbonFormat()
+    {
+        $this->assertEquals(
+            Carbon::now()->format(Carbon::DEFAULT_TO_STRING_FORMAT),
+            (string) Carbon::now(),
+            'Carbon was not formatted using the default format.'
+        );
+    }
+
     /**
      * @test
      *
@@ -679,5 +763,74 @@ class FrontendTest extends TestCase
 
         // Before the fix, you'd see "Service" instead of "Home", because the URI would also be /
         $this->get('/')->assertSee('Home');
+    }
+
+    /**
+     * @test
+     * @dataProvider redirectProvider
+     */
+    public function redirect_is_followed($dataValue, $augmentedValue, $expectedStatus, $expectedLocation)
+    {
+        // Making a fake fieldtype to test that the augmented value is used for the redirect.
+        // The actual redirect resolving logic is already completely under test, and happens
+        // in the "link" fieldtype's augment method.
+
+        app()->bind('test-augmented-value', fn () => $augmentedValue);
+
+        (new class($augmentedValue) extends \Statamic\Fields\Fieldtype
+        {
+            protected static $handle = 'fake_link';
+
+            public function augment($value)
+            {
+                return app('test-augmented-value');
+            }
+        })->register();
+
+        $blueprint = Blueprint::makeFromFields(['redirect' => ['type' => 'fake_link']]);
+        Blueprint::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
+
+        $this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => $dataValue, // this should not be used - the augmented value should.
+            ],
+        ])->save();
+
+        $response = $this->get('/about');
+
+        if ($expectedStatus === 302) {
+            $response->assertRedirect($expectedLocation);
+        } elseif ($expectedStatus === 200) {
+            $response->assertOk();
+        } elseif ($expectedStatus === 404) {
+            $response->assertNotFound();
+        } else {
+            throw new \Exception('Test not set up to handle status code: '.$expectedStatus);
+        }
+    }
+
+    public function redirectProvider()
+    {
+        return [
+            'valid redirect' => [
+                '/shouldnt-be-used',   // its got a value
+                '/target',             // the fieldtype will augmented to this
+                302,                   // its a redirect
+                '/target',             // to here
+            ],
+            'invalid redirect' => [
+                'something',           // its got a value
+                null,                  // the fieldtype will augment to this because its an invalid reference
+                404,                   // so it should 404
+                null,                  // and not redirect
+            ],
+            'missing redirect' => [
+                null,                  // its got no value
+                null,                  // the fieldtype will augment to this (although it wouldn't even be called)
+                200,                   // since there's no redirect, its a successful response
+                null,                  // and not a redirect
+            ],
+        ];
     }
 }

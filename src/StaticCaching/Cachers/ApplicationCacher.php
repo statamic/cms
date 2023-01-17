@@ -103,13 +103,12 @@ class ApplicationCacher extends AbstractCacher
      */
     public function invalidateUrl($url, $domain = null)
     {
-        if (! $key = $this->getUrls($domain)->flip()->get($url)) {
-            // URL doesn't exist, nothing to invalidate.
-            return;
-        }
-
-        $this->cache->forget($this->normalizeKey('responses:'.$key));
-
-        $this->forgetUrl($key);
+        $this
+            ->getUrls($domain)
+            ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
+            ->each(function ($value, $key) {
+                $this->cache->forget($this->normalizeKey('responses:'.$key));
+                $this->forgetUrl($key);
+            });
     }
 }

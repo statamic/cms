@@ -145,6 +145,10 @@
 	.sortable-row.draggable-mirror {
 		display: none;
 	}
+
+    .date-index-field {
+        @apply whitespace-no-wrap;
+    }
 }
 
 @screen md {

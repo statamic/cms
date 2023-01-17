@@ -27,7 +27,7 @@ class UserGroups extends Relationship
 
     public function getIndexItems($request)
     {
-        return UserGroup::all()->map(function ($group) {
+        return UserGroup::all()->sortBy('title')->map(function ($group) {
             return [
                 'id' => $group->handle(),
                 'title' => $group->title(),
