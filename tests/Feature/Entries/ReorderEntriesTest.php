@@ -16,6 +16,9 @@ class ReorderEntriesTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
+    private $structure;
+    private $collection;
+
     public function setUp(): void
     {
         parent::setUp();

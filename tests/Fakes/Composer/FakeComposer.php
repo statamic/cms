@@ -8,6 +8,8 @@ use Statamic\Support\Str;
 
 class FakeComposer
 {
+    private $files;
+
     public function __construct()
     {
         $this->files = app(Filesystem::class);

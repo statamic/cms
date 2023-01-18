@@ -54,6 +54,7 @@ class Parser implements ParserContract
     protected $variableLoopRegex;
     protected $variableRegex;
     protected $variableTagRegex;
+    protected $ignoreRegex;
 
     // Extractions
     protected $extractions = [

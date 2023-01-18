@@ -13,6 +13,8 @@ class AssetQueryBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $container;
+
     public function setUp(): void
     {
         parent::setUp();
