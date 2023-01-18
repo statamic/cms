@@ -1,5 +1,44 @@
 # Release Notes
 
+## 3.3.65 (2023-01-18)
+
+### What's new
+- PHP 8.2 support. [#7299](https://github.com/statamic/cms/issues/7299) by @jasonvarga
+- Ability to pass an array of roles into the `user_roles` tag. [#7328](https://github.com/statamic/cms/issues/7328) by @edalzell
+
+### What's improved
+- When using revisions, the publish action button takes into consideration whether you can manage publish state. [#7168](https://github.com/statamic/cms/issues/7168) by @arthurperton
+- Pasting multiple lines into the `list` fieldtype will create multiple list items. [#7340](https://github.com/statamic/cms/issues/7340) by @jacksleight
+
+### What's fixed
+- Fix how user blueprint fields are handled in a few cases. [#7368](https://github.com/statamic/cms/issues/7368) by @jesseleite
+- Fix misspelling [#7354](https://github.com/statamic/cms/issues/7354) by @stefanbauer
+- Improve memory leak and garbage collection in Antlers. [#7361](https://github.com/statamic/cms/issues/7361) [#7367](https://github.com/statamic/cms/issues/7367) by @JohnathonKoster
+- Fix `revealer` fields disappearing on save. [#7329](https://github.com/statamic/cms/issues/7329) by @jacksleight
+- Use customizable create label on the empty collection listing view. [#7323](https://github.com/statamic/cms/issues/7323) by @arthurperton
+
+
+
+## 3.3.64 (2023-01-06)
+
+### What's new
+- The searchable item is now passed into search transformers. [#7305](https://github.com/statamic/cms/issues/7305) by @okaufmann
+- You are now required to enter your existing password in order to change it, in the CP. [#7287](https://github.com/statamic/cms/issues/7287) by @jasonvarga
+
+### What's improved
+- Danish translations. [#7314](https://github.com/statamic/cms/issues/7314) by @rabol
+- French translations. [#7275](https://github.com/statamic/cms/issues/7275) by @ebeauchamps
+- Switch operator parsing in Antlers. [#7283](https://github.com/statamic/cms/issues/7283) by @JohnathonKoster
+
+### What's fixed
+- Fix asset search in nested subdirectories. [#7313](https://github.com/statamic/cms/issues/7313) by @edalzell
+- Sanitize form tokens. [#7309](https://github.com/statamic/cms/issues/7309) by @jackmcdade
+- Rename filename label to path in the Asset editor. [#7303](https://github.com/statamic/cms/issues/7303) by @jasonvarga
+- Fix YAML facade casing. [#7298](https://github.com/statamic/cms/issues/7298) by @beatwiz
+- Add property to translator to prevent deprecation message. [#7289](https://github.com/statamic/cms/issues/7289) by @jasonvarga
+
+
+
 ## 3.3.63 (2022-12-21)
 
 ### What's new

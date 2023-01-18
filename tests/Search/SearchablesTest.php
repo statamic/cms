@@ -5,8 +5,10 @@ namespace Tests\Search;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
 use Mockery;
+use PHPUnit\Framework\Assert;
 use Statamic\Assets\AssetCollection;
 use Statamic\Auth\UserCollection;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -286,7 +288,11 @@ class SearchablesTest extends TestCase
                 'title',
             ],
             'transformers' => [
-                'title' => function ($value) {
+                'title' => function ($value, $searchable) {
+                    $this->assertEquals('Hello', $value);
+                    $this->assertInstanceOf(EntryContract::class, $searchable);
+                    $this->assertEquals('a', $searchable->id());
+
                     return strtoupper($value);
                 },
             ],
@@ -297,7 +303,7 @@ class SearchablesTest extends TestCase
             'config' => config('statamic.search.indexes.default'),
         ]);
 
-        $searchable = EntryFactory::collection('test')->data(['title' => 'Hello'])->make();
+        $searchable = EntryFactory::collection('test')->id('a')->data(['title' => 'Hello'])->make();
         $searchables = new Searchables($index);
 
         $this->assertEquals([
@@ -343,7 +349,7 @@ class SearchablesTest extends TestCase
             'config' => config('statamic.search.indexes.default'),
         ]);
 
-        $searchable = EntryFactory::collection('test')->data(['title' => 'Hello'])->make();
+        $searchable = EntryFactory::collection('test')->id('a')->data(['title' => 'Hello'])->make();
         $searchables = new Searchables($index);
 
         $this->assertEquals([
@@ -474,8 +480,13 @@ class NotSearchable
 
 class BasicTestTransformer
 {
-    public function handle($value)
+    public function handle($value, $field, $searchable)
     {
+        Assert::assertEquals('Hello', $value);
+        Assert::assertEquals('title', $field);
+        Assert::assertInstanceOf(EntryContract::class, $searchable);
+        Assert::assertEquals('a', $searchable->id());
+
         return strtoupper($value);
     }
 }

@@ -394,7 +394,7 @@ class Statamic
             return false;
         }
 
-        return Str::startsWith(Arr::get(request()->server(), 'argv.1'), ['queue:', 'horizon:']);
+        return Str::startsWith(Arr::get(request()->server(), 'argv.1') ?? '', ['queue:', 'horizon:']);
     }
 
     private static function createVersionedAssetPath($name, $path, $extension)

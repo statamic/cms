@@ -26,6 +26,7 @@ class NavItem
     protected $hidden;
     protected $manipulations;
     protected $original;
+    protected $attributes;
 
     /**
      * Get or set display.

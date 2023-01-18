@@ -843,6 +843,7 @@ class NavBuilder
         // Collect and order each section's items...
         $built = collect($sections)
             ->reject(fn ($items, $section) => $this->withHidden ? false : Arr::get($manipulations, "{$section}.action") === '@hide')
+            ->filter(fn ($items) => $items || $this->withHidden)
             ->map(function ($items, $section) {
                 return collect($this->sectionsWithReorderedItems)->contains($section)
                     ? collect($items)->sortBy(fn ($item) => $item->order())->values()

@@ -15,6 +15,8 @@ class DataRepositoryTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $data;
+
     // Mocking method_exists, courtesy of https://stackoverflow.com/a/37928161
     public static $functions;
 

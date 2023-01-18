@@ -19,6 +19,8 @@ class ResolvesValuesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $blueprint;
+
     public function setUp(): void
     {
         parent::setUp();
