@@ -60,7 +60,8 @@ class Searchables
             }
 
             throw new \LogicException("Unknown searchable [$item].");
-        });
+        })
+            ->filter(fn ($item) => $this->index->filter($item));
     }
 
     public function contains($searchable)
