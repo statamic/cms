@@ -17,6 +17,7 @@ return [
     'between.array' => 'Musí být mezi :min a :max položkami.',
     'boolean' => 'Musí být true nebo false.',
     'confirmed' => 'Potvrzení se neshoduje.',
+    'current_password' => 'Současné heslo není spravné.',
     'date' => 'Není platné datum.',
     'date_format' => 'Nesouhlasí s formátem :format.',
     'different' => 'Musí být rozdílné.',

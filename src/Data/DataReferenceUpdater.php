@@ -3,6 +3,7 @@
 namespace Statamic\Data;
 
 use Statamic\Fields\Fields;
+use Statamic\Git\Subscriber as GitSubscriber;
 use Statamic\Support\Arr;
 
 abstract class DataReferenceUpdater
@@ -62,8 +63,10 @@ abstract class DataReferenceUpdater
         $this->recursivelyUpdateFields($this->getTopLevelFields());
 
         if ($this->updated) {
-            $this->item->save();
+            $this->saveItem();
         }
+
+        return (bool) $this->updated;
     }
 
     /**
@@ -272,5 +275,15 @@ abstract class DataReferenceUpdater
         $this->item->data($data);
 
         $this->updated = true;
+    }
+
+    /**
+     * Save item without triggering individual git commits, as these should be batched into one larger commit.
+     */
+    protected function saveItem()
+    {
+        GitSubscriber::withoutListeners(function () {
+            $this->item->save();
+        });
     }
 }

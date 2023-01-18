@@ -40,7 +40,8 @@ class CacheServiceProvider extends ServiceProvider
             Cache::extend('statamic', function () {
                 return Cache::repository(new FileStore(
                     $this->app['files'],
-                    $this->app['config']['cache.stores.file']['path']
+                    $this->app['config']['cache.stores.file']['path'],
+                    $this->app['config']['cache.stores.file']['permission'] ?? null
                 ));
             });
 

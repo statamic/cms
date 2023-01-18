@@ -42,8 +42,7 @@ export default {
         },
 
         canDownload() {
-            return Statamic.$permissions.has('super')
-                || Statamic.$permissions.has(`view ${this.container} assets`)
+            return Statamic.$permissions.has(`view ${this.container} assets`);
         },
 
         thumbnail() {
@@ -96,7 +95,16 @@ export default {
         assetSaved(asset) {
             this.$emit('updated', asset);
             this.closeEditor();
-        }
+        },
+
+        actionCompleted(successful, response) {
+            if (successful === false) return;
+            const id = response.ids[0] || null;
+            if (id && id !== this.asset.id) {
+                this.$emit('id-changed', id);
+            }
+            this.closeEditor();
+        },
 
     },
 

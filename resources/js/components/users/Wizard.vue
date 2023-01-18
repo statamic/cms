@@ -1,6 +1,6 @@
 <template>
     <div class="max-w-xl mx-auto rounded shadow bg-white">
-        <div class="max-w-lg mx-auto pt-6 relative">
+        <div v-if="steps.length > 1" class="max-w-lg mx-auto pt-6 relative">
             <div class="wizard-steps">
                 <a class="step" :class="{'complete': currentStep >= index}" v-for="(step, index) in steps" @click="goToStep(index)">
                     <div class="ball">{{ index+1 }}</div>
@@ -9,8 +9,8 @@
             </div>
         </div>
 
-        <!-- Step 1 -->
-        <div v-if="!completed && currentStep === 0">
+        <!-- Step: User Info -->
+        <div v-if="!completed && onUserInfoStep">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Create User') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_intro')" />
@@ -34,7 +34,7 @@
             <!-- Name -->
             <div v-if="! separateNameFields" class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">{{ __('Name') }}</label>
-                <input type="text" v-model="user.name" id="name" class="input-text" autofocus tabindex="2">
+                <input type="text" v-model="user.name" id="name" class="input-text" tabindex="2">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_name_instructions') }}
@@ -44,7 +44,7 @@
             <div v-else class="max-w-md mx-auto px-2 pb-7 flex space-x-4">
                 <div class="flex-1">
                     <label class="font-bold text-base mb-sm" for="first_name">{{ __('First Name') }}</label>
-                    <input type="text" v-model="user.first_name" id="first_name" class="input-text" autofocus tabindex="2">
+                    <input type="text" v-model="user.first_name" id="first_name" class="input-text" tabindex="2">
                     <div class="text-2xs text-grey-60 mt-1 flex items-center">
                         <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
                         {{ __('messages.user_wizard_name_instructions') }}
@@ -53,13 +53,13 @@
 
                 <div class="flex-1">
                     <label class="font-bold text-base mb-sm" for="last_name">{{ __('Last Name') }}</label>
-                    <input type="text" v-model="user.last_name" id="last_name" class="input-text" autofocus tabindex="2">
+                    <input type="text" v-model="user.last_name" id="last_name" class="input-text" tabindex="2">
                 </div>
             </div>
         </div>
 
-        <!-- Step 2 -->
-        <div v-if="!completed && currentStep === 1" class="max-w-md mx-auto px-2 pb-2">
+        <!-- Step: Roles & Groups -->
+        <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-2 pb-2">
             <div class="py-6 text-center">
                 <h1 class="mb-3">{{ __('Roles & Groups') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_roles_groups_intro')" />
@@ -78,7 +78,7 @@
             </div>
 
             <!-- Roles -->
-            <div class="pb-5" v-if="! user.super">
+            <div class="pb-5" v-if="! user.super && canAssignRoles">
                 <label class="font-bold text-base mb-sm" for="role">{{ __('Roles') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
@@ -96,7 +96,7 @@
             </div>
 
             <!-- Groups -->
-            <div class="pb-5" v-if="! user.super">
+            <div class="pb-5" v-if="! user.super && canAssignGroups">
                 <label class="font-bold text-base mb-sm" for="group">{{ __('Groups') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.groups', type: 'user_groups' }"
@@ -114,8 +114,8 @@
             </div>
         </div>
 
-        <!-- Step 3 -->
-        <div v-if="!completed && currentStep === 2">
+        <!-- Step: Invitation -->
+        <div v-if="!completed && onInvitationStep">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Invitation') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_invitation_intro')" />
@@ -159,13 +159,16 @@
             </div>
 
             <!-- Copy Pasta -->
-            <div class="max-w-md mx-auto px-2 pb-7">
+            <div class="max-w-md mx-auto px-2 pb-5">
                 <p class="mb-1" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
-                <textarea readonly class="input-text" v-elastic onclick="this.select()">
-{{ __('Activation URL') }}: {{ activationUrl }}
-
-{{ __('Username') }}: {{ user.email }}
-</textarea>
+            </div>
+            <div class="max-w-md mx-auto px-2 pb-5">
+                <label class="font-bold text-base mb-sm" for="email">{{ __('Activation URL') }}</label>
+                <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" />
+            </div>
+            <div class="max-w-md mx-auto px-2 pb-7">
+                <label class="font-bold text-base mb-sm" for="email">{{ __('Email Address') }}</label>
+                <input type="text" readonly class="input-text" onclick="this.select()" :value="user.email" />
             </div>
         </div>
 
@@ -206,13 +209,15 @@ export default {
         usersCreateUrl: { type: String },
         usersIndexUrl: { type: String },
         canCreateSupers: { type: Boolean },
+        canAssignRoles: { type: Boolean },
+        canAssignGroups: { type: Boolean },
         activationExpiry: { type: Number },
         separateNameFields: { type: Boolean },
+        canSendInvitation: { type: Boolean },
     },
 
     data() {
         return {
-            steps: [__('User Information'), __('Roles & Groups'), __('Customize Invitation')],
             user: {
                 email: null,
                 super: this.canCreateSupers,
@@ -220,7 +225,7 @@ export default {
                 groups: []
             },
             invitation: {
-                send: true,
+                send: this.canSendInvitation,
                 subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
                 message: __('messages.user_wizard_invitation_body', { site: window.location.hostname, expiry: this.activationExpiry }),
             },
@@ -232,6 +237,25 @@ export default {
     },
 
     computed: {
+        steps() {
+            let steps = [__('User Information')];
+            if (this.canAssignPermissions) steps.push(__('Roles & Groups'));
+            if (this.canSendInvitation) steps.push(__('Customize Invitation'));
+
+            return steps;
+        },
+        canAssignPermissions() {
+            return this.canAssignRoles || this.canAssignGroups;
+        },
+        onUserInfoStep() {
+            return this.onFirstStep;
+        },
+        onPermissionStep() {
+            return this.canAssignPermissions ? this.currentStep === 1 : false;
+        },
+        onInvitationStep() {
+            return this.canAssignPermissions ? this.currentStep === 2 : this.currentStep === 1;
+        },
         finishButtonText() {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
         },

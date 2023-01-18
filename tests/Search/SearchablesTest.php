@@ -4,8 +4,10 @@ namespace Tests\Search;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Assert;
 use Statamic\Assets\AssetCollection;
 use Statamic\Auth\UserCollection;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -279,8 +281,112 @@ class SearchablesTest extends TestCase
                 'title',
             ],
             'transformers' => [
-                'title' => function ($value) {
+                'title' => function ($value, $searchable) {
+                    $this->assertEquals('Hello', $value);
+                    $this->assertInstanceOf(EntryContract::class, $searchable);
+                    $this->assertEquals('a', $searchable->id());
+
                     return strtoupper($value);
+                },
+            ],
+        ]);
+
+        $index = app(\Statamic\Search\Comb\Index::class, [
+            'name' => 'default',
+            'config' => config('statamic.search.indexes.default'),
+        ]);
+
+        $searchable = EntryFactory::collection('test')->id('a')->data(['title' => 'Hello'])->make();
+        $searchables = new Searchables($index);
+
+        $this->assertEquals([
+            'title' => 'HELLO',
+        ], $searchables->fields($searchable));
+    }
+
+    /** @test */
+    public function it_uses_regular_value_if_theres_not_a_corresponding_transformer()
+    {
+        config()->set('statamic.search.indexes.default', [
+            'fields' => ['title'],
+            'transformers' => [],
+        ]);
+
+        $index = app(\Statamic\Search\Comb\Index::class, [
+            'name' => 'default',
+            'config' => config('statamic.search.indexes.default'),
+        ]);
+
+        $searchable = EntryFactory::collection('test')->data(['title' => 'Hello'])->make();
+        $searchables = new Searchables($index);
+
+        $this->assertEquals([
+            'title' => 'Hello',
+        ], $searchables->fields($searchable));
+    }
+
+    /** @test */
+    public function it_transforms_by_a_class_set_in_the_config_file()
+    {
+        config()->set('statamic.search.indexes.default', [
+            'fields' => [
+                'title',
+            ],
+            'transformers' => [
+                'title' => BasicTestTransformer::class,
+            ],
+        ]);
+
+        $index = app(\Statamic\Search\Comb\Index::class, [
+            'name' => 'default',
+            'config' => config('statamic.search.indexes.default'),
+        ]);
+
+        $searchable = EntryFactory::collection('test')->id('a')->data(['title' => 'Hello'])->make();
+        $searchables = new Searchables($index);
+
+        $this->assertEquals([
+            'title' => 'HELLO',
+        ], $searchables->fields($searchable));
+    }
+
+    /** @test */
+    public function if_transformed_value_is_a_string_without_a_matching_class_it_throws_exception()
+    {
+        $this->expectExceptionMessage('Search transformer [foo] not found.');
+
+        config()->set('statamic.search.indexes.default', [
+            'fields' => [
+                'title',
+            ],
+            'transformers' => [
+                'title' => 'foo',
+            ],
+        ]);
+
+        $index = app(\Statamic\Search\Comb\Index::class, [
+            'name' => 'default',
+            'config' => config('statamic.search.indexes.default'),
+        ]);
+
+        $searchable = EntryFactory::collection('test')->data(['title' => 'Hello'])->make();
+        $searchables = new Searchables($index);
+        $searchables->fields($searchable);
+    }
+
+    /** @test */
+    public function if_a_closure_based_transformer_returns_an_array_it_gets_combined_into_the_results()
+    {
+        config()->set('statamic.search.indexes.default', [
+            'fields' => [
+                'title',
+            ],
+            'transformers' => [
+                'title' => function ($value) {
+                    return [
+                        'title' => $value,
+                        'title_upper' => strtoupper($value),
+                    ];
                 },
             ],
         ]);
@@ -294,24 +400,20 @@ class SearchablesTest extends TestCase
         $searchables = new Searchables($index);
 
         $this->assertEquals([
-            'title' => 'HELLO',
+            'title' => 'Hello',
+            'title_upper' => 'HELLO',
         ], $searchables->fields($searchable));
     }
 
     /** @test */
-    public function if_a_transformer_returns_an_array_it_gets_combined_into_the_results()
+    public function if_a_class_based_transformer_returns_an_array_it_gets_combined_into_the_results()
     {
         config()->set('statamic.search.indexes.default', [
             'fields' => [
                 'title',
             ],
             'transformers' => [
-                'title' => function ($value) {
-                    return [
-                        'title' => $value,
-                        'title_upper' => strtoupper($value),
-                    ];
-                },
+                'title' => ArrayTestTransformer::class,
             ],
         ]);
 
@@ -342,4 +444,28 @@ class SearchablesTest extends TestCase
 class NotSearchable
 {
     //
+}
+
+class BasicTestTransformer
+{
+    public function handle($value, $field, $searchable)
+    {
+        Assert::assertEquals('Hello', $value);
+        Assert::assertEquals('title', $field);
+        Assert::assertInstanceOf(EntryContract::class, $searchable);
+        Assert::assertEquals('a', $searchable->id());
+
+        return strtoupper($value);
+    }
+}
+
+class ArrayTestTransformer
+{
+    public function handle($value, $field)
+    {
+        return [
+            $field => $value,
+            $field.'_upper' => strtoupper($value),
+        ];
+    }
 }

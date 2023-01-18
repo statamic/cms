@@ -64,6 +64,8 @@ return [
     'change_passwords' => 'Wijzig wachtwoorden',
     'edit_user_groups' => 'Wijzig groepen',
     'edit_roles' => 'Wijzig rollen',
+    'assign_user_groups' => 'Groepen toekennen aan gebruikers',
+    'assign_roles' => 'Rollen toekennen aan gebruikers',
     'group_updates' => 'Updates',
     'view_updates' => 'Bekijk updates',
     'perform_updates' => 'Voer updates uit',
@@ -73,4 +75,6 @@ return [
     'group_misc' => 'Diversen',
     'resolve_duplicate_ids' => 'Los dubbele IDs op',
     'resolve_duplicate_ids_desc' => 'Geeft de mogelijkheid om dubbele IDs te zien en op te lossen.',
+    'view_graphql' => 'Bekijk GraphQL',
+    'view_graphql_desc' => 'Geeft de mogelijkheid om de GraphQL viewer te bekijken',
 ];

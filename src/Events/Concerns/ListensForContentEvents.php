@@ -16,6 +16,8 @@ trait ListensForContentEvents
         \Statamic\Events\AssetFolderDeleted::class,
         \Statamic\Events\AssetFolderSaved::class,
         \Statamic\Events\AssetSaved::class,
+        \Statamic\Events\AssetReuploaded::class,
+        \Statamic\Events\AssetReferencesUpdated::class,
         \Statamic\Events\BlueprintDeleted::class,
         \Statamic\Events\BlueprintSaved::class,
         \Statamic\Events\CollectionDeleted::class,
@@ -44,10 +46,12 @@ trait ListensForContentEvents
         \Statamic\Events\TaxonomySaved::class,
         \Statamic\Events\TermDeleted::class,
         \Statamic\Events\TermSaved::class,
+        \Statamic\Events\TermReferencesUpdated::class,
         \Statamic\Events\UserDeleted::class,
         \Statamic\Events\UserGroupDeleted::class,
         \Statamic\Events\UserGroupSaved::class,
         \Statamic\Events\UserSaved::class,
+        \Statamic\Events\DefaultPreferencesSaved::class,
         \Statamic\Events\DuplicateIdRegenerated::class,
     ];
 }
