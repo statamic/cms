@@ -3,8 +3,6 @@
 namespace Statamic\CP\Navigation;
 
 use Closure;
-use Exception;
-use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 class Nav
@@ -23,14 +21,14 @@ class Nav
     }
 
     /**
-     * Create nav item.
+     * Create and register nav item.
      *
      * @param  string  $name
      * @return NavItem
      */
     public function create($name)
     {
-        $item = (new NavItem)->name($name);
+        $item = (new NavItem)->display($name);
 
         $this->items[] = $item;
 
@@ -38,9 +36,10 @@ class Nav
     }
 
     /**
-     * Create nav item (an alias that reads a little nicer when creating children).
+     * Create and register nav item (an alias that reads a little nicer when creating children).
      *
-     * @param  mixed  $name
+     * @param  string  $name
+     * @return NavItem
      */
     public function item($name)
     {
@@ -57,7 +56,8 @@ class Nav
     {
         $item = collect($this->items)->first(function ($item) use ($section, $name) {
             return $item->section() === $section
-                && $item->name() === $name;
+                && $item->display() === $name
+                && ! $item->isChild();
         });
 
         return $item ?: $this->create($name)->section($section);
@@ -75,7 +75,7 @@ class Nav
         $this->items = collect($this->items)
             ->reject(function ($item) use ($section, $name) {
                 return $name
-                    ? $item->section() === $section && $item->name() === $name
+                    ? $item->section() === $section && $item->display() === $name
                     : $item->section() === $section;
             })
             ->all();
@@ -84,218 +84,56 @@ class Nav
     }
 
     /**
-     * Get currently registered nav items as a raw array, before creating build structure.
+     * Build navigation.
+     *
+     * @param  mixed  $preferences
+     * @return \Illuminate\Support\Collection
+     */
+    public function build($preferences = true, $withHidden = false)
+    {
+        return (new NavBuilder($this->makeBaseItems(), $withHidden))->build($preferences);
+    }
+
+    /**
+     * Build navigation without applying preferences.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function buildWithoutPreferences($withHidden = false)
+    {
+        return $this->build(false, $withHidden);
+    }
+
+    /**
+     * Make base items.
+     *
+     * @return $this
+     */
+    protected function makeBaseItems()
+    {
+        $originalItems = $this->items;
+
+        CoreNav::make();
+
+        collect($this->extensions)->each(function ($callback) {
+            $callback($this);
+        });
+
+        $items = $this->items;
+
+        $this->items = $originalItems;
+
+        return $items;
+    }
+
+    /**
+     * Get currently registered items.
      *
      * @return array
      */
     public function items()
     {
         return $this->items;
-    }
-
-    /**
-     * Build navigation.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function build()
-    {
-        return $this->built = $this
-            ->makeDefaultItems()
-            ->buildExtensions()
-            ->buildChildren()
-            ->validateNesting()
-            ->validateIcons()
-            ->validateViews()
-            ->authorizeItems()
-            ->authorizeChildren()
-            ->buildSections();
-    }
-
-    /**
-     * Make default nav items.
-     *
-     * @return $this
-     */
-    protected function makeDefaultItems()
-    {
-        CoreNav::make();
-
-        return $this;
-    }
-
-    /**
-     * Build extension closures.
-     *
-     * @return $this
-     */
-    protected function buildExtensions()
-    {
-        collect($this->extensions)->each(function ($callback) {
-            $callback($this);
-        });
-
-        return $this;
-    }
-
-    /**
-     * Build children closures.
-     *
-     * @return $this
-     */
-    public function buildChildren()
-    {
-        collect($this->items)
-            ->filter(function ($item) {
-                return is_callable($item->children()) && $item->isActive();
-            })
-            ->each(function ($item) {
-                $item->children($item->children()());
-            });
-
-        return $this;
-    }
-
-    /**
-     * Validate that nav children don't exceed nesting limit.
-     *
-     * @return $this
-     *
-     * @throws Exception
-     */
-    protected function validateNesting()
-    {
-        collect($this->items)
-            ->flatMap(function ($item) {
-                return $item->children();
-            })
-            ->reject(function ($item) {
-                return empty($item->children());
-            })
-            ->each(function ($item) {
-                throw new Exception('Nav children have exceeded their nesting limit.');
-            });
-
-        return $this;
-    }
-
-    /**
-     * Validate that nav children don't specify icons.
-     *
-     * @return $this
-     *
-     * @throws Exception
-     */
-    protected function validateIcons()
-    {
-        collect($this->items)
-            ->flatMap(function ($item) {
-                return $item->children();
-            })
-            ->reject(function ($item) {
-                return is_null($item->icon());
-            })
-            ->each(function ($item) {
-                throw new Exception('These nav children cannot have icons.');
-            });
-
-        return $this;
-    }
-
-    /**
-     * Validate that nav children don't specify views.
-     *
-     * @return $this
-     *
-     * @throws Exception
-     */
-    protected function validateViews()
-    {
-        collect($this->items)
-            ->flatMap(function ($item) {
-                return $item->children();
-            })
-            ->reject(function ($item) {
-                return is_null($item->view());
-            })
-            ->each(function ($item) {
-                throw new Exception('Nav children cannot specify views.');
-            });
-
-        return $this;
-    }
-
-    /**
-     * Authorize nav items.
-     *
-     * @return $this
-     */
-    protected function authorizeItems()
-    {
-        $this->items = $this->filterAuthorizedNavItems($this->items);
-
-        return $this;
-    }
-
-    /**
-     * Authorize nav children.
-     *
-     * @return $this
-     */
-    protected function authorizeChildren()
-    {
-        collect($this->items)
-            ->reject(function ($item) {
-                return is_callable($item->children());
-            })
-            ->each(function ($item) {
-                $item->children($this->filterAuthorizedNavItems($item->children()));
-            });
-
-        return $this;
-    }
-
-    /**
-     * Filter authorized nav items.
-     *
-     * @param  mixed  $items
-     * @return \Illuminate\Support\Collection
-     */
-    protected function filterAuthorizedNavItems($items)
-    {
-        return collect($items)
-            ->filter(function ($item) {
-                return $item->authorization()
-                    ? User::current()->can($item->can()->ability, $item->can()->arguments)
-                    : true;
-            })
-            ->values();
-    }
-
-    /**
-     * Build sections collection.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function buildSections()
-    {
-        $sections = [];
-
-        collect($this->items)
-            ->filter(function ($item) {
-                return $item->section();
-            })
-            ->reject(function ($item) {
-                return $item->section() === 'Top Level'
-                    && ! in_array($item->name(), CoreNav::ALLOWED_TOP_LEVEL);
-            })
-            ->each(function ($item) use (&$sections) {
-                $sections[$item->section()][] = $item;
-            });
-
-        return collect($sections)->map(function ($items) {
-            return collect($items);
-        });
     }
 
     /**
