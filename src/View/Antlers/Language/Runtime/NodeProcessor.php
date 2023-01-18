@@ -446,6 +446,16 @@ class NodeProcessor
      */
     public function setData($data)
     {
+        if (GlobalRuntimeState::$garbageCollect) {
+            $this->data = [];
+            $this->previousAssignments = [];
+            $this->runtimeAssignments = [];
+            $this->canHandleInterpolations = [];
+            $this->interpolationCache = [];
+            $this->lockedData = [];
+            GlobalRuntimeState::$garbageCollect = false;
+        }
+
         if ($this->scopeLock) {
             return $this;
         }

@@ -11,6 +11,11 @@ class FilesystemAdapterTest extends TestCase
 {
     use FilesystemAdapterTests;
 
+    private $tempDir;
+    private $baseDir;
+    private $outsideRoot;
+    private $filesystem;
+
     public function setUp(): void
     {
         parent::setUp();

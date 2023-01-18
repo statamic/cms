@@ -8,6 +8,7 @@ use Statamic\Data\StoresComputedFieldCallbacks;
 use Statamic\Events\UserBlueprintFound;
 use Statamic\Facades\Blueprint;
 use Statamic\OAuth\Provider;
+use Statamic\Statamic;
 
 abstract class UserRepository implements RepositoryContract
 {
@@ -57,11 +58,18 @@ abstract class UserRepository implements RepositoryContract
     public function blueprint()
     {
         $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
-            'email' => ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address', 'listable' => true],
             'name' => ['type' => 'text', 'display' => 'Name', 'listable' => true],
-            'roles' => ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true],
-            'groups' => ['type' => 'user_groups', 'mode' => 'select', 'width' => 50, 'listable' => true],
         ])->setHandle('user');
+
+        $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address', 'listable' => true]);
+
+        if (Statamic::pro()) {
+            $blueprint->ensureField('roles', ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true]);
+            $blueprint->ensureField('groups', ['type' => 'user_groups', 'mode' => 'select', 'width' => 50, 'listable' => true]);
+        } else {
+            $blueprint->removeField('roles');
+            $blueprint->removeField('groups');
+        }
 
         UserBlueprintFound::dispatch($blueprint);
 
