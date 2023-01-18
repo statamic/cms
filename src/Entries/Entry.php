@@ -24,6 +24,7 @@ use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\EntryCreated;
+use Statamic\Events\EntryCreating;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
@@ -299,6 +300,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && EntryCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (EntrySaving::dispatch($this) === false) {
                 return false;
             }

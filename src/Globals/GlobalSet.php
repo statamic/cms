@@ -5,6 +5,7 @@ namespace Statamic\Globals;
 use Statamic\Contracts\Globals\GlobalSet as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\GlobalSetCreated;
+use Statamic\Events\GlobalSetCreating;
 use Statamic\Events\GlobalSetDeleted;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalSetSaving;
@@ -84,6 +85,10 @@ class GlobalSet implements Contract
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && GlobalSetCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (GlobalSetSaving::dispatch($this) === false) {
                 return false;
             }

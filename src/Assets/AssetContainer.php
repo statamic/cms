@@ -11,6 +11,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\AssetContainerBlueprintFound;
 use Statamic\Events\AssetContainerCreated;
+use Statamic\Events\AssetContainerCreating;
 use Statamic\Events\AssetContainerDeleted;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Events\AssetContainerSaving;
@@ -213,6 +214,10 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && AssetContainerCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (AssetContainerSaving::dispatch($this) === false) {
                 return false;
             }

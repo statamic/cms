@@ -5,6 +5,7 @@ namespace Tests\Forms;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\SubmissionCreated;
+use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Blueprint;
@@ -102,6 +103,10 @@ class SubmissionTest extends TestCase
             return $event->submission === $submission;
         });
 
+        Event::assertDispatched(SubmissionCreating::class, function ($event) use ($submission) {
+            return $event->submission === $submission;
+        });
+
         Event::assertDispatched(SubmissionCreated::class, function ($event) use ($submission) {
             return $event->submission === $submission;
         });
@@ -142,6 +147,26 @@ class SubmissionTest extends TestCase
 
         Event::assertNotDispatched(SubmissionSaving::class);
         Event::assertNotDispatched(SubmissionSaved::class);
+        Event::assertNotDispatched(SubmissionCreated::class);
+        Event::assertNotDispatched(SubmissionCreating::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_submission_doesnt_save()
+    {
+        Event::fake([SubmissionCreated::class]);
+
+        Event::listen(SubmissionCreating::class, function () {
+            return false;
+        });
+
+        $form = Form::make('contact_us');
+        $form->save();
+
+        $submission = $form->makeSubmission();
+        $return = $submission->save();
+
+        $this->assertFalse($return);
         Event::assertNotDispatched(SubmissionCreated::class);
     }
 

@@ -4,6 +4,7 @@ namespace Tests\Fields;
 
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\FieldsetCreated;
+use Statamic\Events\FieldsetCreating;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
 use Statamic\Facades\Fieldset as FieldsetRepository;
@@ -157,6 +158,10 @@ class FieldsetTest extends TestCase
 
         $this->assertEquals($fieldset, $return);
 
+        Event::assertDispatched(FieldsetCreating::class, function ($event) use ($fieldset) {
+            return $event->fieldset === $fieldset;
+        });
+
         Event::assertDispatched(FieldsetSaving::class, function ($event) use ($fieldset) {
             return $event->fieldset === $fieldset;
         });
@@ -202,8 +207,26 @@ class FieldsetTest extends TestCase
 
         $this->assertEquals($fieldset, $return);
 
+        Event::assertNotDispatched(FieldsetCreating::class);
         Event::assertNotDispatched(FieldsetSaving::class);
         Event::assertNotDispatched(FieldsetSaved::class);
+        Event::assertNotDispatched(FieldsetCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_fieldset_doesnt_save()
+    {
+        Event::fake([FieldsetCreated::class]);
+
+        Event::listen(FieldsetCreating::class, function () {
+            return false;
+        });
+
+        $fieldset = (new Fieldset)->setHandle('seo');
+
+        $return = $fieldset->save();
+
+        $this->assertFalse($return);
         Event::assertNotDispatched(FieldsetCreated::class);
     }
 
