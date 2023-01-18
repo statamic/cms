@@ -43,11 +43,11 @@ class FormController extends Controller
         $submission = $form->makeSubmission();
 
         try {
-            $this->withLocale($site->lang(), function () use ($fields) {
-                $fields->validate($this->extraRules($fields));
-            });
-
             throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
+
+            $values = $this->withLocale($site->lang(), function () use ($fields) {
+                return $fields->validate($this->extraRules($fields));
+            });
 
             $values = array_merge($values, $submission->uploadFiles($assets));
 
