@@ -1,5 +1,24 @@
 # Release Notes
 
+## 3.3.65 (2023-01-18)
+
+### What's new
+- PHP 8.2 support. [#7299](https://github.com/statamic/cms/issues/7299) by @jasonvarga
+- Ability to pass an array of roles into the `user_roles` tag. [#7328](https://github.com/statamic/cms/issues/7328) by @edalzell
+
+### What's improved
+- When using revisions, the publish action button takes into consideration whether you can manage publish state. [#7168](https://github.com/statamic/cms/issues/7168) by @arthurperton
+- Pasting multiple lines into the `list` fieldtype will create multiple list items. [#7340](https://github.com/statamic/cms/issues/7340) by @jacksleight
+
+### What's fixed
+- Fix how user blueprint fields are handled in a few cases. [#7368](https://github.com/statamic/cms/issues/7368) by @jesseleite
+- Fix misspelling [#7354](https://github.com/statamic/cms/issues/7354) by @stefanbauer
+- Improve memory leak and garbage collection in Antlers. [#7361](https://github.com/statamic/cms/issues/7361) [#7367](https://github.com/statamic/cms/issues/7367) by @JohnathonKoster
+- Fix `revealer` fields disappearing on save. [#7329](https://github.com/statamic/cms/issues/7329) by @jacksleight
+- Use customizable create label on the empty collection listing view. [#7323](https://github.com/statamic/cms/issues/7323) by @arthurperton
+
+
+
 ## 3.3.64 (2023-01-06)
 
 ### What's new
