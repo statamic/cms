@@ -20,6 +20,7 @@ use Statamic\Search\Searchables;
 use Statamic\Search\Searchables\Provider;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Query\TermQueryBuilder;
+use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -166,7 +167,7 @@ class SearchablesTest extends TestCase
     /** @test */
     public function it_gets_searchable_terms_in_all_taxonomies()
     {
-        $terms = [Term::make(), Term::make()];
+        $terms = [new LocalizedTerm(Term::make(), 'en'), new LocalizedTerm(Term::make(), 'en')];
         $entry = Entry::make();
         $asset = Asset::make();
         $user = User::make();
