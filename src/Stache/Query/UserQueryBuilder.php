@@ -6,6 +6,56 @@ use Statamic\Auth\UserCollection;
 
 class UserQueryBuilder extends Builder
 {
+    public function whereGroup($value, $operator = '=', $boolean = 'and')
+    {
+        $this->where('group/'.$value, $operator, true, $boolean);
+    }
+
+    public function orWhereGroup($value, $operator = '=')
+    {
+        $this->whereGroup($value, $operator, 'or');
+    }
+
+    public function whereGroupIn($groups, $boolean = 'and')
+    {
+        $method = $boolean == 'or' ? 'orWhere' : 'where';
+        $this->$method(function ($query) use ($groups) {
+             foreach ($groups as $group) {
+                 $query->orWhere('groups/'.$group, true);
+             }
+         });
+    }
+
+    public function orWhereGroupIn($groups)
+    {
+        $this->whereGroupIn($groups, 'or');
+    }
+
+    public function whereRole($value, $operator = '=', $boolean = 'and')
+    {
+        $this->where('role/'.$value, $operator, true, $boolean);
+    }
+
+    public function orWhereRole($value, $operator = '=')
+    {
+        $this->whereRole($value, $operator, 'or');
+    }
+
+    public function whereRoleIn($roles, $boolean = 'and')
+    {
+        $method = $boolean == 'or' ? 'orWhere' : 'where';
+        $this->$method(function ($query) use ($roles) {
+             foreach ($roles as $role) {
+                 $query->orWhere('roles/'.$role, true);
+             }
+         });
+    }
+
+    public function orWhereRoleIn($roles)
+    {
+        $this->whereRoleIn($roles, 'or');
+    }
+
     protected function getFilteredKeys()
     {
         if (! empty($this->wheres)) {
