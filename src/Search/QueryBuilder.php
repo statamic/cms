@@ -53,7 +53,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
         return collect($results)->groupBy(function ($result) {
             return Str::before($result['reference'], '::');
         })->flatMap(function ($results, $prefix) {
-            $ids = $results->map(fn ($result) => Str::after($result['reference'], '::'))->all();
+            $ids = $results->map(fn ($result) => Str::after($result['reference'], $prefix.'::'))->all();
 
             return app(Providers::class)
                 ->getByPrefix($prefix)
