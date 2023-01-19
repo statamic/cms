@@ -38,8 +38,17 @@ class UpdateItemIndexes
         }
 
         $items->each(function ($item) {
-            $this->indexes($item)->each(function ($index) use ($item) {
-                $index->exists() ? $index->insert($item) : $index->update();
+            Search::indexes()->each(function ($index) use ($item) {
+                $shouldIndex = $index->shouldIndex($item);
+                $exists = $index->exists();
+
+                if ($shouldIndex && $exists) {
+                    $index->insert($item);
+                } elseif ($shouldIndex && ! $exists) {
+                    $index->update();
+                } elseif ($exists) {
+                    $index->delete($item);
+                }
             });
         });
     }
@@ -48,11 +57,10 @@ class UpdateItemIndexes
     {
         $item = $event->entry ?? $event->asset ?? $event->user ?? $event->term;
 
-        $this->indexes($item)->each->delete($item);
-    }
-
-    protected function indexes($item)
-    {
-        return Search::indexes()->filter->shouldIndex($item);
+        Search::indexes()->each(function ($index) use ($item) {
+            if ($index->exists()) {
+                $index->delete($item);
+            }
+        });
     }
 }
