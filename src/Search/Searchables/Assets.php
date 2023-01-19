@@ -37,11 +37,6 @@ class Assets extends Provider
         return $this->filter()($searchable);
     }
 
-    public function isSearchable($searchable): bool
-    {
-        return $searchable instanceof AssetContract;
-    }
-
     public function find(array $keys): Collection
     {
         return collect($keys)->map(function ($id) {

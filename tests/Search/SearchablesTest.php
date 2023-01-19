@@ -630,9 +630,4 @@ class TestCustomSearchables extends Provider
     {
         return $searchable instanceof TestCustomSearchable;
     }
-
-    public function isSearchable($searchable): bool
-    {
-        return true;
-    }
 }

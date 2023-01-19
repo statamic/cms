@@ -12,8 +12,6 @@ interface ProvidesSearchables
 
     public function contains($searchable): bool;
 
-    public function isSearchable($searchable): bool;
-
     public function find(array $keys): Collection;
 
     public function referencePrefix(): string;

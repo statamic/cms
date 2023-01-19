@@ -35,11 +35,6 @@ class Entries extends Provider
         return $this->filter()($searchable);
     }
 
-    public function isSearchable($searchable): bool
-    {
-        return $searchable instanceof EntryContract;
-    }
-
     public function find(array $ids): Collection
     {
         return Entry::query()->whereIn('id', $ids)->get();

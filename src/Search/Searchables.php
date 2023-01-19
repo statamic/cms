@@ -45,23 +45,8 @@ class Searchables
 
     public function contains($searchable)
     {
-        if (! $this->isSearchable($searchable)) {
-            return false;
-        }
-
         foreach ($this->providers as $provider) {
             if ($provider->contains($searchable)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function isSearchable($searchable)
-    {
-        foreach ($this->providers as $provider) {
-            if ($provider->isSearchable($searchable)) {
                 return true;
             }
         }

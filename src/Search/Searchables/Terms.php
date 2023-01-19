@@ -36,11 +36,6 @@ class Terms extends Provider
         return $this->filter()($searchable);
     }
 
-    public function isSearchable($searchable): bool
-    {
-        return $searchable instanceof TermContract;
-    }
-
     public function find(array $refs): Collection
     {
         $ids = collect($refs)
