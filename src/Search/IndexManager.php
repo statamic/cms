@@ -5,6 +5,7 @@ namespace Statamic\Search;
 use Algolia\AlgoliaSearch\SearchClient;
 use Statamic\Search\Algolia\Index as AlgoliaIndex;
 use Statamic\Search\Comb\Index as CombIndex;
+use Statamic\Search\Null\NullIndex;
 use Statamic\Support\Manager;
 
 class IndexManager extends Manager
@@ -29,6 +30,11 @@ class IndexManager extends Manager
     public function getDefaultDriver()
     {
         return $this->app['config']['statamic.search.default'];
+    }
+
+    public function createNullDriver(array $config, $name)
+    {
+        return new NullIndex($name, $config);
     }
 
     public function createLocalDriver(array $config, $name)
