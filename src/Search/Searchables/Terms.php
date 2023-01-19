@@ -16,11 +16,11 @@ class Terms extends Provider
 
     public function provide(): Collection
     {
-        if ($this->usesWildcard()) {
-            return Term::all();
-        }
+        $terms = $this->usesWildcard()
+            ? Term::all()
+            : Term::query()->whereIn('taxonomy', $this->keys)->get();
 
-        return Term::query()->whereIn('taxonomy', $this->keys)->get();
+        return $terms->filter($this->filter());
     }
 
     public function contains($searchable): bool
@@ -29,7 +29,11 @@ class Terms extends Provider
             return false;
         }
 
-        return $this->usesWildcard() || in_array($searchable->taxonomyHandle(), $this->keys);
+        if (! $this->usesWildcard() && ! in_array($searchable->taxonomyHandle(), $this->keys)) {
+            return false;
+        }
+
+        return $this->filter()($searchable);
     }
 
     public function isSearchable($searchable): bool

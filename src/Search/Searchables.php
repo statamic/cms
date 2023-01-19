@@ -29,13 +29,13 @@ class Searchables
         $providers = collect(Arr::wrap($this->index->config()['searchables'] ?? []));
 
         if ($providers->contains('all')) {
-            return $manager->providers()->map(fn ($_, $key) => $manager->make($key, ['*']));
+            return $manager->providers()->map(fn ($_, $key) => $manager->make($key, $this->index, ['*']));
         }
 
         return $providers
             ->map(fn ($key) => ['provider' => Str::before($key, ':'), 'key' => Str::after($key, ':')])
             ->groupBy('provider')
-            ->map(fn ($items, $provider) => $manager->make($provider, $items->map->key->all()));
+            ->map(fn ($items, $provider) => $manager->make($provider, $this->index, $items->map->key->all()));
     }
 
     public function all(): Collection

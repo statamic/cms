@@ -3,6 +3,7 @@
 namespace Statamic\Search\Searchables;
 
 use Illuminate\Support\Collection;
+use Statamic\Search\Index;
 
 class Providers
 {
@@ -27,10 +28,14 @@ class Providers
         return $this->providers;
     }
 
-    public function make(string $key, array $keys = null)
+    public function make(string $key, Index $index = null, array $keys = null)
     {
         if (! $provider = $this->providers()->get($key)) {
             throw new \Exception('Unknown searchable ['.$key.']');
+        }
+
+        if ($index) {
+            $provider->setIndex($index);
         }
 
         if ($keys) {

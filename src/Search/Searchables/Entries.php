@@ -45,10 +45,8 @@ class Entries extends Provider
         return Entry::query()->whereIn('id', $ids)->get();
     }
 
-    private function filter()
+    protected function defaultFilter()
     {
-        return function ($item) {
-            return $item->published();
-        };
+        return fn ($item) => $item->published();
     }
 }

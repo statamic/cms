@@ -15,12 +15,16 @@ class Users extends Provider
 
     public function provide(): Collection
     {
-        return User::all();
+        return User::all()->filter($this->filter());
     }
 
     public function contains($searchable): bool
     {
-        return $searchable instanceof UserContract;
+        if (! $searchable instanceof UserContract) {
+            return false;
+        }
+
+        return $this->filter()($searchable);
     }
 
     public function isSearchable($searchable): bool

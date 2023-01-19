@@ -16,12 +16,12 @@ class Assets extends Provider
 
     public function provide(): Collection
     {
-        if ($this->usesWildcard()) {
-            return Asset::all();
-        }
+        $assets = $this->usesWildcard()
+            ? Asset::all()
+            : AssetCollection::make($this->keys)
+                ->flatMap(fn ($key) => Asset::whereContainer($key));
 
-        return AssetCollection::make($this->keys)
-            ->flatMap(fn ($key) => Asset::whereContainer($key));
+        return $assets->filter($this->filter());
     }
 
     public function contains($searchable): bool
@@ -30,7 +30,11 @@ class Assets extends Provider
             return false;
         }
 
-        return $this->usesWildcard() || in_array($searchable->containerHandle(), $this->keys);
+        if (! $this->usesWildcard() && ! in_array($searchable->containerHandle(), $this->keys)) {
+            return false;
+        }
+
+        return $this->filter()($searchable);
     }
 
     public function isSearchable($searchable): bool

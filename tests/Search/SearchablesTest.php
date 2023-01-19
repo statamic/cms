@@ -4,6 +4,7 @@ namespace Tests\Search;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use Mockery;
 use PHPUnit\Framework\Assert;
 use Statamic\Assets\AssetCollection;
@@ -14,6 +15,7 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Search;
+use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Search\Searchables;
@@ -33,9 +35,14 @@ class SearchablesTest extends TestCase
     {
         parent::setUp();
 
-        AssetContainer::make('images')->save();
-        AssetContainer::make('documents')->save();
-        AssetContainer::make('audio')->save();
+        Taxonomy::make('tags')->save();
+
+        Storage::fake('images');
+        Storage::fake('documents');
+        Storage::fake('audio');
+        AssetContainer::make('images')->disk('images')->save();
+        AssetContainer::make('documents')->disk('documents')->save();
+        AssetContainer::make('audio')->disk('audio')->save();
     }
 
     /** @test */
@@ -468,6 +475,89 @@ class SearchablesTest extends TestCase
         $this->makeSearchables(['searchables' => ['test']]);
     }
 
+    /**
+     * @test
+     *
+     * @dataProvider indexFilterProvider
+     */
+    public function indexes_can_use_a_custom_filter($filter)
+    {
+        $entries = EntryCollection::make([
+            $entryA = Entry::make()->collection('blog'),
+            $entryB = Entry::make()->collection('blog')->published(false),
+            $entryC = Entry::make()->collection('blog')->data(['is_searchable' => false]),
+            $entryD = Entry::make()->collection('blog')->data(['is_searchable' => true]),
+            $entryE = Entry::make()->collection('blog'),
+        ]);
+        Entry::shouldReceive('all')->andReturn($entries);
+
+        $terms = [
+            $termA = Term::make()->taxonomy('tags'),
+            $termB = Term::make()->taxonomy('tags')->dataForLocale('en', ['is_searchable' => false]),
+            $termC = Term::make()->taxonomy('tags')->dataForLocale('en', ['is_searchable' => true]),
+            $termD = Term::make()->taxonomy('tags'),
+        ];
+        Term::shouldReceive('all')->once()->andReturn(TermCollection::make($terms));
+
+        $assets = [
+            $assetA = Asset::make()->container('images'),
+            $assetB = Asset::make()->container('images')->set('is_searchable', false),
+            $assetC = Asset::make()->container('images')->set('is_searchable', true),
+            $assetD = Asset::make()->container('images'),
+        ];
+        Asset::shouldReceive('all')->once()->andReturn(AssetCollection::make($assets));
+
+        $users = [
+            $userA = User::make(),
+            $userB = User::make()->set('is_searchable', false),
+            $userC = User::make()->set('is_searchable', true),
+            $userD = User::make(),
+        ];
+        User::shouldReceive('all')->once()->andReturn(UserCollection::make($users));
+
+        $searchables = $this->makeSearchables([
+            'searchables' => 'all',
+            'filter' => $filter,
+        ]);
+
+        $this->assertEquals([
+            $entryA, $entryB, $entryD, $entryE,
+            $termA, $termC, $termD,
+            $assetA, $assetC, $assetD,
+            $userA, $userC, $userD,
+        ], $searchables->all()->all());
+
+        $this->assertTrue($searchables->contains($entryA));
+        $this->assertTrue($searchables->contains($entryB));
+        $this->assertFalse($searchables->contains($entryC));
+        $this->assertTrue($searchables->contains($entryD));
+        $this->assertTrue($searchables->contains($entryE));
+        $this->assertTrue($searchables->contains($termA));
+        $this->assertFalse($searchables->contains($termB));
+        $this->assertTrue($searchables->contains($termC));
+        $this->assertTrue($searchables->contains($termD));
+        $this->assertTrue($searchables->contains($assetA));
+        $this->assertFalse($searchables->contains($assetB));
+        $this->assertTrue($searchables->contains($assetC));
+        $this->assertTrue($searchables->contains($assetD));
+        $this->assertTrue($searchables->contains($userA));
+        $this->assertFalse($searchables->contains($userB));
+        $this->assertTrue($searchables->contains($userC));
+        $this->assertTrue($searchables->contains($userD));
+    }
+
+    public function indexFilterProvider()
+    {
+        return [
+            'class' => [TestSearchableFilter::class],
+            'closure' => [
+                function ($entry) {
+                    return $entry->get('is_searchable') !== false;
+                },
+            ],
+        ];
+    }
+
     private function makeSearchables($config)
     {
         $index = $this->mock(\Statamic\Search\Index::class);
@@ -504,6 +594,14 @@ class ArrayTestTransformer
             $field => $value,
             $field.'_upper' => strtoupper($value),
         ];
+    }
+}
+
+class TestSearchableFilter
+{
+    public function handle($item)
+    {
+        return $item->get('is_searchable') !== false;
     }
 }
 
