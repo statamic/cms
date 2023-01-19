@@ -8,7 +8,7 @@ class UserQueryBuilder extends Builder
 {
     public function whereGroup($value, $operator = '=', $boolean = 'and')
     {
-        $this->where('group/'.$value, $operator, true, $boolean);
+        $this->where('groups/'.$value, $operator, true, $boolean);
     }
 
     public function orWhereGroup($value, $operator = '=')
@@ -33,7 +33,7 @@ class UserQueryBuilder extends Builder
 
     public function whereRole($value, $operator = '=', $boolean = 'and')
     {
-        $this->where('role/'.$value, $operator, true, $boolean);
+        $this->where('roles/'.$value, $operator, true, $boolean);
     }
 
     public function orWhereRole($value, $operator = '=')
