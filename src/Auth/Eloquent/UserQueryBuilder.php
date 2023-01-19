@@ -12,7 +12,7 @@ class UserQueryBuilder extends EloquentQueryBuilder
     {
         $method = $boolean == 'or' ? 'orWhereHas' : 'whereHas';
         $this->$method('groups', function ($query) use ($value, $operator) {
-            return $query->where('name', $operator, $value);
+            return $query->where('handle', $operator, $value);
         });
     }
 
@@ -25,7 +25,7 @@ class UserQueryBuilder extends EloquentQueryBuilder
     {
         $method = $boolean == 'or' ? 'orWhereHas' : 'whereHas';
         $this->$method('groups', function ($query) use ($groups) {
-            return $query->whereIn('name', $groups);
+            return $query->whereIn('handle', $groups);
         });
     }
 
@@ -38,7 +38,7 @@ class UserQueryBuilder extends EloquentQueryBuilder
     {
         $method = $boolean == 'or' ? 'orWhereHas' : 'whereHas';
         $this->$method('roles', function ($query) use ($value, $operator) {
-            return $query->where('name', $operator, $value);
+            return $query->where('handle', $operator, $value);
         });
     }
 
@@ -51,7 +51,7 @@ class UserQueryBuilder extends EloquentQueryBuilder
     {
         $method = $boolean == 'or' ? 'orWhereHas' : 'whereHas';
         $this->$method('roles', function ($query) use ($roles) {
-            return $query->whereIn('name', $roles);
+            return $query->whereIn('handle', $roles);
         });
     }
 
