@@ -202,7 +202,7 @@ class LocalizedTerm implements
 
     public function reference()
     {
-        return $this->term->reference();
+        return $this->term->reference().'::'.$this->locale();
     }
 
     public function in($site)
