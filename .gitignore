@@ -1,5 +1,6 @@
 .idea
 .vscode
+.nova
 /vendor
 node_modules
 .DS_Store
