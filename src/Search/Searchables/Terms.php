@@ -7,7 +7,7 @@ use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Facades\Term;
 use Statamic\Support\Str;
 
-class Taxonomies extends Provider
+class Terms extends Provider
 {
     public function referencePrefix(): string
     {

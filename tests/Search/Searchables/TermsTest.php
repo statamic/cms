@@ -5,11 +5,11 @@ namespace Tests\Search\Searchables;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
-use Statamic\Search\Searchables\Taxonomies;
+use Statamic\Search\Searchables\Terms;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class TaxonomiesTest extends TestCase
+class TermsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -26,7 +26,7 @@ class TaxonomiesTest extends TestCase
         Term::make('bravo')->taxonomy('tags')->dataForLocale('en', [])->dataForLocale('fr', [])->save();
         Term::make('charlie')->taxonomy('tags')->dataForLocale('en', [])->dataForLocale('fr', [])->save();
 
-        $found = (new Taxonomies)->find([
+        $found = (new Terms)->find([
             'tags::alfa::en',
             'tags::alfa::fr',
             'tags::bravo::fr',

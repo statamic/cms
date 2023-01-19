@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Facades\Search;
 use Statamic\Search\Searchables\Assets;
-use Statamic\Search\Searchables\Collections;
+use Statamic\Search\Searchables\Entries;
 use Statamic\Search\Searchables\Providers;
-use Statamic\Search\Searchables\Taxonomies;
+use Statamic\Search\Searchables\Terms;
 use Statamic\Search\Searchables\Users;
 
 class ServiceProvider extends LaravelServiceProvider
@@ -36,8 +36,8 @@ class ServiceProvider extends LaravelServiceProvider
         Event::subscribe(UpdateItemIndexes::class);
 
         collect([
-            'collection' => Collections::class,
-            'taxonomy' => Taxonomies::class,
+            'collection' => Entries::class,
+            'taxonomy' => Terms::class,
             'assets' => Assets::class,
             'users' => Users::class,
         ])->each(fn ($provider, $key) => Search::registerSearchableProvider($key, new $provider));

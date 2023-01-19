@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Entry;
 
-class Collections extends Provider
+class Entries extends Provider
 {
     public function referencePrefix(): string
     {
