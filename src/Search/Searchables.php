@@ -13,6 +13,7 @@ use Statamic\Support\Str;
 class Searchables
 {
     protected $index;
+    protected $providers;
     protected $manager;
 
     public function __construct(Index $index)
