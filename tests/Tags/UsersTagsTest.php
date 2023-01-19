@@ -2,7 +2,6 @@
 
 namespace Tests\Tags;
 
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
 use Tests\FakesRoles;

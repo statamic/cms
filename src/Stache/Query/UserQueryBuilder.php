@@ -20,10 +20,10 @@ class UserQueryBuilder extends Builder
     {
         $method = $boolean == 'or' ? 'orWhere' : 'where';
         $this->$method(function ($query) use ($groups) {
-             foreach ($groups as $group) {
-                 $query->orWhere('groups/'.$group, true);
-             }
-         });
+            foreach ($groups as $group) {
+                $query->orWhere('groups/'.$group, true);
+            }
+        });
     }
 
     public function orWhereGroupIn($groups)
@@ -45,10 +45,10 @@ class UserQueryBuilder extends Builder
     {
         $method = $boolean == 'or' ? 'orWhere' : 'where';
         $this->$method(function ($query) use ($roles) {
-             foreach ($roles as $role) {
-                 $query->orWhere('roles/'.$role, true);
-             }
-         });
+            foreach ($roles as $role) {
+                $query->orWhere('roles/'.$role, true);
+            }
+        });
     }
 
     public function orWhereRoleIn($roles)
