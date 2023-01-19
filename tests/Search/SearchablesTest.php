@@ -41,7 +41,7 @@ class SearchablesTest extends TestCase
     /** @test */
     public function all_searchables_include_entries_terms_assets_and_users()
     {
-        $entries = [$entryA = Entry::make(), $entryB = Entry::make()];
+        $entries = [$entryA = Entry::make(), $entryB = Entry::make(), $entryC = Entry::make()->published(false)];
         Entry::shouldReceive('all')->once()->andReturn(EntryCollection::make($entries));
         $terms = [$termA = Term::make(), $termB = Term::make()];
         Term::shouldReceive('all')->once()->andReturn(TermCollection::make($terms));
@@ -77,7 +77,7 @@ class SearchablesTest extends TestCase
     /** @test */
     public function it_gets_searchable_entries_in_specific_collections()
     {
-        $blog = [$entryA = Entry::make()->collection('blog'), $entryB = Entry::make()->collection('blog')];
+        $blog = [$entryA = Entry::make()->collection('blog'), $entryB = Entry::make()->collection('blog'), $entryC = Entry::make()->collection('blog')->published(false)];
         $pages = [$entryC = Entry::make()->collection('pages'), $entryD = Entry::make()->collection('pages')];
         $entry = Entry::make()->collection('events');
         $term = Term::make();
@@ -109,7 +109,11 @@ class SearchablesTest extends TestCase
     /** @test */
     public function it_gets_searchable_entries_in_all_collections()
     {
-        $entries = [Entry::make()->collection('blog'), Entry::make()->collection('pages')];
+        $entries = [
+            $entryA = Entry::make()->collection('blog'),
+            $entryB = Entry::make()->collection('blog')->published(false),
+            $entryC = Entry::make()->collection('pages'),
+        ];
         $term = Term::make();
         $asset = Asset::make();
         $user = User::make();
@@ -122,10 +126,10 @@ class SearchablesTest extends TestCase
 
         $searchables = $this->makeSearchables(['searchables' => ['collection:*']]);
 
-        $this->assertEquals($entries, $searchables->all()->all());
-        foreach ($entries as $item) {
-            $this->assertTrue($searchables->contains($item));
-        }
+        $this->assertEquals([$entryA, $entryC], $searchables->all()->all());
+        $this->assertTrue($searchables->contains($entryA));
+        $this->assertFalse($searchables->contains($entryB));
+        $this->assertTrue($searchables->contains($entryC));
         $this->assertFalse($searchables->contains($term));
         $this->assertFalse($searchables->contains($asset));
         $this->assertFalse($searchables->contains($user));

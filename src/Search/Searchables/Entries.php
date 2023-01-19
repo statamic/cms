@@ -15,11 +15,11 @@ class Entries extends Provider
 
     public function provide(): Collection
     {
-        if ($this->usesWildcard()) {
-            return Entry::all();
-        }
+        $entries = $this->usesWildcard()
+            ? Entry::all()
+            : Entry::query()->whereIn('collection', $this->keys)->get();
 
-        return Entry::query()->whereIn('collection', $this->keys)->get();
+        return $entries->filter($this->filter());
     }
 
     public function contains($searchable): bool
@@ -28,7 +28,11 @@ class Entries extends Provider
             return false;
         }
 
-        return $this->usesWildcard() || in_array($searchable->collectionHandle(), $this->keys);
+        if (! $this->usesWildcard() && ! in_array($searchable->collectionHandle(), $this->keys)) {
+            return false;
+        }
+
+        return $this->filter()($searchable);
     }
 
     public function isSearchable($searchable): bool
@@ -39,5 +43,12 @@ class Entries extends Provider
     public function find(array $ids): Collection
     {
         return Entry::query()->whereIn('id', $ids)->get();
+    }
+
+    private function filter()
+    {
+        return function ($item) {
+            return $item->published();
+        };
     }
 }
