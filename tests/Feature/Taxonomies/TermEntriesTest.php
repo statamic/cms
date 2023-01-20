@@ -36,7 +36,7 @@ class TermEntriesTest extends TestCase
         $this->assertEquals(1, Term::find('colors::yellow')->entriesCount());
 
         $this->assertEquals(['red-shirt'], Term::find('colors::red')->entries()->map->slug()->all());
-        $this->assertEquals(['panther', 'black-shirt'], Term::find('colors::black')->entries()->map->slug()->all());
+        $this->assertEquals(['panther', 'black-shirt', 'draft'], Term::find('colors::black')->entries()->map->slug()->all());
         $this->assertEquals(['cheetah'], Term::find('colors::yellow')->entries()->map->slug()->all());
 
         // and for the base Term class, it should work the same way
@@ -46,7 +46,7 @@ class TermEntriesTest extends TestCase
         $this->assertEquals(1, Term::find('colors::yellow')->term()->entriesCount());
 
         $this->assertEquals(['red-shirt'], Term::find('colors::red')->term()->entries()->map->slug()->all());
-        $this->assertEquals(['panther', 'black-shirt'], Term::find('colors::black')->term()->entries()->map->slug()->all());
+        $this->assertEquals(['panther', 'black-shirt', 'draft'], Term::find('colors::black')->term()->entries()->map->slug()->all());
         $this->assertEquals(['cheetah'], Term::find('colors::yellow')->term()->entries()->map->slug()->all());
     }
 
