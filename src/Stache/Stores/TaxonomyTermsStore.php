@@ -114,6 +114,7 @@ class TaxonomyTermsStore extends ChildStore
                 'entry' => $entry->id(),
                 'collection' => $entry->collectionHandle(),
                 'site' => $entry->locale(),
+                'status' => $entry->status(),
             ]);
         }
         $associations->cache();
