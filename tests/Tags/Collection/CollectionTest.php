@@ -51,8 +51,6 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->books, 'g')->set('title', 'I Love Tolkien')->save();
         $this->makeEntry($this->books, 'h')->set('title', 'I Love Lewis')->save();
         $this->makeEntry($this->books, 'i')->set('title', 'I Hate Martin')->save();
-
-        $this->makeEntry($this->books, 'j')->published(false)->set('title', 'I Hate Publishing')->save();
     }
 
     /** @test */
@@ -216,24 +214,32 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_draft_entries_using_a_filter()
+    public function it_gets_entries_filter_by_status()
     {
         $this->makePosts();
 
+        Entry::find('e')->published(false)->save();
+
+        $this->setTagParameters(['from' => '*']);
+        $this->assertCount(8, $this->collectionTag->index());
+
         $this->setTagParameters(['from' => '*', 'status:is' => 'published']);
-        $this->assertCount(9, $this->collectionTag->index());
+        $this->assertCount(8, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => '*', 'published:is' => 'true']);
+        $this->assertCount(8, $this->collectionTag->index());
 
         $this->setTagParameters(['from' => '*', 'status:is' => 'draft']);
         $this->assertCount(1, $this->collectionTag->index());
 
-        $this->setTagParameters(['from' => '*', 'status:isnt' => 'published']);
+        $this->setTagParameters(['from' => '*', 'published:is' => 'false']);
         $this->assertCount(1, $this->collectionTag->index());
 
         $this->setTagParameters(['from' => '*', 'status:in' => 'published|draft']);
-        $this->assertCount(10, $this->collectionTag->index());
+        $this->assertCount(9, $this->collectionTag->index());
 
         $this->setTagParameters(['from' => '*', 'status:exists' => 'true']);
-        $this->assertCount(10, $this->collectionTag->index());
+        $this->assertCount(9, $this->collectionTag->index());
     }
 
     /** @test */
