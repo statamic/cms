@@ -12,8 +12,6 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Tags\Collection\Collection;
-use Statamic\Tags\Collection\Entries;
-use Statamic\Tags\Context;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -53,6 +51,8 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->books, 'g')->set('title', 'I Love Tolkien')->save();
         $this->makeEntry($this->books, 'h')->set('title', 'I Love Lewis')->save();
         $this->makeEntry($this->books, 'i')->set('title', 'I Hate Martin')->save();
+
+        $this->makeEntry($this->books, 'j')->published(false)->set('title', 'I Hate Publishing')->save();
     }
 
     /** @test */
@@ -213,6 +213,27 @@ class CollectionTest extends TestCase
 
         $this->setTagParameters(['collection' => '*', 'not_collection' => 'art|music', 'title:contains' => 'love']);
         $this->assertCount(2, $this->collectionTag->index());
+    }
+
+    /** @test */
+    public function it_gets_draft_entries_using_a_filter()
+    {
+        $this->makePosts();
+
+        $this->setTagParameters(['from' => '*', 'status:is' => 'published']);
+        $this->assertCount(9, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => '*', 'status:is' => 'draft']);
+        $this->assertCount(1, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => '*', 'status:isnt' => 'published']);
+        $this->assertCount(1, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => '*', 'status:in' => 'published|draft']);
+        $this->assertCount(10, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => '*', 'status:exists' => 'true']);
+        $this->assertCount(10, $this->collectionTag->index());
     }
 
     /** @test */
