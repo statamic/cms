@@ -52,7 +52,7 @@ export default {
             this.$store.commit(`publish/${this.storeName}/setRevealerField`, fieldPath);
         },
         value(value, oldValue) {
-            if (!value && oldValue) {
+            if (!this.isToggleMode && !value && oldValue) {
                 this.buttonReveal();   
             }
         }
