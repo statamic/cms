@@ -3,7 +3,6 @@
 namespace Statamic\Query;
 
 use Illuminate\Support\Traits\ForwardsCalls;
-use ReflectionClass;
 use Statamic\Contracts\Query\Builder;
 
 class StatusQueryBuilder implements Builder
@@ -52,29 +51,8 @@ class StatusQueryBuilder implements Builder
 
     private function queriesStatus(): bool
     {
-        $wheres = null;
-
-        $builder = $this->builder;
-        $reflector = new ReflectionClass($builder);
-
-        while (is_null($wheres)) {
-            if ($reflector->hasProperty('wheres')) {
-                $wheresProperty = $reflector->getProperty('wheres');
-                $wheresProperty->setAccessible(true);
-
-                $wheres = $wheresProperty->getValue($builder);
-            } elseif ($reflector->hasProperty('builder')) {
-                $builderProperty = $reflector->getProperty('builder');
-                $builderProperty->setAccessible(true);
-
-                $builder = $builderProperty->getValue($builder);
-
-                $reflector = new ReflectionClass($builder);
-            } else {
-                return false;
-            }
-        }
-
-        return collect($wheres)->contains(fn ($where) => array_get($where, 'column') === 'status');
+        return collect($this->wheres())->contains(fn ($where) =>
+            in_array(array_get($where, 'column'), ['status', 'published'])
+        );
     }
 }
