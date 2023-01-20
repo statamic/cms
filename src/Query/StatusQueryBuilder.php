@@ -51,8 +51,8 @@ class StatusQueryBuilder implements Builder
 
     private function queriesStatus(): bool
     {
-        return collect($this->wheres())->contains(fn ($where) =>
-            in_array(array_get($where, 'column'), ['status', 'published'])
+        return collect($this->wheres())->contains(
+            fn ($where) => in_array(array_get($where, 'column'), ['status', 'published'])
         );
     }
 }
