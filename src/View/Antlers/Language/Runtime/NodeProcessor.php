@@ -447,18 +447,20 @@ class NodeProcessor
     public function setData($data)
     {
         if (GlobalRuntimeState::$garbageCollect) {
-            $this->data = [];
-            $this->previousAssignments = [];
-            $this->runtimeAssignments = [];
-            $this->canHandleInterpolations = [];
-            $this->interpolationCache = [];
-            $this->lockedData = [];
+            $this->scopeLock = false;
             GlobalRuntimeState::$garbageCollect = false;
         }
 
         if ($this->scopeLock) {
             return $this;
         }
+
+        $this->data = [];
+        $this->previousAssignments = [];
+        $this->runtimeAssignments = [];
+        $this->canHandleInterpolations = [];
+        $this->interpolationCache = [];
+        $this->lockedData = [];
 
         if ((is_array($data) == false && (is_object($data) && ($data instanceof Arrayable) == false)) ||
             is_string($data)) {
