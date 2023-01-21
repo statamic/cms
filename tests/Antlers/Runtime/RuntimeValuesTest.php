@@ -2,12 +2,12 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Facades\Tests\Factories\EntryFactory;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Collection;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
-use Facades\Tests\Factories\EntryFactory;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 
