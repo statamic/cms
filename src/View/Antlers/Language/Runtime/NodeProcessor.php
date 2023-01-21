@@ -45,7 +45,7 @@ use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
@@ -2315,7 +2315,7 @@ class NodeProcessor
 
         foreach ($loop as $key => &$value) {
             if ($value instanceof Augmentable) {
-                $value = RuntimeValueCache::getAugmentableValue($value);
+                $value = RuntimeValues::resolveWithRuntimeIsolation($value);
             }
 
             if ($value instanceof Values) {
