@@ -63,16 +63,6 @@ class RuntimeValueCache
 
     public static function getAugmentableValue(Augmentable $augmentable)
     {
-        $augmentKey = self::getAugmentableKey($augmentable);
-
-        if ($augmentKey != null) {
-            if (! array_key_exists($augmentKey, self::$runtimeValueCache)) {
-                self::$runtimeValueCache[$augmentKey] = self::resolveWithRuntimeIsolation($augmentable);
-            }
-
-            return self::$runtimeValueCache[$augmentKey];
-        }
-
         return self::resolveWithRuntimeIsolation($augmentable);
     }
 
