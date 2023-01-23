@@ -21,7 +21,7 @@ class Assets extends Provider
             : AssetCollection::make($this->keys)
                 ->flatMap(fn ($key) => Asset::whereContainer($key));
 
-        return $assets->filter($this->filter());
+        return $assets->filter($this->filter())->values();
     }
 
     public function contains($searchable): bool

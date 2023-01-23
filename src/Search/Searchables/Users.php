@@ -15,7 +15,7 @@ class Users extends Provider
 
     public function provide(): Collection
     {
-        return User::all()->filter($this->filter());
+        return User::all()->filter($this->filter())->values();
     }
 
     public function contains($searchable): bool

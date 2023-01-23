@@ -8,6 +8,7 @@ use Statamic\Support\Arr;
 abstract class Index
 {
     protected $name;
+    protected $locale;
     protected $config;
 
     abstract public function search($query);
@@ -20,10 +21,11 @@ abstract class Index
 
     abstract protected function deleteIndex();
 
-    public function __construct($name, array $config)
+    public function __construct($name, array $config, string $locale = null)
     {
-        $this->name = $name;
+        $this->name = $locale ? $name.'_'.$locale : $name;
         $this->config = $config;
+        $this->locale = $locale;
     }
 
     public function name()
@@ -39,6 +41,11 @@ abstract class Index
     public function config()
     {
         return $this->config;
+    }
+
+    public function locale()
+    {
+        return $this->locale;
     }
 
     public function for($query)
