@@ -32,7 +32,7 @@ class Result implements Contract, ContainsQueryableValues
 
     public function getReference(): string
     {
-        return $this->searchable->reference();
+        return $this->searchable->getSearchReference();
     }
 
     public function setScore(int $score = null): self
