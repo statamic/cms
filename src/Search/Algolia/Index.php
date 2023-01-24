@@ -44,7 +44,7 @@ class Index extends BaseIndex
 
     public function delete($document)
     {
-        $this->getIndex()->deleteObject($document->reference());
+        $this->getIndex()->deleteObject($document->getSearchReference());
     }
 
     public function deleteIndex()
