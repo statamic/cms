@@ -46,6 +46,14 @@ class UpdateItemIndexes
     {
         $item = $event->entry ?? $event->asset ?? $event->user ?? $event->term;
 
-        Search::deleteFromIndexes($item);
+        if ($item instanceof Term) {
+            $items = $item->localizations();
+        } else {
+            $items = collect([$item]);
+        }
+
+        $items->each(function ($item) {
+            Search::deleteFromIndexes($item);
+        });
     }
 }
