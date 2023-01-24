@@ -519,4 +519,9 @@ class LocalizedTerm implements
 
         return $field->fieldtype()->toQueryableValue($value);
     }
+
+    public function getCpSearchResultBadge()
+    {
+        return $this->taxonomy()->title();
+    }
 }
