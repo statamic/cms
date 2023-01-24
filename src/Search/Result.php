@@ -91,12 +91,12 @@ class Result implements Contract, ContainsQueryableValues
 
     public function getCpTitle(): string
     {
-        return $this->searchable->title;
+        return $this->searchable->getCpSearchResultTitle();
     }
 
     public function getCpUrl(): string
     {
-        return $this->searchable->editUrl();
+        return $this->searchable->getCpSearchResultUrl();
     }
 
     public function getCpBadge(): string
