@@ -15,11 +15,11 @@ class Index extends BaseIndex
 {
     protected $client;
 
-    public function __construct(SearchClient $client, $name, $config)
+    public function __construct(SearchClient $client, $name, $config, $locale)
     {
         $this->client = $client;
 
-        parent::__construct($name, $config);
+        parent::__construct($name, $config, $locale);
     }
 
     public function search($query)
