@@ -1,4 +1,4 @@
-import Values from '../publish/Values.js';
+import Values from './Values.js';
 
 export default {
 

@@ -187,7 +187,7 @@ import EditorActions from './EditorActions.vue';
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
-import HasHiddenFields from '../../data-list/HasHiddenFields';
+import HasHiddenFields from '../../publish/HasHiddenFields';
 
 export default {
 

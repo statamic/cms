@@ -240,7 +240,7 @@ import PublishActions from './PublishActions.vue';
 import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History.vue';
 import HasPreferences from '../data-list/HasPreferences';
-import HasHiddenFields from '../data-list/HasHiddenFields';
+import HasHiddenFields from '../publish/HasHiddenFields';
 
 export default {
 
