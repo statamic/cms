@@ -95,7 +95,7 @@ class Result implements Contract, ContainsQueryableValues
             return $this->searchable->getQueryableValue($field);
         }
 
-        throw new \Exception('Searchable must implement ContainsQueryableValues.');
+        throw new \Exception('Searchable '.get_class($this->searchable).' must implement '.ContainsQueryableValues::class);
     }
 
     public function toAugmentedCollection($keys = null)
