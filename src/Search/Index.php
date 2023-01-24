@@ -96,4 +96,9 @@ abstract class Index
     {
         return new Searchables($this);
     }
+
+    public function extraAugmentedResultData(Result $result)
+    {
+        return [];
+    }
 }

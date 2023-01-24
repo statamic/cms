@@ -8,29 +8,27 @@ use Statamic\Support\Str;
 
 class PlainResult extends Result
 {
-    private $data;
-
     public function __construct(array $data)
     {
-        $this->data = $data;
+        $this->setRawResult($data);
     }
 
     public function getType(): string
     {
-        return Str::after($this->data['reference'], '::');
+        return Str::after($this->result['reference'], '::');
     }
 
     public function getQueryableValue($field)
     {
         if ($field === 'status') {
-            return $this->data['status'] ?? 'published';
+            return $this->result['status'] ?? 'published';
         }
 
-        return $this->data[$field] ?? null;
+        return $this->result[$field] ?? null;
     }
 
     public function newAugmentedInstance(): Augmented
     {
-        return new AugmentedData($this, $this->data);
+        return new AugmentedData($this, $this->result);
     }
 }

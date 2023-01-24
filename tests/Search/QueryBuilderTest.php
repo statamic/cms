@@ -7,6 +7,7 @@ use Mockery;
 use Statamic\Contracts\Search\Result;
 use Statamic\Contracts\Search\Result as SearchResult;
 use Statamic\Contracts\Search\Searchable;
+use Statamic\Search\Index;
 use Statamic\Search\ProvidesSearchables;
 use Statamic\Search\QueryBuilder;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -45,13 +46,19 @@ class QueryBuilderTest extends TestCase
         ]);
 
         $resultA = Mockery::mock(SearchResult::class);
-        $resultA->shouldReceive('setScore')->with(2)->once();
+        $resultA->shouldReceive('setIndex')->once()->andReturnSelf();
+        $resultA->shouldReceive('setRawResult')->with(['reference' => 'entry::a', 'search_score' => 2])->once()->andReturnSelf();
+        $resultA->shouldReceive('setScore')->with(2)->once()->andReturnSelf();
         $resultA->shouldReceive('getScore')->andReturn(2)->once();
         $resultB = Mockery::mock(SearchResult::class);
-        $resultB->shouldReceive('setScore')->with(1)->once();
+        $resultB->shouldReceive('setIndex')->once()->andReturnSelf();
+        $resultB->shouldReceive('setRawResult')->with(['reference' => 'user::b', 'search_score' => 1])->once()->andReturnSelf();
+        $resultB->shouldReceive('setScore')->with(1)->once()->andReturnSelf();
         $resultB->shouldReceive('getScore')->andReturn(1)->once();
         $resultC = Mockery::mock(SearchResult::class);
-        $resultC->shouldReceive('setScore')->with(3)->once();
+        $resultC->shouldReceive('setIndex')->once()->andReturnSelf();
+        $resultC->shouldReceive('setRawResult')->with(['reference' => 'entry::c', 'search_score' => 3])->once()->andReturnSelf();
+        $resultC->shouldReceive('setScore')->with(3)->once()->andReturnSelf();
         $resultC->shouldReceive('getScore')->andReturn(3)->once();
 
         $a = Mockery::mock(Searchable::class);
@@ -624,6 +631,7 @@ class FakeQueryBuilder extends QueryBuilder
     public function __construct($results)
     {
         $this->results = $results;
+        parent::__construct(Mockery::mock(Index::class));
     }
 
     public function getSearchResults($query)

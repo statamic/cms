@@ -18,11 +18,37 @@ class Result implements Contract, ContainsQueryableValues
     protected $searchable;
     protected $type;
     protected $score;
+    protected $index;
+    protected $result;
 
     public function __construct(Searchable $searchable, $type)
     {
         $this->searchable = $searchable;
         $this->type = $type;
+    }
+
+    public function setRawResult(array $result): self
+    {
+        $this->result = $result;
+
+        return $this;
+    }
+
+    public function getRawResult(): array
+    {
+        return $this->result;
+    }
+
+    public function setIndex(Index $index): self
+    {
+        $this->index = $index;
+
+        return $this;
+    }
+
+    public function getIndex(): Index
+    {
+        return $this->index;
     }
 
     public function getSearchable(): Searchable
@@ -77,7 +103,7 @@ class Result implements Contract, ContainsQueryableValues
         return $this->traitToAugmentedCollection($keys)->merge([
             'result_type' => $this->getType(),
             'search_score' => $this->getScore(),
-        ]);
+        ])->merge($this->index->extraAugmentedResultData($this));
     }
 
     public function newAugmentedInstance(): Augmented

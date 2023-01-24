@@ -47,7 +47,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
         if (! $this->withData) {
             return collect($results)
                 ->map(fn ($result) => new PlainResult($result))
-                ->each(fn (Result $result, $i) => $result->setScore($results[$i]['search_score'] ?? null));
+                ->each(fn (Result $result, $i) => $result->setIndex($this->index)->setScore($results[$i]['search_score'] ?? null));
         }
 
         return collect($results)->groupBy(function ($result) {
@@ -59,7 +59,10 @@ abstract class QueryBuilder extends BaseQueryBuilder
                 ->getByPrefix($prefix)
                 ->find($ids)
                 ->map->toSearchResult()
-                ->each(fn (Result $result, $i) => $result->setScore($results[$i]['search_score'] ?? null));
+                ->each(fn (Result $result, $i) => $result
+                    ->setIndex($this->index)
+                    ->setRawResult($results[$i])
+                    ->setScore($results[$i]['search_score'] ?? null));
         })
         ->sortByDesc->getScore()
         ->values();
