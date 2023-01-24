@@ -1,4 +1,4 @@
-import Omitter from '../components/field-conditions/Omitter.js';
+import Omitter from '../components/publish/Values.js';
 
 test('it omits values at top level', () => {
     let values = {

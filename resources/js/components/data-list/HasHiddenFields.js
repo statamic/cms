@@ -1,4 +1,4 @@
-import HiddenValuesOmitter from '../field-conditions/Omitter.js';
+import Values from '../publish/Values.js';
 
 export default {
 
@@ -18,7 +18,7 @@ export default {
                 .keys()
                 .value();
 
-            return new HiddenValuesOmitter(this.values, this.jsonSubmittingFields).omit(omittableFields);
+            return new Values(this.values, this.jsonSubmittingFields).omit(omittableFields);
         },
 
     }
