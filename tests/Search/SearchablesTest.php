@@ -46,10 +46,10 @@ class SearchablesTest extends TestCase
     /** @test */
     public function it_checks_all_providers_for_whether_an_item_is_searchable()
     {
-        app(Providers::class)->register('collection', $entries = Mockery::mock(Entries::class)->makePartial());
-        app(Providers::class)->register('taxonomy', $terms = Mockery::mock(Terms::class)->makePartial());
-        app(Providers::class)->register('assets', $assets = Mockery::mock(Assets::class)->makePartial());
-        app(Providers::class)->register('users', $users = Mockery::mock(Users::class)->makePartial());
+        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
+        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
+        app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
+        app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
 
         $searchable = Mockery::mock();
         $searchables = $this->makeSearchables(['searchables' => 'all']);
@@ -70,10 +70,10 @@ class SearchablesTest extends TestCase
     /** @test */
     public function all_searchables_include_entries_terms_assets_and_users()
     {
-        app(Providers::class)->register('collection', $entries = Mockery::mock(Entries::class)->makePartial());
-        app(Providers::class)->register('taxonomy', $terms = Mockery::mock(Terms::class)->makePartial());
-        app(Providers::class)->register('assets', $assets = Mockery::mock(Assets::class)->makePartial());
-        app(Providers::class)->register('users', $users = Mockery::mock(Users::class)->makePartial());
+        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
+        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
+        app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
+        app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
 
         $entries->shouldReceive('provide')->andReturn(collect([$entryA = Entry::make(), $entryB = Entry::make()]));
         $terms->shouldReceive('provide')->andReturn(collect([$termA = Term::make(), $termB = Term::make()]));
@@ -101,9 +101,9 @@ class SearchablesTest extends TestCase
     /** @test */
     public function it_gets_searchables_from_specific_providers()
     {
-        app(Providers::class)->register('collection', $entries = Mockery::mock(Entries::class)->makePartial());
-        app(Providers::class)->register('taxonomy', $terms = Mockery::mock(Terms::class)->makePartial());
-        app(Providers::class)->register('users', $users = Mockery::mock(Users::class)->makePartial());
+        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
+        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
+        app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
 
         $entries->shouldReceive('provide')->once()->andReturn(collect([$entryA = Entry::make(), $entryB = Entry::make()]));
         $users->shouldReceive('provide')->once()->andReturn(collect([$userA = User::make(), $userB = User::make()]));
@@ -286,7 +286,7 @@ class SearchablesTest extends TestCase
         $c = new NotSearchable;
         app()->instance('all-custom-searchables', collect([$a, $b]));
 
-        Search::registerSearchableProvider('custom', new TestCustomSearchables);
+        Search::registerSearchableProvider(TestCustomSearchables::class);
 
         $searchables = $this->makeSearchables(['searchables' => ['custom']]);
 
@@ -349,11 +349,16 @@ class TestCustomSearchable
 
 class TestCustomSearchables extends Provider
 {
+    public static function handle(): string
+    {
+        return 'custom';
+    }
+
     public function find(array $keys): Collection
     {
     }
 
-    public function referencePrefix(): string
+    public static function referencePrefix(): string
     {
         return 'customprefix';
     }

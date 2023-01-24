@@ -9,7 +9,12 @@ use Statamic\Facades\Asset;
 
 class Assets extends Provider
 {
-    public function referencePrefix(): string
+    public static function handle(): string
+    {
+        return 'assets';
+    }
+
+    public static function referencePrefix(): string
     {
         return 'asset';
     }

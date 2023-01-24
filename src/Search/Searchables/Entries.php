@@ -8,7 +8,12 @@ use Statamic\Facades\Entry;
 
 class Entries extends Provider
 {
-    public function referencePrefix(): string
+    public static function handle(): string
+    {
+        return 'collection';
+    }
+
+    public static function referencePrefix(): string
     {
         return 'entry';
     }

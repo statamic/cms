@@ -15,17 +15,19 @@ class Providers
         $this->providers = Collection::make();
     }
 
-    public function register(string $name, $class)
+    public function register($class)
     {
-        $this->providers[$name] = $class;
-        $this->prefixes[$class->referencePrefix()] = $name;
+        $this->providers[$handle = $class::handle()] = $class;
+        $this->prefixes[$class::referencePrefix()] = $handle;
 
         return $this;
     }
 
     public function providers(): Collection
     {
-        return $this->providers;
+        return $this->providers = $this->providers->map(function ($provider) {
+            return is_string($provider) ? app($provider) : $provider;
+        });
     }
 
     public function make(string $key, Index $index = null, array $keys = null)

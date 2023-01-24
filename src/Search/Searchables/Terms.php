@@ -9,7 +9,12 @@ use Statamic\Support\Str;
 
 class Terms extends Provider
 {
-    public function referencePrefix(): string
+    public static function handle(): string
+    {
+        return 'taxonomy';
+    }
+
+    public static function referencePrefix(): string
     {
         return 'term';
     }

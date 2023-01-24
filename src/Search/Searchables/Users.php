@@ -8,7 +8,12 @@ use Statamic\Facades\User;
 
 class Users extends Provider
 {
-    public function referencePrefix(): string
+    public static function handle(): string
+    {
+        return 'users';
+    }
+
+    public static function referencePrefix(): string
     {
         return 'user';
     }

@@ -7,7 +7,6 @@ use Mockery;
 use Statamic\Contracts\Search\Result;
 use Statamic\Contracts\Search\Result as SearchResult;
 use Statamic\Contracts\Search\Searchable;
-use Statamic\Facades\Search;
 use Statamic\Search\ProvidesSearchables;
 use Statamic\Search\QueryBuilder;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -35,10 +34,14 @@ class QueryBuilderTest extends TestCase
     /** @test */
     public function it_can_get_results_with_data()
     {
+        // Using actual searchable providers here simply because calling
+        // static methods on mocks is a pain. We override the entries
+        // and users providers in the container with the mocks.
+
         $items = collect([
-            ['reference' => 'foo::a', 'search_score' => 2],
-            ['reference' => 'bar::b', 'search_score' => 1],
-            ['reference' => 'foo::c', 'search_score' => 3],
+            ['reference' => 'entry::a', 'search_score' => 2],
+            ['reference' => 'user::b', 'search_score' => 1],
+            ['reference' => 'entry::c', 'search_score' => 3],
         ]);
 
         $resultA = Mockery::mock(SearchResult::class);
@@ -59,15 +62,12 @@ class QueryBuilderTest extends TestCase
         $c->shouldReceive('toSearchResult')->andReturn($resultC);
 
         $foo = Mockery::mock(ProvidesSearchables::class);
-        $foo->shouldReceive('referencePrefix')->andReturn('foo');
         $foo->shouldReceive('find')->with(['a', 'c'])->andReturn(collect([$a, $c]));
+        $this->app->instance(\Statamic\Search\Searchables\Entries::class, $foo);
 
         $bar = Mockery::mock(ProvidesSearchables::class);
-        $bar->shouldReceive('referencePrefix')->andReturn('bar');
         $bar->shouldReceive('find')->with(['b'])->andReturn(collect([$b]));
-
-        Search::registerSearchableProvider('foo', $foo);
-        Search::registerSearchableProvider('bar', $bar);
+        $this->app->instance(\Statamic\Search\Searchables\Users::class, $bar);
 
         $results = (new FakeQueryBuilder($items))->get();
 
