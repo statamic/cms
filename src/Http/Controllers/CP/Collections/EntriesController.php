@@ -247,13 +247,6 @@ class EntriesController extends CpController
 
         [$values] = $this->extractFromFields($entry, $blueprint);
 
-        // TODO: Ugly proof of concept only...
-        // This works, but only handles revealers at the top level, and we'll also need to handle nested
-        // revealers. Should we remove revealers at PHP level, or when merging values in Vue on save?
-        $values = collect($values)
-            ->forget($blueprint->fields()->all()->filter(fn ($field) => $field->type() === 'revealer')->keys()->all())
-            ->all();
-
         return (new EntryResource($entry->fresh()))
             ->additional([
                 'data' => [
