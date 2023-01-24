@@ -29,20 +29,15 @@ class UpdateItemIndexes
 
     public function update($event)
     {
-        $item = $event->entry ?? $event->asset ?? $event->user ?? $event->term;
-
-        if ($item instanceof Term) {
-            $items = $item->localizations();
-        } else {
-            $items = collect([$item]);
-        }
-
-        $items->each(function ($item) {
-            Search::updateWithinIndexes($item);
-        });
+        $this->items($event)->each(fn ($item) => Search::updateWithinIndexes($item));
     }
 
     public function delete($event)
+    {
+        $this->items($event)->each(fn ($item) => Search::deleteFromIndexes($item));
+    }
+
+    private function items($event)
     {
         $item = $event->entry ?? $event->asset ?? $event->user ?? $event->term;
 
@@ -52,8 +47,6 @@ class UpdateItemIndexes
             $items = collect([$item]);
         }
 
-        $items->each(function ($item) {
-            Search::deleteFromIndexes($item);
-        });
+        return $items;
     }
 }
