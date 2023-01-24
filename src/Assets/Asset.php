@@ -13,6 +13,7 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
@@ -30,6 +31,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
+use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -37,11 +39,11 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues
+class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues, SearchableContract
 {
     use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
     TracksQueriedRelations,
-    ContainsData {
+    Searchable, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
@@ -1022,6 +1024,11 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    public function getCpSearchResultBadge(): string
+    {
+        return $this->container()->title();
     }
 
     public function warmPresets()
