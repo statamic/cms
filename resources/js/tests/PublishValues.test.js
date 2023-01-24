@@ -1,6 +1,6 @@
-import Omitter from '../components/publish/Values.js';
+import Values from '../components/publish/Values.js';
 
-test('it omits values at top level', () => {
+test('it rejects values at top level', () => {
     let values = {
         first_name: 'Han',
         last_name: 'Solo',
@@ -8,7 +8,7 @@ test('it omits values at top level', () => {
         bff: 'Chewy',
     };
 
-    let omitted = new Omitter(values).omit([
+    let rejected = new Values(values).reject([
         'last_name',
         'bff',
     ]);
@@ -18,10 +18,10 @@ test('it omits values at top level', () => {
         ship: 'Falcon',
     };
 
-    expect(new Omitter(values).omit(['last_name', 'bff'])).toEqual(expected);
+    expect(new Values(values).reject(['last_name', 'bff'])).toEqual(expected);
 });
 
-test('it omits nested values', () => {
+test('it rejects nested values', () => {
     let values = {
         first_name: 'Han',
         last_name: 'Solo',
@@ -68,7 +68,7 @@ test('it omits nested values', () => {
         ],
     };
 
-    let omitted = new Omitter(values).omit([
+    let rejected = new Values(values).reject([
         'last_name',
         'ship.completed_kessel_run',
         'bffs.0.type',
@@ -117,10 +117,10 @@ test('it omits nested values', () => {
         ],
     };
 
-    expect(omitted).toEqual(expected);
+    expect(rejected).toEqual(expected);
 });
 
-test('it omits nested json field values', () => {
+test('it rejects nested json field values', () => {
     let values = {
         first_name: 'Han',
         last_name: 'Solo',
@@ -148,11 +148,11 @@ test('it omits nested json field values', () => {
     };
 
     let jsonFields = [
-        'bffs.1.crush', // Intentionally passing deeper JSON value first to ensure the Omitter properly sorts these before decoding
+        'bffs.1.crush', // Intentionally passing deeper JSON value first to ensure these are properly sorted before decoding
         'bffs',
     ];
 
-    let omitted = new Omitter(values, jsonFields).omit([
+    let rejected = new Values(values, jsonFields).reject([
         'last_name',
         'ship.completed_kessel_run',
         'bffs.0.type',
@@ -181,10 +181,10 @@ test('it omits nested json field values', () => {
         ]),
     };
 
-    expect(omitted).toEqual(expected);
+    expect(rejected).toEqual(expected);
 });
 
-test('it omits null hidden values', () => {
+test('it rejects null hidden values', () => {
     let values = {
         first_name: 'Han',
         last_name: 'Solo',
@@ -192,7 +192,7 @@ test('it omits null hidden values', () => {
         bff: null, // this is null, but should still get removed
     };
 
-    let omitted = new Omitter(values).omit([
+    let rejected = new Values(values).reject([
         'last_name',
         'bff',
     ]);
@@ -202,7 +202,7 @@ test('it omits null hidden values', () => {
         ship: 'Falcon',
     };
 
-    expect(new Omitter(values).omit(['last_name', 'bff'])).toEqual(expected);
+    expect(new Values(values).reject(['last_name', 'bff'])).toEqual(expected);
 });
 
 test('it gracefully handles errors', () => {
@@ -224,7 +224,7 @@ test('it gracefully handles errors', () => {
         'bffs.0.crush', // non-existent field
     ];
 
-    let omitted = new Omitter(values, jsonFields).omit([
+    let rejected = new Values(values, jsonFields).reject([
         'last_name',
         'middle_name',  // non-existent field
         'bffs.0.name',
@@ -243,7 +243,7 @@ test('it gracefully handles errors', () => {
         ]),
     };
 
-    expect(omitted).toEqual(expected);
+    expect(rejected).toEqual(expected);
 });
 
 test('it properly handles keys that javascript considers having numeric separators', () => {
@@ -268,7 +268,7 @@ test('it properly handles keys that javascript considers having numeric separato
         '123_key.456_key.404_text',
     ];
 
-    let omitted = new Omitter(values, jsonFields).omit([
+    let rejected = new Values(values, jsonFields).reject([
         '404_text',
         '123_key.456_key.404_text',
     ]);
@@ -286,5 +286,5 @@ test('it properly handles keys that javascript considers having numeric separato
         },
     };
 
-    expect(omitted).toEqual(expected);
+    expect(rejected).toEqual(expected);
 });

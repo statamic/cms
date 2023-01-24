@@ -9,7 +9,7 @@ export default class {
             .sort();
     }
 
-    omit(hiddenKeys) {
+    reject(hiddenKeys) {
         this.jsonDecode()
             .omitHiddenFields(hiddenKeys)
             .jsonEncode();

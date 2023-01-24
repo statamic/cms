@@ -18,7 +18,7 @@ export default {
                 .keys()
                 .value();
 
-            return new Values(this.values, this.jsonSubmittingFields).omit(omittableFields);
+            return new Values(this.values, this.jsonSubmittingFields).reject(omittableFields);
         },
 
     }
