@@ -2,6 +2,7 @@
 
 namespace Statamic\Search\Searchables;
 
+use Statamic\Facades\Search;
 use Statamic\Search\Index;
 use Statamic\Search\ProvidesSearchables;
 
@@ -9,6 +10,11 @@ abstract class Provider implements ProvidesSearchables
 {
     protected $index;
     protected $keys;
+
+    public static function register()
+    {
+        Search::registerSearchableProvider(static::class);
+    }
 
     public function setIndex(Index $index)
     {
