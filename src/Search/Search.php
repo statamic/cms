@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Searchables\Providers;
 
 class Search
@@ -41,5 +42,30 @@ class Search
     public function __call($method, $parameters)
     {
         return $this->index()->$method(...$parameters);
+    }
+
+    public function updateWithinIndexes(Searchable $searchable)
+    {
+        $this->indexes()->each(function ($index) use ($searchable) {
+            $shouldIndex = $index->shouldIndex($searchable);
+            $exists = $index->exists();
+
+            if ($shouldIndex && $exists) {
+                $index->insert($searchable);
+            } elseif ($shouldIndex && ! $exists) {
+                $index->update();
+            } elseif ($exists) {
+                $index->delete($searchable);
+            }
+        });
+    }
+
+    public function deleteFromIndexes(Searchable $searchable)
+    {
+        $this->indexes()->each(function ($index) use ($searchable) {
+            if ($index->exists()) {
+                $index->delete($searchable);
+            }
+        });
     }
 }

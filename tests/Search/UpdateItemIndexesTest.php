@@ -3,29 +3,21 @@
 namespace Tests\Search;
 
 use Mockery;
-use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Search\Searchable;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
 use Statamic\Facades\Search;
-use Statamic\Search\Index;
 use Statamic\Search\UpdateItemIndexes;
 use Tests\TestCase;
 
 class UpdateItemIndexesTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider saveProvider
-     */
-    public function it_updates_indexes_on_save($updateMock)
+    /** @test */
+    public function it_updates_indexes_on_save()
     {
-        $index = Mockery::mock(Index::class);
-        $item = Mockery::mock();
+        $item = Mockery::mock(Searchable::class);
 
-        $updateMock($index, $item);
-
-        Search::shouldReceive('indexes')->andReturn(collect([$index]));
+        Search::shouldReceive('updateWithinIndexes')->with($item)->once();
 
         $event = new EntrySaved($item);
 
@@ -34,80 +26,18 @@ class UpdateItemIndexesTest extends TestCase
         $listener->update($event);
     }
 
-    public function saveProvider()
+    /** @test */
+    public function it_updates_indexes_on_delete()
     {
-        return [
-            'contains entry' => [
-                function ($mock, $entry) {
-                    $mock->shouldReceive('shouldIndex')->with($entry)->andReturnTrue();
-                    $mock->shouldReceive('exists')->andReturnTrue();
-                    $mock->shouldReceive('insert')->once()->with($entry);
-                },
-            ],
+        $item = Mockery::mock(Searchable::class);
 
-            'doesnt contain entry' => [
-                function ($mock, $entry) {
-                    $mock->shouldReceive('shouldIndex')->with($entry)->andReturnFalse();
-                    $mock->shouldReceive('exists')->andReturnTrue();
-                    $mock->shouldReceive('delete')->once();
-                },
-            ],
+        Search::shouldReceive('deleteFromIndexes')->with($item)->once();
 
-            'contains entry but index doesnt exist' => [
-                function ($mock, $entry) {
-                    $mock->shouldReceive('shouldIndex')->with($entry)->andReturnTrue();
-                    $mock->shouldReceive('exists')->andReturnFalse();
-                    $mock->shouldReceive('update')->once();
-                },
-            ],
-
-            'doesnt contain entry and index doesnt exist' => [
-                function ($mock, $entry) {
-                    $mock->shouldReceive('shouldIndex')->with($entry)->andReturnFalse();
-                    $mock->shouldReceive('exists')->once()->andReturnFalse();
-                },
-            ],
-        ];
-    }
-
-    /**
-     * @test
-     *
-     * @dataProvider deleteProvider
-     */
-    public function it_updates_indexes_on_delete($updateMock)
-    {
-        $index = Mockery::mock(Index::class);
-        $entry = Mockery::mock(Entry::class);
-
-        $updateMock($index, $entry);
-
-        Search::shouldReceive('indexes')->andReturn(collect([$index]));
-
-        $event = new EntryDeleted($entry);
+        $event = new EntryDeleted($item);
 
         $listener = new UpdateItemIndexes;
 
         $listener->delete($event);
-    }
-
-    public function deleteProvider()
-    {
-        return [
-            'index exists' => [
-                function ($mock, $entry) {
-                    $mock->shouldReceive('exists')->andReturnTrue();
-                    $mock->shouldReceive('delete')->once();
-                },
-            ],
-
-            'index doesnt exist' => [
-                function ($mock, $entry) {
-                    $mock->shouldReceive('exists')->andReturnFalse();
-                    $mock->shouldReceive('delete')->never();
-                },
-            ],
-        ];
     }
 
     /** @test */
