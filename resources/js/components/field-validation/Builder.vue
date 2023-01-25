@@ -138,8 +138,8 @@ export default {
                 .value();
         },
 
-        customRules() {
-            return _.chain(clone(Statamic.$config.get('customRules')))
+        extensionRules() {
+            return _.chain(clone(Statamic.$config.get('extensionRules')))
                 .map(rule => {
                     return this.prepareRenderableRule(rule);
                 })
@@ -147,7 +147,7 @@ export default {
         },
 
         allRules() {
-            return _.sortBy([...this.laravelRules, ...this.customRules], 'display');
+            return _.sortBy([...this.laravelRules, ...this.extensionRules], 'display');
         },
 
         helpBlock() {

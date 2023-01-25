@@ -22,7 +22,7 @@ class FieldComposer
     {
         Statamic::provideToScript([
             'fieldsets' => $this->fieldsets(),
-            'customRules' => $this->customRules(),
+            'extensionRules' => $this->extensionRules(),
         ]);
     }
 
@@ -39,7 +39,7 @@ class FieldComposer
         })->sortBy('title');
     }
 
-    private function customRules()
+    private function extensionRules()
     {
         return collect(Validator::make([], [])->extensions)
             ->keys()
