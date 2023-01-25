@@ -132,6 +132,8 @@ return [
     'licensing_error_outside_license_range' => 'Licentie geldig voor versies :start en :end',
     'licensing_error_unknown_site' => 'Onbekende site',
     'licensing_error_unlicensed' => 'Zonder licentie',
+    'licensing_incorrect_key_format_body' => 'Het lijkt erop dat je licentiesleutel niet de juiste indeling heeft. Controleer de licentiesleutel en probeer het opnieuw. Je kunt je licentiesleutel bekijken in je accountgedeelte op statamic.com. Het is alfanumeriek en 16 tekens lang. Zorg ervoor dat je niet de verouderde licentiesleutel gebruikt, dit is een UUID.',
+    'licensing_incorrect_key_format_heading' => 'Niet correcte licentiesleutel indeling',
     'licensing_production_alert' => 'Deze site maakt gebruik van Statamic Pro en commerciële add-ons. Schaf de juiste licenties aan.',
     'licensing_production_alert_addons' => 'Deze site gebruikt commerciële add-ons. Schaf de juiste licenties aan.',
     'licensing_production_alert_renew_statamic' => 'Voor het gebruik van deze versie van Statamic Pro is een vernieuwing van de licentie nodig.',
