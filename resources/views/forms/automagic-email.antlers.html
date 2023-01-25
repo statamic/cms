@@ -7,10 +7,10 @@
             {{ value }}{{ permalink }}{{ if !last }}, {{ /if }}{{ /value }}
 
         {{ elseif fieldtype == "select" && !config:multiple }}
-            {{ value:label ?? value:value }}
+            {{ value:label ?? value }}
 
         {{ elseif fieldtype == "radio" }}
-            {{ value:label ?? value:value }}
+            {{ value:label ?? value }}
 
         {{ elseif fieldtype == "select" || fieldtype == "checkboxes" }}
             {{ value }}{{ label ?? value }}{{ if !last }}, {{ /if }}{{ /value }}
