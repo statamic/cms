@@ -95,13 +95,6 @@ class NodeProcessor
     protected $bufferOverwrites = [];
 
     /**
-     * Indicates if the runtime is holding a lock to prevent scope manipulation.
-     *
-     * @var bool
-     */
-    protected $scopeLock = false;
-
-    /**
      * Indicates if the current runtime instance is evaluating an interpolated document.
      *
      * @var bool
@@ -446,19 +439,12 @@ class NodeProcessor
      */
     public function setData($data)
     {
-        if (GlobalRuntimeState::$garbageCollect) {
-            $this->data = [];
-            $this->previousAssignments = [];
-            $this->runtimeAssignments = [];
-            $this->canHandleInterpolations = [];
-            $this->interpolationCache = [];
-            $this->lockedData = [];
-            GlobalRuntimeState::$garbageCollect = false;
-        }
-
-        if ($this->scopeLock) {
-            return $this;
-        }
+        $this->data = [];
+        $this->previousAssignments = [];
+        $this->runtimeAssignments = [];
+        $this->canHandleInterpolations = [];
+        $this->interpolationCache = [];
+        $this->lockedData = [];
 
         if ((is_array($data) == false && (is_object($data) && ($data instanceof Arrayable) == false)) ||
             is_string($data)) {
@@ -491,10 +477,6 @@ class NodeProcessor
      */
     protected function pushScope(AntlersNode $node, $data)
     {
-        if ($this->scopeLock) {
-            return;
-        }
-
         $this->popScopes[$node->refId] = 1;
         $this->data[] = $data;
     }
@@ -662,10 +644,6 @@ class NodeProcessor
      */
     private function updateCurrentScope($data)
     {
-        if ($this->scopeLock) {
-            return;
-        }
-
         $dataLen = count($this->data);
 
         if ($dataLen == 0) {
@@ -2297,7 +2275,6 @@ class NodeProcessor
      */
     protected function addLoopIterationVariables($loop)
     {
-        $this->scopeLock = false;
         $index = 0;
         $total = count($loop);
         $lastIndex = $total - 1;
@@ -2345,8 +2322,6 @@ class NodeProcessor
         }
 
         $this->data = $curData;
-
-        $this->scopeLock = false;
 
         $prev = null;
 

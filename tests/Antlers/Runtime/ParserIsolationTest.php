@@ -93,4 +93,36 @@ EOT;
 
         $this->assertSame($expected, trim($this->renderString($template, [])));
     }
+
+    public function test_runtime_assignment_variable_leak_multiple_requests_inside_same_process()
+    {
+        Collection::make('pages')->routes(['en' => '{slug}'])->save();
+        EntryFactory::collection('pages')->id('1')->slug('one')->data(['title' => 'One', 'template' => 'template_one'])->create();
+        EntryFactory::collection('pages')->id('2')->slug('two')->data(['title' => 'Two', 'template' => 'template_two'])->create();
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+
+        $this->viewShouldReturnRaw('breadcrumb', '{{ _breadcrumb_title ?? title }}');
+
+        $templateOne = <<<'EOT'
+{{ _breadcrumb_title = "A new title" }}
+{{ partial src="breadcrumb" }}
+EOT;
+
+        $templateTwo = <<<'EOT'
+{{ partial src="breadcrumb" }}
+EOT;
+
+        $this->viewShouldReturnRaw('template_one', $templateOne);
+        $this->viewShouldReturnRaw('template_two', $templateTwo);
+
+        $responseOne = $this->get('one')->assertOk();
+        $content = trim($responseOne->content());
+        $responseTwo = $this->get('two')->assertOk();
+        $contentTwo = trim($responseTwo->content());
+
+        $this->assertSame('A new title', $content);
+        $this->assertSame('Two', $contentTwo);
+    }
 }
