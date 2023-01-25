@@ -23,5 +23,6 @@
         'wrapperClass' => $__env->getSection('wrapper_class', 'max-w-xl')
     ])));
 </script>
-{{-- Statamic.start() defered to allow Vite modules to load first --}}
+
+{{-- Deferred to allow Vite modules to load first --}}
 <script src="data:text/javascript;base64,{{ base64_encode('Statamic.start()') }}" defer></script>
