@@ -4,6 +4,7 @@ namespace Statamic;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
@@ -405,6 +406,15 @@ class Statamic
         }
 
         return $line;
+    }
+
+    public static function isWorker()
+    {
+        if (! App::runningInConsole()) {
+            return false;
+        }
+
+        return Str::startsWith(Arr::get(request()->server(), 'argv.1') ?? '', ['queue:', 'horizon:']);
     }
 
     private static function createVersionedAssetPath($name, $path, $extension)

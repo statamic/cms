@@ -14,6 +14,10 @@ class UpdateAssetReferencesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $container;
+    private $assetHoff;
+    private $assetNorris;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -759,6 +763,36 @@ class UpdateAssetReferencesTest extends TestCase
         $this->assertEquals('asset::test_container::content/norris-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.2.content.0.attrs.src'));
         $this->assertEquals('norris', Arr::get($entry->fresh()->data(), 'bardo.2.content.0.attrs.alt'));
         $this->assertEquals('statamic://asset::test_container::content/norris-new.jpg', Arr::get($entry->fresh()->data(), 'bardo.2.content.1.attrs.href'));
+    }
+
+    /** @test */
+    public function it_fails_gracefully_when_bard_value_is_null()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'bardo',
+                    'field' => [
+                        'type' => 'bard',
+                        'container' => 'test_container',
+                    ],
+                ],
+            ],
+        ]);
+
+        // Though nulls are normally filtered out, they may not be in multisite and/or eloquent situations...
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'bardo' => null,
+        ]))->save();
+
+        $this->assertNull($entry->fresh()->get('bardo'));
+
+        $this->assetHoff->delete();
+        $this->assetNorris->path('content/norris-new.jpg')->save();
+
+        $this->assertNull($entry->fresh()->get('bardo'));
     }
 
     /** @test */

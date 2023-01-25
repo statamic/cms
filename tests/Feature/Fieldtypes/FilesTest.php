@@ -3,6 +3,7 @@
 namespace Tests\Feature\Fieldtypes;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -15,6 +16,7 @@ class FilesTest extends TestCase
     /** @test */
     public function it_uploads_a_file()
     {
+        Carbon::setTestNow(now());
         $disk = Storage::fake('local');
         $file = UploadedFile::fake()->image('test.jpg');
 

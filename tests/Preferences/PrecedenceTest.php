@@ -13,6 +13,8 @@ class PrecedenceTest extends TestCase
 {
     use FakesRoles;
 
+    private $files;
+
     public function setUp(): void
     {
         parent::setUp();

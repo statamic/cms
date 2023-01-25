@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\RequireStatamicPro;
@@ -86,9 +87,13 @@ class UserGroupsController extends CpController
 
         $group
             ->title($request->title)
-            ->handle($request->handle ?: snake_case($request->title))
-            ->roles($request->roles)
-            ->save();
+            ->handle($request->handle ?: snake_case($request->title));
+
+        if (User::current()->can('assign roles')) {
+            $group->roles($request->roles);
+        }
+
+        $group->save();
 
         session()->flash('success', __('User group updated'));
 
@@ -114,8 +119,11 @@ class UserGroupsController extends CpController
 
         $group = UserGroup::make()
             ->title($request->title)
-            ->handle($request->handle ?: snake_case($request->title))
-            ->roles($request->roles);
+            ->handle($request->handle ?: snake_case($request->title));
+
+        if (User::current()->can('assign roles')) {
+            $group->roles($request->roles);
+        }
 
         $group->save();
 

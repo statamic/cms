@@ -46,4 +46,15 @@ return [
 
     'send_email_job' => \Statamic\Forms\SendEmail::class,
 
+    /*
+    |--------------------------------------------------------------------------
+    | CSV Export Delimiter
+    |--------------------------------------------------------------------------
+    |
+    | Statamic will use this character as delimiter for csv exports.
+    |
+    */
+
+    'csv_delimiter' => ',',
+
 ];

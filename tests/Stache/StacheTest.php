@@ -12,6 +12,8 @@ use Statamic\Stache\Stores\EntriesStore;
 
 class StacheTest extends TestCase
 {
+    protected $stache;
+
     public function setUp(): void
     {
         $this->stache = new Stache;

@@ -197,7 +197,7 @@ class Date extends Fieldtype
             return $start.' - '.$end;
         }
 
-        return Carbon::parse($data)->format($this->indexDisplayFormat());
+        return $this->parseSaved($data)->format($this->indexDisplayFormat());
     }
 
     private function saveFormat()

@@ -82,6 +82,65 @@ trait UserContractTests
         ], $this->additionalDataValues()), $this->user()->data()->all());
     }
 
+    /** @test */
+    public function it_gets_custom_computed_data()
+    {
+        Facades\User::computed('balance', function ($user) {
+            return $user->name().'\'s balance is $25 owing.';
+        });
+
+        $user = $this->makeUser()->data(['name' => 'Han Solo']);
+
+        $expectedData = [
+            'name' => 'Han Solo',
+        ];
+
+        $expectedComputedData = [
+            'balance' => 'Han Solo\'s balance is $25 owing.',
+        ];
+
+        $expectedValues = array_merge($expectedData, $expectedComputedData);
+
+        $this->assertArraySubset($expectedData, $user->data()->all());
+        $this->assertEquals($expectedComputedData, $user->computedData()->all());
+        $this->assertEquals($expectedValues['name'], $user->value('name'));
+        $this->assertEquals($expectedValues['balance'], $user->value('balance'));
+    }
+
+    /** @test */
+    public function it_gets_empty_computed_data_by_default()
+    {
+        $this->assertEquals([], $this->user()->computedData()->all());
+    }
+
+    /** @test */
+    public function it_doesnt_recursively_get_computed_data_when_callback_uses_value_method()
+    {
+        Facades\User::computed('balance', function ($user) {
+            return $user->value('balance') ?? $user->name().'\'s balance is $25 owing.';
+        });
+
+        $user = $this->makeUser()->data(['name' => 'Han Solo']);
+
+        $this->assertEquals('Han Solo\'s balance is $25 owing.', $user->value('balance'));
+    }
+
+    /** @test */
+    public function it_can_use_actual_data_to_compose_computed_data()
+    {
+        Facades\User::computed('nickname', function ($user, $value) {
+            return $value ?? 'Nameless';
+        });
+
+        $user = $this->makeUser();
+
+        $this->assertEquals('Nameless', $user->value('nickname'));
+
+        $user->data(['nickname' => 'The Hoff']);
+
+        $this->assertEquals('The Hoff', $user->value('nickname'));
+    }
+
     public function additionalDataValues()
     {
         return [];
@@ -313,6 +372,86 @@ trait UserContractTests
         $this->assertNotEquals('secret', $user->password());
         $this->assertTrue(Hash::check('secret', $user->password()));
         $this->assertArrayNotHasKey('password', $user->data());
+    }
+
+    /** @test */
+    public function it_provides_email_field_fallback_in_blueprint()
+    {
+        $blueprint = Blueprint::make();
+        Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $this->assertTrue($this->user()->blueprint()->hasField('email'));
+        $this->assertEquals('Email Address', $this->user()->blueprint()->fields()->get('email')->display());
+        $this->assertEquals('email', $this->user()->blueprint()->fields()->get('email')->get('input_type'));
+    }
+
+    /** @test */
+    public function it_allows_email_field_customizations_in_blueprint()
+    {
+        $blueprint = Blueprint::makeFromFields(['email' => ['display' => 'Custom Email Display']]);
+        Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $this->assertTrue($this->user()->blueprint()->hasField('email'));
+        $this->assertEquals('Custom Email Display', $this->user()->blueprint()->fields()->get('email')->display());
+        $this->assertEquals('email', $this->user()->blueprint()->fields()->get('email')->get('input_type'));
+    }
+
+    /** @test */
+    public function it_provides_roles_and_groups_field_fallbacks_in_blueprint()
+    {
+        $blueprint = Blueprint::make();
+        Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $this->assertTrue($this->user()->blueprint()->hasField('roles'));
+        $this->assertEquals('Roles', $this->user()->blueprint()->fields()->get('roles')->display());
+        $this->assertEquals('user_roles', $this->user()->blueprint()->fields()->get('roles')->type());
+
+        $this->assertTrue($this->user()->blueprint()->hasField('groups'));
+        $this->assertEquals('Groups', $this->user()->blueprint()->fields()->get('groups')->display());
+        $this->assertEquals('user_groups', $this->user()->blueprint()->fields()->get('groups')->type());
+    }
+
+    /** @test */
+    public function it_allows_roles_and_groups_field_customizations_in_blueprint()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'roles' => ['display' => 'Custom Roles Display'],
+            'groups' => ['display' => 'Custom Groups Display'],
+        ]);
+        Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $this->assertTrue($this->user()->blueprint()->hasField('roles'));
+        $this->assertEquals('Custom Roles Display', $this->user()->blueprint()->fields()->get('roles')->display());
+        $this->assertEquals('user_roles', $this->user()->blueprint()->fields()->get('roles')->type());
+
+        $this->assertTrue($this->user()->blueprint()->hasField('groups'));
+        $this->assertEquals('Custom Groups Display', $this->user()->blueprint()->fields()->get('groups')->display());
+        $this->assertEquals('user_groups', $this->user()->blueprint()->fields()->get('groups')->type());
+    }
+
+    /** @test */
+    public function it_removes_roles_and_groups_field_fallbacks_in_blueprint_when_pro_is_disabled()
+    {
+        config(['statamic.editions.pro' => false]);
+        $blueprint = Blueprint::make();
+        Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $this->assertFalse($this->user()->blueprint()->hasField('roles'));
+        $this->assertFalse($this->user()->blueprint()->hasField('groups'));
+    }
+
+    /** @test */
+    public function it_removes_roles_and_groups_event_when_explicitly_defined_in_blueprint_when_pro_is_disabled()
+    {
+        config(['statamic.editions.pro' => false]);
+        $blueprint = Blueprint::makeFromFields([
+            'roles' => ['display' => 'Custom Roles Display'],
+            'groups' => ['display' => 'Custom Groups Display'],
+        ]);
+        Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $this->assertFalse($this->user()->blueprint()->hasField('roles'));
+        $this->assertFalse($this->user()->blueprint()->hasField('groups'));
     }
 
     /** @test */

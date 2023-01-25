@@ -16,6 +16,10 @@ use Statamic\Structures\Tree;
 
 class CollectionStructureTest extends StructureTestCase
 {
+    private $collection;
+    private $entryQueryBuilder;
+    private $queryBuilderGetReturnValue;
+
     public function setUp(): void
     {
         parent::setUp();

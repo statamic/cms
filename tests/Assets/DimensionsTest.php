@@ -13,6 +13,8 @@ namespace Tests\Assets;
 
  class DimensionsTest extends TestCase
  {
+     private $dimensions;
+
      public function setUp(): void
      {
          parent::setUp();

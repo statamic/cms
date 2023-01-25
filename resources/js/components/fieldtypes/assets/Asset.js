@@ -42,8 +42,7 @@ export default {
         },
 
         canDownload() {
-            return Statamic.$permissions.has('super')
-                || Statamic.$permissions.has(`view ${this.container} assets`)
+            return Statamic.$permissions.has(`view ${this.container} assets`);
         },
 
         thumbnail() {

@@ -5,7 +5,7 @@
         </div>
         <div ref="popover" class="popover" v-if="!disabled">
             <div class="popover-content bg-white shadow-popover rounded-md">
-                <slot :close="close" />
+                <slot :close="close" :after-closed="afterClosed" />
             </div>
         </div>
     </div>
@@ -47,6 +47,7 @@ export default {
             isOpen: false,
             escBinding: null,
             popper: null,
+            closedCallbacks: []
         }
     },
 
@@ -98,10 +99,16 @@ export default {
             }
         },
         destroyPopper() {
-            if (this.popper) {
-                this.popper.destroy();
-                this.popper = null;
-            }
+            if (!this.popper) return;
+
+            this.popper.destroy();
+            this.popper = null;
+
+            // run any after-closed callbacks
+            this.closedCallbacks.forEach(callback => callback());
+        },
+        afterClosed(callback) {
+            this.closedCallbacks.push(callback);
         },
     }
 }
