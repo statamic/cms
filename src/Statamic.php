@@ -27,6 +27,7 @@ class Statamic
     protected static $externalScripts = [];
     protected static $styles = [];
     protected static $externalStyles = [];
+    protected static $vites = [];
     protected static $cpRoutes = [];
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
@@ -105,6 +106,25 @@ class Statamic
         static::$externalStyles[] = $url;
 
         return new static;
+    }
+
+    public static function vite($name, $config)
+    {
+        if (is_string($config) || ! Arr::isAssoc($config)) {
+            $config = ['input' => $config];
+        }
+
+        static::$vites[$name] = array_merge([
+            'hotFile' => null,
+            'buildDirectory' => 'build',
+        ], $config);
+
+        return new static;
+    }
+
+    public static function availableVites(Request $request)
+    {
+        return static::$vites;
     }
 
     public static function pushWebRoutes(Closure $routes)
