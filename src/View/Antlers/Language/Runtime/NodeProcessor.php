@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Antlers\Language\Runtime;
 
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -1446,8 +1447,15 @@ class NodeProcessor
                         $beforeAssignments = $this->runtimeAssignments;
                         $currentIsolationState = GlobalRuntimeState::$requiresRuntimeIsolation;
                         GlobalRuntimeState::$requiresRuntimeIsolation = true;
-                        $output = call_user_func([$tag, $methodToCall]);
-                        GlobalRuntimeState::$requiresRuntimeIsolation = $currentIsolationState;
+
+                        try {
+                            $output = call_user_func([$tag, $methodToCall]);
+                        } catch (Exception $e) {
+                            throw $e;
+                        } finally {
+                            GlobalRuntimeState::$requiresRuntimeIsolation = $currentIsolationState;
+                        }
+
                         $afterAssignments = $this->runtimeAssignments;
 
                         foreach ($afterAssignments as $assignedVar => $val) {
@@ -1530,20 +1538,10 @@ class NodeProcessor
 
                             $sectionName = 'section:'.$tagMethod.'__yield'.$activeYield;
 
-                            $sections = null;
-
-                            if ($this->cascade == null) {
-                                // If our current cascade is null (most likely from deep isolation/etc.
-                                // attempt to locate the sections from a global Cascade instance.
-                                $sections = app(Cascade::class)->sections();
-                            } else {
-                                $sections = $this->cascade->sections();
-                            }
-
                             LiteralReplacementManager::registerRegionReplacement(
                                 $sectionName,
                                 $tagMethod,
-                                $sections->get($tagMethod)
+                                $this->cascade->sections()->get($tagMethod)
                             );
 
                             if ($this->isTracingEnabled()) {
