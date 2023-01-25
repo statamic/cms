@@ -10,6 +10,9 @@ use Tests\TestCase;
 
 class NavTreeRepositoryTest extends TestCase
 {
+    private $store;
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();

@@ -9,6 +9,9 @@ use Statamic\View\Antlers\Engine;
 
 trait EngineTests
 {
+    private $engine;
+    private $files;
+
     public function setUp(): void
     {
         parent::setUp();

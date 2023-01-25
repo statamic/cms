@@ -11,6 +11,8 @@ use Tests\TestCase;
 
 class UserRepositoryTest extends TestCase
 {
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();

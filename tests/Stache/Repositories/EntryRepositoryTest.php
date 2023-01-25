@@ -20,6 +20,10 @@ class EntryRepositoryTest extends TestCase
 {
     use UnlinksPaths;
 
+    private $stache;
+    private $directory;
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();

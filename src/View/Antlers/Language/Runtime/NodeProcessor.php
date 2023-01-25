@@ -45,7 +45,7 @@ use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
@@ -93,13 +93,6 @@ class NodeProcessor
      * @var array
      */
     protected $bufferOverwrites = [];
-
-    /**
-     * Indicates if the runtime is holding a lock to prevent scope manipulation.
-     *
-     * @var bool
-     */
-    protected $scopeLock = false;
 
     /**
      * Indicates if the current runtime instance is evaluating an interpolated document.
@@ -446,9 +439,12 @@ class NodeProcessor
      */
     public function setData($data)
     {
-        if ($this->scopeLock) {
-            return $this;
-        }
+        $this->data = [];
+        $this->previousAssignments = [];
+        $this->runtimeAssignments = [];
+        $this->canHandleInterpolations = [];
+        $this->interpolationCache = [];
+        $this->lockedData = [];
 
         if ((is_array($data) == false && (is_object($data) && ($data instanceof Arrayable) == false)) ||
             is_string($data)) {
@@ -481,10 +477,6 @@ class NodeProcessor
      */
     protected function pushScope(AntlersNode $node, $data)
     {
-        if ($this->scopeLock) {
-            return;
-        }
-
         $this->popScopes[$node->refId] = 1;
         $this->data[] = $data;
     }
@@ -652,10 +644,6 @@ class NodeProcessor
      */
     private function updateCurrentScope($data)
     {
-        if ($this->scopeLock) {
-            return;
-        }
-
         $dataLen = count($this->data);
 
         if ($dataLen == 0) {
@@ -2301,7 +2289,6 @@ class NodeProcessor
      */
     protected function addLoopIterationVariables($loop)
     {
-        $this->scopeLock = false;
         $index = 0;
         $total = count($loop);
         $lastIndex = $total - 1;
@@ -2319,7 +2306,7 @@ class NodeProcessor
 
         foreach ($loop as $key => &$value) {
             if ($value instanceof Augmentable) {
-                $value = RuntimeValueCache::getAugmentableValue($value);
+                $value = RuntimeValues::resolveWithRuntimeIsolation($value);
             }
 
             if ($value instanceof Values) {
@@ -2349,8 +2336,6 @@ class NodeProcessor
         }
 
         $this->data = $curData;
-
-        $this->scopeLock = false;
 
         $prev = null;
 

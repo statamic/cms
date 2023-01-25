@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class DefaultPreferencesTest extends TestCase
 {
+    private $files;
+
     public function setUp(): void
     {
         parent::setUp();
