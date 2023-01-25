@@ -61,13 +61,11 @@ class Svg extends Tags
 
         if (count($doc->getElementsByTagName('desc')) === 0) {
             $desc = $doc->createElement('desc', $this->params->get('desc'));
-            $desc->setAttribute('id', 'desc');
             $doc->firstChild->insertBefore($desc, $doc->firstChild->firstChild);
         }
 
         if (count($doc->getElementsByTagName('title')) === 0) {
             $title = $doc->createElement('title', $this->params->get('title'));
-            $title->setAttribute('id', 'title');
             $doc->firstChild->insertBefore($title, $doc->firstChild->firstChild);
         }
 
