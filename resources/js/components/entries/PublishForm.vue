@@ -558,7 +558,7 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
-                        this.values = this.resetValuesFromResponse(response.data.data.values);
+                        this.values = this.mergeIntoValues(response.data.data.values);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;

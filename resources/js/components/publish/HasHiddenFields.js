@@ -29,7 +29,7 @@ export default {
 
     methods: {
 
-        resetValuesFromResponse(responseValues) {
+        mergeIntoValues(responseValues) {
             let newValues = this.rejectRevealerValues(responseValues);
 
             let mergedValues = new Values(this.values, this.jsonSubmittingFields).merge(newValues);
