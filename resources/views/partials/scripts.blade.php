@@ -12,7 +12,7 @@
     @endforeach
 @endforeach
 
-@foreach (Statamic::avaliableVites(request()) as $package => $vite)
+@foreach (Statamic::availableVites(request()) as $package => $vite)
     {{ Vite::useHotFile($vite['hotFile'])
            ->useBuildDirectory($vite['buildDirectory'])
            ->withEntryPoints($vite['input']) }}

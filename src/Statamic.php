@@ -122,7 +122,7 @@ class Statamic
         return new static;
     }
 
-    public static function avaliableVites(Request $request)
+    public static function availableVites(Request $request)
     {
         return static::$vites;
     }
