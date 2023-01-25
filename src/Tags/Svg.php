@@ -72,7 +72,7 @@ class Svg extends Tags
             if ($el = $doc->getElementsByTagName('title')[0]) {
                 $el->nodeValue = $title;
             } else {
-                $el = $doc->createElement('desc', $title);
+                $el = $doc->createElement('title', $title);
                 $doc->firstChild->insertBefore($el, $doc->firstChild->firstChild);
             }
         }
