@@ -12,6 +12,10 @@ export default {
             return this.$store.state.publish[this.publishContainer].jsonSubmittingFields;
         },
 
+        revealerFields() {
+            return this.$store.state.publish[this.publishContainer].revealerFields;
+        },
+
         visibleValues() {
             let omittableFields = _.chain(this.hiddenFields)
                 .pick(field => field.omitValue)
@@ -21,6 +25,22 @@ export default {
             return new Values(this.values, this.jsonSubmittingFields).reject(omittableFields);
         },
 
-    }
+    },
+
+    methods: {
+
+        resetValuesFromResponse(responseValues) {
+            let newValues = this.rejectRevealerValues(responseValues);
+
+            let mergedValues = new Values(this.values, this.jsonSubmittingFields).merge(newValues);
+
+            return mergedValues;
+        },
+
+        rejectRevealerValues(values) {
+            return new Values(values, this.jsonSubmittingFields).reject(this.revealerFields);
+        },
+
+    },
 
 }
