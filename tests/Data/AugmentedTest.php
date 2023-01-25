@@ -13,6 +13,9 @@ use Tests\TestCase;
 
 class AugmentedTest extends TestCase
 {
+    private $thing;
+    private $blueprintThing;
+
     public function setUp(): void
     {
         parent::setUp();

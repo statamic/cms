@@ -20,6 +20,7 @@ class NavItem
     protected $authorization;
     protected $active;
     protected $view;
+    protected $attributes;
 
     /**
      * Get or set name.

@@ -13,6 +13,8 @@ class RendersFormsTest extends TestCase
 {
     const MISSING = 'field is missing from request';
 
+    private $tag;
+
     public function setUp(): void
     {
         parent::setUp();

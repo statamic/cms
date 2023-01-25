@@ -65,6 +65,7 @@ export default {
                 // Color was manually cleared
                 this.update(null);
             }
+            pickr.hide();
         });
     }
 

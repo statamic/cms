@@ -18,7 +18,7 @@
                     :alt="asset.basename"
                     v-if="isImage"
                 />
-                <file-icon :extension="asset.extension" v-else />
+                <file-icon :extension="asset.extension" v-else class="w-7 h-7" />
             </button>
             <button
                 v-if="showFilename"

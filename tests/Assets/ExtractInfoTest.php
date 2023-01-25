@@ -9,6 +9,8 @@ use Tests\TestCase;
 
 class ExtractInfoTest extends TestCase
 {
+    private $container;
+
     public function setUp(): void
     {
         parent::setUp();

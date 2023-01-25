@@ -13,6 +13,9 @@ class GetContentTagTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $one;
+    private $two;
+
     public function setUp(): void
     {
         parent::setUp();

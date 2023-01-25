@@ -29,6 +29,8 @@ class HasAugmentedInstanceTest extends TestCase
         {
             use HasAugmentedInstance;
 
+            private $mock;
+
             public function __construct($mock)
             {
                 $this->mock = $mock;
@@ -66,6 +68,8 @@ class HasAugmentedInstanceTest extends TestCase
         {
             use HasAugmentedInstance;
 
+            private $mock;
+
             public function __construct($mock)
             {
                 $this->mock = $mock;
@@ -96,6 +100,8 @@ class HasAugmentedInstanceTest extends TestCase
         {
             use HasAugmentedInstance;
 
+            private $mock;
+
             public function __construct($mock)
             {
                 $this->mock = $mock;
@@ -123,6 +129,8 @@ class HasAugmentedInstanceTest extends TestCase
         $thing = new class($mock) implements ArrayAccess
         {
             use HasAugmentedInstance;
+
+            private $mock;
 
             public function __construct($mock)
             {
