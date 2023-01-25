@@ -1544,7 +1544,7 @@ class NodeProcessor
 
                             $sections = null;
 
-                            if ($this->cascade == null && $sections == null) {
+                            if ($this->cascade == null) {
                                 // If our current cascade is null (most likely from deep isolation/etc.
                                 // attempt to locate the sections from a global Cascade instance.
                                 $sections = app(Cascade::class)->sections();
