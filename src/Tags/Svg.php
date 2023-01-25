@@ -59,14 +59,22 @@ class Svg extends Tags
         $doc = new \DOMDocument;
         $doc->loadXML($svg);
 
-        if (count($doc->getElementsByTagName('desc')) === 0) {
-            $desc = $doc->createElement('desc', $this->params->get('desc'));
-            $doc->firstChild->insertBefore($desc, $doc->firstChild->firstChild);
+        if ($desc = $this->params->get('desc')) {
+            if ($el = $doc->getElementsByTagName('desc')[0]) {
+                $el->nodeValue = $desc;
+            } else {
+                $el = $doc->createElement('desc', $desc);
+                $doc->firstChild->insertBefore($el, $doc->firstChild->firstChild);
+            }
         }
 
-        if (count($doc->getElementsByTagName('title')) === 0) {
-            $title = $doc->createElement('title', $this->params->get('title'));
-            $doc->firstChild->insertBefore($title, $doc->firstChild->firstChild);
+        if ($title = $this->params->get('title')) {
+            if ($el = $doc->getElementsByTagName('title')[0]) {
+                $el->nodeValue = $title;
+            } else {
+                $el = $doc->createElement('desc', $title);
+                $doc->firstChild->insertBefore($el, $doc->firstChild->firstChild);
+            }
         }
 
         return $doc->saveHTML();
