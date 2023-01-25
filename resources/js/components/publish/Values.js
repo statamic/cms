@@ -1,4 +1,5 @@
 import { clone } from  '../../bootstrap/globals.js'
+import isObject from 'underscore/modules/isObject.js'
 
 export default class {
     constructor(values, jsonFields) {
@@ -17,6 +18,18 @@ export default class {
         return this.values;
     }
 
+    merge(newValues) {
+        this.jsonDecode()
+            .deepMergeIntoValues(newValues)
+            .jsonEncode();
+
+        return this.values;
+    }
+
+    get() {
+        return this.values;
+    }
+
     jsonDecode() {
         this.jsonFields.forEach(dottedKey => {
             this.jsonDecodeValue(dottedKey);
@@ -31,6 +44,37 @@ export default class {
         });
 
         return this;
+    }
+
+    deepMergeIntoValues(newValues) {
+        let decodedNewValues = new this.constructor(newValues, this.jsonFields)
+            .jsonDecode()
+            .get();
+
+        this.values = this.deepMergeObjects(clone(this.values), decodedNewValues);
+
+        return this;
+    }
+
+    deepMergeObjects(target, ...sources) {
+        if (! sources.length) {
+            return target;
+        }
+
+        const source = sources.shift();
+
+        if (isObject(target) && isObject(source)) {
+            for (const key in source) {
+                if (isObject(source[key])) {
+                    if (! target[key]) Object.assign(target, {[key]: {}});
+                    this.deepMergeObjects(target[key], source[key]);
+                } else {
+                    Object.assign(target, {[key]: source[key]});
+                }
+            }
+        }
+
+        return this.deepMergeObjects(target, ...sources);
     }
 
     jsonEncode() {
