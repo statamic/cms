@@ -12,6 +12,22 @@ export default class {
             .sort();
     }
 
+    get(dottedKey) {
+        let decodedValues = new this.constructor(clone(this.values), this.jsonFields)
+            .jsonDecode()
+            .values;
+
+        return data_get(decodedValues, dottedKey);
+    }
+
+    set(dottedKey, value)  {
+        this.jsonDecode()
+            .setValue(dottedKey, value)
+            .jsonEncode();
+
+        return this;
+    }
+
     except(dottedKeys) {
         return this.jsonDecode()
             .rejectValuesByKey(dottedKeys)
@@ -77,6 +93,12 @@ export default class {
         eval(jsPath + ' = encodedFieldValue');
 
         this.values = values;
+    }
+
+    setValue(dottedKey, value) {
+        data_set(this.values, dottedKey, value);
+
+        return this;
     }
 
     rejectValuesByKey(dottedKeys) {
