@@ -30,14 +30,13 @@ class AssetContainerContents
             // and will let us perform more efficient filtering and caching.
             $files = $this->filesystem()->listContents('/', true);
 
-            // If Flysystem 3.x, re-apply sorting and return a backwards compatible result set.
-            // See: https://flysystem.thephpleague.com/v2/docs/usage/directory-listings/
             if (! is_array($files)) {
-                $files = collect($files->sortByPath()->toArray())->keyBy('path')->map(function ($file) {
+                // Flysystem v3 is a DirectoryListing class, not an array.
+                $files = collect($files->toArray())->keyBy('path')->map(function ($file) {
                     return $this->normalizeFlysystemAttributes($file);
                 });
             } else {
-                // Flysystem 1.x
+                // Flysystem 1.x is an array.
                 $files = collect($files)->keyBy('path');
             }
 
@@ -63,7 +62,7 @@ class AssetContainerContents
                     }
                 });
 
-            return $files;
+            return $files->sortKeys();
         });
     }
 
