@@ -99,6 +99,7 @@ class Terms extends Relationship
             && $parent
             && $parent instanceof Entry
             && $this->field->handle() === $this->taxonomies()[0]
+            && $parent->collection() !== null
             && $parent->collection()->taxonomies()->map->handle()->contains($this->field->handle());
 
         if ($shouldQueryCollection) {
