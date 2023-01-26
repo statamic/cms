@@ -576,8 +576,8 @@ class AssetContainerTest extends TestCase
             ->andReturn([
                 'alfa' => ['type' => 'dir', 'path' => 'alfa', 'basename' => 'alfa'],
                 'bravo' => ['type' => 'dir', 'path' => 'bravo', 'basename' => 'bravo'],
-                'charlie/delta.jpg' => ['type' => 'file', 'path' => 'charlie/delta.jpg', 'basename' => 'delta', 'dirname' => 'charlie'],
-                'echo/foxtrot/golf.jpg' => ['type' => 'file', 'path' => 'echo/foxtrot/golf.jpg', 'basename' => 'golf', 'dirname' => 'echo/foxtrot'],
+                'charlie/delta/echo/foxtrot.jpg' => ['type' => 'file', 'path' => 'charlie/delta/echo/foxtrot.jpg', 'basename' => 'foxtrot', 'dirname' => 'charlie/delta/echo'],
+                'golf.jpg' => ['type' => 'file', 'path' => 'golf.jpg', 'basename' => 'golf', 'dirname' => ''],
             ]);
 
         File::shouldReceive('disk')->with('test')->andReturn($disk);
@@ -587,7 +587,7 @@ class AssetContainerTest extends TestCase
 
         $container = (new AssetContainer)->handle('test')->disk('test');
 
-        $expected = ['alfa', 'bravo', 'charlie', 'echo/foxtrot', 'echo'];
+        $expected = ['alfa', 'bravo', 'charlie', 'charlie/delta', 'charlie/delta/echo'];
         $this->assertEquals($expected, $container->folders()->all());
     }
 
