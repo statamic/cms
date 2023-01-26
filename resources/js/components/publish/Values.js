@@ -10,9 +10,9 @@ export default class {
             .sort();
     }
 
-    reject(hiddenKeys) {
+    except(dottedKeys) {
         this.jsonDecode()
-            .omitHiddenFields(hiddenKeys)
+            .rejectFieldsByKey(dottedKeys)
             .jsonEncode();
 
         return this.values;
@@ -38,8 +38,8 @@ export default class {
         return this;
     }
 
-    omitHiddenFields(hiddenKeys) {
-        hiddenKeys.forEach(dottedKey => {
+    rejectFieldsByKey(dottedKeys) {
+        dottedKeys.forEach(dottedKey => {
             this.forgetValue(dottedKey);
         });
 

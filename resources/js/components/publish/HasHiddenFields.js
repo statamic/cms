@@ -22,7 +22,7 @@ export default {
                 .keys()
                 .value();
 
-            return new Values(this.values, this.jsonSubmittingFields).reject(omittableFields);
+            return new Values(this.values, this.jsonSubmittingFields).except(omittableFields);
         },
 
     },
@@ -38,7 +38,7 @@ export default {
         },
 
         rejectRevealerValues(values) {
-            return new Values(values, this.jsonSubmittingFields).reject(this.revealerFields);
+            return new Values(values, this.jsonSubmittingFields).except(this.revealerFields);
         },
 
     },

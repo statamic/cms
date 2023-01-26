@@ -8,7 +8,7 @@ test('it rejects values at top level', () => {
         bff: 'Chewy',
     };
 
-    let rejected = new Values(values).reject([
+    let rejected = new Values(values).except([
         'last_name',
         'bff',
     ]);
@@ -68,7 +68,7 @@ test('it rejects nested values', () => {
         ],
     };
 
-    let rejected = new Values(values).reject([
+    let rejected = new Values(values).except([
         'last_name',
         'ship.completed_kessel_run',
         'bffs.0.type',
@@ -152,7 +152,7 @@ test('it rejects nested json field values', () => {
         'bffs',
     ];
 
-    let rejected = new Values(values, jsonFields).reject([
+    let rejected = new Values(values, jsonFields).except([
         'last_name',
         'ship.completed_kessel_run',
         'bffs.0.type',
@@ -192,7 +192,7 @@ test('it rejects null hidden values', () => {
         bff: null, // this is null, but should still get removed
     };
 
-    let rejected = new Values(values).reject([
+    let rejected = new Values(values).except([
         'last_name',
         'bff',
     ]);
@@ -202,7 +202,7 @@ test('it rejects null hidden values', () => {
         ship: 'Falcon',
     };
 
-    expect(new Values(values).reject(['last_name', 'bff'])).toEqual(expected);
+    expect(new Values(values).except(['last_name', 'bff'])).toEqual(expected);
 });
 
 test('it merges values at top level', () => {
@@ -408,7 +408,7 @@ test('it gracefully handles errors', () => {
         'bffs.0.crush', // non-existent field
     ];
 
-    let rejected = new Values(values, jsonFields).reject([
+    let rejected = new Values(values, jsonFields).except([
         'last_name',
         'middle_name',  // non-existent field
         'bffs.0.name',
@@ -452,7 +452,7 @@ test('it properly rejects keys that javascript considers having numeric separato
         '123_key.456_key.404_text',
     ];
 
-    let rejected = new Values(values, jsonFields).reject([
+    let rejected = new Values(values, jsonFields).except([
         '404_text',
         '123_key.456_key.404_text',
     ]);
