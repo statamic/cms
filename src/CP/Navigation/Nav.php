@@ -100,7 +100,7 @@ class Nav
      */
     public function build()
     {
-        return $this->built = $this
+        return $this
             ->makeDefaultItems()
             ->buildExtensions()
             ->buildChildren()

@@ -12,6 +12,8 @@ class GitProcessTest extends TestCase
 {
     use Concerns\PreparesTempRepos;
 
+    private $files;
+
     public function setUp(): void
     {
         parent::setUp();

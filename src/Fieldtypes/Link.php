@@ -52,9 +52,9 @@ class Link extends Fieldtype
 
         $showAssetOption = $this->showAssetOption();
 
-        $selectedEntry = Str::startsWith($value, 'entry::') ? Str::after($value, 'entry::') : null;
+        $selectedEntry = $value && Str::startsWith($value, 'entry::') ? Str::after($value, 'entry::') : null;
 
-        $selectedAsset = Str::startsWith($value, 'asset::') ? Str::after($value, 'asset::') : null;
+        $selectedAsset = $value && Str::startsWith($value, 'asset::') ? Str::after($value, 'asset::') : null;
 
         $url = ($value !== '@child' && ! $selectedEntry && ! $selectedAsset) ? $value : null;
 

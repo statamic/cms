@@ -132,6 +132,8 @@ return [
     'licensing_error_outside_license_range' => 'Lizenz gültig für Versionen :start bis :end',
     'licensing_error_unknown_site' => 'Unbekannte Website',
     'licensing_error_unlicensed' => 'Nicht lizenziert',
+    'licensing_incorrect_key_format_heading' => 'Lizenzschlüssel verwendet falsches Format',
+    'licensing_incorrect_key_format_body' => 'Es sieht so aus, als wäre dein Lizenzschlüssel nicht im richtigen Format. Bitte überprüfe ihn noch einmal. Du findest den Schlüssel in deinem Account auf statamic.com. Er sollte 16 Zeichen lang sein und aus Zahlen und Buchstaben bestehen. Bitte verwende nicht den alten Legacy Lizenzschlüssel. Dieser ist eine UUID.',
     'licensing_production_alert' => 'Diese Website verwendet Statamic Pro und kommerzielle Addons. Bitte erwirb die entsprechenden Lizenzen.',
     'licensing_production_alert_addons' => 'Diese Website verwendet kommerzielle Addons. Bitte erwirb die entsprechenden Lizenzen.',
     'licensing_production_alert_renew_statamic' => 'Die Nutzung dieser Version von Statamic Pro erfordert eine Lizenzverlängerung.',

@@ -11,6 +11,10 @@ class UpdateTermReferencesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $topics;
+    private $termHoff;
+    private $termNorris;
+
     public function setUp(): void
     {
         parent::setUp();

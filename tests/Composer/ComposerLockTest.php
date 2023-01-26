@@ -12,6 +12,10 @@ use Tests\TestCase;
 
 class ComposerLockTest extends TestCase
 {
+    private $files;
+    private $lockPath;
+    private $previousLockPath;
+
     public function setUp(): void
     {
         parent::setUp();

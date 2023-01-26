@@ -31,6 +31,7 @@ return [
     ],
     'boolean'              => '必须为真或假。',
     'confirmed'            => '确认不匹配。',
+    'current_password'     => '密码错误。',
     'date'                 => '无效日期',
     'date_format'          => '与格式 :format 不匹配',
     'different'            => '此字段和 :other 必须不同。',

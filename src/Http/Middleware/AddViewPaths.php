@@ -12,6 +12,7 @@ class AddViewPaths
     private $hints;
     private $amp;
     private $site;
+    private $finder;
 
     public function handle($request, Closure $next)
     {

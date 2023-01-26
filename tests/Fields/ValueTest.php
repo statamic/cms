@@ -158,6 +158,8 @@ class DummyAugmentable implements \Statamic\Contracts\Data\Augmentable
 {
     use \Statamic\Data\HasAugmentedData;
 
+    private $id;
+
     public function __construct($id)
     {
         $this->id = $id;

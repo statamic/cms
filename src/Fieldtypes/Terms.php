@@ -372,8 +372,16 @@ class Terms extends Relationship
 
     protected function createTermFromString($string, $taxonomy)
     {
+        // The parent is the item this terms fieldtype exists on. Most commonly an
+        // entry, but could also be something else, like another taxonomy term.
+        $parent = $this->field->parent();
+
+        $lang = $parent instanceof Localization
+            ? Site::get($parent->locale())->lang()
+            : Site::default()->lang();
+
         $term = Facades\Term::make()
-            ->slug(Str::slug($string))
+            ->slug(Str::slug($string, '-', $lang))
             ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
             ->set('title', $string);
 

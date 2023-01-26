@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class ColumnsTest extends TestCase
 {
+    private $columns;
+
     public function setUp(): void
     {
         parent::setUp();

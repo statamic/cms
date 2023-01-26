@@ -231,7 +231,7 @@ class Assets extends Fieldtype
             if ($isImage) {
                 $arr['thumbnail'] = cp_route('assets.thumbnails.show', [
                     'encoded_asset' => base64_encode($asset->id()),
-                    'size' => 'thumbnail',
+                    'size' => 'small',
                 ]);
             }
 

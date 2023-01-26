@@ -10,6 +10,8 @@ use Tests\TestCase;
 
 class RoleRepositoryTest extends TestCase
 {
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();
