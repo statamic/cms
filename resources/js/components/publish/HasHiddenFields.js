@@ -29,16 +29,12 @@ export default {
 
     methods: {
 
-        mergeIntoValues(responseValues) {
-            let newValues = this.rejectRevealerValues(responseValues);
-
-            let mergedValues = new Values(this.values, this.jsonSubmittingFields).merge(newValues);
+        resetValuesFromResponse(responseValues) {
+            let preserveFields = ['id'].concat(this.revealerFields);
+            let preservedValues = new Values(this.values, this.jsonSubmittingFields).only(preserveFields);
+            let mergedValues = new Values(responseValues, this.jsonSubmittingFields).merge(preservedValues);
 
             return mergedValues;
-        },
-
-        rejectRevealerValues(values) {
-            return new Values(values, this.jsonSubmittingFields).except(this.revealerFields);
         },
 
     },
