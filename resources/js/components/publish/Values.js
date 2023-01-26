@@ -13,30 +13,13 @@ export default class {
     }
 
     except(dottedKeys) {
-        this.jsonDecode()
-            .rejectFieldsByKey(dottedKeys)
-            .jsonEncode();
-
-        return this.values;
+        return this.jsonDecode()
+            .rejectValuesByKey(dottedKeys)
+            .jsonEncode()
+            .all();
     }
 
-    only(dottedKeys) {
-        this.jsonDecode()
-            .filterFieldsByKey(dottedKeys)
-            .jsonEncode();
-
-        return this.values;
-    }
-
-    merge(newValues) {
-        this.jsonDecode()
-            .deepMergeIntoValues(newValues)
-            .jsonEncode();
-
-        return this.values;
-    }
-
-    get() {
+    all() {
         return this.values;
     }
 
@@ -46,57 +29,6 @@ export default class {
         });
 
         return this;
-    }
-
-    rejectFieldsByKey(dottedKeys) {
-        dottedKeys.forEach(dottedKey => {
-            this.forgetValue(dottedKey);
-        });
-
-        return this;
-    }
-
-    filterFieldsByKey(dottedKeys) {
-        var newValues = {};
-
-        dottedKeys.forEach(dottedKey => {
-            data_set(newValues, dottedKey, data_get(this.values, dottedKey));
-        });
-
-        this.values = newValues;
-
-        return this;
-    }
-
-    deepMergeIntoValues(newValues) {
-        let decodedNewValues = new this.constructor(newValues, this.jsonFields)
-            .jsonDecode()
-            .get();
-
-        this.values = this.deepMergeObjects(clone(this.values), decodedNewValues);
-
-        return this;
-    }
-
-    deepMergeObjects(target, ...sources) {
-        if (! sources.length) {
-            return target;
-        }
-
-        const source = sources.shift();
-
-        if (isObject(target) && isObject(source)) {
-            for (const key in source) {
-                if (isObject(source[key])) {
-                    if (! target[key]) Object.assign(target, {[key]: {}});
-                    this.deepMergeObjects(target[key], source[key]);
-                } else {
-                    Object.assign(target, {[key]: source[key]});
-                }
-            }
-        }
-
-        return this.deepMergeObjects(target, ...sources);
     }
 
     jsonEncode() {
@@ -145,6 +77,14 @@ export default class {
         eval(jsPath + ' = encodedFieldValue');
 
         this.values = values;
+    }
+
+    rejectValuesByKey(dottedKeys) {
+        dottedKeys.forEach(dottedKey => {
+            this.forgetValue(dottedKey);
+        });
+
+        return this;
     }
 
     forgetValue(dottedKey) {
