@@ -39,7 +39,8 @@ export function data_set(obj, path, value) {
     var parts = path.split('.');
     while (parts.length - 1) {
         var key = parts.shift();
-        if (! (key in obj)) obj[key] = {};
+        var shouldBeArray = parts.length ? new RegExp('^[0-9]+$').test(parts[0]) : false;
+        if (! (key in obj)) obj[key] = shouldBeArray ? [] : {};
         obj = obj[key];
     }
     obj[parts[0]] = value;

@@ -50,7 +50,8 @@ test('it_can_set_value_to_data_using_dotted_path', () => {
     data_set(data, 'nested.array_value.0.foo', 'delta_changed');
     data_set(data, 'nested.array_value.1', 'element_two_is_now_string');
     data_set(data, 'nested.array_value.2', 'element_added');
-    data_set(data, 'deep.new.element', 'deep_element_added');
+    data_set(data, 'deep.new.object', 'deep_new_object_value_added');
+    data_set(data, 'deep.new.array.0', 'deep_new_array_element_added');
 
     let expected = {
         foo: 'alpha_changed',
@@ -66,7 +67,10 @@ test('it_can_set_value_to_data_using_dotted_path', () => {
         },
         deep: {
             new: {
-                element: 'deep_element_added',
+                object: 'deep_new_object_value_added',
+                array: [
+                    'deep_new_array_element_added',
+                ],
             },
         },
     };
