@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Antlers\Language\Runtime;
 
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -25,7 +26,7 @@ use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Parser\LanguageKeywords;
 use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
 
@@ -665,8 +666,14 @@ class PathDataManager
                 if ($this->reducedVar instanceof Builder) {
                     $this->lockData();
                     GlobalRuntimeState::$requiresRuntimeIsolation = true;
-                    $this->reducedVar = $this->reducedVar->get()->all();
-                    GlobalRuntimeState::$requiresRuntimeIsolation = false;
+                    try {
+                        $this->reducedVar = $this->reducedVar->get()->all();
+                    } catch (Exception $e) {
+                        throw $e;
+                    } finally {
+                        GlobalRuntimeState::$requiresRuntimeIsolation = false;
+                    }
+
                     $this->unlockData();
                 }
 
@@ -906,7 +913,7 @@ class PathDataManager
             if ($reductionValue instanceof Value) {
                 GlobalRuntimeState::$isEvaluatingUserData = true;
                 GlobalRuntimeState::$isEvaluatingData = true;
-                $augmented = RuntimeValueCache::getValue($reductionValue);
+                $augmented = RuntimeValues::getValue($reductionValue);
                 $augmented = self::guardRuntimeReturnValue($augmented);
                 GlobalRuntimeState::$isEvaluatingUserData = false;
                 GlobalRuntimeState::$isEvaluatingData = false;
@@ -924,7 +931,7 @@ class PathDataManager
                 continue;
             } elseif ($reductionValue instanceof \Statamic\Entries\Collection) {
                 GlobalRuntimeState::$isEvaluatingData = true;
-                $reductionStack[] = RuntimeValueCache::resolveWithRuntimeIsolation($reductionValue);
+                $reductionStack[] = RuntimeValues::resolveWithRuntimeIsolation($reductionValue);
                 GlobalRuntimeState::$isEvaluatingData = false;
                 continue;
             } elseif ($reductionValue instanceof ArrayableString) {
@@ -937,7 +944,7 @@ class PathDataManager
                 if ($reduceBuildersAndAugmentables) {
                     GlobalRuntimeState::$isEvaluatingUserData = true;
                     GlobalRuntimeState::$isEvaluatingData = true;
-                    $augmented = RuntimeValueCache::getAugmentableValue($reductionValue);
+                    $augmented = RuntimeValues::resolveWithRuntimeIsolation($reductionValue);
                     $augmented = self::guardRuntimeReturnValue($augmented);
                     GlobalRuntimeState::$isEvaluatingUserData = false;
                     GlobalRuntimeState::$isEvaluatingData = false;

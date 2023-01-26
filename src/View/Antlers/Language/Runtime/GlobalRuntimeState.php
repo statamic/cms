@@ -199,13 +199,6 @@ class GlobalRuntimeState
      */
     public static $peekCallbacks = [];
 
-    /**
-     * Indicates if data should be removed.
-     *
-     * @var bool
-     */
-    public static $garbageCollect = true;
-
     public static function resetGlobalState()
     {
         self::$containsLayout = false;
@@ -214,7 +207,6 @@ class GlobalRuntimeState
         self::$environmentId = StringUtilities::uuidv4();
         self::$yieldCount = 0;
         self::$yieldStacks = [];
-        self::$garbageCollect = true;
 
         StackReplacementManager::clearStackState();
         LiteralReplacementManager::resetLiteralState();

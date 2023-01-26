@@ -224,7 +224,12 @@ class AntlersNodeParser
 
         try {
             if ($parseName) {
+                $node->originalPathReferenceContent = $name;
                 $node->pathReference = $this->pathParser->parse($name);
+
+                if (! empty($node->interpolationRegions)) {
+                    $node->pathReferenceContainsDynamicVariables = Str::contains($name, array_keys($node->interpolationRegions));
+                }
 
                 if ($node->pathReference->isStrictTagReference) {
                     // Remove the leading # symbol to not frustrate everyone with "tag not found" errors.
