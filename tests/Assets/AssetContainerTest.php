@@ -442,11 +442,11 @@ class AssetContainerTest extends TestCase
             ->with('/', true)
             ->once()
             ->andReturn([
-                '.meta/one.jpg.yaml' => ['type' => 'file', 'path' => '.meta/one.jpg.yaml', 'basename' => 'one.jpg.yaml'],
-                '.DS_Store' => ['type' => 'file', 'path' => '.DS_Store', 'basename' => '.DS_Store'],
-                '.gitignore' => ['type' => 'file', 'path' => '.gitignore', 'basename' => '.gitignore'],
-                'one.jpg' => ['type' => 'file', 'path' => 'one.jpg', 'basename' => 'one.jpg'],
-                'two.jpg' => ['type' => 'file', 'path' => 'two.jpg', 'basename' => 'two.jpg'],
+                '.meta/one.jpg.yaml' => ['type' => 'file', 'path' => '.meta/one.jpg.yaml', 'basename' => 'one.jpg.yaml', 'dirname' => '.meta'],
+                '.DS_Store' => ['type' => 'file', 'path' => '.DS_Store', 'basename' => '.DS_Store', 'dirname' => ''],
+                '.gitignore' => ['type' => 'file', 'path' => '.gitignore', 'basename' => '.gitignore', 'dirname' => ''],
+                'one.jpg' => ['type' => 'file', 'path' => 'one.jpg', 'basename' => 'one.jpg', 'dirname' => ''],
+                'two.jpg' => ['type' => 'file', 'path' => 'two.jpg', 'basename' => 'two.jpg', 'dirname' => ''],
             ]);
 
         File::shouldReceive('disk')->with('test')->andReturn($disk);
@@ -561,6 +561,34 @@ class AssetContainerTest extends TestCase
 
         Carbon::setTestNow(now()->addYears(5)); // i.e. forever.
         $this->assertTrue(Cache::has($cacheKey));
+    }
+
+    /** @test */
+    public function it_gets_the_folders_even_if_some_folders_are_missing()
+    {
+        // For example, S3 may not not return a directory as part of the listing in
+        // some situations, even though there may be a file in those directories.
+
+        $disk = $this->mock(Filesystem::class);
+        $disk->shouldReceive('filesystem->getDriver->listContents')
+            ->with('/', true)
+            ->once()
+            ->andReturn([
+                'alfa' => ['type' => 'dir', 'path' => 'alfa', 'basename' => 'alfa'],
+                'bravo' => ['type' => 'dir', 'path' => 'bravo', 'basename' => 'bravo'],
+                'charlie/delta/echo/foxtrot.jpg' => ['type' => 'file', 'path' => 'charlie/delta/echo/foxtrot.jpg', 'basename' => 'foxtrot', 'dirname' => 'charlie/delta/echo'],
+                'golf.jpg' => ['type' => 'file', 'path' => 'golf.jpg', 'basename' => 'golf', 'dirname' => ''],
+            ]);
+
+        File::shouldReceive('disk')->with('test')->andReturn($disk);
+
+        $this->assertFalse(Cache::has($cacheKey = 'asset-list-contents-test'));
+        $this->assertFalse(Blink::has($cacheKey));
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        $expected = ['alfa', 'bravo', 'charlie', 'charlie/delta', 'charlie/delta/echo'];
+        $this->assertEquals($expected, $container->folders()->all());
     }
 
     /** @test */
