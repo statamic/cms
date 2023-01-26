@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Antlers\Language\Runtime;
 
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -665,8 +666,14 @@ class PathDataManager
                 if ($this->reducedVar instanceof Builder) {
                     $this->lockData();
                     GlobalRuntimeState::$requiresRuntimeIsolation = true;
-                    $this->reducedVar = $this->reducedVar->get()->all();
-                    GlobalRuntimeState::$requiresRuntimeIsolation = false;
+                    try {
+                        $this->reducedVar = $this->reducedVar->get()->all();
+                    } catch (Exception $e) {
+                        throw $e;
+                    } finally {
+                        GlobalRuntimeState::$requiresRuntimeIsolation = false;
+                    }
+
                     $this->unlockData();
                 }
 

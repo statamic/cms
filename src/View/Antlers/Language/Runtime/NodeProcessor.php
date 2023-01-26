@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Antlers\Language\Runtime;
 
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -825,6 +826,7 @@ class NodeProcessor
         if ($this->antlersParser != null) {
             $processor->setAntlersParserInstance($this->antlersParser);
         }
+
         $processor->cascade($this->cascade)->setDoStackIntercept($this->doStackIntercept);
 
         if ($this->runtimeConfiguration != null) {
@@ -1443,7 +1445,17 @@ class NodeProcessor
                         }
 
                         $beforeAssignments = $this->runtimeAssignments;
-                        $output = call_user_func([$tag, $methodToCall]);
+                        $currentIsolationState = GlobalRuntimeState::$requiresRuntimeIsolation;
+                        GlobalRuntimeState::$requiresRuntimeIsolation = true;
+
+                        try {
+                            $output = call_user_func([$tag, $methodToCall]);
+                        } catch (Exception $e) {
+                            throw $e;
+                        } finally {
+                            GlobalRuntimeState::$requiresRuntimeIsolation = $currentIsolationState;
+                        }
+
                         $afterAssignments = $this->runtimeAssignments;
 
                         foreach ($afterAssignments as $assignedVar => $val) {
