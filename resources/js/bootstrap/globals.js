@@ -34,6 +34,17 @@ export function data_get(obj, path, fallback=null) {
     return value !== undefined ? value : fallback;
 };
 
+export function data_set(obj, path, value) {
+    // Source: https://stackoverflow.com/a/20240290
+    var parts = path.split('.');
+    while (parts.length - 1) {
+        var key = parts.shift();
+        if (! (key in obj)) obj[key] = {};
+        obj = obj[key];
+    }
+    obj[parts[0]] = value;
+};
+
 export function clone(value) {
     if (value === undefined) return undefined;
 
