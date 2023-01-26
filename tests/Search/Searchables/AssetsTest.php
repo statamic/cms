@@ -10,7 +10,7 @@ use Statamic\Search\Searchables\Assets;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class AssetsTEst extends TestCase
+class AssetsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
