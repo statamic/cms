@@ -184,7 +184,7 @@ test('it rejects nested json field values', () => {
     expect(rejected).toEqual(expected);
 });
 
-test('it rejects null hidden values', () => {
+test('it rejects null values', () => {
     let values = {
         first_name: 'Han',
         last_name: 'Solo',
@@ -202,7 +202,166 @@ test('it rejects null hidden values', () => {
         ship: 'Falcon',
     };
 
-    expect(new Values(values).except(['last_name', 'bff'])).toEqual(expected);
+    expect(rejected).toEqual(expected);
+});
+
+test('it filters values at top level', () => {
+    let values = {
+        first_name: 'Han',
+        last_name: 'Solo',
+        ship: 'Falcon',
+        bff: 'Chewy',
+    };
+
+    let filtered = new Values(values).only([
+        'last_name',
+        'bff',
+    ]);
+
+    let expected = {
+        last_name: 'Solo',
+        bff: 'Chewy',
+    };
+
+    expect(filtered).toEqual(expected);
+});
+
+test('it filters nested values', () => {
+    let values = {
+        first_name: 'Han',
+        last_name: 'Solo',
+        ship: {
+            name: 'Falcon',
+            completed_kessel_run: 'less than 12 parsecs',
+            junk: true,
+        },
+        bffs: [
+            {
+                name: 'Chewy',
+                type: 'Wookie',
+            },
+            {
+                name: 'Leia',
+                type: 'Woman',
+                crush: [
+                    {
+                        name: 'Lando',
+                        type: 'Man',
+                    }
+                ],
+            },
+        ],
+    };
+
+    let filtered = new Values(values).only([
+        'last_name',
+        'ship.completed_kessel_run',
+        'bffs.0.name',
+        'bffs.1.crush.0.name',
+    ]);
+
+    let expected = {
+        last_name: 'Solo',
+        ship: {
+            completed_kessel_run: 'less than 12 parsecs',
+        },
+        bffs: [
+            {
+                name: 'Chewy',
+            },
+            {
+                crush: [
+                    {
+                        name: 'Lando',
+                    }
+                ],
+            },
+        ],
+    };
+
+    expect(filtered).toEqual(expected);
+});
+
+test('it filters nested json field values', () => {
+    let values = {
+        first_name: 'Han',
+        last_name: 'Solo',
+        ship: {
+            name: 'Falcon',
+            completed_kessel_run: 'less than 12 parsecs',
+            junk: true,
+        },
+        bffs: JSON.stringify([
+            {
+                name: 'Chewy',
+                type: 'Wookie',
+            },
+            {
+                name: 'Leia',
+                type: 'Woman',
+                crush: JSON.stringify([
+                    {
+                        name: 'Lando',
+                        type: 'Man',
+                    },
+                ]),
+            },
+        ]),
+    };
+
+    let jsonFields = [
+        'bffs.1.crush', // Intentionally passing deeper JSON value first to ensure these are properly sorted before decoding
+        'bffs',
+    ];
+
+    let filtered = new Values(values, jsonFields).only([
+        'last_name',
+        'ship.completed_kessel_run',
+        'bffs.0.type',
+        'bffs.1.crush.0.name',
+    ]);
+
+    let expected = {
+        last_name: 'Solo',
+        ship: {
+            completed_kessel_run: 'less than 12 parsecs',
+        },
+        bffs: JSON.stringify([
+            {
+                type: 'Wookie',
+            },
+            {
+                crush: JSON.stringify([
+                    {
+                        name: 'Lando',
+                    },
+                ]),
+            },
+        ]),
+    };
+
+    expect(filtered).toEqual(expected);
+});
+
+test('it filters null values', () => {
+    let values = {
+        first_name: 'Han',
+        last_name: 'Solo',
+        ship: 'Falcon',
+        bff: null, // this is null, but should still get removed
+    };
+
+    let filtered = new Values(values).only([
+        'last_name',
+        'bff',
+    ]);
+
+    let expected = {
+        last_name: 'Solo',
+        bff: null, // this is null, but should still be present in filtered data
+    };
+
+    expect(filtered).toEqual(filtered);
 });
 
 test('it merges values at top level', () => {

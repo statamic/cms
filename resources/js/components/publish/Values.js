@@ -1,4 +1,6 @@
 import { clone } from  '../../bootstrap/globals.js'
+import { data_get } from  '../../bootstrap/globals.js'
+import { data_set } from  '../../bootstrap/globals.js'
 import isObject from 'underscore/modules/isObject.js'
 
 export default class {
@@ -13,6 +15,14 @@ export default class {
     except(dottedKeys) {
         this.jsonDecode()
             .rejectFieldsByKey(dottedKeys)
+            .jsonEncode();
+
+        return this.values;
+    }
+
+    only(dottedKeys) {
+        this.jsonDecode()
+            .filterFieldsByKey(dottedKeys)
             .jsonEncode();
 
         return this.values;
@@ -42,6 +52,18 @@ export default class {
         dottedKeys.forEach(dottedKey => {
             this.forgetValue(dottedKey);
         });
+
+        return this;
+    }
+
+    filterFieldsByKey(dottedKeys) {
+        var newValues = {};
+
+        dottedKeys.forEach(dottedKey => {
+            data_set(newValues, dottedKey, data_get(this.values, dottedKey));
+        });
+
+        this.values = newValues;
 
         return this;
     }
