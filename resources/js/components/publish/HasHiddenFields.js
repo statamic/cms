@@ -31,10 +31,14 @@ export default {
 
         resetValuesFromResponse(responseValues) {
             let preserveFields = ['id'].concat(this.revealerFields);
-            let preservedValues = new Values(this.values, this.jsonSubmittingFields).only(preserveFields);
-            let mergedValues = new Values(responseValues, this.jsonSubmittingFields).merge(preservedValues);
+            let originalValues = new Values(this.values, this.jsonSubmittingFields);
+            let newValues = new Values(responseValues, this.jsonSubmittingFields);
 
-            return mergedValues;
+            preserveFields.forEach(dottedKey => {
+                newValues.set(dottedKey, originalValues.get(dottedKey));
+            });
+
+            return newValues.all();
         },
 
     },
