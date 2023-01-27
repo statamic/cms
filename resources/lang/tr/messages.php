@@ -67,7 +67,7 @@ return [
     'field_synced_with_origin' => 'Kaynak ile senkronize edildi. Eşitlemeyi kaldırmak için alanı tıklayın veya düzenleyin.',
     'field_validation_advanced_instructions' => 'Bu alana daha gelişmiş doğrulama ekleyin.',
     'field_validation_required_instructions' => 'Bu alanın gerekli olup olmadığını kontrol edin.',
-    'fields_always_save_instructions' => 'Alan koşullarının nasıl değerlendirildiğine bakılmaksızın her zaman alan değerini kaydedin.',
+    'field_conditions_always_save_instructions' => 'Alan koşullarının nasıl değerlendirildiğine bakılmaksızın her zaman alan değerini kaydedin.',
     'fields_blueprints_description' => 'Planlar, koleksiyonlar, sınıflandırmalar, kullanıcılar ve formlar gibi içerik yapıları için alanları tanımlar.',
     'fields_default_instructions' => 'Varsayılan değeri ayarlayın.',
     'fields_display_instructions' => 'Kontrol Panelinde gösterilen alanın etiketi.',

@@ -72,7 +72,7 @@ return [
     'field_synced_with_origin' => 'Synchronisé avec l’origine. Cliquez ou modifiez le champ pour désynchroniser.',
     'field_validation_advanced_instructions' => 'Ajouter des règles de validation plus avancées à ce champ.',
     'field_validation_required_instructions' => 'Permet de contrôler si ce champ est obligatoire ou non.',
-    'fields_always_save_instructions' => 'Toujours enregistrer la valeur du champ, quelle que soit la façon dont les conditions du champ sont évaluées.',
+    'field_conditions_always_save_instructions' => 'Toujours enregistrer la valeur du champ, quelle que soit la façon dont les conditions du champ sont évaluées.',
     'fields_blueprints_description' => 'Les Blueprints définissent les champs pour les structures de contenu comme les collections, les taxonomies, les utilisateurs et les formulaires.',
     'fields_default_instructions' => 'Définissez la valeur par défaut.',
     'fields_display_instructions' => 'L’étiquette du champ affichée dans le Panneau de configuration.',

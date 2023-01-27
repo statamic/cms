@@ -71,7 +71,7 @@ return [
     'field_synced_with_origin' => 'Szinkronizálva a forrással. Kattintson vagy szerkessze a mezőt a szinkronizálás megszüntetéséhez.',
     'field_validation_advanced_instructions' => 'Adjon ehhez a mezőhöz további validációs szabályt.',
     'field_validation_required_instructions' => 'Adja meg, hogy ez a mező kötelező-e vagy sem.',
-    'fields_always_save_instructions' => 'Mindig mentse a mező értékét, függetlenül attól, hogy a mezők hogyan kerülnek kiértékelésre.',
+    'field_conditions_always_save_instructions' => 'Mindig mentse a mező értékét, függetlenül attól, hogy a mezők hogyan kerülnek kiértékelésre.',
     'fields_blueprints_description' => 'A Blueprintek határozzák meg a Gyűjtemények, Taxonómiák, Felhasználók és Űrlapok mezőit és tartalmi felépítésüket.',
     'fields_default_instructions' => 'Állítsa be az alapértelmezett értéket.',
     'fields_display_instructions' => 'A mező neve, ahogy az a Vezérlőpulton jelenik meg.',

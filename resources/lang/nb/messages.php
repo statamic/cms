@@ -72,7 +72,7 @@ return [
     'field_synced_with_origin' => 'Synkronisert med opprinnelse. Klikk eller rediger feltet for å avsynkronisere.',
     'field_validation_advanced_instructions' => 'Legg til mer avansert validering i dette feltet.',
     'field_validation_required_instructions' => 'Kontroller om dette feltet er obligatorisk eller ikke.',
-    'fields_always_save_instructions' => 'Alltid lagre innhold i felt, uavhengig av om vilkårene er gyldig.',
+    'field_conditions_always_save_instructions' => 'Alltid lagre innhold i felt, uavhengig av om vilkårene er gyldig.',
     'fields_blueprints_description' => 'Blueprint definerer feltene for innholdsstrukturer som samlinger, taksonomier, brukere og skjemaer.',
     'fields_default_instructions' => 'Angi standardverdien.',
     'fields_display_instructions' => 'Feltets etikett vises i kontrollpanelet.',

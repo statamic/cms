@@ -64,7 +64,7 @@ return [
     'field_synced_with_origin' => 'Sincronizado con el origen. Haz clic o edita el campo para desincronizar.',
     'field_validation_advanced_instructions' => 'Agrega una validación más avanzada a este campo.',
     'field_validation_required_instructions' => 'Controla si este campo es obligatorio o no.',
-    'fields_always_save_instructions' => 'Guarde siempre el valor del campo, independientemente de cómo se evalúen las condiciones del campo.',
+    'field_conditions_always_save_instructions' => 'Guarde siempre el valor del campo, independientemente de cómo se evalúen las condiciones del campo.',
     'fields_blueprints_description' => 'Los planos definen los campos para estructuras de contenido como colecciones, taxonomías, usuarios y formularios.',
     'fields_default_instructions' => 'Establezca el valor predeterminado.',
     'fields_display_instructions' => 'La etiqueta del campo mostrado en el Panel de Control.',
