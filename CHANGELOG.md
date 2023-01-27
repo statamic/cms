@@ -1,5 +1,28 @@
 # Release Notes
 
+## 3.3.66 (2023-01-26)
+
+### What's new
+- Support Vite assets in the Control Panel. [#6869](https://github.com/statamic/cms/issues/6869) by @jacksleight
+- Dynamic Antlers Tags and Variables. [#7164](https://github.com/statamic/cms/issues/7164) by @JohnathonKoster
+- SVG tag allows adding `title` and `desc` elements. [#7348](https://github.com/statamic/cms/issues/7348) by @jackmcdade
+
+### What's improved
+- Custom rules are displayed in the validation builder dropdown. [#7363](https://github.com/statamic/cms/issues/7363) by @jacksleight
+- Dutch translations. [#7404](https://github.com/statamic/cms/issues/7404) by @oakeddev
+
+### What's fixed
+- Fix issue where some asset directories wouldn't appear. [#7205](https://github.com/statamic/cms/issues/7205) by @jasonvarga
+- Fix error when using taxonomy terms in navs. [#7407](https://github.com/statamic/cms/issues/7407) by @FrittenKeeZ
+- Fix modifier exceptions losing their stack trace. [#7409](https://github.com/statamic/cms/issues/7409) by @jasonvarga
+- Fix missing form values in submission emails. [#7369](https://github.com/statamic/cms/issues/7369) by @jacksleight
+- Fix Eloquent user login timestamps not being set. [#7402](https://github.com/statamic/cms/issues/7402) by @ryanmitchell
+- Fix Antlers issuess where variables could leak into other places. [#7353](https://github.com/statamic/cms/issues/7353) [#7392](https://github.com/statamic/cms/issues/7392) by @JohnathonKoster
+- Fix Antlers issue where variables were being overzealously cached. [#7390](https://github.com/statamic/cms/issues/7390) by @JohnathonKoster
+- Fix revealer fields disappearing on save. [#7388](https://github.com/statamic/cms/issues/7388) by @jesseleite
+
+
+
 ## 3.3.65 (2023-01-18)
 
 ### What's new
