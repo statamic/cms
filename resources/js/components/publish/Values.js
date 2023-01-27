@@ -1,4 +1,7 @@
 import { clone } from  '../../bootstrap/globals.js'
+import { data_get } from  '../../bootstrap/globals.js'
+import { data_set } from  '../../bootstrap/globals.js'
+import isObject from 'underscore/modules/isObject.js'
 
 export default class {
     constructor(values, jsonFields) {
@@ -9,25 +12,36 @@ export default class {
             .sort();
     }
 
-    omit(hiddenKeys) {
+    get(dottedKey) {
+        let decodedValues = new this.constructor(clone(this.values), this.jsonFields)
+            .jsonDecode()
+            .values;
+
+        return data_get(decodedValues, dottedKey);
+    }
+
+    set(dottedKey, value)  {
         this.jsonDecode()
-            .omitHiddenFields(hiddenKeys)
+            .setValue(dottedKey, value)
             .jsonEncode();
 
+        return this;
+    }
+
+    except(dottedKeys) {
+        return this.jsonDecode()
+            .rejectValuesByKey(dottedKeys)
+            .jsonEncode()
+            .all();
+    }
+
+    all() {
         return this.values;
     }
 
     jsonDecode() {
         this.jsonFields.forEach(dottedKey => {
             this.jsonDecodeValue(dottedKey);
-        });
-
-        return this;
-    }
-
-    omitHiddenFields(hiddenKeys) {
-        hiddenKeys.forEach(dottedKey => {
-            this.forgetValue(dottedKey);
         });
 
         return this;
@@ -79,6 +93,20 @@ export default class {
         eval(jsPath + ' = encodedFieldValue');
 
         this.values = values;
+    }
+
+    setValue(dottedKey, value) {
+        data_set(this.values, dottedKey, value);
+
+        return this;
+    }
+
+    rejectValuesByKey(dottedKeys) {
+        dottedKeys.forEach(dottedKey => {
+            this.forgetValue(dottedKey);
+        });
+
+        return this;
     }
 
     forgetValue(dottedKey) {

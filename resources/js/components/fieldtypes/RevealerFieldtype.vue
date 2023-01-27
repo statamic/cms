@@ -50,11 +50,6 @@ export default {
     watch: {
         fieldPath(fieldPath) {
             this.$store.commit(`publish/${this.storeName}/setRevealerField`, fieldPath);
-        },
-        value(value, oldValue) {
-            if (!value && oldValue) {
-                this.buttonReveal();   
-            }
         }
     },
 
