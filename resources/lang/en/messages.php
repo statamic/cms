@@ -68,7 +68,7 @@ return [
     'entry_origin_instructions' => 'The new localization will inherit values from the entry in the selected site.',
     'expect_root_instructions' => 'Consider the first page in the tree a "root" or "home" page.',
     'field_conditions_instructions' => 'When to show or hide this field.',
-    'field_conditions_always_save_instructions' => 'Always save field value, even if field is conditionally hidden.',
+    'field_conditions_always_save_instructions' => 'Always save field value, even if field is hidden.',
     'field_desynced_from_origin' => 'Desynced from origin. Click to sync and revert to the origin\'s value.',
     'field_synced_with_origin' => 'Synced with origin. Click or edit the field to desync.',
     'field_validation_advanced_instructions' => 'Add more advanced validation to this field.',
