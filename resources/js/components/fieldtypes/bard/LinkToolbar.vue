@@ -122,6 +122,7 @@
             :columns="[{ label: __('Title'), field: 'title' }]"
             :max-items="1"
             :site="bard.site"
+            :search="true"
             @loading="isLoading = $event"
             @item-data-updated="entrySelected"
         />
