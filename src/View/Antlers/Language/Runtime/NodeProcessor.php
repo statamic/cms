@@ -12,6 +12,7 @@ use ParseError;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser;
+use Statamic\Data\DataCollection;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
@@ -1681,7 +1682,9 @@ class NodeProcessor
                         $this->data = $lockData;
 
                         if (is_object($output)) {
-                            if ($output instanceof Collection) {
+                            if ($output instanceof DataCollection) {
+                                $output = RuntimeValues::resolveWithRuntimeIsolation($output);
+                            } else if ($output instanceof Collection) {
                                 $output = $output->all();
                             }
 
