@@ -1684,7 +1684,7 @@ class NodeProcessor
                         if (is_object($output)) {
                             if ($output instanceof DataCollection) {
                                 $output = RuntimeValues::resolveWithRuntimeIsolation($output);
-                            } else if ($output instanceof Collection) {
+                            } elseif ($output instanceof Collection) {
                                 $output = $output->all();
                             }
 
