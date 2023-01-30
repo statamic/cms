@@ -1,5 +1,19 @@
 # Release Notes
 
+## 3.4.1 (2023-01-30)
+
+### What's improved
+- Dutch translations. [#7418](https://github.com/statamic/cms/issues/7418) by @oakeddev
+- German translations. [#7422](https://github.com/statamic/cms/issues/7422) by @helloDanuk
+
+### What's fixed
+- Fix Bard backwards compatibility. [#7433](https://github.com/statamic/cms/issues/7433) by @jasonvarga
+- Fix preferences listing errors when using Eloquent users. [#7430](https://github.com/statamic/cms/issues/7430) by @jesseleite
+- Prevent Vite error when missing alias in app config file. [#7429](https://github.com/statamic/cms/issues/7429) by @jacksleight
+- Revert "Easier Dynamic Antlers Tags and Variables (#7164)" [#7435](https://github.com/statamic/cms/issues/7435) by @jasonvarga
+
+
+
 ## 3.4.0 (2023-01-27)
 
 ### What's new
@@ -30,11 +44,18 @@
 
 
 
+## 3.3.67 (2023-01-30)
+
+### What's fixed
+- Reverted "Dynamic Antlers Tags and Variables" [#7420](https://github.com/statamic/cms/issues/7420) by @edalzell
+
+
+
 ## 3.3.66 (2023-01-26)
 
 ### What's new
 - Support Vite assets in the Control Panel. [#6869](https://github.com/statamic/cms/issues/6869) by @jacksleight
-- Dynamic Antlers Tags and Variables. [#7164](https://github.com/statamic/cms/issues/7164) by @JohnathonKoster
+- ~~Dynamic Antlers Tags and Variables.~~ Reverted in 3.3.67/3.4.1 [#7164](https://github.com/statamic/cms/issues/7164) by @JohnathonKoster
 - SVG tag allows adding `title` and `desc` elements. [#7348](https://github.com/statamic/cms/issues/7348) by @jackmcdade
 
 ### What's improved
