@@ -230,7 +230,7 @@ class Bard extends Replicator
             $value = $this->convertLegacyData($value);
         }
 
-        $value = $this->handleLegacyTiptap($value);
+        $value = $this->convertLegacyTiptap($value);
 
         return (new Augmentor($this))->augment($value, $shallow);
     }
@@ -341,7 +341,7 @@ class Bard extends Replicator
             $value = $this->convertLegacyData($value);
         }
 
-        $value = $this->handleLegacyTiptap($value);
+        $value = $this->convertLegacyTiptap($value);
 
         if ($this->config('inline')) {
             // Root should be text, if it's not this must be a block field converted
@@ -483,7 +483,7 @@ class Bard extends Replicator
         })->all();
     }
 
-    protected function handleLegacyTiptap($value)
+    protected function convertLegacyTiptap($value)
     {
         if (is_string($value)) {
             return $value;
@@ -495,7 +495,7 @@ class Bard extends Replicator
             }
 
             if (is_array($item)) {
-                return $this->handleLegacyTiptap($item);
+                return $this->convertLegacyTiptap($item);
             }
 
             if ($key === 'type') {
