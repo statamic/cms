@@ -8,10 +8,12 @@ use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use IteratorAggregate;
 use JsonSerializable;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesGqlValues;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\Compare;
 use Traversable;
 
-class Values implements ArrayAccess, Arrayable, IteratorAggregate, JsonSerializable
+class Values implements ArrayAccess, Arrayable, IteratorAggregate, JsonSerializable, ResolvesGqlValues
 {
     protected $instance;
 
@@ -115,5 +117,25 @@ class Values implements ArrayAccess, Arrayable, IteratorAggregate, JsonSerializa
     public function jsonSerialize()
     {
         return $this->all();
+    }
+
+    public function resolveGqlValue($field)
+    {
+        $value = $this->$field;
+
+        if ($value instanceof Value) {
+            $value = $value->value();
+        }
+
+        if ($value instanceof Builder) {
+            $value = $value->get();
+        }
+
+        return $value;
+    }
+
+    public function resolveRawGqlValue($field)
+    {
+        return $this->raw($field);
     }
 }
