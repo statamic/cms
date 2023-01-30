@@ -22,7 +22,7 @@ class TemplateTest extends ParserTestCase
     {
         Log::shouldReceive('debug')->once()
             ->with('Cannot loop over non-loopable variable: {{ string }}', [
-                'line' => 1, 'file' => ''
+                'line' => 1, 'file' => '',
             ]);
 
         $template = '{{ string }} {{ /string }}';
@@ -35,7 +35,7 @@ class TemplateTest extends ParserTestCase
     {
         Log::shouldReceive('debug')->once()
             ->with('Cannot render an array variable as a string: {{ simple }}', [
-                'line' => 1, 'file' => ''
+                'line' => 1, 'file' => '',
             ]);
 
         $template = '{{ simple }}';
@@ -46,7 +46,7 @@ class TemplateTest extends ParserTestCase
     public function test_rendering_a_non_array_variable_reports_current_file()
     {
         Log::shouldReceive('debug')->once()->with('Cannot render an array variable as a string: {{ an_array_value }}', [
-            'line' => 3, 'file' => 'the_partial.antlers.html'
+            'line' => 3, 'file' => 'the_partial.antlers.html',
         ]);
 
         Collection::make('pages')->routes(['en' => '/{{slug}}'])->save();
@@ -75,7 +75,7 @@ PARTIAL;
     {
         Log::shouldReceive('debug')->once()
             ->with('Cannot render an object variable as a string: {{ object }}', [
-                'line' => 1, 'file' => ''
+                'line' => 1, 'file' => '',
             ]);
 
         $object = new class
@@ -90,7 +90,7 @@ PARTIAL;
     {
         Log::shouldReceive('debug')->once()
             ->with('Cannot loop over non-loopable variable: {{ object }}', [
-                'line' => 1, 'file' => ''
+                'line' => 1, 'file' => '',
             ]);
 
         $nonArrayableObject = new NonArrayableObject([
