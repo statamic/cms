@@ -230,6 +230,8 @@ class Bard extends Replicator
             $value = $this->convertLegacyData($value);
         }
 
+        $value = $this->convertLegacyTiptap($value);
+
         return (new Augmentor($this))->augment($value, $shallow);
     }
 
@@ -338,6 +340,8 @@ class Bard extends Replicator
         } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
         }
+
+        $value = $this->convertLegacyTiptap($value);
 
         if ($this->config('inline')) {
             // Root should be text, if it's not this must be a block field converted
@@ -476,6 +480,29 @@ class Bard extends Replicator
                     ],
                 ],
             ];
+        })->all();
+    }
+
+    protected function convertLegacyTiptap($value)
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        return collect($value)->map(function ($item, $key) {
+            if (is_array($item) && ($item['type'] ?? null) === 'set') {
+                return $item;
+            }
+
+            if (is_array($item)) {
+                return $this->convertLegacyTiptap($item);
+            }
+
+            if ($key === 'type') {
+                return Str::camel($item);
+            }
+
+            return $item;
         })->all();
     }
 
