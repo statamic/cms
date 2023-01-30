@@ -59,7 +59,7 @@
                     </div>
                 </td>
                 <td class="text-right text-2xs text-grey-50">
-                    @if (auth()->user()->hasPreference('nav'))
+                    @if (Statamic\Facades\User::current()->hasPreference('nav'))
                         {{ __('Modified') }}
                     @endif
                 </td>
