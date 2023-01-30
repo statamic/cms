@@ -13,7 +13,7 @@
 @endforeach
 
 @foreach (Statamic::availableVites(request()) as $package => $vite)
-    {{ Vite::useHotFile($vite['hotFile'])
+    {{ \Illuminate\Support\Facades\Vite::useHotFile($vite['hotFile'])
            ->useBuildDirectory($vite['buildDirectory'])
            ->withEntryPoints($vite['input']) }}
 @endforeach
