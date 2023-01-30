@@ -1,10 +1,17 @@
 # Release Notes
 
+## 3.3.67 (2023-01-30)
+
+### What's fixed
+- Reverted "Dynamic Antlers Tags and Variables" [#7420](https://github.com/statamic/cms/issues/7420) by @edalzell
+
+
+
 ## 3.3.66 (2023-01-26)
 
 ### What's new
 - Support Vite assets in the Control Panel. [#6869](https://github.com/statamic/cms/issues/6869) by @jacksleight
-- Dynamic Antlers Tags and Variables. [#7164](https://github.com/statamic/cms/issues/7164) by @JohnathonKoster
+- ~~Dynamic Antlers Tags and Variables.~~ Reverted in 3.3.67 [#7164](https://github.com/statamic/cms/issues/7164) by @JohnathonKoster
 - SVG tag allows adding `title` and `desc` elements. [#7348](https://github.com/statamic/cms/issues/7348) by @jackmcdade
 
 ### What's improved
