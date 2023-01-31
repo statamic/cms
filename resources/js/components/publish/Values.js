@@ -3,7 +3,7 @@ import { data_get } from  '../../bootstrap/globals.js'
 import { data_set } from  '../../bootstrap/globals.js'
 import isObject from 'underscore/modules/isObject.js'
 
-export default class {
+export default class Values {
     constructor(values, jsonFields) {
         this.values = clone(values);
 
