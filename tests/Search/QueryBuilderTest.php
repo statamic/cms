@@ -50,16 +50,19 @@ class QueryBuilderTest extends TestCase
         $resultA->shouldReceive('setRawResult')->with(['reference' => 'entry::a', 'search_score' => 2])->once()->andReturnSelf();
         $resultA->shouldReceive('setScore')->with(2)->once()->andReturnSelf();
         $resultA->shouldReceive('getScore')->andReturn(2)->once();
+        $resultA->shouldReceive('getReference')->andReturn('entry::a')->once();
         $resultB = Mockery::mock(SearchResult::class);
         $resultB->shouldReceive('setIndex')->once()->andReturnSelf();
         $resultB->shouldReceive('setRawResult')->with(['reference' => 'user::b', 'search_score' => 1])->once()->andReturnSelf();
         $resultB->shouldReceive('setScore')->with(1)->once()->andReturnSelf();
         $resultB->shouldReceive('getScore')->andReturn(1)->once();
+        $resultB->shouldReceive('getReference')->andReturn('user::b')->once();
         $resultC = Mockery::mock(SearchResult::class);
         $resultC->shouldReceive('setIndex')->once()->andReturnSelf();
         $resultC->shouldReceive('setRawResult')->with(['reference' => 'entry::c', 'search_score' => 3])->once()->andReturnSelf();
         $resultC->shouldReceive('setScore')->with(3)->once()->andReturnSelf();
         $resultC->shouldReceive('getScore')->andReturn(3)->once();
+        $resultC->shouldReceive('getReference')->andReturn('entry::c')->once();
 
         $a = Mockery::mock(Searchable::class);
         $a->shouldReceive('toSearchResult')->andReturn($resultA);
