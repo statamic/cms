@@ -566,7 +566,7 @@ export default {
                     }
 
                     this.quickSave = false;
-                }).catch(e => {});
+                }).catch(e => console.error(e));
         },
 
         confirmPublish() {
