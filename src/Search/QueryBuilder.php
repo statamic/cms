@@ -61,11 +61,9 @@ abstract class QueryBuilder extends BaseQueryBuilder
                 ->find($ids)
                 ->map->toSearchResult()
                 ->each(function (Result $result) use ($results) {
-                    $raw = $results[$result->getReference()];
-
                     return $result
                         ->setIndex($this->index)
-                        ->setRawResult($raw)
+                        ->setRawResult($raw = $results[$result->getReference()])
                         ->setScore($raw['search_score'] ?? null);
                 });
         })
