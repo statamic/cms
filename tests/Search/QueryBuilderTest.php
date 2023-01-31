@@ -72,7 +72,7 @@ class QueryBuilderTest extends TestCase
         $c->shouldReceive('toSearchResult')->andReturn($resultC);
 
         $foo = Mockery::mock(ProvidesSearchables::class);
-        $foo->shouldReceive('find')->with(['a', 'c'])->andReturn(collect([$a, $c]));
+        $foo->shouldReceive('find')->with(['a', 'c'])->andReturn(collect([$c, $a])); // return it in the wrong order to make sure it gets ordered by score
         $this->app->instance(\Statamic\Search\Searchables\Entries::class, $foo);
 
         $bar = Mockery::mock(ProvidesSearchables::class);
