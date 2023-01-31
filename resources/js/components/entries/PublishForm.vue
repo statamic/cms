@@ -569,7 +569,7 @@ export default {
 
                     this.quickSave = false;
                     this.isAutosave = false;
-                }).catch(e => {});
+                }).catch(e => console.error(e));
         },
 
         confirmPublish() {

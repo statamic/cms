@@ -30,6 +30,8 @@ export default {
     methods: {
 
         resetValuesFromResponse(responseValues) {
+            if (!responseValues) return this.values;
+
             let preserveFields = ['id'].concat(this.revealerFields);
             let originalValues = new Values(this.values, this.jsonSubmittingFields);
             let newValues = new Values(responseValues, this.jsonSubmittingFields);
