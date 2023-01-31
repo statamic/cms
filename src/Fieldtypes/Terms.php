@@ -264,9 +264,9 @@ class Terms extends Relationship
             }
 
             $blueprints = $taxonomy->termBlueprints();
-            
+
             $taxonomies = is_countable($taxonomies) ? $taxonomies : [$taxonomies];
-            
+
             return $blueprints->map(function ($blueprint) use ($taxonomy, $taxonomies, $blueprints) {
                 return [
                     'title' => $this->getCreatableTitle($taxonomy, $blueprint, count($taxonomies), $blueprints->count()),
