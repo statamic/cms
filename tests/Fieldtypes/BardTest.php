@@ -14,6 +14,7 @@ use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Tiptap\Core\Node;
 
 class BardTest extends TestCase
 {
@@ -132,6 +133,20 @@ class BardTest extends TestCase
     /** @test */
     public function it_augments_tiptap_v1_snake_case_types_to_v2_camel_case_types()
     {
+        Augmentor::addExtension('customNode', new class extends Node
+        {
+            public static $name = 'customNode';
+
+            public function renderHTML($node, $HTMLAttributes = [])
+            {
+                return [
+                    'div',
+                    ['type' => $node->attrs->type],
+                    0,
+                ];
+            }
+        });
+
         $data = [
             [
                 'type' => 'paragraph',
@@ -151,6 +166,12 @@ class BardTest extends TestCase
                         'type' => 'text',
                         'text' => ' text.',
                     ],
+                ],
+            ],
+            [
+                'type' => 'custom_node',
+                'attrs' => [
+                    'type' => 'custom_type_attribute', // shouldn't be camel cased
                 ],
             ],
             [
@@ -187,7 +208,7 @@ class BardTest extends TestCase
         $expected = [
             [
                 'type' => 'text',
-                'text' => '<p>This is <strong>bold</strong> text.</p>',
+                'text' => '<p>This is <strong>bold</strong> text.</p><div type="custom_type_attribute"></div>',
             ],
             [
                 'id' => '123',
@@ -815,6 +836,13 @@ EOT;
                     ],
                 ],
             ],
+
+            [
+                'type' => 'custom_node',
+                'attrs' => [
+                    'type' => 'custom_type_attribute', // shouldn't be camel cased
+                ],
+            ],
             [
                 'type' => 'set',
                 'attrs' => [
@@ -868,6 +896,12 @@ EOT;
                 ],
             ],
             [
+                'type' => 'customNode',
+                'attrs' => [
+                    'type' => 'custom_type_attribute',
+                ],
+            ],
+            [
                 'type' => 'set',
                 'attrs' => [
                     'id' => '123',
@@ -900,21 +934,6 @@ EOT;
         ];
 
         $this->assertEquals($expected, json_decode($this->bard()->preProcess($data), true));
-    }
-
-    /** @test */
-    public function it_doesnt_convert_custom_type_attrs_to_camel_case()
-    {
-        $data = [
-            [
-                'type' => 'myCustomNode',
-                'attrs' => [
-                    'type' => 'my_custom_type_attr',
-                ],
-            ],
-        ];
-
-        $this->assertEquals($data, json_decode($this->bard()->preProcess($data), true));
     }
 
     private function bard($config = [])
