@@ -23,10 +23,6 @@ interface Result extends Augmentable
 
     public function setScore(int $score);
 
-    public function getSnippets(): array;
-
-    public function setSnippets(array $snippets);
-
     public function getType(): string;
 
     public function setType(string $type): self;

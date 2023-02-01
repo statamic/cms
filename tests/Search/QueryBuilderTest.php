@@ -40,28 +40,25 @@ class QueryBuilderTest extends TestCase
         // and users providers in the container with the mocks.
 
         $items = collect([
-            ['reference' => 'entry::a', 'search_score' => 2, 'search_snippets' => []],
-            ['reference' => 'user::b', 'search_score' => 1, 'search_snippets' => []],
-            ['reference' => 'entry::c', 'search_score' => 3, 'search_snippets' => []],
+            ['reference' => 'entry::a', 'search_score' => 2],
+            ['reference' => 'user::b', 'search_score' => 1],
+            ['reference' => 'entry::c', 'search_score' => 3],
         ]);
 
         $resultA = Mockery::mock(SearchResult::class);
         $resultA->shouldReceive('setIndex')->once()->andReturnSelf();
-        $resultA->shouldReceive('setRawResult')->with(['reference' => 'entry::a', 'search_score' => 2, 'search_snippets' => []])->once()->andReturnSelf();
+        $resultA->shouldReceive('setRawResult')->with(['reference' => 'entry::a', 'search_score' => 2])->once()->andReturnSelf();
         $resultA->shouldReceive('setScore')->with(2)->once()->andReturnSelf();
-        $resultA->shouldReceive('setSnippets')->with([])->once()->andReturnSelf();
         $resultA->shouldReceive('getScore')->andReturn(2)->once();
         $resultB = Mockery::mock(SearchResult::class);
         $resultB->shouldReceive('setIndex')->once()->andReturnSelf();
-        $resultB->shouldReceive('setRawResult')->with(['reference' => 'user::b', 'search_score' => 1, 'search_snippets' => []])->once()->andReturnSelf();
+        $resultB->shouldReceive('setRawResult')->with(['reference' => 'user::b', 'search_score' => 1])->once()->andReturnSelf();
         $resultB->shouldReceive('setScore')->with(1)->once()->andReturnSelf();
-        $resultB->shouldReceive('setSnippets')->with([])->once()->andReturnSelf();
         $resultB->shouldReceive('getScore')->andReturn(1)->once();
         $resultC = Mockery::mock(SearchResult::class);
         $resultC->shouldReceive('setIndex')->once()->andReturnSelf();
-        $resultC->shouldReceive('setRawResult')->with(['reference' => 'entry::c', 'search_score' => 3, 'search_snippets' => []])->once()->andReturnSelf();
+        $resultC->shouldReceive('setRawResult')->with(['reference' => 'entry::c', 'search_score' => 3])->once()->andReturnSelf();
         $resultC->shouldReceive('setScore')->with(3)->once()->andReturnSelf();
-        $resultC->shouldReceive('setSnippets')->with([])->once()->andReturnSelf();
         $resultC->shouldReceive('getScore')->andReturn(3)->once();
 
         $a = Mockery::mock(Searchable::class);
