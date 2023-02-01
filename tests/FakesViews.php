@@ -7,6 +7,10 @@ use Illuminate\View\View;
 
 trait FakesViews
 {
+    protected $fakeView;
+    protected $fakeViewFinder;
+    protected $fakeViewFactory;
+
     public function withFakeViews()
     {
         $originalFactory = $this->app['view'];

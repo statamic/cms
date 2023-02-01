@@ -4,6 +4,7 @@ namespace Tests\Antlers\Runtime;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Nav;
 use Statamic\Facades\Taxonomy;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
@@ -92,5 +93,89 @@ EOT;
 EOT;
 
         $this->assertSame($expected, trim($this->renderString($template, [])));
+    }
+
+    public function test_runtimes_are_isolated_when_evaluating_tags()
+    {
+        $this->withFakeViews();
+
+        $collection = tap(Collection::make('pages')->routes(['en' => '/{{slug}}{{ if deprecated == "true" }}-old{{ /if }}']))->save();
+        EntryFactory::collection('pages')->id('1')->slug('home')->data(['title' => 'Home'])->create();
+        EntryFactory::collection('pages')->id('2')->slug('about')->data(['title' => 'About', 'deprecated' => 'true'])->create();
+        EntryFactory::collection('pages')->id('3')->slug('contact')->data(['title' => 'Contact'])->create();
+
+        $collection->structureContents(['root' => true, 'slugs' => true])->save();
+        $collection->structure()->in('en')->tree([
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
+        ])->save();
+
+        $nav = Nav::make('test');
+        $nav->makeTree('en', [
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
+        ])->save();
+
+        $nav->save();
+
+        $template = <<<'EOT'
+{{ title }}
+--------------------------------
+{{ nav:test }}
+{{ title }} -> {{ url }}
+{{ /nav:test }}
+EOT;
+
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('default', $template);
+
+        $expected = <<<'EXPECTED'
+About
+--------------------------------
+
+Home -> /
+
+About -> /about-old
+
+Contact -> /contact
+EXPECTED;
+
+        $response = $this->get('/about-old')->assertOk();
+
+        $this->assertSame(StringUtilities::normalizeLineEndings($expected), StringUtilities::normalizeLineEndings(trim($response->content())));
+    }
+
+    public function test_runtime_assignment_variable_leak_multiple_requests_inside_same_process()
+    {
+        Collection::make('pages')->routes(['en' => '{slug}'])->save();
+        EntryFactory::collection('pages')->id('1')->slug('one')->data(['title' => 'One', 'template' => 'template_one'])->create();
+        EntryFactory::collection('pages')->id('2')->slug('two')->data(['title' => 'Two', 'template' => 'template_two'])->create();
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+
+        $this->viewShouldReturnRaw('breadcrumb', '{{ _breadcrumb_title ?? title }}');
+
+        $templateOne = <<<'EOT'
+{{ _breadcrumb_title = "A new title" }}
+{{ partial src="breadcrumb" }}
+EOT;
+
+        $templateTwo = <<<'EOT'
+{{ partial src="breadcrumb" }}
+EOT;
+
+        $this->viewShouldReturnRaw('template_one', $templateOne);
+        $this->viewShouldReturnRaw('template_two', $templateTwo);
+
+        $responseOne = $this->get('one')->assertOk();
+        $content = trim($responseOne->content());
+        $responseTwo = $this->get('two')->assertOk();
+        $contentTwo = trim($responseTwo->content());
+
+        $this->assertSame('A new title', $content);
+        $this->assertSame('Two', $contentTwo);
     }
 }

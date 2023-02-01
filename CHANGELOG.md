@@ -1,5 +1,207 @@
 # Release Notes
 
+## 3.4.1 (2023-01-30)
+
+### What's improved
+- Dutch translations. [#7418](https://github.com/statamic/cms/issues/7418) by @oakeddev
+- German translations. [#7422](https://github.com/statamic/cms/issues/7422) by @helloDanuk
+
+### What's fixed
+- Fix Bard backwards compatibility. [#7433](https://github.com/statamic/cms/issues/7433) by @jasonvarga
+- Fix preferences listing errors when using Eloquent users. [#7430](https://github.com/statamic/cms/issues/7430) by @jesseleite
+- Prevent Vite error when missing alias in app config file. [#7429](https://github.com/statamic/cms/issues/7429) by @jacksleight
+- Revert "Easier Dynamic Antlers Tags and Variables (#7164)" [#7435](https://github.com/statamic/cms/issues/7435) by @jasonvarga
+
+
+
+## 3.4.0 (2023-01-27)
+
+### What's new
+- Preference management UI in the Control Panel. [#7226](https://github.com/statamic/cms/issues/7226) by @jasonvarga
+- Ability to customize the Control Panel Nav. [#6678](https://github.com/statamic/cms/issues/6678) by @jesseleite
+- A bunch of search features, improvements, and fixes. [#6318](https://github.com/statamic/cms/issues/6318) by @jasonvarga
+- Ability to process/resize image assets on upload. [#6040](https://github.com/statamic/cms/issues/6040) by @jesseleite
+- Bard: Upgraded Tiptap to version 2. [#6043](https://github.com/statamic/cms/issues/6043) by @wiebkevogel
+- Bard: Smart Typography. [#7326](https://github.com/statamic/cms/issues/7326) by @jackmcdade
+- Bard: Inline mode. [#6973](https://github.com/statamic/cms/issues/6973) by @jacksleight
+- Bard: Text align support to Bard [#6450](https://github.com/statamic/cms/issues/6450) by @jacksleight
+- Bard: Placeholder and character limit support. [#6449](https://github.com/statamic/cms/issues/6449) by @jacksleight
+- Bard: Ability to use a custom Tiptap Editor class. [#6422](https://github.com/statamic/cms/issues/6422) by @jacksleight
+- Experimental: Autosave for entries. [#6198](https://github.com/statamic/cms/issues/6198) by @wiebkevogel
+
+### What's improved
+- The Runtime Antlers parser is now the default. [#6414](https://github.com/statamic/cms/issues/6414) by @jasonvarga
+- Action classes have more access to selected items. [#7261](https://github.com/statamic/cms/issues/7261) by @jasonvarga
+- Bard: Improve PHP extension syntax. [#6421](https://github.com/statamic/cms/issues/6421) by @jacksleight
+
+### What's fixed
+- Ability to defer permission and utility registration, which fixes incorrect translations. [#7343](https://github.com/statamic/cms/issues/7343) by @jasonvarga
+- Replicator, Bard, and Grid items `id` fields are available in templates, GraphQL and REST API. [#7279](https://github.com/statamic/cms/issues/7279) by @arthurperton
+- Respect ascii replace option in JavaScript slugify function. [#6338](https://github.com/statamic/cms/issues/6338) by @jasonvarga
+
+### What's changed
+- A number of these items may contain breaking changes. Consult the [3.4 upgrade guide](https://statamic.dev/upgrade-guide/3-3-to-3-4).
+
+
+
+## 3.3.67 (2023-01-30)
+
+### What's fixed
+- Reverted "Dynamic Antlers Tags and Variables" [#7420](https://github.com/statamic/cms/issues/7420) by @edalzell
+
+
+
+## 3.3.66 (2023-01-26)
+
+### What's new
+- Support Vite assets in the Control Panel. [#6869](https://github.com/statamic/cms/issues/6869) by @jacksleight
+- ~~Dynamic Antlers Tags and Variables.~~ Reverted in 3.3.67/3.4.1 [#7164](https://github.com/statamic/cms/issues/7164) by @JohnathonKoster
+- SVG tag allows adding `title` and `desc` elements. [#7348](https://github.com/statamic/cms/issues/7348) by @jackmcdade
+
+### What's improved
+- Custom rules are displayed in the validation builder dropdown. [#7363](https://github.com/statamic/cms/issues/7363) by @jacksleight
+- Dutch translations. [#7404](https://github.com/statamic/cms/issues/7404) by @oakeddev
+
+### What's fixed
+- Fix issue where some asset directories wouldn't appear. [#7205](https://github.com/statamic/cms/issues/7205) by @jasonvarga
+- Fix error when using taxonomy terms in navs. [#7407](https://github.com/statamic/cms/issues/7407) by @FrittenKeeZ
+- Fix modifier exceptions losing their stack trace. [#7409](https://github.com/statamic/cms/issues/7409) by @jasonvarga
+- Fix missing form values in submission emails. [#7369](https://github.com/statamic/cms/issues/7369) by @jacksleight
+- Fix Eloquent user login timestamps not being set. [#7402](https://github.com/statamic/cms/issues/7402) by @ryanmitchell
+- Fix Antlers issuess where variables could leak into other places. [#7353](https://github.com/statamic/cms/issues/7353) [#7392](https://github.com/statamic/cms/issues/7392) by @JohnathonKoster
+- Fix Antlers issue where variables were being overzealously cached. [#7390](https://github.com/statamic/cms/issues/7390) by @JohnathonKoster
+- Fix revealer fields disappearing on save. [#7388](https://github.com/statamic/cms/issues/7388) by @jesseleite
+
+
+
+## 3.3.65 (2023-01-18)
+
+### What's new
+- PHP 8.2 support. [#7299](https://github.com/statamic/cms/issues/7299) by @jasonvarga
+- Ability to pass an array of roles into the `user_roles` tag. [#7328](https://github.com/statamic/cms/issues/7328) by @edalzell
+
+### What's improved
+- When using revisions, the publish action button takes into consideration whether you can manage publish state. [#7168](https://github.com/statamic/cms/issues/7168) by @arthurperton
+- Pasting multiple lines into the `list` fieldtype will create multiple list items. [#7340](https://github.com/statamic/cms/issues/7340) by @jacksleight
+
+### What's fixed
+- Fix how user blueprint fields are handled in a few cases. [#7368](https://github.com/statamic/cms/issues/7368) by @jesseleite
+- Fix misspelling [#7354](https://github.com/statamic/cms/issues/7354) by @stefanbauer
+- Improve memory leak and garbage collection in Antlers. [#7361](https://github.com/statamic/cms/issues/7361) [#7367](https://github.com/statamic/cms/issues/7367) by @JohnathonKoster
+- Fix `revealer` fields disappearing on save. [#7329](https://github.com/statamic/cms/issues/7329) by @jacksleight
+- Use customizable create label on the empty collection listing view. [#7323](https://github.com/statamic/cms/issues/7323) by @arthurperton
+
+
+
+## 3.3.64 (2023-01-06)
+
+### What's new
+- The searchable item is now passed into search transformers. [#7305](https://github.com/statamic/cms/issues/7305) by @okaufmann
+- You are now required to enter your existing password in order to change it, in the CP. [#7287](https://github.com/statamic/cms/issues/7287) by @jasonvarga
+
+### What's improved
+- Danish translations. [#7314](https://github.com/statamic/cms/issues/7314) by @rabol
+- French translations. [#7275](https://github.com/statamic/cms/issues/7275) by @ebeauchamps
+- Switch operator parsing in Antlers. [#7283](https://github.com/statamic/cms/issues/7283) by @JohnathonKoster
+
+### What's fixed
+- Fix asset search in nested subdirectories. [#7313](https://github.com/statamic/cms/issues/7313) by @edalzell
+- Sanitize form tokens. [#7309](https://github.com/statamic/cms/issues/7309) by @jackmcdade
+- Rename filename label to path in the Asset editor. [#7303](https://github.com/statamic/cms/issues/7303) by @jasonvarga
+- Fix YAML facade casing. [#7298](https://github.com/statamic/cms/issues/7298) by @beatwiz
+- Add property to translator to prevent deprecation message. [#7289](https://github.com/statamic/cms/issues/7289) by @jasonvarga
+
+
+
+## 3.3.63 (2022-12-21)
+
+### What's new
+- Ability to use separate queue for in the `static:warm` command. [#7184](https://github.com/statamic/cms/issues/7184) by @robbanl
+
+### What's improved
+- Order `collection` and `taxonomy` fieldtype options by title. [#7246](https://github.com/statamic/cms/issues/7246) by @duncanmcclean
+- Order `roles`, `groups`, and `sites` fieldtype options by title. [#7259](https://github.com/statamic/cms/issues/7259) by @j3ll3yfi5h
+- German translations. [#7252](https://github.com/statamic/cms/issues/7252) by @j3ll3yfi5h, [#7260](https://github.com/statamic/cms/issues/7260) by @helloDanuk
+
+### What's fixed
+- Fix duplicate action not respecting entries without slugs. [#7243](https://github.com/statamic/cms/issues/7243) by @duncanmcclean
+- Support `Carbon` values in conditions. [#6931](https://github.com/statamic/cms/issues/6931) by @edalzell
+- Fix focus related JS error when there are no inputs. [#7257](https://github.com/statamic/cms/issues/7257) by @martyf
+- Remove sound effects on tree drag & drop interactions. [#7255](https://github.com/statamic/cms/issues/7255) by @jackmcdade
+
+
+
+## 3.3.62 (2022-12-16)
+
+### What's new
+- Support default manipulations for Glide. Support using aliases in presets. [#7239](https://github.com/statamic/cms/issues/7239) by @jackmcdade
+- Support prepend and append options on the `integer` fieldtype. [#7241](https://github.com/statamic/cms/issues/7241) by @jackmcdade
+- Support for search transformers to be classes. [#7177](https://github.com/statamic/cms/issues/7177) by @ryanmitchell
+
+### What's improved
+- Improve Control Panel's UX when using an invalid site key format. [#7110](https://github.com/statamic/cms/issues/7110) by @joshuablum
+- Links in field instructions will in new windows. [#7223](https://github.com/statamic/cms/issues/7223) by @jackmcdade
+
+### What's fixed
+- Fix asset thumbnails and file icons in entry listings and `assets` field. [#7195](https://github.com/statamic/cms/issues/7195) by @jacksleight
+- Fix autofocusing of the first field in Control Panel forms. [#7242](https://github.com/statamic/cms/issues/7242) by @jackmcdade
+- Fix default preferences not being tracked with the Git integration. [#7230](https://github.com/statamic/cms/issues/7230) by @jesseleite
+- The `color` fieldtype's picker closes when clicking save. [#7219](https://github.com/statamic/cms/issues/7219) by @jacksleight
+- The `collection` widget's "create entry" button works with multiple blueprints. [#7217](https://github.com/statamic/cms/issues/7217) by @jackmcdade
+
+
+
+## 3.3.61 (2022-12-13)
+
+### What's new
+- Add `user:profile_form` and `user:password_form` tags. [#6400](https://github.com/statamic/cms/issues/6400) by @jacksleight
+- Add info about Stache watcher and Static Caching to the `about` and `support:details` commands. [#7213](https://github.com/statamic/cms/issues/7213) by @joshuablum
+
+### What's improved
+- French translations. [#7196](https://github.com/statamic/cms/issues/7196) by @ebeauchamps
+- Hungarian translations. [#7162](https://github.com/statamic/cms/issues/7162) by @zsoltjanes
+
+### What's fixed
+- Handle edits within front-end fields. [#7178](https://github.com/statamic/cms/issues/7178) by @jasonvarga
+- Handle empty checkboxes fieldtype on front-end. [#7180](https://github.com/statamic/cms/issues/7180) by @jasonvarga
+- Fix term slugs not using appropriate language when creating through fieldtype. [#7208](https://github.com/statamic/cms/issues/7208) by @FrittenKeeZ
+- Fix deprecation notices in `link` fieldtype when empty. [#7201](https://github.com/statamic/cms/issues/7201) by @linaspasv
+- Fix Statamic's file cache driver not honoring custom permission setting. [#7189](https://github.com/statamic/cms/issues/7189) by @tomgillett
+- Fix utility route authorization. [#7214](https://github.com/statamic/cms/issues/7214) by @jasonvarga
+- Fix Javascript error on publish form in Chrome. [#7170](https://github.com/statamic/cms/issues/7170) by @arthurperton
+- Fix focal point not saving when editing other asset fields. [#7171](https://github.com/statamic/cms/issues/7171) by @arthurperton
+- Hook up REST API pagination size config. [#7161](https://github.com/statamic/cms/issues/7161) by @duncanmcclean
+- Allow version 6 of `symfony/var-exporter`. [#7191](https://github.com/statamic/cms/issues/7191) by @tomschlick
+- Bump express from 4.17.1 to 4.18.2 [#7187](https://github.com/statamic/cms/issues/7187) by @dependabot
+- Bump minimatch from 3.0.4 to 3.1.2 [#7167](https://github.com/statamic/cms/issues/7167) by @dependabot
+- Bump qs from 6.9.4 to 6.9.7 [#7176](https://github.com/statamic/cms/issues/7176) by @dependabot
+- Fix npm build issues. [#7190](https://github.com/statamic/cms/issues/7190) by @jasonvarga
+
+
+
+## 3.3.60 (2022-12-02)
+
+### What's new
+- Add `when` and `unless` to `partial` tag. [#7054](https://github.com/statamic/cms/issues/7054) by @edalzell
+- Ability to override greeting in activation mail. [#7154](https://github.com/statamic/cms/issues/7154) by @ruslansteiger
+
+### What's improved
+- Replicator and Bard sets can be toggled with a single click. [#7037](https://github.com/statamic/cms/issues/7037) by @jacksleight
+- Improve accessibility for tabs. [#6704](https://github.com/statamic/cms/issues/6704) by @arthurperton
+- Show YouTube Shorts in `video` fieldtype preview. [#7153](https://github.com/statamic/cms/issues/7153) by @duncanmcclean
+- German translations. [#7157](https://github.com/statamic/cms/issues/7157) by @helloDanuk
+- Dutch translations. [#7152](https://github.com/statamic/cms/issues/7152) by @oakeddev
+
+### What's fixed
+- Maintain `sort` parameter in REST API links. [#7158](https://github.com/statamic/cms/issues/7158) by @edalzell
+- Make Antlers value resolution "lazy", and make pluck operator work with nulls. [#7151](https://github.com/statamic/cms/issues/7151) by @JohnathonKoster
+- Prevent deprecation warning when using `yield` tag with no matching section and no fallback. [#7149](https://github.com/statamic/cms/issues/7149) by @xuneXTW
+- Add authorization to "duplicate" actions. [#7150](https://github.com/statamic/cms/issues/7150) by @jasonvarga
+- Avoid wrapping of date fields in listings. [#7146](https://github.com/statamic/cms/issues/7146) by @jackmcdade
+- Allows localization variable to be saved as false. [#7087](https://github.com/statamic/cms/issues/7087) by @tao
+
+
+
 ## 3.3.59 (2022-11-29)
 
 ### What's new

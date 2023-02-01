@@ -2,16 +2,13 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use ProseMirrorToHtml\Marks\Link as DefaultLinkMark;
-use ProseMirrorToHtml\Nodes\Image as DefaultImageNode;
-use ProseMirrorToHtml\Renderer;
+use Closure;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
-use Statamic\Fieldtypes\Bard\ImageNode as CustomImageNode;
-use Statamic\Fieldtypes\Bard\LinkMark as CustomLinkMark;
 use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
+use Tiptap\Editor;
 
 class Augmentor
 {
@@ -20,11 +17,8 @@ class Augmentor
     protected $includeDisabledSets = false;
     protected $augmentSets = true;
     protected $withStatamicImageUrls = false;
-
-    protected static $customMarks = [];
-    protected static $customNodes = [];
-    protected static $replaceMarks = [];
-    protected static $replaceNodes = [];
+    protected static $extensions = [];
+    protected static $extensionReplacements = [];
 
     public function __construct($fieldtype)
     {
@@ -95,7 +89,10 @@ class Augmentor
     {
         return collect($value)->map(function ($value, $index) {
             if ($value['type'] == 'set') {
-                $this->sets[$index] = $value['attrs']['values'];
+                $this->sets[$index] = array_merge(
+                    $value['attrs']['values'],
+                    ['id' => $value['attrs']['id'] ?? null]
+                );
                 $value['index'] = 'index-'.$index;
             }
 
@@ -105,45 +102,24 @@ class Augmentor
 
     public function convertToHtml($value)
     {
-        $customImageNode = $this->withStatamicImageUrls ? StatamicImageNode::class : CustomImageNode::class;
-        $customLinkMark = $this->withStatamicImageUrls ? StatamicLinkMark::class : CustomLinkMark::class;
+        return $this->renderProsemirrorToHtml(['type' => 'doc', 'content' => $value]);
+    }
 
-        $renderer = (new Renderer)
-            ->replaceNode(DefaultImageNode::class, $customImageNode)
-            ->replaceMark(DefaultLinkMark::class, $customLinkMark)
-            ->addNode(SetNode::class)
-            ->addNodes(static::$customNodes)
-            ->addMarks(static::$customMarks);
-
-        foreach (static::$replaceNodes as $searchNode => $replaceNode) {
-            $renderer->replaceNode($searchNode, $replaceNode);
+    public static function addExtensions($extensions)
+    {
+        foreach ($extensions as $name => $extension) {
+            static::addExtension($name, $extension);
         }
-
-        foreach (static::$replaceMarks as $searchMark => $replaceMark) {
-            $renderer->replaceMark($searchMark, $replaceMark);
-        }
-
-        return $renderer->render(['type' => 'doc', 'content' => $value]);
     }
 
-    public static function addNode($node)
+    public static function addExtension($name, $extension)
     {
-        static::$customNodes[] = $node;
+        static::$extensions[$name] = $extension;
     }
 
-    public static function addMark($mark)
+    public static function replaceExtension($name, $extension)
     {
-        static::$customMarks[] = $mark;
-    }
-
-    public static function replaceNode($searchNode, $replaceNode)
-    {
-        static::$replaceNodes[$searchNode] = $replaceNode;
-    }
-
-    public static function replaceMark($searchMark, $replaceMark)
-    {
-        static::$replaceMarks[$searchMark] = $replaceMark;
+        static::$extensionReplacements[$name] = $extension;
     }
 
     protected function convertToSets($html)
@@ -179,7 +155,47 @@ class Augmentor
 
             $values = $this->fieldtype->fields($set['type'])->addValues($set)->{$augmentMethod}()->values()->all();
 
-            return array_merge($values, ['type' => $set['type']]);
+            return array_merge($values, ['id' => $set['id'], 'type' => $set['type']]);
         })->all();
+    }
+
+    public function renderHtmlToProsemirror(string $value)
+    {
+        return $this->editor()->setContent($value)->getDocument();
+    }
+
+    public function renderProsemirrorToHtml(array $value)
+    {
+        return $this->editor()->setContent($value)->getHTML();
+    }
+
+    private function editor()
+    {
+        return app()->makeWith(Editor::class, [
+            'configuration' => [
+                'extensions' => $this->extensions(),
+            ],
+        ]);
+    }
+
+    public function extensions()
+    {
+        $extensions = [];
+        $options = ['withStatamicImageUrls' => $this->withStatamicImageUrls];
+        $args = [$this->fieldtype, $options];
+
+        foreach (static::$extensions as $name => $extension) {
+            $extensions[$name] = $extension instanceof Closure
+                ? $extension(...$args)
+                : $extension;
+        }
+
+        foreach (static::$extensionReplacements as $name => $extension) {
+            $extensions[$name] = $extension instanceof Closure
+                ? $extension($extensions[$name] ?? null, ...$args)
+                : $extension;
+        }
+
+        return Arr::removeNullValues($extensions);
     }
 }

@@ -3,55 +3,55 @@
 return [
 
     'cheatsheet' => '
-<p>Markdown is a text-to-HTML markup syntax for web writers. Markdown allows you to write using an easy-to-read, easy-to-write plain text format that is converted to structurally valid HTML.</p>
+<p>A Markdown egy szöveg-HTML jelölési szintaxis webfejlesztők számára. A Markdown lehetővé teszi, hogy könnyen olvasható és írható egyszerű szöveges formátum hozzunk létre, amit szerkezetileg érvényes HTML-é alakítanak át.</p>
 
-<h3>Headers</h3>
-<pre class="language-markdown"><code># This is an h1
-## This is an h2
-### This is an h3, and so on.
+<h3>Fejlécek</h3>
+<pre class="language-markdown"><code># Ez egy h1
+## Ez egy h2
+### Ez pedig h3 tag, és így tovább.
 </code></pre>
 
-<h3>Bold &amp; Italic</h3>
-<pre class="language-markdown"><code>You can make things *emphasized*, **bold**, or _**both**_.</code></pre>
+<h3>Félkövér és Dőlt</h3>
+<pre class="language-markdown"><code>Szöveges részt *kitudsz emelni*, **félkövérré tudsz alakítani**, vagy _**mindkettő**_.</code></pre>
 
-<h3>Links</h3>
-<pre class="language-markdown"><code>This is an [example link](http://example.com).</code></pre>
+<h3>Hivatkozások</h3>
+<pre class="language-markdown"><code>Ez egy [példa hivatkozás](http://example.com).</code></pre>
 
-<h3>Code</h3>
+<h3>Kód</h3>
 <p>
-Wrap your code with 3 backticks (<code>```</code>) on the line before and after.
+Formázd a kódodat 3 aposztróffal (<code>```</code>) a kód előtt és után.
 </p>
 
 <pre class="language-markdown"><code>```
-this: is some yaml
+ez: egy yaml részlet
 ```</code></pre>
 
-<p>You can also add code inline by wrapping content with <code>`</code> single backticks.
+<p>A szövegrészbe is tudsz kódrészletet megadni, ha 1-1 darab aposztróf <code>`</code> közé rakod a szöveget.
 
-<h3>Quoting</h3>
+<h3>Idézet</h3>
 
-<p>Create a blockquote by starting your text with <code>> </code>.</p>
+<p>Hozzon létre idézetet úgy, hogy a szöveget ezzel kezdi <code>> </code>.</p>
 
-<pre class="language-markdown"><code>> This is going to be a blockquote.</code></pre>
+<pre class="language-markdown"><code>> Ez blokk idézet lesz.</code></pre>
 
-<h3>Images</h3>
-<pre class="language-markdown"><code>![alt text](http://example.com/image.jpg)</code></pre>
+<h3>Képek</h3>
+<pre class="language-markdown"><code>![alternatív szöveg](http://example.com/image.jpg)</code></pre>
 
-<h3>Unordered List</h3>
-<pre class="language-markdown"><code>- Bacon
-- Steak
-- Beer</code></pre>
+<h3>Rendezetlen lista</h3>
+<pre class="language-markdown"><code>- Szalonna
+- Hús
+- Sör</code></pre>
 
-<h3>Ordered List</h3>
-<pre class="language-markdown"><code>1. Eat
-2. Drink
-3. Be merry</code></pre>
+<h3>Rendezett lista</h3>
+<pre class="language-markdown"><code>1. Enni
+2. Inni
+3. Házasodni</code></pre>
 
-<h3>Tables</h3>
+<h3>Táblázat</h3>
 
-<pre class="language-markdown"><code>First Header  | Second Header
-------------- | -------------
-Content Cell  | Content Cell
-Content Cell  | Content Cell</code></pre>',
+<pre class="language-markdown"><code>Első fejléc  | Második fejléc
+--------------- | -------------
+Tartalom cella  | Tartalom cella
+Tartalom cella  | Tartalom cella</code></pre>',
 
 ];

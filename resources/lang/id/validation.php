@@ -17,6 +17,7 @@ return [
     'between.array' => 'Harus memiliki antara :min dan :max item.',
     'boolean' => 'Harus benar atau salah.',
     'confirmed' => 'Konfirmasi tidak cocok.',
+    'current_password' => 'Kata sandi salah.',
     'date' => 'Bukan tanggal yang valid.',
     'date_format' => 'Tidak sesuai dengan format :format.',
     'different' => 'Bidang ini dan :other harus berbeda.',

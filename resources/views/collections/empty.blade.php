@@ -32,7 +32,7 @@
                 @cp_svg('content-writing')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
-                <h3 class="mb-1 text-blue">{{ __('Create Entry') }} @if (!$multipleBlueprints)&rarr;@endif</h3>
+                <h3 class="mb-1 text-blue">{{ $collection->createLabel() }} @if (!$multipleBlueprints)&rarr;@endif</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_create_entry_description') }}</p>
                 @if ($multipleBlueprints)
                     @foreach ($collection->entryBlueprints() as $blueprint)

@@ -13,6 +13,7 @@ class ExportTest extends TestCase
     protected $files;
     protected $configPath;
     protected $exportPath;
+    protected $postInstallHookPath;
 
     public function setUp(): void
     {

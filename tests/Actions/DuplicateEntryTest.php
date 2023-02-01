@@ -84,6 +84,38 @@ class DuplicateEntryTest extends TestCase
         $this->assertFalse((new DuplicateEntry)->authorizeBulk($userWithoutPermission, $items));
     }
 
+    /** @test */
+    public function it_respects_the_collection_not_requiring_slugs()
+    {
+        Collection::make('test')->requiresSlugs(false)->save();
+        EntryFactory::id('alfa-id')->collection('test')->data(['title' => 'Alfa'])->create();
+        EntryFactory::id('bravo-id')->collection('test')->data(['title' => 'Bravo'])->create();
+        EntryFactory::id('charlie-id')->collection('test')->data(['title' => 'Charlie'])->create();
+
+        $this->assertEquals([
+            ['slug' => null, 'published' => true, 'data' => ['title' => 'Alfa']],
+            ['slug' => null, 'published' => true, 'data' => ['title' => 'Bravo']],
+            ['slug' => null, 'published' => true, 'data' => ['title' => 'Charlie']],
+        ], $this->entryData());
+
+        (new DuplicateEntry)->run(collect([
+            Entry::find('alfa-id'),
+            Entry::find('charlie-id'),
+        ]), collect());
+
+        $alfaDuplicate = Entry::query()->where('duplicated_from', 'alfa-id')->first();
+
+        $this->assertNull($alfaDuplicate->slug());
+        $this->assertNotEquals('alfa-id', $id = $alfaDuplicate->id());
+        $this->assertEquals($id.'.md', basename($alfaDuplicate->path()));
+
+        $charlieDuplicate = Entry::query()->where('duplicated_from', 'charlie-id')->first();
+
+        $this->assertNull($charlieDuplicate->slug());
+        $this->assertNotEquals('charlie-id', $id = $charlieDuplicate->id());
+        $this->assertEquals($id.'.md', basename($charlieDuplicate->path()));
+    }
+
     private function entryData()
     {
         return Entry::all()->map(fn ($entry) => [
