@@ -75,7 +75,8 @@
                 <field-conditions-builder
                     :config="config"
                     :suggestable-fields="suggestableConditionFields"
-                    @updated="updateFieldConditions" />
+                    @updated="updateFieldConditions"
+                    @updated-always-save="updateAlwaysSave" />
             </div>
 
             <div class="publish-fields" v-show="activeTab === 'validation'">
@@ -228,6 +229,10 @@ export default {
             if (Object.keys(conditions).length > 0) {
                 this.markFieldEdited(Object.keys(conditions)[0]);
             }
+        },
+
+        updateAlwaysSave(alwaysSave) {
+            this.values.always_save = alwaysSave;
         },
 
         markFieldEdited(handle) {
