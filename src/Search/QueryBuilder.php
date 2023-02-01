@@ -62,7 +62,8 @@ abstract class QueryBuilder extends BaseQueryBuilder
                 ->each(fn (Result $result, $i) => $result
                     ->setIndex($this->index)
                     ->setRawResult($results[$i])
-                    ->setScore($results[$i]['search_score'] ?? null));
+                    ->setScore($results[$i]['search_score'] ?? null)
+                    ->setSnippets($results[$i]['search_snippets'] ?? []));
         })
         ->sortByDesc->getScore()
         ->values();

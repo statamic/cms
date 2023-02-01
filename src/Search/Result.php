@@ -18,6 +18,7 @@ class Result implements Contract, ContainsQueryableValues
     protected $searchable;
     protected $type;
     protected $score;
+    protected $snippets;
     protected $index;
     protected $result;
 
@@ -73,6 +74,18 @@ class Result implements Contract, ContainsQueryableValues
         return (int) $this->score;
     }
 
+    public function setSnippets(array $snippets): self
+    {
+        $this->snippets = $snippets;
+
+        return $this;
+    }
+
+    public function getSnippets(): array
+    {
+        return $this->snippets;
+    }
+
     public function setType(string $type): self
     {
         $this->type = $type;
@@ -103,6 +116,7 @@ class Result implements Contract, ContainsQueryableValues
         return $this->traitToAugmentedCollection($keys)->merge([
             'result_type' => $this->getType(),
             'search_score' => $this->getScore(),
+            'search_snippets' => $this->getSnippets(),
         ])->merge($this->index->extraAugmentedResultData($this));
     }
 
