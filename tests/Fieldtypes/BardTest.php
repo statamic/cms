@@ -902,6 +902,21 @@ EOT;
         $this->assertEquals($expected, json_decode($this->bard()->preProcess($data), true));
     }
 
+    /** @test */
+    public function it_doesnt_convert_custom_type_attrs_to_camel_case()
+    {
+        $data = [
+            [
+                'type' => 'myCustomNode',
+                'attrs' => [
+                    'type' => 'my_custom_type_attr',
+                ],
+            ],
+        ];
+
+        $this->assertEquals($data, json_decode($this->bard()->preProcess($data), true));
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
