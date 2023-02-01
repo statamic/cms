@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Fieldtypes;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Statamic\Assets\FileUploader as Uploader;
 use Statamic\Http\Controllers\CP\CpController;
 
 class FilesFieldtypeController extends CpController
@@ -20,9 +20,7 @@ class FilesFieldtypeController extends CpController
 
         $file = $request->file('file');
 
-        $path = now()->timestamp.'/'.$file->getClientOriginalName();
-
-        Storage::disk('local')->putFileAs('statamic/file-uploads', $file, $path);
+        $path = Uploader::container($request->container)->upload($file);
 
         return ['data' => ['id' => $path]];
     }

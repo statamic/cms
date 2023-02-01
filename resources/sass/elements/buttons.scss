@@ -172,6 +172,10 @@ button {
         @apply rounded-l;
     }
 
+    button.disabled {
+        @apply opacity-75;
+    }
+
     button:last-child {
         @apply rounded-r border-l;
         padding: .475rem .5rem;

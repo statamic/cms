@@ -65,13 +65,9 @@ class TermQueryBuilder extends Builder
             $this->filterUsagesWithinCollections($taxonomies);
         }
 
-        $keys = empty($this->wheres)
+        return empty($this->wheres)
             ? $this->getKeysFromTaxonomies($taxonomies)
             : $this->getKeysFromTaxonomiesWithWheres($taxonomies, $this->wheres);
-
-        return $keys->unique(function ($key) {
-            return collect(explode('::', $key))->forget(1)->join('::');
-        });
     }
 
     protected function getKeysFromTaxonomies($taxonomies)

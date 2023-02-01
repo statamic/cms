@@ -2,9 +2,11 @@
 
 namespace Statamic\Search;
 
+use Statamic\Contracts\Search\Result;
 use Statamic\Data\DataCollection;
-use Statamic\Facades\Data;
 use Statamic\Query\IteratorBuilder as BaseQueryBuilder;
+use Statamic\Search\Searchables\Providers;
+use Statamic\Support\Str;
 
 abstract class QueryBuilder extends BaseQueryBuilder
 {
@@ -43,16 +45,30 @@ abstract class QueryBuilder extends BaseQueryBuilder
         $results = $this->getSearchResults($this->query);
 
         if (! $this->withData) {
-            return new \Statamic\Data\DataCollection($results);
+            return collect($results)
+                ->map(fn ($result) => new PlainResult($result))
+                ->each(fn (Result $result, $i) => $result->setIndex($this->index)->setScore($results[$i]['search_score'] ?? null));
         }
 
-        return $this->collect($results)->map(function ($result) {
-            if ($data = Data::find($result['reference'])) {
-                $data->setSupplement('search_score', $result['search_score'] ?? null);
-            }
+        return collect($results)->groupBy(function ($result) {
+            return Str::before($result['reference'], '::');
+        })->flatMap(function ($results, $prefix) {
+            $results = $results->keyBy('reference');
+            $ids = $results->map(fn ($result) => Str::after($result['reference'], $prefix.'::'))->values()->all();
 
-            return $data;
-        })->filter()->values();
+            return app(Providers::class)
+                ->getByPrefix($prefix)
+                ->find($ids)
+                ->map->toSearchResult()
+                ->each(function (Result $result) use ($results) {
+                    return $result
+                        ->setIndex($this->index)
+                        ->setRawResult($raw = $results[$result->getReference()])
+                        ->setScore($raw['search_score'] ?? null);
+                });
+        })
+        ->sortByDesc->getScore()
+        ->values();
     }
 
     protected function collect($items = [])
