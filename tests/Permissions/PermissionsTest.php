@@ -100,6 +100,42 @@ class PermissionsTest extends TestCase
     }
 
     /** @test */
+    public function it_defers_registration_until_boot_using_extend_method()
+    {
+        $permissions = new Permissions;
+        $callbackRan = false;
+
+        $permissions->extend(function ($arg) use ($permissions, &$callbackRan) {
+            $this->assertEquals($permissions, $arg);
+            $callbackRan = true;
+        });
+
+        $this->assertFalse($callbackRan);
+
+        $permissions->boot();
+
+        $this->assertTrue($callbackRan);
+    }
+
+    /** @test */
+    public function it_places_any_permissions_registered_early_without_extend_callback_at_the_end()
+    {
+        $permissions = new Permissions;
+        $permissions->register('one');
+        $permissions->register('two');
+
+        $permissions->extend(function ($preference) {
+            $preference->register('three');
+        });
+
+        $permissions->boot();
+
+        $names = $permissions->all()->keys()->all();
+
+        $this->assertEquals(['three', 'one', 'two'], $names);
+    }
+
+    /** @test */
     public function it_makes_a_tree()
     {
         $this->setupComplicatedTest($permissions = new Permissions);

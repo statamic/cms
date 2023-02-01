@@ -19,6 +19,7 @@ use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
+use Statamic\Facades\Image;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
@@ -38,6 +39,8 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     protected $allowMoving;
     protected $allowRenaming;
     protected $createFolders;
+    protected $sourcePreset;
+    protected $warmPresets;
     protected $searchIndex;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
@@ -527,6 +530,55 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             ->args(func_get_args());
     }
 
+    /**
+     * The glide source preset to be permanently applied to source image on upload.
+     *
+     * @param  string|null  $preset
+     * @return string|null|$this
+     */
+    public function sourcePreset($preset = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('sourcePreset')
+            ->args(func_get_args());
+    }
+
+    /**
+     * The specific glide presets to be used when warming glide image cache on upload.
+     *
+     * @param  array|null  $presets
+     * @return array|null|$this
+     */
+    public function warmPresets($preset = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('warmPresets')
+            ->getter(function ($presets) {
+                if ($presets === false) {
+                    return [];
+                }
+
+                if ($presets !== null) {
+                    return $presets;
+                }
+
+                $presets = Image::userManipulationPresets();
+
+                $presets = Arr::except($presets, $this->sourcePreset);
+
+                return array_keys($presets);
+            })
+            ->setter(function ($presets) {
+                return $presets === [] ? false : $presets;
+            })
+            ->args(func_get_args());
+    }
+
+    public function warmsPresetsIntelligently()
+    {
+        return $this->warmPresets === null;
+    }
+
     public function fileData()
     {
         $array = [
@@ -538,6 +590,8 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             'allow_renaming' => $this->allowRenaming,
             'allow_moving' => $this->allowMoving,
             'create_folders' => $this->createFolders,
+            'source_preset' => $this->sourcePreset,
+            'warm_presets' => $this->warmPresets,
         ];
 
         $array = Arr::removeNullValues(array_merge($array, [

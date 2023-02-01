@@ -146,6 +146,7 @@ class EntriesController extends CpController
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish', $entry),
             'previewTargets' => $collection->previewTargets()->all(),
+            'autosaveInterval' => $collection->autosaveInterval(),
         ];
 
         if ($request->wantsJson()) {
@@ -318,6 +319,7 @@ class EntriesController extends CpController
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
             'previewTargets' => $collection->previewTargets()->all(),
+            'autosaveInterval' => $collection->autosaveInterval(),
         ];
 
         if ($request->wantsJson()) {

@@ -1,10 +1,61 @@
 # Release Notes
 
+## 3.4.1 (2023-01-30)
+
+### What's improved
+- Dutch translations. [#7418](https://github.com/statamic/cms/issues/7418) by @oakeddev
+- German translations. [#7422](https://github.com/statamic/cms/issues/7422) by @helloDanuk
+
+### What's fixed
+- Fix Bard backwards compatibility. [#7433](https://github.com/statamic/cms/issues/7433) by @jasonvarga
+- Fix preferences listing errors when using Eloquent users. [#7430](https://github.com/statamic/cms/issues/7430) by @jesseleite
+- Prevent Vite error when missing alias in app config file. [#7429](https://github.com/statamic/cms/issues/7429) by @jacksleight
+- Revert "Easier Dynamic Antlers Tags and Variables (#7164)" [#7435](https://github.com/statamic/cms/issues/7435) by @jasonvarga
+
+
+
+## 3.4.0 (2023-01-27)
+
+### What's new
+- Preference management UI in the Control Panel. [#7226](https://github.com/statamic/cms/issues/7226) by @jasonvarga
+- Ability to customize the Control Panel Nav. [#6678](https://github.com/statamic/cms/issues/6678) by @jesseleite
+- A bunch of search features, improvements, and fixes. [#6318](https://github.com/statamic/cms/issues/6318) by @jasonvarga
+- Ability to process/resize image assets on upload. [#6040](https://github.com/statamic/cms/issues/6040) by @jesseleite
+- Bard: Upgraded Tiptap to version 2. [#6043](https://github.com/statamic/cms/issues/6043) by @wiebkevogel
+- Bard: Smart Typography. [#7326](https://github.com/statamic/cms/issues/7326) by @jackmcdade
+- Bard: Inline mode. [#6973](https://github.com/statamic/cms/issues/6973) by @jacksleight
+- Bard: Text align support to Bard [#6450](https://github.com/statamic/cms/issues/6450) by @jacksleight
+- Bard: Placeholder and character limit support. [#6449](https://github.com/statamic/cms/issues/6449) by @jacksleight
+- Bard: Ability to use a custom Tiptap Editor class. [#6422](https://github.com/statamic/cms/issues/6422) by @jacksleight
+- Experimental: Autosave for entries. [#6198](https://github.com/statamic/cms/issues/6198) by @wiebkevogel
+
+### What's improved
+- The Runtime Antlers parser is now the default. [#6414](https://github.com/statamic/cms/issues/6414) by @jasonvarga
+- Action classes have more access to selected items. [#7261](https://github.com/statamic/cms/issues/7261) by @jasonvarga
+- Bard: Improve PHP extension syntax. [#6421](https://github.com/statamic/cms/issues/6421) by @jacksleight
+
+### What's fixed
+- Ability to defer permission and utility registration, which fixes incorrect translations. [#7343](https://github.com/statamic/cms/issues/7343) by @jasonvarga
+- Replicator, Bard, and Grid items `id` fields are available in templates, GraphQL and REST API. [#7279](https://github.com/statamic/cms/issues/7279) by @arthurperton
+- Respect ascii replace option in JavaScript slugify function. [#6338](https://github.com/statamic/cms/issues/6338) by @jasonvarga
+
+### What's changed
+- A number of these items may contain breaking changes. Consult the [3.4 upgrade guide](https://statamic.dev/upgrade-guide/3-3-to-3-4).
+
+
+
+## 3.3.67 (2023-01-30)
+
+### What's fixed
+- Reverted "Dynamic Antlers Tags and Variables" [#7420](https://github.com/statamic/cms/issues/7420) by @edalzell
+
+
+
 ## 3.3.66 (2023-01-26)
 
 ### What's new
 - Support Vite assets in the Control Panel. [#6869](https://github.com/statamic/cms/issues/6869) by @jacksleight
-- Dynamic Antlers Tags and Variables. [#7164](https://github.com/statamic/cms/issues/7164) by @JohnathonKoster
+- ~~Dynamic Antlers Tags and Variables.~~ Reverted in 3.3.67/3.4.1 [#7164](https://github.com/statamic/cms/issues/7164) by @JohnathonKoster
 - SVG tag allows adding `title` and `desc` elements. [#7348](https://github.com/statamic/cms/issues/7348) by @jackmcdade
 
 ### What's improved

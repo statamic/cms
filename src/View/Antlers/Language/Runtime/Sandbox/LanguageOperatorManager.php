@@ -6,15 +6,12 @@ use Exception;
 use Illuminate\Support\Arr;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
 use Statamic\View\Antlers\Language\Errors\ErrorFactory;
-use Statamic\View\Antlers\Language\Errors\TypeLabeler;
-use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Constants\FalseConstant;
 use Statamic\View\Antlers\Language\Nodes\Constants\NullConstant;
 use Statamic\View\Antlers\Language\Nodes\Constants\TrueConstant;
 use Statamic\View\Antlers\Language\Nodes\NumberNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Statamic\View\Antlers\Language\Nodes\StringValueNode;
-use Statamic\View\Antlers\Language\Nodes\Structures\ArrayNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\LogicGroup;
 use Statamic\View\Antlers\Language\Nodes\Structures\SwitchCase;
 use Statamic\View\Antlers\Language\Nodes\Structures\SwitchGroup;
@@ -148,83 +145,9 @@ class LanguageOperatorManager
                     break;
                 }
             }
-        } elseif ($operator == LanguageOperatorRegistry::DYNAMIC_ISSET) {
-            $allIsset = true;
-
-            /** @var ArrayNode $nodeToCheck */
-            $nodeToCheck = $rawB;
-
-            foreach ($nodeToCheck->nodes as $argNode) {
-                if ($argNode->value instanceof VariableNode) {
-                    $tmpResult = $this->environment->evaluateBool([$argNode->value]);
-
-                    if ($tmpResult == false) {
-                        $allIsset = false;
-                        break;
-                    }
-                } else {
-                    throw ErrorFactory::makeRuntimeError(
-                        AntlersErrorCodes::RUNTIME_INVALID_OPERATOR_VALUE,
-                        $rawA,
-                        $this->getDynamicErrorMessage(LanguageOperatorRegistry::DYNAMIC_ISSET, $argNode->value)
-                    );
-                }
-            }
-
-            return $allIsset;
-        } elseif ($operator == LanguageOperatorRegistry::DYNAMIC_EXISTS) {
-            $allExists = true;
-
-            /** @var ArrayNode $nodeToCheck */
-            $nodeToCheck = $rawB;
-
-            foreach ($nodeToCheck->nodes as $argNode) {
-                if ($argNode->value instanceof VariableNode) {
-                    $varReference = $this->getDynamicVariableReference($argNode->value);
-
-                    $tmpResult = $this->dataManager->getDataWithExistence($varReference, $context);
-
-                    if ($tmpResult[0] === false) {
-                        $allExists = false;
-                        break;
-                    }
-                } else {
-                    throw ErrorFactory::makeRuntimeError(
-                        AntlersErrorCodes::RUNTIME_INVALID_OPERATOR_VALUE,
-                        $rawA,
-                        $this->getDynamicErrorMessage(LanguageOperatorRegistry::DYNAMIC_EXISTS, $argNode->value)
-                    );
-                }
-            }
-
-            return $allExists;
         }
 
         return $value;
-    }
-
-    private function getDynamicVariableReference(VariableNode $variable)
-    {
-        $varReference = $variable->variableReference;
-
-        if ($variable->isInterpolationReference && count($variable->interpolationNodes) == 1) {
-            /** @var AntlersNode $refNode */
-            $refNode = $variable->interpolationNodes[0];
-
-            if ($refNode->pathReferenceContainsDynamicVariables) {
-                /** @var AntlersNode $refNode */
-                $refNode = $this->hostProcessor->reevaluateAntlersNode($refNode);
-
-                $varReference = $refNode->pathReference;
-            }
-        }
-
-        return $varReference;
-    }
-
-    protected function getDynamicErrorMessage($operator, $invalidType)
-    {
-        return 'Unexpected type ['.TypeLabeler::getPrettyTypeName($invalidType).'] supplied to '.$operator.' operator. Expecting a list of variables: {{ '.$operator.' (var1, var2, var3) }}';
     }
 
     protected function unpackQueryLogicGroup(LogicGroup $group)

@@ -5,6 +5,7 @@ namespace Statamic\Search\Commands;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Search;
+use Statamic\Support\Str;
 
 class Update extends Command
 {
@@ -16,22 +17,20 @@ class Update extends Command
 
     protected $description = 'Update a search index';
 
+    private $indexes;
+
     public function handle()
     {
         foreach ($this->getIndexes() as $index) {
-            Search::in($index)->update();
-            $this->info("Index <comment>{$index}</comment> updated.");
+            $index->update();
+            $this->info("Index <comment>{$index->name()}</comment> updated.");
         }
     }
 
     private function getIndexes()
     {
-        if ($index = $this->argument('index')) {
-            if (! $this->indexExists($index)) {
-                throw new \InvalidArgumentException("Index [$index] does not exist.");
-            }
-
-            return [$index];
+        if ($requestedIndex = $this->getRequestedIndex()) {
+            return $requestedIndex;
         }
 
         if ($this->option('all')) {
@@ -40,20 +39,34 @@ class Update extends Command
 
         $selection = $this->choice(
             'Select an index to update',
-            collect(['all'])->merge($this->indexes())->all(),
+            collect(['all'])->merge($this->indexes()->keys())->all(),
             0
         );
 
-        return ($selection == 'all') ? $this->indexes() : [$selection];
+        return ($selection == 'all') ? $this->indexes() : [$this->indexes()->get($selection)];
     }
 
     private function indexes()
     {
-        return Search::indexes()->keys();
+        return $this->indexes = $this->indexes ?? Search::indexes();
     }
 
-    private function indexExists($index)
+    private function getRequestedIndex()
     {
-        return $this->indexes()->contains($index);
+        if (! $arg = $this->argument('index')) {
+            return;
+        }
+
+        if ($this->indexes()->has($arg)) {
+            return [$this->indexes()->get($arg)];
+        }
+
+        // They might have entered a name as it appears in the config, but if it
+        // should be localized we'll get all of the localized versions.
+        if (collect(config('statamic.search.indexes'))->has($arg)) {
+            return $this->indexes()->filter(fn ($index) => Str::startsWith($index->name(), $arg))->all();
+        }
+
+        throw new \InvalidArgumentException("Index [$arg] does not exist.");
     }
 }

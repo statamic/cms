@@ -28,3 +28,16 @@
         @apply flex w-6 rounded-l items-center border-r;
     }
 }
+
+.page-tree-with-sections {
+    > .tree-node > .tree-node-children > .tree-node {
+        @apply mb-4;
+    }
+
+    .section-placeholder-inner {
+        @apply rounded;
+        border: 1px dashed #0088F8;
+        background: rgba(0, 136, 249, 0.09);
+        min-height: 42px;
+    }
+}

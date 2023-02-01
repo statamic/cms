@@ -20,14 +20,31 @@ class TermQueryBuilderTest extends TestCase
     /** @test */
     public function it_gets_terms()
     {
-        Taxonomy::make('tags')->save();
-        Term::make('a')->taxonomy('tags')->data([])->save();
-        Term::make('b')->taxonomy('tags')->data([])->save();
-        Term::make('c')->taxonomy('tags')->data([])->save();
+        Site::setConfig(['sites' => [
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
+        ]]);
+
+        Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+        Term::make('a')->taxonomy('tags')->dataForLocale('en', ['title' => 'Alfa'])->dataForLocale('fr', ['title' => 'Le Alfa'])->save();
+        Term::make('b')->taxonomy('tags')->dataForLocale('en', ['title' => 'Bravo'])->dataForLocale('fr', ['title' => 'Le Bravo'])->save();
+        Term::make('c')->taxonomy('tags')->dataForLocale('en', ['title' => 'Charlie'])->save(); // intentionally no french translation
 
         $terms = Term::query()->get();
         $this->assertInstanceOf(TermCollection::class, $terms);
+        $this->assertCount(6, $terms);
         $this->assertEveryItemIsInstanceOf(LocalizedTerm::class, $terms);
+        $this->assertEquals([
+            'en Alfa',
+            'fr Le Alfa',
+            'en Bravo',
+            'fr Le Bravo',
+            'en Charlie',
+            'fr Charlie', // term still exists in fr site, just not translated
+        ], $terms
+            ->sortBy->slug()
+            ->map(fn ($t) => $t->locale().' '.$t->title())
+            ->values()->all());
     }
 
     /** @test */
