@@ -10,6 +10,8 @@ use Tests\TestCase;
 
 class ComposerTest extends TestCase
 {
+    private $files;
+
     public function setUp(): void
     {
         $this->markTestSkippedInWindows();

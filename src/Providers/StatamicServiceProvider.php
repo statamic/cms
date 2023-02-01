@@ -36,5 +36,6 @@ class StatamicServiceProvider extends AggregateServiceProvider
         \Statamic\Git\ServiceProvider::class,
         \Statamic\GraphQL\ServiceProvider::class,
         BardServiceProvider::class,
+        \Statamic\Preferences\ServiceProvider::class,
     ];
 }

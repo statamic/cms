@@ -17,6 +17,9 @@ class EntriesStoreTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $parent;
+    private $directory;
+
     public function setUp(): void
     {
         parent::setUp();

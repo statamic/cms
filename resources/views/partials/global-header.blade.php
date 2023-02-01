@@ -51,6 +51,16 @@
 
         <dropdown-list v-cloak>
             <template v-slot:trigger>
+                <button class="hidden md:block h-6 w-6 ml-2 p-sm text-grey hover:text-grey-80" v-tooltip="__('Preferences')" aria-label="{{ __('Manage Preferences') }}">
+                    @cp_svg('cog')
+                </button>
+            </template>
+            <dropdown-item :text="__('Preferences')" redirect="{{ route('statamic.cp.preferences.index') }}"></dropdown-item>
+            <dropdown-item :text="__('CP Nav')" redirect="{{ route('statamic.cp.preferences.nav.index') }}"></dropdown-item>
+        </dropdown-list>
+
+        <dropdown-list v-cloak>
+            <template v-slot:trigger>
                 <button class="hidden md:block h-6 w-6 ml-2 p-sm text-grey hover:text-grey-80" v-tooltip="__('Useful Links')" aria-label="{{ __('View Useful Links') }}">
                     @cp_svg('book-open')
                 </button>

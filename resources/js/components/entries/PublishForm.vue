@@ -256,6 +256,7 @@
             :collection="collectionHandle"
             :reference="initialReference"
             :publish-container="publishContainer"
+            :can-manage-publish-state="canManagePublishState"
             @closed="confirmingPublish = false"
             @saving="saving = true"
             @saved="publishActionCompleted"
@@ -291,7 +292,7 @@ import PublishActions from './PublishActions';
 import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History';
 import HasPreferences from '../data-list/HasPreferences';
-import HasHiddenFields from '../data-list/HasHiddenFields';
+import HasHiddenFields from '../publish/HasHiddenFields';
 import HasListActions from '../publish/HasListActions';
 
 export default {
@@ -341,6 +342,7 @@ export default {
         listingUrl: String,
         collectionHasRoutes: Boolean,
         previewTargets: Array,
+        autosaveInterval: Number,
         initialListActions: Array,
         listActionUrl: String,
     },
@@ -387,6 +389,7 @@ export default {
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
             quickSave: false,
+            isAutosave: false,
         }
     },
 
@@ -537,7 +540,7 @@ export default {
                     document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
                 }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                if (!this.isCreating) this.$toast.success(__('Saved'));
+                if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);
             }).catch(error => this.handleAxiosError(error));
@@ -559,7 +562,7 @@ export default {
                         return;
                     }
 
-                    let nextAction = this.quickSave ? 'continue_editing' : this.afterSaveOption;
+                    let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && nextAction === 'create_another') {
@@ -575,7 +578,7 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
-                        this.values = { ...this.values, ...response.data.data.values };
+                        this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;
@@ -583,7 +586,8 @@ export default {
                     }
 
                     this.quickSave = false;
-                }).catch(e => {});
+                    this.isAutosave = false;
+                }).catch(e => console.error(e));
         },
 
         confirmPublish() {
@@ -748,6 +752,17 @@ export default {
                 this.localizedFields.push(handle);
 
             this.$refs.container.dirty();
+        },
+
+        setAutosaveInterval() {
+            const interval = setInterval(() => {
+                if (!this.isDirty) return;
+
+                this.isAutosave = true;
+                this.save();
+            }, this.autosaveInterval);
+
+            this.$store.commit(`publish/${this.publishContainer}/setAutosaveInterval`, interval);
         }
     },
 
@@ -766,6 +781,10 @@ export default {
         });
 
         this.$store.commit(`publish/${this.publishContainer}/setPreloadedAssets`, this.preloadedAssets);
+
+        if (typeof this.autosaveInterval === 'number') {
+            this.setAutosaveInterval();
+        }
     },
 
     created() {
@@ -778,6 +797,10 @@ export default {
 
     unmounted() {
         clearTimeout(this.trackDirtyStateTimeout);
+    },
+
+    beforeDestroy() {
+        this.$store.commit(`publish/${this.publishContainer}/clearAutosaveInterval`);
     },
 
     destroyed() {

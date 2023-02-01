@@ -49,12 +49,14 @@ class UserRolesTagTest extends TestCase
         Role::make()->handle('test3')->title('Test 3')->save();
 
         $this->assertEquals('test2|test3|', $this->tag('{{ user_roles handle="test2|test3" }}{{ handle }}|{{ /user_roles }}'));
+        $this->assertEquals('test2|test3|', $this->tag('{{ user_roles :handle="roles" }}{{ handle }}|{{ /user_roles }}', ['roles' => ['test2', 'test3']]));
     }
 
     /** @test */
     public function it_outputs_no_results_when_finding_multiple_roles()
     {
         $this->assertEquals('nothing', $this->tag('{{ user_roles handle="test2|test3" }}{{ if no_results }}nothing{{ else }}something{{ /if }}{{ /user_roles }}'));
+        $this->assertEquals('nothing', $this->tag('{{ user_roles :handle="roles" }}{{ if no_results }}nothing{{ else }}something{{ /if }}{{ /user_roles }}', ['roles' => ['test2', 'test3']]));
     }
 
     private function tag($tag, $data = [])

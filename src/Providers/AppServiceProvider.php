@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
     protected $root = __DIR__.'/../..';
 
     protected $configFiles = [
-        'amp', 'antlers', 'api', 'assets', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'oauth', 'protect', 'revisions',
+        'amp', 'antlers', 'api', 'assets', 'autosave', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'oauth', 'protect', 'revisions',
         'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'users',
     ];
 
@@ -181,6 +181,8 @@ class AppServiceProvider extends ServiceProvider
             'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
             'Antlers' => config('statamic.antlers.version'),
             'Addons' => $addons->count(),
+            'Stache Watcher' => config('statamic.stache.watcher') ? 'Enabled' : 'Disabled',
+            'Static Caching' => config('statamic.static_caching.strategy') ?: 'Disabled',
         ]);
 
         foreach ($addons as $addon) {

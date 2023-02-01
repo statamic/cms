@@ -20,6 +20,7 @@ use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Tags;
 use Statamic\UpdateScripts\UpdateScript;
@@ -105,6 +106,11 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $externalScripts = [];
 
     /**
+     * @var list<string> - URLs of Vite entry points
+     */
+    protected $vite = null;
+
+    /**
      * Map of path on disk to name in the public directory. The file will be published
      * as `vendor/{packageName}/{value}`.
      *
@@ -180,6 +186,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootPolicies()
                 ->bootStylesheets()
                 ->bootScripts()
+                ->bootVite()
                 ->bootPublishables()
                 ->bootConfig()
                 ->bootTranslations()
@@ -324,6 +331,15 @@ abstract class AddonServiceProvider extends ServiceProvider
 
         foreach ($this->externalScripts as $url) {
             $this->registerExternalScript($url);
+        }
+
+        return $this;
+    }
+
+    protected function bootVite()
+    {
+        if ($this->vite) {
+            $this->registerVite($this->vite);
         }
 
         return $this;
@@ -522,6 +538,33 @@ abstract class AddonServiceProvider extends ServiceProvider
         ], $this->getAddon()->slug());
 
         Statamic::script($name, "{$filename}.js?v={$version}");
+    }
+
+    public function registerVite($config)
+    {
+        $name = $this->getAddon()->packageName();
+        $directory = $this->getAddon()->directory();
+
+        if (is_string($config) || ! Arr::isAssoc($config)) {
+            $config = ['input' => $config];
+        }
+
+        $publicDirectory = $config['publicDirectory'] ?? 'public';
+        $buildDirectory = $config['buildDirectory'] ?? 'build';
+        $hotFile = $config['hotFile'] ?? "{$directory}{$publicDirectory}/hot";
+        $input = $config['input'];
+
+        $publishSource = "{$directory}{$publicDirectory}/{$buildDirectory}/";
+        $publishTarget = public_path("vendor/{$name}/{$buildDirectory}/");
+        $this->publishes([
+            $publishSource => $publishTarget,
+        ], $this->getAddon()->slug());
+
+        Statamic::vite($name, [
+            'hotFile' => $hotFile,
+            'buildDirectory' => "vendor/{$name}/{$buildDirectory}",
+            'input' => $input,
+        ]);
     }
 
     public function registerExternalScript(string $url)

@@ -77,6 +77,7 @@ class ReuploadAsset extends Action
                 'type' => 'files',
                 'max_files' => 1,
                 'validate' => ['required'],
+                'container' => $this->items->first()->container()->handle(),
             ],
         ];
     }

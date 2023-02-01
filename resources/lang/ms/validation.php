@@ -31,6 +31,7 @@ return [
     ],
     'boolean'              => 'Mesti betul atau salah.',
     'confirmed'            => 'Pengesahan tidak sepadan dengan e-mel',
+    'current_password'     => 'Katalaluan anda adalah salah.',
     'date'                 => 'Bukan tarikh yang sah.',
     'date_format'          => 'Tidak sepadan dengan format :format.',
     'different'            => 'Bidang ini dan :other mestilah berbeza.',

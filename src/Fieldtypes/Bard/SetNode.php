@@ -2,22 +2,23 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use ProseMirrorToHtml\Nodes\Node;
+use Tiptap\Core\Node;
 
 class SetNode extends Node
 {
-    public function matching()
+    public static $name = 'set';
+
+    public function parseHTML()
     {
-        return $this->node->type === 'set';
+        return [
+            [
+                'tag' => 'set',
+            ],
+        ];
     }
 
-    public function tag()
+    public function renderHTML($node, $HTMLAttributes = [])
     {
-        return 'set';
-    }
-
-    public function text()
-    {
-        return $this->node->index;
+        return ['content' => "<set>{$node->index}</set>"];
     }
 }
