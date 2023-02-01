@@ -490,7 +490,7 @@ class Bard extends Replicator
         }
 
         return collect($value)->map(function ($item, $key) {
-            if (is_array($item) && ($item['type'] ?? null) === 'set') {
+            if (is_array($item) && $key === 'attrs') {
                 return $item;
             }
 
