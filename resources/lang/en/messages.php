@@ -76,6 +76,7 @@ return [
     'field_synced_with_origin' => 'Synced with origin. Click or edit the field to desync.',
     'field_validation_advanced_instructions' => 'Add more advanced validation to this field.',
     'field_validation_required_instructions' => 'Control whether or not this field is required.',
+    'field_validation_sometimes_instructions' => 'Only validate when this field is visible or submitted.',
     'fields_blueprints_description' => 'Blueprints define the fields for content structures like collections, taxonomies, users, and forms.',
     'fields_default_instructions' => 'Set the default value.',
     'fields_display_instructions' => 'The field\'s label shown in the Control Panel.',
