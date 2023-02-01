@@ -73,7 +73,7 @@
         <div class="form-group publish-field select-fieldtype field-w-full">
             <label class="publish-field-label">{{ __('Always Save') }}</label>
             <div class="help-block -mt-1">
-                <p>{{ __('Always submit and save value, even if field is conditionally hidden.') }}</p>
+                <p>{{ __('messages.field_conditions_always_save_instructions') }}</p>
             </div>
             <toggle-input v-model="alwaysSave" />
         </div>
