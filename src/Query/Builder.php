@@ -54,11 +54,6 @@ abstract class Builder implements Contract
         return $this;
     }
 
-    public function wheres()
-    {
-        return $this->wheres;
-    }
-
     public function forPage($page, $perPage = null)
     {
         $perPage = $perPage ?: $this->defaultPerPageSize();
