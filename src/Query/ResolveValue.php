@@ -24,21 +24,21 @@ class ResolveValue
         return $item;
     }
 
-    private function resolveItemPartValue($item, $name)
+    private function resolveItemPartValue($item, $name, $wildcardDepth = 0)
     {
-        $value = $this->getItemPartValue($item, $name);
+        $value = $this->getItemPartValue($item, $name, $wildcardDepth);
 
         return $value instanceof QueryableValue
             ? $value->toQueryableValue()
             : $value;
     }
 
-    private function getItemPartValue($item, $name)
+    private function getItemPartValue($item, $name, $wildcardDepth)
     {
         if (is_array($item)) {
             if ($name === '*' && ! empty($this->nameExploded)) {
                 foreach ($item as $value) {
-                    if ($this->resolveItemPartValue($value, $this->nameExploded[0])) {
+                    if ($this->resolveItemPartValue($value, $this->nameExploded[$wildcardDepth], $wildcardDepth + 1)) {
                         return $value;
                     }
                 }
