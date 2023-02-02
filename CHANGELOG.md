@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.3.68 (2023-02-02)
+
+### What's fixed
+- Fix create entry form not redirecting on save. [#7443](https://github.com/statamic/cms/issues/7443) by @jasonvarga
+
+
+
 ## 3.3.67 (2023-01-30)
 
 ### What's fixed
