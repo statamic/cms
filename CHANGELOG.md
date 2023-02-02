@@ -1,5 +1,22 @@
 # Release Notes
 
+## 3.4.2 (2023-02-02)
+
+### What's improved
+- Move `always_save` field setting toggle to conditions tab. [#7417](https://github.com/statamic/cms/issues/7417) by @jesseleite
+- Add toggle for `sometimes` rule in validation builder [#7416](https://github.com/statamic/cms/issues/7416) by @jesseleite
+- Auto-focus search input when opening selectors in Bard link or standalone link fieldtype. [#7425](https://github.com/statamic/cms/issues/7425) by @duncanmcclean
+- French translations. [#7453](https://github.com/statamic/cms/issues/7453) by @ebeauchamps
+- Dutch translations. [#7442](https://github.com/statamic/cms/issues/7442) by @stephanbouman
+
+### What's fixed
+- Fix GraphQL nested fields. [#7431](https://github.com/statamic/cms/issues/7431) by @jasonvarga
+- Fix custom Bard extension type attributes. [#7450](https://github.com/statamic/cms/issues/7450) by @jacksleight
+- Fix mismatched search results. [#7445](https://github.com/statamic/cms/issues/7445) by @jasonvarga
+- Fix create entry form not redirecting on save. [#7444](https://github.com/statamic/cms/issues/7444) by @jasonvarga
+
+
+
 ## 3.4.1 (2023-01-30)
 
 ### What's improved
@@ -41,6 +58,13 @@
 
 ### What's changed
 - A number of these items may contain breaking changes. Consult the [3.4 upgrade guide](https://statamic.dev/upgrade-guide/3-3-to-3-4).
+
+
+
+## 3.3.68 (2023-02-02)
+
+### What's fixed
+- Fix create entry form not redirecting on save. [#7443](https://github.com/statamic/cms/issues/7443) by @jasonvarga
 
 
 
