@@ -32,7 +32,7 @@ class GridFieldtypeTest extends TestCase
                 'fields' => [
                     ['handle' => 'food', 'field' => ['type' => 'text']],
                     ['handle' => 'drink', 'field' => ['type' => 'markdown']], // using markdown to show nested fields are resolved using their fieldtype.
-                    ['handle' => 'stuff', 'field' => ['type' => 'entries']],
+                    ['handle' => 'stuff', 'field' => ['type' => 'entries']], // using entries to query builders get resolved
                 ],
             ],
         ]);

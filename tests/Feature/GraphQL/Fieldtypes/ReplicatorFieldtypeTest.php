@@ -40,7 +40,7 @@ class ReplicatorFieldtypeTest extends TestCase
                         'fields' => [
                             ['handle' => 'make', 'field' => ['type' => 'text']],
                             ['handle' => 'model', 'field' => ['type' => 'text']],
-                            ['handle' => 'trims', 'field' => ['type' => 'entries']],
+                            ['handle' => 'trims', 'field' => ['type' => 'entries']], // using entries to query builders get resolved
                         ],
                     ],
                 ],
