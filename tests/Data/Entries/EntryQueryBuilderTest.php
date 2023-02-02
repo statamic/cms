@@ -507,7 +507,7 @@ class EntryQueryBuilderTest extends TestCase
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'content' => ['x' => ['value' => 1]]])->create();
         EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'content' => ['y' => ['value' => 2]]])->create();
-        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'content' => ['z' => ['value' => 3]]])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'content' => ['z' => ['x' => ['y' => ['value' => 2]]]]])->create();
         EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'content' => ['a' => ['x' => ['value' => 2]]]])->create();
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'content' => ['b' => ['value' => 1]]])->create();
         // the following two entries use scalars for the content field to test that they get successfully ignored.
@@ -529,6 +529,12 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(1, $entries);
         $this->assertEquals(['Post 4'], $entries->map->title->all());
+
+        // ensure we can use multiple wildcards
+        $entries = Entry::query()->where('content->*->x->*->value', 2)->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 3'], $entries->map->title->all());
 
         // ensure it only works on array level elements
         $entries = Entry::query()->where('content->value->*', 1)->get();
