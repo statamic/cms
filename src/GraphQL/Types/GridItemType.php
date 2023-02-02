@@ -3,9 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use Rebing\GraphQL\Support\Type;
-use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\GraphQL;
-use Statamic\Fields\Value;
 
 class GridItemType extends Type
 {
@@ -19,23 +17,19 @@ class GridItemType extends Type
 
     public function fields(): array
     {
-        return $this->fieldtype->fields()->toGql()
+        $fields = $this->fieldtype->fields()->toGql();
+
+        return $fields
             ->merge([
                 'id' => [
                     'type' => GraphQL::string(),
                 ],
             ])
-            ->map(function ($field) {
-                $field['resolve'] = function ($row, $args, $context, $info) {
-                    $value = $row[$info->fieldName];
-
-                    $value = $value instanceof Value ? $value->value() : $value;
-
-                    if ($value instanceof Builder) {
-                        $value = $value->get();
-                    }
-
-                    return $value;
+            ->map(function ($field) use ($fields) {
+                $field['resolve'] = function ($row, $args, $context, $info) use ($fields) {
+                    return ($resolver = $fields[$info->fieldName]['resolve'] ?? null)
+                         ? $resolver($row, $args, $context, $info)
+                         : $row[$info->fieldName];
                 };
 
                 return $field;
