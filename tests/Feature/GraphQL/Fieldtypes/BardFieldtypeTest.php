@@ -33,7 +33,7 @@ class BardFieldtypeTest extends TestCase
                     'meal' => [
                         'fields' => [
                             ['handle' => 'food', 'field' => ['type' => 'text']],
-                            ['handle' => 'drink', 'field' => ['type' => 'markdown']],
+                            ['handle' => 'drink', 'field' => ['type' => 'markdown']], // using markdown to show nested fields are resolved using their fieldtype.
                         ],
                     ],
                     'car' => [
