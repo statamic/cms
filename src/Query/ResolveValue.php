@@ -10,10 +10,10 @@ class ResolveValue
 {
     public function __invoke($item, $name)
     {
-        $nameExploded = explode('->', $name);
+        $this->nameExploded = explode('->', $name);
 
-        while (! empty($nameExploded)) {
-            $name = array_shift($nameExploded);
+        while (! empty($this->nameExploded)) {
+            $name = array_shift($this->nameExploded);
             $item = $this->resolveItemPartValue($item, $name);
 
             if (is_null($item)) {
@@ -36,6 +36,14 @@ class ResolveValue
     private function getItemPartValue($item, $name)
     {
         if (is_array($item)) {
+            if ($name === '*' && ! empty($this->nameExploded)) {
+                foreach ($item as $value) {
+                    if ($this->resolveItemPartValue($value, $this->nameExploded[0])) {
+                        return $value;
+                    }
+                }
+            }
+
             return $item[$name] ?? null;
         }
 
