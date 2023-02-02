@@ -10,6 +10,7 @@ class StatusQueryBuilder implements Builder
     use ForwardsCalls;
 
     const METHODS = [
+        'where',
         'whereIn',
         'whereNotIn',
         'whereNull',
