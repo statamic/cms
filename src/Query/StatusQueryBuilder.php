@@ -3,15 +3,27 @@
 namespace Statamic\Query;
 
 use Illuminate\Support\Traits\ForwardsCalls;
-use ReflectionClass;
 use Statamic\Contracts\Query\Builder;
 
 class StatusQueryBuilder implements Builder
 {
     use ForwardsCalls;
 
+    const METHODS = [
+        'whereIn',
+        'whereNotIn',
+        'whereNull',
+        'whereNotNull',
+        'orWhere',
+        'orWhereIn',
+        'orWhereNotIn',
+        'orWhereNull',
+        'orWhereNotNull',
+    ];
+
     protected $builder;
     protected $anyStatus = false;
+    protected $hasQueriedStatus = false;
 
     public function __construct(Builder $builder)
     {
@@ -20,7 +32,7 @@ class StatusQueryBuilder implements Builder
 
     public function get($columns = ['*'])
     {
-        if (! $this->anyStatus && ! $this->queriesStatus()) {
+        if (! $this->anyStatus && ! $this->hasQueriedStatus) {
             $this->builder->where('status', 'published');
         }
 
@@ -34,6 +46,10 @@ class StatusQueryBuilder implements Builder
 
     public function __call($method, $parameters)
     {
+        if (in_array($method, self::METHODS) && in_array(array_first($parameters), ['status', 'published'])) {
+            $this->hasQueriedStatus = true;
+        }
+
         $result = $this->forwardCallTo($this->builder, $method, $parameters);
 
         if ($result === $this->builder) {
@@ -48,33 +64,5 @@ class StatusQueryBuilder implements Builder
         $this->anyStatus = true;
 
         return $this;
-    }
-
-    private function queriesStatus(): bool
-    {
-        $wheres = null;
-
-        $builder = $this->builder;
-        $reflector = new ReflectionClass($builder);
-
-        while (is_null($wheres)) {
-            if ($reflector->hasProperty('wheres')) {
-                $wheresProperty = $reflector->getProperty('wheres');
-                $wheresProperty->setAccessible(true);
-
-                $wheres = $wheresProperty->getValue($builder);
-            } elseif ($reflector->hasProperty('builder')) {
-                $builderProperty = $reflector->getProperty('builder');
-                $builderProperty->setAccessible(true);
-
-                $builder = $builderProperty->getValue($builder);
-
-                $reflector = new ReflectionClass($builder);
-            } else {
-                return false;
-            }
-        }
-
-        return collect($wheres)->contains(fn ($where) => array_get($where, 'column') === 'status');
     }
 }
