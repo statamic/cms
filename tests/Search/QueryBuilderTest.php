@@ -438,6 +438,23 @@ class QueryBuilderTest extends TestCase
             ['reference' => 'a', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']],
             ['reference' => 'b', 'test_taxonomy' => ['taxonomy-3']],
             ['reference' => 'c', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']],
+            ['reference' => 'd', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4', 'taxonomy-5']],
+            ['reference' => 'e', 'test_taxonomy' => ['taxonomy-5']],
+        ]);
+
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereJsonLength('test_taxonomy', 1)->orWhereJsonLength('test_taxonomy', 3)->get();
+
+        $this->assertCount(3, $results);
+        $this->assertEquals(['b', 'e', 'd'], $results->map->reference->all());
+    }
+
+    /** @test **/
+    public function results_are_found_using_or_where_json_length()
+    {
+        $items = collect([
+            ['reference' => 'a', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']],
+            ['reference' => 'b', 'test_taxonomy' => ['taxonomy-3']],
+            ['reference' => 'c', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']],
             ['reference' => 'd', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']],
             ['reference' => 'e', 'test_taxonomy' => ['taxonomy-5']],
         ]);
