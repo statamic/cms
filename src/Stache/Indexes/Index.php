@@ -134,6 +134,7 @@ abstract class Index
 
     public function clear()
     {
+        $this->loaded = false;
         $this->items = null;
 
         Cache::forget($this->cacheKey());
