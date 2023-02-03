@@ -15,6 +15,7 @@ abstract class EloquentQueryBuilder implements Builder
 {
     protected $builder;
     protected $columns;
+    protected $schemas;
 
     protected $operators = [
         '=' => 'Equals',
@@ -33,6 +34,7 @@ abstract class EloquentQueryBuilder implements Builder
     public function __construct(EloquentBuilder $builder)
     {
         $this->builder = $builder;
+        $this->schemas = collect();
     }
 
     public function __call($method, $args)
@@ -394,7 +396,13 @@ abstract class EloquentQueryBuilder implements Builder
             // exception. Stripping out invalid columns is fine here. They
             // will still be sent through and used for augmentation.
             $model = $this->builder->getModel();
-            $schema = $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
+            $table = $model->getTable();
+
+            if (! $schema = $this->schemas->get($table)) {
+                $schema = $model->getConnection()->getSchemaBuilder()->getColumnListing($table);
+                $this->schemas->put($table, $schame);
+            }
+
             $selected = array_intersect($schema, $columns);
         }
 
