@@ -11,7 +11,7 @@ return [
     'configure_addons' => 'Konfigurer tillegg',
     'configure_addons_desc' => 'Gir tilgang til området for installering og avinstallering av tillegg.',
     'manage_preferences' => 'Administrer preferanser',
-    'manage_preferences_desc' => 'Gir tilgang til å administrere egne, og andre preferanser.',
+    'manage_preferences_desc' => 'Gir tilgang til å administrere globale, og bruker-spesifikke preferanser.',
     'group_collections' => 'Samlinger',
     'configure_collections' => 'Konfigurer samlinger',
     'configure_collections_desc' => 'Gir tilgang til alle tillatelser tilknyttet samlinger',
