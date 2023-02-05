@@ -88,6 +88,7 @@ return [
     'unique_entry_value' => 'Denne verdien er allerede brukt.',
     'unique_term_value' => 'Denne verdien er allerede brukt.',
     'unique_user_value' => 'Denne verdien er allerede brukt.',
+    'unique_form_handle' => 'Denne verdien er allerede brukt.',
     'duplicate_field_handle' => 'Felt med et håndtak på :handle kan kun brukes én gang.',
     'one_site_without_origin' => 'Minst ett nettsted må være uten opprinnelse.',
     'origin_cannot_be_disabled' => 'Kan ikke velge en deaktivert opprinnelse.',
