@@ -397,7 +397,7 @@ abstract class EloquentQueryBuilder implements Builder
             $model = $this->builder->getModel();
             $table = $model->getTable();
 
-            Blink::once("eloquent-schema-{$table}", function () use ($model, $table) {
+            $schema = Blink::once("eloquent-schema-{$table}", function () use ($model, $table) {
                 return $model->getConnection()->getSchemaBuilder()->getColumnListing($table);
             });
 
