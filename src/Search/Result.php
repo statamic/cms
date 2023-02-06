@@ -130,6 +130,11 @@ class Result implements Contract, ContainsQueryableValues
         return $this->searchable->getCpSearchResultBadge();
     }
 
+    public function get($key, $fallback = null)
+    {
+        return $this->searchable->get($key, $fallback);
+    }
+
     public function setSupplement($key, $value)
     {
         $this->searchable->setSupplement($key, $value);
