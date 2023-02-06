@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Facades\Blink;
 use Statamic\Support\Arr;
 
 abstract class EloquentQueryBuilder implements Builder
@@ -394,7 +395,12 @@ abstract class EloquentQueryBuilder implements Builder
             // exception. Stripping out invalid columns is fine here. They
             // will still be sent through and used for augmentation.
             $model = $this->builder->getModel();
-            $schema = $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
+            $table = $model->getTable();
+
+            $schema = Blink::once("eloquent-schema-{$table}", function () use ($model, $table) {
+                return $model->getConnection()->getSchemaBuilder()->getColumnListing($table);
+            });
+
             $selected = array_intersect($schema, $columns);
         }
 
