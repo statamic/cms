@@ -400,7 +400,7 @@ abstract class EloquentQueryBuilder implements Builder
 
             if (! $schema = $this->schemas->get($table)) {
                 $schema = $model->getConnection()->getSchemaBuilder()->getColumnListing($table);
-                $this->schemas->put($table, $schame);
+                $this->schemas->put($table, $schema);
             }
 
             $selected = array_intersect($schema, $columns);
