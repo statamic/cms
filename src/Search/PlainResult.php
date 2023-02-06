@@ -31,4 +31,9 @@ class PlainResult extends Result
     {
         return new AugmentedData($this, $this->result);
     }
+
+    public function setSupplement($key, $value)
+    {
+        $this->result[$key] = $value;
+    }
 }
