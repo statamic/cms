@@ -9,13 +9,13 @@ use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Facades\Blink;
 use Statamic\Support\Arr;
 
 abstract class EloquentQueryBuilder implements Builder
 {
     protected $builder;
     protected $columns;
-    protected $schemas;
 
     protected $operators = [
         '=' => 'Equals',
@@ -34,7 +34,6 @@ abstract class EloquentQueryBuilder implements Builder
     public function __construct(EloquentBuilder $builder)
     {
         $this->builder = $builder;
-        $this->schemas = collect();
     }
 
     public function __call($method, $args)
@@ -398,10 +397,9 @@ abstract class EloquentQueryBuilder implements Builder
             $model = $this->builder->getModel();
             $table = $model->getTable();
 
-            if (! $schema = $this->schemas->get($table)) {
-                $schema = $model->getConnection()->getSchemaBuilder()->getColumnListing($table);
-                $this->schemas->put($table, $schema);
-            }
+            Blink::once("eloquent-schema-{$table}", function () use ($model, $table) {
+                return $model->getConnection()->getSchemaBuilder()->getColumnListing($table);
+            });
 
             $selected = array_intersect($schema, $columns);
         }
