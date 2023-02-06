@@ -5,7 +5,9 @@ namespace Statamic\StaticCaching\NoCache;
 use Facades\Statamic\View\Cascade;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Request;
 use Statamic\Facades\Data;
+use Statamic\Support\Str;
 
 class Session
 {
@@ -20,7 +22,7 @@ class Session
 
     public function __construct($url)
     {
-        $this->url = $url;
+        $this->setUrl($url);
         $this->regions = new Collection;
     }
 
@@ -31,6 +33,10 @@ class Session
 
     public function setUrl(string $url)
     {
+        if (Str::contains($url, '?')) {
+            $url = Str::before($url, '?').'?'.Request::normalizeQueryString(Str::after($url, '?'));
+        }
+
         $this->url = $url;
 
         return $this;
