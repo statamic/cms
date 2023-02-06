@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     props: ['entry', 'key',
         'type', 'primary', 'is'], // these prevent warnings in alpha
 

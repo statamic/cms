@@ -1,7 +1,3 @@
-<script src="{{ Statamic::cpAssetUrl('js/manifest.js') }}?v={{ Statamic::version() }}"></script>
-<script src="{{ Statamic::cpAssetUrl('js/vendor.js') }}?v={{ Statamic::version() }}"></script>
-<script src="{{ Statamic::cpAssetUrl('js/app.js') }}?v={{ Statamic::version() }}"></script>
-
 @foreach (Statamic::availableExternalScripts(request()) as $url)
     <script src="{{ $url }}"></script>
 @endforeach
@@ -18,11 +14,11 @@
            ->withEntryPoints($vite['input']) }}
 @endforeach
 
-<script>
-    Statamic.config(@json(array_merge(Statamic::jsonVariables(request()), [
+@php
+    $start = 'Statamic.config('.json_encode(array_merge(Statamic::jsonVariables(request()), [
         'wrapperClass' => $__env->getSection('wrapper_class', 'max-w-xl')
-    ])));
-</script>
+    ])).'); Statamic.start()';
+@endphp
 
 {{-- Deferred to allow Vite modules to load first --}}
-<script src="data:text/javascript;base64,{{ base64_encode('Statamic.start()') }}" defer></script>
+<script src="data:text/javascript;base64,{{ base64_encode($start) }}" defer></script>

@@ -2,13 +2,8 @@
   "name": "statamic",
   "private": true,
   "scripts": {
-    "dev": "npm run development",
-    "development": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch-poll": "npm run watch -- --watch-poll",
-    "hot": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "prod": "npm run production",
-    "production": "node node_modules/cross-env/dist/bin/cross-env.js NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "dev": "vite",
+    "build": "vite build",
     "svgo": "svgo -f ./resources/svg/  -r",
     "test": "cross-env NODE_ENV=test jest --silent",
     "test-watch": "npm run test -- --watch --notify",
@@ -56,7 +51,7 @@
     "body-scroll-lock": "^2.6.4",
     "codemirror": "^5.58.2",
     "cookies-js": "^1.2.2",
-    "dmuploader": "file:resources/js/vendor/dmuploader",
+    "dm-file-uploader": "^1.0.2",
     "dropzone": "^4.0.1",
     "element-resize-detector": "^1.2.1",
     "fuse.js": "^3.4.6",
@@ -90,7 +85,7 @@
     "v-calendar": "^2.3.0",
     "v-tooltip": "^2.0.3",
     "validator": "^13.7.0",
-    "vue": "^2.6.11",
+    "vue": "^2.7.14",
     "vue-clickaway": "~2.2.2",
     "vue-countable": "^1.0.9",
     "vue-draggable-nested-tree": "^2.2.20",
@@ -102,15 +97,15 @@
     "vuex": "^3.1.2"
   },
   "devDependencies": {
+    "@rollup/plugin-inject": "^5.0.3",
+    "@vitejs/plugin-vue2": "^2.2.0",
     "babel-jest": "^24.9.0",
     "cross-env": "^5.2.1",
     "jest": "^24.9.0",
     "kind-of": ">=6.0.3",
-    "laravel-mix": "^5.0.9",
-    "sass": "^1.26.2",
-    "sass-loader": "^8.0.2",
+    "laravel-vite-plugin": "^0.7.2",
     "tailwindcss": "^1.9.0",
-    "vue-template-compiler": "^2.6.11"
+    "vite": "^4.0.0"
   },
   "jest": {
     "roots": [
