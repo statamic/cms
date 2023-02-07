@@ -58,7 +58,6 @@
     "generate-password": "^1.5.1",
     "highlight.js": "^9.18.1",
     "jquery": "^3.5.0",
-    "jquery-ui": "file:resources/js/vendor/jquery-ui",
     "laravel-echo": "^1.6.1",
     "lowlight": "^2.6.1",
     "luminous-lightbox": "^0.2.0",
