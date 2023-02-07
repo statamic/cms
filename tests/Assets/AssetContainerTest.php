@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\DirectoryAttributes;
+use League\Flysystem\DirectoryListing;
+use League\Flysystem\FileAttributes;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -524,13 +527,13 @@ class AssetContainerTest extends TestCase
         $disk->shouldReceive('filesystem->getDriver->listContents')
             ->with('/', true)
             ->once()
-            ->andReturn([
-                '.meta/one.jpg.yaml' => ['type' => 'file', 'path' => '.meta/one.jpg.yaml', 'basename' => 'one.jpg.yaml', 'dirname' => '.meta'],
-                '.DS_Store' => ['type' => 'file', 'path' => '.DS_Store', 'basename' => '.DS_Store', 'dirname' => ''],
-                '.gitignore' => ['type' => 'file', 'path' => '.gitignore', 'basename' => '.gitignore', 'dirname' => ''],
-                'one.jpg' => ['type' => 'file', 'path' => 'one.jpg', 'basename' => 'one.jpg', 'dirname' => ''],
-                'two.jpg' => ['type' => 'file', 'path' => 'two.jpg', 'basename' => 'two.jpg', 'dirname' => ''],
-            ]);
+            ->andReturn(new DirectoryListing([
+                new FileAttributes('.meta/one.jpg.yaml'),
+                new FileAttributes('.DS_Store'),
+                new FileAttributes('.gitignore'),
+                new FileAttributes('one.jpg'),
+                new FileAttributes('two.jpg'),
+            ]));
 
         File::shouldReceive('disk')->with('test')->andReturn($disk);
 
@@ -620,12 +623,12 @@ class AssetContainerTest extends TestCase
         $disk->shouldReceive('filesystem->getDriver->listContents')
             ->with('/', true)
             ->once()
-            ->andReturn([
-                '.meta' => ['type' => 'dir', 'path' => '.meta', 'basename' => '.meta'],
-                'one' => ['type' => 'dir', 'path' => 'one', 'basename' => 'one'],
-                'one/.meta' => ['type' => 'dir', 'path' => 'one/.meta', 'basename' => '.meta'],
-                'two' => ['type' => 'dir', 'path' => 'two', 'basename' => 'two'],
-            ]);
+            ->andReturn(new DirectoryListing([
+                new DirectoryAttributes('.meta'),
+                new DirectoryAttributes('one'),
+                new DirectoryAttributes('one/.meta'),
+                new DirectoryAttributes('two'),
+            ]));
 
         File::shouldReceive('disk')->with('test')->andReturn($disk);
 
@@ -656,12 +659,12 @@ class AssetContainerTest extends TestCase
         $disk->shouldReceive('filesystem->getDriver->listContents')
             ->with('/', true)
             ->once()
-            ->andReturn([
-                'alfa' => ['type' => 'dir', 'path' => 'alfa', 'basename' => 'alfa'],
-                'bravo' => ['type' => 'dir', 'path' => 'bravo', 'basename' => 'bravo'],
-                'charlie/delta/echo/foxtrot.jpg' => ['type' => 'file', 'path' => 'charlie/delta/echo/foxtrot.jpg', 'basename' => 'foxtrot', 'dirname' => 'charlie/delta/echo'],
-                'golf.jpg' => ['type' => 'file', 'path' => 'golf.jpg', 'basename' => 'golf', 'dirname' => ''],
-            ]);
+            ->andReturn(new DirectoryListing([
+                new DirectoryAttributes('alfa'),
+                new DirectoryAttributes('bravo'),
+                new FileAttributes('charlie/delta/echo/foxtrot.jpg'),
+                new FileAttributes('golf.jpg'),
+            ]));
 
         File::shouldReceive('disk')->with('test')->andReturn($disk);
 
