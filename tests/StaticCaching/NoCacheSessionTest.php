@@ -73,18 +73,6 @@ class NoCacheSessionTest extends TestCase
     }
 
     /** @test */
-    public function it_normalizes_the_query_string()
-    {
-        $session = new Session('/foo?c=3&b=2&a=1');
-
-        $this->assertEquals('/foo?a=1&b=2&c=3', $session->url());
-
-        $session = tap(new Session(''), function($session) { $session->setUrl('/foo?c=3&b=2&a=1'); });
-
-        $this->assertEquals('/foo?a=1&b=2&c=3', $session->url());
-    }
-
-    /** @test */
     public function it_writes()
     {
         // Testing that the cache key used is unique to the url.
@@ -98,15 +86,11 @@ class NoCacheSessionTest extends TestCase
             ->with('nocache::session.'.md5('/foo'), Mockery::any())
             ->once();
 
-        Cache::shouldReceive('forever')
-            ->with('nocache::session.'.md5('/foo?a=1&b=2'), Mockery::any())
-            ->twice();
-
         // ...and that the urls are tracked in the cache.
 
         Cache::shouldReceive('get')
             ->with('nocache::urls', [])
-            ->times(4)
+            ->times(2)
             ->andReturn([], ['/']);
 
         Cache::shouldReceive('forever')
@@ -117,23 +101,11 @@ class NoCacheSessionTest extends TestCase
             ->with('nocache::urls', ['/', '/foo'])
             ->once();
 
-        Cache::shouldReceive('forever')
-            ->with('nocache::urls', ['/', '/foo?a=1&b=2'])
-            ->twice();
-
         tap(new Session('/'), function ($session) {
             $session->pushRegion('test', [], '.html');
         })->write();
 
         tap(new Session('/foo'), function ($session) {
-            $session->pushRegion('test', [], '.html');
-        })->write();
-
-        tap(new Session('/foo?a=1&b=2'), function ($session) {
-            $session->pushRegion('test', [], '.html');
-        })->write();
-
-        tap(new Session('/foo?b=2&a=1'), function ($session) {
             $session->pushRegion('test', [], '.html');
         })->write();
     }
