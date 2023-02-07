@@ -9,6 +9,11 @@ use Tests\TestCase;
 
 class ContextTest extends TestCase
 {
+    private $value;
+    private $antlersValue;
+    private $nonAntlersValue;
+    private $context;
+
     public function setUp(): void
     {
         parent::setUp();

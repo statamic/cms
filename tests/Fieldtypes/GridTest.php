@@ -359,14 +359,14 @@ class GridTest extends TestCase
         ]);
 
         $augmented = $field->fieldtype()->augment([
-            ['words' => 'one'],
-            ['words' => 'two'],
+            ['id' => '1', 'words' => 'one'],
+            ['words' => 'two'], // id intentionally omitted
         ]);
 
         $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
         $this->assertEquals([
-            ['words' => 'one (augmented)'],
-            ['words' => 'two (augmented)'],
+            ['id' => '1', 'words' => 'one (augmented)'],
+            ['id' => null, 'words' => 'two (augmented)'],
         ], collect($augmented)->toArray());
     }
 

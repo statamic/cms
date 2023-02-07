@@ -3,7 +3,6 @@
 namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Fieldtypes\RowId;
-use ProseMirrorToHtml\Renderer;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -35,13 +34,25 @@ class Bard extends Replicator
                 'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
                 'type' => 'select',
                 'cast_booleans' => true,
-                'width' => 33,
+                'width' => 50,
                 'options' => [
                     'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
                     'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
                     'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
                 ],
                 'default' => false,
+            ],
+            'placeholder' => [
+                'display' => __('Placeholder'),
+                'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                'type' => 'text',
+                'width' => 50,
+            ],
+            'character_limit' => [
+                'display' => __('Character Limit'),
+                'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
+                'type' => 'text',
+                'width' => 50,
             ],
             'always_show_set_button' => [
                 'display' => __('Always Show Set Button'),
@@ -55,6 +66,13 @@ class Bard extends Replicator
                 'instructions' => __('statamic::fieldtypes.bard.config.previews'),
                 'type' => 'toggle',
                 'default' => true,
+                'width' => 50,
+            ],
+            'smart_typography' => [
+                'display' => __('Smart Typography'),
+                'instructions' => __('statamic::fieldtypes.bard.config.smart_typography'),
+                'type' => 'toggle',
+                'default' => false,
                 'width' => 50,
             ],
             'sets' => [
@@ -96,6 +114,12 @@ class Bard extends Replicator
                 'instructions' => __('statamic::fieldtypes.bard.config.save_html'),
                 'type' => 'toggle',
             ],
+            'inline' => [
+                'display' => __('Inline'),
+                'instructions' => __('statamic::fieldtypes.bard.config.inline'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
             'toolbar_mode' => [
                 'display' => __('Toolbar Mode'),
                 'instructions' => __('statamic::fieldtypes.bard.config.toolbar_mode'),
@@ -128,18 +152,18 @@ class Bard extends Replicator
                 'width' => 50,
                 'instructions' => __('statamic::fieldtypes.bard.config.target_blank'),
             ],
-            'link_collections' => [
-                'display' => __('Link Collections'),
-                'instructions' => __('statamic::fieldtypes.bard.config.link_collections'),
-                'type' => 'collections',
-                'mode' => 'select',
-            ],
             'reading_time' => [
                 'display' => __('Show Reading Time'),
                 'instructions' => __('statamic::fieldtypes.bard.config.reading_time'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
+            ],
+            'link_collections' => [
+                'display' => __('Link Collections'),
+                'instructions' => __('statamic::fieldtypes.bard.config.link_collections'),
+                'type' => 'collections',
+                'mode' => 'select',
             ],
             'fullscreen' => [
                 'display' => __('Allow Fullscreen Mode'),
@@ -206,6 +230,8 @@ class Bard extends Replicator
             $value = $this->convertLegacyData($value);
         }
 
+        $value = $this->convertLegacyTiptap($value);
+
         return (new Augmentor($this))->augment($value, $shallow);
     }
 
@@ -214,6 +240,10 @@ class Bard extends Replicator
         $value = json_decode($value, true);
 
         $value = $this->removeEmptyNodes($value);
+
+        if ($this->config('inline')) {
+            $value = $this->unwrapInlineValue($value);
+        }
 
         $structure = collect($value)->map(function ($row) {
             if ($row['type'] !== 'set') {
@@ -305,10 +335,27 @@ class Bard extends Replicator
 
         if (is_string($value)) {
             $value = str_replace('statamic://', '', $value);
-            $doc = (new \HtmlToProseMirror\Renderer)->render($value);
+            $doc = (new Augmentor($this))->renderHtmlToProsemirror($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
+        }
+
+        $value = $this->convertLegacyTiptap($value);
+
+        if ($this->config('inline')) {
+            // Root should be text, if it's not this must be a block field converted
+            // to inline. In that instance unwrap the content of the first node.
+            if ($value[0]['type'] !== 'text') {
+                $value = $this->unwrapInlineValue($value);
+            }
+            $value = $this->wrapInlineValue($value);
+        } else {
+            // Root should not be text, if it is this must be an inline field converted
+            // to block. In that instance wrap the content in a paragraph node.
+            if ($value[0]['type'] === 'text') {
+                $value = $this->wrapInlineValue($value);
+            }
         }
 
         return collect($value)->map(function ($row, $i) {
@@ -350,9 +397,7 @@ class Bard extends Replicator
             return $value['type'] === 'set';
         })->values();
 
-        $renderer = new Renderer;
-
-        return $renderer->render([
+        return (new Augmentor($this))->renderProsemirrorToHtml([
             'type' => 'doc',
             'content' => $data,
         ]);
@@ -421,7 +466,7 @@ class Bard extends Replicator
                 if (empty($set['text'])) {
                     return;
                 }
-                $doc = (new \HtmlToProseMirror\Renderer)->render($set['text']);
+                $doc = (new Augmentor($this))->renderHtmlToProsemirror($set['text']);
 
                 return $doc['content'];
             }
@@ -435,6 +480,29 @@ class Bard extends Replicator
                     ],
                 ],
             ];
+        })->all();
+    }
+
+    protected function convertLegacyTiptap($value)
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        return collect($value)->map(function ($item, $key) {
+            if (is_array($item) && $key === 'attrs') {
+                return $item;
+            }
+
+            if (is_array($item)) {
+                return $this->convertLegacyTiptap($item);
+            }
+
+            if ($key === 'type') {
+                return Str::camel($item);
+            }
+
+            return $item;
         })->all();
     }
 
@@ -612,5 +680,18 @@ class Bard extends Replicator
         }
 
         return [$ref => $data];
+    }
+
+    private function wrapInlineValue($value)
+    {
+        return [[
+            'type' => 'paragraph',
+            'content' => $value,
+        ]];
+    }
+
+    private function unwrapInlineValue($value)
+    {
+        return $value[0]['content'] ?? [];
     }
 }

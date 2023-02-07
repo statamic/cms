@@ -13,6 +13,9 @@ use Tests\TestCase;
 
 class TaxonomiesStoreTest extends TestCase
 {
+    private $tempDir;
+    private $store;
+
     public function setUp(): void
     {
         parent::setUp();

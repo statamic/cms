@@ -8,6 +8,8 @@ use Statamic\Support\FileCollection;
 
 trait FilesystemAdapterTests
 {
+    private $adapter;
+
     /** @test */
     public function it_makes_a_file_collection()
     {

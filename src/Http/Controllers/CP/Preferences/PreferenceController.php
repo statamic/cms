@@ -1,14 +1,24 @@
 <?php
 
-namespace Statamic\Http\Controllers\CP\Users;
+namespace Statamic\Http\Controllers\CP\Preferences;
 
 use Illuminate\Http\Request;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Statamic;
 
 class PreferenceController extends CpController
 {
+    public function index()
+    {
+        if (! Statamic::pro() || User::current()->cannot('manage preferences')) {
+            return redirect()->route('statamic.cp.preferences.user.edit');
+        }
+
+        return view('statamic::preferences.index');
+    }
+
     /**
      * Store a user preference.
      *

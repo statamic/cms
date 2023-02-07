@@ -4,18 +4,24 @@ namespace Tests\Search;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
+use Mockery;
 use PHPUnit\Framework\Assert;
-use Statamic\Assets\AssetCollection;
-use Statamic\Auth\UserCollection;
 use Statamic\Contracts\Entries\Entry as EntryContract;
-use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Search;
+use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Search\Searchables;
-use Statamic\Taxonomies\TermCollection;
+use Statamic\Search\Searchables\Assets;
+use Statamic\Search\Searchables\Entries;
+use Statamic\Search\Searchables\Provider;
+use Statamic\Search\Searchables\Providers;
+use Statamic\Search\Searchables\Terms;
+use Statamic\Search\Searchables\Users;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -27,22 +33,52 @@ class SearchablesTest extends TestCase
     {
         parent::setUp();
 
-        AssetContainer::make('images')->save();
-        AssetContainer::make('documents')->save();
-        AssetContainer::make('audio')->save();
+        Taxonomy::make('tags')->save();
+
+        Storage::fake('images');
+        Storage::fake('documents');
+        Storage::fake('audio');
+        AssetContainer::make('images')->disk('images')->save();
+        AssetContainer::make('documents')->disk('documents')->save();
+        AssetContainer::make('audio')->disk('audio')->save();
+    }
+
+    /** @test */
+    public function it_checks_all_providers_for_whether_an_item_is_searchable()
+    {
+        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
+        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
+        app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
+        app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
+
+        $searchable = Mockery::mock();
+        $searchables = $this->makeSearchables(['searchables' => 'all']);
+
+        // Check twice.
+        // First time they'll all return false, so contains() will return false.
+        // Second time, assets will return true, so contains() will return true early, and users won't be checked.
+
+        $entries->shouldReceive('contains')->with($searchable)->twice()->andReturn(false, false);
+        $terms->shouldReceive('contains')->with($searchable)->twice()->andReturn(false, false);
+        $assets->shouldReceive('contains')->with($searchable)->twice()->andReturn(false, true);
+        $users->shouldReceive('contains')->with($searchable)->once()->andReturn(false);
+
+        $this->assertFalse($searchables->contains($searchable));
+        $this->assertTrue($searchables->contains($searchable));
     }
 
     /** @test */
     public function all_searchables_include_entries_terms_assets_and_users()
     {
-        $entries = [$entryA = Entry::make(), $entryB = Entry::make()];
-        Entry::shouldReceive('all')->once()->andReturn(EntryCollection::make($entries));
-        $terms = [$termA = Term::make(), $termB = Term::make()];
-        Term::shouldReceive('all')->once()->andReturn(TermCollection::make($terms));
-        $assets = [$assetA = Asset::make(), $assetB = Asset::make()];
-        Asset::shouldReceive('all')->once()->andReturn(AssetCollection::make($assets));
-        $users = [$userA = User::make(), $userB = User::make()];
-        User::shouldReceive('all')->once()->andReturn(UserCollection::make($users));
+        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
+        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
+        app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
+        app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
+
+        $entries->shouldReceive('provide')->andReturn(collect([$entryA = Entry::make(), $entryB = Entry::make()]));
+        $terms->shouldReceive('provide')->andReturn(collect([$termA = Term::make(), $termB = Term::make()]));
+        $assets->shouldReceive('provide')->andReturn(collect([$assetA = Asset::make(), $assetB = Asset::make()]));
+        $users->shouldReceive('provide')->andReturn(collect([$userA = User::make(), $userB = User::make()]));
 
         $searchables = $this->makeSearchables(['searchables' => 'all']);
 
@@ -60,217 +96,22 @@ class SearchablesTest extends TestCase
         $items = $searchables->all();
         $this->assertInstanceOf(Collection::class, $items);
         $this->assertEquals($everything, $items->all());
-
-        foreach ($everything as $searchable) {
-            $this->assertTrue($searchables->contains($searchable));
-        }
-
-        $this->assertFalse($searchables->contains(new NotSearchable));
     }
 
     /** @test */
-    public function it_gets_searchable_entries_in_specific_collections()
+    public function it_gets_searchables_from_specific_providers()
     {
-        $blog = [$entryA = Entry::make()->collection('blog'), $entryB = Entry::make()->collection('blog')];
-        $pages = [$entryC = Entry::make()->collection('pages'), $entryD = Entry::make()->collection('pages')];
-        $entry = Entry::make()->collection('events');
-        $term = Term::make();
-        $asset = Asset::make();
-        $user = User::make();
-        Term::shouldReceive('all')->never();
-        Term::shouldReceive('whereTaxonomy')->never();
-        Asset::shouldReceive('all')->never();
-        Asset::shouldReceive('whereContainer')->never();
-        User::shouldReceive('all')->never();
-        Entry::shouldReceive('whereCollection')->with('blog')->once()->andReturn(EntryCollection::make($blog));
-        Entry::shouldReceive('whereCollection')->with('pages')->once()->andReturn(EntryCollection::make($pages));
+        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
+        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
+        app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
 
-        $searchables = $this->makeSearchables(['searchables' => ['collection:blog', 'collection:pages']]);
+        $entries->shouldReceive('provide')->once()->andReturn(collect([$entryA = Entry::make(), $entryB = Entry::make()]));
+        $users->shouldReceive('provide')->once()->andReturn(collect([$userA = User::make(), $userB = User::make()]));
+        $terms->shouldReceive('provide')->never();
 
-        $expected = [$entryA, $entryB, $entryC, $entryD];
-        $this->assertEquals($expected, $searchables->all()->all());
-        foreach ($expected as $item) {
-            $this->assertTrue($searchables->contains($item));
-        }
-        $this->assertFalse($searchables->contains($term));
-        $this->assertFalse($searchables->contains($asset));
-        $this->assertFalse($searchables->contains($user));
-        $this->assertFalse($searchables->contains($entry));
-        $this->assertFalse($searchables->contains(new NotSearchable));
-    }
+        $searchables = $this->makeSearchables(['searchables' => ['collection:blog', 'collection:pages', 'users']]);
 
-    /** @test */
-    public function it_gets_searchable_entries_in_all_collections()
-    {
-        $entries = [Entry::make()->collection('blog'), Entry::make()->collection('pages')];
-        $term = Term::make();
-        $asset = Asset::make();
-        $user = User::make();
-        Term::shouldReceive('all')->never();
-        Term::shouldReceive('whereTaxonomy')->never();
-        Asset::shouldReceive('all')->never();
-        Asset::shouldReceive('whereContainer')->never();
-        User::shouldReceive('all')->never();
-        Entry::shouldReceive('all')->once()->andReturn(EntryCollection::make($entries));
-
-        $searchables = $this->makeSearchables(['searchables' => ['collection:*']]);
-
-        $this->assertEquals($entries, $searchables->all()->all());
-        foreach ($entries as $item) {
-            $this->assertTrue($searchables->contains($item));
-        }
-        $this->assertFalse($searchables->contains($term));
-        $this->assertFalse($searchables->contains($asset));
-        $this->assertFalse($searchables->contains($user));
-        $this->assertFalse($searchables->contains(new NotSearchable));
-    }
-
-    /** @test */
-    public function it_gets_searchable_terms_in_specific_taxonomies()
-    {
-        $tags = [$termA = Term::make()->taxonomy('tags'), $termB = Term::make()->taxonomy('tags')];
-        $categories = [$termC = Term::make()->taxonomy('categories'), $termD = Term::make()->taxonomy('categories')];
-        $entry = Entry::make();
-        $term = Term::make();
-        $asset = Asset::make();
-        $user = User::make();
-        Entry::shouldReceive('all')->never();
-        Entry::shouldReceive('whereTaxonomy')->never();
-        Asset::shouldReceive('all')->never();
-        Asset::shouldReceive('whereContainer')->never();
-        User::shouldReceive('all')->never();
-        Term::shouldReceive('whereTaxonomy')->with('tags')->once()->andReturn(TermCollection::make($tags));
-        Term::shouldReceive('whereTaxonomy')->with('categories')->once()->andReturn(TermCollection::make($categories));
-
-        $searchables = $this->makeSearchables(['searchables' => ['taxonomy:tags', 'taxonomy:categories']]);
-
-        $expected = [$termA, $termB, $termC, $termD];
-        $this->assertEquals($expected, $searchables->all()->all());
-        foreach ($expected as $item) {
-            $this->assertTrue($searchables->contains($item));
-        }
-        $this->assertFalse($searchables->contains($entry));
-        $this->assertFalse($searchables->contains($asset));
-        $this->assertFalse($searchables->contains($user));
-        $this->assertFalse($searchables->contains($term));
-        $this->assertFalse($searchables->contains(new NotSearchable));
-    }
-
-    /** @test */
-    public function it_gets_searchable_terms_in_all_taxonomies()
-    {
-        $terms = [Term::make(), Term::make()];
-        $entry = Entry::make();
-        $asset = Asset::make();
-        $user = User::make();
-        Entry::shouldReceive('all')->never();
-        Entry::shouldReceive('whereCollection')->never();
-        Asset::shouldReceive('all')->never();
-        Asset::shouldReceive('whereContainer')->never();
-        User::shouldReceive('all')->never();
-        Term::shouldReceive('all')->once()->andReturn(TermCollection::make($terms));
-
-        $searchables = $this->makeSearchables(['searchables' => ['taxonomy:*']]);
-
-        $this->assertEquals($terms, $searchables->all()->all());
-        foreach ($terms as $item) {
-            $this->assertTrue($searchables->contains($item));
-        }
-        $this->assertFalse($searchables->contains($entry));
-        $this->assertFalse($searchables->contains($asset));
-        $this->assertFalse($searchables->contains($user));
-        $this->assertFalse($searchables->contains(new NotSearchable));
-    }
-
-    /** @test */
-    public function it_gets_searchable_assets_in_specific_containers()
-    {
-        $images = [
-            $assetA = Asset::make()->container('images')->path('a.jpg'),
-            $assetB = Asset::make()->container('images')->path('b.jpg'),
-        ];
-        $documents = [
-            $assetC = Asset::make()->container('documents')->path('c.jpg'),
-            $assetD = Asset::make()->container('documents')->path('d.jpg'),
-        ];
-        $entry = Entry::make();
-        $term = Term::make();
-        $asset = Asset::make()->container('audio');
-        $user = User::make();
-        Entry::shouldReceive('all')->never();
-        Entry::shouldReceive('whereCollection')->never();
-        Term::shouldReceive('all')->never();
-        Term::shouldReceive('whereTaxonomy')->never();
-        User::shouldReceive('all')->never();
-        Asset::shouldReceive('whereContainer')->with('images')->once()->andReturn(AssetCollection::make($images));
-        Asset::shouldReceive('whereContainer')->with('documents')->once()->andReturn(AssetCollection::make($documents));
-
-        $searchables = $this->makeSearchables(['searchables' => ['assets:images', 'assets:documents']]);
-
-        $expected = [$assetA, $assetB, $assetC, $assetD];
-        $this->assertEquals($expected, $searchables->all()->all());
-        foreach ($expected as $item) {
-            $this->assertTrue($searchables->contains($item));
-        }
-        $this->assertFalse($searchables->contains($entry));
-        $this->assertFalse($searchables->contains($asset));
-        $this->assertFalse($searchables->contains($user));
-        $this->assertFalse($searchables->contains($term));
-        $this->assertFalse($searchables->contains(new NotSearchable));
-    }
-
-    /** @test */
-    public function it_gets_searchable_assets_in_all_containers()
-    {
-        $assets = [Asset::make(), Asset::make()];
-        $entry = Entry::make();
-        $term = Term::make();
-        $user = User::make();
-        Entry::shouldReceive('all')->never();
-        Entry::shouldReceive('whereCollection')->never();
-        Term::shouldReceive('all')->never();
-        Term::shouldReceive('whereTaxonomy')->never();
-        User::shouldReceive('all')->never();
-
-        Asset::shouldReceive('all')->once()->andReturn(AssetCollection::make($assets));
-
-        $searchables = $this->makeSearchables(['searchables' => ['assets:*']]);
-        $this->assertEquals($assets, $searchables->all()->all());
-        foreach ($assets as $item) {
-            $this->assertTrue($searchables->contains($item));
-        }
-        $this->assertFalse($searchables->contains($entry));
-        $this->assertFalse($searchables->contains($term));
-        $this->assertFalse($searchables->contains($user));
-        $this->assertFalse($searchables->contains(new NotSearchable));
-    }
-
-    /** @test */
-    public function it_gets_searchable_users()
-    {
-        $users = [User::make(), User::make()];
-        $entry = Entry::make();
-        $term = Term::make();
-        $user = User::make();
-        $asset = Asset::make();
-        Entry::shouldReceive('all')->never();
-        Entry::shouldReceive('whereCollection')->never();
-        Term::shouldReceive('all')->never();
-        Term::shouldReceive('whereTaxonomy')->never();
-        Asset::shouldReceive('all')->never();
-        Asset::shouldReceive('whereContainer')->never();
-
-        User::shouldReceive('all')->once()->andReturn(UserCollection::make($users));
-
-        $searchables = $this->makeSearchables(['searchables' => ['users']]);
-        $this->assertEquals($users, $searchables->all()->all());
-        foreach ($users as $item) {
-            $this->assertTrue($searchables->contains($item));
-        }
-        $this->assertFalse($searchables->contains($entry));
-        $this->assertFalse($searchables->contains($term));
-        $this->assertFalse($searchables->contains($asset));
-        $this->assertFalse($searchables->contains(new NotSearchable));
+        $this->assertEquals([$entryA, $entryB, $userA, $userB], $searchables->all()->all());
     }
 
     /** @test */
@@ -294,6 +135,7 @@ class SearchablesTest extends TestCase
         $index = app(\Statamic\Search\Comb\Index::class, [
             'name' => 'default',
             'config' => config('statamic.search.indexes.default'),
+            'locale' => 'en',
         ]);
 
         $searchable = EntryFactory::collection('test')->id('a')->data(['title' => 'Hello'])->make();
@@ -315,6 +157,7 @@ class SearchablesTest extends TestCase
         $index = app(\Statamic\Search\Comb\Index::class, [
             'name' => 'default',
             'config' => config('statamic.search.indexes.default'),
+            'locale' => 'en',
         ]);
 
         $searchable = EntryFactory::collection('test')->data(['title' => 'Hello'])->make();
@@ -340,6 +183,7 @@ class SearchablesTest extends TestCase
         $index = app(\Statamic\Search\Comb\Index::class, [
             'name' => 'default',
             'config' => config('statamic.search.indexes.default'),
+            'locale' => 'en',
         ]);
 
         $searchable = EntryFactory::collection('test')->id('a')->data(['title' => 'Hello'])->make();
@@ -367,6 +211,7 @@ class SearchablesTest extends TestCase
         $index = app(\Statamic\Search\Comb\Index::class, [
             'name' => 'default',
             'config' => config('statamic.search.indexes.default'),
+            'locale' => 'en',
         ]);
 
         $searchable = EntryFactory::collection('test')->data(['title' => 'Hello'])->make();
@@ -394,6 +239,7 @@ class SearchablesTest extends TestCase
         $index = app(\Statamic\Search\Comb\Index::class, [
             'name' => 'default',
             'config' => config('statamic.search.indexes.default'),
+            'locale' => 'en',
         ]);
 
         $searchable = EntryFactory::collection('test')->data(['title' => 'Hello'])->make();
@@ -420,6 +266,7 @@ class SearchablesTest extends TestCase
         $index = app(\Statamic\Search\Comb\Index::class, [
             'name' => 'default',
             'config' => config('statamic.search.indexes.default'),
+            'locale' => 'en',
         ]);
 
         $searchable = EntryFactory::collection('test')->data(['title' => 'Hello'])->make();
@@ -429,6 +276,31 @@ class SearchablesTest extends TestCase
             'title' => 'Hello',
             'title_upper' => 'HELLO',
         ], $searchables->fields($searchable));
+    }
+
+    /** @test */
+    public function can_register_a_custom_searchable_and_get_results()
+    {
+        $a = new TestCustomSearchable(['title' => 'Custom 1']);
+        $b = new TestCustomSearchable(['title' => 'Custom 2']);
+        $c = new NotSearchable;
+        app()->instance('all-custom-searchables', collect([$a, $b]));
+
+        Search::registerSearchableProvider(TestCustomSearchables::class);
+
+        $searchables = $this->makeSearchables(['searchables' => ['custom']]);
+
+        $this->assertEquals([$a, $b], $searchables->all()->all());
+        $this->assertTrue($searchables->contains($a));
+        $this->assertTrue($searchables->contains($b));
+        $this->assertFalse($searchables->contains($c));
+    }
+
+    /** @test */
+    public function it_throws_exception_when_using_unknown_searchable()
+    {
+        $this->expectExceptionMessage('Unknown searchable [test]');
+        $this->makeSearchables(['searchables' => ['test']]);
     }
 
     private function makeSearchables($config)
@@ -467,5 +339,37 @@ class ArrayTestTransformer
             $field => $value,
             $field.'_upper' => strtoupper($value),
         ];
+    }
+}
+
+class TestCustomSearchable
+{
+    //
+}
+
+class TestCustomSearchables extends Provider
+{
+    public static function handle(): string
+    {
+        return 'custom';
+    }
+
+    public function find(array $keys): Collection
+    {
+    }
+
+    public static function referencePrefix(): string
+    {
+        return 'customprefix';
+    }
+
+    public function provide(): Collection
+    {
+        return app('all-custom-searchables');
+    }
+
+    public function contains($searchable): bool
+    {
+        return $searchable instanceof TestCustomSearchable;
     }
 }

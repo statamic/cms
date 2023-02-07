@@ -3,6 +3,12 @@
 namespace Tests\Search;
 
 use Illuminate\Support\Carbon;
+use Mockery;
+use Statamic\Contracts\Search\Result;
+use Statamic\Contracts\Search\Result as SearchResult;
+use Statamic\Contracts\Search\Searchable;
+use Statamic\Search\Index;
+use Statamic\Search\ProvidesSearchables;
 use Statamic\Search\QueryBuilder;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -24,6 +30,60 @@ class QueryBuilderTest extends TestCase
 
         $this->assertCount(3, $results);
         $this->assertEquals(['a', 'b', 'c'], $results->map->reference->all());
+    }
+
+    /** @test */
+    public function it_can_get_results_with_data()
+    {
+        // Using actual searchable providers here simply because calling
+        // static methods on mocks is a pain. We override the entries
+        // and users providers in the container with the mocks.
+
+        $items = collect([
+            ['reference' => 'entry::a', 'search_score' => 2],
+            ['reference' => 'user::b', 'search_score' => 1],
+            ['reference' => 'entry::c', 'search_score' => 3],
+        ]);
+
+        $resultA = Mockery::mock(SearchResult::class);
+        $resultA->shouldReceive('setIndex')->once()->andReturnSelf();
+        $resultA->shouldReceive('setRawResult')->with(['reference' => 'entry::a', 'search_score' => 2])->once()->andReturnSelf();
+        $resultA->shouldReceive('setScore')->with(2)->once()->andReturnSelf();
+        $resultA->shouldReceive('getScore')->andReturn(2)->once();
+        $resultA->shouldReceive('getReference')->andReturn('entry::a')->once();
+        $resultB = Mockery::mock(SearchResult::class);
+        $resultB->shouldReceive('setIndex')->once()->andReturnSelf();
+        $resultB->shouldReceive('setRawResult')->with(['reference' => 'user::b', 'search_score' => 1])->once()->andReturnSelf();
+        $resultB->shouldReceive('setScore')->with(1)->once()->andReturnSelf();
+        $resultB->shouldReceive('getScore')->andReturn(1)->once();
+        $resultB->shouldReceive('getReference')->andReturn('user::b')->once();
+        $resultC = Mockery::mock(SearchResult::class);
+        $resultC->shouldReceive('setIndex')->once()->andReturnSelf();
+        $resultC->shouldReceive('setRawResult')->with(['reference' => 'entry::c', 'search_score' => 3])->once()->andReturnSelf();
+        $resultC->shouldReceive('setScore')->with(3)->once()->andReturnSelf();
+        $resultC->shouldReceive('getScore')->andReturn(3)->once();
+        $resultC->shouldReceive('getReference')->andReturn('entry::c')->once();
+
+        $a = Mockery::mock(Searchable::class);
+        $a->shouldReceive('toSearchResult')->andReturn($resultA);
+        $b = Mockery::mock(Searchable::class);
+        $b->shouldReceive('toSearchResult')->andReturn($resultB);
+        $c = Mockery::mock(Searchable::class);
+        $c->shouldReceive('toSearchResult')->andReturn($resultC);
+
+        $foo = Mockery::mock(ProvidesSearchables::class);
+        $foo->shouldReceive('find')->with(['a', 'c'])->andReturn(collect([$c, $a])); // return it in the wrong order to make sure it gets ordered by score
+        $this->app->instance(\Statamic\Search\Searchables\Entries::class, $foo);
+
+        $bar = Mockery::mock(ProvidesSearchables::class);
+        $bar->shouldReceive('find')->with(['b'])->andReturn(collect([$b]));
+        $this->app->instance(\Statamic\Search\Searchables\Users::class, $bar);
+
+        $results = (new FakeQueryBuilder($items))->get();
+
+        $this->assertCount(3, $results);
+        $this->assertEveryItemIsInstanceOf(Result::class, $results);
+        $this->assertEquals([$resultC, $resultA, $resultB], $results->all());
     }
 
     /** @test **/
@@ -574,6 +634,7 @@ class FakeQueryBuilder extends QueryBuilder
     public function __construct($results)
     {
         $this->results = $results;
+        parent::__construct(Mockery::mock(Index::class));
     }
 
     public function getSearchResults($query)

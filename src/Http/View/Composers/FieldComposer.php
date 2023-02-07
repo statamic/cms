@@ -3,9 +3,11 @@
 namespace Statamic\Http\View\Composers;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Validator;
 use Statamic\Facades\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 
 class FieldComposer
 {
@@ -20,6 +22,7 @@ class FieldComposer
     {
         Statamic::provideToScript([
             'fieldsets' => $this->fieldsets(),
+            'extensionRules' => $this->extensionRules(),
         ]);
     }
 
@@ -34,5 +37,18 @@ class FieldComposer
                 })->sortBy('config.display')->values()->all(),
             ]];
         })->sortBy('title');
+    }
+
+    private function extensionRules()
+    {
+        return collect(Validator::make([], [])->extensions)
+            ->keys()
+            ->map(function ($rule) {
+                return [
+                    'label' => Str::title(str_replace('_', ' ', $rule)),
+                    'value' => $rule,
+                ];
+            })
+            ->all();
     }
 }

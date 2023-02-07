@@ -31,8 +31,8 @@ class GridFieldtypeTest extends TestCase
                 'type' => 'grid',
                 'fields' => [
                     ['handle' => 'food', 'field' => ['type' => 'text']],
-                    ['handle' => 'drink', 'field' => ['type' => 'text']],
-                    ['handle' => 'stuff', 'field' => ['type' => 'entries']],
+                    ['handle' => 'drink', 'field' => ['type' => 'markdown']], // using markdown to show nested fields are resolved using their fieldtype.
+                    ['handle' => 'stuff', 'field' => ['type' => 'entries']], // using entries to query builders get resolved
                 ],
             ],
         ]);
@@ -50,8 +50,8 @@ class GridFieldtypeTest extends TestCase
         EntryFactory::collection('blog')->id('1')->data([
             'title' => 'Main Post',
             'meals' => [
-                ['food' => 'burger', 'drink' => 'coke'],
-                ['food' => 'salad', 'drink' => 'water', 'stuff' => ['stuff1']],
+                ['id' => '1', 'food' => 'burger', 'drink' => 'coke _zero_'],
+                ['food' => 'salad', 'drink' => 'water', 'stuff' => ['stuff1']], // id intentionally omitted
             ],
         ])->create();
 
@@ -63,8 +63,10 @@ class GridFieldtypeTest extends TestCase
         title
         ... on Entry_Blog_Article {
             meals {
+                id
                 food
                 drink
+                drink_md: drink(format: "markdown")
                 stuff {
                     title
                 }
@@ -82,8 +84,8 @@ GQL;
                 'entry' => [
                     'title' => 'Main Post',
                     'meals' => [
-                        ['food' => 'burger', 'drink' => 'coke', 'stuff' => []],
-                        ['food' => 'salad', 'drink' => 'water', 'stuff' => [['title' => 'One']]],
+                        ['id' => '1', 'food' => 'burger', 'drink' => "<p>coke <em>zero</em></p>\n", 'drink_md' => 'coke _zero_', 'stuff' => []],
+                        ['id' => null, 'food' => 'salad', 'drink' => "<p>water</p>\n", 'drink_md' => 'water', 'stuff' => [['title' => 'One']]],
                     ],
                 ],
             ]]);

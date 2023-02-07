@@ -16,7 +16,7 @@ use Statamic\Sites\Site;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Structures\Page;
 use Statamic\Taxonomies\Taxonomy;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
 
 class ScopeDumper
 {
@@ -173,7 +173,7 @@ class ScopeDumper
             } elseif ($v instanceof Site) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $this->additionalVars[$thisVar] = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $this->additionalVars[$thisVar] = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
 
                 $variable->value = '{site}';
                 $variable->variablesReference = $thisVar;
@@ -201,7 +201,7 @@ class ScopeDumper
                 $resolvedValue = null;
 
                 if ($v instanceof Augmentable) {
-                    $resolvedValue = RuntimeValueCache::resolveWithRuntimeIsolation($v);
+                    $resolvedValue = RuntimeValues::resolveWithRuntimeIsolation($v);
                 } else {
                     $resolvedValue = $v->value();
                 }
@@ -241,7 +241,7 @@ class ScopeDumper
             } elseif ($v instanceof Collection) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{Entries\Collection['.count($subVar).']}';
@@ -251,7 +251,7 @@ class ScopeDumper
             } elseif ($v instanceof Page) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{Page['.count($subVar).']}';
@@ -273,7 +273,7 @@ class ScopeDumper
             } elseif ($v instanceof Entry) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{Entry['.count($subVar).']}';
@@ -283,7 +283,7 @@ class ScopeDumper
             } elseif ($v instanceof Blueprint) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{Blueprint['.count($subVar).']}';
@@ -293,7 +293,7 @@ class ScopeDumper
             } elseif ($v instanceof User) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{User['.count($subVar).']}';
@@ -303,7 +303,7 @@ class ScopeDumper
             } elseif ($v instanceof \Statamic\Auth\Eloquent\User) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{EloquentUser['.count($subVar).']}';
@@ -313,7 +313,7 @@ class ScopeDumper
             } elseif ($v instanceof Taxonomy) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{Taxonomy['.count($subVar).']}';

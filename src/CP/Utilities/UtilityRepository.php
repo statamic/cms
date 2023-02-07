@@ -2,16 +2,32 @@
 
 namespace Statamic\CP\Utilities;
 
+use Facades\Statamic\CP\Utilities\CoreUtilities;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\User;
 
 class UtilityRepository
 {
     protected $utilities;
+    protected $extensions = [];
 
     public function __construct()
     {
         $this->utilities = collect([]);
+    }
+
+    public function boot()
+    {
+        CoreUtilities::boot();
+
+        foreach ($this->extensions as $callback) {
+            $callback($this);
+        }
+    }
+
+    public function extend($callback)
+    {
+        $this->extensions[] = $callback;
     }
 
     public function make($handle)
@@ -19,9 +35,21 @@ class UtilityRepository
         return (new Utility)->handle($handle);
     }
 
+    public function register($utility)
+    {
+        if (! $utility instanceof Utility) {
+            $utility = $this->make($utility);
+        }
+
+        $this->utilities[$utility->handle()] = $utility;
+
+        return $utility;
+    }
+
+    /** @deprecated */
     public function push(Utility $utility)
     {
-        $this->utilities[$utility->handle()] = $utility;
+        $this->register($utility);
 
         return $this;
     }
@@ -45,6 +73,8 @@ class UtilityRepository
 
     public function routes()
     {
+        $this->boot();
+
         Route::namespace('\\')->prefix('utilities')->name('utilities.')->group(function () {
             $this->all()->each(function ($utility) {
                 if ($utility->action()) {
