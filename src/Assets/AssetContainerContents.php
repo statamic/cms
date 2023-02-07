@@ -29,17 +29,11 @@ class AssetContainerContents
         return $this->files = Cache::remember($this->key(), $this->ttl(), function () {
             // Use Flysystem directly because it gives us type, timestamps, dirname
             // and will let us perform more efficient filtering and caching.
-            $files = $this->filesystem()->listContents('/', true);
+            $directoryListing = $this->filesystem()->listContents('/', true)->toArray();
 
-            if (! is_array($files)) {
-                // Flysystem v3 is a DirectoryListing class, not an array.
-                $files = collect($files->toArray())->keyBy('path')->map(function ($file) {
-                    return $this->normalizeFlysystemAttributes($file);
-                });
-            } else {
-                // Flysystem 1.x is an array.
-                $files = collect($files)->keyBy('path');
-            }
+            $files = collect($directoryListing)
+                ->keyBy('path')
+                ->map(fn ($file) => $this->normalizeFlysystemAttributes($file));
 
             return $this
                 ->ensureMissingDirectoriesExist($files)
@@ -48,21 +42,21 @@ class AssetContainerContents
     }
 
     /**
-     * Normalize flysystem 3.x `FileAttributes` and `DirectoryAttributes` payloads back to the 1.x array style.
+     * Normalize `FileAttributes` and `DirectoryAttributes` payloads to the legacy Statamic array style.
      *
      * @param  mixed  $attributes
      * @return array
      */
     private function normalizeFlysystemAttributes($attributes)
     {
-        // Merge attributes with `pathinfo()`, since Flysystem 3.x removed `Util::pathinfo()`.
+        // Merge attributes with `pathinfo()`.
         $normalized = array_merge([
             'type' => $attributes->type(),
             'path' => $attributes->path(),
             'timestamp' => $attributes->lastModified(),
         ], pathinfo($attributes['path']));
 
-        // Flysystem 1.x never returned `.` dirnames.
+        // Flysystem 3+ now returns `.` dirnames, but the rest of our system expects an empty string.
         if (isset($normalized['dirname']) && $normalized['dirname'] === '.') {
             $normalized['dirname'] = '';
         }
@@ -113,22 +107,16 @@ class AssetContainerContents
     }
 
     /**
-     * Normalize flysystem 3.x meta data to match 1.x payloads.
+     * Get normalized flysystem meta data.
      *
      * @param  string  $path
      * @return array
      */
     private function getNormalizedFlysystemMetadata($path)
     {
-        $isFlysystemV1 = method_exists($this->filesystem(), 'getTimestamp');
-
-        // Determine whether or not to use Flysystem 1.x or 3.x getter methods.
-        $lastModifiedMethod = $isFlysystemV1 ? 'getTimestamp' : 'lastModified';
-        $fileSizeMethod = $isFlysystemV1 ? 'getSize' : 'fileSize';
-
         // Use exception handling to avoid another `has()` API method call if possible.
         try {
-            $timestamp = $this->filesystem()->{$lastModifiedMethod}($path);
+            $timestamp = $this->filesystem()->lastModified($path);
         } catch (\Exception $exception) {
             $timestamp = null;
         }
@@ -142,7 +130,7 @@ class AssetContainerContents
 
         // Use exception handling to normalize file size output.
         try {
-            $size = $this->filesystem()->{$fileSizeMethod}($path);
+            $size = $this->filesystem()->fileSize($path);
         } catch (\Exception $exception) {
             $size = false;
         }
@@ -150,10 +138,10 @@ class AssetContainerContents
         // Determine `type` off returned size to avoid another API method call.
         $type = $size === false ? 'dir' : 'file';
 
-        // Merge `pathinfo()` in, since Flysystem 3.x removed `Util::pathinfo()`.
+        // Merge attributes with `pathinfo()`.
         $normalized = array_merge(compact('type', 'path', 'timestamp'), pathinfo($path));
 
-        // Flysystem 1.x never returned `.` dirnames.
+        // Flysystem 3+ now returns `.` dirnames, but the rest of our system expects an empty string.
         if (isset($normalized['dirname']) && $normalized['dirname'] === '.') {
             $normalized['dirname'] = '';
         }
