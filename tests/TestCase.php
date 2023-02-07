@@ -17,6 +17,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         parent::setUp();
 
+        $this->withoutVite();
+
         $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[PreventSavingStacheItemsToDisk::class])) {
