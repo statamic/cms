@@ -14,11 +14,11 @@
            ->withEntryPoints($vite['input']) }}
 @endforeach
 
-@php
-    $start = 'Statamic.config('.json_encode(array_merge(Statamic::jsonVariables(request()), [
-        'wrapperClass' => $__env->getSection('wrapper_class', 'max-w-xl')
-    ])).'); Statamic.start()';
-@endphp
+<script>
+var StatamicConfig = @json(array_merge(Statamic::jsonVariables(request()), [
+    'wrapperClass' => $__env->getSection('wrapper_class', 'max-w-xl')
+]))
+</script>
 
 {{-- Deferred to allow Vite modules to load first --}}
-<script src="data:text/javascript;base64,{{ base64_encode($start) }}" defer></script>
+<script src="data:text/javascript;base64,{{ base64_encode('Statamic.config(StatamicConfig); Statamic.start()') }}" defer></script>
