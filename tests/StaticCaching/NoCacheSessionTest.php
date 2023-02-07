@@ -149,6 +149,19 @@ class NoCacheSessionTest extends TestCase
     }
 
     /** @test */
+    public function it_ignores_the_query_string()
+    {
+        config(['statamic.static_caching.ignore_query_strings' => true]);
+
+        $this->get('/test?foo=bar');
+
+        $session = $this->app->make(Session::class);
+
+        $this->assertInstanceOf(Session::class, $session);
+        $this->assertEquals('http://localhost/test', $session->url());
+    }
+
+    /** @test */
     public function it_writes_session_if_a_nocache_tag_is_used()
     {
         $this->withStandardFakeViews();
