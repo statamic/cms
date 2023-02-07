@@ -1,5 +1,5 @@
-module.exports = function(value) {
-	var striptags = require('striptags')
+import striptags from 'striptags';
 
+export default function(value) {
 	return striptags(value);
 };
