@@ -35,11 +35,11 @@ class ServiceProvider extends LaravelServiceProvider
 
         $this->app->singleton(Session::class, function ($app) {
             $uri = $app['request']->getUri();
-            
+
             if (config('statamic.static_caching.ignore_query_strings', false)) {
                 $uri = explode('?', $uri)[0];
             }
-            
+
             return new Session($uri);
         });
 
