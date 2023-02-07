@@ -1,10 +1,10 @@
 @foreach (Statamic::availableExternalScripts(request()) as $url)
-    <script src="{{ $url }}"></script>
+    <script src="{{ $url }}" defer></script>
 @endforeach
 
 @foreach (Statamic::availableScripts(request()) as $package => $paths)
     @foreach ($paths as $path)
-        <script src="{{ Statamic::vendorPackageAssetUrl($package, $path, 'js') }}"></script>
+        <script src="{{ Statamic::vendorPackageAssetUrl($package, $path, 'js') }}" defer></script>
     @endforeach
 @endforeach
 
