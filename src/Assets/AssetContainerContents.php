@@ -2,6 +2,7 @@
 
 namespace Statamic\Assets;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -40,29 +41,9 @@ class AssetContainerContents
                 $files = collect($files)->keyBy('path');
             }
 
-            $files
-                ->filter(fn ($item) => $item['type'] === 'file')
-                ->each(function ($file) use ($files) {
-                    $dirname = $file['dirname'];
-
-                    while ($dirname !== '') {
-                        $parentDir = pathinfo($dirname, PATHINFO_DIRNAME);
-                        $parentDir = $parentDir === '.' ? '' : $parentDir;
-
-                        $files->put($dirname, [
-                            'type' => 'dir',
-                            'path' => $dirname,
-                            'basename' => $basename = pathinfo($dirname, PATHINFO_BASENAME),
-                            'filename' => $basename,
-                            'timestamp' => null,
-                            'dirname' => $parentDir,
-                        ]);
-
-                        $dirname = $parentDir;
-                    }
-                });
-
-            return $files->sortKeys();
+            return $this
+                ->ensureMissingDirectoriesExist($files)
+                ->sortKeys();
         });
     }
 
@@ -92,6 +73,43 @@ class AssetContainerContents
         }
 
         return $normalized;
+    }
+
+    /**
+     * Ensure missing directories exist.
+     *
+     * Note: S3 doesn't always return directories as part of the listings, so
+     * this method ensures we get consistent results with S3 filesystems.
+     * For more info, see: https://github.com/statamic/cms/pull/7205
+     *
+     * @param  Collection  $files
+     * @return Collection
+     */
+    private function ensureMissingDirectoriesExist(Collection $files): Collection
+    {
+        $files
+            ->filter(fn ($item) => $item['type'] === 'file')
+            ->each(function ($file) use ($files) {
+                $dirname = $file['dirname'];
+
+                while ($dirname !== '') {
+                    $parentDir = pathinfo($dirname, PATHINFO_DIRNAME);
+                    $parentDir = $parentDir === '.' ? '' : $parentDir;
+
+                    $files->put($dirname, [
+                        'type' => 'dir',
+                        'path' => $dirname,
+                        'basename' => $basename = pathinfo($dirname, PATHINFO_BASENAME),
+                        'filename' => $basename,
+                        'timestamp' => null,
+                        'dirname' => $parentDir,
+                    ]);
+
+                    $dirname = $parentDir;
+                }
+            });
+
+        return $files;
     }
 
     /**
