@@ -7,9 +7,8 @@
     "svgo": "svgo -f ./resources/svg/  -r",
     "test": "cross-env NODE_ENV=test jest --silent",
     "test-watch": "npm run test -- --watch --notify",
-    "frontend-dev": "npm run development -- --env.mixfile=frontend.mix",
-    "frontend-prod": "npm run production -- --env.mixfile=frontend.mix",
-    "frontend-watch": "npm run watch -- --env.mixfile=frontend.mix"
+    "frontend-dev": "vite -c vite-frontend.config.js",
+    "frontend-build": "vite build -c vite-frontend.config.js"
   },
   "dependencies": {
     "@popperjs/core": "^2.5.3",
