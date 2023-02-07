@@ -97,6 +97,7 @@
     "vuex": "^3.1.2"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.20.2",
     "@rollup/plugin-inject": "^5.0.3",
     "@vitejs/plugin-vue2": "^2.2.0",
     "babel-jest": "^24.9.0",
