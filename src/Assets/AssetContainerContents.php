@@ -4,6 +4,7 @@ namespace Statamic\Assets;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use League\Flysystem\DirectoryListing;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
@@ -20,6 +21,11 @@ class AssetContainerContents
         $this->container = $container;
     }
 
+    /**
+     * Get all asset container contents.
+     *
+     * @return Collection
+     */
     public function all()
     {
         if ($this->files && ! Statamic::isWorker()) {
@@ -27,18 +33,22 @@ class AssetContainerContents
         }
 
         return $this->files = Cache::remember($this->key(), $this->ttl(), function () {
-            // Use Flysystem directly because it gives us type, timestamps, dirname
-            // and will let us perform more efficient filtering and caching.
-            $directoryListing = $this->filesystem()->listContents('/', true)->toArray();
-
-            $files = collect($directoryListing)
+            return collect($this->getRawFlysystemDirectoryListing())
                 ->keyBy('path')
-                ->map(fn ($file) => $this->normalizeFlysystemAttributes($file));
-
-            return $this
-                ->ensureMissingDirectoriesExist($files)
+                ->map(fn ($file) => $this->normalizeFlysystemAttributes($file))
+                ->pipe(fn ($files) => $this->ensureMissingDirectoriesExist($files))
                 ->sortKeys();
         });
+    }
+
+    /**
+     * Flysystem's `DirectoryListing` gives us type, timestamps, dirname, and will allow us perform more efficient filtering, caching, etc.
+     *
+     * @return DirectoryListing
+     */
+    private function getRawFlysystemDirectoryListing(): DirectoryListing
+    {
+        return $this->filesystem()->listContents('/', true);
     }
 
     /**
