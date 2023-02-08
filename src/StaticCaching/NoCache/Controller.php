@@ -9,7 +9,11 @@ class Controller
 {
     public function __invoke(Request $request, Session $session)
     {
-        $url = $request->input('url'); // todo: maybe strip off query params?
+        $url = $request->input('url');
+
+        if (config('statamic.static_caching.ignore_query_strings', false)) {
+            $url = explode('?', $url)[0];
+        }
 
         $session = $session->setUrl($url)->restore();
 
