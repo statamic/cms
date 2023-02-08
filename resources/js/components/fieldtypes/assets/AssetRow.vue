@@ -7,7 +7,7 @@
                 :style="'background-image:url(' + thumbnail + ')'"
             ></div>
             <button
-                class="w-7 h-7 cursor-pointer whitespace-no-wrap flex items-center justify-center"
+                class="w-7 h-7 cursor-pointer whitespace-nowrap flex items-center justify-center"
                 @click="edit"
                 v-else
             >

@@ -41,7 +41,7 @@
                             >
                                 <td class="flex items-center">
                                     <div
-                                        class="w-7 h-7 cursor-pointer whitespace-no-wrap flex items-center justify-center"
+                                        class="w-7 h-7 cursor-pointer whitespace-nowrap flex items-center justify-center"
                                     >
                                         <file-icon :extension="getExtension(file)" />
                                     </div>

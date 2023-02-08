@@ -196,7 +196,7 @@ input.input-text-minimal:read-only,
 
     select {
         @apply text-sm text-grey-80 shadow-button cursor-pointer block w-full h-full text-left relative max-w-full;
-        @apply select-none rounded leading-normal align-middle whitespace-no-wrap appearance-none subpixel-antialiased;
+        @apply select-none rounded leading-normal align-middle whitespace-nowrap appearance-none subpixel-antialiased;
 
         background: linear-gradient(180deg, #fff, #f9fafb);
         border: 1px solid #c4cdd6;

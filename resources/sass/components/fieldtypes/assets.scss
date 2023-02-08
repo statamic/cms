@@ -18,7 +18,7 @@
     }
 
     .upload-text-button {
-        @apply text-blue underline whitespace-no-wrap;
+        @apply text-blue underline whitespace-nowrap;
         &:hover {
             @apply text-blue-dark;
         }

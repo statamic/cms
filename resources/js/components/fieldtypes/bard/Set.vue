@@ -9,7 +9,7 @@
             <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" data-drag-handle />
                 <div class="flex-1 p-1 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label v-text="display || config.handle" class="text-xs whitespace-no-wrap mr-1"/>
+                    <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-1"/>
                     <div
                         v-if="config.instructions"
                         v-show="!collapsed"
@@ -19,7 +19,7 @@
                     <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-4">
                         <div
                             v-html="previewText"
-                            class="help-block mb-0 whitespace-no-wrap overflow-hidden text-overflow-ellipsis" />
+                            class="help-block mb-0 whitespace-nowrap overflow-hidden text-overflow-ellipsis" />
                     </div>
                 </div>
                 <div class="replicator-set-controls">
