@@ -1,5 +1,5 @@
 <script>
-require('dmuploader')
+import 'dm-file-uploader';
 
 export default {
 

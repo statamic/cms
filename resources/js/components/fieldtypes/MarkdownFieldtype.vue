@@ -120,23 +120,23 @@
 </template>
 
 <script>
-var CodeMirror = require('codemirror');
-var { marked } = require('marked');
-var PlainTextRenderer = require('marked-plaintext');
+import { marked } from 'marked';
+import PlainTextRenderer from 'marked-plaintext';
 
-require('codemirror/addon/edit/closebrackets');
-require('codemirror/addon/edit/matchbrackets');
-require('codemirror/addon/display/autorefresh');
-require('codemirror/mode/htmlmixed/htmlmixed');
-require('codemirror/mode/xml/xml');
-require('codemirror/mode/markdown/markdown');
-require('codemirror/mode/gfm/gfm');
-require('codemirror/mode/javascript/javascript');
-require('codemirror/mode/css/css');
-require('codemirror/mode/clike/clike');
-require('codemirror/mode/php/php');
-require('codemirror/mode/yaml/yaml');
-require('codemirror/addon/edit/continuelist');
+import CodeMirror from 'codemirror/lib/codemirror';
+import 'codemirror/addon/edit/closebrackets';
+import 'codemirror/addon/edit/matchbrackets';
+import 'codemirror/addon/display/autorefresh';
+import 'codemirror/mode/htmlmixed/htmlmixed';
+import 'codemirror/mode/xml/xml';
+import 'codemirror/mode/markdown/markdown';
+import 'codemirror/mode/gfm/gfm';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/css/css';
+import 'codemirror/mode/clike/clike';
+import 'codemirror/mode/php/php';
+import 'codemirror/mode/yaml/yaml';
+import 'codemirror/addon/edit/continuelist';
 
 import Selector from '../assets/Selector.vue';
 import Uploader from '../assets/Uploader.vue';

@@ -1,4 +1,4 @@
-var getSlug = require('speakingurl');
+import getSlug from 'speakingurl';
 
 export default {
     install(Vue, options) {

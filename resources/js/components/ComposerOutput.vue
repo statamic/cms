@@ -13,7 +13,7 @@
 </template>
 
 <script>
-    const ansi = require('ansi-to-html');
+    import ansi from 'ansi-to-html';
 
     export default {
         props: {

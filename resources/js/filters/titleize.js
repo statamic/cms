@@ -1,4 +1,4 @@
-module.exports = function(value) {
+export default function(value) {
     if(!value.split) return value;
 
     var _titleizeWord = function(string) {

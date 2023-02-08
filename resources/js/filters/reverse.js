@@ -1,3 +1,3 @@
-module.exports = function(val) {
+export default function(val) {
 	return val.split('').reverse().join('');
 };

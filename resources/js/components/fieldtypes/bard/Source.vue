@@ -21,7 +21,7 @@
 </template>
 
 <script>
-const pretty = require('pretty');
+import pretty from 'pretty';
 
 export default {
 
