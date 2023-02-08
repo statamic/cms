@@ -547,12 +547,18 @@ export default {
         },
 
         buttonIsActive(button) {
+            if (button.hasOwnProperty('active')) {
+                return button.active(this.editor, button.args);
+            }
             const nameProperty = button.hasOwnProperty('activeName') ? 'activeName' : 'name';
             const name = button[nameProperty];
             return this.editor.isActive(name, button.args);
         },
 
         buttonIsVisible(button) {
+            if (button.hasOwnProperty('visible')) {
+                return button.visible(this.editor, button.args);
+            }
             if (! button.hasOwnProperty('visibleWhenActive')) return true;
             return this.editor.isActive(button.visibleWhenActive, button.args);
         },
