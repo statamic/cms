@@ -449,13 +449,13 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->create();
         EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_taxonomy' => ['taxonomy-3']])->create();
         EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->create();
-        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4', 'taxonomy-5']])->create();
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
 
-        $entries = Entry::query()->whereJsonLength('test_taxonomy', 1)->get();
+        $entries = Entry::query()->whereJsonLength('test_taxonomy', 1)->orWhereJsonLength('test_taxonomy', 3)->get();
 
-        $this->assertCount(2, $entries);
-        $this->assertEquals(['Post 2', 'Post 5'], $entries->map->title->all());
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 2', 'Post 5', 'Post 4'], $entries->map->title->all());
     }
 
     /** @test **/
