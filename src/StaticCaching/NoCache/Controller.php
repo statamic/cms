@@ -4,6 +4,7 @@ namespace Statamic\StaticCaching\NoCache;
 
 use Illuminate\Http\Request;
 use Statamic\StaticCaching\Replacers\NoCacheReplacer;
+use Statamic\Support\Str;
 
 class Controller
 {
@@ -13,6 +14,10 @@ class Controller
 
         if (config('statamic.static_caching.ignore_query_strings', false)) {
             $url = explode('?', $url)[0];
+        }
+
+        if (Str::contains($url, '?')) {
+            $url = Str::before($url, '?').'?'.Request::normalizeQueryString(Str::after($url, '?'));
         }
 
         $session = $session->setUrl($url)->restore();
