@@ -47,7 +47,6 @@ return [
     'collection_next_steps_scaffold_description' => 'Koleksiyon adından hızlı bir şekilde dizin ve ayrıntı görünümleri oluşturun.',
     'collection_revisions_instructions' => 'Bu Koleksiyon için revizyonları etkinleştirin.',
     'collection_scaffold_instructions' => 'Hangi boş görünümlerin oluşturulacağını seçin. Mevcut dosyaların üzerine yazılmaz.',
-    'collections_amp_instructions' => 'Hızlandırılmış Mobil Sayfaları (AMP) etkinleştirin. Bu koleksiyondaki girişler için otomatik olarak rotaları ve URL\'yi ekler. [Belgelerde](https://statamic.dev/amp) daha fazla bilgi edinin',
     'collections_blueprint_instructions' => 'Bu koleksiyondaki girişler bu planlardan herhangi birini kullanabilir.',
     'collections_default_publish_state_instructions' => 'Bu koleksiyonda yeni girişler oluştururken, yayınlanan geçiş varsayılan olarak **false** (taslak) yerine **true** olur.',
     'collections_future_date_behavior_instructions' => 'Gelecek tarihli girişlerin nasıl davranması gerektiği.',

@@ -496,11 +496,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return false;
     }
 
-    public function ampable()
-    {
-        return $this->collection()->ampable();
-    }
-
     protected function revisionKey()
     {
         return vsprintf('collections/%s/%s/%s', [

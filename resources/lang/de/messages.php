@@ -54,7 +54,6 @@ return [
     'collection_next_steps_scaffold_description' => 'Erstelle anhand des Namens der Sammlung rasch Index- und Detailansichten.',
     'collection_revisions_instructions' => 'Revisionen für diese Sammlung aktivieren.',
     'collection_scaffold_instructions' => 'Wähle aus, welche leeren Ansichten erstellt werden sollen. Bereits vorhandene Dateien werden nicht überschrieben.',
-    'collections_amp_instructions' => 'Aktiviert die beschleunigten mobilen Seiten (Accelerated Mobile Pages) und fügt automatisch Routen und URLs für Einträge in dieser Sammlung hinzu. Erfahre mehr in der [Dokumentation](https://statamic.dev/amp).',
     'collections_blueprint_instructions' => 'Einträge in dieser Sammlung können jeden dieser Blueprints verwenden.',
     'collections_default_publish_state_instructions' => 'Beim Erstellen neuer Einträge in dieser Sammlung wird der Schalter für die Veröffentlichung standardmäßig auf *Veröffentlicht* und nicht auf *Entwurf* gestellt.',
     'collections_future_date_behavior_instructions' => 'Wie sollen sich in der Zukunft liegende Einträge verhalten?',

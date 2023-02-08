@@ -44,7 +44,6 @@ return [
     'collection_next_steps_scaffold_description' => 'Gere rapidamente índices e visualização de detalhes a partir do nome da coleção.',
     'collection_revisions_instructions' => 'Habilita revisões para esta coleção.',
     'collection_scaffold_instructions' => 'Escolha quais visualizações vazias serão geradas. Arquivos existentes não serão substituídos.',
-    'collections_amp_instructions' => 'Ative as Páginas Móveis Aceleradas (AMP). Adiciona automaticamente rotas e URL para entradas nesta coleção. Saiba mais na [documentação](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'As entradas nesta coleção podem usar qualquer um desses diagramas.',
     'collections_default_publish_state_instructions' => 'Ao criar novas entradas nesta coleção, a alternância publicada será definida como **verdadeiro** em vez de **falso** (rascunho).',
     'collections_future_date_behavior_instructions' => 'Como as entradas com datas futuras devem se comportar.',

@@ -50,10 +50,6 @@ class DataRepository
 
         $url = $site->relativePath($url);
 
-        if ($this->isAmpUrl($url)) {
-            $url = Str::ensureLeft(Str::after($url, '/'.config('statamic.amp.route')), '/');
-        }
-
         if (Str::contains($url, '?')) {
             $url = substr($url, 0, strpos($url, '?'));
         }
@@ -63,17 +59,6 @@ class DataRepository
         }
 
         return $this->findByUri($url, $site->handle());
-    }
-
-    private function isAmpUrl($url)
-    {
-        if (! config('statamic.amp.enabled')) {
-            return false;
-        }
-
-        $url = URL::makeRelative($url);
-
-        return Str::startsWith($url, '/'.config('statamic.amp.route'));
     }
 
     protected function attemptAllRepositories($method, ...$args)

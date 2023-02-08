@@ -41,7 +41,6 @@ return [
     'collection_next_steps_create_entry_description' => 'Skapa den första posten eller släng ut en handfull platshållarposter, det är upp till dig.',
     'collection_next_steps_scaffold_description' => 'Generera snabbt index- och detaljvyer från namnet på samlingen.',
     'collection_scaffold_instructions' => 'Välj vilka tomma vyer som ska genereras. Befintliga filer kommer inte att skrivas över.',
-    'collections_amp_instructions' => 'Aktivera Accelerated Mobile Pages (AMP). Lägger automatiskt till rutter och URL för poster i den här samlingen. Läs mer i [dokumentationen](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Inlägg i denna samling kan använda vilken som helst av dessa ritningar.',
     'collections_default_publish_state_instructions' => 'När du skapar nya poster i den här samlingen kommer den publicerade växlingen som standard till **true** istället för **false** (utkast).',
     'collections_future_date_behavior_instructions' => 'Hur framtida daterade poster ska bete sig.',

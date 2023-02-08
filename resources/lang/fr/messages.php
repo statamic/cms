@@ -54,7 +54,6 @@ return [
     'collection_next_steps_scaffold_description' => 'Générez rapidement des vues d’index et de détail à partir du nom de votre collection.',
     'collection_revisions_instructions' => 'Active les révisions pour cette collection',
     'collection_scaffold_instructions' => 'Choisissez les vues vides à générer. Les fichiers existants ne seront pas écrasés.',
-    'collections_amp_instructions' => 'Activez les Pages Accélérées pour Mobile (AMP). Ajoutez automatiquement des routes et des URLs pour les entrées de cette collection. Apprenez-en plus dans la [documentation](https://statamic.dev/amp).',
     'collections_blueprint_instructions' => 'Les entrées de cette collection peuvent utiliser l’un de ces Blueprints.',
     'collections_default_publish_state_instructions' => 'Lors de la création de nouvelles entrées dans cette collection, l’indicateur de publication basculera par défaut sur **true** plutôt que sur **false** (brouillon).',
     'collections_future_date_behavior_instructions' => 'Conditions d’accès aux entrées datées dans le futur.',

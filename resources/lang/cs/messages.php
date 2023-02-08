@@ -43,7 +43,6 @@ return [
     'collection_next_steps_create_entry_description' => 'Vytvořte první záznam nebo vytvořte několik zástupných záznamů - záleží na vás.',
     'collection_next_steps_scaffold_description' => 'Rychlé vytváření indexových a detailních zobrazení na základě názvu kolekce.',
     'collection_scaffold_instructions' => 'Vyberte, které prázdné pohledy mají být vytvořeny. Stávající soubory se nepřepisují.',
-    'collections_amp_instructions' => 'Povolí funkci Accelerated Mobile Pages a automaticky přidá trasy a adresy URL pro položky v této kolekci. Více informací najdete v [dokumentaci](https://statamic.dev/amp).',
     'collections_blueprint_instructions' => 'Záznamy v této kolekci mohou používat kterýkoli z těchto blueprintů.',
     'collections_default_publish_state_instructions' => 'Při vytváření nových záznamů v této kolekci bude přepínač publikování ve výchozím nastavení nastaven na *Published*, nikoli na *Draft*.',
     'collections_future_date_behavior_instructions' => 'Když nastavíte data zveřejnění, záznamy v této kolekci mohou být zobrazeny v budoucnu.',

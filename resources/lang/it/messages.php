@@ -39,7 +39,6 @@ return [
     'collection_next_steps_documentation_description' => 'Ulteriori informazioni sulle raccolte, su come funzionano e su come configurarle.',
     'collection_next_steps_scaffold_description' => 'Generare rapidamente progetti vuoti e template frontend in base al nome della raccolta.',
     'collection_scaffold_instructions' => 'Scegli quali risorse generare. I file esistenti non verranno sovrascritti.',
-    'collections_amp_instructions' => 'Abilita le Accelerated Mobile Pages (AMP). Aggiunge automaticamente route e URL per le voci di questa raccolta. Ulteriori informazioni nella [documentazione](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Le voci in questa raccolta possono utilizzare uno qualsiasi di questi progetti.',
     'collections_default_publish_state_instructions' => 'Le nuove voci di questa raccolta verranno pubblicate come impostazione predefinita invece di essere in "bozza".',
     'collections_future_date_behavior_instructions' => 'Come dovrebbero comportarsi le voci con date future.',

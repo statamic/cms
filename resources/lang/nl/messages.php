@@ -54,7 +54,6 @@ return [
     'collection_next_steps_scaffold_description' => 'Genereer snel een aantal lege blauwdrukken en frontend-templates gebaseerd op de naam van deze collectie.',
     'collection_revisions_instructions' => 'Schakel revisies in voor deze collectie.',
     'collection_scaffold_instructions' => 'Kies welke lege resources er gegenereerd moeten worden. Bestaande bestanden worden niet overschreven.',
-    'collections_amp_instructions' => 'Activeer Accelerated Mobile Pages (AMP). Voeg automatisch routes en URL\'s toe voor entries in deze collectie. Lees meer in de [documentatie](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Entries in deze collectie mogen elke van deze blueprints gebruiken.',
     'collections_default_publish_state_instructions' => 'Tijdens het aanmaken van entries in deze collectie wordt de publiceerknop standaard op **aan** gezet in plaats van **uit** (concept).',
     'collections_future_date_behavior_instructions' => 'Hoe entries met een datum in de toekomst zich moeten gedragen.',

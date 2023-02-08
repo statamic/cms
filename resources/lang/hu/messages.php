@@ -50,7 +50,6 @@ return [
     'collection_next_steps_scaffold_description' => 'Gyorsan generálhat gyűjtő- (index) és részletnézeteket (details) a gyűjtemény nevéből.',
     'collection_revisions_instructions' => 'Verziók engedélyezése ehhez a gyűjteményhez.',
     'collection_scaffold_instructions' => 'Válassza ki, hogy mely üres nézeteket kívánja létrehozni. A meglévő fájlok nem kerülnek felülírásra.',
-    'collections_amp_instructions' => 'Az Accelerated Mobile Pages (AMP) engedélyezése. Automatikusan hozzáadja az útvonalakat (routes) és URL-eket a gyűjtemény bejegyzéseihez. További információ a [dokumentációban](https://statamic.dev/amp).',
     'collections_blueprint_instructions' => 'A gyűjtemény bejegyzései használhatják ezen Blueprintek bármelyikét.',
     'collections_default_publish_state_instructions' => 'Amikor új bejegyzéseket hoz létre ebben a gyűjteményben, a `published` kapcsoló alapértelmezés szerint **true** lesz (**false**, azaz piszkozat helyett).',
     'collections_future_date_behavior_instructions' => 'Hogyan viselkedjenek a jövőben keltezett bejegyzések.',

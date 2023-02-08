@@ -223,19 +223,6 @@ class Statamic
         return $route;
     }
 
-    public static function isAmpRequest()
-    {
-        if (! config('statamic.amp.enabled')) {
-            return false;
-        }
-
-        $url = Site::current()->relativePath(
-            str_finish(request()->getUri(), '/')
-        );
-
-        return starts_with($url, '/'.config('statamic.amp.route'));
-    }
-
     public static function jsonVariables(Request $request)
     {
         return collect(static::$jsonVariables)->map(function ($variable) use ($request) {

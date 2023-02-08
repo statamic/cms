@@ -51,7 +51,6 @@ return [
     'collection_next_steps_scaffold_description' => 'Generer raskt indeks- og detaljoversikter fra navnet på samlingen.',
     'collection_revisions_instructions' => 'Aktiver revisjoner for denne samlingen.',
     'collection_scaffold_instructions' => 'Velg hvilke tomme visninger som skal genereres. Eksisterende filer overskrives ikke.',
-    'collections_amp_instructions' => 'Aktiver Accelerated Mobile Pages (AMP). Legger automatisk til ruter og URL for oppføringer i denne samlingen. Les mer i [dokumentasjon](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Oppføringer i denne samlingen kan bruke en hvilken som helst av disse blueprintene.',
     'collections_default_publish_state_instructions' => 'Under opprettelse av nye oppføringer i denne samlingen vil den publiserte veksleknappen som standard være **true** i stedet for **false** (kladd).',
     'collections_future_date_behavior_instructions' => 'Hvordan framtidig daterte oppføringer skal oppføre seg.',

@@ -42,7 +42,6 @@ return [
     'collection_next_steps_documentation_description' => '瞭解更多有關條目集的資訊，如條目集如何運作、以及如何設定條目集。',
     'collection_next_steps_scaffold_description' => '依據條目集的名稱快速產生空白藍圖與前端 View。',
     'collection_scaffold_instructions' => '選擇要建立的空白字元。現有的檔案將不會被覆蓋。',
-    'collections_amp_instructions' => '啟用 AMP (Accelerated Mobile Page)。將自動為該條目集中的條目新增路由與 URL。詳細可參考 [說明文件](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => '該條目集中的條目可用於下列任意藍圖。',
     'collections_default_publish_state_instructions' => '在此條目集中建立新條目時，發佈切換鍵將預設為 **true** 而非 **false** (草稿)。',
     'collections_future_date_behavior_instructions' => '未來日期條目的行為。',

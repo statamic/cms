@@ -42,7 +42,6 @@ class JavascriptComposer
             'translations' => app('translator')->toJson(),
             'sites' => $this->sites(),
             'selectedSite' => Site::selected()->handle(),
-            'ampEnabled' => config('statamic.amp.enabled'),
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
             'locale' => config('app.locale'),
