@@ -5,6 +5,7 @@ namespace Tests\Antlers\Sandbox;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
+use Statamic\Tags\Tags;
 use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -37,5 +38,27 @@ EOT;
         $resp = $this->get('one')->assertOk();
 
         $this->assertSame('rad  test  test-two   meh   rad  two', trim($resp->getContent()));
+    }
+
+    public function test_tags_returning_collections_resolve_correctly()
+    {
+
+        (new class extends Tags
+        {
+            public static $handle = 'test';
+
+            public function index()
+            {
+                return collect(['a', 'b', 'c']);
+            }
+        })::register();
+
+        $template = <<<'EOT'
+{{ results = {test}; }}
+
+{{ results }}{{ value }}{{ /results }}
+EOT;
+
+        dd($this->renderString($template, [], true));
     }
 }

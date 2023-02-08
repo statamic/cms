@@ -12,7 +12,6 @@ use ParseError;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\View\Antlers\Parser;
-use Statamic\Data\DataCollection;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
@@ -1682,10 +1681,8 @@ class NodeProcessor
                         $this->data = $lockData;
 
                         if (is_object($output)) {
-                            if ($output instanceof DataCollection) {
+                            if ($output instanceof Collection) {
                                 $output = RuntimeValues::resolveWithRuntimeIsolation($output);
-                            } elseif ($output instanceof Collection) {
-                                $output = $output->all();
                             }
 
                             $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
