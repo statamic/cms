@@ -2,7 +2,9 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Log;
+use Statamic\Facades\Collection;
 use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -39,6 +41,33 @@ class TemplateTest extends ParserTestCase
         $template = '{{ simple }}';
 
         $this->assertEquals('', $this->renderString($template, $this->variables));
+    }
+
+    public function test_rendering_a_non_array_variable_reports_current_file()
+    {
+        Log::shouldReceive('debug')->once()->with('Cannot render an array variable as a string: {{ an_array_value }}', [
+            'line' => 3, 'file' => 'the_partial.antlers.html',
+        ]);
+
+        Collection::make('pages')->routes(['en' => '/{{slug}}'])->save();
+        EntryFactory::collection('pages')->id('1')->slug('home')->data(['title' => 'Home'])->create();
+        $this->withFakeViews();
+
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $default = <<<'DEFAULT'
+Some content
+more content
+even more content
+hey look a wild partial appears! {{ partial:the_partial }}
+DEFAULT;
+        $this->viewShouldReturnRaw('default', $default);
+        $thePartial = <<<'PARTIAL'
+{{ an_array_value = [1,2,3,4,5]; }}
+
+Attempt to render as a string: {{ an_array_value }}
+PARTIAL;
+        $this->viewShouldReturnRaw('the_partial', $thePartial);
+        $this->get('/home')->assertOk();
     }
 
     /** @test */
