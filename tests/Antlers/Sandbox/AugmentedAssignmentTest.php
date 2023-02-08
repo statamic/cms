@@ -59,6 +59,6 @@ EOT;
 {{ results }}{{ value }}{{ /results }}
 EOT;
 
-        dd($this->renderString($template, [], true));
+        $this->assertSame('abc', trim($this->renderString($template, [], true)));
     }
 }
