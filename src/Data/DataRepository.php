@@ -3,7 +3,6 @@
 namespace Statamic\Data;
 
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 

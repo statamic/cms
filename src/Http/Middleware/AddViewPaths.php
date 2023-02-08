@@ -4,7 +4,6 @@ namespace Statamic\Http\Middleware;
 
 use Closure;
 use Statamic\Facades\Site;
-use Statamic\Statamic;
 
 class AddViewPaths
 {
