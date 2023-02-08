@@ -6,7 +6,8 @@
                     <a :href="collection.entries_url">{{ collection.title }}</a>
                 </template>
                 <template slot="actions" slot-scope="{ row: collection, index }">
-                    <dropdown-list v-if="collection.editable || collection.blueprint_editable || collection.deleteable">
+                    <dropdown-list>
+                        <dropdown-item :text="__('View')" :redirect="collection.entries_url" />
                         <dropdown-item v-if="collection.editable" :text="__('Edit Collection')" :redirect="collection.edit_url" />
                         <dropdown-item v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" :redirect="collection.blueprints_url" />
                         <dropdown-item v-if="collection.editable" :text="__('Scaffold Views')" :redirect="collection.scaffold_url" />
