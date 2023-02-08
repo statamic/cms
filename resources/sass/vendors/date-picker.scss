@@ -109,7 +109,7 @@ $rem-base: 16px;
         position: absolute;
 
         .dr-calendar {
-            @apply .shadow bg-white rounded-b relative overflow-hidden text-sm;
+            @apply shadow bg-white rounded-b relative overflow-hidden text-sm;
             z-index: 4;
             padding-top: 5px;
             top: 2px;

@@ -214,7 +214,7 @@ td .btn-icon {
 }
 
 .btn-with-icon {
-    @apply .flex .items-center;
+    @apply flex items-center;
 
     svg {
         margin: 0 8px 0 -4px;
@@ -225,7 +225,7 @@ td .btn-icon {
 }
 
 .btn-icon-only {
-    @apply .flex .items-center;
+    @apply flex items-center;
 
     padding: 0 12px;
     svg {

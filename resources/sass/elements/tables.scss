@@ -46,8 +46,8 @@
 
         th {
             @apply font-medium px-2 pt-2 pb-1;
-            &:first-child { @apply .rounded-tl; }
-			&:last-child { @apply .rounded-tr; }
+            &:first-child { @apply rounded-tl; }
+			&:last-child { @apply rounded-tr; }
 			&:hover {
 				@apply text-grey-90;
 			}
@@ -72,22 +72,22 @@
 
 			&:first-child {
 				td:first-child {
-				    @apply .rounded-tl;
+				    @apply rounded-tl;
 				}
 
 				td:last-child {
-				    @apply .rounded-tr;
+				    @apply rounded-tr;
 				}
 			}
 
 			&:last-child {
 				@apply border-none;
 				td:first-child {
-				    @apply .rounded-bl;
+				    @apply rounded-bl;
 				}
 
 				td:last-child {
-				    @apply .rounded-br;
+				    @apply rounded-br;
 				}
 			}
 
@@ -116,7 +116,7 @@
     }
 
     .checkbox-column {
-		@apply .w-4 .pr-0 relative z-10;
+		@apply w-4 pr-0 relative z-10;
 		padding-left: 20px;
     }
 
@@ -185,7 +185,7 @@ td.table-drag-handle {
 	@apply w-3 border-r h-full p-1;
 	cursor: grab;
 	background: theme('colors.grey-20') url('../svg/drag-dots.svg') center center no-repeat;
-	&:hover { @apply .bg-grey-30; }
+	&:hover { @apply bg-grey-30; }
 }
 
 table.table-legacy {

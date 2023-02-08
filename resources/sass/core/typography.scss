@@ -3,14 +3,14 @@
    ========================================================================== */
 
 body {
-    @apply .font-sans .text-grey-90 .text-base .tracking-normal;
+    @apply font-sans text-grey-90 text-base tracking-normal;
     font-variant: common-ligatures tabular-nums;
     font-feature-settings: "zero", "ss01", "calt" off;
 
 }
 
 h1, h2, h3, h4, h5, h6 {
-    @apply .m-0 antialiased;
+    @apply m-0 antialiased;
 }
 
 h1 {
@@ -42,10 +42,10 @@ h6 {
 }
 
 a:not([class^="btn"]) {
-    @apply .text-grey-80 .cursor-pointer;
+    @apply text-grey-80 cursor-pointer;
 
     &:hover {
-        @apply .text-blue;
+        @apply text-blue;
     }
 }
 
@@ -55,7 +55,7 @@ a:not([class^="btn"]) {
     }
 
     h2, h3, h4, h5, h6 {
-        @apply .mb-1 font-bold;
+        @apply mb-1 font-bold;
     }
 
     p, ol, ul, pre {
@@ -71,7 +71,7 @@ a:not([class^="btn"]) {
 
     p {
         &:last-child {
-            @apply .mb-0;
+            @apply mb-0;
         }
     }
 
@@ -92,7 +92,7 @@ a:focus {
 }
 
 .bullet {
-    @apply .inline-block .rounded-full .bg-grey;
+    @apply inline-block rounded-full bg-grey;
     height: 7px;
     width: 7px;
 }

@@ -10,7 +10,7 @@
     }
 
     .markdown-toolbar {
-        @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between;
+        @apply bg-white shadow-none rounded-t border-b text-sm flex items-start justify-between;
         padding: 4px 8px;
     }
 
@@ -38,9 +38,9 @@
     }
 
     .markdown-buttons button:disabled {
-        @apply .opacity-50;
+        @apply opacity-50;
         &:hover {
-            @apply .text-grey-80;
+            @apply text-grey-80;
         }
     }
 
@@ -74,7 +74,7 @@
         }
     }
 
-    .CodeMirror-code { min-height: 100px; }
+    CodeMirror-code { min-height: 100px; }
 
     .helpers {
         @apply border-t text-xs text-grey-80 flex items-center;

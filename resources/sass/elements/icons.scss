@@ -38,7 +38,7 @@ svg {
     &.scheduled, &.hollow { @apply bg-transparent border border-grey-60 }
 }
 
-.icon-status-draft {
+icon-status-draft {
 	background: $color_gray_light;
 }
 .icon-status-hidden {
@@ -51,7 +51,7 @@ svg {
 	background: $color_red;
 }
 .icon-status-warning {
-    @apply .bg-yellow-dark;
+    @apply bg-yellow-dark;
 }
 
 .icon-large {
@@ -73,7 +73,7 @@ svg {
     @apply w-4 h-4;
 
 	&.using-svg {
-		@apply .flex .items-center;
+		@apply flex items-center;
 	}
 
 	svg {

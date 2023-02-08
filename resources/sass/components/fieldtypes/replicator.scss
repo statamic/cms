@@ -25,7 +25,7 @@
         @apply w-4 border-r rounded-tl p-1;
         cursor: grab;
         background: transparent url('../svg/drag-dots.svg') center center no-repeat;
-        &:hover { @apply .bg-grey-20; }
+        &:hover { @apply bg-grey-20; }
     }
 
     img {

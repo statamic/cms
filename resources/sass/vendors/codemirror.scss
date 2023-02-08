@@ -4,7 +4,7 @@
 
    .CodeMirror {
     /* Set height, width, borders, and global font properties here */
-    @apply .text-grey-90 .font-mono .text-sm .leading-loose;
+    @apply text-grey-90 font-mono text-sm leading-loose;
     min-height: 80px;
   }
 
@@ -357,7 +357,7 @@
         @apply border p-0
     }
 
-    .CodeMirror-scroll {
+    CodeMirror-scroll {
         min-height: 80px;
     }
   }

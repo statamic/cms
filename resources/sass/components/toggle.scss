@@ -10,11 +10,11 @@ $toggle_radius: 20px;
     align-items: center;
 
     .inline-label {
-        @apply .ml-1 .font-normal .text-grey-70;
+        @apply ml-1 font-normal text-grey-70;
         a {
-            @apply .text-grey-80 underline;
+            @apply text-grey-80 underline;
             &:hover {
-                @apply .text-blue-darker;
+                @apply text-blue-darker;
             }
         }
     }
