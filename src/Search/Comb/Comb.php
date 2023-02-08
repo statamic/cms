@@ -214,7 +214,7 @@ class Comb
     private function setHaystack(array $data)
     {
         reset($data);
-        $firstKey = array_keys($data)[0];
+        $firstKey = array_keys($data)[0] ?? null;
         reset($data);
 
         if (! is_numeric($firstKey)) {
