@@ -9,14 +9,6 @@ use UnexpectedValueException;
 class Manager
 {
     protected $parsers = [];
-    protected $parserClass;
-
-    public function __construct()
-    {
-        $this->parserClass = $this->isLegacyCommonmark()
-            ? LegacyParser::class
-            : Parser::class;
-    }
 
     public function __call($method, $args)
     {
@@ -25,7 +17,7 @@ class Manager
 
     public function makeParser(array $config = []): Parser
     {
-        return new $this->parserClass($config);
+        return new Parser($config);
     }
 
     public function parser(string $name)
@@ -51,14 +43,9 @@ class Manager
         $parser = $closure($this->makeParser());
 
         if (! $parser instanceof Parser) {
-            throw new UnexpectedValueException('A '.$this->parserClass.' instance is expected.');
+            throw new UnexpectedValueException('A ['.Parser::class.'] instance is expected.');
         }
 
         $this->parsers[$name] = $parser;
-    }
-
-    public function isLegacyCommonmark()
-    {
-        return class_exists('League\CommonMark\Inline\Element\Text');
     }
 }

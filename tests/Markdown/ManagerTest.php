@@ -10,22 +10,6 @@ use UnexpectedValueException;
 
 class ManagerTest extends TestCase
 {
-    private $parserClass;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->parserClass = $this->isLegacyCommonmark()
-            ? Markdown\LegacyParser::class
-            : Markdown\Parser::class;
-    }
-
-    public function isLegacyCommonmark()
-    {
-        return class_exists('League\CommonMark\Inline\Element\Text');
-    }
-
     public function tearDown(): void
     {
         Mockery::close();
@@ -38,7 +22,7 @@ class ManagerTest extends TestCase
     {
         $manager = app(Markdown\Manager::class);
         $manager->extend('default', function () {
-            return Mockery::mock($this->parserClass)->shouldReceive('foo')->once()->andReturn('bar')->getMock();
+            return Mockery::mock(Markdown\Parser::class)->shouldReceive('foo')->once()->andReturn('bar')->getMock();
         });
 
         $this->assertEquals('bar', $manager->foo());
@@ -56,7 +40,7 @@ class ManagerTest extends TestCase
             'max_nesting_level' => 3,
         ]);
 
-        $this->assertInstanceOf($this->parserClass, $parser);
+        $this->assertInstanceOf(Markdown\Parser::class, $parser);
         $this->assertEquals("\n", $parser->config('renderer/block_separator'));
         $this->assertEquals('foo', $parser->config('renderer/inner_separator'));
         $this->assertEquals(3, $parser->config('max_nesting_level'));
@@ -92,7 +76,7 @@ class ManagerTest extends TestCase
     {
         $this->expectNotToPerformAssertions();
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('A '.$this->parserClass.' instance is expected.');
+        $this->expectExceptionMessage('A ['.Markdown\Parser::class.'] instance is expected.');
 
         (new Markdown\Manager)->extend('a', function ($parser) {
             //
