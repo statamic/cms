@@ -95,16 +95,10 @@ class AssetContainerTest extends TestCase
 
         $config = $container->disk()->filesystem()->getConfig();
 
-        // If Flysystem 1.x, it will be an array, so wrap it with `collect()` so it can `get()` values;
-        // Otherwise it will already be a `ReadOnlyConfiguration` object with a `get()` method.
-        if (is_array($config)) {
-            $config = collect($config);
-        }
-
         $this->assertEquals($container, $return);
         $this->assertInstanceOf(FlysystemAdapter::class, $container->disk());
         $this->assertEquals('test', $container->diskHandle());
-        $this->assertEquals('/the-url', $config->get('url'));
+        $this->assertEquals('/the-url', $config['url']);
     }
 
     /** @test */
