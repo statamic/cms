@@ -3,6 +3,7 @@
 namespace Statamic\Filesystem;
 
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemAdapter;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
 use Statamic\Facades\Path;
 use Statamic\Support\Str;
@@ -31,12 +32,7 @@ class FlysystemAdapter extends AbstractAdapter
         if (Path::isAbsolute($path)) {
             $adapter = $this->filesystem->getAdapter();
 
-            // Determine which adapter to use for Flysystem 1.x or 3.x.
-            $localClass = class_exists($legacyAdapter = '\League\Flysystem\Adapter\Local')
-                ? $legacyAdapter
-                : '\League\Flysystem\Local\LocalFilesystemAdapter';
-
-            if (! $adapter instanceof $localClass) {
+            if (! $adapter instanceof LocalFilesystemAdapter) {
                 throw new \LogicException('Cannot use absolute paths on non-local adapters.');
             }
 
