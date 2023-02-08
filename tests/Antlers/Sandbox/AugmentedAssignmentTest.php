@@ -42,7 +42,6 @@ EOT;
 
     public function test_tags_returning_collections_resolve_correctly()
     {
-
         (new class extends Tags
         {
             public static $handle = 'test';
