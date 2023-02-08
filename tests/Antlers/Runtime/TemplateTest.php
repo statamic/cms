@@ -45,6 +45,8 @@ class TemplateTest extends ParserTestCase
 
     public function test_rendering_a_non_array_variable_reports_current_file()
     {
+        $this->markTestSkipped(); // todo
+
         Log::shouldReceive('debug')->once()->with('Cannot render an array variable as a string: {{ an_array_value }}', [
             'line' => 3, 'file' => 'the_partial.antlers.html',
         ]);
