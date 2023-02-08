@@ -133,11 +133,6 @@ class CacheController extends CpController
 
     protected function normalizeFlysystemFileSize($file)
     {
-        // If legacy Flysystem 1.x, we'll have an array of file attributes
-        if (is_array($file)) {
-            return $file['size'];
-        }
-
         return $file->fileSize();
     }
 }
