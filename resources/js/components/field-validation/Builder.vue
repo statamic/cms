@@ -6,7 +6,7 @@
 
             <div class="form-group publish-field select-fieldtype field-w-full">
                 <label class="publish-field-label">{{ __('Required') }}</label>
-                <div class="help-block -mt-1">
+                <div class="help-block -mt-2___REPLACED">
                     <p>{{ __('messages.field_validation_required_instructions') }}</p>
                 </div>
                 <toggle-input v-model="isRequired" />
@@ -14,7 +14,7 @@
 
             <div class="form-group publish-field select-fieldtype field-w-full">
                 <label class="publish-field-label">{{ __('Sometimes') }}</label>
-                <div class="help-block -mt-1">
+                <div class="help-block -mt-2___REPLACED">
                     <p>{{ __('messages.field_validation_sometimes_instructions') }}</p>
                 </div>
                 <toggle-input v-model="sometimesValidate" />
@@ -24,7 +24,7 @@
 
         <div class="form-group publish-field select-fieldtype field-w-full">
             <label class="publish-field-label">{{ __('Rules') }}</label>
-            <div class="help-block -mt-1">
+            <div class="help-block -mt-2___REPLACED">
                 <p>
                     {{ __('messages.field_validation_advanced_instructions') }}
                     <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>

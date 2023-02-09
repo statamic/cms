@@ -13,7 +13,7 @@
                                 <span v-text="__('Localizations')" />
                                 <i class="required ml-1___REPLACED">*</i>
                             </label>
-                            <div class="help-block -mt-1"><p v-html="instructions" /></div>
+                            <div class="help-block -mt-2___REPLACED"><p v-html="instructions" /></div>
                         </div>
 
                         <div class="button-group-fieldtype-wrapper">

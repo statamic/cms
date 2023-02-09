@@ -4,7 +4,7 @@
 
         <div class="form-group publish-field select-fieldtype field-w-full">
             <label class="publish-field-label">{{ __('Conditions') }}</label>
-            <div class="help-block -mt-1"><p>{{ __('messages.field_conditions_instructions') }}</p></div>
+            <div class="help-block -mt-2___REPLACED"><p>{{ __('messages.field_conditions_instructions') }}</p></div>
 
             <div class="flex items-center mb-6___REPLACED">
                 <select-input
@@ -72,7 +72,7 @@
 
         <div class="form-group publish-field select-fieldtype field-w-full">
             <label class="publish-field-label">{{ __('Always Save') }}</label>
-            <div class="help-block -mt-1">
+            <div class="help-block -mt-2___REPLACED">
                 <p>{{ __('messages.field_conditions_always_save_instructions') }}</p>
             </div>
             <toggle-input v-model="alwaysSave" />

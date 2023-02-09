@@ -2,7 +2,7 @@
 
     <div class="h-full overflow-auto p-8___REPLACED bg-grey-30 h-full">
 
-        <div class="flex items-center mb-6___REPLACED -mt-1">
+        <div class="flex items-center mb-6___REPLACED -mt-2___REPLACED">
             <h1 class="flex-1">
                 <small class="block text-xs text-grey-70 font-medium leading-none mt-2___REPLACED flex items-center">
                     <svg-icon class="h-4 w-4 mr-2___REPLACED inline-block text-grey-70" name="paperclip"/>{{ __('Linked fieldset') }}

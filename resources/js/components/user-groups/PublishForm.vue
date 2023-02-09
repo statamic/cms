@@ -28,7 +28,7 @@
                 <div class="form-group publish-field w-full" v-if="$permissions.has('assign roles')">
                     <div class="field-inner">
                         <label class="publish-field-label" v-text="__('Roles')" />
-                        <div class="help-block -mt-1">
+                        <div class="help-block -mt-2___REPLACED">
                             <p>{{ __('messages.user_groups_role_instructions') }}</p>
                         </div>
                     </div>

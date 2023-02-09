@@ -44,7 +44,7 @@
             </label>
 
             <div
-                class="help-block -mt-1"
+                class="help-block -mt-2___REPLACED"
                 v-if="instructions && config.instructions_position !== 'below'"
                 v-html="instructions" />
         </div>

@@ -26,7 +26,7 @@
                 <div class="publish-field mb-8___REPLACED" :class="{ 'has-error': validateUrl }">
                     <div class="field-inner">
                         <label class="text-sm font-medium mb-2___REPLACED">{{ __('URL') }} <span class="text-red">*</span></label>
-                        <div class="help-block -mt-1">
+                        <div class="help-block -mt-2___REPLACED">
                             <p v-text="__('Enter any internal or external URL.')"></p>
                         </div>
                         <text-input v-model="config.url" />

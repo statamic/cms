@@ -264,7 +264,7 @@
             <div class="publish-fields">
                 <div class="form-group publish-field field-w-full">
                     <label v-text="__('Origin')" />
-                    <div class="help-block -mt-1" v-text="__('messages.entry_origin_instructions')"></div>
+                    <div class="help-block -mt-2___REPLACED" v-text="__('messages.entry_origin_instructions')"></div>
                     <select-input
                         v-model="selectedOrigin"
                         :options="originOptions"
