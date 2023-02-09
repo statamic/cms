@@ -32,7 +32,7 @@
             </div>
 
             <div v-if="! hasResults && hasFavorites">
-                <div class="px-3___REPLACED py-1 text-grey uppercase text-3xs">{{ __('Your Favorites') }}</div>
+                <div class="px-3___REPLACED py-2___REPLACED text-grey uppercase text-3xs">{{ __('Your Favorites') }}</div>
 
                 <div v-for="(favorite, index) in favorites" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousemove="setActive(index)">
                     <div class="flex items-center flex-1 p-2___REPLACED" @click="hit">
@@ -42,7 +42,7 @@
                     <div class="p-2___REPLACED text-grey-60 hover:text-grey-80" @click="removeFavorite(favorite)">&times;</div>
                 </div>
 
-                <div class="text-grey text-xs px-3___REPLACED py-1 border-t text-center">
+                <div class="text-grey text-xs px-3___REPLACED py-2___REPLACED border-t text-center">
                     <b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b>
                     <span v-html="__('messages.global_search_open_using_slash')" />
                 </div>

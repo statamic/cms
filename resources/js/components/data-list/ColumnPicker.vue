@@ -18,7 +18,7 @@
                 handle-class="column-picker-item"
                 append-to=".popover-content"
             >
-                <div class="outline-none text-left px-2___REPLACED py-1">
+                <div class="outline-none text-left px-2___REPLACED py-2___REPLACED">
                     <h6 v-text="__('Displayed Columns')" class="p-2___REPLACED"/>
                     <div class="column-picker-item sortable" v-for="column in selectedColumns" :key="column.field">
                         <label>

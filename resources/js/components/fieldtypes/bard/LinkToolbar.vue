@@ -5,7 +5,7 @@
         <div>
 
             <!-- Link type select -->
-            <div class="flex items-center px-4___REPLACED py-1 border-b">
+            <div class="flex items-center px-4___REPLACED py-2___REPLACED border-b">
 
                 <label
                     class="mr-3___REPLACED flex items-center font-normal"

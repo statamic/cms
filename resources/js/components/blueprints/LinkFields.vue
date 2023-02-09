@@ -10,7 +10,7 @@
         <stack narrow v-if="open" @closed="open = false" name="field-linker">
             <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
-                <div class="bg-grey-20 px-6___REPLACED py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+                <div class="bg-grey-20 px-6___REPLACED py-2___REPLACED border-b border-grey-30 text-lg font-medium flex items-center justify-between">
                     {{ __('Link Fields') }}
                     <button
                         type="button"
@@ -39,7 +39,7 @@
                                 </div>
                             </template>
                             <template v-slot:no-options>
-                               <div class="text-sm text-grey-70 text-left py-1 px-4___REPLACED" v-text="__('No options to choose from.')" />
+                               <div class="text-sm text-grey-70 text-left py-2___REPLACED px-4___REPLACED" v-text="__('No options to choose from.')" />
                            </template>
                         </v-select>
                         <button
@@ -67,7 +67,7 @@
                             v-model="fieldset"
                         >
                             <template v-slot:no-options>
-                                <div class="text-sm text-grey-70 text-left py-1 px-4___REPLACED" v-text="__('No options to choose from.')" />
+                                <div class="text-sm text-grey-70 text-left py-2___REPLACED px-4___REPLACED" v-text="__('No options to choose from.')" />
                             </template>
                         </v-select>
                         <p class="text-sm font-medium mt-6___REPLACED mb-2___REPLACED" v-text="__('Prefix')" />

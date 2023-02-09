@@ -4,7 +4,7 @@
         <div class="blueprint-section-field-inner">
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
-                <div class="flex items-center flex-1 pr-2 py-1 pl-1">
+                <div class="flex items-center flex-1 pr-2 py-2___REPLACED pl-1">
                     <svg-icon class="flex-none text-grey-70 h-4 w-4 mr-2___REPLACED" name="paperclip" v-tooltip="__('Linked fieldset')" />
                     <a class="break-all" @click="$emit('edit')">
                         <span v-text="__('Fieldset')" />

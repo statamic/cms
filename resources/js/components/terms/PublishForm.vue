@@ -122,7 +122,7 @@
 
                                 <!--
                                 TODO
-                                <div class="flex items-center border-t justify-between px-4___REPLACED py-1" v-if="!revisionsEnabled">
+                                <div class="flex items-center border-t justify-between px-4___REPLACED py-2___REPLACED" v-if="!revisionsEnabled">
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
                                     <toggle-input v-model="published" />
                                 </div>
@@ -164,7 +164,7 @@
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
-                                        class="text-sm flex items-center -mx-2 px-4___REPLACED py-1 cursor-pointer"
+                                        class="text-sm flex items-center -mx-2 px-4___REPLACED py-2___REPLACED cursor-pointer"
                                         :class="option.active ? 'bg-blue-100' : 'hover:bg-grey-20'"
                                         @click="localizationSelected(option)"
                                     >

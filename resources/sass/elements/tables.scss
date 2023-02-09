@@ -7,7 +7,7 @@
 }
 
 .data-list-search-input {
-	// @apply text-sm px-4___REPLACED py-1 flex-1 rounded border;
+	// @apply text-sm px-4___REPLACED py-2___REPLACED flex-1 rounded border;
 	@apply bg-white;
 
 	&:focus {
@@ -96,11 +96,11 @@
             }
 
             th {
-                @apply py-1 pr-2;
+                @apply py-2___REPLACED pr-2;
             }
 
             td {
-                @apply py-1 px-4___REPLACED break-words;
+                @apply py-2___REPLACED px-4___REPLACED break-words;
             }
 		}
 		.type-column {

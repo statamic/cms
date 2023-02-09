@@ -1,7 +1,7 @@
 <template>
 
     <div class="h-full bg-grey-10 overflow-auto">
-        <div class="bg-grey-30 px-6___REPLACED py-1 border-b text-lg font-medium flex items-center justify-between">
+        <div class="bg-grey-30 px-6___REPLACED py-2___REPLACED border-b text-lg font-medium flex items-center justify-between">
             {{ __('Fieldtypes') }}
             <button type="button" class="btn-close" @click="close">×</button>
         </div>

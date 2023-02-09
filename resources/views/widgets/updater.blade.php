@@ -12,7 +12,7 @@
             </a>
         @endif
     </header>
-    <section class="px-4___REPLACED py-1">
+    <section class="px-4___REPLACED py-2___REPLACED">
         @if (! $count)
             <p class="text-base text-center text-grey-70">{{ __('Everything is up to date.') }}</p>
         @endif

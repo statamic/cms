@@ -23,7 +23,7 @@
                 </data-list-table>
                 <data-list-pagination
                     v-if="meta.last_page != 1"
-                    class="py-1 border-t bg-grey-20 rounded-b-lg text-sm"
+                    class="py-2___REPLACED border-t bg-grey-20 rounded-b-lg text-sm"
                     :resource-meta="meta"
                     @page-selected="selectPage"
                     :scroll-to-top="false"
