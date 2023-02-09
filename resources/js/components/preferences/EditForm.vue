@@ -18,7 +18,7 @@
 
                 <div class="ml-4___REPLACED text-left" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
-                        class="btn-primary pl-2"
+                        class="btn-primary pl-4___REPLACED"
                         :class="{ 'disabled': !isDirty }"
                         :disabled="!isDirty"
                         @click="save"
