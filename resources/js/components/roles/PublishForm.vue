@@ -46,7 +46,7 @@
 
             <div v-if="!isSuper">
                 <div class="mt-6___REPLACED content" v-for="group in permissions" :key="group.handle">
-                    <h2 class="mt-5 text-base mb-2___REPLACED">{{ group.label }}</h2>
+                    <h2 class="mt-10___REPLACED text-base mb-2___REPLACED">{{ group.label }}</h2>
                     <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
                 </div>
             </div>
