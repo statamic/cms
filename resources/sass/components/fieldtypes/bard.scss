@@ -236,7 +236,7 @@
     }
 
     .ProseMirror {
-        @apply px-3 py-6 flex flex-col;
+        @apply px-6___REPLACED py-6 flex flex-col;
         min-height: calc(100vh - 120px);
 
         > p > code, > pre code {

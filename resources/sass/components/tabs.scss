@@ -51,7 +51,7 @@
     }
 
     .tab-button.ghost {
-        @apply bg-transparent relative h-full min-h-full shadow-none border-none text-grey-50 px-3;
+        @apply bg-transparent relative h-full min-h-full shadow-none border-none text-grey-50 px-6___REPLACED;
         min-width: 0;
         &:hover {
             @apply text-blue;

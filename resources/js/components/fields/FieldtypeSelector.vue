@@ -1,7 +1,7 @@
 <template>
 
     <div class="h-full bg-grey-10 overflow-auto">
-        <div class="bg-grey-30 px-3 py-1 border-b text-lg font-medium flex items-center justify-between">
+        <div class="bg-grey-30 px-6___REPLACED py-1 border-b text-lg font-medium flex items-center justify-between">
             {{ __('Fieldtypes') }}
             <button type="button" class="btn-close" @click="close">×</button>
         </div>
@@ -10,7 +10,7 @@
             <loading-graphic />
         </div>
 
-        <div class="py-2 px-3 border-b bg-white flex items-center" v-if="fieldtypesLoaded">
+        <div class="py-2 px-6___REPLACED border-b bg-white flex items-center" v-if="fieldtypesLoaded">
             <input type="text" class="input-text flex-1 bg-white text-sm w-full" autofocus v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
         </div>
 

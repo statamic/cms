@@ -8,7 +8,7 @@
         </div>
 
         <div class="flex flex-wrap md:-mx-3 mt-6___REPLACED">
-            <div class="w-full md:w-1/2 md:px-3 mb-6___REPLACED">
+            <div class="w-full md:w-1/2 md:px-6___REPLACED mb-6___REPLACED">
                 <div class="card p-0 content border-t-6 border-blue">
                     <div class="p-6___REPLACED">
                         <h2><a href="{{ cp_route('blueprints.index') }}" class="text-grey-90 hover:text-blue">{{ __('Blueprints') }}</a></h2>
@@ -25,7 +25,7 @@
                     </div>
                 </div>
             </div>
-            <div class="w-full md:w-1/2 md:px-3 mb-6___REPLACED">
+            <div class="w-full md:w-1/2 md:px-6___REPLACED mb-6___REPLACED">
                 <div class="card p-0 content border-t-6 border-blue">
                     <div class="p-6___REPLACED">
                         <h2>{{ __('Fieldsets') }}</h2>
