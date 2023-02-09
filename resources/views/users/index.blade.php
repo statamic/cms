@@ -16,7 +16,7 @@
         @endcan
 
         @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Auth\User'))
-            <a href="{{ cp_route('users.create') }}" class="btn-primary ml-2">{{ __('Create User') }}</a>
+            <a href="{{ cp_route('users.create') }}" class="btn-primary ml-4___REPLACED">{{ __('Create User') }}</a>
         @endif
     </header>
 

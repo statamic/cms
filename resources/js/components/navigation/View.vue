@@ -30,7 +30,7 @@
                             @click="addLink"
                         >
                             {{ __('Add Nav Item') }}
-                            <svg-icon name="chevron-down-xs" class="w-2 ml-2" v-if="hasCollections" />
+                            <svg-icon name="chevron-down-xs" class="w-2 ml-4___REPLACED" v-if="hasCollections" />
                         </button>
                     </template>
                     <dropdown-item :text="__('Add Nav Item')" @click="linkPage()" />
@@ -38,7 +38,7 @@
                 </dropdown-list>
 
                 <button
-                    class="btn-primary ml-2"
+                    class="btn-primary ml-4___REPLACED"
                     :class="{ 'disabled': !changed }"
                     :disabled="!changed"
                     @click="$refs.tree.save"

@@ -18,14 +18,14 @@
                     <template #trigger>
                         <button class="btn flex items-center pr-2">
                             {{ __('Add Item') }}
-                            <svg-icon name="chevron-down-xs" class="w-2 ml-2" />
+                            <svg-icon name="chevron-down-xs" class="w-2 ml-4___REPLACED" />
                         </button>
                     </template>
                     <dropdown-item :text="__('Add Nav Item')" @click="addItem(topLevelTreeData)" />
                     <dropdown-item :text="__('Add Section')" @click="addSection" />
                 </dropdown-list>
 
-                <div class="ml-2 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
+                <div class="ml-4___REPLACED text-left" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
                         class="btn-primary pl-2"
                         :class="{ 'disabled': !changed }"

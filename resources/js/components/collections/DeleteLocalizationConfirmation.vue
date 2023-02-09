@@ -31,7 +31,7 @@
                 <button class="text-grey hover:text-grey-90"
                     @click="$emit('cancel')"
                     v-text="__('Cancel')" />
-                <button class="btn ml-2 btn-danger"
+                <button class="btn ml-4___REPLACED btn-danger"
                     @click="confirm"
                     v-text="__('Confirm')" />
             </div>

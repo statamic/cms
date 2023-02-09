@@ -12,7 +12,7 @@
                 </template>
                 <template v-else>{{ __('Last Install Log' ) }}</template>
             </button>
-            <button v-if="canUpdateToLatestVersion" class="btn-primary ml-2" @click="updateToLatest()">{{ __('Update to Latest') }}</button>
+            <button v-if="canUpdateToLatestVersion" class="btn-primary ml-4___REPLACED" @click="updateToLatest()">{{ __('Update to Latest') }}</button>
             <div v-if="onLatestVersion" v-text="__('Up to date')" />
         </div>
 

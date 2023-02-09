@@ -17,12 +17,12 @@
                     v-model="type"
                     :options="typeOptions"
                     :placeholder="false"
-                    class="ml-2" />
+                    class="ml-4___REPLACED" />
 
                 <text-input
                     v-if="hasConditions && isCustom"
                     v-model="customMethod"
-                    class="ml-2 flex-1" />
+                    class="ml-4___REPLACED flex-1" />
             </div>
 
             <div
@@ -50,11 +50,11 @@
                     v-model="conditions[index].operator"
                     :options="operatorOptions"
                     :placeholder="false"
-                    class="ml-2" />
+                    class="ml-4___REPLACED" />
 
                 <text-input
                     v-model="conditions[index].value"
-                    class="ml-2" />
+                    class="ml-4___REPLACED" />
 
                 <button @click="remove(index)" class="btn-close ml-2___REPLACED group">
                     <svg-icon name="trash" class="w-4 h-4 group-hover:text-red" />

@@ -37,7 +37,7 @@
 
                 <button
                     v-if="revisionsEnabled && !isCreating"
-                    class="ml-2 btn-primary flex items-center"
+                    class="ml-4___REPLACED btn-primary flex items-center"
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
                     <span>{{ __('Publish') }}…</span>
@@ -187,7 +187,7 @@
                 <template v-slot:buttons>
                    <button
                         v-if="!readOnly"
-                        class="ml-2"
+                        class="ml-4___REPLACED"
                         :class="{
                             'btn': revisionsEnabled,
                             'btn-primary': isCreating || !revisionsEnabled,
@@ -199,7 +199,7 @@
 
                     <button
                         v-if="revisionsEnabled && !isCreating"
-                        class="ml-2 btn-primary flex items-center"
+                        class="ml-4___REPLACED btn-primary flex items-center"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true">
                         <span v-text="__('Publish')" />

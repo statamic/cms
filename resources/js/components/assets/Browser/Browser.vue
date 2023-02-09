@@ -51,18 +51,18 @@
                                     <data-list-search ref="search" v-model="searchQuery" />
 
                                     <template v-if="! hasSelections">
-                                        <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-2" @click="creatingFolder = true">
+                                        <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-4___REPLACED" @click="creatingFolder = true">
                                             <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
                                             <span>{{ __('Create Folder') }}</span>
                                         </button>
 
-                                        <button v-if="canUpload" class="btn-flat btn-icon-only ml-2" @click="openFileBrowser">
+                                        <button v-if="canUpload" class="btn-flat btn-icon-only ml-4___REPLACED" @click="openFileBrowser">
                                             <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
                                             <span>{{ __('Upload') }}</span>
                                         </button>
                                     </template>
 
-                                    <div class="btn-group ml-2">
+                                    <div class="btn-group ml-4___REPLACED">
                                         <button class="btn-flat px-2" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                             <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                         </button>

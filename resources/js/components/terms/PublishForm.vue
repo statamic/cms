@@ -39,7 +39,7 @@
 
                 <button
                     v-if="revisionsEnabled"
-                    class="ml-2 btn-primary flex items-center"
+                    class="ml-4___REPLACED btn-primary flex items-center"
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
                     <span v-text="__('Publish')" />

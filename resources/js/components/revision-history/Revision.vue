@@ -36,7 +36,7 @@
                             :revision="revision"
                             :url="restoreUrl"
                             :reference="reference"
-                            class="ml-2" />
+                            class="ml-4___REPLACED" />
                     </template>
                 </revision-preview>
             </div>

@@ -16,8 +16,8 @@
                         <div class="flex items-center">
                             <button v-if="canPopOut && !poppedOut" class="btn" @click="popout">{{ __('Pop out') }}</button>
                             <button v-if="poppedOut" class="btn" @click="closePopout">{{ __('Pop in') }}</button>
-                            <select-input :options="deviceSelectOptions" v-model="previewDevice" v-show="!poppedOut" class="ml-2" />
-                            <select-input :options="targetSelectOptions" v-model="target" class="ml-2" v-if="targets.length > 1" />
+                            <select-input :options="deviceSelectOptions" v-model="previewDevice" v-show="!poppedOut" class="ml-4___REPLACED" />
+                            <select-input :options="targetSelectOptions" v-model="target" class="ml-4___REPLACED" v-if="targets.length > 1" />
 
                             <component
                                 v-for="(component, handle) in inputs"
@@ -26,7 +26,7 @@
                                 :value="extras[handle]"
                                 :loading="loading"
                                 @input="componentUpdated(handle, $event)"
-                                class="ml-2" />
+                                class="ml-4___REPLACED" />
 
                             <slot name="buttons" />
 

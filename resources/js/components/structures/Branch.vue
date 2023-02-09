@@ -24,7 +24,7 @@
                     <svg-icon name="chevron-down-xs" class="h-2.5" />
                 </button>
 
-                <div v-if="page.collection" class="ml-2 flex items-center">
+                <div v-if="page.collection" class="ml-4___REPLACED flex items-center">
                     <svg-icon name="content-writing" class="w-4 h-4" />
                     <div class="ml-1___REPLACED">
                         <a :href="page.collection.create_url" v-text="__('Add')" />
@@ -37,7 +37,7 @@
             <div class="pr-1 flex items-center">
                 <slot name="branch-icon" :branch="page" />
 
-                <dropdown-list class="ml-2" v-if="!isRoot">
+                <dropdown-list class="ml-4___REPLACED" v-if="!isRoot">
                     <slot name="branch-options"
                         :branch="page"
                         :depth="depth"

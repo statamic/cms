@@ -35,7 +35,7 @@
         </div>
         <div class="flex items-center bg-grey-21 border-t rounded-b px-2 py-1">
             <button class="btn-primary" @click.prevent="save">{{ __('Change Password') }}</button>
-            <label class="ml-2">
+            <label class="ml-4___REPLACED">
                 <input type="checkbox" v-model="reveal" />
                 {{ __('Reveal Password') }}
             </label>

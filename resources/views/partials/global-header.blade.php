@@ -32,26 +32,26 @@
         <favorite-creator class="hidden md:block"></favorite-creator>
 
         @if (Route::has('horizon.index') && \Laravel\Horizon\Horizon::check(request()))
-            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
+            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-4___REPLACED hover:text-grey-80" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
                 @cp_svg('horizon')
             </a>
         @endif
 
         @if (config('nova.path') && (app()->environment('local') || $user->can('viewNova')))
-            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="/{{ trim(config('nova.path'), '/') }}/dashboards/main" target="_blank" v-tooltip="'Laravel Nova'">
+            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-4___REPLACED hover:text-grey-80" href="/{{ trim(config('nova.path'), '/') }}/dashboards/main" target="_blank" v-tooltip="'Laravel Nova'">
                 @cp_svg('nova')
             </a>
         @endif
 
         @if (Route::has('telescope') && \Laravel\Telescope\Telescope::check(request()))
-            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="{{ route('telescope') }}" target="_blank" v-tooltip="'Laravel Telescope'">
+            <a class="hidden md:block h-6 w-6 p-sm text-grey ml-4___REPLACED hover:text-grey-80" href="{{ route('telescope') }}" target="_blank" v-tooltip="'Laravel Telescope'">
                 @cp_svg('telescope')
             </a>
         @endif
 
         <dropdown-list v-cloak>
             <template v-slot:trigger>
-                <button class="hidden md:block h-6 w-6 ml-2 p-sm text-grey hover:text-grey-80" v-tooltip="__('Preferences')" aria-label="{{ __('Manage Preferences') }}">
+                <button class="hidden md:block h-6 w-6 ml-4___REPLACED p-sm text-grey hover:text-grey-80" v-tooltip="__('Preferences')" aria-label="{{ __('Manage Preferences') }}">
                     @cp_svg('cog')
                 </button>
             </template>
@@ -61,7 +61,7 @@
 
         <dropdown-list v-cloak>
             <template v-slot:trigger>
-                <button class="hidden md:block h-6 w-6 ml-2 p-sm text-grey hover:text-grey-80" v-tooltip="__('Useful Links')" aria-label="{{ __('View Useful Links') }}">
+                <button class="hidden md:block h-6 w-6 ml-4___REPLACED p-sm text-grey hover:text-grey-80" v-tooltip="__('Useful Links')" aria-label="{{ __('View Useful Links') }}">
                     @cp_svg('book-open')
                 </button>
             </template>
@@ -85,12 +85,12 @@
             </dropdown-item>
         </dropdown-list>
 
-        <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="{{ Statamic\Facades\Site::selected()->url() }}" target="_blank" v-tooltip="'{{ __('View Site') }}'" aria-label="{{ __('View Site') }}">
+        <a class="hidden md:block h-6 w-6 p-sm text-grey ml-4___REPLACED hover:text-grey-80" href="{{ Statamic\Facades\Site::selected()->url() }}" target="_blank" v-tooltip="'{{ __('View Site') }}'" aria-label="{{ __('View Site') }}">
             @cp_svg('browser-com')
         </a>
         <dropdown-list v-cloak>
             <template v-slot:trigger>
-                <a class="dropdown-toggle items-center ml-2 h-full hide flex">
+                <a class="dropdown-toggle items-center ml-4___REPLACED h-full hide flex">
                     @if ($user->avatar())
                         <div class="icon-header-avatar"><img src="{{ $user->avatar() }}" /></div>
                     @else

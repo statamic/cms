@@ -23,7 +23,7 @@
                     <svg-icon name="chevron-down-xs" class="h-2.5" />
                 </button>
 
-                <div v-if="item.collection" class="ml-2 flex items-center">
+                <div v-if="item.collection" class="ml-4___REPLACED flex items-center">
                     <svg-icon name="content-writing" class="w-4 h-4" />
                     <div class="ml-1___REPLACED">
                         <a :href="item.collection.create_url" v-text="__('Add')" />
@@ -44,7 +44,7 @@
                 <svg-icon v-else-if="isModified" class="inline-block w-4 h-4 text-grey-50" name="content-writing" v-tooltip="__('Modified Item')" />
                 <svg-icon v-else-if="isCustom" class="inline-block w-4 text-grey-50" name="user-edit" v-tooltip="isSection ? __('Custom Section') : __('Custom Item')" />
 
-                <dropdown-list class="ml-2">
+                <dropdown-list class="ml-4___REPLACED">
                     <slot name="branch-options"
                         :item="item"
                         :depth="depth"
