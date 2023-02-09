@@ -53,7 +53,7 @@
                                 </div>
                             </div>
 
-                            <div class="icon icon-arrow-right my-sm mx-2___REPLACED text-grey-60" />
+                            <div class="icon icon-arrow-right my-1___REPLACED mx-2___REPLACED text-grey-60" />
 
                             <div class="input-group">
                                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
