@@ -26,7 +26,7 @@
                                 <div class="p-2___REPLACED flex items-center border-r border-grey-50 group-hover:border-grey-60 bg-grey-20 rounded-l">
                                     <svg-icon class="h-5 w-5 text-grey-80" :name="fieldtype.icon" default="generic-field"></svg-icon>
                                 </div>
-                                <span class="pl-1.5 text-grey-80 text-md group-hover:text-grey-90">{{ fieldtype.text }}</span>
+                                <span class="pl-3___REPLACED text-grey-80 text-md group-hover:text-grey-90">{{ fieldtype.text }}</span>
                             </button>
                         </div>
                     </div>

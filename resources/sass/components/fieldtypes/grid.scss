@@ -17,7 +17,7 @@
         top: -1px;
         z-index: auto;
 
-        &:first-child { @apply rounded-tl pl-1.5; }
+        &:first-child { @apply rounded-tl pl-3___REPLACED; }
         &:last-child { @apply rounded-tr; }
         &.grid-drag-handle-header {
             @apply w-3;
@@ -40,7 +40,7 @@
         @apply border-b px-2___REPLACED py-3___REPLACED align-top;
 
         &:first-child.grid-cell {
-            @apply pl-1.5;
+            @apply pl-3___REPLACED;
         }
 
         &.drag-handle {

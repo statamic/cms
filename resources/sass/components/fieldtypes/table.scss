@@ -16,7 +16,7 @@
         position: sticky;
         top: -1px;
 
-        &:first-child { @apply rounded-tl pl-1.5; }
+        &:first-child { @apply rounded-tl pl-3___REPLACED; }
         &:last-child { @apply rounded-tr border-r-0; }
         &.grid-drag-handle-header {
             @apply w-3;
@@ -42,7 +42,7 @@
         @apply border-b border-r p-0;
 
         &:first-child.grid-cell {
-            @apply pl-1.5;
+            @apply pl-3___REPLACED;
         }
 
         &:last-child {
