@@ -16,7 +16,7 @@
             width="75%"
             @closed="showComposer = false"
         >
-            <div class="p-3 relative">
+            <div class="p-6___REPLACED relative">
                 <composer-output :package="package" />
                 <button
                     v-if="!composer.processing"

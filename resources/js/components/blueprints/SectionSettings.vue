@@ -2,7 +2,7 @@
 
     <div class="flex flex-col h-full">
 
-        <div class="flex items-center p-3 bg-grey-20 border-b text-center">
+        <div class="flex items-center p-6___REPLACED bg-grey-20 border-b text-center">
             Section
         </div>
 

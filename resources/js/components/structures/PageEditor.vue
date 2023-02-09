@@ -49,7 +49,7 @@
                     </div>
                 </publish-container>
 
-                <div class="p-3">
+                <div class="p-6___REPLACED">
                     <button @click="submit" class="btn-primary w-full">{{ __('Submit') }}</button>
 
                     <div class="text-xs mt-4___REPLACED" v-if="type === 'entry'">

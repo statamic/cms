@@ -44,7 +44,7 @@
                     <transition name="live-preview-editor-slide">
                         <div v-show="panesVisible" class="live-preview-editor" :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }">
                             <div class="live-preview-fields flex-1 h-full overflow-scroll" :class="{
-                                'p-3 bg-grey-30': poppedOut,
+                                'p-6___REPLACED bg-grey-30': poppedOut,
                                 'live-preview-fields-wide': editorWidth >= 920,
                                 'live-preview-fields-narrow': editorWidth < 920
                             }">

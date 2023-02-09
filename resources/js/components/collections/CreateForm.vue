@@ -1,7 +1,7 @@
 <template>
     <div class="max-w-lg mt-4___REPLACED mx-auto">
 
-        <div class="rounded p-3 lg:px-7 lg:py-5 shadow bg-white">
+        <div class="rounded p-6___REPLACED lg:px-7 lg:py-5 shadow bg-white">
             <header class="text-center mb-16___REPLACED">
                 <h1 class="mb-6___REPLACED">{{ __('Create Collection') }}</h1>
                 <p class="text-grey" v-text="__('messages.collection_configure_intro')" />

@@ -3,7 +3,7 @@
         <h1 class="p-2 bg-grey-20 border-b text-center">
             {{ __('Keyboard Shortcuts') }}
         </h1>
-        <div class="p-3 relative">
+        <div class="p-6___REPLACED relative">
             <div class="shortcut-pair">
                 <span class="shortcut-combo">
                     <span class="shortcut">shift</span><span class="shortcut-joiner">+</span><span class="shortcut">?</span>

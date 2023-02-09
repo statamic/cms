@@ -105,7 +105,7 @@
         </stack>
 
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
-            <div class="h-full overflow-auto p-3 bg-white relative">
+            <div class="h-full overflow-auto p-6___REPLACED bg-white relative">
                 <button class="btn-close absolute top-0 right-0 mt-4___REPLACED mr-8___REPLACED" @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;</button>
                 <div class="max-w-md mx-auto my-8___REPLACED clean-content">
                     <h2 v-text="__('Markdown Cheatsheet')"></h2>

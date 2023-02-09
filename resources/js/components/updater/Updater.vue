@@ -16,7 +16,7 @@
             <div v-if="onLatestVersion" v-text="__('Up to date')" />
         </div>
 
-        <div v-if="gettingChangelog" class="card p-3 text-center">
+        <div v-if="gettingChangelog" class="card p-6___REPLACED text-center">
             <loading-graphic  />
         </div>
 
@@ -62,7 +62,7 @@
             @opened="$events.$emit('start-composer')"
             @closed="modalOpen = false"
         >
-            <div class="p-3 relative">
+            <div class="p-6___REPLACED relative">
                 <composer-output :package="package" />
                 <button
                     v-if="!composer.processing"

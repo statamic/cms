@@ -12,7 +12,7 @@
                     v-html="'&times'" />
             </div>
 
-            <div class="flex-1 overflow-auto p-3">
+            <div class="flex-1 overflow-auto p-6___REPLACED">
                 <div class="publish-fields publish-fields-narrow">
 
                 <div class="publish-field mb-8___REPLACED" :class="{ 'has-error': validate }">

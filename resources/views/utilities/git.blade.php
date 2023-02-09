@@ -40,7 +40,7 @@
                 </div>
             </div>
         @empty
-            <p class="p-3 italic text-grey-60">{{ __('statamic::messages.git_nothing_to_commit') }}</p>
+            <p class="p-6___REPLACED italic text-grey-60">{{ __('statamic::messages.git_nothing_to_commit') }}</p>
         @endforelse
     </div>
 

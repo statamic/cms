@@ -2,7 +2,7 @@
 
     <div class="mt-6___REPLACED">
 
-        <div v-if="fieldtypesLoading" class="card p-3 text-center">
+        <div v-if="fieldtypesLoading" class="card p-6___REPLACED text-center">
             <loading-graphic  />
         </div>
 

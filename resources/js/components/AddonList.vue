@@ -18,7 +18,7 @@
             {{ __('messages.addon_list_loading_error') }}
         </div>
 
-        <div v-if="initializing" class="card p-3 text-center">
+        <div v-if="initializing" class="card p-6___REPLACED text-center">
             <loading-graphic  />
         </div>
 

@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <div class="card p-3 ">
+        <div class="card p-6___REPLACED ">
             <header class="mb-6___REPLACED">
                 <p class="text-grey" v-text="__('messages.collection_scaffold_instructions')" />
             </header>

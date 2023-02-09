@@ -177,13 +177,13 @@
 
         <h6 class="mb-4___REPLACED">Other Colors (needs simplifying)</h6>
         <div class="flex text-sm text-center">
-            <div class="text-black bg-blue p-3 flex-1">Blue</div>
-            <div class="text-black bg-green p-3 flex-1">Green</div>
-            <div class="text-black bg-red p-3 flex-1">Red</div>
-            <div class="text-black bg-yellow p-3 flex-1">Yellow</div>
-            <div class="text-black bg-yellow-dark p-3 flex-1">Yellow Dark</div>
-            <div class="text-black bg-pink p-3 flex-1">Pink</div>
-            <div class="text-black bg-purple p-3 flex-1">Purple</div>
+            <div class="text-black bg-blue p-6___REPLACED flex-1">Blue</div>
+            <div class="text-black bg-green p-6___REPLACED flex-1">Green</div>
+            <div class="text-black bg-red p-6___REPLACED flex-1">Red</div>
+            <div class="text-black bg-yellow p-6___REPLACED flex-1">Yellow</div>
+            <div class="text-black bg-yellow-dark p-6___REPLACED flex-1">Yellow Dark</div>
+            <div class="text-black bg-pink p-6___REPLACED flex-1">Pink</div>
+            <div class="text-black bg-purple p-6___REPLACED flex-1">Purple</div>
         </div>
     </div>
 

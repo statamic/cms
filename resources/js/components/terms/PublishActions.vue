@@ -12,7 +12,7 @@
                     v-html="'&times'" />
             </div>
 
-            <div class="flex-1 overflow-auto p-3">
+            <div class="flex-1 overflow-auto p-6___REPLACED">
 
                 <div class="flex h-full items-center justify-center loading" v-if="saving">
                     <loading-graphic text="" />

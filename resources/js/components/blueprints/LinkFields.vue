@@ -19,7 +19,7 @@
                         v-html="'&times'" />
                 </div>
 
-                <div class="flex-1 overflow-auto p-3">
+                <div class="flex-1 overflow-auto p-6___REPLACED">
 
                     <div>
                         <p class="text-sm font-medium mb-2___REPLACED" v-text="__('Link a single field')" />
