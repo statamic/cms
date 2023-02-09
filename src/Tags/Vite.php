@@ -3,7 +3,6 @@
 namespace Statamic\Tags;
 
 use Illuminate\Foundation\Vite as LaravelVite;
-use Illuminate\Support\Arr;
 
 class Vite extends Tags
 {
@@ -14,13 +13,6 @@ class Vite extends Tags
      */
     public function index()
     {
-        $asset = $this->params->explode('asset');
-
-        if ($asset) {
-            return app(LaravelVite::class)
-                ->asset(Arr::first($asset));
-        }
-
         if (! $src = $this->params->explode('src')) {
             throw new \Exception('Please provide a source file.');
         }
@@ -33,5 +25,22 @@ class Vite extends Tags
             ->useBuildDirectory($directory)
             ->useHotFile($hot ? base_path($hot) : null)
             ->toHtml();
+    }
+
+    /**
+     * The {{ vite:asset src="" }} tag.
+     *
+     * @return string
+     */
+    public function asset()
+    {
+        if (! $src = $this->params->get('src')) {
+            throw new \Exception('Please provide a source file.');
+        }
+
+        $buildDirectory = $this->params->get('buildDirectory', null);
+
+        return app(LaravelVite::class)
+                ->asset($src, $buildDirectory);
     }
 }
