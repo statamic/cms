@@ -31,7 +31,7 @@
             </div>
         </data-list>
 
-        <p v-else-if="!initializing && !items.length" class="p-4___REPLACED pt-1 text-sm text-grey-50">
+        <p v-else-if="!initializing && !items.length" class="p-4___REPLACED pt-2___REPLACED text-sm text-grey-50">
             {{ __('There are no entries in this site') }}
         </p>
 

@@ -174,7 +174,7 @@
 
                             <!-- Grid Mode -->
                             <div v-if="mode === 'grid' && ! containerIsEmpty">
-                                <div class="asset-grid-listing px-4___REPLACED pt-1">
+                                <div class="asset-grid-listing px-4___REPLACED pt-2___REPLACED">
                                     <!-- Parent Folder -->
                                     <div class="asset-tile" v-if="(folder && folder.parent_path) && !restrictFolderNavigation">
                                         <div class="asset-thumb-container">

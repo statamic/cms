@@ -12,7 +12,7 @@
                 <template #default="{ close: closePopover, afterClosed: afterPopoverClosed }">
                     <div class="flex flex-col text-left w-64">
                         <h6 class="p-4___REPLACED pb-0" v-text="__('Show everything where:')"/>
-                        <div v-if="showFilterSelection" class="p-4___REPLACED pt-1">
+                        <div v-if="showFilterSelection" class="p-4___REPLACED pt-2___REPLACED">
                             <button
                                 v-for="filter in unpinnedFilters"
                                 :key="filter.handle"

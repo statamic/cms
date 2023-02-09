@@ -27,7 +27,7 @@
             <h2 v-text="__('Fields')" />
         </div>
 
-        <div class="card" :class="{ 'pt-1': !fields.length }">
+        <div class="card" :class="{ 'pt-2___REPLACED': !fields.length }">
             <fields
                 :fields="fieldset.fields"
                 :editing-field="editingField"
