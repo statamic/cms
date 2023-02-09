@@ -16,7 +16,7 @@
         </a>
     </div>
 
-    <div class="sm:px-4 w-full flex-1 lg:flex items-center lg:justify-center mx-auto max-w-full">
+    <div class="sm:px-8___REPLACED w-full flex-1 lg:flex items-center lg:justify-center mx-auto max-w-full">
         <global-search endpoint="{{ cp_route('search') }}" placeholder="{{ __('Search...') }}">
         </global-search>
     </div>
