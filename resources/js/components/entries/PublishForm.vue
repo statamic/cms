@@ -101,7 +101,7 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-4___REPLACED flex items-center -mx-1">
+                                    <div class="p-4___REPLACED flex items-center -mx-2___REPLACED">
                                         <button
                                             class="flex items-center justify-center btn-flat w-full mx-2___REPLACED px-2___REPLACED"
                                             v-if="isBase && livePreviewUrl"
