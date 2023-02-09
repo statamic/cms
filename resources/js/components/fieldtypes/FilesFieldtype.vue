@@ -13,7 +13,7 @@
             <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
 
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-8 w-8 mr-3" />
+                    <svg-icon name="upload" class="h-8 w-8 mr-6___REPLACED" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
