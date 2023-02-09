@@ -28,7 +28,7 @@
         </div>
 
         <h6 class="mt-8___REPLACED">Core</h6>
-        <div class="card p-0 mt-1">
+        <div class="card p-0 mt-2___REPLACED">
             <table class="data-table">
                 <tr>
                     <td class="w-64"><a href="{{ route('statamic.cp.updater.product', 'statamic') }}" class="text-blue font-bold">Statamic</a></td>
@@ -43,7 +43,7 @@
         </div>
 
         <h6 class="mt-8___REPLACED">{{ __('Addons') }}</h6>
-        <div class="card p-0 mt-1">
+        <div class="card p-0 mt-2___REPLACED">
             <table class="data-table">
                 @foreach ($addons as $addon)
                 <tr>
@@ -62,7 +62,7 @@
         </div>
 
         <h6 class="mt-8___REPLACED">{{ __('Unlisted Addons') }}</h6>
-        <div class="card p-0 mt-1">
+        <div class="card p-0 mt-2___REPLACED">
             <table class="data-table">
                 @foreach ($unlistedAddons as $addon)
                     <tr>

@@ -19,7 +19,7 @@
                     <div class="field-inner">
                         <label class="text-sm font-medium mb-2___REPLACED">{{ __('Display') }} <span class="text-red">*</span></label>
                         <text-input v-model="section" :focus="true" />
-                        <div v-if="validate" class="help-block text-red mt-1"><p>{{ __('statamic::validation.required') }}</p></div>
+                        <div v-if="validate" class="help-block text-red mt-2___REPLACED"><p>{{ __('statamic::validation.required') }}</p></div>
                     </div>
                 </div>
 

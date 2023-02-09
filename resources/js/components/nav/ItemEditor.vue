@@ -19,7 +19,7 @@
                     <div class="field-inner">
                         <label class="text-sm font-medium mb-2___REPLACED">{{ __('Display') }} <span class="text-red">*</span></label>
                         <text-input v-model="config.display" :focus="true" />
-                        <div v-if="validateDisplay" class="help-block text-red mt-1"><p>{{ __('statamic::validation.required') }}</p></div>
+                        <div v-if="validateDisplay" class="help-block text-red mt-2___REPLACED"><p>{{ __('statamic::validation.required') }}</p></div>
                     </div>
                 </div>
 
@@ -30,7 +30,7 @@
                             <p v-text="__('Enter any internal or external URL.')"></p>
                         </div>
                         <text-input v-model="config.url" />
-                        <div v-if="validateUrl" class="help-block text-red mt-1"><p>{{ __('statamic::validation.required') }}</p></div>
+                        <div v-if="validateUrl" class="help-block text-red mt-2___REPLACED"><p>{{ __('statamic::validation.required') }}</p></div>
                     </div>
                 </div>
 

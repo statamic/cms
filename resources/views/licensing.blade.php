@@ -46,7 +46,7 @@
         @endif
 
         <h6 class="mt-8___REPLACED">Site</h6>
-        <div class="card p-0 mt-1">
+        <div class="card p-0 mt-2___REPLACED">
             <table class="data-table">
                 <tr>
                     <td class="w-64 font-bold">
@@ -65,7 +65,7 @@
         </div>
 
         <h6 class="mt-8___REPLACED">Core</h6>
-        <div class="card p-0 mt-1">
+        <div class="card p-0 mt-2___REPLACED">
             <table class="data-table">
                 <tr>
                     <td class="w-64 font-bold">
@@ -80,9 +80,9 @@
 
         <h6 class="mt-8___REPLACED">{{ __('Addons') }}</h6>
         @if ($addons->isEmpty())
-        <p class="text-sm text-grey mt-1">{{ __('No addons installed') }}</p>
+        <p class="text-sm text-grey mt-2___REPLACED">{{ __('No addons installed') }}</p>
         @else
-        <div class="card p-0 mt-1">
+        <div class="card p-0 mt-2___REPLACED">
             <table class="data-table">
                 @foreach ($addons as $addon)
                     <tr>
@@ -101,7 +101,7 @@
 
         @if (!$unlistedAddons->isEmpty())
         <h6 class="mt-8___REPLACED">{{ __('Unlisted Addons') }}</h6>
-        <div class="card p-0 mt-1">
+        <div class="card p-0 mt-2___REPLACED">
             <table class="data-table">
                 @foreach ($unlistedAddons as $addon)
                     <tr>

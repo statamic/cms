@@ -23,7 +23,7 @@
                 <input id="email" type="text" class="input-text input-text" name="email" value="{{ old('email') }}" >
 
                 @error('email', 'user.forgot_password')
-                    <div class="text-red text-xs mt-1">{{ $message }}</div>
+                    <div class="text-red text-xs mt-2___REPLACED">{{ $message }}</div>
                 @enderror
             </div>
 

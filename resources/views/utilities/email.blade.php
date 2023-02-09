@@ -20,7 +20,7 @@
                 <button type="submit" class="btn-primary">{{ __('Send Test Email') }}</button>
             </div>
             @if ($errors->has('email'))
-                <p class="mt-1"><small class="help-block text-red">{{ $errors->first('email') }}</small></p>
+                <p class="mt-2___REPLACED"><small class="help-block text-red">{{ $errors->first('email') }}</small></p>
             @endif
         </form>
     </div>

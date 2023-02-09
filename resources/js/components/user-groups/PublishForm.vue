@@ -45,7 +45,7 @@
                                 @input="roles = $event" />
                         </div>
                     </publish-field-meta>
-                    <small class="help-block text-red mt-1 mb-0" v-if="errors.roles" v-text="errors.roles[0]" />
+                    <small class="help-block text-red mt-2___REPLACED mb-0" v-if="errors.roles" v-text="errors.roles[0]" />
                 </div>
 
             </publish-fields-container>

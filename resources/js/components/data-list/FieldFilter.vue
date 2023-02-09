@@ -18,7 +18,7 @@
                     :meta="{}"
                     :values="containerValues"
                     :track-dirty-state="false"
-                    class="filter-fields mt-1"
+                    class="filter-fields mt-2___REPLACED"
                     @updated="updateValues"
                 >
                     <!-- TODO: handle showing/hiding of labels more elegantly -->

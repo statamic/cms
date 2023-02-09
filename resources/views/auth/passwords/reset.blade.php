@@ -21,7 +21,7 @@
                 <input id="email" type="email" class="input-text input-text" name="email" value="{{ $email ?? old('email') }}" autofocus required>
 
                 @error('email')
-                    <div class="text-red text-xs mt-1">{{ $message }}</div>
+                    <div class="text-red text-xs mt-2___REPLACED">{{ $message }}</div>
                 @enderror
             </div>
 
@@ -31,7 +31,7 @@
                 <input id="password" type="password" class="input-text input-text" name="password" required>
 
                 @error('password')
-                    <div class="text-red text-xs mt-1">{{ $message }}</div>
+                    <div class="text-red text-xs mt-2___REPLACED">{{ $message }}</div>
                 @enderror
             </div>
 

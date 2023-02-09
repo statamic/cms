@@ -25,7 +25,7 @@
 
         <div v-if="text" :class="{
             'ml-1 text-sm text-grey': inline,
-            'mt-1': !inline
+            'mt-2___REPLACED': !inline
         }">{{ __(text) }}</div>
     </div>
 </template>

@@ -9,14 +9,14 @@
             <div class="mb-10___REPLACED">
                 <label class="font-bold text-base mb-1___REPLACED" for="name">{{ __('Title') }}</label>
                 <input type="text" v-model="title" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-grey-60 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-2___REPLACED flex items-center">
                     {{ __('messages.collection_configure_title_instructions') }}
                 </div>
             </div>
             <div class="mb-4___REPLACED">
                 <label class="font-bold text-base mb-1___REPLACED" for="name">{{ __('Handle') }}</label>
                 <input type="text" v-model="handle" class="input-text" tabindex="2">
-                <div class="text-2xs text-grey-60 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-2___REPLACED flex items-center">
                     {{ __('messages.collection_configure_handle_instructions') }}
                 </div>
             </div>

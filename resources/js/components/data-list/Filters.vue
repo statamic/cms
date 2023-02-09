@@ -17,7 +17,7 @@
                                 v-for="filter in unpinnedFilters"
                                 :key="filter.handle"
                                 v-text="filter.title"
-                                class="btn w-full mt-1"
+                                class="btn w-full mt-2___REPLACED"
                                 @click="creating = filter.handle"
                             />
                         </div>
@@ -98,7 +98,7 @@
 
         </div>
 
-        <div class="flex flex-wrap mt-1" v-if="activeCount">
+        <div class="flex flex-wrap mt-2___REPLACED" v-if="activeCount">
             <div class="filter-badge mr-1" v-for="(badge, handle) in fieldFilterBadges">
                 <span>{{ badge }}</span>
                 <button @click="removeFieldFilter(handle)">&times;</button>

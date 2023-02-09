@@ -23,7 +23,7 @@
             />
         </div>
 
-        <div class="blueprint-section-field-actions flex mt-1 -mx-sm">
+        <div class="blueprint-section-field-actions flex mt-2___REPLACED -mx-sm">
             <div class="px-sm">
                 <link-fields
                     :exclude-fieldset="excludeFieldset"

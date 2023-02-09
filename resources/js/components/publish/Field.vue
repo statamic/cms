@@ -71,12 +71,12 @@
         </slot>
 
         <div
-            class="help-block mt-1"
+            class="help-block mt-2___REPLACED"
             v-if="instructions && config.instructions_position === 'below'"
             v-html="instructions" />
 
         <div v-if="hasError">
-            <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block text-red mt-2___REPLACED mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
     </div>
     </publish-field-meta>

@@ -23,7 +23,7 @@
                             </div>
                         </div>
 
-                        <small v-if="error" class="help-block text-red mt-1 mb-0" v-text="__('statamic::validation.required')" />
+                        <small v-if="error" class="help-block text-red mt-2___REPLACED mb-0" v-text="__('statamic::validation.required')" />
                     </div>
                 </div>
             </div>

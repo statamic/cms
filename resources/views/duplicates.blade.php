@@ -18,7 +18,7 @@
     @foreach ($duplicates as $id => $paths)
         <h6 class="mt-8___REPLACED">{{ $id }}</h6>
 
-        <div class="card p-0 mt-1">
+        <div class="card p-0 mt-2___REPLACED">
             <table class="data-table">
                 @foreach ($paths as $path)
                     <tr>
