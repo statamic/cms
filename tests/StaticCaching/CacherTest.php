@@ -328,40 +328,12 @@ class CacherTest extends TestCase
     /** @test */
     public function it_gets_path_and_domain_from_an_absolute_url()
     {
-        $cacher = $this->cacher();
-
-        $getPathAndDomain = (new \ReflectionClass($cacher))->getMethod('getPathAndDomain');
-        $getPathAndDomain->setAccessible(true);
-
-        [$path, $domain] = $getPathAndDomain->invoke($cacher, 'http://example.com/');
-
-        $this->assertEquals('/', $path);
-        $this->assertEquals('http://example.com', $domain);
-
-        [$path, $domain] = $getPathAndDomain->invoke($cacher, 'http://example.com');
-
-        $this->assertEquals('/', $path);
-        $this->assertEquals('http://example.com', $domain);
-
-        [$path, $domain] = $getPathAndDomain->invoke($cacher, 'http://example.com/blog');
-
-        $this->assertEquals('/blog', $path);
-        $this->assertEquals('http://example.com', $domain);
-
-        [$path, $domain] = $getPathAndDomain->invoke($cacher, 'http://example.com/blog/');
-
-        $this->assertEquals('/blog/', $path);
-        $this->assertEquals('http://example.com', $domain);
-
-        [$path, $domain] = $getPathAndDomain->invoke($cacher, 'http://example.com/blog/post');
-
-        $this->assertEquals('/blog/post', $path);
-        $this->assertEquals('http://example.com', $domain);
-
-        [$path, $domain] = $getPathAndDomain->invoke($cacher, 'http://example.com/blog/post?b=2&a=1');
-
-        $this->assertEquals('/blog/post?b=2&a=1', $path);
-        $this->assertEquals('http://example.com', $domain);
+        $this->assertEquals(['/', 'http://example.com'], $this->getPathAndDomain('http://example.com'));
+        $this->assertEquals(['/', 'http://example.com'], $this->getPathAndDomain('http://example.com/'));
+        $this->assertEquals(['/blog', 'http://example.com'], $this->getPathAndDomain('http://example.com/blog'));
+        $this->assertEquals(['/blog/', 'http://example.com'], $this->getPathAndDomain('http://example.com/blog/'));
+        $this->assertEquals(['/blog/post', 'http://example.com'], $this->getPathAndDomain('http://example.com/blog/post'));
+        $this->assertEquals(['/blog/post?b=2&a=1', 'http://example.com'], $this->getPathAndDomain('http://example.com/blog/post?b=2&a=1'));
     }
 
     /** @test */
@@ -372,22 +344,28 @@ class CacherTest extends TestCase
             'uk' => ['url' => 'http://example.co.uk'],
         ]]);
 
-        $cacher = $this->cacher();
+        $this->assertEquals(['/', 'http://example.com'], $this->getPathAndDomain('/'));
+        $this->assertEquals(['/blog', 'http://example.com'], $this->getPathAndDomain('blog'));
+        $this->assertEquals(['/blog', 'http://example.com'], $this->getPathAndDomain('/blog'));
+        $this->assertEquals(['/blog/', 'http://example.com'], $this->getPathAndDomain('/blog/'));
+        $this->assertEquals(['/blog/post', 'http://example.com'], $this->getPathAndDomain('/blog/post'));
+        $this->assertEquals(['/blog/post?b=2&a=1', 'http://example.com'], $this->getPathAndDomain('/blog/post?b=2&a=1'));
+    }
 
-        [$path, $domain] = $this->getPathAndDomain($cacher, '/');
+    /** @test */
+    public function it_gets_path_and_domain_from_a_relative_url_when_sites_have_absolute_urls_with_trailing_slashes()
+    {
+        Site::setConfig(['sites' => [
+            'default' => ['url' => 'http://example.com/'],
+            'uk' => ['url' => 'http://example.co.uk/'],
+        ]]);
 
-        $this->assertEquals('/', $path);
-        $this->assertEquals('http://example.com', $domain);
-
-        [$path, $domain] = $this->getPathAndDomain($cacher, '/blog');
-
-        $this->assertEquals('/blog', $path);
-        $this->assertEquals('http://example.com', $domain);
-
-        [$path, $domain] = $this->getPathAndDomain($cacher, 'blog');
-
-        $this->assertEquals('/blog', $path);
-        $this->assertEquals('http://example.com', $domain);
+        $this->assertEquals(['/', 'http://example.com'], $this->getPathAndDomain('/'));
+        $this->assertEquals(['/blog', 'http://example.com'], $this->getPathAndDomain('blog'));
+        $this->assertEquals(['/blog', 'http://example.com'], $this->getPathAndDomain('/blog'));
+        $this->assertEquals(['/blog/', 'http://example.com'], $this->getPathAndDomain('/blog/'));
+        $this->assertEquals(['/blog/post', 'http://example.com'], $this->getPathAndDomain('/blog/post'));
+        $this->assertEquals(['/blog/post?b=2&a=1', 'http://example.com'], $this->getPathAndDomain('/blog/post?b=2&a=1'));
     }
 
     /** @test */
@@ -400,26 +378,54 @@ class CacherTest extends TestCase
 
         config(['app.url' => 'http://example.com']);
 
-        $cacher = $this->cacher();
-
-        [$path, $domain] = $this->getPathAndDomain($cacher, '/');
-
-        $this->assertEquals('/default', $path);
-        $this->assertEquals('http://example.com', $domain);
-
-        [$path, $domain] = $this->getPathAndDomain($cacher, '/blog');
-
-        $this->assertEquals('/default/blog', $path);
-        $this->assertEquals('http://example.com', $domain);
-
-        [$path, $domain] = $this->getPathAndDomain($cacher, 'blog');
-
-        $this->assertEquals('/default/blog', $path);
-        $this->assertEquals('http://example.com', $domain);
+        $this->assertEquals(['/default', 'http://example.com'], $this->getPathAndDomain('/'));
+        $this->assertEquals(['/default/blog', 'http://example.com'], $this->getPathAndDomain('blog'));
+        $this->assertEquals(['/default/blog', 'http://example.com'], $this->getPathAndDomain('/blog'));
+        $this->assertEquals(['/default/blog/', 'http://example.com'], $this->getPathAndDomain('/blog/'));
+        $this->assertEquals(['/default/blog/post', 'http://example.com'], $this->getPathAndDomain('/blog/post'));
+        $this->assertEquals(['/default/blog/post?b=2&a=1', 'http://example.com'], $this->getPathAndDomain('/blog/post?b=2&a=1'));
     }
 
-    private function getPathAndDomain($cacher, $url)
+    /** @test */
+    public function it_gets_path_and_domain_from_a_relative_url_when_sites_have_relative_urls_with_trailing_slashes()
     {
+        Site::setConfig(['sites' => [
+            'default' => ['url' => '/default/'],
+            'uk' => ['url' => '/uk/'],
+        ]]);
+
+        config(['app.url' => 'http://example.com']);
+
+        $this->assertEquals(['/default', 'http://example.com'], $this->getPathAndDomain('/'));
+        $this->assertEquals(['/default/blog', 'http://example.com'], $this->getPathAndDomain('blog'));
+        $this->assertEquals(['/default/blog', 'http://example.com'], $this->getPathAndDomain('/blog'));
+        $this->assertEquals(['/default/blog/', 'http://example.com'], $this->getPathAndDomain('/blog/'));
+        $this->assertEquals(['/default/blog/post', 'http://example.com'], $this->getPathAndDomain('/blog/post'));
+        $this->assertEquals(['/default/blog/post?b=2&a=1', 'http://example.com'], $this->getPathAndDomain('/blog/post?b=2&a=1'));
+    }
+    
+    /** @test */
+    public function it_gets_path_and_domain_from_a_relative_url_when_site_is_just_a_slash()
+    {
+        Site::setConfig(['sites' => [
+            'default' => ['url' => '/'],
+            'uk' => ['url' => '/uk/'],
+        ]]);
+
+        config(['app.url' => 'http://example.com']);
+
+        $this->assertEquals(['/', 'http://example.com'], $this->getPathAndDomain('/'));
+        $this->assertEquals(['/blog', 'http://example.com'], $this->getPathAndDomain('blog'));
+        $this->assertEquals(['/blog', 'http://example.com'], $this->getPathAndDomain('/blog'));
+        $this->assertEquals(['/blog/', 'http://example.com'], $this->getPathAndDomain('/blog/'));
+        $this->assertEquals(['/blog/post', 'http://example.com'], $this->getPathAndDomain('/blog/post'));
+        $this->assertEquals(['/blog/post?b=2&a=1', 'http://example.com'], $this->getPathAndDomain('/blog/post?b=2&a=1'));
+    }
+
+    private function getPathAndDomain($url)
+    {
+        $cacher = $this->cacher();
+
         $method = (new \ReflectionClass($cacher))->getMethod('getPathAndDomain');
         $method->setAccessible(true);
 
