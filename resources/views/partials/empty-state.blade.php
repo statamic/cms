@@ -18,7 +18,7 @@
                 <a href="{{ $button_url }}" class="btn-primary btn-lg">{{ $button_text }}</a>
             @endunless
         </div>
-        <div class="hidden md:block w-1/2 pl-6">
+        <div class="hidden md:block w-1/2 pl-16___REPLACED">
             @cp_svg($svg ?? 'empty/content')
         </div>
     </div>
