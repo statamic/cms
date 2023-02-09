@@ -49,7 +49,7 @@
                             @click="linkField"
                             v-text="__('Link')" />
                     </div>
-                    <div class="my-2 flex items-center">
+                    <div class="my-4___REPLACED flex items-center">
                         <div class="border-b border-grey-30 flex-1" />
                         <div class="text-2xs text-grey-60 mx-4___REPLACED" v-text="__('or')"></div>
                         <div class="border-b border-grey-30 flex-1" />

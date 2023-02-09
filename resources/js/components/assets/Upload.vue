@@ -1,6 +1,6 @@
 <template>
 
-    <div class="flex items-center my-2"
+    <div class="flex items-center my-4___REPLACED"
         :class="{
             'text-red': status == 'error',
             'text-green': status === 'pending'
