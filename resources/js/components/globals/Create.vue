@@ -2,7 +2,7 @@
     <div class="max-w-lg mt-2 mx-auto">
 
         <div class="rounded p-3 lg:px-7 lg:py-5 shadow bg-white">
-            <header class="text-center mb-6">
+            <header class="text-center mb-16___REPLACED">
                 <h1 class="mb-6___REPLACED">{{ __('Create Global Set') }}</h1>
                 <p class="text-grey" v-text="__('messages.globals_configure_intro')" />
             </header>

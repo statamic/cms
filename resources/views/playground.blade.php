@@ -18,7 +18,7 @@
         Form Inputs
     </h2>
 
-    <div class="shadow bg-white p-4 rounded-lg mb-6">
+    <div class="shadow bg-white p-4 rounded-lg mb-16___REPLACED">
         <div class="mb-2">
             <input type="text" placeholder="unstyled">
         </div>
@@ -53,7 +53,7 @@
     </div>
 
     <h2 class="mb-1">Typography</h2>
-    <div class="shadow bg-white p-4 rounded-lg overflow-hidden mb-6">
+    <div class="shadow bg-white p-4 rounded-lg overflow-hidden mb-16___REPLACED">
         <h1 class="mb-2">This is first level heading</h1>
         <h2 class="mb-2">This is a second level heading</h2>
         <h3 class="mb-2">This is a third level heading</h3>
@@ -64,7 +64,7 @@
     </div>
 
     <h2 class="mb-1">Buttons</h2>
-    <div class="shadow bg-white p-4 rounded-lg mb-6">
+    <div class="shadow bg-white p-4 rounded-lg mb-16___REPLACED">
         <h6 class="mb-2">Flavors</h6>
         <div class="mb-8___REPLACED flex">
             <button class="mr-2 btn">Default Button</button>
@@ -157,7 +157,7 @@
     </div>
 
     <h2 class="mb-1">Colors</h2>
-    <div class="bg-white p-5 shadow rounded-lg overflow-hidden mb-6">
+    <div class="bg-white p-5 shadow rounded-lg overflow-hidden mb-16___REPLACED">
 
         <h6 class="mb-2">Greys</h6>
         <div class="flex flex-row-reverse text-sm text-center mb-8___REPLACED">
