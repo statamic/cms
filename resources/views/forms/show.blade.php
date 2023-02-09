@@ -60,7 +60,7 @@
         <div slot="no-results" class="text-center border-2 border-dashed rounded-lg">
             <div class="max-w-md mx-auto px-4 py-8">
                 @cp_svg('empty/form')
-                <h1 class="my-3">{{ __('No submissions') }}</h1>
+                <h1 class="my-6___REPLACED">{{ __('No submissions') }}</h1>
             </div>
         </div>
     </form-submission-listing>

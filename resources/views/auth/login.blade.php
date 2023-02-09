@@ -21,7 +21,7 @@
             </div>
 
             @if($emailLoginEnabled)
-                <div class="text-center italic my-3">or</div>
+                <div class="text-center italic my-6___REPLACED">or</div>
 
                 <div class="login-with-email" v-if="! showEmailLogin">
                     <a class="btn block" @click.prevent="showEmailLogin = true">

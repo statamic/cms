@@ -3,7 +3,7 @@
 
         @cp_svg($svg)
 
-        <h1 class="my-3">
+        <h1 class="my-6___REPLACED">
             @if ($can ?? $user->can('super'))
                 {{ __("Create your first {$resource} now") }}
             @else
