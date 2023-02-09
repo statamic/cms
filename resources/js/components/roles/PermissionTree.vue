@@ -16,7 +16,7 @@
                             :class="{ 'cursor-not-allowed': disabled }"
                         />
                     </div>
-                    <div class="pl-1">
+                    <div class="pl-2___REPLACED">
                         {{ permission.label }}
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 <div class="global-header">
-    <div class="lg:min-w-xl pl-1 md:pl-6___REPLACED h-full flex items-center">
+    <div class="lg:min-w-xl pl-2___REPLACED md:pl-6___REPLACED h-full flex items-center">
         <button class="nav-toggle hidden md:block ml-1___REPLACED flex-shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@cp_svg('burger')</button>
         <button class="nav-toggle md:hidden ml-1___REPLACED flex-shrink-0" @click="toggleMobileNav" v-if="! mobileNavOpen" aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('burger')</button>
         <button class="nav-toggle md:hidden ml-1___REPLACED flex-shrink-0" @click="toggleMobileNav" v-else v-cloak aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('close')</button>

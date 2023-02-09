@@ -4,7 +4,7 @@
         <div class="blueprint-section-field-inner">
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
-                <div class="flex items-center flex-1 pr-2 py-2___REPLACED pl-1">
+                <div class="flex items-center flex-1 pr-2 py-2___REPLACED pl-2___REPLACED">
                     <svg-icon class="text-grey-80 mr-2___REPLACED h-4 w-4 flex-none" :name="field.icon" v-tooltip="tooltipText" default="generic-field" />
                     <a class="break-all" v-text="labelText" @click="$emit('edit')" />
                     <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-2___REPLACED h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
