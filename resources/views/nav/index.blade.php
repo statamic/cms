@@ -7,7 +7,7 @@
         <h1>@yield('title')</h1>
     </div>
 
-    <div class="card p-0 mb-2">
+    <div class="card p-0 mb-4___REPLACED">
         <table class="data-table">
             <tr>
                 <td>
@@ -27,7 +27,7 @@
 
     @if (Statamic\Facades\Role::all()->isNotEmpty())
         <h3 class="little-heading pl-0 mb-2___REPLACED">{{ __('Override For Role') }}</h3>
-        <div class="card p-0 mb-2">
+        <div class="card p-0 mb-4___REPLACED">
             <table class="data-table">
                 @foreach (Statamic\Facades\Role::all() as $role)
                     <tr>
@@ -49,7 +49,7 @@
     @endif
 
     <h3 class="little-heading pl-0 mb-2___REPLACED">{{ __('Override For User') }}</h3>
-    <div class="card p-0 mb-2">
+    <div class="card p-0 mb-4___REPLACED">
         <table class="data-table">
             <tr>
                 <td>

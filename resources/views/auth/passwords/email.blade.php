@@ -4,8 +4,8 @@
     @include('statamic::partials.outside-logo')
 
     <div class="card auth-card mx-auto">
-        <div class="text-center pb-2 mb-2">
-            <h1 class="mb-2 text-lg text-grey-80">{{ __('Forgot Your Password?') }}</h1>
+        <div class="text-center pb-2 mb-4___REPLACED">
+            <h1 class="mb-4___REPLACED text-lg text-grey-80">{{ __('Forgot Your Password?') }}</h1>
             <p class="text-sm text-grey">{{ __('statamic::messages.forgot_password_enter_email') }}</p>
         </div>
 

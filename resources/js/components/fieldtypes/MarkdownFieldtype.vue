@@ -45,7 +45,7 @@
                 </div>
 
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-12 w-12 mb-2" />
+                    <svg-icon name="upload" class="h-12 w-12 mb-4___REPLACED" />
                     {{ __('Drop File to Upload') }}
                 </div>
 
@@ -82,7 +82,7 @@
                         </div>
 
                         <div class="drag-notification" v-if="assetsEnabled && draggingFile">
-                            <svg-icon name="upload" class="h-12 w-12 mb-2" />
+                            <svg-icon name="upload" class="h-12 w-12 mb-4___REPLACED" />
                             {{ __('Drop File to Upload') }}
                         </div>
                     </div>

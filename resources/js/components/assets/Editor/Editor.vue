@@ -132,7 +132,7 @@
                         </div>
 
                         <div class="editor-form-fields">
-                            <div v-if="error" class="bg-red text-white p-2 shadow mb-2" v-text="error" />
+                            <div v-if="error" class="bg-red text-white p-2 shadow mb-4___REPLACED" v-text="error" />
                             <publish-fields
                                 :fields="fields"
                                 :read-only="readOnly"

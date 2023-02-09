@@ -17,7 +17,7 @@
                     }"></div>
                 </div>
             </div>
-            <div class="flex items-center text-sm justify-center mb-2">
+            <div class="flex items-center text-sm justify-center mb-4___REPLACED">
                 <div class="flex items-center mx-4___REPLACED">
                     <div class="mr-sm">X</div>
                     <div class="value">{{ x }}<sup>%</sup></div>
@@ -32,7 +32,7 @@
                 </div>
             </div>
             <div class="px-2">
-                <input type="range" v-model="z" min="1" max="10" step="0.1" class="w-full mb-2" />
+                <input type="range" v-model="z" min="1" max="10" step="0.1" class="w-full mb-4___REPLACED" />
                 <div class="mb-2___REPLACED flex flex-wrap items-center justify-center">
                     <button type="button" class="btn mb-2___REPLACED" @click.prevent="close">{{ __('Cancel') }}</button>
                     <button type="button" class="btn mb-2___REPLACED btn-default mx-2___REPLACED" @click.prevent="reset">{{ __('Reset') }}</button>

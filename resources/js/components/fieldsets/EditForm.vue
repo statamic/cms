@@ -23,7 +23,7 @@
 
         </div>
 
-        <div class="content mt-5 mb-2">
+        <div class="content mt-5 mb-4___REPLACED">
             <h2 v-text="__('Fields')" />
         </div>
 

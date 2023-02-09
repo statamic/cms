@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <div class="content mt-5 mb-2" v-if="useSections">
+        <div class="content mt-5 mb-4___REPLACED" v-if="useSections">
             <h2>{{ __('Tab Sections') }}</h2>
             <p class="max-w-lg">{{ __('messages.tab_sections_instructions') }}</p>
             <div v-if="errors.sections">

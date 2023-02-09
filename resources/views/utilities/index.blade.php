@@ -14,7 +14,7 @@
                 <div class="h-8 w-8 mr-2 text-grey-80">
                     {!! $utility->icon() !!}
                 </div>
-                <div class="text-blue flex-1 mb-2 md:mb-0 md:mr-3">
+                <div class="text-blue flex-1 mb-4___REPLACED md:mb-0 md:mr-3">
                     <h3>{{ $utility->title() }}</h3>
                     <p class="text-xs">{{ $utility->description() }}</p>
                 </div>

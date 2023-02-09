@@ -19,24 +19,24 @@
     </h2>
 
     <div class="shadow bg-white p-4 rounded-lg mb-16___REPLACED">
-        <div class="mb-2">
+        <div class="mb-4___REPLACED">
             <input type="text" placeholder="unstyled">
         </div>
-        <div class="mb-2 flex">
+        <div class="mb-4___REPLACED flex">
             <input type="text" class="input-text" placeholder="v3 style">
             <select class="ml-1" name="" id="">
                 <option value="">Oh hai Mark</option>
             </select>
         </div>
-        <div class="mb-2 flex">
+        <div class="mb-4___REPLACED flex">
             <input type="text" class="input-text" placeholder="v3 style">
             <button class="btn ml-1">Default Button</button>
             <button class="btn-primary ml-1">Primary Button</button>
         </div>
-        <div class="mb-2">
+        <div class="mb-4___REPLACED">
             <textarea name="" class="input-text" placeholder="v3 style"></textarea>
         </div>
-        <div class="mb-2">
+        <div class="mb-4___REPLACED">
             <div class="select-input-container w-64">
                 <select class="select-input">
                     <option value="">Oh hai Mark</option>
@@ -47,32 +47,32 @@
                  </div>
             </div>
         </div>
-        <div class="mb-2">
+        <div class="mb-4___REPLACED">
             <v-select :multiple="true" :options="['Nintendo 64', 'Super Nintendo', 'Nintendo Gameboy', 'Sega Genesis', 'Sega Game Gear', 'Atari 2600']"></v-select>
         </div>
     </div>
 
     <h2 class="mb-2___REPLACED">Typography</h2>
     <div class="shadow bg-white p-4 rounded-lg overflow-hidden mb-16___REPLACED">
-        <h1 class="mb-2">This is first level heading</h1>
-        <h2 class="mb-2">This is a second level heading</h2>
-        <h3 class="mb-2">This is a third level heading</h3>
-        <h4 class="mb-2">This is a fourth level heading</h4>
-        <h5 class="mb-2">This is a fifth level heading</h5>
-        <h6 class="mb-2">This is a sixth level heading</h6>
+        <h1 class="mb-4___REPLACED">This is first level heading</h1>
+        <h2 class="mb-4___REPLACED">This is a second level heading</h2>
+        <h3 class="mb-4___REPLACED">This is a third level heading</h3>
+        <h4 class="mb-4___REPLACED">This is a fourth level heading</h4>
+        <h5 class="mb-4___REPLACED">This is a fifth level heading</h5>
+        <h6 class="mb-4___REPLACED">This is a sixth level heading</h6>
         <p>Paragraph text. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam error tempore veritatis, laborum, et assumenda? Necessitatibus excepturi enim quidem maxime! Temporibus dolorum fugit aspernatur.
     </div>
 
     <h2 class="mb-2___REPLACED">Buttons</h2>
     <div class="shadow bg-white p-4 rounded-lg mb-16___REPLACED">
-        <h6 class="mb-2">Flavors</h6>
+        <h6 class="mb-4___REPLACED">Flavors</h6>
         <div class="mb-8___REPLACED flex">
             <button class="mr-2 btn">Default Button</button>
             <button class="mr-2 btn-primary">Primary Button</button>
             <button class="mr-2 btn-danger">Danger Button</button>
             <button class="btn-flat">Flat Button</button>
         </div>
-        <h6 class="mb-2">With Dropdowns</h6>
+        <h6 class="mb-4___REPLACED">With Dropdowns</h6>
         <div class="mb-8___REPLACED flex">
             <div class="btn-group mr-2">
                 <button class="btn">Default Button</button>
@@ -131,7 +131,7 @@
                 </dropdown-list>
             </div>
         </div>
-        <h6 class="mb-2">Disabled States</h6>
+        <h6 class="mb-4___REPLACED">Disabled States</h6>
         <div class="mb-8___REPLACED flex">
             <button disabled class="mr-2 btn disabled">Default Button</button>
             <button disabled class="mr-2 btn-primary disabled">Primary Button</button>
@@ -139,7 +139,7 @@
             <button disabled class="btn-flat disabled">Flat Button</button>
         </div>
 
-        <h6 class="mb-2">Large</h6>
+        <h6 class="mb-4___REPLACED">Large</h6>
         <div class="mb-8___REPLACED flex">
             <button class="mr-2 btn btn-lg">Default Button</button>
             <button class="mr-2 btn-primary btn-lg">Primary Button</button>
@@ -147,7 +147,7 @@
             <button class="btn-flat btn-lg">Flat Button</button>
         </div>
 
-        <h6 class="mb-2">Small</h6>
+        <h6 class="mb-4___REPLACED">Small</h6>
         <div class="flex">
             <button class="mr-2 btn btn-sm">Default Button</button>
             <button class="mr-2 btn-primary btn-sm">Primary Button</button>
@@ -159,7 +159,7 @@
     <h2 class="mb-2___REPLACED">Colors</h2>
     <div class="bg-white p-5 shadow rounded-lg overflow-hidden mb-16___REPLACED">
 
-        <h6 class="mb-2">Greys</h6>
+        <h6 class="mb-4___REPLACED">Greys</h6>
         <div class="flex flex-row-reverse text-sm text-center mb-8___REPLACED">
             <div class="text-black bg-white p-2 flex-1">White</div>
             <div class="text-black bg-grey-10 p-2 flex-1">10</div>
@@ -175,7 +175,7 @@
             <div class="text-white bg-black p-2 flex-1">Black</div>
         </div>
 
-        <h6 class="mb-2">Other Colors (needs simplifying)</h6>
+        <h6 class="mb-4___REPLACED">Other Colors (needs simplifying)</h6>
         <div class="flex text-sm text-center">
             <div class="text-black bg-blue p-3 flex-1">Blue</div>
             <div class="text-black bg-green p-3 flex-1">Green</div>
@@ -191,13 +191,13 @@
     <div class="flex flex-wrap -mx-2 mb-8___REPLACED">
         <div class="w-1/3 px-2">
             <div class="card px-3">
-                <div class="flex justify-between items-center mb-2">
+                <div class="flex justify-between items-center mb-4___REPLACED">
                     <h3 class="font-bold text-grey">New Users</h3>
                     <select class="text-xs" name="" id="">
                         <option value="">30 Days</option>
                     </select>
                 </div>
-                <div class="text-4xl mb-2">89</div>
+                <div class="text-4xl mb-4___REPLACED">89</div>
                 <div class="flex items-center ">
                     <span class="w-4 h-4 text-green mr-1">@cp_svg('performance-increase')</span>
                     <span class="leading-none text-sm">8.54% Increase</span>
@@ -206,13 +206,13 @@
         </div>
         <div class="w-1/3 px-2">
             <div class="card px-3">
-                <div class="flex justify-between items-center mb-2">
+                <div class="flex justify-between items-center mb-4___REPLACED">
                     <h3 class="font-bold text-grey">Form Submissions</h3>
                     <select class="text-xs" name="" id="">
                         <option value="">7 Days</option>
                     </select>
                 </div>
-                <div class="text-4xl mb-2">35</div>
+                <div class="text-4xl mb-4___REPLACED">35</div>
                 <div class="flex items-center ">
                     <span class="w-4 h-4 text-green mr-1">@cp_svg('performance-increase')</span>
                     <span class="leading-none text-sm">2.15% Increase</span>
@@ -221,13 +221,13 @@
         </div>
         <div class="w-1/3 px-2">
             <div class="card bg-grey-90 px-3">
-                <div class="flex justify-between items-center mb-2">
+                <div class="flex justify-between items-center mb-4___REPLACED">
                     <h3 class="font-bold text-grey-40">New Users</h3>
                     <select class="text-xs" name="" id="" class="bg-grey-80 border-grey-80 text-grey-40">
                         <option value="">30 Days</option>
                     </select>
                 </div>
-                <div class="text-4xl mb-2 text-grey-40">251</div>
+                <div class="text-4xl mb-4___REPLACED text-grey-40">251</div>
                 <div class="flex items-center ">
                     <span class="w-4 h-4 text-green mr-1">@cp_svg('performance-increase')</span>
                     <span class="leading-none text-grey-40 text-sm">8.54% Increase</span>

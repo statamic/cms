@@ -11,7 +11,7 @@
         </div>
 
         @foreach ($fieldsets as $key => $f)
-            <div class="mb-2">
+            <div class="mb-4___REPLACED">
                 @if ($fieldsets->count() > 1)<h3 class="pl-0 mb-2___REPLACED little-heading">{{ $key }}</h3>@endif
                 <fieldset-listing :initial-rows="{{ json_encode($f) }}"></fieldset-listing>
             </div>
