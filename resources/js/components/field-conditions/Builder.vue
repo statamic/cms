@@ -61,7 +61,7 @@
                 </button>
             </div>
 
-            <div class="border-t pt-3" v-if="hasConditions && isStandard">
+            <div class="border-t pt-6___REPLACED" v-if="hasConditions && isStandard">
                 <button
                     v-text="__('Add Condition')"
                     @click="add"
