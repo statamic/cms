@@ -127,19 +127,19 @@
 
                                 <div class="border-t p-2" v-if="revisionsEnabled && !isCreating">
                                     <label class="publish-field-label font-medium mb-1" v-text="__('Revisions')"/>
-                                    <div class="mb-sm flex items-center" v-if="published">
+                                    <div class="mb-1___REPLACED flex items-center" v-if="published">
                                         <span class="text-green w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('Entry has a published version')"></span>
                                     </div>
-                                    <div class="mb-sm flex items-center" v-else>
+                                    <div class="mb-1___REPLACED flex items-center" v-else>
                                         <span class="text-orange w-6 text-center">!</span>
                                         <span class="text-2xs" v-text="__('Entry has not been published')"></span>
                                     </div>
-                                    <div class="mb-sm flex items-center" v-if="!isWorkingCopy && published">
+                                    <div class="mb-1___REPLACED flex items-center" v-if="!isWorkingCopy && published">
                                         <span class="text-green w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('This is the published version')"></span>
                                     </div>
-                                    <div class="mb-sm flex items-center" v-if="isDirty">
+                                    <div class="mb-1___REPLACED flex items-center" v-if="isDirty">
                                         <span class="text-orange w-6 text-center">!</span>
                                         <span class="text-2xs" v-text="__('Unsaved changes')"></span>
                                     </div>

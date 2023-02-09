@@ -7,14 +7,14 @@
                 <p class="text-grey" v-text="__('messages.navigation_configure_intro')" />
             </header>
             <div class="mb-10___REPLACED">
-                <label class="font-bold text-base mb-sm" for="name">{{ __('Title') }}</label>
+                <label class="font-bold text-base mb-1___REPLACED" for="name">{{ __('Title') }}</label>
                 <input type="text" v-model="title" class="input-text" autofocus tabindex="1">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     {{ __('messages.navigation_configure_title_instructions') }}
                 </div>
             </div>
             <div class="mb-2">
-                <label class="font-bold text-base mb-sm" for="name">{{ __('Handle') }}</label>
+                <label class="font-bold text-base mb-1___REPLACED" for="name">{{ __('Handle') }}</label>
                 <input type="text" v-model="handle" class="input-text" tabindex="2">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     {{ __('messages.navigation_configure_handle_instructions') }}

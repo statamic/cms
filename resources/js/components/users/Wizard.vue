@@ -18,7 +18,7 @@
 
             <!-- Email Address -->
             <div class="max-w-md mx-auto px-2 pb-5">
-                <label class="font-bold text-base mb-sm" for="email">{{ __('Email Address') }}*</label>
+                <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Address') }}*</label>
                 <input type="email" v-model="user.email" id="email" class="input-text" required autofocus tabindex="1">
 
                 <div class="text-2xs text-red mt-1 flex items-center" v-if="userExists">
@@ -33,7 +33,7 @@
 
             <!-- Name -->
             <div v-if="! separateNameFields" class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">{{ __('Name') }}</label>
+                <label class="font-bold text-base mb-1___REPLACED" for="name">{{ __('Name') }}</label>
                 <input type="text" v-model="user.name" id="name" class="input-text" tabindex="2">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
@@ -43,7 +43,7 @@
 
             <div v-else class="max-w-md mx-auto px-2 pb-7 flex space-x-4">
                 <div class="flex-1">
-                    <label class="font-bold text-base mb-sm" for="first_name">{{ __('First Name') }}</label>
+                    <label class="font-bold text-base mb-1___REPLACED" for="first_name">{{ __('First Name') }}</label>
                     <input type="text" v-model="user.first_name" id="first_name" class="input-text" tabindex="2">
                     <div class="text-2xs text-grey-60 mt-1 flex items-center">
                         <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
@@ -52,7 +52,7 @@
                 </div>
 
                 <div class="flex-1">
-                    <label class="font-bold text-base mb-sm" for="last_name">{{ __('Last Name') }}</label>
+                    <label class="font-bold text-base mb-1___REPLACED" for="last_name">{{ __('Last Name') }}</label>
                     <input type="text" v-model="user.last_name" id="last_name" class="input-text" tabindex="2">
                 </div>
             </div>
@@ -79,7 +79,7 @@
 
             <!-- Roles -->
             <div class="pb-5" v-if="! user.super && canAssignRoles">
-                <label class="font-bold text-base mb-sm" for="role">{{ __('Roles') }}</label>
+                <label class="font-bold text-base mb-1___REPLACED" for="role">{{ __('Roles') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
                     :initial-value="user.roles">
@@ -97,7 +97,7 @@
 
             <!-- Groups -->
             <div class="pb-5" v-if="! user.super && canAssignGroups">
-                <label class="font-bold text-base mb-sm" for="group">{{ __('Groups') }}</label>
+                <label class="font-bold text-base mb-1___REPLACED" for="group">{{ __('Groups') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.groups', type: 'user_groups' }"
                     :initial-value="user.groups">
@@ -130,13 +130,13 @@
             <div class="max-w-lg mx-auto bg-grey-10 py-5 mb-20___REPLACED border rounded-lg " v-if="invitation.send">
                 <!-- Subject Line -->
                 <div class="max-w-md mx-auto px-2 pb-5">
-                    <label class="font-bold text-base mb-sm" for="email">{{ __('Email Subject') }}</label>
+                    <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Subject') }}</label>
                     <input type="text" v-model="invitation.subject" class="input-text bg-white">
                 </div>
 
                 <!-- Email Content -->
                 <div class="max-w-md mx-auto px-2">
-                    <label class="font-bold text-base mb-sm" for="email">{{ __('Email Content') }}</label>
+                    <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Content') }}</label>
                     <textarea
                         class="input-text min-h-48 p-2 bg-white"
                         v-model="invitation.message"
@@ -163,11 +163,11 @@
                 <p class="mb-1" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
             </div>
             <div class="max-w-md mx-auto px-2 pb-5">
-                <label class="font-bold text-base mb-sm" for="email">{{ __('Activation URL') }}</label>
+                <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Activation URL') }}</label>
                 <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" />
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="email">{{ __('Email Address') }}</label>
+                <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Address') }}</label>
                 <input type="text" readonly class="input-text" onclick="this.select()" :value="user.email" />
             </div>
         </div>
