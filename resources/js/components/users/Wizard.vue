@@ -1,6 +1,6 @@
 <template>
     <div class="max-w-xl mx-auto rounded shadow bg-white">
-        <div v-if="steps.length > 1" class="max-w-lg mx-auto pt-6 relative">
+        <div v-if="steps.length > 1" class="max-w-lg mx-auto pt-16___REPLACED relative">
             <div class="wizard-steps">
                 <a class="step" :class="{'complete': currentStep >= index}" v-for="(step, index) in steps" @click="goToStep(index)">
                     <div class="ball">{{ index+1 }}</div>
