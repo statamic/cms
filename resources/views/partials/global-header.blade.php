@@ -21,7 +21,7 @@
         </global-search>
     </div>
 
-    <div class="head-link h-full md:pr-3 flex items-center justify-end">
+    <div class="head-link h-full md:pr-6___REPLACED flex items-center justify-end">
 
         @if (Statamic\Facades\Site::hasMultiple())
             <global-site-selector>
