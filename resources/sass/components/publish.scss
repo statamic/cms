@@ -98,12 +98,12 @@ code.parent-url {
     }
 
     .publish-fields .form-group {
-        @apply p-2;
+        @apply p-4;
     }
 }
 
 .publish-section-actions-footer {
-    @apply mt-3;
+    @apply mt-6;
 }
 
 .sneak-peek-editing .publish-tabs {
@@ -147,11 +147,11 @@ code.parent-url {
     }
 
     .editor-form-actions {
-        @apply absolute p-2 h-16 border-t bottom-0 inset-x-0;
+        @apply absolute p-4 h-16 border-t bottom-0 inset-x-0;
         z-index: 2;
     }
 
     .publish-fields .form-group {
-        @apply px-2 pt-2
+        @apply px-4 pt-2
     }
 }

@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .shortcut-pair {
-    @apply pb-1 mb-1 antialiased flex items-center justify-between;
+    @apply pb-2 mb-2 antialiased flex items-center justify-between;
     &:not(:last-child) {
         @apply border-b;
     }
@@ -26,9 +26,9 @@
 }
 
 .shortcut-joiner {
-    @apply text-grey text-xs mx-sm;
+    @apply text-grey text-xs mx-1;
 }
 
 .shortcut-value {
-    @apply whitespace-nowrap py-sm text-sm;
+    @apply whitespace-nowrap py-1 text-sm;
 }

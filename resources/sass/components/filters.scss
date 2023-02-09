@@ -3,11 +3,11 @@
    ========================================================================== */
 
 .filter {
-    @apply bg-grey-20 mb-3 rounded-full text-center;
+    @apply bg-grey-20 mb-6 rounded-full text-center;
     padding: 10px 8px 14px;
 
     a {
-        @apply text-xs text-grey-70 mx-sm p-1 relative;
+        @apply text-xs text-grey-70 mx-1 p-2 relative;
     }
 
     a.active, a:hover {
@@ -39,7 +39,7 @@
 
 .filter-fields {
     .form-group {
-        @apply p-0 pb-2;
+        @apply p-0 pb-4;
 
         &:last-child {
             @apply p-0;
@@ -47,12 +47,12 @@
     }
 
     .text-fieldtype .input-text {
-        @apply py-1 px-1.5;
+        @apply py-2 px-3;
     }
 
     .no-label.form-group,
     .no-label .form-group {
-        @apply pb-1;
+        @apply pb-2;
 
         &:last-child {
             @apply p-0;

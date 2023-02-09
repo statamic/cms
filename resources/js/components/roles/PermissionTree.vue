@@ -3,7 +3,7 @@
     <div>
         <div v-for="permission in permissions" :key="permission.value">
             <label
-                class="flex items-center justify-between py-1 pr-2 border-b group hover:bg-grey-10"
+                class="flex items-center justify-between py-2 pr-4 border-b group hover:bg-grey-10"
                 :style="{ paddingLeft: `${16*depth}px` }"
             >
                 <div class="flex" :class="{ 'text-grey-50': disabled, 'cursor-not-allowed': disabled }">
@@ -16,7 +16,7 @@
                             :class="{ 'cursor-not-allowed': disabled }"
                         />
                     </div>
-                    <div class="pl-1">
+                    <div class="pl-2">
                         {{ permission.label }}
                     </div>
                 </div>

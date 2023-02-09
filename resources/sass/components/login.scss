@@ -3,12 +3,12 @@
    ========================================================================== */
 
 .auth-card {
-   @apply max-w-xs p-3 rounded shadow-lg;
+   @apply max-w-xs p-6 rounded shadow-lg;
    transition: .12s ease-out;
 }
 
 .outside .white-label-logo {
-    @apply mx-auto mb-4;
+    @apply mx-auto mb-8;
     max-width: 300px;
 }
 

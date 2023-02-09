@@ -12,7 +12,7 @@
                         'current-column': sharedState.sortColumn === column.field,
                         'sortable-column': column.sortable === true,
                         'cursor-not-allowed': !sortable,
-                        'text-right pr-4': column.numeric,
+                        'text-right pr-8': column.numeric,
                     }"
                     @click.prevent="changeSortColumn(column.field)"
                 >
@@ -52,7 +52,7 @@
                         @click="checkboxClicked(row, index, $event)"
                     />
                 </td>
-                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width" :class="{'text-right pr-4': column.numeric}">
+                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width" :class="{'text-right pr-8': column.numeric}">
                     <slot
                         :name="`cell-${column.field}`"
                         :value="row[column.value || column.field]"
@@ -66,7 +66,7 @@
                     </slot>
                 </td>
                 <td class="type-column" v-if="type">
-                    <span v-if="type === 'entries' || type === 'terms'" class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey">
+                    <span v-if="type === 'entries' || type === 'terms'" class="rounded px-1 py-px text-2xs uppercase bg-grey-20 text-grey">
                         <template v-if="type === 'entries'">{{ row.collection.title }}</template>
                         <template v-if="type === 'terms'">{{ row.taxonomy.title }}</template>
                     </span>

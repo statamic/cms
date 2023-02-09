@@ -1,11 +1,11 @@
 <template>
 
-    <div class="p-2 m-0" :class="classes">
+    <div class="p-4 m-0" :class="classes">
 
         <label class="block">
             {{ display }}
             <i class="required" v-if="field.required">*</i>
-            <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm" v-text="__('Read Only')" />
+            <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-1" v-text="__('Read Only')" />
         </label>
 
         <div
@@ -31,12 +31,12 @@
         />
 
         <div
-            class="help-block mt-1"
+            class="help-block mt-2"
             v-if="instructions && field.instructions_position === 'below'"
             v-html="instructions" />
 
         <div v-if="hasError">
-            <small class="help-block text-red mt-1" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block text-red mt-2" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
 
     </div>

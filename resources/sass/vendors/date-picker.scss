@@ -179,7 +179,7 @@ $rem-base: 16px;
                 }
             }
             .dr-days-of-week-list {
-                @apply bg-grey-20 flex p-sm border-t border-b text-grey-40 text-2xs;
+                @apply bg-grey-20 flex p-1 border-t border-b text-grey-40 text-2xs;
 
                 .dr-day-of-week {
                     width: calc(100% / 7);

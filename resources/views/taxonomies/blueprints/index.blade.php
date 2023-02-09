@@ -14,7 +14,7 @@
         reorder-url="{{ cp_route('taxonomies.blueprints.reorder', $taxonomy) }}"
     >
         <div>
-            <div class="flex justify-between items-center mb-3">
+            <div class="flex justify-between items-center mb-6">
                 <h1>@yield('title')</h1>
 
                 <div>
@@ -27,7 +27,7 @@
                         >{{ __('Save Order') }}</button>
                     @endif
 
-                    <a href="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}" class="btn-primary ml-1">{{ __('Create Blueprint') }}</a>
+                    <a href="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}" class="btn-primary ml-2">{{ __('Create Blueprint') }}</a>
                 </div>
             </div>
 

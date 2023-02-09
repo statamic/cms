@@ -56,7 +56,7 @@
     }
 
     tbody tr td {
-        @apply p-1;
+        @apply p-2;
     }
 
 }
@@ -243,7 +243,7 @@
     @apply flex flex-1 items-center;
 
     .meta-item {
-  		@apply flex items-start flex-col border-l px-2 h-full justify-center;
+  		@apply flex items-start flex-col border-l px-4 h-full justify-center;
       cursor: text;
     }
 
@@ -300,10 +300,10 @@
     }
 
     .editor-file-actions {
-		@apply bg-grey-90 p-2 text-center h-16;
+		@apply bg-grey-90 p-4 text-center h-16;
 
         button {
-            @apply mx-sm;
+            @apply mx-1;
         }
     }
 }

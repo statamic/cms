@@ -13,11 +13,11 @@
             <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
 
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-8 w-8 mr-3" />
+                    <svg-icon name="upload" class="h-8 w-8 mr-6" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
-                <div class="assets-fieldtype-picker py-2" :class="{ 'is-expanded': value.length }">
+                <div class="assets-fieldtype-picker py-4" :class="{ 'is-expanded': value.length }">
                     <p class="asset-upload-control text-xs text-grey-60 ml-0">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
@@ -46,14 +46,14 @@
                                         <file-icon :extension="getExtension(file)" />
                                     </div>
                                     <div
-                                        class="flex items-center flex-1 ml-1 text-xs text-left truncate"
+                                        class="flex items-center flex-1 ml-2 text-xs text-left truncate"
                                         v-text="file.slice(11)"
                                     />
                                 </td>
                                 <td class="p-0 w-8 text-right align-middle">
                                     <button
                                         @click="remove(i)"
-                                        class="flex items-center p-1 w-full h-full text-grey-60 hover:text-grey-90"
+                                        class="flex items-center p-2 w-full h-full text-grey-60 hover:text-grey-90"
                                     >
                                         <svg-icon name="trash" class="w-6 h-6" />
                                     </button>

@@ -2,7 +2,7 @@
 
     <modal name="folder-editor">
 
-        <div class="flex items-center justify-between px-3 py-2 bg-grey-20 border-b text-center">
+        <div class="flex items-center justify-between px-6 py-4 bg-grey-20 border-b text-center">
             {{ modalTitle }}
             <button type="button"
                 tabindex="-1"
@@ -25,7 +25,7 @@
                 v-model="directory"
             />
 
-            <div class="px-3 pb-3">
+            <div class="px-6 pb-6">
                 <button
                     class="btn-primary"
                     @click.prevent="submit"

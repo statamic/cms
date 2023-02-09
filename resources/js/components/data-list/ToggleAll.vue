@@ -1,5 +1,5 @@
 <template>
-    <label for="checkerOfAllBoxes" class="btn btn-sm px-sm flex items-center justify-center -ml-sm relative -left-px cursor-pointer">
+    <label for="checkerOfAllBoxes" class="btn btn-sm px-1 flex items-center justify-center -ml-1 relative -left-px cursor-pointer">
         <input type="checkbox" @change="toggle" :checked="anyItemsChecked" id="checkerOfAllBoxes">
     </label>
 </template>

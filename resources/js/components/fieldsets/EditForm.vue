@@ -2,7 +2,7 @@
 
     <div>
 
-        <header class="mb-3">
+        <header class="mb-6">
             <breadcrumb :url="breadcrumbUrl" :title="__('Fieldsets')" />
             <div class="flex items-center justify-between">
                 <h1>{{ initialTitle }}</h1>
@@ -10,7 +10,7 @@
             </div>
         </header>
 
-        <div class="publish-form card p-0 mb-5">
+        <div class="publish-form card p-0 mb-10">
 
             <div class="form-group">
                 <label class="block">{{ __('Title') }}</label>
@@ -23,11 +23,11 @@
 
         </div>
 
-        <div class="content mt-5 mb-2">
+        <div class="content mt-10 mb-4">
             <h2 v-text="__('Fields')" />
         </div>
 
-        <div class="card" :class="{ 'pt-1': !fields.length }">
+        <div class="card" :class="{ 'pt-2': !fields.length }">
             <fields
                 :fields="fieldset.fields"
                 :editing-field="editingField"

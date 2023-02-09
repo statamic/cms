@@ -1,6 +1,7 @@
 const colors = require('tailwindcss/colors')
 
 module.exports = {
+    important: true,
     theme: {
         zIndex: {
             '0': '0',
@@ -121,6 +122,9 @@ module.exports = {
                 '13': '3.25rem',
                 '30': '7.5rem',
                 '55': '13.75rem',
+            },
+            minHeight: {
+                '40': '10rem',
             },
             width: {
                 '128': '32rem',
