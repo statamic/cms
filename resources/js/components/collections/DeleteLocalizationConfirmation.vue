@@ -11,7 +11,7 @@
                         <div class="field-inner">
                             <label class="publish-field-label" for="field_behavior">
                                 <span v-text="__('Localizations')" />
-                                <i class="required ml-sm">*</i>
+                                <i class="required ml-1___REPLACED">*</i>
                             </label>
                             <div class="help-block -mt-1"><p v-html="instructions" /></div>
                         </div>

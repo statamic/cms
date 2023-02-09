@@ -6,7 +6,7 @@
                 <template slot="trigger">
                     <button class="input-group-prepend cursor-pointer px-2" @click="resetFilterPopover">
                         {{ __('Filter') }}
-                        <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
+                        <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-1___REPLACED"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>
                 </template>
                 <template #default="{ close: closePopover, afterClosed: afterPopoverClosed }">
@@ -80,7 +80,7 @@
                 <template slot="trigger">
                     <button class="input-group-item px-1.5">
                         {{ filter.title }}
-                        <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
+                        <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-1___REPLACED"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>
                 </template>
                 <template #default="{ close: closePopover }">

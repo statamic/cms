@@ -13,12 +13,12 @@
                     v-text="labelText"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
-                <i class="required ml-sm" v-if="config.required">*</i>
+                <i class="required ml-1___REPLACED" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
                 <span v-if="isReadOnly && !isSection" class="text-grey-50 font-normal text-2xs mx-1___REPLACED">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
-                <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="isLocalizable && !isSection" v-tooltip.top="__('Localizable field')" />
+                <svg-icon name="translate" class="h-4 ml-1___REPLACED w-4 text-grey-60" v-if="isLocalizable && !isSection" v-tooltip.top="__('Localizable field')" />
 
                 <button
                     v-if="!isReadOnly && !isSection"

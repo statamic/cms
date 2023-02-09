@@ -25,7 +25,7 @@
 
                 <div v-if="item.collection" class="ml-2 flex items-center">
                     <svg-icon name="content-writing" class="w-4 h-4" />
-                    <div class="ml-sm">
+                    <div class="ml-1___REPLACED">
                         <a :href="item.collection.create_url" v-text="__('Add')" />
                         <span class="text-grey">/</span>
                         <a :href="item.collection.edit_url" v-text="__('Edit')" />
