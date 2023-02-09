@@ -27,7 +27,7 @@
                     @input="toggleEnabledState"
                     :value="values.enabled"
                     v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
-                <dropdown-list class="-mt-sm">
+                <dropdown-list class="-mt-1___REPLACED">
                     <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                     <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
                     <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />

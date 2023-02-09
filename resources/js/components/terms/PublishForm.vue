@@ -18,7 +18,7 @@
             </dropdown-list>
 
             <div class="pt-px text-2xs text-grey-60 flex mr-4___REPLACED" v-if="readOnly">
-                <svg-icon name="lock" class="w-4 mr-1___REPLACED -mt-sm" /> {{ __('Read Only') }}
+                <svg-icon name="lock" class="w-4 mr-1___REPLACED -mt-1___REPLACED" /> {{ __('Read Only') }}
             </div>
 
             <div class="hidden md:flex items-center">
