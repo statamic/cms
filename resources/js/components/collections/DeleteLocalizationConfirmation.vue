@@ -5,7 +5,7 @@
             <div class="text-lg font-medium p-4___REPLACED pb-0">
                 {{ __('Delete') }}
             </div>
-            <div class="flex-1 px-4___REPLACED py-3 text-grey">
+            <div class="flex-1 px-4___REPLACED py-6___REPLACED text-grey">
                 <div class="publish-fields">
                     <div class="form-group" :class="{ 'has-error': this.error }">
                         <div class="field-inner">

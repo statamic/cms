@@ -1,5 +1,5 @@
 <div class="card p-0 content">
-    <div class="py-3 px-8___REPLACED border-b">
+    <div class="py-6___REPLACED px-8___REPLACED border-b">
         <h1>{{ __('statamic::messages.getting_started_widget_header') }}</h1>
         <p>{{ __('statamic::messages.getting_started_widget_intro') }}</p>
     </div>
