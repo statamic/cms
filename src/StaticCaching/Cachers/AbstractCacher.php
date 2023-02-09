@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Facades\Site;
+use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
@@ -52,10 +53,12 @@ abstract class AbstractCacher implements Cacher
     {
         // Check 'base_url' for backward compatibility.
         if (! $baseUrl = $this->config('base_url')) {
-            // This could potentially just be Site::current()->absoluteUrl() but at the
+            $site = Statamic::isCpRoute() ? Site::selected() : Site::current();
+
+            // This could potentially just be $site->absoluteUrl() but at the
             // moment that method gets the URL based on the request. For now, we will
             // manually get it from the config, as to not break any existing sites.
-            $baseUrl = Str::startsWith($url = Site::current()->url(), '/')
+            $baseUrl = Str::startsWith($url = $site->url(), '/')
                 ? Str::removeRight(config('app.url'), '/').$url
                 : $url;
         }
