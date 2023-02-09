@@ -29,7 +29,7 @@
                 {{ asset.basename }}
             </button>
             <button
-                class="asset-set-alt text-blue px-2 text-sm hover:text-black"
+                class="asset-set-alt text-blue px-4___REPLACED text-sm hover:text-black"
                 @click="edit"
                 v-if="needsAlt"
             >

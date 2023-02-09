@@ -63,10 +63,10 @@
                                     </template>
 
                                     <div class="btn-group ml-4___REPLACED">
-                                        <button class="btn-flat px-2" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
+                                        <button class="btn-flat px-4___REPLACED" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                             <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                         </button>
-                                        <button class="btn-flat px-2" @click="setMode('table')" :class="{'active': mode === 'table'}">
+                                        <button class="btn-flat px-4___REPLACED" @click="setMode('table')" :class="{'active': mode === 'table'}">
                                             <svg-icon name="assets-mode-table" class="h-4 w-4" />
                                         </button>
                                     </div>
@@ -174,7 +174,7 @@
 
                             <!-- Grid Mode -->
                             <div v-if="mode === 'grid' && ! containerIsEmpty">
-                                <div class="asset-grid-listing px-2 pt-1">
+                                <div class="asset-grid-listing px-4___REPLACED pt-1">
                                     <!-- Parent Folder -->
                                     <div class="asset-tile" v-if="(folder && folder.parent_path) && !restrictFolderNavigation">
                                         <div class="asset-thumb-container">

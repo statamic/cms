@@ -7,7 +7,7 @@
                 <button
                     v-for="edition in addon.editions"
                     :key="edition.handle"
-                    class="btn px-2"
+                    class="btn px-4___REPLACED"
                     :class="{ 'disabled': buttonDisabled(edition) }"
                     :disabled="buttonDisabled(edition)"
                     v-text="label(edition)"

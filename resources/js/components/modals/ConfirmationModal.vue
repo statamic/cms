@@ -4,7 +4,7 @@
             <div class="text-lg font-medium p-4___REPLACED pb-0">
                 {{ __(title) }}
             </div>
-            <div class="flex-1 px-2 py-3 text-grey">
+            <div class="flex-1 px-4___REPLACED py-3 text-grey">
                 <p v-if="bodyText" v-text="bodyText" />
                 <slot v-else>
                     <p>{{ __('Are you sure?') }}</p>

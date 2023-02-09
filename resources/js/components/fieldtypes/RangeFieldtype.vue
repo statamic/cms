@@ -1,5 +1,5 @@
 <template>
-    <div class="range-fieldtype-wrapper bg-grey-20 rounded py-1 px-2 border">
+    <div class="range-fieldtype-wrapper bg-grey-20 rounded py-1 px-4___REPLACED border">
         <div class="flex items-center">
             <div v-if="config.prepend" v-text="config.prepend" class="mr-2___REPLACED" />
             <input

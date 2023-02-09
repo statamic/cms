@@ -7,7 +7,7 @@
 }
 
 .data-list-search-input {
-	// @apply text-sm px-2 py-1 flex-1 rounded border;
+	// @apply text-sm px-4___REPLACED py-1 flex-1 rounded border;
 	@apply bg-white;
 
 	&:focus {
@@ -45,7 +45,7 @@
 		}
 
         th {
-            @apply font-medium px-2 pt-2 pb-1;
+            @apply font-medium px-4___REPLACED pt-2 pb-1;
             &:first-child { @apply rounded-tl; }
 			&:last-child { @apply rounded-tr; }
 			&:hover {
@@ -100,7 +100,7 @@
             }
 
             td {
-                @apply py-1 px-2 break-words;
+                @apply py-1 px-4___REPLACED break-words;
             }
 		}
 		.type-column {

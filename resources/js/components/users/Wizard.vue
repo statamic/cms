@@ -11,13 +11,13 @@
 
         <!-- Step: User Info -->
         <div v-if="!completed && onUserInfoStep">
-            <div class="max-w-md mx-auto px-2 py-6 text-center">
+            <div class="max-w-md mx-auto px-4___REPLACED py-6 text-center">
                 <h1 class="mb-6___REPLACED">{{ __('Create User') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_intro')" />
             </div>
 
             <!-- Email Address -->
-            <div class="max-w-md mx-auto px-2 pb-5">
+            <div class="max-w-md mx-auto px-4___REPLACED pb-5">
                 <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Address') }}*</label>
                 <input type="email" v-model="user.email" id="email" class="input-text" required autofocus tabindex="1">
 
@@ -32,7 +32,7 @@
             </div>
 
             <!-- Name -->
-            <div v-if="! separateNameFields" class="max-w-md mx-auto px-2 pb-7">
+            <div v-if="! separateNameFields" class="max-w-md mx-auto px-4___REPLACED pb-7">
                 <label class="font-bold text-base mb-1___REPLACED" for="name">{{ __('Name') }}</label>
                 <input type="text" v-model="user.name" id="name" class="input-text" tabindex="2">
                 <div class="text-2xs text-grey-60 mt-2___REPLACED flex items-center">
@@ -41,7 +41,7 @@
                 </div>
             </div>
 
-            <div v-else class="max-w-md mx-auto px-2 pb-7 flex space-x-4">
+            <div v-else class="max-w-md mx-auto px-4___REPLACED pb-7 flex space-x-4">
                 <div class="flex-1">
                     <label class="font-bold text-base mb-1___REPLACED" for="first_name">{{ __('First Name') }}</label>
                     <input type="text" v-model="user.first_name" id="first_name" class="input-text" tabindex="2">
@@ -59,7 +59,7 @@
         </div>
 
         <!-- Step: Roles & Groups -->
-        <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-2 pb-2">
+        <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-4___REPLACED pb-2">
             <div class="py-6 text-center">
                 <h1 class="mb-6___REPLACED">{{ __('Roles & Groups') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_roles_groups_intro')" />
@@ -116,26 +116,26 @@
 
         <!-- Step: Invitation -->
         <div v-if="!completed && onInvitationStep">
-            <div class="max-w-md mx-auto px-2 py-6 text-center">
+            <div class="max-w-md mx-auto px-4___REPLACED py-6 text-center">
                 <h1 class="mb-6___REPLACED">{{ __('Invitation') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_invitation_intro')" />
             </div>
 
             <!-- Send Email? -->
-            <div class="max-w-md mx-auto px-2 mb-6___REPLACED flex items-center">
+            <div class="max-w-md mx-auto px-4___REPLACED mb-6___REPLACED flex items-center">
                 <toggle-input v-model="invitation.send" />
                 <label class="font-bold ml-2___REPLACED">{{ __('Send Email Invitation') }}</label>
             </div>
 
             <div class="max-w-lg mx-auto bg-grey-10 py-5 mb-20___REPLACED border rounded-lg " v-if="invitation.send">
                 <!-- Subject Line -->
-                <div class="max-w-md mx-auto px-2 pb-5">
+                <div class="max-w-md mx-auto px-4___REPLACED pb-5">
                     <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Subject') }}</label>
                     <input type="text" v-model="invitation.subject" class="input-text bg-white">
                 </div>
 
                 <!-- Email Content -->
-                <div class="max-w-md mx-auto px-2">
+                <div class="max-w-md mx-auto px-4___REPLACED">
                     <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Content') }}</label>
                     <textarea
                         class="input-text min-h-48 p-4___REPLACED bg-white"
@@ -146,27 +146,27 @@
             </div>
 
             <!-- Copy Pasta -->
-            <div class="max-w-md mx-auto px-2 pb-7" v-else>
+            <div class="max-w-md mx-auto px-4___REPLACED pb-7" v-else>
                 <p class="mb-2___REPLACED" v-html="__('messages.user_wizard_invitation_share_before', { email: user.email })" />
             </div>
         </div>
 
         <!-- Post creation -->
         <div v-if="completed">
-            <div class="max-w-md mx-auto px-2 py-6 text-center">
+            <div class="max-w-md mx-auto px-4___REPLACED py-6 text-center">
                 <h1 class="mb-6___REPLACED">{{ __('User created') }}</h1>
                 <p class="text-grey" v-html="__('messages.user_wizard_account_created')" />
             </div>
 
             <!-- Copy Pasta -->
-            <div class="max-w-md mx-auto px-2 pb-5">
+            <div class="max-w-md mx-auto px-4___REPLACED pb-5">
                 <p class="mb-2___REPLACED" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
             </div>
-            <div class="max-w-md mx-auto px-2 pb-5">
+            <div class="max-w-md mx-auto px-4___REPLACED pb-5">
                 <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Activation URL') }}</label>
                 <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" />
             </div>
-            <div class="max-w-md mx-auto px-2 pb-7">
+            <div class="max-w-md mx-auto px-4___REPLACED pb-7">
                 <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Address') }}</label>
                 <input type="text" readonly class="input-text" onclick="this.select()" :value="user.email" />
             </div>

@@ -189,7 +189,7 @@
 
     <h2 class="mb-2___REPLACED">Widgets</h2>
     <div class="flex flex-wrap -mx-2 mb-8___REPLACED">
-        <div class="w-1/3 px-2">
+        <div class="w-1/3 px-4___REPLACED">
             <div class="card px-6___REPLACED">
                 <div class="flex justify-between items-center mb-4___REPLACED">
                     <h3 class="font-bold text-grey">New Users</h3>
@@ -204,7 +204,7 @@
                 </div>
             </div>
         </div>
-        <div class="w-1/3 px-2">
+        <div class="w-1/3 px-4___REPLACED">
             <div class="card px-6___REPLACED">
                 <div class="flex justify-between items-center mb-4___REPLACED">
                     <h3 class="font-bold text-grey">Form Submissions</h3>
@@ -219,7 +219,7 @@
                 </div>
             </div>
         </div>
-        <div class="w-1/3 px-2">
+        <div class="w-1/3 px-4___REPLACED">
             <div class="card bg-grey-90 px-6___REPLACED">
                 <div class="flex justify-between items-center mb-4___REPLACED">
                     <h3 class="font-bold text-grey-40">New Users</h3>

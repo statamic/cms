@@ -5,7 +5,7 @@
             <div class="text-lg font-medium p-4___REPLACED pb-0">
                 {{ __('Remove Page') }}
             </div>
-            <div class="flex-1 px-2 py-3 text-grey">
+            <div class="flex-1 px-4___REPLACED py-3 text-grey">
                 <p class="mb-4___REPLACED" v-text="__('Are you sure you want to remove this page?')" />
                 <p class="mb-4___REPLACED" v-text="__('Only the references will be removed. Entries will not be deleted.')" />
                 <label class="flex items-center" v-if="children">

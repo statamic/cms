@@ -5,7 +5,7 @@
         <div>
 
             <!-- Link type select -->
-            <div class="flex items-center px-2 py-1 border-b">
+            <div class="flex items-center px-4___REPLACED py-1 border-b">
 
                 <label
                     class="mr-3___REPLACED flex items-center font-normal"
@@ -26,7 +26,7 @@
 
             </div>
 
-            <div class="px-2 py-2 border-b">
+            <div class="px-4___REPLACED py-2 border-b">
                 <div class="h-8 mb-4___REPLACED p-2___REPLACED border rounded border-grey-50 flex items-center">
 
                     <!-- URL input -->
@@ -86,7 +86,7 @@
                 </label>
             </div>
 
-            <div class="flex items-center justify-end space-x-1 font-normal px-2 py-1.5">
+            <div class="flex items-center justify-end space-x-1 font-normal px-4___REPLACED py-1.5">
                 <button
                     v-tooltip="__('Remove Link')"
                     :aria-label="__('Remove Link')"

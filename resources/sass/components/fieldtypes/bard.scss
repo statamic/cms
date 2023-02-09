@@ -41,7 +41,7 @@
 // Responive Wangjangling
 @screen md {
     .bard-editor .ProseMirror { @apply p-4___REPLACED; }
-    .bard-editor .bard-invalid { @apply px-2; }
+    .bard-editor .bard-invalid { @apply px-4___REPLACED; }
 }
 
 .bard-fixed-toolbar {
@@ -86,7 +86,7 @@
 }
 
 .bard-fixed-toolbar.dark {
-    @apply bg-black rounded-full shadow-lg px-2;
+    @apply bg-black rounded-full shadow-lg px-4___REPLACED;
 
     button {
         @apply focus-none text-grey-70 rounded px-1___REPLACED flex items-center justify-center text-base text-center bg-transparent;
@@ -428,7 +428,7 @@
     }
 
     blockquote {
-        @apply text-grey-80 border-l-4 border-blue px-2;
+        @apply text-grey-80 border-l-4 border-blue px-4___REPLACED;
         margin: 0 0 .85em;
     }
 

@@ -5,7 +5,7 @@
             <div class="text-lg font-medium p-4___REPLACED pb-0">
                 {{ __('Delete') }}
             </div>
-            <div class="flex-1 px-2 py-3 text-grey">
+            <div class="flex-1 px-4___REPLACED py-3 text-grey">
                 <div class="publish-fields">
                     <div class="form-group" :class="{ 'has-error': this.error }">
                         <div class="field-inner">
@@ -18,8 +18,8 @@
 
                         <div class="button-group-fieldtype-wrapper">
                             <div class="btn-group">
-                                <button @click="behavior = 'delete'" class="btn px-2" :class="{ active: behavior === 'delete' }"><span v-text="__('Delete')" /></button>
-                                <button @click="behavior = 'copy'" class="btn px-2" :class="{ active: behavior === 'copy' }"><span v-text="__('Detach')" /></button>
+                                <button @click="behavior = 'delete'" class="btn px-4___REPLACED" :class="{ active: behavior === 'delete' }"><span v-text="__('Delete')" /></button>
+                                <button @click="behavior = 'copy'" class="btn px-4___REPLACED" :class="{ active: behavior === 'copy' }"><span v-text="__('Detach')" /></button>
                             </div>
                         </div>
 

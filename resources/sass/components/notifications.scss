@@ -17,7 +17,7 @@
     height: 48px;
 
     i {
-        @apply flex items-center rounded-l mr-4___REPLACED h-full px-2 text-white;
+        @apply flex items-center rounded-l mr-4___REPLACED h-full px-4___REPLACED text-white;
     }
 
     &.success i {
@@ -33,7 +33,7 @@
     }
 
     .action {
-        @apply font-normal text-xl px-2 h-full text-grey-60 m-0 ml-2___REPLACED flex items-center;
+        @apply font-normal text-xl px-4___REPLACED h-full text-grey-60 m-0 ml-2___REPLACED flex items-center;
         &:hover {
             @apply no-underline text-grey-90;
         }

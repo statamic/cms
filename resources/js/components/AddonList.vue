@@ -26,7 +26,7 @@
             <div class="" slot-scope="{ rows: addons }">
 
                 <div class="card p-0">
-                    <div class="border-b px-2 text-sm">
+                    <div class="border-b px-4___REPLACED text-sm">
                         <button
                             class="data-list-filter-link"
                             :class="{ active: filter === 'all' }"

@@ -39,7 +39,7 @@
                                 </div>
                             </template>
                             <template v-slot:no-options>
-                               <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                               <div class="text-sm text-grey-70 text-left py-1 px-4___REPLACED" v-text="__('No options to choose from.')" />
                            </template>
                         </v-select>
                         <button
@@ -67,7 +67,7 @@
                             v-model="fieldset"
                         >
                             <template v-slot:no-options>
-                                <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                                <div class="text-sm text-grey-70 text-left py-1 px-4___REPLACED" v-text="__('No options to choose from.')" />
                             </template>
                         </v-select>
                         <p class="text-sm font-medium mt-6___REPLACED mb-2___REPLACED" v-text="__('Prefix')" />
