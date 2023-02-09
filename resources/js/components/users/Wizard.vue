@@ -59,7 +59,7 @@
         </div>
 
         <!-- Step: Roles & Groups -->
-        <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-4___REPLACED pb-2">
+        <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-4___REPLACED pb-4___REPLACED">
             <div class="py-16___REPLACED text-center">
                 <h1 class="mb-6___REPLACED">{{ __('Roles & Groups') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_roles_groups_intro')" />
