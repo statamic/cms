@@ -11,7 +11,7 @@
             @input="selected"
         >
             <template #selected-option="option">
-                <div class="flex items-center px-1 text-sm text-grey hover:text-grey-80 anti">
+                <div class="flex items-center px-2___REPLACED text-sm text-grey hover:text-grey-80 anti">
                     <svg-icon name="sites" class="site-selector-icon mr-2___REPLACED h-4 w-4" />
                     <div class="whitespace-nowrap">{{ option.name }}</div>
                 </div>

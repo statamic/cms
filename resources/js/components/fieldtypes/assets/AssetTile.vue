@@ -79,14 +79,14 @@
 
         <div class="asset-meta flex items-center" v-if="showFilename">
             <div
-                class="asset-filename flex-1 px-1 py-sm"
+                class="asset-filename flex-1 px-2___REPLACED py-sm"
                 :title="label"
                 :class="{ 'text-center': !needsAlt }"
             >
                 {{ label }}
             </div>
             <button
-                class="text-blue border-l px-1 py-sm hover:bg-grey-20"
+                class="text-blue border-l px-2___REPLACED py-sm hover:bg-grey-20"
                 @click="edit"
                 v-if="needsAlt"
             >

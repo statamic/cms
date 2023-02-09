@@ -8,7 +8,7 @@
 }
 
 .badge-pill {
-    @apply bg-grey-30 px-1 py-sm rounded;
+    @apply bg-grey-30 px-2___REPLACED py-sm rounded;
 }
 
 .badge-pill-sm {
@@ -32,7 +32,7 @@
     padding-left: 10px;
 
     button {
-        @apply px-1 text-base text-grey-50 flex items-center rounded;
+        @apply px-2___REPLACED text-base text-grey-50 flex items-center rounded;
 
         &:hover {
             @apply text-grey-70;

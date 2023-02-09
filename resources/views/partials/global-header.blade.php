@@ -99,7 +99,7 @@
                 </a>
             </template>
 
-            <div class="px-1">
+            <div class="px-2___REPLACED">
                 <div class="text-base mb-px">{{ $user->email() }}</div>
                 @if ($user->isSuper())
                     <div class="text-2xs mt-px text-grey-60">{{ __('Super Admin') }}</div>

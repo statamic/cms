@@ -108,7 +108,7 @@
 
 .vs__open-indicator {
 	@include clickable;
-	@apply flex items-center rounded-r px-1 text-sm flex-shrink-0;
+	@apply flex items-center rounded-r px-2___REPLACED text-sm flex-shrink-0;
 	height: 2.375rem;
 }
 
@@ -134,7 +134,7 @@
 }
 
 .vs__clear {
-	@apply text-grey-90 px-1 cursor-pointer shadow-inner text-base bg-transparent;
+	@apply text-grey-90 px-2___REPLACED cursor-pointer shadow-inner text-base bg-transparent;
 	height: 2.375rem;
 	box-shadow: inset -1px 1px 1px 0px rgba(0,0,0,.05);
 	border-top: 1px solid #c4cdd6;
@@ -178,7 +178,7 @@
 
 .v-select:not(.vs--single) .vs__selected {
 	@include clickable;
-	@apply flex items-center text-sm rounded py-0 px-1 mr-2___REPLACED;
+	@apply flex items-center text-sm rounded py-0 px-2___REPLACED mr-2___REPLACED;
 
     &.sortable-item { @apply cursor-grab; }
 }
@@ -231,7 +231,7 @@
 
 .vs__search,
 .vs__search:focus {
-	@apply appearance-none text-sm text-grey-80 px-1 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
+	@apply appearance-none text-sm text-grey-80 px-2___REPLACED border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
 	line-height: 1.4;
 	border-left: none;
 	box-shadow: none;

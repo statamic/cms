@@ -95,7 +95,7 @@ input.input-text-minimal:read-only,
     }
 
     .input-group-prepend, .input-group-append, .input-group-item {
-        @apply rounded-l px-1 border text-sm text-grey-80 select-none;
+        @apply rounded-l px-2___REPLACED border text-sm text-grey-80 select-none;
         background: linear-gradient(180deg, #fff, #f9fafb);
         border: 1px solid #c4cdd6;
         box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
@@ -215,7 +215,7 @@ input.input-text-minimal:read-only,
     }
 
     .select-input-toggle {
-        @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-grey-90;
+        @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-2___REPLACED text-grey-90;
 
         svg {
             @apply fill-current h-4 w-4;

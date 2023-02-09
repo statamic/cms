@@ -18,7 +18,7 @@
                 handle-class="column-picker-item"
                 append-to=".popover-content"
             >
-                <div class="outline-none text-left px-1 py-1">
+                <div class="outline-none text-left px-2___REPLACED py-1">
                     <h6 v-text="__('Displayed Columns')" class="p-2___REPLACED"/>
                     <div class="column-picker-item sortable" v-for="column in selectedColumns" :key="column.field">
                         <label>
@@ -29,8 +29,8 @@
                 </div>
             </sortable-list>
 
-            <div v-if="hiddenColumns.length" class="outline-none text-left px-1 pb-1">
-                <h6 v-text="__('Available Columns')" class="px-1 pb-1"/>
+            <div v-if="hiddenColumns.length" class="outline-none text-left px-2___REPLACED pb-1">
+                <h6 v-text="__('Available Columns')" class="px-2___REPLACED pb-1"/>
                 <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field">
                     <label class="cursor-pointer">
                         <input type="checkbox" class="mr-2___REPLACED" v-model="column.visible" @change="columnToggled(column) "/>
