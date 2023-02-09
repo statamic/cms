@@ -25,7 +25,7 @@
 
         <div v-show="focused && (hasResults || hasFavorites)" class="global-search-results">
 
-            <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-1 flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
+            <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-2___REPLACED flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
                 <svg-icon :name="getResultIcon(result)" class="icon"></svg-icon>
                 <div class="flex-1 ml-2___REPLACED title" v-html="result.title"></div>
                 <span class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey" v-text="result.badge" />
@@ -35,11 +35,11 @@
                 <div class="px-1.5 py-1 text-grey uppercase text-3xs">{{ __('Your Favorites') }}</div>
 
                 <div v-for="(favorite, index) in favorites" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousemove="setActive(index)">
-                    <div class="flex items-center flex-1 p-1" @click="hit">
+                    <div class="flex items-center flex-1 p-2___REPLACED" @click="hit">
                         <svg-icon name="pin" class="icon w-4 h-4"></svg-icon>
                         <div class="ml-2___REPLACED title" v-text="favorite.name"></div>
                     </div>
-                    <div class="p-1 text-grey-60 hover:text-grey-80" @click="removeFavorite(favorite)">&times;</div>
+                    <div class="p-2___REPLACED text-grey-60 hover:text-grey-80" @click="removeFavorite(favorite)">&times;</div>
                 </div>
 
                 <div class="text-grey text-xs px-1.5 py-1 border-t text-center">

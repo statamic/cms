@@ -1,7 +1,7 @@
 @inject('licenses', 'Statamic\Licensing\LicenseManager')
 
 @if ($licenses->requestFailed())
-    <div class="p-1 w-full fixed bottom-0 z-20">
+    <div class="p-2___REPLACED w-full fixed bottom-0 z-20">
         <div class="py-1.5 px-2 text-sm w-full rounded-md bg-yellow border border-yellow-dark">
         @if ($licenses->requestErrorCode() === 422)
             {{ __('statamic::messages.outpost_error_422') }}
@@ -16,7 +16,7 @@
     </div>
 @else
     @if ($licenses->invalid())
-        <div class="p-1 w-full fixed bottom-0 z-20" v-show="showBanner">
+        <div class="p-2___REPLACED w-full fixed bottom-0 z-20" v-show="showBanner">
             <div class="
                 py-1.5 px-2 text-sm w-full rounded-md
                 @if ($licenses->isOnTestDomain()) bg-grey-80 text-grey-30 @endif

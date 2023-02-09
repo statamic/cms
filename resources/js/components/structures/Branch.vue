@@ -2,7 +2,7 @@
 
     <div class="flex">
         <div class="page-move w-6" />
-        <div class="flex items-center flex-1 p-1 ml-2___REPLACED text-xs leading-normal">
+        <div class="flex items-center flex-1 p-2___REPLACED ml-2___REPLACED text-xs leading-normal">
             <div class="flex items-center flex-1">
                 <div class="little-dot mr-2___REPLACED" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />
                 <svg-icon name="home-page" class="mr-2___REPLACED h-4 w-4 text-grey-80" v-if="isRoot" v-tooltip="__('This is the root page')" />
@@ -17,7 +17,7 @@
 
                 <button
                     v-if="hasChildren"
-                    class="p-1 text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
+                    class="p-2___REPLACED text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >

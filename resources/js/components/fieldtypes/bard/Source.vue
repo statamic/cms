@@ -12,7 +12,7 @@
                 v-text="block.text" />
 
             <div
-                class="border border-dashed p-1 rounded text-xs"
+                class="border border-dashed p-2___REPLACED rounded text-xs"
                 v-if="block.type === 'set'"
                 v-text="setDisplay(block.set)" />
         </div>

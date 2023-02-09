@@ -44,7 +44,7 @@
         }
 
         &.drag-handle {
-            @apply border-r h-full p-1;
+            @apply border-r h-full p-2___REPLACED;
             width: 1%;
             cursor: grab;
             background: theme('colors.grey-20') url('../svg/drag-dots.svg') center center no-repeat;

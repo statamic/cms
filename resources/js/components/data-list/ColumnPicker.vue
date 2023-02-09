@@ -19,7 +19,7 @@
                 append-to=".popover-content"
             >
                 <div class="outline-none text-left px-1 py-1">
-                    <h6 v-text="__('Displayed Columns')" class="p-1"/>
+                    <h6 v-text="__('Displayed Columns')" class="p-2___REPLACED"/>
                     <div class="column-picker-item sortable" v-for="column in selectedColumns" :key="column.field">
                         <label>
                             <input type="checkbox" class="mr-2___REPLACED" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
@@ -42,12 +42,12 @@
 
         <div class="flex border-t text-grey-80" v-if="preferencesKey">
             <button
-                class="p-1 hover:bg-grey-10 rounded-bl text-xs flex-1"
+                class="p-2___REPLACED hover:bg-grey-10 rounded-bl text-xs flex-1"
                 v-text="__('Reset')"
                 @click="reset" :disabled="saving"
             />
             <button
-                class="p-1 hover:bg-grey-10 text-blue flex-1 rounded-br border-l text-xs"
+                class="p-2___REPLACED hover:bg-grey-10 text-blue flex-1 rounded-br border-l text-xs"
                 v-text="__('Save')"
                 @click="save" :disabled="saving"
             />

@@ -46,7 +46,7 @@
                 <template v-slot:empty-state>
                     <div
                         v-text="__('Add or drag fields here')"
-                        class="text-2xs text-grey-60 text-center border border-dashed rounded mb-2___REPLACED p-1"
+                        class="text-2xs text-grey-60 text-center border border-dashed rounded mb-2___REPLACED p-2___REPLACED"
                     />
                 </template>
             </fields>

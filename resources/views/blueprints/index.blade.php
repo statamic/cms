@@ -15,12 +15,12 @@
             </template>
 
             @foreach (Statamic\Facades\Collection::all() as $collection)
-                @if ($loop->first)<h6 class="p-1">{{ __('Collections') }}</h6>@endif
+                @if ($loop->first)<h6 class="p-2___REPLACED">{{ __('Collections') }}</h6>@endif
                 <dropdown-item redirect="{{ cp_route('collections.blueprints.create', $collection) }}">{{ $collection->title() }}</dropdown-item>
             @endforeach
 
             @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
-                @if ($loop->first)<h6 class="p-1 mt-4___REPLACED">{{ __('Taxonomies') }}</h6>@endif
+                @if ($loop->first)<h6 class="p-2___REPLACED mt-4___REPLACED">{{ __('Taxonomies') }}</h6>@endif
                 <dropdown-item redirect="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}">{{ $taxonomy->title() }}</dropdown-item>
             @endforeach
         </dropdown-list>

@@ -13,11 +13,11 @@
 }
 
 .bard-editor .ProseMirror {
-    @apply p-1 min-h-48;
+    @apply p-2___REPLACED min-h-48;
 }
 
 .bard-editor .bard-invalid {
-    @apply p-1 bg-red-lighter text-red text-xs whitespace-nowrap;
+    @apply p-2___REPLACED bg-red-lighter text-red text-xs whitespace-nowrap;
 }
 
 // Modes
@@ -30,7 +30,7 @@
 }
 
 .bard-editor.mode\:inline .ProseMirror {
-    @apply p-1;
+    @apply p-2___REPLACED;
     min-height: 38px;
     p {
         margin-bottom: 0;
@@ -176,7 +176,7 @@
 }
 
 .bard-footer-toolbar {
-    @apply bg-white shadow-none text-grey-70 rounded-b border-t text-xs p-1 flex items-center justify-between;
+    @apply bg-white shadow-none text-grey-70 rounded-b border-t text-xs p-2___REPLACED flex items-center justify-between;
     padding: 8px 12px;
 
     .bard-fullscreen & {

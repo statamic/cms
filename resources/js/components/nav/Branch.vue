@@ -2,7 +2,7 @@
 
     <div class="flex">
         <div class="page-move w-6" />
-        <div class="flex items-center flex-1 p-1 ml-2___REPLACED text-xs leading-normal">
+        <div class="flex items-center flex-1 p-2___REPLACED ml-2___REPLACED text-xs leading-normal">
             <div class="flex items-center flex-1" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
                 <template v-if="! isSection">
                     <i v-if="isAlreadySvg" class="w-4 h-4 mr-2___REPLACED" v-html="icon"></i>
@@ -16,7 +16,7 @@
 
                 <button
                     v-if="hasChildren && !isSection"
-                    class="p-1 text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
+                    class="p-2___REPLACED text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >

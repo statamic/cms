@@ -35,7 +35,7 @@ select {
   ========================================================================== */
 
 .input-text {
-    @apply appearance-none bg-grey-10 text-grey-80 max-w-full w-full border p-1 rounded shadow-inner;
+    @apply appearance-none bg-grey-10 text-grey-80 max-w-full w-full border p-2___REPLACED rounded shadow-inner;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
 
@@ -51,7 +51,7 @@ select {
 
 // Used inside tables, grids, and so on
 .input-text-minimal {
-    @apply appearance-none shadow-none bg-white w-full p-1;
+    @apply appearance-none shadow-none bg-white w-full p-2___REPLACED;
 
     &:focus {
         @apply outline-none bg-grey-20;

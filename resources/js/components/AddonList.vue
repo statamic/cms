@@ -3,7 +3,7 @@
         <div class="breadcrumb flex" v-if="showingAddon">
             <button
                 @click="showingAddon = false"
-                class="flex-initial flex p-1 -m-1 items-center text-xs text-grey-70 hover:text-grey-90"
+                class="flex-initial flex p-2___REPLACED -m-1 items-center text-xs text-grey-70 hover:text-grey-90"
             >
                 <svg-icon name="chevron-right" class="h-6 w-4 rotate-180" />
                 <span v-text="__('Addons')" />
@@ -42,7 +42,7 @@
                         </button>
                     </div>
 
-                    <div class="p-1">
+                    <div class="p-2___REPLACED">
                         <data-list-search
                             ref="search"
                             v-model="searchQuery" />

@@ -182,7 +182,7 @@
 }
 
 td.table-drag-handle {
-	@apply w-3 border-r h-full p-1;
+	@apply w-3 border-r h-full p-2___REPLACED;
 	cursor: grab;
 	background: theme('colors.grey-20') url('../svg/drag-dots.svg') center center no-repeat;
 	&:hover { @apply bg-grey-30; }

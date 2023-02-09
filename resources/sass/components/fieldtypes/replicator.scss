@@ -22,7 +22,7 @@
     }
 
     .sortable-handle {
-        @apply w-4 border-r rounded-tl p-1;
+        @apply w-4 border-r rounded-tl p-2___REPLACED;
         cursor: grab;
         background: transparent url('../svg/drag-dots.svg') center center no-repeat;
         &:hover { @apply bg-grey-20; }

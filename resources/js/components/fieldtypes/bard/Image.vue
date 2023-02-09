@@ -3,12 +3,12 @@
     <node-view-wrapper>
         <div class="bard-inline-image-container">
             <div v-if="src">
-                <div class="p-1 text-center">
+                <div class="p-2___REPLACED text-center">
                     <div ref="content" hidden />
                     <img :src="src" class="block mx-auto" data-drag-handle />
                 </div>
 
-                <div class="flex items-center p-1 pt-0 rounded-b" @paste.stop>
+                <div class="flex items-center p-2___REPLACED pt-0 rounded-b" @paste.stop>
                     <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-2___REPLACED" />
                     <button class="btn-flat mr-2___REPLACED" @click="openSelector">
                         {{ __('Replace') }}

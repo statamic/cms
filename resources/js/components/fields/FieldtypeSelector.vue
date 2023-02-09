@@ -20,10 +20,10 @@
                 <p v-if="group.description" v-text="group.description" class="px-1 mb-2___REPLACED text-grey-70 text-sm"/>
                 <div class="fieldtype-selector">
                     <div class="fieldtype-list">
-                        <div class="p-1" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
+                        <div class="p-2___REPLACED" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
                             <button class="bg-white border border-grey-50 flex items-center group w-full rounded hover:border-grey-60 shadow-sm hover:shadow-md pr-1.5"
                                 @click="select(fieldtype)">
-                                <div class="p-1 flex items-center border-r border-grey-50 group-hover:border-grey-60 bg-grey-20 rounded-l">
+                                <div class="p-2___REPLACED flex items-center border-r border-grey-50 group-hover:border-grey-60 bg-grey-20 rounded-l">
                                     <svg-icon class="h-5 w-5 text-grey-80" :name="fieldtype.icon" default="generic-field"></svg-icon>
                                 </div>
                                 <span class="pl-1.5 text-grey-80 text-md group-hover:text-grey-90">{{ fieldtype.text }}</span>

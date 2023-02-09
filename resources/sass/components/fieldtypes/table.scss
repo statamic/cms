@@ -11,7 +11,7 @@
 
 .table-fieldtype-table thead {
     th {
-        @apply font-medium border-r p-1 border-b z-10 bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide;
+        @apply font-medium border-r p-2___REPLACED border-b z-10 bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide;
         display: table-cell;
         position: sticky;
         top: -1px;
@@ -50,7 +50,7 @@
         }
 
         &.table-drag-handle {
-            @apply w-3 border-r h-full p-1;
+            @apply w-3 border-r h-full p-2___REPLACED;
             cursor: grab;
             background: theme('colors.grey-20') url('../svg/drag-dots.svg') center center no-repeat;
             &:hover { @apply bg-grey-30; }
