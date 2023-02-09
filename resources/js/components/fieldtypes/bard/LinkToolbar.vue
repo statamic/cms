@@ -86,7 +86,7 @@
                 </label>
             </div>
 
-            <div class="flex items-center justify-end space-x-1 font-normal px-4___REPLACED py-1.5">
+            <div class="flex items-center justify-end space-x-1 font-normal px-4___REPLACED py-3___REPLACED">
                 <button
                     v-tooltip="__('Remove Link')"
                     :aria-label="__('Remove Link')"
