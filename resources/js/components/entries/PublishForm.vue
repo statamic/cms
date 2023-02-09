@@ -106,7 +106,7 @@
                                             class="flex items-center justify-center btn-flat w-full mx-2___REPLACED px-2___REPLACED"
                                             v-if="isBase && livePreviewUrl"
                                             @click="openLivePreview">
-                                            <svg-icon name="synchronize" class="w-5 h-5 mr-2___REPLACED" />
+                                            <svg-icon name="synchronize" class="w-5 h-1___REPLACED mr-2___REPLACED" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
@@ -147,7 +147,7 @@
                                             class="flex items-center justify-center mt-4___REPLACED btn-flat px-2___REPLACED w-full"
                                             v-if="!isCreating && revisionsEnabled"
                                             @click="showRevisionHistory = true">
-                                            <svg-icon name="history" class="w-5 h-5 mr-2___REPLACED" />
+                                            <svg-icon name="history" class="w-5 h-1___REPLACED mr-2___REPLACED" />
                                             <span>{{ __('View History') }}</span>
                                         </button>
                                 </div>
