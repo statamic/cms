@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <header class="mb-6">
+    <header class="mb-6___REPLACED">
         <div class="flex items-center justify-between">
             <h1>{{ __('Duplicate IDs') }}</h1>
         </div>
@@ -16,9 +16,9 @@
     @endif
 
     @foreach ($duplicates as $id => $paths)
-        <h6 class="mt-8">{{ $id }}</h6>
+        <h6 class="mt-8___REPLACED">{{ $id }}</h6>
 
-        <div class="card p-0 mt-2">
+        <div class="card p-0 mt-2___REPLACED">
             <table class="data-table">
                 @foreach ($paths as $path)
                     <tr>

@@ -9,7 +9,7 @@
   }
 
   .code-mode {
-      @apply select-none z-10 opacity-25 absolute right-0 p-2 text-white text-2xs;
+      @apply select-none z-10 opacity-25 absolute right-0 p-2___REPLACED text-white text-2xs;
   }
 
   /* PADDING */
@@ -21,7 +21,7 @@
     padding: 0 16px; /* Horizontal padding of content */
   }
   .CodeMirror-wrap {
-    @apply py-2 rounded;
+    @apply py-2___REPLACED rounded;
   }
 
   .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {

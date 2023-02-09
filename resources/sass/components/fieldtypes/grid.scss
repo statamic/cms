@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .grid-table {
-    @apply w-full text-left border text-grey relative mb-4 outline-none shadow-sm rounded;
+    @apply w-full text-left border text-grey relative mb-4___REPLACED outline-none shadow-sm rounded;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: auto;
@@ -11,13 +11,13 @@
 
 .grid-table thead {
     th {
-        @apply font-medium px-2 py-3 border-b z-10 bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide;
+        @apply font-medium px-2___REPLACED py-3___REPLACED border-b z-10 bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide;
         display: table-cell;
         position: sticky;
         top: -1px;
         z-index: auto;
 
-        &:first-child { @apply rounded-tl pl-3; }
+        &:first-child { @apply rounded-tl pl-3___REPLACED; }
         &:last-child { @apply rounded-tr; }
         &.grid-drag-handle-header {
             @apply w-3;
@@ -37,14 +37,14 @@
     }
 
     > tr > td {
-        @apply border-b px-2 py-3 align-top;
+        @apply border-b px-2___REPLACED py-3___REPLACED align-top;
 
         &:first-child.grid-cell {
-            @apply pl-3;
+            @apply pl-3___REPLACED;
         }
 
         &.drag-handle {
-            @apply border-r h-full p-2;
+            @apply border-r h-full p-2___REPLACED;
             width: 1%;
             cursor: grab;
             background: theme('colors.grey-20') url('../svg/drag-dots.svg') center center no-repeat;
@@ -70,7 +70,7 @@
 }
 
 .grid-item-header {
-    @apply bg-grey-20 border-b px-4 py-2 text-sm flex items-center justify-between outline-none cursor-move;
+    @apply bg-grey-20 border-b px-4___REPLACED py-2___REPLACED text-sm flex items-center justify-between outline-none cursor-move;
 }
 
 .grid-stacked .input-text {

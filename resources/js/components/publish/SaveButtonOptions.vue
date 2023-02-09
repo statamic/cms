@@ -12,8 +12,8 @@
                     <svg-icon v-if="buttonIcon" :name="buttonIcon.name" :class="buttonIcon.class" />
                 </button>
             </template>
-            <h6 v-text="__('After Saving')" class="p-2" />
-            <div class="publish-fields px-2">
+            <h6 v-text="__('After Saving')" class="p-2___REPLACED" />
+            <div class="publish-fields px-2___REPLACED">
                 <div class="publish-field save-and-continue-options">
                     <radio-fieldtype
                         handle="save_and_continue_options"

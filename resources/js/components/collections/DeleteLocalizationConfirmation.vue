@@ -2,36 +2,36 @@
 
     <modal name="delete-entry-confirmation" :pivotY="0.1" :overflow="false">
         <div class="confirmation-modal flex flex-col h-full">
-            <div class="text-lg font-medium p-4 pb-0">
+            <div class="text-lg font-medium p-4___REPLACED pb-0">
                 {{ __('Delete') }}
             </div>
-            <div class="flex-1 px-4 py-6 text-grey">
+            <div class="flex-1 px-4___REPLACED py-6___REPLACED text-grey">
                 <div class="publish-fields">
                     <div class="form-group" :class="{ 'has-error': this.error }">
                         <div class="field-inner">
                             <label class="publish-field-label" for="field_behavior">
                                 <span v-text="__('Localizations')" />
-                                <i class="required ml-1">*</i>
+                                <i class="required ml-1___REPLACED">*</i>
                             </label>
                             <div class="help-block -mt-1"><p v-html="instructions" /></div>
                         </div>
 
                         <div class="button-group-fieldtype-wrapper">
                             <div class="btn-group">
-                                <button @click="behavior = 'delete'" class="btn px-4" :class="{ active: behavior === 'delete' }"><span v-text="__('Delete')" /></button>
-                                <button @click="behavior = 'copy'" class="btn px-4" :class="{ active: behavior === 'copy' }"><span v-text="__('Detach')" /></button>
+                                <button @click="behavior = 'delete'" class="btn px-4___REPLACED" :class="{ active: behavior === 'delete' }"><span v-text="__('Delete')" /></button>
+                                <button @click="behavior = 'copy'" class="btn px-4___REPLACED" :class="{ active: behavior === 'copy' }"><span v-text="__('Detach')" /></button>
                             </div>
                         </div>
 
-                        <small v-if="error" class="help-block text-red mt-2 mb-0" v-text="__('statamic::validation.required')" />
+                        <small v-if="error" class="help-block text-red mt-2___REPLACED mb-0" v-text="__('statamic::validation.required')" />
                     </div>
                 </div>
             </div>
-            <div class="p-4 bg-grey-20 border-t flex items-center justify-end text-sm">
+            <div class="p-4___REPLACED bg-grey-20 border-t flex items-center justify-end text-sm">
                 <button class="text-grey hover:text-grey-90"
                     @click="$emit('cancel')"
                     v-text="__('Cancel')" />
-                <button class="btn ml-4 btn-danger"
+                <button class="btn ml-4___REPLACED btn-danger"
                     @click="confirm"
                     v-text="__('Confirm')" />
             </div>

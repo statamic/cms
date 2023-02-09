@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <header class="mb-6">
+    <header class="mb-6___REPLACED">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('taxonomies.index'),
             'title' => __('Taxonomies')
@@ -12,7 +12,7 @@
         <div class="flex items-center">
             <h1 class="flex-1">{{ $taxonomy->title() }}</h1>
 
-            <dropdown-list class="mr-2">
+            <dropdown-list class="mr-2___REPLACED">
                 @can('edit', $taxonomy)
                     <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
                 @endcan

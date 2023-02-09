@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <header class="mb-6">
+    <header class="mb-6___REPLACED">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('forms.show', $form->handle()),
             'title' => $form->title()

@@ -12,7 +12,7 @@
                 <tr v-for="site in sites" :key="site.handle">
                     <td>
                         <div class="flex items-center text-sm">
-                            <toggle-input v-model="site.enabled" class="mr-4" />
+                            <toggle-input v-model="site.enabled" class="mr-4___REPLACED" />
                             {{ site.name }}
                         </div>
                     </td>

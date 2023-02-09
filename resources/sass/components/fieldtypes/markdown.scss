@@ -19,7 +19,7 @@
     }
 
     .markdown-buttons button {
-        @apply text-grey-80 rounded px-1 flex items-center justify-center text-base text-center;
+        @apply text-grey-80 rounded px-1___REPLACED flex items-center justify-center text-base text-center;
         height: 32px;
         width: 32px;
         margin: 0 2px;
@@ -45,10 +45,10 @@
     }
 
     .markdown-modes {
-        @apply ml-2 flex items-center h-full;
+        @apply ml-2___REPLACED flex items-center h-full;
 
         button {
-            @apply mr-4 text-grey-50 outline-none h-full;
+            @apply mr-4___REPLACED text-grey-50 outline-none h-full;
             padding: 6px 4px;
 
             &:hover {
@@ -66,7 +66,7 @@
     }
 
     .CodeMirror {
-        @apply bg-grey-10 shadow-inner h-auto font-mono leading-normal p-3 text-xs;
+        @apply bg-grey-10 shadow-inner h-auto font-mono leading-normal p-3___REPLACED text-xs;
         border-radius: 0 0 3px 3px;
 
         .cm-comment {
@@ -85,11 +85,11 @@
     }
 
     .markdown-cheatsheet-helper {
-        @apply py-2 px-4 inline-block;
+        @apply py-2___REPLACED px-4___REPLACED inline-block;
     }
 
     .markdown-asset-helper {
-        @apply py-2 px-4 inline-block;
+        @apply py-2___REPLACED px-4___REPLACED inline-block;
     }
 }
 
@@ -159,7 +159,7 @@
     }
 
     .markdown-preview {
-        @apply border-none p-2 text-left;
+        @apply border-none p-2___REPLACED text-left;
         p { line-height: 1.2; }
     }
 }
@@ -214,7 +214,7 @@
     will-change: transform;
 
     .markdown-toolbar {
-        @apply fixed top-0 w-full px-6 py-2 h-13 shadow text-base flex items-center justify-between;
+        @apply fixed top-0 w-full px-6___REPLACED py-2___REPLACED h-13 shadow text-base flex items-center justify-between;
         background: linear-gradient(180deg, #fff, #f9fafb);
         border-bottom: 1px solid #c4cdd6;
     }
@@ -229,7 +229,7 @@
     }
 
     .CodeMirror {
-        @apply max-w-xl bg-transparent mx-auto relative p-8 shadow-none text-base;
+        @apply max-w-xl bg-transparent mx-auto relative p-8___REPLACED shadow-none text-base;
 
         .CodeMirror-scroll {
             @apply m-0;
@@ -237,7 +237,7 @@
     }
 
     .markdown-preview {
-        @apply max-w-xl bg-transparent mx-auto relative p-8 text-lg;
+        @apply max-w-xl bg-transparent mx-auto relative p-8___REPLACED text-lg;
     }
 
     .helpers {

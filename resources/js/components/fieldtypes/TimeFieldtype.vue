@@ -5,7 +5,7 @@
                 <svg-icon name="time" class="w-4 h-4" />
             </div>
             <div
-                class="input-text flex items-center px-1 w-auto"
+                class="input-text flex items-center px-1___REPLACED w-auto"
                 :class="{ 'read-only': isReadOnly }"
             >
                 <template v-for="(part, index) in parts">
@@ -37,7 +37,7 @@
                 </template>
             </div>
         </div>
-        <button class="text-xl text-grey-60 hover:text-grey-80 h-4 w-4 p-2 flex items-center outline-none" tabindex="0"
+        <button class="text-xl text-grey-60 hover:text-grey-80 h-4 w-4 p-2___REPLACED flex items-center outline-none" tabindex="0"
               v-if="! required && ! isReadOnly"
               @click="clear" @keyup.enter.space="clear">
               &times;

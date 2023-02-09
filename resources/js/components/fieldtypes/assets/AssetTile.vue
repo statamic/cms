@@ -30,11 +30,11 @@
                     <img :src="thumbnail" v-if="isImage" :title="label" />
 
                     <template v-else>
-                        <img v-if="canShowSvg" :src="asset.url" class="p-4" />
+                        <img v-if="canShowSvg" :src="asset.url" class="p-4___REPLACED" />
                         <file-icon
                             v-else
                             :extension="asset.extension"
-                            class="p-4 h-full w-full"
+                            class="p-4___REPLACED h-full w-full"
                         />
                     </template>
                 </template>
@@ -62,7 +62,7 @@
                         class="btn btn-icon"
                         :alt="__('Open in a new window')"
                     >
-                        <svg-icon name="external-link" class="h-4 my-2" />
+                        <svg-icon name="external-link" class="h-4 my-2___REPLACED" />
                     </button>
 
                     <button
@@ -71,7 +71,7 @@
                         class="btn btn-icon"
                         :alt="__('Download file')"
                     >
-                        <svg-icon name="download" class="h-4 my-2" />
+                        <svg-icon name="download" class="h-4 my-2___REPLACED" />
                     </button>
                 </div>
             </div>
@@ -79,14 +79,14 @@
 
         <div class="asset-meta flex items-center" v-if="showFilename">
             <div
-                class="asset-filename flex-1 px-2 py-1"
+                class="asset-filename flex-1 px-2___REPLACED py-1___REPLACED"
                 :title="label"
                 :class="{ 'text-center': !needsAlt }"
             >
                 {{ label }}
             </div>
             <button
-                class="text-blue border-l px-2 py-1 hover:bg-grey-20"
+                class="text-blue border-l px-2___REPLACED py-1___REPLACED hover:bg-grey-20"
                 @click="edit"
                 v-if="needsAlt"
             >

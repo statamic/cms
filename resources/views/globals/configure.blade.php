@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <header class="mb-6">
+    <header class="mb-6___REPLACED">
         @include('statamic::partials.breadcrumb', $breadcrumb)
         <h1>@yield('title')</h1>
     </header>

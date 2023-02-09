@@ -2,31 +2,31 @@
 
     <div class="flex">
         <div class="page-move w-6" />
-        <div class="flex items-center flex-1 p-2 ml-2 text-xs leading-normal">
+        <div class="flex items-center flex-1 p-2___REPLACED ml-2___REPLACED text-xs leading-normal">
             <div class="flex items-center flex-1">
-                <div class="little-dot mr-2" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />
-                <svg-icon name="home-page" class="mr-2 h-4 w-4 text-grey-80" v-if="isRoot" v-tooltip="__('This is the root page')" />
+                <div class="little-dot mr-2___REPLACED" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />
+                <svg-icon name="home-page" class="mr-2___REPLACED h-4 w-4 text-grey-80" v-if="isRoot" v-tooltip="__('This is the root page')" />
                 <a
                     @click="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"
                     v-text="title" />
 
-                <span v-if="showSlugs" class="ml-2 font-mono text-grey-70 text-2xs pt-px">
+                <span v-if="showSlugs" class="ml-2___REPLACED font-mono text-grey-70 text-2xs pt-px">
                     {{ isRoot ? '/' : page.slug }}
                 </span>
 
                 <button
                     v-if="hasChildren"
-                    class="p-2 text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
+                    class="p-2___REPLACED text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >
-                    <svg-icon name="chevron-down-xs" class="h-1.5" />
+                    <svg-icon name="chevron-down-xs" class="h-1.5___REPLACED" />
                 </button>
 
-                <div v-if="page.collection" class="ml-4 flex items-center">
+                <div v-if="page.collection" class="ml-4___REPLACED flex items-center">
                     <svg-icon name="content-writing" class="w-4 h-4" />
-                    <div class="ml-1">
+                    <div class="ml-1___REPLACED">
                         <a :href="page.collection.create_url" v-text="__('Add')" />
                         <span class="text-grey">/</span>
                         <a :href="page.collection.edit_url" v-text="__('Edit')" />
@@ -34,10 +34,10 @@
                 </div>
             </div>
 
-            <div class="pr-2 flex items-center">
+            <div class="pr-2___REPLACED flex items-center">
                 <slot name="branch-icon" :branch="page" />
 
-                <dropdown-list class="ml-4" v-if="!isRoot">
+                <dropdown-list class="ml-4___REPLACED" v-if="!isRoot">
                     <slot name="branch-options"
                         :branch="page"
                         :depth="depth"

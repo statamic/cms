@@ -2,21 +2,21 @@
 
     <div>
 
-        <header class="mb-6" v-if="mounted">
+        <header class="mb-6___REPLACED" v-if="mounted">
             <breadcrumb :url="breadcrumbUrl" :title="__('Navigation')" />
 
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
 
-                <dropdown-list class="mr-2">
+                <dropdown-list class="mr-2___REPLACED">
                     <slot name="twirldown" />
                 </dropdown-list>
 
-                <a @click="$refs.tree.cancel" class="text-2xs text-blue mr-4 underline" v-if="isDirty" v-text="__('Discard changes')" />
+                <a @click="$refs.tree.cancel" class="text-2xs text-blue mr-4___REPLACED underline" v-if="isDirty" v-text="__('Discard changes')" />
 
                 <site-selector
                     v-if="sites.length > 1"
-                    class="mr-4"
+                    class="mr-4___REPLACED"
                     :sites="sites"
                     :value="site"
                     @input="siteSelected"
@@ -26,11 +26,11 @@
                     <template #trigger>
                         <button
                             class="btn"
-                            :class="{ 'flex items-center pr-4': hasCollections }"
+                            :class="{ 'flex items-center pr-4___REPLACED': hasCollections }"
                             @click="addLink"
                         >
                             {{ __('Add Nav Item') }}
-                            <svg-icon name="chevron-down-xs" class="w-2 ml-4" v-if="hasCollections" />
+                            <svg-icon name="chevron-down-xs" class="w-2 ml-4___REPLACED" v-if="hasCollections" />
                         </button>
                     </template>
                     <dropdown-item :text="__('Add Nav Item')" @click="linkPage()" />
@@ -38,7 +38,7 @@
                 </dropdown-list>
 
                 <button
-                    class="btn-primary ml-4"
+                    class="btn-primary ml-4___REPLACED"
                     :class="{ 'disabled': !changed }"
                     :disabled="!changed"
                     @click="$refs.tree.save"
@@ -62,33 +62,33 @@
             @canceled="changed = false"
         >
             <template #empty>
-                <div class="card p-4 content w-full">
+                <div class="card p-4___REPLACED content w-full">
                     <div class="flex flex-wrap w-full">
-                        <a :href="editUrl" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-20 rounded-md group">
-                            <svg-icon name="hammer-wrench" class="h-8 w-8 mr-4 text-grey-80" />
-                            <div class="flex-1 mb-4 md:mb-0 md:mr-6">
-                                <h3 class="mb-2 text-blue">{{ __('Configure Navigation') }} &rarr;</h3>
+                        <a :href="editUrl" class="w-full lg:w-1/2 p-4___REPLACED flex items-start hover:bg-grey-20 rounded-md group">
+                            <svg-icon name="hammer-wrench" class="h-8 w-8 mr-4___REPLACED text-grey-80" />
+                            <div class="flex-1 mb-4___REPLACED md:mb-0 md:mr-6___REPLACED">
+                                <h3 class="mb-2___REPLACED text-blue">{{ __('Configure Navigation') }} &rarr;</h3>
                                 <p>{{ __('messages.navigation_configure_settings_intro') }}</p>
                             </div>
                         </a>
-                        <a @click="linkPage()" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-20 rounded-md group">
-                            <svg-icon name="paperclip" class="h-8 w-8 mr-4 text-grey-80" />
-                            <div class="flex-1 mb-4 md:mb-0 md:mr-6">
-                                <h3 class="mb-2 text-blue">{{ __('Link to URL') }} &rarr;</h3>
+                        <a @click="linkPage()" class="w-full lg:w-1/2 p-4___REPLACED flex items-start hover:bg-grey-20 rounded-md group">
+                            <svg-icon name="paperclip" class="h-8 w-8 mr-4___REPLACED text-grey-80" />
+                            <div class="flex-1 mb-4___REPLACED md:mb-0 md:mr-6___REPLACED">
+                                <h3 class="mb-2___REPLACED text-blue">{{ __('Link to URL') }} &rarr;</h3>
                                  <p>{{ __('messages.navigation_link_to_url_instructions') }}</p>
                             </div>
                         </a>
-                        <a @click="linkEntries()" v-if="hasCollections" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-20 rounded-md group">
-                            <svg-icon name="hierarchy-files" class="h-8 w-8 mr-4 text-grey-80" />
-                            <div class="flex-1 mb-4 md:mb-0 md:mr-6">
-                                <h3 class="mb-2 text-blue">{{ __('Link to Entry') }} &rarr;</h3>
+                        <a @click="linkEntries()" v-if="hasCollections" class="w-full lg:w-1/2 p-4___REPLACED flex items-start hover:bg-grey-20 rounded-md group">
+                            <svg-icon name="hierarchy-files" class="h-8 w-8 mr-4___REPLACED text-grey-80" />
+                            <div class="flex-1 mb-4___REPLACED md:mb-0 md:mr-6___REPLACED">
+                                <h3 class="mb-2___REPLACED text-blue">{{ __('Link to Entry') }} &rarr;</h3>
                                  <p>{{ __('messages.navigation_link_to_entry_instructions') }}</p>
                             </div>
                         </a>
-                        <a :href="docs_url('navigation')" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-20 rounded-md group">
-                            <svg-icon name="book-pages" class="h-8 w-8 mr-4 text-grey-80" />
-                            <div class="flex-1 mb-4 md:mb-0 md:mr-6">
-                                <h3 class="mb-2 text-blue">{{ __('Read the Documentation') }} &rarr;</h3>
+                        <a :href="docs_url('navigation')" class="w-full lg:w-1/2 p-4___REPLACED flex items-start hover:bg-grey-20 rounded-md group">
+                            <svg-icon name="book-pages" class="h-8 w-8 mr-4___REPLACED text-grey-80" />
+                            <div class="flex-1 mb-4___REPLACED md:mb-0 md:mr-6___REPLACED">
+                                <h3 class="mb-2___REPLACED text-blue">{{ __('Read the Documentation') }} &rarr;</h3>
                                  <p>{{ __('messages.navigation_documentation_instructions') }}</p>
                             </div>
                         </a>

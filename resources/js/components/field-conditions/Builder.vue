@@ -6,7 +6,7 @@
             <label class="publish-field-label">{{ __('Conditions') }}</label>
             <div class="help-block -mt-1"><p>{{ __('messages.field_conditions_instructions') }}</p></div>
 
-            <div class="flex items-center mb-6">
+            <div class="flex items-center mb-6___REPLACED">
                 <select-input
                     v-model="when"
                     :options="whenOptions"
@@ -17,19 +17,19 @@
                     v-model="type"
                     :options="typeOptions"
                     :placeholder="false"
-                    class="ml-4" />
+                    class="ml-4___REPLACED" />
 
                 <text-input
                     v-if="hasConditions && isCustom"
                     v-model="customMethod"
-                    class="ml-4 flex-1" />
+                    class="ml-4___REPLACED flex-1" />
             </div>
 
             <div
                 v-if="hasConditions && isStandard"
                 v-for="(condition, index) in conditions"
                 :key="condition._id"
-                class="flex items-center py-4 border-t"
+                class="flex items-center py-4___REPLACED border-t"
             >
                 <v-select
                     ref="fieldSelect"
@@ -50,18 +50,18 @@
                     v-model="conditions[index].operator"
                     :options="operatorOptions"
                     :placeholder="false"
-                    class="ml-4" />
+                    class="ml-4___REPLACED" />
 
                 <text-input
                     v-model="conditions[index].value"
-                    class="ml-4" />
+                    class="ml-4___REPLACED" />
 
-                <button @click="remove(index)" class="btn-close ml-2 group">
+                <button @click="remove(index)" class="btn-close ml-2___REPLACED group">
                     <svg-icon name="trash" class="w-4 h-4 group-hover:text-red" />
                 </button>
             </div>
 
-            <div class="border-t pt-6" v-if="hasConditions && isStandard">
+            <div class="border-t pt-6___REPLACED" v-if="hasConditions && isStandard">
                 <button
                     v-text="__('Add Condition')"
                     @click="add"

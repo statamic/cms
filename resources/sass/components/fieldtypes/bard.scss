@@ -13,11 +13,11 @@
 }
 
 .bard-editor .ProseMirror {
-    @apply p-2 min-h-40;
+    @apply p-2___REPLACED min-h-40___REPLACED;
 }
 
 .bard-editor .bard-invalid {
-    @apply p-2 bg-red-lighter text-red text-xs whitespace-nowrap;
+    @apply p-2___REPLACED bg-red-lighter text-red text-xs whitespace-nowrap;
 }
 
 // Modes
@@ -30,7 +30,7 @@
 }
 
 .bard-editor.mode\:inline .ProseMirror {
-    @apply p-2;
+    @apply p-2___REPLACED;
     min-height: 38px;
     p {
         margin-bottom: 0;
@@ -40,8 +40,8 @@
 
 // Responive Wangjangling
 @screen md {
-    .bard-editor .ProseMirror { @apply p-4; }
-    .bard-editor .bard-invalid { @apply px-4; }
+    .bard-editor .ProseMirror { @apply p-4___REPLACED; }
+    .bard-editor .bard-invalid { @apply px-4___REPLACED; }
 }
 
 .bard-fixed-toolbar {
@@ -52,7 +52,7 @@
     top: 0;
 
     .bard-toolbar-button {
-        @apply text-grey-80 rounded px-1 flex items-center justify-center text-base text-center;
+        @apply text-grey-80 rounded px-1___REPLACED flex items-center justify-center text-base text-center;
         height: 32px;
         width: 32px;
         margin: 0 2px;
@@ -86,10 +86,10 @@
 }
 
 .bard-fixed-toolbar.dark {
-    @apply bg-black rounded-full shadow-lg px-4;
+    @apply bg-black rounded-full shadow-lg px-4___REPLACED;
 
     button {
-        @apply focus-none text-grey-70 rounded px-1 flex items-center justify-center text-base text-center bg-transparent;
+        @apply focus-none text-grey-70 rounded px-1___REPLACED flex items-center justify-center text-base text-center bg-transparent;
         height: 32px;
         width: 32px;
         margin: 0 2px;
@@ -176,7 +176,7 @@
 }
 
 .bard-footer-toolbar {
-    @apply bg-white shadow-none text-grey-70 rounded-b border-t text-xs p-2 flex items-center justify-between;
+    @apply bg-white shadow-none text-grey-70 rounded-b border-t text-xs p-2___REPLACED flex items-center justify-between;
     padding: 8px 12px;
 
     .bard-fullscreen & {
@@ -221,7 +221,7 @@
                 // too high and it'll be over the top of stacks, etc.
 
     .bard-editor {
-        @apply bg-white shadow max-w-xl mx-auto rounded relative my-6 px-8;
+        @apply bg-white shadow max-w-xl mx-auto rounded relative my-6___REPLACED px-8___REPLACED;
     }
 
     .bard-fixed-toolbar {
@@ -231,12 +231,12 @@
         z-index: 999;
 
         button {
-            @apply mx-1;
+            @apply mx-1___REPLACED;
         }
     }
 
     .ProseMirror {
-        @apply px-6 py-16 flex flex-col;
+        @apply px-6___REPLACED py-16___REPLACED flex flex-col;
         min-height: calc(100vh - 120px);
 
         > p > code, > pre code {
@@ -250,11 +250,11 @@
     }
 
     .bard-set-selector {
-        @apply ml-6;
+        @apply ml-6___REPLACED;
     }
 
     .bard-field-options {
-        @apply fixed top-0 inset-x-0 bg-grey-70 p-4 w-full;
+        @apply fixed top-0 inset-x-0 bg-grey-70 p-4___REPLACED w-full;
         text-align: right;
         z-index: 1; // to appear over the top of .bard-editor
 
@@ -428,7 +428,7 @@
     }
 
     blockquote {
-        @apply text-grey-80 border-l-4 border-blue px-4;
+        @apply text-grey-80 border-l-4 border-blue px-4___REPLACED;
         margin: 0 0 .85em;
     }
 
@@ -444,7 +444,7 @@
     blockquote > .tableWrapper table,
     ol li > .tableWrapper table,
     ul li > .tableWrapper table {
-        @apply w-full overflow-hidden m-0 mb-4 bg-white text-sm ;
+        @apply w-full overflow-hidden m-0 mb-4___REPLACED bg-white text-sm ;
         border-collapse: collapse;
         table-layout: fixed;
 
@@ -453,7 +453,7 @@
         }
 
         td, th {
-            @apply border align-top relative py-1 px-2;
+            @apply border align-top relative py-1___REPLACED px-2___REPLACED;
             min-width: 1em;
         }
 
@@ -489,7 +489,7 @@
     }
 
     pre code {
-        @apply font-mono bg-grey-40 text-xs p-4 block w-full rounded;
+        @apply font-mono bg-grey-40 text-xs p-4___REPLACED block w-full rounded;
         line-height: 1.8;
     }
 }
@@ -509,7 +509,7 @@
   ========================================================================== */
 
   .bard-link-toolbar {
-    @apply bg-white rounded absolute leading-none shadow mt-2;
+    @apply bg-white rounded absolute leading-none shadow mt-2___REPLACED;
     z-index: 100;
     width: 300px;
     top: 100%;
@@ -540,7 +540,7 @@
 }
 
 .bard-inline-image-container {
-    @apply relative bg-white border rounded whitespace-normal mb-6;
+    @apply relative bg-white border rounded whitespace-normal mb-6___REPLACED;
     &:hover {
         cursor: grab;
     }

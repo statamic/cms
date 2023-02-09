@@ -8,7 +8,7 @@
         'title' => __('User Groups')
     ])
 
-    <h1 class="mb-6">{{ __('Create User Group') }}</h1>
+    <h1 class="mb-6___REPLACED">{{ __('Create User Group') }}</h1>
 
     <user-group-publish-form
         action="{{ cp_route('user-groups.store') }}"

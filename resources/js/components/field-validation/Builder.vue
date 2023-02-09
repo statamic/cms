@@ -59,10 +59,10 @@
                     />
                 </template>
                 <template #option="{ value, display }">
-                    {{ display }} <code class="ml-2">{{ valueWithoutTrailingColon(value) }}</code>
+                    {{ display }} <code class="ml-2___REPLACED">{{ valueWithoutTrailingColon(value) }}</code>
                 </template>
                 <template #no-options="{ search }">
-                    <div class="vs__dropdown-option text-left">{{ __('Add') }} <code class="ml-2">{{ search }}</code></div>
+                    <div class="vs__dropdown-option text-left">{{ __('Add') }} <code class="ml-2___REPLACED">{{ search }}</code></div>
                 </template>
             </v-select>
 
@@ -81,7 +81,7 @@
                     v-model="rules"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap outline-none">
-                        <span v-for="rule in rules" :key="rule" class="vs__selected mt-2 sortable-item">
+                        <span v-for="rule in rules" :key="rule" class="vs__selected mt-2___REPLACED sortable-item">
                             {{ rule }}
                             <button @click="remove(rule)" type="button" :aria-label="__('Delete Rule')" class="vs__deselect">
                                 <span>×</span>

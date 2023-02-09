@@ -3,14 +3,14 @@
     <dropdown-list class="inline-block" :disabled="!hasMultipleBlueprints">
         <template v-slot:trigger>
             <button
-                :class="[buttonClass, {'flex items-center pr-4': hasMultipleBlueprints }]"
+                :class="[buttonClass, {'flex items-center pr-4___REPLACED': hasMultipleBlueprints }]"
                 @click="create"
             >
                 {{ text }}
-                <svg-icon name="chevron-down-xs" class="w-2 ml-2" v-if="hasMultipleBlueprints" />
+                <svg-icon name="chevron-down-xs" class="w-2 ml-2___REPLACED" v-if="hasMultipleBlueprints" />
             </button>
         </template>
-        <h6 v-text="__('Choose Blueprint')" class="p-2" />
+        <h6 v-text="__('Choose Blueprint')" class="p-2___REPLACED" />
 
         <div v-for="blueprint in blueprints" :key="blueprint.handle">
             <dropdown-item :text="blueprint.title" @click="select(blueprint.handle, $event)" />

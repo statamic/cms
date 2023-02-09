@@ -13,12 +13,12 @@
         <div>
             <breadcrumbs v-if="breadcrumbs" :crumbs="breadcrumbs" />
 
-            <div class="flex items-center mb-6">
+            <div class="flex items-center mb-6___REPLACED">
                 <h1 class="flex-1">{{ title }}</h1>
 
-                <div class="ml-4 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
+                <div class="ml-4___REPLACED text-left" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
-                        class="btn-primary pl-4"
+                        class="btn-primary pl-4___REPLACED"
                         :class="{ 'disabled': !isDirty }"
                         :disabled="!isDirty"
                         @click="save"
@@ -30,10 +30,10 @@
                                 <svg-icon name="chevron-down-xs" class="w-2" />
                             </button>
                         </template>
-                        <h6 class="p-2">{{ __('Save to') }}...</h6>
+                        <h6 class="p-2___REPLACED">{{ __('Save to') }}...</h6>
                         <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)">
-                            <div class="flex items-start pr-4">
-                                <svg-icon :name="option.icon" class="text-grey flex-shrink-0 mr-2 w-4 group-hover:text-white" />
+                            <div class="flex items-start pr-4___REPLACED">
+                                <svg-icon :name="option.icon" class="text-grey flex-shrink-0 mr-2___REPLACED w-4 group-hover:text-white" />
                                 <span class="whitespace-normal">{{ option.label }}</span>
                             </div>
                         </dropdown-item>

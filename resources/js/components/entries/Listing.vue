@@ -45,7 +45,7 @@
                         />
                     </div>
 
-                    <div v-show="items.length === 0" class="p-6 text-center text-grey-50" v-text="__('No results')" />
+                    <div v-show="items.length === 0" class="p-6___REPLACED text-center text-grey-50" v-text="__('No results')" />
 
                     <data-list-bulk-actions
                         :url="actionUrl"
@@ -68,7 +68,7 @@
                     >
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
-                                <div class="little-dot mr-2" :class="getStatusClass(entry)" />
+                                <div class="little-dot mr-2___REPLACED" :class="getStatusClass(entry)" />
                                 <a :href="entry.edit_url" @click.stop>{{ entry.title }}</a>
                             </div>
                         </template>
@@ -92,7 +92,7 @@
                     </data-list-table>
                 </div>
                 <data-list-pagination
-                    class="mt-6"
+                    class="mt-6___REPLACED"
                     :resource-meta="meta"
                     :per-page="perPage"
                     :show-totals="true"

@@ -8,13 +8,13 @@
         <div class="saving flex justify-center text-center" v-if="saving">
             <loading-graphic :text="__('Saving')" />
         </div>
-        <div class="publish-fields p-4 pb-0 w-96">
+        <div class="publish-fields p-4___REPLACED pb-0 w-96">
             <form-group
                 handle="password"
                 :display="__('Current Password')"
                 v-model="currentPassword"
                 :errors="errors.current_password"
-                class="p-0 mb-6"
+                class="p-0 mb-6___REPLACED"
                 :config="{ input_type: this.inputType }"
             />
             <form-group
@@ -22,20 +22,20 @@
                 :display="__('Password')"
                 v-model="password"
                 :errors="errors.password"
-                class="p-0 mb-6"
+                class="p-0 mb-6___REPLACED"
                 :config="{ input_type: this.inputType }"
             />
             <form-group
                 handle="confirmation"
                 :display="__('Password Confirmation')"
                 v-model="confirmation"
-                class="p-0 mb-6"
+                class="p-0 mb-6___REPLACED"
                 :config="{ input_type: this.inputType }"
             />
         </div>
-        <div class="flex items-center bg-grey-21 border-t rounded-b px-4 py-2">
+        <div class="flex items-center bg-grey-21 border-t rounded-b px-4___REPLACED py-2___REPLACED">
             <button class="btn-primary" @click.prevent="save">{{ __('Change Password') }}</button>
-            <label class="ml-4">
+            <label class="ml-4___REPLACED">
                 <input type="checkbox" v-model="reveal" />
                 {{ __('Reveal Password') }}
             </label>

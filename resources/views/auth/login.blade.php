@@ -12,7 +12,7 @@
         @if ($oauth)
             <div class="login-oauth-providers">
                 @foreach ($providers as $provider)
-                    <div class="provider mb-2">
+                    <div class="provider mb-2___REPLACED">
                         <a href="{{ $provider->loginUrl() }}?redirect={{ parse_url(cp_route('index'))['path'] }}" class="btn block btn-primary">
                             {{ __('Log in with :provider', ['provider' => $provider->label()]) }}
                         </a>
@@ -21,7 +21,7 @@
             </div>
 
             @if($emailLoginEnabled)
-                <div class="text-center italic my-6">or</div>
+                <div class="text-center italic my-6___REPLACED">or</div>
 
                 <div class="login-with-email" v-if="! showEmailLogin">
                     <a class="btn block" @click.prevent="showEmailLogin = true">
@@ -36,21 +36,21 @@
 
             <input type="hidden" name="referer" value="{{ $referer }}" />
 
-            <div class="mb-8">
-                <label class="mb-2" for="input-email">{{ __('Email') }}</label>
+            <div class="mb-8___REPLACED">
+                <label class="mb-2___REPLACED" for="input-email">{{ __('Email') }}</label>
                 <input type="text" class="input-text input-text" name="email" value="{{ old('email') }}" autofocus id="input-email">
-                @if ($hasError('email'))<div class="text-red text-xs mt-2">{{ $errors->first('email') }}</div>@endif
+                @if ($hasError('email'))<div class="text-red text-xs mt-2___REPLACED">{{ $errors->first('email') }}</div>@endif
             </div>
 
-            <div class="mb-8">
-                <label class="mb-2" for="input-password">{{ __('Password') }}</label>
+            <div class="mb-8___REPLACED">
+                <label class="mb-2___REPLACED" for="input-password">{{ __('Password') }}</label>
                 <input type="password" class="input-text input-text" name="password" id="input-password">
-                @if ($hasError('password'))<div class="text-red text-xs mt-2">{{ $errors->first('password') }}</div>@endif
+                @if ($hasError('password'))<div class="text-red text-xs mt-2___REPLACED">{{ $errors->first('password') }}</div>@endif
             </div>
             <div class="flex justify-between items-center">
                 <label for="remember-me" class="flex items-center cursor-pointer">
                     <input type="checkbox" name="remember" id="remember-me">
-                    <span class="ml-2">{{ __('Remember me') }}</span>
+                    <span class="ml-2___REPLACED">{{ __('Remember me') }}</span>
                 </label>
                 <button type="submit" class="btn-primary">{{ __('Log in') }}</button>
             </div>
@@ -59,7 +59,7 @@
     </login>
 </div>
 @if (! $oauth)
-    <div class="w-full text-center mt-4">
+    <div class="w-full text-center mt-4___REPLACED">
         <a href="{{ cp_route('password.request') }}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
             {{ __('Forgot password?') }}
         </a>

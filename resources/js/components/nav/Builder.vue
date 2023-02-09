@@ -2,32 +2,32 @@
 
     <div>
 
-        <header class="mb-6">
+        <header class="mb-6___REPLACED">
             <breadcrumb v-if="indexUrl" :url="indexUrl" :title="__('CP Nav Preferences')" />
 
             <div class="flex items-center">
                 <h1 class="flex-1">{{ title }}</h1>
 
-                <dropdown-list class="mr-2">
+                <dropdown-list class="mr-2___REPLACED">
                     <dropdown-item :text="__('Reset Nav Customizations')" class="warning" @click="confirmingReset = true"></dropdown-item>
                 </dropdown-list>
 
-                <a @click="discardChanges" class="text-2xs text-blue mr-4 underline" v-if="isDirty" v-text="__('Discard changes')" />
+                <a @click="discardChanges" class="text-2xs text-blue mr-4___REPLACED underline" v-if="isDirty" v-text="__('Discard changes')" />
 
                 <dropdown-list>
                     <template #trigger>
-                        <button class="btn flex items-center pr-4">
+                        <button class="btn flex items-center pr-4___REPLACED">
                             {{ __('Add Item') }}
-                            <svg-icon name="chevron-down-xs" class="w-2 ml-4" />
+                            <svg-icon name="chevron-down-xs" class="w-2 ml-4___REPLACED" />
                         </button>
                     </template>
                     <dropdown-item :text="__('Add Nav Item')" @click="addItem(topLevelTreeData)" />
                     <dropdown-item :text="__('Add Section')" @click="addSection" />
                 </dropdown-list>
 
-                <div class="ml-4 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
+                <div class="ml-4___REPLACED text-left" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
-                        class="btn-primary pl-4"
+                        class="btn-primary pl-4___REPLACED"
                         :class="{ 'disabled': !changed }"
                         :disabled="!changed"
                         @click="save"
@@ -39,10 +39,10 @@
                                 <svg-icon name="chevron-down-xs" class="w-2" />
                             </button>
                         </template>
-                        <h6 class="p-2">{{ __('Save to') }}...</h6>
+                        <h6 class="p-2___REPLACED">{{ __('Save to') }}...</h6>
                         <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)" class="group">
-                            <div class="flex items-start pr-4">
-                                <svg-icon :name="option.icon" class="text-grey flex-shrink-0 mr-2 w-4 group-hover:text-white" />
+                            <div class="flex items-start pr-4___REPLACED">
+                                <svg-icon :name="option.icon" class="text-grey flex-shrink-0 mr-2___REPLACED w-4 group-hover:text-white" />
                                 <span class="whitespace-normal">{{ option.label }}</span>
                             </div>
                         </dropdown-item>
@@ -51,14 +51,14 @@
             </div>
         </header>
 
-        <div class="mb-2 flex justify-end">
+        <div class="mb-2___REPLACED flex justify-end">
             <a
-                class="text-2xs text-blue mr-4 underline"
+                class="text-2xs text-blue mr-4___REPLACED underline"
                 v-text="__('Expand All')"
                 @click="expandAll"
             />
             <a
-                class="text-2xs text-blue mr-2 underline"
+                class="text-2xs text-blue mr-2___REPLACED underline"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />
@@ -68,7 +68,7 @@
             <draggable-tree
                 draggable
                 cross-tree
-                class="mb-8"
+                class="mb-8___REPLACED"
                 :class="{ 'section-placeholder-inner': showTopLevelSectionPlaceholder }"
                 ref="topLevelTree"
                 :data="topLevelTreeData"

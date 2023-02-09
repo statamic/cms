@@ -3,15 +3,15 @@
    ========================================================================== */
 
 .revision-list {
-    // @apply pb-4;
+    // @apply pb-4___REPLACED;
 }
 
 .revision-date {
-    @apply p-4 pb-2 mt-4;
+    @apply p-4___REPLACED pb-2___REPLACED mt-4___REPLACED;
 }
 
 .revision-item {
-    @apply p-2 text-sm block cursor-pointer border-t;
+    @apply p-2___REPLACED text-sm block cursor-pointer border-t;
     &:hover {
         @apply bg-grey-20;
     }
@@ -34,7 +34,7 @@
 }
 
 .revision-item .badge {
-    @apply uppercase text-4xs ml-2 text-white rounded-sm;
+    @apply uppercase text-4xs ml-2___REPLACED text-white rounded-sm;
     height: 16px;
 
     &.publish { @apply bg-green-light; }
@@ -44,7 +44,7 @@
 }
 
 .revision-item-note {
-    @apply text-sm text-grey-80 font-medium mb-1;
+    @apply text-sm text-grey-80 font-medium mb-1___REPLACED;
     width: 300px;
 }
 

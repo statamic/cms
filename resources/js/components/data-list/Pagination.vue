@@ -33,7 +33,7 @@
 
             <select-input
                 v-if="perPage && isPerPageEvenUseful"
-                class="ml-6"
+                class="ml-6___REPLACED"
                 name="perPage"
                 :placeholder="__('Per Page')"
                 :options="perPageOptions"

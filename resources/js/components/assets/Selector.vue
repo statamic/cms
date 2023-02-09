@@ -17,13 +17,13 @@
                     @asset-doubleclicked="select">
 
                     <template slot="contextual-actions" v-if="browserSelections.length">
-                        <button class="btn action mb-6" @click="browserSelections = []">{{ __('Uncheck All') }}</button>
+                        <button class="btn action mb-6___REPLACED" @click="browserSelections = []">{{ __('Uncheck All') }}</button>
                     </template>
 
                 </asset-browser>
             </div>
 
-            <div class="p-4 border-t flex items-center justify-between bg-grey-20">
+            <div class="p-4___REPLACED border-t flex items-center justify-between bg-grey-20">
                 <div class="text-sm text-grey-70"
                     v-text="hasMaxFiles
                         ? __n(':count/:max selected', browserSelections, { max: maxFiles })
@@ -39,7 +39,7 @@
 
                     <button
                         type="button"
-                        class="btn-primary ml-2"
+                        class="btn-primary ml-2___REPLACED"
                         @click="select">
                         {{ __('Select') }}
                     </button>

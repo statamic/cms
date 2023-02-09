@@ -1,24 +1,24 @@
 <template>
 
     <div>
-        <header class="mb-6">
+        <header class="mb-6___REPLACED">
             <breadcrumb :url="globalsUrl" :title="__('Globals')" />
 
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
 
-                <div class="pt-px text-2xs text-grey-60 ml-4 flex" v-if="! canEdit">
-                    <svg-icon name="lock" class="w-4 mr-1 -mt-sm" /> {{ __('Read Only') }}
+                <div class="pt-px text-2xs text-grey-60 ml-4___REPLACED flex" v-if="! canEdit">
+                    <svg-icon name="lock" class="w-4 mr-1___REPLACED -mt-sm" /> {{ __('Read Only') }}
                 </div>
 
-                <dropdown-list v-if="canConfigure || canEditBlueprint" class="mr-2">
+                <dropdown-list v-if="canConfigure || canEditBlueprint" class="mr-2___REPLACED">
                     <dropdown-item v-if="canConfigure" v-text="__('Configure')" :redirect="configureUrl" />
                     <dropdown-item v-if="canEditBlueprint" :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
                 </dropdown-list>
 
                 <site-selector
                     v-if="localizations.length > 1"
-                    class="mr-4"
+                    class="mr-4___REPLACED"
                     :sites="localizations"
                     :value="site"
                     @input="localizationSelected"
@@ -36,9 +36,9 @@
             </div>
         </header>
 
-        <div v-if="fieldset.empty" class="text-center mt-10 border-2 border-dashed rounded-lg px-8 py-30">
+        <div v-if="fieldset.empty" class="text-center mt-10___REPLACED border-2 border-dashed rounded-lg px-8___REPLACED py-30___REPLACED">
             <div class="max-w-md mx-auto opacity-50">
-                <h1 class="my-6" v-text="__('This Global Set has no fields.')" />
+                <h1 class="my-6___REPLACED" v-text="__('This Global Set has no fields.')" />
                 <p v-text="__('messages.global_set_no_fields_description')" />
             </div>
         </div>

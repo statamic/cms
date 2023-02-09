@@ -4,7 +4,7 @@
         <div
             v-for="(block, i) in blocks"
             :key="i"
-            class="p-4"
+            class="p-4___REPLACED"
         >
             <pre
                 class="whitespace-pre-wrap leading-normal text-xs font-mono"
@@ -12,7 +12,7 @@
                 v-text="block.text" />
 
             <div
-                class="border border-dashed p-2 rounded text-xs"
+                class="border border-dashed p-2___REPLACED rounded text-xs"
                 v-if="block.type === 'set'"
                 v-text="setDisplay(block.set)" />
         </div>

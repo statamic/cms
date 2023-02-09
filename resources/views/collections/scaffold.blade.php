@@ -2,7 +2,7 @@
 @section('title', __('Scaffold Collection'))
 
 @section('content')
-    <header class="mb-6">
+    <header class="mb-6___REPLACED">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('collections.show', $collection->handle()),
             'title' => $collection->title()

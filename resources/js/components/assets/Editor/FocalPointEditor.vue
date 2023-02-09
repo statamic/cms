@@ -2,7 +2,7 @@
 
     <div class="focal-point">
         <div class="focal-point-toolbox card p-0">
-            <div class="p-4">
+            <div class="p-4___REPLACED">
                 <label>{{ __('Focal Point') }}</label>
                 <small class="help-block">{{ __('messages.focal_point_instructions') }}</small>
                 <div class="focal-point-image">
@@ -17,29 +17,29 @@
                     }"></div>
                 </div>
             </div>
-            <div class="flex items-center text-sm justify-center mb-4">
-                <div class="flex items-center mx-4">
-                    <div class="mr-1">X</div>
+            <div class="flex items-center text-sm justify-center mb-4___REPLACED">
+                <div class="flex items-center mx-4___REPLACED">
+                    <div class="mr-1___REPLACED">X</div>
                     <div class="value">{{ x }}<sup>%</sup></div>
                 </div>
-                <div class="flex items-center mx-4">
-                    <div class="mr-1">Y</div>
+                <div class="flex items-center mx-4___REPLACED">
+                    <div class="mr-1___REPLACED">Y</div>
                     <div class="value">{{ y }}<sup>%</sup></div>
                 </div>
-                <div class="flex items-center mx-4">
-                    <div class="mr-1">Z</div>
+                <div class="flex items-center mx-4___REPLACED">
+                    <div class="mr-1___REPLACED">Z</div>
                     <div class="value">{{ z }}</div>
                 </div>
             </div>
-            <div class="px-4">
-                <input type="range" v-model="z" min="1" max="10" step="0.1" class="w-full mb-4" />
-                <div class="mb-2 flex flex-wrap items-center justify-center">
-                    <button type="button" class="btn mb-2" @click.prevent="close">{{ __('Cancel') }}</button>
-                    <button type="button" class="btn mb-2 btn-default mx-2" @click.prevent="reset">{{ __('Reset') }}</button>
-                    <button type="button" class="btn mb-2 btn-primary" @click="select">{{ __('Finish') }}</button>
+            <div class="px-4___REPLACED">
+                <input type="range" v-model="z" min="1" max="10" step="0.1" class="w-full mb-4___REPLACED" />
+                <div class="mb-2___REPLACED flex flex-wrap items-center justify-center">
+                    <button type="button" class="btn mb-2___REPLACED" @click.prevent="close">{{ __('Cancel') }}</button>
+                    <button type="button" class="btn mb-2___REPLACED btn-default mx-2___REPLACED" @click.prevent="reset">{{ __('Reset') }}</button>
+                    <button type="button" class="btn mb-2___REPLACED btn-primary" @click="select">{{ __('Finish') }}</button>
                 </div>
             </div>
-            <h6 class="p-4 text-center bg-grey-30 rounded-b">{{ __('messages.focal_point_previews_are_examples') }}</h6>
+            <h6 class="p-4___REPLACED text-center bg-grey-30 rounded-b">{{ __('messages.focal_point_previews_are_examples') }}</h6>
         </div>
         <div v-for="n in 9" :key="n"
              :class="`frame frame-${n}`">

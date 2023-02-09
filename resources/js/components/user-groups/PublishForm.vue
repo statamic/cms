@@ -1,7 +1,7 @@
 <template>
 
         <div>
-            <publish-fields-container class="card p-0 mb-6">
+            <publish-fields-container class="card p-0 mb-6___REPLACED">
 
                 <form-group
                     :display="__('Title')"
@@ -21,7 +21,7 @@
                     v-model="handle"
                 />
 
-                <div class="text-xs text-red p-6 pt-0" v-if="initialHandle && handle != initialHandle">
+                <div class="text-xs text-red p-6___REPLACED pt-0" v-if="initialHandle && handle != initialHandle">
                     {{ __('messages.role_change_handle_warning') }}
                 </div>
 
@@ -45,11 +45,11 @@
                                 @input="roles = $event" />
                         </div>
                     </publish-field-meta>
-                    <small class="help-block text-red mt-2 mb-0" v-if="errors.roles" v-text="errors.roles[0]" />
+                    <small class="help-block text-red mt-2___REPLACED mb-0" v-if="errors.roles" v-text="errors.roles[0]" />
                 </div>
 
             </publish-fields-container>
-            <div class="py-4 border-t flex justify-between">
+            <div class="py-4___REPLACED border-t flex justify-between">
                 <a :href="action" class="btn" v-text="__('Cancel') "/>
                 <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
             </div>

@@ -5,17 +5,17 @@
 
     @if ($requestError)
 
-        <div class="no-results md:pt-30 max-w-2xl mx-auto">
+        <div class="no-results md:pt-30___REPLACED max-w-2xl mx-auto">
             <div class="flex flex-wrap items-center">
                 <div class="w-full md:w-1/2">
-                    <h1 class="mb-8">{{ __('Updates') }}</h1>
-                    <p class="text-grey-70 leading-normal mb-8 text-lg antialiased">
+                    <h1 class="mb-8___REPLACED">{{ __('Updates') }}</h1>
+                    <p class="text-grey-70 leading-normal mb-8___REPLACED text-lg antialiased">
                         {{ __('statamic::messages.outpost_issue_try_later') }}
                     </p>
                     <a href="{{ cp_route('updater') }}"
                         class="btn-primary btn-lg">{{ __('Try again') }}</a>
                 </div>
-                <div class="hidden md:block w-1/2 pl-16">
+                <div class="hidden md:block w-1/2 pl-16___REPLACED">
                     @cp_svg('empty/navigation')
                 </div>
             </div>
@@ -23,12 +23,12 @@
 
     @else
 
-        <div class="flex mb-6">
+        <div class="flex mb-6___REPLACED">
             <h1 class="flex-1">{{ __('Updates') }}</h1>
         </div>
 
-        <h6 class="mt-8">Core</h6>
-        <div class="card p-0 mt-2">
+        <h6 class="mt-8___REPLACED">Core</h6>
+        <div class="card p-0 mt-2___REPLACED">
             <table class="data-table">
                 <tr>
                     <td class="w-64"><a href="{{ route('statamic.cp.updater.product', 'statamic') }}" class="text-blue font-bold">Statamic</a></td>
@@ -42,13 +42,13 @@
             </table>
         </div>
 
-        <h6 class="mt-8">{{ __('Addons') }}</h6>
-        <div class="card p-0 mt-2">
+        <h6 class="mt-8___REPLACED">{{ __('Addons') }}</h6>
+        <div class="card p-0 mt-2___REPLACED">
             <table class="data-table">
                 @foreach ($addons as $addon)
                 <tr>
                     <td class="w-64"><a href="{{ route('statamic.cp.updater.product', $addon -> slug()) }}"
-                            class="text-blue font-bold mr-2">{{ $addon -> name() }}</a>
+                            class="text-blue font-bold mr-2___REPLACED">{{ $addon -> name() }}</a>
                     <td>{{ $addon -> version() }}</td>
                     @if ($count = $addon->changelog()->availableUpdatesCount())
                     <td class="text-right"><span
@@ -61,8 +61,8 @@
             </table>
         </div>
 
-        <h6 class="mt-8">{{ __('Unlisted Addons') }}</h6>
-        <div class="card p-0 mt-2">
+        <h6 class="mt-8___REPLACED">{{ __('Unlisted Addons') }}</h6>
+        <div class="card p-0 mt-2___REPLACED">
             <table class="data-table">
                 @foreach ($unlistedAddons as $addon)
                     <tr>

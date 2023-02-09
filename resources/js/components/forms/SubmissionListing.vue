@@ -26,7 +26,7 @@
                         />
                     </div>
 
-                    <div v-show="items.length === 0" class="p-6 text-center text-grey-50" v-text="__('No results')" />
+                    <div v-show="items.length === 0" class="p-6___REPLACED text-center text-grey-50" v-text="__('No results')" />
 
                     <data-list-bulk-actions
                         :url="actionUrl"
@@ -61,7 +61,7 @@
                 </div>
 
                 <data-list-pagination
-                    class="mt-6"
+                    class="mt-6___REPLACED"
                     :resource-meta="meta"
                     :per-page="perPage"
                     :show-totals="true"

@@ -4,20 +4,20 @@
 
             <popover v-if="filters.length">
                 <template slot="trigger">
-                    <button class="input-group-prepend cursor-pointer px-4" @click="resetFilterPopover">
+                    <button class="input-group-prepend cursor-pointer px-4___REPLACED" @click="resetFilterPopover">
                         {{ __('Filter') }}
-                        <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-1"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
+                        <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-1___REPLACED"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>
                 </template>
                 <template #default="{ close: closePopover, afterClosed: afterPopoverClosed }">
                     <div class="flex flex-col text-left w-64">
-                        <h6 class="p-4 pb-0" v-text="__('Show everything where:')"/>
-                        <div v-if="showFilterSelection" class="p-4 pt-2">
+                        <h6 class="p-4___REPLACED pb-0" v-text="__('Show everything where:')"/>
+                        <div v-if="showFilterSelection" class="p-4___REPLACED pt-2___REPLACED">
                             <button
                                 v-for="filter in unpinnedFilters"
                                 :key="filter.handle"
                                 v-text="filter.title"
-                                class="btn w-full mt-2"
+                                class="btn w-full mt-2___REPLACED"
                                 @click="creating = filter.handle"
                             />
                         </div>
@@ -53,18 +53,18 @@
             <template v-if="isFiltering">
                 <popover v-if="canSave" placement="bottom-end" ref="savePopover">
                     <template slot="trigger">
-                        <button class="input-group-item px-3">{{ __('Save') }}</button>
+                        <button class="input-group-item px-3___REPLACED">{{ __('Save') }}</button>
                     </template>
-                    <div class="p-4 w-96">
-                        <h6 v-text="__('Filter preset name')" class="mb-2" />
+                    <div class="p-4___REPLACED w-96">
+                        <h6 v-text="__('Filter preset name')" class="mb-2___REPLACED" />
                         <div class="flex items-center">
                             <input class="input-text border-r rounded-r" type="text" v-model="savingPresetName" @keydown.enter="save" ref="savedFilterName">
-                            <button class="btn-primary ml-2" @click="save" :disabled="saving || ! savingPresetName">Save</button>
+                            <button class="btn-primary ml-2___REPLACED" @click="save" :disabled="saving || ! savingPresetName">Save</button>
                         </div>
                     </div>
                 </popover>
-                <button v-if="isDirty" class="input-group-item px-3" @click="reset">{{ __('Reset') }}</button>
-                <button v-if="activePreset" class="flex items-center input-group-item px-3" @click="deleting = true"><svg-icon name="trash" class="w-4 h-4" /></button>
+                <button v-if="isDirty" class="input-group-item px-3___REPLACED" @click="reset">{{ __('Reset') }}</button>
+                <button v-if="activePreset" class="flex items-center input-group-item px-3___REPLACED" @click="deleting = true"><svg-icon name="trash" class="w-4 h-4" /></button>
                 <confirmation-modal
                     v-if="deleting"
                     :title="__('Delete Preset')"
@@ -78,9 +78,9 @@
 
             <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle" placement="bottom-end">
                 <template slot="trigger">
-                    <button class="input-group-item px-3">
+                    <button class="input-group-item px-3___REPLACED">
                         {{ filter.title }}
-                        <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-1"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
+                        <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-1___REPLACED"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>
                 </template>
                 <template #default="{ close: closePopover }">
@@ -98,12 +98,12 @@
 
         </div>
 
-        <div class="flex flex-wrap mt-2" v-if="activeCount">
-            <div class="filter-badge mr-2" v-for="(badge, handle) in fieldFilterBadges">
+        <div class="flex flex-wrap mt-2___REPLACED" v-if="activeCount">
+            <div class="filter-badge mr-2___REPLACED" v-for="(badge, handle) in fieldFilterBadges">
                 <span>{{ badge }}</span>
                 <button @click="removeFieldFilter(handle)">&times;</button>
             </div>
-            <div class="filter-badge mr-2" v-for="(badge, handle) in standardBadges">
+            <div class="filter-badge mr-2___REPLACED" v-for="(badge, handle) in standardBadges">
                 <span>{{ badge }}</span>
                 <button @click="removeStandardFilter(handle)">&times;</button>
             </div>

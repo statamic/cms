@@ -1,7 +1,7 @@
 <template>
-    <div class="range-fieldtype-wrapper bg-grey-20 rounded py-2 px-4 border">
+    <div class="range-fieldtype-wrapper bg-grey-20 rounded py-2___REPLACED px-4___REPLACED border">
         <div class="flex items-center">
-            <div v-if="config.prepend" v-text="config.prepend" class="mr-2" />
+            <div v-if="config.prepend" v-text="config.prepend" class="mr-2___REPLACED" />
             <input
                 type="range"
                 v-model="val"
@@ -15,7 +15,7 @@
                 :id="fieldId"
                 class="flex-1 min-w-0"
             />
-            <div class="rounded border px-2 py-1 mx-2 bg-grey-10">{{ val }}</div>
+            <div class="rounded border px-2___REPLACED py-1___REPLACED mx-2___REPLACED bg-grey-10">{{ val }}</div>
             <div v-if="config.append" v-text="config.append" />
         </div>
     </div>

@@ -23,15 +23,15 @@
             />
         </div>
 
-        <div class="blueprint-section-field-actions flex mt-2 -mx-sm">
-            <div class="px-1">
+        <div class="blueprint-section-field-actions flex mt-2___REPLACED -mx-sm">
+            <div class="px-1___REPLACED">
                 <link-fields
                     :exclude-fieldset="excludeFieldset"
                     @linked="$emit('field-linked', $event)" />
             </div>
-            <div class="px-1">
+            <div class="px-1___REPLACED">
                 <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
-                    <svg-icon name="wireframe" class="mr-2 w-4 h-4" />
+                    <svg-icon name="wireframe" class="mr-2___REPLACED w-4 h-4" />
                     {{ __('Create Field') }}
                 </button>
             </div>

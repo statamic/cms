@@ -20,29 +20,29 @@
             tabindex="-1"
         />
 
-        <span v-if="! (isDirty || searching)" class="rounded px-1 pb-px text-2xs border text-grey-60">/</span>
+        <span v-if="! (isDirty || searching)" class="rounded px-1___REPLACED pb-px text-2xs border text-grey-60">/</span>
         <loading-graphic v-if="searching" :size="14" :inline="true" text="" class="global-search-loading-indicator" />
 
         <div v-show="focused && (hasResults || hasFavorites)" class="global-search-results">
 
-            <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-2 flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
+            <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-2___REPLACED flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
                 <svg-icon :name="getResultIcon(result)" class="icon"></svg-icon>
-                <div class="flex-1 ml-2 title" v-html="result.title"></div>
-                <span class="rounded px-1 py-px text-2xs uppercase bg-grey-20 text-grey" v-text="result.badge" />
+                <div class="flex-1 ml-2___REPLACED title" v-html="result.title"></div>
+                <span class="rounded px-1___REPLACED py-px text-2xs uppercase bg-grey-20 text-grey" v-text="result.badge" />
             </div>
 
             <div v-if="! hasResults && hasFavorites">
-                <div class="px-3 py-2 text-grey uppercase text-3xs">{{ __('Your Favorites') }}</div>
+                <div class="px-3___REPLACED py-2___REPLACED text-grey uppercase text-3xs">{{ __('Your Favorites') }}</div>
 
                 <div v-for="(favorite, index) in favorites" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousemove="setActive(index)">
-                    <div class="flex items-center flex-1 p-2" @click="hit">
+                    <div class="flex items-center flex-1 p-2___REPLACED" @click="hit">
                         <svg-icon name="pin" class="icon w-4 h-4"></svg-icon>
-                        <div class="ml-2 title" v-text="favorite.name"></div>
+                        <div class="ml-2___REPLACED title" v-text="favorite.name"></div>
                     </div>
-                    <div class="p-2 text-grey-60 hover:text-grey-80" @click="removeFavorite(favorite)">&times;</div>
+                    <div class="p-2___REPLACED text-grey-60 hover:text-grey-80" @click="removeFavorite(favorite)">&times;</div>
                 </div>
 
-                <div class="text-grey text-xs px-3 py-2 border-t text-center">
+                <div class="text-grey text-xs px-3___REPLACED py-2___REPLACED border-t text-center">
                     <b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b>
                     <span v-html="__('messages.global_search_open_using_slash')" />
                 </div>

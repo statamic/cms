@@ -1,6 +1,6 @@
 <template>
 
-    <div class="bg-grey-40 text-xs p-2">
+    <div class="bg-grey-40 text-xs p-2___REPLACED">
         <upload
             v-for="(upload, i) in uploads"
             :key="upload.id"

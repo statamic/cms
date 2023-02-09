@@ -5,7 +5,7 @@
 
     @unless($taxonomies->isEmpty())
 
-        <div class="flex mb-6">
+        <div class="flex mb-6___REPLACED">
             <h1 class="flex-1">{{ __('Taxonomies') }}</h1>
 
             @can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')

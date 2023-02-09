@@ -25,7 +25,7 @@
                 >
             </template>
              <template #no-options>
-                <div class="text-sm text-grey-70 text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                <div class="text-sm text-grey-70 text-left py-2___REPLACED px-4___REPLACED" v-text="__('No options to choose from.')" />
             </template>
             <template #footer="{ deselect }">
                 <sortable-list
@@ -35,7 +35,7 @@
                     @input="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="tag in value" :key="tag" class="vs__selected mt-2 sortable-item">
+                        <span v-for="tag in value" :key="tag" class="vs__selected mt-2___REPLACED sortable-item">
                             {{ tag }}
                             <button @click="deselect(tag)" type="button" :aria-label="__('Remove tag')" class="vs__deselect">
                                 <span>×</span>

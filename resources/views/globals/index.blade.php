@@ -5,7 +5,7 @@
 
     @unless($globals->isEmpty())
 
-        <div class="flex items-center mb-6">
+        <div class="flex items-center mb-6___REPLACED">
             <h1 class="flex-1">{{ __('Globals') }}</h1>
             @can('create', 'Statamic\Contracts\Globals\GlobalSet')
                 <a href="{{ cp_route('globals.create') }}" class="btn-primary">{{ __('Create Global Set') }}</a>

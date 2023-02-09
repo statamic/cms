@@ -1,8 +1,8 @@
 <template>
     <div>
-        <div class="flex items-center mb-6">
+        <div class="flex items-center mb-6___REPLACED">
             <h1 class="flex-1" v-text="addon.name" />
-            <a :href="addon.url" target="_blank" class="btn mr-4" v-text="__('View on Marketplace')" />
+            <a :href="addon.url" target="_blank" class="btn mr-4___REPLACED" v-text="__('View on Marketplace')" />
             <button v-if="addon.installed" class="btn" :disabled="processing" @click="uninstall" v-text="__('Uninstall')" />
             <button v-else class="btn btn-primary" :disabled="processing" @click="install" v-text="__('Install')" />
         </div>
@@ -16,36 +16,36 @@
             width="75%"
             @closed="showComposer = false"
         >
-            <div class="p-6 relative">
+            <div class="p-6___REPLACED relative">
                 <composer-output :package="package" />
                 <button
                     v-if="!composer.processing"
-                    class="btn-close absolute top-0 right-0 mt-4 mr-4"
+                    class="btn-close absolute top-0 right-0 mt-4___REPLACED mr-4___REPLACED"
                     aria-label="Close"
                     @click="closeModal"
                     v-html="'&times'" />
             </div>
         </modal>
         <div>
-            <div class="card mb-6 flex items-center">
+            <div class="card mb-6___REPLACED flex items-center">
                 <div class="flex-1 text-lg">
-                    <div class="little-heading p-0 mb-2 text-grey-70" v-text="__('Price')" />
+                    <div class="little-heading p-0 mb-2___REPLACED text-grey-70" v-text="__('Price')" />
                     <div class="font-bold" v-text="priceRange" />
                 </div>
                 <div class="flex-1 text-lg">
-                    <div class="little-heading p-0 mb-2 text-grey-70" v-text="__('Seller')" />
+                    <div class="little-heading p-0 mb-2___REPLACED text-grey-70" v-text="__('Seller')" />
                     <a :href="addon.seller.website" class="relative flex items-center">
-                        <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full w-6 mr-2">
+                        <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full w-6 mr-2___REPLACED">
                         <span class="font-bold">{{ addon.seller.name }}</span>
                     </a>
                 </div>
                 <div class="flex-1 text-lg" v-if="downloads">
-                    <div class="little-heading p-0 mb-2 text-grey-70" v-text="__('Downloads')" />
+                    <div class="little-heading p-0 mb-2___REPLACED text-grey-70" v-text="__('Downloads')" />
                     <div class="font-bold">{{ downloads }}</div>
                 </div>
             </div>
             <addon-editions v-if="addon.editions.length" :addon="addon" />
-            <div class="card content p-8" v-html="description" />
+            <div class="card content p-8___REPLACED" v-html="description" />
         </div>
     </div>
 </template>

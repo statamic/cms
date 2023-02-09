@@ -4,14 +4,14 @@
 
 @section('content')
 
-<header class="mb-6">
+<header class="mb-6___REPLACED">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('user-groups.index'),
             'title' => __('User Groups')
         ])
         <div class="flex items-center">
             <h1 class="flex-1">{{ $group->title() }}</h1>
-            <dropdown-list class="mr-2">
+            <dropdown-list class="mr-2___REPLACED">
                 @can('edit', $group)
                     <dropdown-item :text="__('Edit User Group')" redirect="{{ $group->editUrl() }}"></dropdown-item>
                 @endcan

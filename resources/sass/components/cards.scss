@@ -3,9 +3,9 @@
    ========================================================================== */
 
 .card {
-    @apply shadow bg-white rounded-md p-2;
+    @apply shadow bg-white rounded-md p-2___REPLACED;
 }
 
 @screen md {
-    .card { @apply p-4; }
+    .card { @apply p-4___REPLACED; }
 }

@@ -2,7 +2,7 @@
 
     <div class="blueprint-builder">
 
-        <header class="mb-6">
+        <header class="mb-6___REPLACED">
             <div class="flex items-center justify-between">
                 <h1 v-text="__('Edit Blueprint')" />
                 <button type="submit" class="btn-primary" @click.prevent="save" v-text="__('Save')" />
@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <div class="content mt-10 mb-4" v-if="useSections">
+        <div class="content mt-10___REPLACED mb-4___REPLACED" v-if="useSections">
             <h2>{{ __('Tab Sections') }}</h2>
             <p class="max-w-lg">{{ __('messages.tab_sections_instructions') }}</p>
             <div v-if="errors.sections">

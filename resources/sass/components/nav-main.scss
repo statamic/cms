@@ -7,7 +7,7 @@
     transition: all .3s;
     z-index: 9998;
 
-    h6 { @apply mt-6; }
+    h6 { @apply mt-6___REPLACED; }
 
     ul {
         @apply list-none p-0 mt-0;
@@ -27,7 +27,7 @@
         }
 
         i {
-            @apply block h-7 p-1 w-7 mr-2 rounded-full;
+            @apply block h-7 p-1___REPLACED w-7 mr-2___REPLACED rounded-full;
         }
     }
 
@@ -40,7 +40,7 @@
     }
 
     li ul {
-        @apply mb-2;
+        @apply mb-2___REPLACED;
         margin-left: 1.5rem;
 
         li {
@@ -58,7 +58,7 @@
     }
 
     .nav-section-top-level {
-        @apply mt-4;
+        @apply mt-4___REPLACED;
     }
 }
 
@@ -74,11 +74,11 @@
 }
 
 .nav-main-inner {
-    @apply pl-6 pr-4 pt-2;
+    @apply pl-6___REPLACED pr-4___REPLACED pt-2___REPLACED;
 }
 
 .nav-toggle {
-    @apply block h-6 p-1 w-6 mr-3 rounded;
+    @apply block h-6 p-1___REPLACED w-6 mr-3___REPLACED rounded;
     outline: none !important;
 
     &:hover {

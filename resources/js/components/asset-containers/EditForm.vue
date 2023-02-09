@@ -13,7 +13,7 @@
     >
         <div slot-scope="{ setFieldValue }">
             <configure-sections @updated="setFieldValue" :enable-sidebar="false"/>
-            <div class="py-4 border-t flex justify-between">
+            <div class="py-4___REPLACED border-t flex justify-between">
                 <a :href="url" class="btn" v-text="__('Cancel') "/>
                 <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>

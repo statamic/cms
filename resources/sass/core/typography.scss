@@ -51,15 +51,15 @@ a:not([class^="btn"]) {
 
 .content {
     h1 {
-        @apply mb-2 font-medium;
+        @apply mb-2___REPLACED font-medium;
     }
 
     h2, h3, h4, h5, h6 {
-        @apply mb-2 font-bold;
+        @apply mb-2___REPLACED font-bold;
     }
 
     p, ol, ul, pre {
-        @apply text-grey-70 text-sm leading-normal mb-2;
+        @apply text-grey-70 text-sm leading-normal mb-2___REPLACED;
 
         a {
             @apply text-blue;
@@ -77,7 +77,7 @@ a:not([class^="btn"]) {
 
     pre {
         background-color: #f9f2f4;
-        @apply p-2;
+        @apply p-2___REPLACED;
 
         code {
             @apply p-0;
@@ -279,7 +279,7 @@ code {
     }
 
     .highlight {
-        @apply mb-4;
+        @apply mb-4___REPLACED;
 
         pre {
             margin-bottom: 0;
@@ -289,7 +289,7 @@ code {
 
     .highlight pre,
     pre {
-        @apply p-4 bg-grey-30 rounded;
+        @apply p-4___REPLACED bg-grey-30 rounded;
         overflow: auto;
         font-size: 85%;
         line-height: 1.45;
