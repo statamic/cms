@@ -7,7 +7,7 @@
                 </button>
             </template>
             <div class="p-2 pb-1">
-                <h6 class="mb-1">{{ __('Pin to Favorites') }}</h6>
+                <h6 class="mb-2___REPLACED">{{ __('Pin to Favorites') }}</h6>
                 <div class="flex items-center">
                     <input type="text" class="input-text w-auto" ref="fave" v-model="name" @keydown.enter="save" />
                     <button @click="save" class="btn-primary ml-1">{{ __('Save') }}</button>

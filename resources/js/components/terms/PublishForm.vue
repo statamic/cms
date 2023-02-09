@@ -128,7 +128,7 @@
                                 </div>
 
                                 <div class="border-t p-2" v-if="revisionsEnabled">
-                                    <label class="publish-field-label font-medium mb-1" v-text="__('Revisions')"/>
+                                    <label class="publish-field-label font-medium mb-2___REPLACED" v-text="__('Revisions')"/>
                                     <div class="mb-1___REPLACED flex items-center" v-if="published">
                                         <span class="text-green w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('Entry has a published version')"></span>
@@ -160,7 +160,7 @@
                                 -->
 
                                 <div class="p-2 border-t" v-if="localizations.length > 1">
-                                    <label class="publish-field-label font-medium mb-1" v-text="__('Sites')" />
+                                    <label class="publish-field-label font-medium mb-2___REPLACED" v-text="__('Sites')" />
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"

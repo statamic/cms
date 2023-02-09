@@ -57,7 +57,7 @@
                             <a :href="addon.seller.website" class="relative">
                                 <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 bg-white relative -mt-4 border-2 border-white inline">
                             </a>
-                            <div class="addon-card-title mb-1 text-lg font-bold text-center">{{ addon.name }}</div>
+                            <div class="addon-card-title mb-2___REPLACED text-lg font-bold text-center">{{ addon.name }}</div>
                             <p class="text-grey mb-2" v-text="getPriceRange(addon)" />
                             <p v-text="addon.summary" class="text-sm"></p>
                         </div>

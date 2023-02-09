@@ -12,7 +12,7 @@
         @if ($oauth)
             <div class="login-oauth-providers">
                 @foreach ($providers as $provider)
-                    <div class="provider mb-1">
+                    <div class="provider mb-2___REPLACED">
                         <a href="{{ $provider->loginUrl() }}?redirect={{ parse_url(cp_route('index'))['path'] }}" class="btn block btn-primary">
                             {{ __('Log in with :provider', ['provider' => $provider->label()]) }}
                         </a>
@@ -37,13 +37,13 @@
             <input type="hidden" name="referer" value="{{ $referer }}" />
 
             <div class="mb-8___REPLACED">
-                <label class="mb-1" for="input-email">{{ __('Email') }}</label>
+                <label class="mb-2___REPLACED" for="input-email">{{ __('Email') }}</label>
                 <input type="text" class="input-text input-text" name="email" value="{{ old('email') }}" autofocus id="input-email">
                 @if ($hasError('email'))<div class="text-red text-xs mt-1">{{ $errors->first('email') }}</div>@endif
             </div>
 
             <div class="mb-8___REPLACED">
-                <label class="mb-1" for="input-password">{{ __('Password') }}</label>
+                <label class="mb-2___REPLACED" for="input-password">{{ __('Password') }}</label>
                 <input type="password" class="input-text input-text" name="password" id="input-password">
                 @if ($hasError('password'))<div class="text-red text-xs mt-1">{{ $errors->first('password') }}</div>@endif
             </div>

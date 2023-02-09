@@ -44,7 +44,7 @@
             </div>
             <div v-if="canSelectOrCreate" class="relationship-input-buttons relative" :class="{ 'mt-2': items.length > 0 }" >
                 <div class="flex flex-wrap items-center text-sm -mb-1">
-                    <div class="relative mb-1">
+                    <div class="relative mb-2___REPLACED">
                         <create-button
                             v-if="canCreate && creatables.length"
                             :creatables="creatables"
@@ -54,7 +54,7 @@
                             @created="itemCreated"
                         />
                     </div>
-                    <button ref="existing" class="text-blue hover:text-grey-80 flex mb-1 outline-none" @click.prevent="isSelecting = true">
+                    <button ref="existing" class="text-blue hover:text-grey-80 flex mb-2___REPLACED outline-none" @click.prevent="isSelecting = true">
                         <svg-icon name="hyperlink" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
                         {{ __('Link Existing Item') }}
                     </button>

@@ -25,7 +25,7 @@
         </form>
     </div>
 
-    <h2 class="mt-5 mb-1 font-bold text-lg">{{ __('Configuration') }}</h2>
+    <h2 class="mt-5 mb-2___REPLACED font-bold text-lg">{{ __('Configuration') }}</h2>
     <p class="text-sm text-grey mb-2">{!! __('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) !!}</p>
     <div class="card p-0">
         <table class="data-table">

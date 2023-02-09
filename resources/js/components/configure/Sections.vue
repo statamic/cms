@@ -2,7 +2,7 @@
     <element-container @resized="containerWidth = $event.width">
         <div>
             <div v-for="section in mainSections" :key="section.handle">
-                <div class="mb-1 content">
+                <div class="mb-2___REPLACED content">
                     <h2 v-text="section.display" class="text-base" />
                     <p v-html="section.instructions" />
                 </div>

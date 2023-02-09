@@ -17,7 +17,7 @@
 
                 <div class="publish-field mb-8___REPLACED" :class="{ 'has-error': validate }">
                     <div class="field-inner">
-                        <label class="text-sm font-medium mb-1">{{ __('Display') }} <span class="text-red">*</span></label>
+                        <label class="text-sm font-medium mb-2___REPLACED">{{ __('Display') }} <span class="text-red">*</span></label>
                         <text-input v-model="section" :focus="true" />
                         <div v-if="validate" class="help-block text-red mt-1"><p>{{ __('statamic::validation.required') }}</p></div>
                     </div>

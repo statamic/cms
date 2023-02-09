@@ -16,7 +16,7 @@
             @endif
 
             <div class="mb-8___REPLACED">
-                <label for="email"  class="mb-1">{{ __('Email Address') }}</label>
+                <label for="email"  class="mb-2___REPLACED">{{ __('Email Address') }}</label>
 
                 <input id="email" type="email" class="input-text input-text" name="email" value="{{ $email ?? old('email') }}" autofocus required>
 
@@ -26,7 +26,7 @@
             </div>
 
             <div class="mb-8___REPLACED">
-                <label for="password" class="mb-1">{{ __('Password') }}</label>
+                <label for="password" class="mb-2___REPLACED">{{ __('Password') }}</label>
 
                 <input id="password" type="password" class="input-text input-text" name="password" required>
 
@@ -36,7 +36,7 @@
             </div>
 
             <div class="mb-8___REPLACED">
-                <label for="password-confirm" class="mb-1">{{ __('Confirm Password') }}</label>
+                <label for="password-confirm" class="mb-2___REPLACED">{{ __('Confirm Password') }}</label>
 
                 <input id="password-confirm" type="password" class="input-text input-text" name="password_confirmation" required>
             </div>

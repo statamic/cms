@@ -1,7 +1,7 @@
 <template>
     <div>
 
-        <div class="mb-1 flex justify-end">
+        <div class="mb-2___REPLACED flex justify-end">
             <a
                 class="text-2xs text-blue mr-2 underline"
                 v-text="__('Expand All')"

@@ -9,7 +9,7 @@
                 @cp_svg('book-pages')
             </div>
             <div class="flex-1">
-                <h3 class="mb-1 text-blue">{{ __('Read the Documentation') }}</h3>
+                <h3 class="mb-2___REPLACED text-blue">{{ __('Read the Documentation') }}</h3>
                 <p>{{ __('statamic::messages.getting_started_widget_docs') }}</p>
             </div>
         </a>
@@ -19,7 +19,7 @@
                 @cp_svg('pro-ribbon')
             </div>
             <div class="flex-1">
-                <h3 class="mb-1 text-blue">{{ __('Enable Pro Mode') }}</h3>
+                <h3 class="mb-2___REPLACED text-blue">{{ __('Enable Pro Mode') }}</h3>
                 <p>{{ __('statamic::messages.getting_started_widget_pro') }}</p>
             </div>
         </a>
@@ -29,7 +29,7 @@
                 @cp_svg('content-writing')
             </div>
             <div class="flex-1">
-                <h3 class="mb-1 text-blue">{{ __('Create a Collection') }}</h3>
+                <h3 class="mb-2___REPLACED text-blue">{{ __('Create a Collection') }}</h3>
                 <p>{{ __('statamic::messages.getting_started_widget_collections') }}</p>
             </div>
         </a>
@@ -38,7 +38,7 @@
                 @cp_svg('blueprints')
             </div>
             <div class="flex-1">
-                <h3 class="mb-1 text-blue">{{ __('Create a Blueprint') }}</h3>
+                <h3 class="mb-2___REPLACED text-blue">{{ __('Create a Blueprint') }}</h3>
                 <p>{{ __('statamic::messages.getting_started_widget_blueprints') }}</p>
             </div>
         </a>
@@ -47,7 +47,7 @@
                 @cp_svg('hierarchy-files')
             </div>
             <div class="flex-1">
-                <h3 class="mb-1 text-blue">{{ __('Create a Navigation') }}</h3>
+                <h3 class="mb-2___REPLACED text-blue">{{ __('Create a Navigation') }}</h3>
                 <p>{{ __('statamic::messages.getting_started_widget_navigation') }}</p>
             </div>
         </a>

@@ -2,7 +2,7 @@
 
     <div>
         <div v-if="hasMultipleSites">
-            <div class="radio-fieldtype mb-1">
+            <div class="radio-fieldtype mb-2___REPLACED">
                 <radio-fieldtype :handle="`${handle}_mode`" :value="mode" @input="setMode" :config="{
                     inline: true,
                     options: {

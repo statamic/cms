@@ -33,10 +33,10 @@
             </div>
             <div class="px-2">
                 <input type="range" v-model="z" min="1" max="10" step="0.1" class="w-full mb-2" />
-                <div class="mb-1 flex flex-wrap items-center justify-center">
-                    <button type="button" class="btn mb-1" @click.prevent="close">{{ __('Cancel') }}</button>
-                    <button type="button" class="btn mb-1 btn-default mx-2___REPLACED" @click.prevent="reset">{{ __('Reset') }}</button>
-                    <button type="button" class="btn mb-1 btn-primary" @click="select">{{ __('Finish') }}</button>
+                <div class="mb-2___REPLACED flex flex-wrap items-center justify-center">
+                    <button type="button" class="btn mb-2___REPLACED" @click.prevent="close">{{ __('Cancel') }}</button>
+                    <button type="button" class="btn mb-2___REPLACED btn-default mx-2___REPLACED" @click.prevent="reset">{{ __('Reset') }}</button>
+                    <button type="button" class="btn mb-2___REPLACED btn-primary" @click="select">{{ __('Finish') }}</button>
                 </div>
             </div>
             <h6 class="p-2 text-center bg-grey-30 rounded-b">{{ __('messages.focal_point_previews_are_examples') }}</h6>

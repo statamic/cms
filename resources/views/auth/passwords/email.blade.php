@@ -19,7 +19,7 @@
             @csrf
 
             <div class="mb-8___REPLACED">
-                <label for="email" class="mb-1">{{ __('Email Address') }}</label>
+                <label for="email" class="mb-2___REPLACED">{{ __('Email Address') }}</label>
                 <input id="email" type="text" class="input-text input-text" name="email" value="{{ old('email') }}" >
 
                 @error('email', 'user.forgot_password')

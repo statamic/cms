@@ -29,7 +29,7 @@
 
     @foreach (Statamic\Facades\Collection::all() as $collection)
         @if ($loop->first)
-        <h3 class="little-heading pl-0 mb-1">{{ __('Collections') }}</h3>
+        <h3 class="little-heading pl-0 mb-2___REPLACED">{{ __('Collections') }}</h3>
         <div class="card p-0 mb-2">
             <table class="data-table">
         @endif
@@ -53,7 +53,7 @@
 
     @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
         @if ($loop->first)
-        <h3 class="little-heading pl-0 mb-1">{{ __('Taxonomies') }}</h3>
+        <h3 class="little-heading pl-0 mb-2___REPLACED">{{ __('Taxonomies') }}</h3>
         <div class="card p-0 mb-2">
             <table class="data-table">
         @endif
@@ -77,7 +77,7 @@
 
     @foreach (Statamic\Facades\Nav::all() as $nav)
         @if ($loop->first)
-        <h3 class="little-heading pl-0 mb-1">{{ __('Navigation') }}</h3>
+        <h3 class="little-heading pl-0 mb-2___REPLACED">{{ __('Navigation') }}</h3>
         <div class="card p-0 mb-2">
             <table class="data-table">
         @endif
@@ -97,7 +97,7 @@
 
     @foreach (Statamic\Facades\GlobalSet::all() as $set)
         @if ($loop->first)
-        <h3 class="little-heading pl-0 mb-1">{{ __('Globals') }}</h3>
+        <h3 class="little-heading pl-0 mb-2___REPLACED">{{ __('Globals') }}</h3>
         <div class="card p-0 mb-2">
             <table class="data-table">
         @endif
@@ -117,7 +117,7 @@
 
     @foreach (Statamic\Facades\AssetContainer::all() as $container)
         @if ($loop->first)
-        <h3 class="little-heading pl-0 mb-1">{{ __('Asset Containers') }}</h3>
+        <h3 class="little-heading pl-0 mb-2___REPLACED">{{ __('Asset Containers') }}</h3>
         <div class="card p-0 mb-2">
             <table class="data-table">
         @endif
@@ -137,7 +137,7 @@
 
     @foreach (Statamic\Facades\Form::all() as $form)
         @if ($loop->first)
-        <h3 class="little-heading pl-0 mb-1">{{ __('Forms') }}</h3>
+        <h3 class="little-heading pl-0 mb-2___REPLACED">{{ __('Forms') }}</h3>
         <div class="card p-0 mb-2">
             <table class="data-table">
         @endif
@@ -155,7 +155,7 @@
     </div>
     @endforeach
 
-    <h3 class="little-heading pl-0 mb-1">{{ __('Other') }}</h3>
+    <h3 class="little-heading pl-0 mb-2___REPLACED">{{ __('Other') }}</h3>
     <div class="card p-0 mb-2">
         <table class="data-table">
             <tr>

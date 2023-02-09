@@ -26,7 +26,7 @@
     </div>
 
     @if (Statamic\Facades\Role::all()->isNotEmpty())
-        <h3 class="little-heading pl-0 mb-1">{{ __('Override For Role') }}</h3>
+        <h3 class="little-heading pl-0 mb-2___REPLACED">{{ __('Override For Role') }}</h3>
         <div class="card p-0 mb-2">
             <table class="data-table">
                 @foreach (Statamic\Facades\Role::all() as $role)
@@ -48,7 +48,7 @@
         </div>
     @endif
 
-    <h3 class="little-heading pl-0 mb-1">{{ __('Override For User') }}</h3>
+    <h3 class="little-heading pl-0 mb-2___REPLACED">{{ __('Override For User') }}</h3>
     <div class="card p-0 mb-2">
         <table class="data-table">
             <tr>

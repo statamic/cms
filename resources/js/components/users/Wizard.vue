@@ -147,7 +147,7 @@
 
             <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-2 pb-7" v-else>
-                <p class="mb-1" v-html="__('messages.user_wizard_invitation_share_before', { email: user.email })" />
+                <p class="mb-2___REPLACED" v-html="__('messages.user_wizard_invitation_share_before', { email: user.email })" />
             </div>
         </div>
 
@@ -160,7 +160,7 @@
 
             <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-2 pb-5">
-                <p class="mb-1" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
+                <p class="mb-2___REPLACED" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
             </div>
             <div class="max-w-md mx-auto px-2 pb-5">
                 <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Activation URL') }}</label>

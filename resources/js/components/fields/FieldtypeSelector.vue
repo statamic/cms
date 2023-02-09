@@ -17,7 +17,7 @@
         <div class="p-2" v-if="fieldtypesLoaded">
             <div v-for="group in displayedFieldtypes" :key="group.handle" v-show="group.fieldtypes.length > 0" class="mb-8___REPLACED">
                 <h2 v-if="group.title" v-text="group.title" class="px-1 mb-1___REPLACED" />
-                <p v-if="group.description" v-text="group.description" class="px-1 mb-1 text-grey-70 text-sm"/>
+                <p v-if="group.description" v-text="group.description" class="px-1 mb-2___REPLACED text-grey-70 text-sm"/>
                 <div class="fieldtype-selector">
                     <div class="fieldtype-list">
                         <div class="p-1" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">

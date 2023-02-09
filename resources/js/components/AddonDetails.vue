@@ -29,18 +29,18 @@
         <div>
             <div class="card mb-6___REPLACED flex items-center">
                 <div class="flex-1 text-lg">
-                    <div class="little-heading p-0 mb-1 text-grey-70" v-text="__('Price')" />
+                    <div class="little-heading p-0 mb-2___REPLACED text-grey-70" v-text="__('Price')" />
                     <div class="font-bold" v-text="priceRange" />
                 </div>
                 <div class="flex-1 text-lg">
-                    <div class="little-heading p-0 mb-1 text-grey-70" v-text="__('Seller')" />
+                    <div class="little-heading p-0 mb-2___REPLACED text-grey-70" v-text="__('Seller')" />
                     <a :href="addon.seller.website" class="relative flex items-center">
                         <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full w-6 mr-1">
                         <span class="font-bold">{{ addon.seller.name }}</span>
                     </a>
                 </div>
                 <div class="flex-1 text-lg" v-if="downloads">
-                    <div class="little-heading p-0 mb-1 text-grey-70" v-text="__('Downloads')" />
+                    <div class="little-heading p-0 mb-2___REPLACED text-grey-70" v-text="__('Downloads')" />
                     <div class="font-bold">{{ downloads }}</div>
                 </div>
             </div>

@@ -5,7 +5,7 @@
             v-for="(item, i) in value"
             :key="item.id"
             class="flex items-center"
-            :class="{ 'mb-1': i < value.length-1 }"
+            :class="{ 'mb-2___REPLACED': i < value.length-1 }"
         >
             <div v-if="item.published && item.published !== null"
                 class="little-dot mr-1" :class="[item.published ? 'bg-green' : 'bg-grey-40']" />

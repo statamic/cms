@@ -18,7 +18,7 @@
                 @cp_svg('hammer-wrench')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
-                <h3 class="mb-1 text-blue">{{ __('Configure Collection') }} &rarr;</h3>
+                <h3 class="mb-2___REPLACED text-blue">{{ __('Configure Collection') }} &rarr;</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_configure_description') }}</p>
             </div>
         </a>
@@ -32,7 +32,7 @@
                 @cp_svg('content-writing')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
-                <h3 class="mb-1 text-blue">{{ $collection->createLabel() }} @if (!$multipleBlueprints)&rarr;@endif</h3>
+                <h3 class="mb-2___REPLACED text-blue">{{ $collection->createLabel() }} @if (!$multipleBlueprints)&rarr;@endif</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_create_entry_description') }}</p>
                 @if ($multipleBlueprints)
                     @foreach ($collection->entryBlueprints() as $blueprint)
@@ -47,7 +47,7 @@
                 @cp_svg('blueprint')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
-                <h3 class="mb-1 text-blue">{{ __('Configure Blueprints') }} &rarr;</h3>
+                <h3 class="mb-2___REPLACED text-blue">{{ __('Configure Blueprints') }} &rarr;</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_blueprints_description') }}</p>
             </div>
         </a>
@@ -56,7 +56,7 @@
                 @cp_svg('crane')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
-                <h3 class="mb-1 text-blue">{{ __('Scaffold Views') }} &rarr;</h3>
+                <h3 class="mb-2___REPLACED text-blue">{{ __('Scaffold Views') }} &rarr;</h3>
                 <p>{{ __('statamic::messages.collection_next_steps_scaffold_description') }}</p>
             </div>
         </a>

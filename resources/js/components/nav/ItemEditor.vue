@@ -17,7 +17,7 @@
 
                 <div class="publish-field mb-8___REPLACED" :class="{ 'has-error': validateDisplay }">
                     <div class="field-inner">
-                        <label class="text-sm font-medium mb-1">{{ __('Display') }} <span class="text-red">*</span></label>
+                        <label class="text-sm font-medium mb-2___REPLACED">{{ __('Display') }} <span class="text-red">*</span></label>
                         <text-input v-model="config.display" :focus="true" />
                         <div v-if="validateDisplay" class="help-block text-red mt-1"><p>{{ __('statamic::validation.required') }}</p></div>
                     </div>
@@ -25,7 +25,7 @@
 
                 <div class="publish-field mb-8___REPLACED" :class="{ 'has-error': validateUrl }">
                     <div class="field-inner">
-                        <label class="text-sm font-medium mb-1">{{ __('URL') }} <span class="text-red">*</span></label>
+                        <label class="text-sm font-medium mb-2___REPLACED">{{ __('URL') }} <span class="text-red">*</span></label>
                         <div class="help-block -mt-1">
                             <p v-text="__('Enter any internal or external URL.')"></p>
                         </div>

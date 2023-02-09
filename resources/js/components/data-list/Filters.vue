@@ -56,7 +56,7 @@
                         <button class="input-group-item px-1.5">{{ __('Save') }}</button>
                     </template>
                     <div class="p-2 w-96">
-                        <h6 v-text="__('Filter preset name')" class="mb-1" />
+                        <h6 v-text="__('Filter preset name')" class="mb-2___REPLACED" />
                         <div class="flex items-center">
                             <input class="input-text border-r rounded-r" type="text" v-model="savingPresetName" @keydown.enter="save" ref="savedFilterName">
                             <button class="btn-primary ml-1" @click="save" :disabled="saving || ! savingPresetName">Save</button>
