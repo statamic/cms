@@ -7,14 +7,14 @@
 }
 
 .assets-fieldtype .assets-fieldtype-picker {
-    @apply flex items-center px-4___REPLACED py-2___REPLACED bg-grey-20 border rounded;
+    @apply flex items-center px-4 py-2 bg-grey-20 border rounded;
 
     &.is-expanded {
         @apply border-b-0 rounded-b-none;
     }
 
     .asset-upload-control {
-      @apply ml-4___REPLACED;
+      @apply ml-4;
     }
 
     .upload-text-button {

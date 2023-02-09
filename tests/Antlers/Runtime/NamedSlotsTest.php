@@ -23,15 +23,15 @@ EOT;
         $expected = <<<'EOT'
 <div class="max-w-sm rounded overflow-hidden shadow-lg">
     <img class="w-full" src="image/path.jpg" alt="Test Title">
-    <div class="px-16___REPLACED py-8___REPLACED">
-        <div class="font-bold text-xl mb-4___REPLACED">Test Title</div>
+    <div class="px-16 py-8">
+        <div class="font-bold text-xl mb-4">Test Title</div>
         <p class="text-gray-700 text-base">Test description.</p>
     </div>
-    <div class="px-16___REPLACED pt-8___REPLACED pb-4___REPLACED">
+    <div class="px-16 pt-8 pb-4">
         
-        <span class="inline-block bg-gray-200 rounded-full px-6___REPLACED py-2___REPLACED text-sm font-semibold text-gray-700 mr-4___REPLACED mb-4___REPLACED">#tag1</span>
-        <span class="inline-block bg-gray-200 rounded-full px-6___REPLACED py-2___REPLACED text-sm font-semibold text-gray-700 mr-4___REPLACED mb-4___REPLACED">#tag2</span>
-        <span class="inline-block bg-gray-200 rounded-full px-6___REPLACED py-2___REPLACED text-sm font-semibold text-gray-700 mr-4___REPLACED mb-4___REPLACED">#tag3</span>
+        <span class="inline-block bg-gray-200 rounded-full px-6 py-2 text-sm font-semibold text-gray-700 mr-4 mb-4">#tag1</span>
+        <span class="inline-block bg-gray-200 rounded-full px-6 py-2 text-sm font-semibold text-gray-700 mr-4 mb-4">#tag2</span>
+        <span class="inline-block bg-gray-200 rounded-full px-6 py-2 text-sm font-semibold text-gray-700 mr-4 mb-4">#tag3</span>
         
     </div>
 </div>
@@ -59,11 +59,11 @@ EOT;
         $expected = <<<'EOT'
 <div class="max-w-sm rounded overflow-hidden shadow-lg">
     <img class="w-full" src="image/path.jpg" alt="Test Title">
-    <div class="px-16___REPLACED py-8___REPLACED">
-        <div class="font-bold text-xl mb-4___REPLACED">Test Title</div>
+    <div class="px-16 py-8">
+        <div class="font-bold text-xl mb-4">Test Title</div>
         <p class="text-gray-700 text-base">Test description.</p>
     </div>
-    <div class="px-16___REPLACED pt-8___REPLACED pb-4___REPLACED">
+    <div class="px-16 pt-8 pb-4">
         
             <span>I am the new content!</span>
         

@@ -2,11 +2,11 @@
     <element-container @resized="containerWidth = $event.width">
         <div>
             <div v-for="section in mainSections" :key="section.handle">
-                <div class="mb-2___REPLACED content">
+                <div class="mb-2 content">
                     <h2 v-text="section.display" class="text-base" />
                     <p v-html="section.instructions" />
                 </div>
-                <div class="card p-0 mb-10___REPLACED configure-section">
+                <div class="card p-0 mb-10 configure-section">
                     <publish-fields
                         :fields="section.fields"
                         :read-only="readOnly"

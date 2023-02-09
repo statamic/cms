@@ -45,7 +45,7 @@
                 </div>
 
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-12 w-12 mb-4___REPLACED" />
+                    <svg-icon name="upload" class="h-12 w-12 mb-4" />
                     {{ __('Drop File to Upload') }}
                 </div>
 
@@ -70,19 +70,19 @@
                             <div class="flex w-full">
                                 <div class="markdown-cheatsheet-helper">
                                     <button class="text-link flex items-center" @click="showCheatsheet = true" :aria-label="__('Show Markdown Cheatsheet')">
-                                        <svg-icon name="markdown-icon" class="w-6 h-4 items-start mr-2___REPLACED" />
+                                        <svg-icon name="markdown-icon" class="w-6 h-4 items-start mr-2" />
                                         <span>{{ __('Markdown Cheatsheet') }}</span>
                                     </button>
                                 </div>
                             </div>
-                            <div v-if="fullScreenMode" class="flex items-center pr-2___REPLACED">
-                                <div class="whitespace-nowrap mr-4___REPLACED"><span v-text="count.words" /> {{ __('Words') }}</div>
+                            <div v-if="fullScreenMode" class="flex items-center pr-2">
+                                <div class="whitespace-nowrap mr-4"><span v-text="count.words" /> {{ __('Words') }}</div>
                                 <div class="whitespace-nowrap"><span v-text="count.characters" /> {{ __('Characters') }}</div>
                             </div>
                         </div>
 
                         <div class="drag-notification" v-if="assetsEnabled && draggingFile">
-                            <svg-icon name="upload" class="h-12 w-12 mb-4___REPLACED" />
+                            <svg-icon name="upload" class="h-12 w-12 mb-4" />
                             {{ __('Drop File to Upload') }}
                         </div>
                     </div>
@@ -105,9 +105,9 @@
         </stack>
 
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
-            <div class="h-full overflow-auto p-6___REPLACED bg-white relative">
-                <button class="btn-close absolute top-0 right-0 mt-4___REPLACED mr-8___REPLACED" @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;</button>
-                <div class="max-w-md mx-auto my-8___REPLACED clean-content">
+            <div class="h-full overflow-auto p-6 bg-white relative">
+                <button class="btn-close absolute top-0 right-0 mt-4 mr-8" @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;</button>
+                <div class="max-w-md mx-auto my-8 clean-content">
                     <h2 v-text="__('Markdown Cheatsheet')"></h2>
                     <div v-html="__('markdown.cheatsheet')"></div>
                 </div>

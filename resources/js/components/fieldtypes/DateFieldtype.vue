@@ -2,8 +2,8 @@
     <element-container @resized="containerWidth = $event.width">
     <div class="datetime">
 
-        <button type="button" class="btn flex mb-2___REPLACED md:mb-0 items-center pl-3___REPLACED" v-if="!isReadOnly && config.inline === false && !hasDate" @click="addDate" tabindex="0">
-            <svg-icon name="calendar" class="w-4 h-4 mr-2___REPLACED"></svg-icon>
+        <button type="button" class="btn flex mb-2 md:mb-0 items-center pl-3" v-if="!isReadOnly && config.inline === false && !hasDate" @click="addDate" tabindex="0">
+            <svg-icon name="calendar" class="w-4 h-4 mr-2"></svg-icon>
     		{{ __('Add Date') }}
     	</button>
 
@@ -53,7 +53,7 @@
                                 </div>
                             </div>
 
-                            <div class="icon icon-arrow-right my-1___REPLACED mx-2___REPLACED text-grey-60" />
+                            <div class="icon icon-arrow-right my-1 mx-2 text-grey-60" />
 
                             <div class="input-group">
                                 <div class="input-group-prepend flex items-center" v-if="!config.inline">

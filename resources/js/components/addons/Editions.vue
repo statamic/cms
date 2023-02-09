@@ -1,13 +1,13 @@
 <template>
-    <div class="card mb-6___REPLACED">
-        <div class="little-heading p-0 mb-2___REPLACED text-grey-70" v-text="__('Editions')" />
+    <div class="card mb-6">
+        <div class="little-heading p-0 mb-2 text-grey-70" v-text="__('Editions')" />
 
         <div class="flex items-center">
             <div class="btn-group">
                 <button
                     v-for="edition in addon.editions"
                     :key="edition.handle"
-                    class="btn px-4___REPLACED"
+                    class="btn px-4"
                     :class="{ 'disabled': buttonDisabled(edition) }"
                     :disabled="buttonDisabled(edition)"
                     v-text="label(edition)"
@@ -15,7 +15,7 @@
                 />
             </div>
 
-            <loading-graphic inline v-if="saving" text="" class="ml-4___REPLACED" />
+            <loading-graphic inline v-if="saving" text="" class="ml-4" />
         </div>
     </div>
 </template>

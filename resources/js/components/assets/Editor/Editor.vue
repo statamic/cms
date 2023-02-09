@@ -61,17 +61,17 @@
                             <!-- SVG -->
                             <div v-else-if="asset.isSvg" class="bg-checkerboard h-full w-full flex flex-col">
                                 <div class="flex border-b-2 border-grey-90">
-                                    <div class="flex-1 order-r p-4___REPLACED border-grey-90 flex items-center justify-center">
+                                    <div class="flex-1 order-r p-4 border-grey-90 flex items-center justify-center">
                                         <img :src="asset.url" class="asset-thumb w-4 h-4" />
                                     </div>
-                                    <div class="flex-1 border-l border-r p-4___REPLACED border-grey-90 flex items-center justify-center">
+                                    <div class="flex-1 border-l border-r p-4 border-grey-90 flex items-center justify-center">
                                         <img :src="asset.url" class="asset-thumb w-12 h-12" />
                                     </div>
-                                    <div class="flex-1 border-l p-4___REPLACED border-grey-90 flex items-center justify-center">
+                                    <div class="flex-1 border-l p-4 border-grey-90 flex items-center justify-center">
                                         <img :src="asset.url" class="asset-thumb w-24 h-24" />
                                     </div>
                                 </div>
-                                <div class="min-h-0 h-full p-4___REPLACED flex items-center justify-center">
+                                <div class="min-h-0 h-full p-4 flex items-center justify-center">
                                     <img :src="asset.url" class="asset-thumb w-2/3 max-w-full max-h-full" />
                                 </div>
                             </div>
@@ -132,7 +132,7 @@
                         </div>
 
                         <div class="editor-form-fields">
-                            <div v-if="error" class="bg-red text-white p-4___REPLACED shadow mb-4___REPLACED" v-text="error" />
+                            <div v-if="error" class="bg-red text-white p-4 shadow mb-4" v-text="error" />
                             <publish-fields
                                 :fields="fields"
                                 :read-only="readOnly"
@@ -142,7 +142,7 @@
                         </div>
 
                         <div class="editor-form-actions text-right" v-if="!readOnly">
-                            <button v-if="allowDeleting && canRunAction('delete')" type="button" class="btn-danger mr-2___REPLACED" @click="runAction('delete')">
+                            <button v-if="allowDeleting && canRunAction('delete')" type="button" class="btn-danger mr-2" @click="runAction('delete')">
                                 {{ __('Delete') }}
                             </button>
                             <button type="button" class="btn-primary" @click="save">

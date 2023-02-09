@@ -13,7 +13,7 @@
         <div>
             <breadcrumbs v-if="breadcrumbs" :crumbs="breadcrumbs" />
 
-            <div class="flex items-center mb-6___REPLACED">
+            <div class="flex items-center mb-6">
                 <h1 class="flex-1">{{ title }}</h1>
                 <button v-if="action" type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>

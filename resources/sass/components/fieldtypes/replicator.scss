@@ -7,22 +7,22 @@
 }
 
 .replicator-set {
-    @apply mt-10___REPLACED shadow-set rounded bg-white outline-none relative;
+    @apply mt-10 shadow-set rounded bg-white outline-none relative;
 
     &:last-child {
-        @apply mb-10___REPLACED;
+        @apply mb-10;
     }
 }
 
 .replicator-set-header {
-    @apply bg-grey-30 border-b rounded-t pr-3___REPLACED flex select-none;
+    @apply bg-grey-30 border-b rounded-t pr-3 flex select-none;
 
     &.collapsed {
         @apply rounded border-b-0;
     }
 
     .sortable-handle {
-        @apply w-4 border-r rounded-tl p-2___REPLACED;
+        @apply w-4 border-r rounded-tl p-2;
         cursor: grab;
         background: transparent url('../svg/drag-dots.svg') center center no-repeat;
         &:hover { @apply bg-grey-20; }
@@ -61,14 +61,14 @@
 
 // Extra contrast when full width
 .replicator-fieldtype {
-    @apply py-6___REPLACED px-0 bg-grey-20 border-t border-b;
+    @apply py-6 px-0 bg-grey-20 border-t border-b;
 
     > .field-inner {
-        @apply ml-6___REPLACED;
+        @apply ml-6;
     }
 
     .replicator-fieldtype-container {
-        @apply px-6___REPLACED;
+        @apply px-6;
     }
 }
 

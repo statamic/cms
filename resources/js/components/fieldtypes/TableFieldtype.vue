@@ -43,7 +43,7 @@
             {{ __('Add Row') }}
         </button>
 
-        <button class="btn ml-2___REPLACED" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
+        <button class="btn ml-2" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
             {{ __('Add Column') }}
         </button>
 

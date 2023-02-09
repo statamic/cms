@@ -13,12 +13,12 @@
                     v-text="labelText"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
-                <i class="required ml-1___REPLACED" v-if="config.required">*</i>
-                <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-2___REPLACED mr-2___REPLACED" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly && !isSection" class="text-grey-50 font-normal text-2xs mx-1___REPLACED">
+                <i class="required ml-1" v-if="config.required">*</i>
+                <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-2 mr-2" v-tooltip="lockingUser.name" />
+                <span v-if="isReadOnly && !isSection" class="text-grey-50 font-normal text-2xs mx-1">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
-                <svg-icon name="translate" class="h-4 ml-1___REPLACED w-4 text-grey-60" v-if="isLocalizable && !isSection" v-tooltip.top="__('Localizable field')" />
+                <svg-icon name="translate" class="h-4 ml-1 w-4 text-grey-60" v-if="isLocalizable && !isSection" v-tooltip.top="__('Localizable field')" />
 
                 <button
                     v-if="!isReadOnly && !isSection"
@@ -27,7 +27,7 @@
                     :class="{ flex: syncable && isSynced }"
                     @click="$emit('desynced')"
                 >
-                    <svg-icon name="hyperlink" class="h-4 w-4 ml-1.5___REPLACED mb-1___REPLACED text-grey-60"
+                    <svg-icon name="hyperlink" class="h-4 w-4 ml-1.5 mb-1 text-grey-60"
                         v-tooltip.top="__('messages.field_synced_with_origin')" />
                 </button>
 
@@ -38,7 +38,7 @@
                     :class="{ flex: syncable && !isSynced }"
                     @click="$emit('synced')"
                 >
-                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-1.5___REPLACED mb-1___REPLACED text-grey-60"
+                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-1.5 mb-1 text-grey-60"
                         v-tooltip.top="__('messages.field_desynced_from_origin')" />
                 </button>
             </label>
@@ -71,12 +71,12 @@
         </slot>
 
         <div
-            class="help-block mt-2___REPLACED"
+            class="help-block mt-2"
             v-if="instructions && config.instructions_position === 'below'"
             v-html="instructions" />
 
         <div v-if="hasError">
-            <small class="help-block text-red mt-2___REPLACED mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block text-red mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
     </div>
     </publish-field-meta>

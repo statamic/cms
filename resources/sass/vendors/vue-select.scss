@@ -108,7 +108,7 @@
 
 .vs__open-indicator {
 	@include clickable;
-	@apply flex items-center rounded-r px-2___REPLACED text-sm flex-shrink-0;
+	@apply flex items-center rounded-r px-2 text-sm flex-shrink-0;
 	height: 2.375rem;
 }
 
@@ -134,7 +134,7 @@
 }
 
 .vs__clear {
-	@apply text-grey-90 px-2___REPLACED cursor-pointer shadow-inner text-base bg-transparent;
+	@apply text-grey-90 px-2 cursor-pointer shadow-inner text-base bg-transparent;
 	height: 2.375rem;
 	box-shadow: inset -1px 1px 1px 0px rgba(0,0,0,.05);
 	border-top: 1px solid #c4cdd6;
@@ -147,7 +147,7 @@
 
 .vs__dropdown-menu {
 	@apply block absolute z-top m-0 w-full;
-	@apply bg-white flex flex-col shadow-popover block p-4___REPLACED rounded-md text-left;
+	@apply bg-white flex flex-col shadow-popover block p-4 rounded-md text-left;
 	top: 46px;
 	left: 0;
 	padding: 0;
@@ -178,13 +178,13 @@
 
 .v-select:not(.vs--single) .vs__selected {
 	@include clickable;
-	@apply flex items-center text-sm rounded py-0 px-2___REPLACED mr-2___REPLACED;
+	@apply flex items-center text-sm rounded py-0 px-2 mr-2;
 
     &.sortable-item { @apply cursor-grab; }
 }
 
 .vs__deselect {
-	@apply flex items-center cursor-pointer text-grey-60 ml-1___REPLACED p-0 outline-none;
+	@apply flex items-center cursor-pointer text-grey-60 ml-1 p-0 outline-none;
 
 	&:hover {
 		@apply text-grey-80;
@@ -231,7 +231,7 @@
 
 .vs__search,
 .vs__search:focus {
-	@apply appearance-none text-sm text-grey-80 px-2___REPLACED border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
+	@apply appearance-none text-sm text-grey-80 px-2 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
 	line-height: 1.4;
 	border-left: none;
 	box-shadow: none;

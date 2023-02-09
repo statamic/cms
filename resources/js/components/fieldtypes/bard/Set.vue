@@ -1,22 +1,22 @@
 <template>
 
     <node-view-wrapper>
-        <div class="bard-set whitespace-normal my-6___REPLACED rounded bg-white border shadow"
+        <div class="bard-set whitespace-normal my-6 rounded bg-white border shadow"
             :class="{ 'border-blue-lighter': selected, 'has-error': hasError }"
             contenteditable="false" @copy.stop @paste.stop @cut.stop
         >
             <div ref="content" hidden />
             <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" data-drag-handle />
-                <div class="flex-1 p-2___REPLACED replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2___REPLACED"/>
+                <div class="flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
+                    <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2"/>
                     <div
                         v-if="config.instructions"
                         v-show="!collapsed"
                         v-html="instructions"
-                        class="help-block mt-2___REPLACED -mb-1" />
+                        class="help-block mt-2 -mb-1" />
 
-                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-8___REPLACED">
+                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-8">
                         <div
                             v-html="previewText"
                             class="help-block mb-0 whitespace-nowrap overflow-hidden text-overflow-ellipsis" />
@@ -25,7 +25,7 @@
                 <div class="replicator-set-controls">
                     <toggle-fieldtype
                         handle="set-enabled"
-                        class="toggle-sm mr-4___REPLACED"
+                        class="toggle-sm mr-4"
                         v-model="enabled"
                         v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list class="-mt-sm">

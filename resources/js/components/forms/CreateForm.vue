@@ -1,28 +1,28 @@
 <template>
-    <div class="max-w-lg mt-4___REPLACED mx-auto">
+    <div class="max-w-lg mt-4 mx-auto">
 
-        <div class="rounded p-6___REPLACED lg:px-20___REPLACED lg:py-10___REPLACED shadow bg-white">
-            <header class="text-center mb-16___REPLACED">
-                <h1 class="mb-6___REPLACED">{{ __('Create Form') }}</h1>
+        <div class="rounded p-6 lg:px-20 lg:py-10 shadow bg-white">
+            <header class="text-center mb-16">
+                <h1 class="mb-6">{{ __('Create Form') }}</h1>
                 <p class="text-grey" v-text="__('messages.form_configure_intro')" />
             </header>
-            <div class="mb-10___REPLACED">
-                <label class="font-bold text-base mb-1___REPLACED" for="name">{{ __('Title') }}</label>
+            <div class="mb-10">
+                <label class="font-bold text-base mb-1" for="name">{{ __('Title') }}</label>
                 <input type="text" v-model="title" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-grey-60 mt-2___REPLACED flex items-center">
+                <div class="text-2xs text-grey-60 mt-2 flex items-center">
                     {{ __('messages.form_configure_title_instructions') }}
                 </div>
             </div>
-            <div class="mb-4___REPLACED">
-                <label class="font-bold text-base mb-1___REPLACED" for="name">{{ __('Handle') }}</label>
+            <div class="mb-4">
+                <label class="font-bold text-base mb-1" for="name">{{ __('Handle') }}</label>
                 <input type="text" v-model="handle" class="input-text" tabindex="2">
-                <div class="text-2xs text-grey-60 mt-2___REPLACED flex items-center">
+                <div class="text-2xs text-grey-60 mt-2 flex items-center">
                     {{ __('messages.form_configure_handle_instructions') }}
                 </div>
             </div>
         </div>
 
-        <div class="flex justify-center mt-8___REPLACED">
+        <div class="flex justify-center mt-8">
             <button tabindex="4" class="btn-primary mx-auto btn-lg" :disabled="! canSubmit" @click="submit">
                 {{ __('Create Form')}}
             </button>

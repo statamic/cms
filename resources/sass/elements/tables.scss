@@ -3,11 +3,11 @@
    ========================================================================== */
 
 .data-list-header {
-    @apply p-4___REPLACED pb-2___REPLACED flex flex-wrap items-center;
+    @apply p-4 pb-2 flex flex-wrap items-center;
 }
 
 .data-list-search-input {
-	// @apply text-sm px-4___REPLACED py-2___REPLACED flex-1 rounded border;
+	// @apply text-sm px-4 py-2 flex-1 rounded border;
 	@apply bg-white;
 
 	&:focus {
@@ -16,12 +16,12 @@
 }
 
 .data-list-bulk-actions {
-	@apply bg-white absolute w-full pt-4___REPLACED z-10;
+	@apply bg-white absolute w-full pt-4 z-10;
 	padding-left: 56px;
 }
 
 .mode-grid .data-list-bulk-actions {
-	@apply bg-white w-full pt-2___REPLACED z-10 pl-4___REPLACED static;
+	@apply bg-white w-full pt-2 z-10 pl-4 static;
 }
 
 .mode-grid .rotating-dots-button {
@@ -29,7 +29,7 @@
 }
 
 .data-list-footer {
-    @apply py-3___REPLACED pr-4___REPLACED flex items-center border-t;
+    @apply py-3 pr-4 flex items-center border-t;
 }
 
 .data-table {
@@ -45,7 +45,7 @@
 		}
 
         th {
-            @apply font-medium px-4___REPLACED pt-4___REPLACED pb-2___REPLACED;
+            @apply font-medium px-4 pt-4 pb-2;
             &:first-child { @apply rounded-tl; }
 			&:last-child { @apply rounded-tr; }
 			&:hover {
@@ -56,7 +56,7 @@
 			text-align: right;
 		}
 		.actions-column {
-			@apply p-0 pr-4___REPLACED text-right;
+			@apply p-0 pr-4 text-right;
 			width: 24px;
 		}
 	}
@@ -96,11 +96,11 @@
             }
 
             th {
-                @apply py-2___REPLACED pr-4___REPLACED;
+                @apply py-2 pr-4;
             }
 
             td {
-                @apply py-2___REPLACED px-4___REPLACED break-words;
+                @apply py-2 px-4 break-words;
             }
 		}
 		.type-column {
@@ -164,7 +164,7 @@
 }
 
 .data-list-filter-link {
-	@apply border-grey-40 text-grey-60 mr-2___REPLACED p-3___REPLACED pb-2___REPLACED;
+	@apply border-grey-40 text-grey-60 mr-2 p-3 pb-2;
 
 	&:hover {
 		@apply border-b-3 text-grey-70;
@@ -182,7 +182,7 @@
 }
 
 td.table-drag-handle {
-	@apply w-3 border-r h-full p-2___REPLACED;
+	@apply w-3 border-r h-full p-2;
 	cursor: grab;
 	background: theme('colors.grey-20') url('../svg/drag-dots.svg') center center no-repeat;
 	&:hover { @apply bg-grey-30; }

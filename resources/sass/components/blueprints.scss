@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .blueprint-section {
-    @apply p-2___REPLACED min-h-40___REPLACED outline-none;
+    @apply p-2 min-h-40 outline-none;
 
     &.draggable-source--is-dragging {
         opacity: 0.5;
@@ -21,7 +21,7 @@
 }
 
 .blueprint-section-field {
-    @apply relative mb-2___REPLACED px-1___REPLACED z-10 outline-none;
+    @apply relative mb-2 px-1 z-10 outline-none;
 
     .blueprint-section-field-inner {
         @apply relative border rounded bg-grey-20 shadow-sm flex outline-none z-10;
@@ -60,7 +60,7 @@
 .blueprint-section-field-w-full { @apply w-full };
 
 .blueprint-add-section-container {
-    @apply p-2___REPLACED flex min-h-40___REPLACED;
+    @apply p-2 flex min-h-40;
 
     .draggable-container--is-dragging & {
         display: none;
@@ -75,7 +75,7 @@
     }
 
     .blueprint-section-draggable-zone {
-        @apply absolute inset-0 p-4___REPLACED;
+        @apply absolute inset-0 p-4;
     }
 
     .blueprint-section-field {

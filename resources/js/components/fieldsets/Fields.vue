@@ -1,15 +1,15 @@
 <template>
 
-    <div class="mt-6___REPLACED">
+    <div class="mt-6">
 
-        <div v-if="fieldtypesLoading" class="card p-6___REPLACED text-center">
+        <div v-if="fieldtypesLoading" class="card p-6 text-center">
             <loading-graphic  />
         </div>
 
         <template v-if="fieldtypesLoaded">
 
             <data-list v-show="fields.length" :rows="fields" :columns="columns" :sort="false">
-                <div class="card p-0 mb-6___REPLACED" slot-scope="{}">
+                <div class="card p-0 mb-6" slot-scope="{}">
                     <data-list-table :reorderable="true" @reordered="$emit('updated', $event)">
                         <template slot="cell-display" slot-scope="{ row: field }">
                             <input
@@ -28,7 +28,7 @@
                         </template>
                         <template slot="cell-type" slot-scope="{ value: type }">
                             <div class="flex">
-                                <svg-icon :name="fieldtype(type).icon" class="w-4 h-4 mr-2___REPLACED" />
+                                <svg-icon :name="fieldtype(type).icon" class="w-4 h-4 mr-2" />
                                 <span v-text="fieldtype(type).title" />
                             </div>
                         </template>
@@ -36,8 +36,8 @@
                             <width-selector v-model="field.width" />
                         </template>
                         <template slot="actions" slot-scope="{ row: field, index }">
-                            <a class="mr-2___REPLACED text-grey" @click.prevent="edit(field._id)"><span class="icon icon-pencil" /></a>
-                            <a class="mr-2___REPLACED text-grey" @click.prevent="destroy(index)"><span class="icon icon-cross" /></a>
+                            <a class="mr-2 text-grey" @click.prevent="edit(field._id)"><span class="icon icon-pencil" /></a>
+                            <a class="mr-2 text-grey" @click.prevent="destroy(index)"><span class="icon icon-cross" /></a>
                             <stack v-if="editingField === field._id" :name="`${field._id}-field-settings`" @closed="editingField = null">
                                 <field-settings
                                     slot-scope="{ close }"

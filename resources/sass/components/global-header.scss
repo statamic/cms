@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow pr-4___REPLACED h-13 items-center flex relative w-full;
+    @apply bg-white shadow pr-4 h-13 items-center flex relative w-full;
     z-index: 997; // Let Live Preview stack on top
 }
 
@@ -17,7 +17,7 @@
 /* Search
    ========================================================================== */
 global-search {
-    @apply rounded-md px-2___REPLACED hidden py-0 flex items-center relative border;
+    @apply rounded-md px-2 hidden py-0 flex items-center relative border;
     transition: .12s ease-out;
 
     .search-input {
@@ -92,7 +92,7 @@ global-search {
     }
 
     kbd {
-        @apply font-sans rounded px-1___REPLACED pb-px text-2xs border text-grey-50;
+        @apply font-sans rounded px-1 pb-px text-2xs border text-grey-50;
     }
 }
 
@@ -124,7 +124,7 @@ site-selector {
 
 
 .session-expiry-stripe {
-    @apply px-4___REPLACED py-2___REPLACED text-xs top-0 text-center bg-red text-white cursor-pointer w-full outline-none fixed;
+    @apply px-4 py-2 text-xs top-0 text-center bg-red text-white cursor-pointer w-full outline-none fixed;
     z-index: 999;
     height: 48px;
 

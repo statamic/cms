@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .table-fieldtype-table {
-    @apply w-full text-left border text-grey relative mb-4___REPLACED outline-none shadow-sm rounded;
+    @apply w-full text-left border text-grey relative mb-4 outline-none shadow-sm rounded;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
@@ -11,12 +11,12 @@
 
 .table-fieldtype-table thead {
     th {
-        @apply font-medium border-r p-2___REPLACED border-b z-10 bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide;
+        @apply font-medium border-r p-2 border-b z-10 bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide;
         display: table-cell;
         position: sticky;
         top: -1px;
 
-        &:first-child { @apply rounded-tl pl-3___REPLACED; }
+        &:first-child { @apply rounded-tl pl-3; }
         &:last-child { @apply rounded-tr border-r-0; }
         &.grid-drag-handle-header {
             @apply w-3;
@@ -42,7 +42,7 @@
         @apply border-b border-r p-0;
 
         &:first-child.grid-cell {
-            @apply pl-3___REPLACED;
+            @apply pl-3;
         }
 
         &:last-child {
@@ -50,7 +50,7 @@
         }
 
         &.table-drag-handle {
-            @apply w-3 border-r h-full p-2___REPLACED;
+            @apply w-3 border-r h-full p-2;
             cursor: grab;
             background: theme('colors.grey-20') url('../svg/drag-dots.svg') center center no-repeat;
             &:hover { @apply bg-grey-30; }

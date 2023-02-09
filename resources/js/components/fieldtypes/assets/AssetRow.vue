@@ -3,7 +3,7 @@
         <td class="flex items-center h-full">
             <div
                 v-if="canShowSvg"
-                class="img svg-img mr-2___REPLACED h-7 w-7 bg-no-repeat bg-center bg-cover text-center flex items-center justify-center"
+                class="img svg-img mr-2 h-7 w-7 bg-no-repeat bg-center bg-cover text-center flex items-center justify-center"
                 :style="'background-image:url(' + thumbnail + ')'"
             ></div>
             <button
@@ -23,24 +23,24 @@
             <button
                 v-if="showFilename"
                 @click="edit"
-                class="flex items-center flex-1 ml-2___REPLACED text-xs text-left truncate"
+                class="flex items-center flex-1 ml-2 text-xs text-left truncate"
                 :aria-label="__('Edit Asset')"
             >
                 {{ asset.basename }}
             </button>
             <button
-                class="asset-set-alt text-blue px-4___REPLACED text-sm hover:text-black"
+                class="asset-set-alt text-blue px-4 text-sm hover:text-black"
                 @click="edit"
                 v-if="needsAlt"
             >
                 {{ asset.values.alt ? "✅" : __("Set Alt") }}
             </button>
-            <div v-text="asset.size" class="asset-filesize text-xs text-grey-50 px-2___REPLACED" />
+            <div v-text="asset.size" class="asset-filesize text-xs text-grey-50 px-2" />
         </td>
         <td class="p-0 w-8 text-right align-middle">
             <button
                 v-if="!readOnly"
-                class="flex items-center p-1___REPLACED w-6 h-8 text-grey-60 hover:text-grey-90"
+                class="flex items-center p-1 w-6 h-8 text-grey-60 hover:text-grey-90"
                 @click="remove"
                 :aria-label="__('Remove Asset')"
             >

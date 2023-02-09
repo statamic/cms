@@ -5,7 +5,7 @@
 
     @unless($collections->isEmpty())
 
-        <div class="flex items-center justify-between mb-6___REPLACED">
+        <div class="flex items-center justify-between mb-6">
             <h1>{{ __('Collections') }}</h1>
 
             @can('create', 'Statamic\Contracts\Entries\Collection')
