@@ -1571,7 +1571,7 @@ class NodeProcessor
 
                         if (is_object($output)) {
                             if ($output instanceof Collection) {
-                                $output = $output->all();
+                                $output = RuntimeValues::resolveWithRuntimeIsolation($output);
                             }
 
                             $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
