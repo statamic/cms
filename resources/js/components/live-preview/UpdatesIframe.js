@@ -14,16 +14,21 @@ export default {
                 return;
             }
 
-            let isSameOrigin = url.startsWith('/') || new URL(url).host === window.location.host;
+            let iframeUrl = new URL(url);
+            let cleanUrl = iframeUrl.host + iframeUrl.pathname;
 
-            let scroll = isSameOrigin ? [
+            let isSameOrigin = url.startsWith('/') || iframeUrl.host === window.location.host;
+
+            let preserveScroll = isSameOrigin && (cleanUrl === this.previousUrl || this.previousUrl === null);
+
+            let scroll = preserveScroll ? [
                 container.firstChild.contentWindow.scrollX ?? 0,
                 container.firstChild.contentWindow.scrollY ?? 0
             ] : null;
 
             container.replaceChild(iframe, container.firstChild);
 
-            if (isSameOrigin) {
+            if (preserveScroll) {
                 let iframeContentWindow = iframe.contentWindow;
                 const iframeScrollUpdate = (event) => {
                     iframeContentWindow.scrollTo(...scroll);
@@ -32,6 +37,8 @@ export default {
                 iframeContentWindow.addEventListener('DOMContentLoaded', iframeScrollUpdate, true);
                 iframeContentWindow.addEventListener('load', iframeScrollUpdate, true);
             }
+
+            this.previousUrl = cleanUrl;
         },
 
         setIframeAttributes(iframe) {
