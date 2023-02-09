@@ -20,7 +20,7 @@
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >
-                    <svg-icon name="chevron-down-xs" class="h-2.5" />
+                    <svg-icon name="chevron-down-xs" class="h-1.5___REPLACED" />
                 </button>
 
                 <div v-if="item.collection" class="ml-4___REPLACED flex items-center">
