@@ -18,15 +18,15 @@
                 </div>
             </div>
             <div class="flex items-center text-sm justify-center mb-2">
-                <div class="flex items-center mx-2">
+                <div class="flex items-center mx-4___REPLACED">
                     <div class="mr-sm">X</div>
                     <div class="value">{{ x }}<sup>%</sup></div>
                 </div>
-                <div class="flex items-center mx-2">
+                <div class="flex items-center mx-4___REPLACED">
                     <div class="mr-sm">Y</div>
                     <div class="value">{{ y }}<sup>%</sup></div>
                 </div>
-                <div class="flex items-center mx-2">
+                <div class="flex items-center mx-4___REPLACED">
                     <div class="mr-sm">Z</div>
                     <div class="value">{{ z }}</div>
                 </div>

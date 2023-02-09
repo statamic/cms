@@ -174,19 +174,19 @@
 
         <div class="border-t p-2">
             <div class="max-w-md mx-auto flex items-center justify-center">
-                <button tabindex="3" class="btn mx-2 w-32" @click="previous" v-if="! completed && ! onFirstStep">
+                <button tabindex="3" class="btn mx-4___REPLACED w-32" @click="previous" v-if="! completed && ! onFirstStep">
                     &larr; {{ __('Previous')}}
                 </button>
-                <button tabindex="4" class="btn mx-2 w-32" :disabled="! canContinue" @click="next" v-if="! completed && ! onLastStep">
+                <button tabindex="4" class="btn mx-4___REPLACED w-32" :disabled="! canContinue" @click="next" v-if="! completed && ! onLastStep">
                     {{ __('Next')}} &rarr;
                 </button>
-                <button tabindex="4" class="btn-primary mx-2" @click="submit" v-if="! completed && onLastStep">
+                <button tabindex="4" class="btn-primary mx-4___REPLACED" @click="submit" v-if="! completed && onLastStep">
                     {{ finishButtonText }}
                 </button>
-                <a :href="usersIndexUrl" class="btn mx-2" v-if="completed">
+                <a :href="usersIndexUrl" class="btn mx-4___REPLACED" v-if="completed">
                     {{ __('Back to Users') }}
                 </a>
-                <a :href="usersCreateUrl" class="btn-primary mx-2" v-if="completed">
+                <a :href="usersCreateUrl" class="btn-primary mx-4___REPLACED" v-if="completed">
                     {{ __('Create Another') }}
                 </a>
             </div>
