@@ -14,7 +14,7 @@
                     :key="type.type"
                 >
                     <input
-                        class="mr-sm top-0"
+                        class="mr-1___REPLACED top-0"
                         type="radio"
                         name="link-type"
                         :id="type.type"

@@ -42,12 +42,12 @@
                             </a>
                         </template>
                         <template slot="cell-roles" slot-scope="{ row: user, value: roles }">
-                            <span v-if="user.super" class="badge-pill-sm mr-sm">{{ __('Super Admin') }}</span>
+                            <span v-if="user.super" class="badge-pill-sm mr-1___REPLACED">{{ __('Super Admin') }}</span>
                             <span v-if="!roles || roles.length === 0" />
-                            <span v-for="role in (roles || [])" class="badge-pill-sm mr-sm">{{ role.title }}</span>
+                            <span v-for="role in (roles || [])" class="badge-pill-sm mr-1___REPLACED">{{ role.title }}</span>
                         </template>
                         <template slot="cell-groups" slot-scope="{ row: user, value: groups }">
-                            <span v-for="group in (groups || [])" class="badge-pill-sm mr-sm">{{ group.title }}</span>
+                            <span v-for="group in (groups || [])" class="badge-pill-sm mr-1___REPLACED">{{ group.title }}</span>
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list>

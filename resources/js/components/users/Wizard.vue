@@ -22,11 +22,11 @@
                 <input type="email" v-model="user.email" id="email" class="input-text" required autofocus tabindex="1">
 
                 <div class="text-2xs text-red mt-2___REPLACED flex items-center" v-if="userExists">
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-1___REPLACED flex items-center mb-px"></svg-icon>
                     {{ __('This user already exists.') }}
                 </div>
                 <div class="text-2xs text-grey-60 mt-2___REPLACED flex items-center" v-else>
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-1___REPLACED flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_email_instructions') }}
                 </div>
             </div>
@@ -36,7 +36,7 @@
                 <label class="font-bold text-base mb-1___REPLACED" for="name">{{ __('Name') }}</label>
                 <input type="text" v-model="user.name" id="name" class="input-text" tabindex="2">
                 <div class="text-2xs text-grey-60 mt-2___REPLACED flex items-center">
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-1___REPLACED flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_name_instructions') }}
                 </div>
             </div>
@@ -46,7 +46,7 @@
                     <label class="font-bold text-base mb-1___REPLACED" for="first_name">{{ __('First Name') }}</label>
                     <input type="text" v-model="user.first_name" id="first_name" class="input-text" tabindex="2">
                     <div class="text-2xs text-grey-60 mt-2___REPLACED flex items-center">
-                        <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
+                        <svg-icon name="info-circle" class="h-4 w-4 mr-1___REPLACED flex items-center mb-px"></svg-icon>
                         {{ __('messages.user_wizard_name_instructions') }}
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                     <label class="font-bold ml-2___REPLACED">{{ __('Super Admin') }}</label>
                 </div>
                 <div class="text-2xs text-grey-60 mt-2___REPLACED flex items-center">
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-1___REPLACED flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_super_admin_instructions') }}
                 </div>
             </div>

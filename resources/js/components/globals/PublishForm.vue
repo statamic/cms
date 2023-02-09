@@ -8,7 +8,7 @@
                 <h1 class="flex-1" v-text="title" />
 
                 <div class="pt-px text-2xs text-grey-60 ml-4___REPLACED flex" v-if="! canEdit">
-                    <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
+                    <svg-icon name="lock" class="w-4 mr-1___REPLACED -mt-sm" /> {{ __('Read Only') }}
                 </div>
 
                 <dropdown-list v-if="canConfigure || canEditBlueprint" class="mr-1">

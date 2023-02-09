@@ -55,7 +55,7 @@
                         />
                     </div>
                     <button ref="existing" class="text-blue hover:text-grey-80 flex mb-2___REPLACED outline-none" @click.prevent="isSelecting = true">
-                        <svg-icon name="hyperlink" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
+                        <svg-icon name="hyperlink" class="mr-1___REPLACED h-4 w-4 flex items-center"></svg-icon>
                         {{ __('Link Existing Item') }}
                     </button>
                 </div>
