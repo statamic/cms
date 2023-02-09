@@ -5,7 +5,7 @@
 <form action="{{ $action }}" method="POST">
     @csrf
     <div class="max-w-lg mt-4___REPLACED mx-auto">
-        <div class="rounded p-6___REPLACED lg:px-20___REPLACED lg:py-5 shadow bg-white">
+        <div class="rounded p-6___REPLACED lg:px-20___REPLACED lg:py-10___REPLACED shadow bg-white">
             <header class="text-center mb-16___REPLACED">
                 <h1 class="mb-6___REPLACED">{{ __('Create Blueprint') }}</h1>
                 <p class="text-grey">{{ __('statamic::messages.blueprints_intro') }}</p>

@@ -127,7 +127,7 @@
                 <label class="font-bold ml-2___REPLACED">{{ __('Send Email Invitation') }}</label>
             </div>
 
-            <div class="max-w-lg mx-auto bg-grey-10 py-5 mb-20___REPLACED border rounded-lg " v-if="invitation.send">
+            <div class="max-w-lg mx-auto bg-grey-10 py-10___REPLACED mb-20___REPLACED border rounded-lg " v-if="invitation.send">
                 <!-- Subject Line -->
                 <div class="max-w-md mx-auto px-4___REPLACED pb-5">
                     <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Subject') }}</label>
