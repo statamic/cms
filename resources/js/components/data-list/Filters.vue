@@ -59,7 +59,7 @@
                         <h6 v-text="__('Filter preset name')" class="mb-2___REPLACED" />
                         <div class="flex items-center">
                             <input class="input-text border-r rounded-r" type="text" v-model="savingPresetName" @keydown.enter="save" ref="savedFilterName">
-                            <button class="btn-primary ml-1" @click="save" :disabled="saving || ! savingPresetName">Save</button>
+                            <button class="btn-primary ml-2___REPLACED" @click="save" :disabled="saving || ! savingPresetName">Save</button>
                         </div>
                     </div>
                 </popover>

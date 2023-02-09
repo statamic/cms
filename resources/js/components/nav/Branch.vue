@@ -2,7 +2,7 @@
 
     <div class="flex">
         <div class="page-move w-6" />
-        <div class="flex items-center flex-1 p-1 ml-1 text-xs leading-normal">
+        <div class="flex items-center flex-1 p-1 ml-2___REPLACED text-xs leading-normal">
             <div class="flex items-center flex-1" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
                 <template v-if="! isSection">
                     <i v-if="isAlreadySvg" class="w-4 h-4 mr-1" v-html="icon"></i>

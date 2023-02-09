@@ -69,7 +69,7 @@
              <div class="pb-5" v-if="canCreateSupers">
                 <div class="flex items-center">
                     <toggle-input v-model="user.super" />
-                    <label class="font-bold ml-1">{{ __('Super Admin') }}</label>
+                    <label class="font-bold ml-2___REPLACED">{{ __('Super Admin') }}</label>
                 </div>
                 <div class="text-2xs text-grey-60 mt-2___REPLACED flex items-center">
                     <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
@@ -124,7 +124,7 @@
             <!-- Send Email? -->
             <div class="max-w-md mx-auto px-2 mb-6___REPLACED flex items-center">
                 <toggle-input v-model="invitation.send" />
-                <label class="font-bold ml-1">{{ __('Send Email Invitation') }}</label>
+                <label class="font-bold ml-2___REPLACED">{{ __('Send Email Invitation') }}</label>
             </div>
 
             <div class="max-w-lg mx-auto bg-grey-10 py-5 mb-20___REPLACED border rounded-lg " v-if="invitation.send">

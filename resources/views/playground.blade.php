@@ -24,14 +24,14 @@
         </div>
         <div class="mb-4___REPLACED flex">
             <input type="text" class="input-text" placeholder="v3 style">
-            <select class="ml-1" name="" id="">
+            <select class="ml-2___REPLACED" name="" id="">
                 <option value="">Oh hai Mark</option>
             </select>
         </div>
         <div class="mb-4___REPLACED flex">
             <input type="text" class="input-text" placeholder="v3 style">
-            <button class="btn ml-1">Default Button</button>
-            <button class="btn-primary ml-1">Primary Button</button>
+            <button class="btn ml-2___REPLACED">Default Button</button>
+            <button class="btn-primary ml-2___REPLACED">Primary Button</button>
         </div>
         <div class="mb-4___REPLACED">
             <textarea name="" class="input-text" placeholder="v3 style"></textarea>

@@ -38,7 +38,7 @@
                             tabindex="1"
                             autofocus
                             @keydown.enter.prevent="submit" />
-                        <button @click="submit" class="btn-primary ml-1" v-text="__('Log in')" />
+                        <button @click="submit" class="btn-primary ml-2___REPLACED" v-text="__('Log in')" />
                     </div>
                 </div>
             </div>

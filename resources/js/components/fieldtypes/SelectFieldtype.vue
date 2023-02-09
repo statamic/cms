@@ -55,7 +55,7 @@
                     </div>
                 </template>
         </v-select>
-        <div class="text-xs ml-1 mt-3___REPLACED" :class="limitIndicatorColor" v-if="config.max_items">
+        <div class="text-xs ml-2___REPLACED mt-3___REPLACED" :class="limitIndicatorColor" v-if="config.max_items">
             <span v-text="currentLength"></span>/<span v-text="config.max_items"></span>
         </div>
     </div>

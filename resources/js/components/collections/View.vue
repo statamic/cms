@@ -64,11 +64,11 @@
                         v-text="__('Reorder')" />
 
                     <template v-if="reordering">
-                        <button class="btn ml-1"
+                        <button class="btn ml-2___REPLACED"
                             @click="reordering = false"
                             v-text="__('Cancel')" />
 
-                        <button class="btn-primary ml-1"
+                        <button class="btn-primary ml-2___REPLACED"
                             @click="$refs.list.saveOrder"
                             v-text="__('Save Order')" />
                     </template>

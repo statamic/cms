@@ -56,7 +56,7 @@
                     v-model="conditions[index].value"
                     class="ml-2" />
 
-                <button @click="remove(index)" class="btn-close ml-1 group">
+                <button @click="remove(index)" class="btn-close ml-2___REPLACED group">
                     <svg-icon name="trash" class="w-4 h-4 group-hover:text-red" />
                 </button>
             </div>

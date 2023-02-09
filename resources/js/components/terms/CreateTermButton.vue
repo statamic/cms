@@ -7,7 +7,7 @@
                 @click="create"
             >
                 <span v-text="__('Create Term')" />
-                <svg-icon name="chevron-down-xs" class="ml-1 -mr-1 w-2" v-if="blueprints.length > 1" />
+                <svg-icon name="chevron-down-xs" class="ml-2___REPLACED -mr-1 w-2" v-if="blueprints.length > 1" />
             </button>
         </template>
 

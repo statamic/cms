@@ -39,7 +39,7 @@
 
                     <button
                         type="button"
-                        class="btn-primary ml-1"
+                        class="btn-primary ml-2___REPLACED"
                         @click="select">
                         {{ __('Select') }}
                     </button>

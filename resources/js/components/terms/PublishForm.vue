@@ -43,7 +43,7 @@
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
                     <span v-text="__('Publish')" />
-                    <svg-icon name="chevron-down-xs" class="ml-1 w-2" />
+                    <svg-icon name="chevron-down-xs" class="ml-2___REPLACED w-2" />
                 </button>
             </div>
 
@@ -175,7 +175,7 @@
                                                 'bg-red': !option.exists
                                             }" />
                                             {{ option.name }}
-                                            <loading-graphic :size="14" text="" class="ml-1" v-if="localizing === option.handle" />
+                                            <loading-graphic :size="14" text="" class="ml-2___REPLACED" v-if="localizing === option.handle" />
                                         </div>
                                         <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
                                         <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
@@ -204,11 +204,11 @@
 
             <button
                 v-if="revisionsEnabled"
-                class="ml-1 btn-primary btn-lg justify-center flex items-center w-1/2"
+                class="ml-2___REPLACED btn-primary btn-lg justify-center flex items-center w-1/2"
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
                 <span v-text="__('Publish')" />
-                <svg-icon name="chevron-down-xs" class="ml-1 w-2" />
+                <svg-icon name="chevron-down-xs" class="ml-2___REPLACED w-2" />
             </button>
         </div>
 

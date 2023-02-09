@@ -10,7 +10,7 @@
             <template v-slot:trigger>
                 <button class="button btn-primary flex items-center pr-2">
                     {{ __('Create Blueprint') }}
-                    <svg-icon name="chevron-down-xs" class="w-2 ml-1" />
+                    <svg-icon name="chevron-down-xs" class="w-2 ml-2___REPLACED" />
                 </button>
             </template>
 

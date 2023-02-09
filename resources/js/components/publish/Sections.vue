@@ -45,7 +45,7 @@
             <div class="fade-left" v-if="canScrollLeft" />
             <div class="fade-right" :class="{ 'mr-4': showHiddenTabsDropdown }" v-if="canScrollRight" />
 
-            <dropdown-list class="ml-1" v-cloak v-if="showHiddenTabsDropdown">
+            <dropdown-list class="ml-2___REPLACED" v-cloak v-if="showHiddenTabsDropdown">
                 <dropdown-item
                     v-for="(section, index) in mainSections"
                     v-show="shouldShowInDropdown(index)"

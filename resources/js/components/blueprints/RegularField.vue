@@ -7,7 +7,7 @@
                 <div class="flex items-center flex-1 pr-2 py-1 pl-1">
                     <svg-icon class="text-grey-80 mr-1 h-4 w-4 flex-none" :name="field.icon" v-tooltip="tooltipText" default="generic-field" />
                     <a class="break-all" v-text="labelText" @click="$emit('edit')" />
-                    <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1 h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
+                    <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-2___REPLACED h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
                 <div class="flex-none pr-1 flex">
                     <width-selector v-if="!isHidden" v-model="width" class="mr-1" />

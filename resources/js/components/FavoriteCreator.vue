@@ -10,7 +10,7 @@
                 <h6 class="mb-2___REPLACED">{{ __('Pin to Favorites') }}</h6>
                 <div class="flex items-center">
                     <input type="text" class="input-text w-auto" ref="fave" v-model="name" @keydown.enter="save" />
-                    <button @click="save" class="btn-primary ml-1">{{ __('Save') }}</button>
+                    <button @click="save" class="btn-primary ml-2___REPLACED">{{ __('Save') }}</button>
                 </div>
                 <button @click="makeStartPage" class="mt-2___REPLACED text-xs text-blue outline-none hover:text-blue-darker">{{ __('Set as start page') }} &rarr;</button>
             </div>

@@ -46,7 +46,7 @@
                                         <file-icon :extension="getExtension(file)" />
                                     </div>
                                     <div
-                                        class="flex items-center flex-1 ml-1 text-xs text-left truncate"
+                                        class="flex items-center flex-1 ml-2___REPLACED text-xs text-left truncate"
                                         v-text="file.slice(11)"
                                     />
                                 </td>

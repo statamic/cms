@@ -26,7 +26,7 @@
                 :style="{ width: percent+'%' }" />
         </div>
 
-        <div class="ml-1" v-if="status === 'error'">
+        <div class="ml-2___REPLACED" v-if="status === 'error'">
             {{ error }}
             <button v-if="status == 'error'" @click.prevent="clear">
                 <i class="icon icon-circle-with-cross"></i>
