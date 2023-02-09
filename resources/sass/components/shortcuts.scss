@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .shortcut-pair {
-    @apply pb-1 mb-2___REPLACED antialiased flex items-center justify-between;
+    @apply pb-2___REPLACED mb-2___REPLACED antialiased flex items-center justify-between;
     &:not(:last-child) {
         @apply border-b;
     }

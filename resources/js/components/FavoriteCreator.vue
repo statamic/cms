@@ -6,7 +6,7 @@
                     <svg-icon name="pin"></svg-icon>
                 </button>
             </template>
-            <div class="p-4___REPLACED pb-1">
+            <div class="p-4___REPLACED pb-2___REPLACED">
                 <h6 class="mb-2___REPLACED">{{ __('Pin to Favorites') }}</h6>
                 <div class="flex items-center">
                     <input type="text" class="input-text w-auto" ref="fave" v-model="name" @keydown.enter="save" />
