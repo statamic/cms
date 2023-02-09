@@ -16,7 +16,7 @@
 }
 
 .data-list-bulk-actions {
-	@apply bg-white absolute w-full pt-2 z-10;
+	@apply bg-white absolute w-full pt-4___REPLACED z-10;
 	padding-left: 56px;
 }
 
@@ -45,7 +45,7 @@
 		}
 
         th {
-            @apply font-medium px-4___REPLACED pt-2 pb-2___REPLACED;
+            @apply font-medium px-4___REPLACED pt-4___REPLACED pb-2___REPLACED;
             &:first-child { @apply rounded-tl; }
 			&:last-child { @apply rounded-tr; }
 			&:hover {
