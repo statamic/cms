@@ -26,7 +26,7 @@
                     <template #trigger>
                         <button
                             class="btn"
-                            :class="{ 'flex items-center pr-2': hasCollections }"
+                            :class="{ 'flex items-center pr-4___REPLACED': hasCollections }"
                             @click="addLink"
                         >
                             {{ __('Add Nav Item') }}

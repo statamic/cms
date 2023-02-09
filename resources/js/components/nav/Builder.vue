@@ -16,7 +16,7 @@
 
                 <dropdown-list>
                     <template #trigger>
-                        <button class="btn flex items-center pr-2">
+                        <button class="btn flex items-center pr-4___REPLACED">
                             {{ __('Add Item') }}
                             <svg-icon name="chevron-down-xs" class="w-2 ml-4___REPLACED" />
                         </button>
@@ -41,7 +41,7 @@
                         </template>
                         <h6 class="p-2___REPLACED">{{ __('Save to') }}...</h6>
                         <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)" class="group">
-                            <div class="flex items-start pr-2">
+                            <div class="flex items-start pr-4___REPLACED">
                                 <svg-icon :name="option.icon" class="text-grey flex-shrink-0 mr-2___REPLACED w-4 group-hover:text-white" />
                                 <span class="whitespace-normal">{{ option.label }}</span>
                             </div>

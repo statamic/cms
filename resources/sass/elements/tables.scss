@@ -29,7 +29,7 @@
 }
 
 .data-list-footer {
-    @apply py-3___REPLACED pr-2 flex items-center border-t;
+    @apply py-3___REPLACED pr-4___REPLACED flex items-center border-t;
 }
 
 .data-table {
@@ -56,7 +56,7 @@
 			text-align: right;
 		}
 		.actions-column {
-			@apply p-0 pr-2 text-right;
+			@apply p-0 pr-4___REPLACED text-right;
 			width: 24px;
 		}
 	}
@@ -96,7 +96,7 @@
             }
 
             th {
-                @apply py-2___REPLACED pr-2;
+                @apply py-2___REPLACED pr-4___REPLACED;
             }
 
             td {

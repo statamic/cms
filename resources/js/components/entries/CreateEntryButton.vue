@@ -3,7 +3,7 @@
     <dropdown-list class="inline-block" :disabled="!hasMultipleBlueprints">
         <template v-slot:trigger>
             <button
-                :class="[buttonClass, {'flex items-center pr-2': hasMultipleBlueprints }]"
+                :class="[buttonClass, {'flex items-center pr-4___REPLACED': hasMultipleBlueprints }]"
                 @click="create"
             >
                 {{ text }}
