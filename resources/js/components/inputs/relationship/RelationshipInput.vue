@@ -43,7 +43,7 @@
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
             <div v-if="canSelectOrCreate" class="relationship-input-buttons relative" :class="{ 'mt-4___REPLACED': items.length > 0 }" >
-                <div class="flex flex-wrap items-center text-sm -mb-1">
+                <div class="flex flex-wrap items-center text-sm -mb-2___REPLACED">
                     <div class="relative mb-2___REPLACED">
                         <create-button
                             v-if="canCreate && creatables.length"

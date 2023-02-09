@@ -14,7 +14,7 @@
                         v-if="config.instructions"
                         v-show="!collapsed"
                         v-html="instructions"
-                        class="help-block mt-2___REPLACED -mb-1" />
+                        class="help-block mt-2___REPLACED -mb-2___REPLACED" />
 
                     <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-8___REPLACED">
                         <div
