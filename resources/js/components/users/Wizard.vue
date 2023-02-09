@@ -138,7 +138,7 @@
                 <div class="max-w-md mx-auto px-4___REPLACED">
                     <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Content') }}</label>
                     <textarea
-                        class="input-text min-h-48 p-4___REPLACED bg-white"
+                        class="input-text min-h-40___REPLACED p-4___REPLACED bg-white"
                         v-model="invitation.message"
                         v-elastic
                     />

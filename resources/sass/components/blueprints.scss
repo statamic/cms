@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .blueprint-section {
-    @apply p-2___REPLACED min-h-48 outline-none;
+    @apply p-2___REPLACED min-h-40___REPLACED outline-none;
 
     &.draggable-source--is-dragging {
         opacity: 0.5;
@@ -60,7 +60,7 @@
 .blueprint-section-field-w-full { @apply w-full };
 
 .blueprint-add-section-container {
-    @apply p-2___REPLACED flex min-h-48;
+    @apply p-2___REPLACED flex min-h-40___REPLACED;
 
     .draggable-container--is-dragging & {
         display: none;
