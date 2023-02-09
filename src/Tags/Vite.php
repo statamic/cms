@@ -38,9 +38,12 @@ class Vite extends Tags
             throw new \Exception('Please provide a source file.');
         }
 
-        $buildDirectory = $this->params->get('buildDirectory', null);
+        $directory = $this->params->get('directory', 'build');
+        $hot = $this->params->get('hot');
 
         return app(LaravelVite::class)
-                ->asset($src, $buildDirectory);
+            ->useBuildDirectory($directory)
+            ->useHotFile($hot ? base_path($hot) : null)
+            ->asset($src);
     }
 }
