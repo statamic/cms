@@ -1,4 +1,4 @@
-<div class="no-results md:pt-8 max-w-2xl mx-auto">
+<div class="no-results md:pt-30___REPLACED max-w-2xl mx-auto">
     <div class="flex flex-wrap">
         <div class="w-full md:w-1/2">
             <h1 class="mb-8___REPLACED">{{ $title }}</h1>
