@@ -11,7 +11,7 @@
             @cancel="confirming = false"
         >
             <p class="mb-2" v-text="__('Are you sure you want to restore this revision?')" />
-            <p class="mb-3" v-text="__('Your working copy will be replaced by the contents of this revision.')" />
+            <p class="mb-6___REPLACED" v-text="__('Your working copy will be replaced by the contents of this revision.')" />
         </confirmation-modal>
     </div>
 

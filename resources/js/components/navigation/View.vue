@@ -2,7 +2,7 @@
 
     <div>
 
-        <header class="mb-3" v-if="mounted">
+        <header class="mb-6___REPLACED" v-if="mounted">
             <breadcrumb :url="breadcrumbUrl" :title="__('Navigation')" />
 
             <div class="flex items-center">

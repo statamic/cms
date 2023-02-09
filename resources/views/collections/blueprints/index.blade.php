@@ -14,7 +14,7 @@
         reorder-url="{{ cp_route('collections.blueprints.reorder', $collection) }}"
     >
         <div>
-            <div class="flex justify-between items-center mb-3">
+            <div class="flex justify-between items-center mb-6___REPLACED">
                 <h1>@yield('title')</h1>
 
                 <div>

@@ -10,7 +10,7 @@
         </div>
 
         @if (session('status'))
-            <div class="alert alert-success mb-3">
+            <div class="alert alert-success mb-6___REPLACED">
                 {{ session('status') }}
             </div>
         @endif

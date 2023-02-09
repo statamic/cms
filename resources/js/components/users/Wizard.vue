@@ -12,7 +12,7 @@
         <!-- Step: User Info -->
         <div v-if="!completed && onUserInfoStep">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">{{ __('Create User') }}</h1>
+                <h1 class="mb-6___REPLACED">{{ __('Create User') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_intro')" />
             </div>
 
@@ -61,7 +61,7 @@
         <!-- Step: Roles & Groups -->
         <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-2 pb-2">
             <div class="py-6 text-center">
-                <h1 class="mb-3">{{ __('Roles & Groups') }}</h1>
+                <h1 class="mb-6___REPLACED">{{ __('Roles & Groups') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_roles_groups_intro')" />
             </div>
 
@@ -117,12 +117,12 @@
         <!-- Step: Invitation -->
         <div v-if="!completed && onInvitationStep">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">{{ __('Invitation') }}</h1>
+                <h1 class="mb-6___REPLACED">{{ __('Invitation') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_invitation_intro')" />
             </div>
 
             <!-- Send Email? -->
-            <div class="max-w-md mx-auto px-2 mb-3 flex items-center">
+            <div class="max-w-md mx-auto px-2 mb-6___REPLACED flex items-center">
                 <toggle-input v-model="invitation.send" />
                 <label class="font-bold ml-1">{{ __('Send Email Invitation') }}</label>
             </div>
@@ -154,7 +154,7 @@
         <!-- Post creation -->
         <div v-if="completed">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">{{ __('User created') }}</h1>
+                <h1 class="mb-6___REPLACED">{{ __('User created') }}</h1>
                 <p class="text-grey" v-html="__('messages.user_wizard_account_created')" />
             </div>
 

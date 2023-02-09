@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <header class="flex items-center mb-3">
+    <header class="flex items-center mb-6___REPLACED">
         <h1 class="flex-1">
             {{ __('Users') }}
         </h1>

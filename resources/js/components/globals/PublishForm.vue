@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <header class="mb-3">
+        <header class="mb-6___REPLACED">
             <breadcrumb :url="globalsUrl" :title="__('Globals')" />
 
             <div class="flex items-center">

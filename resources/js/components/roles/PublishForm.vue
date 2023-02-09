@@ -1,12 +1,12 @@
 <template>
 
         <div>
-            <header class="mb-3">
+            <header class="mb-6___REPLACED">
                 <breadcrumb :url="breadcrumbUrl" :title="__('Roles & Permissions')" />
                 <h1 v-text="initialTitle || __('Create Role')" />
             </header>
 
-            <publish-fields-container class="card p-0 mb-3 configure-section">
+            <publish-fields-container class="card p-0 mb-6___REPLACED configure-section">
 
                 <form-group
                     handle="title"

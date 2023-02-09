@@ -2,7 +2,7 @@
 
     <div class="asset-manager">
 
-        <div class="flex items-center mb-3">
+        <div class="flex items-center mb-6___REPLACED">
             <h1 class="flex-1">{{ container.title }}</h1>
 
             <dropdown-list v-if="container.can_edit || container.can_delete" class="ml-2">

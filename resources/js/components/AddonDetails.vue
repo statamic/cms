@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="flex items-center mb-3">
+        <div class="flex items-center mb-6___REPLACED">
             <h1 class="flex-1" v-text="addon.name" />
             <a :href="addon.url" target="_blank" class="btn mr-2" v-text="__('View on Marketplace')" />
             <button v-if="addon.installed" class="btn" :disabled="processing" @click="uninstall" v-text="__('Uninstall')" />
@@ -27,7 +27,7 @@
             </div>
         </modal>
         <div>
-            <div class="card mb-3 flex items-center">
+            <div class="card mb-6___REPLACED flex items-center">
                 <div class="flex-1 text-lg">
                     <div class="little-heading p-0 mb-1 text-grey-70" v-text="__('Price')" />
                     <div class="font-bold" v-text="priceRange" />

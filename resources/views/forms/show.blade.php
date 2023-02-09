@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <header class="mb-3">
+    <header class="mb-6___REPLACED">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('forms.index'),
             'title' => __('Forms')
@@ -39,7 +39,7 @@
     </header>
 
     @if (! empty($form->metrics()))
-    <div class="metrics mb-3">
+    <div class="metrics mb-6___REPLACED">
         @foreach($form->metrics() as $metric)
             <div class="card px-3">
                 <h3 class="mb-2 font-bold text-grey">{{ $metric->label() }}</h3>

@@ -2,7 +2,7 @@
 
     <div>
 
-        <header class="mb-3">
+        <header class="mb-6___REPLACED">
             <breadcrumb v-if="indexUrl" :url="indexUrl" :title="__('CP Nav Preferences')" />
 
             <div class="flex items-center">

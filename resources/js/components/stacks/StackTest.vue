@@ -2,7 +2,7 @@
 
     <div>
         <small class="text-grey">Collections > Blog ></small>
-        <h1 class="mt-1 mb-3">Fire!</h1>
+        <h1 class="mt-1 mb-6___REPLACED">Fire!</h1>
 
         {{ depth === 0 ? 'Base' : `Stack ${depth}` }}<br><br>
 

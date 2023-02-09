@@ -5,7 +5,7 @@
 
     @unless($fieldsets->isEmpty())
 
-        <div class="flex mb-3">
+        <div class="flex mb-6___REPLACED">
             <h1 class="flex-1">{{ __('Fieldsets') }}</h1>
             <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary">{{ __('Create Fieldset') }}</a>
         </div>

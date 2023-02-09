@@ -27,7 +27,7 @@
 
     @else
 
-        <div class="flex mb-3">
+        <div class="flex mb-6___REPLACED">
             <h1 class="flex-1">{{ __('Licensing') }}</h1>
         </div>
 

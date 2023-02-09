@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <div class="flex justify-between items-center mb-3">
+    <div class="flex justify-between items-center mb-6___REPLACED">
         <h1>@yield('title')</h1>
     </div>
 

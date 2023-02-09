@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="flex items-center mb-3">
+        <div class="flex items-center mb-6___REPLACED">
             <h1 class="flex-1">
                 <span v-text="name" />
                 <span v-if="currentVersion" class="font-normal text-grey-70">{{ currentVersion }}</span>
@@ -20,7 +20,7 @@
             <loading-graphic  />
         </div>
 
-        <div class="bg-yellow border-yellow-dark border-dashed p-2 text-xs border mb-3 rounded cursor-pointer flex items-center justify-between"
+        <div class="bg-yellow border-yellow-dark border-dashed p-2 text-xs border mb-6___REPLACED rounded cursor-pointer flex items-center justify-between"
             v-if="!showingUnlicensedReleases && hasUnlicensedReleases"
             @click="showingUnlicensedReleases = true"
         >

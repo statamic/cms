@@ -10,7 +10,7 @@
             </button>
         </div>
 
-        <div class="flex mb-3" v-if="!showingAddon">
+        <div class="flex mb-6___REPLACED" v-if="!showingAddon">
             <h1 class="flex-1" v-text="__('Addons')" />
         </div>
 

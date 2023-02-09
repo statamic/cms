@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <header class="mb-3">
+    <header class="mb-6___REPLACED">
         <div class="flex items-center justify-between">
             <h1>{{ __('Duplicate IDs') }}</h1>
         </div>

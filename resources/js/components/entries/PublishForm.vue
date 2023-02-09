@@ -3,7 +3,7 @@
     <div>
         <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
 
-        <div class="flex items-center mb-3">
+        <div class="flex items-center mb-6___REPLACED">
             <h1 class="flex-1">
                 <div class="flex items-center">
                     <span v-if="! isCreating" class="little-dot mr-1" :class="activeLocalization.status" v-tooltip="activeLocalization.status" />

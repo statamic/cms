@@ -6,7 +6,7 @@
             <label class="publish-field-label">{{ __('Conditions') }}</label>
             <div class="help-block -mt-1"><p>{{ __('messages.field_conditions_instructions') }}</p></div>
 
-            <div class="flex items-center mb-3">
+            <div class="flex items-center mb-6___REPLACED">
                 <select-input
                     v-model="when"
                     :options="whenOptions"

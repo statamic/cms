@@ -14,7 +14,7 @@
         reorder-url="{{ cp_route('taxonomies.blueprints.reorder', $taxonomy) }}"
     >
         <div>
-            <div class="flex justify-between items-center mb-3">
+            <div class="flex justify-between items-center mb-6___REPLACED">
                 <h1>@yield('title')</h1>
 
                 <div>

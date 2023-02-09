@@ -1,5 +1,5 @@
 <template>
-    <div class="card mb-3">
+    <div class="card mb-6___REPLACED">
         <div class="little-heading p-0 mb-1 text-grey-70" v-text="__('Editions')" />
 
         <div class="flex items-center">

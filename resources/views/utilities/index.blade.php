@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <header class="mb-3">
+    <header class="mb-6___REPLACED">
         <h1>{{ __('Utilities') }}</h1>
     </header>
 

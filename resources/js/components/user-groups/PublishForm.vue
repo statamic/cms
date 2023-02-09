@@ -1,7 +1,7 @@
 <template>
 
         <div>
-            <publish-fields-container class="card p-0 mb-3">
+            <publish-fields-container class="card p-0 mb-6___REPLACED">
 
                 <form-group
                     :display="__('Title')"

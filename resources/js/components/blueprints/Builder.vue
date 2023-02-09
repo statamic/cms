@@ -2,7 +2,7 @@
 
     <div class="blueprint-builder">
 
-        <header class="mb-3">
+        <header class="mb-6___REPLACED">
             <div class="flex items-center justify-between">
                 <h1 v-text="__('Edit Blueprint')" />
                 <button type="submit" class="btn-primary" @click.prevent="save" v-text="__('Save')" />

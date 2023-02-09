@@ -2,7 +2,7 @@
 
     <div>
 
-        <header class="mb-3">
+        <header class="mb-6___REPLACED">
             <breadcrumb :url="cp_url('users')" :title="__('Users')" />
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />

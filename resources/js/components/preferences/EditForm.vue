@@ -13,7 +13,7 @@
         <div>
             <breadcrumbs v-if="breadcrumbs" :crumbs="breadcrumbs" />
 
-            <div class="flex items-center mb-3">
+            <div class="flex items-center mb-6___REPLACED">
                 <h1 class="flex-1">{{ title }}</h1>
 
                 <div class="ml-2 text-left" :class="{ 'btn-group': hasSaveAsOptions }">

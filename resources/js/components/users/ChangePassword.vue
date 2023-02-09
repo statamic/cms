@@ -14,7 +14,7 @@
                 :display="__('Current Password')"
                 v-model="currentPassword"
                 :errors="errors.current_password"
-                class="p-0 mb-3"
+                class="p-0 mb-6___REPLACED"
                 :config="{ input_type: this.inputType }"
             />
             <form-group
@@ -22,14 +22,14 @@
                 :display="__('Password')"
                 v-model="password"
                 :errors="errors.password"
-                class="p-0 mb-3"
+                class="p-0 mb-6___REPLACED"
                 :config="{ input_type: this.inputType }"
             />
             <form-group
                 handle="confirmation"
                 :display="__('Password Confirmation')"
                 v-model="confirmation"
-                class="p-0 mb-3"
+                class="p-0 mb-6___REPLACED"
                 :config="{ input_type: this.inputType }"
             />
         </div>

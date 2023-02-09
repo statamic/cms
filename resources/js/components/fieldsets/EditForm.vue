@@ -2,7 +2,7 @@
 
     <div>
 
-        <header class="mb-3">
+        <header class="mb-6___REPLACED">
             <breadcrumb :url="breadcrumbUrl" :title="__('Fieldsets')" />
             <div class="flex items-center justify-between">
                 <h1>{{ initialTitle }}</h1>

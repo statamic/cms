@@ -17,7 +17,7 @@
                     @asset-doubleclicked="select">
 
                     <template slot="contextual-actions" v-if="browserSelections.length">
-                        <button class="btn action mb-3" @click="browserSelections = []">{{ __('Uncheck All') }}</button>
+                        <button class="btn action mb-6___REPLACED" @click="browserSelections = []">{{ __('Uncheck All') }}</button>
                     </template>
 
                 </asset-browser>

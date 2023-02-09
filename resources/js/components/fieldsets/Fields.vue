@@ -9,7 +9,7 @@
         <template v-if="fieldtypesLoaded">
 
             <data-list v-show="fields.length" :rows="fields" :columns="columns" :sort="false">
-                <div class="card p-0 mb-3" slot-scope="{}">
+                <div class="card p-0 mb-6___REPLACED" slot-scope="{}">
                     <data-list-table :reorderable="true" @reordered="$emit('updated', $event)">
                         <template slot="cell-display" slot-scope="{ row: field }">
                             <input

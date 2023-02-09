@@ -19,7 +19,7 @@
                 </div>
 
                 <select-input
-                    class="mb-3"
+                    class="mb-6___REPLACED"
                     v-model="action"
                     :options="options"
                 />
@@ -28,31 +28,31 @@
 
                     <date-fieldtype
                         v-if="action == 'schedule'"
-                        class="mb-3"
+                        class="mb-6___REPLACED"
                         name="publishTime"
                         :value="publishTime" />
 
                     <textarea-input
-                        class="mb-3 text-sm"
+                        class="mb-6___REPLACED text-sm"
                         v-model="revisionMessage"
                         :placeholder="__('Notes about this revision')"
                         @keydown.enter="submit"
                         :focus="true" />
 
                     <button
-                        class="btn-primary w-full mb-3"
+                        class="btn-primary w-full mb-6___REPLACED"
                         v-text="submitButtonText"
                         @click="submit"
                     />
 
-                    <div class="text-grey text-xs flex mb-3">
+                    <div class="text-grey text-xs flex mb-6___REPLACED">
                         <div class="pt-px w-4 mr-1">
                             <svg-icon name="info-circle" class="pt-px" />
                         </div>
                         <div class="flex-1" v-text="actionInfoText" />
                     </div>
 
-                    <div class="text-grey text-xs flex mb-3 text-red" v-if="action === 'schedule'">
+                    <div class="text-grey text-xs flex mb-6___REPLACED text-red" v-if="action === 'schedule'">
                         <div class="pt-px w-4 mr-1">
                             <svg-icon name="info-circle" class="pt-px" />
                         </div>
