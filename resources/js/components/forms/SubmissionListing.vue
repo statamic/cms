@@ -61,7 +61,7 @@
                 </div>
 
                 <data-list-pagination
-                    class="mt-3"
+                    class="mt-6___REPLACED"
                     :resource-meta="meta"
                     :per-page="perPage"
                     :show-totals="true"

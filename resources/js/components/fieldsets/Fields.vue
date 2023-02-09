@@ -1,6 +1,6 @@
 <template>
 
-    <div class="mt-3">
+    <div class="mt-6___REPLACED">
 
         <div v-if="fieldtypesLoading" class="card p-3 text-center">
             <loading-graphic  />

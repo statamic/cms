@@ -209,7 +209,7 @@
             </live-preview>
         </publish-container>
 
-        <div class="md:hidden mt-3 flex items-center">
+        <div class="md:hidden mt-6___REPLACED flex items-center">
             <button
                 v-if="!readOnly"
                 class="btn-lg"

@@ -43,7 +43,7 @@
                            </template>
                         </v-select>
                         <button
-                            class="btn-primary w-full mt-3"
+                            class="btn-primary w-full mt-6___REPLACED"
                             :class="{ 'opacity-50': !reference }"
                             :disabled="!reference"
                             @click="linkField"
@@ -70,11 +70,11 @@
                                 <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
                             </template>
                         </v-select>
-                        <p class="text-sm font-medium mt-3 mb-2___REPLACED" v-text="__('Prefix')" />
+                        <p class="text-sm font-medium mt-6___REPLACED mb-2___REPLACED" v-text="__('Prefix')" />
                         <p class="text-2xs text-grey mb-2___REPLACED" v-text="__('messages.fieldset_link_fields_prefix_instructions')" />
                         <text-input v-model="importPrefix" :placeholder="__('e.g. hero_')" />
                         <button
-                            class="btn-primary w-full mt-3"
+                            class="btn-primary w-full mt-6___REPLACED"
                             :class="{ 'opacity-50': !fieldset }"
                             :disabled="!fieldset"
                             @click="linkFieldset"

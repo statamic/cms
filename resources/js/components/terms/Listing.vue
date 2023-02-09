@@ -86,7 +86,7 @@
                     </data-list-table>
                 </div>
                 <data-list-pagination
-                    class="mt-3"
+                    class="mt-6___REPLACED"
                     :resource-meta="meta"
                     :show-totals="true"
                     @page-selected="selectPage"

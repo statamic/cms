@@ -24,7 +24,7 @@
                 </div>
 
                 <button
-                    class="btn-primary w-full mt-3"
+                    class="btn-primary w-full mt-6___REPLACED"
                     :class="{ 'opacity-50': false }"
                     :disabled="false"
                     @click="save"

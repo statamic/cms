@@ -45,13 +45,13 @@
             </publish-fields-container>
 
             <div v-if="!isSuper">
-                <div class="mt-3 content" v-for="group in permissions" :key="group.handle">
+                <div class="mt-6___REPLACED content" v-for="group in permissions" :key="group.handle">
                     <h2 class="mt-5 text-base mb-2___REPLACED">{{ group.label }}</h2>
                     <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
                 </div>
             </div>
 
-            <div class="py-2 mt-3 border-t flex justify-between">
+            <div class="py-2 mt-6___REPLACED border-t flex justify-between">
                 <a :href="indexUrl" class="btn" v-text="__('Cancel') "/>
                 <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
             </div>

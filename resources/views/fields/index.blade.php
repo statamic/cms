@@ -7,7 +7,7 @@
             <h1>{{ __('Fields') }}</h1>
         </div>
 
-        <div class="flex flex-wrap md:-mx-3 mt-3">
+        <div class="flex flex-wrap md:-mx-3 mt-6___REPLACED">
             <div class="w-full md:w-1/2 md:px-3 mb-6___REPLACED">
                 <div class="card p-0 content border-t-6 border-blue">
                     <div class="p-3">
