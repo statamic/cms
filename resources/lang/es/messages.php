@@ -44,7 +44,6 @@ return [
     'collection_next_steps_documentation_description' => 'Obtén más información sobre las colecciones, cómo funcionan y cómo configurarlas.',
     'collection_next_steps_scaffold_description' => 'Genera rápidamente planos vacíos y vistas para el frontend según el nombre de la colección.',
     'collection_scaffold_instructions' => 'Elige qué recursos en blanco generar. Los archivos existentes no se sobrescribirán.',
-    'collections_amp_instructions' => 'Habilitar Páginas Móviles Aceleradas (AMP). Agrega automáticamente rutas y URL para entradas en esta colección. Obtén más información en la [documentación](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Las entradas en esta colección pueden usar cualquiera de estos planos.',
     'collections_default_publish_state_instructions' => 'Mientras se crean nuevas entradas en esta colección el interruptor de publicación será **verdadero** en vez de **falso** (borrador).',
     'collections_future_date_behavior_instructions' => 'Cómo deben comportarse las entradas con fecha futura.',

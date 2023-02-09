@@ -39,7 +39,6 @@ return [
     'collection_next_steps_documentation_description' => 'Preberite več o zbirkah, kako delujejo in kako jih konfigurirati.',
     'collection_next_steps_scaffold_description' => 'Na podlagi imena zbirke hitro ustvarite prazne načrte in poglede sočelja.',
     'collection_scaffold_instructions' => 'Izberite, katere prazne vire želite ustvariti. Obstoječih datotek ne bo mogoče prepisati.',
-    'collections_amp_instructions' => 'Omogoči pospešene strani za mobilne naprave (AMP). Samodejno doda poti in URL za vnose v tej zbirki. Več o tem v [dokumentaciji] (https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Vnosi v tej zbirki lahko uporabljajo katerega koli od teh načrtov.',
     'collections_default_publish_state_instructions' => 'Med ustvarjanjem novih vnosov v tej zbirki bo objavljeni preklopnik privzeto nastavljen na ** true ** namesto ** false ** (osnutek).',
     'collections_future_date_behavior_instructions' => 'Kako naj se obnašajo prihodnji vnosi.',

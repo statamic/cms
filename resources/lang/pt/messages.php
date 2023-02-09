@@ -39,7 +39,6 @@ return [
     'collection_next_steps_documentation_description' => 'Saiba mais sobre as colecções, como funcionam e como as configurar.',
     'collection_next_steps_scaffold_description' => 'Crie rapidamente plantas vazias e vistas front-end com base no nome da sua colecção.',
     'collection_scaffold_instructions' => 'Escolha quais os recursos em branco a gerar. Os arquivos existentes não serão sobrescritos.',
-    'collections_amp_instructions' => 'Activar as Páginas Móveis Aceleradas (AMP). Adiciona automaticamente rotas e URL para entradas nesta colecção. Saiba mais na [documentação](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'As entradas nesta colecção podem usar qualquer um desses diagramas.',
     'collections_default_publish_state_instructions' => 'Se novas entradas criadas no Painel de Controlo devem ser publicadas por padrão.',
     'collections_future_date_behavior_instructions' => 'Como as entradas futuras datadas devem se comportar.',

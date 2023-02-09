@@ -44,7 +44,6 @@ return [
     'collection_next_steps_blueprints_description' => 'Urus cetakan biru dan bidang yang tersedia untuk koleksi ini.',
     'collection_next_steps_scaffold_description' => 'Hasilkan paparan indeks dan butiran dengan cepat daripada nama koleksi.',
     'collection_scaffold_instructions' => 'Pilih paparan kosong yang ingin dijana. Fail sedia ada tidak akan ditimpa.',
-    'collections_amp_instructions' => 'Dayakan Accelerated Mobile Pages (AMP). Menambah laluan dan URL secara automatik untuk entri dalam koleksi ini. Ketahui lebih lanjut dalam [dokumentasi](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Entri dalam koleksi ini boleh menggunakan mana-mana cetakan biru ini.',
     'collections_default_publish_state_instructions' => 'Semasa mencipta entri baharu dalam koleksi ini, togol yang diterbitkan akan default kepada **true** dan bukannya **false** (draf).',
     'collections_future_date_behavior_instructions' => 'Bagaimana entri bertarikh masa hadapan harus berkelakuan.',

@@ -43,7 +43,6 @@ return [
     'collection_next_steps_documentation_description' => 'Узнайте больше о коллекциях, как они работают и как их настраивать.',
     'collection_next_steps_scaffold_description' => 'Быстрое создание индексных и детальных представлений на основе имени коллекции.',
     'collection_scaffold_instructions' => 'Выберите, какие пустые представления следует генерировать. Существующие файлы не будут перезаписаны.',
-    'collections_amp_instructions' => 'Включить ускоренные мобильные страницы (AMP). Автоматически добавляет маршруты и URL для записей в этой коллекции. Подробности в [документации](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Записи в этой коллекции могут использовать любой из этих чертежей.',
     'collections_default_publish_state_instructions' => 'При создании новых записей в этой коллекции переключатель публикации по умолчанию будет иметь значение **true** вместо **false** (черновик).',
     'collections_future_date_behavior_instructions' => 'Как должны вести себя записи, даты публикации которых ещё не наступили.',

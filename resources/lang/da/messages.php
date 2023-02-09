@@ -40,7 +40,6 @@ return [
     'collection_next_steps_documentation_description' => 'Lær mere om samlinger, hvordan de fungerer, og hvordan du konfigurerer dem.',
     'collection_next_steps_scaffold_description' => 'Generer hurtigt tomme blueprints og frontend-visninger baseret på samlingens navn.',
     'collection_scaffold_instructions' => 'Vælg hvilke tomme filer du vil generere. Eksisterende filer overskrives ikke.',
-    'collections_amp_instructions' => 'Aktivér AMP (Accelerated Mobile Pages). Tilføjer automatisk ruter og URL til poster i denne samling. Lær mere i [dokumentationen](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Indlæg i denne samling kan bruge en hvilken som helst af disse blueprints.',
     'collections_default_publish_state_instructions' => 'Mens du opretter nye poster i denne samling, vil den offentliggjorte skifte standard være **true** i stedet for **false** (kladde).',
     'collections_future_date_behavior_instructions' => 'Hvordan fremtidige daterede poster skal opføre sig.',
