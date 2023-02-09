@@ -40,7 +40,7 @@
         <td class="p-0 w-8 text-right align-middle">
             <button
                 v-if="!readOnly"
-                class="flex items-center p-sm w-6 h-8 text-grey-60 hover:text-grey-90"
+                class="flex items-center p-1___REPLACED w-6 h-8 text-grey-60 hover:text-grey-90"
                 @click="remove"
                 :aria-label="__('Remove Asset')"
             >
