@@ -53,7 +53,7 @@
             <template v-if="isFiltering">
                 <popover v-if="canSave" placement="bottom-end" ref="savePopover">
                     <template slot="trigger">
-                        <button class="input-group-item px-1.5">{{ __('Save') }}</button>
+                        <button class="input-group-item px-3___REPLACED">{{ __('Save') }}</button>
                     </template>
                     <div class="p-4___REPLACED w-96">
                         <h6 v-text="__('Filter preset name')" class="mb-2___REPLACED" />
@@ -63,8 +63,8 @@
                         </div>
                     </div>
                 </popover>
-                <button v-if="isDirty" class="input-group-item px-1.5" @click="reset">{{ __('Reset') }}</button>
-                <button v-if="activePreset" class="flex items-center input-group-item px-1.5" @click="deleting = true"><svg-icon name="trash" class="w-4 h-4" /></button>
+                <button v-if="isDirty" class="input-group-item px-3___REPLACED" @click="reset">{{ __('Reset') }}</button>
+                <button v-if="activePreset" class="flex items-center input-group-item px-3___REPLACED" @click="deleting = true"><svg-icon name="trash" class="w-4 h-4" /></button>
                 <confirmation-modal
                     v-if="deleting"
                     :title="__('Delete Preset')"
@@ -78,7 +78,7 @@
 
             <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle" placement="bottom-end">
                 <template slot="trigger">
-                    <button class="input-group-item px-1.5">
+                    <button class="input-group-item px-3___REPLACED">
                         {{ filter.title }}
                         <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-1___REPLACED"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>

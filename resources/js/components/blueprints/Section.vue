@@ -18,7 +18,7 @@
                         <input type="text" v-model="section.handle" @input="handleSyncedWithDisplay = false" class="bg-transparent w-full outline-none" />
                     </span>
                 </div>
-                <div class="flex items-center px-1.5">
+                <div class="flex items-center px-3___REPLACED">
                     <button @click.prevent="toggleEditing" class="flex items-center text-grey-60 hover:text-grey-100 mr-2___REPLACED">
                         <svg-icon class="h-4 w-4" :name="isEditing ? 'shrink' : 'expand'" />
                     </button>
