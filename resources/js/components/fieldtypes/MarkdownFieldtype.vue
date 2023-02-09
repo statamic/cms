@@ -75,7 +75,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div v-if="fullScreenMode" class="flex items-center pr-1">
+                            <div v-if="fullScreenMode" class="flex items-center pr-2___REPLACED">
                                 <div class="whitespace-nowrap mr-4___REPLACED"><span v-text="count.words" /> {{ __('Words') }}</div>
                                 <div class="whitespace-nowrap"><span v-text="count.characters" /> {{ __('Characters') }}</div>
                             </div>

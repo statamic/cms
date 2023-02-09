@@ -11,7 +11,7 @@
                         <span class="font-mono text-3xs text-grey-60">{{ field.fieldset }}</span>
                     </a>
                 </div>
-                <div class="flex-none pr-1 flex">
+                <div class="flex-none pr-2___REPLACED flex">
                     <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100"><svg-icon name="trash" class="w-4 h-4" /></button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings

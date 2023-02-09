@@ -9,7 +9,7 @@
                     <a class="break-all" v-text="labelText" @click="$emit('edit')" />
                     <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-2___REPLACED h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
-                <div class="flex-none pr-1 flex">
+                <div class="flex-none pr-2___REPLACED flex">
                     <width-selector v-if="!isHidden" v-model="width" class="mr-2___REPLACED" />
 
                     <div v-else class="relative border border-grey-40 opacity-50 w-12 flex items-center justify-center mr-2___REPLACED">

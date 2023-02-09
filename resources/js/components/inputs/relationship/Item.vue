@@ -30,7 +30,7 @@
 
         <div v-if="item.collection" v-text="item.collection.title" class="text-4xs text-grey-60 uppercase whitespace-nowrap mr-2___REPLACED" />
 
-        <div class="pr-1 flex items-center" v-if="!readOnly">
+        <div class="pr-2___REPLACED flex items-center" v-if="!readOnly">
             <dropdown-list>
                 <dropdown-item :text="__('Edit')" @click="edit" v-if="editable" />
                 <dropdown-item :text="__('Unlink')" class="warning" @click="$emit('removed')" />

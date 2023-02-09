@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-            <div class="pr-1 flex items-center">
+            <div class="pr-2___REPLACED flex items-center">
                 <slot name="branch-icon" :branch="page" />
 
                 <dropdown-list class="ml-4___REPLACED" v-if="!isRoot">

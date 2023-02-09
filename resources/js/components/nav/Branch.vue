@@ -33,7 +33,7 @@
                 </div>
             </div>
 
-            <div class="pr-1 flex items-center">
+            <div class="pr-2___REPLACED flex items-center">
                 <slot name="branch-icon" :branch="item" />
 
                 <svg-icon v-if="isRenamedSection" class="inline-block w-4 h-4 text-grey-50" name="content-writing" v-tooltip="__('Renamed Section')" />
