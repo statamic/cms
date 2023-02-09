@@ -23,11 +23,11 @@ EOT;
         $expected = <<<'EOT'
 <div class="max-w-sm rounded overflow-hidden shadow-lg">
     <img class="w-full" src="image/path.jpg" alt="Test Title">
-    <div class="px-6 py-4">
+    <div class="px-16___REPLACED py-4">
         <div class="font-bold text-xl mb-4___REPLACED">Test Title</div>
         <p class="text-gray-700 text-base">Test description.</p>
     </div>
-    <div class="px-6 pt-4 pb-2">
+    <div class="px-16___REPLACED pt-4 pb-2">
         
         <span class="inline-block bg-gray-200 rounded-full px-6___REPLACED py-1 text-sm font-semibold text-gray-700 mr-4___REPLACED mb-4___REPLACED">#tag1</span>
         <span class="inline-block bg-gray-200 rounded-full px-6___REPLACED py-1 text-sm font-semibold text-gray-700 mr-4___REPLACED mb-4___REPLACED">#tag2</span>
@@ -59,11 +59,11 @@ EOT;
         $expected = <<<'EOT'
 <div class="max-w-sm rounded overflow-hidden shadow-lg">
     <img class="w-full" src="image/path.jpg" alt="Test Title">
-    <div class="px-6 py-4">
+    <div class="px-16___REPLACED py-4">
         <div class="font-bold text-xl mb-4___REPLACED">Test Title</div>
         <p class="text-gray-700 text-base">Test description.</p>
     </div>
-    <div class="px-6 pt-4 pb-2">
+    <div class="px-16___REPLACED pt-4 pb-2">
         
             <span>I am the new content!</span>
         
