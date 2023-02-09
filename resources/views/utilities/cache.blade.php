@@ -22,7 +22,7 @@
     <div class="card p-0">
         <div class="p-4___REPLACED">
             <div class="flex justify-between items-center">
-                <div class="pr-4">
+                <div class="pr-8___REPLACED">
                     <h2 class="font-bold">{{ __('Content Stache') }}</h2>
                     <p class="text-grey text-sm my-2___REPLACED">{{ __('statamic::messages.cache_utility_stache_description') }}</p>
                 </div>
@@ -50,7 +50,7 @@
         </div>
         <div class="p-4___REPLACED bg-grey-20 border-t">
             <div class="flex justify-between items-center">
-                <div class="pr-4">
+                <div class="pr-8___REPLACED">
                     <h2 class="font-bold">{{ __('Static Page Cache') }}</h2>
                     <p class="text-grey text-sm my-2___REPLACED">{{ __('statamic::messages.cache_utility_static_cache_description') }}</p>
                 </div>
@@ -71,7 +71,7 @@
 
         <div class="p-4___REPLACED border-t">
             <div class="flex justify-between items-center">
-                <div class="pr-4">
+                <div class="pr-8___REPLACED">
                     <h2 class="font-bold">{{ __('Application Cache') }}</h2>
                     <p class="text-grey text-sm my-2___REPLACED">{{ __('statamic::messages.cache_utility_application_cache_description') }}</p>
                 </div>
@@ -87,7 +87,7 @@
 
         <div class="p-4___REPLACED border-t bg-grey-20 rounded-b">
             <div class="flex justify-between items-center">
-                <div class="pr-4">
+                <div class="pr-8___REPLACED">
                     <h2 class="font-bold">{{ __('Image Cache') }}</h2>
                     <p class="text-grey text-sm my-2___REPLACED">{{ __('statamic::messages.cache_utility_image_cache_description') }}</p>
                 </div>
