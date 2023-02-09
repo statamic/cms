@@ -35,7 +35,7 @@
                 <div class="flex-1 text-lg">
                     <div class="little-heading p-0 mb-2___REPLACED text-grey-70" v-text="__('Seller')" />
                     <a :href="addon.seller.website" class="relative flex items-center">
-                        <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full w-6 mr-1">
+                        <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full w-6 mr-2___REPLACED">
                         <span class="font-bold">{{ addon.seller.name }}</span>
                     </a>
                 </div>

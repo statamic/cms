@@ -19,7 +19,7 @@
             <div class="blueprint-add-section-container w-full md:w-1/2" v-if="!singleSection">
                 <button class="blueprint-add-section-button outline-none" @click="addSection">
                     <div class="text-center flex items-center leading-none">
-                        <div class="text-2xl mr-1">+</div>
+                        <div class="text-2xl mr-2___REPLACED">+</div>
                         <div v-text="addSectionText" />
                     </div>
 

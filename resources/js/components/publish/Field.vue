@@ -14,7 +14,7 @@
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
                 <i class="required ml-1___REPLACED" v-if="config.required">*</i>
-                <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-2___REPLACED mr-1" v-tooltip="lockingUser.name" />
+                <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-2___REPLACED mr-2___REPLACED" v-tooltip="lockingUser.name" />
                 <span v-if="isReadOnly && !isSection" class="text-grey-50 font-normal text-2xs mx-1___REPLACED">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>

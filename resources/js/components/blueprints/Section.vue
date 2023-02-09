@@ -11,15 +11,15 @@
             <div class="bg-grey-20 border-b text-sm flex rounded-t" v-if="!isSingle">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
                 <div class="p-1.5 py-1 flex-1">
-                    <span class="font-medium mr-1">
+                    <span class="font-medium mr-2___REPLACED">
                         <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
                     </span>
-                    <span class="font-mono text-xs text-grey-70 mr-1">
+                    <span class="font-mono text-xs text-grey-70 mr-2___REPLACED">
                         <input type="text" v-model="section.handle" @input="handleSyncedWithDisplay = false" class="bg-transparent w-full outline-none" />
                     </span>
                 </div>
                 <div class="flex items-center px-1.5">
-                    <button @click.prevent="toggleEditing" class="flex items-center text-grey-60 hover:text-grey-100 mr-1">
+                    <button @click.prevent="toggleEditing" class="flex items-center text-grey-60 hover:text-grey-100 mr-2___REPLACED">
                         <svg-icon class="h-4 w-4" :name="isEditing ? 'shrink' : 'expand'" />
                     </button>
                     <button @click.prevent="$emit('deleted')" class="flex items-center text-grey-60 hover:text-grey-100" v-if="deletable">

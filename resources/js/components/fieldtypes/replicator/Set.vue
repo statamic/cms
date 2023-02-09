@@ -7,7 +7,7 @@
         <div class="replicator-set-header" :class="{ 'p-1': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
             <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
             <div class="flex-1 p-1 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-1 cursor-pointer"/>
+                <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2___REPLACED cursor-pointer"/>
                 <div
                     v-if="config.instructions"
                     v-show="!collapsed"

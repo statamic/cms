@@ -68,7 +68,7 @@
                     >
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
-                                <div class="little-dot mr-1" :class="getStatusClass(entry)" />
+                                <div class="little-dot mr-2___REPLACED" :class="getStatusClass(entry)" />
                                 <a :href="entry.edit_url" @click.stop>{{ entry.title }}</a>
                             </div>
                         </template>

@@ -8,7 +8,7 @@
                 @click="expandAll"
             />
             <a
-                class="text-2xs text-blue mr-1 underline"
+                class="text-2xs text-blue mr-2___REPLACED underline"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />

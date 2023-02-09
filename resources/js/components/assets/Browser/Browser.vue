@@ -52,12 +52,12 @@
 
                                     <template v-if="! hasSelections">
                                         <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-4___REPLACED" @click="creatingFolder = true">
-                                            <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
+                                            <svg-icon name="folder-add" class="h-4 w-4 mr-2___REPLACED" />
                                             <span>{{ __('Create Folder') }}</span>
                                         </button>
 
                                         <button v-if="canUpload" class="btn-flat btn-icon-only ml-4___REPLACED" @click="openFileBrowser">
-                                            <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
+                                            <svg-icon name="upload" class="h-4 w-4 mr-2___REPLACED text-current" />
                                             <span>{{ __('Upload') }}</span>
                                         </button>
                                     </template>
@@ -104,7 +104,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
                                             <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter group-hover:text-blue" />
+                                                <file-icon extension="folder" class="w-8 h-8 mr-2___REPLACED inline-block text-blue-lighter group-hover:text-blue" />
                                                 ..
                                             </a>
                                         </td>
@@ -114,7 +114,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter group-hover:text-blue" />
+                                                <file-icon extension="folder" class="w-8 h-8 mr-2___REPLACED inline-block text-blue-lighter group-hover:text-blue" />
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
@@ -149,7 +149,7 @@
 
                                 <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
                                     <div class="flex items-center w-fit-content group">
-                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-1 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
+                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-2___REPLACED cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
                                         <label :for="checkboxId" class="cursor-pointer select-none group-hover:text-blue" @click.stop="$emit('edit-asset', asset)">
                                             {{ asset.basename }}
                                         </label>

@@ -12,7 +12,7 @@
             <loading-graphic v-else :inline="true" text="" />
         </div>
 
-        <div class="w-6 mr-1">
+        <div class="w-6 mr-2___REPLACED">
             <file-icon :extension="extension"></file-icon>
         </div>
 

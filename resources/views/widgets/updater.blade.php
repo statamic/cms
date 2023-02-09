@@ -1,7 +1,7 @@
 <div class="card p-0 h-full">
     <header class="flex justify-between items-center p-2 border-b">
         <h2 class="flex items-center">
-            <div class="h-6 w-6 mr-1 text-grey-80">
+            <div class="h-6 w-6 mr-2___REPLACED text-grey-80">
                 @cp_svg('loading-bar')
             </div>
             <span>{{ __('Updates') }}</span>

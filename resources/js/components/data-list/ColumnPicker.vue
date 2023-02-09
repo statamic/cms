@@ -22,7 +22,7 @@
                     <h6 v-text="__('Displayed Columns')" class="p-1"/>
                     <div class="column-picker-item sortable" v-for="column in selectedColumns" :key="column.field">
                         <label>
-                            <input type="checkbox" class="mr-1" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
+                            <input type="checkbox" class="mr-2___REPLACED" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
                             {{ column.label }}
                         </label>
                     </div>
@@ -33,7 +33,7 @@
                 <h6 v-text="__('Available Columns')" class="px-1 pb-1"/>
                 <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field">
                     <label class="cursor-pointer">
-                        <input type="checkbox" class="mr-1" v-model="column.visible" @change="columnToggled(column) "/>
+                        <input type="checkbox" class="mr-2___REPLACED" v-model="column.visible" @change="columnToggled(column) "/>
                         {{ column.label }}
                     </label>
                 </div>

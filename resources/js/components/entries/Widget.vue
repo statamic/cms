@@ -16,7 +16,7 @@
                 <data-list-table :loading="loading">
                     <template slot="cell-title" slot-scope="{ row: entry }">
                         <div class="flex items-center">
-                            <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
+                            <div class="little-dot mr-2___REPLACED" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
                             <a :href="entry.edit_url">{{ entry.title }}</a>
                         </div>
                     </template>

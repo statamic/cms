@@ -4,8 +4,8 @@
         <div class="page-move w-6" />
         <div class="flex items-center flex-1 p-1 ml-2___REPLACED text-xs leading-normal">
             <div class="flex items-center flex-1">
-                <div class="little-dot mr-1" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />
-                <svg-icon name="home-page" class="mr-1 h-4 w-4 text-grey-80" v-if="isRoot" v-tooltip="__('This is the root page')" />
+                <div class="little-dot mr-2___REPLACED" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />
+                <svg-icon name="home-page" class="mr-2___REPLACED h-4 w-4 text-grey-80" v-if="isRoot" v-tooltip="__('This is the root page')" />
                 <a
                     @click="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"

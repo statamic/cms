@@ -3,7 +3,7 @@
     <div class="datetime">
 
         <button type="button" class="btn flex mb-2___REPLACED md:mb-0 items-center pl-1.5" v-if="!isReadOnly && config.inline === false && !hasDate" @click="addDate" tabindex="0">
-            <svg-icon name="calendar" class="w-4 h-4 mr-1"></svg-icon>
+            <svg-icon name="calendar" class="w-4 h-4 mr-2___REPLACED"></svg-icon>
     		{{ __('Add Date') }}
     	</button>
 

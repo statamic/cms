@@ -6,7 +6,7 @@
     >
         <div class="item-move" v-if="sortable">&nbsp;</div>
         <div class="item-inner">
-            <div v-if="statusIcon" class="little-dot mr-1" :class="item.status" />
+            <div v-if="statusIcon" class="little-dot mr-2___REPLACED" :class="item.status" />
 
             <div
                 v-if="item.invalid"
@@ -28,7 +28,7 @@
 
         </div>
 
-        <div v-if="item.collection" v-text="item.collection.title" class="text-4xs text-grey-60 uppercase whitespace-nowrap mr-1" />
+        <div v-if="item.collection" v-text="item.collection.title" class="text-4xs text-grey-60 uppercase whitespace-nowrap mr-2___REPLACED" />
 
         <div class="pr-1 flex items-center" v-if="!readOnly">
             <dropdown-list>

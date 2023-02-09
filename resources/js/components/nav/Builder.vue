@@ -8,7 +8,7 @@
             <div class="flex items-center">
                 <h1 class="flex-1">{{ title }}</h1>
 
-                <dropdown-list class="mr-1">
+                <dropdown-list class="mr-2___REPLACED">
                     <dropdown-item :text="__('Reset Nav Customizations')" class="warning" @click="confirmingReset = true"></dropdown-item>
                 </dropdown-list>
 
@@ -42,7 +42,7 @@
                         <h6 class="p-1">{{ __('Save to') }}...</h6>
                         <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)" class="group">
                             <div class="flex items-start pr-2">
-                                <svg-icon :name="option.icon" class="text-grey flex-shrink-0 mr-1 w-4 group-hover:text-white" />
+                                <svg-icon :name="option.icon" class="text-grey flex-shrink-0 mr-2___REPLACED w-4 group-hover:text-white" />
                                 <span class="whitespace-normal">{{ option.label }}</span>
                             </div>
                         </dropdown-item>
@@ -58,7 +58,7 @@
                 @click="expandAll"
             />
             <a
-                class="text-2xs text-blue mr-1 underline"
+                class="text-2xs text-blue mr-2___REPLACED underline"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />

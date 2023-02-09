@@ -8,7 +8,7 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
 
-                <dropdown-list class="mr-1">
+                <dropdown-list class="mr-2___REPLACED">
                     <slot name="twirldown" />
                 </dropdown-list>
 

@@ -9,8 +9,8 @@
                 </div>
 
                 <div class="flex items-center p-1 pt-0 rounded-b" @paste.stop>
-                    <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-1" />
-                    <button class="btn-flat mr-1" @click="openSelector">
+                    <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-2___REPLACED" />
+                    <button class="btn-flat mr-2___REPLACED" @click="openSelector">
                         {{ __('Replace') }}
                     </button>
                     <button class="btn-flat" @click="deleteNode">

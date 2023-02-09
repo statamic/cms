@@ -48,11 +48,11 @@
 
                         <loading-graphic v-if="isLoading" :inline="true" />
 
-                        <div v-else class="flex-1 flex items-center mr-1 truncate">
+                        <div v-else class="flex-1 flex items-center mr-2___REPLACED truncate">
                             <img
                                 v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
                                 :src="itemData.asset.thumbnail || itemData.asset.url"
-                                class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-1 fit-cover lazyloaded"
+                                class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-2___REPLACED fit-cover lazyloaded"
                             >
                             {{ displayValue }}
                         </div>
@@ -81,7 +81,7 @@
                 </div>
 
                 <label for="target-blank" class="flex items-center font-normal">
-                    <input class="checkbox mr-1" type="checkbox" v-model="targetBlank" id="target-blank">
+                    <input class="checkbox mr-2___REPLACED" type="checkbox" v-model="targetBlank" id="target-blank">
                     {{ __('Open in new window') }}
                 </label>
             </div>

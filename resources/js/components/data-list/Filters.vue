@@ -99,11 +99,11 @@
         </div>
 
         <div class="flex flex-wrap mt-2___REPLACED" v-if="activeCount">
-            <div class="filter-badge mr-1" v-for="(badge, handle) in fieldFilterBadges">
+            <div class="filter-badge mr-2___REPLACED" v-for="(badge, handle) in fieldFilterBadges">
                 <span>{{ badge }}</span>
                 <button @click="removeFieldFilter(handle)">&times;</button>
             </div>
-            <div class="filter-badge mr-1" v-for="(badge, handle) in standardBadges">
+            <div class="filter-badge mr-2___REPLACED" v-for="(badge, handle) in standardBadges">
                 <span>{{ badge }}</span>
                 <button @click="removeStandardFilter(handle)">&times;</button>
             </div>

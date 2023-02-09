@@ -37,7 +37,7 @@
                     >
                         <template slot="cell-email" slot-scope="{ row: user, value }">
                             <a :href="user.edit_url" class="flex items-center">
-                                <avatar :user="user" class="w-8 h-8 rounded-full mr-1" />
+                                <avatar :user="user" class="w-8 h-8 rounded-full mr-2___REPLACED" />
                                 {{ value }}
                             </a>
                         </template>

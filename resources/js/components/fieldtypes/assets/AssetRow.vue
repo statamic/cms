@@ -3,7 +3,7 @@
         <td class="flex items-center h-full">
             <div
                 v-if="canShowSvg"
-                class="img svg-img mr-1 h-7 w-7 bg-no-repeat bg-center bg-cover text-center flex items-center justify-center"
+                class="img svg-img mr-2___REPLACED h-7 w-7 bg-no-repeat bg-center bg-cover text-center flex items-center justify-center"
                 :style="'background-image:url(' + thumbnail + ')'"
             ></div>
             <button

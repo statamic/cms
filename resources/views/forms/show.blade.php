@@ -14,7 +14,7 @@
                 {{ $form->title() }}
             </h1>
 
-            <dropdown-list class="mr-1">
+            <dropdown-list class="mr-2___REPLACED">
                 @can('edit', $form)
                     <dropdown-item :text="__('Edit Form')" redirect="{{ $form->editUrl() }}"></dropdown-item>
                 @endcan

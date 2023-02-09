@@ -9,7 +9,7 @@
                 <p class="mb-4___REPLACED" v-text="__('Are you sure you want to remove this page?')" />
                 <p class="mb-4___REPLACED" v-text="__('Only the references will be removed. Entries will not be deleted.')" />
                 <label class="flex items-center" v-if="children">
-                    <input type="checkbox" class="mr-1" v-model="shouldDeleteChildren" />
+                    <input type="checkbox" class="mr-2___REPLACED" v-model="shouldDeleteChildren" />
                     {{ __n('Remove child page|Remove :count child pages', children) }}
                 </label>
             </div>

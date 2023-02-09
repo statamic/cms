@@ -48,7 +48,7 @@
                 @foreach ($addons as $addon)
                 <tr>
                     <td class="w-64"><a href="{{ route('statamic.cp.updater.product', $addon -> slug()) }}"
-                            class="text-blue font-bold mr-1">{{ $addon -> name() }}</a>
+                            class="text-blue font-bold mr-2___REPLACED">{{ $addon -> name() }}</a>
                     <td>{{ $addon -> version() }}</td>
                     @if ($count = $addon->changelog()->availableUpdatesCount())
                     <td class="text-right"><span

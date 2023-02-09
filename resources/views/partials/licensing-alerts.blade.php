@@ -25,7 +25,7 @@
                 @if ($licenses->isOnTestDomain())
                     <div class="flex items-center justify-between">
                         <span>
-                            <b class="mr-1">{{ __('Trial Mode') }}:</b>
+                            <b class="mr-2___REPLACED">{{ __('Trial Mode') }}:</b>
                             @if ($licenses->onlyAddonsAreInvalid())
                                 {{ __('statamic::messages.licensing_trial_mode_alert_addons') }}
                             @elseif ($licenses->onlyStatamicIsInvalid())

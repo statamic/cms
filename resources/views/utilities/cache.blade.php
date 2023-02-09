@@ -27,7 +27,7 @@
                     <p class="text-grey text-sm my-2___REPLACED">{{ __('statamic::messages.cache_utility_stache_description') }}</p>
                 </div>
                 <div class="flex">
-                    <form method="POST" action="{{ cp_route('utilities.cache.warm', 'stache') }}" class="mr-1">
+                    <form method="POST" action="{{ cp_route('utilities.cache.warm', 'stache') }}" class="mr-2___REPLACED">
                         @csrf
                         <button class="btn">{{ __('Warm') }}</button>
                     </form>

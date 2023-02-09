@@ -37,7 +37,7 @@
                 @if ($multipleBlueprints)
                     @foreach ($collection->entryBlueprints() as $blueprint)
                         <a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site, 'blueprint' => $blueprint->handle()]) }}"
-                           class="text-blue text-sm mr-1">{{ $blueprint->title() }} &rarr;</a>
+                           class="text-blue text-sm mr-2___REPLACED">{{ $blueprint->title() }} &rarr;</a>
                     @endforeach
                 @endif
             </div>

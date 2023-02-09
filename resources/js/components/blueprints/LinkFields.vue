@@ -3,7 +3,7 @@
     <div>
 
         <button class="btn flex w-full justify-center items-center" @click="open = true">
-            <svg-icon name="hyperlink" class="mr-1 w-4 h-4" />
+            <svg-icon name="hyperlink" class="mr-2___REPLACED w-4 h-4" />
             <span>{{ __('Link Existing') }}</span>
         </button>
 
@@ -34,7 +34,7 @@
                             v-model="reference">
                             <template slot="option" slot-scope="option">
                                 <div class="flex items-center">
-                                    <span v-text="option.fieldset" class="text-2xs text-grey-50 mr-1" />
+                                    <span v-text="option.fieldset" class="text-2xs text-grey-50 mr-2___REPLACED" />
                                     <span v-text="option.label" />
                                 </div>
                             </template>

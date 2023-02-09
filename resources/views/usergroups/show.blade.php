@@ -11,7 +11,7 @@
         ])
         <div class="flex items-center">
             <h1 class="flex-1">{{ $group->title() }}</h1>
-            <dropdown-list class="mr-1">
+            <dropdown-list class="mr-2___REPLACED">
                 @can('edit', $group)
                     <dropdown-item :text="__('Edit User Group')" redirect="{{ $group->editUrl() }}"></dropdown-item>
                 @endcan

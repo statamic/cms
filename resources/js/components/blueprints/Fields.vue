@@ -31,7 +31,7 @@
             </div>
             <div class="px-sm">
                 <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
-                    <svg-icon name="wireframe" class="mr-1 w-4 h-4" />
+                    <svg-icon name="wireframe" class="mr-2___REPLACED w-4 h-4" />
                     {{ __('Create Field') }}
                 </button>
             </div>

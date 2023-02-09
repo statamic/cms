@@ -54,7 +54,7 @@
 
                     <div class="text-xs mt-4___REPLACED" v-if="type === 'entry'">
                         <a :href="editEntryUrl" target="_blank" class="flex items-center justify-center text-blue hover:text-blue-dark underline">
-                            <svg-icon name="external-link" class="w-4 h-4 mr-1" />
+                            <svg-icon name="external-link" class="w-4 h-4 mr-2___REPLACED" />
                             {{ __('Edit Entry') }}
                         </a>
                     </div>

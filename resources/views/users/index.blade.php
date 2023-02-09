@@ -10,7 +10,7 @@
         </h1>
 
         @can('configure fields')
-            <dropdown-list class="mr-1">
+            <dropdown-list class="mr-2___REPLACED">
                 <dropdown-item :text="__('Edit Blueprint')" redirect="{{ cp_route('users.blueprint.edit') }}"></dropdown-item>
             </dropdown-list>
         @endcan

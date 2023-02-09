@@ -11,7 +11,7 @@
                     <svg-icon name="lock" class="w-4 mr-1___REPLACED -mt-sm" /> {{ __('Read Only') }}
                 </div>
 
-                <dropdown-list v-if="canConfigure || canEditBlueprint" class="mr-1">
+                <dropdown-list v-if="canConfigure || canEditBlueprint" class="mr-2___REPLACED">
                     <dropdown-item v-if="canConfigure" v-text="__('Configure')" :redirect="configureUrl" />
                     <dropdown-item v-if="canEditBlueprint" :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
                 </dropdown-list>

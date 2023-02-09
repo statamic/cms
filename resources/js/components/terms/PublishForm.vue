@@ -7,7 +7,7 @@
             <h1 class="flex-1">
                 <div class="flex items-center">
                     <span v-if="! isCreating"
-                        class="little-dot mr-1"
+                        class="little-dot mr-2___REPLACED"
                         :class="{ 'bg-green-light': published, 'bg-grey-60': !published }" />
                     <span v-html="$options.filters.striptags(title)" />
                 </div>
@@ -106,7 +106,7 @@
                                             class="flex items-center justify-center btn-flat w-full mx-2___REPLACED px-1"
                                             v-if="isBase"
                                             @click="openLivePreview">
-                                            <svg-icon name="synchronize" class="w-5 h-5 mr-1" />
+                                            <svg-icon name="synchronize" class="w-5 h-5 mr-2___REPLACED" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
@@ -114,7 +114,7 @@
                                             v-if="permalink"
                                             :href="permalink"
                                             target="_blank">
-                                            <svg-icon name="external-link" class="w-4 h-4 mr-1" />
+                                            <svg-icon name="external-link" class="w-4 h-4 mr-2___REPLACED" />
                                             <span>{{ __('Visit URL') }}</span>
                                         </a>
                                     </div>
@@ -153,7 +153,7 @@
                                             class="flex items-center justify-center mt-4___REPLACED btn-flat px-1 w-full"
                                             v-if="!isCreating && revisionsEnabled"
                                             @click="showRevisionHistory = true">
-                                            <svg-icon name="history" class="w-5 h-5 mr-1" />
+                                            <svg-icon name="history" class="w-5 h-5 mr-2___REPLACED" />
                                             <span>{{ __('View History') }}</span>
                                         </button>
                                 </div>
@@ -169,7 +169,7 @@
                                         @click="localizationSelected(option)"
                                     >
                                         <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
-                                            <span class="little-dot mr-1" :class="{
+                                            <span class="little-dot mr-2___REPLACED" :class="{
                                                 'bg-green': option.published,
                                                 'bg-grey-50': !option.published,
                                                 'bg-red': !option.exists

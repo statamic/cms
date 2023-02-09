@@ -5,7 +5,7 @@
             v-for="(part, index) in pathParts"
             :key="index"
             @click="selectFolder(index)"
-            class="mr-1 group"
+            class="mr-2___REPLACED group"
         >
             <span v-if="index !== 0" class="px-sm text-grey-70">></span>
             <span class="icon icon-folder text-blue-lighter group-hover:text-blue" />

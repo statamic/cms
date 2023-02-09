@@ -38,7 +38,7 @@
                         <td>
                             <div class="flex items-center">
                                 <div class="w-4 h-4 mr-2">@cp_svg('content-writing')</div>
-                                <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green' }} mr-1" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
+                                <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green' }} mr-2___REPLACED" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
                                 <a href="{{ cp_route('collections.blueprints.edit', [$collection, $blueprint]) }}">{{ $blueprint->title() }}</a>
                             </div>
                         </td>
@@ -62,7 +62,7 @@
                         <td>
                             <div class="flex items-center">
                                 <div class="w-4 h-4 mr-2">@cp_svg('tags')</div>
-                                <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green' }} mr-1" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
+                                <span class="little-dot {{ $blueprint->hidden() ? 'hollow' : 'bg-green' }} mr-2___REPLACED" v-tooltip="'{{ __($blueprint->hidden() ? 'Hidden': 'Visible') }}'"></span>
                                 <a href="{{ cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]) }}">{{ $blueprint->title() }}</a>
                             </div>
                         </td>

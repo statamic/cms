@@ -48,7 +48,7 @@
                             >
                                 <template slot="cell-title" slot-scope="{ row: entry }">
                                     <div class="flex items-center">
-                                        <div v-if="entry.published !== undefined" class="little-dot mr-1" :class="getStatusClass(entry)" />
+                                        <div v-if="entry.published !== undefined" class="little-dot mr-2___REPLACED" :class="getStatusClass(entry)" />
                                         {{ entry.title }}
                                     </div>
                                 </template>
