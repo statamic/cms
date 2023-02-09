@@ -157,7 +157,7 @@
     </div>
 
     <h2 class="mb-2___REPLACED">Colors</h2>
-    <div class="bg-white p-5 shadow rounded-lg overflow-hidden mb-16___REPLACED">
+    <div class="bg-white p-10___REPLACED shadow rounded-lg overflow-hidden mb-16___REPLACED">
 
         <h6 class="mb-4___REPLACED">Greys</h6>
         <div class="flex flex-row-reverse text-sm text-center mb-8___REPLACED">
