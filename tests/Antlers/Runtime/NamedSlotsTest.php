@@ -27,7 +27,7 @@ EOT;
         <div class="font-bold text-xl mb-4___REPLACED">Test Title</div>
         <p class="text-gray-700 text-base">Test description.</p>
     </div>
-    <div class="px-16___REPLACED pt-4 pb-4___REPLACED">
+    <div class="px-16___REPLACED pt-8___REPLACED pb-4___REPLACED">
         
         <span class="inline-block bg-gray-200 rounded-full px-6___REPLACED py-2___REPLACED text-sm font-semibold text-gray-700 mr-4___REPLACED mb-4___REPLACED">#tag1</span>
         <span class="inline-block bg-gray-200 rounded-full px-6___REPLACED py-2___REPLACED text-sm font-semibold text-gray-700 mr-4___REPLACED mb-4___REPLACED">#tag2</span>
@@ -63,7 +63,7 @@ EOT;
         <div class="font-bold text-xl mb-4___REPLACED">Test Title</div>
         <p class="text-gray-700 text-base">Test description.</p>
     </div>
-    <div class="px-16___REPLACED pt-4 pb-4___REPLACED">
+    <div class="px-16___REPLACED pt-8___REPLACED pb-4___REPLACED">
         
             <span>I am the new content!</span>
         
