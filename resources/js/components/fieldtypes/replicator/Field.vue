@@ -5,7 +5,7 @@
         <label class="block">
             {{ display }}
             <i class="required" v-if="field.required">*</i>
-            <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm" v-text="__('Read Only')" />
+            <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-1___REPLACED" v-text="__('Read Only')" />
         </label>
 
         <div
