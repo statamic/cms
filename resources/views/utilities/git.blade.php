@@ -27,15 +27,15 @@
                 <h2>{{ __('Repository path') }}: <code class="font-normal">{{ $path }}</code></h2>
                 <pre class="mt-4___REPLACED p-2 rounded text-sm font-mono bg-grey-30 text-grey-70">{{ $status->status }}</pre>
                 <div class="mt-4___REPLACED text-sm text-grey flex">
-                    <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Affected files') }}:</span> {{ $status->totalCount }}</div>
+                    <div class="mr-4___REPLACED badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Affected files') }}:</span> {{ $status->totalCount }}</div>
                     @if ($status->addedCount)
-                        <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Added') }}:</span> {{ $status->addedCount }}</div>
+                        <div class="mr-4___REPLACED badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Added') }}:</span> {{ $status->addedCount }}</div>
                     @endif
                     @if ($status->modifiedCount)
-                        <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Modified') }}:</span> {{ $status->modifiedCount }}</div>
+                        <div class="mr-4___REPLACED badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Modified') }}:</span> {{ $status->modifiedCount }}</div>
                     @endif
                     @if ($status->deletedCount)
-                        <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Deleted') }}:</span> {{ $status->deletedCount }}</div>
+                        <div class="mr-4___REPLACED badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Deleted') }}:</span> {{ $status->deletedCount }}</div>
                     @endif
                 </div>
             </div>

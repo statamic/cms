@@ -11,7 +11,7 @@
         <div class="flex flex-wrap">
         @foreach ($utilities as $utility)
             <a href="{{ $utility->url() }}" class="w-full lg:w-1/2 p-2 md:flex items-start hover:bg-grey-20 rounded-md group">
-                <div class="h-8 w-8 mr-2 text-grey-80">
+                <div class="h-8 w-8 mr-4___REPLACED text-grey-80">
                     {!! $utility->icon() !!}
                 </div>
                 <div class="text-blue flex-1 mb-4___REPLACED md:mb-0 md:mr-6___REPLACED">

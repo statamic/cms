@@ -67,14 +67,14 @@
     <div class="shadow bg-white p-4 rounded-lg mb-16___REPLACED">
         <h6 class="mb-4___REPLACED">Flavors</h6>
         <div class="mb-8___REPLACED flex">
-            <button class="mr-2 btn">Default Button</button>
-            <button class="mr-2 btn-primary">Primary Button</button>
-            <button class="mr-2 btn-danger">Danger Button</button>
+            <button class="mr-4___REPLACED btn">Default Button</button>
+            <button class="mr-4___REPLACED btn-primary">Primary Button</button>
+            <button class="mr-4___REPLACED btn-danger">Danger Button</button>
             <button class="btn-flat">Flat Button</button>
         </div>
         <h6 class="mb-4___REPLACED">With Dropdowns</h6>
         <div class="mb-8___REPLACED flex">
-            <div class="btn-group mr-2">
+            <div class="btn-group mr-4___REPLACED">
                 <button class="btn">Default Button</button>
                 <dropdown-list>
                     <template v-slot:trigger>
@@ -88,7 +88,7 @@
                     </li>
                 </dropdown-list>
             </div>
-            <div class="btn-group mr-2">
+            <div class="btn-group mr-4___REPLACED">
                 <button class="btn-primary">Default Button</button>
                 <dropdown-list>
                     <template v-slot:trigger>
@@ -102,7 +102,7 @@
                     </li>
                 </dropdown-list>
             </div>
-            <div class="btn-group mr-2">
+            <div class="btn-group mr-4___REPLACED">
                 <button class="btn-danger">Default Button</button>
                 <dropdown-list>
                     <template v-slot:trigger>
@@ -116,7 +116,7 @@
                     </li>
                 </dropdown-list>
             </div>
-            <div class="btn-group mr-2">
+            <div class="btn-group mr-4___REPLACED">
                 <button class="btn-flat">Default Button</button>
                 <dropdown-list>
                     <template v-slot:trigger>
@@ -133,25 +133,25 @@
         </div>
         <h6 class="mb-4___REPLACED">Disabled States</h6>
         <div class="mb-8___REPLACED flex">
-            <button disabled class="mr-2 btn disabled">Default Button</button>
-            <button disabled class="mr-2 btn-primary disabled">Primary Button</button>
-            <button disabled class="mr-2 btn-danger disabled">Danger Button</button>
+            <button disabled class="mr-4___REPLACED btn disabled">Default Button</button>
+            <button disabled class="mr-4___REPLACED btn-primary disabled">Primary Button</button>
+            <button disabled class="mr-4___REPLACED btn-danger disabled">Danger Button</button>
             <button disabled class="btn-flat disabled">Flat Button</button>
         </div>
 
         <h6 class="mb-4___REPLACED">Large</h6>
         <div class="mb-8___REPLACED flex">
-            <button class="mr-2 btn btn-lg">Default Button</button>
-            <button class="mr-2 btn-primary btn-lg">Primary Button</button>
-            <button class="mr-2 btn-danger btn-lg">Danger Button</button>
+            <button class="mr-4___REPLACED btn btn-lg">Default Button</button>
+            <button class="mr-4___REPLACED btn-primary btn-lg">Primary Button</button>
+            <button class="mr-4___REPLACED btn-danger btn-lg">Danger Button</button>
             <button class="btn-flat btn-lg">Flat Button</button>
         </div>
 
         <h6 class="mb-4___REPLACED">Small</h6>
         <div class="flex">
-            <button class="mr-2 btn btn-sm">Default Button</button>
-            <button class="mr-2 btn-primary btn-sm">Primary Button</button>
-            <button class="mr-2 btn-danger btn-sm">Danger Button</button>
+            <button class="mr-4___REPLACED btn btn-sm">Default Button</button>
+            <button class="mr-4___REPLACED btn-primary btn-sm">Primary Button</button>
+            <button class="mr-4___REPLACED btn-danger btn-sm">Danger Button</button>
             <button class="btn-flat btn-sm">Flat Button</button>
         </div>
     </div>

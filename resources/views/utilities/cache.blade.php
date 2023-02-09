@@ -38,10 +38,10 @@
                 </div>
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Records') }}:</span> {{ $stache['records'] }}</div>
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Size') }}:</span> {{ $stache['size'] }}</div>
+                <div class="mr-4___REPLACED badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Records') }}:</span> {{ $stache['records'] }}</div>
+                <div class="mr-4___REPLACED badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Size') }}:</span> {{ $stache['size'] }}</div>
                 @if ($stache['time'])
-                    <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Build time') }}:</span> {{ $stache['time'] }}</div>
+                    <div class="mr-4___REPLACED badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Build time') }}:</span> {{ $stache['time'] }}</div>
                 @endif
                 @if ($stache['rebuilt'])
                     <div class="badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Last rebuild') }}:</span> {{ $stache['rebuilt'] }}</div>
@@ -62,9 +62,9 @@
                 @endunless
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-2 badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Strategy') }}:</span> {{ $static['strategy'] }}</div>
+                <div class="mr-4___REPLACED badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Strategy') }}:</span> {{ $static['strategy'] }}</div>
                 @if ($static['enabled'])
-                    <div class="mr-2 badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Pages') }}:</span> {{ $static['count'] }}</div>
+                    <div class="mr-4___REPLACED badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Pages') }}:</span> {{ $static['count'] }}</div>
                 @endif
             </div>
         </div>
@@ -81,7 +81,7 @@
                 </form>
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Driver') }}:</span> {{ $cache['driver'] }}</div>
+                <div class="mr-4___REPLACED badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Driver') }}:</span> {{ $cache['driver'] }}</div>
             </div>
         </div>
 
@@ -97,8 +97,8 @@
                 </form>
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-2 badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Cached images') }}:</span> {{ $images['count'] }}</div>
-                <div class="mr-2 badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Size') }}:</span> {{ $images['size'] }}</div>
+                <div class="mr-4___REPLACED badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Cached images') }}:</span> {{ $images['count'] }}</div>
+                <div class="mr-4___REPLACED badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Size') }}:</span> {{ $images['size'] }}</div>
             </div>
         </div>
     </div>

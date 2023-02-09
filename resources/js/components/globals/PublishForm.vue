@@ -18,7 +18,7 @@
 
                 <site-selector
                     v-if="localizations.length > 1"
-                    class="mr-2"
+                    class="mr-4___REPLACED"
                     :sites="localizations"
                     :value="site"
                     @input="localizationSelected"

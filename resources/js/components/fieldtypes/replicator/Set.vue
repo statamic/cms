@@ -23,7 +23,7 @@
             <div class="replicator-set-controls" v-if="!isReadOnly">
                 <toggle-fieldtype
                     handle="set-enabled"
-                    class="toggle-sm mr-2"
+                    class="toggle-sm mr-4___REPLACED"
                     @input="toggleEnabledState"
                     :value="values.enabled"
                     v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />

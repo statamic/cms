@@ -13,11 +13,11 @@
                 </div>
             </h1>
 
-            <dropdown-list class="mr-2" v-if="canEditBlueprint">
+            <dropdown-list class="mr-4___REPLACED" v-if="canEditBlueprint">
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
             </dropdown-list>
 
-            <div class="pt-px text-2xs text-grey-60 flex mr-2" v-if="readOnly">
+            <div class="pt-px text-2xs text-grey-60 flex mr-4___REPLACED" v-if="readOnly">
                 <svg-icon name="lock" class="w-4 mr-1___REPLACED -mt-sm" /> {{ __('Read Only') }}
             </div>
 
@@ -196,7 +196,7 @@
                 class="btn-lg"
                 :class="{
                     'btn-primary w-full': ! revisionsEnabled,
-                    'btn w-1/2 mr-2': revisionsEnabled,
+                    'btn w-1/2 mr-4___REPLACED': revisionsEnabled,
                 }"
                 :disabled="!canSave"
                 @click.prevent="save"

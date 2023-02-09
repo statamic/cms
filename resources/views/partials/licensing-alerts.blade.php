@@ -35,7 +35,7 @@
                             @endif
                         </span>
                         <div class="flex">
-                            <button @click="hideBanner" class="mr-2 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
+                            <button @click="hideBanner" class="mr-4___REPLACED text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
                             <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Manage Licenses') }}">
                                 {{ __('Manage Licenses') }} &rarr;
@@ -57,7 +57,7 @@
                             {{ __('statamic::messages.licensing_production_alert') }}
                         @endif
                         <div class="flex">
-                            <button @click="hideBanner" class="mr-2 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
+                            <button @click="hideBanner" class="mr-4___REPLACED text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
                                 <a href="{{ cp_route('utilities.licensing') }}" class="text-2xs text-white hover:text-yellow flex items-center" aria-label="{{ __('Manage Licenses') }}">
                                     {{ __('Manage Licenses') }} &rarr;

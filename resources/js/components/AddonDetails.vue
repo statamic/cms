@@ -2,7 +2,7 @@
     <div>
         <div class="flex items-center mb-6___REPLACED">
             <h1 class="flex-1" v-text="addon.name" />
-            <a :href="addon.url" target="_blank" class="btn mr-2" v-text="__('View on Marketplace')" />
+            <a :href="addon.url" target="_blank" class="btn mr-4___REPLACED" v-text="__('View on Marketplace')" />
             <button v-if="addon.installed" class="btn" :disabled="processing" @click="uninstall" v-text="__('Uninstall')" />
             <button v-else class="btn btn-primary" :disabled="processing" @click="install" v-text="__('Install')" />
         </div>
@@ -20,7 +20,7 @@
                 <composer-output :package="package" />
                 <button
                     v-if="!composer.processing"
-                    class="btn-close absolute top-0 right-0 mt-4___REPLACED mr-2"
+                    class="btn-close absolute top-0 right-0 mt-4___REPLACED mr-4___REPLACED"
                     aria-label="Close"
                     @click="closeModal"
                     v-html="'&times'" />

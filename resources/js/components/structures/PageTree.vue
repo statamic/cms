@@ -3,7 +3,7 @@
 
         <div class="mb-2___REPLACED flex justify-end">
             <a
-                class="text-2xs text-blue mr-2 underline"
+                class="text-2xs text-blue mr-4___REPLACED underline"
                 v-text="__('Expand All')"
                 @click="expandAll"
             />

@@ -13,7 +13,7 @@
                     <slot name="twirldown" />
                 </dropdown-list>
 
-                <div class="btn-group mr-2" v-if="canUseStructureTree && !treeIsDirty">
+                <div class="btn-group mr-4___REPLACED" v-if="canUseStructureTree && !treeIsDirty">
                     <button class="btn flex items-center px-2" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
                         <svg-icon name="structures" class="h-4 w-4"/>
                     </button>
@@ -25,7 +25,7 @@
                 <template v-if="view === 'tree'">
 
                     <a
-                        class="text-2xs text-blue mr-2 underline"
+                        class="text-2xs text-blue mr-4___REPLACED underline"
                         v-if="treeIsDirty"
                         v-text="__('Discard changes')"
                         @click="cancelTreeProgress"
@@ -33,14 +33,14 @@
 
                     <site-selector
                         v-if="sites.length > 1"
-                        class="mr-2"
+                        class="mr-4___REPLACED"
                         :sites="sites"
                         :value="site"
                         @input="site = $event.handle"
                     />
 
                     <button
-                        class="btn mr-2"
+                        class="btn mr-4___REPLACED"
                         :class="{ 'disabled': !treeIsDirty, 'btn-danger': deletedEntries.length }"
                         :disabled="!treeIsDirty"
                         @click="saveTree"
@@ -52,13 +52,13 @@
                 <template v-if="view === 'list' && reorderable">
                     <site-selector
                         v-if="sites.length > 1 && reordering && site"
-                        class="mr-2"
+                        class="mr-4___REPLACED"
                         :sites="sites"
                         :value="site"
                         @input="site = $event.handle"
                     />
 
-                    <button class="btn mr-2"
+                    <button class="btn mr-4___REPLACED"
                         v-if="!reordering"
                         @click="reordering = true"
                         v-text="__('Reorder')" />

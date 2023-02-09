@@ -16,7 +16,7 @@
             @csrf
 
             <div class="flex items-center">
-                <input class="input-text mr-2" type="text" name="email" value="{{ old('email', $user->email()) }}" />
+                <input class="input-text mr-4___REPLACED" type="text" name="email" value="{{ old('email', $user->email()) }}" />
                 <button type="submit" class="btn-primary">{{ __('Send Test Email') }}</button>
             </div>
             @if ($errors->has('email'))

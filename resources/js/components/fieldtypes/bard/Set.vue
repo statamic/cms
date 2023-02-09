@@ -25,7 +25,7 @@
                 <div class="replicator-set-controls">
                     <toggle-fieldtype
                         handle="set-enabled"
-                        class="toggle-sm mr-2"
+                        class="toggle-sm mr-4___REPLACED"
                         v-model="enabled"
                         v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
                     <dropdown-list class="-mt-sm">

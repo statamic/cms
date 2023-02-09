@@ -12,7 +12,7 @@
                     <dropdown-item :text="__('Reset Nav Customizations')" class="warning" @click="confirmingReset = true"></dropdown-item>
                 </dropdown-list>
 
-                <a @click="discardChanges" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
+                <a @click="discardChanges" class="text-2xs text-blue mr-4___REPLACED underline" v-if="isDirty" v-text="__('Discard changes')" />
 
                 <dropdown-list>
                     <template #trigger>
@@ -53,7 +53,7 @@
 
         <div class="mb-2___REPLACED flex justify-end">
             <a
-                class="text-2xs text-blue mr-2 underline"
+                class="text-2xs text-blue mr-4___REPLACED underline"
                 v-text="__('Expand All')"
                 @click="expandAll"
             />

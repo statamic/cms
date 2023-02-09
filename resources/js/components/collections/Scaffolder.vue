@@ -9,7 +9,7 @@
                     <tr>
                         <td class="checkbox-column border-r" @click="selected.index = ! selected.index">
                             <div class="flex items-center h-full">
-                                <input type="checkbox" v-model="selected.index" class="mr-2" id="field_index" />
+                                <input type="checkbox" v-model="selected.index" class="mr-4___REPLACED" id="field_index" />
                             </div>
                         </td>
                         <td class="border-r">
@@ -22,7 +22,7 @@
                     <tr>
                         <td class="checkbox-column border-r" @click="selected.show = ! selected.show">
                             <div class="flex items-center h-full">
-                                <input type="checkbox" v-model="selected.show" class="mr-2" id="field_template" />
+                                <input type="checkbox" v-model="selected.show" class="mr-4___REPLACED" id="field_template" />
                             </div>
                         </td>
                         <td class="border-r">
