@@ -8,7 +8,7 @@
             <div class="flex items-center px-2 py-1 border-b">
 
                 <label
-                    class="mr-1.5 flex items-center font-normal"
+                    class="mr-3___REPLACED flex items-center font-normal"
                     v-for="type in visibleLinkTypes"
                     :for="type.type"
                     :key="type.type"
