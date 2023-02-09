@@ -11,7 +11,7 @@
 
         <!-- Step: User Info -->
         <div v-if="!completed && onUserInfoStep">
-            <div class="max-w-md mx-auto px-4___REPLACED py-6 text-center">
+            <div class="max-w-md mx-auto px-4___REPLACED py-16___REPLACED text-center">
                 <h1 class="mb-6___REPLACED">{{ __('Create User') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_intro')" />
             </div>
@@ -60,7 +60,7 @@
 
         <!-- Step: Roles & Groups -->
         <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-4___REPLACED pb-2">
-            <div class="py-6 text-center">
+            <div class="py-16___REPLACED text-center">
                 <h1 class="mb-6___REPLACED">{{ __('Roles & Groups') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_roles_groups_intro')" />
             </div>
@@ -116,7 +116,7 @@
 
         <!-- Step: Invitation -->
         <div v-if="!completed && onInvitationStep">
-            <div class="max-w-md mx-auto px-4___REPLACED py-6 text-center">
+            <div class="max-w-md mx-auto px-4___REPLACED py-16___REPLACED text-center">
                 <h1 class="mb-6___REPLACED">{{ __('Invitation') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_invitation_intro')" />
             </div>
@@ -153,7 +153,7 @@
 
         <!-- Post creation -->
         <div v-if="completed">
-            <div class="max-w-md mx-auto px-4___REPLACED py-6 text-center">
+            <div class="max-w-md mx-auto px-4___REPLACED py-16___REPLACED text-center">
                 <h1 class="mb-6___REPLACED">{{ __('User created') }}</h1>
                 <p class="text-grey" v-html="__('messages.user_wizard_account_created')" />
             </div>
