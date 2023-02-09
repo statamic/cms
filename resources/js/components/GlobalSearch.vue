@@ -20,7 +20,7 @@
             tabindex="-1"
         />
 
-        <span v-if="! (isDirty || searching)" class="rounded px-sm pb-px text-2xs border text-grey-60">/</span>
+        <span v-if="! (isDirty || searching)" class="rounded px-1___REPLACED pb-px text-2xs border text-grey-60">/</span>
         <loading-graphic v-if="searching" :size="14" :inline="true" text="" class="global-search-loading-indicator" />
 
         <div v-show="focused && (hasResults || hasFavorites)" class="global-search-results">
@@ -28,7 +28,7 @@
             <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-2___REPLACED flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
                 <svg-icon :name="getResultIcon(result)" class="icon"></svg-icon>
                 <div class="flex-1 ml-2___REPLACED title" v-html="result.title"></div>
-                <span class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey" v-text="result.badge" />
+                <span class="rounded px-1___REPLACED py-px text-2xs uppercase bg-grey-20 text-grey" v-text="result.badge" />
             </div>
 
             <div v-if="! hasResults && hasFavorites">

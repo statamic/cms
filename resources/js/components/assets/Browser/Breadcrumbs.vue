@@ -7,7 +7,7 @@
             @click="selectFolder(index)"
             class="mr-2___REPLACED group"
         >
-            <span v-if="index !== 0" class="px-sm text-grey-70">></span>
+            <span v-if="index !== 0" class="px-1___REPLACED text-grey-70">></span>
             <span class="icon icon-folder text-blue-lighter group-hover:text-blue" />
             <span class="text-grey-70 group-hover:text-grey-80">{{ part }}</span>
         </a>

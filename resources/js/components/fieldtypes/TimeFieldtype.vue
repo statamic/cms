@@ -5,7 +5,7 @@
                 <svg-icon name="time" class="w-4 h-4" />
             </div>
             <div
-                class="input-text flex items-center px-sm w-auto"
+                class="input-text flex items-center px-1___REPLACED w-auto"
                 :class="{ 'read-only': isReadOnly }"
             >
                 <template v-for="(part, index) in parts">
