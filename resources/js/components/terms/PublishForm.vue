@@ -103,14 +103,14 @@
 
                                     <div class="p-2 flex items-center -mx-1">
                                         <button
-                                            class="flex items-center justify-center btn-flat w-full mx-1 px-1"
+                                            class="flex items-center justify-center btn-flat w-full mx-2___REPLACED px-1"
                                             v-if="isBase"
                                             @click="openLivePreview">
                                             <svg-icon name="synchronize" class="w-5 h-5 mr-1" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
-                                            class="flex items-center justify-center btn-flat w-full mx-1 px-1"
+                                            class="flex items-center justify-center btn-flat w-full mx-2___REPLACED px-1"
                                             v-if="permalink"
                                             :href="permalink"
                                             target="_blank">

@@ -7,7 +7,7 @@
         }"
     >
 
-        <div class="mx-1">
+        <div class="mx-2___REPLACED">
             <span class="icon icon-warning error" v-if="status === 'error'"></span>
             <loading-graphic v-else :inline="true" text="" />
         </div>
@@ -20,7 +20,7 @@
 
         <div
             v-if="status !== 'error'"
-            class="bg-white flex-1 h-4 mx-1 rounded"
+            class="bg-white flex-1 h-4 mx-2___REPLACED rounded"
         >
             <div class="bg-blue h-full rounded"
                 :style="{ width: percent+'%' }" />
