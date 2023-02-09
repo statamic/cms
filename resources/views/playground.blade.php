@@ -66,14 +66,14 @@
     <h2 class="mb-1">Buttons</h2>
     <div class="shadow bg-white p-4 rounded-lg mb-6">
         <h6 class="mb-2">Flavors</h6>
-        <div class="mb-4 flex">
+        <div class="mb-8___REPLACED flex">
             <button class="mr-2 btn">Default Button</button>
             <button class="mr-2 btn-primary">Primary Button</button>
             <button class="mr-2 btn-danger">Danger Button</button>
             <button class="btn-flat">Flat Button</button>
         </div>
         <h6 class="mb-2">With Dropdowns</h6>
-        <div class="mb-4 flex">
+        <div class="mb-8___REPLACED flex">
             <div class="btn-group mr-2">
                 <button class="btn">Default Button</button>
                 <dropdown-list>
@@ -132,7 +132,7 @@
             </div>
         </div>
         <h6 class="mb-2">Disabled States</h6>
-        <div class="mb-4 flex">
+        <div class="mb-8___REPLACED flex">
             <button disabled class="mr-2 btn disabled">Default Button</button>
             <button disabled class="mr-2 btn-primary disabled">Primary Button</button>
             <button disabled class="mr-2 btn-danger disabled">Danger Button</button>
@@ -140,7 +140,7 @@
         </div>
 
         <h6 class="mb-2">Large</h6>
-        <div class="mb-4 flex">
+        <div class="mb-8___REPLACED flex">
             <button class="mr-2 btn btn-lg">Default Button</button>
             <button class="mr-2 btn-primary btn-lg">Primary Button</button>
             <button class="mr-2 btn-danger btn-lg">Danger Button</button>
@@ -160,7 +160,7 @@
     <div class="bg-white p-5 shadow rounded-lg overflow-hidden mb-6">
 
         <h6 class="mb-2">Greys</h6>
-        <div class="flex flex-row-reverse text-sm text-center mb-4">
+        <div class="flex flex-row-reverse text-sm text-center mb-8___REPLACED">
             <div class="text-black bg-white p-2 flex-1">White</div>
             <div class="text-black bg-grey-10 p-2 flex-1">10</div>
             <div class="text-black bg-grey-20 p-2 flex-1">20</div>
@@ -188,7 +188,7 @@
     </div>
 
     <h2 class="mb-1">Widgets</h2>
-    <div class="flex flex-wrap -mx-2 mb-4">
+    <div class="flex flex-wrap -mx-2 mb-8___REPLACED">
         <div class="w-1/3 px-2">
             <div class="card px-3">
                 <div class="flex justify-between items-center mb-2">

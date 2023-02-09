@@ -18,7 +18,7 @@
         <form method="POST" action="{{ cp_route('password.email') }}">
             @csrf
 
-            <div class="mb-4">
+            <div class="mb-8___REPLACED">
                 <label for="email" class="mb-1">{{ __('Email Address') }}</label>
                 <input id="email" type="text" class="input-text input-text" name="email" value="{{ old('email') }}" >
 

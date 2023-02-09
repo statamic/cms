@@ -68,7 +68,7 @@
             <draggable-tree
                 draggable
                 cross-tree
-                class="mb-4"
+                class="mb-8___REPLACED"
                 :class="{ 'section-placeholder-inner': showTopLevelSectionPlaceholder }"
                 ref="topLevelTree"
                 :data="topLevelTreeData"

@@ -15,7 +15,7 @@
             <div class="flex-1 overflow-auto p-3">
                 <div class="publish-fields publish-fields-narrow">
 
-                <div class="publish-field mb-4" :class="{ 'has-error': validate }">
+                <div class="publish-field mb-8___REPLACED" :class="{ 'has-error': validate }">
                     <div class="field-inner">
                         <label class="text-sm font-medium mb-1">{{ __('Display') }} <span class="text-red">*</span></label>
                         <text-input v-model="section" :focus="true" />

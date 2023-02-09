@@ -15,7 +15,7 @@
                 <input type="hidden" name="redirect" value="{{ request('redirect') }}">
             @endif
 
-            <div class="mb-4">
+            <div class="mb-8___REPLACED">
                 <label for="email"  class="mb-1">{{ __('Email Address') }}</label>
 
                 <input id="email" type="email" class="input-text input-text" name="email" value="{{ $email ?? old('email') }}" autofocus required>
@@ -25,7 +25,7 @@
                 @enderror
             </div>
 
-            <div class="mb-4">
+            <div class="mb-8___REPLACED">
                 <label for="password" class="mb-1">{{ __('Password') }}</label>
 
                 <input id="password" type="password" class="input-text input-text" name="password" required>
@@ -35,7 +35,7 @@
                 @enderror
             </div>
 
-            <div class="mb-4">
+            <div class="mb-8___REPLACED">
                 <label for="password-confirm" class="mb-1">{{ __('Confirm Password') }}</label>
 
                 <input id="password-confirm" type="password" class="input-text input-text" name="password_confirmation" required>

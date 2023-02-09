@@ -15,7 +15,7 @@
             <div class="flex-1 overflow-auto p-3">
                 <div class="publish-fields publish-fields-narrow">
 
-                <div class="publish-field mb-4" :class="{ 'has-error': validateDisplay }">
+                <div class="publish-field mb-8___REPLACED" :class="{ 'has-error': validateDisplay }">
                     <div class="field-inner">
                         <label class="text-sm font-medium mb-1">{{ __('Display') }} <span class="text-red">*</span></label>
                         <text-input v-model="config.display" :focus="true" />
@@ -23,7 +23,7 @@
                     </div>
                 </div>
 
-                <div class="publish-field mb-4" :class="{ 'has-error': validateUrl }">
+                <div class="publish-field mb-8___REPLACED" :class="{ 'has-error': validateUrl }">
                     <div class="field-inner">
                         <label class="text-sm font-medium mb-1">{{ __('URL') }} <span class="text-red">*</span></label>
                         <div class="help-block -mt-1">

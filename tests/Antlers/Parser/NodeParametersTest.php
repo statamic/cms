@@ -196,7 +196,7 @@ EOT;
         }}
 
     <div class="md:absolute md:z-10 p-6 md:p-8 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
-        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-4" }}
+        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-8___REPLACED" }}
     </div>
 </figure>
 EOT;
@@ -219,7 +219,7 @@ EOT;
         }}
 
     <div class="md:absolute md:z-10 p-6 md:p-8 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
-        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-4" }}
+        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-8___REPLACED" }}
     </div>
 </figure>
 EOT;

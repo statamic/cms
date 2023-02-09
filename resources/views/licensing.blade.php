@@ -13,8 +13,8 @@
         <div class="no-results md:pt-8 max-w-2xl mx-auto">
             <div class="flex flex-wrap items-center">
                 <div class="w-full md:w-1/2">
-                    <h1 class="mb-4">{{ __('Licensing') }}</h1>
-                    <p class="text-grey-70 leading-normal mb-4 text-lg antialiased">
+                    <h1 class="mb-8___REPLACED">{{ __('Licensing') }}</h1>
+                    <p class="text-grey-70 leading-normal mb-8___REPLACED text-lg antialiased">
                         {{ __('statamic::messages.outpost_issue_try_later') }}
                     </p>
                     <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
