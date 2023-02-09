@@ -25,7 +25,7 @@
                 v-model="directory"
             />
 
-            <div class="px-6___REPLACED pb-3">
+            <div class="px-6___REPLACED pb-6___REPLACED">
                 <button
                     class="btn-primary"
                     @click.prevent="submit"
