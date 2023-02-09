@@ -70,7 +70,7 @@
         </data-list>
 
         <template v-if="unlisted.length && !showingAddon">
-            <h6 class="mt-4">{{ __('Unlisted Addons') }}</h6>
+            <h6 class="mt-8___REPLACED">{{ __('Unlisted Addons') }}</h6>
             <div class="card p-0 mt-1">
                 <table class="data-table">
                     <tbody>

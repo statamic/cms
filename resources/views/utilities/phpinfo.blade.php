@@ -21,7 +21,7 @@
     </div>
 
     @foreach ($phpinfo as $section => $items)
-        <h2 class="mt-4 mb-2___REPLACED font-bold text-lg">{{ $section }}</h2>
+        <h2 class="mt-8___REPLACED mb-2___REPLACED font-bold text-lg">{{ $section }}</h2>
         <div class="card p-0">
             <table class="data-table">
                 @foreach ($items as $name => $value)

@@ -36,7 +36,7 @@
             </table>
         </div>
 
-        <div class="flex justify-center mt-4">
+        <div class="flex justify-center mt-8___REPLACED">
             <button tabindex="4" class="btn-primary mx-auto btn-lg" :disabled="! canSubmit" @click="submit">
                 {{ __('Create Views')}}
             </button>

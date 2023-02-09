@@ -16,7 +16,7 @@
     @endif
 
     @foreach ($duplicates as $id => $paths)
-        <h6 class="mt-4">{{ $id }}</h6>
+        <h6 class="mt-8___REPLACED">{{ $id }}</h6>
 
         <div class="card p-0 mt-1">
             <table class="data-table">

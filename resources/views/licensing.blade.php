@@ -39,13 +39,13 @@
         @endif
 
         @if ($site->key() && $site->usesIncorrectKeyFormat())
-            <div class="text-xs border border-yellow-dark rounded p-2 bg-yellow {{ $configCached ? 'mt-4' : '' }}">
+            <div class="text-xs border border-yellow-dark rounded p-2 bg-yellow {{ $configCached ? 'mt-8___REPLACED' : '' }}">
                 <div class="font-bold mb-2___REPLACED">{{ __('statamic::messages.licensing_incorrect_key_format_heading') }}</div>
                 <p>{!! __('statamic::messages.licensing_incorrect_key_format_body') !!}</p>
            </div>
         @endif
 
-        <h6 class="mt-4">Site</h6>
+        <h6 class="mt-8___REPLACED">Site</h6>
         <div class="card p-0 mt-1">
             <table class="data-table">
                 <tr>
@@ -64,7 +64,7 @@
             </table>
         </div>
 
-        <h6 class="mt-4">Core</h6>
+        <h6 class="mt-8___REPLACED">Core</h6>
         <div class="card p-0 mt-1">
             <table class="data-table">
                 <tr>
@@ -78,7 +78,7 @@
             </table>
         </div>
 
-        <h6 class="mt-4">{{ __('Addons') }}</h6>
+        <h6 class="mt-8___REPLACED">{{ __('Addons') }}</h6>
         @if ($addons->isEmpty())
         <p class="text-sm text-grey mt-1">{{ __('No addons installed') }}</p>
         @else
@@ -100,7 +100,7 @@
         @endif
 
         @if (!$unlistedAddons->isEmpty())
-        <h6 class="mt-4">{{ __('Unlisted Addons') }}</h6>
+        <h6 class="mt-8___REPLACED">{{ __('Unlisted Addons') }}</h6>
         <div class="card p-0 mt-1">
             <table class="data-table">
                 @foreach ($unlistedAddons as $addon)

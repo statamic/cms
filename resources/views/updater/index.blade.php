@@ -27,7 +27,7 @@
             <h1 class="flex-1">{{ __('Updates') }}</h1>
         </div>
 
-        <h6 class="mt-4">Core</h6>
+        <h6 class="mt-8___REPLACED">Core</h6>
         <div class="card p-0 mt-1">
             <table class="data-table">
                 <tr>
@@ -42,7 +42,7 @@
             </table>
         </div>
 
-        <h6 class="mt-4">{{ __('Addons') }}</h6>
+        <h6 class="mt-8___REPLACED">{{ __('Addons') }}</h6>
         <div class="card p-0 mt-1">
             <table class="data-table">
                 @foreach ($addons as $addon)
@@ -61,7 +61,7 @@
             </table>
         </div>
 
-        <h6 class="mt-4">{{ __('Unlisted Addons') }}</h6>
+        <h6 class="mt-8___REPLACED">{{ __('Unlisted Addons') }}</h6>
         <div class="card p-0 mt-1">
             <table class="data-table">
                 @foreach ($unlistedAddons as $addon)
