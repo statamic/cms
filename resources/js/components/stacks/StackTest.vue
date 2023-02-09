@@ -9,7 +9,7 @@
         <button @click="show = true" class="btn">Open Stack {{ depth + 1 }}</button>
 
         <stack name="test" v-if="show" @closed="show = false">
-            <div slot-scope="{ depth }" class="p-4">
+            <div slot-scope="{ depth }" class="p-8___REPLACED">
                 <stack-test :depth="depth" />
             </div>
         </stack>

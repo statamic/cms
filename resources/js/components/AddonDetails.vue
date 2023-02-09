@@ -45,7 +45,7 @@
                 </div>
             </div>
             <addon-editions v-if="addon.editions.length" :addon="addon" />
-            <div class="card content p-4" v-html="description" />
+            <div class="card content p-8___REPLACED" v-html="description" />
         </div>
     </div>
 </template>

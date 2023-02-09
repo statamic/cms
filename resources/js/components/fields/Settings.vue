@@ -1,6 +1,6 @@
 <template>
 
-    <div class="h-full overflow-auto p-4 bg-grey-30 h-full">
+    <div class="h-full overflow-auto p-8___REPLACED bg-grey-30 h-full">
 
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />

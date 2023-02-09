@@ -229,7 +229,7 @@
     }
 
     .CodeMirror {
-        @apply max-w-xl bg-transparent mx-auto relative p-4 shadow-none text-base;
+        @apply max-w-xl bg-transparent mx-auto relative p-8___REPLACED shadow-none text-base;
 
         .CodeMirror-scroll {
             @apply m-0;
@@ -237,7 +237,7 @@
     }
 
     .markdown-preview {
-        @apply max-w-xl bg-transparent mx-auto relative p-4 text-lg;
+        @apply max-w-xl bg-transparent mx-auto relative p-8___REPLACED text-lg;
     }
 
     .helpers {

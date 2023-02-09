@@ -1,6 +1,6 @@
 <template>
 
-    <div class="h-full overflow-auto p-4 bg-grey-30 h-full">
+    <div class="h-full overflow-auto p-8___REPLACED bg-grey-30 h-full">
 
         <div class="flex items-center mb-6___REPLACED -mt-1">
             <h1 class="flex-1">
