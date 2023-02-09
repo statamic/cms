@@ -185,7 +185,7 @@
                                             </button>
                                         </div>
                                         <div class="asset-meta flex items-center">
-                                            <div class="asset-filename text-center w-full px-2___REPLACED py-sm">..</div>
+                                            <div class="asset-filename text-center w-full px-2___REPLACED py-1___REPLACED">..</div>
                                         </div>
                                     </div>
                                     <!-- Sub-Folders -->
@@ -198,7 +198,7 @@
                                             </button>
                                         </div>
                                         <div class="asset-meta flex items-center">
-                                            <div class="asset-filename text-center w-full px-2___REPLACED py-sm" v-text="folder.basename" :title="folder.basename" />
+                                            <div class="asset-filename text-center w-full px-2___REPLACED py-1___REPLACED" v-text="folder.basename" :title="folder.basename" />
                                         </div>
                                         <dropdown-list autoclose v-if="folderActions(folder).length" class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
                                              <data-list-inline-actions
@@ -223,7 +223,7 @@
                                             </div>
                                         </div>
                                         <div class="asset-meta">
-                                            <div class="asset-filename px-2___REPLACED py-sm text-center" v-text="asset.basename" :title="asset.basename" />
+                                            <div class="asset-filename px-2___REPLACED py-1___REPLACED text-center" v-text="asset.basename" :title="asset.basename" />
                                         </div>
                                         <dropdown-list autoclose class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
                                              <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
