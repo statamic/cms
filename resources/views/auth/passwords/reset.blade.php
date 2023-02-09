@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <h1 class="mb-6___REPLACED pt-7 text-center text-grey-80">{{ $title }}</h1>
+    <h1 class="mb-6___REPLACED pt-20___REPLACED text-center text-grey-80">{{ $title }}</h1>
 
     <div class="card auth-card mx-auto">
 
