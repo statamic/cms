@@ -6,7 +6,7 @@
                     <h2 v-text="section.display" class="text-base" />
                     <p v-html="section.instructions" />
                 </div>
-                <div class="card p-0 mb-5 configure-section">
+                <div class="card p-0 mb-10___REPLACED configure-section">
                     <publish-fields
                         :fields="section.fields"
                         :read-only="readOnly"

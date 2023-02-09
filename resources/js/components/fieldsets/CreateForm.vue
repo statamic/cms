@@ -6,7 +6,7 @@
                 <h1 class="mb-6___REPLACED">{{ __('Create Fieldset') }}</h1>
                 <p class="text-grey" v-text="__('messages.fields_fieldsets_description')" />
             </header>
-            <div class="mb-5">
+            <div class="mb-10___REPLACED">
                 <label class="font-bold text-base mb-sm" for="name">{{ __('Title') }}</label>
                 <input type="text" v-model="title" class="input-text" autofocus tabindex="1">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">

@@ -10,7 +10,7 @@
                 <h1 class="mb-6___REPLACED">{{ __('Create Blueprint') }}</h1>
                 <p class="text-grey">{{ __('statamic::messages.blueprints_intro') }}</p>
             </header>
-            <div class="mb-5">
+            <div class="mb-10___REPLACED">
                 <label class="font-bold text-base mb-sm" for="name">{{ __('Title') }}</label>
                 <input type="text" name="title" value="{{ old('title') }}" class="input-text" autofocus required tabindex="1">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">

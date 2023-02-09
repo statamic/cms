@@ -10,7 +10,7 @@
             </div>
         </header>
 
-        <div class="publish-form card p-0 mb-5">
+        <div class="publish-form card p-0 mb-10___REPLACED">
 
             <div class="form-group">
                 <label class="block">{{ __('Title') }}</label>

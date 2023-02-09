@@ -10,7 +10,7 @@
 
 @section('content')
 
-    <div class="flex mb-5">
+    <div class="flex mb-10___REPLACED">
         <h1>{{ __('The Statamic Playground') }}</h1>
     </div>
 

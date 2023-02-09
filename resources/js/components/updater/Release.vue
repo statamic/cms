@@ -1,6 +1,6 @@
 <template>
 
-    <div class="card update-release mb-5">
+    <div class="card update-release mb-10___REPLACED">
         <div class="flex justify-between mb-6___REPLACED">
             <div>
                 <h1>{{ release.version }}</h1>
