@@ -10,7 +10,7 @@
 
             <div class="bg-grey-20 border-b text-sm flex rounded-t" v-if="!isSingle">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
-                <div class="p-1.5 py-1 flex-1">
+                <div class="p-3___REPLACED py-1 flex-1">
                     <span class="font-medium mr-2___REPLACED">
                         <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
                     </span>
