@@ -43,7 +43,7 @@
             </div>
 
             <div class="fade-left" v-if="canScrollLeft" />
-            <div class="fade-right" :class="{ 'mr-4': showHiddenTabsDropdown }" v-if="canScrollRight" />
+            <div class="fade-right" :class="{ 'mr-8___REPLACED': showHiddenTabsDropdown }" v-if="canScrollRight" />
 
             <dropdown-list class="ml-2___REPLACED" v-cloak v-if="showHiddenTabsDropdown">
                 <dropdown-item
