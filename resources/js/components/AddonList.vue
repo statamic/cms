@@ -55,7 +55,7 @@
                         <div class="h-48___REPLACED rounded-t bg-cover bg-center" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
                         <div class="px-6___REPLACED mb-4___REPLACED relative text-center">
                             <a :href="addon.seller.website" class="relative">
-                                <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 bg-white relative -mt-4 border-2 border-white inline">
+                                <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 bg-white relative -mt-8___REPLACED border-2 border-white inline">
                             </a>
                             <div class="addon-card-title mb-2___REPLACED text-lg font-bold text-center">{{ addon.name }}</div>
                             <p class="text-grey mb-4___REPLACED" v-text="getPriceRange(addon)" />
