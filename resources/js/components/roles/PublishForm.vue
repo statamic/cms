@@ -51,7 +51,7 @@
                 </div>
             </div>
 
-            <div class="py-2 mt-6___REPLACED border-t flex justify-between">
+            <div class="py-4___REPLACED mt-6___REPLACED border-t flex justify-between">
                 <a :href="indexUrl" class="btn" v-text="__('Cancel') "/>
                 <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
             </div>

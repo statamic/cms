@@ -26,7 +26,7 @@
 
             </div>
 
-            <div class="px-4___REPLACED py-2 border-b">
+            <div class="px-4___REPLACED py-4___REPLACED border-b">
                 <div class="h-8 mb-4___REPLACED p-2___REPLACED border rounded border-grey-50 flex items-center">
 
                     <!-- URL input -->

@@ -10,7 +10,7 @@
             <loading-graphic />
         </div>
 
-        <div class="py-2 px-6___REPLACED border-b bg-white flex items-center" v-if="fieldtypesLoaded">
+        <div class="py-4___REPLACED px-6___REPLACED border-b bg-white flex items-center" v-if="fieldtypesLoaded">
             <input type="text" class="input-text flex-1 bg-white text-sm w-full" autofocus v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
         </div>
 

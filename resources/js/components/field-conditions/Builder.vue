@@ -29,7 +29,7 @@
                 v-if="hasConditions && isStandard"
                 v-for="(condition, index) in conditions"
                 :key="condition._id"
-                class="flex items-center py-2 border-t"
+                class="flex items-center py-4___REPLACED border-t"
             >
                 <v-select
                     ref="fieldSelect"

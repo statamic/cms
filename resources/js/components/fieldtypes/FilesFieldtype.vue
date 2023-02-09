@@ -17,7 +17,7 @@
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
-                <div class="assets-fieldtype-picker py-2" :class="{ 'is-expanded': value.length }">
+                <div class="assets-fieldtype-picker py-4___REPLACED" :class="{ 'is-expanded': value.length }">
                     <p class="asset-upload-control text-xs text-grey-60 ml-0">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}

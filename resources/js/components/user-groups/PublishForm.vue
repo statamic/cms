@@ -49,7 +49,7 @@
                 </div>
 
             </publish-fields-container>
-            <div class="py-2 border-t flex justify-between">
+            <div class="py-4___REPLACED border-t flex justify-between">
                 <a :href="action" class="btn" v-text="__('Cancel') "/>
                 <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
             </div>
