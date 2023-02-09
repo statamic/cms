@@ -62,7 +62,7 @@
                         class="btn btn-icon"
                         :alt="__('Open in a new window')"
                     >
-                        <svg-icon name="external-link" class="h-4 my-1" />
+                        <svg-icon name="external-link" class="h-4 my-2___REPLACED" />
                     </button>
 
                     <button
@@ -71,7 +71,7 @@
                         class="btn btn-icon"
                         :alt="__('Download file')"
                     >
-                        <svg-icon name="download" class="h-4 my-1" />
+                        <svg-icon name="download" class="h-4 my-2___REPLACED" />
                     </button>
                 </div>
             </div>

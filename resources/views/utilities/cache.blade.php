@@ -24,7 +24,7 @@
             <div class="flex justify-between items-center">
                 <div class="pr-4">
                     <h2 class="font-bold">{{ __('Content Stache') }}</h2>
-                    <p class="text-grey text-sm my-1">{{ __('statamic::messages.cache_utility_stache_description') }}</p>
+                    <p class="text-grey text-sm my-2___REPLACED">{{ __('statamic::messages.cache_utility_stache_description') }}</p>
                 </div>
                 <div class="flex">
                     <form method="POST" action="{{ cp_route('utilities.cache.warm', 'stache') }}" class="mr-1">
@@ -52,7 +52,7 @@
             <div class="flex justify-between items-center">
                 <div class="pr-4">
                     <h2 class="font-bold">{{ __('Static Page Cache') }}</h2>
-                    <p class="text-grey text-sm my-1">{{ __('statamic::messages.cache_utility_static_cache_description') }}</p>
+                    <p class="text-grey text-sm my-2___REPLACED">{{ __('statamic::messages.cache_utility_static_cache_description') }}</p>
                 </div>
                 @if ($static['enabled'])
                     <form method="POST" action="{{ cp_route('utilities.cache.clear', 'static') }}">
@@ -73,7 +73,7 @@
             <div class="flex justify-between items-center">
                 <div class="pr-4">
                     <h2 class="font-bold">{{ __('Application Cache') }}</h2>
-                    <p class="text-grey text-sm my-1">{{ __('statamic::messages.cache_utility_application_cache_description') }}</p>
+                    <p class="text-grey text-sm my-2___REPLACED">{{ __('statamic::messages.cache_utility_application_cache_description') }}</p>
                 </div>
                 <form method="POST" action="{{ cp_route('utilities.cache.clear', 'application') }}">
                     @csrf
@@ -89,7 +89,7 @@
             <div class="flex justify-between items-center">
                 <div class="pr-4">
                     <h2 class="font-bold">{{ __('Image Cache') }}</h2>
-                    <p class="text-grey text-sm my-1">{{ __('statamic::messages.cache_utility_image_cache_description') }}</p>
+                    <p class="text-grey text-sm my-2___REPLACED">{{ __('statamic::messages.cache_utility_image_cache_description') }}</p>
                 </div>
                 <form method="POST" action="{{ cp_route('utilities.cache.clear', 'image') }}">
                     @csrf
