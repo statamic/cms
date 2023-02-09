@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <div v-else class="text-center p-2">
+            <div v-else class="text-center p-4___REPLACED">
                 <button class="btn-flat" @click="openSelector">
                     {{ __('Choose Image') }}
                 </button>

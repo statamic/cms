@@ -11,9 +11,9 @@
     <h1>{{ $collection->title() }}</h1>
 </header>
 
-<div class="card p-2 content">
+<div class="card p-4___REPLACED content">
     <div class="flex flex-wrap">
-        <a href="{{ cp_route('collections.edit', $collection->handle()) }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+        <a href="{{ cp_route('collections.edit', $collection->handle()) }}" class="w-full lg:w-1/2 p-4___REPLACED flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-4___REPLACED text-grey-80">
                 @cp_svg('hammer-wrench')
             </div>
@@ -26,7 +26,7 @@
         @if ($multipleBlueprints)<div
         @else<a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site]) }}"
         @endif
-            class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group"
+            class="w-full lg:w-1/2 p-4___REPLACED flex items-start hover:bg-grey-20 rounded-md group"
         >
             <div class="h-8 w-8 mr-4___REPLACED text-grey-80">
                 @cp_svg('content-writing')
@@ -42,7 +42,7 @@
                 @endif
             </div>
         @if ($multipleBlueprints)</div>@else</a>@endif
-        <a href="{{ cp_route('collections.blueprints.index', $collection->handle()) }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+        <a href="{{ cp_route('collections.blueprints.index', $collection->handle()) }}" class="w-full lg:w-1/2 p-4___REPLACED flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-4___REPLACED text-grey-80">
                 @cp_svg('blueprint')
             </div>
@@ -51,7 +51,7 @@
                 <p>{{ __('statamic::messages.collection_next_steps_blueprints_description') }}</p>
             </div>
         </a>
-        <a href="{{ cp_route('collections.scaffold', $collection->handle()) }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+        <a href="{{ cp_route('collections.scaffold', $collection->handle()) }}" class="w-full lg:w-1/2 p-4___REPLACED flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-4___REPLACED text-grey-80">
                 @cp_svg('crane')
             </div>

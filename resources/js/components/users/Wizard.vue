@@ -138,7 +138,7 @@
                 <div class="max-w-md mx-auto px-2">
                     <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Content') }}</label>
                     <textarea
-                        class="input-text min-h-48 p-2 bg-white"
+                        class="input-text min-h-48 p-4___REPLACED bg-white"
                         v-model="invitation.message"
                         v-elastic
                     />
@@ -172,7 +172,7 @@
             </div>
         </div>
 
-        <div class="border-t p-2">
+        <div class="border-t p-4___REPLACED">
             <div class="max-w-md mx-auto flex items-center justify-center">
                 <button tabindex="3" class="btn mx-4___REPLACED w-32" @click="previous" v-if="! completed && ! onFirstStep">
                     &larr; {{ __('Previous')}}

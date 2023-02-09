@@ -11,8 +11,8 @@
                 </template>
                 <template #default="{ close: closePopover, afterClosed: afterPopoverClosed }">
                     <div class="flex flex-col text-left w-64">
-                        <h6 class="p-2 pb-0" v-text="__('Show everything where:')"/>
-                        <div v-if="showFilterSelection" class="p-2 pt-1">
+                        <h6 class="p-4___REPLACED pb-0" v-text="__('Show everything where:')"/>
+                        <div v-if="showFilterSelection" class="p-4___REPLACED pt-1">
                             <button
                                 v-for="filter in unpinnedFilters"
                                 :key="filter.handle"
@@ -55,7 +55,7 @@
                     <template slot="trigger">
                         <button class="input-group-item px-1.5">{{ __('Save') }}</button>
                     </template>
-                    <div class="p-2 w-96">
+                    <div class="p-4___REPLACED w-96">
                         <h6 v-text="__('Filter preset name')" class="mb-2___REPLACED" />
                         <div class="flex items-center">
                             <input class="input-text border-r rounded-r" type="text" v-model="savingPresetName" @keydown.enter="save" ref="savedFilterName">

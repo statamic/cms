@@ -1,5 +1,5 @@
 <div class="card p-0 overflow-hidden h-full">
-    <div class="flex justify-between items-center p-2">
+    <div class="flex justify-between items-center p-4___REPLACED">
         <h2>
             <a class="flex items-center" href="{{ $collection->showUrl() }}">
                 <div class="h-6 w-6 mr-2___REPLACED text-grey-80">

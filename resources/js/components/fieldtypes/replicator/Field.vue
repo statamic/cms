@@ -1,6 +1,6 @@
 <template>
 
-    <div class="p-2 m-0" :class="classes">
+    <div class="p-4___REPLACED m-0" :class="classes">
 
         <label class="block">
             {{ display }}

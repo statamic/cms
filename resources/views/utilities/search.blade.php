@@ -23,7 +23,7 @@
 
     <div class="card p-0">
         @if ($errors->has('indexes'))
-            <p class="p-2"><small class="help-block text-red">{{ $errors->first() }}</small></p>
+            <p class="p-4___REPLACED"><small class="help-block text-red">{{ $errors->first() }}</small></p>
         @endif
 
         <table class="data-table">

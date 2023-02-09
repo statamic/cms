@@ -20,7 +20,7 @@
             <loading-graphic  />
         </div>
 
-        <div class="bg-yellow border-yellow-dark border-dashed p-2 text-xs border mb-6___REPLACED rounded cursor-pointer flex items-center justify-between"
+        <div class="bg-yellow border-yellow-dark border-dashed p-4___REPLACED text-xs border mb-6___REPLACED rounded cursor-pointer flex items-center justify-between"
             v-if="!showingUnlicensedReleases && hasUnlicensedReleases"
             @click="showingUnlicensedReleases = true"
         >

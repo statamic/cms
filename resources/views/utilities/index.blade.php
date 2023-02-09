@@ -7,10 +7,10 @@
         <h1>{{ __('Utilities') }}</h1>
     </header>
 
-    <div class="card p-2 content">
+    <div class="card p-4___REPLACED content">
         <div class="flex flex-wrap">
         @foreach ($utilities as $utility)
-            <a href="{{ $utility->url() }}" class="w-full lg:w-1/2 p-2 md:flex items-start hover:bg-grey-20 rounded-md group">
+            <a href="{{ $utility->url() }}" class="w-full lg:w-1/2 p-4___REPLACED md:flex items-start hover:bg-grey-20 rounded-md group">
                 <div class="h-8 w-8 mr-4___REPLACED text-grey-80">
                     {!! $utility->icon() !!}
                 </div>

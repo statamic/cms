@@ -32,14 +32,14 @@
         </div>
 
         @if ($configCached)
-            <div class="text-xs border border-yellow-dark rounded p-2 bg-yellow">
+            <div class="text-xs border border-yellow-dark rounded p-4___REPLACED bg-yellow">
                 <div class="font-bold mb-2___REPLACED">{{ __('Configuration is cached') }}</div>
                 <p>{!! __('statamic::messages.licensing_config_cached_warning') !!}</p>
            </div>
         @endif
 
         @if ($site->key() && $site->usesIncorrectKeyFormat())
-            <div class="text-xs border border-yellow-dark rounded p-2 bg-yellow {{ $configCached ? 'mt-8___REPLACED' : '' }}">
+            <div class="text-xs border border-yellow-dark rounded p-4___REPLACED bg-yellow {{ $configCached ? 'mt-8___REPLACED' : '' }}">
                 <div class="font-bold mb-2___REPLACED">{{ __('statamic::messages.licensing_incorrect_key_format_heading') }}</div>
                 <p>{!! __('statamic::messages.licensing_incorrect_key_format_body') !!}</p>
            </div>

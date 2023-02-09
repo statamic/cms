@@ -40,7 +40,7 @@
 
 // Responive Wangjangling
 @screen md {
-    .bard-editor .ProseMirror { @apply p-2; }
+    .bard-editor .ProseMirror { @apply p-4___REPLACED; }
     .bard-editor .bard-invalid { @apply px-2; }
 }
 
@@ -254,7 +254,7 @@
     }
 
     .bard-field-options {
-        @apply fixed top-0 inset-x-0 bg-grey-70 p-2 w-full;
+        @apply fixed top-0 inset-x-0 bg-grey-70 p-4___REPLACED w-full;
         text-align: right;
         z-index: 1; // to appear over the top of .bard-editor
 
@@ -489,7 +489,7 @@
     }
 
     pre code {
-        @apply font-mono bg-grey-40 text-xs p-2 block w-full rounded;
+        @apply font-mono bg-grey-40 text-xs p-4___REPLACED block w-full rounded;
         line-height: 1.8;
     }
 }

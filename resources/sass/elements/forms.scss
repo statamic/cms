@@ -178,7 +178,7 @@ input.input-text-minimal:read-only,
 }
 
 .radio-box {
-    @apply border rounded cursor-pointer relative p-2 h-full;
+    @apply border rounded cursor-pointer relative p-4___REPLACED h-full;
     &.selected {
         @apply border-blue text-blue shadow;
     }

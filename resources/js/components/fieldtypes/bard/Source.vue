@@ -4,7 +4,7 @@
         <div
             v-for="(block, i) in blocks"
             :key="i"
-            class="p-2"
+            class="p-4___REPLACED"
         >
             <pre
                 class="whitespace-pre-wrap leading-normal text-xs font-mono"

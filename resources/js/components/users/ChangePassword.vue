@@ -8,7 +8,7 @@
         <div class="saving flex justify-center text-center" v-if="saving">
             <loading-graphic :text="__('Saving')" />
         </div>
-        <div class="publish-fields p-2 pb-0 w-96">
+        <div class="publish-fields p-4___REPLACED pb-0 w-96">
             <form-group
                 handle="password"
                 :display="__('Current Password')"

@@ -23,7 +23,7 @@
                 </asset-browser>
             </div>
 
-            <div class="p-2 border-t flex items-center justify-between bg-grey-20">
+            <div class="p-4___REPLACED border-t flex items-center justify-between bg-grey-20">
                 <div class="text-sm text-grey-70"
                     v-text="hasMaxFiles
                         ? __n(':count/:max selected', browserSelections, { max: maxFiles })

@@ -23,7 +23,7 @@
                 :set-index="index"
                 :errors="errors(field.handle)"
                 :field-path="fieldPath(field.handle)"
-                class="p-2"
+                class="p-4___REPLACED"
                 :read-only="grid.isReadOnly"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"

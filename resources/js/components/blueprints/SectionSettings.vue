@@ -8,7 +8,7 @@
 
         <div class="flex-1 overflow-scroll">
 
-            <div class="p-2">
+            <div class="p-4___REPLACED">
                 <div class="flex flex-wrap">
                     <div
                         v-for="field in fields"

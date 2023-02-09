@@ -161,18 +161,18 @@
 
         <h6 class="mb-4___REPLACED">Greys</h6>
         <div class="flex flex-row-reverse text-sm text-center mb-8___REPLACED">
-            <div class="text-black bg-white p-2 flex-1">White</div>
-            <div class="text-black bg-grey-10 p-2 flex-1">10</div>
-            <div class="text-black bg-grey-20 p-2 flex-1">20</div>
-            <div class="text-black bg-grey-30 p-2 flex-1">30</div>
-            <div class="text-black bg-grey-40 p-2 flex-1">40</div>
-            <div class="text-black bg-grey-50 p-2 flex-1">50</div>
-            <div class="text-black bg-grey-60 p-2 flex-1">60</div>
-            <div class="text-black bg-grey-70 p-2 flex-1">70</div>
-            <div class="text-white bg-grey-80 p-2 flex-1">80</div>
-            <div class="text-white bg-grey-90 p-2 flex-1">90</div>
-            <div class="text-white bg-grey-100 p-2 flex-1">100</div>
-            <div class="text-white bg-black p-2 flex-1">Black</div>
+            <div class="text-black bg-white p-4___REPLACED flex-1">White</div>
+            <div class="text-black bg-grey-10 p-4___REPLACED flex-1">10</div>
+            <div class="text-black bg-grey-20 p-4___REPLACED flex-1">20</div>
+            <div class="text-black bg-grey-30 p-4___REPLACED flex-1">30</div>
+            <div class="text-black bg-grey-40 p-4___REPLACED flex-1">40</div>
+            <div class="text-black bg-grey-50 p-4___REPLACED flex-1">50</div>
+            <div class="text-black bg-grey-60 p-4___REPLACED flex-1">60</div>
+            <div class="text-black bg-grey-70 p-4___REPLACED flex-1">70</div>
+            <div class="text-white bg-grey-80 p-4___REPLACED flex-1">80</div>
+            <div class="text-white bg-grey-90 p-4___REPLACED flex-1">90</div>
+            <div class="text-white bg-grey-100 p-4___REPLACED flex-1">100</div>
+            <div class="text-white bg-black p-4___REPLACED flex-1">Black</div>
         </div>
 
         <h6 class="mb-4___REPLACED">Other Colors (needs simplifying)</h6>

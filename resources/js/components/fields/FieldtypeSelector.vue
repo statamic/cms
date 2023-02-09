@@ -14,7 +14,7 @@
             <input type="text" class="input-text flex-1 bg-white text-sm w-full" autofocus v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
         </div>
 
-        <div class="p-2" v-if="fieldtypesLoaded">
+        <div class="p-4___REPLACED" v-if="fieldtypesLoaded">
             <div v-for="group in displayedFieldtypes" :key="group.handle" v-show="group.fieldtypes.length > 0" class="mb-8___REPLACED">
                 <h2 v-if="group.title" v-text="group.title" class="px-1 mb-1___REPLACED" />
                 <p v-if="group.description" v-text="group.description" class="px-1 mb-2___REPLACED text-grey-70 text-sm"/>

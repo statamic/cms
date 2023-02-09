@@ -20,7 +20,7 @@
     </header>
 
     <div class="card p-0">
-        <div class="p-2">
+        <div class="p-4___REPLACED">
             <div class="flex justify-between items-center">
                 <div class="pr-4">
                     <h2 class="font-bold">{{ __('Content Stache') }}</h2>
@@ -48,7 +48,7 @@
                 @endif
             </div>
         </div>
-        <div class="p-2 bg-grey-20 border-t">
+        <div class="p-4___REPLACED bg-grey-20 border-t">
             <div class="flex justify-between items-center">
                 <div class="pr-4">
                     <h2 class="font-bold">{{ __('Static Page Cache') }}</h2>
@@ -69,7 +69,7 @@
             </div>
         </div>
 
-        <div class="p-2 border-t">
+        <div class="p-4___REPLACED border-t">
             <div class="flex justify-between items-center">
                 <div class="pr-4">
                     <h2 class="font-bold">{{ __('Application Cache') }}</h2>
@@ -85,7 +85,7 @@
             </div>
         </div>
 
-        <div class="p-2 border-t bg-grey-20 rounded-b">
+        <div class="p-4___REPLACED border-t bg-grey-20 rounded-b">
             <div class="flex justify-between items-center">
                 <div class="pr-4">
                     <h2 class="font-bold">{{ __('Image Cache') }}</h2>

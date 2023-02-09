@@ -30,7 +30,7 @@
 
 
             <fields
-                class="p-2"
+                class="p-4___REPLACED"
                 :fields="section.fields"
                 :editing-field="editingField"
                 :is-section-expanded="isEditing || isSingle"

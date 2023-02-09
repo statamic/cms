@@ -2,7 +2,7 @@
 
     <div class="w-full no-label">
         <publish-container
-            class="p-2"
+            class="p-4___REPLACED"
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
             :meta="{}"

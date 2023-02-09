@@ -101,7 +101,7 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-2 flex items-center -mx-1">
+                                    <div class="p-4___REPLACED flex items-center -mx-1">
                                         <button
                                             class="flex items-center justify-center btn-flat w-full mx-2___REPLACED px-1"
                                             v-if="isBase && livePreviewUrl"
@@ -125,7 +125,7 @@
                                     <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
                                 </div>
 
-                                <div class="border-t p-2" v-if="revisionsEnabled && !isCreating">
+                                <div class="border-t p-4___REPLACED" v-if="revisionsEnabled && !isCreating">
                                     <label class="publish-field-label font-medium mb-2___REPLACED" v-text="__('Revisions')"/>
                                     <div class="mb-1___REPLACED flex items-center" v-if="published">
                                         <span class="text-green w-6 text-center">&check;</span>
@@ -152,7 +152,7 @@
                                         </button>
                                 </div>
 
-                                <div class="p-2 border-t" v-if="localizations.length > 1">
+                                <div class="p-4___REPLACED border-t" v-if="localizations.length > 1">
                                     <label class="publish-field-label font-medium mb-2___REPLACED" v-text="__('Sites')" />
                                     <div
                                         v-for="option in localizations"

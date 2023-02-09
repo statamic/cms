@@ -20,7 +20,7 @@
         >
             <div slot-scope="{}" class="flex flex-col h-full">
                 <div class="bg-white border-b flex items-center justify-between bg-grey-20">
-                    <div class="p-2 flex flex-1 items-center">
+                    <div class="p-4___REPLACED flex flex-1 items-center">
                         <data-list-filters
                             ref="filters"
                             :filters="filters"
@@ -65,7 +65,7 @@
                             :inline="true"
                             @page-selected="setPage" />
 
-                        <div class="p-2 border-t flex items-center justify-between bg-grey-20">
+                        <div class="p-4___REPLACED border-t flex items-center justify-between bg-grey-20">
                             <div class="text-sm text-grey-70"
                                 v-text="hasMaxSelections
                                     ? __n(':count/:max selected', selections, { max: maxSelections })

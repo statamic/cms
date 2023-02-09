@@ -62,30 +62,30 @@
             @canceled="changed = false"
         >
             <template #empty>
-                <div class="card p-2 content w-full">
+                <div class="card p-4___REPLACED content w-full">
                     <div class="flex flex-wrap w-full">
-                        <a :href="editUrl" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+                        <a :href="editUrl" class="w-full lg:w-1/2 p-4___REPLACED flex items-start hover:bg-grey-20 rounded-md group">
                             <svg-icon name="hammer-wrench" class="h-8 w-8 mr-4___REPLACED text-grey-80" />
                             <div class="flex-1 mb-4___REPLACED md:mb-0 md:mr-6___REPLACED">
                                 <h3 class="mb-2___REPLACED text-blue">{{ __('Configure Navigation') }} &rarr;</h3>
                                 <p>{{ __('messages.navigation_configure_settings_intro') }}</p>
                             </div>
                         </a>
-                        <a @click="linkPage()" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+                        <a @click="linkPage()" class="w-full lg:w-1/2 p-4___REPLACED flex items-start hover:bg-grey-20 rounded-md group">
                             <svg-icon name="paperclip" class="h-8 w-8 mr-4___REPLACED text-grey-80" />
                             <div class="flex-1 mb-4___REPLACED md:mb-0 md:mr-6___REPLACED">
                                 <h3 class="mb-2___REPLACED text-blue">{{ __('Link to URL') }} &rarr;</h3>
                                  <p>{{ __('messages.navigation_link_to_url_instructions') }}</p>
                             </div>
                         </a>
-                        <a @click="linkEntries()" v-if="hasCollections" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+                        <a @click="linkEntries()" v-if="hasCollections" class="w-full lg:w-1/2 p-4___REPLACED flex items-start hover:bg-grey-20 rounded-md group">
                             <svg-icon name="hierarchy-files" class="h-8 w-8 mr-4___REPLACED text-grey-80" />
                             <div class="flex-1 mb-4___REPLACED md:mb-0 md:mr-6___REPLACED">
                                 <h3 class="mb-2___REPLACED text-blue">{{ __('Link to Entry') }} &rarr;</h3>
                                  <p>{{ __('messages.navigation_link_to_entry_instructions') }}</p>
                             </div>
                         </a>
-                        <a :href="docs_url('navigation')" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+                        <a :href="docs_url('navigation')" class="w-full lg:w-1/2 p-4___REPLACED flex items-start hover:bg-grey-20 rounded-md group">
                             <svg-icon name="book-pages" class="h-8 w-8 mr-4___REPLACED text-grey-80" />
                             <div class="flex-1 mb-4___REPLACED md:mb-0 md:mr-6___REPLACED">
                                 <h3 class="mb-2___REPLACED text-blue">{{ __('Read the Documentation') }} &rarr;</h3>

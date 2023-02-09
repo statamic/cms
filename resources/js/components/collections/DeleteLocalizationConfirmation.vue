@@ -2,7 +2,7 @@
 
     <modal name="delete-entry-confirmation" :pivotY="0.1" :overflow="false">
         <div class="confirmation-modal flex flex-col h-full">
-            <div class="text-lg font-medium p-2 pb-0">
+            <div class="text-lg font-medium p-4___REPLACED pb-0">
                 {{ __('Delete') }}
             </div>
             <div class="flex-1 px-2 py-3 text-grey">
@@ -27,7 +27,7 @@
                     </div>
                 </div>
             </div>
-            <div class="p-2 bg-grey-20 border-t flex items-center justify-end text-sm">
+            <div class="p-4___REPLACED bg-grey-20 border-t flex items-center justify-end text-sm">
                 <button class="text-grey hover:text-grey-90"
                     @click="$emit('cancel')"
                     v-text="__('Cancel')" />

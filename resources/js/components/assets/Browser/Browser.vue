@@ -214,11 +214,11 @@
                                     <button class="asset-tile outline-none group relative" v-for="(asset, index) in assets" :key="asset.id" :class="{ 'selected': isSelected(asset.id) }" @click="toggleSelection(asset.id, index, $event)" @dblclick="$emit('edit-asset', asset)">
                                         <div class="asset-thumb-container">
                                             <div class="asset-thumb">
-                                                <img v-if="asset.is_image" :src="asset.thumbnail" loading="lazy" :class="{'p-2 h-full w-full': asset.extension === 'svg'}" />
+                                                <img v-if="asset.is_image" :src="asset.thumbnail" loading="lazy" :class="{'p-4___REPLACED h-full w-full': asset.extension === 'svg'}" />
                                                 <file-icon
                                                     v-else
                                                     :extension="asset.extension"
-                                                    class="p-2 h-full w-full"
+                                                    class="p-4___REPLACED h-full w-full"
                                                 />
                                             </div>
                                         </div>
@@ -240,7 +240,7 @@
                                 </div>
                             </div>
 
-                            <div class="p-2 text-grey-70"
+                            <div class="p-4___REPLACED text-grey-70"
                                 v-if="containerIsEmpty"
                                 v-text="searchQuery ? __('No results') : __('This container is empty')" />
 

@@ -23,9 +23,9 @@
 
     <div class="card p-0">
         @forelse($statuses ?? [] as $path => $status)
-            <div class="p-2 {{ $loop->first ? '' : 'border-t' }}">
+            <div class="p-4___REPLACED {{ $loop->first ? '' : 'border-t' }}">
                 <h2>{{ __('Repository path') }}: <code class="font-normal">{{ $path }}</code></h2>
-                <pre class="mt-4___REPLACED p-2 rounded text-sm font-mono bg-grey-30 text-grey-70">{{ $status->status }}</pre>
+                <pre class="mt-4___REPLACED p-4___REPLACED rounded text-sm font-mono bg-grey-30 text-grey-70">{{ $status->status }}</pre>
                 <div class="mt-4___REPLACED text-sm text-grey flex">
                     <div class="mr-4___REPLACED badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Affected files') }}:</span> {{ $status->totalCount }}</div>
                     @if ($status->addedCount)

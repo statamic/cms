@@ -30,11 +30,11 @@
                     <img :src="thumbnail" v-if="isImage" :title="label" />
 
                     <template v-else>
-                        <img v-if="canShowSvg" :src="asset.url" class="p-2" />
+                        <img v-if="canShowSvg" :src="asset.url" class="p-4___REPLACED" />
                         <file-icon
                             v-else
                             :extension="asset.extension"
-                            class="p-2 h-full w-full"
+                            class="p-4___REPLACED h-full w-full"
                         />
                     </template>
                 </template>

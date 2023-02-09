@@ -2,7 +2,7 @@
 
     <div class="focal-point">
         <div class="focal-point-toolbox card p-0">
-            <div class="p-2">
+            <div class="p-4___REPLACED">
                 <label>{{ __('Focal Point') }}</label>
                 <small class="help-block">{{ __('messages.focal_point_instructions') }}</small>
                 <div class="focal-point-image">
@@ -39,7 +39,7 @@
                     <button type="button" class="btn mb-2___REPLACED btn-primary" @click="select">{{ __('Finish') }}</button>
                 </div>
             </div>
-            <h6 class="p-2 text-center bg-grey-30 rounded-b">{{ __('messages.focal_point_previews_are_examples') }}</h6>
+            <h6 class="p-4___REPLACED text-center bg-grey-30 rounded-b">{{ __('messages.focal_point_previews_are_examples') }}</h6>
         </div>
         <div v-for="n in 9" :key="n"
              :class="`frame frame-${n}`">

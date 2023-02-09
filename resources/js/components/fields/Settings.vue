@@ -201,7 +201,7 @@ export default {
 
         configFieldClasses(field) {
             return [
-                `form-group p-2 m-0 ${field.type}-fieldtype`,
+                `form-group p-4___REPLACED m-0 ${field.type}-fieldtype`,
                 tailwind_width_class(field.width)
             ];
         },
