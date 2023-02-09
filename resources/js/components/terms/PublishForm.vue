@@ -164,7 +164,7 @@
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
-                                        class="text-sm flex items-center -mx-2 px-4___REPLACED py-2___REPLACED cursor-pointer"
+                                        class="text-sm flex items-center -mx-4___REPLACED px-4___REPLACED py-2___REPLACED cursor-pointer"
                                         :class="option.active ? 'bg-blue-100' : 'hover:bg-grey-20'"
                                         @click="localizationSelected(option)"
                                     >

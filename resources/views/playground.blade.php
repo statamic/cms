@@ -188,7 +188,7 @@
     </div>
 
     <h2 class="mb-2___REPLACED">Widgets</h2>
-    <div class="flex flex-wrap -mx-2 mb-8___REPLACED">
+    <div class="flex flex-wrap -mx-4___REPLACED mb-8___REPLACED">
         <div class="w-1/3 px-4___REPLACED">
             <div class="card px-6___REPLACED">
                 <div class="flex justify-between items-center mb-4___REPLACED">
