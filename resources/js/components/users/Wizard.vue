@@ -32,7 +32,7 @@
             </div>
 
             <!-- Name -->
-            <div v-if="! separateNameFields" class="max-w-md mx-auto px-4___REPLACED pb-7">
+            <div v-if="! separateNameFields" class="max-w-md mx-auto px-4___REPLACED pb-20___REPLACED">
                 <label class="font-bold text-base mb-1___REPLACED" for="name">{{ __('Name') }}</label>
                 <input type="text" v-model="user.name" id="name" class="input-text" tabindex="2">
                 <div class="text-2xs text-grey-60 mt-2___REPLACED flex items-center">
@@ -41,7 +41,7 @@
                 </div>
             </div>
 
-            <div v-else class="max-w-md mx-auto px-4___REPLACED pb-7 flex space-x-4">
+            <div v-else class="max-w-md mx-auto px-4___REPLACED pb-20___REPLACED flex space-x-4">
                 <div class="flex-1">
                     <label class="font-bold text-base mb-1___REPLACED" for="first_name">{{ __('First Name') }}</label>
                     <input type="text" v-model="user.first_name" id="first_name" class="input-text" tabindex="2">
@@ -146,7 +146,7 @@
             </div>
 
             <!-- Copy Pasta -->
-            <div class="max-w-md mx-auto px-4___REPLACED pb-7" v-else>
+            <div class="max-w-md mx-auto px-4___REPLACED pb-20___REPLACED" v-else>
                 <p class="mb-2___REPLACED" v-html="__('messages.user_wizard_invitation_share_before', { email: user.email })" />
             </div>
         </div>
@@ -166,7 +166,7 @@
                 <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Activation URL') }}</label>
                 <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" />
             </div>
-            <div class="max-w-md mx-auto px-4___REPLACED pb-7">
+            <div class="max-w-md mx-auto px-4___REPLACED pb-20___REPLACED">
                 <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Address') }}</label>
                 <input type="text" readonly class="input-text" onclick="this.select()" :value="user.email" />
             </div>
