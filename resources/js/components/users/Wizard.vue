@@ -17,7 +17,7 @@
             </div>
 
             <!-- Email Address -->
-            <div class="max-w-md mx-auto px-4___REPLACED pb-5">
+            <div class="max-w-md mx-auto px-4___REPLACED pb-10___REPLACED">
                 <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Address') }}*</label>
                 <input type="email" v-model="user.email" id="email" class="input-text" required autofocus tabindex="1">
 
@@ -66,7 +66,7 @@
             </div>
 
             <!-- Super Admin -->
-             <div class="pb-5" v-if="canCreateSupers">
+             <div class="pb-10___REPLACED" v-if="canCreateSupers">
                 <div class="flex items-center">
                     <toggle-input v-model="user.super" />
                     <label class="font-bold ml-2___REPLACED">{{ __('Super Admin') }}</label>
@@ -78,7 +78,7 @@
             </div>
 
             <!-- Roles -->
-            <div class="pb-5" v-if="! user.super && canAssignRoles">
+            <div class="pb-10___REPLACED" v-if="! user.super && canAssignRoles">
                 <label class="font-bold text-base mb-1___REPLACED" for="role">{{ __('Roles') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
@@ -96,7 +96,7 @@
             </div>
 
             <!-- Groups -->
-            <div class="pb-5" v-if="! user.super && canAssignGroups">
+            <div class="pb-10___REPLACED" v-if="! user.super && canAssignGroups">
                 <label class="font-bold text-base mb-1___REPLACED" for="group">{{ __('Groups') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.groups', type: 'user_groups' }"
@@ -129,7 +129,7 @@
 
             <div class="max-w-lg mx-auto bg-grey-10 py-10___REPLACED mb-20___REPLACED border rounded-lg " v-if="invitation.send">
                 <!-- Subject Line -->
-                <div class="max-w-md mx-auto px-4___REPLACED pb-5">
+                <div class="max-w-md mx-auto px-4___REPLACED pb-10___REPLACED">
                     <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Email Subject') }}</label>
                     <input type="text" v-model="invitation.subject" class="input-text bg-white">
                 </div>
@@ -159,10 +159,10 @@
             </div>
 
             <!-- Copy Pasta -->
-            <div class="max-w-md mx-auto px-4___REPLACED pb-5">
+            <div class="max-w-md mx-auto px-4___REPLACED pb-10___REPLACED">
                 <p class="mb-2___REPLACED" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
             </div>
-            <div class="max-w-md mx-auto px-4___REPLACED pb-5">
+            <div class="max-w-md mx-auto px-4___REPLACED pb-10___REPLACED">
                 <label class="font-bold text-base mb-1___REPLACED" for="email">{{ __('Activation URL') }}</label>
                 <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" />
             </div>
