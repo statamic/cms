@@ -17,7 +17,7 @@
         >
             <div slot-scope="{ dragging }" class="min-h-screen">
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-12 w-12 m-2" />
+                    <svg-icon name="upload" class="h-12 w-12 m-4___REPLACED" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
