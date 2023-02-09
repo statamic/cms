@@ -6,14 +6,14 @@
     }
 
     .step:not(:first-child):before {
-        @apply absolute h-2 w-1/2 bg-grey-30;
+        @apply absolute h-1___REPLACED w-1/2 bg-grey-30;
         content: '';
         left: 0;
         top: 18px;
     }
 
     .step:not(:last-child):after {
-        @apply absolute h-2 w-1/2 bg-grey-30;
+        @apply absolute h-1___REPLACED w-1/2 bg-grey-30;
         content: '';
         left: 50%;
         top: 18px;
