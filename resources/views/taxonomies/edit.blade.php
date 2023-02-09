@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <header class="mb-6___REPLACED">
+    <header class="mb-6">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('taxonomies.show', $taxonomy->handle()),
             'title' => $taxonomy->title()

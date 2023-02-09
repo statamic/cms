@@ -69,12 +69,12 @@ a {
 /* Page Wrapper
   ========================================================================== */
 .page-wrapper {
-    @apply p-3___REPLACED pt-6___REPLACED;
+    @apply p-3 pt-6;
 }
 
 @screen md {
     .page-wrapper {
-        @apply px-8___REPLACED max-w-xl mx-auto;
+        @apply px-8 max-w-xl mx-auto;
     }
 }
 
@@ -86,14 +86,14 @@ a {
 /* Outside the Control Panel
   ========================================================================== */
 .outside {
-    @apply bg-grey-30 px-2___REPLACED min-h-screen;
+    @apply bg-grey-30 px-2 min-h-screen;
 
     label {
         color: #596498;
     }
 
     .logo svg {
-        @apply h-6 block mx-auto mb-20___REPLACED mb-8___REPLACED w-auto;
+        @apply h-6 block mx-auto mb-20 mb-8 w-auto;
         path {
             fill: rgba(0,0,0,.25);
         }

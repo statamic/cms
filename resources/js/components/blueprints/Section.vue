@@ -10,16 +10,16 @@
 
             <div class="bg-grey-20 border-b text-sm flex rounded-t" v-if="!isSingle">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
-                <div class="p-3___REPLACED py-2___REPLACED flex-1">
-                    <span class="font-medium mr-2___REPLACED">
+                <div class="p-3 py-2 flex-1">
+                    <span class="font-medium mr-2">
                         <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
                     </span>
-                    <span class="font-mono text-xs text-grey-70 mr-2___REPLACED">
+                    <span class="font-mono text-xs text-grey-70 mr-2">
                         <input type="text" v-model="section.handle" @input="handleSyncedWithDisplay = false" class="bg-transparent w-full outline-none" />
                     </span>
                 </div>
-                <div class="flex items-center px-3___REPLACED">
-                    <button @click.prevent="toggleEditing" class="flex items-center text-grey-60 hover:text-grey-100 mr-2___REPLACED">
+                <div class="flex items-center px-3">
+                    <button @click.prevent="toggleEditing" class="flex items-center text-grey-60 hover:text-grey-100 mr-2">
                         <svg-icon class="h-4 w-4" :name="isEditing ? 'shrink' : 'expand'" />
                     </button>
                     <button @click.prevent="$emit('deleted')" class="flex items-center text-grey-60 hover:text-grey-100" v-if="deletable">
@@ -30,7 +30,7 @@
 
 
             <fields
-                class="p-4___REPLACED"
+                class="p-4"
                 :fields="section.fields"
                 :editing-field="editingField"
                 :is-section-expanded="isEditing || isSingle"
@@ -46,7 +46,7 @@
                 <template v-slot:empty-state>
                     <div
                         v-text="__('Add or drag fields here')"
-                        class="text-2xs text-grey-60 text-center border border-dashed rounded mb-2___REPLACED p-2___REPLACED"
+                        class="text-2xs text-grey-60 text-center border border-dashed rounded mb-2 p-2"
                     />
                 </template>
             </fields>

@@ -4,7 +4,7 @@
 }
 
 .live-preview-header {
-    @apply relative pr-4___REPLACED pl-6___REPLACED py-2___REPLACED h-13 shadow-lg flex items-center justify-between;
+    @apply relative pr-4 pl-6 py-2 h-13 shadow-lg flex items-center justify-between;
     background: linear-gradient(180deg, #fff, #f9fafb);
     border-bottom: 1px solid #c4cdd6;
     z-index: 2;
@@ -46,7 +46,7 @@
 .live-preview-contents iframe {
     @apply bg-white;
     &.responsive { @apply h-full w-full; }
-    &.device { @apply mt-4___REPLACED shadow-lg rounded; }
+    &.device { @apply mt-4 shadow-lg rounded; }
 }
 
 .live-preview-fields {
@@ -118,7 +118,7 @@
 
 // add grey bg and padding so that it looks like a publish form, when its wide enough.
 .live-preview-fields-wide {
-    @apply p-6___REPLACED bg-grey-30;
+    @apply p-6 bg-grey-30;
 }
 
 // remove shadow of sections when its narrow enough to be no longer be displayed as sections.

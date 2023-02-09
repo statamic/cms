@@ -54,11 +54,11 @@
 	}
 
 	p {
-        @apply my-8___REPLACED;
+        @apply my-8;
 	}
 
 	h2 {
-		@apply font-black text-xl mb-0 py-2___REPLACED;
+		@apply font-black text-xl mb-0 py-2;
 	}
 
 	h3, h4, h5, h6 {
@@ -71,7 +71,7 @@
 		@apply p-0;
 
 		li {
-			@apply my-2___REPLACED pb-2___REPLACED relative text-base pl-6___REPLACED;
+			@apply my-2 pb-2 relative text-base pl-6;
 		}
 
 		li:before {
@@ -85,7 +85,7 @@
 		}
 
 		.label {
-			@apply text-3xs relative inline-block mr-2___REPLACED uppercase text-center text-white rounded;
+			@apply text-3xs relative inline-block mr-2 uppercase text-center text-white rounded;
 			padding: 2px;
 			width: 54px;
 			top: -2px;

@@ -2,8 +2,8 @@
 
     <div class="replicator-fieldtype-container">
 
-        <div class="absolute top-0 right-0 p-6___REPLACED text-2xs" v-if="config.collapse !== 'accordion' && value.length > 0">
-            <button @click="collapseAll" class="text-blue hover:text-black mr-2___REPLACED" v-text="__('Collapse All')" />
+        <div class="absolute top-0 right-0 p-6 text-2xs" v-if="config.collapse !== 'accordion' && value.length > 0">
+            <button @click="collapseAll" class="text-blue hover:text-black mr-2" v-text="__('Collapse All')" />
             <button @click="expandAll" class="text-blue hover:text-black" v-text="__('Expand All')" />
         </div>
 

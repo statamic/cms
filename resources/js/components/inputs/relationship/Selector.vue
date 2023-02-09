@@ -20,7 +20,7 @@
         >
             <div slot-scope="{}" class="flex flex-col h-full">
                 <div class="bg-white border-b flex items-center justify-between bg-grey-20">
-                    <div class="p-4___REPLACED flex flex-1 items-center">
+                    <div class="p-4 flex flex-1 items-center">
                         <data-list-filters
                             ref="filters"
                             :filters="filters"
@@ -48,7 +48,7 @@
                             >
                                 <template slot="cell-title" slot-scope="{ row: entry }">
                                     <div class="flex items-center">
-                                        <div v-if="entry.published !== undefined" class="little-dot mr-2___REPLACED" :class="getStatusClass(entry)" />
+                                        <div v-if="entry.published !== undefined" class="little-dot mr-2" :class="getStatusClass(entry)" />
                                         {{ entry.title }}
                                     </div>
                                 </template>
@@ -65,7 +65,7 @@
                             :inline="true"
                             @page-selected="setPage" />
 
-                        <div class="p-4___REPLACED border-t flex items-center justify-between bg-grey-20">
+                        <div class="p-4 border-t flex items-center justify-between bg-grey-20">
                             <div class="text-sm text-grey-70"
                                 v-text="hasMaxSelections
                                     ? __n(':count/:max selected', selections, { max: maxSelections })
@@ -82,7 +82,7 @@
                                 <button
                                     v-if="! hasMaxSelections || maxSelections > 1"
                                     type="button"
-                                    class="btn-primary ml-2___REPLACED"
+                                    class="btn-primary ml-2"
                                     @click="select">
                                     {{ __('Select') }}
                                 </button>

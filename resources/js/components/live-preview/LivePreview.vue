@@ -12,12 +12,12 @@
 
                 <transition name="live-preview-header-slide">
                     <div v-show="headerVisible" class="live-preview-header">
-                        <div class="text-base text-grey-70 font-medium mr-4___REPLACED">{{ __('Live Preview') }}</div>
+                        <div class="text-base text-grey-70 font-medium mr-4">{{ __('Live Preview') }}</div>
                         <div class="flex items-center">
                             <button v-if="canPopOut && !poppedOut" class="btn" @click="popout">{{ __('Pop out') }}</button>
                             <button v-if="poppedOut" class="btn" @click="closePopout">{{ __('Pop in') }}</button>
-                            <select-input :options="deviceSelectOptions" v-model="previewDevice" v-show="!poppedOut" class="ml-4___REPLACED" />
-                            <select-input :options="targetSelectOptions" v-model="target" class="ml-4___REPLACED" v-if="targets.length > 1" />
+                            <select-input :options="deviceSelectOptions" v-model="previewDevice" v-show="!poppedOut" class="ml-4" />
+                            <select-input :options="targetSelectOptions" v-model="target" class="ml-4" v-if="targets.length > 1" />
 
                             <component
                                 v-for="(component, handle) in inputs"
@@ -26,7 +26,7 @@
                                 :value="extras[handle]"
                                 :loading="loading"
                                 @input="componentUpdated(handle, $event)"
-                                class="ml-4___REPLACED" />
+                                class="ml-4" />
 
                             <slot name="buttons" />
 
@@ -44,7 +44,7 @@
                     <transition name="live-preview-editor-slide">
                         <div v-show="panesVisible" class="live-preview-editor" :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }">
                             <div class="live-preview-fields flex-1 h-full overflow-scroll" :class="{
-                                'p-6___REPLACED bg-grey-30': poppedOut,
+                                'p-6 bg-grey-30': poppedOut,
                                 'live-preview-fields-wide': editorWidth >= 920,
                                 'live-preview-fields-narrow': editorWidth < 920
                             }">

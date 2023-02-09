@@ -111,7 +111,7 @@
     background: rgba(white, .9);
 
     .inner {
-        @apply p-10___REPLACED text-center mx-auto;
+        @apply p-10 text-center mx-auto;
     }
 
     i {
@@ -128,7 +128,7 @@
 
 .help-block {
     width: 100%;
-    p { @apply mb-2___REPLACED }
+    p { @apply mb-2 }
 }
 
 text-truncate {

@@ -1,12 +1,12 @@
 <template>
 
         <div>
-            <header class="mb-6___REPLACED">
+            <header class="mb-6">
                 <breadcrumb :url="breadcrumbUrl" :title="__('Roles & Permissions')" />
                 <h1 v-text="initialTitle || __('Create Role')" />
             </header>
 
-            <publish-fields-container class="card p-0 mb-6___REPLACED configure-section">
+            <publish-fields-container class="card p-0 mb-6 configure-section">
 
                 <form-group
                     handle="title"
@@ -28,7 +28,7 @@
                     v-model="handle"
                 />
 
-                <div class="text-xs text-red p-6___REPLACED pt-0" v-if="initialHandle && handle != initialHandle">
+                <div class="text-xs text-red p-6 pt-0" v-if="initialHandle && handle != initialHandle">
                     {{ __('messages.role_change_handle_warning') }}
                 </div>
 
@@ -45,13 +45,13 @@
             </publish-fields-container>
 
             <div v-if="!isSuper">
-                <div class="mt-6___REPLACED content" v-for="group in permissions" :key="group.handle">
-                    <h2 class="mt-10___REPLACED text-base mb-2___REPLACED">{{ group.label }}</h2>
+                <div class="mt-6 content" v-for="group in permissions" :key="group.handle">
+                    <h2 class="mt-10 text-base mb-2">{{ group.label }}</h2>
                     <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
                 </div>
             </div>
 
-            <div class="py-4___REPLACED mt-6___REPLACED border-t flex justify-between">
+            <div class="py-4 mt-6 border-t flex justify-between">
                 <a :href="indexUrl" class="btn" v-text="__('Cancel') "/>
                 <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
             </div>

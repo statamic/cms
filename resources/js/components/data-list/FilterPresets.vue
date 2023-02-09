@@ -1,5 +1,5 @@
 <template>
-    <div v-if="presets" class="border-b px-4___REPLACED text-sm">
+    <div v-if="presets" class="border-b px-4 text-sm">
 
         <button class="data-list-filter-link" :class="{ active: ! activePreset }" @click="viewAll" v-text="__('All')" />
 

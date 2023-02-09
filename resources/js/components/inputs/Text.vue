@@ -23,7 +23,7 @@
             >
             <div class="input-group-append" v-if="append" v-text="append" />
         </div>
-        <div class="text-xs ml-2___REPLACED" :class="limitIndicatorColor" v-if="limit">
+        <div class="text-xs ml-2" :class="limitIndicatorColor" v-if="limit">
             <span v-text="currentLength"></span>/<span v-text="limit"></span>
         </div>
     </div>

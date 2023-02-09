@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="flex items-center mb-6___REPLACED">
+        <div class="flex items-center mb-6">
             <h1 class="flex-1">
                 <span v-text="name" />
                 <span v-if="currentVersion" class="font-normal text-grey-70">{{ currentVersion }}</span>
@@ -12,15 +12,15 @@
                 </template>
                 <template v-else>{{ __('Last Install Log' ) }}</template>
             </button>
-            <button v-if="canUpdateToLatestVersion" class="btn-primary ml-4___REPLACED" @click="updateToLatest()">{{ __('Update to Latest') }}</button>
+            <button v-if="canUpdateToLatestVersion" class="btn-primary ml-4" @click="updateToLatest()">{{ __('Update to Latest') }}</button>
             <div v-if="onLatestVersion" v-text="__('Up to date')" />
         </div>
 
-        <div v-if="gettingChangelog" class="card p-6___REPLACED text-center">
+        <div v-if="gettingChangelog" class="card p-6 text-center">
             <loading-graphic  />
         </div>
 
-        <div class="bg-yellow border-yellow-dark border-dashed p-4___REPLACED text-xs border mb-6___REPLACED rounded cursor-pointer flex items-center justify-between"
+        <div class="bg-yellow border-yellow-dark border-dashed p-4 text-xs border mb-6 rounded cursor-pointer flex items-center justify-between"
             v-if="!showingUnlicensedReleases && hasUnlicensedReleases"
             @click="showingUnlicensedReleases = true"
         >
@@ -62,11 +62,11 @@
             @opened="$events.$emit('start-composer')"
             @closed="modalOpen = false"
         >
-            <div class="p-6___REPLACED relative">
+            <div class="p-6 relative">
                 <composer-output :package="package" />
                 <button
                     v-if="!composer.processing"
-                    class="btn-close absolute top-0 right-0 mt-4___REPLACED mr-4___REPLACED"
+                    class="btn-close absolute top-0 right-0 mt-4 mr-4"
                     :aria-label="__('Close')"
                     @click="closeModal"
                     v-html="'&times'" />

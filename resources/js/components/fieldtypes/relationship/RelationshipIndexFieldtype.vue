@@ -5,10 +5,10 @@
             v-for="(item, i) in value"
             :key="item.id"
             class="flex items-center"
-            :class="{ 'mb-2___REPLACED': i < value.length-1 }"
+            :class="{ 'mb-2': i < value.length-1 }"
         >
             <div v-if="item.published && item.published !== null"
-                class="little-dot mr-2___REPLACED" :class="[item.published ? 'bg-green' : 'bg-grey-40']" />
+                class="little-dot mr-2" :class="[item.published ? 'bg-green' : 'bg-grey-40']" />
             <a :href="item.edit_url">{{ item.title }}</a>
         </div>
     </div>
