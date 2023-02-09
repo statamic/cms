@@ -34,7 +34,7 @@
 
     </div>
 
-    <div class="w-full text-center mt-2">
+    <div class="w-full text-center mt-4___REPLACED">
         <a href="{{ cp_route('login') }}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
             {{ __('I remember my password') }}
         </a>

@@ -66,7 +66,7 @@
                 <composer-output :package="package" />
                 <button
                     v-if="!composer.processing"
-                    class="btn-close absolute top-0 right-0 mt-2 mr-2"
+                    class="btn-close absolute top-0 right-0 mt-4___REPLACED mr-2"
                     :aria-label="__('Close')"
                     @click="closeModal"
                     v-html="'&times'" />

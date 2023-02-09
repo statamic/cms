@@ -4,7 +4,7 @@
 @section('content')
 <form action="{{ $action }}" method="POST">
     @csrf
-    <div class="max-w-lg mt-2 mx-auto">
+    <div class="max-w-lg mt-4___REPLACED mx-auto">
         <div class="rounded p-3 lg:px-7 lg:py-5 shadow bg-white">
             <header class="text-center mb-16___REPLACED">
                 <h1 class="mb-6___REPLACED">{{ __('Create Blueprint') }}</h1>

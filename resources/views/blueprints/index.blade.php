@@ -20,7 +20,7 @@
             @endforeach
 
             @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
-                @if ($loop->first)<h6 class="p-1 mt-2">{{ __('Taxonomies') }}</h6>@endif
+                @if ($loop->first)<h6 class="p-1 mt-4___REPLACED">{{ __('Taxonomies') }}</h6>@endif
                 <dropdown-item redirect="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}">{{ $taxonomy->title() }}</dropdown-item>
             @endforeach
         </dropdown-list>

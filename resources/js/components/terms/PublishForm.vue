@@ -150,7 +150,7 @@
                                         <span class="text-2xs" v-text="__('This is the published version')"></span>
                                     </div>
                                     <button
-                                            class="flex items-center justify-center mt-2 btn-flat px-1 w-full"
+                                            class="flex items-center justify-center mt-4___REPLACED btn-flat px-1 w-full"
                                             v-if="!isCreating && revisionsEnabled"
                                             @click="showRevisionHistory = true">
                                             <svg-icon name="history" class="w-5 h-5 mr-1" />

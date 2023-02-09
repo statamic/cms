@@ -13,7 +13,7 @@
                 <a :href="oauthProvider.loginUrl" target="_blank" class="btn-primary">
                     {{ __('Log in with :provider', {provider: oauthProvider.label}) }}
                 </a>
-                <div class="text-2xs text-grey mt-2">
+                <div class="text-2xs text-grey mt-4___REPLACED">
                     {{ __('messages.session_expiry_new_window') }}
                 </div>
             </div>

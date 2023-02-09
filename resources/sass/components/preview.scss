@@ -46,7 +46,7 @@
 .live-preview-contents iframe {
     @apply bg-white;
     &.responsive { @apply h-full w-full; }
-    &.device { @apply mt-2 shadow-lg rounded; }
+    &.device { @apply mt-4___REPLACED shadow-lg rounded; }
 }
 
 .live-preview-fields {
