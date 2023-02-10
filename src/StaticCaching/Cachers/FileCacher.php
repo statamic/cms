@@ -149,7 +149,7 @@ class FileCacher extends AbstractCacher
         $paths = $this->getCachePaths();
 
         if (! $site) {
-            $site = $this->config('locale');
+            $site = $this->config('locale', Site::current()->handle());
         }
 
         return $paths[$site];
