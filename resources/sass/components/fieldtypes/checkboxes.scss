@@ -4,10 +4,10 @@
 
 .checkboxes-fieldtype {
     .option {
-        @apply flex items-center mb-1;
+        @apply flex items-center mb-2;
     }
 
     .option + label {
-        @apply ml-1;
+        @apply ml-2;
     }
 }

@@ -3,15 +3,15 @@
    ========================================================================== */
 
 .dropdown-list .popover-content {
-    @apply p-1;
+    @apply p-2;
 
     button, a {
-        @apply block w-full text-left rounded-sm text-xs font-normal px-1 py-sm text-grey-80;
+        @apply block w-full text-left rounded-sm text-xs font-normal px-2 py-1 text-grey-80;
         line-height: 1.4;
         white-space: nowrap;
 
         &:hover {
-            @apply .bg-blue .text-white;
+            @apply bg-blue text-white;
         }
 
         .icon {

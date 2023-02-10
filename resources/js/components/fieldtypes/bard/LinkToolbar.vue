@@ -5,16 +5,16 @@
         <div>
 
             <!-- Link type select -->
-            <div class="flex items-center px-2 py-1 border-b">
+            <div class="flex items-center px-4 py-2 border-b">
 
                 <label
-                    class="mr-1.5 flex items-center font-normal"
+                    class="mr-3 flex items-center font-normal"
                     v-for="type in visibleLinkTypes"
                     :for="type.type"
                     :key="type.type"
                 >
                     <input
-                        class="mr-sm top-0"
+                        class="mr-1 top-0"
                         type="radio"
                         name="link-type"
                         :id="type.type"
@@ -26,8 +26,8 @@
 
             </div>
 
-            <div class="px-2 py-2 border-b">
-                <div class="h-8 mb-2 p-1 border rounded border-grey-50 flex items-center">
+            <div class="px-4 py-4 border-b">
+                <div class="h-8 mb-4 p-2 border rounded border-grey-50 flex items-center">
 
                     <!-- URL input -->
                     <input
@@ -48,11 +48,11 @@
 
                         <loading-graphic v-if="isLoading" :inline="true" />
 
-                        <div v-else class="flex-1 flex items-center mr-1 truncate">
+                        <div v-else class="flex-1 flex items-center mr-2 truncate">
                             <img
                                 v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
                                 :src="itemData.asset.thumbnail || itemData.asset.url"
-                                class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-1 fit-cover lazyloaded"
+                                class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-2 fit-cover lazyloaded"
                             >
                             {{ displayValue }}
                         </div>
@@ -70,7 +70,7 @@
                 </div>
 
                 <!-- Title attribute -->
-                <div class="h-8 mb-2 p-1 border rounded border-grey-50 flex items-center" >
+                <div class="h-8 mb-4 p-2 border rounded border-grey-50 flex items-center" >
                     <input
                         type="text"
                         ref="input"
@@ -81,12 +81,12 @@
                 </div>
 
                 <label for="target-blank" class="flex items-center font-normal">
-                    <input class="checkbox mr-1" type="checkbox" v-model="targetBlank" id="target-blank">
+                    <input class="checkbox mr-2" type="checkbox" v-model="targetBlank" id="target-blank">
                     {{ __('Open in new window') }}
                 </label>
             </div>
 
-            <div class="flex items-center justify-end space-x-1 font-normal px-2 py-1.5">
+            <div class="flex items-center justify-end space-x-1 font-normal px-4 py-3">
                 <button
                     v-tooltip="__('Remove Link')"
                     :aria-label="__('Remove Link')"

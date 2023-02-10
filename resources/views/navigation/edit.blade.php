@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <header class="mb-3">
+    <header class="mb-6">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('navigation.show', $nav->handle()),
             'title' => $nav->title()

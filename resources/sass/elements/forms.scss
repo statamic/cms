@@ -11,7 +11,7 @@ form {
 }
 
 label {
-    @apply .text-grey-80 .font-normal .text-sm .block .leading-normal;
+    @apply text-grey-80 font-normal text-sm block leading-normal;
 }
 
 input[type="checkbox"] {
@@ -27,7 +27,7 @@ input[type="radio"] {
 }
 
 select {
-    @apply .text-base .bg-grey-30 .border-2 .border-grey-30 .cursor-pointer;
+    @apply text-base bg-grey-30 border-2 border-grey-30 cursor-pointer;
 }
 
 
@@ -35,7 +35,7 @@ select {
   ========================================================================== */
 
 .input-text {
-    @apply appearance-none bg-grey-10 text-grey-80 max-w-full w-full border p-1 rounded shadow-inner;
+    @apply appearance-none bg-grey-10 text-grey-80 max-w-full w-full border p-2 rounded shadow-inner;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
 
@@ -51,7 +51,7 @@ select {
 
 // Used inside tables, grids, and so on
 .input-text-minimal {
-    @apply appearance-none shadow-none bg-white w-full p-1;
+    @apply appearance-none shadow-none bg-white w-full p-2;
 
     &:focus {
         @apply outline-none bg-grey-20;
@@ -83,7 +83,7 @@ input.input-text-minimal:read-only,
     }
 
     .input-text {
-        @apply .flex-1 border-grey-50 min-w-0;
+        @apply flex-1 border-grey-50 min-w-0;
     }
 
     .input-text:not(:first-child) {
@@ -95,7 +95,7 @@ input.input-text-minimal:read-only,
     }
 
     .input-group-prepend, .input-group-append, .input-group-item {
-        @apply rounded-l px-1 border text-sm text-grey-80 select-none;
+        @apply rounded-l px-2 border text-sm text-grey-80 select-none;
         background: linear-gradient(180deg, #fff, #f9fafb);
         border: 1px solid #c4cdd6;
         box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
@@ -156,10 +156,10 @@ input.input-text-minimal:read-only,
 
 .radio-fieldtype .option,
 .checkboxes-fieldtype .option {
-    @apply mt-1.5 flex items-center;
+    @apply mt-3 flex items-center;
 
     input {
-        @apply leading-normal mr-sm relative;
+        @apply leading-normal mr-1 relative;
         top: -1px;
     }
 
@@ -173,12 +173,12 @@ input.input-text-minimal:read-only,
     @apply flex items-center flex-wrap;
 
     .option {
-        @apply mr-2 mb-1.5;
+        @apply mr-4 mb-3;
     }
 }
 
 .radio-box {
-    @apply border rounded cursor-pointer relative p-2 h-full;
+    @apply border rounded cursor-pointer relative p-4 h-full;
     &.selected {
         @apply border-blue text-blue shadow;
     }
@@ -196,7 +196,7 @@ input.input-text-minimal:read-only,
 
     select {
         @apply text-sm text-grey-80 shadow-button cursor-pointer block w-full h-full text-left relative max-w-full;
-        @apply select-none rounded leading-normal align-middle whitespace-no-wrap appearance-none subpixel-antialiased;
+        @apply select-none rounded leading-normal align-middle whitespace-nowrap appearance-none subpixel-antialiased;
 
         background: linear-gradient(180deg, #fff, #f9fafb);
         border: 1px solid #c4cdd6;
@@ -215,7 +215,7 @@ input.input-text-minimal:read-only,
     }
 
     .select-input-toggle {
-        @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-grey-90;
+        @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-grey-90;
 
         svg {
             @apply fill-current h-4 w-4;
@@ -274,7 +274,7 @@ input.slug {
 /* Form groups
   ========================================================================== */
 .form-group {
-    @apply .p-1.5 .m-0;
+    @apply p-3 m-0;
 
     label {
         font-weight: 500;
@@ -306,17 +306,17 @@ input.slug {
 }
 
 .help-block {
-    @apply .block .mb-1 .text-grey-70 .text-xs;
+    @apply block mb-2 text-grey-70 text-xs;
     a {
-        @apply .text-grey-80 underline;
+        @apply text-grey-80 underline;
         &:hover {
-            @apply .text-blue-darker;
+            @apply text-blue-darker;
         }
     }
 }
 
 @screen md {
     .form-group {
-        @apply .p-3;
+        @apply p-6;
     }
 }

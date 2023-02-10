@@ -1,5 +1,5 @@
 .bard-fieldtype-wrapper {
-    @apply .border .rounded relative outline-none;
+    @apply border rounded relative outline-none;
 
     * { outline: none; }
 
@@ -13,11 +13,11 @@
 }
 
 .bard-editor .ProseMirror {
-    @apply p-1 min-h-48;
+    @apply p-2 min-h-40;
 }
 
 .bard-editor .bard-invalid {
-    @apply p-1 bg-red-lighter text-red text-xs whitespace-no-wrap;
+    @apply p-2 bg-red-lighter text-red text-xs whitespace-nowrap;
 }
 
 // Modes
@@ -30,7 +30,7 @@
 }
 
 .bard-editor.mode\:inline .ProseMirror {
-    @apply p-1;
+    @apply p-2;
     min-height: 38px;
     p {
         margin-bottom: 0;
@@ -40,19 +40,19 @@
 
 // Responive Wangjangling
 @screen md {
-    .bard-editor .ProseMirror { @apply p-2; }
-    .bard-editor .bard-invalid { @apply px-2; }
+    .bard-editor .ProseMirror { @apply p-4; }
+    .bard-editor .bard-invalid { @apply px-4; }
 }
 
 .bard-fixed-toolbar {
-    @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between;
+    @apply bg-white shadow-none rounded-t border-b text-sm flex items-start justify-between;
     position: sticky;
     padding: 4px 8px;
     z-index: 5;
     top: 0;
 
     .bard-toolbar-button {
-        @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center;
+        @apply text-grey-80 rounded px-1 flex items-center justify-center text-base text-center;
         height: 32px;
         width: 32px;
         margin: 0 2px;
@@ -74,9 +74,9 @@
     }
 
     .bard-toolbar-button:disabled {
-        @apply .opacity-50;
+        @apply opacity-50;
         &:hover {
-            @apply .text-grey-80;
+            @apply text-grey-80;
         }
     }
 
@@ -86,10 +86,10 @@
 }
 
 .bard-fixed-toolbar.dark {
-    @apply bg-black rounded-full shadow-lg px-2;
+    @apply bg-black rounded-full shadow-lg px-4;
 
     button {
-        @apply focus-none text-grey-70 rounded px-sm flex items-center justify-center text-base text-center bg-transparent;
+        @apply focus-none text-grey-70 rounded px-1 flex items-center justify-center text-base text-center bg-transparent;
         height: 32px;
         width: 32px;
         margin: 0 2px;
@@ -152,11 +152,11 @@
     }
 
     .bard-toolbar-button:hover {
-        @apply .text-white;
+        @apply text-white;
     }
 
     .bard-toolbar-button.active {
-        @apply .text-blue;
+        @apply text-blue;
     }
 
     .bard-toolbar-button:focus {
@@ -164,9 +164,9 @@
     }
 
     .bard-toolbar-button:disabled {
-        @apply .opacity-50;
+        @apply opacity-50;
         &:hover {
-            @apply .text-grey-20;
+            @apply text-grey-20;
         }
     }
 
@@ -176,7 +176,7 @@
 }
 
 .bard-footer-toolbar {
-    @apply .bg-white .shadow-none text-grey-70 rounded-b .border-t .text-xs .p-1 flex items-center justify-between;
+    @apply bg-white shadow-none text-grey-70 rounded-b border-t text-xs p-2 flex items-center justify-between;
     padding: 8px 12px;
 
     .bard-fullscreen & {
@@ -221,7 +221,7 @@
                 // too high and it'll be over the top of stacks, etc.
 
     .bard-editor {
-        @apply bg-white shadow max-w-xl mx-auto rounded relative my-3 px-4;
+        @apply bg-white shadow max-w-xl mx-auto rounded relative my-6 px-8;
     }
 
     .bard-fixed-toolbar {
@@ -231,12 +231,12 @@
         z-index: 999;
 
         button {
-            @apply mx-sm;
+            @apply mx-1;
         }
     }
 
     .ProseMirror {
-        @apply .px-3 py-6 flex flex-col;
+        @apply px-6 py-16 flex flex-col;
         min-height: calc(100vh - 120px);
 
         > p > code, > pre code {
@@ -250,11 +250,11 @@
     }
 
     .bard-set-selector {
-        @apply ml-3;
+        @apply ml-6;
     }
 
     .bard-field-options {
-        @apply fixed top-0 inset-x-0 bg-grey-70 p-2 w-full;
+        @apply fixed top-0 inset-x-0 bg-grey-70 p-4 w-full;
         text-align: right;
         z-index: 1; // to appear over the top of .bard-editor
 
@@ -428,7 +428,7 @@
     }
 
     blockquote {
-        @apply text-grey-80 border-l-4 border-blue px-2;
+        @apply text-grey-80 border-l-4 border-blue px-4;
         margin: 0 0 .85em;
     }
 
@@ -444,7 +444,7 @@
     blockquote > .tableWrapper table,
     ol li > .tableWrapper table,
     ul li > .tableWrapper table {
-        @apply w-full overflow-hidden m-0 mb-2 bg-white text-sm ;
+        @apply w-full overflow-hidden m-0 mb-4 bg-white text-sm ;
         border-collapse: collapse;
         table-layout: fixed;
 
@@ -453,7 +453,7 @@
         }
 
         td, th {
-            @apply border align-top relative py-sm px-1;
+            @apply border align-top relative py-1 px-2;
             min-width: 1em;
         }
 
@@ -489,7 +489,7 @@
     }
 
     pre code {
-        @apply font-mono bg-grey-40 text-xs p-2 block w-full rounded;
+        @apply font-mono bg-grey-40 text-xs p-4 block w-full rounded;
         line-height: 1.8;
     }
 }
@@ -509,7 +509,7 @@
   ========================================================================== */
 
   .bard-link-toolbar {
-    @apply bg-white rounded absolute leading-none shadow mt-1;
+    @apply bg-white rounded absolute leading-none shadow mt-2;
     z-index: 100;
     width: 300px;
     top: 100%;
@@ -540,7 +540,7 @@
 }
 
 .bard-inline-image-container {
-    @apply relative bg-white border rounded whitespace-normal mb-3;
+    @apply relative bg-white border rounded whitespace-normal mb-6;
     &:hover {
         cursor: grab;
     }

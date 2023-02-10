@@ -5,7 +5,7 @@
 $color: hsla(210, 10%, 30%, 1); // grey-80
 
 div[data-popover="tooltip"] {
-    @apply w-auto bg-grey-80 px-1 text-center text-white;
+    @apply w-auto bg-grey-80 px-2 text-center text-white;
     width: auto !important;
 
     &.dropdown-position-top:before { border-top-color: $color; }
@@ -19,7 +19,7 @@ div[data-popover="tooltip"] {
   z-index: 10000;
 
   .tooltip-inner {
-    @apply w-auto bg-grey-80 px-1 py-sm text-center text-2xs text-white rounded;
+    @apply w-auto bg-grey-80 px-2 py-1 text-center text-2xs text-white rounded;
   }
 
   .tooltip-arrow {

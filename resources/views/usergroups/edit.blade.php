@@ -8,7 +8,7 @@
         'title' => $group->title()
     ])
 
-    <h1 class="mb-3">@yield('title')</h1>
+    <h1 class="mb-6">@yield('title')</h1>
 
     <collection-edit-form>
     </collection-edit-form>

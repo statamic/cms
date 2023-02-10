@@ -4,7 +4,7 @@
             <template v-if="composer.status">{{ composer.status }}</template>
             <loading-graphic v-if="polling" text="" class="h-6 w-6"/>
         </p>
-        <div class="mt-2 p-2 rounded text-sm font-mono bg-black text-white">
+        <div class="mt-4 p-4 rounded text-sm font-mono bg-black text-white">
             <div
                 ref="output"
                 class="whitespace-pre-wrap h-96 overflow-auto" v-html="coloredOutput" />

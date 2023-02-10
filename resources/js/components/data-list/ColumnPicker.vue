@@ -4,7 +4,7 @@
         <template slot="trigger">
             <button
                 v-tooltip="__('Customize Columns')"
-                class="btn btn-sm px-sm mt-1 py-sm -ml-sm cursor-pointer"
+                class="btn btn-sm px-1 mt-2 py-1 -ml-1 cursor-pointer"
             >
                 <svg-icon name="settings-horizontal" class="w-4" />
             </button>
@@ -18,22 +18,22 @@
                 handle-class="column-picker-item"
                 append-to=".popover-content"
             >
-                <div class="outline-none text-left px-1 py-1">
-                    <h6 v-text="__('Displayed Columns')" class="p-1"/>
+                <div class="outline-none text-left px-2 py-2">
+                    <h6 v-text="__('Displayed Columns')" class="p-2"/>
                     <div class="column-picker-item sortable" v-for="column in selectedColumns" :key="column.field">
                         <label>
-                            <input type="checkbox" class="mr-1" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
+                            <input type="checkbox" class="mr-2" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
                             {{ column.label }}
                         </label>
                     </div>
                 </div>
             </sortable-list>
 
-            <div v-if="hiddenColumns.length" class="outline-none text-left px-1 pb-1">
-                <h6 v-text="__('Available Columns')" class="px-1 pb-1"/>
+            <div v-if="hiddenColumns.length" class="outline-none text-left px-2 pb-2">
+                <h6 v-text="__('Available Columns')" class="px-2 pb-2"/>
                 <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field">
                     <label class="cursor-pointer">
-                        <input type="checkbox" class="mr-1" v-model="column.visible" @change="columnToggled(column) "/>
+                        <input type="checkbox" class="mr-2" v-model="column.visible" @change="columnToggled(column) "/>
                         {{ column.label }}
                     </label>
                 </div>
@@ -42,12 +42,12 @@
 
         <div class="flex border-t text-grey-80" v-if="preferencesKey">
             <button
-                class="p-1 hover:bg-grey-10 rounded-bl text-xs flex-1"
+                class="p-2 hover:bg-grey-10 rounded-bl text-xs flex-1"
                 v-text="__('Reset')"
                 @click="reset" :disabled="saving"
             />
             <button
-                class="p-1 hover:bg-grey-10 text-blue flex-1 rounded-br border-l text-xs"
+                class="p-2 hover:bg-grey-10 text-blue flex-1 rounded-br border-l text-xs"
                 v-text="__('Save')"
                 @click="save" :disabled="saving"
             />

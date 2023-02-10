@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <header class="mb-3">
+    <header class="mb-6">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('utilities.index'),
             'title' => __('Utilities')
@@ -23,7 +23,7 @@
 
     <div class="card p-0">
         @if ($errors->has('indexes'))
-            <p class="p-2"><small class="help-block text-red">{{ $errors->first() }}</small></p>
+            <p class="p-4"><small class="help-block text-red">{{ $errors->first() }}</small></p>
         @endif
 
         <table class="data-table">
@@ -40,7 +40,7 @@
                 @foreach (\Statamic\Facades\Search::indexes() as $index)
                     <tr>
                         <td class="flex items-center">
-                            @cp_svg('search-drivers/' . $index->config()['driver'], 'w-6 h-6 mr-1')
+                            @cp_svg('search-drivers/' . $index->config()['driver'], 'w-6 h-6 mr-2')
                             <div class="text-grey-80 leading-none">{{ $index->title() }}</div>
                         </td>
                         <td>
@@ -52,7 +52,7 @@
                             @else
                                 <div class="text-sm text-grey flex flex-wrap">
                                     @foreach($index->config()['searchables'] as $searchable)
-                                        <div class="mr-1 badge-pill-sm">
+                                        <div class="mr-2 badge-pill-sm">
                                             {{ $searchable }}
                                         </div>
                                     @endforeach
@@ -62,7 +62,7 @@
                         <td>
                             <div class="text-sm text-grey flex flex-wrap">
                                 @foreach($index->config()['fields'] as $field)
-                                    <div class="mr-1 badge-pill-sm">
+                                    <div class="mr-2 badge-pill-sm">
                                         {{ $field }}
                                     </div>
                                 @endforeach

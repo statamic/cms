@@ -4,12 +4,12 @@
 
    .CodeMirror {
     /* Set height, width, borders, and global font properties here */
-    @apply .text-grey-90 .font-mono .text-sm .leading-loose;
+    @apply text-grey-90 font-mono text-sm leading-loose;
     min-height: 80px;
   }
 
   .code-mode {
-      @apply select-none z-10 opacity-25 absolute right-0 p-1 text-white text-2xs;
+      @apply select-none z-10 opacity-25 absolute right-0 p-2 text-white text-2xs;
   }
 
   /* PADDING */
@@ -21,7 +21,7 @@
     padding: 0 16px; /* Horizontal padding of content */
   }
   .CodeMirror-wrap {
-    @apply py-1 rounded;
+    @apply py-2 rounded;
   }
 
   .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
@@ -357,7 +357,7 @@
         @apply border p-0
     }
 
-    .CodeMirror-scroll {
+    CodeMirror-scroll {
         min-height: 80px;
     }
   }

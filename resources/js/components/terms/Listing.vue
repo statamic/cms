@@ -44,7 +44,7 @@
                         />
                     </div>
 
-                    <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+                    <div v-show="items.length === 0" class="p-6 text-center text-grey-50" v-text="__('No results')" />
 
                     <data-list-bulk-actions
                         :url="actionUrl"
@@ -86,7 +86,7 @@
                     </data-list-table>
                 </div>
                 <data-list-pagination
-                    class="mt-3"
+                    class="mt-6"
                     :resource-meta="meta"
                     :show-totals="true"
                     @page-selected="selectPage"

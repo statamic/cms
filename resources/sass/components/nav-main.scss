@@ -7,7 +7,7 @@
     transition: all .3s;
     z-index: 9998;
 
-    h6 { @apply mt-3; }
+    h6 { @apply mt-6; }
 
     ul {
         @apply list-none p-0 mt-0;
@@ -27,7 +27,7 @@
         }
 
         i {
-            @apply block h-7 p-sm w-7 mr-1 rounded-full;
+            @apply block h-7 p-1 w-7 mr-2 rounded-full;
         }
     }
 
@@ -40,7 +40,7 @@
     }
 
     li ul {
-        @apply mb-1;
+        @apply mb-2;
         margin-left: 1.5rem;
 
         li {
@@ -58,7 +58,7 @@
     }
 
     .nav-section-top-level {
-        @apply mt-2;
+        @apply mt-4;
     }
 }
 
@@ -74,15 +74,15 @@
 }
 
 .nav-main-inner {
-    @apply pl-3 pr-2 pt-1;
+    @apply pl-6 pr-4 pt-2;
 }
 
 .nav-toggle {
-    @apply block h-6 p-sm w-6 mr-1.5 rounded;
+    @apply block h-6 p-1 w-6 mr-3 rounded;
     outline: none !important;
 
     &:hover {
-        @apply .bg-grey-20;
+        @apply bg-grey-20;
     }
 }
 

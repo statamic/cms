@@ -2,13 +2,13 @@
 
     <div class="flex flex-col h-full">
 
-        <div class="flex items-center p-3 bg-grey-20 border-b text-center">
+        <div class="flex items-center p-6 bg-grey-20 border-b text-center">
             Section
         </div>
 
         <div class="flex-1 overflow-scroll">
 
-            <div class="p-2">
+            <div class="p-4">
                 <div class="flex flex-wrap">
                     <div
                         v-for="field in fields"

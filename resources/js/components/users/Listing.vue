@@ -20,7 +20,7 @@
                         <data-list-search v-model="searchQuery" />
                     </div>
 
-                    <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+                    <div v-show="items.length === 0" class="p-6 text-center text-grey-50" v-text="__('No results')" />
 
                     <data-list-bulk-actions
                         class="rounded"
@@ -37,17 +37,17 @@
                     >
                         <template slot="cell-email" slot-scope="{ row: user, value }">
                             <a :href="user.edit_url" class="flex items-center">
-                                <avatar :user="user" class="w-8 h-8 rounded-full mr-1" />
+                                <avatar :user="user" class="w-8 h-8 rounded-full mr-2" />
                                 {{ value }}
                             </a>
                         </template>
                         <template slot="cell-roles" slot-scope="{ row: user, value: roles }">
-                            <span v-if="user.super" class="badge-pill-sm mr-sm">{{ __('Super Admin') }}</span>
+                            <span v-if="user.super" class="badge-pill-sm mr-1">{{ __('Super Admin') }}</span>
                             <span v-if="!roles || roles.length === 0" />
-                            <span v-for="role in (roles || [])" class="badge-pill-sm mr-sm">{{ role.title }}</span>
+                            <span v-for="role in (roles || [])" class="badge-pill-sm mr-1">{{ role.title }}</span>
                         </template>
                         <template slot="cell-groups" slot-scope="{ row: user, value: groups }">
-                            <span v-for="group in (groups || [])" class="badge-pill-sm mr-sm">{{ group.title }}</span>
+                            <span v-for="group in (groups || [])" class="badge-pill-sm mr-1">{{ group.title }}</span>
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list>
@@ -66,7 +66,7 @@
                 </div>
 
                 <data-list-pagination
-                    class="mt-3"
+                    class="mt-6"
                     :resource-meta="meta"
                     :per-page="perPage"
                     :show-totals="true"

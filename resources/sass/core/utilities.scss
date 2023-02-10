@@ -111,7 +111,7 @@
     background: rgba(white, .9);
 
     .inner {
-        @apply .p-5 .text-center .mx-auto;
+        @apply p-10 text-center mx-auto;
     }
 
     i {
@@ -128,10 +128,10 @@
 
 .help-block {
     width: 100%;
-    p { @apply mb-1 }
+    p { @apply mb-2 }
 }
 
-.text-truncate {
+text-truncate {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
