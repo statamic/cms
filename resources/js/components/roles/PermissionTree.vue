@@ -3,10 +3,10 @@
     <div>
         <div v-for="permission in permissions" :key="permission.value">
             <label
-                class="flex items-center justify-between py-2 pr-4 border-b group hover:bg-grey-10"
+                class="flex items-center justify-between py-2 pr-4 border-b group hover:bg-grey-100"
                 :style="{ paddingLeft: `${16*depth}px` }"
             >
-                <div class="flex" :class="{ 'text-grey-50': disabled, 'cursor-not-allowed': disabled }">
+                <div class="flex" :class="{ 'text-grey-500': disabled, 'cursor-not-allowed': disabled }">
                     <div class="leading-normal">
                         <input type="checkbox"
                             v-model="permission.checked"
@@ -20,7 +20,7 @@
                         {{ permission.label }}
                     </div>
                 </div>
-                <div class="text-grey-70 text-xs opacity-0 group-hover:opacity-100" v-if="permission.description" v-text="permission.description" />
+                <div class="text-grey-700 text-xs opacity-0 group-hover:opacity-100" v-if="permission.description" v-text="permission.description" />
             </label>
 
             <role-permission-tree

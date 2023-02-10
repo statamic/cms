@@ -9,7 +9,7 @@
             <div class="flex flex-wrap items-center">
                 <div class="w-full md:w-1/2">
                     <h1 class="mb-8">{{ __('Updates') }}</h1>
-                    <p class="text-grey-70 leading-normal mb-8 text-lg antialiased">
+                    <p class="text-grey-700 leading-normal mb-8 text-lg antialiased">
                         {{ __('statamic::messages.outpost_issue_try_later') }}
                     </p>
                     <a href="{{ cp_route('updater') }}"

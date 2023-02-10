@@ -1,7 +1,7 @@
 <div class="card p-0 h-full">
     <header class="flex justify-between items-center p-4 border-b">
         <h2 class="flex items-center">
-            <div class="h-6 w-6 mr-2 text-grey-80">
+            <div class="h-6 w-6 mr-2 text-grey-800">
                 @cp_svg('loading-bar')
             </div>
             <span>{{ __('Updates') }}</span>
@@ -14,7 +14,7 @@
     </header>
     <section class="px-4 py-2">
         @if (! $count)
-            <p class="text-base text-center text-grey-70">{{ __('Everything is up to date.') }}</p>
+            <p class="text-base text-center text-grey-700">{{ __('Everything is up to date.') }}</p>
         @endif
 
         @if ($hasStatamicUpdate)

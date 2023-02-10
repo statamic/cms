@@ -19,18 +19,18 @@
     }
 
     .markdown-buttons button {
-        @apply text-grey-80 rounded px-1 flex items-center justify-center text-base text-center;
+        @apply text-grey-800 rounded px-1 flex items-center justify-center text-base text-center;
         height: 32px;
         width: 32px;
         margin: 0 2px;
     }
 
     .markdown-buttons button:hover {
-        @apply bg-grey-20;
+        @apply bg-grey-200;
     }
 
     .markdown-buttons button.active {
-        @apply bg-grey-30 text-black;
+        @apply bg-grey-300 text-black;
     }
 
     .markdown-buttons button:focus {
@@ -40,7 +40,7 @@
     .markdown-buttons button:disabled {
         @apply opacity-50;
         &:hover {
-            @apply text-grey-80;
+            @apply text-grey-800;
         }
     }
 
@@ -48,7 +48,7 @@
         @apply ml-2 flex items-center h-full;
 
         button {
-            @apply mr-4 text-grey-50 outline-none h-full;
+            @apply mr-4 text-grey-500 outline-none h-full;
             padding: 6px 4px;
 
             &:hover {
@@ -56,7 +56,7 @@
             }
 
             &.active {
-                @apply text-grey-80;
+                @apply text-grey-800;
             }
 
             &:focus {
@@ -66,7 +66,7 @@
     }
 
     .CodeMirror {
-        @apply bg-grey-10 shadow-inner h-auto font-mono leading-normal p-3 text-xs;
+        @apply bg-grey-100 shadow-inner h-auto font-mono leading-normal p-3 text-xs;
         border-radius: 0 0 3px 3px;
 
         .cm-comment {
@@ -77,7 +77,7 @@
     CodeMirror-code { min-height: 100px; }
 
     .helpers {
-        @apply border-t text-xs text-grey-80 flex items-center;
+        @apply border-t text-xs text-grey-800 flex items-center;
 
         button:hover {
             @apply text-blue;
@@ -98,27 +98,27 @@
   ========================================================================== */
 
 .markdown-fieldtype-wrapper.markdown-fullscreen.markdown-dark-mode {
-    @apply bg-grey-80 border-none;
+    @apply bg-grey-800 border-none;
 
     .markdown-toolbar {
-        @apply text-white border-b border-grey-100 shadow-lg;
-        background: linear-gradient(180deg, theme('colors.grey-90'), hsl(210, 20%, 13%));
+        @apply text-white border-b border-grey-950 shadow-lg;
+        background: linear-gradient(180deg, theme('colors.grey.900'), hsl(210, 20%, 13%));
     }
 
     .helpers {
-        @apply bg-grey-90 text-white border-t border-grey-100;
+        @apply bg-grey-900 text-white border-t border-grey-950;
     }
 
     .markdown-buttons button {
-        @apply text-grey-40;
+        @apply text-grey-400;
     }
 
     .markdown-buttons button:hover {
-        @apply bg-grey-100 text-white;
+        @apply bg-grey-950 text-white;
     }
 
     .markdown-modes button {
-        @apply text-grey-70;
+        @apply text-grey-700;
         &.active {
             @apply text-white;
         }
@@ -146,7 +146,7 @@
   ========================================================================== */
 
 .markdown-fieldtype.read-only-field .CodeMirror {
-    @apply bg-grey-30 text-grey-70;
+    @apply bg-grey-300 text-grey-700;
 }
 
 
@@ -169,7 +169,7 @@
   ========================================================================== */
 
 .markdown-fieldtype .cm-header {
-    @apply text-grey-80;
+    @apply text-grey-800;
 
     &.cm-header-1 {
         @apply text-lg;
@@ -185,7 +185,7 @@
 }
 
 .markdown-fieldtype .cm-quote {
-    @apply text-grey-80 italic text-sm;
+    @apply text-grey-800 italic text-sm;
 }
 
 

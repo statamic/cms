@@ -27,8 +27,8 @@
                     </div>
                 </div>
             </div>
-            <div class="p-4 bg-grey-20 border-t flex items-center justify-end text-sm">
-                <button class="text-grey hover:text-grey-90"
+            <div class="p-4 bg-grey-200 border-t flex items-center justify-end text-sm">
+                <button class="text-grey hover:text-grey-900"
                     @click="$emit('cancel')"
                     v-text="__('Cancel')" />
                 <button class="btn ml-4 btn-danger"

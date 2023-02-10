@@ -121,7 +121,7 @@
         >
             <template #branch-icon="{ branch }">
                 <svg-icon v-if="isRedirectBranch(branch)"
-                    class="inline-block w-4 h-4 text-grey-50"
+                    class="inline-block w-4 h-4 text-grey-500"
                     name="external-link"
                     v-tooltip="__('Redirect')" />
             </template>

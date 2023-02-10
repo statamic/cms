@@ -16,14 +16,14 @@
                 <data-list-table :loading="loading">
                     <template slot="cell-title" slot-scope="{ row: entry }">
                         <div class="flex items-center">
-                            <div class="little-dot mr-2" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
+                            <div class="little-dot mr-2" :class="[entry.published ? 'bg-green' : 'bg-grey-400']" />
                             <a :href="entry.edit_url">{{ entry.title }}</a>
                         </div>
                     </template>
                 </data-list-table>
                 <data-list-pagination
                     v-if="meta.last_page != 1"
-                    class="py-2 border-t bg-grey-20 rounded-b-lg text-sm"
+                    class="py-2 border-t bg-grey-200 rounded-b-lg text-sm"
                     :resource-meta="meta"
                     @page-selected="selectPage"
                     :scroll-to-top="false"
@@ -31,7 +31,7 @@
             </div>
         </data-list>
 
-        <p v-else-if="!initializing && !items.length" class="p-4 pt-2 text-sm text-grey-50">
+        <p v-else-if="!initializing && !items.length" class="p-4 pt-2 text-sm text-grey-500">
             {{ __('There are no entries in this site') }}
         </p>
 

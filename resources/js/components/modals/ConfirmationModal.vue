@@ -10,8 +10,8 @@
                     <p>{{ __('Are you sure?') }}</p>
                 </slot>
             </div>
-            <div class="p-4 bg-grey-20 border-t flex items-center justify-end text-sm">
-                <button class="text-grey hover:text-grey-90" @click="$emit('cancel')" v-text="__(cancelText)" />
+            <div class="p-4 bg-grey-200 border-t flex items-center justify-end text-sm">
+                <button class="text-grey hover:text-grey-900" @click="$emit('cancel')" v-text="__(cancelText)" />
                 <button class="ml-4" :class="buttonClass" v-text="buttonText" @click="$emit('confirm')" />
             </div>
         </div>
@@ -41,7 +41,7 @@ export default {
             default: false
         }
     },
-    
+
     data() {
         return {
             escBinding: null,
@@ -68,7 +68,7 @@ export default {
         this.escBinding = this.$keys.bind('esc', this.dismiss)
         this.enterBinding = this.$keys.bind('enter', this.submit)
     },
-    
+
      beforeDestroy() {
         this.escBinding.destroy()
         this.enterBinding.destroy()

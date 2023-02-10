@@ -41,7 +41,7 @@
                     <tr>
                         <td class="flex items-center">
                             @cp_svg('search-drivers/' . $index->config()['driver'], 'w-6 h-6 mr-2')
-                            <div class="text-grey-80 leading-none">{{ $index->title() }}</div>
+                            <div class="text-grey-800 leading-none">{{ $index->title() }}</div>
                         </td>
                         <td>
                             {{ ucwords($index->config()['driver']) }}

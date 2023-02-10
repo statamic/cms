@@ -3,7 +3,7 @@
         <div class="breadcrumb flex" v-if="showingAddon">
             <button
                 @click="showingAddon = false"
-                class="flex-initial flex p-2 -m-2 items-center text-xs text-grey-70 hover:text-grey-90"
+                class="flex-initial flex p-2 -m-2 items-center text-xs text-grey-700 hover:text-grey-900"
             >
                 <svg-icon name="chevron-right" class="h-6 w-4 rotate-180" />
                 <span v-text="__('Addons')" />
@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="addon-grid my-8" :class="{ 'opacity-50': loading }">
-                    <div class="addon-card bg-white text-grey-80 h-full shadow rounded cursor-pointer relative" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
+                    <div class="addon-card bg-white text-grey-800 h-full shadow rounded cursor-pointer relative" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
                         <span class="badge absolute top-0 left-0 mt-2 ml-2" v-if="addon.installed">Installed</span>
                         <div class="h-48 rounded-t bg-cover bg-center" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
                         <div class="px-6 mb-4 relative text-center">

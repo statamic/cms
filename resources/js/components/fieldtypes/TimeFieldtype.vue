@@ -37,7 +37,7 @@
                 </template>
             </div>
         </div>
-        <button class="text-xl text-grey-60 hover:text-grey-80 h-4 w-4 p-2 flex items-center outline-none" tabindex="0"
+        <button class="text-xl text-grey-600 hover:text-grey-800 h-4 w-4 p-2 flex items-center outline-none" tabindex="0"
               v-if="! required && ! isReadOnly"
               @click="clear" @keyup.enter.space="clear">
               &times;

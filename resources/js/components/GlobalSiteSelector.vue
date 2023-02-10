@@ -11,13 +11,13 @@
             @input="selected"
         >
             <template #selected-option="option">
-                <div class="flex items-center px-2 text-sm text-grey hover:text-grey-80 anti">
+                <div class="flex items-center px-2 text-sm text-grey hover:text-grey-800 anti">
                     <svg-icon name="sites" class="site-selector-icon mr-2 h-4 w-4" />
                     <div class="whitespace-nowrap">{{ option.name }}</div>
                 </div>
             </template>
             <template #option="{ name, handle }">
-                <div :class="{ 'text-grey-50': handle === active }">{{ name }}</div>
+                <div :class="{ 'text-grey-500': handle === active }">{{ name }}</div>
             </template>
         </v-select>
     </div>

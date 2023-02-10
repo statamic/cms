@@ -13,7 +13,7 @@
 	}
 
 	h3, dt {
-        @apply font-normal text-grey-70 antialiased;
+        @apply font-normal text-grey-700 antialiased;
 		margin: 25px 0;
 		font-size: 21px;
 		line-height: 1.5;
@@ -73,7 +73,7 @@
 		}
 
 		li:before {
-			@apply absolute rounded-full bg-grey-90;
+			@apply absolute rounded-full bg-grey-900;
 			height: 6px;
 			width: 6px;
 			content: "";

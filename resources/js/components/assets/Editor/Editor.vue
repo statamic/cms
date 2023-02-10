@@ -60,14 +60,14 @@
 
                             <!-- SVG -->
                             <div v-else-if="asset.isSvg" class="bg-checkerboard h-full w-full flex flex-col">
-                                <div class="flex border-b-2 border-grey-90">
-                                    <div class="flex-1 order-r p-4 border-grey-90 flex items-center justify-center">
+                                <div class="flex border-b-2 border-grey-900">
+                                    <div class="flex-1 order-r p-4 border-grey-900 flex items-center justify-center">
                                         <img :src="asset.url" class="asset-thumb w-4 h-4" />
                                     </div>
-                                    <div class="flex-1 border-l border-r p-4 border-grey-90 flex items-center justify-center">
+                                    <div class="flex-1 border-l border-r p-4 border-grey-900 flex items-center justify-center">
                                         <img :src="asset.url" class="asset-thumb w-12 h-12" />
                                     </div>
-                                    <div class="flex-1 border-l p-4 border-grey-90 flex items-center justify-center">
+                                    <div class="flex-1 border-l p-4 border-grey-900 flex items-center justify-center">
                                         <img :src="asset.url" class="asset-thumb w-24 h-24" />
                                     </div>
                                 </div>

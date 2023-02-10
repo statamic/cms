@@ -2,7 +2,7 @@
    TABS
    ========================================================================== */
 
-   
+
 .tabs-container {
     @apply relative;
 
@@ -11,7 +11,7 @@
     }
 
    .fade-left, .fade-right {
-        @apply absolute w-4 inset-y-0 from-grey-30 pointer-events-none z-10;
+        @apply absolute w-4 inset-y-0 from-grey-300 pointer-events-none z-10;
     }
 
     .fade-left {
@@ -32,7 +32,7 @@
     }
 
     .tab-button {
-        @apply whitespace-nowrap bg-grey-10 py-1 px-4 shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-grey-30 select-none;
+        @apply whitespace-nowrap bg-grey-100 py-1 px-4 shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-grey-300 select-none;
         height: 94%;
         min-height: 94%;
     }
@@ -51,7 +51,7 @@
     }
 
     .tab-button.ghost {
-        @apply bg-transparent relative h-full min-h-full shadow-none border-none text-grey-50 px-6;
+        @apply bg-transparent relative h-full min-h-full shadow-none border-none text-grey-500 px-6;
         min-width: 0;
         &:hover {
             @apply text-blue;

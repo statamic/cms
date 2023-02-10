@@ -3,7 +3,7 @@
     <div v-if="showAlways || hasSelections" class="data-list-bulk-actions">
         <div class="input-group input-group-sm relative z-10">
             <div class="input-group-prepend">
-                <div class="text-grey-60"
+                <div class="text-grey-600"
                     v-text="__n(`:count item selected|:count items selected`, selections.length)" />
             </div>
 

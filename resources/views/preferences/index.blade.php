@@ -16,7 +16,7 @@
                         <a href="{{ cp_route('preferences.default.edit') }}">{{ __('Default') }}</a>
                     </div>
                 </td>
-                <td class="text-right text-2xs text-grey-50">
+                <td class="text-right text-2xs text-grey-500">
                     @if (!empty(Statamic\Facades\Preference::default()->all()))
                         {{ __('Modified') }}
                     @endif
@@ -37,7 +37,7 @@
                                 <a href="{{ cp_route('preferences.role.edit', [$role->handle()]) }}">{{ __($role->title()) }}</a>
                             </div>
                         </td>
-                        <td class="text-right text-2xs text-grey-50">
+                        <td class="text-right text-2xs text-grey-500">
                             @if (!empty($role->preferences()))
                                 {{ __('Modified') }}
                             @endif
@@ -58,7 +58,7 @@
                         <a href="{{ cp_route('preferences.user.edit') }}">{{ __('My Preferences') }}</a>
                     </div>
                 </td>
-                <td class="text-right text-2xs text-grey-50">
+                <td class="text-right text-2xs text-grey-500">
                     @if (!empty(Statamic\Facades\User::current()->preferences()))
                         {{ __('Modified') }}
                     @endif

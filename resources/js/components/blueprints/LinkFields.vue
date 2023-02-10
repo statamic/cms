@@ -10,7 +10,7 @@
         <stack narrow v-if="open" @closed="open = false" name="field-linker">
             <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
-                <div class="bg-grey-20 px-6 py-2 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+                <div class="bg-grey-200 px-6 py-2 border-b border-grey-300 text-lg font-medium flex items-center justify-between">
                     {{ __('Link Fields') }}
                     <button
                         type="button"
@@ -34,12 +34,12 @@
                             v-model="reference">
                             <template slot="option" slot-scope="option">
                                 <div class="flex items-center">
-                                    <span v-text="option.fieldset" class="text-2xs text-grey-50 mr-2" />
+                                    <span v-text="option.fieldset" class="text-2xs text-grey-500 mr-2" />
                                     <span v-text="option.label" />
                                 </div>
                             </template>
                             <template v-slot:no-options>
-                               <div class="text-sm text-grey-70 text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                               <div class="text-sm text-grey-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
                            </template>
                         </v-select>
                         <button
@@ -50,9 +50,9 @@
                             v-text="__('Link')" />
                     </div>
                     <div class="my-4 flex items-center">
-                        <div class="border-b border-grey-30 flex-1" />
-                        <div class="text-2xs text-grey-60 mx-4" v-text="__('or')"></div>
-                        <div class="border-b border-grey-30 flex-1" />
+                        <div class="border-b border-grey-300 flex-1" />
+                        <div class="text-2xs text-grey-600 mx-4" v-text="__('or')"></div>
+                        <div class="border-b border-grey-300 flex-1" />
                     </div>
                     <div>
                         <p class="text-sm font-medium mb-2" v-text="__('Link a fieldset')" />
@@ -67,7 +67,7 @@
                             v-model="fieldset"
                         >
                             <template v-slot:no-options>
-                                <div class="text-sm text-grey-70 text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                                <div class="text-sm text-grey-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
                             </template>
                         </v-select>
                         <p class="text-sm font-medium mt-6 mb-2" v-text="__('Prefix')" />
@@ -101,7 +101,7 @@ export default {
 
     data() {
         const fieldsets = JSON.parse(JSON.stringify(
-            Object.values(this.$config.get('fieldsets')).filter(fieldset => 
+            Object.values(this.$config.get('fieldsets')).filter(fieldset =>
                 fieldset.handle != this.excludeFieldset
             )
         ));

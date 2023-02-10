@@ -1,7 +1,7 @@
 <template>
 
     <div
-        class="bg-grey-10 shadow-sm mb-4 rounded border"
+        class="bg-grey-100 shadow-sm mb-4 rounded border"
         :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
         <div

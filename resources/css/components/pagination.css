@@ -6,15 +6,15 @@
 	@apply flex justify-center shadow items-center list-none p-0 rounded overflow-hidden;
 
 	li a {
-		@apply h-full px-3 py-2 border-r bg-white block text-grey-80;
+		@apply h-full px-3 py-2 border-r bg-white block text-grey-800;
 
 		&:hover {
-			@apply bg-grey-10 text-grey-80;
+			@apply bg-grey-100 text-grey-800;
 		}
 	}
 
 	li > .unclickable {
-		@apply h-full px-3 py-2 border-r bg-white block text-grey-50;
+		@apply h-full px-3 py-2 border-r bg-white block text-grey-500;
 
 		&:hover {
       cursor: text;
@@ -26,7 +26,7 @@
 	}
 
 	li.current a {
-		@apply bg-grey-10 text-blue shadow-inner;
+		@apply bg-grey-100 text-blue shadow-inner;
 	}
 }
 

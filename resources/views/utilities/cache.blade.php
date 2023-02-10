@@ -38,17 +38,17 @@
                 </div>
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-4 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Records') }}:</span> {{ $stache['records'] }}</div>
-                <div class="mr-4 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Size') }}:</span> {{ $stache['size'] }}</div>
+                <div class="mr-4 badge-pill-sm"><span class="text-grey-800 font-medium">{{ __('Records') }}:</span> {{ $stache['records'] }}</div>
+                <div class="mr-4 badge-pill-sm"><span class="text-grey-800 font-medium">{{ __('Size') }}:</span> {{ $stache['size'] }}</div>
                 @if ($stache['time'])
-                    <div class="mr-4 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Build time') }}:</span> {{ $stache['time'] }}</div>
+                    <div class="mr-4 badge-pill-sm"><span class="text-grey-800 font-medium">{{ __('Build time') }}:</span> {{ $stache['time'] }}</div>
                 @endif
                 @if ($stache['rebuilt'])
-                    <div class="badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Last rebuild') }}:</span> {{ $stache['rebuilt'] }}</div>
+                    <div class="badge-pill-sm"><span class="text-grey-800 font-medium">{{ __('Last rebuild') }}:</span> {{ $stache['rebuilt'] }}</div>
                 @endif
             </div>
         </div>
-        <div class="p-4 bg-grey-20 border-t">
+        <div class="p-4 bg-grey-200 border-t">
             <div class="flex justify-between items-center">
                 <div class="pr-8">
                     <h2 class="font-bold">{{ __('Static Page Cache') }}</h2>
@@ -62,9 +62,9 @@
                 @endunless
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-4 badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Strategy') }}:</span> {{ $static['strategy'] }}</div>
+                <div class="mr-4 badge-pill-sm bg-white border"><span class="text-grey-800 font-medium">{{ __('Strategy') }}:</span> {{ $static['strategy'] }}</div>
                 @if ($static['enabled'])
-                    <div class="mr-4 badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Pages') }}:</span> {{ $static['count'] }}</div>
+                    <div class="mr-4 badge-pill-sm bg-white border"><span class="text-grey-800 font-medium">{{ __('Pages') }}:</span> {{ $static['count'] }}</div>
                 @endif
             </div>
         </div>
@@ -81,11 +81,11 @@
                 </form>
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-4 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Driver') }}:</span> {{ $cache['driver'] }}</div>
+                <div class="mr-4 badge-pill-sm"><span class="text-grey-800 font-medium">{{ __('Driver') }}:</span> {{ $cache['driver'] }}</div>
             </div>
         </div>
 
-        <div class="p-4 border-t bg-grey-20 rounded-b">
+        <div class="p-4 border-t bg-grey-200 rounded-b">
             <div class="flex justify-between items-center">
                 <div class="pr-8">
                     <h2 class="font-bold">{{ __('Image Cache') }}</h2>
@@ -97,8 +97,8 @@
                 </form>
             </div>
             <div class="text-sm text-grey flex">
-                <div class="mr-4 badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Cached images') }}:</span> {{ $images['count'] }}</div>
-                <div class="mr-4 badge-pill-sm bg-white border"><span class="text-grey-80 font-medium">{{ __('Size') }}:</span> {{ $images['size'] }}</div>
+                <div class="mr-4 badge-pill-sm bg-white border"><span class="text-grey-800 font-medium">{{ __('Cached images') }}:</span> {{ $images['count'] }}</div>
+                <div class="mr-4 badge-pill-sm bg-white border"><span class="text-grey-800 font-medium">{{ __('Size') }}:</span> {{ $images['size'] }}</div>
             </div>
         </div>
     </div>

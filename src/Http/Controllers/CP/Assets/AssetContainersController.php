@@ -314,7 +314,7 @@ class AssetContainersController extends CpController
 
     private function expandedGlidePresetLabel($handle, $params)
     {
-        $separator = '<span class="hidden-outside text-grey-50">-</span>';
+        $separator = '<span class="hidden-outside text-grey-500">-</span>';
 
         $params = collect($params)
             ->map(function ($value, $param) {

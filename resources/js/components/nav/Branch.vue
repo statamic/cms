@@ -16,7 +16,7 @@
 
                 <button
                     v-if="hasChildren && !isSection"
-                    class="p-2 text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
+                    class="p-2 text-grey-600 hover:text-grey-700 transition duration-100 outline-none flex"
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >
@@ -36,13 +36,13 @@
             <div class="pr-2 flex items-center">
                 <slot name="branch-icon" :branch="item" />
 
-                <svg-icon v-if="isRenamedSection" class="inline-block w-4 h-4 text-grey-50" name="content-writing" v-tooltip="__('Renamed Section')" />
-                <svg-icon v-else-if="isHidden" class="inline-block w-4 h-4 text-grey-50" name="hidden" v-tooltip="isSection ? __('Hidden Section') : __('Hidden Item')" />
-                <svg-icon v-else-if="isPinnedAlias" class="inline-block w-4 h-4 text-grey-50" name="pin" v-tooltip="__('Pinned Item')" />
-                <svg-icon v-else-if="isAlias" class="inline-block w-4 h-4 text-grey-50" name="duplicate-ids" v-tooltip="__('Alias Item')" />
-                <svg-icon v-else-if="isMoved" class="inline-block w-4 text-grey-50" name="flip-vertical" v-tooltip="__('Moved Item')" />
-                <svg-icon v-else-if="isModified" class="inline-block w-4 h-4 text-grey-50" name="content-writing" v-tooltip="__('Modified Item')" />
-                <svg-icon v-else-if="isCustom" class="inline-block w-4 text-grey-50" name="user-edit" v-tooltip="isSection ? __('Custom Section') : __('Custom Item')" />
+                <svg-icon v-if="isRenamedSection" class="inline-block w-4 h-4 text-grey-500" name="content-writing" v-tooltip="__('Renamed Section')" />
+                <svg-icon v-else-if="isHidden" class="inline-block w-4 h-4 text-grey-500" name="hidden" v-tooltip="isSection ? __('Hidden Section') : __('Hidden Item')" />
+                <svg-icon v-else-if="isPinnedAlias" class="inline-block w-4 h-4 text-grey-500" name="pin" v-tooltip="__('Pinned Item')" />
+                <svg-icon v-else-if="isAlias" class="inline-block w-4 h-4 text-grey-500" name="duplicate-ids" v-tooltip="__('Alias Item')" />
+                <svg-icon v-else-if="isMoved" class="inline-block w-4 text-grey-500" name="flip-vertical" v-tooltip="__('Moved Item')" />
+                <svg-icon v-else-if="isModified" class="inline-block w-4 h-4 text-grey-500" name="content-writing" v-tooltip="__('Modified Item')" />
+                <svg-icon v-else-if="isCustom" class="inline-block w-4 text-grey-500" name="user-edit" v-tooltip="isSection ? __('Custom Section') : __('Custom Item')" />
 
                 <dropdown-list class="ml-4">
                     <slot name="branch-options"

@@ -26,7 +26,7 @@
                         v-text="item.title"
                         :class="{
                             active: item.id === container.id,
-                            'border-b border-grey-30': item.id !== container.id
+                            'border-b border-grey-300': item.id !== container.id
                         }"
                         @click="selectContainer(item.id)"
                     />
@@ -240,7 +240,7 @@
                                 </div>
                             </div>
 
-                            <div class="p-4 text-grey-70"
+                            <div class="p-4 text-grey-700"
                                 v-if="containerIsEmpty"
                                 v-text="searchQuery ? __('No results') : __('This container is empty')" />
 

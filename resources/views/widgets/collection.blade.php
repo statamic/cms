@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center p-4">
         <h2>
             <a class="flex items-center" href="{{ $collection->showUrl() }}">
-                <div class="h-6 w-6 mr-2 text-grey-80">
+                <div class="h-6 w-6 mr-2 text-grey-800">
                     @cp_svg('content-writing')
                 </div>
                 <span>{{ $title }}</span>

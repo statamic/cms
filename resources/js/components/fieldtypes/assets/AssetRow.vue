@@ -1,5 +1,5 @@
 <template>
-    <tr class="cursor-grab bg-white hover:bg-grey-10">
+    <tr class="cursor-grab bg-white hover:bg-grey-100">
         <td class="flex items-center h-full">
             <div
                 v-if="canShowSvg"
@@ -35,12 +35,12 @@
             >
                 {{ asset.values.alt ? "✅" : __("Set Alt") }}
             </button>
-            <div v-text="asset.size" class="asset-filesize text-xs text-grey-50 px-2" />
+            <div v-text="asset.size" class="asset-filesize text-xs text-grey-500 px-2" />
         </td>
         <td class="p-0 w-8 text-right align-middle">
             <button
                 v-if="!readOnly"
-                class="flex items-center p-1 w-6 h-8 text-grey-60 hover:text-grey-90"
+                class="flex items-center p-1 w-6 h-8 text-grey-600 hover:text-grey-900"
                 @click="remove"
                 :aria-label="__('Remove Asset')"
             >

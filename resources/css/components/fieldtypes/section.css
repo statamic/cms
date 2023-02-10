@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .section-fieldtype {
-    @apply border-t border-b bg-grey-20;
+    @apply border-t border-b bg-grey-200;
     top: -1px; /*  Avoid adjacent borders just in case they're stacked */
 
     &.form-group {

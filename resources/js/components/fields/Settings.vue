@@ -1,6 +1,6 @@
 <template>
 
-    <div class="h-full overflow-auto p-8 bg-grey-30 h-full">
+    <div class="h-full overflow-auto p-8 bg-grey-300 h-full">
 
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
@@ -8,14 +8,14 @@
 
         <div v-if="!loading" class="flex items-center mb-6 -mt-2">
             <h1 class="flex-1">
-                <small class="block text-xs text-grey-70 font-medium leading-none mt-2 flex items-center">
-                    <svg-icon class="h-4 w-4 mr-2 inline-block text-grey-70" :name="fieldtype.icon"></svg-icon>
+                <small class="block text-xs text-grey-700 font-medium leading-none mt-2 flex items-center">
+                    <svg-icon class="h-4 w-4 mr-2 inline-block text-grey-700" :name="fieldtype.icon"></svg-icon>
                     {{ fieldtype.title }}
                 </small>
                 {{ values.display || config.display || config.handle }}
             </h1>
             <button
-                class="text-grey-70 hover:text-grey-80 mr-6 text-sm"
+                class="text-grey-700 hover:text-grey-800 mr-6 text-sm"
                 @click.prevent="close"
                 v-text="__('Cancel')"
             ></button>

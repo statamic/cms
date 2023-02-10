@@ -19,7 +19,7 @@
     }
 
     li a {
-        @apply p-0 flex items-center text-grey-80;
+        @apply p-0 flex items-center text-grey-800;
         transition: all .08s ease-in-out;
 
         &:hover {
@@ -32,7 +32,7 @@
     }
 
     li.current > a {
-        @apply text-grey-90 font-medium;
+        @apply text-grey-900 font-medium;
 
         i {
             @apply bg-white;
@@ -82,7 +82,7 @@
     outline: none !important;
 
     &:hover {
-        @apply bg-grey-20;
+        @apply bg-grey-200;
     }
 }
 

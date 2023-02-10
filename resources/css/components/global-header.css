@@ -31,7 +31,7 @@
     }
 
     .global-search-results {
-        @apply shadow-lg absolute p-0 w-full bg-white rounded border border-grey-50;
+        @apply shadow-lg absolute p-0 w-full bg-white rounded border border-grey-500;
         top: 36px;
         left: -1px; /*  border offset */
         z-index: 999;
@@ -55,7 +55,7 @@
     }
 
     .active {
-        @apply bg-grey-30;
+        @apply bg-grey-300;
     }
 
     .title {
@@ -63,7 +63,7 @@
     }
 
     .url {
-        @apply text-2xs text-grey-40;
+        @apply text-2xs text-grey-400;
     }
 
     .status {
@@ -92,7 +92,7 @@
     }
 
     kbd {
-        @apply font-sans rounded px-1 pb-px text-2xs border text-grey-50;
+        @apply font-sans rounded px-1 pb-px text-2xs border text-grey-500;
     }
 }
 

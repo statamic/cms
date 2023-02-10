@@ -1,7 +1,7 @@
 <template>
 
-    <div class="h-full bg-grey-10 overflow-auto">
-        <div class="bg-grey-30 px-6 py-2 border-b text-lg font-medium flex items-center justify-between">
+    <div class="h-full bg-grey-100 overflow-auto">
+        <div class="bg-grey-300 px-6 py-2 border-b text-lg font-medium flex items-center justify-between">
             {{ __('Fieldtypes') }}
             <button type="button" class="btn-close" @click="close">×</button>
         </div>
@@ -17,16 +17,16 @@
         <div class="p-4" v-if="fieldtypesLoaded">
             <div v-for="group in displayedFieldtypes" :key="group.handle" v-show="group.fieldtypes.length > 0" class="mb-8">
                 <h2 v-if="group.title" v-text="group.title" class="px-2 mb-1" />
-                <p v-if="group.description" v-text="group.description" class="px-2 mb-2 text-grey-70 text-sm"/>
+                <p v-if="group.description" v-text="group.description" class="px-2 mb-2 text-grey-700 text-sm"/>
                 <div class="fieldtype-selector">
                     <div class="fieldtype-list">
                         <div class="p-2" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
-                            <button class="bg-white border border-grey-50 flex items-center group w-full rounded hover:border-grey-60 shadow-sm hover:shadow-md pr-3"
+                            <button class="bg-white border border-grey-500 flex items-center group w-full rounded hover:border-grey-600 shadow-sm hover:shadow-md pr-3"
                                 @click="select(fieldtype)">
-                                <div class="p-2 flex items-center border-r border-grey-50 group-hover:border-grey-60 bg-grey-20 rounded-l">
-                                    <svg-icon class="h-5 w-5 text-grey-80" :name="fieldtype.icon" default="generic-field"></svg-icon>
+                                <div class="p-2 flex items-center border-r border-grey-500 group-hover:border-grey-600 bg-grey-200 rounded-l">
+                                    <svg-icon class="h-5 w-5 text-grey-800" :name="fieldtype.icon" default="generic-field"></svg-icon>
                                 </div>
-                                <span class="pl-3 text-grey-80 text-md group-hover:text-grey-90">{{ fieldtype.text }}</span>
+                                <span class="pl-3 text-grey-800 text-md group-hover:text-grey-900">{{ fieldtype.text }}</span>
                             </button>
                         </div>
                     </div>

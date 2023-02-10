@@ -8,9 +8,9 @@
     align-items: center;
 
     .inline-label {
-        @apply ml-2 font-normal text-grey-70;
+        @apply ml-2 font-normal text-grey-700;
         a {
-            @apply text-grey-80 underline;
+            @apply text-grey-800 underline;
             &:hover {
                 @apply text-blue;
             }
@@ -79,7 +79,7 @@
 
 .toggle-container.on.read-only {
     .toggle-slider {
-        @apply bg-grey-50;
+        @apply bg-grey-500;
     }
 }
 

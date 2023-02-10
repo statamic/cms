@@ -45,7 +45,7 @@
                         />
                     </div>
 
-                    <div v-show="items.length === 0" class="p-6 text-center text-grey-50" v-text="__('No results')" />
+                    <div v-show="items.length === 0" class="p-6 text-center text-grey-500" v-text="__('No results')" />
 
                     <data-list-bulk-actions
                         :url="actionUrl"
@@ -165,11 +165,11 @@ export default {
         getStatusClass(entry) {
             // TODO: Replace with `entry.status` (will need to pass down)
             if (entry.published && entry.private) {
-                return 'bg-transparent border border-grey-60';
+                return 'bg-transparent border border-grey-600';
             } else if (entry.published) {
                 return 'bg-green';
             } else {
-                return 'bg-grey-40';
+                return 'bg-grey-400';
             }
         },
 

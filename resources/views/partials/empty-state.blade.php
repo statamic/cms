@@ -4,7 +4,7 @@
             <h1 class="mb-8">{{ $title }}</h1>
 
             @if ($description ?? false)
-            <p class="text-grey-70 leading-normal mb-8 text-lg antialiased">
+            <p class="text-grey-700 leading-normal mb-8 text-lg antialiased">
                 {{ $description }}
             </p>
             @endif

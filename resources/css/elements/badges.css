@@ -3,16 +3,16 @@
    ========================================================================== */
 
 .badge {
-    @apply text-3xs not-italic bg-grey-30 text-grey-80 rounded-md leading-normal;
+    @apply text-3xs not-italic bg-grey-300 text-grey-800 rounded-md leading-normal;
     padding: 1px 5px 0;
 }
 
 .badge-pill {
-    @apply bg-grey-30 px-2 py-1 rounded;
+    @apply bg-grey-300 px-2 py-1 rounded;
 }
 
 .badge-pill-sm {
-    @apply bg-grey-30 px-1 py-px rounded;
+    @apply bg-grey-300 px-1 py-px rounded;
 }
 
 .badge-updates {
@@ -21,21 +21,21 @@
 }
 
 .badge-sm {
-    @apply bg-grey-30 uppercase text-4xs text-white rounded-sm leading-normal;
+    @apply bg-grey-300 uppercase text-4xs text-white rounded-sm leading-normal;
     height: 16px;
     padding: 1px 5px 2px;
 }
 
 .filter-badge {
-    @apply text-2xs text-grey-80 bg-grey-30 flex items-center;
+    @apply text-2xs text-grey-800 bg-grey-300 flex items-center;
     height: 1.625rem; /*  24px */
     padding-left: 10px;
 
     button {
-        @apply px-2 text-base text-grey-50 flex items-center rounded;
+        @apply px-2 text-base text-grey-500 flex items-center rounded;
 
         &:hover {
-            @apply text-grey-70;
+            @apply text-grey-700;
         }
 
         &:focus {

@@ -2,7 +2,7 @@
 
     <modal name="folder-editor">
 
-        <div class="flex items-center justify-between px-6 py-4 bg-grey-20 border-b text-center">
+        <div class="flex items-center justify-between px-6 py-4 bg-grey-200 border-b text-center">
             {{ modalTitle }}
             <button type="button"
                 tabindex="-1"

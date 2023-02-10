@@ -28,7 +28,7 @@
                 <p>
                     {{ __('messages.field_validation_advanced_instructions') }}
                     <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
-                    <span v-if="helpBlock" class="italic text-grey-50 float-right">
+                    <span v-if="helpBlock" class="italic text-grey-500 float-right">
                         {{ __('Example') }}:
                         <span class="italic text-blue-lighter">{{ helpBlock }}</span>
                     </span>

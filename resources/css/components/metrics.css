@@ -14,7 +14,7 @@
 }
 
 .mini-chart {
-    @apply shadow bg-grey-80 relative rounded;
+    @apply shadow bg-grey-800 relative rounded;
     .count {
         overflow: hidden;
         color: #fff;

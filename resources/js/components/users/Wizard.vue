@@ -25,7 +25,7 @@
                     <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
                     {{ __('This user already exists.') }}
                 </div>
-                <div class="text-2xs text-grey-60 mt-2 flex items-center" v-else>
+                <div class="text-2xs text-grey-600 mt-2 flex items-center" v-else>
                     <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_email_instructions') }}
                 </div>
@@ -35,7 +35,7 @@
             <div v-if="! separateNameFields" class="max-w-md mx-auto px-4 pb-20">
                 <label class="font-bold text-base mb-1" for="name">{{ __('Name') }}</label>
                 <input type="text" v-model="user.name" id="name" class="input-text" tabindex="2">
-                <div class="text-2xs text-grey-60 mt-2 flex items-center">
+                <div class="text-2xs text-grey-600 mt-2 flex items-center">
                     <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_name_instructions') }}
                 </div>
@@ -45,7 +45,7 @@
                 <div class="flex-1">
                     <label class="font-bold text-base mb-1" for="first_name">{{ __('First Name') }}</label>
                     <input type="text" v-model="user.first_name" id="first_name" class="input-text" tabindex="2">
-                    <div class="text-2xs text-grey-60 mt-2 flex items-center">
+                    <div class="text-2xs text-grey-600 mt-2 flex items-center">
                         <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
                         {{ __('messages.user_wizard_name_instructions') }}
                     </div>
@@ -71,7 +71,7 @@
                     <toggle-input v-model="user.super" />
                     <label class="font-bold ml-2">{{ __('Super Admin') }}</label>
                 </div>
-                <div class="text-2xs text-grey-60 mt-2 flex items-center">
+                <div class="text-2xs text-grey-600 mt-2 flex items-center">
                     <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_super_admin_instructions') }}
                 </div>
@@ -127,7 +127,7 @@
                 <label class="font-bold ml-2">{{ __('Send Email Invitation') }}</label>
             </div>
 
-            <div class="max-w-lg mx-auto bg-grey-10 py-10 mb-20 border rounded-lg " v-if="invitation.send">
+            <div class="max-w-lg mx-auto bg-grey-100 py-10 mb-20 border rounded-lg " v-if="invitation.send">
                 <!-- Subject Line -->
                 <div class="max-w-md mx-auto px-4 pb-10">
                     <label class="font-bold text-base mb-1" for="email">{{ __('Email Subject') }}</label>

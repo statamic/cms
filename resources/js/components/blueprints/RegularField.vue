@@ -5,26 +5,26 @@
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-4 py-2 pl-2">
-                    <svg-icon class="text-grey-80 mr-2 h-4 w-4 flex-none" :name="field.icon" v-tooltip="tooltipText" default="generic-field" />
+                    <svg-icon class="text-grey-800 mr-2 h-4 w-4 flex-none" :name="field.icon" v-tooltip="tooltipText" default="generic-field" />
                     <a class="break-all" v-text="labelText" @click="$emit('edit')" />
-                    <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-2 h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
+                    <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-600 text-3xs ml-2 h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
                 <div class="flex-none pr-2 flex">
                     <width-selector v-if="!isHidden" v-model="width" class="mr-2" />
 
-                    <div v-else class="relative border border-grey-40 opacity-50 w-12 flex items-center justify-center mr-2">
+                    <div v-else class="relative border border-grey-400 opacity-50 w-12 flex items-center justify-center mr-2">
                         <svg-icon name="hidden" class="h-4 w-4 opacity-50"></svg-icon>
                     </div>
 
                     <button v-if="canDefineLocalizable"
-                        class="hover:text-grey-100 mr-2 flex items-center"
-                        :class="{ 'text-grey-100': localizable, 'text-grey-60': !localizable }"
+                        class="hover:text-grey-950 mr-2 flex items-center"
+                        :class="{ 'text-grey-950': localizable, 'text-grey-600': !localizable }"
                         v-tooltip="__('Localizable')"
                         @click="localizable = !localizable"
                     >
                         <svg-icon name="earth" class="h-4 w-4" />
                     </button>
-                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100 flex items-center"><svg-icon name="trash" class="h-4 w-4" /></button>
+                    <button @click.prevent="$emit('deleted')" class="text-grey-600 hover:text-grey-950 flex items-center"><svg-icon name="trash" class="h-4 w-4" /></button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"

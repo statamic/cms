@@ -51,7 +51,7 @@
                 <dropdown-list>
                     <template v-slot:trigger>
                         <button type="button" class="btn-round" :aria-label="__('Add Set')" v-tooltip="__('Add Set')">
-                            <span class="icon icon-plus text-grey-80 antialiased"></span>
+                            <span class="icon icon-plus text-grey-800 antialiased"></span>
                         </button>
                     </template>
 

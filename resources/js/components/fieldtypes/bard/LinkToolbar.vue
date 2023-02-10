@@ -27,7 +27,7 @@
             </div>
 
             <div class="px-4 py-4 border-b">
-                <div class="h-8 mb-4 p-2 border rounded border-grey-50 flex items-center">
+                <div class="h-8 mb-4 p-2 border rounded border-grey-500 flex items-center">
 
                     <!-- URL input -->
                     <input
@@ -70,7 +70,7 @@
                 </div>
 
                 <!-- Title attribute -->
-                <div class="h-8 mb-4 p-2 border rounded border-grey-50 flex items-center" >
+                <div class="h-8 mb-4 p-2 border rounded border-grey-500 flex items-center" >
                     <input
                         type="text"
                         ref="input"

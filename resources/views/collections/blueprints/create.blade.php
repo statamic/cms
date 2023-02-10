@@ -13,7 +13,7 @@
             <div class="mb-10">
                 <label class="font-bold text-base mb-1" for="name">{{ __('Title') }}</label>
                 <input type="text" name="title" value="{{ old('title') }}" class="input-text" autofocus required tabindex="1">
-                <div class="text-2xs text-grey-60 mt-2 flex items-center">
+                <div class="text-2xs text-grey-600 mt-2 flex items-center">
                     {{ __('statamic::messages.blueprints_title_instructions') }}
                 </div>
                 @if ($errors->has('title'))

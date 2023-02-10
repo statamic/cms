@@ -13,8 +13,8 @@
 
 <div class="card p-4 content">
     <div class="flex flex-wrap">
-        <a href="{{ cp_route('collections.edit', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-20 rounded-md group">
-            <div class="h-8 w-8 mr-4 text-grey-80">
+        <a href="{{ cp_route('collections.edit', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-200 rounded-md group">
+            <div class="h-8 w-8 mr-4 text-grey-800">
                 @cp_svg('hammer-wrench')
             </div>
             <div class="flex-1 mb-4 md:mb-0 md:mr-6">
@@ -26,9 +26,9 @@
         @if ($multipleBlueprints)<div
         @else<a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site]) }}"
         @endif
-            class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-20 rounded-md group"
+            class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-200 rounded-md group"
         >
-            <div class="h-8 w-8 mr-4 text-grey-80">
+            <div class="h-8 w-8 mr-4 text-grey-800">
                 @cp_svg('content-writing')
             </div>
             <div class="flex-1 mb-4 md:mb-0 md:mr-6">
@@ -42,8 +42,8 @@
                 @endif
             </div>
         @if ($multipleBlueprints)</div>@else</a>@endif
-        <a href="{{ cp_route('collections.blueprints.index', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-20 rounded-md group">
-            <div class="h-8 w-8 mr-4 text-grey-80">
+        <a href="{{ cp_route('collections.blueprints.index', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-200 rounded-md group">
+            <div class="h-8 w-8 mr-4 text-grey-800">
                 @cp_svg('blueprint')
             </div>
             <div class="flex-1 mb-4 md:mb-0 md:mr-6">
@@ -51,8 +51,8 @@
                 <p>{{ __('statamic::messages.collection_next_steps_blueprints_description') }}</p>
             </div>
         </a>
-        <a href="{{ cp_route('collections.scaffold', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-20 rounded-md group">
-            <div class="h-8 w-8 mr-4 text-grey-80">
+        <a href="{{ cp_route('collections.scaffold', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-200 rounded-md group">
+            <div class="h-8 w-8 mr-4 text-grey-800">
                 @cp_svg('crane')
             </div>
             <div class="flex-1 mb-4 md:mb-0 md:mr-6">

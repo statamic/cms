@@ -3,7 +3,7 @@
     <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')">
         <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
-            <div class="bg-grey-20 px-6 py-2 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+            <div class="bg-grey-200 px-6 py-2 border-b border-grey-300 text-lg font-medium flex items-center justify-between">
                 {{ headerText }}
                 <button
                     type="button"

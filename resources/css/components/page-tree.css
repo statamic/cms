@@ -4,7 +4,7 @@
         @apply relative text-xs bg-white shadow rounded;
 
         &:hover {
-            @apply bg-grey-10;
+            @apply bg-grey-100;
         }
     }
 
@@ -22,7 +22,7 @@
         background-image: url('../svg/drag-dots.svg');
         background-position: center center;
         background-repeat: no-repeat;
-        &:hover { @apply bg-grey-30; }
+        &:hover { @apply bg-grey-300; }
     }
 
     .page-root {

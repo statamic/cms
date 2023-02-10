@@ -9,7 +9,7 @@
 }
 
 .bard-editor {
-    @apply text-grey-80 bg-grey-10 shadow-inner p-0 relative;
+    @apply text-grey-800 bg-grey-100 shadow-inner p-0 relative;
 }
 
 .bard-editor .ProseMirror {
@@ -22,7 +22,7 @@
 
 /*  Modes */
 .bard-editor.mode\:read-only .ProseMirror {
-    @apply bg-grey-30 text-grey-70;
+    @apply bg-grey-300 text-grey-700;
 }
 
 .bard-editor.mode\:minimal .ProseMirror {
@@ -52,7 +52,7 @@
     top: 0;
 
     .bard-toolbar-button {
-        @apply text-grey-80 rounded px-1 flex items-center justify-center text-base text-center;
+        @apply text-grey-800 rounded px-1 flex items-center justify-center text-base text-center;
         height: 32px;
         width: 32px;
         margin: 0 2px;
@@ -62,11 +62,11 @@
     }
 
     .bard-toolbar-button:hover {
-        @apply bg-grey-20;
+        @apply bg-grey-200;
     }
 
     .bard-toolbar-button.active {
-        @apply bg-grey-30 text-black;
+        @apply bg-grey-300 text-black;
     }
 
     .bard-toolbar-button:focus {
@@ -76,7 +76,7 @@
     .bard-toolbar-button:disabled {
         @apply opacity-50;
         &:hover {
-            @apply text-grey-80;
+            @apply text-grey-800;
         }
     }
 
@@ -89,7 +89,7 @@
     @apply bg-black rounded-full shadow-lg px-4;
 
     button {
-        @apply focus-none text-grey-70 rounded px-1 flex items-center justify-center text-base text-center bg-transparent;
+        @apply focus-none text-grey-700 rounded px-1 flex items-center justify-center text-base text-center bg-transparent;
         height: 32px;
         width: 32px;
         margin: 0 2px;
@@ -143,7 +143,7 @@
     }
 
     .bard-toolbar-button {
-        @apply text-grey-20 h-10 w-10 text-center bg-black rounded-lg flex items-center justify-center;
+        @apply text-grey-200 h-10 w-10 text-center bg-black rounded-lg flex items-center justify-center;
         font-size: 16px;
         transition: all .1s ease-in-out;
         svg {
@@ -166,7 +166,7 @@
     .bard-toolbar-button:disabled {
         @apply opacity-50;
         &:hover {
-            @apply text-grey-20;
+            @apply text-grey-200;
         }
     }
 
@@ -176,7 +176,7 @@
 }
 
 .bard-footer-toolbar {
-    @apply bg-white shadow-none text-grey-70 rounded-b border-t text-xs p-2 flex items-center justify-between;
+    @apply bg-white shadow-none text-grey-700 rounded-b border-t text-xs p-2 flex items-center justify-between;
     padding: 8px 12px;
 
     .bard-fullscreen & {
@@ -216,7 +216,7 @@
    ========================================================================== */
 
 .bard-fieldtype .bard-fullscreen {
-    @apply fixed bg-grey-20 inset-0 min-h-screen overflow-scroll rounded-none;
+    @apply fixed bg-grey-200 inset-0 min-h-screen overflow-scroll rounded-none;
     z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
                 /*  too high and it'll be over the top of stacks, etc. */
 
@@ -240,7 +240,7 @@
         min-height: calc(100vh - 120px);
 
         > p > code, > pre code {
-            @apply bg-grey-30;
+            @apply bg-grey-300;
         }
 
         /*  To remove min height from nested bard fields inside bard in fullscreen mode. */
@@ -254,7 +254,7 @@
     }
 
     .bard-field-options {
-        @apply fixed top-0 inset-x-0 bg-grey-70 p-4 w-full;
+        @apply fixed top-0 inset-x-0 bg-grey-700 p-4 w-full;
         text-align: right;
         z-index: 1; /*  to appear over the top of .bard-editor */
 
@@ -275,7 +275,7 @@
 
 .bard-fieldtype .ProseMirror > {
     p {
-        @apply text-grey-80;
+        @apply text-grey-800;
         word-break: break-all;
         word-break: break-word;
 
@@ -325,7 +325,7 @@
     }
 
     hr {
-        @apply bg-grey-60;
+        @apply bg-grey-600;
         height: 4px;
         padding: 0;
         margin: 1.7em 0;
@@ -361,7 +361,7 @@
 
     h6 {
         font-size: 1em;
-        @apply text-grey-70;
+        @apply text-grey-700;
     }
 
     h1:first-child,
@@ -428,7 +428,7 @@
     }
 
     blockquote {
-        @apply text-grey-80 border-l-4 border-blue px-4;
+        @apply text-grey-800 border-l-4 border-blue px-4;
         margin: 0 0 .85em;
     }
 
@@ -449,7 +449,7 @@
         table-layout: fixed;
 
         th {
-            @apply font-bold text-left bg-grey-20;
+            @apply font-bold text-left bg-grey-200;
         }
 
         td, th {
@@ -461,7 +461,7 @@
             @apply relative;
 
             &:after {
-                @apply bg-grey-40 absolute inset-0 pointer-events-none opacity-25;
+                @apply bg-grey-400 absolute inset-0 pointer-events-none opacity-25;
                 content: '';
             }
         }
@@ -479,7 +479,7 @@
     }
 
     p > code {
-        @apply font-mono bg-grey-40 rounded-sm text-xs relative;
+        @apply font-mono bg-grey-400 rounded-sm text-xs relative;
         padding: 2px 4px;
         top: -1px;
     }
@@ -489,7 +489,7 @@
     }
 
     pre code {
-        @apply font-mono bg-grey-40 text-xs p-4 block w-full rounded;
+        @apply font-mono bg-grey-400 text-xs p-4 block w-full rounded;
         line-height: 1.8;
     }
 }
@@ -498,7 +498,7 @@
 ========================================================================== */
 
 .bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
-    @apply text-grey-60;
+    @apply text-grey-600;
     content: attr(data-placeholder);
     float: left;
     height: 0;
@@ -530,11 +530,11 @@
     }
 
     .bard-toolbar-button {
-        @apply p-0 text-grey-70 outline-none;
+        @apply p-0 text-grey-700 outline-none;
         font-size: 16px;
 
         &:hover {
-            @apply text-grey-90;
+            @apply text-grey-900;
         }
     }
 }

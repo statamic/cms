@@ -4,7 +4,7 @@
 
    .CodeMirror {
     /* Set height, width, borders, and global font properties here */
-    @apply text-grey-90 font-mono text-sm leading-loose;
+    @apply text-grey-900 font-mono text-sm leading-loose;
     min-height: 80px;
   }
 
@@ -31,7 +31,7 @@
   /* GUTTER */
 
   .CodeMirror-gutters {
-    @apply bg-grey-20 border-r;
+    @apply bg-grey-200 border-r;
     height: 100% !important;
     white-space: nowrap;
   }
@@ -350,7 +350,7 @@
   .code-fieldtype .theme-light {
 
     .code-mode {
-        @apply text-grey-90;
+        @apply text-grey-900;
     }
 
     .CodeMirror {

@@ -1,15 +1,15 @@
 <template>
 
-    <div class="px-4 py-2 flex flex-wrap text-sm bg-grey-10 border-t border-b">
+    <div class="px-4 py-2 flex flex-wrap text-sm bg-grey-100 border-t border-b">
         <a
             v-for="(part, index) in pathParts"
             :key="index"
             @click="selectFolder(index)"
             class="mr-2 group"
         >
-            <span v-if="index !== 0" class="px-1 mr-1 text-grey-70">></span>
+            <span v-if="index !== 0" class="px-1 mr-1 text-grey-700">></span>
             <span class="icon icon-folder mr-1 text-blue-lighter group-hover:text-blue" />
-            <span class="text-grey-70 group-hover:text-grey-80">{{ part }}</span>
+            <span class="text-grey-700 group-hover:text-grey-800">{{ part }}</span>
         </a>
     </div>
 

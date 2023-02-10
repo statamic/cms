@@ -28,7 +28,7 @@
 
         </div>
 
-        <div v-if="item.collection" v-text="item.collection.title" class="text-4xs text-grey-60 uppercase whitespace-nowrap mr-2" />
+        <div v-if="item.collection" v-text="item.collection.title" class="text-4xs text-grey-600 uppercase whitespace-nowrap mr-2" />
 
         <div class="pr-2 flex items-center" v-if="!readOnly">
             <dropdown-list>

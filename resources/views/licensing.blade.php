@@ -14,7 +14,7 @@
             <div class="flex flex-wrap items-center">
                 <div class="w-full md:w-1/2">
                     <h1 class="mb-8">{{ __('Licensing') }}</h1>
-                    <p class="text-grey-70 leading-normal mb-8 text-lg antialiased">
+                    <p class="text-grey-700 leading-normal mb-8 text-lg antialiased">
                         {{ __('statamic::messages.outpost_issue_try_later') }}
                     </p>
                     <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
@@ -89,7 +89,7 @@
                         <td class="w-64 mr-2">
                             <span class="little-dot {{ $addon->valid() ? 'bg-green' : 'bg-red' }} mr-2"></span>
                             <span class="font-bold"><a href="{{ $addon->addon()->marketplaceUrl() }}" class="text-grey hover:text-blue">{{ $addon->name() }}</a></span>
-                            @if ($addon->edition())<span class="badge uppercase font-bold text-grey-60">{{ $addon->edition() ?? '' }}</span>@endif
+                            @if ($addon->edition())<span class="badge uppercase font-bold text-grey-600">{{ $addon->edition() ?? '' }}</span>@endif
                         </td>
                         <td>{{ $addon->version() }}</td>
                         <td class="text-right text-red">{{ $addon->invalidReason() }}</td>

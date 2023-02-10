@@ -15,7 +15,7 @@
         }
 
         &:hover  {
-            @apply bg-grey-20;
+            @apply bg-grey-200;
         }
 
         /*  Drag interaction */

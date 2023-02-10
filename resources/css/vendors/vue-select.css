@@ -24,7 +24,7 @@
 }
 
 .vs--disabled .vs__dropdown-toggle {
-	@apply bg-grey-20;
+	@apply bg-grey-200;
 }
 
 .v-select[dir=rtl] .vs__actions {
@@ -46,7 +46,7 @@
 }
 
 .vs__dropdown-toggle {
-	@apply appearance-none text-grey-80 w-full p-0 rounded flex items-center;
+	@apply appearance-none text-grey-800 w-full p-0 rounded flex items-center;
     height: 2.375rem;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
@@ -56,7 +56,7 @@
     }
 
 	.vs--disabled & {
-		@apply bg-grey-20;
+		@apply bg-grey-200;
 	}
 }
 
@@ -69,8 +69,8 @@
 }
 
 .v-select:not(.vs--unsearchable) .vs__selected-options {
-	@apply appearance-none text-grey-80 text-sm;
-	@apply flex flex-wrap flex-1 border border-grey-50 border-r-0 rounded-l relative h-full;
+	@apply appearance-none text-grey-800 text-sm;
+	@apply flex flex-wrap flex-1 border border-grey-500 border-r-0 rounded-l relative h-full;
 	box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,.05);
 	padding: 5px 8px;
 	line-height: 1.5;
@@ -113,7 +113,7 @@
 }
 
 .vs__open-indicator svg {
-	@apply flex items-center text-grey-90;
+	@apply flex items-center text-grey-900;
 	height: 16px;
 	width: 16px;
 	-webkit-transform: scale(1);
@@ -134,7 +134,7 @@
 }
 
 .vs__clear {
-	@apply text-grey-90 px-2 cursor-pointer shadow-inner text-base bg-transparent;
+	@apply text-grey-900 px-2 cursor-pointer shadow-inner text-base bg-transparent;
 	height: 2.375rem;
 	box-shadow: inset -1px 1px 1px 0px rgba(0,0,0,.05);
 	border-top: 1px solid #c4cdd6;
@@ -163,12 +163,12 @@
 }
 
 .vs__dropdown-option {
-    @apply block text-sm text-grey-80 cursor-pointer;
+    @apply block text-sm text-grey-800 cursor-pointer;
 	padding: 6px 12px;
 }
 
 .vs__dropdown-option--highlight {
-    @apply bg-grey-30;
+    @apply bg-grey-300;
 }
 
 .vs__dropdown-option--selected {
@@ -184,10 +184,10 @@
 }
 
 .vs__deselect {
-	@apply flex items-center cursor-pointer text-grey-60 ml-1 p-0 outline-none;
+	@apply flex items-center cursor-pointer text-grey-600 ml-1 p-0 outline-none;
 
 	&:hover {
-		@apply text-grey-80;
+		@apply text-grey-800;
 	}
 
 	&:focus {
@@ -231,7 +231,7 @@
 
 .vs__search,
 .vs__search:focus {
-	@apply appearance-none text-sm text-grey-80 px-2 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
+	@apply appearance-none text-sm text-grey-800 px-2 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
 	line-height: 1.4;
 	border-left: none;
 	box-shadow: none;
@@ -240,7 +240,7 @@
 }
 
 .vs__search::placeholder {
-	@apply text-grey-60;
+	@apply text-grey-600;
 }
 
 .vs--unsearchable .vs__search {

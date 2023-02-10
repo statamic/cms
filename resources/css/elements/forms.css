@@ -11,7 +11,7 @@ form {
 }
 
 label {
-    @apply text-grey-80 font-normal text-sm block leading-normal;
+    @apply text-grey-800 font-normal text-sm block leading-normal;
 }
 
 input[type="checkbox"] {
@@ -27,7 +27,7 @@ input[type="radio"] {
 }
 
 select {
-    @apply text-base bg-grey-30 border-2 border-grey-30 cursor-pointer;
+    @apply text-base bg-grey-300 border-2 border-grey-300 cursor-pointer;
 }
 
 
@@ -35,7 +35,7 @@ select {
   ========================================================================== */
 
 .input-text {
-    @apply appearance-none bg-grey-10 text-grey-80 max-w-full w-full border p-2 rounded shadow-inner;
+    @apply appearance-none bg-grey-100 text-grey-800 max-w-full w-full border p-2 rounded shadow-inner;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
 
@@ -54,7 +54,7 @@ select {
     @apply appearance-none shadow-none bg-white w-full p-2;
 
     &:focus {
-        @apply outline-none bg-grey-20;
+        @apply outline-none bg-grey-200;
     }
 }
 
@@ -64,14 +64,14 @@ input.input-text:read-only,
 textarea.input-text:read-only,
 input.input-text-minimal:read-only,
 .input-text.read-only {
-    @apply bg-grey-30 text-grey-70;
+    @apply bg-grey-300 text-grey-700;
 }
 
 /* Input Groups
   ========================================================================== */
 
 .input-group {
-    @apply appearance-none text-grey-80 w-full p-0 rounded flex items-center;
+    @apply appearance-none text-grey-800 w-full p-0 rounded flex items-center;
     height: 38px;
 
     &:not(.focus-within-only):focus, &:not(.focus-within-only):focus-within {
@@ -83,7 +83,7 @@ input.input-text-minimal:read-only,
     }
 
     .input-text {
-        @apply flex-1 border-grey-50 min-w-0;
+        @apply flex-1 border-grey-500 min-w-0;
     }
 
     .input-text:not(:first-child) {
@@ -95,7 +95,7 @@ input.input-text-minimal:read-only,
     }
 
     .input-group-prepend, .input-group-append, .input-group-item {
-        @apply rounded-l px-2 border text-sm text-grey-80 select-none;
+        @apply rounded-l px-2 border text-sm text-grey-800 select-none;
         background: linear-gradient(180deg, #fff, #f9fafb);
         border: 1px solid #c4cdd6;
         box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
@@ -195,7 +195,7 @@ input.input-text-minimal:read-only,
     }
 
     select {
-        @apply text-sm text-grey-80 shadow-button cursor-pointer block w-full h-full text-left relative max-w-full;
+        @apply text-sm text-grey-800 shadow-button cursor-pointer block w-full h-full text-left relative max-w-full;
         @apply select-none rounded leading-normal align-middle whitespace-nowrap appearance-none subpixel-antialiased;
 
         background: linear-gradient(180deg, #fff, #f9fafb);
@@ -215,7 +215,7 @@ input.input-text-minimal:read-only,
     }
 
     .select-input-toggle {
-        @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-grey-90;
+        @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-grey-900;
 
         svg {
             @apply fill-current h-4 w-4;
@@ -287,9 +287,9 @@ input[type="file"] {
 }
 
 .help-block {
-    @apply block mb-2 text-grey-70 text-xs;
+    @apply block mb-2 text-grey-700 text-xs;
     a {
-        @apply text-grey-80 underline;
+        @apply text-grey-800 underline;
         &:hover {
             @apply text-blue;
         }

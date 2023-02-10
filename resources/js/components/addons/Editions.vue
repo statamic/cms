@@ -1,6 +1,6 @@
 <template>
     <div class="card mb-6">
-        <div class="little-heading p-0 mb-2 text-grey-70" v-text="__('Editions')" />
+        <div class="little-heading p-0 mb-2 text-grey-700" v-text="__('Editions')" />
 
         <div class="flex items-center">
             <div class="btn-group">
