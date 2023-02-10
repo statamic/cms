@@ -162,15 +162,15 @@
         <h6 class="mb-4">Greys</h6>
         <div class="p-4" style="background: #48606f"></div>
         <div class="flex flex-row-reverse text-sm text-center mb-8">
-            <div class="text-black bg-blue-100 p-4 flex-1">10</div>
-            <div class="text-black bg-blue-200 p-4 flex-1">20</div>
-            <div class="text-black bg-blue-300 p-4 flex-1">30</div>
-            <div class="text-black bg-blue-400 p-4 flex-1">40</div>
-            <div class="text-black bg-blue-500 p-4 flex-1">50</div>
-            <div class="text-black bg-blue-600 p-4 flex-1">60</div>
-            <div class="text-black bg-blue-700 p-4 flex-1">70</div>
-            <div class="text-white bg-blue-800 p-4 flex-1">80</div>
-            <div class="text-white bg-blue-900 p-4 flex-1">90</div>
+            <div class="text-black bg-blue-100 p-4 flex-1">100</div>
+            <div class="text-black bg-blue-200 p-4 flex-1">200</div>
+            <div class="text-black bg-blue-300 p-4 flex-1">300</div>
+            <div class="text-black bg-blue-400 p-4 flex-1">400</div>
+            <div class="text-black bg-blue-500 p-4 flex-1">500</div>
+            <div class="text-black bg-blue-600 p-4 flex-1">600</div>
+            <div class="text-black bg-blue-700 p-4 flex-1">700</div>
+            <div class="text-white bg-blue-800 p-4 flex-1">800</div>
+            <div class="text-white bg-blue-900 p-4 flex-1">900</div>
         </div>
         <div class="flex flex-row-reverse text-sm text-center mb-8">
             <div class="text-black bg-white p-4 flex-1">White</div>

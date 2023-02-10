@@ -12,7 +12,7 @@
         a {
             @apply text-grey-80 underline;
             &:hover {
-                @apply text-blue-darker;
+                @apply text-blue;
             }
         }
     }

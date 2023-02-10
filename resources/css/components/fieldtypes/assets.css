@@ -20,7 +20,7 @@
     .upload-text-button {
         @apply text-blue underline whitespace-nowrap;
         &:hover {
-            @apply text-blue-dark;
+            @apply text-blue-800;
         }
     }
 }
