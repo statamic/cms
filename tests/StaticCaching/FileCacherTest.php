@@ -74,8 +74,8 @@ class FileCacherTest extends TestCase
         ]);
 
         $this->assertEquals(
-            'test/path/foo/bar/baz/qux_a=b&c=d.html',
-            $cacher->getFilePath('http://domain.com/foo/bar/baz/qux?a=b&c=d')
+            'test/path/foo/bar/baz/qux_c=d&a=b.html',
+            $cacher->getFilePath('http://domain.com/foo/bar/baz/qux?c=d&a=b')
         );
 
         $this->assertEquals(

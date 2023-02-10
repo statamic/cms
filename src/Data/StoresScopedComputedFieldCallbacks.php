@@ -4,15 +4,23 @@ namespace Statamic\Data;
 
 use Closure;
 use Illuminate\Support\Collection;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 trait StoresScopedComputedFieldCallbacks
 {
     protected $computedFieldCallbacks;
 
-    public function computed(string $scope, string $field, Closure $callback)
+    /**
+     * @param  string|array  $scopes
+     * @param  string  $field
+     * @param  Closure  $callback
+     */
+    public function computed($scopes, string $field, Closure $callback)
     {
-        $this->computedFieldCallbacks["$scope.$field"] = $callback;
+        foreach (Arr::wrap($scopes) as $scope) {
+            $this->computedFieldCallbacks["$scope.$field"] = $callback;
+        }
     }
 
     public function getComputedCallbacks(string $scope): Collection

@@ -45,12 +45,12 @@ abstract class QueryBuilder extends BaseQueryBuilder
         $results = $this->getSearchResults($this->query);
 
         if (! $this->withData) {
-            return collect($results)
+            return $this->collect($results)
                 ->map(fn ($result) => new PlainResult($result))
                 ->each(fn (Result $result, $i) => $result->setIndex($this->index)->setScore($results[$i]['search_score'] ?? null));
         }
 
-        return collect($results)->groupBy(function ($result) {
+        return $this->collect($results)->groupBy(function ($result) {
             return Str::before($result['reference'], '::');
         })->flatMap(function ($results, $prefix) {
             $results = $results->keyBy('reference');
