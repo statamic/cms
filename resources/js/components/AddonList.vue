@@ -29,12 +29,12 @@
                     <div class="border-b px-4 text-sm">
                         <button
                             class="data-list-filter-link"
-                            :class="{ active: === 'all' }"
+                            :class="{ active: filter === 'all' }"
                             @click="filter = 'all'"
                             v-text="__('All')" />
                         <button
                             class="data-list-filter-link"
-                            :class="{ active: === 'installed' }"
+                            :class="{ active: filter === 'installed' }"
                             @click="filter = 'installed'"
                         >
                             {{ __('Installed') }}
