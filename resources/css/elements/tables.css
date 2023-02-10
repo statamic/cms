@@ -33,7 +33,7 @@
 }
 
 .data-table {
-	@apply text-left text-grey outline-none max-w-full w-full;
+	@apply text-left text-grey-700 outline-none max-w-full w-full;
 	overflow-x: auto;
 
     thead {

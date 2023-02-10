@@ -92,7 +92,7 @@ a:focus {
 }
 
 .bullet {
-    @apply inline-block rounded-full bg-grey;
+    @apply inline-block rounded-full bg-grey-700;
     height: 7px;
     width: 7px;
 }

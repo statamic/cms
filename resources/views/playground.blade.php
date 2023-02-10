@@ -160,7 +160,7 @@
     <div class="bg-white p-10 shadow rounded-lg overflow-hidden mb-16">
 
         <h6 class="mb-4">Greys</h6>
-        <div class="p-4" style="background: #48606f"></div>
+        {{-- <div class="p-4" style="background: #48606f"></div> --}}
         <div class="flex flex-row-reverse text-sm text-center mb-8">
             <div class="text-black bg-blue-100 p-4 flex-1">100</div>
             <div class="text-black bg-blue-200 p-4 flex-1">200</div>
@@ -183,7 +183,21 @@
             <div class="text-black bg-grey-700 p-4 flex-1">700</div>
             <div class="text-white bg-grey-800 p-4 flex-1">800</div>
             <div class="text-white bg-grey-900 p-4 flex-1">900</div>
-            <div class="text-white bg-grey-950 p-4 flex-1">950</div>
+            {{-- <div class="text-white bg-grey-950 p-4 flex-1">950</div> --}}
+            <div class="text-white bg-black p-4 flex-1">Black</div>
+        </div>
+
+        <div class="flex flex-row-reverse text-sm text-center mb-8">
+            <div class="text-black bg-white p-4 flex-1">White</div>
+            <div class="text-black bg-slate-100 p-4 flex-1">100</div>
+            <div class="text-black bg-slate-200 p-4 flex-1">200</div>
+            <div class="text-black bg-slate-300 p-4 flex-1">300</div>
+            <div class="text-black bg-slate-400 p-4 flex-1">400</div>
+            <div class="text-black bg-slate-500 p-4 flex-1">500</div>
+            <div class="text-black bg-slate-600 p-4 flex-1">600</div>
+            <div class="text-black bg-slate-700 p-4 flex-1">700</div>
+            <div class="text-white bg-slate-800 p-4 flex-1">800</div>
+            <div class="text-white bg-slate-900 p-4 flex-1">900</div>
             <div class="text-white bg-black p-4 flex-1">Black</div>
         </div>
 
