@@ -2,9 +2,7 @@
    ASSETS
    ========================================================================== */
 
-// only used in the folder editor now.
 .asset-modal {
-	// Saving overlay
 	.saving {
 		position: absolute;
 		top: 0;

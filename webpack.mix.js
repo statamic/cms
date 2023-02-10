@@ -6,7 +6,7 @@ const dest = 'resources/dist';
 
 mix.setPublicPath('./resources/dist');
 
-mix.sass(`${src}/sass/cp.scss`, `${dest}/css`).options({
+mix.sass(`${src}/sass/tailwind.css`, `${dest}/css`).options({
     processCssUrls: false,
     postCss: [
         tailwindcss('./tailwind.config.js'),

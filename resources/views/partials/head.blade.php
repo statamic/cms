@@ -18,7 +18,7 @@
     ->useBuildDirectory('vendor/statamic/cp/build')
     ->withEntryPoints([
         'resources/js/app.js',
-        'resources/sass/cp.scss'
+        'resources/css/tailwind.css'
     ]) }}
 
 @if (Statamic::pro() && config('statamic.cp.custom_css_url'))

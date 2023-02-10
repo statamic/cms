@@ -250,7 +250,7 @@ code {
         margin-bottom: 0;
     }
 
-    // Inline code snippets
+    /* Inline code snippets */
     code,
     tt {
         @apply rounded m-0;
@@ -266,7 +266,7 @@ code {
     pre {
         word-wrap: normal;
 
-        // Code tags within code blocks (<pre>s)
+        /* Code tags within code blocks (<pre>s) */
         > code {
             padding: 0;
             margin: 0;

@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
             laravel({
                 valetTls: env.VALET_TLS,
                 input: [
-                    'resources/sass/cp.scss',
+                    'resources/css/tailwind.css',
                     'resources/js/app.js'
                 ],
                 refresh: true,

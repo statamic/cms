@@ -1,7 +1,10 @@
 const colors = require('tailwindcss/colors')
 
 module.exports = {
-    content: ['./resources/**/*.{html,js,vue,blade.php}', './tests/**/*.{html,vue,blade.php}'],
+    content: [
+        './resources/**/*.{html,js,vue,blade.php}',
+        './tests/**/*.{html,vue,blade.php}'
+    ],
     theme: {
         zIndex: {
             0: '0',
@@ -17,8 +20,20 @@ module.exports = {
             auto: 'auto',
         },
         extend: {
+            borderRadius: {
+                default: '3px',
+                'sm': '2px',
+                'md': '4px',
+                'lg': '8px',
+            },
             borderWidth: {
-                3: '3px',
+                default: '1px',
+                '0': '0',
+                '2': '2px',
+                '3': '3px',
+                '4': '4px',
+                '6': '6px',
+                '8': '8px',
             },
             boxShadow: {
                 sm: '1px 2px 4px 0 rgba(0,0,0,.03)',

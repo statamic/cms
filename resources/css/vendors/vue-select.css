@@ -6,7 +6,7 @@
 
 .vs__fade-enter-active,
 .vs__fade-leave-active {
-	// transition: opacity .15s cubic-bezier(1, .5, .8, 1)
+	/* transition: opacity .15s cubic-bezier(1, .5, .8, 1) */
 }
 
 .vs__fade-enter,
@@ -281,7 +281,7 @@
 	opacity: 1
 }
 
-// Animation
+/* Animation */
 @-webkit-keyframes vSelectSpinner {
 	0% {
 		-webkit-transform: rotate(0deg);
