@@ -188,109 +188,8 @@ td.table-drag-handle {
 	&:hover { @apply bg-grey-30; }
 }
 
-table.table-legacy {
-	margin-top: 25px;
-	margin-bottom: 40px;
-	width: 100%;
-
-	thead { border-top: solid 2px $color_border; }
-
-	tr {
-		border-top: solid 1px $color_border;
-		position: relative;
-	}
-
-    tr.warning td {
-        background-color: #fcf8e2;
-    }
-
-	tbody tr.active td { background: $color_gray_input; }
-
-	.checkbox-col {
-		width: 37px;
-		padding: 5px 5px;
-	}
-
-	th {
-		color: $color_gray_light;
-		font-size: 11px;
-        font-weight: bold;
-        padding: 12px 5px 12px 5px;
-        text-transform: uppercase;
-	}
-	td {
-        font-size: 14px;
-		padding: 10px 5px;
-
-        &.minor {
-            color: $color_gray_light;
-            font-size: 14px;
-        }
-
-		input[type="checkbox"] + label {
-			position: relative;
-			top: 2px;
-			vertical-align: 0;
-		}
-
-		span.status {
-			border-radius: 7px;
-			display: inline-block;
-			height: 7px;
-			width: 7px;
-		}
-
-		span.status-draft { background: $color_gray_light; }
-		span.status-hidden { border: solid 1px $color_gray_light; }
-		span.status-live { background: $color_green; }
-	}
-	.handle {
-        @apply select-none;
-	    cursor: ns-resize;
-	}
-}
-
-.bordered-table {
-	border-spacing: 0;
-	border-collapse: separate;
-	margin-bottom: 20px;
-	margin-top: 0;
-	table-layout: fixed;
-
-	> thead,
-	> thead > tr > td,
-	> thead > tr > th,
-	> tbody > tr > td,
-	> tbody > tr > th {
-		border: none;
-	}
-
-	> thead, > tbody {
-		> tr {
-			> th {
-				border-top: solid 1px $color_border;
-				font-size: 14px;
-				text-transform: none;
-			}
-			> th, > td {
-				border-right: solid 1px $color_border;
-				border-bottom: solid 1px $color_border;
-
-				&:first-child {
-					border-left: solid 1px $color_border;
-				}
-			}
-		}
-
-		tr:first-child th:first-child { border-top-left-radius: 3px; }
-		tr:first-child th:last-child { border-top-right-radius: 3px; }
-		tr:last-child td:first-child { border-bottom-left-radius: 3px; }
-		tr:last-child td:last-child { border-bottom-right-radius: 3px; }
-	}
-}
-
 .table-row-placeholder {
-	background: $bg;
+	background: hsla(210, 30%, 95%, 1);
 }
 
 .delete-column {
@@ -326,10 +225,10 @@ table.table-legacy {
 	}
 
 	&:hover:before {
-        background: $brand-secondary;
+        @apply bg-grey-30;
 	}
 	&.active:before {
-        background: $brand-primary;
+        @apply bg-blue;
     }
 	.icon {
         position: relative;

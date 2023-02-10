@@ -25,9 +25,9 @@
         }
     }
     &.dark { }
-    &.blue { background: $brand-primary; }
-    &.green { background: $color_green; }
-    &.red { background: $color_red; }
+    &.blue { @apply bg-blue; }
+    &.green { @apply bg-green; }
+    &.red { @apply bg-red; }
 }
 
 .metric.simple {

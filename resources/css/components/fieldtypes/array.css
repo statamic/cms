@@ -30,16 +30,10 @@
 
     /*  Dynamic Mode */
     .array-dynamic .btn {
+        @apply text-blue block w-full h-auto border-0 text-left shadow-none;
         background: #f4f4f4;
-        color: $brand-primary;
         padding: 10px 10px 11px;
-        display: block;
-        width: 100%;
-        height: auto;
-        box-shadow: none;
-        border: 0;
         margin: 15px 0 0;
-        text-align: left;
 
         &:hover, &:active, &:focus {
             top: 0;

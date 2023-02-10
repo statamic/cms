@@ -158,9 +158,7 @@
     }
 
     .asset-meta {
-        @apply border-t w-full;
-        font-size: 12px;
-        color: $color_gray_light;
+        @apply border-t w-full text-2xs text-grey-70;
     }
 
     .asset-filename {
@@ -175,11 +173,6 @@
 
     .asset-thumb-container:hover .asset-controls {
         display: block;
-    }
-
-    &.is-selected {
-        background: rgba($color_dark_blue, .07);
-        border-radius: 4px;
     }
 }
 
@@ -267,7 +260,7 @@
         padding: 0 25px;
 
         &:not(:first-child) {
-            border-left: 1px solid $border;
+            @apply border;
         }
         svg { opacity: .75; }
         &:hover svg { opacity: 1; }

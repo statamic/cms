@@ -1,11 +1,8 @@
 @import "core/fonts";
-/* @import "core/mixins"; */
-/* @import "core/variables"; */
 @import "core/animation";
 
 /* Vendor things */
 @import "vendors/codemirror";
-/* @import "vendors/date-picker"; */
 @import "vendors/vue-select";
 
 /* Core things that need to override vendor things */

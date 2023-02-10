@@ -191,7 +191,7 @@
 }
 
 .bard-set.has-error > .replicator-set-header label {
-    color: $color_red;
+    @apply text-red;
 }
 
 .bard-set .popover-container:not(.popover-open) .popover{

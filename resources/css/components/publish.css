@@ -36,11 +36,8 @@
 }
 
 code.parent-url {
+    @apply block text-3xs bg-none text-grey-70;
     padding: 0 0 3px 0;
-    display: block;
-    font-size: 11px;
-    background: none;
-    color: $color_gray_light;
 }
 
 .publish-fields {
@@ -60,7 +57,7 @@ code.parent-url {
     }
 
     .has-error > .field-inner > label {
-        color: $color_red;
+        @apply text-red;
     }
 
     .field-inner {

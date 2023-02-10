@@ -25,6 +25,9 @@
     }
 }
 
+.assets-fieldtype .drag-drop-text {
+    @apply ml-1;
+}
 
 
 /* Inside a Grid

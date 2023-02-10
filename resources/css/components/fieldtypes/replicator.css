@@ -73,14 +73,14 @@
 }
 
 /*  Avoid double borders */
-.section-fieldtype ~ .replicator-fieldtype {
+.section-fieldtype + .replicator-fieldtype {
     border-top: 0;
 }
 
 .replicator-set.has-error > .replicator-set-header label {
-    color: $color_red;
+    @apply text-red;
 }
 
 .replicator-set-body > .has-error > label {
-    color: $color_red;
+    @apply text-red;
 }

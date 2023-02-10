@@ -30,18 +30,15 @@
     }
 
     button.warning, a.warning {
-        color: $color_red;
+        @apply text-red;
 
         &:hover {
-            background: $color_red;
-            color: #fff;
+            @apply bg-red text-white;
         }
     }
 
     .divider {
-        background-color: $color_gray_page;
-        height: 1px;
-        overflow: hidden;
+        @apply h-px bg-grey-40 overflow-hidden;
         margin: 6px -8px;
     }
 

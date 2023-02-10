@@ -200,8 +200,7 @@ button {
 
 .btn-icon-small,
 td .btn-icon {
-    @extend .btn-icon;
-
+    border-radius: 2px;
     height: 24px;
     line-height: 24px;
     padding: 1px 5px;
@@ -232,53 +231,6 @@ td .btn-icon {
         margin: 0;
         height: 16px;
         width: 16px;
-    }
-}
-
-/* Button with Dropdown
-  ========================================================================== */
-
-.btn-dropdown {
-    @extend .btn;
-}
-
-.btn-dropdown-primary {
-    @extend .btn-primary;
-    @apply flex items-center p-0;
-
-    &:hover .trigger {
-        @apply border-blue-darker;
-    }
-
-    &:active, &:focus:active {
-        bottom: 0;
-    }
-
-    &:focus-within {
-        @apply focus-outline;
-    }
-
-    .cta {
-        height: 100%;
-        padding: 0 16px;
-    }
-
-    .trigger {
-        @apply h-full border-l border-blue-dark;
-        padding: 0 12px;
-    }
-
-    button:focus, button:active, button:focus:active {
-        @apply outline-none;
-        box-shadow: inset 1px 3px 5px rgba(0, 0, 0, .15);
-    }
-
-    button:hover {
-        @apply bg-blue-dark;
-    }
-
-    div {
-        height: 100%;
     }
 }
 

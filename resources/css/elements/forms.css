@@ -225,7 +225,7 @@ input.input-text-minimal:read-only,
 
 
 label .required {
-    color: $color_red;
+    @apply text-red;
     font-style: normal;
 
     + .localizable-icon {
@@ -237,25 +237,6 @@ input[type="file"] {
     padding: 16px;
     height: auto;
     line-height: 1;
-}
-
-input.slug {
-    background: none;
-    box-shadow: none;
-    border: none;
-    float: left;
-    flex-grow: 1;
-    font-size: 19px !important;
-    height: 32px !important;
-    padding-top: 3px !important;
-    transition: none !important;
-    width: 75% !important;
-    -webkit-font-smoothing: antialiased;
-    &:hover,
-    &:focus {
-        @extend .input-text;
-        transition: none !important;
-    }
 }
 
 .filter-control {

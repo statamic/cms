@@ -34,7 +34,7 @@ module.exports = {
                 'lg': '8px',
             },
             borderWidth: {
-                default: '1px',
+                DEFAULT: '1px',
                 '0': '0',
                 '2': '2px',
                 '3': '3px',
@@ -44,7 +44,7 @@ module.exports = {
             },
             boxShadow: {
                 sm: '1px 2px 4px 0 rgba(0,0,0,.03)',
-                default:
+                DEFAULT:
                     '0 0 0 1px rgba(49,49,93,.05), 0 2px 5px 0 rgba(49,49,93,.075), 0 1px 3px 0 rgba(49,49,93,.15)',
                 lg: '0 7px 14px 0 rgba(50,50,93,.1), 0 2px 8px 0 rgba(0,0,0,.075)',
                 xl: '0 12px 24px 0 rgba(50, 50, 93, .1), 0 10px 20px 0 rgba(0, 0, 0, .075)',
@@ -131,11 +131,6 @@ module.exports = {
                 '4xl': '48px',
                 '5xl': '60px',
             },
-            height: {
-                13: '3.25rem',
-                30: '7.5rem',
-                55: '13.75rem',
-            },
             minHeight: {
                 40: '10rem',
             },
@@ -155,6 +150,11 @@ module.exports = {
                 '4xl': '90rem',
                 '5xl': '100rem',
                 'full': '100%',
+            },
+            spacing: {
+                13: '3.25rem',
+                30: '7.5rem',
+                55: '13.75rem',
             },
             width: {
                 128: '32rem',

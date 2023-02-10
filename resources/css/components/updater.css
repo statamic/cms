@@ -13,12 +13,10 @@
 	}
 
 	h3, dt {
-		font-weight: 400;
+        @apply font-normal text-grey-70 antialiased;
 		margin: 25px 0;
-		color: $color_gray_light;
 		font-size: 21px;
 		line-height: 1.5;
-		-webkit-font-smoothing: antialiased;
 	}
 
 	dl {
@@ -65,7 +63,7 @@
 		@apply font-bold;
 	}
 
-    a { color: $brand-primary; }
+    a { color: @apply text-blue; }
 
 	ul {
 		@apply p-0;

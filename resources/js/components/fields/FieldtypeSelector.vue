@@ -24,7 +24,7 @@
                             <button class="bg-white border border-grey-50 flex items-center group w-full rounded hover:border-grey-60 shadow-sm hover:shadow-md pr-3"
                                 @click="select(fieldtype)">
                                 <div class="p-2 flex items-center border-r border-grey-50 group-hover:border-grey-60 bg-grey-20 rounded-l">
-                                    <svg-icon class="h-1 w-5 text-grey-80" :name="fieldtype.icon" default="generic-field"></svg-icon>
+                                    <svg-icon class="h-5 w-5 text-grey-80" :name="fieldtype.icon" default="generic-field"></svg-icon>
                                 </div>
                                 <span class="pl-3 text-grey-80 text-md group-hover:text-grey-90">{{ fieldtype.text }}</span>
                             </button>

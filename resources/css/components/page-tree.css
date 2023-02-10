@@ -15,16 +15,18 @@
         * { display: none; }
     }
 
-
-    .page-move {
-        @apply w-6 border-r;
+.page-move {
+        @apply w-6 border-r rounded-l;
         cursor: grab;
-        background: rgba($bg, .5) url('../svg/drag-dots.svg') center center no-repeat;
+        background-color: hsla(210, 30%, 95%, .5);
+        background-image: url('../svg/drag-dots.svg');
+        background-position: center center;
+        background-repeat: no-repeat;
         &:hover { @apply bg-grey-30; }
     }
 
     .page-root {
-        background: rgba($bg, .5);
+        background-color: hsla(210, 30%, 95%, .5);
         @apply flex w-6 rounded-l items-center border-r;
     }
 }

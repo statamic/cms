@@ -39,16 +39,16 @@ svg {
 }
 
 icon-status-draft {
-	background: $color_gray_light;
+	@apply bg-grey-70;
 }
 .icon-status-hidden {
-	border: solid 1px $color_gray_light;
+    @apply border border-grey-70;
 }
 .icon-status-live {
-	background: $color_green;
+	@apply bg-green;
 }
 .icon-status-error {
-	background: $color_red;
+	@apply bg-red;
 }
 .icon-status-warning {
     @apply bg-yellow-dark;
