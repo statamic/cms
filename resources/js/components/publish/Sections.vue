@@ -10,7 +10,7 @@
             :class="{ 'offset-for-sidebar': shouldShowSidebar }"
         >
             <div
-                class="publish-tabs tabs flex-shrink"
+                class="publish-tabs tabs shrink"
                 :class="{ 'tabs-scrolled': canScrollLeft }"
                 ref="tabs"
                 role="tablist"

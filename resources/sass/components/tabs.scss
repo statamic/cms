@@ -32,7 +32,7 @@
     }
 
     .tab-button {
-        @apply whitespace-nowrap bg-grey-10 py-1 px-4 flex-shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-grey-30 select-none;
+        @apply whitespace-nowrap bg-grey-10 py-1 px-4 shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-grey-30 select-none;
         height: 94%;
         min-height: 94%;
     }

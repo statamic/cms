@@ -108,7 +108,7 @@
 
 .vs__open-indicator {
 	@include clickable;
-	@apply flex items-center rounded-r px-2 text-sm flex-shrink-0;
+	@apply flex items-center rounded-r px-2 text-sm shrink-0;
 	height: 2.375rem;
 }
 

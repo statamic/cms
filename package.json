@@ -103,10 +103,10 @@
     "jest": "^24.9.0",
     "kind-of": ">=6.0.3",
     "laravel-vite-plugin": "^0.7.2",
-    "tailwindcss": "^2.2.16",
+    "tailwindcss": "^3.0.0",
     "vite": "^4.0.0",
     "autoprefixer": "^10.4.0",
-    "postcss": "^8.3.11"
+    "postcss": "^8.4.4"
   },
   "jest": {
     "roots": [
