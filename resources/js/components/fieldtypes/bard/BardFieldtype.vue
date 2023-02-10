@@ -84,6 +84,7 @@ import BulletList from '@tiptap/extension-bullet-list';
 import CharacterCount from '@tiptap/extension-character-count';
 import Code from '@tiptap/extension-code';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import Dropcursor from '@tiptap/extension-dropcursor';
 import Gapcursor from '@tiptap/extension-gapcursor';
 import HardBreak from '@tiptap/extension-hard-break';
 import Heading from '@tiptap/extension-heading';
@@ -578,6 +579,7 @@ export default {
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
                 ...(this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak]),
+                Dropcursor,
                 Gapcursor,
                 History,
                 Paragraph,
