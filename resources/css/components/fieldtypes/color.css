@@ -1,5 +1,5 @@
 .color-fieldtype .pickr {
-    @include clickable;
+    @apply clickable;
     @apply inline-block rounded p-1;
 
     .pcr-button {

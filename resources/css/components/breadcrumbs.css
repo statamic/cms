@@ -3,12 +3,8 @@
    ========================================================================== */
 
 .breadcrumbs {
-    border-top: 1px solid $border;
-    border-bottom: 1px solid $border;
-    margin-top: -1px; /*  do this so we dont have to check if there are or aren't breadcrumbs. */
+    @apply border-t border-b -mt-px flex text-xs ;
     background: #fafafa;
-    font-size: 13px;
-    display: flex;
 
     a, .step {
         @apply text-blue-dark;

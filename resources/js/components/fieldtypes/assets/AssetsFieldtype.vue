@@ -135,7 +135,7 @@
 </template>
 
 
-<style lang="scss">
+<style>
 
     .asset-listing-uploads {
         border: 1px dashed #ccc;

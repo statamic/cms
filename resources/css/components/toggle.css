@@ -2,8 +2,6 @@
    TOGGLE
    ========================================================================== */
 
-$toggle_radius: 20px;
-
 .toggle-fieldtype-wrapper {
     height: 32px;
     display: flex;
@@ -29,7 +27,7 @@ $toggle_radius: 20px;
     background: #fff;
     height: 22px;
     width: 46px;
-    border-radius: $toggle_radius;
+    border-radius: 20px;
     cursor: pointer;
     position: relative;
     border: 1px solid #dfdfdf;
@@ -43,7 +41,7 @@ $toggle_radius: 20px;
     top: -1px;
     width: 20px;
     height: 22px;
-    border-radius: $toggle_radius;
+    border-radius: 20px;
     transition: all 0.2s ease;
 
     &.disabled {
@@ -59,13 +57,13 @@ $toggle_radius: 20px;
     height: 20px;
     border-radius: 50%;
     background: white;
-    box-shadow: 0 1px 3px rgba(black, .4);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .4);
     outline: none;
     transition: box-shadow 0.1s, background-color 0.2s ease-in-out;
 }
 
 .toggle-knob:hover {
-    box-shadow: 0 1px 3px rgba($brand-primary, .9);
+    box-shadow: 0 1px 3px rgba(theme('colors.blue'), .9);
 }
 
 .toggle-container.on {

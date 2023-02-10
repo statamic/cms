@@ -6,6 +6,13 @@ module.exports = {
         './tests/**/*.{html,vue,blade.php}'
     ],
     theme: {
+        screens: {
+            'sm': '576px',
+            'md': '768px',
+            'lg': '992px',
+            'xl': '1200px',
+            '2xl': '1440px',
+        },
         zIndex: {
             0: '0',
             5: '5',
@@ -131,6 +138,23 @@ module.exports = {
             },
             minHeight: {
                 40: '10rem',
+            },
+            maxHeight: {
+                'screen-1/2': '50vh',
+            },
+            maxWidth: {
+                '3xs': '5rem',
+                '2xs': '10rem',
+                'xs': '20rem',
+                'sm': '30rem',
+                'md': '40rem',
+                'lg': '50rem',
+                'xl': '60rem',
+                '2xl': '70rem',
+                '3xl': '80rem',
+                '4xl': '90rem',
+                '5xl': '100rem',
+                'full': '100%',
             },
             width: {
                 128: '32rem',

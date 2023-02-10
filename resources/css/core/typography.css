@@ -256,7 +256,7 @@ code {
         @apply rounded m-0;
         padding: 0.2em 0.4em;
         font-size: 85%;
-        background-color: rgba(black, 0.05);
+        background-color: rgba(0, 0, 0, 0.05);
 
         br { display: none; }
     }

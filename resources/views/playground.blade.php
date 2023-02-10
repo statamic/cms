@@ -160,6 +160,7 @@
     <div class="bg-white p-10 shadow rounded-lg overflow-hidden mb-16">
 
         <h6 class="mb-4">Greys</h6>
+        <div class="p-4" style="background: #f6f9fc"></div>
         <div class="flex flex-row-reverse text-sm text-center mb-8">
             <div class="text-black bg-white p-4 flex-1">White</div>
             <div class="text-black bg-grey-10 p-4 flex-1">10</div>

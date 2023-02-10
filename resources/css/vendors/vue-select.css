@@ -89,7 +89,7 @@
 }
 
 .vs--single.vs--unsearchable .vs__selected-options {
-	@include clickable;
+	@apply clickable;
 	@apply flex flex-1 rounded-l relative h-full border-r-0;
 	width: calc(100% - 34px);
 }
@@ -107,7 +107,7 @@
 }
 
 .vs__open-indicator {
-	@include clickable;
+	@apply clickable;
 	@apply flex items-center rounded-r px-2 text-sm shrink-0;
 	height: 2.375rem;
 }
@@ -177,7 +177,7 @@
 }
 
 .v-select:not(.vs--single) .vs__selected {
-	@include clickable;
+	@apply clickable;
 	@apply flex items-center text-sm rounded py-0 px-2 mr-2;
 
     &.sortable-item { @apply cursor-grab; }
