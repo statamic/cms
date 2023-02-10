@@ -31,7 +31,6 @@ module.exports = {
                 set: 'rgba(50,50,93,.1) 0 0 0 1px, rgba(50,50,93,.08) 0 2px 5px, rgba(0,0,0,.07) 0 1px 1.5px,rgba(0,0,0,.08) 0 1px 2px 0, transparent 0 0 0 0',
                 button: '0 1px 0 0 rgba(25,30,35,.05)',
                 inner: 'inset 0px 1px 1px 0px rgba(0,0,0,.05)',
-                none: 'none',
             },
             colors: {
                 transparent: 'transparent',
