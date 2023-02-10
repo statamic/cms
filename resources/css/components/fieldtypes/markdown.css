@@ -196,7 +196,7 @@
     @apply mx-auto;
 
     padding: 16px 20px;
-    min-height: 167px; // @TODO Refactor to avoid a magic number.
+    min-height: 167px; /*  @TODO Refactor to avoid a magic number. */
 
     ol {
         @apply list-decimal;
@@ -209,7 +209,7 @@
 
 .markdown-fieldtype-wrapper.markdown-fullscreen {
     @apply fixed bg-white inset-0 h-screen rounded-none;
-    padding-top: 52px; // offset the nav
+    padding-top: 52px; /*  offset the nav */
     z-index: 998;
     will-change: transform;
 
@@ -220,11 +220,11 @@
     }
 
     .mode-wrap {
-        height: calc(100vh - 88px); // sans toolbars
+        height: calc(100vh - 88px); /*  sans toolbars */
         overflow-y: scroll;
         cursor: text;
         &.mode-preview {
-            height: calc(100vh - 52px); // no footer toolbar
+            height: calc(100vh - 52px); /*  no footer toolbar */
         }
     }
 

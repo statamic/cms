@@ -28,7 +28,7 @@
         tr > :last-child { border-right: 0; }
     }
 
-    // Dynamic Mode
+    /*  Dynamic Mode */
     .array-dynamic .btn {
         background: #f4f4f4;
         color: $brand-primary;

@@ -34,11 +34,11 @@
     position: relative;
 }
 
-// Supporting elements
+/*  Supporting elements */
 .rotating-dots {
     @apply relative cursor-pointer;
     transition: .12s ease-out;
-    // top: 1px;
+    /*  top: 1px; */
 }
 
 .rotating-dots-button {
@@ -55,7 +55,7 @@
     }
 }
 
-// When open
+/*  When open */
 .popover-open {
     .popover {
         pointer-events: auto;

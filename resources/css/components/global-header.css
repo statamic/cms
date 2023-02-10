@@ -4,7 +4,7 @@
 
 .global-header {
     @apply bg-white shadow pr-4 h-13 items-center flex relative w-full;
-    z-index: 997; // Let Live Preview stack on top
+    z-index: 997; /*  Let Live Preview stack on top */
 }
 
 /* Responsive Wangjangling
@@ -33,7 +33,7 @@ global-search {
     .global-search-results {
         @apply shadow-lg absolute p-0 w-full bg-white rounded border border-grey-50;
         top: 36px;
-        left: -1px; // border offset
+        left: -1px; /*  border offset */
         z-index: 999;
     }
 

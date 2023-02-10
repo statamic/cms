@@ -2,7 +2,7 @@
    BASE FORM ELEMENTS
    ========================================================================== */
 
-// TODO: Figure out where this is used. What even is it?
+/*  TODO: Figure out where this is used. What even is it? */
 form {
     ul, li {
         list-style: none;
@@ -49,7 +49,7 @@ select {
 
 }
 
-// Used inside tables, grids, and so on
+/*  Used inside tables, grids, and so on */
 .input-text-minimal {
     @apply appearance-none shadow-none bg-white w-full p-2;
 
@@ -59,7 +59,7 @@ select {
 }
 
 
-// Needs an 'input' selector, otherwise when .input-text is used on a div, it's always considered read only.
+/*  Needs an 'input' selector, otherwise when .input-text is used on a div, it's always considered read only. */
 input.input-text:read-only,
 textarea.input-text:read-only,
 input.input-text-minimal:read-only,
@@ -129,7 +129,7 @@ input.input-text-minimal:read-only,
     }
 
     .input-group-append {
-        @apply rounded-l-none border-r-0; // Rounded on the right side
+        @apply rounded-l-none border-r-0; /*  Rounded on the right side */
         &:last-child { @apply rounded-r border-r; }
     }
 
@@ -200,7 +200,7 @@ input.input-text-minimal:read-only,
 
         background: linear-gradient(180deg, #fff, #f9fafb);
         border: 1px solid #c4cdd6;
-        height: 2.375rem; // 38px
+        height: 2.375rem; /*  38px */
         letter-spacing: -0.01em;
         padding: .475rem 1.75rem .475rem .75rem;
 

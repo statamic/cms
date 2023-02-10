@@ -2,7 +2,7 @@
    VARIABLES
    ========================================================================== */
 
-// Colors
+/*  Colors */
 $color_dark_blue:       #2d393c;
 $color_border: 		    #e0e0e0;
 $color_pin:			    #979797;
@@ -24,7 +24,7 @@ $color_gray_lighter:    $color_gray_input;
 $bg:                    hsla(210, 30%, 95%, 1);
 $asset_bg:              #394045;
 
-// Fonts
+/*  Fonts */
 $font_monospace: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace';
 $font_serif: 'Georgia', 'serif';
 

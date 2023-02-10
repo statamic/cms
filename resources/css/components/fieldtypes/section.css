@@ -4,7 +4,7 @@
 
 .section-fieldtype {
     @apply border-t border-b bg-grey-20;
-    top: -1px; // Avoid adjacent borders just in case they're stacked
+    top: -1px; /*  Avoid adjacent borders just in case they're stacked */
 
     &.form-group {
         position: relative;

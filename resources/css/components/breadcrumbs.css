@@ -5,13 +5,13 @@
 .breadcrumbs {
     border-top: 1px solid $border;
     border-bottom: 1px solid $border;
-    margin-top: -1px; // do this so we dont have to check if there are or aren't breadcrumbs.
+    margin-top: -1px; /*  do this so we dont have to check if there are or aren't breadcrumbs. */
     background: #fafafa;
     font-size: 13px;
     display: flex;
 
     a, .step {
-        color: $color_dark_blue;
+        @apply text-blue-dark;
         padding: 5px 20px 5px 33px;
         position: relative;
         overflow: hidden;
@@ -30,7 +30,7 @@
 
             &:after {
                 right: 0;
-                border-left-color: $border;
+                @apply border-l;
                 z-index: 1;
             }
 
@@ -42,7 +42,7 @@
         }
 
         &:hover {
-            color: $brand-primary;
+            @apply text-blue;
         }
     }
 
@@ -63,9 +63,9 @@
         padding: 10px 60px 10px 0;
 
         &:before, &:after { border: 21px solid transparent; }
-        &:after { border-left-color: $border; }
+        &:after { @apply border-l; }
         &:before { border-left-color: #fafafa; }
-        &:hover { color: $color_dark_blue; }
-        &.active { color: $brand-primary; }
+        &:hover { @apply text-blue-dark; }
+        &.active { @apply text-blue; }
     }
 }

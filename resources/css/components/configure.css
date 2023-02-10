@@ -7,7 +7,7 @@
            @apply border-b;
        }
 
-       // Push toggle off to the right
+       /*  Push toggle off to the right */
        > .publish-fields > .toggle-fieldtype {
            @apply flex justify-between items-center;
            .help-block, .help-block p { @apply mb-0; }

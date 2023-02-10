@@ -1,22 +1,22 @@
-// TODO Clean this up further.
-// I don't like having all these one-off variables and methods here.
+/*  TODO Clean this up further. */
+/*  I don't like having all these one-off variables and methods here. */
 
-// Colors
+/*  Colors */
 $blue: $brand-primary;
 $moon: #EBF1F4;
 $mouse: #C3CACD;
 
-// Variables
+/*  Variables */
 $rem-base: 16px;
 
-// Functions
+/*  Functions */
 @function strip-unit($num) {
   @return $num / ($num * 0 + 1);
 }
 
 @function convert-to-rem($value, $base-value: $rem-base)  {
   $value: strip-unit($value) / strip-unit($base-value) * 1rem;
-  @if ($value == 0rem) { $value: 0; } // Turn 0rem into 0
+  @if ($value == 0rem) { $value: 0; } /*  Turn 0rem into 0 */
   @return $value;
 }
 

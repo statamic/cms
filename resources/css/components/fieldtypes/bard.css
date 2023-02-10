@@ -20,7 +20,7 @@
     @apply p-2 bg-red-lighter text-red text-xs whitespace-nowrap;
 }
 
-// Modes
+/*  Modes */
 .bard-editor.mode\:read-only .ProseMirror {
     @apply bg-grey-30 text-grey-70;
 }
@@ -34,11 +34,11 @@
     min-height: 38px;
     p {
         margin-bottom: 0;
-        line-height: 1.375; // 22px
+        line-height: 1.375; /*  22px */
     }
 }
 
-// Responive Wangjangling
+/*  Responive Wangjangling */
 @screen md {
     .bard-editor .ProseMirror { @apply p-4; }
     .bard-editor .bard-invalid { @apply px-4; }
@@ -103,28 +103,28 @@
     }
 }
 
-// Fixed toolbar inside another bard field
+/*  Fixed toolbar inside another bard field */
 .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
     z-index: 4;
     top: 40px;
 }
 
-// Fixed toolbar inside the live preview
+/*  Fixed toolbar inside the live preview */
 .live-preview-fields-narrow .bard-fixed-toolbar { top: 0; }
 .live-preview-fields-wide .bard-fixed-toolbar { top: -24px; }
 .live-preview-fields-narrow .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 40px; }
 .live-preview-fields-wide .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 16px; }
 
-// Fixed toolbar inside a stack
+/*  Fixed toolbar inside a stack */
 .stack-content .bard-fixed-toolbar { top: -24px; }
 
-// Responive Wangjangling
+/*  Responive Wangjangling */
 @screen md {
-    // Fixed toolbar below fixed global header
+    /*  Fixed toolbar below fixed global header */
     .bard-fixed-toolbar { top: 52px; }
     .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 92px; }
 
-    // Fixed toolbar inside a stack
+    /*  Fixed toolbar inside a stack */
     .stack-content .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 16px; }
 }
 
@@ -203,7 +203,7 @@
   ========================================================================== */
 
 .bard-set-selector {
-    // transition: all .15s ease-in-out;
+    /*  transition: all .15s ease-in-out; */
 
     .dropdown-menu {
         left: -5px;
@@ -217,8 +217,8 @@
 
 .bard-fieldtype .bard-fullscreen {
     @apply fixed bg-grey-20 inset-0 min-h-screen overflow-scroll rounded-none;
-    z-index: 998; // to appear over the top of the rest of the stuff on the page.
-                // too high and it'll be over the top of stacks, etc.
+    z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
+                /*  too high and it'll be over the top of stacks, etc. */
 
     .bard-editor {
         @apply bg-white shadow max-w-xl mx-auto rounded relative my-6 px-8;
@@ -243,7 +243,7 @@
             @apply bg-grey-30;
         }
 
-        // To remove min height from nested bard fields inside bard in fullscreen mode.
+        /*  To remove min height from nested bard fields inside bard in fullscreen mode. */
         * > .ProseMirror {
             min-height: auto;
         }
@@ -256,7 +256,7 @@
     .bard-field-options {
         @apply fixed top-0 inset-x-0 bg-grey-70 p-4 w-full;
         text-align: right;
-        z-index: 1; // to appear over the top of .bard-editor
+        z-index: 1; /*  to appear over the top of .bard-editor */
 
         .icon { font-size: 24px; }
         a { margin-left: 16px; color: #fff; opacity: 1; }
@@ -373,13 +373,13 @@
         margin-top: 0;
     }
 
-    ul, 
+    ul,
     blockquote ul,
     .tableWrapper table ul {
         list-style-type: disc;
     }
 
-    ol, 
+    ol,
     blockquote ol,
     .tableWrapper table ol {
         list-style-type: decimal;
@@ -503,7 +503,7 @@
     float: left;
     height: 0;
     pointer-events: none;
-}  
+}
 
 /* Link toolbar
   ========================================================================== */

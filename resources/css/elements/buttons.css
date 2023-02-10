@@ -6,13 +6,13 @@ button {
     @apply font-normal;
 }
 
-// Base button styles that shouldn't need overriding
+/*  Base button styles that shouldn't need overriding */
 [class^="btn"], [class*=" btn"] {
     @apply cursor-pointer select-none h-auto rounded relative;
     @apply leading-normal inline-block align-middle whitespace-nowrap;
     @apply text-center text-sm subpixel-antialiased;
 
-    height: 2.375rem; // 38px
+    height: 2.375rem; /*  38px */
     letter-spacing: -0.01em;
     padding: .475rem 1.25rem;
 
@@ -26,10 +26,10 @@ button {
 }
 
 .btn-height {
-    height: 2.375rem; // 38px
+    height: 2.375rem; /*  38px */
 }
 
-// Default, non-primary action button
+/*  Default, non-primary action button */
 .btn, .btn-default {
     @apply text-grey-80 shadow-button;
 
@@ -52,7 +52,7 @@ button {
     }
 }
 
-// Primary action button
+/*  Primary action button */
 .btn-primary {
     @apply text-white;
     background: linear-gradient(to bottom, theme('colors.blue-500'), theme('colors.blue-600'));
@@ -70,7 +70,7 @@ button {
     }
 }
 
-// Danger/delete button
+/*  Danger/delete button */
 .btn-danger {
     background: linear-gradient(180deg, #e53e3e, #c53030);
     border: 1px solid #9b2c2c;
@@ -87,7 +87,7 @@ button {
     }
 }
 
-// Earth isn't flat but these buttons are
+/*  Earth isn't flat but these buttons are */
 .btn-flat {
     @apply text-white text-grey-80 bg-grey-30 flex items-center;
     position: inherit;
@@ -114,7 +114,7 @@ button {
 
 .btn-sm {
     @apply text-2xs;
-    height: 1.625rem; // 24px
+    height: 1.625rem; /*  24px */
     padding: 4px 10px;
 }
 

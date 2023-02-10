@@ -119,7 +119,7 @@ code.parent-url {
 .field-w-3\/4 { @apply w-3/4; }
 .field-w-full { @apply w-full; }
 
-// When the wrapper gets narrow enough, the fields should all become full width.
+/*  When the wrapper gets narrow enough, the fields should all become full width. */
 .publish-fields-narrow .publish-field { width: 100%; }
 
 .publish-section:not(:empty) {
@@ -136,8 +136,8 @@ code.parent-url {
     position: relative;
 
     .editor-form-fields {
-        // Could have done this with flexbox but firefox was pushing
-        // out the height if there were many publish fields.
+        /*  Could have done this with flexbox but firefox was pushing */
+        /*  out the height if there were many publish fields. */
         position: absolute;
         top: 0;
         left: 0;

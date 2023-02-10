@@ -40,8 +40,8 @@
 	}
 }
 
-// Make date and time and fields sit one above the other
-// when it's too narrow for them to sit side by side.
+/*  Make date and time and fields sit one above the other */
+/*  when it's too narrow for them to sit side by side. */
 .date-time-container.narrow {
     @apply block;
 
@@ -50,7 +50,7 @@
     }
 }
 
-// Dear sweet baby Jesus please forgive me for this brittle selector
+/*  Dear sweet baby Jesus please forgive me for this brittle selector */
 .date-time-container .date-container > span > .vc-popover-content-wrapper {
 	left: -50px !important;
 }

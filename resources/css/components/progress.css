@@ -9,7 +9,7 @@ $color: hsla(200, 80%, 50%, 1);
     background: $color;
 
     position: fixed;
-    z-index: 10000; // above global-header
+    z-index: 10000; /*  above global-header */
     top: 0;
     left: 0;
 

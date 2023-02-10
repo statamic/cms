@@ -1,6 +1,6 @@
 .live-preview {
     @apply inset-0;
-    z-index: 998; // arbitrary under stacks.
+    z-index: 998; /*  arbitrary under stacks. */
 }
 
 .live-preview-header {
@@ -92,8 +92,8 @@
 }
 
 
-// We only want the animation to happen when its on the regular publish page.
-// When portal-ed into live preview, it won't be inside .workspace
+/*  We only want the animation to happen when its on the regular publish page. */
+/*  When portal-ed into live preview, it won't be inside .workspace */
 .workspace {
     .live-preview-sections-drop-enter-active,
     .live-preview-sections-drop-leave-active {
@@ -114,14 +114,14 @@
 
 
 
-// Responsive
+/*  Responsive */
 
-// add grey bg and padding so that it looks like a publish form, when its wide enough.
+/*  add grey bg and padding so that it looks like a publish form, when its wide enough. */
 .live-preview-fields-wide {
     @apply p-6 bg-grey-30;
 }
 
-// remove shadow of sections when its narrow enough to be no longer be displayed as sections.
+/*  remove shadow of sections when its narrow enough to be no longer be displayed as sections. */
 .live-preview-fields-narrow .publish-section {
     @apply shadow-none
 }

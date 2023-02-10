@@ -54,8 +54,8 @@
 }
 
 
-// Background with retina support
-// @TODO Replace the need for this
+/*  Background with retina support */
+/*  @TODO Replace the need for this */
 @mixin background($imgpath, $size: 100% 100%, $color: transparent, $position:0 0, $repeat: no-repeat) {
     background: #{$color} url(#{$imgpath}) $repeat $position;
 }

@@ -334,7 +334,7 @@ $circle-origins: 0% 33%, 0% -50%, 50% 0%, -50% 0%;
   }
 
   &[data-inertia] {
-    // Safari/Webkit can't go out of range
+    /*  Safari/Webkit can't go out of range */
     -webkit-transition-timing-function: cubic-bezier(.53,1,.36,.85);
     transition-timing-function: cubic-bezier(.53,2,.36,.85);
   }

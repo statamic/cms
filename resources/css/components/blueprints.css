@@ -36,8 +36,8 @@
     }
 }
 
-// Use specific selector because we don't want it to happen
-// when used inside  a grid field configuratormajig.
+/*  Use specific selector because we don't want it to happen */
+/*  when used inside  a grid field configuratormajig. */
 .blueprint-section .blueprint-section-field-actions > div {
     @apply w-1/2;
 }
@@ -50,8 +50,8 @@
     }
 }
 
-// These are applied here rather than the utility classes so they don't override
-// the inline widths defined by the draggable library.
+/*  These are applied here rather than the utility classes so they don't override */
+/*  the inline widths defined by the draggable library. */
 .blueprint-section-field-w-1\/4 { @apply w-1/4 };
 .blueprint-section-field-w-1\/3 { @apply w-1/3 };
 .blueprint-section-field-w-1\/2 { @apply w-1/2 };

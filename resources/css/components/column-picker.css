@@ -18,10 +18,10 @@
             @apply bg-grey-20;
         }
 
-        // Drag interaction
+        /*  Drag interaction */
         &.draggable-mirror,
         &.draggable-source--is-dragging {
-            // @apply bg-white;
+            /*  @apply bg-white; */
             cursor: grabbing;
         }
     }
