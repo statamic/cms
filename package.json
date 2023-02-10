@@ -52,7 +52,6 @@
     "cookies-js": "^1.2.2",
     "fuse.js": "^3.4.6",
     "highlight.js": "^9.18.1",
-    "jquery": "^3.5.0",
     "laravel-echo": "^1.6.1",
     "lowlight": "^2.6.1",
     "marked": "^4.0.10",
