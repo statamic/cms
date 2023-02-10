@@ -27,20 +27,10 @@ module.exports = {
             auto: 'auto',
         },
         extend: {
-            borderRadius: {
-                default: '3px',
-                'sm': '2px',
-                'md': '4px',
-                'lg': '8px',
-            },
             borderWidth: {
-                DEFAULT: '1px',
                 '0': '0',
-                '2': '2px',
                 '3': '3px',
-                '4': '4px',
                 '6': '6px',
-                '8': '8px',
             },
             boxShadow: {
                 sm: '1px 2px 4px 0 rgba(0,0,0,.03)',
@@ -130,6 +120,10 @@ module.exports = {
                 '3xl': '32px',
                 '4xl': '48px',
                 '5xl': '60px',
+            },
+            letterSpacing: {
+                normal: '-0.004em',
+                widest: '.15em',
             },
             minHeight: {
                 40: '10rem',

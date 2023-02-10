@@ -43,7 +43,7 @@
                 </div>
 
                 <div class="text-grey text-xs px-3 py-2 border-t text-center">
-                    <b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b>
+                    <b class="tracking-widest uppercase text-3xs">{{ __('Pro Tip')}}:</b>
                     <span v-html="__('messages.global_search_open_using_slash')" />
                 </div>
             </div>
