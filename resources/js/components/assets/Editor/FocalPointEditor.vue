@@ -102,13 +102,13 @@ export default {
         },
 
         define(e) {
-            var $el = $(e.target);
+            var rect = e.target.getBoundingClientRect();
 
-            var imageW = $el.width();
-            var imageH = $el.height();
+            var imageW = rect.width;
+            var imageH = rect.height;
 
-            var offsetX = e.pageX - $el.offset().left;
-            var offsetY = e.pageY - $el.offset().top;
+            var offsetX = e.pageX - rect.left;
+            var offsetY = e.pageY - rect.top;
 
             this.x = ((offsetX/imageW)*100).toFixed();
             this.y = ((offsetY/imageH)*100).toFixed();
