@@ -11,7 +11,6 @@ export const Link = Mark.create({
         return {
             href: {
                 default: null,
-                parseHTML: element => element.querySelector('a')?.getAttribute('href'),
             },
             rel: {
                 default: null,
