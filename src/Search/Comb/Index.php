@@ -9,6 +9,7 @@ use Statamic\Search\Comb\Exceptions\NotEnoughCharacters;
 use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
 use Statamic\Search\IndexNotFoundException;
+use Statamic\Search\Result;
 
 class Index extends BaseIndex
 {
@@ -34,6 +35,7 @@ class Index extends BaseIndex
         return collect($results)->map(function ($result) {
             $data = $result['data'];
             $data['search_score'] = $result['score'];
+            $data['search_snippets'] = $result['snippets'];
 
             return array_except($data, '_category');
         });
@@ -115,5 +117,12 @@ class Index extends BaseIndex
     protected function save($documents)
     {
         File::put($this->path(), $documents->toJson());
+    }
+
+    public function extraAugmentedResultData(Result $result)
+    {
+        return [
+            'search_snippets' => $result->getRawResult()['search_snippets'],
+        ];
     }
 }

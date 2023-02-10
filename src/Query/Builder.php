@@ -271,9 +271,9 @@ abstract class Builder implements Contract
         return $this;
     }
 
-    public function orWhereJsonLength($column, $operator, $value)
+    public function orWhereJsonLength($column, $operator, $value = null)
     {
-        return $this->whereJsonLength($column, $operator, $value = null, 'or');
+        return $this->whereJsonLength($column, $operator, $value, 'or');
     }
 
     public function whereNull($column, $boolean = 'and', $not = false)

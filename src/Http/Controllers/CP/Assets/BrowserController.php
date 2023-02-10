@@ -100,6 +100,10 @@ class BrowserController extends CpController
 
         $assets = $query->paginate(request('perPage'));
 
+        if ($container->hasSearchIndex()) {
+            $assets->setCollection($assets->getCollection()->map->getSearchable());
+        }
+
         return new SearchedAssetsCollection($assets);
     }
 }
