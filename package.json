@@ -50,7 +50,6 @@
     "body-scroll-lock": "^2.6.4",
     "codemirror": "^5.58.2",
     "cookies-js": "^1.2.2",
-    "dm-file-uploader": "^1.0.2",
     "fuse.js": "^3.4.6",
     "highlight.js": "^9.18.1",
     "jquery": "^3.5.0",
