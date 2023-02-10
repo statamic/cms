@@ -115,9 +115,6 @@ import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
 import { lowlight } from 'lowlight/lib/common.js';
-import javascript from 'highlight.js/lib/languages/javascript'
-import css from 'highlight.js/lib/languages/css'
-import hljs from 'highlight.js/lib/highlight';
 import 'highlight.js/styles/github.css';
 
 export default {
