@@ -14,15 +14,12 @@ export const Link = Mark.create({
             },
             rel: {
                 default: null,
-                parseHTML: element => element.querySelector('a')?.getAttribute('rel'),
             },
             target: {
                 default: null,
-                parseHTML: element => element.querySelector('a')?.getAttribute('target'),
             },
             title: {
                 default: null,
-                parseHTML: element => element.querySelector('a')?.getAttribute('title'),
             },
         }
     },
