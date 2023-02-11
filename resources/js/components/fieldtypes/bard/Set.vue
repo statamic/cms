@@ -19,7 +19,7 @@
                     <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-8">
                         <div
                             v-html="previewText"
-                            class="help-block mb-0 whitespace-nowrap overflow-hidden text-overflow-ellipsis" />
+                            class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
                     </div>
                 </div>
                 <div class="replicator-set-controls">

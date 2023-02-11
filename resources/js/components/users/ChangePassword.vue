@@ -5,7 +5,7 @@
             class="btn"
             v-text="__('Change Password')"
         />
-        <div class="saving flex justify-center text-center" v-if="saving">
+        <div class="saving-overlay flex justify-center text-center" v-if="saving">
             <loading-graphic :text="__('Saving')" />
         </div>
         <div class="publish-fields p-4 pb-0 w-96">

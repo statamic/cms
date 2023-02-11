@@ -7,7 +7,7 @@
         }"
         @click="open"
     >
-        <div v-if="revision.message" class="revision-item-note text-truncate" v-text="revision.message" />
+        <div v-if="revision.message" class="revision-item-note truncate" v-text="revision.message" />
 
         <div class="flex items-center">
             <avatar v-if="revision.user" :user="revision.user" class="shrink-0 mr-2 w-6" />

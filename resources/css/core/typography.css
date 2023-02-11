@@ -128,10 +128,7 @@ code {
 }
 
 .clean-content {
-
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    word-wrap: break-word;
-    color: #333;
+    @apply font-sans break-words text-gray-800;
     line-height: 1.7;
     text-size-adjust: 100%;
 
@@ -157,9 +154,7 @@ code {
     }
 
     a {
-        color: #4183c4;
-        text-decoration: none;
-        text-decoration: underline;
+        @apply text-blue underline;
     }
 
     a:active,
@@ -211,7 +206,6 @@ code {
 
     h6 {
         font-size: 1em;
-        color: #777;
     }
 
     ol,
@@ -307,4 +301,9 @@ code {
         background-color: transparent;
         border: 0;
     }
+}
+
+.help-block {
+    width: 100%;
+    p { @apply mb-2 }
 }

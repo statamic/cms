@@ -1,12 +1,9 @@
-@import "core/fonts";
-@import "core/animation";
-
-/* Vendor things */
 @import "vendors/codemirror";
 @import "vendors/vue-select";
 
-/* Core things that need to override vendor things */
+@import "core/animation";
 @import "core/layout";
+@import "core/fonts";
 @import "core/typography";
 
 /* Elements */
@@ -76,19 +73,3 @@
 @import "components/fieldtypes/time";
 @import "components/fieldtypes/video";
 @import "components/fieldtypes/yaml";
-@import "core/utilities";
-
-
-#statamic {
-    transition: all 0.3s ease;
-    min-height: 100vh;
-}
-
-.pane-slide-enter-active,
-.pane-slide-leave-active {
-    transition: all 0.3s ease;
-}
-.pane-slide-enter,
-.pane-slide-leave-to {
-    transform: translateX(24rem);
-}

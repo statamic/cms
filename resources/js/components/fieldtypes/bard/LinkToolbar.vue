@@ -52,7 +52,7 @@
                             <img
                                 v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
                                 :src="itemData.asset.thumbnail || itemData.asset.url"
-                                class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-2 fit-cover lazyloaded"
+                                class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-2 object-cover lazyloaded"
                             >
                             {{ displayValue }}
                         </div>

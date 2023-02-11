@@ -6,10 +6,11 @@ body {
     @apply w-full bg-gray-300 relative;
 }
 
-a {
-    text-decoration: none;
-    cursor: pointer;
+#statamic {
+    transition: all 0.3s ease;
+    min-height: 100vh;
 }
+
 
 #main {
     @apply flex;
@@ -19,6 +20,11 @@ a {
 #main .workspace {
     transition: padding .3s;
     @apply w-full;
+}
+
+a {
+    text-decoration: none;
+    cursor: pointer;
 }
 
 @screen md {
