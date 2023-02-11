@@ -36,66 +36,6 @@ class RouterMixinTest extends TestCase
         $this->assertEquals('the-uri', $route->uri());
     }
 
-    /** @test */
-    public function amp_routes_are_registered()
-    {
-        config(['statamic.amp.enabled' => true]);
-
-        $this->assertCount(0, $this->router->getRoutes()->get());
-
-        $this->router->amp(function () {
-            $this->router->statamic('named-uri', 'view-name', ['foo' => 'bar'])->name('test');
-            $this->router->statamic('unnamed-uri', 'view-name', ['foo' => 'bar']);
-        });
-
-        $routes = $this->router->getRoutes()->get();
-        $this->assertCount(4, $routes);
-
-        tap($routes[0], function ($route) {
-            $this->commonRouteAssertions($route);
-            $this->assertEquals('named-uri', $route->uri());
-            $this->assertEquals('test', $route->getName());
-        });
-
-        tap($routes[1], function ($route) {
-            $this->commonRouteAssertions($route);
-            $this->assertEquals('unnamed-uri', $route->uri());
-            $this->assertNull($route->getName());
-        });
-
-        tap($routes[2], function ($route) {
-            $this->commonRouteAssertions($route);
-            $this->assertEquals('amp/named-uri', $route->uri());
-            $this->assertEquals('test.amp', $route->getName());
-        });
-
-        tap($routes[3], function ($route) {
-            $this->commonRouteAssertions($route);
-            $this->assertEquals('amp/unnamed-uri', $route->uri());
-            $this->assertNull($route->getName());
-        });
-    }
-
-    /** @test */
-    public function amp_routes_do_not_get_registered_if_amp_is_disabled()
-    {
-        config(['statamic.amp.enabled' => false]);
-
-        $this->assertCount(0, $this->router->getRoutes()->get());
-
-        $this->router->amp(function () {
-            $this->router->statamic('the-uri', 'view-name', ['foo' => 'bar']);
-        });
-
-        $routes = $this->router->getRoutes()->get();
-        $this->assertCount(1, $routes);
-
-        tap($routes[0], function ($route) {
-            $this->commonRouteAssertions($route);
-            $this->assertEquals('the-uri', $route->uri());
-        });
-    }
-
     public function commonRouteAssertions($route)
     {
         $this->assertEquals(['GET', 'HEAD'], $route->methods());

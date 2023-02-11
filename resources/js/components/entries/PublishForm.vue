@@ -318,7 +318,6 @@ export default {
         breadcrumbs: Array,
         initialActions: Object,
         method: String,
-        amp: Boolean,
         isCreating: Boolean,
         isInline: Boolean,
         initialReadOnly: Boolean,

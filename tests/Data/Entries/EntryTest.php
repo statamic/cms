@@ -481,15 +481,13 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_url_from_the_collection()
     {
-        config(['statamic.amp.enabled' => true]);
-
         Facades\Site::setConfig(['default' => 'en', 'sites' => [
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr_FR'],
             'de' => ['url' => 'http://domain.de/', 'locale' => 'de_DE'],
         ]]);
 
-        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->ampable(true)->routes([
+        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',
@@ -506,7 +504,6 @@ class EntryTest extends TestCase
         $this->assertEquals('/blog/foo', $entryEn->urlWithoutRedirect());
         $this->assertEquals('http://domain.com/blog/foo', $entryEn->absoluteUrl());
         $this->assertEquals('http://domain.com/blog/foo', $entryEn->absoluteUrlWithoutRedirect());
-        $this->assertEquals('http://domain.com/amp/blog/foo', $entryEn->ampUrl());
         $this->assertNull($entryEn->redirectUrl());
 
         $this->assertEquals('/le-blog/le-foo', $entryFr->uri());
@@ -514,7 +511,6 @@ class EntryTest extends TestCase
         $this->assertEquals('/fr/le-blog/le-foo', $entryFr->urlWithoutRedirect());
         $this->assertEquals('http://domain.com/fr/le-blog/le-foo', $entryFr->absoluteUrl());
         $this->assertEquals('http://domain.com/fr/le-blog/le-foo', $entryFr->absoluteUrlWithoutRedirect());
-        $this->assertEquals('http://domain.com/fr/amp/le-blog/le-foo', $entryFr->ampUrl());
         $this->assertNull($entryFr->redirectUrl());
 
         $this->assertEquals('/das-blog/das-foo', $entryDe->uri());
@@ -522,7 +518,6 @@ class EntryTest extends TestCase
         $this->assertEquals('/das-blog/das-foo', $entryDe->urlWithoutRedirect());
         $this->assertEquals('http://domain.de/das-blog/das-foo', $entryDe->absoluteUrl());
         $this->assertEquals('http://domain.de/das-blog/das-foo', $entryDe->absoluteUrlWithoutRedirect());
-        $this->assertEquals('http://domain.de/amp/das-blog/das-foo', $entryDe->ampUrl());
         $this->assertNull($entryDe->redirectUrl());
 
         $this->assertEquals('/blog/redirected', $redirectEntry->uri());
@@ -530,7 +525,6 @@ class EntryTest extends TestCase
         $this->assertEquals('/blog/redirected', $redirectEntry->urlWithoutRedirect());
         $this->assertEquals('http://example.com/page', $redirectEntry->absoluteUrl());
         $this->assertEquals('http://domain.com/blog/redirected', $redirectEntry->absoluteUrlWithoutRedirect());
-        $this->assertNull($redirectEntry->ampUrl());
         $this->assertEquals('http://example.com/page', $redirectEntry->redirectUrl());
 
         $this->assertEquals('/blog/redirect-404', $redirect404Entry->uri());
@@ -538,7 +532,6 @@ class EntryTest extends TestCase
         $this->assertEquals('/blog/redirect-404', $redirect404Entry->urlWithoutRedirect());
         $this->assertEquals('http://domain.com/blog/redirect-404', $redirect404Entry->absoluteUrl());
         $this->assertEquals('http://domain.com/blog/redirect-404', $redirect404Entry->absoluteUrlWithoutRedirect());
-        $this->assertEquals('http://domain.com/amp/blog/redirect-404', $redirect404Entry->ampUrl());
         $this->assertEquals(404, $redirect404Entry->redirectUrl());
     }
 
@@ -1939,7 +1932,7 @@ class EntryTest extends TestCase
             'de' => ['url' => 'http://domain.de/', 'locale' => 'de_DE'],
         ]]);
 
-        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->ampable(true)->routes([
+        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',

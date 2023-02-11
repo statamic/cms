@@ -43,7 +43,6 @@ return [
     'collection_next_steps_create_entry_description' => 'Możesz utworzyć pierwszy rekord lub dodać kilka przykładowych, twój wybór.',
     'collection_next_steps_scaffold_description' => 'Wygeneruj szubko indeksy i widoki szczegółowe na podstawie nazwy kolekcji.',
     'collection_scaffold_instructions' => 'Wybierz które puste widoki wygenerować. Istniejące pliki nie zostaną nadpisane.',
-    'collections_amp_instructions' => 'Włącz  Accelerated Mobile Pages (AMP). Automatycznie dodaje ścieżki i URL dla rekordów w tej kolekcji. Dowiedz się więcej w [dokumentacji](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Rekordy w tej kolekcji mogą wykorzystywać dowolny z tych schematów.',
     'collections_default_publish_state_instructions' => 'Podczas tworzenia nowych rekordów w tej kolekcji publikowany przełącznik będzie domyślnie ustawiony na **true** zamiast **false** (wersja robocza).',
     'collections_future_date_behavior_instructions' => 'Jak powinny zachowywać się przyszłe rekordy z datą.',

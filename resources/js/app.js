@@ -5,7 +5,6 @@ import Alpine from 'alpinejs'
 import * as Globals from './bootstrap/globals'
 import { default as underscore } from 'underscore'
 import Cookies from 'cookies-js';
-import jQuery from 'jquery';
 import rangy from 'rangy';
 
 let global_functions = Object.keys(Globals)
@@ -20,12 +19,10 @@ window.Alpine = Alpine
 window.Vue = Vue;
 window.Statamic = Statamic;
 window._ = underscore;
-window.$ = window.jQuery = jQuery;
 window.rangy = rangy;
 
 import './bootstrap/polyfills';
 import './bootstrap/underscore-mixins';
-import './bootstrap/jquery-plugins';
 import './bootstrap/plugins';
 import './bootstrap/filters';
 import './bootstrap/mixins';

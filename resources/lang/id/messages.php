@@ -39,7 +39,6 @@ return [
     'collection_next_steps_documentation_description' => 'Pelajari lebih lanjut tentang koleksi, cara kerjanya, dan cara mengonfigurasinya.',
     'collection_next_steps_scaffold_description' => 'Buat cetak biru kosong dan tampilan frontend dengan cepat berdasarkan nama koleksi.',
     'collection_scaffold_instructions' => 'Pilih sumber daya kosong mana yang akan dibuat. File yang sudah ada tidak akan ditimpa.',
-    'collections_amp_instructions' => 'Aktifkan Accelerated Mobile Pages (AMP). Secara otomatis menambahkan rute dan URL untuk entri dalam koleksi ini. Pelajari lebih lanjut di [dokumentasi](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Entri dalam koleksi ini dapat menggunakan salah satu dari cetak biru ini.',
     'collections_default_publish_state_instructions' => 'Saat membuat entri baru dalam koleksi ini, tombol yang dipublikasikan akan secara default ke **benar** bukan **salah** (draf).',
     'collections_future_date_behavior_instructions' => 'Bagaimana entri bertanggal masa depan harus berperilaku.',

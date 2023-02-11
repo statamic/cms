@@ -90,7 +90,7 @@ class AugmentedPageTest extends AugmentedTestCase
             // entry blueprint
             'title', 'foo',
             // augmented entry keys
-            'amp_url', 'api_url', 'collection', 'blueprint', 'date', 'edit_url', 'id', 'origin_id', 'is_entry',
+            'api_url', 'collection', 'blueprint', 'date', 'edit_url', 'id', 'origin_id', 'is_entry',
             'last_modified', 'locale', 'mount', 'order', 'permalink', 'private',
             'published', 'slug', 'status', 'updated_at', 'updated_by', 'uri', 'url',
             // page blueprint

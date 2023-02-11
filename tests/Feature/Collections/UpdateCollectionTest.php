@@ -43,7 +43,6 @@ class UpdateCollectionTest extends TestCase
             ->layout('original-layout')
             ->defaultPublishState(true)
             ->sortDirection('asc')
-            ->ampable(false)
         )->save();
         $this->assertCount(1, Collection::all());
         $this->assertEquals('Original title', $collection->title());
@@ -54,7 +53,6 @@ class UpdateCollectionTest extends TestCase
         $this->assertEquals('original-layout', $collection->layout());
         $this->assertTrue($collection->defaultPublishState());
         $this->assertEquals('asc', $collection->sortDirection());
-        $this->assertFalse($collection->ampable());
 
         $this
             ->actingAs($this->userWithPermission())
@@ -67,7 +65,6 @@ class UpdateCollectionTest extends TestCase
                 'layout' => 'updated-layout',
                 'default_publish_state' => false,
                 'sort_direction' => 'desc',
-                'amp' => true,
             ])
             ->assertOk();
 
@@ -81,7 +78,6 @@ class UpdateCollectionTest extends TestCase
         $this->assertEquals('updated-layout', $updated->layout());
         $this->assertFalse($updated->defaultPublishState());
         $this->assertEquals('desc', $updated->sortDirection());
-        $this->assertTrue($updated->ampable());
         // structure
     }
 

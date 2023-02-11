@@ -7,6 +7,8 @@
                 </template>
                 <template slot="actions" slot-scope="{ row: collection, index }">
                     <dropdown-list>
+                        <dropdown-item :text="__('View')" :redirect="collection.entries_url" />
+                        <dropdown-item v-if="collection.url" :text="__('Visit URL')" :external-link="collection.url"  />
                         <dropdown-item v-if="collection.editable" :text="__('Edit Collection')" :redirect="collection.edit_url" />
                         <dropdown-item v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" :redirect="collection.blueprints_url" />
                         <dropdown-item v-if="collection.editable" :text="__('Scaffold Views')" :redirect="collection.scaffold_url" />

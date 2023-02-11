@@ -34,7 +34,13 @@ class ServiceProvider extends LaravelServiceProvider
         });
 
         $this->app->singleton(Session::class, function ($app) {
-            return new Session($app['request']->getUri());
+            $uri = $app['request']->getUri();
+
+            if (config('statamic.static_caching.ignore_query_strings', false)) {
+                $uri = explode('?', $uri)[0];
+            }
+
+            return new Session($uri);
         });
 
         $this->app->bind(UrlExcluder::class, function ($app) {

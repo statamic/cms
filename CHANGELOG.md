@@ -1,5 +1,33 @@
 # Release Notes
 
+## 3.4.3 (2023-02-08)
+
+### What's new
+- Contextual keyword snippets for `local` search driver. [#7144](https://github.com/statamic/cms/issues/7144) by @jacksleight
+- Support adding computed values to multiple collections at once. [#7165](https://github.com/statamic/cms/issues/7165) by @jacksleight
+- Custom Bard button active and visible callbacks. [#7479](https://github.com/statamic/cms/issues/7479) by @jacksleight
+
+### What's improved
+- Antlers logs will include the file and line numbers. [#7438](https://github.com/statamic/cms/issues/7438) by @JohnathonKoster
+- Add view and visit url options to collection listing dropdowns. [#7469](https://github.com/statamic/cms/issues/7469) by @arthurperton
+- Cache result of schema call to avoid duplication. [#7466](https://github.com/statamic/cms/issues/7466) by @ryanmitchell
+- Norwegian translations. [#7472](https://github.com/statamic/cms/issues/7472) by @espenlg
+- French translations. [#7463](https://github.com/statamic/cms/issues/7463) by @ebeauchamps
+
+### What's fixed
+- Fix `nocache` tag when using URLs with multiple query parameters. [#7486](https://github.com/statamic/cms/issues/7486) by @arthurperton
+- Fix `nocache` tag behavior when using the `ignore_query_string` setting. [#7488](https://github.com/statamic/cms/issues/7488) by @arthurperton
+- Fix `orWhereJsonLength()` method in the query builders. [#7462](https://github.com/statamic/cms/issues/7462) by @arthurperton
+- Fix bard toolbar button active states. [#7470](https://github.com/statamic/cms/issues/7470) by @jacksleight
+- Fix queue worker state issues around assets and stache indexes. [#7467](https://github.com/statamic/cms/issues/7467) by @jesseleite
+- Fix underline in Bard not outputting any HTML tags. [#7494](https://github.com/statamic/cms/issues/7494) by @mauricewijnia
+- Fix Bard and Replicator dropdown positioning when in secondary sections. [#7478](https://github.com/statamic/cms/issues/7478) by @arthurperton
+- Fix a few search issues. [#7481](https://github.com/statamic/cms/issues/7481) by @jasonvarga
+- Fix warning when a search index is empty. [#7492](https://github.com/statamic/cms/issues/7492) by @simonworkhouse
+- Workaround for GitHub Actions network issue. [#7482](https://github.com/statamic/cms/issues/7482) by @jasonvarga
+
+
+
 ## 3.4.2 (2023-02-02)
 
 ### What's improved

@@ -24,7 +24,6 @@ export default defineConfig(({ mode }) => {
             svgLoader(),
             inject({
                 Vue: 'vue',
-                jQuery: 'jquery',
                 _: 'underscore',
                 include: 'resources/js/**'
             })

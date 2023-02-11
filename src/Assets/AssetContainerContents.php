@@ -2,7 +2,9 @@
 
 namespace Statamic\Assets;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use League\Flysystem\DirectoryListing;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
@@ -19,6 +21,11 @@ class AssetContainerContents
         $this->container = $container;
     }
 
+    /**
+     * Get all asset container contents.
+     *
+     * @return Collection
+     */
     public function all()
     {
         if ($this->files && ! Statamic::isWorker()) {
@@ -26,62 +33,40 @@ class AssetContainerContents
         }
 
         return $this->files = Cache::remember($this->key(), $this->ttl(), function () {
-            // Use Flysystem directly because it gives us type, timestamps, dirname
-            // and will let us perform more efficient filtering and caching.
-            $files = $this->filesystem()->listContents('/', true);
-
-            if (! is_array($files)) {
-                // Flysystem v3 is a DirectoryListing class, not an array.
-                $files = collect($files->toArray())->keyBy('path')->map(function ($file) {
-                    return $this->normalizeFlysystemAttributes($file);
-                });
-            } else {
-                // Flysystem 1.x is an array.
-                $files = collect($files)->keyBy('path');
-            }
-
-            $files
-                ->filter(fn ($item) => $item['type'] === 'file')
-                ->each(function ($file) use ($files) {
-                    $dirname = $file['dirname'];
-
-                    while ($dirname !== '') {
-                        $parentDir = pathinfo($dirname, PATHINFO_DIRNAME);
-                        $parentDir = $parentDir === '.' ? '' : $parentDir;
-
-                        $files->put($dirname, [
-                            'type' => 'dir',
-                            'path' => $dirname,
-                            'basename' => $basename = pathinfo($dirname, PATHINFO_BASENAME),
-                            'filename' => $basename,
-                            'timestamp' => null,
-                            'dirname' => $parentDir,
-                        ]);
-
-                        $dirname = $parentDir;
-                    }
-                });
-
-            return $files->sortKeys();
+            return collect($this->getRawFlysystemDirectoryListing())
+                ->keyBy('path')
+                ->map(fn ($file) => $this->normalizeFlysystemAttributes($file))
+                ->pipe(fn ($files) => $this->ensureMissingDirectoriesExist($files))
+                ->sortKeys();
         });
     }
 
     /**
-     * Normalize flysystem 3.x `FileAttributes` and `DirectoryAttributes` payloads back to the 1.x array style.
+     * Flysystem's `DirectoryListing` gives us type, timestamps, dirname, and will allow us perform more efficient filtering, caching, etc.
+     *
+     * @return DirectoryListing
+     */
+    private function getRawFlysystemDirectoryListing(): DirectoryListing
+    {
+        return $this->filesystem()->listContents('/', true);
+    }
+
+    /**
+     * Normalize `FileAttributes` and `DirectoryAttributes` payloads to the legacy Statamic array style.
      *
      * @param  mixed  $attributes
      * @return array
      */
     private function normalizeFlysystemAttributes($attributes)
     {
-        // Merge attributes with `pathinfo()`, since Flysystem 3.x removed `Util::pathinfo()`.
+        // Merge attributes with `pathinfo()`.
         $normalized = array_merge([
             'type' => $attributes->type(),
             'path' => $attributes->path(),
             'timestamp' => $attributes->lastModified(),
         ], pathinfo($attributes['path']));
 
-        // Flysystem 1.x never returned `.` dirnames.
+        // Flysystem 3+ now returns `.` dirnames, but the rest of our system expects an empty string.
         if (isset($normalized['dirname']) && $normalized['dirname'] === '.') {
             $normalized['dirname'] = '';
         }
@@ -95,22 +80,53 @@ class AssetContainerContents
     }
 
     /**
-     * Normalize flysystem 3.x meta data to match 1.x payloads.
+     * Ensure missing directories exist.
+     *
+     * Note: S3 doesn't always return directories as part of the listings, so
+     * this method ensures we get consistent results with S3 filesystems.
+     * For more info, see: https://github.com/statamic/cms/pull/7205
+     *
+     * @param  Collection  $files
+     * @return Collection
+     */
+    private function ensureMissingDirectoriesExist(Collection $files): Collection
+    {
+        $files
+            ->filter(fn ($item) => $item['type'] === 'file')
+            ->each(function ($file) use ($files) {
+                $dirname = $file['dirname'];
+
+                while ($dirname !== '') {
+                    $parentDir = pathinfo($dirname, PATHINFO_DIRNAME);
+                    $parentDir = $parentDir === '.' ? '' : $parentDir;
+
+                    $files->put($dirname, [
+                        'type' => 'dir',
+                        'path' => $dirname,
+                        'basename' => $basename = pathinfo($dirname, PATHINFO_BASENAME),
+                        'filename' => $basename,
+                        'timestamp' => null,
+                        'dirname' => $parentDir,
+                    ]);
+
+                    $dirname = $parentDir;
+                }
+            });
+
+        return $files;
+    }
+
+    /**
+     * Get normalized flysystem meta data.
      *
      * @param  string  $path
      * @return array
      */
     private function getNormalizedFlysystemMetadata($path)
     {
-        $isFlysystemV1 = method_exists($this->filesystem(), 'getTimestamp');
-
-        // Determine whether or not to use Flysystem 1.x or 3.x getter methods.
-        $lastModifiedMethod = $isFlysystemV1 ? 'getTimestamp' : 'lastModified';
-        $fileSizeMethod = $isFlysystemV1 ? 'getSize' : 'fileSize';
-
         // Use exception handling to avoid another `has()` API method call if possible.
         try {
-            $timestamp = $this->filesystem()->{$lastModifiedMethod}($path);
+            $timestamp = $this->filesystem()->lastModified($path);
         } catch (\Exception $exception) {
             $timestamp = null;
         }
@@ -124,7 +140,7 @@ class AssetContainerContents
 
         // Use exception handling to normalize file size output.
         try {
-            $size = $this->filesystem()->{$fileSizeMethod}($path);
+            $size = $this->filesystem()->fileSize($path);
         } catch (\Exception $exception) {
             $size = false;
         }
@@ -132,10 +148,10 @@ class AssetContainerContents
         // Determine `type` off returned size to avoid another API method call.
         $type = $size === false ? 'dir' : 'file';
 
-        // Merge `pathinfo()` in, since Flysystem 3.x removed `Util::pathinfo()`.
+        // Merge attributes with `pathinfo()`.
         $normalized = array_merge(compact('type', 'path', 'timestamp'), pathinfo($path));
 
-        // Flysystem 1.x never returned `.` dirnames.
+        // Flysystem 3+ now returns `.` dirnames, but the rest of our system expects an empty string.
         if (isset($normalized['dirname']) && $normalized['dirname'] === '.') {
             $normalized['dirname'] = '';
         }

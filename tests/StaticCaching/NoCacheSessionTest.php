@@ -140,12 +140,25 @@ class NoCacheSessionTest extends TestCase
     /** @test */
     public function a_singleton_is_bound_in_the_container()
     {
+        $this->get('/test?foo=bar&bar=baz');
+
+        $session = $this->app->make(Session::class);
+
+        $this->assertInstanceOf(Session::class, $session);
+        $this->assertEquals('http://localhost/test?bar=baz&foo=bar', $session->url());
+    }
+
+    /** @test */
+    public function it_ignores_the_query_string()
+    {
+        config(['statamic.static_caching.ignore_query_strings' => true]);
+
         $this->get('/test?foo=bar');
 
         $session = $this->app->make(Session::class);
 
         $this->assertInstanceOf(Session::class, $session);
-        $this->assertEquals('http://localhost/test?foo=bar', $session->url());
+        $this->assertEquals('http://localhost/test', $session->url());
     }
 
     /** @test */

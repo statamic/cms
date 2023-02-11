@@ -43,7 +43,6 @@ return [
     'collection_next_steps_blueprints_description' => '管理此集合可用的蓝图和字段。',
     'collection_next_steps_scaffold_description' => '根据集合名称快速生成索引和详细视图。',
     'collection_scaffold_instructions' => '选择要生成的空白资源。现有文件不会被覆盖。',
-    'collections_amp_instructions' => '启用加速移动页面 (AMP)。 自动为此集合中的条目添加路由和 URL。 在 [文档](https://statamic.dev/amp) 中了解更多信息',
     'collections_blueprint_instructions' => '此集合中的条目可以使用任何这些蓝图。',
     'collections_default_publish_state_instructions' => '默认情况下是否应发布在控制面板中创建的新条目。',
     'collections_future_date_behavior_instructions' => '将来标有日期的条目的行为方式。',

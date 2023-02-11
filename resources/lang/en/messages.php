@@ -54,7 +54,6 @@ return [
     'collection_next_steps_scaffold_description' => 'Quickly generate index and detail views from the name of the collection.',
     'collection_revisions_instructions' => 'Enable revisions for this Collection.',
     'collection_scaffold_instructions' => 'Choose which empty views to generate. Existing files will not be overwritten.',
-    'collections_amp_instructions' => 'Enable Accelerated Mobile Pages (AMP). Automatically adds routes and URL for entries in this collection. Learn more in the [documentation](https://statamic.dev/amp)',
     'collections_blueprint_instructions' => 'Entries in this collection may use any of these blueprints.',
     'collections_default_publish_state_instructions' => 'While creating new entries in this collection the published toggle will default to **true** instead of **false** (draft).',
     'collections_future_date_behavior_instructions' => 'How future dated entries should behave.',

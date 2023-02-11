@@ -697,6 +697,20 @@ class NodeProcessor
         return $bufferContent;
     }
 
+    private function getErrorLogContext(AntlersNode $node)
+    {
+        $line = null;
+
+        if ($node->startPosition != null) {
+            $line = $node->startPosition->line;
+        }
+
+        return [
+            'line' => $line,
+            'file' => GlobalRuntimeState::$currentExecutionFile,
+        ];
+    }
+
     /**
      * Tests if the provided node is internally treated like a tag.
      *
@@ -732,13 +746,13 @@ class NodeProcessor
         if ($node->isClosedBy != null && $this->isLoopable($value) == false) {
             if (! $this->isInternalTagLike($node)) {
                 $varName = $node->name->getContent();
-                Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}");
+                Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}", $this->getErrorLogContext($node));
             }
 
             return false;
         } elseif ($this->isInterpolationProcessor == false && $this->isLoopable($value) && $node->isClosedBy == null) {
             $varName = $node->name->getContent();
-            Log::debug("Cannot render an array variable as a string: {{ {$varName} }}");
+            Log::debug("Cannot render an array variable as a string: {{ {$varName} }}", $this->getErrorLogContext($node));
 
             return false;
         } elseif (is_object($value) && $node->isClosedBy == null) {
@@ -760,7 +774,7 @@ class NodeProcessor
                 );
             }
 
-            Log::debug("Cannot render an object variable as a string: {{ {$varName} }}");
+            Log::debug("Cannot render an object variable as a string: {{ {$varName} }}", $this->getErrorLogContext($node));
 
             return false;
         }
@@ -1557,7 +1571,7 @@ class NodeProcessor
 
                         if (is_object($output)) {
                             if ($output instanceof Collection) {
-                                $output = $output->all();
+                                $output = RuntimeValues::resolveWithRuntimeIsolation($output);
                             }
 
                             $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);

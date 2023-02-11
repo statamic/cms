@@ -33,6 +33,7 @@ class CollectionsController extends CpController
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
+                'url' => $collection->absoluteUrl(Site::selected()->handle()),
                 'blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
                 'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
                 'deleteable' => User::current()->can('delete', $collection),
@@ -153,7 +154,6 @@ class CollectionsController extends CpController
             'default_publish_state' => $collection->defaultPublishState(),
             'template' => $collection->template(),
             'layout' => $collection->layout(),
-            'amp' => $collection->ampable(),
             'sites' => $collection->sites()->all(),
             'propagate' => $collection->propagate(),
             'routes' => $collection->routes()->unique()->count() === 1
@@ -232,7 +232,6 @@ class CollectionsController extends CpController
             ->layout($values['layout'])
             ->defaultPublishState($values['default_publish_state'])
             ->sortDirection($values['sort_direction'])
-            ->ampable($values['amp'])
             ->mount($values['mount'] ?? null)
             ->revisions($values['revisions'] ?? false)
             ->taxonomies($values['taxonomies'] ?? [])
@@ -516,11 +515,6 @@ class CollectionsController extends CpController
                         'collections' => Collection::all()->map->handle()->reject(function ($collectionHandle) use ($collection) {
                             return $collectionHandle === $collection->handle();
                         })->values()->all(),
-                    ],
-                    'amp' => [
-                        'display' => __('Enable AMP'),
-                        'instructions' => __('statamic::messages.collections_amp_instructions'),
-                        'type' => 'toggle',
                     ],
                     'preview_targets' => [
                         'display' => __('Preview Targets'),

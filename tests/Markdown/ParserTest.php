@@ -8,27 +8,12 @@ use Tests\TestCase;
 class ParserTest extends TestCase
 {
     private $parser;
-    private $smileyExtension;
-    private $frownyExtension;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        if ($this->isLegacyCommonmark()) {
-            $this->parser = new Markdown\LegacyParser;
-            $this->smileyExtension = Fixtures\Legacy\SmileyExtension::class;
-            $this->frownyExtension = Fixtures\Legacy\FrownyExtension::class;
-        } else {
-            $this->parser = new Markdown\Parser;
-            $this->smileyExtension = Fixtures\SmileyExtension::class;
-            $this->frownyExtension = Fixtures\FrownyExtension::class;
-        }
-    }
-
-    public function isLegacyCommonmark()
-    {
-        return class_exists('League\CommonMark\Inline\Element\Text');
+        $this->parser = new Markdown\Parser;
     }
 
     /** @test */
@@ -43,7 +28,7 @@ class ParserTest extends TestCase
         $this->assertEquals("<p>smile :)</p>\n", $this->parser->parse('smile :)'));
 
         $this->parser->addExtension(function () {
-            return new $this->smileyExtension;
+            return new Fixtures\SmileyExtension;
         });
 
         $this->assertEquals("<p>smile 😀</p>\n", $this->parser->parse('smile :)'));
@@ -55,7 +40,7 @@ class ParserTest extends TestCase
         $this->assertEquals("<p>smile :) frown :(</p>\n", $this->parser->parse('smile :) frown :('));
 
         $this->parser->addExtensions(function () {
-            return [new $this->smileyExtension, new $this->frownyExtension];
+            return [new Fixtures\SmileyExtension, new Fixtures\FrownyExtension];
         });
 
         $this->assertEquals("<p>smile 😀 frown 🙁</p>\n", $this->parser->parse('smile :) frown :('));
@@ -65,7 +50,7 @@ class ParserTest extends TestCase
     public function it_creates_a_new_instance_based_on_the_current_instance()
     {
         $this->parser->addExtension(function () {
-            return new $this->smileyExtension;
+            return new Fixtures\SmileyExtension;
         });
 
         $this->assertEquals("\n", $this->parser->config('renderer/block_separator'));
@@ -82,7 +67,7 @@ class ParserTest extends TestCase
         ]);
 
         $newParser->addExtension(function () {
-            return new $this->frownyExtension;
+            return new Fixtures\FrownyExtension;
         });
 
         $this->assertNotSame($this->parser, $newParser);
