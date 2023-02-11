@@ -178,7 +178,7 @@
 
 .asset-tile.selected {
     @apply border-blue;
-    box-shadow: 0 0 0 1px theme('colors.blue');
+    box-shadow: 0 0 0 1px theme('colors.blue.DEFAULT');
 
 }
 

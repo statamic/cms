@@ -34,7 +34,7 @@
   ========================================================================== */
 
 .focus-outline {
-    @apply border-blue-light;
+    @apply border-blue-300;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0,125,255,.25);
 }
@@ -48,7 +48,7 @@
 .selected-outline {
     @apply border-blue;
     outline: 0;
-    box-shadow: 0 0 0 2px theme('colors.blue');
+    box-shadow: 0 0 0 2px theme('colors.blue.DEFAULT');
 }
 
 .ease-quick {

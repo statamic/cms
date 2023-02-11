@@ -10,7 +10,7 @@ svg {
 }
 
 .heroicon-component-accent {
-    fill: theme('colors.blue');
+    fill: theme('colors.blue.DEFAULT');
 }
 
 [class^="icon"] {

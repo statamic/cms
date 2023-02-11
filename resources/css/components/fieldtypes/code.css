@@ -11,7 +11,7 @@
             background: none;
             border: none;
             &:focus {
-                @apply outline-none shadow-none text-blue-light;
+                @apply outline-none shadow-none text-blue-300;
             }
         }
         select:hover:not(:disabled) {

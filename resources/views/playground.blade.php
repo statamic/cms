@@ -166,6 +166,7 @@
             <div class="text-black bg-blue-200 p-4 flex-1">200</div>
             <div class="text-black bg-blue-300 p-4 flex-1">300</div>
             <div class="text-black bg-blue-400 p-4 flex-1">400</div>
+            <div class="text-black bg-blue p-4 flex-1">def</div>
             <div class="text-black bg-blue-500 p-4 flex-1">500</div>
             <div class="text-black bg-blue-600 p-4 flex-1">600</div>
             <div class="text-black bg-blue-700 p-4 flex-1">700</div>
@@ -206,10 +207,11 @@
             <div class="text-black bg-blue p-6 flex-1">Blue</div>
             <div class="text-black bg-green p-6 flex-1">Green</div>
             <div class="text-black bg-red p-6 flex-1">Red</div>
-            <div class="text-black bg-yellow p-6 flex-1">Yellow</div>
-            <div class="text-black bg-yellow-dark p-6 flex-1">Yellow Dark</div>
-            <div class="text-black bg-pink p-6 flex-1">Pink</div>
-            <div class="text-black bg-purple p-6 flex-1">Purple</div>
+            <div class="text-black bg-orange-light border border-orange p-6 m-1 flex-1">Orange</div>
+            <div class="text-black bg-yellow border border-yellow-dark p-6 m-1 flex-1">Yellow</div>
+            <div class="text-black bg-yellow-dark p-6 m-1 flex-1">Yellow Dark</div>
+            <div class="text-black bg-pink border border-pink-dark m-1 p-6 flex-1">Pink</div>
+            <div class="text-black bg-purple-light border border-purple p-6 flex-1">Purple</div>
         </div>
     </div>
 

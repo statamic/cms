@@ -8,7 +8,7 @@
             class="mr-2 group"
         >
             <span v-if="index !== 0" class="px-1 mr-1 text-gray-700">></span>
-            <span class="icon icon-folder mr-1 text-blue-lighter group-hover:text-blue" />
+            <span class="icon icon-folder mr-1 text-blue-400 group-hover:text-blue" />
             <span class="text-gray-700 group-hover:text-gray-800">{{ part }}</span>
         </a>
     </div>

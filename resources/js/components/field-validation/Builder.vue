@@ -30,7 +30,7 @@
                     <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
                     <span v-if="helpBlock" class="italic text-gray-500 float-right">
                         {{ __('Example') }}:
-                        <span class="italic text-blue-lighter">{{ helpBlock }}</span>
+                        <span class="italic text-blue-400">{{ helpBlock }}</span>
                     </span>
                 </p>
             </div>

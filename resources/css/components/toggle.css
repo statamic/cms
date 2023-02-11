@@ -63,7 +63,7 @@
 }
 
 .toggle-knob:hover {
-    box-shadow: 0 1px 3px rgba(theme('colors.blue'), .9);
+    box-shadow: 0 1px 3px rgba(theme('colors.blue.DEFAULT'), .9);
 }
 
 .toggle-container.on {

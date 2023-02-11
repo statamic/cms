@@ -104,7 +104,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
                                             <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-2 inline-block text-blue-lighter group-hover:text-blue" />
+                                                <file-icon extension="folder" class="w-8 h-8 mr-2 inline-block text-blue-400 group-hover:text-blue" />
                                                 ..
                                             </a>
                                         </td>
@@ -114,7 +114,7 @@
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-2 inline-block text-blue-lighter group-hover:text-blue" />
+                                                <file-icon extension="folder" class="w-8 h-8 mr-2 inline-block text-blue-400 group-hover:text-blue" />
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
@@ -180,7 +180,7 @@
                                         <div class="asset-thumb-container">
                                             <button @click="selectFolder(folder.parent_path)">
                                                 <div class="asset-thumb">
-                                                    <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue" />
+                                                    <file-icon extension="folder" class="w-full h-full text-blue-400 hover:text-blue" />
                                                 </div>
                                             </button>
                                         </div>
@@ -193,7 +193,7 @@
                                         <div class="asset-thumb-container">
                                             <button @click="selectFolder(folder.path)">
                                                 <div class="asset-thumb">
-                                                    <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue" />
+                                                    <file-icon extension="folder" class="w-full h-full text-blue-400 hover:text-blue" />
                                                 </div>
                                             </button>
                                         </div>
