@@ -2,16 +2,12 @@
    BASE FORM ELEMENTS
    ========================================================================== */
 
-/*  TODO: Figure out where this is used. What even is it? */
-form {
-    ul, li {
-        list-style: none;
-        padding: 3px 0;
-    }
-}
-
 label {
     @apply text-gray-800 font-normal text-sm block leading-normal;
+}
+
+input {
+    @apply placeholder:text-gray-600;
 }
 
 input[type="checkbox"] {

@@ -48,7 +48,7 @@
         @apply ml-2 flex items-center h-full;
 
         button {
-            @apply mr-4 text-gray-500 outline-none h-full;
+            @apply mr-4 text-gray-600 outline-none h-full;
             padding: 6px 4px;
 
             &:hover {
