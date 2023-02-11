@@ -34,15 +34,15 @@ svg {
     flex-shrink: 0;
 
     &.published { @apply bg-green-light }
-    &.draft, &.expired { @apply bg-grey-600 }
-    &.scheduled, &.hollow { @apply bg-transparent border border-grey-600 }
+    &.draft, &.expired { @apply bg-gray-600 }
+    &.scheduled, &.hollow { @apply bg-transparent border border-gray-600 }
 }
 
 icon-status-draft {
-	@apply bg-grey-700;
+	@apply bg-gray-700;
 }
 .icon-status-hidden {
-    @apply border border-grey-700;
+    @apply border border-gray-700;
 }
 .icon-status-live {
 	@apply bg-green;

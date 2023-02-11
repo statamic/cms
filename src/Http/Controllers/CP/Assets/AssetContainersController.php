@@ -224,7 +224,7 @@ class AssetContainersController extends CpController
                         'html' => $container ? ''.
                             '<div class="text-xs">'.
                             '   <a href="'.cp_route('asset-containers.blueprint.edit', $container->handle()).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>' : '<div class="text-xs text-grey">'.__('Editable once created').'</div>',
+                            '</div>' : '<div class="text-xs text-gray">'.__('Editable once created').'</div>',
                     ],
                 ],
             ];
@@ -314,7 +314,7 @@ class AssetContainersController extends CpController
 
     private function expandedGlidePresetLabel($handle, $params)
     {
-        $separator = '<span class="hidden-outside text-grey-500">-</span>';
+        $separator = '<span class="hidden-outside text-gray-500">-</span>';
 
         $params = collect($params)
             ->map(function ($value, $param) {

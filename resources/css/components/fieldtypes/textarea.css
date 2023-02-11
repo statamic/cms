@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .textarea-fieldtype textarea {
-    @apply border-grey-500;
+    @apply border-gray-500;
     min-height: 80px;
 }
 

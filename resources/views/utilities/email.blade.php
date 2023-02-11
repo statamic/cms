@@ -26,7 +26,7 @@
     </div>
 
     <h2 class="mt-10 mb-2 font-bold text-lg">{{ __('Configuration') }}</h2>
-    <p class="text-sm text-grey mb-4">{!! __('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) !!}</p>
+    <p class="text-sm text-gray mb-4">{!! __('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) !!}</p>
     <div class="card p-0">
         <table class="data-table">
             @if (config('mail.mailers'))

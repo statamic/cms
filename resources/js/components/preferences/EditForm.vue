@@ -33,7 +33,7 @@
                         <h6 class="p-2">{{ __('Save to') }}...</h6>
                         <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)">
                             <div class="flex items-start pr-4">
-                                <svg-icon :name="option.icon" class="text-grey shrink-0 mr-2 w-4 group-hover:text-white" />
+                                <svg-icon :name="option.icon" class="text-gray shrink-0 mr-2 w-4 group-hover:text-white" />
                                 <span class="whitespace-normal">{{ option.label }}</span>
                             </div>
                         </dropdown-item>

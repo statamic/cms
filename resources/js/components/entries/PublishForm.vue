@@ -15,7 +15,7 @@
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
             </dropdown-list>
 
-            <div class="pt-px text-2xs text-grey-600 flex mr-4" v-if="readOnly">
+            <div class="pt-px text-2xs text-gray-600 flex mr-4" v-if="readOnly">
                 <svg-icon name="lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
             </div>
 
@@ -158,13 +158,13 @@
                                         v-for="option in localizations"
                                         :key="option.handle"
                                         class="text-sm flex items-center -mx-4 px-4 py-2 cursor-pointer"
-                                        :class="option.active ? 'bg-blue-100' : 'hover:bg-grey-200'"
+                                        :class="option.active ? 'bg-blue-100' : 'hover:bg-gray-200'"
                                         @click="localizationSelected(option)"
                                     >
                                         <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
                                             <span class="little-dot mr-2" :class="{
                                                 'bg-green': option.published,
-                                                'bg-grey-500': !option.published,
+                                                'bg-gray-500': !option.published,
                                                 'bg-red': !option.exists
                                             }" />
                                             {{ option.name }}

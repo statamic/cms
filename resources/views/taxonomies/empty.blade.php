@@ -13,8 +13,8 @@
 
 <div class="card p-4 content">
     <div class="flex flex-wrap">
-        <a href="{{ cp_route('taxonomies.edit', $taxonomy->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-200 rounded-md group">
-            <div class="h-8 w-8 mr-4 text-grey-800">
+        <a href="{{ cp_route('taxonomies.edit', $taxonomy->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
+            <div class="h-8 w-8 mr-4 text-gray-800">
                 @cp_svg('hammer-wrench')
             </div>
             <div class="flex-1 mb-4 md:mb-0 md:mr-6">
@@ -22,8 +22,8 @@
                 <p>{{ __('statamic::messages.taxonomy_next_steps_configure_description') }}</p>
             </div>
         </a>
-        <a href="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-200 rounded-md group">
-            <div class="h-8 w-8 mr-4 text-grey-800">
+        <a href="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
+            <div class="h-8 w-8 mr-4 text-gray-800">
                 @cp_svg('content-writing')
             </div>
             <div class="flex-1 mb-4 md:mb-0 md:mr-6">
@@ -31,8 +31,8 @@
                 <p>{{ __('statamic::messages.taxonomy_next_steps_create_term_description') }}</p>
             </div>
         </a>
-        <a href="{{ Statamic::docsUrl('taxonomies') }}" target="_blank" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-grey-200 rounded-md group">
-            <div class="h-8 w-8 mr-4 text-grey-800">
+        <a href="{{ Statamic::docsUrl('taxonomies') }}" target="_blank" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
+            <div class="h-8 w-8 mr-4 text-gray-800">
                 @cp_svg('book-pages')
             </div>
             <div class="flex-1 mb-4 md:mb-0 md:mr-6">

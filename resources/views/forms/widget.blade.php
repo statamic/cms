@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center p-4">
         <h2>
             <a class="flex items-center" href="{{ $form->showUrl() }}">
-                <div class="h-6 w-6 mr-2 text-grey-800">
+                <div class="h-6 w-6 mr-2 text-gray-800">
                     @cp_svg('drawer-file')
                 </div>
                 <span>{{ $title }}</span>

@@ -33,11 +33,11 @@
                         @click="openSelector"
                         @keyup.space.enter="openSelector"
                         tabindex="0">
-                        <svg-icon name="folder-image" class="w-6 h-6 text-grey-800"></svg-icon>
+                        <svg-icon name="folder-image" class="w-6 h-6 text-gray-800"></svg-icon>
                         {{ __('Browse') }}
                     </button>
 
-                    <p class="asset-upload-control text-xs text-grey-600" v-if="config.allow_uploads">
+                    <p class="asset-upload-control text-xs text-gray-600" v-if="config.allow_uploads">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>

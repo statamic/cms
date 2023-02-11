@@ -42,12 +42,12 @@
 }
 
 .rotating-dots-button {
-    @apply  text-grey-700 rounded-full flex items-center justify-center;
+    @apply  text-gray-700 rounded-full flex items-center justify-center;
     height: 24px;
     width: 24px;
 
     &:hover {
-        @apply text-grey-950;
+        @apply text-gray-950;
     }
 
     &:focus {

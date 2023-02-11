@@ -36,7 +36,7 @@
 }
 
 code.parent-url {
-    @apply block text-3xs bg-none text-grey-700;
+    @apply block text-3xs bg-none text-gray-700;
     padding: 0 0 3px 0;
 }
 

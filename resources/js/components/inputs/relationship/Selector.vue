@@ -19,7 +19,7 @@
             @selections-updated="selectionsUpdated"
         >
             <div slot-scope="{}" class="flex flex-col h-full">
-                <div class="bg-white border-b flex items-center justify-between bg-grey-200">
+                <div class="bg-white border-b flex items-center justify-between bg-gray-200">
                     <div class="p-4 flex flex-1 items-center">
                         <data-list-filters
                             ref="filters"
@@ -65,8 +65,8 @@
                             :inline="true"
                             @page-selected="setPage" />
 
-                        <div class="p-4 border-t flex items-center justify-between bg-grey-200">
-                            <div class="text-sm text-grey-700"
+                        <div class="p-4 border-t flex items-center justify-between bg-gray-200">
+                            <div class="text-sm text-gray-700"
                                 v-text="hasMaxSelections
                                     ? __n(':count/:max selected', selections, { max: maxSelections })
                                     : __n(':count item selected|:count items selected', selections)" />
@@ -269,11 +269,11 @@ export default {
 
         getStatusClass(entry) {
             if (entry.published && entry.private) {
-                return 'bg-transparent border border-grey-600';
+                return 'bg-transparent border border-gray-600';
             } else if (entry.published) {
                 return 'bg-green';
             } else {
-                return 'bg-grey-400';
+                return 'bg-gray-400';
             }
         }
 

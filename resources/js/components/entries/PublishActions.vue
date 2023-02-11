@@ -3,7 +3,7 @@
     <stack narrow name="publish-options" @closed="$emit('closed')">
         <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
-            <div class="bg-grey-200 px-6 py-2 border-b border-grey-300 text-lg font-medium flex items-center justify-between">
+            <div class="bg-gray-200 px-6 py-2 border-b border-gray-300 text-lg font-medium flex items-center justify-between">
                 {{ __('Publish') }}
                 <button
                     type="button"
@@ -45,14 +45,14 @@
                         @click="submit"
                     />
 
-                    <div class="text-grey text-xs flex mb-6">
+                    <div class="text-gray text-xs flex mb-6">
                         <div class="pt-px w-4 mr-2">
                             <svg-icon name="info-circle" class="pt-px" />
                         </div>
                         <div class="flex-1" v-text="actionInfoText" />
                     </div>
 
-                    <div class="text-grey text-xs flex mb-6 text-red" v-if="action === 'schedule'">
+                    <div class="text-gray text-xs flex mb-6 text-red" v-if="action === 'schedule'">
                         <div class="pt-px w-4 mr-2">
                             <svg-icon name="info-circle" class="pt-px" />
                         </div>

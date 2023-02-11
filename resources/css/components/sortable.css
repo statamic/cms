@@ -22,7 +22,7 @@ table .ui-sortable-helper {
 
 tbody.ui-sortable {
 	> tr > .cell-counter > .move {
-        @apply hidden relative text-grey-700 text-md;
+        @apply hidden relative text-gray-700 text-md;
 		top: 2px;
 	}
 

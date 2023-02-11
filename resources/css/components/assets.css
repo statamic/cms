@@ -31,7 +31,7 @@
 
 .drag-notification {
     @apply text-lg absolute inset-0 text-center rounded flex items-center justify-center;
-    border: 1px dashed theme('colors.grey.600');
+    border: 1px dashed theme('colors.gray.600');
     pointer-events: none;
     z-index: 1049;
     background: rgba(white, .9);
@@ -158,7 +158,7 @@
     }
 
     .asset-meta {
-        @apply border-t w-full text-2xs text-grey-700;
+        @apply border-t w-full text-2xs text-gray-700;
     }
 
     .asset-filename {
@@ -239,11 +239,11 @@
     }
 
     .meta-label {
-		@apply block p-0 text-sm text-grey-800;
+		@apply block p-0 text-sm text-gray-800;
     }
 
 	.meta-value {
-		@apply block p-0 text-xs text-grey-600;
+		@apply block p-0 text-xs text-gray-600;
     }
 }
 
@@ -268,7 +268,7 @@
 }
 
 .asset-editor .editor-preview {
-	@apply bg-grey-800 flex flex-col justify-between;
+	@apply bg-gray-800 flex flex-col justify-between;
 
     .editor-preview-image {
         flex: 1;
@@ -291,7 +291,7 @@
     }
 
     .editor-file-actions {
-		@apply bg-grey-900 p-4 text-center h-16;
+		@apply bg-gray-900 p-4 text-center h-16;
 
         button {
             @apply mx-1;

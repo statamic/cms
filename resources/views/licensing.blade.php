@@ -14,7 +14,7 @@
             <div class="flex flex-wrap items-center">
                 <div class="w-full md:w-1/2">
                     <h1 class="mb-8">{{ __('Licensing') }}</h1>
-                    <p class="text-grey-700 leading-normal mb-8 text-lg antialiased">
+                    <p class="text-gray-700 leading-normal mb-8 text-lg antialiased">
                         {{ __('statamic::messages.outpost_issue_try_later') }}
                     </p>
                     <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
@@ -80,7 +80,7 @@
 
         <h6 class="mt-8">{{ __('Addons') }}</h6>
         @if ($addons->isEmpty())
-        <p class="text-sm text-grey mt-2">{{ __('No addons installed') }}</p>
+        <p class="text-sm text-gray mt-2">{{ __('No addons installed') }}</p>
         @else
         <div class="card p-0 mt-2">
             <table class="data-table">
@@ -88,8 +88,8 @@
                     <tr>
                         <td class="w-64 mr-2">
                             <span class="little-dot {{ $addon->valid() ? 'bg-green' : 'bg-red' }} mr-2"></span>
-                            <span class="font-bold"><a href="{{ $addon->addon()->marketplaceUrl() }}" class="text-grey hover:text-blue">{{ $addon->name() }}</a></span>
-                            @if ($addon->edition())<span class="badge uppercase font-bold text-grey-600">{{ $addon->edition() ?? '' }}</span>@endif
+                            <span class="font-bold"><a href="{{ $addon->addon()->marketplaceUrl() }}" class="text-gray hover:text-blue">{{ $addon->name() }}</a></span>
+                            @if ($addon->edition())<span class="badge uppercase font-bold text-gray-600">{{ $addon->edition() ?? '' }}</span>@endif
                         </td>
                         <td>{{ $addon->version() }}</td>
                         <td class="text-right text-red">{{ $addon->invalidReason() }}</td>
@@ -120,7 +120,7 @@
             <a href="{{ $site->url() }}" target="_blank" class="btn btn-primary mr-4">{{ __('Edit Site') }}</a>
             @if ($addToCartUrl) <a href="{{ $addToCartUrl }}" target="_blank" class="btn mr-4">{{ __('Buy Licenses') }}</a> @endif
             <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn">{{ __('Sync') }}</a>
-            <p class="ml-4 text-2xs text-grey">{{ __('statamic::messages.licensing_sync_instructions') }}</p>
+            <p class="ml-4 text-2xs text-gray">{{ __('statamic::messages.licensing_sync_instructions') }}</p>
         </div>
 
     @endif

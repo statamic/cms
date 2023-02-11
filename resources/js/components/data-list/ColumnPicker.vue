@@ -40,14 +40,14 @@
             </div>
         </div>
 
-        <div class="flex border-t text-grey-800" v-if="preferencesKey">
+        <div class="flex border-t text-gray-800" v-if="preferencesKey">
             <button
-                class="p-2 hover:bg-grey-100 rounded-bl text-xs flex-1"
+                class="p-2 hover:bg-gray-100 rounded-bl text-xs flex-1"
                 v-text="__('Reset')"
                 @click="reset" :disabled="saving"
             />
             <button
-                class="p-2 hover:bg-grey-100 text-blue flex-1 rounded-br border-l text-xs"
+                class="p-2 hover:bg-gray-100 text-blue flex-1 rounded-br border-l text-xs"
                 v-text="__('Save')"
                 @click="save" :disabled="saving"
             />

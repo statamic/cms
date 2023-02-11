@@ -3,7 +3,7 @@
         <div class="flex items-center mb-6">
             <h1 class="flex-1">
                 <span v-text="name" />
-                <span v-if="currentVersion" class="font-normal text-grey-700">{{ currentVersion }}</span>
+                <span v-if="currentVersion" class="font-normal text-gray-700">{{ currentVersion }}</span>
             </h1>
             <button v-if="(composer.processing || lastInstallLog) && ! modalOpen" class="btn" @click="modalOpen = true">
                 <template v-if="composer.processing">

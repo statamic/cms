@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <small class="text-grey">Collections > Blog ></small>
+        <small class="text-gray">Collections > Blog ></small>
         <h1 class="mt-2 mb-6">Fire!</h1>
 
         {{ depth === 0 ? 'Base' : `Stack ${depth}` }}<br><br>

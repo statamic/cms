@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .table-fieldtype-table {
-    @apply w-full text-left border text-grey relative mb-4 outline-none shadow-sm rounded;
+    @apply w-full text-left border text-gray relative mb-4 outline-none shadow-sm rounded;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
@@ -11,7 +11,7 @@
 
 .table-fieldtype-table thead {
     th {
-        @apply font-medium border-r p-2 border-b z-10 bg-grey-200 text-grey-900 uppercase text-2xs tracking-widest;
+        @apply font-medium border-r p-2 border-b z-10 bg-gray-200 text-gray-900 uppercase text-2xs tracking-widest;
         display: table-cell;
         position: sticky;
         top: -1px;
@@ -27,7 +27,7 @@
 .table-fieldtype-table .input-text {
     @apply bg-white border-none rounded-none shadow-none outline-none text-sm;
     &:focus {
-        @apply shadow-inner bg-grey-100;
+        @apply shadow-inner bg-gray-100;
     }
 }
 
@@ -52,8 +52,8 @@
         &.table-drag-handle {
             @apply w-3 border-r h-full p-2;
             cursor: grab;
-            background: theme('colors.grey.200') url('../svg/drag-dots.svg') center center no-repeat;
-            &:hover { @apply bg-grey-300; }
+            background: theme('colors.gray.200') url('../svg/drag-dots.svg') center center no-repeat;
+            &:hover { @apply bg-gray-300; }
         }
     }
 
@@ -64,7 +64,7 @@
     }
 
     tr.draggable-source--is-dragging td {
-        @apply bg-grey-100;
+        @apply bg-gray-100;
     }
 
     .draggable-mirror {

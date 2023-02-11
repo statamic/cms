@@ -38,7 +38,7 @@
                 />
             </div>
 
-            <div class="py-2 text-xs text-grey" v-if="maxItemsReached && maxItems != 1">
+            <div class="py-2 text-xs text-gray" v-if="maxItemsReached && maxItems != 1">
                 <span>{{ __('Maximum items selected:')}}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
@@ -54,7 +54,7 @@
                             @created="itemCreated"
                         />
                     </div>
-                    <button ref="existing" class="text-blue hover:text-grey-800 flex mb-2 outline-none" @click.prevent="isSelecting = true">
+                    <button ref="existing" class="text-blue hover:text-gray-800 flex mb-2 outline-none" @click.prevent="isSelecting = true">
                         <svg-icon name="hyperlink" class="mr-1 h-4 w-4 flex items-center"></svg-icon>
                         {{ __('Link Existing Item') }}
                     </button>

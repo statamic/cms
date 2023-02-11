@@ -8,7 +8,7 @@
             :class="{ 'mb-2': i < value.length-1 }"
         >
             <div v-if="item.published && item.published !== null"
-                class="little-dot mr-2" :class="[item.published ? 'bg-green' : 'bg-grey-400']" />
+                class="little-dot mr-2" :class="[item.published ? 'bg-green' : 'bg-gray-400']" />
             <a :href="item.edit_url">{{ item.title }}</a>
         </div>
     </div>

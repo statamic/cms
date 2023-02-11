@@ -14,7 +14,7 @@
 
             <div class="revision-item-content w-full flex">
                 <div class="flex-1">
-                    <div class="revision-author text-grey-700 text-2xs">
+                    <div class="revision-author text-gray-700 text-2xs">
                         <template v-if="revision.user">{{ revision.user.name || revision.user.email }} &ndash;</template>
                         {{ date.fromNow() }}
                     </div>

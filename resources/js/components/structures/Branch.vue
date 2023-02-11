@@ -5,19 +5,19 @@
         <div class="flex items-center flex-1 p-2 ml-2 text-xs leading-normal">
             <div class="flex items-center flex-1">
                 <div class="little-dot mr-2" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />
-                <svg-icon name="home-page" class="mr-2 h-4 w-4 text-grey-800" v-if="isRoot" v-tooltip="__('This is the root page')" />
+                <svg-icon name="home-page" class="mr-2 h-4 w-4 text-gray-800" v-if="isRoot" v-tooltip="__('This is the root page')" />
                 <a
                     @click="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"
                     v-text="title" />
 
-                <span v-if="showSlugs" class="ml-2 font-mono text-grey-700 text-2xs pt-px">
+                <span v-if="showSlugs" class="ml-2 font-mono text-gray-700 text-2xs pt-px">
                     {{ isRoot ? '/' : page.slug }}
                 </span>
 
                 <button
                     v-if="hasChildren"
-                    class="p-2 text-grey-600 hover:text-grey-700 transition duration-100 outline-none flex"
+                    class="p-2 text-gray-600 hover:text-gray-700 transition duration-100 outline-none flex"
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >
@@ -28,7 +28,7 @@
                     <svg-icon name="content-writing" class="w-4 h-4" />
                     <div class="ml-1">
                         <a :href="page.collection.create_url" v-text="__('Add')" />
-                        <span class="text-grey">/</span>
+                        <span class="text-gray">/</span>
                         <a :href="page.collection.edit_url" v-text="__('Edit')" />
                     </div>
                 </div>
@@ -114,9 +114,9 @@ export default {
                 case 'published':
                     return 'bg-green';
                 case 'draft':
-                    return 'bg-grey-400';
+                    return 'bg-gray-400';
                 default:
-                    return 'bg-transparent border border-grey-600';
+                    return 'bg-transparent border border-gray-600';
             }
         },
 

@@ -24,7 +24,7 @@
     @apply relative mb-2 px-1 z-10 outline-none;
 
     .blueprint-section-field-inner {
-        @apply relative border rounded bg-grey-200 shadow-sm flex outline-none z-10;
+        @apply relative border rounded bg-gray-200 shadow-sm flex outline-none z-10;
     }
 
     &.draggable-source--is-dragging {
@@ -45,7 +45,7 @@
 .blueprint-section-import {
     &:before {
         content: '';
-        @apply border rounded absolute bg-grey-200 shadow-sm;
+        @apply border rounded absolute bg-gray-200 shadow-sm;
         top: -3px; left: 6px; right: 0; bottom: 3px; z-index: 1;
     }
 }
@@ -68,10 +68,10 @@
 }
 
 .blueprint-add-section-button {
-    @apply relative w-full border border-grey-500 border-dashed rounded flex justify-center items-center text-grey-700;
+    @apply relative w-full border border-gray-500 border-dashed rounded flex justify-center items-center text-gray-700;
 
     &:hover {
-        @apply border-grey text-grey-950;
+        @apply border-gray text-gray-950;
     }
 
     .blueprint-section-draggable-zone {
@@ -96,7 +96,7 @@
     cursor: pointer;
 
     .field-width-label {
-        @apply absolute text-4xs font-bold w-full text-center z-10 text-grey-700;
+        @apply absolute text-4xs font-bold w-full text-center z-10 text-gray-700;
         top: 3px;
         pointer-events: none;
     }
@@ -106,7 +106,7 @@
     }
 
     .field-width-notch {
-        @apply relative border border-grey-400 border-l-0;
+        @apply relative border border-gray-400 border-l-0;
         width: 8px;
 
         &.notch-25 {
@@ -114,7 +114,7 @@
         }
 
         &.filled {
-            @apply border-grey-400 border-r-0 bg-white;
+            @apply border-gray-400 border-r-0 bg-white;
             margin: -1px 0;
         }
 

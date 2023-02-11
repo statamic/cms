@@ -4,8 +4,8 @@
     .item-move {
         @apply w-4 border-r rounded-l p-2;
         cursor: grab;
-        background: theme('colors.grey.200') url('../svg/drag-dots.svg') center center no-repeat;
-        &:hover { @apply bg-grey-300; }
+        background: theme('colors.gray.200') url('../svg/drag-dots.svg') center center no-repeat;
+        &:hover { @apply bg-gray-300; }
     }
 
     .item-inner {

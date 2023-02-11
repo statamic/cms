@@ -31,7 +31,7 @@ button {
 
 /*  Default, non-primary action button */
 .btn, .btn-default {
-    @apply text-grey-800 shadow-button;
+    @apply text-gray-800 shadow-button;
 
     background: linear-gradient(180deg, #fff, #f9fafb);
     border: 1px solid #c4cdd6;
@@ -43,12 +43,12 @@ button {
 
     &.active, &.active:hover {
         box-shadow: inset 2px 2px 3px 0px rgba(25,30,35,.1);
-        background: theme('colors.grey.400');
+        background: theme('colors.gray.400');
         border-color: #aeb9c3 !important;
     }
 
     &:disabled {
-        @apply text-grey-700 opacity-75;
+        @apply text-gray-700 opacity-75;
     }
 }
 
@@ -89,23 +89,23 @@ button {
 
 /*  Earth isn't flat but these buttons are */
 .btn-flat {
-    @apply text-white text-grey-800 bg-grey-300 flex items-center;
+    @apply text-white text-gray-800 bg-gray-300 flex items-center;
     position: inherit;
 
     &:hover:not(:disabled), &:active:not(:disabled), &.active {
-        @apply bg-grey-400;
+        @apply bg-gray-400;
     }
 
     &:focus {
-        @apply focus-outline bg-grey-300;
+        @apply focus-outline bg-gray-300;
     }
 
     &:active, &:focus:active {
-        @apply bg-grey-500;
+        @apply bg-gray-500;
     }
 
     &:disabled {
-        @apply text-grey-600 opacity-75;
+        @apply text-gray-600 opacity-75;
     }
 }
 
@@ -239,7 +239,7 @@ td .btn-icon {
   ========================================================================== */
 
 .btn-close {
-    @apply ml-4 p-0 text-xl text-grey-600 rounded-full;
+    @apply ml-4 p-0 text-xl text-gray-600 rounded-full;
     height: 32px;
     width: 32px;
     line-height: 32px;

@@ -13,7 +13,7 @@
 	}
 
 	h3, dt {
-        @apply font-normal text-grey-700 antialiased;
+        @apply font-normal text-gray-700 antialiased;
 		margin: 25px 0;
 		font-size: 21px;
 		line-height: 1.5;
@@ -48,7 +48,7 @@
 .update-release {
 
     .date {
-		@apply font-normal text-grey;
+		@apply font-normal text-gray;
 	}
 
 	p {
@@ -73,7 +73,7 @@
 		}
 
 		li:before {
-			@apply absolute rounded-full bg-grey-900;
+			@apply absolute rounded-full bg-gray-900;
 			height: 6px;
 			width: 6px;
 			content: "";

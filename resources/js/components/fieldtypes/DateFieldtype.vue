@@ -43,7 +43,7 @@
                                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
                                     <svg-icon name="calendar" class="w-4 h-4" />
                                 </div>
-                                <div class="input-text border border-grey-500 border-l-0" :class="{ 'read-only': isReadOnly }">
+                                <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
                                     <input
                                         class="input-text-minimal p-0 bg-transparent leading-none"
                                         :value="inputValue.start"
@@ -53,13 +53,13 @@
                                 </div>
                             </div>
 
-                            <div class="icon icon-arrow-right my-1 mx-2 text-grey-600" />
+                            <div class="icon icon-arrow-right my-1 mx-2 text-gray-600" />
 
                             <div class="input-group">
                                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
                                     <svg-icon name="calendar" class="w-4 h-4" />
                                 </div>
-                                <div class="input-text border border-grey-500 border-l-0" :class="{ 'read-only': isReadOnly }">
+                                <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
                                     <input
                                         class="input-text-minimal p-0 bg-transparent leading-none"
                                         :value="inputValue.end"
@@ -75,7 +75,7 @@
                             <div class="input-group-prepend flex items-center" v-if="!config.inline">
                                 <svg-icon name="calendar" class="w-4 h-4" />
                             </div>
-                            <div class="input-text border border-grey-500 border-l-0" :class="{ 'read-only': isReadOnly }">
+                            <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
                                 <input
                                     class="input-text-minimal p-0 bg-transparent leading-none"
                                     :value="inputValue"

@@ -41,7 +41,7 @@
                     <tr>
                         <td class="flex items-center">
                             @cp_svg('search-drivers/' . $index->config()['driver'], 'w-6 h-6 mr-2')
-                            <div class="text-grey-800 leading-none">{{ $index->title() }}</div>
+                            <div class="text-gray-800 leading-none">{{ $index->title() }}</div>
                         </td>
                         <td>
                             {{ ucwords($index->config()['driver']) }}
@@ -50,7 +50,7 @@
                             @if (is_string($index->config()['searchables']))
                                 <span class="badge-pill-sm">{{ $index->config()['searchables'] }}</span>
                             @else
-                                <div class="text-sm text-grey flex flex-wrap">
+                                <div class="text-sm text-gray flex flex-wrap">
                                     @foreach($index->config()['searchables'] as $searchable)
                                         <div class="mr-2 badge-pill-sm">
                                             {{ $searchable }}
@@ -60,7 +60,7 @@
                             @endif
                         </td>
                         <td>
-                            <div class="text-sm text-grey flex flex-wrap">
+                            <div class="text-sm text-gray flex flex-wrap">
                                 @foreach($index->config()['fields'] as $field)
                                     <div class="mr-2 badge-pill-sm">
                                         {{ $field }}

@@ -19,7 +19,7 @@
         <div class="p-2 w-full fixed bottom-0 z-20" v-show="showBanner">
             <div class="
                 py-3 px-4 text-sm w-full rounded-md
-                @if ($licenses->isOnTestDomain()) bg-grey-800 text-grey-300 @endif
+                @if ($licenses->isOnTestDomain()) bg-gray-800 text-gray-300 @endif
                 @if ($licenses->isOnPublicDomain()) bg-red text-white @endif
             ">
                 @if ($licenses->isOnTestDomain())

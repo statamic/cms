@@ -10,7 +10,7 @@
     right: 0;
     bottom: 0;
     border: 5px solid #394045;
-    @apply bg-grey-800;
+    @apply bg-gray-800;
 }
 
 .focal-point-toolbox {

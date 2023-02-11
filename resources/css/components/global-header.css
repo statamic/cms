@@ -31,7 +31,7 @@
     }
 
     .global-search-results {
-        @apply shadow-lg absolute p-0 w-full bg-white rounded border border-grey-500;
+        @apply shadow-lg absolute p-0 w-full bg-white rounded border border-gray-500;
         top: 36px;
         left: -1px; /*  border offset */
         z-index: 999;
@@ -55,7 +55,7 @@
     }
 
     .active {
-        @apply bg-grey-300;
+        @apply bg-gray-300;
     }
 
     .title {
@@ -63,7 +63,7 @@
     }
 
     .url {
-        @apply text-2xs text-grey-400;
+        @apply text-2xs text-gray-400;
     }
 
     .status {
@@ -74,7 +74,7 @@
     }
 
     .icon {
-        @apply text-grey;
+        @apply text-gray;
         font-size: 18px;
         cursor: pointer;
         position: relative;
@@ -92,7 +92,7 @@
     }
 
     kbd {
-        @apply font-sans rounded px-1 pb-px text-2xs border text-grey-500;
+        @apply font-sans rounded px-1 pb-px text-2xs border text-gray-500;
     }
 }
 

@@ -159,7 +159,7 @@
     <h2 class="mb-2">Colors</h2>
     <div class="bg-white p-10 shadow rounded-lg overflow-hidden mb-16">
 
-        <h6 class="mb-4">Greys</h6>
+        <h6 class="mb-4">grays</h6>
         {{-- <div class="p-4" style="background: #48606f"></div> --}}
         <div class="flex flex-row-reverse text-sm text-center mb-8">
             <div class="text-black bg-blue-100 p-4 flex-1">100</div>
@@ -174,16 +174,16 @@
         </div>
         <div class="flex flex-row-reverse text-sm text-center mb-8">
             <div class="text-black bg-white p-4 flex-1">White</div>
-            <div class="text-black bg-grey-100 p-4 flex-1">100</div>
-            <div class="text-black bg-grey-200 p-4 flex-1">200</div>
-            <div class="text-black bg-grey-300 p-4 flex-1">300</div>
-            <div class="text-black bg-grey-400 p-4 flex-1">400</div>
-            <div class="text-black bg-grey-500 p-4 flex-1">500</div>
-            <div class="text-black bg-grey-600 p-4 flex-1">600</div>
-            <div class="text-black bg-grey-700 p-4 flex-1">700</div>
-            <div class="text-white bg-grey-800 p-4 flex-1">800</div>
-            <div class="text-white bg-grey-900 p-4 flex-1">900</div>
-            {{-- <div class="text-white bg-grey-950 p-4 flex-1">950</div> --}}
+            <div class="text-black bg-gray-100 p-4 flex-1">100</div>
+            <div class="text-black bg-gray-200 p-4 flex-1">200</div>
+            <div class="text-black bg-gray-300 p-4 flex-1">300</div>
+            <div class="text-black bg-gray-400 p-4 flex-1">400</div>
+            <div class="text-black bg-gray-500 p-4 flex-1">500</div>
+            <div class="text-black bg-gray-600 p-4 flex-1">600</div>
+            <div class="text-black bg-gray-700 p-4 flex-1">700</div>
+            <div class="text-white bg-gray-800 p-4 flex-1">800</div>
+            <div class="text-white bg-gray-900 p-4 flex-1">900</div>
+            {{-- <div class="text-white bg-gray-950 p-4 flex-1">950</div> --}}
             <div class="text-white bg-black p-4 flex-1">Black</div>
         </div>
 
@@ -218,7 +218,7 @@
         <div class="w-1/3 px-4">
             <div class="card px-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-grey">New Users</h3>
+                    <h3 class="font-bold text-gray">New Users</h3>
                     <select class="text-xs" name="" id="">
                         <option value="">30 Days</option>
                     </select>
@@ -233,7 +233,7 @@
         <div class="w-1/3 px-4">
             <div class="card px-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-grey">Form Submissions</h3>
+                    <h3 class="font-bold text-gray">Form Submissions</h3>
                     <select class="text-xs" name="" id="">
                         <option value="">7 Days</option>
                     </select>
@@ -246,17 +246,17 @@
             </div>
         </div>
         <div class="w-1/3 px-4">
-            <div class="card bg-grey-900 px-6">
+            <div class="card bg-gray-900 px-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-grey-400">New Users</h3>
-                    <select class="text-xs" name="" id="" class="bg-grey-800 border-grey-800 text-grey-400">
+                    <h3 class="font-bold text-gray-400">New Users</h3>
+                    <select class="text-xs" name="" id="" class="bg-gray-800 border-gray-800 text-gray-400">
                         <option value="">30 Days</option>
                     </select>
                 </div>
-                <div class="text-4xl mb-4 text-grey-400">251</div>
+                <div class="text-4xl mb-4 text-gray-400">251</div>
                 <div class="flex items-center ">
                     <span class="w-4 h-4 text-green mr-2">@cp_svg('performance-increase')</span>
-                    <span class="leading-none text-grey-400 text-sm">8.54% Increase</span>
+                    <span class="leading-none text-gray-400 text-sm">8.54% Increase</span>
                 </div>
             </div>
         </div>

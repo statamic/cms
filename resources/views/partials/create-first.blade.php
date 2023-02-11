@@ -12,7 +12,7 @@
         </h1>
 
         @if ($description ?? false)
-            <p class="text-grey mb-6">
+            <p class="text-gray mb-6">
                 {{ __($description) }}
             </p>
         @endif

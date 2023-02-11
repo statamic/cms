@@ -5,7 +5,7 @@
             <div class="text-lg font-medium p-4 pb-0">
                 {{ __('Delete') }}
             </div>
-            <div class="flex-1 px-4 py-6 text-grey">
+            <div class="flex-1 px-4 py-6 text-gray">
                 <div class="publish-fields">
                     <div class="form-group" :class="{ 'has-error': this.error }">
                         <div class="field-inner">
@@ -27,8 +27,8 @@
                     </div>
                 </div>
             </div>
-            <div class="p-4 bg-grey-200 border-t flex items-center justify-end text-sm">
-                <button class="text-grey hover:text-grey-900"
+            <div class="p-4 bg-gray-200 border-t flex items-center justify-end text-sm">
+                <button class="text-gray hover:text-gray-900"
                     @click="$emit('cancel')"
                     v-text="__('Cancel')" />
                 <button class="btn ml-4 btn-danger"

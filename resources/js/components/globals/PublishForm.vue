@@ -7,7 +7,7 @@
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
 
-                <div class="pt-px text-2xs text-grey-600 ml-4 flex" v-if="! canEdit">
+                <div class="pt-px text-2xs text-gray-600 ml-4 flex" v-if="! canEdit">
                     <svg-icon name="lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
                 </div>
 

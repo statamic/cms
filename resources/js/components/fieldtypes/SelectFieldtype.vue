@@ -38,7 +38,7 @@
                     <template v-else v-text="label"></template>
                 </template>
                 <template #no-options>
-                    <div class="text-sm text-grey-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
+                    <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
                 </template>
                 <template #footer="{ deselect }" v-if="config.multiple">
                     <div class="vs__selected-options-outside flex flex-wrap">
@@ -126,7 +126,7 @@ export default {
                 return 'text-green';
             }
 
-            return 'text-grey';
+            return 'text-gray';
         }
     },
 

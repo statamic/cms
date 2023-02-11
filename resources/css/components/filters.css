@@ -3,15 +3,15 @@
    ========================================================================== */
 
 .filter {
-    @apply bg-grey-200 mb-6 rounded-full text-center;
+    @apply bg-gray-200 mb-6 rounded-full text-center;
     padding: 10px 8px 14px;
 
     a {
-        @apply text-xs text-grey-700 mx-1 p-2 relative;
+        @apply text-xs text-gray-700 mx-1 p-2 relative;
     }
 
     a.active, a:hover {
-        @apply text-grey-950;
+        @apply text-gray-950;
     }
 
     a.active:after {

@@ -3,7 +3,7 @@
    ========================================================================== */
 
 body {
-    @apply font-sans text-grey-900 text-base tracking-normal;
+    @apply font-sans text-gray-900 text-base tracking-normal;
     font-variant: common-ligatures tabular-nums;
     font-feature-settings: "zero", "ss01", "calt" off;
 
@@ -42,7 +42,7 @@ h6 {
 }
 
 a:not([class^="btn"]) {
-    @apply text-grey-800 cursor-pointer;
+    @apply text-gray-800 cursor-pointer;
 
     &:hover {
         @apply text-blue;
@@ -59,7 +59,7 @@ a:not([class^="btn"]) {
     }
 
     p, ol, ul, pre {
-        @apply text-grey-700 text-sm leading-normal mb-2;
+        @apply text-gray-700 text-sm leading-normal mb-2;
 
         a {
             @apply text-blue;
@@ -92,7 +92,7 @@ a:focus {
 }
 
 .bullet {
-    @apply inline-block rounded-full bg-grey-700;
+    @apply inline-block rounded-full bg-gray-700;
     height: 7px;
     width: 7px;
 }
@@ -289,7 +289,7 @@ code {
 
     .highlight pre,
     pre {
-        @apply p-4 bg-grey-300 rounded;
+        @apply p-4 bg-gray-300 rounded;
         overflow: auto;
         font-size: 85%;
         line-height: 1.45;

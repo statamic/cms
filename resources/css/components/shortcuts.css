@@ -26,7 +26,7 @@
 }
 
 .shortcut-joiner {
-    @apply text-grey text-xs mx-1;
+    @apply text-gray text-xs mx-1;
 }
 
 .shortcut-value {

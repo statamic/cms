@@ -2,7 +2,7 @@
     <div class="">
         <div class="card p-6 ">
             <header class="mb-6">
-                <p class="text-grey" v-text="__('messages.collection_scaffold_instructions')" />
+                <p class="text-gray" v-text="__('messages.collection_scaffold_instructions')" />
             </header>
              <table class="data-table border rounded">
                 <tbody>

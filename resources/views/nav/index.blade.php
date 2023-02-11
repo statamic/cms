@@ -16,7 +16,7 @@
                         <a href="{{ cp_route('preferences.nav.default.edit') }}">{{ __('Default') }}</a>
                     </div>
                 </td>
-                <td class="text-right text-2xs text-grey-500">
+                <td class="text-right text-2xs text-gray-500">
                     @if (Statamic\Facades\Preference::default()->hasPreference('nav'))
                         {{ __('Modified') }}
                     @endif
@@ -37,7 +37,7 @@
                                 <a href="{{ cp_route('preferences.nav.role.edit', [$role->handle()]) }}">{{ __($role->title()) }}</a>
                             </div>
                         </td>
-                        <td class="text-right text-2xs text-grey-500">
+                        <td class="text-right text-2xs text-gray-500">
                             @if ($role->hasPreference('nav'))
                                 {{ __('Modified') }}
                             @endif
@@ -58,7 +58,7 @@
                     <a href="{{ cp_route('preferences.nav.user.edit') }}">{{ __('My Nav') }}</a>
                     </div>
                 </td>
-                <td class="text-right text-2xs text-grey-500">
+                <td class="text-right text-2xs text-gray-500">
                     @if (Statamic\Facades\User::current()->hasPreference('nav'))
                         {{ __('Modified') }}
                     @endif

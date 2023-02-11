@@ -4,19 +4,19 @@
         <div class="rounded p-6 lg:px-20 lg:py-10 shadow bg-white">
             <header class="text-center mb-16">
                 <h1 class="mb-6">{{ __('Create Fieldset') }}</h1>
-                <p class="text-grey" v-text="__('messages.fields_fieldsets_description')" />
+                <p class="text-gray" v-text="__('messages.fields_fieldsets_description')" />
             </header>
             <div class="mb-10">
                 <label class="font-bold text-base mb-1" for="name">{{ __('Title') }}</label>
                 <input type="text" v-model="title" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-grey-600 mt-2 flex items-center">
+                <div class="text-2xs text-gray-600 mt-2 flex items-center">
                     {{ __('messages.fieldsets_title_instructions') }}
                 </div>
             </div>
             <div class="mb-4">
                 <label class="font-bold text-base mb-1" for="name">{{ __('Handle') }}</label>
                 <input type="text" v-model="handle" class="input-text" tabindex="2">
-                <div class="text-2xs text-grey-600 mt-2 flex items-center">
+                <div class="text-2xs text-gray-600 mt-2 flex items-center">
                     {{ __('messages.fieldsets_handle_instructions') }}
                 </div>
             </div>

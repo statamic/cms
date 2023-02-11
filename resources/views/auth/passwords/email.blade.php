@@ -5,8 +5,8 @@
 
     <div class="card auth-card mx-auto">
         <div class="text-center pb-4 mb-4">
-            <h1 class="mb-4 text-lg text-grey-800">{{ __('Forgot Your Password?') }}</h1>
-            <p class="text-sm text-grey">{{ __('statamic::messages.forgot_password_enter_email') }}</p>
+            <h1 class="mb-4 text-lg text-gray-800">{{ __('Forgot Your Password?') }}</h1>
+            <p class="text-sm text-gray">{{ __('statamic::messages.forgot_password_enter_email') }}</p>
         </div>
 
         @if (session('status'))

@@ -42,7 +42,7 @@
     <div class="metrics mb-6">
         @foreach($form->metrics() as $metric)
             <div class="card px-6">
-                <h3 class="mb-4 font-bold text-grey">{{ $metric->label() }}</h3>
+                <h3 class="mb-4 font-bold text-gray">{{ $metric->label() }}</h3>
                 <div class="text-4xl">{{ $metric->result() }}</div>
             </div>
         @endforeach

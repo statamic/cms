@@ -13,7 +13,7 @@
 .revision-item {
     @apply p-2 text-sm block cursor-pointer border-t;
     &:hover {
-        @apply bg-grey-200;
+        @apply bg-gray-200;
     }
     &:last-child {
         @apply border-b;
@@ -25,7 +25,7 @@
     top: -2px;
 
     .revision-item-bullet {
-        @apply bg-grey-600 inline-block relative;
+        @apply bg-gray-600 inline-block relative;
         border-radius: 7px;
         height: 7px;
         width: 7px;
@@ -39,12 +39,12 @@
 
     &.publish { @apply bg-green-light; }
     &.revision,
-    &.restore { @apply text-grey-700; }
+    &.restore { @apply text-gray-700; }
     &.unpublish { @apply bg-red; }
 }
 
 .revision-item-note {
-    @apply text-sm text-grey-800 font-medium mb-1;
+    @apply text-sm text-gray-800 font-medium mb-1;
     width: 300px;
 }
 

@@ -16,7 +16,7 @@
     }
 
     th {
-        @apply border-r p-2 bg-grey-300;
+        @apply border-r p-2 bg-gray-300;
     }
 
     td {
@@ -46,12 +46,12 @@
     }
 
     td:focus-within {
-        @apply bg-grey-200;
+        @apply bg-gray-200;
     }
 
     /* Read Only */
     .read-only-field & {
-        th { @apply text-grey-500; }
-        tr td { @apply bg-grey-200; }
+        th { @apply text-gray-500; }
+        tr td { @apply bg-gray-200; }
     }
 }

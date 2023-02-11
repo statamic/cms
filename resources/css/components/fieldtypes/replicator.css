@@ -15,7 +15,7 @@
 }
 
 .replicator-set-header {
-    @apply bg-grey-300 border-b rounded-t pr-3 flex select-none;
+    @apply bg-gray-300 border-b rounded-t pr-3 flex select-none;
 
     &.collapsed {
         @apply rounded border-b-0;
@@ -25,7 +25,7 @@
         @apply w-4 border-r rounded-tl p-2;
         cursor: grab;
         background: transparent url('../svg/drag-dots.svg') center center no-repeat;
-        &:hover { @apply bg-grey-200; }
+        &:hover { @apply bg-gray-200; }
     }
 
     img {
@@ -61,7 +61,7 @@
 
 /*  Extra contrast when full width */
 .replicator-fieldtype {
-    @apply py-6 px-0 bg-grey-200 border-t border-b;
+    @apply py-6 px-0 bg-gray-200 border-t border-b;
 
     > .field-inner {
         @apply ml-6;

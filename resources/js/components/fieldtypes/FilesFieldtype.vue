@@ -18,7 +18,7 @@
                 </div>
 
                 <div class="assets-fieldtype-picker py-4" :class="{ 'is-expanded': value.length }">
-                    <p class="asset-upload-control text-xs text-grey-600 ml-0">
+                    <p class="asset-upload-control text-xs text-gray-600 ml-0">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
@@ -37,7 +37,7 @@
                             <tr
                                 v-for="(file, i) in value"
                                 :key="file"
-                                class="asset-row bg-white hover:bg-grey-100"
+                                class="asset-row bg-white hover:bg-gray-100"
                             >
                                 <td class="flex items-center">
                                     <div
@@ -53,7 +53,7 @@
                                 <td class="p-0 w-8 text-right align-middle">
                                     <button
                                         @click="remove(i)"
-                                        class="flex items-center p-2 w-full h-full text-grey-600 hover:text-grey-900"
+                                        class="flex items-center p-2 w-full h-full text-gray-600 hover:text-gray-900"
                                     >
                                         <svg-icon name="trash" class="w-6 h-6" />
                                     </button>

@@ -12,7 +12,7 @@
 
                 <transition name="live-preview-header-slide">
                     <div v-show="headerVisible" class="live-preview-header">
-                        <div class="text-base text-grey-700 font-medium mr-4">{{ __('Live Preview') }}</div>
+                        <div class="text-base text-gray-700 font-medium mr-4">{{ __('Live Preview') }}</div>
                         <div class="flex items-center">
                             <button v-if="canPopOut && !poppedOut" class="btn" @click="popout">{{ __('Pop out') }}</button>
                             <button v-if="poppedOut" class="btn" @click="closePopout">{{ __('Pop in') }}</button>
@@ -44,7 +44,7 @@
                     <transition name="live-preview-editor-slide">
                         <div v-show="panesVisible" class="live-preview-editor" :style="{ width: poppedOut ? '100%' : `${editorWidth}px` }">
                             <div class="live-preview-fields flex-1 h-full overflow-scroll" :class="{
-                                'p-6 bg-grey-300': poppedOut,
+                                'p-6 bg-gray-300': poppedOut,
                                 'live-preview-fields-wide': editorWidth >= 920,
                                 'live-preview-fields-narrow': editorWidth < 920
                             }">

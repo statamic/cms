@@ -2,7 +2,7 @@
 
     <div class="flex flex-col h-full">
 
-        <div class="flex items-center p-6 bg-grey-200 border-b text-center">
+        <div class="flex items-center p-6 bg-gray-200 border-b text-center">
             Section
         </div>
 
@@ -20,7 +20,7 @@
 
                             <label class="block">{{ field.display }}</label>
                             <div v-if="field.instructions" class="help-block">{{ field.instructions }}</div>
-                            <div class="h-10 border border-dashed rounded bg-grey-200"></div>
+                            <div class="h-10 border border-dashed rounded bg-gray-200"></div>
                         </div>
                     </div>
                 </div>

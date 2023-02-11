@@ -3,7 +3,7 @@
     <stack narrow name="nav-item-editor" @closed="$emit('closed')">
         <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
-            <div class="bg-grey-200 px-6 py-2 border-b border-grey-300 text-lg font-medium flex items-center justify-between">
+            <div class="bg-gray-200 px-6 py-2 border-b border-gray-300 text-lg font-medium flex items-center justify-between">
                 {{ creating ? __('Add Section') : __('Edit Section') }}
                 <button
                     type="button"

@@ -86,7 +86,7 @@
                 {{ label }}
             </div>
             <button
-                class="text-blue border-l px-2 py-1 hover:bg-grey-200"
+                class="text-blue border-l px-2 py-1 hover:bg-gray-200"
                 @click="edit"
                 v-if="needsAlt"
             >

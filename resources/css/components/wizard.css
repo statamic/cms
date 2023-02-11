@@ -6,14 +6,14 @@
     }
 
     .step:not(:first-child):before {
-        @apply absolute h-1 w-1/2 bg-grey-300;
+        @apply absolute h-1 w-1/2 bg-gray-300;
         content: '';
         left: 0;
         top: 18px;
     }
 
     .step:not(:last-child):after {
-        @apply absolute h-1 w-1/2 bg-grey-300;
+        @apply absolute h-1 w-1/2 bg-gray-300;
         content: '';
         left: 50%;
         top: 18px;
@@ -25,12 +25,12 @@
     }
 
     .ball {
-        @apply h-10 w-10 bg-grey-300 text-grey text-base rounded-full text-center z-10 mx-auto relative;
+        @apply h-10 w-10 bg-gray-300 text-gray text-base rounded-full text-center z-10 mx-auto relative;
         line-height: 40px;
     }
 
     .label {
-        @apply text-xs mt-1 text-grey;
+        @apply text-xs mt-1 text-gray;
     }
 
     .complete {

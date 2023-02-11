@@ -33,12 +33,12 @@
 }
 
 .data-table {
-	@apply text-left text-grey-700 outline-none max-w-full w-full;
+	@apply text-left text-gray-700 outline-none max-w-full w-full;
 	overflow-x: auto;
 
     thead {
-		/*  @apply bg-grey-200 text-grey-900 uppercase text-2xs tracking-widest outline-none; */
-		@apply text-sm text-grey-700 text-grey-900;
+		/*  @apply bg-gray-200 text-gray-900 uppercase text-2xs tracking-widest outline-none; */
+		@apply text-sm text-gray-700 text-gray-900;
 
 		tr {
 			@apply border-b;
@@ -49,7 +49,7 @@
             &:first-child { @apply rounded-tl; }
 			&:last-child { @apply rounded-tr; }
 			&:hover {
-				@apply text-grey-900;
+				@apply text-gray-900;
 			}
 		}
 		.type-column {
@@ -67,7 +67,7 @@
 			@apply border-b text-sm;
 
 			&.row-selected {
-				@apply bg-grey-200;
+				@apply bg-gray-200;
 			}
 
 			&:first-child {
@@ -92,7 +92,7 @@
 			}
 
             &:hover {
-                @apply bg-grey-100;
+                @apply bg-gray-100;
             }
 
             th {
@@ -164,10 +164,10 @@
 }
 
 .data-list-filter-link {
-	@apply border-grey-400 text-grey-600 mr-2 p-3 pb-2;
+	@apply border-gray-400 text-gray-600 mr-2 p-3 pb-2;
 
 	&:hover {
-		@apply border-b-3 text-grey-700;
+		@apply border-b-3 text-gray-700;
 	}
 
 	&:focus {
@@ -177,15 +177,15 @@
 	}
 
 	&.active {
-		@apply border-b-3 border-blue text-grey-800;
+		@apply border-b-3 border-blue text-gray-800;
 	}
 }
 
 td.table-drag-handle {
 	@apply w-3 border-r h-full p-2;
 	cursor: grab;
-	background: theme('colors.grey.200') url('../svg/drag-dots.svg') center center no-repeat;
-	&:hover { @apply bg-grey-300; }
+	background: theme('colors.gray.200') url('../svg/drag-dots.svg') center center no-repeat;
+	&:hover { @apply bg-gray-300; }
 }
 
 .table-row-placeholder {
@@ -225,7 +225,7 @@ td.table-drag-handle {
 	}
 
 	&:hover:before {
-        @apply bg-grey-300;
+        @apply bg-gray-300;
 	}
 	&.active:before {
         @apply bg-blue;

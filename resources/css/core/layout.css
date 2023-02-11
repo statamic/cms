@@ -3,7 +3,7 @@
    ========================================================================== */
 
 body {
-    @apply w-full bg-grey-300 relative;
+    @apply w-full bg-gray-300 relative;
 }
 
 a {
@@ -86,7 +86,7 @@ a {
 /* Outside the Control Panel
   ========================================================================== */
 .outside {
-    @apply bg-grey-300 px-2 min-h-screen;
+    @apply bg-gray-300 px-2 min-h-screen;
 
     label {
         color: #596498;

@@ -32,26 +32,26 @@
         <favorite-creator class="hidden md:block"></favorite-creator>
 
         @if (Route::has('horizon.index') && \Laravel\Horizon\Horizon::check(request()))
-            <a class="hidden md:block h-6 w-6 p-1 text-grey ml-4 hover:text-grey-800" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
+            <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="{{ route('horizon.index') }}" target="_blank" v-tooltip="'Laravel Horizon'">
                 @cp_svg('horizon')
             </a>
         @endif
 
         @if (config('nova.path') && (app()->environment('local') || $user->can('viewNova')))
-            <a class="hidden md:block h-6 w-6 p-1 text-grey ml-4 hover:text-grey-800" href="/{{ trim(config('nova.path'), '/') }}/dashboards/main" target="_blank" v-tooltip="'Laravel Nova'">
+            <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="/{{ trim(config('nova.path'), '/') }}/dashboards/main" target="_blank" v-tooltip="'Laravel Nova'">
                 @cp_svg('nova')
             </a>
         @endif
 
         @if (Route::has('telescope') && \Laravel\Telescope\Telescope::check(request()))
-            <a class="hidden md:block h-6 w-6 p-1 text-grey ml-4 hover:text-grey-800" href="{{ route('telescope') }}" target="_blank" v-tooltip="'Laravel Telescope'">
+            <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="{{ route('telescope') }}" target="_blank" v-tooltip="'Laravel Telescope'">
                 @cp_svg('telescope')
             </a>
         @endif
 
         <dropdown-list v-cloak>
             <template v-slot:trigger>
-                <button class="hidden md:block h-6 w-6 ml-4 p-1 text-grey hover:text-grey-800" v-tooltip="__('Preferences')" aria-label="{{ __('Manage Preferences') }}">
+                <button class="hidden md:block h-6 w-6 ml-4 p-1 text-gray hover:text-gray-800" v-tooltip="__('Preferences')" aria-label="{{ __('Manage Preferences') }}">
                     @cp_svg('cog')
                 </button>
             </template>
@@ -61,7 +61,7 @@
 
         <dropdown-list v-cloak>
             <template v-slot:trigger>
-                <button class="hidden md:block h-6 w-6 ml-4 p-1 text-grey hover:text-grey-800" v-tooltip="__('Useful Links')" aria-label="{{ __('View Useful Links') }}">
+                <button class="hidden md:block h-6 w-6 ml-4 p-1 text-gray hover:text-gray-800" v-tooltip="__('Useful Links')" aria-label="{{ __('View Useful Links') }}">
                     @cp_svg('book-open')
                 </button>
             </template>
@@ -85,7 +85,7 @@
             </dropdown-item>
         </dropdown-list>
 
-        <a class="hidden md:block h-6 w-6 p-1 text-grey ml-4 hover:text-grey-800" href="{{ Statamic\Facades\Site::selected()->url() }}" target="_blank" v-tooltip="'{{ __('View Site') }}'" aria-label="{{ __('View Site') }}">
+        <a class="hidden md:block h-6 w-6 p-1 text-gray ml-4 hover:text-gray-800" href="{{ Statamic\Facades\Site::selected()->url() }}" target="_blank" v-tooltip="'{{ __('View Site') }}'" aria-label="{{ __('View Site') }}">
             @cp_svg('browser-com')
         </a>
         <dropdown-list v-cloak>
@@ -102,7 +102,7 @@
             <div class="px-2">
                 <div class="text-base mb-px">{{ $user->email() }}</div>
                 @if ($user->isSuper())
-                    <div class="text-2xs mt-px text-grey-600">{{ __('Super Admin') }}</div>
+                    <div class="text-2xs mt-px text-gray-600">{{ __('Super Admin') }}</div>
                 @endif
             </div>
             <div class="divider"></div>
