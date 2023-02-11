@@ -18,7 +18,6 @@
 @import "elements/tables";
 
 /* Components */
-@import "components/alerts";
 @import "components/array";
 @import "components/assets";
 @import "components/blueprints";
