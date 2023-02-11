@@ -1,31 +1,18 @@
-$color: hsla(200, 80%, 50%, 1);
-
 /* Make clicks pass-through */
 #nprogress {
     pointer-events: none;
 }
 
 #nprogress .bar {
-    background: $color;
-
-    position: fixed;
-    z-index: 10000; /*  above global-header */
-    top: 0;
-    left: 0;
-
-    width: 100%;
+    @apply bg-blue fixed top-0 left-0 w-full;;
     height: 2px;
+    z-index: 10000; /*  above global-header */
 }
 
 /* Fancy blur effect */
 #nprogress .peg {
-    display: block;
-    position: absolute;
-    right: 0px;
-    width: 100px;
-    height: 100%;
-    box-shadow: 0 0 10px $color, 0 0 5px $color;
-    opacity: 1.0;
+    @apply block absolute right-0 w-full h-full opacity-100;
+    box-shadow: 0 0 10px theme('colors.blue.DEFAULT'), 0 0 5px theme('colors.blue.DEFAULT');
 
     -webkit-transform: rotate(3deg) translate(0px, -4px);
     -ms-transform: rotate(3deg) translate(0px, -4px);

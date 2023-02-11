@@ -2,16 +2,14 @@
    TOOLTIPS
    ========================================================================== */
 
-$color: hsla(210, 10%, 30%, 1); /*  gray-800 */
-
 div[data-popover="tooltip"] {
     @apply w-auto bg-gray-800 px-2 text-center text-white;
     width: auto !important;
 
-    &.dropdown-position-top:before { border-top-color: $color; }
-    &.dropdown-position-bottom:before { border-bottom-color: $color; }
-    &.dropdown-position-left:before { border-left-color: $color; }
-    &.dropdown-position-right:before { border-right-color: $color; }
+    &.dropdown-position-top:before { border-top-color: theme('colors.blue.DEFAULT'); }
+    &.dropdown-position-bottom:before { border-bottom-color: theme('colors.blue.DEFAULT'); }
+    &.dropdown-position-left:before { border-left-color: theme('colors.blue.DEFAULT'); }
+    &.dropdown-position-right:before { border-right-color: theme('colors.blue.DEFAULT'); }
 }
 
 .tooltip {
@@ -93,18 +91,17 @@ div[data-popover="tooltip"] {
   }
 
   &.popover {
-    $color: #f9f9f9;
+    @apply text-gray-100;
 
     .popover-inner {
-      background: $color;
-      color: black;
+        @apply bg-gray-800 text-black;
       padding: 24px;
       border-radius: 5px;
       box-shadow: 0 5px 30px rgba(0, 0, 0, .1);
     }
 
     .popover-arrow {
-      border-color: $color;
+      @apply border-gray-800;
     }
   }
 
