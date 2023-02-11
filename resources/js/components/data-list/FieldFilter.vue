@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="hasAvailableFieldFilters">
-            <div class="flex flex-col p-2">
+            <div class="flex flex-col p-4">
 
                 <v-select
                     ref="fieldSelect"
@@ -18,7 +18,7 @@
                     :meta="{}"
                     :values="containerValues"
                     :track-dirty-state="false"
-                    class="filter-fields mt-1"
+                    class="filter-fields mt-2"
                     @updated="updateValues"
                 >
                     <!-- TODO: handle showing/hiding of labels more elegantly -->
@@ -34,14 +34,14 @@
 
             </div>
 
-            <div class="flex border-t text-grey-80">
+            <div class="flex border-t text-gray-800">
                 <button
-                    class="p-1 hover:bg-grey-10 rounded-bl text-xs flex-1"
+                    class="p-2 hover:bg-gray-100 rounded-bl text-xs flex-1"
                     v-text="__('Clear')"
                     @click="resetAll"
                 />
                 <button
-                    class="p-1 hover:bg-grey-10 flex-1 rounded-br border-l text-xs"
+                    class="p-2 hover:bg-gray-100 flex-1 rounded-br border-l text-xs"
                     v-text="__('Close')"
                     @click="$emit('closed')"
                 />

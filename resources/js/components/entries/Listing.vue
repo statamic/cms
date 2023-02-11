@@ -45,7 +45,7 @@
                         />
                     </div>
 
-                    <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+                    <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
 
                     <data-list-bulk-actions
                         :url="actionUrl"
@@ -68,7 +68,7 @@
                     >
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
-                                <div class="little-dot mr-1" :class="getStatusClass(entry)" />
+                                <div class="little-dot mr-2" :class="getStatusClass(entry)" />
                                 <a :href="entry.edit_url" @click.stop>{{ entry.title }}</a>
                             </div>
                         </template>
@@ -92,7 +92,7 @@
                     </data-list-table>
                 </div>
                 <data-list-pagination
-                    class="mt-3"
+                    class="mt-6"
                     :resource-meta="meta"
                     :per-page="perPage"
                     :show-totals="true"
@@ -165,11 +165,11 @@ export default {
         getStatusClass(entry) {
             // TODO: Replace with `entry.status` (will need to pass down)
             if (entry.published && entry.private) {
-                return 'bg-transparent border border-grey-60';
+                return 'bg-transparent border border-gray-600';
             } else if (entry.published) {
                 return 'bg-green';
             } else {
-                return 'bg-grey-40';
+                return 'bg-gray-400';
             }
         },
 

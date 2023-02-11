@@ -8,21 +8,21 @@
     >
         <div class="blueprint-section-card card p-0 h-full flex rounded-t flex-col">
 
-            <div class="bg-grey-20 border-b text-sm flex rounded-t" v-if="!isSingle">
+            <div class="bg-gray-200 border-b text-sm flex rounded-t" v-if="!isSingle">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
-                <div class="p-1.5 py-1 flex-1">
-                    <span class="font-medium mr-1">
+                <div class="p-3 py-2 flex-1">
+                    <span class="font-medium mr-2">
                         <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
                     </span>
-                    <span class="font-mono text-xs text-grey-70 mr-1">
+                    <span class="font-mono text-xs text-gray-700 mr-2">
                         <input type="text" v-model="section.handle" @input="handleSyncedWithDisplay = false" class="bg-transparent w-full outline-none" />
                     </span>
                 </div>
-                <div class="flex items-center px-1.5">
-                    <button @click.prevent="toggleEditing" class="flex items-center text-grey-60 hover:text-grey-100 mr-1">
+                <div class="flex items-center px-3">
+                    <button @click.prevent="toggleEditing" class="flex items-center text-gray-600 hover:text-gray-950 mr-2">
                         <svg-icon class="h-4 w-4" :name="isEditing ? 'shrink' : 'expand'" />
                     </button>
-                    <button @click.prevent="$emit('deleted')" class="flex items-center text-grey-60 hover:text-grey-100" v-if="deletable">
+                    <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-600 hover:text-gray-950" v-if="deletable">
                         <svg-icon class="h-4 w-4" name="trash" />
                     </button>
                 </div>
@@ -30,7 +30,7 @@
 
 
             <fields
-                class="p-2"
+                class="p-4"
                 :fields="section.fields"
                 :editing-field="editingField"
                 :is-section-expanded="isEditing || isSingle"
@@ -46,7 +46,7 @@
                 <template v-slot:empty-state>
                     <div
                         v-text="__('Add or drag fields here')"
-                        class="text-2xs text-grey-60 text-center border border-dashed rounded mb-1 p-1"
+                        class="text-2xs text-gray-600 text-center border border-dashed rounded mb-2 p-2"
                     />
                 </template>
             </fields>

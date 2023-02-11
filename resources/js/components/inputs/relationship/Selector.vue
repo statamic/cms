@@ -19,8 +19,8 @@
             @selections-updated="selectionsUpdated"
         >
             <div slot-scope="{}" class="flex flex-col h-full">
-                <div class="bg-white border-b flex items-center justify-between bg-grey-20">
-                    <div class="p-2 flex flex-1 items-center">
+                <div class="bg-white border-b flex items-center justify-between bg-gray-200">
+                    <div class="p-4 flex flex-1 items-center">
                         <data-list-filters
                             ref="filters"
                             :filters="filters"
@@ -48,7 +48,7 @@
                             >
                                 <template slot="cell-title" slot-scope="{ row: entry }">
                                     <div class="flex items-center">
-                                        <div v-if="entry.published !== undefined" class="little-dot mr-1" :class="getStatusClass(entry)" />
+                                        <div v-if="entry.published !== undefined" class="little-dot mr-2" :class="getStatusClass(entry)" />
                                         {{ entry.title }}
                                     </div>
                                 </template>
@@ -65,8 +65,8 @@
                             :inline="true"
                             @page-selected="setPage" />
 
-                        <div class="p-2 border-t flex items-center justify-between bg-grey-20">
-                            <div class="text-sm text-grey-70"
+                        <div class="p-4 border-t flex items-center justify-between bg-gray-200">
+                            <div class="text-sm text-gray-700"
                                 v-text="hasMaxSelections
                                     ? __n(':count/:max selected', selections, { max: maxSelections })
                                     : __n(':count item selected|:count items selected', selections)" />
@@ -82,7 +82,7 @@
                                 <button
                                     v-if="! hasMaxSelections || maxSelections > 1"
                                     type="button"
-                                    class="btn-primary ml-1"
+                                    class="btn-primary ml-2"
                                     @click="select">
                                     {{ __('Select') }}
                                 </button>
@@ -269,11 +269,11 @@ export default {
 
         getStatusClass(entry) {
             if (entry.published && entry.private) {
-                return 'bg-transparent border border-grey-60';
+                return 'bg-transparent border border-gray-600';
             } else if (entry.published) {
                 return 'bg-green';
             } else {
-                return 'bg-grey-40';
+                return 'bg-gray-400';
             }
         }
 

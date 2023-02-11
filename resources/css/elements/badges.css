@@ -1,0 +1,45 @@
+/* ==========================================================================
+   BADGES
+   ========================================================================== */
+
+.badge {
+    @apply text-3xs not-italic bg-gray-300 text-gray-800 rounded-md leading-normal;
+    padding: 1px 5px 0;
+}
+
+.badge-pill {
+    @apply bg-gray-300 px-2 py-1 rounded;
+}
+
+.badge-pill-sm {
+    @apply bg-gray-300 px-1 py-px rounded;
+}
+
+.badge-updates {
+    @apply text-3xs not-italic bg-red text-white rounded-full leading-normal;
+    padding: 2px 6px 1px;
+}
+
+.badge-sm {
+    @apply bg-gray-300 uppercase text-4xs text-white rounded-sm leading-normal;
+    height: 16px;
+    padding: 1px 5px 2px;
+}
+
+.filter-badge {
+    @apply text-2xs text-gray-800 bg-gray-300 flex items-center;
+    height: 1.625rem; /*  24px */
+    padding-left: 10px;
+
+    button {
+        @apply px-2 text-base text-gray-500 flex items-center rounded;
+
+        &:hover {
+            @apply text-gray-700;
+        }
+
+        &:focus {
+            @apply focus-outline;
+        }
+    }
+}

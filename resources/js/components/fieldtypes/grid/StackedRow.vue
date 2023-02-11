@@ -1,7 +1,7 @@
 <template>
 
     <div
-        class="bg-grey-10 shadow-sm mb-2 rounded border"
+        class="bg-gray-100 shadow-sm mb-4 rounded border"
         :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
         <div
@@ -23,7 +23,7 @@
                 :set-index="index"
                 :errors="errors(field.handle)"
                 :field-path="fieldPath(field.handle)"
-                class="p-2"
+                class="p-4"
                 :read-only="grid.isReadOnly"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"

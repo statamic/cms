@@ -5,15 +5,15 @@
         <button v-if="isWarning" class="session-expiry-stripe" @click="extend" v-text="warningText" />
 
         <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true" :pivotY=".1">
-            <div class="flex items-center p-3 bg-grey-20 border-b text-center">
+            <div class="flex items-center p-6 bg-gray-200 border-b text-center">
                 {{ __('Resume Your Session') }}
             </div>
 
-            <div v-if="isUsingOauth" class="p-3">
+            <div v-if="isUsingOauth" class="p-6">
                 <a :href="oauthProvider.loginUrl" target="_blank" class="btn-primary">
                     {{ __('Log in with :provider', {provider: oauthProvider.label}) }}
                 </a>
-                <div class="text-2xs text-grey mt-2">
+                <div class="text-2xs text-gray mt-4">
                     {{ __('messages.session_expiry_new_window') }}
                 </div>
             </div>
@@ -38,7 +38,7 @@
                             tabindex="1"
                             autofocus
                             @keydown.enter.prevent="submit" />
-                        <button @click="submit" class="btn-primary ml-1" v-text="__('Log in')" />
+                        <button @click="submit" class="btn-primary ml-2" v-text="__('Log in')" />
                     </div>
                 </div>
             </div>

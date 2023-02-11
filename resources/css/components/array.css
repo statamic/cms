@@ -1,0 +1,57 @@
+/* ==========================================================================
+   ARRAY FIELDTYPE
+   ========================================================================== */
+
+.array-fieldtype {
+
+}
+
+.array-table {
+    @apply border rounded border-separate text-sm text-left w-full;
+
+    tr:not(:last-child) {
+        th, td {
+            @apply border-b;
+        }
+    }
+
+    th {
+        @apply border-r p-2 bg-gray-300;
+    }
+
+    td {
+        @apply p-0 m-0;
+    }
+
+    tr:first-child th {
+        @apply rounded-tl-sm;
+    }
+
+    tr:first-child td,
+    tr:first-child .input-text-minimal {
+        @apply rounded-tr-sm;
+    }
+
+    tr:last-child th {
+        @apply rounded-bl-sm;
+    }
+    tr:last-child tr,
+
+    tr:last-child .input-minimal {
+        @apply rounded-br-sm;
+    }
+
+    &:focus-within {
+        @apply focus-outline;
+    }
+
+    td:focus-within {
+        @apply bg-gray-200;
+    }
+
+    /* Read Only */
+    .read-only-field & {
+        th { @apply text-gray-500; }
+        tr td { @apply bg-gray-200; }
+    }
+}

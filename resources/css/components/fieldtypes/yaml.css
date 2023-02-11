@@ -1,0 +1,21 @@
+/* ==========================================================================
+   YAML FIELDTYPE
+   ========================================================================== */
+
+
+
+/* Inside a Grid field
+  ========================================================================== */
+
+.grid-fieldtype .yaml-fieldtype-wrapper {
+    > span {
+        border-top: 0;
+        border-right: 0;
+    }
+
+    .editor {
+        border: none;
+        border-radius: 0;
+        .CodeMirror { box-shadow: none; }
+    }
+}

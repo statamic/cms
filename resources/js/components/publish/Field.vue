@@ -9,16 +9,16 @@
         <div class="field-inner">
             <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span
-                    :class="{ 'text-grey-60': syncable && isSynced }"
+                    :class="{ 'text-gray-600': syncable && isSynced }"
                     v-text="labelText"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
-                <i class="required ml-sm" v-if="config.required">*</i>
-                <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly && !isSection" class="text-grey-50 font-normal text-2xs mx-sm">
+                <i class="required ml-1" v-if="config.required">*</i>
+                <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-2 mr-2" v-tooltip="lockingUser.name" />
+                <span v-if="isReadOnly && !isSection" class="text-gray-500 font-normal text-2xs mx-1">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
-                <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="isLocalizable && !isSection" v-tooltip.top="__('Localizable field')" />
+                <svg-icon name="translate" class="h-4 ml-1 w-4 text-gray-600" v-if="isLocalizable && !isSection" v-tooltip.top="__('Localizable field')" />
 
                 <button
                     v-if="!isReadOnly && !isSection"
@@ -27,7 +27,7 @@
                     :class="{ flex: syncable && isSynced }"
                     @click="$emit('desynced')"
                 >
-                    <svg-icon name="hyperlink" class="h-4 w-4 ml-.5 mb-sm text-grey-60"
+                    <svg-icon name="hyperlink" class="h-4 w-4 ml-1.5 mb-1 text-gray-600"
                         v-tooltip.top="__('messages.field_synced_with_origin')" />
                 </button>
 
@@ -38,13 +38,13 @@
                     :class="{ flex: syncable && !isSynced }"
                     @click="$emit('synced')"
                 >
-                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-.5 mb-sm text-grey-60"
+                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-1.5 mb-1 text-gray-600"
                         v-tooltip.top="__('messages.field_desynced_from_origin')" />
                 </button>
             </label>
 
             <div
-                class="help-block -mt-1"
+                class="help-block -mt-2"
                 v-if="instructions && config.instructions_position !== 'below'"
                 v-html="instructions" />
         </div>
@@ -71,12 +71,12 @@
         </slot>
 
         <div
-            class="help-block mt-1"
+            class="help-block mt-2"
             v-if="instructions && config.instructions_position === 'below'"
             v-html="instructions" />
 
         <div v-if="hasError">
-            <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block text-red mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
     </div>
     </publish-field-meta>

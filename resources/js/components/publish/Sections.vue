@@ -10,7 +10,7 @@
             :class="{ 'offset-for-sidebar': shouldShowSidebar }"
         >
             <div
-                class="publish-tabs tabs flex-shrink"
+                class="publish-tabs tabs shrink"
                 :class="{ 'tabs-scrolled': canScrollLeft }"
                 ref="tabs"
                 role="tablist"
@@ -43,9 +43,9 @@
             </div>
 
             <div class="fade-left" v-if="canScrollLeft" />
-            <div class="fade-right" :class="{ 'mr-4': showHiddenTabsDropdown }" v-if="canScrollRight" />
+            <div class="fade-right" :class="{ 'mr-8': showHiddenTabsDropdown }" v-if="canScrollRight" />
 
-            <dropdown-list class="ml-1" v-cloak v-if="showHiddenTabsDropdown">
+            <dropdown-list class="ml-2" v-cloak v-if="showHiddenTabsDropdown">
                 <dropdown-item
                     v-for="(section, index) in mainSections"
                     v-show="shouldShowInDropdown(index)"

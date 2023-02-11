@@ -3,7 +3,7 @@
     <div class="w-full flex">
 
         <div class="flex flex-1 items-center" v-if="! inline">
-            <div class="text-xs text-grey-70" v-if="showTotals && totalItems > 0">
+            <div class="text-xs text-gray-700" v-if="showTotals && totalItems > 0">
                 {{ __(':start-:end of :total', { start: fromItem, end: toItem, total: totalItems }) }}
             </div>
         </div>
@@ -33,7 +33,7 @@
 
             <select-input
                 v-if="perPage && isPerPageEvenUseful"
-                class="ml-3"
+                class="ml-6"
                 name="perPage"
                 :placeholder="__('Per Page')"
                 :options="perPageOptions"

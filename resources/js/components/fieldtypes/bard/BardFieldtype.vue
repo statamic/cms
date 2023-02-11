@@ -20,7 +20,7 @@
                     :editor="editor" />
             </div>
             <div class="flex items-center no-select">
-                <div class="h-10 -my-sm border-l pr-1 w-px" v-if="toolbarIsFixed && hasExtraButtons"></div>
+                <div class="h-10 -my-1 border-l pr-2 w-1" v-if="toolbarIsFixed && hasExtraButtons"></div>
                 <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
                     <svg-icon name="file-code" class="w-4 h-4 "/>
                 </button>
@@ -51,7 +51,7 @@
                 <dropdown-list>
                     <template v-slot:trigger>
                         <button type="button" class="btn-round" :aria-label="__('Add Set')" v-tooltip="__('Add Set')">
-                            <span class="icon icon-plus text-grey-80 antialiased"></span>
+                            <span class="icon icon-plus text-gray-800 antialiased"></span>
                         </button>
                     </template>
 

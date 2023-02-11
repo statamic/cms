@@ -24,8 +24,8 @@
         </svg>
 
         <div v-if="text" :class="{
-            'ml-1 text-sm text-grey': inline,
-            'mt-1': !inline
+            'ml-2 text-sm text-gray': inline,
+            'mt-2': !inline
         }">{{ __(text) }}</div>
     </div>
 </template>

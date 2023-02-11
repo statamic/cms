@@ -1,0 +1,86 @@
+/* ==========================================================================
+   TABS
+   ========================================================================== */
+
+
+.tabs-container {
+    @apply relative;
+
+    &.offset-for-sidebar {
+        width: calc(100% - 320px);
+    }
+
+   .fade-left, .fade-right {
+        @apply absolute w-4 inset-y-0 from-gray-300 pointer-events-none z-10;
+    }
+
+    .fade-left {
+        @apply left-0 bg-gradient-to-r;
+    }
+
+    .fade-right {
+        @apply right-0 bg-gradient-to-l;
+    }
+}
+
+.tabs {
+    @apply flex items-end overflow-hidden px-2 -ml-2;
+    height: 48px;
+
+    &-scrolled {
+        @apply pl-0 ml-0;
+    }
+
+    .tab-button {
+        @apply whitespace-nowrap bg-gray-100 py-1 px-4 shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-gray-300 select-none;
+        height: 94%;
+        min-height: 94%;
+    }
+
+    .tab-button.active {
+        @apply bg-white text-blue border-t-2 border-blue relative h-full min-h-full border-b-0 outline-none;
+        z-index: 1;
+    }
+
+    .tab-button:active {
+        @apply bg-white text-blue border-b-0 outline-none;
+    }
+
+    .tab-button:focus {
+        @apply bg-white text-blue border-b-0 focus-outline;
+    }
+
+    .tab-button.ghost {
+        @apply bg-transparent relative h-full min-h-full shadow-none border-none text-gray-500 px-6;
+        min-width: 0;
+        &:hover {
+            @apply text-blue;
+        }
+    }
+
+    .tab-button.has-error {
+        @apply text-red;
+
+        &.active {
+            box-shadow: theme('colors.red.DEFAULT') 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
+        }
+    }
+}
+
+.tab-panel:focus {
+    @apply focus-outline;
+}
+
+@screen md {
+    .tabs .tab-button {
+        min-width: 120px;
+    }
+}
+
+
+/* Responsive Wangjangling
+  ========================================================================== */
+
+@screen md {
+    .tabs .tab-button { @apply text-base; }
+}

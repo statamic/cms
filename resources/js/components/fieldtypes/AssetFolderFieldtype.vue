@@ -1,6 +1,6 @@
 <template>
     <div class="asset-folder-fieldtype-wrapper">
-        <small class="help-block text-grey-60" v-if="!container">{{ __('Select asset container') }}</small>
+        <small class="help-block text-gray-600" v-if="!container">{{ __('Select asset container') }}</small>
 
         <relationship-fieldtype
             v-if="container"

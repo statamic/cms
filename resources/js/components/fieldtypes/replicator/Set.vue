@@ -4,30 +4,30 @@
 
         <slot name="picker" />
 
-        <div class="replicator-set-header" :class="{ 'p-1': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
+        <div class="replicator-set-header" :class="{ 'p-2': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
             <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
-            <div class="flex-1 p-1 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                <label v-text="display || config.handle" class="text-xs whitespace-no-wrap mr-1 cursor-pointer"/>
+            <div class="flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
+                <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2 cursor-pointer"/>
                 <div
                     v-if="config.instructions"
                     v-show="!collapsed"
                     v-html="instructions"
-                    class="help-block mt-1 -mb-1" />
+                    class="help-block mt-2 -mb-2" />
 
-                <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-4">
+                <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-8">
                     <div
                         v-html="previewText"
-                        class="help-block mb-0 whitespace-no-wrap overflow-hidden text-overflow-ellipsis" />
+                        class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
                 </div>
             </div>
             <div class="replicator-set-controls" v-if="!isReadOnly">
                 <toggle-fieldtype
                     handle="set-enabled"
-                    class="toggle-sm mr-2"
+                    class="toggle-sm mr-4"
                     @input="toggleEnabledState"
                     :value="values.enabled"
                     v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
-                <dropdown-list class="-mt-sm">
+                <dropdown-list class="-mt-1">
                     <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                     <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
                     <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />

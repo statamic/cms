@@ -1,0 +1,15 @@
+/* ==========================================================================
+   TEXTAREA FIELDTYPE
+   ========================================================================== */
+
+.textarea-fieldtype textarea {
+    @apply border-gray-500;
+    min-height: 80px;
+}
+
+/* Inside a Grid
+  ========================================================================== */
+
+ .grid-fieldtype .textarea-fieldtype textarea {
+     @apply bg-white;
+ }

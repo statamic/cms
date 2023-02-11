@@ -1,9 +1,9 @@
 <div class="no-results border-dashed border-2">
-    <div class="text-center max-w-md mx-auto mt-5 rounded-lg px-4 py-8">
+    <div class="text-center max-w-md mx-auto mt-10 rounded-lg px-8 py-30">
 
         @cp_svg($svg)
 
-        <h1 class="my-3">
+        <h1 class="my-6">
             @if ($can ?? $user->can('super'))
                 {{ __("Create your first {$resource} now") }}
             @else
@@ -12,7 +12,7 @@
         </h1>
 
         @if ($description ?? false)
-            <p class="text-grey mb-3">
+            <p class="text-gray mb-6">
                 {{ __($description) }}
             </p>
         @endif

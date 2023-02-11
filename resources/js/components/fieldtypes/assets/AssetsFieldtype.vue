@@ -14,7 +14,7 @@
             <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
 
                 <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
-                    <svg-icon name="upload" class="h-8 w-8 mr-3" />
+                    <svg-icon name="upload" class="h-8 w-8 mr-6" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
@@ -33,11 +33,11 @@
                         @click="openSelector"
                         @keyup.space.enter="openSelector"
                         tabindex="0">
-                        <svg-icon name="folder-image" class="w-6 h-6 text-grey-80"></svg-icon>
+                        <svg-icon name="folder-image" class="w-6 h-6 text-gray-800"></svg-icon>
                         {{ __('Browse') }}
                     </button>
 
-                    <p class="asset-upload-control text-xs text-grey-60" v-if="config.allow_uploads">
+                    <p class="asset-upload-control text-xs text-gray-600" v-if="config.allow_uploads">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
@@ -135,7 +135,7 @@
 </template>
 
 
-<style lang="scss">
+<style>
 
     .asset-listing-uploads {
         border: 1px dashed #ccc;

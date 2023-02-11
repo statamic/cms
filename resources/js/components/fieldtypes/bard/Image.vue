@@ -3,14 +3,14 @@
     <node-view-wrapper>
         <div class="bard-inline-image-container">
             <div v-if="src">
-                <div class="p-1 text-center">
+                <div class="p-2 text-center">
                     <div ref="content" hidden />
                     <img :src="src" class="block mx-auto" data-drag-handle />
                 </div>
 
-                <div class="flex items-center p-1 pt-0 rounded-b" @paste.stop>
-                    <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-1" />
-                    <button class="btn-flat mr-1" @click="openSelector">
+                <div class="flex items-center p-2 pt-0 rounded-b" @paste.stop>
+                    <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-2" />
+                    <button class="btn-flat mr-2" @click="openSelector">
                         {{ __('Replace') }}
                     </button>
                     <button class="btn-flat" @click="deleteNode">
@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <div v-else class="text-center p-2">
+            <div v-else class="text-center p-4">
                 <button class="btn-flat" @click="openSelector">
                     {{ __('Choose Image') }}
                 </button>
