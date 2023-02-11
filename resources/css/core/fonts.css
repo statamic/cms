@@ -1,67 +1,22 @@
-/* Inter UI
+/* Inter
    ========================================================================== */
 
-@font-face {
-  font-family: 'Inter UI';
-  font-style:  normal;
-  font-weight: 400;
-  src: url("../fonts/Inter-UI/Inter-UI-Regular.woff2") format("woff2"),
-       url("../fonts/Inter-UI/Inter-UI-Regular.woff") format("woff");
-}
-
-@font-face {
-  font-family: 'Inter UI';
-  font-style:  italic;
-  font-weight: 400;
-  src: url("../fonts/Inter-UI/Inter-UI-Italic.woff2") format("woff2"),
-       url("../fonts/Inter-UI/Inter-UI-Italic.woff") format("woff");
-}
-
-@font-face {
-  font-family: 'Inter UI';
-  font-style:  normal;
-  font-weight: 500;
-  src: url("../fonts/Inter-UI/Inter-UI-Medium.woff2") format("woff2"),
-       url("../fonts/Inter-UI/Inter-UI-Medium.woff") format("woff");
-}
-
-@font-face {
-  font-family: 'Inter UI';
-  font-style:  italic;
-  font-weight: 500;
-  src: url("../fonts/Inter-UI/Inter-UI-MediumItalic.woff2") format("woff2"),
-       url("../fonts/Inter-UI/Inter-UI-MediumItalic.woff") format("woff");
-}
-
-@font-face {
-  font-family: 'Inter UI';
-  font-style:  normal;
-  font-weight: 700;
-  src: url("../fonts/Inter-UI/Inter-UI-Bold.woff2") format("woff2"),
-       url("../fonts/Inter-UI/Inter-UI-Bold.woff") format("woff");
-}
-@font-face {
-  font-family: 'Inter UI';
-  font-style:  italic;
-  font-weight: 700;
-  src: url("../fonts/Inter-UI/Inter-UI-BoldItalic.woff2") format("woff2"),
-       url("../fonts/Inter-UI/Inter-UI-BoldItalic.woff") format("woff");
-}
-
-@font-face {
-  font-family: 'Inter UI';
-  font-style:  normal;
-  font-weight: 900;
-  src: url("../fonts/Inter-UI/Inter-UI-Black.woff2") format("woff2"),
-       url("../fonts/Inter-UI/Inter-UI-Black.woff") format("woff");
-}
-@font-face {
-  font-family: 'Inter UI';
-  font-style:  italic;
-  font-weight: 900;
-  src: url("../fonts/Inter-UI/Inter-UI-BlackItalic.woff2") format("woff2"),
-       url("../fonts/Inter-UI/Inter-UI-BlackItalic.woff") format("woff");
-}
+   @font-face {
+    font-family: 'Inter var';
+    font-weight: 100 900;
+    font-display: swap;
+    font-style: normal;
+    font-named-instance: 'Regular';
+    src: url("../fonts/Inter/Inter-roman.var.woff2?v=3.19") format("woff2");
+  }
+  @font-face {
+    font-family: 'Inter var';
+    font-weight: 100 900;
+    font-display: swap;
+    font-style: italic;
+    font-named-instance: 'Italic';
+    src: url("../fonts/Inter/Inter-italic.var.woff2?v=3.19") format("woff2");
+  }
 
 
 /* Entypo
