@@ -7,7 +7,7 @@
     font-display: swap;
     font-style: normal;
     font-named-instance: 'Regular';
-    src: url("../fonts/Inter/Inter-roman.var.woff2?v=3.19") format("woff2");
+    src: url("../../fonts/Inter/Inter-roman.var.woff2?v=3.19") format("woff2");
   }
   @font-face {
     font-family: 'Inter var';
@@ -15,7 +15,7 @@
     font-display: swap;
     font-style: italic;
     font-named-instance: 'Italic';
-    src: url("../fonts/Inter/Inter-italic.var.woff2?v=3.19") format("woff2");
+    src: url("../../fonts/Inter/Inter-italic.var.woff2?v=3.19") format("woff2");
   }
 
 
@@ -24,11 +24,11 @@
 
 @font-face {
   font-family: "entypo";
-  src: url('../fonts/entypo.eot');
-  src: url('../fonts/entypo.eot?#iefix') format('eot'),
-       url('../fonts/entypo.woff2') format('woff2'),
-       url('../fonts/entypo.woff') format('woff'),
-       url('../fonts/entypo.ttf') format('truetype');
+  src: url('../../fonts/entypo.eot');
+  src: url('../../fonts/entypo.eot?#iefix') format('eot'),
+       url('../../fonts/entypo.woff2') format('woff2'),
+       url('../../fonts/entypo.woff') format('woff'),
+       url('../../fonts/entypo.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -40,9 +40,9 @@
 @font-face {
     font-family: 'fontawesome';
     src:
-        url('../fonts/fontawesome.ttf?hj1qzi') format('truetype'),
-        url('../fonts/fontawesome.woff?hj1qzi') format('woff'),
-        url('../fonts/fontawesome.svg?hj1qzi#fontawesome') format('svg');
+        url('../../fonts/fontawesome.ttf?hj1qzi') format('truetype'),
+        url('../../fonts/fontawesome.woff?hj1qzi') format('woff'),
+        url('../../fonts/fontawesome.svg?hj1qzi#fontawesome') format('svg');
     font-weight: normal;
     font-style: normal;
 }

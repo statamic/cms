@@ -17,7 +17,7 @@
 .blueprint-drag-handle {
     @apply flex-none;
     cursor: move;
-    background: rgba(0, 0, 0, 0.01) url('../svg/drag-dots.svg') 50% 50% no-repeat;
+    background: rgba(0, 0, 0, 0.01) url('../../svg/drag-dots.svg') 50% 50% no-repeat;
 }
 
 .blueprint-section-field {
