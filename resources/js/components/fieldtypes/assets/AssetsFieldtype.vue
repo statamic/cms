@@ -44,15 +44,6 @@
                         <span v-if="soloAsset" class="drag-drop-text" v-text="__('or drag & drop here to replace.')"></span>
                         <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
                     </p>
-
-                    <button
-                        type="button"
-                        class="delete-bard-set btn btn-icon float-right"
-                        v-if="isInBardField"
-                        @click.prevent="$dispatch('asset-field.delete-bard-set')">
-                        <span class="icon icon-trash"></span>
-                    </button>
-
                 </div>
 
                 <uploads

@@ -53,7 +53,7 @@
                                 </div>
                             </div>
 
-                            <div class="icon icon-arrow-right my-1 mx-2 text-gray-600" />
+                            <svg-icon name="micro-arrow-right" class="w-6 h-6 my-1 mx-2 text-gray-700" />
 
                             <div class="input-group">
                                 <div class="input-group-prepend flex items-center" v-if="!config.inline">

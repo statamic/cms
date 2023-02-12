@@ -72,7 +72,3 @@
 .grid-item-header {
     @apply bg-gray-200 border-b px-4 py-2 text-sm flex items-center justify-between outline-none cursor-move;
 }
-
-.grid-stacked .input-text {
-    @apply bg-white;
-}

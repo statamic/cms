@@ -3,11 +3,7 @@
     <th v-show="field.type !== 'hidden'">
         <div class="flex items-center justify-between">
             <div>{{ field.display || field.handle }}</div>
-            <div
-                v-if="field.instructions"
-                class="icon icon-help-with-circle opacity-50 text-xs"
-                v-tooltip="$options.filters.markdown(field.instructions)"
-            />
+            <svg-icon name="micro-circle-help" class="text-gray-600 hover:text-gray-700 h-3 w-3 text-xs" v-if="field.instructions" v-tooltip="$options.filters.markdown(field.instructions)" />
         </div>
     </th>
 
