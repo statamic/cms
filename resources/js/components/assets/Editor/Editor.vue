@@ -305,8 +305,8 @@ export default {
                 this.actions = data.actions;
 
                 this.fieldset = data.blueprint;
-                this.fields = _.chain(this.fieldset.sections)
-                    .map(section => section.fields)
+                this.fields = _.chain(this.fieldset.tabs)
+                    .map(tab => tab.fields)
                     .flatten(true)
                     .value();
 

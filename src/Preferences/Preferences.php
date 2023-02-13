@@ -13,7 +13,7 @@ class Preferences
     protected $preventMergingChildren = [];
     protected $fields = [];
     protected $sections = [];
-    protected $pendingSection = null;
+    protected $pendingTab = null;
     protected $extensions = [];
 
     /**
@@ -199,8 +199,8 @@ class Preferences
     {
         $preference = (new Preference)->handle($handle)->field($field);
 
-        if ($this->pendingSection) {
-            $preference->section($this->pendingSection);
+        if ($this->pendingTab) {
+            $preference->section($this->pendingTab);
         }
 
         return $preference;
@@ -218,7 +218,7 @@ class Preferences
 
     public function section($handle, $label, $permissions = null)
     {
-        throw_if($this->pendingSection, new \Exception('Cannot nest preference sections'));
+        throw_if($this->pendingTab, new \Exception('Cannot nest preference sections'));
 
         if (func_num_args() === 3) {
             $this->sections[$handle] = $label;
@@ -228,10 +228,10 @@ class Preferences
             $permissions = $label;
         }
 
-        $this->pendingSection = $handle;
+        $this->pendingTab = $handle;
 
         $permissions($this);
 
-        $this->pendingSection = null;
+        $this->pendingTab = null;
     }
 }

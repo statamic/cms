@@ -15,7 +15,7 @@ class FieldsetFactory
         return $this;
     }
 
-    public function withSections($sections)
+    public function withTabs($sections)
     {
         if (! $this->contents) {
             $this->contents = [];

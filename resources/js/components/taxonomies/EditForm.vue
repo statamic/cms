@@ -12,7 +12,7 @@
         @updated="values = $event"
     >
         <div slot-scope="{ setFieldValue, setFieldMeta }">
-            <configure-sections
+            <configure-tabs
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
                 :enable-sidebar="false"/>

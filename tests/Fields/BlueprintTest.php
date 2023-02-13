@@ -20,7 +20,7 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
-use Statamic\Fields\Section;
+use Statamic\Fields\Tab;
 use Tests\TestCase;
 
 class BlueprintTest extends TestCase
@@ -41,10 +41,10 @@ class BlueprintTest extends TestCase
     public function it_gets_contents()
     {
         $blueprint = new Blueprint;
-        $this->assertEquals(['sections' => ['main' => ['fields' => []]]], $blueprint->contents());
+        $this->assertEquals(['tabs' => ['main' => ['fields' => []]]], $blueprint->contents());
 
         $contents = [
-            'sections' => [
+            'tabs' => [
                 'main' => [
                     'fields' => [
                         ['handle' => 'one', 'field' => ['type' => 'text']],
@@ -94,20 +94,20 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_sections()
+    public function it_gets_tabs()
     {
         $blueprint = new Blueprint;
-        tap($blueprint->sections(), function ($sections) {
-            $this->assertInstanceOf(Collection::class, $sections);
-            $this->assertCount(1, $sections);
+        tap($blueprint->tabs(), function ($tabs) {
+            $this->assertInstanceOf(Collection::class, $tabs);
+            $this->assertCount(1, $tabs);
         });
 
         $contents = [
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'fields' => ['one' => ['type' => 'text']],
                 ],
-                'section_two' => [
+                'tab_two' => [
                     'fields' => ['two' => ['type' => 'text']],
                 ],
             ],
@@ -115,18 +115,18 @@ class BlueprintTest extends TestCase
 
         $blueprint->setContents($contents);
 
-        tap($blueprint->sections(), function ($sections) {
-            $this->assertCount(2, $sections);
-            $this->assertEveryItemIsInstanceOf(Section::class, $sections);
-            $this->assertEquals(['section_one', 'section_two'], $sections->map->handle()->values()->all());
+        tap($blueprint->tabs(), function ($tabs) {
+            $this->assertCount(2, $tabs);
+            $this->assertEveryItemIsInstanceOf(Tab::class, $tabs);
+            $this->assertEquals(['tab_one', 'tab_two'], $tabs->map->handle()->values()->all());
         });
     }
 
     /** @test */
-    public function it_puts_top_level_fields_into_a_main_section()
+    public function it_puts_top_level_fields_into_a_main_tab()
     {
         $blueprint = new Blueprint;
-        $this->assertEquals(['sections' => ['main' => ['fields' => []]]], $blueprint->contents());
+        $this->assertEquals(['tabs' => ['main' => ['fields' => []]]], $blueprint->contents());
 
         $blueprint->setContents([
             'fields' => [
@@ -138,7 +138,7 @@ class BlueprintTest extends TestCase
         ]);
 
         $this->assertEquals([
-            'sections' => [
+            'tabs' => [
                 'main' => [
                     'fields' => [
                         [
@@ -165,15 +165,15 @@ class BlueprintTest extends TestCase
                 ],
             ]));
 
-        $blueprint = (new Blueprint)->setHandle('sectioned')->setContents($contents = [
+        $blueprint = (new Blueprint)->setHandle('tabbed')->setContents($contents = [
             'title' => 'Test',
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'fields' => [
                         ['handle' => 'one', 'field' => ['type' => 'text']],
                     ],
                 ],
-                'section_two' => [
+                'tab_two' => [
                     'fields' => [
                         ['handle' => 'two', 'field' => ['type' => 'text']],
                         ['import' => 'partial'],
@@ -187,12 +187,12 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('three'));
         $this->assertFalse($blueprint->hasField('four')); // Doesnt exist
 
-        $this->assertTrue($blueprint->hasFieldInSection('one', 'section_one'));
-        $this->assertTrue($blueprint->hasFieldInSection('two', 'section_two'));
-        $this->assertTrue($blueprint->hasFieldInSection('three', 'section_two'));
-        $this->assertFalse($blueprint->hasFieldInSection('one', 'section_two')); // In section one
-        $this->assertFalse($blueprint->hasFieldInSection('three', 'section_one')); // In section two
-        $this->assertFalse($blueprint->hasFieldInSection('four', 'section_two')); // Doesnt exist
+        $this->assertTrue($blueprint->hasFieldInTab('one', 'tab_one'));
+        $this->assertTrue($blueprint->hasFieldInTab('two', 'tab_two'));
+        $this->assertTrue($blueprint->hasFieldInTab('three', 'tab_two'));
+        $this->assertFalse($blueprint->hasFieldInTab('one', 'tab_two')); // In tab one
+        $this->assertFalse($blueprint->hasFieldInTab('three', 'tab_one')); // In tab two
+        $this->assertFalse($blueprint->hasFieldInTab('four', 'tab_two')); // Doesnt exist
     }
 
     /** @test */
@@ -212,8 +212,8 @@ class BlueprintTest extends TestCase
             ->andReturn(new Field('field_one', ['type' => 'textarea']));
 
         $blueprint->setContents($contents = [
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'fields' => [
                         [
                             'handle' => 'one',
@@ -221,7 +221,7 @@ class BlueprintTest extends TestCase
                         ],
                     ],
                 ],
-                'section_two' => [
+                'tab_two' => [
                     'fields' => [
                         [
                             'handle' => 'two',
@@ -263,8 +263,8 @@ class BlueprintTest extends TestCase
             ->andReturn(new Field('field_one', ['type' => 'textarea']));
 
         $blueprint->setContents($contents = [
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'fields' => [
                         [
                             'handle' => 'one',
@@ -272,7 +272,7 @@ class BlueprintTest extends TestCase
                         ],
                     ],
                 ],
-                'section_two' => [
+                'tab_two' => [
                     'fields' => [
                         [
                             'handle' => 'two',
@@ -317,8 +317,8 @@ class BlueprintTest extends TestCase
 
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
             'title' => 'Test',
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'instructions' => 'Does stuff',
                     'fields' => [
                         [
@@ -327,7 +327,7 @@ class BlueprintTest extends TestCase
                         ],
                     ],
                 ],
-                'section_two' => [
+                'tab_two' => [
                     'fields' => [
                         [
                             'handle' => 'two',
@@ -341,10 +341,10 @@ class BlueprintTest extends TestCase
         $this->assertEquals([
             'title' => 'Test',
             'handle' => 'test',
-            'sections' => [
+            'tabs' => [
                 [
-                    'display' => 'Section one',
-                    'handle' => 'section_one',
+                    'display' => 'Tab one',
+                    'handle' => 'tab_one',
                     'instructions' => 'Does stuff',
                     'fields' => [
                         [
@@ -370,8 +370,8 @@ class BlueprintTest extends TestCase
                     ],
                 ],
                 [
-                    'display' => 'Section two',
-                    'handle' => 'section_two',
+                    'display' => 'Tab two',
+                    'handle' => 'tab_two',
                     'instructions' => null,
                     'fields' => [
                         [
@@ -431,8 +431,8 @@ class BlueprintTest extends TestCase
 
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
             'title' => 'Test',
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'fields' => [
                         ['import' => 'partial', 'prefix' => 'nested_'],
                     ],
@@ -443,10 +443,10 @@ class BlueprintTest extends TestCase
         $this->assertEquals([
             'title' => 'Test',
             'handle' => 'test',
-            'sections' => [
+            'tabs' => [
                 [
-                    'display' => 'Section one',
-                    'handle' => 'section_one',
+                    'display' => 'Tab one',
+                    'handle' => 'tab_one',
                     'instructions' => null,
                     'fields' => [
                         [
@@ -582,8 +582,8 @@ class BlueprintTest extends TestCase
     /** @test */
     public function it_ensures_a_field_exists()
     {
-        $blueprint = (new Blueprint)->setContents(['sections' => [
-            'section_one' => [
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'existing', 'field' => ['type' => 'text']],
                 ],
@@ -595,8 +595,8 @@ class BlueprintTest extends TestCase
         $this->assertEquals($blueprint, $return);
         $this->assertTrue($blueprint->hasField('existing'));
         $this->assertTrue($blueprint->hasField('new'));
-        $this->assertEquals(['sections' => [
-            'section_one' => [
+        $this->assertEquals(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'existing', 'field' => ['type' => 'text']],
                     ['handle' => 'new', 'field' => ['type' => 'textarea']],
@@ -607,28 +607,28 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
-    public function it_ensures_a_field_exists_in_a_specific_section()
+    public function it_ensures_a_field_exists_in_a_specific_tab()
     {
-        $blueprint = (new Blueprint)->setContents(['sections' => [
-            'section_one' => [
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'existing', 'field' => ['type' => 'text']],
                 ],
             ],
         ]]);
 
-        $return = $blueprint->ensureField('new', ['type' => 'textarea'], 'section_two');
+        $return = $blueprint->ensureField('new', ['type' => 'textarea'], 'tab_two');
 
         $this->assertEquals($blueprint, $return);
         $this->assertTrue($blueprint->hasField('existing'));
         $this->assertTrue($blueprint->hasField('new'));
-        $this->assertEquals(['sections' => [
-            'section_one' => [
+        $this->assertEquals(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'existing', 'field' => ['type' => 'text']],
                 ],
             ],
-            'section_two' => [
+            'tab_two' => [
                 'fields' => [
                     ['handle' => 'new', 'field' => ['type' => 'textarea']],
                 ],
@@ -640,14 +640,14 @@ class BlueprintTest extends TestCase
     /** @test */
     public function it_ensures_a_field_has_config()
     {
-        $blueprint = (new Blueprint)->setContents(['sections' => [
-            'section_one' => [
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'title', 'field' => ['type' => 'text']],
                     ['handle' => 'author', 'field' => ['type' => 'text', 'do_not_touch_other_config' => true]],
                 ],
             ],
-            'section_two' => [
+            'tab_two' => [
                 'fields' => [
                     ['handle' => 'content', 'field' => ['type' => 'text']],
                 ],
@@ -671,8 +671,8 @@ class BlueprintTest extends TestCase
     /** @test */
     public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists()
     {
-        $blueprint = (new Blueprint)->setContents(['sections' => [
-            'section_one' => [
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'existing', 'field' => ['type' => 'text']],
                 ],
@@ -683,8 +683,8 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals($blueprint, $return);
         $this->assertTrue($blueprint->hasField('existing'));
-        $this->assertEquals(['sections' => [
-            'section_one' => [
+        $this->assertEquals(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'existing', 'field' => ['type' => 'text', 'foo' => 'bar']],
                 ],
@@ -696,8 +696,8 @@ class BlueprintTest extends TestCase
     /** @test */
     public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_prepended_a_field_exists_and_it_already_exists()
     {
-        $blueprint = (new Blueprint)->setContents(['sections' => [
-            'section_one' => [
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'first', 'field' => ['type' => 'text']],
                     ['handle' => 'existing', 'field' => ['type' => 'text']],
@@ -709,8 +709,8 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals($blueprint, $return);
         $this->assertTrue($blueprint->hasField('existing'));
-        $this->assertEquals(['sections' => [
-            'section_one' => [
+        $this->assertEquals(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'first', 'field' => ['type' => 'text']],
                     ['handle' => 'existing', 'field' => ['type' => 'text', 'foo' => 'bar']],
@@ -721,22 +721,22 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
-    public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists_in_a_specific_section()
+    public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists_in_a_specific_tab()
     {
-        $blueprint = (new Blueprint)->setContents(['sections' => [
-            'section_one' => [
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'existing', 'field' => ['type' => 'text']],
                 ],
             ],
         ]]);
 
-        $return = $blueprint->ensureField('existing', ['type' => 'textarea', 'foo' => 'bar'], 'another_section');
+        $return = $blueprint->ensureField('existing', ['type' => 'textarea', 'foo' => 'bar'], 'another_tab');
 
         $this->assertEquals($blueprint, $return);
         $this->assertTrue($blueprint->hasField('existing'));
-        $this->assertEquals(['sections' => [
-            'section_one' => [
+        $this->assertEquals(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'existing', 'field' => ['type' => 'text', 'foo' => 'bar']],
                 ],
@@ -757,8 +757,8 @@ class BlueprintTest extends TestCase
             ]])
         );
 
-        $blueprint = (new Blueprint)->setContents(['sections' => [
-            'section_one' => [
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'from_partial', 'field' => 'the_partial.the_field'],
                 ],
@@ -769,8 +769,8 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals($blueprint, $return);
         $this->assertTrue($blueprint->hasField('from_partial'));
-        $this->assertEquals(['sections' => [
-            'section_one' => [
+        $this->assertEquals(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['handle' => 'from_partial', 'field' => 'the_partial.the_field', 'config' => ['foo' => 'bar']],
                 ],
@@ -791,8 +791,8 @@ class BlueprintTest extends TestCase
             ]])
         );
 
-        $blueprint = (new Blueprint)->setContents(['sections' => [
-            'section_one' => [
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     ['import' => 'the_partial'],
                 ],
@@ -803,8 +803,8 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals($blueprint, $return);
         $this->assertTrue($blueprint->hasField('one'));
-        $this->assertEquals(['sections' => [
-            'section_one' => [
+        $this->assertEquals(['tabs' => [
+            'tab_one' => [
                 'fields' => [
                     [
                         'import' => 'the_partial',
@@ -823,13 +823,13 @@ class BlueprintTest extends TestCase
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
             'title' => 'Test',
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'fields' => [
                         ['handle' => 'one', 'field' => ['type' => 'text']],
                     ],
                 ],
-                'section_two' => [
+                'tab_two' => [
                     'fields' => [
                         ['handle' => 'two', 'field' => ['type' => 'text']],
                     ],
@@ -852,17 +852,17 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
-    public function it_ensures_a_field_exists_in_a_given_section_if_it_doesnt_exist_at_all()
+    public function it_ensures_a_field_exists_in_a_given_tab_if_it_doesnt_exist_at_all()
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
             'title' => 'Test',
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'fields' => [
                         ['handle' => 'one', 'field' => ['type' => 'text']],
                     ],
                 ],
-                'section_two' => [
+                'tab_two' => [
                     'fields' => [
                         ['handle' => 'two', 'field' => ['type' => 'text', 'foo' => 'bar']],
                     ],
@@ -870,17 +870,17 @@ class BlueprintTest extends TestCase
             ],
         ]);
         $this->assertFalse($blueprint->hasField('three'));
-        $this->assertEquals(2, $blueprint->sections()->count());
+        $this->assertEquals(2, $blueprint->tabs()->count());
 
         $return = $blueprint
-            // field "three" doesnt exist, so it will be added to a new "section_three" section
-            ->ensureField('three', ['type' => 'textarea'], 'section_three')
-            // field "two" exists, even though its in a different section than the one requested, so the config is merged
-            ->ensureField('two', ['type' => 'textarea'], 'section_three');
+            // field "three" doesnt exist, so it will be added to a new "tab_three" tab
+            ->ensureField('three', ['type' => 'textarea'], 'tab_three')
+            // field "two" exists, even though its in a different tab than the one requested, so the config is merged
+            ->ensureField('two', ['type' => 'textarea'], 'tab_three');
 
         $this->assertEquals($blueprint, $return);
         $this->assertTrue($blueprint->hasField('three'));
-        $this->assertEquals(3, $blueprint->sections()->count());
+        $this->assertEquals(3, $blueprint->tabs()->count());
         tap($blueprint->fields()->all(), function ($items) {
             $this->assertCount(3, $items);
             $this->assertEveryItemIsInstanceOf(Field::class, $items);
@@ -899,13 +899,13 @@ class BlueprintTest extends TestCase
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
             'title' => 'Test',
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'fields' => [
                         ['handle' => 'one', 'field' => ['type' => 'text']],
                     ],
                 ],
-                'section_two' => [
+                'tab_two' => [
                     'fields' => [
                         ['handle' => 'two', 'field' => ['type' => 'text']],
                         ['handle' => 'three', 'field' => ['type' => 'text']],
@@ -931,18 +931,18 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
-    public function it_removes_a_field_from_a_specific_section()
+    public function it_removes_a_field_from_a_specific_tab()
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
             'title' => 'Test',
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'fields' => [
                         ['handle' => 'one', 'field' => ['type' => 'text']],
                         ['handle' => 'two', 'field' => ['type' => 'text']],
                     ],
                 ],
-                'section_two' => [
+                'tab_two' => [
                     'fields' => [
                         ['handle' => 'three', 'field' => ['type' => 'text']],
                         ['handle' => 'four', 'field' => ['type' => 'text']],
@@ -957,12 +957,12 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('four'));
 
         $return = $blueprint
-            ->removeField('one', 'section_one')
-            ->removeField('four', 'section_one') // Doesn't exist in section one, so it won't be removed.
-            ->removeFieldFromSection('three', 'section_two')
-            ->removeFieldFromSection('two', 'section_two') // Don't exist in section two, so it won't be removed.
-            ->removeField('seven', 'section_one') // Ensure it doesn't error when field doesn't exist at all.
-            ->removeFieldFromSection('eight', 'section_one'); // Ensure it doesn't error when field doesn't exist at all.
+            ->removeField('one', 'tab_one')
+            ->removeField('four', 'tab_one') // Doesn't exist in tab one, so it won't be removed.
+            ->removeFieldFromTab('three', 'tab_two')
+            ->removeFieldFromTab('two', 'tab_two') // Don't exist in tab two, so it won't be removed.
+            ->removeField('seven', 'tab_one') // Ensure it doesn't error when field doesn't exist at all.
+            ->removeFieldFromTab('eight', 'tab_one'); // Ensure it doesn't error when field doesn't exist at all.
 
         $this->assertEquals($blueprint, $return);
 
@@ -973,18 +973,18 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
-    public function it_removes_a_specific_section()
+    public function it_removes_a_specific_tab()
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
             'title' => 'Test',
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'fields' => [
                         ['handle' => 'one', 'field' => ['type' => 'text']],
                         ['handle' => 'two', 'field' => ['type' => 'text']],
                     ],
                 ],
-                'section_two' => [
+                'tab_two' => [
                     'fields' => [
                         ['handle' => 'three', 'field' => ['type' => 'text']],
                         ['handle' => 'four', 'field' => ['type' => 'text']],
@@ -993,21 +993,21 @@ class BlueprintTest extends TestCase
             ],
         ]);
 
-        $this->assertTrue($blueprint->hasSection('section_one'));
+        $this->assertTrue($blueprint->hasTab('tab_one'));
         $this->assertTrue($blueprint->hasField('one'));
         $this->assertTrue($blueprint->hasField('two'));
-        $this->assertTrue($blueprint->hasSection('section_two'));
+        $this->assertTrue($blueprint->hasTab('tab_two'));
         $this->assertTrue($blueprint->hasField('three'));
         $this->assertTrue($blueprint->hasField('four'));
 
-        $return = $blueprint->removeSection('section_two');
+        $return = $blueprint->removeTab('tab_two');
 
         $this->assertEquals($blueprint, $return);
 
-        $this->assertTrue($blueprint->hasSection('section_one'));
+        $this->assertTrue($blueprint->hasTab('tab_one'));
         $this->assertTrue($blueprint->hasField('one'));
         $this->assertTrue($blueprint->hasField('two'));
-        $this->assertFalse($blueprint->hasSection('section_two'));
+        $this->assertFalse($blueprint->hasTab('tab_two'));
         $this->assertFalse($blueprint->hasField('three'));
         $this->assertFalse($blueprint->hasField('four'));
     }
@@ -1017,13 +1017,13 @@ class BlueprintTest extends TestCase
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
             'title' => 'Test',
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'fields' => [
                         ['handle' => 'one', 'field' => ['type' => 'text']],
                     ],
                 ],
-                'section_two' => [
+                'tab_two' => [
                     'fields' => [
                         ['handle' => 'one', 'field' => ['type' => 'text']],
                     ],
@@ -1052,13 +1052,13 @@ class BlueprintTest extends TestCase
 
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
             'title' => 'Test',
-            'sections' => [
-                'section_one' => [
+            'tabs' => [
+                'tab_one' => [
                     'fields' => [
                         ['import' => 'test'],
                     ],
                 ],
-                'section_two' => [
+                'tab_two' => [
                     'fields' => [
                         ['handle' => 'one', 'field' => ['type' => 'text']],
                     ],
@@ -1088,8 +1088,8 @@ class BlueprintTest extends TestCase
         $blueprint = (new Blueprint)->setHandle('test')
             ->setContents($contents = [
                 'title' => 'Test',
-                'sections' => [
-                    'section_one' => [
+                'tabs' => [
+                    'tab_one' => [
                         'fields' => [
                             ['import' => 'test', 'prefix' => 'first_'],
                             ['import' => 'test', 'prefix' => 'second_'],

@@ -149,7 +149,7 @@ return [
     'session_expiry_logged_out_for_inactivity' => 'Sei stato disconnesso perché risulti inattivo da un po\'.',
     'session_expiry_logging_out_in_seconds' => 'Risulti inattivo da un po\'e verrai disconnesso tra :seconds secondi. Clicca per estendere la sessione.',
     'session_expiry_new_window' => 'Apertura in una nuova finestra. Torna dopo aver effettuato l\'accesso.',
-    'tab_sections_instructions' => 'I campi in ciascuna sezione saranno raggruppati in schede. Crea nuovi campi, riutilizza campi esistenti o importa interi gruppi di campi da fieldset esistenti.',
+    'tabs_instructions' => 'I campi in ciascuna sezione saranno raggruppati in schede. Crea nuovi campi, riutilizza campi esistenti o importa interi gruppi di campi da fieldset esistenti.',
     'taxonomies_blueprints_instructions' => 'I termini di questa tassonomia possono utilizzare uno qualsiasi di questi progetti.',
     'taxonomies_collections_instructions' => 'Le raccolte che utilizzano questa tassonomia.',
     'taxonomy_configure_handle_instructions' => 'Utilizzato come riferimento a questa tassonomia sul frontend. Non è semplice modificarlo successivamente.',

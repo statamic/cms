@@ -63,7 +63,7 @@ export default {
     data() {
         return {
             confirming: false,
-            fieldset: {sections:[{fields:this.action.fields}]},
+            fieldset: {tabs:[{fields:this.action.fields}]},
             values: this.action.values,
         }
     },

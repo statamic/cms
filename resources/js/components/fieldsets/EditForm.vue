@@ -32,7 +32,7 @@
                 :fields="fieldset.fields"
                 :editing-field="editingField"
                 :exclude-fieldset="fieldset.handle"
-                :is-section-expanded="true"
+                :is-tab-expanded="true"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-linked="fieldLinked"
@@ -121,8 +121,8 @@ export default {
         },
 
         makeSortable() {
-            new Sortable(this.$el.querySelector('.blueprint-section-draggable-zone'), {
-                draggable: '.blueprint-section-field',
+            new Sortable(this.$el.querySelector('.blueprint-tab-draggable-zone'), {
+                draggable: '.blueprint-tab-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true },
                 plugins: [Plugins.SwapAnimation]

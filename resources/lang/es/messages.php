@@ -168,7 +168,7 @@ return [
     'session_expiry_logging_out_in_seconds' => '¡Tu sesión ha estado inactiva durante un rato y se cerrará en :seconds segundos! Haz clic para extender tu sesión y seguir trabajando.',
     'session_expiry_new_window' => 'Se abrirá una ventana nueva. Vuelve aquí una vez que hayas iniciado sesión.',
     'show_slugs_instructions' => 'Ya sea para mostrar slugs en la vista de árbol.',
-    'tab_sections_instructions' => 'Los campos en cada sección se agruparán en pestañas. Crea nuevos campos, reutiliza campos existentes o importa grupos enteros de campos en conjuntos de campos existentes.',
+    'tabs_instructions' => 'Los campos en cada sección se agruparán en pestañas. Crea nuevos campos, reutiliza campos existentes o importa grupos enteros de campos en conjuntos de campos existentes.',
     'taxonomies_blueprints_instructions' => 'Los términos en esta taxonomía pueden ser usados en cualquiera de estos planos.',
     'taxonomies_collections_instructions' => 'Las colecciones que usan esta taxonomía.',
     'taxonomies_preview_targets_instructions' => 'Las direcciones URL que se pueden ver en Vista previa en vivo. Obtén más información en la [documentación](https://statamic.dev/live-preview#preview-targets).',

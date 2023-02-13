@@ -1,14 +1,14 @@
 <template>
     <element-container @resized="containerWidth = $event.width">
         <div>
-            <div v-for="section in mainSections" :key="section.handle">
+            <div v-for="tab in mainTabs" :key="tab.handle">
                 <div class="mb-2 content">
-                    <h2 v-text="section.display" class="text-base" />
-                    <p v-html="section.instructions" />
+                    <h2 v-text="tab.display" class="text-base" />
+                    <p v-html="tab.instructions" />
                 </div>
-                <div class="card p-0 mb-10 configure-section">
+                <div class="card p-0 mb-10 configure-tab">
                     <publish-fields
-                        :fields="section.fields"
+                        :fields="tab.fields"
                         :read-only="readOnly"
                         :syncable="syncable"
                         @updated="(handle, value) => $emit('updated', handle, value)"
@@ -21,7 +21,7 @@
                 </div>
             </div>
 
-            <portal-target :name="actionsPortal" class="publish-section publish-section-actions-footer" />
+            <portal-target :name="actionsPortal" class="publish-tab publish-tab-actions-footer" />
         </div>
     </element-container>
 </template>
@@ -40,7 +40,7 @@ export default {
         const state = this.$store.state.publish[this.storeName];
 
         return {
-            active: state.blueprint.sections[0].handle,
+            active: state.blueprint.tabs[0].handle,
             containerWidth: null
         }
     },
@@ -51,18 +51,18 @@ export default {
             return this.$store.state.publish[this.storeName];
         },
 
-        sections() {
-            return this.state.blueprint.sections;
+        tabs() {
+            return this.state.blueprint.tabs;
         },
 
-        mainSections() {
-            if (! this.shouldShowSidebar) return this.sections;
+        mainTabs() {
+            if (! this.shouldShowSidebar) return this.tab;
 
             if (this.active === "sidebar") {
-                this.active = this.state.blueprint.sections[0].handle
+                this.active = this.state.blueprint.tab[0].handle
             }
 
-            return _.filter(this.sections, section => section.handle != 'sidebar');
+            return _.filter(this.tab, tab => tab.handle != 'sidebar');
         },
 
         actionsPortal() {

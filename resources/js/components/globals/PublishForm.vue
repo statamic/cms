@@ -65,7 +65,7 @@
                     :container="container"
                     v-bind="component.props"
                 />
-                <publish-sections
+                <publish-tabs
                     :read-only="! canEdit"
                     :syncable="hasOrigin"
                     :can-toggle-labels="true"

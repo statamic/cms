@@ -186,7 +186,7 @@ return [
     'session_expiry_logging_out_in_seconds' => 'You have been inactive for a while and will be logged out in :seconds seconds. Click to extend your session.',
     'session_expiry_new_window' => 'Opens in a new window. Come back once you\'ve logged in.',
     'show_slugs_instructions' => 'Whether to display slugs in the tree view.',
-    'tab_sections_instructions' => 'The fields in each section will be grouped together into tabs. Create new fields, reuse existing fields, or import entire groups of fields from existing fieldsets.',
+    'tabs_instructions' => 'The fields in each section will be grouped together into tabs. Create new fields, reuse existing fields, or import entire groups of fields from existing fieldsets.',
     'taxonomies_blueprints_instructions' => 'Terms in this taxonomy may use any of these blueprints.',
     'taxonomies_collections_instructions' => 'The collections that use this taxonomy.',
     'taxonomies_preview_targets_instructions' => 'The URLs to be viewable within Live Preview. Learn more in the [documentation](https://statamic.dev/live-preview#preview-targets).',

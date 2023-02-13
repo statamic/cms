@@ -22,7 +22,7 @@
                         </button>
                     </template>
                     <dropdown-item :text="__('Add Nav Item')" @click="addItem(topLevelTreeData)" />
-                    <dropdown-item :text="__('Add Section')" @click="addSection" />
+                    <dropdown-item :text="__('Add Tab')" @click="addTab" />
                 </dropdown-list>
 
                 <div class="ml-4 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
@@ -64,12 +64,12 @@
             />
         </div>
 
-        <div v-if="!loading" class="page-tree page-tree-with-sections w-full">
+        <div v-if="!loading" class="page-tree page-tree-with-tabs w-full">
             <draggable-tree
                 draggable
                 cross-tree
                 class="mb-8"
-                :class="{ 'section-placeholder-inner': showTopLevelSectionPlaceholder }"
+                :class="{ 'tab-placeholder-inner': showTopLevelTabPlaceholder }"
                 ref="topLevelTree"
                 :data="topLevelTreeData"
                 :space="1"
@@ -85,7 +85,7 @@
                     :vm="vm"
                     :is-open="item.open"
                     :has-children="item.children.length > 0"
-                    :disable-sections="true"
+                    :disable-tabs="true"
                     :top-level="true"
                     @edit="editItem(item, true)"
                     @toggle-open="store.toggleOpen(item)"
@@ -118,7 +118,7 @@
             <draggable-tree
                 draggable
                 cross-tree
-                class="page-tree-with-sections"
+                class="page-tree-with-tabs"
                 ref="mainTree"
                 :data="mainTreeData"
                 :space="1"
@@ -130,7 +130,7 @@
                 <tree-branch
                     slot-scope="{ data: item, store, vm }"
                     :item="item"
-                    :parent-section="getParentSectionNode(item)"
+                    :parent-tab="getParentTabNode(item)"
                     :depth="vm.level"
                     :vm="vm"
                     :is-open="item.open"
@@ -147,11 +147,11 @@
                             :text="__('Edit')"
                             @click="editItem(item)" />
                         <dropdown-item
-                            v-if="! isSectionNode(item)"
+                            v-if="! isTabNode(item)"
                             :text="__('Pin to Top Level')"
                             @click="pinItem(item)" />
                         <dropdown-item
-                            v-if="! isSectionNode(item)"
+                            v-if="! isTabNode(item)"
                             :text="__('Duplicate')"
                             @click="aliasItem(item)" />
                         <li class="divider" />
@@ -183,18 +183,18 @@
             @updated="itemUpdated"
         />
 
-        <section-editor
-            v-if="creatingSection"
+        <tab-editor
+            v-if="creatingTab"
             :creating="true"
-            @closed="resetSectionEditor"
-            @updated="sectionAdded"
+            @closed="resetTabEditor"
+            @updated="tabAdded"
         />
 
-        <section-editor
-            v-if="editingSection"
-            :section-item="editingSection"
-            @closed="resetSectionEditor"
-            @updated="sectionUpdated"
+        <tab-editor
+            v-if="editingTab"
+            :tab-item="editingTab"
+            @closed="resetTabEditor"
+            @updated="tabUpdated"
         />
 
         <confirmation-modal
@@ -210,7 +210,7 @@
         <confirmation-modal
             v-if="confirmingRemoval"
             :title="__('Remove')"
-            :bodyText="__('Are you sure you want to remove this section and all of its children?')"
+            :bodyText="__('Are you sure you want to remove this tab and all of its children?')"
             :buttonText="__('Remove')"
             :danger="true"
             @confirm="removeItem(confirmingRemoval, true)"
@@ -225,7 +225,7 @@
 import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
 import ItemEditor from './ItemEditor.vue';
-import SectionEditor from './SectionEditor.vue';
+import TabEditor from './TabEditor.vue';
 import { data_get } from  '../../bootstrap/globals.js'
 
 export default {
@@ -234,7 +234,7 @@ export default {
         DraggableTree,
         TreeBranch,
         ItemEditor,
-        SectionEditor,
+        TabEditor,
     },
 
     props: {
@@ -269,13 +269,13 @@ export default {
             loading: false,
             topLevelTreeData: [],
             mainTreeData: [],
-            originalSectionItems: {},
+            originalTabItems: {},
             changed: false,
             targetDataArray: null,
             creatingItem: false,
             editingItem: false,
-            creatingSection: false,
-            editingSection: false,
+            creatingTab: false,
+            editingTab: false,
             confirmingReset: false,
             confirmingRemoval: false,
             draggingNode: false,
@@ -304,7 +304,7 @@ export default {
             return this.saveAsOptions.length;
         },
 
-        showTopLevelSectionPlaceholder() {
+        showTopLevelTabPlaceholder() {
             if (! this.topLevelTreeData.length) {
                 return true;
             }
@@ -321,23 +321,23 @@ export default {
         setInitialNav(nav) {
             let navConfig = clone(nav);
 
-            this.setOriginalSectionItems(navConfig);
+            this.setOriginalTabItems(navConfig);
 
             let topLevelConfig = navConfig.shift();
 
             this.topLevelTreeData = _.chain(topLevelConfig.items)
-                .map(section => this.normalizeNavConfig(section, false))
+                .map(tab => this.normalizeNavConfig(tab, false))
                 .values()
                 .value();
 
             this.mainTreeData = _.chain(navConfig)
-                .mapObject(section => this.normalizeNavConfig(section))
+                .mapObject(tab => this.normalizeNavConfig(tab))
                 .values()
                 .value();
         },
 
-        setOriginalSectionItems(nav) {
-            nav.forEach(section => this.originalSectionItems[section.display_original] = section.items_original || []);
+        setOriginalTabItems(nav) {
+            nav.forEach(tab => this.originalTabItems[tab.display_original] = tab.items_original || []);
         },
 
         discardChanges() {
@@ -346,14 +346,14 @@ export default {
             this.changed = false;
         },
 
-        normalizeNavConfig(config, isSectionNode = true) {
+        normalizeNavConfig(config, isTabNode = true) {
             let item = {
                 text: config.display,
                 config: config,
                 original: config.original,
-                manipulations: isSectionNode ? config : config.manipulations || {},
-                isSection: isSectionNode,
-                open: isSectionNode,
+                manipulations: isTabNode ? config : config.manipulations || {},
+                isTab: isTabNode,
+                open: isTabNode,
             };
 
             let children = config.items || config.children;
@@ -367,7 +367,7 @@ export default {
                         config: childItem,
                         original: childItem.original,
                         manipulations: childItem.manipulations || {},
-                        isSection: false,
+                        isTab: false,
                     };
                 });
             }
@@ -386,26 +386,26 @@ export default {
             });
 
             // Ensure you can only drop nav item nodes into top level tree root
-            this.$set(this.$refs.topLevelTree.rootData, 'droppable', ! this.isSectionNode(node));
+            this.$set(this.$refs.topLevelTree.rootData, 'droppable', ! this.isTabNode(node));
 
-            // Ensure you can only drop section nodes to main tree root
-            this.$set(this.$refs.mainTree.rootData, 'droppable', this.isSectionNode(node));
+            // Ensure you can only drop tab nodes to main tree root
+            this.$set(this.$refs.mainTree.rootData, 'droppable', this.isTabNode(node));
 
             // Hardcode max depths
             const topLevelTreeMaxDepth = 2 - nodeDepth; // 2 for nav items, and one level of nav item children
-            const mainTreeMaxDepth = 3 - nodeDepth; // 3 for sections, nav items, and one level of nav item children
+            const mainTreeMaxDepth = 3 - nodeDepth; // 3 for tabs, nav items, and one level of nav item children
 
             // Ensure max depth for top level tree
             this.traverseTree(this.topLevelTreeData, (childNode, { depth }) => {
                 if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= topLevelTreeMaxDepth && ! this.isSectionNode(node));
+                    this.$set(childNode, 'droppable', depth <= topLevelTreeMaxDepth && ! this.isTabNode(node));
                 }
             });
 
             // Ensure max depth for main tree
             this.traverseTree(this.mainTreeData, (childNode, { depth }) => {
                 if (childNode !== node) {
-                    this.$set(childNode, 'droppable', depth <= mainTreeMaxDepth && ! this.isSectionNode(node));
+                    this.$set(childNode, 'droppable', depth <= mainTreeMaxDepth && ! this.isTabNode(node));
                 }
             });
         },
@@ -423,17 +423,17 @@ export default {
             });
         },
 
-        isSectionNode(node) {
-            return data_get(node, 'isSection', false);
+        isTabNode(node) {
+            return data_get(node, 'isTab', false);
         },
 
-        isCustomSectionNode(node) {
-            return this.isSectionNode(node) && data_get(node, 'manipulations.action') === '@create';
+        isCustomTabNode(node) {
+            return this.isTabNode(node) && data_get(node, 'manipulations.action') === '@create';
         },
 
-        getParentSectionNode(node) {
-            if (! this.isSectionNode(node) && node !== undefined) {
-                return this.getParentSectionNode(node.parent);
+        getParentTabNode(node) {
+            if (! this.isTabNode(node) && node !== undefined) {
+                return this.getParentTabNode(node.parent);
             }
 
             return node;
@@ -444,7 +444,7 @@ export default {
                 return false;
             }
 
-            return ! this.isSectionNode(node.parent);
+            return ! this.isTabNode(node.parent);
         },
 
         traverseTree(nodes, callback, parentPath = []) {
@@ -472,8 +472,8 @@ export default {
             this.creatingItem = true;
         },
 
-        addSection() {
-            this.creatingSection = true;
+        addTab() {
+            this.creatingTab = true;
         },
 
         itemAdded(createdConfig) {
@@ -490,21 +490,21 @@ export default {
             this.changed = true;
         },
 
-        sectionAdded(sectionDisplay) {
+        tabAdded(tabDisplay) {
             let item = this.normalizeNavConfig({
                 action: '@create',
-                display: sectionDisplay,
+                display: tabDisplay,
                 display_original: false,
             });
 
             this.mainTreeData.push(item);
-            this.resetSectionEditor();
+            this.resetTabEditor();
             this.changed = true;
         },
 
         editItem(item, topLevel) {
-            if (this.isSectionNode(item) && ! topLevel) {
-                this.editingSection = item;
+            if (this.isTabNode(item) && ! topLevel) {
+                this.editingTab = item;
             } else {
                 this.editingItem = item;
             }
@@ -521,10 +521,10 @@ export default {
             this.changed = true;
         },
 
-        sectionUpdated(sectionDisplay, sectionItem) {
-            sectionItem.text = sectionDisplay;
+        tabUpdated(tabDisplay, tabItem) {
+            tabItem.text = tabDisplay;
 
-            this.resetSectionEditor();
+            this.resetTabEditor();
             this.changed = true;
         },
 
@@ -539,7 +539,7 @@ export default {
         },
 
         updateItemAction(item) {
-            if (this.isSectionNode(item)) {
+            if (this.isTabNode(item)) {
                 return;
             }
 
@@ -580,8 +580,8 @@ export default {
                 return false;
             }
 
-            return this.itemHasMovedWithinSection(item)
-                || this.itemHasMovedToAnotherSection(item);
+            return this.itemHasMovedWithinTab(item)
+                || this.itemHasMovedToAnotherTab(item);
         },
 
         itemIsWithinOriginalParentItem(item) {
@@ -592,7 +592,7 @@ export default {
             return this.isChildItemNode(item) && parentsOriginalChildIds.includes(item.config.id);
         },
 
-        itemHasMovedWithinSection(item) {
+        itemHasMovedWithinTab(item) {
             let parentsOriginalChildIds = data_get(item.parent, 'original', { children: [] })
                 .children
                 .map(child => child.id);
@@ -601,25 +601,25 @@ export default {
                 return true;
             }
 
-            let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
-            let sectionsOriginalIds = this.originalSectionItems[currentSection];
+            let currentTab = data_get(this.getParentTabNode(item), 'config.display_original', 'Top Level');
+            let tabsOriginalIds = this.originalTabItems[currentTab];
 
-            if (sectionsOriginalIds === undefined) {
+            if (tabsOriginalIds === undefined) {
                 return false;
             }
 
-            if (! this.isChildItemNode(item) && ! sectionsOriginalIds.includes(item.config.id)) {
+            if (! this.isChildItemNode(item) && ! tabsOriginalIds.includes(item.config.id)) {
                 return true;
             }
 
             return false;
         },
 
-        itemHasMovedToAnotherSection(item) {
-            let currentSection = data_get(this.getParentSectionNode(item), 'config.display_original', 'Top Level');
-            let originalSection = data_get(item.original, 'section') || data_get(item.parent, 'original.section');
+        itemHasMovedToAnotherTab(item) {
+            let currentTab = data_get(this.getParentTabNode(item), 'config.display_original', 'Top Level');
+            let originalTab = data_get(item.original, 'tab') || data_get(item.parent, 'original.tab');
 
-            return currentSection !== originalSection;
+            return currentTab !== originalTab;
         },
 
         itemHasBeenModified(item) {
@@ -639,13 +639,13 @@ export default {
 
         expandAll() {
             this.traverseTree(this.topLevelTreeData, (node) => {
-                if (! this.isSectionNode(node)) {
+                if (! this.isTabNode(node)) {
                     this.$set(node, 'open', true);
                 }
             });
 
             this.traverseTree(this.mainTreeData, (node) => {
-                if (! this.isSectionNode(node)) {
+                if (! this.isTabNode(node)) {
                     this.$set(node, 'open', true);
                 }
             });
@@ -653,13 +653,13 @@ export default {
 
         collapseAll() {
             this.traverseTree(this.topLevelTreeData, (node) => {
-                if (! this.isSectionNode(node)) {
+                if (! this.isTabNode(node)) {
                     this.$set(node, 'open', false);
                 }
             });
 
             this.traverseTree(this.mainTreeData, (node) => {
-                if (! this.isSectionNode(node)) {
+                if (! this.isTabNode(node)) {
                     this.$set(node, 'open', false);
                 }
             });
@@ -671,9 +671,9 @@ export default {
             this.targetDataArray = false;
         },
 
-        resetSectionEditor() {
-            this.editingSection = false;
-            this.creatingSection = false;
+        resetTabEditor() {
+            this.editingTab = false;
+            this.creatingTab = false;
         },
 
         pinItem(item) {
@@ -710,7 +710,7 @@ export default {
         isHideable(item) {
             let action = data_get(item.manipulations, 'action');
 
-            if (this.isSectionNode(item) && action === '@create') {
+            if (this.isTabNode(item) && action === '@create') {
                 return false;
             }
 
@@ -718,7 +718,7 @@ export default {
         },
 
         removeItem(item, bypassConfirmation = false) {
-            if (this.isCustomSectionNode(item) && item.children.length && ! bypassConfirmation) {
+            if (this.isCustomTabNode(item) && item.children.length && ! bypassConfirmation) {
                 return this.confirmingRemoval = item;
             }
 
@@ -779,12 +779,12 @@ export default {
                 'items': this.prepareItemsForSubmission(this.topLevelTreeData),
             });
 
-            this.mainTreeData.forEach(section => {
+            this.mainTreeData.forEach(tab => {
                 tree.push({
-                    'display': section.text,
-                    'display_original': section.config.display_original || section.text,
-                    'action': section.manipulations.action || false,
-                    'items': this.prepareItemsForSubmission(section.children),
+                    'display': tab.text,
+                    'display_original': tab.config.display_original || tab.text,
+                    'action': tab.manipulations.action || false,
+                    'items': this.prepareItemsForSubmission(tab.children),
                 });
             });
 

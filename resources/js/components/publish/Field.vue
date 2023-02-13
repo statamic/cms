@@ -15,13 +15,13 @@
                 />
                 <i class="required ml-1" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-2 mr-2" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly && !isSection" class="text-gray-500 font-normal text-2xs mx-1">
+                <span v-if="isReadOnly && !isTab" class="text-gray-500 font-normal text-2xs mx-1">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
-                <svg-icon name="translate" class="h-4 ml-1 w-4 text-gray-600" v-if="isLocalizable && !isSection" v-tooltip.top="__('Localizable field')" />
+                <svg-icon name="translate" class="h-4 ml-1 w-4 text-gray-600" v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')" />
 
                 <button
-                    v-if="!isReadOnly && !isSection"
+                    v-if="!isReadOnly && !isTab"
                     v-show="syncable && isSynced"
                     class="outline-none"
                     :class="{ flex: syncable && isSynced }"
@@ -32,7 +32,7 @@
                 </button>
 
                 <button
-                    v-if="!isReadOnly && !isSection"
+                    v-if="!isReadOnly && !isTab"
                     v-show="syncable && !isSynced"
                     class="outline-none"
                     :class="{ flex: syncable && !isSynced }"
@@ -148,8 +148,8 @@ export default {
             return this.$config.get('sites').length > 1 && this.config.localizable;
         },
 
-        isSection() {
-            return this.config.type === 'section';
+        isTab() {
+            return this.config.type === 'tab';
         },
 
         classes() {

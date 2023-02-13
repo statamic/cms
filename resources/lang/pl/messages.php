@@ -160,7 +160,7 @@ return [
     'session_expiry_logging_out_in_seconds' => 'Byłeś nieaktywny przez jakiś czas i zostaniesz wylogowany za :seconds sekund. Kliknij, aby przedłużyć sesję.',
     'session_expiry_new_window' => 'Otwiera się w nowym oknie. Wróć po zalogowaniu.',
     'show_slugs_instructions' => 'Czy wyświetlać slugi w widoku drzewa.',
-    'tab_sections_instructions' => 'Pola w każdej sekcji zostaną pogrupowane w zakładki. Twórz nowe pola, wykorzystuj istniejące lub importuj stworzone grupy pól.',
+    'tabs_instructions' => 'Pola w każdej sekcji zostaną pogrupowane w zakładki. Twórz nowe pola, wykorzystuj istniejące lub importuj stworzone grupy pól.',
     'taxonomies_blueprints_instructions' => 'Terminy w tej taksonomii mogą wykorzystywać dowolny z tych schematów.',
     'taxonomies_collections_instructions' => 'Kolekcje korzystające z tej taksonomii.',
     'taxonomy_configure_handle_instructions' => 'Służy do odwoływania się do tej taksonomii na frontendzie. Późniejsza zmiana może być problematyczna.',

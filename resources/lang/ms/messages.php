@@ -165,7 +165,7 @@ return [
     'session_expiry_logging_out_in_seconds' => 'Anda telah tidak aktif untuk seketika dan akan dilog keluar masuk :seconds seconds. Klik untuk melanjutkan sesi anda.',
     'session_expiry_new_window' => 'Dibuka dalam tetingkap baharu. Kembali setelah anda log masuk.',
     'show_slugs_instructions' => 'Sama ada untuk memaparkan slug dalam paparan pokok.',
-    'tab_sections_instructions' => 'Medan dalam setiap bahagian akan dikumpulkan bersama ke dalam tab. Cipta bidang baharu, gunakan semula bidang sedia ada atau import keseluruhan kumpulan bidang daripada set bidang sedia ada.',
+    'tabs_instructions' => 'Medan dalam setiap bahagian akan dikumpulkan bersama ke dalam tab. Cipta bidang baharu, gunakan semula bidang sedia ada atau import keseluruhan kumpulan bidang daripada set bidang sedia ada.',
     'taxonomies_blueprints_instructions' => 'Terma dalam taksonomi ini boleh menggunakan mana-mana cetakan biru ini.',
     'taxonomies_collections_instructions' => 'Koleksi yang menggunakan taksonomi ini.',
     'taxonomy_configure_handle_instructions' => 'Digunakan untuk merujuk taksonomi ini pada bahagian hadapan. Bukan remeh untuk berubah nanti.',

@@ -1,5 +1,5 @@
 title: Article
-sections:
+tabs:
   main:
     display: Main
     fields:

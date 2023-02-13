@@ -39,7 +39,7 @@
     @apply bg-gray-300;
 }
 
-.live-preview .publish-section-actions-footer {
+.live-preview .publish-tab-actions-footer {
     display: none;
 }
 
@@ -95,18 +95,18 @@
 /*  We only want the animation to happen when its on the regular publish page. */
 /*  When portal-ed into live preview, it won't be inside .workspace */
 .workspace {
-    .live-preview-sections-drop-enter-active,
-    .live-preview-sections-drop-leave-active {
+    .live-preview-tabs-drop-enter-active,
+    .live-preview-tabs-drop-leave-active {
         transition: all 0.2s;
     }
-    .live-preview-sections-drop-enter-active {
+    .live-preview-tabs-drop-enter-active {
         transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275)
     }
-    .live-preview-sections-drop-leave-active {
+    .live-preview-tabs-drop-leave-active {
         transition-timing-function: cubic-bezier(0.6, -0.28, 0.735, 0.045);
     }
-    .live-preview-sections-drop-enter,
-    .live-preview-sections-drop-leave-to {
+    .live-preview-tabs-drop-enter,
+    .live-preview-tabs-drop-leave-to {
         transform: translateY(100px);
         opacity: 0;
     }
@@ -121,7 +121,7 @@
     @apply p-6 bg-gray-300;
 }
 
-/*  remove shadow of sections when its narrow enough to be no longer be displayed as sections. */
-.live-preview-fields-narrow .publish-section {
+/*  remove shadow of tabs when its narrow enough to be no longer be displayed as tabs. */
+.live-preview-fields-narrow .publish-tab {
     @apply shadow-none
 }

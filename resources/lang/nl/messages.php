@@ -185,7 +185,7 @@ return [
     'session_expiry_logging_out_in_seconds' => 'Je bent een tijd inactief geweest en wordt uitgelogd over :seconds seconden. Klik hier om je sessie te verlengen.',
     'session_expiry_new_window' => 'Opent in een nieuw venster. Kom terug als je ingelogd bent.',
     'show_slugs_instructions' => 'Toon slugs in de boomweergave.',
-    'tab_sections_instructions' => 'De velden in iedere sectie worden gegroepeerd in tabs. Voeg nieuwe velden toe, herbruik bestaande velden of importeer groepen van velden uit reeds bestaande fieldsets.',
+    'tabs_instructions' => 'De velden in iedere sectie worden gegroepeerd in tabs. Voeg nieuwe velden toe, herbruik bestaande velden of importeer groepen van velden uit reeds bestaande fieldsets.',
     'taxonomies_blueprints_instructions' => 'Termen in deze taxonomie mogen in al deze blueprints gebruikt worden.',
     'taxonomies_collections_instructions' => 'De collectie die deze taxonomie gebruikt.',
     'taxonomies_preview_targets_instructions' => 'De URLs die je kunt bezoeken via Live Preview. Lees meer in de [documentatie](https://statamic.dev/live-preview#preview-targets).',

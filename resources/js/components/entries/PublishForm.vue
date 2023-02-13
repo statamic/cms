@@ -84,9 +84,9 @@
                         v-on="component.events"
                     />
 
-                    <transition name="live-preview-sections-drop">
-                        <publish-sections
-                            v-show="sectionsVisible"
+                    <transition name="live-preview-tabs-drop">
+                        <publish-tabs
+                            v-show="tabsVisible"
                             :read-only="readOnly"
                             :syncable="hasOrigin"
                             :can-toggle-labels="true"
@@ -181,7 +181,7 @@
                                 </div>
 
                             </template>
-                        </publish-sections>
+                        </publish-tabs>
                     </transition>
                 </div>
                 <template v-slot:buttons>
@@ -356,7 +356,7 @@ export default {
             error: null,
             errors: {},
             isPreviewing: false,
-            sectionsVisible: true,
+            tabsVisible: true,
             state: 'new',
             revisionMessage: null,
             showRevisionHistory: false,
@@ -679,18 +679,18 @@ export default {
         },
 
         openLivePreview() {
-            this.sectionsVisible = false;
+            this.tabsVisible = false;
             this.$wait(200)
                 .then(() => {
                     this.isPreviewing = true;
                     return this.$wait(300);
                 })
-                .then(() => this.sectionsVisible = true);
+                .then(() => this.tabsVisible = true);
         },
 
         closeLivePreview() {
             this.isPreviewing = false;
-            this.sectionsVisible = true;
+            this.tabsVisible = true;
         },
 
         publishActionCompleted({ published, isWorkingCopy, response }) {

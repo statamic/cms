@@ -6,7 +6,7 @@
                 <h1 v-text="initialTitle || __('Create Role')" />
             </header>
 
-            <publish-fields-container class="card p-0 mb-6 configure-section">
+            <publish-fields-container class="card p-0 mb-6 configure-tab">
 
                 <form-group
                     handle="title"

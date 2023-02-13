@@ -3,7 +3,7 @@
     <div class="flex flex-col h-full">
 
         <div class="flex items-center p-6 bg-gray-200 border-b text-center">
-            Section
+            {{ __('Tabs') }}
         </div>
 
         <div class="flex-1 overflow-scroll">
@@ -13,9 +13,9 @@
                     <div
                         v-for="field in fields"
                         :key="field._id"
-                        class="blueprint-section-field"
+                        class="blueprint-tab-field"
                     >
-                        <div class="blueprint-section-field-inner">
+                        <div class="blueprint-tab-field-inner">
                             <div class="blueprint-drag-handle w-4 border-r"></div>
 
                             <label class="block">{{ field.display }}</label>
@@ -39,12 +39,12 @@ export default {
     components: { PublishField },
 
     props: {
-        section: Object
+        tab: Object
     },
 
     computed: {
         fields() {
-            return this.section.fields.map(field => {
+            return this.tab.fields.map(field => {
                 const config = field.config || {};
 
                 return {

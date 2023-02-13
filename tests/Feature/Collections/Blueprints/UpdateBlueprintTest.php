@@ -75,7 +75,7 @@ class UpdateBlueprintTest extends TestCase
                     [
                         '_id' => 'id-one',
                         'handle' => 'one',
-                        'display' => 'Section One',
+                        'display' => 'Tab One',
                         'fields' => [
                             [
                                 '_id' => 'id-s1-f1',
@@ -108,7 +108,7 @@ class UpdateBlueprintTest extends TestCase
             'foo' => 'bar',
             'sections' => [
                 'one' => [
-                    'display' => 'Section One',
+                    'display' => 'Tab One',
                     'fields' => [
                         [
                             'handle' => 'title',
@@ -236,7 +236,7 @@ class UpdateBlueprintTest extends TestCase
                     [
                         '_id' => 'id-one',
                         'handle' => 'one',
-                        'display' => 'Section One',
+                        'display' => 'Tab One',
                         'fields' => [
                             [
                                 '_id' => 'id-s1-f1',
@@ -277,7 +277,7 @@ class UpdateBlueprintTest extends TestCase
             'title' => 'Updated title',
             'sections' => [
                 'one' => [
-                    'display' => 'Section One',
+                    'display' => 'Tab One',
                     'fields' => [
                         [
                             'handle' => 'title',
@@ -352,7 +352,7 @@ class UpdateBlueprintTest extends TestCase
                     [
                         '_id' => 'id-one',
                         'handle' => 'one',
-                        'display' => 'Section One',
+                        'display' => 'Tab One',
                         'fields' => [
                             [
                                 '_id' => 'id-s1-f1',
@@ -393,7 +393,7 @@ class UpdateBlueprintTest extends TestCase
             'title' => 'Updated title',
             'sections' => [
                 'one' => [
-                    'display' => 'Section One',
+                    'display' => 'Tab One',
                     'fields' => [
                         [
                             'handle' => 'title',
