@@ -2,8 +2,6 @@
 
 namespace Statamic\Tags\Taxonomy;
 
-use Statamic\Facades\Site;
-use Statamic\Support\Arr;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
 
