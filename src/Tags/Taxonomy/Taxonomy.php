@@ -30,10 +30,6 @@ class Taxonomy extends Tags
     {
         $terms = $this->terms()->get();
 
-        $site = Arr::getFirst($this->params, ['site', 'locale'], Site::current()->handle());
-
-        $terms = $terms->map->in($site);
-
         return $this->output($terms);
     }
 
