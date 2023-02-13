@@ -10,7 +10,7 @@
 
 .list-fieldtype li {
 	padding: 0 16px;
-	background: url('../svg/bullet.svg') no-repeat 0px 8px;
+	background: url('../../../svg/bullet.svg') no-repeat 0px 8px;
 	margin-bottom: 8px;
     font-size: 16px;
 	position: relative;
@@ -30,7 +30,7 @@
 	}
 
 	input {
-		background: #fff url('../svg/bullet.svg') no-repeat 0 8px;
+		background: #fff url('../../../svg/bullet.svg') no-repeat 0 8px;
 		box-shadow: none;
         padding: 0 16px;
         height: auto !important;
@@ -40,7 +40,7 @@
 	}
 
     .delete {
-	    background: #fff url(../svg/delete-x.svg) no-repeat 0 0;
+	    background: #fff url(../../../svg/delete-x.svg) no-repeat 0 0;
 	    width: 12px;
 	    height: 12px;
 	    display: inline-block;

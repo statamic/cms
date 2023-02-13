@@ -47,7 +47,7 @@
             @apply border-r h-full p-2;
             width: 1%;
             cursor: grab;
-            background: theme('colors.gray.200') url('../svg/drag-dots.svg') center center no-repeat;
+            background: theme('colors.gray.200') url('../../../svg/drag-dots.svg') center center no-repeat;
             &:hover { @apply bg-gray-300; }
         }
     }

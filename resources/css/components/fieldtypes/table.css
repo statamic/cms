@@ -52,7 +52,7 @@
         &.table-drag-handle {
             @apply w-3 border-r h-full p-2;
             cursor: grab;
-            background: theme('colors.gray.200') url('../svg/drag-dots.svg') center center no-repeat;
+            background: theme('colors.gray.200') url('../../../svg/drag-dots.svg') center center no-repeat;
             &:hover { @apply bg-gray-300; }
         }
     }
