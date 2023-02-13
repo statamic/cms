@@ -199,14 +199,6 @@ class Field implements Arrayable
         return ! in_array($this->get('listable'), [false, 'hidden'], true);
     }
 
-    /**
-     * @deprecated  Use isVisibleOnListing() instead.
-     */
-    public function isVisible()
-    {
-        return $this->isVisibleOnListing();
-    }
-
     public function isSortable()
     {
         if (is_null($this->get('sortable'))) {
