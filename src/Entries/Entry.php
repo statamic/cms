@@ -676,7 +676,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             return null;
         }
 
-        return $this->structure()->in($this->locale())->page($id);
+        return $this->structure()->in($this->locale())->find($id);
     }
 
     public function route()

@@ -140,14 +140,6 @@ abstract class Tree implements Contract, Localization
         return $this->uriCacheEnabled;
     }
 
-    /**
-     * @deprecated  Use find() instead.
-     */
-    public function page($id): ?Page
-    {
-        return $this->find($id);
-    }
-
     public function find($id): ?Page
     {
         return $this->flattenedPages()
@@ -245,7 +237,7 @@ abstract class Tree implements Contract, Localization
 
     public function appendTo($parent, $page)
     {
-        if ($parent && ! $this->page($parent)) {
+        if ($parent && ! $this->find($parent)) {
             throw new \Exception("Page [{$parent}] does not exist in this structure");
         }
 
@@ -287,7 +279,7 @@ abstract class Tree implements Contract, Localization
 
     public function move($entry, $target)
     {
-        $parent = optional($this->page($entry)->parent());
+        $parent = optional($this->find($entry)->parent());
 
         if ($parent->id() === $target || $parent->isRoot() && is_null($target)) {
             return $this;

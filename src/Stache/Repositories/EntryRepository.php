@@ -65,7 +65,7 @@ class EntryRepository implements RepositoryContract
         }
 
         return $entry->hasStructure()
-            ? $entry->structure()->in($site)->page($entry->id())
+            ? $entry->structure()->in($site)->find($entry->id())
             : $entry;
     }
 
