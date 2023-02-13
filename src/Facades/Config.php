@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Facade;
  * @method static mixed getDefaultLocale()
  * @method static array getOtherLocales($locale = null)
  * @method static mixed getSiteUrl($locale = null)
- * @method static array getImageManipulationPresets()
  *
  * @see \Statamic\Config
  */
