@@ -185,13 +185,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         return $mock;
     }
 
-    public static function assertMatchesRegularExpression(string $pattern, string $string, string $message = ''): void
-    {
-        method_exists(\PHPUnit\Framework\Assert::class, 'assertMatchesRegularExpression')
-            ? parent::assertMatchesRegularExpression($pattern, $string, $message)
-            : parent::assertRegExp($pattern, $string, $message);
-    }
-
     private function addGqlMacros()
     {
         $testResponseClass = version_compare($this->app->version(), 7, '<')
