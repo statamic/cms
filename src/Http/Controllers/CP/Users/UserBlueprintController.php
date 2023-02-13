@@ -28,7 +28,7 @@ class UserBlueprintController extends CpController
 
     public function update(Request $request)
     {
-        $request->validate(['sections' => 'array']);
+        $request->validate(['tabs' => 'array']);
 
         $this->updateBlueprint($request, User::make()->blueprint());
     }

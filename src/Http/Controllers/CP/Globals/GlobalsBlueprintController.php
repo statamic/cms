@@ -37,7 +37,7 @@ class GlobalsBlueprintController extends CpController
             return $this->pageNotFound();
         }
 
-        $request->validate(['sections' => 'array']);
+        $request->validate(['tabs' => 'array']);
 
         $this->updateBlueprint($request, $this->blueprint($set));
     }

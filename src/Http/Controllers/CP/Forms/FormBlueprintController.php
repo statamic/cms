@@ -28,7 +28,7 @@ class FormBlueprintController extends CpController
 
     public function update(Request $request, $form)
     {
-        $request->validate(['sections' => 'array']);
+        $request->validate(['tabs' => 'array']);
 
         $this->updateBlueprint($request, $form->blueprint());
     }
