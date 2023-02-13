@@ -119,7 +119,6 @@ class ExtensionServiceProvider extends ServiceProvider
         'piped' => 'optionList',
         'json' => 'toJson',
         'email' => 'obfuscateEmail',
-        'l10n' => 'formatLocalized',
         'lowercase' => 'lower',
         'tz' => 'timezone',
         'inFuture' => 'isFuture',
