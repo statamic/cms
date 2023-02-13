@@ -241,20 +241,6 @@ class Field implements Arrayable
         ]);
     }
 
-    /**
-     * @deprecated
-     */
-    public function toBlueprintArray()
-    {
-        return [
-            'handle' => $this->handle,
-            'type' => $this->type(),
-            'display' => $this->display(),
-            'instructions' => $this->instructions(),
-            'config' => array_except($this->preProcessedConfig(), 'type'),
-        ];
-    }
-
     public function setValue($value)
     {
         $this->value = $value;
