@@ -31,7 +31,7 @@ class MakeFilterTest extends TestCase
     {
         $path = base_path('app/Scopes/Mouse.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:filter', ['name' => 'Mouse']);
 
@@ -44,7 +44,7 @@ class MakeFilterTest extends TestCase
     {
         $path = base_path('app/Scopes/Mouse.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:filter', ['name' => 'Mouse']);
         $this->files->put($path, 'overwritten filter');
@@ -80,7 +80,7 @@ class MakeFilterTest extends TestCase
 
         Composer::shouldReceive('installedPath')->andReturn($path);
 
-        $this->assertFileNotExists($filter = "$path/src/Scopes/Yoda.php");
+        $this->assertFileDoesNotExist($filter = "$path/src/Scopes/Yoda.php");
 
         $this->artisan('statamic:make:filter', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 

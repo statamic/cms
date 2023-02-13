@@ -126,7 +126,7 @@ class ComposerTest extends TestCase
         // Test that the package isn't installed yet...
 
         $this->assertNotContains('test/package', Composer::installed()->keys());
-        $this->assertFileNotExists($this->basePath('vendor/test/package'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/package'));
         $this->assertFalse(Cache::has('composer.test/package'));
 
         // Test that we can require a package...
@@ -170,7 +170,7 @@ class ComposerTest extends TestCase
         Composer::remove('test/package');
 
         $this->assertStringNotContainsString('test/package', Composer::installed()->keys());
-        $this->assertFileNotExists($this->basePath('vendor/test/package'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/package'));
         $this->assertStringContainsString('Removing test/package', Cache::get('composer.test/package')['output']);
 
         // Test that we can add extra params when requiring...
@@ -180,7 +180,7 @@ class ComposerTest extends TestCase
 
         $installed = Composer::installed();
         $this->assertFalse($installed->keys()->contains('test/package'));
-        $this->assertFileNotExists($this->basePath('vendor/test/package'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/package'));
         $this->assertStringContainsString('Installing test/package', Cache::get('composer.test/package')['output']);
 
         // Test that we can add extra params when requiring a dev dependency...
@@ -190,7 +190,7 @@ class ComposerTest extends TestCase
 
         $installed = Composer::installed();
         $this->assertFalse($installed->keys()->contains('test/package'));
-        $this->assertFileNotExists($this->basePath('vendor/test/package'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/package'));
         $this->assertStringContainsString('Installing test/package', Cache::get('composer.test/package')['output']);
 
         // Test that we can require a package as a dev dependency...
@@ -210,7 +210,7 @@ class ComposerTest extends TestCase
         Composer::removeDev('test/package');
 
         $this->assertStringNotContainsString('test/package', Composer::installed()->keys());
-        $this->assertFileNotExists($this->basePath('vendor/test/package'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/package'));
         $this->assertStringContainsString('Removing test/package', Cache::get('composer.test/package')['output']);
     }
 
@@ -242,8 +242,8 @@ class ComposerTest extends TestCase
 
         $this->assertNotContains('test/one', Composer::installed()->keys());
         $this->assertNotContains('test/two', Composer::installed()->keys());
-        $this->assertFileNotExists($this->basePath('vendor/test/one'));
-        $this->assertFileNotExists($this->basePath('vendor/test/two'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/one'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/two'));
 
         // Test that we can require multiple packages...
 
@@ -272,8 +272,8 @@ class ComposerTest extends TestCase
         $output = Cache::get('composer.test/one')['output'];
         $this->assertStringNotContainsString('test/one', Composer::installed()->keys());
         $this->assertStringNotContainsString('test/two', Composer::installed()->keys());
-        $this->assertFileNotExists($this->basePath('vendor/test/one'));
-        $this->assertFileNotExists($this->basePath('vendor/test/two'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/one'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/two'));
         $this->assertStringContainsString('Removing test/one', $output);
         $this->assertStringContainsString('Removing test/two', $output);
 
@@ -284,8 +284,8 @@ class ComposerTest extends TestCase
         $output = Cache::get('composer.test/one')['output'];
         $this->assertStringNotContainsString('test/one', Composer::installed()->keys());
         $this->assertStringNotContainsString('test/two', Composer::installed()->keys());
-        $this->assertFileNotExists($this->basePath('vendor/test/one'));
-        $this->assertFileNotExists($this->basePath('vendor/test/two'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/one'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/two'));
         $this->assertStringContainsString('Installing test/one', $output);
         $this->assertStringContainsString('Installing test/two', $output);
 
@@ -296,8 +296,8 @@ class ComposerTest extends TestCase
         $output = Cache::get('composer.test/one')['output'];
         $this->assertStringNotContainsString('test/one', Composer::installed()->keys());
         $this->assertStringNotContainsString('test/two', Composer::installed()->keys());
-        $this->assertFileNotExists($this->basePath('vendor/test/one'));
-        $this->assertFileNotExists($this->basePath('vendor/test/two'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/one'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/two'));
         $this->assertStringContainsString('Installing test/one', $output);
         $this->assertStringContainsString('Installing test/two', $output);
 
@@ -328,8 +328,8 @@ class ComposerTest extends TestCase
         $output = Cache::get('composer.test/one')['output'];
         $this->assertStringNotContainsString('test/one', Composer::installed()->keys());
         $this->assertStringNotContainsString('test/two', Composer::installed()->keys());
-        $this->assertFileNotExists($this->basePath('vendor/test/one'));
-        $this->assertFileNotExists($this->basePath('vendor/test/two'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/one'));
+        $this->assertFileDoesNotExist($this->basePath('vendor/test/two'));
         $this->assertStringContainsString('Removing test/one', $output);
         $this->assertStringContainsString('Removing test/two', $output);
     }
