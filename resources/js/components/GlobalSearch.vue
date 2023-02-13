@@ -36,7 +36,7 @@
 
                 <div v-for="(favorite, index) in favorites" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousemove="setActive(index)">
                     <div class="flex items-center flex-1 p-2" @click="hit">
-                        <svg-icon name="pin" class="icon w-4 h-4"></svg-icon>
+                        <svg-icon name="pin" class="w-4 h-4"></svg-icon>
                         <div class="ml-2 title" v-text="favorite.name"></div>
                     </div>
                     <div class="p-2 text-gray-600 hover:text-gray-800" @click="removeFavorite(favorite)">&times;</div>

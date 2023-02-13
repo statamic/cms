@@ -1,19 +1,10 @@
 <template>
 
-    <div class="flex items-center my-4"
-        :class="{
-            'text-red': status == 'error',
-            'text-green': status === 'pending'
-        }"
-    >
+    <div class="flex items-center my-4" :class="{'text-red': status == 'error'}">
 
-        <div class="mx-2">
-            <span class="icon icon-warning error" v-if="status === 'error'"></span>
+        <div class="mx-2 flex items-center">
+            <svg-icon name="micro-warning" class="text-red h-4 w-4" v-if="status === 'error'" />
             <loading-graphic v-else :inline="true" text="" />
-        </div>
-
-        <div class="w-6 mr-2">
-            <file-icon :extension="extension"></file-icon>
         </div>
 
         <div class="filename">{{ basename }}</div>
@@ -26,10 +17,10 @@
                 :style="{ width: percent+'%' }" />
         </div>
 
-        <div class="ml-2" v-if="status === 'error'">
+        <div class="px-2" v-if="status === 'error'">
             {{ error }}
-            <button v-if="status == 'error'" @click.prevent="clear">
-                <i class="icon icon-circle-with-cross"></i>
+            <button @click.prevent="clear" class="flex items-center text-gray-700 hover:text-gray-800">
+                <svg-icon name="micro-circle-with-cross" class="h-4 w-4" />
             </button>
         </div>
 

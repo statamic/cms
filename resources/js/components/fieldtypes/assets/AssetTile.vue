@@ -41,17 +41,13 @@
 
                 <div class="asset-controls" v-if="!readOnly">
                     <div class="h-full w-full flex items-center justify-center space-x-1">
-                        <button
-                            @click="edit"
-                            class="btn btn-icon icon icon-pencil"
-                            :alt="__('Edit')"
-                        ></button>
+                        <button @click="edit" class="btn btn-icon" :alt="__('Edit')">
+                            <svg-icon name="sharp-pencil" class="h-4 my-2" />
+                        </button>
 
-                        <button
-                            @click="remove"
-                            class="btn btn-icon icon icon-trash"
-                            :alt="__('Remove')"
-                        ></button>
+                        <button @click="remove" class="btn btn-icon" :alt="__('Remove')">
+                            <svg-icon name="sharp-trash" class="h-4 my-2" />
+                        </button>
                     </div>
                 </div>
 

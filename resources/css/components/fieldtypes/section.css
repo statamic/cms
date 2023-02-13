@@ -23,8 +23,11 @@
         p { margin: 0; }
     }
 
-
     .read-only-overlay {
         display: none;
     }
+}
+
+.bard-fieldtype .section-fieldtype {
+    top: 0;
 }

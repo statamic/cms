@@ -72,7 +72,7 @@ code.parent-url {
         right: 0;
         z-index: 100;
         cursor: not-allowed;
-        background: rgba(white, 0.25);
+        background: rgba(255, 255, 255, 0.25);
     }
 }
 
