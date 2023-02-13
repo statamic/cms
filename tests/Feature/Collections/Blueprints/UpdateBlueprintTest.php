@@ -71,7 +71,7 @@ class UpdateBlueprintTest extends TestCase
             ->actingAs($user)
             ->submit($collection, $blueprint, [
                 'title' => 'Updated title',
-                'sections' => [
+                'tabs' => [
                     [
                         '_id' => 'id-one',
                         'handle' => 'one',
@@ -106,7 +106,7 @@ class UpdateBlueprintTest extends TestCase
         $this->assertEquals([
             'title' => 'Updated title',
             'foo' => 'bar',
-            'sections' => [
+            'tabs' => [
                 'one' => [
                     'display' => 'Tab One',
                     'fields' => [
@@ -168,7 +168,7 @@ class UpdateBlueprintTest extends TestCase
     }
 
     /** @test */
-    public function sections_are_required()
+    public function tabs_are_required()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();
@@ -180,15 +180,15 @@ class UpdateBlueprintTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($collection, $blueprint, ['sections' => ''])
+            ->submit($collection, $blueprint, ['tabs' => ''])
             ->assertRedirect('/original')
-            ->assertSessionHasErrors('sections');
+            ->assertSessionHasErrors('tabs');
 
         $this->assertEquals($originalContents, Facades\Blueprint::find('collections.test.test')->contents());
     }
 
     /** @test */
-    public function sections_must_be_an_array()
+    public function tabs_must_be_an_array()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();
@@ -200,9 +200,9 @@ class UpdateBlueprintTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($collection, $blueprint, ['sections' => 'string'])
+            ->submit($collection, $blueprint, ['tabs' => 'string'])
             ->assertRedirect('/original')
-            ->assertSessionHasErrors('sections');
+            ->assertSessionHasErrors('tabs');
 
         $this->assertEquals($originalContents, Facades\Blueprint::find('collections.test.test')->contents());
     }
@@ -232,7 +232,7 @@ class UpdateBlueprintTest extends TestCase
             ->actingAs($user)
             ->submit($collection, $blueprint, [
                 'title' => 'Updated title',
-                'sections' => [
+                'tabs' => [
                     [
                         '_id' => 'id-one',
                         'handle' => 'one',
@@ -275,7 +275,7 @@ class UpdateBlueprintTest extends TestCase
 
         $this->assertEquals([
             'title' => 'Updated title',
-            'sections' => [
+            'tabs' => [
                 'one' => [
                     'display' => 'Tab One',
                     'fields' => [
@@ -348,7 +348,7 @@ class UpdateBlueprintTest extends TestCase
             ->actingAs($user)
             ->submit($collection, $blueprint, [
                 'title' => 'Updated title',
-                'sections' => [
+                'tabs' => [
                     [
                         '_id' => 'id-one',
                         'handle' => 'one',
@@ -391,7 +391,7 @@ class UpdateBlueprintTest extends TestCase
 
         $this->assertEquals([
             'title' => 'Updated title',
-            'sections' => [
+            'tabs' => [
                 'one' => [
                     'display' => 'Tab One',
                     'fields' => [
@@ -451,7 +451,7 @@ class UpdateBlueprintTest extends TestCase
     {
         return array_merge([
             'title' => 'Updated',
-            'sections' => [],
+            'tabs' => [],
         ], $overrides);
     }
 }
