@@ -1,16 +1,19 @@
 <template>
 
     <div
-        class="bg-gray-100 shadow-sm mb-4 rounded border"
+        class="shadow-sm mb-4 rounded border"
         :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
-        <div
-            class="grid-item-header"
-            :class="{ [sortableHandleClass]: grid.isReorderable }"
-        >
-            <div />
-            <button v-if="canDelete" class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" :aria-label="__('Delete Row')" />
+
+        <div class="replicator-set-header" :class="{ [sortableHandleClass]: grid.isReorderable }">
+            <div class="item-move cursor-grab sortable-handle" data-drag-handle />
+            <div class="py-2 pl-2 replicator-set-header-inner flex justify-end items-end w-full">
+                <button v-if="canDelete" class="flex self-end group items-center" @click="$emit('removed', index)" :aria-label="__('Delete Row')">
+                    <svg-icon name="trash" class="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
+                </button>
+            </div>
         </div>
+
         <publish-fields-container>
             <set-field
                 v-for="field in fields"

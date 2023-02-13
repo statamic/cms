@@ -10,7 +10,7 @@
 		right: 0;
 		bottom: 0;
 		z-index: 200;
-		background: rgba(white, .9);
+		background: rgba(255, 255, 255, .9);
 		display: flex;
 		align-items: center;
 		border-radius: 3px;
@@ -34,7 +34,7 @@
     border: 1px dashed theme('colors.gray.600');
     pointer-events: none;
     z-index: 1049;
-    background: rgba(white, .9);
+    background: rgba(255, 255, 255, .9);
 }
 
 
@@ -205,7 +205,7 @@
         right: 0;
         bottom: 0;
         z-index: 10;
-        background: rgba(white, 0.7);
+        background: rgba(255, 255, 255, 0.7);
         @apply flex items-center justify-center;
     }
 

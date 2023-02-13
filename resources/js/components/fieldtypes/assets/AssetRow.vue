@@ -35,7 +35,7 @@
             >
                 {{ asset.values.alt ? "✅" : __("Set Alt") }}
             </button>
-            <div v-text="asset.size" class="asset-filesize text-xs text-gray-500 px-2" />
+            <div v-text="asset.size" class="asset-filesize text-xs text-gray-600 px-2" />
         </td>
         <td class="p-0 w-8 text-right align-middle">
             <button

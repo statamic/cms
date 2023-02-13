@@ -36,8 +36,8 @@
                             <width-selector v-model="field.width" />
                         </template>
                         <template slot="actions" slot-scope="{ row: field, index }">
-                            <a class="mr-2 text-gray" @click.prevent="edit(field._id)"><span class="icon icon-pencil" /></a>
-                            <a class="mr-2 text-gray" @click.prevent="destroy(index)"><span class="icon icon-cross" /></a>
+                            <a class="mr-2 text-gray" @click.prevent="edit(field._id)"><svg-icon name="micro-pencil" class="h-4 w-4" /></a>
+                            <a class="mr-2 text-gray" @click.prevent="destroy(index)"><svg-icon name="trash" class="h-4 w-4" /></a>
                             <stack v-if="editingField === field._id" :name="`${field._id}-field-settings`" @closed="editingField = null">
                                 <field-settings
                                     slot-scope="{ close }"
@@ -106,6 +106,7 @@ export default {
     },
 
     created() {
+        console.log('okay its in use')
         this.fields = JSON.parse(JSON.stringify(this.initialFields))
             .map(field => Object.assign(field, { _id: uniqid() }));
     },

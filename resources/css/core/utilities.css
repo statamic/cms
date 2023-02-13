@@ -58,7 +58,7 @@
 
 .saving-overlay {
     @apply absolute inset-0 z-200 flex items-center rounded;
-    background: rgba(white, .9);
+    background: rgba(255, 255, 255, .9);
 
     .inner {
         @apply p-10 text-center mx-auto;

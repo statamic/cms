@@ -19,21 +19,6 @@
   }
 
 
-/* Entypo
-   ========================================================================== */
-
-@font-face {
-  font-family: "entypo";
-  src: url('../../fonts/entypo.eot');
-  src: url('../../fonts/entypo.eot?#iefix') format('eot'),
-       url('../../fonts/entypo.woff2') format('woff2'),
-       url('../../fonts/entypo.woff') format('woff'),
-       url('../../fonts/entypo.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-
 /* Font Awesome - used in Bard's MediumEditor implementation
   ========================================================================== */
 
