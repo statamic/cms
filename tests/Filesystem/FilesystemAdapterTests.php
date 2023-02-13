@@ -374,9 +374,9 @@ trait FilesystemAdapterTests
         $this->assertDirectoryExists($this->tempDir.'/one');
         $this->assertDirectoryExists($this->tempDir.'/one/two');
         $this->assertDirectoryExists($this->tempDir.'/three');
-        $this->assertDirectoryNotExists($this->tempDir.'/three/four');
-        $this->assertDirectoryNotExists($this->tempDir.'/three/five');
-        $this->assertDirectoryNotExists($this->tempDir.'/three/five/six');
+        $this->assertDirectoryDoesNotExist($this->tempDir.'/three/four');
+        $this->assertDirectoryDoesNotExist($this->tempDir.'/three/five');
+        $this->assertDirectoryDoesNotExist($this->tempDir.'/three/five/six');
     }
 
     /** @test */

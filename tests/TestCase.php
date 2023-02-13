@@ -185,16 +185,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         return $mock;
     }
 
-    /**
-     * @deprecated
-     */
-    public static function assertDirectoryNotExists(string $filename, string $message = ''): void
-    {
-        method_exists(static::class, 'assertDirectoryDoesNotExist')
-            ? static::assertDirectoryDoesNotExist($filename, $message)
-            : parent::assertDirectoryNotExists($filename, $message);
-    }
-
     public static function assertMatchesRegularExpression(string $pattern, string $string, string $message = ''): void
     {
         method_exists(\PHPUnit\Framework\Assert::class, 'assertMatchesRegularExpression')
