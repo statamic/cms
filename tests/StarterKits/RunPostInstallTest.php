@@ -40,14 +40,14 @@ class RunPostInstallTest extends TestCase
     /** @test */
     public function it_runs_post_install_hook_script()
     {
-        $this->assertFileNotExists($this->kitVendorPath());
-        $this->assertFileNotExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('copied.md'));
 
         $this->simulateCliInstallWithoutTtySupport();
 
         // Ensure starter kit itself was installed, but not yet cleaned up because a manual post-install is required
         $this->assertFileExists(base_path('copied.md'));
-        $this->assertFileNotExists(base_path('composer.json.bak'));
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
         $this->assertFileExists(base_path('composer.json'));
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists($this->kitVendorPath());
@@ -62,7 +62,7 @@ class RunPostInstallTest extends TestCase
 
         // Now we should see that the hook has been run, and the starter kit has been cleaned up from vendor
         $this->assertTrue(Blink::has('post-install-hook-run'));
-        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileDoesNotExist($this->kitVendorPath());
     }
 
     /** @test */

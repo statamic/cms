@@ -1861,7 +1861,7 @@ class EntryTest extends TestCase
         $page->shouldReceive('parent')->andReturn($parentPage);
         $tree = $this->partialMock(CollectionTree::class);
         $tree->locale('en');
-        $tree->shouldReceive('page')->with('entry-id')->andReturn($page);
+        $tree->shouldReceive('find')->with('entry-id')->andReturn($page);
         CollectionTreeRepository::shouldReceive('find', 'en')->andReturn($tree);
 
         $structure = new CollectionStructure;

@@ -103,10 +103,4 @@ class Utility
     {
         return $this->fluentlyGetOrSet('routes')->args(func_get_args());
     }
-
-    /** @deprecated */
-    public function register()
-    {
-        \Statamic\Facades\Utility::push($this);
-    }
 }

@@ -29,7 +29,7 @@ class DefaultPreferencesTest extends TestCase
     /** @test */
     public function it_gets_empty_array_by_default()
     {
-        $this->assertFileNotExists(resource_path('preferences.yaml'));
+        $this->assertFileDoesNotExist(resource_path('preferences.yaml'));
         $this->assertEquals([], Preference::default()->all());
     }
 
@@ -88,7 +88,7 @@ EOT
     /** @test */
     public function it_saves_preferences_to_file()
     {
-        $this->assertFileNotExists(resource_path('preferences.yaml'));
+        $this->assertFileDoesNotExist(resource_path('preferences.yaml'));
 
         Preference::default()->set($preferences = [
             'collections' => [
@@ -110,7 +110,7 @@ EOT
     /** @test */
     public function it_merges_preferences_to_file()
     {
-        $this->assertFileNotExists(resource_path('preferences.yaml'));
+        $this->assertFileDoesNotExist(resource_path('preferences.yaml'));
 
         Preference::default()->set($preferences = [
             'foo' => 'bar',

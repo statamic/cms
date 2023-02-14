@@ -225,7 +225,7 @@ class EntriesController extends CpController
             $this->validateParent($entry, $tree, $parent);
 
             $entry->afterSave(function ($entry) use ($parent, $tree) {
-                if ($parent && optional($tree->page($parent))->isRoot()) {
+                if ($parent && optional($tree->find($parent))->isRoot()) {
                     $parent = null;
                 }
 
@@ -379,7 +379,7 @@ class EntriesController extends CpController
         if ($structure && ! $collection->orderable()) {
             $parent = $values['parent'] ?? null;
             $entry->afterSave(function ($entry) use ($parent, $tree) {
-                if ($parent && optional($tree->page($parent))->isRoot()) {
+                if ($parent && optional($tree->find($parent))->isRoot()) {
                     $parent = null;
                 }
 
@@ -537,7 +537,7 @@ class EntriesController extends CpController
             return $entry->uri();
         }
 
-        $parent = $parent ? $tree->page($parent) : null;
+        $parent = $parent ? $tree->find($parent) : null;
 
         return app(\Statamic\Contracts\Routing\UrlBuilder::class)
             ->content($entry)

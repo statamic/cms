@@ -43,15 +43,6 @@ class EntryRepository implements RepositoryContract
         return $this->query()->where('id', $id)->first();
     }
 
-    /** @deprecated */
-    public function findBySlug(string $slug, string $collection): ?Entry
-    {
-        return $this->query()
-            ->where('slug', $slug)
-            ->where('collection', $collection)
-            ->first();
-    }
-
     public function findByUri(string $uri, string $site = null): ?Entry
     {
         $site = $site ?? $this->stache->sites()->first();
@@ -74,7 +65,7 @@ class EntryRepository implements RepositoryContract
         }
 
         return $entry->hasStructure()
-            ? $entry->structure()->in($site)->page($entry->id())
+            ? $entry->structure()->in($site)->find($entry->id())
             : $entry;
     }
 
