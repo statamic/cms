@@ -89,7 +89,8 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/jasonvarga/graphql-laravel"
+            "url": "https://github.com/jasonvarga/graphql-laravel",
+            "no-api": true
         }
     ]
 }
