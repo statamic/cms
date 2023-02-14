@@ -690,7 +690,7 @@ EOT
         ];
 
         $expectedInline = [
-            'The Full Name must be at least 3 characters.',
+            trans('validation.min.string', ['attribute' => 'Full Name', 'min' => 3]), // 'The Full Name must be at least 3 characters.',
         ];
 
         $this->assertEquals($expected, $errors[1]);
