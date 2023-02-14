@@ -190,7 +190,6 @@ EOT
         preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
-        // TODO: It seems
         $expected = [
             'The password must be at least 8 characters.',
             'The age field is required.',
