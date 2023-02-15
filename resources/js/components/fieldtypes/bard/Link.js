@@ -11,19 +11,15 @@ export const Link = Mark.create({
         return {
             href: {
                 default: null,
-                parseHTML: element => element.querySelector('a')?.getAttribute('href'),
             },
             rel: {
                 default: null,
-                parseHTML: element => element.querySelector('a')?.getAttribute('rel'),
             },
             target: {
                 default: null,
-                parseHTML: element => element.querySelector('a')?.getAttribute('target'),
             },
             title: {
                 default: null,
-                parseHTML: element => element.querySelector('a')?.getAttribute('title'),
             },
         }
     },
