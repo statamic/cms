@@ -10,7 +10,7 @@
     }
 
     .markdown-toolbar {
-        @apply bg-white shadow-none rounded-t border-b text-sm flex items-start justify-between;
+        @apply bg-white shadow-none rounded-t border-b text-sm flex items-center justify-between;
         padding: 4px 8px;
     }
 
@@ -19,18 +19,15 @@
     }
 
     .markdown-buttons button {
-        @apply text-gray-800 rounded px-1 flex items-center justify-center text-base text-center;
-        height: 32px;
-        width: 32px;
-        margin: 0 2px;
-    }
+        @apply text-gray-800 rounded px-1 flex items-center justify-center text-base text-center h-8 w-8;
 
-    .markdown-buttons button:hover {
-        @apply bg-gray-200;
-    }
+        &:hover {
+            @apply bg-gray-200;
+        }
 
-    .markdown-buttons button.active {
-        @apply bg-gray-300 text-black;
+        &.active {
+                @apply bg-gray-300 text-black;
+        }
     }
 
     .markdown-buttons button:focus {
@@ -45,22 +42,17 @@
     }
 
     .markdown-modes {
-        @apply ml-2 flex items-center h-full;
+        @apply flex items-center;
 
         button {
-            @apply mr-4 text-gray-600 outline-none h-full;
-            padding: 6px 4px;
+            @apply text-gray-700 inline-block focus:outline-none px-2 py-1 mr-1;
 
             &:hover {
                 @apply text-blue;
             }
 
             &.active {
-                @apply text-gray-800;
-            }
-
-            &:focus {
-                @apply focus-outline;
+                @apply bg-blue-100 text-blue-800 rounded;
             }
         }
     }

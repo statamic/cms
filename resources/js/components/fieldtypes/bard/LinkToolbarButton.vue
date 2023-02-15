@@ -5,11 +5,12 @@
         <button
             class="bard-toolbar-button"
             :class="{ active }"
-            v-html="button.html"
             v-tooltip="button.text"
             :aria-label="button.text"
             @click="toggleLinkToolbar"
-        />
+        >
+            <svg-icon :name="button.svg" v-if="button.svg"></svg-icon>
+        </button>
 
         <link-toolbar
             v-if="showingToolbar"
