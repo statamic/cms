@@ -1,4 +1,4 @@
-name: Release messages to discord announcement channel
+name: Announce release on Discord
 
 on: 
   release:
@@ -6,11 +6,11 @@ on:
       - created
 
 jobs:
-  run_main:
+  announce:
     runs-on: ubuntu-18.04
     name: Sends custom message
     steps:
-      - name: Sending message
+      - name: Send message
         uses: nhevia/discord-styled-releases@main
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
