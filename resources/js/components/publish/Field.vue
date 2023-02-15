@@ -51,7 +51,29 @@
 
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
 
-        <slot name="fieldtype" v-if="!loadingMeta">
+        <portal to="modal" v-if="fullscreen">
+            <div class="absolute inset-0 h-full w-full bg-black/10 z-10">
+                <slot name="fieldtype" v-if="!loadingMeta" v-else>
+                    <div class="text-xs text-red" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
+                    <component
+                        v-else
+                        :is="fieldtypeComponent"
+                        :config="config"
+                        :value="value"
+                        :meta="meta"
+                        :handle="config.handle"
+                        :name-prefix="namePrefix"
+                        :field-path-prefix="fieldPathPrefix"
+                        :read-only="isReadOnly"
+                        @input="$emit('input', $event)"
+                        @meta-updated="$emit('meta-updated', $event)"
+                        @focus="focused"
+                        @blur="blurred"
+                    /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
+                </slot>
+            </div>
+        </portal>
+        <slot name="fieldtype" v-if="!loadingMeta" v-else>
             <div class="text-xs text-red" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
             <component
                 v-else
@@ -69,6 +91,7 @@
                 @blur="blurred"
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
         </slot>
+
 
         <div
             class="help-block mt-2"
@@ -110,7 +133,8 @@ export default {
 
     data() {
         return {
-            showHandle: false
+            showHandle: false,
+            fullscreen: false
         }
     },
 

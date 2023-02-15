@@ -52,10 +52,10 @@
     top: 0;
 
     .bard-toolbar-button {
-        @apply text-gray-800 rounded px-1 flex items-center justify-center text-base text-center;
+        @apply text-gray-800 rounded px-1 flex text-center justify-center items-center text-base text-center;
         height: 32px;
         width: 32px;
-        margin: 0 2px;
+        margin: 0;
         svg {
             @apply w-4 h-4;
         }
