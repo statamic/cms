@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .data-list-header {
-    @apply p-4 pb-2 flex flex-wrap items-center;
+    @apply px-4 py-3 flex flex-wrap items-center;
 }
 
 .data-list-search-input {
@@ -16,12 +16,12 @@
 }
 
 .data-list-bulk-actions {
-	@apply bg-white absolute w-full pt-4 z-10;
+	@apply bg-white absolute w-full py-3 z-10;
 	padding-left: 56px;
 }
 
 .mode-grid .data-list-bulk-actions {
-	@apply bg-white w-full pt-2 z-10 pl-4 static;
+	@apply bg-white w-full pt-3 pb-1 z-10 pl-4 static;
 }
 
 .mode-grid .rotating-dots-button {
@@ -37,7 +37,6 @@
 	overflow-x: auto;
 
     thead {
-		/*  @apply bg-gray-200 text-gray-900 uppercase text-2xs tracking-widest outline-none; */
 		@apply text-sm text-gray-700 text-gray-900;
 
 		tr {
@@ -45,7 +44,7 @@
 		}
 
         th {
-            @apply font-medium px-4 pt-4 pb-2;
+            @apply font-medium px-4 py-3;
             &:first-child { @apply rounded-tl; }
 			&:last-child { @apply rounded-tr; }
 			&:hover {
