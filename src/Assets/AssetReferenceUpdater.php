@@ -101,7 +101,12 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                     && $field->get('container') === $this->container;
             })
             ->each(function ($field) use ($dottedPrefix) {
-                $field->get('save_html') === true
+                $data = $this->item->data()->all();
+                $dottedKey = $dottedPrefix.$field->handle();
+                $bardPayload = Arr::get($data, $dottedKey, []);
+                $isString = is_string($bardPayload);        
+
+                ($field->get('save_html') === true || $isString)
                     ? $this->updateStatamicUrlsInStringValue($field, $dottedPrefix)
                     : $this->updateStatamicUrlsInArrayValue($field, $dottedPrefix);
             });
