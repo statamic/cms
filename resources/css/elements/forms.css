@@ -10,16 +10,9 @@ input {
     @apply placeholder:text-gray-600;
 }
 
-input[type="checkbox"] {
-    font-size: 18px;
-    position: relative;
-    top: 1px;
-}
-
+input[type="checkbox"],
 input[type="radio"] {
-    font-size: 18px;
-    position: relative;
-    top: 1px;
+    @apply text-lg;
 }
 
 select {
@@ -155,8 +148,7 @@ input.input-text-minimal:read-only,
     @apply mt-3 flex items-center;
 
     input {
-        @apply leading-normal mr-1 relative;
-        top: -1px;
+        @apply leading-normal mr-1;
     }
 
     label {
