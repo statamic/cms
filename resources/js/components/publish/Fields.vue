@@ -1,6 +1,6 @@
 <template>
 
-    <publish-fields-container>
+    <div class="publish-fields @container">
 
         <publish-field
             v-for="field in fields"
@@ -22,7 +22,7 @@
             @blur="$emit('blur', field.handle)"
         />
 
-    </publish-fields-container>
+    </div>
 
 </template>
 

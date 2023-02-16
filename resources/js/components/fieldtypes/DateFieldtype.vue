@@ -1,6 +1,5 @@
 <template>
-    <element-container @resized="containerWidth = $event.width">
-    <div class="datetime">
+    <div class="datetime @container">
 
         <button type="button" class="btn flex mb-2 md:mb-0 items-center pl-3" v-if="!isReadOnly && config.inline === false && !hasDate" @click="addDate" tabindex="0">
             <svg-icon name="calendar" class="w-4 h-4 mr-2"></svg-icon>
@@ -8,8 +7,7 @@
     	</button>
 
         <div v-if="hasDate || config.inline"
-            class="date-time-container"
-            :class="{ 'narrow': isNarrow }"
+            class="date-time-container flex-col @xs:flex-row"
         >
 
             <div class="flex-1 date-container">
@@ -36,8 +34,7 @@
                         <!-- Date range inputs -->
                         <div
                             v-if="isRange"
-                            class="w-full flex items-center"
-                            :class="{ 'flex-col': isNarrow }"
+                            class="w-full flex items-start @md:items-center flex-col @md:flex-row"
                         >
                             <div class="input-group">
                                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
@@ -53,7 +50,8 @@
                                 </div>
                             </div>
 
-                            <svg-icon name="micro-arrow-right" class="w-6 h-6 my-1 mx-2 text-gray-700" />
+                            <svg-icon name="micro-arrow-right" class="w-6 h-6 my-1 mx-2 text-gray-700 hidden @md:block" />
+                            <svg-icon name="micro-arrow-right" class="w-3.5 h-3.5 my-2 mx-2.5 rotate-90 text-gray-700 @md:hidden" />
 
                             <div class="input-group">
                                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
@@ -88,7 +86,7 @@
                 </v-date-picker>
             </div>
 
-            <div v-if="config.time_enabled && !isRange" class="time-container time-fieldtype">
+            <div v-if="config.time_enabled && !isRange" class="time-container mt-2 @xs:ml-2 @xs:mt-0 time-fieldtype">
 				<time-fieldtype
                     v-if="hasTime"
                     ref="time"
@@ -168,10 +166,6 @@ export default {
 
         displayFormat() {
             return this.meta.displayFormat;
-        },
-
-        isNarrow() {
-            return this.containerWidth <= 320;
         },
 
     },

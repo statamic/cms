@@ -7,7 +7,7 @@ import ComposerOutput from '../components/ComposerOutput.vue';
 import Container from '../components/publish/Container.vue';
 import PublishForm from '../components/publish/PublishForm.vue';
 import Fields from '../components/publish/Fields.vue';
-import FieldsContainer from '../components/publish/FieldsContainer.vue';
+import FieldsContainer from '../components/publish/FieldsContainer.vue'; // deprecated
 import Field from '../components/publish/Field.vue';
 import FieldMeta from '../components/publish/FieldMeta.vue';
 import ConfigureSections from '../components/configure/Sections.vue';

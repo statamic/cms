@@ -23,7 +23,7 @@
 
         <div class="card">
 
-            <publish-fields-container>
+            <div class="publish-fields @container">
 
                 <form-group
                     handle="fieldset"
@@ -42,7 +42,7 @@
                     @input="updateField('prefix', $event)"
                 />
 
-            </publish-fields-container>
+            </div>
         </div>
     </div>
 
