@@ -76,6 +76,7 @@ return [
     'field_synced_with_origin' => 'Gesynchroniseerd met de oorsprong. Klik of wijzig het veld om te desynchroniseren.',
     'field_validation_advanced_instructions' => 'Voeg meer geavanceerde validatie toe aan dit veld.',
     'field_validation_required_instructions' => 'Bepaal wanneer dit veld verplicht is.',
+    'field_validation_sometimes_instructions' => 'Alleen valideren wanneer dit veld zichtbaar is of wordt verzonden.',
     'fields_blueprints_description' => 'Blueprints definieëren de velden voor inhoudsstructuren, zoals collecties, taxonomieën, gebruikers en formulieren.',
     'fields_default_instructions' => 'Stel de standaardwaarde in',
     'fields_display_instructions' => 'Het label van dit veld zoals getoond in het Control Panel.',
