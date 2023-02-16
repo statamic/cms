@@ -67,9 +67,6 @@
     }
 }
 
-.tab-panel:focus {
-    @apply focus-outline;
-}
 
 @screen md {
     .tabs .tab-button {
