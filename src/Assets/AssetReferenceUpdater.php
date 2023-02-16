@@ -104,7 +104,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 $data = $this->item->data()->all();
                 $dottedKey = $dottedPrefix.$field->handle();
                 $bardPayload = Arr::get($data, $dottedKey, []);
-                $isString = is_string($bardPayload);        
+                $isString = is_string($bardPayload);
 
                 ($field->get('save_html') === true || $isString)
                     ? $this->updateStatamicUrlsInStringValue($field, $dottedPrefix)
