@@ -12,7 +12,7 @@
                 v-html="'&times'" />
         </div>
 
-        <publish-fields-container>
+        <div class="publish-fields @container">
 
             <form-group
                 v-if="!initialDirectory"
@@ -33,7 +33,7 @@
                 />
             </div>
 
-        </publish-fields-container>
+        </div>
 
     </modal>
 

@@ -152,11 +152,11 @@ class StrTest extends TestCase
     /** @test */
     public function it_makes_tailwind_width_classes()
     {
-        $this->assertEquals('w-1/4', Str::tailwindWidthClass(25));
-        $this->assertEquals('w-1/3', Str::tailwindWidthClass(33));
-        $this->assertEquals('w-1/2', Str::tailwindWidthClass(50));
-        $this->assertEquals('w-2/3', Str::tailwindWidthClass(66));
-        $this->assertEquals('w-3/4', Str::tailwindWidthClass(75));
+        $this->assertEquals('w-full @lg:w-1/4', Str::tailwindWidthClass(25));
+        $this->assertEquals('w-full @lg:w-1/3', Str::tailwindWidthClass(33));
+        $this->assertEquals('w-full @lg:w-1/2', Str::tailwindWidthClass(50));
+        $this->assertEquals('w-full @lg:w-2/3', Str::tailwindWidthClass(66));
+        $this->assertEquals('w-full @lg:w-3/4', Str::tailwindWidthClass(75));
         $this->assertEquals('w-full', Str::tailwindWidthClass(100));
         $this->assertEquals('w-full', Str::tailwindWidthClass('foo'));
     }

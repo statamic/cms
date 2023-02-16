@@ -181,7 +181,7 @@ export default {
                 'form-group publish-field',
                 `publish-field__` + this.config.handle,
                 `${this.config.component || this.config.type}-fieldtype`,
-                `field-${tailwind_width_class(this.config.width)}`,
+                `${tailwind_width_class(this.config.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.config.classes || '',
                 { 'has-error': this.hasError || this.hasNestedError }
