@@ -21,10 +21,10 @@
                             <svg-icon name="text-bold" class="w-4 h-4" />
                         </button>
                         <button @click="italic" v-tooltip="__('Italic')" :aria-label="__('Italic')">
-                            <svg-icon name="text-italic-2" class="w-4 h-4" />
+                            <svg-icon name="text-italic" class="w-4 h-4" />
                         </button>
                         <button @click="insertLink('')" v-tooltip="__('Insert Link')" :aria-label="__('Insert Link')">
-                            <svg-icon name="insert-link-2" class="w-4 h-4" />
+                            <svg-icon name="insert-link" class="w-4 h-4" />
                         </button>
                         <button @click="addAsset" v-if="assetsEnabled" v-tooltip="__('Insert Asset')" :aria-label="__('Insert Asset')">
                             <svg-icon name="insert-image" class="w-4 h-4" />
@@ -85,7 +85,7 @@
                         </div>
                     </div>
 
-                    <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview clean-content"></div>
+                    <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview prose"></div>
                 </div>
             </div>
         </uploader>
@@ -105,7 +105,7 @@
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
             <div class="h-full overflow-auto p-6 bg-white relative">
                 <button class="btn-close absolute top-0 right-0 mt-4 mr-8" @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;</button>
-                <div class="max-w-md mx-auto my-8 clean-content">
+                <div class="max-w-md mx-auto my-8 prose">
                     <h2 v-text="__('Markdown Cheatsheet')"></h2>
                     <div v-html="__('markdown.cheatsheet')"></div>
                 </div>
