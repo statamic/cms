@@ -76,7 +76,7 @@ EOT;
                 'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'Candy canes ice cream '],
-                    ['type' => 'text', 'marks' => [[ 'type' => 'bold' ]], 'text' => 'chocolate '],
+                    ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'chocolate '],
                     ['type' => 'text', 'text' => 'bar bear claw '],
                     ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'chocolate'],
                     ['type' => 'text', 'text' => ' oat cake powder sweet pudding. Candy canes croissant ma caroon dessert marzipan icing topping. Pastry caramels shortbread '],
@@ -131,7 +131,7 @@ EOT;
                                     [
                                         'type' => 'paragraph',
                                         'attrs' => ['textAlign' => 'left'],
-                                        'content' => [[ 'type' => 'text', 'text' => 'chocolate']],
+                                        'content' => [['type' => 'text', 'text' => 'chocolate']],
                                     ],
                                 ],
                             ],
