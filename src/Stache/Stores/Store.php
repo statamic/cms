@@ -242,6 +242,7 @@ abstract class Store
         // Put the items into the cache
         $modified->each(function ($item) {
             $this->cacheItem($item);
+            $this->setPath($this->getItemKey($item), $item->path());
         });
 
         // There may be duplicate items when we're dealing with items that are split across files.
