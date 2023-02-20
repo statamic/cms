@@ -31,7 +31,7 @@
             </div>
         </div>
 
-        <div class="bard-editor @container/bard" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }" tabindex="0">
+        <div class="bard-editor" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }" tabindex="0">
             <bubble-menu class="bard-floating-toolbar" :editor="editor" :tippy-options="{ maxWidth: 'none', zIndex: 1000 }" v-if="editor && toolbarIsFloating && !readOnly">
                 <component
                     v-for="button in visibleButtons(buttons)"
@@ -45,17 +45,39 @@
             </bubble-menu>
 
             <floating-menu class="bard-set-selector" :editor="editor" :tippy-options="{ offset: calcFloatingOffset, zIndex: 6 }" :should-show="shouldShowSetButton" v-if="editor">
-                <dropdown-list>
-                    <template v-slot:trigger>
-                        <button type="button" class="btn-round group flex items-center justify-center" :aria-label="__('Add Set')" v-tooltip="__('Add Set')">
-                            <svg-icon name="micro-plus" class="w-3 h-3 text-gray-800 group-hover:text-black" />
-                        </button>
+                <popover class="set-picker" :scroll="true" :autoclose="false">
+                    <template #trigger>
+                        <slot name="trigger">
+                            <button type="button" class="btn-round group flex items-center justify-center" :aria-label="__('Add Set')" v-tooltip="__('Add Set')">
+                                <svg-icon name="micro-plus" class="w-3 h-3 text-gray-800 group-hover:text-black" />
+                            </button>
+                        </slot>
                     </template>
-
-                    <div v-for="set in config.sets" :key="set.handle">
-                        <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
-                    </div>
-                </dropdown-list>
+                    <template #default>
+                        <div class="set-picker-header p-3 border-b text-xs flex items-center">
+                            <input type="text" class="py-1 px-2 border rounded w-full" :placeholder="__('Search Sets')" v-show="showSetSearch" />
+                            <button v-show="!showSetSearch" class="text-gray-700 hover:text-gray-900">
+                                <svg-icon name="chevron-left" class="w-2 h-2 mx-1" />
+                                {{ __('Set Group Name')}}
+                            </button>
+                        </div>
+                        <div class="p-1">
+                            <div v-for="set in config.sets" :key="set.handle" class="rounded">
+                                <dropdown-item @click="addSet(set.handle)" class="flex items-center group px-2 py-1.5 hover:bg-gray-200 rounded-md">
+                                    <div class="h-10 w-10 rounded bg-white border border-gray-600 mr-2 p-2.5">
+                                        <svg-icon name="folder-generic" class="text-gray-800" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-md font-medium text-gray-800 truncate w-52">{{ set.display || set.handle }}</div>
+                                        <!-- Placeholder Description -->
+                                        <div class="text-2xs text-gray-700 truncate w-52">{{ set.description || 'Lorem ipsum dolar sit amet' }}</div>
+                                    </div>
+                                    <svg-icon name="chevron-right-thin" class="text-gray-600 group-hover:text-gray-800" />
+                                </dropdown-item>
+                            </div>
+                        </div>
+                    </template>
+                </popover>
             </floating-menu>
 
             <div class="bard-invalid" v-if="invalid" v-html="__('Invalid content')"></div>
@@ -151,6 +173,7 @@ export default {
             invalid: false,
             pageHeader: null,
             escBinding: null,
+            showSetSearch: true
         }
     },
 

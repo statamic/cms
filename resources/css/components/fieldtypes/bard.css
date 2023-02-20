@@ -14,8 +14,8 @@
 
 .bard-editor .ProseMirror {
     @apply p-1 min-h-40 text-sm leading-tight;
-    @apply @sm/bard:p-2 text-md leading-normal;
-    @apply @lg/bard:p-4;
+    @apply @sm:p-2 text-md leading-normal;
+    @apply @lg:p-4;
 }
 
 .bard-editor .bard-invalid {
@@ -201,10 +201,14 @@
 .bard-set-selector {
     /*  transition: all .15s ease-in-out; */
 
-    .dropdown-menu {
+    /* .dropdown-menu {
         left: -5px;
         right: auto;
-    }
+    } */
+}
+
+.set-picker .popover .popover-content {
+    min-width: 320px !important;
 }
 
 
