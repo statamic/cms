@@ -244,7 +244,7 @@ input[type="file"] {
 /* Form groups
   ========================================================================== */
 .form-group {
-    @apply p-3 m-0;
+    @apply p-3 @sm:p-4 @lg:p-6 m-0;
 
     label {
         font-weight: 500;
@@ -285,8 +285,3 @@ input[type="file"] {
     }
 }
 
-@screen md {
-    .form-group {
-        @apply p-6;
-    }
-}
