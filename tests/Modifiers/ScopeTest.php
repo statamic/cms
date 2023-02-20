@@ -94,8 +94,8 @@ class ScopeTest extends TestCase
     public function it_resolves_values_value_when_adding_scope()
     {
         $arr = [
-            new Value([ 'title' => 'One' ]),
-            new Value([ 'title' => 'Two' ]),
+            new Value(['title' => 'One']),
+            new Value(['title' => 'Two']),
         ];
 
         $expected = [
