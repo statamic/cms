@@ -273,10 +273,6 @@ export default {
         this.load();
     },
 
-    destroyed() {
-        this.keybinding.destroy();
-    },
-
     events: {
         'close-child-editor': function() {
             this.closeFocalPointEditor();
