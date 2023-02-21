@@ -1,5 +1,6 @@
 <template>
 
+<fullscreen :enabled="fullScreenMode" :provide="provide">
     <div
         class="bard-fieldtype-wrapper"
         :class="{'bard-fullscreen': fullScreenMode }"
@@ -69,6 +70,7 @@
             <div v-if="config.character_limit">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
         </div>
     </div>
+</fullscreen>
 
 </template>
 
@@ -128,13 +130,6 @@ export default {
         LinkToolbarButton,
     },
 
-    provide() {
-        return {
-            setConfigs: this.config.sets,
-            isReadOnly: this.readOnly,
-        }
-    },
-
     inject: ['storeName'],
 
     data() {
@@ -151,6 +146,11 @@ export default {
             invalid: false,
             pageHeader: null,
             escBinding: null,
+            provide: {
+                setConfigs: this.config.sets,
+                isReadOnly: this.readOnly,
+                storeName: this.storeName
+            }
         }
     },
 
