@@ -24,7 +24,7 @@
         "michelf/php-smartypants": "^1.8.1",
         "nesbot/carbon": "^2.62.1",
         "pixelfear/composer-dist-plugin": "^0.1.4",
-        "rebing/graphql-laravel": "^6.5 || ^8.0 || dev-laravel-10",
+        "rebing/graphql-laravel": "^6.5 || ^8.0",
         "spatie/blink": "^1.1.2",
         "statamic/stringy": "^3.1.2",
         "symfony/http-foundation": "^4.3.3 || ^5.1.4 || ^6.0",
@@ -85,12 +85,5 @@
             "Tests\\": "tests",
             "Foo\\Bar\\": "tests/Fixtures/Addon"
         }
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/jasonvarga/graphql-laravel",
-            "no-api": true
-        }
-    ]
+    }
 }
