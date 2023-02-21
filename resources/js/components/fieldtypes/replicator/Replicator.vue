@@ -1,10 +1,29 @@
 <template>
 
-    <div class="replicator-fieldtype-container">
+<fullscreen :enabled="fullScreenMode" :provide="provide">
+<!-- These wrappers allow any css that expected the field to
+     be within the context of a publish form to continue working
+     once it has been portaled out. -->
+<div :class="{ 'publish-fields': fullScreenMode }">
+<div :class="{ wrapperClasses: fullScreenMode }">
+<div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-white': fullScreenMode }">
 
-        <div class="absolute top-0 right-0 p-6 text-2xs" v-if="config.collapse !== 'accordion' && value.length > 0">
-            <button @click="collapseAll" class="text-blue hover:text-black mr-2" v-text="__('Collapse All')" />
-            <button @click="expandAll" class="text-blue hover:text-black" v-text="__('Expand All')" />
+    <header class="bg-gray-200 border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
+        <h2 v-text="config.display" />
+        <button class="btn-close absolute top-2 right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
+    </header>
+
+    <section :class="{'p-4': fullScreenMode}">
+
+        <div class="absolute top-0 right-0 p-6 text-2xs">
+            <button @click="fullScreenMode = !fullScreenMode" class="flex items-center w-full h-full justify-center text-gray-500 hover:text-gray-700">
+                <svg-icon name="expand-2" class="h-3.5 w-3.5" v-show="! fullScreenMode" />
+                <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="fullScreenMode" />
+            </button>
+            <template v-if="config.collapse !== 'accordion' && value.length > 0">
+                <button @click="collapseAll" class="whitespace-nowrap text-blue hover:text-black mr-2" v-text="__('Collapse All')" />
+                <button @click="expandAll" class="whitespace-nowrap text-blue hover:text-black" v-text="__('Expand All')" />
+            </template>
         </div>
 
         <sortable-list
@@ -62,7 +81,12 @@
             :index="value.length"
             @added="addSet" />
 
-    </div>
+    </section>
+
+</div>
+</div>
+</div>
+</fullscreen>
 
 </template>
 
@@ -89,6 +113,10 @@ export default {
         return {
             focused: false,
             collapsed: clone(this.meta.collapsed),
+            fullScreenMode: false,
+            provide: {
+                storeName: this.storeName
+            }
         }
     },
 
