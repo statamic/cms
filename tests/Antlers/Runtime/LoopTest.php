@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime;
 
 use Statamic\Fields\Value;
+use Statamic\Modifiers\Modifier;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -155,7 +156,7 @@ EOT;
 
     public function test_runtime_does_not_attempt_evaluate_modifiers_twice()
     {
-        mt_srand(1234);
+        PassThroughModifier::register();;
 
         $data = [
             'widths' => [
@@ -166,22 +167,23 @@ EOT;
         ];
 
         $template = <<<'EOT'
-{{ loop from="1" to="10" }}<{{ value }}><{{ widths | shuffle | limit:1 }}width-{{ value }}{{ /widths }}><{{ value }}>{{ unless last }}|{{ /unless}}{{ /loop }}
+{{ loop from="1" to="10" }}<{{ value }}><{{ widths | pass_through | limit:1 }}width-{{ value }}{{ /widths }}><{{ value }}>{{ unless last }}|{{ /unless}}{{ /loop }}
 EOT;
 
         $expected = <<<'EXPECTED'
-<1><width-75><1>|<2><width-75><2>|<3><width-50><3>|<4><width-75><4>|<5><width-25><5>|<6><width-75><6>|<7><width-75><7>|<8><width-50><8>|<9><width-50><9>|<10><width-50><10>
+<1><width-25><1>|<2><width-25><2>|<3><width-25><3>|<4><width-25><4>|<5><width-25><5>|<6><width-25><6>|<7><width-25><7>|<8><width-25><8>|<9><width-25><9>|<10><width-25><10>
 EXPECTED;
 
         $this->assertSame($expected, $this->renderString($template, $data, true));
 
-        mt_srand(1234);
-
         $template = <<<'EOT'
-{{ loop from="1" to="10" }}<{{ value }}><{{ widths | shuffle | limit:1 }}width-{{ value }}{{ /widths | shuffle | limit:1 }}><{{ value }}>{{ unless last }}|{{ /unless }}{{ /loop }}
+{{ loop from="1" to="10" }}<{{ value }}><{{ widths | pass_through | limit:1 }}width-{{ value }}{{ /widths | shuffle | limit:1 }}><{{ value }}>{{ unless last }}|{{ /unless }}{{ /loop }}
 EOT;
 
         $this->assertSame($expected, $this->renderString($template, $data, true));
+        
+        // Ensure our modifier was only called once per outer loop iteration.
+        $this->assertSame(20, PassThroughModifier::$callCount);
     }
 
     public function test_runtime_maintains_scope_on_nested_loops()
@@ -246,5 +248,18 @@ EXPECTED;
             StringUtilities::normalizeLineEndings($expected),
             StringUtilities::normalizeLineEndings($responseContent)
         );
+    }
+}
+
+class PassThroughModifier extends Modifier
+{
+    protected static $handle = 'pass_through';
+    public static $callCount = 0;
+
+    public function index($value)
+    {
+        self::$callCount += 1;
+
+        return $value;
     }
 }
