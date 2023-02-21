@@ -193,11 +193,11 @@ export default {
                     this.$nextTick(() => this.initCodeMirror());
                 });
 
+                this.$root.hideOverflow = fullscreen;
+
                 if (fullscreen) {
-                    document.body.style.setProperty("overflow", "hidden")
                     this.createPortalTarget();
                 } else {
-                    document.body.style.removeProperty("overflow");
                     this.destroyPortalTarget();
                 }
             }
