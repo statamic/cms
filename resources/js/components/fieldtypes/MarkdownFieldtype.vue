@@ -173,8 +173,7 @@ export default {
             uploads: [],
             count: {},
             escBinding: null,
-            markdownPreviewText: null,
-            portalTarget: null
+            markdownPreviewText: null
         };
     },
 
