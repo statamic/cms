@@ -156,7 +156,7 @@ EOT;
 
     public function test_runtime_does_not_attempt_evaluate_modifiers_twice()
     {
-        PassThroughModifier::register();;
+        PassThroughModifier::register();
 
         $data = [
             'widths' => [
@@ -181,7 +181,7 @@ EXPECTED;
 EOT;
 
         $this->assertSame($expected, $this->renderString($template, $data, true));
-        
+
         // Ensure our modifier was only called once per outer loop iteration.
         $this->assertSame(20, PassThroughModifier::$callCount);
     }
