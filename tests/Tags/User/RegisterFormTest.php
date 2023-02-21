@@ -190,10 +190,9 @@ EOT
         preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
-        // TODO: It seems
         $expected = [
-            'The password must be at least 8 characters.',
-            'The age field is required.',
+            trans('validation.min.string', ['attribute' => 'password', 'min' => 8]), // 'The password must be at least 8 characters.',
+            trans('validation.required', ['attribute' => 'age']), // 'The age field is required.',
         ];
 
         $this->assertEmpty($success[1]);
