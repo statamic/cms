@@ -1,6 +1,5 @@
 <template>
-    <element-container @resized="containerWidth = $event.width">
-    <div :class="{ 'narrow': containerWidth < 500, 'really-narrow': containerWidth < 280, 'extremely-narrow': containerWidth < 180 }">
+    <div class="@container">
 
         <uploader
             ref="uploader"
@@ -41,8 +40,8 @@
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
-                        <span v-if="soloAsset" class="drag-drop-text" v-text="__('or drag & drop here to replace.')"></span>
-                        <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
+                        <span v-if="soloAsset" class="drag-drop-text hidden @md:inline" v-text="__('or drag & drop here to replace.')"></span>
+                        <span v-else class="drag-drop-text hidden @md:inline" v-text="__('or drag & drop here.')"></span>
                     </p>
                 </div>
 
@@ -184,7 +183,6 @@ export default {
             uploads: [],
             innerDragging: false,
             displayMode: 'grid',
-            containerWidth: null,
         };
     },
 

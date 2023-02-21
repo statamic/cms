@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <publish-fields-container>
+        <div class="publish-fields @container">
             <set-field
                 v-for="field in fields"
                 v-show="showField(field, fieldPath(field.handle))"
@@ -33,7 +33,7 @@
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             />
-        </publish-fields-container>
+        </div>
     </div>
 
 </template>

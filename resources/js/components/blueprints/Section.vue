@@ -1,6 +1,6 @@
 <template>
 
-    <div class="blueprint-section"
+    <div class="blueprint-section @container"
         :class="{
             'w-full md:w-1/2': !isEditing && !isSingle,
             'w-full': isEditing || isSingle

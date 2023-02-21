@@ -68,11 +68,3 @@
     display: none;
     .bard-set-solo & { display: block; }
 }
-
-
-
-/* Responsive Wangjangling
-  ========================================================================== */
-
-/*  hide the 'or drag to upload' text when too narrow */
-.assets-fieldtype .narrow .assets-fieldtype-picker .drag-drop-text { display: none; }

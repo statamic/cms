@@ -18,28 +18,26 @@
 
                     <div class="markdown-buttons" v-if="! isReadOnly">
                         <button @click="bold" v-tooltip="__('Bold')" :aria-label="__('Bold')">
-                            <i class="fa fa-bold"></i>
+                            <svg-icon name="text-bold" class="w-4 h-4" />
                         </button>
                         <button @click="italic" v-tooltip="__('Italic')" :aria-label="__('Italic')">
-                            <i class="fa fa-italic"></i>
+                            <svg-icon name="text-italic" class="w-4 h-4" />
                         </button>
                         <button @click="insertLink('')" v-tooltip="__('Insert Link')" :aria-label="__('Insert Link')">
-                            <i class="fa fa-link"></i>
+                            <svg-icon name="insert-link" class="w-4 h-4" />
                         </button>
                         <button @click="addAsset" v-if="assetsEnabled" v-tooltip="__('Insert Asset')" :aria-label="__('Insert Asset')">
-                            <i class="fa fa-picture-o"></i>
+                            <svg-icon name="insert-image" class="w-4 h-4" />
                         </button>
                         <button @click="insertImage('')" v-else v-tooltip="__('Insert Image')" :aria-label="__('Insert Image')">
-                            <i class="fa fa-picture-o"></i>
+                            <svg-icon name="insert-image" class="w-4 h-4" />
                         </button>
                         <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
                             <svg-icon name="dark-mode" class="w-4 h-4" />
                         </button>
-                        <button @click="openFullScreen" v-tooltip="__('Fullscreen Mode')" :aria-label="__('Fullscreen Mode')" v-if="! fullScreenMode">
-                            <svg-icon name="expand" class="w-4 h-4" />
-                        </button>
-                        <button @click="closeFullScreen" v-tooltip="__('Close Fullscreen Mode')" :aria-label="__('Close Fullscreen Mode')" v-if="fullScreenMode">
-                            <svg-icon name="shrink-all" class="w-4 h-4" />
+                        <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')" :aria-label="__('Toggle FullScreen Mode')">
+                            <svg-icon name="expand-2" class="w-4 h-4" v-show="!fullScreenMode" />
+                            <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
                         </button>
                     </div>
                 </div>
@@ -87,7 +85,7 @@
                         </div>
                     </div>
 
-                    <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview clean-content"></div>
+                    <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview prose"></div>
                 </div>
             </div>
         </uploader>
@@ -107,7 +105,7 @@
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
             <div class="h-full overflow-auto p-6 bg-white relative">
                 <button class="btn-close absolute top-0 right-0 mt-4 mr-8" @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;</button>
-                <div class="max-w-md mx-auto my-8 clean-content">
+                <div class="max-w-md mx-auto my-8 prose">
                     <h2 v-text="__('Markdown Cheatsheet')"></h2>
                     <div v-html="__('markdown.cheatsheet')"></div>
                 </div>
@@ -212,6 +210,14 @@ export default {
             this.fullScreenMode = true;
             this.escBinding = this.$keys.bindGlobal('esc', this.closeFullScreen);
             this.trackHeightUpdates();
+        },
+
+        toggleFullScreen() {
+            if (this.fullScreenMode) {
+                this.closeFullScreen();
+            } else {
+                this.openFullScreen();
+            }
         },
 
         toggleDarkMode() {
@@ -524,6 +530,13 @@ export default {
                 this.$root.$off('livepreview.closed', throttled);
                 this.$root.$off('livepreview.resizing', throttled);
             });
+        },
+
+        updateMarkdownPreview() {
+            this.$axios
+                .post(this.meta.previewUrl, { value: this.data, config: this.config })
+                .then(response => this.markdownPreviewText = response.data)
+                .catch(e => this.$toast.error(e.response ? e.response.data.message : __('Something went wrong')));
         }
 
     },
@@ -549,13 +562,6 @@ export default {
             return marked(this.data || '', { renderer: new PlainTextRenderer })
                 .replace(/<\/?[^>]+(>|$)/g, "");
         },
-
-        updateMarkdownPreview() {
-            this.$axios
-                .post(this.meta.previewUrl, { value: this.data, config: this.config })
-                .then(response => this.markdownPreviewText = response.data)
-                .catch(e => this.$toast.error(e.response ? e.response.data.message : __('Something went wrong')));
-        }
     },
 
     mounted() {

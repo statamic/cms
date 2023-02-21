@@ -34,20 +34,6 @@
 
 .date-time-container {
 	@apply flex;
-
-	.time-container {
-		@apply ml-2;
-	}
-}
-
-/*  Make date and time and fields sit one above the other */
-/*  when it's too narrow for them to sit side by side. */
-.date-time-container.narrow {
-    @apply block;
-
-    .time-container {
-        @apply mt-2 ml-0;
-    }
 }
 
 /*  Dear sweet baby Jesus please forgive me for this brittle selector */

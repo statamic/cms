@@ -91,7 +91,6 @@ class Environment
     protected $interpolationKeys = [];
     protected $assignments = [];
     protected $dataManagerInterpolations = [];
-    protected $evaluatedModifiers = false;
 
     /**
      * @var LanguageOperatorManager|null
@@ -311,8 +310,6 @@ class Environment
      */
     public function evaluate($nodes)
     {
-        $this->evaluatedModifiers = false;
-
         if (count($nodes) == 0) {
             return null;
         }
@@ -1252,14 +1249,7 @@ class Environment
      */
     private function applyModifiers($value, ModifierChainNode $modifierChain)
     {
-        $this->evaluatedModifiers = true;
-
         return ModifierManager::evaluate($value, $this, $modifierChain, $this->data);
-    }
-
-    public function getDidEvaluateModifiers()
-    {
-        return $this->evaluatedModifiers;
     }
 
     /**

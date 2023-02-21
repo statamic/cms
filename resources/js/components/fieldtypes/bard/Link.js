@@ -11,19 +11,15 @@ export const Link = Mark.create({
         return {
             href: {
                 default: null,
-                parseHTML: element => element.querySelector('a')?.getAttribute('href'),
             },
             rel: {
                 default: null,
-                parseHTML: element => element.querySelector('a')?.getAttribute('rel'),
             },
             target: {
                 default: null,
-                parseHTML: element => element.querySelector('a')?.getAttribute('target'),
             },
             title: {
                 default: null,
-                parseHTML: element => element.querySelector('a')?.getAttribute('title'),
             },
         }
     },
@@ -79,6 +75,8 @@ export const Link = Mark.create({
                         const range = getMarkRange(doc.resolve(pos), schema.marks.link);
 
                         if (range) {
+                            if (range.to === pos) return;
+
                             const $start = doc.resolve(range.from);
                             const $end = doc.resolve(range.to);
                             const selection = new TextSelection($start, $end);

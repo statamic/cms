@@ -119,7 +119,7 @@ export default {
             return [
                 'form-group publish-field',
                 `${this.field.type}-fieldtype`,
-                `field-${tailwind_width_class(this.field.width)}`,
+                `${tailwind_width_class(this.field.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.field.classes || '',
                 { 'has-error': this.hasError || this.hasNestedError }

@@ -8,7 +8,7 @@
     >
 
         <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar">
-            <div class="flex flex-wrap items-center no-select" v-if="toolbarIsFixed">
+            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">
                 <component
                     v-for="button in visibleButtons(buttons)"
                     :key="button.name"
@@ -18,19 +18,16 @@
                     :config="config"
                     :bard="_self"
                     :editor="editor" />
-            </div>
-            <div class="flex items-center no-select">
-                <div class="h-10 -my-1 border-l pr-2 w-1" v-if="toolbarIsFixed && hasExtraButtons"></div>
-                <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                    <svg-icon name="file-code" class="w-4 h-4 "/>
-                </button>
-                <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && config.sets.length > 0">
-                    <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
-                </button>
-                <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
-                    <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
-                    <svg-icon name="expand" class="w-4 h-4" v-else />
-                </button>
+                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
+                        <svg-icon name="show-source" class="w-4 h-4 "/>
+                    </button>
+                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && config.sets.length > 0">
+                        <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
+                    </button>
+                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
+                        <svg-icon name="shrink-all" class="w-4 h-4" v-show="fullScreenMode" />
+                        <svg-icon name="expand-2" class="w-4 h-4" v-show="!fullScreenMode" />
+                    </button>
             </div>
         </div>
 
@@ -84,6 +81,7 @@ import BulletList from '@tiptap/extension-bullet-list';
 import CharacterCount from '@tiptap/extension-character-count';
 import Code from '@tiptap/extension-code';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import Dropcursor from '@tiptap/extension-dropcursor';
 import Gapcursor from '@tiptap/extension-gapcursor';
 import HardBreak from '@tiptap/extension-hard-break';
 import Heading from '@tiptap/extension-heading';
@@ -578,6 +576,7 @@ export default {
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
                 ...(this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak]),
+                Dropcursor,
                 Gapcursor,
                 History,
                 Paragraph,

@@ -256,17 +256,15 @@ class Str extends \Illuminate\Support\Str
     public static function tailwindWidthClass($width)
     {
         $widths = [
-            25 => '1/4',
-            33 => '1/3',
-            50 => '1/2',
-            66 => '2/3',
-            75 => '3/4',
-            100 => 'full',
+            25 => 'w-full @lg:w-1/4',
+            33 => 'w-full @lg:w-1/3',
+            50 => 'w-full @lg:w-1/2',
+            66 => 'w-full @lg:w-2/3',
+            75 => 'w-full @lg:w-3/4',
+            100 => 'w-full',
         ];
 
-        $class = $widths[$width] ?? 'full';
-
-        return "w-$class";
+        return $widths[$width] ?? 'w-full';
     }
 
     /**
