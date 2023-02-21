@@ -19,6 +19,9 @@ class Translate extends Command
     protected $files;
     protected $excluded;
     protected $englishTranslations = [];
+    protected $input;
+    protected $output;
+    protected $client;
 
     public function __construct(Filesystem $files, array $excluded)
     {
