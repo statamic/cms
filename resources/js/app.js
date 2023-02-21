@@ -211,7 +211,8 @@ Statamic.app({
         showBanner: true,
         portals: [],
         panes: [],
-        appendedComponents: []
+        appendedComponents: [],
+        hideOverflow: false,
     },
 
     computed: {
@@ -226,6 +227,18 @@ Statamic.app({
 
         wrapperClass() {
             return this.$config.get('wrapperClass', 'max-w-xl');
+        }
+
+    },
+
+    watch: {
+
+        hideOverflow(hide) {
+            if (hide) {
+                document.body.style.setProperty('overflow', 'hidden')
+            } else {
+                document.body.style.removeProperty('overflow');
+            }
         }
 
     },
