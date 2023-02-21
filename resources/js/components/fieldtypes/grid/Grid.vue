@@ -221,6 +221,10 @@ export default {
             }, 1);
         },
 
+        toggleFullScreen() {
+            this.fullScreenMode = !this.fullScreenMode;
+        },
+
         makeGridProvide() {
             const grid = {};
             Object.defineProperties(grid, {
@@ -230,7 +234,7 @@ export default {
                 handle: { get: () => this.handle },
                 fieldPathPrefix: { get: () => this.fieldPathPrefix },
                 fullScreenMode: { get: () => this.fullScreenMode },
-                toggleFullScreen: { value: () => this.fullScreenMode = !this.fullScreenMode },
+                toggleFullScreen: { get: () => this.toggleFullScreen },
             });
             return grid;
         }
