@@ -6,6 +6,9 @@
     height: 32px;
     display: flex;
     align-items: center;
+    &:focus-within .toggle-container {
+        @apply ring-2;
+    }
 
     .inline-label {
         @apply ml-2 font-normal text-gray-700;

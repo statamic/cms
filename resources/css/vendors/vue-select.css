@@ -51,8 +51,8 @@
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
 
-    &:focus, &:focus-within {
-        @apply focus-outline;
+    &:focus-within {
+        @apply ring-2;
     }
 
 	.vs--disabled & {

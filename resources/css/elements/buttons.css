@@ -17,7 +17,7 @@ button {
     padding: .475rem 1.25rem;
 
     &:focus {
-        @apply focus-outline;
+        @apply ring-2 outline-none;
     }
 
     &:disabled {
@@ -180,6 +180,9 @@ button {
         @apply rounded-r border-l;
         padding: .475rem .5rem;
         &.btn-flat { @apply border-r-0; }
+    }
+    .btn:focus {
+        @apply ring-inset;
     }
 }
 

@@ -2,10 +2,6 @@
     @apply border rounded relative outline-none;
 
     * { outline: none; }
-
-    &:focus-within {
-        @apply focus-outline;
-    }
 }
 
 .bard-editor {
@@ -16,6 +12,9 @@
     @apply p-1 min-h-40 text-sm leading-tight;
     @apply @sm/bard:p-2 text-md leading-normal;
     @apply @lg/bard:p-4;
+    &:focus {
+        @apply ring-2 ring-inset ring-blue-200;
+    }
 }
 
 .bard-editor .bard-invalid {
@@ -85,10 +84,11 @@
     @apply bg-black rounded-full shadow-lg px-4;
 
     button {
-        @apply focus-none text-gray-700 rounded px-1 flex items-center justify-center text-base text-center bg-transparent;
+        @apply text-gray-700 rounded px-1 flex items-center justify-center text-base text-center bg-transparent;
         height: 32px;
         width: 32px;
         margin: 0 2px;
+        outline: none;
         svg {
             @apply w-auto h-4;
         }

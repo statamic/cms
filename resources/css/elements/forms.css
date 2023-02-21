@@ -32,11 +32,6 @@ select {
     &:not(textarea) {
         height: 38px;
     }
-
-    &:focus, &:focus-within {
-        @apply focus-outline;
-    }
-
 }
 
 /*  Used inside tables, grids, and so on */
@@ -65,10 +60,11 @@ input.input-text-minimal:read-only,
     height: 38px;
 
     &:not(.focus-within-only):focus, &:not(.focus-within-only):focus-within {
-        @apply focus-outline;
+        @apply ring-2 ring-blue-300;
 
         .input-text:focus, .input-group-prepend:focus, .input-group-append:focus, .input-group-item:focus {
-            @apply focus-none;
+            outline: 0;
+            box-shadow: none;
         }
     }
 
@@ -179,10 +175,6 @@ input.input-text-minimal:read-only,
   .select-input-container {
     @apply rounded relative;
 
-    &:focus, &:focus-within {
-        @apply focus-outline;
-    }
-
     select {
         @apply text-sm text-gray-800 shadow-button cursor-pointer block w-full h-full text-left relative max-w-full;
         @apply select-none rounded leading-normal align-middle whitespace-nowrap appearance-none subpixel-antialiased;
@@ -192,10 +184,6 @@ input.input-text-minimal:read-only,
         height: 2.375rem; /*  38px */
         letter-spacing: -0.01em;
         padding: .475rem 1.75rem .475rem .75rem;
-
-        &:focus {
-            @apply focus-outline;
-        }
 
         &:hover:not(:disabled), &:active:not(:disabled) {
             background: linear-gradient(180deg, #f9fafb, #f4f6f8);

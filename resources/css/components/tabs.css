@@ -37,17 +37,24 @@
         min-height: 94%;
     }
 
+    .tab-button:hover {
+        @apply bg-white;
+    }
+    .tab-button:active {
+        @apply bg-white text-blue;
+    }
+
+    .tab-button:focus {
+        @apply bg-white text-blue border-b-0 ring-1 ring-inset;
+    }
+
     .tab-button.active {
         @apply bg-white text-blue border-t-2 border-blue relative h-full min-h-full border-b-0 outline-none;
         z-index: 1;
     }
 
-    .tab-button:active {
-        @apply bg-white text-blue border-b-0 outline-none;
-    }
-
     .tab-button:focus {
-        @apply bg-white text-blue border-b-0 focus-outline;
+        @apply border-t;
     }
 
     .tab-button.ghost {

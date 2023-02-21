@@ -7,13 +7,13 @@
 }
 
 .focus-outline {
-    @apply border border-blue-200;
+    @apply border border-blue-300;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0,125,255,.25);
 }
 
 .focus-none {
-    @apply border-0;
+    /* @apply border-0; */
     outline: 0;
     box-shadow: none;
 }
