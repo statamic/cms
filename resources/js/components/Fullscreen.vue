@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <portal :to="portalTargetName" :disabled="!enabled">
+        <portal :to="portalTargetName" :disabled="!enabled" :target-class="targetClass">
             <provider :variables="provide">
                 <slot />
             </provider>
@@ -25,6 +25,9 @@ export default {
         },
         provide: {
             type: Object
+        },
+        targetClass: {
+            type: String
         }
     },
 

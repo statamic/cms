@@ -1,6 +1,12 @@
 <template>
 
 <fullscreen :enabled="fullScreenMode" :provide="provide">
+<!-- These wrappers allow any css that expected the field to
+     be within the context of a publish form to continue working
+     once it has been portaled out. -->
+<div :class="{ 'publish-fields': fullScreenMode }">
+<div :class="{ wrapperClasses: fullScreenMode }">
+
     <div
         class="bard-fieldtype-wrapper"
         :class="{'bard-fullscreen': fullScreenMode }"
@@ -70,6 +76,8 @@
             <div v-if="config.character_limit">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
         </div>
     </div>
+</div>
+</div>
 </fullscreen>
 
 </template>
@@ -262,6 +270,10 @@ export default {
         inputIsInline() {
             return this.config.inline;
         },
+
+        wrapperClasses() {
+            return `form-group publish-field publish-field__${this.handle} bard-fieldtype`;
+        }
 
     },
 

@@ -1,5 +1,5 @@
 <template>
-<fullscreen :enabled="fullScreenMode">
+<fullscreen :enabled="fullScreenMode" target-class="markdown-fieldtype">
     <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
 
         <uploader
