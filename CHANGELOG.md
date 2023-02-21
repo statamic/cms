@@ -1,5 +1,29 @@
 # Release Notes
 
+## 3.4.4 (2023-02-15)
+
+### What's new
+- Added a `vite:asset` tag. [#7477](https://github.com/statamic/cms/issues/7477) by @mwagena
+
+### What's improved
+- French translations [#7503](https://github.com/statamic/cms/issues/7503) by @ebeauchamps
+
+### What's fixed
+- Fix pagination in the `taxonomy` tag. [#7531](https://github.com/statamic/cms/issues/7531) by @ryanmitchell
+- Updated Tiptap in order to fix tables, code blocks, etc. [#7514](https://github.com/statamic/cms/issues/7514) by @jasonvarga
+- Fix issue where you couldn't select text in nested Bard fields in Firefox. [#7525](https://github.com/statamic/cms/issues/7525) by @o1y
+- Fix inability to position cursor after a link in Bard. [#7528](https://github.com/statamic/cms/issues/7528) by @o1y
+- Fix missing dropcursor in Bard. [#7518](https://github.com/statamic/cms/issues/7518) by @o1y
+- Fix Bard set popover flicker. [#7535](https://github.com/statamic/cms/issues/7535) by @o1y
+- Fix issue where pasting links into Bard would strip out attributes. [#7517](https://github.com/statamic/cms/issues/7517) by @o1y
+- Fix typo in preference start page instructions. [#7538](https://github.com/statamic/cms/issues/7538) by @ryanmitchell
+- Fix docs URL on Updater page. [#7539](https://github.com/statamic/cms/issues/7539) by @joshuablum
+- Prevent deprecation warnings in translate commands. [#7537](https://github.com/statamic/cms/issues/7537) by @ryanmitchell
+- Fix issue where you couldn't position the cursor between Bard sets. [#7516](https://github.com/statamic/cms/issues/7516) by @o1y
+- Fix augmentation issue in Antlers when using the scope parameter. [#7436](https://github.com/statamic/cms/issues/7436) by @JohnathonKoster
+
+
+
 ## 3.4.3 (2023-02-08)
 
 ### What's new

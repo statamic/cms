@@ -177,6 +177,7 @@ class NavBuilder
             ->map(fn ($item) => $item->section())
             ->unique()
             ->keyBy(fn ($section) => NavItem::snakeCase($section))
+            ->prepend('Top Level', 'top_level')
             ->all();
 
         return $this;
