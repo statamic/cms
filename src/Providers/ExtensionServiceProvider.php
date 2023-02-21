@@ -95,6 +95,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\UserGroups::class,
         Fieldtypes\UserRoles::class,
         Fieldtypes\Users::class,
+        Fieldtypes\Width::class,
         Fieldtypes\Video::class,
         Fieldtypes\Yaml::class,
         \Statamic\Forms\Fieldtype::class,
