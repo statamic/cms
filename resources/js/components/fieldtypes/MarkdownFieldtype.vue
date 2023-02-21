@@ -1,6 +1,5 @@
 <template>
-<div>
-<portal :to="portalTargetName" :disabled="!fullScreenMode">
+<fullscreen :enabled="fullScreenMode">
     <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
 
         <uploader
@@ -117,8 +116,7 @@
         <vue-countable :text="data" :elementId="'myId'" @change="change"></vue-countable>
 
     </div>
-</portal>
-</div>
+</fullscreen>
 </template>
 
 <script>
@@ -192,14 +190,6 @@ export default {
                 this.$nextTick(() => {
                     this.$nextTick(() => this.initCodeMirror());
                 });
-
-                this.$root.hideOverflow = fullscreen;
-
-                if (fullscreen) {
-                    this.createPortalTarget();
-                } else {
-                    this.destroyPortalTarget();
-                }
             }
         },
 
@@ -592,19 +582,6 @@ export default {
             });
 
             this.trackHeightUpdates();
-
-        },
-
-        createPortalTarget() {
-            let key = `markdown-fullscreen-${this._uid}`;
-            let portalTarget = { key, name: key };
-            this.$root.portals.push(portalTarget);
-            this.portalTarget = portalTarget;
-        },
-
-        destroyPortalTarget() {
-            const i = _.findIndex(this.$root.portals, (portal) => portal.key === this.portalTarget.key);
-            this.$root.portals.splice(i, 1);
         }
 
     },
@@ -629,10 +606,6 @@ export default {
         replicatorPreview() {
             return marked(this.data || '', { renderer: new PlainTextRenderer })
                 .replace(/<\/?[^>]+(>|$)/g, "");
-        },
-
-        portalTargetName() {
-            return this.portalTarget ? this.portalTarget.name : null;
         }
     }
 
