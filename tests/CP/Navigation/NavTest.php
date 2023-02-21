@@ -656,6 +656,21 @@ class NavTest extends TestCase
         $this->assertCount(1, $this->build()->get('Jedi')->map->display());
     }
 
+    /** @test */
+    public function it_ensures_top_level_section_is_always_built_when_building_with_hidden()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::extend(function ($nav) {
+            $nav->remove('Top Level', 'Dashboard'); // Remove default top level dashboard item
+        });
+
+        $nav = Nav::build(true, true)->pluck('items', 'display');
+
+        $this->assertTrue($nav->has('Top Level'));
+        $this->assertCount(0, $nav->get('Top Level'));
+    }
+
     protected function build()
     {
         return Nav::build()->pluck('items', 'display');

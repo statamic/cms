@@ -194,11 +194,6 @@
     @apply text-red;
 }
 
-.bard-set .popover-container:not(.popover-open) .popover{
-    inset: 0 !important;
-    transform: none !important;
-}
-
 /* The set selection options for each text block
   ========================================================================== */
 
