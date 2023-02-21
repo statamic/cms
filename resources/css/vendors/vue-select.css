@@ -1,7 +1,5 @@
 .v-select {
-	@apply rounded min-w-0;
-	position: relative;
-	font-family: inherit
+	@apply rounded min-w-0 relative font-sans;
 }
 
 .vs__fade-enter-active,
@@ -46,7 +44,7 @@
 }
 
 .vs__dropdown-toggle {
-	@apply appearance-none text-gray-800 w-full p-0 rounded flex items-center;
+	@apply appearance-none text-gray-800 w-full p-0 rounded flex items-center bg-gray-100 shadow-inner border border-gray-500;
     height: 2.375rem;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
@@ -70,8 +68,8 @@
 
 .v-select:not(.vs--unsearchable) .vs__selected-options {
 	@apply appearance-none text-gray-800 text-sm;
-	@apply flex flex-wrap flex-1 border border-gray-500 border-r-0 rounded-l relative h-full;
-	box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,.05);
+	@apply flex flex-wrap flex-1 rounded-l relative h-full;
+	/* box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,.05); */
 	padding: 5px 8px;
 	line-height: 1.5;
 	width: calc(100% - 34px);
@@ -90,12 +88,13 @@
 
 .vs--single.vs--unsearchable .vs__selected-options {
 	@apply clickable;
-	@apply flex flex-1 rounded-l relative h-full border-r-0;
+	@apply flex flex-1 rounded-l relative h-full border-0;
 	width: calc(100% - 34px);
 }
 
 .vs__actions {
-	@apply flex items-center;
+	@apply flex items-center rounded-r;
+    height: 2.375rem;
 }
 
 .vs--searchable .vs__dropdown-toggle {
@@ -108,16 +107,13 @@
 
 .vs__open-indicator {
 	@apply clickable;
-	@apply flex items-center rounded-r px-2 text-sm shrink-0;
-	height: 2.375rem;
+	@apply flex items-center rounded-r px-2 text-sm shrink-0 h-full border-r-0;
+	/* height: 2.375rem; */
 }
 
 .vs__open-indicator svg {
-	@apply flex items-center text-gray-900;
-	height: 16px;
-	width: 16px;
-	-webkit-transform: scale(1);
-	transform: scale(1);
+	@apply flex items-center text-gray-900 relative w-4 h-4;
+	transform: translateY(1px) scale(1);
 	transition: -webkit-transform .15s cubic-bezier(1, -.115, .975, .855);
 	transition: transform .15s cubic-bezier(1, -.115, .975, .855);
 	transition: transform .15s cubic-bezier(1, -.115, .975, .855), -webkit-transform .15s cubic-bezier(1, -.115, .975, .855);
@@ -126,7 +122,7 @@
 
 .vs--open .vs__open-indicator svg {
 	-webkit-transform: rotate(180deg) scale(1);
-	transform: rotate(180deg) scale(1)
+	transform: rotate(180deg) scale(1) translateY(0px);
 }
 
 .vs--loading .vs__open-indicator {
@@ -134,12 +130,7 @@
 }
 
 .vs__clear {
-	@apply text-gray-900 px-2 cursor-pointer shadow-inner text-base bg-transparent;
-	height: 2.375rem;
-	box-shadow: inset -1px 1px 1px 0px rgba(0,0,0,.05);
-	border-top: 1px solid #c4cdd6;
-	border-bottom: 1px solid #c4cdd6;
-	background-color: transparent;
+	@apply text-gray-900 px-2 cursor-pointer text-base bg-transparent shadow-none;
 	&:hover {
 		@apply text-blue;
 	}
@@ -187,7 +178,7 @@
 	@apply flex items-center cursor-pointer text-gray-600 ml-1 p-0 outline-none;
 
 	&:hover {
-		@apply text-gray-800;
+		@apply text-gray-700;
 	}
 
 	&:focus {
@@ -195,10 +186,7 @@
 	}
 
 	span {
-		flex-shrink: 0;
-		font-size: 17px;
-		font-weight: 700;
-		padding-top: 1px;
+        @apply text-md shrink-0 font-thin;
 	}
 }
 
@@ -231,7 +219,7 @@
 
 .vs__search,
 .vs__search:focus {
-	@apply appearance-none text-sm text-gray-800 px-2 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
+	@apply appearance-none text-sm text-gray-800 pr-2 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
 	line-height: 1.4;
 	border-left: none;
 	box-shadow: none;

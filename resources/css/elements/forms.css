@@ -30,7 +30,7 @@ select {
                 box-shadow .15s ease-in-out;
 
     &:not(textarea) {
-        height: 38px;
+        height: 2.375rem;
     }
 }
 
@@ -57,7 +57,7 @@ input.input-text-minimal:read-only,
 
 .input-group {
     @apply appearance-none text-gray-800 w-full p-0 rounded flex items-center;
-    height: 38px;
+    height: 2.375rem;
 
     &:not(.focus-within-only):focus, &:not(.focus-within-only):focus-within {
         @apply ring-2 ring-blue-300;
@@ -85,7 +85,7 @@ input.input-text-minimal:read-only,
         background: linear-gradient(180deg, #fff, #f9fafb);
         border: 1px solid #c4cdd6;
         box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
-        height: 38px;
+        height: 2.375rem;
         line-height: 36px;
 
         &button {
