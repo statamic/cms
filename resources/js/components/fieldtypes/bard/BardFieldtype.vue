@@ -443,12 +443,10 @@ export default {
 
         toggleFullscreen() {
             this.fullScreenMode = !this.fullScreenMode;
-            this.$root.hideOverflow = ! this.$root.hideOverflow;
         },
 
         closeFullscreen() {
             this.fullScreenMode = false;
-            this.$root.hideOverflow = false;
         },
 
         shouldShowSetButton({ view, state }) {
