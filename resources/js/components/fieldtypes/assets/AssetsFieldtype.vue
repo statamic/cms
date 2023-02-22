@@ -403,7 +403,6 @@ export default {
          */
         openSelector() {
             this.showSelector = true;
-            this.$root.hideOverflow = true;
         },
 
         /**
@@ -411,7 +410,6 @@ export default {
          */
         closeSelector() {
             this.showSelector = false;
-            this.$root.hideOverflow = false;
         },
 
         /**

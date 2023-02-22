@@ -268,7 +268,6 @@ export default {
     },
 
     mounted() {
-        document.body.classList.add('overflow-hidden')
         this.$modal.show('asset-editor');
         this.load();
     },
@@ -363,7 +362,6 @@ export default {
         close() {
             this.$modal.hide('asset-editor');
             this.$emit('closed');
-            document.body.classList.remove('overflow-hidden')
         },
 
         shouldClose() {
