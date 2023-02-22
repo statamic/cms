@@ -1,4 +1,5 @@
 <template>
+<fullscreen :enabled="fullScreenMode" target-class="markdown-fieldtype">
     <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
 
         <uploader
@@ -115,6 +116,7 @@
         <vue-countable :text="data" :elementId="'myId'" @change="change"></vue-countable>
 
     </div>
+</fullscreen>
 </template>
 
 <script>
@@ -183,12 +185,10 @@ export default {
 
         fullScreenMode: {
             immediate: true,
-            handler: fullscreen => {
-                if (fullscreen) {
-                    document.body.style.setProperty("overflow", "hidden")
-                } else {
-                    document.body.style.removeProperty("overflow")
-                }
+            handler: function (fullscreen) {
+                this.$nextTick(() => {
+                    this.$nextTick(() => this.initCodeMirror());
+                });
             }
         },
 
@@ -537,6 +537,50 @@ export default {
                 .post(this.meta.previewUrl, { value: this.data, config: this.config })
                 .then(response => this.markdownPreviewText = response.data)
                 .catch(e => this.$toast.error(e.response ? e.response.data.message : __('Something went wrong')));
+        },
+
+        initCodeMirror() {
+            var self = this;
+
+            self.codemirror = CodeMirror(this.$refs.codemirror, {
+                value: self.data,
+                mode: 'gfm',
+                dragDrop: false,
+                keyMap: 'sublime',
+                direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
+                lineWrapping: true,
+                viewportMargin: Infinity,
+                tabindex: 0,
+                autoRefresh: true,
+                readOnly: self.isReadOnly ? 'nocursor' : false,
+                inputStyle: 'contenteditable',
+                spellcheck: true,
+                extraKeys: {
+                    "Enter": "newlineAndIndentContinueMarkdownList",
+                    "Cmd-Left": "goLineLeftSmart"
+                }
+            });
+
+            self.codemirror.on('change', function (cm) {
+                self.data = cm.doc.getValue();
+            });
+
+            self.codemirror.on('focus', () => self.$emit('focus'));
+            self.codemirror.on('blur', () => self.$emit('blur'));
+
+            // Expose the array of selections to the Vue instance
+            self.codemirror.on('beforeSelectionChange', function (cm, obj) {
+                self.selections = obj.ranges;
+            });
+
+            // Update CodeMirror if we change the value independent of CodeMirror
+            this.$watch('value', function(val) {
+                if (val !== self.codemirror.doc.getValue()) {
+                    self.codemirror.doc.setValue(val);
+                }
+            });
+
+            this.trackHeightUpdates();
         }
 
     },
@@ -561,52 +605,7 @@ export default {
         replicatorPreview() {
             return marked(this.data || '', { renderer: new PlainTextRenderer })
                 .replace(/<\/?[^>]+(>|$)/g, "");
-        },
-    },
-
-    mounted() {
-        var self = this;
-
-        self.codemirror = CodeMirror(this.$refs.codemirror, {
-            value: self.data,
-            mode: 'gfm',
-            dragDrop: false,
-            keyMap: 'sublime',
-            direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
-            lineWrapping: true,
-            viewportMargin: Infinity,
-            tabindex: 0,
-            autoRefresh: true,
-            readOnly: self.isReadOnly ? 'nocursor' : false,
-            inputStyle: 'contenteditable',
-            spellcheck: true,
-            extraKeys: {
-                "Enter": "newlineAndIndentContinueMarkdownList",
-                "Cmd-Left": "goLineLeftSmart"
-            }
-        });
-
-        self.codemirror.on('change', function (cm) {
-            self.data = cm.doc.getValue();
-        });
-
-        self.codemirror.on('focus', () => self.$emit('focus'));
-        self.codemirror.on('blur', () => self.$emit('blur'));
-
-        // Expose the array of selections to the Vue instance
-        self.codemirror.on('beforeSelectionChange', function (cm, obj) {
-            self.selections = obj.ranges;
-        });
-
-        // Update CodeMirror if we change the value independent of CodeMirror
-        this.$watch('value', function(val) {
-            if (val !== self.codemirror.doc.getValue()) {
-                self.codemirror.doc.setValue(val);
-            }
-        });
-
-        this.trackHeightUpdates();
-
+        }
     }
 
 };
