@@ -6,7 +6,7 @@
     @apply border rounded overflow-hidden relative;
 
     .markdown-toolbar {
-        @apply bg-white shadow-none rounded-t border-b text-sm flex items-center justify-between;
+        @apply bg-white shadow-none rounded-t border-b text-sm flex flex-wrap items-center justify-between;
         padding: 4px 8px;
     }
 
@@ -50,7 +50,7 @@
     }
 
     .CodeMirror {
-        @apply bg-gray-100 shadow-inner h-auto font-mono leading-normal p-3 text-xs;
+        @apply bg-gray-100 shadow-inner h-auto font-mono leading-normal px-0 py-1 @md/markdown:p-3 text-xs;
         border-radius: 0 0 3px 3px;
 
         &:focus-within {
@@ -181,10 +181,9 @@
   ========================================================================== */
 
 .markdown-preview {
-    @apply mx-auto;
+    @apply mx-auto px-3 py-2 @md/markdown:py-4 @md/markdown:px-5;
 
-    padding: 16px 20px;
-    min-height: 167px; /*  @TODO Refactor to avoid a magic number. */
+    min-height: 167px;
 
     ol {
         @apply list-decimal;

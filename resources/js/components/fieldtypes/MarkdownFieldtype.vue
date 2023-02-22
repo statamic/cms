@@ -1,6 +1,6 @@
 <template>
 <fullscreen :enabled="fullScreenMode" target-class="markdown-fieldtype">
-    <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
+    <div class="markdown-fieldtype-wrapper @container/markdown" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
 
         <uploader
             ref="uploader"
@@ -86,7 +86,7 @@
                         </div>
                     </div>
 
-                    <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview prose"></div>
+                    <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview prose-sm @md/markdown:prose-base"></div>
                 </div>
             </div>
         </uploader>
