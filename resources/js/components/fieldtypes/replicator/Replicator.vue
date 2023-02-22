@@ -15,15 +15,19 @@
 
     <section :class="{'p-4': fullScreenMode}">
 
-        <div class="absolute top-0 right-0 p-6 text-2xs">
-            <button @click="fullScreenMode = !fullScreenMode" class="flex items-center w-full h-full justify-center text-gray-500 hover:text-gray-700">
-                <svg-icon name="expand-2" class="h-3.5 w-3.5" v-show="! fullScreenMode" />
-                <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="fullScreenMode" />
-            </button>
-            <template v-if="config.collapse !== 'accordion' && value.length > 0">
-                <button @click="collapseAll" class="whitespace-nowrap text-blue hover:text-black mr-2" v-text="__('Collapse All')" />
-                <button @click="expandAll" class="whitespace-nowrap text-blue hover:text-black" v-text="__('Expand All')" />
-            </template>
+        <div class="flex justify-end">
+            <div class="btn-group">
+                <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
+                    <svg-icon name="arrows-horizontal-expand" class="h-3.5 w-3.5" />
+                </button>
+                <button @click="collapseAll" class="btn btn-icon flex items-center" v-tooltip="__('Collapse Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
+                    <svg-icon name="arrows-horizontal-collapse" class="h-3.5 w-3.5" />
+                </button>
+                <button @click="fullScreenMode = !fullScreenMode" class="btn btn-icon flex items-center" v-tooltip="__('Fullscreen Mode')">
+                    <svg-icon name="expand-2" class="h-3.5 w-3.5" v-show="! fullScreenMode" />
+                    <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="fullScreenMode" />
+                </button>
+            </div>
         </div>
 
         <sortable-list
