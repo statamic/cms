@@ -1,5 +1,5 @@
 <template>
-    <div class="datetime @container">
+    <div class="datetime">
 
         <button type="button" class="btn flex mb-2 md:mb-0 items-center pl-3" v-if="!isReadOnly && config.inline === false && !hasDate" @click="addDate" tabindex="0">
             <svg-icon name="calendar" class="w-4 h-4 mr-2"></svg-icon>

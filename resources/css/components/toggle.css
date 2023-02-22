@@ -6,6 +6,9 @@
     height: 32px;
     display: flex;
     align-items: center;
+    &:focus-within .toggle-container {
+        @apply ring-2;
+    }
 
     .inline-label {
         @apply ml-2 font-normal text-gray-700;
@@ -24,15 +27,13 @@
 }
 
 .toggle-container {
-    background: #fff;
+    @apply bg-white cursor-pointer relative border;
     height: 22px;
     width: 46px;
     border-radius: 20px;
-    cursor: pointer;
-    position: relative;
-    border: 1px solid #dfdfdf;
     font-size: 0.1px;
     margin: 6px 0;
+    transition: background-color 0.2s ease;
     &:focus { outline: none; }
 }
 
@@ -40,7 +41,7 @@
     position: absolute;
     top: -1px;
     width: 20px;
-    height: 22px;
+    height: 20px;
     border-radius: 20px;
     transition: all 0.2s ease;
 
@@ -67,8 +68,8 @@
 }
 
 .toggle-container.on {
+    @apply bg-green-light border-green;
     .toggle-slider {
-        @apply bg-green-light;
         width: 44px;
     }
 
@@ -105,7 +106,7 @@
     }
 
     .toggle-container.on .toggle-slider {
-        width: 22px;
+        width: 19px;
     }
 }
 

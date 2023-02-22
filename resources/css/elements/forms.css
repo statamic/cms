@@ -10,16 +10,9 @@ input {
     @apply placeholder:text-gray-600;
 }
 
-input[type="checkbox"] {
-    font-size: 18px;
-    position: relative;
-    top: 1px;
-}
-
+input[type="checkbox"],
 input[type="radio"] {
-    font-size: 18px;
-    position: relative;
-    top: 1px;
+    @apply text-lg;
 }
 
 select {
@@ -32,17 +25,13 @@ select {
 
 .input-text {
     @apply appearance-none bg-gray-100 text-gray-800 max-w-full w-full border p-2 rounded shadow-inner placeholder:text-gray-600;
+    @apply border;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
 
     &:not(textarea) {
-        height: 38px;
+        height: 2.375rem;
     }
-
-    &:focus, &:focus-within {
-        @apply focus-outline;
-    }
-
 }
 
 /*  Used inside tables, grids, and so on */
@@ -68,13 +57,14 @@ input.input-text-minimal:read-only,
 
 .input-group {
     @apply appearance-none text-gray-800 w-full p-0 rounded flex items-center;
-    height: 38px;
+    height: 2.375rem;
 
     &:not(.focus-within-only):focus, &:not(.focus-within-only):focus-within {
-        @apply focus-outline;
+        @apply ring-2 ring-blue-300;
 
         .input-text:focus, .input-group-prepend:focus, .input-group-append:focus, .input-group-item:focus {
-            @apply focus-none;
+            outline: 0;
+            box-shadow: none;
         }
     }
 
@@ -95,7 +85,7 @@ input.input-text-minimal:read-only,
         background: linear-gradient(180deg, #fff, #f9fafb);
         border: 1px solid #c4cdd6;
         box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
-        height: 38px;
+        height: 2.375rem;
         line-height: 36px;
 
         &button {
@@ -155,8 +145,7 @@ input.input-text-minimal:read-only,
     @apply mt-3 flex items-center;
 
     input {
-        @apply leading-normal mr-1 relative;
-        top: -1px;
+        @apply leading-normal mr-1;
     }
 
     label {
@@ -186,10 +175,6 @@ input.input-text-minimal:read-only,
   .select-input-container {
     @apply rounded relative;
 
-    &:focus, &:focus-within {
-        @apply focus-outline;
-    }
-
     select {
         @apply text-sm text-gray-800 shadow-button cursor-pointer block w-full h-full text-left relative max-w-full;
         @apply select-none rounded leading-normal align-middle whitespace-nowrap appearance-none subpixel-antialiased;
@@ -199,10 +184,6 @@ input.input-text-minimal:read-only,
         height: 2.375rem; /*  38px */
         letter-spacing: -0.01em;
         padding: .475rem 1.75rem .475rem .75rem;
-
-        &:focus {
-            @apply focus-outline;
-        }
 
         &:hover:not(:disabled), &:active:not(:disabled) {
             background: linear-gradient(180deg, #f9fafb, #f4f6f8);
@@ -251,7 +232,7 @@ input[type="file"] {
 /* Form groups
   ========================================================================== */
 .form-group {
-    @apply p-3 m-0;
+    @apply p-3 @sm:p-4 @lg:p-6 m-0;
 
     label {
         font-weight: 500;
@@ -292,8 +273,3 @@ input[type="file"] {
     }
 }
 
-@screen md {
-    .form-group {
-        @apply p-6;
-    }
-}

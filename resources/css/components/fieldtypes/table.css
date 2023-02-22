@@ -74,5 +74,11 @@
 
 .table-fieldtype-table .row-controls {
     @apply w-8 pl-0 text-center;
-    vertical-align: center;
+    vertical-align: middle;
+    &:focus-within {
+        @apply bg-gray-200;
+        button {
+            @apply outline-none ring-0;
+        }
+    }
 }
