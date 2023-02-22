@@ -1,4 +1,5 @@
 import * as core from '@tiptap/core';
+import * as state from '@tiptap/pm/state';
 
 class Bard {
     constructor(instance) {
@@ -26,7 +27,12 @@ class Bard {
     }
 
     get tiptap() {
-        return { core };
+        return {
+            core,
+            pm: {
+                state
+            }
+        };
     }
 }
 
