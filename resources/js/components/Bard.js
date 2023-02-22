@@ -27,7 +27,12 @@ class Bard {
     }
 
     get tiptap() {
-        return { core, state };
+        return {
+            core,
+            pm: {
+                state
+            }
+        };
     }
 }
 
