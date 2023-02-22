@@ -51,6 +51,7 @@ import TemplateFolderFieldtype from '../components/fieldtypes/TemplateFolderFiel
 import TimeFieldtype from '../components/fieldtypes/TimeFieldtype.vue';
 import ToggleFieldtype from '../components/fieldtypes/ToggleFieldtype.vue';
 import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.vue';
+import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
 import YamlFieldtype from '../components/fieldtypes/YamlFieldtype.vue';
 
@@ -103,6 +104,7 @@ Vue.component('template_folder-fieldtype', TemplateFolderFieldtype);
 Vue.component('time-fieldtype', TimeFieldtype);
 Vue.component('toggle-fieldtype', ToggleFieldtype);
 Vue.component('toggle-fieldtype-index', ToggleIndexFieldtype);
+Vue.component('width-fieldtype', WidthFieldtype);
 Vue.component('video-fieldtype', VideoFieldtype);
 Vue.component('yaml-fieldtype', YamlFieldtype);
 

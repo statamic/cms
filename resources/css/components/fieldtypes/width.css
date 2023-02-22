@@ -1,0 +1,48 @@
+/* Basic Component
+  ========================================================================== */
+
+.field-width-selector {
+    @apply w-12 h-5 flex relative cursor-pointer;
+
+    .field-width-label {
+        @apply absolute text-4xs font-bold w-full text-center z-10 text-gray-700 inset-0 flex items-center justify-center pointer-events-none;
+    }
+
+    .field-width-notch {
+        @apply relative border border-gray-400 border-l-0 flex-1;
+
+        &:first-of-type {
+            @apply border-l rounded-l-sm;
+        }
+
+        &.filled {
+            @apply border-gray-400 border-r-0 pr-px bg-white -my-px;
+        }
+
+        &.selected {
+            @apply border-r rounded-r-sm;
+        }
+    }
+}
+
+/* The Fieldtype
+  ========================================================================== */
+
+.width-fieldtype .field-width-selector {
+    @apply w-16 h-9 mt-px;
+
+    .field-width-notch {
+        @apply bg-gray-200 border-r-gray-400 border-y-gray-500;
+        &:last-child {
+            @apply border-r-gray-500 rounded-r-sm;
+        }
+
+        &.filled {
+            @apply bg-gradient-to-b from-white to-gray-100 border-gray-500;
+        }
+    }
+
+    .field-width-label {
+        @apply text-2xs;
+    }
+}
