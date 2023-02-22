@@ -155,6 +155,7 @@ return [
     'user_groups.title' => 'User Groups',
     'user_roles.title' => 'User Roles',
     'users.title' => 'Users',
+    'width.config.options' => 'Set the available width options.',
     'video.title' => 'Video',
     'yaml.title' => 'YAML',
 ];

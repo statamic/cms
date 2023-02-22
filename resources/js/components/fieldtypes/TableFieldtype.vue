@@ -1,53 +1,21 @@
 <template>
-    <fullscreen :enabled="fullScreenMode" target-class="table-fieldtype">
-        <div class="table-fieldtype-container" :class="{'table-fullscreen bg-white': fullScreenMode }">
-            <header class="bg-gray-200 border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
-                <h2 v-text="config.display" />
-                <button class="btn-close absolute top-2 right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
-            </header>
-            <section :class="{'p-4': fullScreenMode}">
-                <table class="table-fieldtype-table" v-if="rowCount">
-                    <thead>
-                        <tr>
-                            <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
-                            <th v-for="(column, index) in columnCount" :key="index">
-                                <div class="flex items-center justify-between h-6">
-                                    <span class="column-count">{{ index + 1 }}</span>
-                                    <a v-show="canDeleteColumns" class="opacity-25 text-lg antialiased hover:opacity-75" @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')">
-                                        &times;
-                                    </a>
-                                </div>
-                            </th>
-                            <th class="row-controls pr-0">
-                                <button @click="fullScreenMode = !fullScreenMode" class="flex items-center w-full h-full justify-center text-gray-500 hover:text-gray-700">
-                                    <svg-icon name="expand-2" class="h-3.5 w-3.5" v-show="! fullScreenMode" />
-                                    <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="fullScreenMode" />
-                                </button>
-                            </th>
-                        </tr>
-                    </thead>
 
-                    <sortable-list
-                        v-model="data"
-                        :vertical="true"
-                        item-class="sortable-row"
-                        handle-class="table-drag-handle"
-                        @dragstart="$emit('focus')"
-                        @dragend="$emit('blur')"
-                    >
-                        <tbody>
-                            <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
-                                <td class="table-drag-handle" v-if="!isReadOnly"></td>
-                                <td v-for="(cell, cellIndex) in row.value.cells">
-                                    <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" :readonly="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
-                                </td>
-                                <td class="row-controls" v-if="canDeleteRows">
-                                    <button @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75" :aria-label="__('Delete Row')">&times;</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </sortable-list>
-                </table>
+    <div class="table-fieldtype-container">
+        <table class="table-fieldtype-table" v-if="rowCount">
+            <thead>
+                <tr>
+                    <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
+                    <th v-for="(column, index) in columnCount" :key="index">
+                        <div class="flex items-center justify-between h-6">
+                            <span class="column-count">{{ index + 1 }}</span>
+                            <a v-show="canDeleteColumns" class="text-gray-600 hover:text-gray-800 text-lg antialiased focus:text-blue" @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')">
+                                &times;
+                            </a>
+                        </div>
+                    </th>
+                    <th class="row-controls" v-if="canDeleteRows"></th>
+                </tr>
+            </thead>
 
                 <button class="btn" @click="addRow" :disabled="atRowMax" v-if="canAddRows">
                     {{ __('Add Row') }}
@@ -68,6 +36,38 @@
                 @cancel="deleteCancelled"
             >
             </confirmation-modal>
+                <tbody>
+                    <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
+                        <td class="table-drag-handle" v-if="!isReadOnly"></td>
+                        <td v-for="(cell, cellIndex) in row.value.cells">
+                            <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" :readonly="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
+                        </td>
+                        <td class="row-controls" v-if="canDeleteRows">
+                            <button @click="confirmDeleteRow(rowIndex)" class="inline text-gray-600 hover:text-gray-800 text-lg antialiased" :aria-label="__('Delete Row')">&times;</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </sortable-list>
+        </table>
+
+        <button class="btn" @click="addRow" :disabled="atRowMax" v-if="canAddRows">
+            {{ __('Add Row') }}
+        </button>
+
+        <button class="btn ml-2" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
+            {{ __('Add Column') }}
+        </button>
+
+        <confirmation-modal
+            v-if="deletingRow !== false"
+            :title="__('Delete Row')"
+            :bodyText="__('Are you sure you want to delete this row?')"
+            :buttonText="__('Delete')"
+            :danger="true"
+            @confirm="deleteRow(deletingRow)"
+            @cancel="deleteCancelled"
+        >
+        </confirmation-modal>
 
             <confirmation-modal
                 v-if="deletingColumn !== false"

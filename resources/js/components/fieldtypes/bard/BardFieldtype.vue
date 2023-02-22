@@ -38,7 +38,7 @@
             </div>
         </div>
 
-        <div class="bard-editor" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }" tabindex="0">
+        <div class="bard-editor @container/bard" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }" tabindex="0">
             <bubble-menu class="bard-floating-toolbar" :editor="editor" :tippy-options="{ maxWidth: 'none', zIndex: 1000 }" v-if="editor && toolbarIsFloating && !readOnly">
                 <component
                     v-for="button in visibleButtons(buttons)"

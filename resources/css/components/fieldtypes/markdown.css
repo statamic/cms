@@ -5,10 +5,6 @@
 .markdown-fieldtype-wrapper {
     @apply border rounded overflow-hidden relative;
 
-    &:focus-within {
-        @apply focus-outline;
-    }
-
     .markdown-toolbar {
         @apply bg-white shadow-none rounded-t border-b text-sm flex items-center justify-between;
         padding: 4px 8px;
@@ -26,12 +22,8 @@
         }
 
         &.active {
-                @apply bg-gray-300 text-black;
+            @apply bg-gray-300 text-black;
         }
-    }
-
-    .markdown-buttons button:focus {
-        @apply focus-outline;
     }
 
     .markdown-buttons button:disabled {
@@ -61,12 +53,16 @@
         @apply bg-gray-100 shadow-inner h-auto font-mono leading-normal p-3 text-xs;
         border-radius: 0 0 3px 3px;
 
+        &:focus-within {
+            @apply ring-2 ring-inset ring-blue-200;
+        }
+
         .cm-comment {
             @apply font-mono text-sm
         }
     }
 
-    CodeMirror-code { min-height: 100px; }
+    .CodeMirror-code { min-height: 100px; }
 
     .helpers {
         @apply border-t text-xs text-gray-800 flex items-center;

@@ -41,14 +41,12 @@ code.parent-url {
 }
 
 .publish-fields {
-    display: flex;
-    flex-wrap: wrap;
+    @apply flex flex-wrap;
 
     .form-group {
         > label,
         .field-inner > label {
-            font-weight: 500;
-            margin-bottom: 8px;
+            @apply font-medium mb-2;
         }
     }
 
@@ -65,14 +63,8 @@ code.parent-url {
     }
 
     .read-only-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
+        @apply absolute inset-0 cursor-not-allowed bg-white/25;
         z-index: 100;
-        cursor: not-allowed;
-        background: rgba(255, 255, 255, 0.25);
     }
 }
 
@@ -87,7 +79,6 @@ code.parent-url {
 .publish-sidebar {
     @apply shrink-0;
     margin-left: 20px;
-
     width: 300px;
 
     .publish-section-actions {
@@ -111,34 +102,4 @@ code.parent-url {
 
 .publish-section:not(:empty) {
     @apply shadow bg-white rounded-md w-full;
-}
-
-
-
-/* Inline publish form
-   Used in popovers and in the asset editor modal.
-   ========================================================================== */
-
-.editor-form {
-    position: relative;
-
-    .editor-form-fields {
-        /*  Could have done this with flexbox but firefox was pushing */
-        /*  out the height if there were many publish fields. */
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 71px;
-        right: 0;
-        overflow: auto;
-    }
-
-    .editor-form-actions {
-        @apply absolute p-4 h-16 border-t bottom-0 inset-x-0;
-        z-index: 2;
-    }
-
-    .publish-fields .form-group {
-        @apply px-4 pt-2
-    }
 }
