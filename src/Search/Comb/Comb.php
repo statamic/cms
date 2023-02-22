@@ -7,6 +7,7 @@ use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Statamic\Search\Comb\Exceptions\NotEnoughCharacters;
 use Statamic\Search\Comb\Exceptions\TooManyResults;
+use Statamic\Support\Str;
 
 class Comb
 {
@@ -134,6 +135,13 @@ class Comb
      */
     private $group_by_category = false;
 
+    /**
+     * Snippet maximum length in characters.
+     *
+     * @var int
+     */
+    private $snippet_length = 100;
+
     // data
     // ----------------------------------------------------------------------
 
@@ -214,7 +222,7 @@ class Comb
     private function setHaystack(array $data)
     {
         reset($data);
-        $firstKey = array_keys($data)[0];
+        $firstKey = array_keys($data)[0] ?? null;
         reset($data);
 
         if (! is_numeric($firstKey)) {
@@ -342,6 +350,11 @@ class Comb
         // group by category
         if (isset($settings['group_by_category']) && $this->is($settings['group_by_category'], true)) {
             $this->group_by_category = true;
+        }
+
+        // snippet length
+        if (isset($settings['snippet_length']) && ! is_null($settings['snippet_length'])) {
+            $this->snippet_length = $settings['snippet_length'];
         }
 
         // exclude properties
@@ -511,8 +524,10 @@ class Comb
                 'whole' => 0,
             ];
 
+            $snippets = [];
+
             // loop over each query chunk
-            foreach ($params['chunks'] as $chunk) {
+            foreach ($params['chunks'] as $j => $chunk) {
                 $escaped_chunk = str_replace('#', '\#', $chunk);
                 $regex = [
                     'whole' => '#^'.$escaped_chunk.'$#i',
@@ -581,6 +596,11 @@ class Comb
 
                         $i++;
                     }
+
+                    // snippet extraction (only needs to run during one chunk)
+                    if ($j === 0) {
+                        $snippets[$name] = $this->extractSnippets($property, $params['chunks']);
+                    }
                 }
 
                 // calculate score
@@ -592,6 +612,7 @@ class Comb
                 }
 
                 $this->haystack[$key]['score'] = $score;
+                $this->haystack[$key]['snippets'] = $snippets;
             }
         }
 
@@ -1010,6 +1031,48 @@ class Comb
     private function getQueryTime()
     {
         return $this->query_end_time - $this->query_start_time;
+    }
+
+    /**
+     * Extract and truncate snippets.
+     *
+     * @return array
+     */
+    private function extractSnippets($value, $chunks)
+    {
+        $length = $this->snippet_length;
+
+        $escaped_chunks = collect($chunks)
+            ->map(fn ($chunk) => str_replace('#', '\#', $chunk))
+            ->join('|');
+        $regex = '#(.*?)('.$escaped_chunks.')(.{0,'.$length.'}(?:\s|$))#i';
+        if (! preg_match_all($regex, $value, $matches, PREG_SET_ORDER)) {
+            return [];
+        }
+
+        $snippets = [];
+        $surplus = '';
+        foreach ($matches as $i => $match) {
+            [, $before, $chunk, $after] = $match;
+            $before = $surplus.$before;
+            $surplus = '';
+            $half = floor(($length - Str::length($chunk)) / 2);
+            if (Str::length($after) < $half) {
+                $snippet = $chunk.$after;
+                $snippet = Str::safeTruncateReverse($before, $length - Str::length($snippet)).$snippet;
+            } else {
+                $snippet = Str::safeTruncateReverse($before, $half).$chunk;
+                $trimmed = Str::safeTruncate($after, $length - Str::length($snippet));
+                $surplus = Str::substr($after, Str::length($trimmed));
+                $snippet = $snippet.$trimmed;
+            }
+            $snippets[] = trim($snippet);
+        }
+        if (preg_match('#('.$escaped_chunks.')#i', $surplus)) {
+            $snippets[] = trim($surplus);
+        }
+
+        return $snippets;
     }
 
     // creators for Bloodhound

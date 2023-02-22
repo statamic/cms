@@ -28,12 +28,7 @@
             <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-1 flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
                 <svg-icon :name="getResultIcon(result)" class="icon"></svg-icon>
                 <div class="flex-1 ml-1 title" v-html="result.title"></div>
-                <span class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey">
-                    <template v-if="result.is_entry">{{ result.collection.title }}</template>
-                    <template v-if="result.is_term">{{ result.taxonomy.title }}</template>
-                    <template v-if="result.is_user">{{ __('User') }}</template>
-                    <template v-if="result.is_asset">{{ result.container.title }}</template>
-                </span>
+                <span class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey" v-text="result.badge" />
             </div>
 
             <div v-if="! hasResults && hasFavorites">
@@ -142,7 +137,7 @@ export default {
 
             if (!item) return;
 
-            const url = this.hasResults ? item.edit_url : `${this.$config.get('cpRoot')}/${item.url}`;
+            const url = this.hasResults ? item.url : `${this.$config.get('cpRoot')}/${item.url}`;
 
             $event.metaKey ? window.open(url) : window.location = url;
         },
@@ -160,9 +155,13 @@ export default {
         },
 
         getResultIcon(result) {
-            if (result.is_asset) return 'assets'
-            if (result.is_user) return 'user'
-            return 'content-writing';
+            if (result.reference.startsWith('asset::')) {
+                return 'assets';
+            } else if (result.reference.startsWith('user::')) {
+                return 'user';
+            } else {
+                return 'content-writing';
+            }
         },
 
         removeFavorite(favorite) {

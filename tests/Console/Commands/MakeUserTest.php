@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class MakeUserTest extends TestCase
 {
+    private $files;
+
     public function tearDown(): void
     {
         $path = __DIR__.'/../../__fixtures__/users';

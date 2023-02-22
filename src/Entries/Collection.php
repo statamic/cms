@@ -4,6 +4,7 @@ namespace Statamic\Entries;
 
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
+use InvalidArgumentException;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
@@ -49,6 +50,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $revisions = false;
     protected $positions;
     protected $defaultPublishState = true;
+    protected $originBehavior = 'select';
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
     protected $structure;
@@ -57,6 +59,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $requiresSlugs = true;
     protected $titleFormats = [];
     protected $previewTargets = [];
+    protected $autosave;
 
     public function __construct()
     {
@@ -509,6 +512,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             'taxonomies' => $this->taxonomies,
             'revisions' => $this->revisions,
             'title_format' => $this->titleFormats,
+            'autosave' => $this->autosave,
         ];
 
         $array = Arr::except($formerlyToArray, [
@@ -537,6 +541,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 'future' => $this->futureDateBehavior,
             ],
             'preview_targets' => $this->previewTargetsForFile(),
+            'origin_behavior' => ($ob = $this->originBehavior()) === 'select' ? null : $ob,
         ]));
 
         if (! Site::hasMultiple()) {
@@ -576,6 +581,22 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function originBehavior($origin = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('originBehavior')
+            ->setter(function ($origin) {
+                $origin = $origin ?? 'select';
+
+                if (! in_array($origin, ['select', 'root', 'active'])) {
+                    throw new InvalidArgumentException("Invalid origin behavior [$origin]. Must be \"select\", \"root\", or \"active\".");
+                }
+
+                return $origin;
+            })
+            ->args(func_get_args());
+    }
+
     public function pastDateBehavior($behavior = null)
     {
         return $this
@@ -606,6 +627,20 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 }
 
                 return $enabled;
+            })
+            ->args(func_get_args());
+    }
+
+    public function autosaveInterval($interval = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('autosave')
+            ->getter(function ($interval) {
+                if (! config('statamic.autosave.enabled') || ! Statamic::pro() || ! $interval) {
+                    return null;
+                }
+
+                return is_bool($interval) ? config('statamic.autosave.interval') : $interval;
             })
             ->args(func_get_args());
     }

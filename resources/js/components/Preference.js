@@ -3,7 +3,7 @@ import Vue from 'vue';
 class Preference {
     constructor(instance) {
         this.instance = instance;
-        this.storeUrl = cp_url('preferences');
+        this.url = cp_url('preferences/js');
     }
 
     all() {
@@ -16,19 +16,19 @@ class Preference {
 
     set(key, value) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.post(this.storeUrl, {key, value})
+            this.instance.$axios.post(this.url, {key, value})
         );
     }
 
     append(key, value) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.post(this.storeUrl, {key, value, append: true})
+            this.instance.$axios.post(this.url, {key, value, append: true})
         );
     }
 
     remove(key, value=null, cleanup=true) {
         return this.commitOnSuccessAndReturnPromise(
-            this.instance.$axios.post(`${this.storeUrl}/${key}/delete`, {value, cleanup})
+            this.instance.$axios.delete(`${this.url}/${key}`, { data: { value, cleanup } })
         );
     }
 

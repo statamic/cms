@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class DefaultPreferencesTest extends TestCase
 {
+    private $files;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -57,6 +59,30 @@ EOT
         ];
 
         $this->assertEquals($expected, Preference::default()->all());
+    }
+
+    /** @test */
+    public function it_gets_a_preference_by_key()
+    {
+        Preference::default()->set([
+            'foo' => 'bar',
+            'bar' => 'baz',
+        ])->save();
+
+        $this->assertEquals('bar', Preference::default()->get('foo'));
+    }
+
+    /** @test */
+    public function it_removes_a_preference_by_key()
+    {
+        Preference::default()->set([
+            'foo' => 'bar',
+            'bar' => 'baz',
+        ])->save();
+
+        Preference::default()->remove('foo')->save();
+
+        $this->assertEquals(['bar' => 'baz'], Preference::default()->all());
     }
 
     /** @test */

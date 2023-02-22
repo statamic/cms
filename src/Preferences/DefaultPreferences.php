@@ -2,6 +2,7 @@
 
 namespace Statamic\Preferences;
 
+use Statamic\Events\DefaultPreferencesSaved;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 
@@ -32,6 +33,28 @@ class DefaultPreferences
     }
 
     /**
+     * Get preference (dot notation in key supported).
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function get($key)
+    {
+        return $this->getPreference($key);
+    }
+
+    /**
+     * Remove preference (dot notation in key supported).
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function remove($key)
+    {
+        return $this->removePreference($key);
+    }
+
+    /**
      * Save preferences to file.
      *
      * @param  array  $preferences
@@ -40,6 +63,8 @@ class DefaultPreferences
     public function save()
     {
         File::put($this->path, YAML::dump($this->preferences));
+
+        DefaultPreferencesSaved::dispatch();
 
         return true;
     }

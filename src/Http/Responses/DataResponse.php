@@ -8,7 +8,6 @@ use Statamic\Auth\Protect\Protection;
 use Statamic\Events\ResponseCreated;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
-use Statamic\Routing\ResolveRedirect;
 use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
 use Statamic\View\View;
@@ -84,13 +83,11 @@ class DataResponse implements Responsable
 
     protected function getRedirect()
     {
-        if (! $redirect = $this->data->get('redirect')) {
+        if (! $this->data->get('redirect')) {
             return;
         }
 
-        $redirect = (new ResolveRedirect)($redirect, $this->data);
-
-        if ($redirect == '404') {
+        if (! $redirect = $this->data->redirect) {
             throw new NotFoundHttpException;
         }
 

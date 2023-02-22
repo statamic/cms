@@ -12,24 +12,31 @@ class NavItem
 {
     use FluentlyGetsAndSets;
 
-    protected $name;
+    protected $display;
     protected $section;
+    protected $id;
     protected $url;
     protected $icon;
     protected $children;
+    protected $isChild;
     protected $authorization;
     protected $active;
     protected $view;
+    protected $order;
+    protected $hidden;
+    protected $manipulations;
+    protected $original;
+    protected $attributes;
 
     /**
-     * Get or set name.
+     * Get or set display.
      *
-     * @param  string|null  $name
+     * @param  string|null  $display
      * @return mixed
      */
-    public function name($name = null)
+    public function display($display = null)
     {
-        return $this->fluentlyGetOrSet('name')->value($name);
+        return $this->fluentlyGetOrSet('display')->value($display);
     }
 
     /**
@@ -44,7 +51,45 @@ class NavItem
     }
 
     /**
-     * Get or set url by cp route name.
+     * Get or set the ID for referencing in preferences.
+     *
+     * @param  string|null  $id
+     * @return mixed
+     */
+    public function id($id = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('id')
+            ->setter(function ($value) {
+                return Str::endsWith($value, '::')
+                    ? $value.static::snakeCase($this->display())
+                    : $value;
+            })
+            ->getter(function ($value) {
+                if ($value) {
+                    return $value;
+                }
+
+                $section = static::snakeCase($this->section());
+                $item = static::snakeCase($this->display());
+
+                return "{$section}::{$item}";
+            })
+            ->value($id);
+    }
+
+    /**
+     * Preserve current ID.
+     *
+     * @return $this
+     */
+    public function preserveCurrentId()
+    {
+        return $this->id($this->id());
+    }
+
+    /**
+     * Set url by cp route name.
      *
      * @param  array|string  $name
      * @param  mixed  $params
@@ -87,6 +132,22 @@ class NavItem
     }
 
     /**
+     * Get editable url for nav builder UI.
+     */
+    public function editableUrl()
+    {
+        if (! $this->url) {
+            return null;
+        }
+
+        if (Str::startsWith($this->url, url('/'))) {
+            return str_replace(url('/'), '', $this->url);
+        }
+
+        return $this->url;
+    }
+
+    /**
      * Get or set icon.
      *
      * @param  string|null  $icon
@@ -96,10 +157,13 @@ class NavItem
     {
         return $this
             ->fluentlyGetOrSet('icon')
+            ->getter(function ($value) {
+                return $value ?? Statamic::svg('entries');
+            })
             ->setter(function ($value) {
                 return Str::startsWith($value, '<svg') ? $value : Statamic::svg($value);
             })
-            ->value($icon);
+            ->args(func_get_args());
     }
 
     /**
@@ -110,12 +174,11 @@ class NavItem
      */
     public function attributes($attrs = null)
     {
-        if (is_array($attrs) && ! empty($attrs)) {
-            $attrs = Html::attributes($attrs);
-        }
-
         return $this
             ->fluentlyGetOrSet('attributes')
+            ->setter(function ($value) {
+                return is_array($value) ? Html::attributes($value) : $value;
+            })
             ->value($attrs);
     }
 
@@ -123,9 +186,10 @@ class NavItem
      * Get or set child nav items.
      *
      * @param  array|null  $items
+     * @param  bool  $generateNewIds
      * @return mixed
      */
-    public function children($items = null)
+    public function children($items = null, $generateNewIds = true)
     {
         if (is_null($items)) {
             return $this->children;
@@ -143,10 +207,60 @@ class NavItem
                     ? $value
                     : Nav::item($key)->url($value);
             })
+            ->map(function ($navItem) use ($generateNewIds) {
+                return $navItem
+                    ->id($generateNewIds ? $this->id().'::' : $navItem->id())
+                    ->icon($this->icon())
+                    ->section($this->section())
+                    ->isChild(true);
+            })
             ->values();
 
         if ($this->children->isEmpty()) {
             $this->children = null;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Track if this nav item is a child of another nav item.
+     *
+     * @param  bool|null  $isChild
+     * @return mixed
+     */
+    public function isChild($isChild = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('isChild')
+            ->getter(function ($value) {
+                return (bool) $value;
+            })
+            ->value($isChild);
+    }
+
+    /**
+     * Resolve children closure.
+     *
+     * @return $this
+     */
+    public function resolveChildren()
+    {
+        if (! is_callable($this->children)) {
+            return $this;
+        }
+
+        // Resolve children closure
+        $this->children($this->children()());
+
+        // Resolve children closure on synced original instance
+        if ($this->original() && is_callable($this->original->children())) {
+            $this->original()->children($this->original->children()());
+        }
+
+        // Sync original on each new child item
+        if ($this->children()) {
+            $this->children()->each(fn ($item) => $item->syncOriginal());
         }
 
         return $this;
@@ -221,5 +335,101 @@ class NavItem
     public function view($view = null)
     {
         return $this->fluentlyGetOrSet('view')->value($view);
+    }
+
+    /**
+     * Get or set nav item order.
+     *
+     * @param  int|null  $order
+     * @return mixed
+     */
+    public function order($order = null)
+    {
+        return $this->fluentlyGetOrSet('order')->value($order);
+    }
+
+    /**
+     * Get or set hidden status.
+     *
+     * @param  bool|null  $hidden
+     * @return mixed
+     */
+    public function hidden($hidden = null)
+    {
+        return $this->fluentlyGetOrSet('hidden')
+            ->getter(function ($value) {
+                return $value ?? false;
+            })
+            ->value($hidden);
+    }
+
+    /**
+     * Get whether the nav item is to be hidden, but still made available for nav builder UI.
+     *
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return $this->hidden();
+    }
+
+    /**
+     * Get or set preferences manipulations.
+     *
+     * @param  string|null  $manipulations
+     * @return mixed
+     */
+    public function manipulations($manipulations = null)
+    {
+        return $this->fluentlyGetOrSet('manipulations')->value($manipulations);
+    }
+
+    /**
+     * Sync original state.
+     *
+     * @return $this
+     */
+    public function syncOriginal()
+    {
+        $this->original = null; // Clear original property so it can never appear in cloned instance.
+
+        $this->original = clone $this;
+
+        return $this;
+    }
+
+    /**
+     * Get original state.
+     *
+     * @return mixed
+     */
+    public function original()
+    {
+        return $this->original;
+    }
+
+    /**
+     * Alias for `display()`, left here for backwards compatibility.
+     *
+     * @param  string|null  $name
+     * @return mixed
+     */
+    public function name(...$arguments)
+    {
+        return $this->display(...$arguments);
+    }
+
+    /**
+     * Convert to snake case.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function snakeCase($string)
+    {
+        $string = Str::modifyMultiple($string, ['lower', 'snake']);
+        $string = Str::replace($string, '-', '_');
+
+        return $string;
     }
 }

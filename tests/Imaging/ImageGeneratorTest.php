@@ -39,8 +39,10 @@ class ImageGeneratorTest extends TestCase
     {
         Event::fake();
 
-        $cacheKey = 'asset::test_container::foo/hoff.jpg::4dbc41d8e3ba1ccd302641e509b48768';
-        $this->assertNull(Glide::cacheStore()->get($cacheKey));
+        $manifestCacheKey = 'asset::test_container::foo/hoff.jpg';
+        $manipulationCacheKey = 'asset::test_container::foo/hoff.jpg::4dbc41d8e3ba1ccd302641e509b48768';
+        $this->assertNull(Glide::cacheStore()->get($manifestCacheKey));
+        $this->assertNull(Glide::cacheStore()->get($manipulationCacheKey));
 
         Storage::fake('test');
         $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
@@ -64,13 +66,50 @@ class ImageGeneratorTest extends TestCase
         $actualParams = array_merge($userParams, ['fit' => 'crop-50-50']);
         $md5 = $this->getGlideMd5($asset->basename(), $actualParams);
 
-        $expectedPath = "containers/test_container/foo/hoff.jpg/{$md5}.jpg";
+        $expectedCacheManifest = [$manipulationCacheKey];
+        $expectedPathPrefix = 'containers/test_container';
+        $expectedPath = "{$expectedPathPrefix}/foo/hoff.jpg/{$md5}.jpg";
 
+        $this->assertEquals($manifestCacheKey, ImageGenerator::assetCacheManifestKey($asset));
+        $this->assertEquals($expectedPathPrefix, ImageGenerator::assetCachePathPrefix($asset));
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());
         $this->assertContains($expectedPath, $paths);
-        $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
+        $this->assertEquals($expectedCacheManifest, Glide::cacheStore()->get($manifestCacheKey));
+        $this->assertEquals($expectedPath, Glide::cacheStore()->get($manipulationCacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
+    }
+
+    /** @test */
+    public function it_generates_cache_manifest_for_multiple_asset_manipulations()
+    {
+        Event::fake();
+
+        $manifestCacheKey = 'asset::test_container::foo/hoff.jpg';
+        $this->assertNull(Glide::cacheStore()->get($manifestCacheKey));
+
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        // Generate the image twice to make sure it's cached.
+        foreach (range(1, 2) as $i) {
+            $this->makeGenerator()->generateByAsset(
+                $asset,
+                ['w' => 100, 'h' => $i] // Ensure unique params so that two manipulations get cached.
+            );
+        }
+
+        Event::assertDispatchedTimes(GlideImageGenerated::class, 2);
+
+        $this->assertCount(2, $manifest = Glide::cacheStore()->get($manifestCacheKey));
+        $this->assertCount(2, $this->generatedImagePaths());
+
+        foreach ($manifest as $cacheKey) {
+            $this->assertTrue(Str::startsWith($cacheKey, 'asset::test_container::foo/hoff.jpg::'));
+        }
     }
 
     /** @test */
