@@ -58,7 +58,7 @@ class ImportUsers extends Command
             return;
         }
 
-        if (! str_contains(Schema::getColumnType('users', 'id'), 'uuid')) {
+        if (! str_contains(Schema::getColumnType('users', 'id'), 'uuid') && ! str_contains(Schema::getColumnType('users', 'id'), 'string')) {
             $this->error('Your user model must use UUIDs for this migration to run');
 
             return;
