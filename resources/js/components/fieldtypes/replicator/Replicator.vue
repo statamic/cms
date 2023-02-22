@@ -8,12 +8,12 @@
 <div :class="{ wrapperClasses: fullScreenMode }">
 <div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-white': fullScreenMode }">
 
-    <header class="bg-gray-200 border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
+    <header class="bg-white border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
         <h2 v-text="config.display" />
         <button class="btn-close absolute top-2 right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
     </header>
 
-    <section :class="{'p-4': fullScreenMode}">
+    <section :class="{'p-4 bg-gray-200 h-full': fullScreenMode}">
 
         <div class="flex justify-end">
             <div class="btn-group">
@@ -23,7 +23,7 @@
                 <button @click="collapseAll" class="btn btn-icon flex items-center" v-tooltip="__('Collapse Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
                     <svg-icon name="arrows-horizontal-collapse" class="h-3.5 w-3.5" />
                 </button>
-                <button @click="fullScreenMode = !fullScreenMode" class="btn btn-icon flex items-center" v-tooltip="__('Fullscreen Mode')">
+                <button @click="fullScreenMode = !fullScreenMode" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
                     <svg-icon name="expand-2" class="h-3.5 w-3.5" v-show="! fullScreenMode" />
                     <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="fullScreenMode" />
                 </button>
