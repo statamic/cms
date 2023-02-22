@@ -19,7 +19,7 @@
                                 </div>
                             </th>
                             <th class="row-controls pr-0">
-                                <button @click="fullScreenMode = !fullScreenMode" class="flex items-center w-full h-full justify-center text-gray-500 hover:text-gray-700">
+                                <button @click="fullScreenMode = !fullScreenMode" class="flex items-center w-full h-full justify-center text-gray-600 hover:text-gray-800">
                                     <svg-icon name="expand-2" class="h-3.5 w-3.5" v-show="! fullScreenMode" />
                                     <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="fullScreenMode" />
                                 </button>

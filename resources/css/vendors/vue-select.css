@@ -186,7 +186,7 @@
 	}
 
 	span {
-        @apply text-md shrink-0 font-thin;
+        @apply text-md shrink-0 font-normal;
 	}
 }
 

@@ -49,7 +49,7 @@
                                 <span>×</span>
                             </button>
                             <button v-else type="button" class="vs__deselect">
-                                <span class="opacity-50">×</span>
+                                <span class="text-gray-500">×</span>
                             </button>
                         </span>
                     </div>
