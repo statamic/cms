@@ -1062,4 +1062,60 @@ EOT;
 
         $this->assertSame('<Zero><One><Two><Three><Four>', trim($this->renderString($template)));
     }
+
+    public function test_tag_parameters_take_priority_over_custom_variable_assignments()
+    {
+        $this->withFakeViews();
+        $partial = <<<'PARTIAL'
+Partial: {{ myVar }}
+PARTIAL;
+
+        $this->viewShouldReturnRaw('test', $partial);
+
+        $template = <<<'TEMPLATE'
+{{ myVar = 'Hello, world!'; }}
+{{ partial:test /}}
+After: {{ myVar }}
+TEMPLATE;
+
+        $expected = <<<'EXP'
+Partial: Hello, world!
+After: Hello, world!
+EXP;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+
+        $template = <<<'TEMPLATE'
+{{ myVar = 'Hello, world!'; }}
+{{ partial:test myVar="I was changed!" /}}
+After: {{ myVar }}
+TEMPLATE;
+
+        $expected = <<<'EXP'
+Partial: I was changed!
+After: I was changed!
+EXP;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+
+        $partial = <<<'PARTIAL'
+Partial: {{ myVar }}
+{{ myVar = 'I was changed a lot!'; }}
+PARTIAL;
+
+        $this->viewShouldReturnRaw('test', $partial);
+        $template = <<<'TEMPLATE'
+{{ myVar = 'Hello, world!'; }}
+{{ partial:test myVar="I was changed!" /}}
+After: {{ myVar }}
+TEMPLATE;
+
+        $expected = <<<'EXP'
+Partial: I was changed!
+
+After: I was changed a lot!
+EXP;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
 }

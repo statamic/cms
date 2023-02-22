@@ -1441,6 +1441,13 @@ class NodeProcessor
                                 $this->runtimeAssignments,
                                 GlobalRuntimeState::$tracedRuntimeAssignments
                             );
+
+                            foreach ($tagParameters as $paramName => $paramValue) {
+                                if (array_key_exists($paramName, GlobalRuntimeState::$tracedRuntimeAssignments)) {
+                                    GlobalRuntimeState::$tracedRuntimeAssignments[$paramName] = $paramValue;
+                                    $tagActiveData[$paramName] = $paramValue;
+                                }
+                            }
                         }
                         /** @var Tags $tag */
                         $tag = $this->loader->load($tagToLoad, [
