@@ -79,7 +79,7 @@ class ImportUsers extends Command
             $eloquentUser = $eloquentRepository->make()
                 ->email($user->email())
                 ->preferences($user->preferences())
-                ->data($data->except(['groups', 'roles']))
+                ->data($data->except(['groups', 'roles'])->merge(['name' => $user->name()]))
                 ->id($user->id());
 
             if ($user->isSuper()) {
