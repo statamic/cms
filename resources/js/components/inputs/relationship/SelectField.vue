@@ -38,8 +38,8 @@
                     item-class="sortable-item"
                     handle-class="sortable-item"
                     :value="items"
+                    :delay="0"
                     @input="input"
-                    delay="0"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="item in items" :key="item.id" class="vs__selected mt-2" :class="{ 'sortable-item': !readOnly }">
