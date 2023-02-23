@@ -89,7 +89,7 @@ class Str
         $string = (string) $string;
 
         // Ensure we use local `ascii()` helper, since IlluminateStr doesn't have access to ours.
-        $string = $language ? static::ascii($string, $language) : $title;
+        $string = $language ? static::ascii($string, $language) : $string;
 
         // Statamic is a-OK with underscores in slugs.
         $string = str_replace('_', $placeholder = strtolower(str_random(16)), $string);
