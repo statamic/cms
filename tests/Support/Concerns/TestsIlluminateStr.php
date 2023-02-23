@@ -8,8 +8,8 @@ use ReflectionClass;
 use Statamic\Support\Str;
 
 /**
- * These tests are copied over from laravel/framework, so that our CI can better detect
- * when there are changes to Illuminate\Support\Str which might affect our users.
+ * These tests are copied over from laravel/framework (v9.52.4), so that we can better detect
+ * via CI when there are changes to Illuminate\Support\Str which might affect our users.
  *
  * Note: We're testing this functionality through Statamic\Support\Str, which
  * will defer calls through `__callStatic()` to Illuminate\Support\Str.

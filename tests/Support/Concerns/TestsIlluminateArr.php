@@ -10,8 +10,8 @@ use Statamic\Support\Arr;
 use stdClass;
 
 /**
- * These tests are copied over from laravel/framework, so that our CI can better detect
- * when there are changes to Illuminate\Support\Arr which might affect our users.
+ * These tests are copied over from laravel/framework (v9.52.4), so that we can better detect
+ * via CI when there are changes to Illuminate\Support\Arr which might affect our users.
  *
  * Note: We're testing this functionality through Statamic\Support\Arr, which
  * will defer calls through `__callStatic()` to Illuminate\Support\Arr.
