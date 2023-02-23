@@ -1072,7 +1072,6 @@ EOT;
         $this->withFakeViews();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
 
-
         $template = <<<'EOT'
 {{ the_array = ['One', 10, 30, 40, 50, 60]; }}
 Value: {{ the_array.0 }}
