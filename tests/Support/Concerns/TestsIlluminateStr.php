@@ -1099,6 +1099,11 @@ trait TestsIlluminateStr
             Str::createUuidsNormally();
         }
     }
+
+    public function testPasswordCreation()
+    {
+        $this->assertTrue(strlen(Str::password()) === 32);
+    }
 }
 
 class StringableObjectStub
