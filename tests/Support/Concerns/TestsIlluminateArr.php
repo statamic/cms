@@ -10,7 +10,7 @@ use Statamic\Support\Arr;
 use stdClass;
 
 /**
- * These tests are copied over from laravel/framework (v9.52.4), so that we can better detect
+ * These tests are copied over from laravel/framework (v10.1.4), so that we can better detect
  * via CI when there are changes to Illuminate\Support\Arr which might affect our users.
  *
  * Note: We're testing this functionality through Statamic\Support\Arr, which
@@ -477,6 +477,16 @@ trait TestsIlluminateArr
         $this->assertTrue(Arr::isAssoc([1 => 'a', 2 => 'b']));
         $this->assertFalse(Arr::isAssoc([0 => 'a', 1 => 'b']));
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
+
+        $this->assertFalse(Arr::isAssoc([]));
+        $this->assertFalse(Arr::isAssoc([1, 2, 3]));
+        $this->assertFalse(Arr::isAssoc(['foo', 2, 3]));
+        $this->assertFalse(Arr::isAssoc([0 => 'foo', 'bar']));
+
+        $this->assertTrue(Arr::isAssoc([1 => 'foo', 'bar']));
+        $this->assertTrue(Arr::isAssoc([0 => 'foo', 'bar' => 'baz']));
+        $this->assertTrue(Arr::isAssoc([0 => 'foo', 2 => 'bar']));
+        $this->assertTrue(Arr::isAssoc(['foo' => 'bar', 'baz' => 'qux']));
     }
 
     public function testIsList()
