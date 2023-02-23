@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class StrTest extends TestCase
 {
+    use Concerns\TestsIlluminateStr;
+
     /** @test */
     public function undefined_methods_get_passed_to_stringy()
     {
