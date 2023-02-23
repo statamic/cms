@@ -5,7 +5,7 @@
                 <breadcrumb :url="breadcrumbUrl" :title="__('Roles & Permissions')" />
                 <div class="flex items-center justify-between">
                     <h1 v-text="initialTitle || __('Create Role')" />
-                    <button type="submit" class="btn-primary">{{ __('Save') }}</button>
+                    <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
                 </div>
             </header>
 
