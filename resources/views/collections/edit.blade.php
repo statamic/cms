@@ -8,7 +8,10 @@
             'url' => cp_route('collections.show', $collection->handle()),
             'title' => $collection->title()
         ])
-        <h1>@yield('title')</h1>
+        <div class="flex items-center justify-between">
+            <h1>@yield('title')</h1>
+            <button type="submit" class="btn-primary">{{ __('Save') }}</button>
+        </div>
     </header>
 
     <collection-edit-form

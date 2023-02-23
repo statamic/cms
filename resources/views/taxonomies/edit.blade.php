@@ -8,7 +8,10 @@
             'url' => cp_route('taxonomies.show', $taxonomy->handle()),
             'title' => $taxonomy->title()
         ])
-        <h1>@yield('title')</h1>
+        <div class="flex items-center justify-between">
+            <h1>@yield('title')</h1>
+            <button type="submit" class="btn-primary">{{ __('Save') }}</button>
+        </div>
     </header>
 
     <taxonomy-edit-form

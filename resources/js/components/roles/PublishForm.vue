@@ -3,7 +3,10 @@
         <div>
             <header class="mb-6">
                 <breadcrumb :url="breadcrumbUrl" :title="__('Roles & Permissions')" />
-                <h1 v-text="initialTitle || __('Create Role')" />
+                <div class="flex items-center justify-between">
+                    <h1 v-text="initialTitle || __('Create Role')" />
+                    <button type="submit" class="btn-primary">{{ __('Save') }}</button>
+                </div>
             </header>
 
             <div class="card p-0 mb-6 configure-section publish-fields @container">
@@ -50,12 +53,6 @@
                     <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
                 </div>
             </div>
-
-            <div class="py-4 mt-6 border-t flex justify-between">
-                <a :href="indexUrl" class="btn" v-text="__('Cancel') "/>
-                <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
-            </div>
-
         </div>
 </template>
 

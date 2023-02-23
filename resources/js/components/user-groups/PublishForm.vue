@@ -49,10 +49,6 @@
                 </div>
 
             </div>
-            <div class="py-4 border-t flex justify-between">
-                <a :href="action" class="btn" v-text="__('Cancel') "/>
-                <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
-            </div>
         </div>
 </template>
 

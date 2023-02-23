@@ -3,12 +3,16 @@
 
 @section('content')
 
-    @include('statamic::partials.breadcrumb', [
-        'url' => cp_route('user-groups.show', $group->handle()),
-        'title' => $group->title()
-    ])
-
-    <h1 class="mb-6">@yield('title')</h1>
+    <header class="mb-6">
+        @include('statamic::partials.breadcrumb', [
+            'url' => cp_route('user-groups.show', $group->handle()),
+            'title' => __('User Groups')
+        ])
+        <div class="flex items-center justify-between">
+            <h1>{{ $group->title() }}</h1>
+            <button type="submit" class="btn-primary">{{ __('Save') }}</button>
+        </div>
+    </header>
 
     <collection-edit-form>
     </collection-edit-form>
