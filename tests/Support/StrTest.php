@@ -206,7 +206,7 @@ class StrTest extends TestCase
      * @test
      *
      * @see https://github.com/statamic/cms/pull/3698
-     **/
+     */
     public function it_replaces_strings()
     {
         $this->assertEquals('FÒÔ bàř', Str::replace('fòô bàř', 'fòô', 'FÒÔ'));
@@ -215,9 +215,7 @@ class StrTest extends TestCase
         $this->assertSame('foo bar laravel', Str::replace('foo bar baz', 'baz', 'laravel'));
         $this->assertSame('foo bar baz 8.x', Str::replace('foo bar baz ?', '?', '8.x'));
         $this->assertSame('foo/bar/baz', Str::replace('foo bar baz', ' ', '/'));
-
-        // Array params don't work with `Stringy::replace()` like they do with `Illuminate\Support\Str::replace()`...
-        // $this->assertSame('foo bar baz', Str::replace('?1 ?2 ?3', ['?1', '?2', '?3'], ['foo', 'bar', 'baz']));
-        // $this->assertSame(['foo', 'bar', 'baz'], Str::replace(collect(['?1', '?2', '?3']), collect(['?1', '?2', '?3']), collect(['foo', 'bar', 'baz'])));
+        $this->assertSame('foo bar baz', Str::replace('?1 ?2 ?3', ['?1', '?2', '?3'], ['foo', 'bar', 'baz']));
+        $this->assertSame(['foo', 'bar', 'baz'], Str::replace(collect(['?1', '?2', '?3']), collect(['?1', '?2', '?3']), collect(['foo', 'bar', 'baz'])));
     }
 }

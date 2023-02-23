@@ -286,6 +286,14 @@ class Str
         return ! in_array(strtolower($value), ['no', 'false', '0', '', '-1']);
     }
 
+    /**
+     * @see https://github.com/statamic/cms/pull/3698
+     */
+    public static function replace($string, $search, $replace)
+    {
+        return IlluminateStr::replace($search, $replace, $string);
+    }
+
     public static function safeTruncateReverse($string, $length, $substring = '')
     {
         return IlluminateStr::reverse(StaticStringy::safeTruncate(IlluminateStr::reverse($string), $length, $substring));
@@ -307,10 +315,10 @@ class Str
             'isAlpha', 'isAlphanumeric', 'isBase64', 'isBlank', 'isHexadecimal', 'isLowerCase', 'isSerialized',
             'isUpperCase', 'last', 'lines', 'longestCommonPrefix', 'longestCommonSubstring', 'longestCommonSuffix',
             'lowerCaseFirst', 'offsetExists', 'offsetGet', 'offsetSet', 'offsetUnset', 'pad', 'prepend', 'regexReplace',
-            'removeLeft', 'removeRight', 'replace', 'safeTruncate', 'shuffle', 'slice', 'slugify', 'split',
-            'startsWithAny', 'stripWhitespace', 'surround', 'swapCase', 'tidy', 'titleize', 'toAscii', 'toBoolean',
-            'toLowerCase', 'toSpaces', 'toTabs', 'toTitleCase', 'toUpperCase', 'trim', 'trimLeft', 'trimRight',
-            'truncate', 'underscored', 'upperCamelize', 'upperCaseFirst',
+            'removeLeft', 'removeRight', 'safeTruncate', 'shuffle', 'slice', 'slugify', 'split', 'startsWithAny',
+            'stripWhitespace', 'surround', 'swapCase', 'tidy', 'titleize', 'toAscii', 'toBoolean', 'toLowerCase',
+            'toSpaces', 'toTabs', 'toTitleCase', 'toUpperCase', 'trim', 'trimLeft', 'trimRight', 'truncate',
+            'underscored', 'upperCamelize', 'upperCaseFirst',
         ];
 
         if (in_array($method, $deferToStringy)) {
