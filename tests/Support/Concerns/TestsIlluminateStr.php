@@ -8,7 +8,7 @@ use ReflectionClass;
 use Statamic\Support\Str;
 
 /**
- * These tests are copied over from laravel/framework (v9.52.4), so that we can better detect
+ * These tests are copied over from laravel/framework (v10.1.4), so that we can better detect
  * via CI when there are changes to Illuminate\Support\Str which might affect our users.
  *
  * Note: We're testing this functionality through Statamic\Support\Str, which
@@ -502,6 +502,10 @@ trait TestsIlluminateStr
     /** @test */
     public function TestWhetherTheNumberOfGeneratedCharactersIsEquallyDistributed()
     {
+        if (version_compare(app()->version(), 10, '<')) {
+            $this->markTestSkipped();
+        }
+
         $results = [];
         // take 6.200.000 samples, because there are 62 different characters
         for ($i = 0; $i < 620000; $i++) {
@@ -1102,6 +1106,10 @@ trait TestsIlluminateStr
 
     public function testPasswordCreation()
     {
+        if (version_compare(app()->version(), 10, '<')) {
+            $this->markTestSkipped();
+        }
+
         $this->assertTrue(strlen(Str::password()) === 32);
     }
 }
