@@ -5,6 +5,7 @@ namespace Statamic\GraphQL\Queries;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
+use Statamic\GraphQL\Middleware\AllowedFilters;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\EntryInterface;
@@ -21,6 +22,7 @@ class EntriesQuery extends Query
 
     protected $middleware = [
         ResolvePage::class,
+        AllowedFilters::class,
     ];
 
     public function type(): Type
@@ -69,5 +71,24 @@ class EntriesQuery extends Query
 
             $query->orderBy($sort, $order);
         }
+    }
+
+    public function allowedFilters($args)
+    {
+        $config = config('statamic.graphql.resources.collections');
+
+        if ($config === true) {
+            return collect();
+        }
+
+        $collections = collect($args['collection'] ?? []);
+
+        // Get the "allowed_filters" from all the collections, filtering out any that don't appear in all of them.
+        // And a collection named "*" will apply to all collections.
+        return $collections
+            ->map(fn ($collection) => $config[$collection]['allowed_filters'] ?? [])
+            ->reduce(function ($carry, $allowedFilters) use ($config) {
+                return $carry->intersect($allowedFilters)->merge($config['*']['allowed_filters'] ?? []);
+            }, collect($config[$collections[0]]['allowed_filters'] ?? []));
     }
 }
