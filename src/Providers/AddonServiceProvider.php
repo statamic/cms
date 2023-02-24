@@ -129,6 +129,11 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $routes = [];
 
     /**
+     * @var string|null
+     */
+    protected $routeNamespace;
+
+    /**
      * Map of group name => Middlewares to apply.
      *
      * @var array<string, class-string[]>
@@ -421,6 +426,11 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
+    protected function routeNamespace()
+    {
+        return $this->routeNamespace;
+    }
+
     /**
      * Register routes from the root of the site.
      *
@@ -430,7 +440,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerWebRoutes($routes)
     {
         Statamic::pushWebRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')->group($routes);
+            Route::namespace($this->routeNamespace())->group($routes);
         });
     }
 
@@ -443,7 +453,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerCpRoutes($routes)
     {
         Statamic::pushCpRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')->group($routes);
+            Route::namespace($this->routeNamespace())->group($routes);
         });
     }
 
@@ -456,7 +466,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerActionRoutes($routes)
     {
         Statamic::pushActionRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')
+            Route::namespace($this->routeNamespace())
                 ->prefix($this->getAddon()->slug())
                 ->group($routes);
         });
