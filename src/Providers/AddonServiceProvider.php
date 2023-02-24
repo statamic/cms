@@ -462,39 +462,6 @@ abstract class AddonServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     * Register a route group.
-     *
-     * @param  string|Closure  $routes  Either the path to a routes file, or a closure containing routes.
-     * @param  array  $attributes  Additional attributes to be applied to the route group.
-     * @return void
-     */
-    protected function registerRouteGroup($routes, array $attributes = [])
-    {
-        if (is_string($routes)) {
-            $routes = function () use ($routes) {
-                require $routes;
-            };
-        }
-
-        Statamic::routes(function () use ($attributes, $routes) {
-            Route::group($this->routeGroupAttributes($attributes), $routes);
-        });
-    }
-
-    /**
-     * The attributes to be applied to the route group.
-     *
-     * @param  array  $overrides  Any additional attributes.
-     * @return array
-     */
-    protected function routeGroupAttributes($overrides = [])
-    {
-        return array_merge($overrides, [
-            'namespace' => $this->getAddon()->namespace(),
-        ]);
-    }
-
     protected function bootMiddleware()
     {
         foreach ($this->middlewareGroups as $group => $middleware) {
