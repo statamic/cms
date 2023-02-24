@@ -286,14 +286,6 @@ class Str
         return ! in_array(strtolower($value), ['no', 'false', '0', '', '-1']);
     }
 
-    /**
-     * @see https://github.com/statamic/cms/pull/3698
-     */
-    public static function replace($string, $search, $replace)
-    {
-        return IlluminateStr::replace($search, $replace, $string);
-    }
-
     public static function safeTruncateReverse($string, $length, $substring = '')
     {
         return IlluminateStr::reverse(StaticStringy::safeTruncate(IlluminateStr::reverse($string), $length, $substring));
