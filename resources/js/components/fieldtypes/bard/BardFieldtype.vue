@@ -415,6 +415,20 @@ export default {
             });
         },
 
+        pasteSet(attrs) {
+            const old_id = attrs.id;
+            const id = uniqid();
+            const enabled = attrs.enabled;
+            const values = Object.assign({}, attrs.values);
+
+            let previews = Object.assign({}, this.previews[old_id] || {});
+            this.previews = Object.assign({}, this.previews, { [id]: previews });
+
+            this.updateSetMeta(id, this.meta.existing[old_id] || this.meta.defaults[values.type] || {});
+
+            return { id, enabled, values };
+        },
+
         collapseSet(id) {
             if (!this.collapsed.includes(id)) {
                 this.collapsed.push(id)
