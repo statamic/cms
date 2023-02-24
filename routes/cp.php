@@ -119,124 +119,113 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('select-site/{handle}', [SelectSiteController::class, 'select']);
 
-    Route::group([], function () {
-        Route::resource('navigation', NavigationController::class);
+    Route::resource('navigation', NavigationController::class);
+    Route::get('navigation/{navigation}/blueprint', [NavigationBlueprintController::class, 'edit'])->name('navigation.blueprint.edit');
+    Route::patch('navigation/{navigation}/blueprint', [NavigationBlueprintController::class, 'update'])->name('navigation.blueprint.update');
+    Route::get('navigation/{navigation}/tree', [NavigationTreeController::class, 'index'])->name('navigation.tree.index');
+    Route::patch('navigation/{navigation}/tree', [NavigationTreeController::class, 'update'])->name('navigation.tree.update');
+    Route::post('navigation/{navigation}/pages', [NavigationPagesController::class, 'update'])->name('navigation.pages.update');
+    Route::get('navigation/{navigation}/pages/create', [NavigationPagesController::class, 'create'])->name('navigation.pages.create');
+    Route::get('navigation/{navigation}/pages/{edit}/edit', [NavigationPagesController::class, 'edit'])->name('navigation.pages.edit');
 
-        Route::get('navigation/{navigation}/blueprint', [NavigationBlueprintController::class, 'edit'])->name('navigation.blueprint.edit');
-        Route::patch('navigation/{navigation}/blueprint', [NavigationBlueprintController::class, 'update'])->name('navigation.blueprint.update');
-        Route::get('navigation/{navigation}/tree', [NavigationTreeController::class, 'index'])->name('navigation.tree.index');
-        Route::patch('navigation/{navigation}/tree', [NavigationTreeController::class, 'update'])->name('navigation.tree.update');
-        Route::post('navigation/{navigation}/pages', [NavigationPagesController::class, 'update'])->name('navigation.pages.update');
-        Route::get('navigation/{navigation}/pages/create', [NavigationPagesController::class, 'create'])->name('navigation.pages.create');
-        Route::get('navigation/{navigation}/pages/{edit}/edit', [NavigationPagesController::class, 'edit'])->name('navigation.pages.edit');
-    });
+    Route::resource('collections', CollectionsController::class);
+    Route::get('collections/{collection}/scaffold', [ScaffoldCollectionController::class, 'index'])->name('collections.scaffold');
+    Route::post('collections/{collection}/scaffold', [ScaffoldCollectionController::class, 'create'])->name('collections.scaffold.create');
+    Route::resource('collections.blueprints', CollectionBlueprintsController::class);
+    Route::post('collections/{collection}/blueprints/reorder', ReorderCollectionBlueprintsController::class)->name('collections.blueprints.reorder');
 
-    Route::group([], function () {
-        Route::resource('collections', CollectionsController::class);
-        Route::get('collections/{collection}/scaffold', [ScaffoldCollectionController::class, 'index'])->name('collections.scaffold');
-        Route::post('collections/{collection}/scaffold', [ScaffoldCollectionController::class, 'create'])->name('collections.scaffold.create');
-        Route::resource('collections.blueprints', CollectionBlueprintsController::class);
-        Route::post('collections/{collection}/blueprints/reorder', ReorderCollectionBlueprintsController::class)->name('collections.blueprints.reorder');
+    Route::get('collections/{collection}/tree', [CollectionTreeController::class, 'index'])->name('collections.tree.index');
+    Route::patch('collections/{collection}/tree', [CollectionTreeController::class, 'update'])->name('collections.tree.update');
 
-        Route::get('collections/{collection}/tree', [CollectionTreeController::class, 'index'])->name('collections.tree.index');
-        Route::patch('collections/{collection}/tree', [CollectionTreeController::class, 'update'])->name('collections.tree.update');
+    Route::group(['prefix' => 'collections/{collection}/entries'], function () {
+        Route::get('/', [EntriesController::class, 'index'])->name('collections.entries.index');
+        Route::post('actions', [EntryActionController::class, 'run'])->name('collections.entries.actions.run');
+        Route::post('actions/list', [EntryActionController::class, 'bulkActions'])->name('collections.entries.actions.bulk');
+        Route::get('create/{site}', [EntriesController::class, 'create'])->name('collections.entries.create');
+        Route::post('create/{site}/preview', [EntryPreviewController::class, 'create'])->name('collections.entries.preview.create');
+        Route::post('reorder', ReorderEntriesController::class)->name('collections.entries.reorder');
+        Route::post('{site}', [EntriesController::class, 'store'])->name('collections.entries.store');
 
-        Route::group(['prefix' => 'collections/{collection}/entries'], function () {
-            Route::get('/', [EntriesController::class, 'index'])->name('collections.entries.index');
-            Route::post('actions', [EntryActionController::class, 'run'])->name('collections.entries.actions.run');
-            Route::post('actions/list', [EntryActionController::class, 'bulkActions'])->name('collections.entries.actions.bulk');
-            Route::get('create/{site}', [EntriesController::class, 'create'])->name('collections.entries.create');
-            Route::post('create/{site}/preview', [EntryPreviewController::class, 'create'])->name('collections.entries.preview.create');
-            Route::post('reorder', ReorderEntriesController::class)->name('collections.entries.reorder');
-            Route::post('{site}', [EntriesController::class, 'store'])->name('collections.entries.store');
+        Route::group(['prefix' => '{entry}'], function () {
+            Route::get('/', [EntriesController::class, 'edit'])->name('collections.entries.edit');
+            Route::post('publish', [PublishedEntriesController::class, 'store'])->name('collections.entries.published.store');
+            Route::post('unpublish', [PublishedEntriesController::class, 'destroy'])->name('collections.entries.published.destroy');
+            Route::post('localize', LocalizeEntryController::class)->name('collections.entries.localize');
 
-            Route::group(['prefix' => '{entry}'], function () {
-                Route::get('/', [EntriesController::class, 'edit'])->name('collections.entries.edit');
-                Route::post('publish', [PublishedEntriesController::class, 'store'])->name('collections.entries.published.store');
-                Route::post('unpublish', [PublishedEntriesController::class, 'destroy'])->name('collections.entries.published.destroy');
-                Route::post('localize', LocalizeEntryController::class)->name('collections.entries.localize');
+            Route::resource('revisions', EntryRevisionsController::class, [
+                'as' => 'collections.entries',
+                'only' => ['index', 'store', 'show'],
+            ]);
 
-                Route::resource('revisions', EntryRevisionsController::class, [
-                    'as' => 'collections.entries',
-                    'only' => ['index', 'store', 'show'],
-                ]);
-
-                Route::post('restore-revision', RestoreEntryRevisionController::class)->name('collections.entries.restore-revision');
-                Route::post('preview', [EntryPreviewController::class, 'edit'])->name('collections.entries.preview.edit');
-                Route::get('preview', [EntryPreviewController::class, 'show'])->name('collections.entries.preview.popout');
-                Route::patch('/', [EntriesController::class, 'update'])->name('collections.entries.update');
-                Route::get('{slug}', fn ($collection, $entry, $slug) => redirect($entry->editUrl()));
-            });
+            Route::post('restore-revision', RestoreEntryRevisionController::class)->name('collections.entries.restore-revision');
+            Route::post('preview', [EntryPreviewController::class, 'edit'])->name('collections.entries.preview.edit');
+            Route::get('preview', [EntryPreviewController::class, 'show'])->name('collections.entries.preview.popout');
+            Route::patch('/', [EntriesController::class, 'update'])->name('collections.entries.update');
+            Route::get('{slug}', fn ($collection, $entry, $slug) => redirect($entry->editUrl()));
         });
     });
 
-    Route::group([], function () {
-        Route::resource('taxonomies', TaxonomiesController::class);
-        Route::resource('taxonomies.blueprints', TaxonomyBlueprintsController::class);
-        Route::post('taxonomies/{taxonomy}/blueprints/reorder', ReorderTaxonomyBlueprintsController::class)->name('taxonomies.blueprints.reorder');
+    Route::resource('taxonomies', TaxonomiesController::class);
+    Route::resource('taxonomies.blueprints', TaxonomyBlueprintsController::class);
+    Route::post('taxonomies/{taxonomy}/blueprints/reorder', ReorderTaxonomyBlueprintsController::class)->name('taxonomies.blueprints.reorder');
 
-        Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
-            Route::get('/', [TermsController::class, 'index'])->name('taxonomies.terms.index');
-            Route::post('actions', [TermActionController::class, 'run'])->name('taxonomies.terms.actions.run');
-            Route::post('actions/list', [TermActionController::class, 'bulkActions'])->name('taxonomies.terms.actions.bulk');
-            Route::get('create/{site}', [TermsController::class, 'create'])->name('taxonomies.terms.create');
-            Route::post('create/{site}/preview', [TermPreviewController::class, 'create'])->name('taxonomies.terms.preview.create');
-            Route::post('{site}', [TermsController::class, 'store'])->name('taxonomies.terms.store');
+    Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
+        Route::get('/', [TermsController::class, 'index'])->name('taxonomies.terms.index');
+        Route::post('actions', [TermActionController::class, 'run'])->name('taxonomies.terms.actions.run');
+        Route::post('actions/list', [TermActionController::class, 'bulkActions'])->name('taxonomies.terms.actions.bulk');
+        Route::get('create/{site}', [TermsController::class, 'create'])->name('taxonomies.terms.create');
+        Route::post('create/{site}/preview', [TermPreviewController::class, 'create'])->name('taxonomies.terms.preview.create');
+        Route::post('{site}', [TermsController::class, 'store'])->name('taxonomies.terms.store');
 
-            Route::group(['prefix' => '{term}/{site?}'], function () {
-                Route::get('/', [TermsController::class, 'edit'])->name('taxonomies.terms.edit');
-                Route::post('/', [PublishedTermsController::class, 'store'])->name('taxonomies.terms.published.store');
-                Route::delete('/', [PublishedTermsController::class, 'destroy'])->name('taxonomies.terms.published.destroy');
+        Route::group(['prefix' => '{term}/{site?}'], function () {
+            Route::get('/', [TermsController::class, 'edit'])->name('taxonomies.terms.edit');
+            Route::post('/', [PublishedTermsController::class, 'store'])->name('taxonomies.terms.published.store');
+            Route::delete('/', [PublishedTermsController::class, 'destroy'])->name('taxonomies.terms.published.destroy');
 
-                Route::resource('revisions', TermRevisionsController::class, [
-                    'as' => 'taxonomies.terms',
-                    'only' => ['index', 'store', 'show'],
-                ]);
+            Route::resource('revisions', TermRevisionsController::class, [
+                'as' => 'taxonomies.terms',
+                'only' => ['index', 'store', 'show'],
+            ]);
 
-                Route::post('restore-revision', RestoreTermRevisionController::class)->name('taxonomies.terms.restore-revision');
-                Route::post('preview', [TermPreviewController::class, 'edit'])->name('taxonomies.terms.preview.edit');
-                Route::get('preview', [TermPreviewController::class, 'show'])->name('taxonomies.terms.preview.popout');
-                Route::patch('/', [TermsController::class, 'update'])->name('taxonomies.terms.update');
-            });
+            Route::post('restore-revision', RestoreTermRevisionController::class)->name('taxonomies.terms.restore-revision');
+            Route::post('preview', [TermPreviewController::class, 'edit'])->name('taxonomies.terms.preview.edit');
+            Route::get('preview', [TermPreviewController::class, 'show'])->name('taxonomies.terms.preview.popout');
+            Route::patch('/', [TermsController::class, 'update'])->name('taxonomies.terms.update');
         });
     });
 
-    Route::group(['namespace' => 'Globals'], function () {
-        Route::get('globals', [GlobalsController::class, 'index'])->name('globals.index');
-        Route::get('globals/create', [GlobalsController::class, 'create'])->name('globals.create');
-        Route::post('globals', [GlobalsController::class, 'store'])->name('globals.store');
-        Route::get('globals/{global_set}/edit', [GlobalsController::class, 'edit'])->name('globals.edit');
-        Route::patch('globals/{global_set}', [GlobalsController::class, 'update'])->name('globals.update');
-        Route::delete('globals/{global_set}', [GlobalsController::class, 'destroy'])->name('globals.destroy');
+    Route::get('globals', [GlobalsController::class, 'index'])->name('globals.index');
+    Route::get('globals/create', [GlobalsController::class, 'create'])->name('globals.create');
+    Route::post('globals', [GlobalsController::class, 'store'])->name('globals.store');
+    Route::get('globals/{global_set}/edit', [GlobalsController::class, 'edit'])->name('globals.edit');
+    Route::patch('globals/{global_set}', [GlobalsController::class, 'update'])->name('globals.update');
+    Route::delete('globals/{global_set}', [GlobalsController::class, 'destroy'])->name('globals.destroy');
 
-        Route::get('globals/{global_set}', [GlobalVariablesController::class, 'edit'])->name('globals.variables.edit');
-        Route::patch('globals/{global_set}/variables', [GlobalVariablesController::class, 'update'])->name('globals.variables.update');
+    Route::get('globals/{global_set}', [GlobalVariablesController::class, 'edit'])->name('globals.variables.edit');
+    Route::patch('globals/{global_set}/variables', [GlobalVariablesController::class, 'update'])->name('globals.variables.update');
 
-        Route::get('globals/{global_set}/blueprint', [GlobalsBlueprintController::class, 'edit'])->name('globals.blueprint.edit');
-        Route::patch('globals/{global_set}/blueprint', [GlobalsBlueprintController::class, 'update'])->name('globals.blueprint.update');
-    });
+    Route::get('globals/{global_set}/blueprint', [GlobalsBlueprintController::class, 'edit'])->name('globals.blueprint.edit');
+    Route::patch('globals/{global_set}/blueprint', [GlobalsBlueprintController::class, 'update'])->name('globals.blueprint.update');
 
-    Route::group([], function () {
-        Route::resource('asset-containers', AssetContainersController::class);
-        Route::post('asset-containers/{asset_container}/folders', [FoldersController::class, 'store']);
-        Route::patch('asset-containers/{asset_container}/folders/{path}', [FoldersController::class, 'update'])->where('path', '.*');
-        Route::get('asset-containers/{asset_container}/blueprint', [AssetContainerBlueprintController::class, 'edit'])->name('asset-containers.blueprint.edit');
-        Route::patch('asset-containers/{asset_container}/blueprint', [AssetContainerBlueprintController::class, 'update'])->name('asset-containers.blueprint.update');
-        Route::post('assets/actions', [ActionController::class, 'run'])->name('assets.actions.run');
-        Route::post('assets/actions/list', [ActionController::class, 'bulkActions'])->name('assets.actions.bulk');
-        Route::get('assets/browse', [BrowserController::class, 'index'])->name('assets.browse.index');
-        Route::get('assets/browse/search/{asset_container}/{path?}', [BrowserController::class, 'search'])->where('path', '.*');
-        Route::post('assets/browse/folders/{asset_container}/actions', [FolderActionController::class, 'run'])->name('assets.folders.actions.run');
-        Route::get('assets/browse/folders/{asset_container}/{path?}', [BrowserController::class, 'folder'])->where('path', '.*');
-        Route::get('assets/browse/{asset_container}/{path?}/edit', [BrowserController::class, 'edit'])->where('path', '.*')->name('assets.browse.edit');
-        Route::get('assets/browse/{asset_container}/{path?}', [BrowserController::class, 'show'])->where('path', '.*')->name('assets.browse.show');
-        Route::get('assets-fieldtype', [FieldtypeController::class, 'index']);
-        Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset']);
-        Route::get('assets/{encoded_asset}/download', [AssetsController::class, 'download'])->name('assets.download');
-        Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', [ThumbnailController::class, 'show'])->name('assets.thumbnails.show');
-        Route::get('svgs/{encoded_asset}', [SvgController::class, 'show'])->name('assets.svgs.show');
-        Route::get('pdfs/{encoded_asset}', [PdfController::class, 'show'])->name('assets.pdfs.show');
-    });
+    Route::resource('asset-containers', AssetContainersController::class);
+    Route::post('asset-containers/{asset_container}/folders', [FoldersController::class, 'store']);
+    Route::patch('asset-containers/{asset_container}/folders/{path}', [FoldersController::class, 'update'])->where('path', '.*');
+    Route::get('asset-containers/{asset_container}/blueprint', [AssetContainerBlueprintController::class, 'edit'])->name('asset-containers.blueprint.edit');
+    Route::patch('asset-containers/{asset_container}/blueprint', [AssetContainerBlueprintController::class, 'update'])->name('asset-containers.blueprint.update');
+    Route::post('assets/actions', [ActionController::class, 'run'])->name('assets.actions.run');
+    Route::post('assets/actions/list', [ActionController::class, 'bulkActions'])->name('assets.actions.bulk');
+    Route::get('assets/browse', [BrowserController::class, 'index'])->name('assets.browse.index');
+    Route::get('assets/browse/search/{asset_container}/{path?}', [BrowserController::class, 'search'])->where('path', '.*');
+    Route::post('assets/browse/folders/{asset_container}/actions', [FolderActionController::class, 'run'])->name('assets.folders.actions.run');
+    Route::get('assets/browse/folders/{asset_container}/{path?}', [BrowserController::class, 'folder'])->where('path', '.*');
+    Route::get('assets/browse/{asset_container}/{path?}/edit', [BrowserController::class, 'edit'])->where('path', '.*')->name('assets.browse.edit');
+    Route::get('assets/browse/{asset_container}/{path?}', [BrowserController::class, 'show'])->where('path', '.*')->name('assets.browse.show');
+    Route::get('assets-fieldtype', [FieldtypeController::class, 'index']);
+    Route::resource('assets', AssetsController::class)->parameters(['assets' => 'encoded_asset']);
+    Route::get('assets/{encoded_asset}/download', [AssetsController::class, 'download'])->name('assets.download');
+    Route::get('thumbnails/{encoded_asset}/{size?}/{orientation?}', [ThumbnailController::class, 'show'])->name('assets.thumbnails.show');
+    Route::get('svgs/{encoded_asset}', [SvgController::class, 'show'])->name('assets.svgs.show');
+    Route::get('pdfs/{encoded_asset}', [PdfController::class, 'show'])->name('assets.pdfs.show');
 
     Route::group(['prefix' => 'fields'], function () {
         Route::get('/', [FieldsController::class, 'index'])->name('fields.index');
@@ -250,13 +239,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('composer/check', [ComposerOutputController::class, 'check']);
 
-    Route::group(['namespace' => 'Updater'], function () {
-        Route::get('updater', [UpdaterController::class, 'index'])->name('updater');
-        Route::get('updater/count', [UpdaterController::class, 'count']);
-        Route::get('updater/{product}', [UpdateProductController::class, 'show'])->name('updater.product');
-        Route::get('updater/{product}/changelog', [UpdateProductController::class, 'changelog']);
-        Route::post('updater/{product}/install', [UpdateProductController::class, 'install']);
-    });
+    Route::get('updater', [UpdaterController::class, 'index'])->name('updater');
+    Route::get('updater/count', [UpdaterController::class, 'count']);
+    Route::get('updater/{product}', [UpdateProductController::class, 'show'])->name('updater.product');
+    Route::get('updater/{product}/changelog', [UpdateProductController::class, 'changelog']);
+    Route::post('updater/{product}/install', [UpdateProductController::class, 'install']);
 
     Route::group(['prefix' => 'duplicates'], function () {
         Route::get('/', [DuplicatesController::class, 'index'])->name('duplicates');
@@ -268,29 +255,25 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('addons/uninstall', [AddonsController::class, 'uninstall']);
     Route::post('addons/editions', AddonEditionsController::class);
 
-    Route::group([], function () {
-        Route::post('forms/actions', [ActionController::class, 'run'])->name('forms.actions.run');
-        Route::post('forms/actions/list', [ActionController::class, 'bulkActions'])->name('forms.actions.bulk');
-        Route::post('forms/{form}/submissions/actions', [SubmissionActionController::class, 'run'])->name('forms.submissions.actions.run');
-        Route::post('forms/{form}/submissions/actions/list', [SubmissionActionController::class, 'bulkActions'])->name('forms.submissions.actions.bulk');
-        Route::resource('forms', FormsController::class);
-        Route::resource('forms.submissions', FormSubmissionsController::class);
-        Route::get('forms/{form}/export/{type}', [FormExportController::class, 'export'])->name('forms.export');
-        Route::get('forms/{form}/blueprint', [FormBlueprintController::class, 'edit'])->name('forms.blueprint.edit');
-        Route::patch('forms/{form}/blueprint', [FormBlueprintController::class, 'update'])->name('forms.blueprint.update');
-    });
+    Route::post('forms/actions', [ActionController::class, 'run'])->name('forms.actions.run');
+    Route::post('forms/actions/list', [ActionController::class, 'bulkActions'])->name('forms.actions.bulk');
+    Route::post('forms/{form}/submissions/actions', [SubmissionActionController::class, 'run'])->name('forms.submissions.actions.run');
+    Route::post('forms/{form}/submissions/actions/list', [SubmissionActionController::class, 'bulkActions'])->name('forms.submissions.actions.bulk');
+    Route::resource('forms', FormsController::class);
+    Route::resource('forms.submissions', FormSubmissionsController::class);
+    Route::get('forms/{form}/export/{type}', [FormExportController::class, 'export'])->name('forms.export');
+    Route::get('forms/{form}/blueprint', [FormBlueprintController::class, 'edit'])->name('forms.blueprint.edit');
+    Route::patch('forms/{form}/blueprint', [FormBlueprintController::class, 'update'])->name('forms.blueprint.update');
 
-    Route::group([], function () {
-        Route::post('users/actions', [UserActionController::class, 'run'])->name('users.actions.run');
-        Route::post('users/actions/list', [UserActionController::class, 'bulkActions'])->name('users.actions.bulk');
-        Route::get('users/blueprint', [UserBlueprintController::class, 'edit'])->name('users.blueprint.edit');
-        Route::patch('users/blueprint', [UserBlueprintController::class, 'update'])->name('users.blueprint.update');
-        Route::resource('users', UsersController::class);
-        Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
-        Route::get('account', AccountController::class)->name('account');
-        Route::resource('user-groups', UserGroupsController::class);
-        Route::resource('roles', RolesController::class);
-    });
+    Route::post('users/actions', [UserActionController::class, 'run'])->name('users.actions.run');
+    Route::post('users/actions/list', [UserActionController::class, 'bulkActions'])->name('users.actions.bulk');
+    Route::get('users/blueprint', [UserBlueprintController::class, 'edit'])->name('users.blueprint.edit');
+    Route::patch('users/blueprint', [UserBlueprintController::class, 'update'])->name('users.blueprint.update');
+    Route::resource('users', UsersController::class);
+    Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
+    Route::get('account', AccountController::class)->name('account');
+    Route::resource('user-groups', UserGroupsController::class);
+    Route::resource('roles', RolesController::class);
 
     Route::post('user-exists', UserWizardController::class)->name('user.exists');
 
@@ -304,7 +287,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('graphiql', [GraphQLController::class, 'graphiql'])->name('graphql.graphiql');
     }
 
-    Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
+    Route::group(['prefix' => 'fieldtypes'], function () {
         Route::get('relationship', [RelationshipFieldtypeController::class, 'index'])->name('relationship.index');
         Route::post('relationship/data', [RelationshipFieldtypeController::class, 'data'])->name('relationship.data');
         Route::get('relationship/filters', [RelationshipFieldtypeController::class, 'filters'])->name('relationship.filters');
@@ -317,7 +300,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::resource('templates', TemplatesController::class);
     });
 
-    Route::group(['prefix' => 'preferences', 'as' => 'preferences.', 'namespace' => 'Preferences'], function () {
+    Route::group(['prefix' => 'preferences', 'as' => 'preferences.'], function () {
         Route::get('/', [PreferenceController::class, 'index'])->name('index');
         Route::get('edit', [UserPreferenceController::class, 'edit'])->name('user.edit');
         Route::patch('/', [UserPreferenceController::class, 'update'])->name('user.update');
@@ -332,7 +315,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('js', [PreferenceController::class, 'store'])->name('store');
         Route::delete('js/{key}', [PreferenceController::class, 'destroy'])->name('destroy');
 
-        Route::group(['prefix' => 'nav', 'as' => 'nav.', 'namespace' => 'Nav'], function () {
+        Route::group(['prefix' => 'nav', 'as' => 'nav.'], function () {
             Route::get('/', [NavController::class, 'index'])->name('index');
             Route::get('edit', [UserNavController::class, 'edit'])->name('user.edit');
             Route::patch('/', [UserNavController::class, 'update'])->name('user.update');
