@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class StrTest extends TestCase
 {
+    use Concerns\TestsIlluminateStr;
+
     /** @test */
     public function undefined_methods_get_passed_to_stringy()
     {
@@ -45,6 +47,24 @@ class StrTest extends TestCase
     /** @test */
     public function it_makes_slugs()
     {
+        // Assertions copied over from laravel/framework...
+        $this->assertEquals('hello-world', Str::slug('hello world'));
+        $this->assertEquals('hello-world', Str::slug('hello-world'));
+        $this->assertEquals('hello_world', Str::slug('hello_world')); // We allow underscores
+        $this->assertEquals('user-at-host', Str::slug('user@host'));
+        $this->assertEquals('سلام-دنیا', Str::slug('سلام دنیا', '-', null));
+        $this->assertEquals('sometext', Str::slug('some text', ''));
+        $this->assertEquals('', Str::slug('', ''));
+        $this->assertEquals('', Str::slug(''));
+        $this->assertEquals('bsm-allah', Str::slug('بسم الله', '-', 'en', ['allh' => 'allah']));
+        $this->assertEquals('500-dollar-bill', Str::slug('500$ bill', '-', 'en', ['$' => 'dollar']));
+        $this->assertEquals('500-dollar-bill', Str::slug('500--$----bill', '-', 'en', ['$' => 'dollar']));
+        $this->assertEquals('500-dollar-bill', Str::slug('500-$-bill', '-', 'en', ['$' => 'dollar']));
+        $this->assertEquals('500-dollar-bill', Str::slug('500$--bill', '-', 'en', ['$' => 'dollar']));
+        $this->assertEquals('500-dollar-bill', Str::slug('500-$--bill', '-', 'en', ['$' => 'dollar']));
+        $this->assertEquals('أحمد-في-المدرسة', Str::slug('أحمد@المدرسة', '-', null, ['@' => 'في']));
+
+        // Test that we respect respect `config('statamic.system.ascii_replace_extra_symbols')`...
         $this->assertEquals('foo-bar-baz', Str::slug('foo bar % baz'));
         $this->assertEquals('foo-bar-baz', Str::slug('Foo Bar % Baz'));
         $this->assertEquals('foo-bar-baz', Str::slug('foo-bar-%-baz'));
@@ -186,9 +206,16 @@ class StrTest extends TestCase
      * @test
      *
      * @see https://github.com/statamic/cms/pull/3698
-     **/
+     */
     public function it_replaces_strings()
     {
         $this->assertEquals('FÒÔ bàř', Str::replace('fòô bàř', 'fòô', 'FÒÔ'));
+
+        // Assertions copied over from laravel/framework, but with Stringy's parameter order...
+        $this->assertSame('foo bar laravel', Str::replace('foo bar baz', 'baz', 'laravel'));
+        $this->assertSame('foo bar baz 8.x', Str::replace('foo bar baz ?', '?', '8.x'));
+        $this->assertSame('foo/bar/baz', Str::replace('foo bar baz', ' ', '/'));
+        $this->assertSame('foo bar baz', Str::replace('?1 ?2 ?3', ['?1', '?2', '?3'], ['foo', 'bar', 'baz']));
+        $this->assertSame(['foo', 'bar', 'baz'], Str::replace(collect(['?1', '?2', '?3']), collect(['?1', '?2', '?3']), collect(['foo', 'bar', 'baz'])));
     }
 }
