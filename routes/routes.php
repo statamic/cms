@@ -34,5 +34,4 @@ if (Glide::shouldServeByHttp()) {
 }
 
 Route::middleware(config('statamic.routes.middleware', 'web'))
-    ->namespace('Statamic\Http\Controllers')
     ->group(__DIR__.'/web.php');
