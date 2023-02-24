@@ -16,7 +16,6 @@ if (config('statamic.api.enabled')) {
         Route::middleware(config('statamic.api.middleware'))
             ->name('statamic.api.')
             ->prefix(config('statamic.api.route'))
-            ->namespace('Statamic\Http\Controllers\API')
             ->group(__DIR__.'/api.php');
     });
 }
