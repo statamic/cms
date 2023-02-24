@@ -97,13 +97,12 @@ export const Set = Node.create({
                 props: {
                     transformPasted: (slice) => {
                         const { content } = slice.content;
-                        const data = new Slice(Fragment.fromArray(content.map(node => {
+                        return new Slice(Fragment.fromArray(content.map(node => {
                             if (node.type === type) {
                                 return node.type.create(bard.pasteSet(node.attrs));
                             }
                             return node.copy(node.content);
                         })), slice.openStart, slice.openEnd);
-                        return data;
                     },
                 },
             }),
