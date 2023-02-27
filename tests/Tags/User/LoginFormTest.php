@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\User;
 
+use Illuminate\Support\Facades\Config;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
 use Statamic\Statamic;
@@ -118,6 +119,46 @@ EOT
         $this->assertEmpty($errors[1]);
         $this->assertEquals(['Login successful.'], $success[1]);
     }
+
+     /** @test */
+     public function it_will_log_user_in_and_render_success_even_when_cp_auth_is_disabled()
+     {
+        Config::set('statamic.cp.auth', false);
+
+         $this->assertFalse(auth()->check());
+
+         User::make()
+             ->email('san@holo.com')
+             ->password('chewy')
+             ->save();
+
+         $this
+             ->post('/!/auth/login', [
+                 'token' => 'test-token',
+                 'email' => 'san@holo.com',
+                 'password' => 'chewy',
+             ])
+             ->assertLocation('/');
+
+         $this->assertTrue(auth()->check());
+
+         $output = $this->tag(<<<'EOT'
+ {{ user:login_form }}
+     {{ errors }}
+         <p class="error">{{ value }}</p>
+     {{ /errors }}
+
+     <p class="success">{{ success }}</p>
+ {{ /user:login_form }}
+ EOT
+         );
+
+         preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+         preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+
+         $this->assertEmpty($errors[1]);
+         $this->assertEquals(['Login successful.'], $success[1]);
+     }
 
     /** @test */
     public function it_will_log_user_in_and_follow_custom_redirect_with_success()
