@@ -125,7 +125,7 @@ class NavItem
                 $cpUrl = url(config('statamic.cp.route')).'/';
 
                 if (! $this->active && Str::startsWith($url, $cpUrl)) {
-                    $this->active = str_replace($cpUrl, '', Str::before($url, '?')).'(/(.*)?|$)';
+                    $this->active = $this->generateActivePatternForCpUrl($url);
                 }
             })
             ->value($url);
@@ -431,5 +431,23 @@ class NavItem
         $string = Str::replace($string, '-', '_');
 
         return $string;
+    }
+
+    /**
+     * Generate active pattern for CP url.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function generateActivePatternForCpUrl($url)
+    {
+        $cpUrl = url(config('statamic.cp.route')).'/';
+
+        $url = Str::before($url, '?'); // Remove query params
+        $url = Str::before($url, '#'); // Remove anchors
+
+        $relativeUrl = str_replace($cpUrl, '', $url);
+
+        return $relativeUrl.'(/(.*)?|$)';
     }
 }
