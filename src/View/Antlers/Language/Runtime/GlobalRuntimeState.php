@@ -78,6 +78,7 @@ class GlobalRuntimeState
      * @var bool
      */
     public static $isEvaluatingUserData = false;
+
     public static $isEvaluatingData = false;
 
     /**
@@ -186,6 +187,8 @@ class GlobalRuntimeState
     public static $containsLayout = false;
 
     public static $requiresRuntimeIsolation = false;
+
+    public static $evaulatingTagContents = false;
 
     public static $userContentEvalState = null;
 

@@ -669,11 +669,20 @@ INFO;
 
     private function cloneRuntimeParser()
     {
-        return (new RuntimeParser(
+        $parser = (new RuntimeParser(
             $this->documentParser,
             $this->nodeProcessor->cloneProcessor(),
             $this->antlersLexer, $this->antlersParser
         ))->allowPhp($this->allowPhp);
+
+        // If we are evaluating a tag's scope, we still
+        // want the overall parser instances to be
+        // isolated, but we also need the Cascade.
+        if (GlobalRuntimeState::$evaulatingTagContents) {
+            $parser->cascade($this->cascade);
+        }
+
+        return $parser;
     }
 
     private function shouldIsolate()
