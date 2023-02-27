@@ -39,9 +39,13 @@ class ImportUsers extends Command
      */
     public function handle()
     {
-        if (config('statamic.users.repository') === 'eloquent') {
-            $this->importUsers();
+        if (config('statamic.users.repository') !== 'eloquent') {
+            $this->error('Your site is not using the eloquent user repository.');
+
+            return 0;
         }
+
+        $this->importUsers();
 
         return 0;
     }
