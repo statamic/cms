@@ -21,6 +21,9 @@ class LanguageOperatorRegistry
     const BITWISE_SHIFT_LEFT = 'bsl';
     const BITWISE_SHIFT_RIGHT = 'bsr';
 
+    const DYNAMIC_EXISTS = 'var_exists';
+    const DYNAMIC_ISSET = 'var_isset';
+
     public static $operators = [
         self::ARR_PLUCK => 1,
         self::QUERY_WHERE => 1,
@@ -38,11 +41,16 @@ class LanguageOperatorRegistry
         self::BITWISE_SHIFT_LEFT => 1,
         self::BITWISE_SHIFT_RIGHT => 1,
         self::STRUCT_SWITCH => 1,
+
+        self::DYNAMIC_EXISTS => 1,
+        self::DYNAMIC_ISSET => 1,
     ];
 
     public static $getsArgsFromRight = [
         self::BITWISE_NOT => 1,
         self::ARR_MAKE => 1,
+        self::DYNAMIC_EXISTS => 1,
+        self::DYNAMIC_ISSET => 1,
     ];
 
     protected static $cacheRawB = [

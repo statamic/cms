@@ -17,6 +17,7 @@ return [
     'between.array' => 'Vsebovati mora med :min in :max postavkami.',
     'boolean' => 'Mora biti resnično ali napačno.',
     'confirmed' => 'Potrditev se ne ujema.',
+    'current_password' => 'Geslo ni veljavno.',
     'date' => 'Ni veljaven datum.',
     'date_format' => 'Ne ustreza obliki :format .',
     'different' => 'To polje in :other morata biti drugačna.',

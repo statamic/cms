@@ -9,6 +9,8 @@ use Statamic\Statamic;
 
 class Translator extends BaseTranslator
 {
+    private $files;
+
     public function __construct(Filesystem $files, Loader $loader, $locale)
     {
         $this->files = $files;

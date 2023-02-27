@@ -92,6 +92,20 @@ class AntlersNode extends AbstractNode
     public $pathReference = null;
 
     /**
+     * The node's original path reference content.
+     *
+     * @var string
+     */
+    public $originalPathReferenceContent = '';
+
+    /**
+     * Indicates if the path reference contains dynamic variables.
+     *
+     * @var bool
+     */
+    public $pathReferenceContainsDynamicVariables = false;
+
+    /**
      * Indicates if the node is a closing pair.
      *
      * @var bool

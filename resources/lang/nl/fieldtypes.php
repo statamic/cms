@@ -126,6 +126,8 @@ return [
     'select.config.taggable' => 'Sta het toevoegen van nieuwe opties toe.',
     'select.title' => 'Select',
     'sites.title' => 'Sites',
+    'slug.config.from' => 'Oorspronkelijk veld om een slug te maken.',
+    'slug.config.generate' => 'Maak automatisch een slug van het oorspronkelijk `van` veld.',
     'slug.title' => 'Slug',
     'structures.title' => 'Structures',
     'table.title' => 'Table',

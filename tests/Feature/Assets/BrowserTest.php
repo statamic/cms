@@ -14,6 +14,8 @@ class BrowserTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
+    private $tempDir;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -237,6 +239,13 @@ class BrowserTest extends TestCase
             ->assertSuccessful()
             ->assertJsonCount(1, 'data.assets')
             ->assertJsonPath('data.assets.0.id', 'one::nested/asset-two.txt');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one/nested/subdirectory?search=asset')
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data.assets')
+            ->assertJsonPath('data.assets.0.id', 'one::nested/subdirectory/asset-three.txt');
     }
 
     /** @test */

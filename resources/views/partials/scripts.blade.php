@@ -12,10 +12,17 @@
     @endforeach
 @endforeach
 
+@foreach (Statamic::availableVites(request()) as $package => $vite)
+    {{ Vite::useHotFile($vite['hotFile'])
+           ->useBuildDirectory($vite['buildDirectory'])
+           ->withEntryPoints($vite['input']) }}
+@endforeach
+
 <script>
     Statamic.config(@json(array_merge(Statamic::jsonVariables(request()), [
         'wrapperClass' => $__env->getSection('wrapper_class', 'max-w-xl')
     ])));
-    Statamic.start();
 </script>
 
+{{-- Deferred to allow Vite modules to load first --}}
+<script src="data:text/javascript;base64,{{ base64_encode('Statamic.start()') }}" defer></script>

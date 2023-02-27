@@ -14,6 +14,10 @@ class UpdateAssetReferencesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $container;
+    private $assetHoff;
+    private $assetNorris;
+
     public function setUp(): void
     {
         parent::setUp();

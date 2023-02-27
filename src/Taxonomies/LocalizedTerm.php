@@ -11,6 +11,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\Data\ContainsSupplementalData;
@@ -28,6 +29,7 @@ use Statamic\GraphQL\ResolvesValues;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
+use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
@@ -39,9 +41,10 @@ class LocalizedTerm implements
     ResolvesValuesContract,
     ArrayAccess,
     Arrayable,
-    ContainsQueryableValues
+    ContainsQueryableValues,
+    SearchableContract
 {
-    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, ContainsSupplementalData, ResolvesValues;
+    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, ContainsSupplementalData, ResolvesValues, Searchable;
 
     protected $locale;
     protected $term;
@@ -199,7 +202,7 @@ class LocalizedTerm implements
 
     public function reference()
     {
-        return $this->term->reference();
+        return $this->term->reference().'::'.$this->locale();
     }
 
     public function in($site)
@@ -515,5 +518,10 @@ class LocalizedTerm implements
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    public function getCpSearchResultBadge()
+    {
+        return $this->taxonomy()->title();
     }
 }

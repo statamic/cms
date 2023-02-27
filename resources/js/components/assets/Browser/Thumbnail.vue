@@ -1,23 +1,18 @@
 <template>
 
     <div class="">
-        <div v-if="showSvg" class="rounded flex items-center justify-center asset-thumbnail h-full w-full">
-            <img
-                class="w-full h-full max-w-full max-h-full mx-auto object-contain"
-                :src="asset.thumbnail"
+        <img v-if="asset.is_image"
+            :src="asset.thumbnail"
+            class="asset-thumbnail max-h-8 max-w-full mx-auto rounded"
+            loading="lazy"
+            :class="{'w-8 h-8 fit-cover': square}"
             />
-        </div>
-
-        <template v-else>
-            <img v-if="asset.is_image"
-                :src="asset.thumbnail"
-                class="asset-thumbnail rounded max-h-full max-w-full mx-auto rounded"
-                loading="lazy"
-                :class="{'w-8 h-8 fit-cover': square}"
-                />
-            <file-icon v-else :extension="asset.extension" class="p-px asset-thumbnail rounded w-full h-full" />
-        </template>
-
+        <img v-else-if="asset.is_svg"
+            :src="asset.url"
+            class="asset-thumbnail h-8 max-w-full mx-auto rounded"
+            loading="lazy"
+            />
+        <file-icon v-else :extension="asset.extension" class="p-px asset-thumbnail rounded w-8 h-8" />
     </div>
 
 </template>

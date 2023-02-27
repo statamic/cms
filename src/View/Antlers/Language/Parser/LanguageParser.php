@@ -982,11 +982,25 @@ class LanguageParser
                     $wrapperSemanticGroup = $next->scope->nodes[0];
 
                     if (empty($wrapperSemanticGroup->nodes) || $wrapperSemanticGroup->nodes[0] instanceof LogicGroup == false) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_UNEXPECTED_SWITCH_START_VALUE_NO_SEMANTIC_VALUE,
-                            $token,
-                            'Unexpected input while parsing [T_SWITCH_GROUP].'
-                        );
+                        $shouldError = true;
+
+                        if (! empty($wrapperSemanticGroup->nodes)) {
+                            $firstNode = $wrapperSemanticGroup->nodes[0];
+
+                            if ($firstNode instanceof  ArrayNode && $firstNode->hasModifiers()) {
+                                $shouldError = false;
+                            } elseif ($firstNode instanceof VariableNode) {
+                                $shouldError = false;
+                            }
+                        }
+
+                        if ($shouldError) {
+                            throw ErrorFactory::makeSyntaxError(
+                                AntlersErrorCodes::TYPE_UNEXPECTED_SWITCH_START_VALUE_NO_SEMANTIC_VALUE,
+                                $token,
+                                'Unexpected input while parsing [T_SWITCH_GROUP].'
+                            );
+                        }
                     }
 
                     $firstCondition = $wrapperSemanticGroup->nodes;
@@ -1140,6 +1154,56 @@ class LanguageParser
 
                     $arrayNode->nodes = $values->values;
 
+                    $newTokens[] = $arrayNode;
+
+                    $i += 1;
+                } elseif ($token->content == LanguageOperatorRegistry::DYNAMIC_EXISTS ||
+                          $token->content == LanguageOperatorRegistry::DYNAMIC_ISSET) {
+                    if ($i + 1 >= $tokenCount) {
+                        throw ErrorFactory::makeSyntaxError(
+                            AntlersErrorCodes::TYPE_OPERATOR_MISSING_TARGET,
+                            $token,
+                            'Missing target for operator: '.$token->content
+                        );
+                    }
+
+                    $nextToken = $tokens[$i + 1];
+
+                    if ($nextToken instanceof LogicGroup == false) {
+                        throw ErrorFactory::makeSyntaxError(
+                            AntlersErrorCodes::TYPE_ARR_MAKE_UNEXPECTED_TYPE,
+                            $token,
+                            'Unexpected ['.TypeLabeler::getPrettyTypeName($nextToken).'] while parsing '.$token->content.' operator arguments.'
+                        );
+                    }
+
+                    $subNodes = $nextToken->nodes;
+
+                    if (count($subNodes) > 0 && $subNodes[0] instanceof SemanticGroup) {
+                        $subNodes = $subNodes[0]->nodes;
+                    }
+
+                    if ($nextToken instanceof  ScopedLogicGroup) {
+                        array_unshift($subNodes, new ScopeAssignmentOperator());
+                        array_unshift($subNodes, $nextToken->scope);
+                    }
+
+                    /** @var ListValueNode $values */
+                    $values = $this->getArrayValues($subNodes);
+                    $arrayNode = new ArrayNode();
+                    $arrayNode->startPosition = $token->startPosition;
+
+                    $valueNodeCount = count($values->values);
+
+                    if ($valueNodeCount > 0) {
+                        $arrayNode->endPosition = $values->values[$valueNodeCount - 1]->endPosition;
+                    } else {
+                        $arrayNode->endPosition = $token->endPosition;
+                    }
+
+                    $arrayNode->nodes = $values->values;
+
+                    $newTokens[] = $token;
                     $newTokens[] = $arrayNode;
 
                     $i += 1;

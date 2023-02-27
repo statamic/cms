@@ -2,7 +2,6 @@
 
 namespace Statamic\Providers;
 
-use Facades\Statamic\Auth\CorePermissions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -34,6 +33,7 @@ class AuthServiceProvider extends ServiceProvider
         \Statamic\Contracts\Assets\Asset::class => Policies\AssetPolicy::class,
         \Statamic\Contracts\Assets\AssetFolder::class => Policies\AssetFolderPolicy::class,
         \Statamic\Contracts\Assets\AssetContainer::class => Policies\AssetContainerPolicy::class,
+        \Statamic\Fields\Fieldset::class => Policies\FieldsetPolicy::class,
     ];
 
     public function register()
@@ -87,10 +87,6 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::after(function ($user, $ability) {
             return optional(User::fromUser($user))->hasPermission($ability) === true ? true : null;
-        });
-
-        $this->app->booted(function () {
-            CorePermissions::boot();
         });
 
         foreach ($this->policies as $key => $policy) {

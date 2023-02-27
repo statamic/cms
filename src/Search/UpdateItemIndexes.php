@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\EntryDeleted;
@@ -28,22 +29,24 @@ class UpdateItemIndexes
 
     public function update($event)
     {
-        $item = $event->entry ?? $event->asset ?? $event->user ?? $event->term;
-
-        $this->indexes($item)->each(function ($index) use ($item) {
-            $index->exists() ? $index->insert($item) : $index->update();
-        });
+        $this->items($event)->each(fn ($item) => Search::updateWithinIndexes($item));
     }
 
     public function delete($event)
     {
-        $item = $event->entry ?? $event->asset ?? $event->user ?? $event->term;
-
-        $this->indexes($item)->each->delete($item);
+        $this->items($event)->each(fn ($item) => Search::deleteFromIndexes($item));
     }
 
-    protected function indexes($item)
+    private function items($event)
     {
-        return Search::indexes()->filter->shouldIndex($item);
+        $item = $event->entry ?? $event->asset ?? $event->user ?? $event->term;
+
+        if ($item instanceof Term) {
+            $items = $item->localizations();
+        } else {
+            $items = collect([$item]);
+        }
+
+        return $items;
     }
 }

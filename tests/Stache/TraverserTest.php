@@ -15,6 +15,9 @@ use Tests\TestCase;
 
 class TraverserTest extends TestCase
 {
+    private $tempDir;
+    private $traverser;
+
     public function setUp(): void
     {
         parent::setUp();

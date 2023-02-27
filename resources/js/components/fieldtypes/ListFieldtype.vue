@@ -47,6 +47,7 @@
                     :placeholder="`${__('Add an item')}...`"
                     @keydown.enter.prevent="addItem"
                     @blur="newItemInputBlurred"
+                    @paste="newItemInputPaste"
                     @focus="editItem(data.length)"
                     @keyup.up="previousItem"
                 />
@@ -129,6 +130,23 @@ export default {
             this.$nextTick(function () {
                 this.focusItem();
             });
+        },
+
+        newItemInputPaste(event) {
+            if (this.newItem !== '') {
+                return;
+            }
+
+            const value = event.clipboardData.getData('text');
+            if (!value.includes("\n")) {
+                return;                
+            }
+            
+            value.split("\n").forEach((item) => {
+                this.data.push(this.newSortableValue(item));
+            });
+
+            event.preventDefault();
         },
 
         newItemInputBlurred() {
