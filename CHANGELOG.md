@@ -1,5 +1,27 @@
 # Release Notes
 
+## 3.4.5 (2023-02-27)
+
+### What's new
+- Add console import for file based users to database. [#6729](https://github.com/statamic/cms/issues/6729) by @ryanmitchell
+
+### What's improved
+- Dutch translations. [#7553](https://github.com/statamic/cms/issues/7553) by @oakeddev
+- Display actual time in past revision history. [#7544](https://github.com/statamic/cms/issues/7544) by @jacksleight
+- Use `@tiptap/pm` package, and export state. [#7574](https://github.com/statamic/cms/issues/7574) by @jacksleight
+
+### What's fixed
+- Fix Antlers tag parameters not understanding arrays with single values. [#7563](https://github.com/statamic/cms/issues/7563) by @JohnathonKoster
+- Fix Antlers new array key variable assignment. [#7594](https://github.com/statamic/cms/issues/7594) by @JohnathonKoster
+- Fix Antlers value changes being lost after calling tags. [#7596](https://github.com/statamic/cms/issues/7596) by @JohnathonKoster
+- Fix active nav item check on CP urls with an hash fragments. [#7616](https://github.com/statamic/cms/issues/7616) by @jesseleite
+- Fix save issue when slug starts with extension. [#7590](https://github.com/statamic/cms/issues/7590) by @jasonvarga
+- Fix read only dynamic mode array fieldtype. [#7577](https://github.com/statamic/cms/issues/7577) by @jacksleight
+- Fix CP Nav preferences builder when top level section is empty. [#7551](https://github.com/statamic/cms/issues/7551) by @jesseleite
+- Refactor randomness out of test. [#7584](https://github.com/statamic/cms/issues/7584) by @jasonvarga
+
+
+
 ## 3.4.4 (2023-02-15)
 
 ### What's new
