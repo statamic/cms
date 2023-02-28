@@ -56,13 +56,13 @@ export default {
         },
 
         mainTabs() {
-            if (! this.shouldShowSidebar) return this.tab;
+            if (! this.shouldShowSidebar) return this.tabs;
 
             if (this.active === "sidebar") {
-                this.active = this.state.blueprint.tab[0].handle
+                this.active = this.state.blueprint.tabs[0].handle
             }
 
-            return _.filter(this.tab, tab => tab.handle != 'sidebar');
+            return _.filter(this.tabs, tab => tab.handle != 'sidebar');
         },
 
         actionsPortal() {
