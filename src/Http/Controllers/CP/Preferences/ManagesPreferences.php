@@ -49,7 +49,7 @@ trait ManagesPreferences
 
     private function blueprint()
     {
-        return Blueprint::makeFromTabs(Preference::sections());
+        return Blueprint::makeFromTabs(Preference::tabs());
     }
 
     private function getSaveAsOptions()
