@@ -1,6 +1,6 @@
 # Release Notes
 
-## 3.4.5 (2023-02-27)
+## 3.4.5 (2023-02-28)
 
 ### What's new
 - Add console import for file based users to database. [#6729](https://github.com/statamic/cms/issues/6729) by @ryanmitchell
