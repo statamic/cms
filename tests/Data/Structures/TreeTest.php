@@ -145,9 +145,9 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_a_page_by_id()
+    public function it_find_a_page_by_id()
     {
-        $page = $this->tree()->page('pages-directors');
+        $page = $this->tree()->find('pages-directors');
 
         $this->assertEquals('Custom Directors Title', $page->title());
     }

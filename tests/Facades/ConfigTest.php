@@ -143,19 +143,6 @@ class ConfigTest extends TestCase
         $this->assertEquals('http://test.com/de', Config::getSiteUrl('de'));
     }
 
-    /** @test */
-    public function gets_image_manipulation_presets()
-    {
-        $presets = [
-            'small' => ['w' => 100],
-            'large' => ['w' => 1000],
-        ];
-
-        config(['statamic.assets.image_manipulation.presets' => $presets]);
-
-        $this->assertEquals($presets, Config::getImageManipulationPresets());
-    }
-
     private function fakeSiteConfig()
     {
         \Statamic\Facades\Site::setConfig([

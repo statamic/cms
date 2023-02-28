@@ -1,5 +1,12 @@
 <template>
 
+<fullscreen :enabled="fullScreenMode" :provide="provide">
+<!-- These wrappers allow any css that expected the field to
+     be within the context of a publish form to continue working
+     once it has been portaled out. -->
+<div :class="{ 'publish-fields': fullScreenMode }">
+<div :class="{ wrapperClasses: fullScreenMode }">
+
     <div
         class="bard-fieldtype-wrapper"
         :class="{'bard-fullscreen': fullScreenMode }"
@@ -8,7 +15,7 @@
     >
 
         <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar">
-            <div class="flex flex-wrap items-center no-select" v-if="toolbarIsFixed">
+            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">
                 <component
                     v-for="button in visibleButtons(buttons)"
                     :key="button.name"
@@ -18,23 +25,20 @@
                     :config="config"
                     :bard="_self"
                     :editor="editor" />
-            </div>
-            <div class="flex items-center no-select">
-                <div class="h-10 -my-1 border-l pr-2 w-1" v-if="toolbarIsFixed && hasExtraButtons"></div>
-                <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                    <svg-icon name="file-code" class="w-4 h-4 "/>
-                </button>
-                <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && config.sets.length > 0">
-                    <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
-                </button>
-                <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
-                    <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
-                    <svg-icon name="expand" class="w-4 h-4" v-else />
-                </button>
+                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
+                        <svg-icon name="show-source" class="w-4 h-4 "/>
+                    </button>
+                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && config.sets.length > 0">
+                        <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
+                    </button>
+                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
+                        <svg-icon name="shrink-all" class="w-4 h-4" v-show="fullScreenMode" />
+                        <svg-icon name="expand-2" class="w-4 h-4" v-show="!fullScreenMode" />
+                    </button>
             </div>
         </div>
 
-        <div class="bard-editor" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }" tabindex="0">
+        <div class="bard-editor @container/bard" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }" tabindex="0">
             <bubble-menu class="bard-floating-toolbar" :editor="editor" :tippy-options="{ maxWidth: 'none', zIndex: 1000 }" v-if="editor && toolbarIsFloating && !readOnly">
                 <component
                     v-for="button in visibleButtons(buttons)"
@@ -72,6 +76,9 @@
             <div v-if="config.character_limit">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
         </div>
     </div>
+</div>
+</div>
+</fullscreen>
 
 </template>
 
@@ -84,6 +91,7 @@ import BulletList from '@tiptap/extension-bullet-list';
 import CharacterCount from '@tiptap/extension-character-count';
 import Code from '@tiptap/extension-code';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import Dropcursor from '@tiptap/extension-dropcursor';
 import Gapcursor from '@tiptap/extension-gapcursor';
 import HardBreak from '@tiptap/extension-hard-break';
 import Heading from '@tiptap/extension-heading';
@@ -131,13 +139,6 @@ export default {
         LinkToolbarButton,
     },
 
-    provide() {
-        return {
-            setConfigs: this.config.sets,
-            isReadOnly: this.readOnly,
-        }
-    },
-
     inject: ['storeName'],
 
     data() {
@@ -154,6 +155,11 @@ export default {
             invalid: false,
             pageHeader: null,
             escBinding: null,
+            provide: {
+                setConfigs: this.config.sets,
+                isReadOnly: this.readOnly,
+                storeName: this.storeName
+            }
         }
     },
 
@@ -265,6 +271,10 @@ export default {
         inputIsInline() {
             return this.config.inline;
         },
+
+        wrapperClasses() {
+            return `form-group publish-field publish-field__${this.handle} bard-fieldtype`;
+        }
 
     },
 
@@ -446,12 +456,10 @@ export default {
 
         toggleFullscreen() {
             this.fullScreenMode = !this.fullScreenMode;
-            this.$root.hideOverflow = ! this.$root.hideOverflow;
         },
 
         closeFullscreen() {
             this.fullScreenMode = false;
-            this.$root.hideOverflow = false;
         },
 
         shouldShowSetButton({ view, state }) {
@@ -578,6 +586,7 @@ export default {
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
                 ...(this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak]),
+                Dropcursor,
                 Gapcursor,
                 History,
                 Paragraph,

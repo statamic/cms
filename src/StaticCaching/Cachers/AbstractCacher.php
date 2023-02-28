@@ -68,8 +68,7 @@ abstract class AbstractCacher implements Cacher
      */
     public function getDefaultExpiration()
     {
-        return $this->config('expiry')
-            ?? $this->config('default_cache_length'); // deprecated
+        return $this->config('expiry');
     }
 
     /**

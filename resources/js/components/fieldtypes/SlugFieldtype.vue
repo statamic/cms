@@ -1,5 +1,4 @@
 <template>
-
     <slugify
         ref="slugify"
         :enabled="generate"
@@ -8,16 +7,23 @@
         :language="language"
         v-model="slug"
     >
-        <text-fieldtype
-            slot-scope="{ }"
-            class="font-mono text-xs"
-            handle="slug"
-            :config="config"
-            :read-only="isReadOnly"
-            v-model="slug"
-            @focus="$emit('focus')"
-            @blur="$emit('blur')"
-        />
+        <div>
+            <text-input
+                v-model="slug"
+                classes="font-mono text-xs"
+                :isReadOnly="isReadOnly"
+                :append="value"
+                :name="slug"
+                @focus="$emit('focus')"
+                @blur="$emit('blur')"
+            >
+                <template v-slot:append>
+                    <button class="input-group-append items-center flex" @click="sync" v-tooltip="__('Regenerate from: ' + config.from)">
+                        <svg-icon name="synchronize" class="w-5 h-5" />
+                    </button>
+                </template>
+            </text-input>
+        </div>
     </slugify>
 
 </template>
@@ -99,8 +105,11 @@ export default {
             if (this.handle === 'slug' && store === this.store) {
                 this.$refs.slugify.reset();
             }
-        }
+        },
 
+        sync() {
+            this.$refs.slugify.reset();
+        }
     }
 
 }

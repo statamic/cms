@@ -1,33 +1,20 @@
-/* Inter
+/* Inter var v3.19 (https://rsms.me/inter/)
    ========================================================================== */
 
-   @font-face {
+@font-face {
     font-family: 'Inter var';
     font-weight: 100 900;
     font-display: swap;
     font-style: normal;
     font-named-instance: 'Regular';
-    src: url("../fonts/Inter/Inter-roman.var.woff2?v=3.19") format("woff2");
-  }
-  @font-face {
+    src: url("../../fonts/Inter/Inter-roman.var.woff2?v=3.19") format("woff2");
+}
+
+@font-face {
     font-family: 'Inter var';
     font-weight: 100 900;
     font-display: swap;
     font-style: italic;
     font-named-instance: 'Italic';
-    src: url("../fonts/Inter/Inter-italic.var.woff2?v=3.19") format("woff2");
-  }
-
-
-/* Font Awesome - used in Bard's MediumEditor implementation
-  ========================================================================== */
-
-@font-face {
-    font-family: 'fontawesome';
-    src:
-        url('../fonts/fontawesome.ttf?hj1qzi') format('truetype'),
-        url('../fonts/fontawesome.woff?hj1qzi') format('woff'),
-        url('../fonts/fontawesome.svg?hj1qzi#fontawesome') format('svg');
-    font-weight: normal;
-    font-style: normal;
+    src: url("../../fonts/Inter/Inter-italic.var.woff2?v=3.19") format("woff2");
 }

@@ -17,7 +17,7 @@
 .blueprint-drag-handle {
     @apply flex-none;
     cursor: move;
-    background: rgba(0, 0, 0, 0.01) url('../svg/drag-dots.svg') 50% 50% no-repeat;
+    background: rgba(0, 0, 0, 0.01) url('../../svg/drag-dots.svg') 50% 50% no-repeat;
 }
 
 .blueprint-tab-field {
@@ -88,43 +88,4 @@
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
 
-.field-width-selector {
-    @apply w-12;
-    display: flex;
-    height: 20px;
-    position: relative;
-    cursor: pointer;
 
-    .field-width-label {
-        @apply absolute text-4xs font-bold w-full text-center z-10 text-gray-700;
-        top: 3px;
-        pointer-events: none;
-    }
-
-    &:hover .field-width-label {
-        opacity: 0.5;
-    }
-
-    .field-width-notch {
-        @apply relative border border-gray-400 border-l-0;
-        width: 8px;
-
-        &.notch-25 {
-            @apply border-l rounded-l-sm;
-        }
-
-        &.filled {
-            @apply border-gray-400 border-r-0 bg-white;
-            margin: -1px 0;
-        }
-
-        &.selected {
-            @apply border-r rounded-r-sm;
-        }
-    }
-
-    &.large {
-        transform: scale(1.3);
-        transform-origin: 0 0;
-    }
-}

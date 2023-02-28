@@ -1,7 +1,15 @@
 <template>
 
         <div>
-            <publish-fields-container class="card p-0 mb-6">
+            <header class="mb-6">
+                <breadcrumb :url="breadcrumbUrl" :title="__('User Groups')" />
+                <div class="flex items-center">
+                    <h1 class="flex-1" v-text="title || __('Create Group')" />
+                    <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
+                </div>
+            </header>
+
+            <div class="card p-0 mb-6 publish-fields @container">
 
                 <form-group
                     :display="__('Title')"
@@ -48,10 +56,6 @@
                     <small class="help-block text-red mt-2 mb-0" v-if="errors.roles" v-text="errors.roles[0]" />
                 </div>
 
-            </publish-fields-container>
-            <div class="py-4 border-t flex justify-between">
-                <a :href="action" class="btn" v-text="__('Cancel') "/>
-                <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
             </div>
         </div>
 </template>
@@ -67,7 +71,8 @@ export default {
         initialUsers: Array,
         action: String,
         method: String,
-        creating: Boolean
+        creating: Boolean,
+        breadcrumbUrl: String,
     },
 
     data() {

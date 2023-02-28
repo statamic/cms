@@ -7,7 +7,7 @@ import ComposerOutput from '../components/ComposerOutput.vue';
 import Container from '../components/publish/Container.vue';
 import PublishForm from '../components/publish/PublishForm.vue';
 import Fields from '../components/publish/Fields.vue';
-import FieldsContainer from '../components/publish/FieldsContainer.vue';
+import FieldsContainer from '../components/publish/FieldsContainer.vue'; // deprecated
 import Field from '../components/publish/Field.vue';
 import FieldMeta from '../components/publish/FieldMeta.vue';
 import ConfigureTabs from '../components/configure/Tabs.vue';
@@ -59,6 +59,7 @@ import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
 import panes from '../components/panes/Pane.vue';
+import Fullscreen from '../components/Fullscreen.vue';
 
 // Third Party
 Vue.component('v-select', vSelect)
@@ -126,6 +127,7 @@ Vue.component('breadcrumb', Breadcrumb);
 Vue.component('breadcrumbs', Breadcrumbs);
 Vue.component('create-entry-button', CreateEntryButton);
 Vue.component('popover', Popover);
+Vue.component('fullscreen', Fullscreen);
 
 // Recursive
 Vue.component('role-permission-tree', PermissionTree);

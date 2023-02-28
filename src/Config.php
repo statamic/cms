@@ -2,7 +2,6 @@
 
 namespace Statamic;
 
-use Statamic\Facades\Image;
 use Statamic\Facades\Site;
 
 /**
@@ -151,18 +150,5 @@ class Config
     public function getSiteUrl($locale = null)
     {
         return $this->getSite($locale)->url();
-    }
-
-    /**
-     * Get the image manipulation presets.
-     *
-     * @return array
-     *
-     * @deprecated Use Statamic\Facades\Image::userManipulationPresets()
-     *             or Image::manipulationPresets() to get merged with CP presets.
-     */
-    public function getImageManipulationPresets()
-    {
-        return Image::userManipulationPresets();
     }
 }

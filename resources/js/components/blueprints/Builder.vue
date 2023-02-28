@@ -9,7 +9,7 @@
             </div>
         </header>
 
-        <div class="publish-form card p-0" v-if="showTitle">
+        <div class="publish-form card p-0 @container" v-if="showTitle">
             <div class="form-group">
                 <label class="block">{{ __('Title') }}</label>
                 <small class="help-block">{{ __('messages.blueprints_title_instructions') }}</small>

@@ -176,7 +176,7 @@ class EntriesStoreTest extends TestCase
 
         $this->assertStringEqualsFile($path = $this->directory.'/blog/2017-07-04.test.md', $entry->fileContents());
         @unlink($path);
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->assertEquals($path, $this->parent->store('blog')->paths()->get('123'));
     }
@@ -229,9 +229,9 @@ class EntriesStoreTest extends TestCase
         @unlink($newPath);
         @unlink($anotherNewPath);
         @unlink($existingPath);
-        $this->assertFileNotExists($newPath);
-        $this->assertFileNotExists($anotherNewPath);
-        $this->assertFileNotExists($existingPath);
+        $this->assertFileDoesNotExist($newPath);
+        $this->assertFileDoesNotExist($anotherNewPath);
+        $this->assertFileDoesNotExist($existingPath);
     }
 
     /** @test */
@@ -253,8 +253,8 @@ class EntriesStoreTest extends TestCase
         $this->assertEquals($existingPath, $this->parent->store('blog')->paths()->get('the-id'));
 
         @unlink($existingPath);
-        $this->assertFileNotExists($pathWithSuffix);
-        $this->assertFileNotExists($existingPath);
+        $this->assertFileDoesNotExist($pathWithSuffix);
+        $this->assertFileDoesNotExist($existingPath);
     }
 
     /** @test */
@@ -276,8 +276,8 @@ class EntriesStoreTest extends TestCase
         $pathWithIncrementedSuffix = $this->directory.'/blog/2017-07-04.test.2.md';
         $this->assertStringEqualsFile($suffixedExistingPath, $entry->fileContents());
         @unlink($suffixedExistingPath);
-        $this->assertFileNotExists($pathWithIncrementedSuffix);
-        $this->assertFileNotExists($suffixedExistingPath);
+        $this->assertFileDoesNotExist($pathWithIncrementedSuffix);
+        $this->assertFileDoesNotExist($suffixedExistingPath);
 
         $this->assertEquals($suffixedExistingPath, $this->parent->store('blog')->paths()->get('another-id'));
     }
@@ -294,12 +294,12 @@ class EntriesStoreTest extends TestCase
         $this->parent->store('blog')->save($entry);
 
         $this->assertStringEqualsFile($existingPath, $entry->fileContents());
-        $this->assertFileNotExists($suffixlessPath);
+        $this->assertFileDoesNotExist($suffixlessPath);
 
         $this->assertEquals($existingPath, $this->parent->store('blog')->paths()->get('123'));
 
         @unlink($existingPath);
-        $this->assertFileNotExists($existingPath);
+        $this->assertFileDoesNotExist($existingPath);
     }
 
     /** @test */
@@ -319,12 +319,12 @@ class EntriesStoreTest extends TestCase
         $this->parent->store('blog')->save($entry);
 
         $this->assertStringEqualsFile($newPath, $entry->fileContents());
-        $this->assertFileNotExists($existingPath);
+        $this->assertFileDoesNotExist($existingPath);
 
         $this->assertEquals($newPath, $this->parent->store('blog')->paths()->get('123'));
 
         @unlink($newPath);
-        $this->assertFileNotExists($newPath);
+        $this->assertFileDoesNotExist($newPath);
     }
 
     /** @test */

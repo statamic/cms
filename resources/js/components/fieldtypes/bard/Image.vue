@@ -8,8 +8,8 @@
                     <img :src="src" class="block mx-auto" data-drag-handle />
                 </div>
 
-                <div class="flex items-center p-2 pt-0 rounded-b" @paste.stop>
-                    <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-2" />
+                <div class="flex items-center p-2 border-t rounded-b" @paste.stop>
+                    <text-input name="alt" v-model="alt" :prepend="__('Alt Text')" class="mr-2 flex-1" />
                     <button class="btn-flat mr-2" @click="openSelector">
                         {{ __('Replace') }}
                     </button>
@@ -179,7 +179,12 @@ export default {
             this.updateAttributes({ src: this.actualSrc });
         },
 
-    }
+    },
 
+    updated() {
+        // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
+        // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
+        this.$el.setAttribute('draggable', false);
+    }
 }
 </script>

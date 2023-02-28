@@ -47,7 +47,7 @@
             @apply border-r h-full p-2;
             width: 1%;
             cursor: grab;
-            background: theme('colors.gray.200') url('../svg/drag-dots.svg') center center no-repeat;
+            background: theme('colors.gray.200') url('../../../svg/drag-dots.svg') center center no-repeat;
             &:hover { @apply bg-gray-300; }
         }
     }
@@ -63,7 +63,7 @@
     }
 }
 
-.grid-table .row-controls {
+.grid-table tbody .row-controls {
     @apply pl-0 text-center;
     width: 1%;
     padding-top: 21px; /*  pseudo-center for text/select fields */
@@ -71,4 +71,10 @@
 
 .grid-item-header {
     @apply bg-gray-200 border-b px-4 py-2 text-sm flex items-center justify-between outline-none cursor-move;
+}
+
+.grid-fullscreen {
+    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none;
+    z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
+                /*  too high and it'll be over the top of stacks, etc. */
 }

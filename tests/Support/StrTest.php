@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class StrTest extends TestCase
 {
+    use Concerns\TestsIlluminateStr;
+
     /** @test */
     public function undefined_methods_get_passed_to_stringy()
     {
@@ -45,6 +47,24 @@ class StrTest extends TestCase
     /** @test */
     public function it_makes_slugs()
     {
+        // Assertions copied over from laravel/framework...
+        $this->assertEquals('hello-world', Str::slug('hello world'));
+        $this->assertEquals('hello-world', Str::slug('hello-world'));
+        $this->assertEquals('hello_world', Str::slug('hello_world')); // We allow underscores
+        $this->assertEquals('user-at-host', Str::slug('user@host'));
+        $this->assertEquals('سلام-دنیا', Str::slug('سلام دنیا', '-', null));
+        $this->assertEquals('sometext', Str::slug('some text', ''));
+        $this->assertEquals('', Str::slug('', ''));
+        $this->assertEquals('', Str::slug(''));
+        $this->assertEquals('bsm-allah', Str::slug('بسم الله', '-', 'en', ['allh' => 'allah']));
+        $this->assertEquals('500-dollar-bill', Str::slug('500$ bill', '-', 'en', ['$' => 'dollar']));
+        $this->assertEquals('500-dollar-bill', Str::slug('500--$----bill', '-', 'en', ['$' => 'dollar']));
+        $this->assertEquals('500-dollar-bill', Str::slug('500-$-bill', '-', 'en', ['$' => 'dollar']));
+        $this->assertEquals('500-dollar-bill', Str::slug('500$--bill', '-', 'en', ['$' => 'dollar']));
+        $this->assertEquals('500-dollar-bill', Str::slug('500-$--bill', '-', 'en', ['$' => 'dollar']));
+        $this->assertEquals('أحمد-في-المدرسة', Str::slug('أحمد@المدرسة', '-', null, ['@' => 'في']));
+
+        // Test that we respect respect `config('statamic.system.ascii_replace_extra_symbols')`...
         $this->assertEquals('foo-bar-baz', Str::slug('foo bar % baz'));
         $this->assertEquals('foo-bar-baz', Str::slug('Foo Bar % Baz'));
         $this->assertEquals('foo-bar-baz', Str::slug('foo-bar-%-baz'));
@@ -152,11 +172,11 @@ class StrTest extends TestCase
     /** @test */
     public function it_makes_tailwind_width_classes()
     {
-        $this->assertEquals('w-1/4', Str::tailwindWidthClass(25));
-        $this->assertEquals('w-1/3', Str::tailwindWidthClass(33));
-        $this->assertEquals('w-1/2', Str::tailwindWidthClass(50));
-        $this->assertEquals('w-2/3', Str::tailwindWidthClass(66));
-        $this->assertEquals('w-3/4', Str::tailwindWidthClass(75));
+        $this->assertEquals('w-full @lg:w-1/4', Str::tailwindWidthClass(25));
+        $this->assertEquals('w-full @lg:w-1/3', Str::tailwindWidthClass(33));
+        $this->assertEquals('w-full @lg:w-1/2', Str::tailwindWidthClass(50));
+        $this->assertEquals('w-full @lg:w-2/3', Str::tailwindWidthClass(66));
+        $this->assertEquals('w-full @lg:w-3/4', Str::tailwindWidthClass(75));
         $this->assertEquals('w-full', Str::tailwindWidthClass(100));
         $this->assertEquals('w-full', Str::tailwindWidthClass('foo'));
     }
@@ -180,15 +200,5 @@ class StrTest extends TestCase
         $this->assertFalse(Str::toBool('0'));
         $this->assertFalse(Str::toBool(''));
         $this->assertFalse(Str::toBool('-1'));
-    }
-
-    /**
-     * @test
-     *
-     * @see https://github.com/statamic/cms/pull/3698
-     **/
-    public function it_replaces_strings()
-    {
-        $this->assertEquals('FÒÔ bàř', Str::replace('fòô bàř', 'fòô', 'FÒÔ'));
     }
 }

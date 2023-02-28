@@ -7,14 +7,14 @@
 }
 
 .assets-fieldtype .assets-fieldtype-picker {
-    @apply flex items-center px-4 py-2 bg-gray-200 border rounded;
+    @apply flex flex-col @sm:flex-row items-start @sm:items-center px-4 py-2 bg-gray-200 border rounded;
 
     &.is-expanded {
         @apply border-b-0 rounded-b-none;
     }
 
     .asset-upload-control {
-      @apply ml-4;
+      @apply mt-2 @sm:ml-4 @sm:mt-0 text-xs text-gray-600 leading-tight;
     }
 
     .upload-text-button {
@@ -68,11 +68,3 @@
     display: none;
     .bard-set-solo & { display: block; }
 }
-
-
-
-/* Responsive Wangjangling
-  ========================================================================== */
-
-/*  hide the 'or drag to upload' text when too narrow */
-.assets-fieldtype .narrow .assets-fieldtype-picker .drag-drop-text { display: none; }

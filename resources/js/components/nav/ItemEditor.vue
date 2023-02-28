@@ -13,7 +13,7 @@
             </div>
 
             <div class="flex-1 overflow-auto p-6">
-                <div class="publish-fields publish-fields-narrow">
+                <div class="publish-fields">
 
                 <div class="publish-field mb-8" :class="{ 'has-error': validateDisplay }">
                     <div class="field-inner">

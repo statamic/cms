@@ -428,7 +428,7 @@ class NavItem
     public static function snakeCase($string)
     {
         $string = Str::modifyMultiple($string, ['lower', 'snake']);
-        $string = Str::replace($string, '-', '_');
+        $string = Str::replace('-', '_', $string);
 
         return $string;
     }

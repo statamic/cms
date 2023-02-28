@@ -37,7 +37,6 @@ import Vuex from 'vuex';
 import StatamicStore from './store';
 import Popover  from 'vue-js-popover'
 import VTooltip from 'v-tooltip'
-import ReactiveProvide from 'vue-reactive-provide';
 import vSelect from 'vue-select'
 import VCalendar from 'v-calendar';
 
@@ -77,7 +76,6 @@ Vue.use(PortalVue)
 Vue.use(VModal, { componentName: 'vue-modal' })
 Vue.use(VTooltip)
 Vue.use(Vuex);
-Vue.use(ReactiveProvide);
 Vue.use(VCalendar);
 
 Vue.component(vSelect)
@@ -211,7 +209,8 @@ Statamic.app({
         showBanner: true,
         portals: [],
         panes: [],
-        appendedComponents: []
+        appendedComponents: [],
+        hideOverflow: false,
     },
 
     computed: {
@@ -226,6 +225,18 @@ Statamic.app({
 
         wrapperClass() {
             return this.$config.get('wrapperClass', 'max-w-xl');
+        }
+
+    },
+
+    watch: {
+
+        hideOverflow(hide) {
+            if (hide) {
+                document.body.style.setProperty('overflow', 'hidden')
+            } else {
+                document.body.style.removeProperty('overflow');
+            }
         }
 
     },

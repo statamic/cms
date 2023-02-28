@@ -1,6 +1,5 @@
 <template>
-    <element-container @resized="containerWidth = $event.width">
-    <div :class="{ 'narrow': containerWidth < 500, 'really-narrow': containerWidth < 280, 'extremely-narrow': containerWidth < 180 }">
+    <div class="@container">
 
         <uploader
             ref="uploader"
@@ -33,11 +32,11 @@
                         @click="openSelector"
                         @keyup.space.enter="openSelector"
                         tabindex="0">
-                        <svg-icon name="folder-image" class="w-6 h-6 text-gray-800"></svg-icon>
+                        <svg-icon name="folder-image" class="w-4 h-4 text-gray-800"></svg-icon>
                         {{ __('Browse') }}
                     </button>
 
-                    <p class="asset-upload-control text-xs text-gray-600" v-if="config.allow_uploads">
+                    <p class="asset-upload-control" v-if="config.allow_uploads">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
@@ -184,7 +183,6 @@ export default {
             uploads: [],
             innerDragging: false,
             displayMode: 'grid',
-            containerWidth: null,
         };
     },
 

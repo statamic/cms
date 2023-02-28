@@ -17,7 +17,7 @@ button {
     padding: .475rem 1.25rem;
 
     &:focus {
-        @apply focus-outline;
+        @apply ring-2 outline-none;
     }
 
     &:disabled {
@@ -181,6 +181,9 @@ button {
         padding: .475rem .5rem;
         &.btn-flat { @apply border-r-0; }
     }
+    .btn:focus {
+        @apply ring-inset;
+    }
 }
 
 
@@ -239,19 +242,14 @@ td .btn-icon {
   ========================================================================== */
 
 .btn-close {
-    @apply ml-4 p-0 text-xl text-gray-600 rounded-full;
-    height: 32px;
-    width: 32px;
-    line-height: 32px;
-    flex-shrink: 0;
-    outline: none;
+    @apply ml-4 p-0 text-xl text-gray-600 rounded-full w-8 h-8 outline-none shrink-0 leading-none;
 
     &:hover {
-        background: rgba(0,0,0,.05);
+        @apply bg-gray-400;
     }
 
     &:active, &:focus:hover {
         outline: none;
-        background: rgba(0,0,0,.075);
+        @apply bg-gray-500;
     }
 }
