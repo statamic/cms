@@ -91,6 +91,7 @@ class Environment
     protected $interpolationKeys = [];
     protected $assignments = [];
     protected $dataManagerInterpolations = [];
+    private $protectedScopes = ['view'];
 
     /**
      * @var LanguageOperatorManager|null
@@ -938,10 +939,12 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $right;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $right;
 
-                if (array_key_exists($lastPath, GlobalRuntimeState::$tracedRuntimeAssignments)) {
-                    GlobalRuntimeState::$tracedRuntimeAssignments[$lastPath] = $right;
+                    if (array_key_exists($lastPath, GlobalRuntimeState::$tracedRuntimeAssignments)) {
+                        GlobalRuntimeState::$tracedRuntimeAssignments[$lastPath] = $right;
+                    }
                 }
 
                 return null;
@@ -983,7 +986,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $newVal;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $newVal;
+                }
 
                 return null;
             } elseif ($operand instanceof DivisionAssignmentOperator) {
@@ -1010,7 +1015,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof ModulusAssignmentOperator) {
@@ -1036,7 +1043,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof MultiplicationAssignmentOperator) {
@@ -1062,7 +1071,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof SubtractionAssignmentOperator) {
@@ -1088,7 +1099,9 @@ class Environment
                     $lastPath = $varName->pathParts[0]->name;
                 }
 
-                $this->assignments[$lastPath] = $assignValue;
+                if (! in_array($lastPath, $this->protectedScopes)) {
+                    $this->assignments[$lastPath] = $assignValue;
+                }
 
                 return null;
             } elseif ($operand instanceof ConditionalVariableFallbackOperator) {
