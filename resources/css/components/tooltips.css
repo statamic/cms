@@ -2,16 +2,6 @@
    TOOLTIPS
    ========================================================================== */
 
-div[data-popover="tooltip"] {
-    @apply w-auto bg-gray-800 px-2 text-center text-white;
-    width: auto !important;
-
-    &.dropdown-position-top:before { border-top-color: theme('colors.blue.DEFAULT'); }
-    &.dropdown-position-bottom:before { border-bottom-color: theme('colors.blue.DEFAULT'); }
-    &.dropdown-position-left:before { border-left-color: theme('colors.blue.DEFAULT'); }
-    &.dropdown-position-right:before { border-right-color: theme('colors.blue.DEFAULT'); }
-}
-
 .tooltip {
   display: block !important;
   z-index: 10000;
