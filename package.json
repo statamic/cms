@@ -72,7 +72,7 @@
     "resize-observer-polyfill": "^1.5.1",
     "speakingurl": "^14.0.1",
     "striptags": "^3.2.0",
-    "svgo": "^2.6.1",
+    "svgo": "^3.0.0",
     "underscore": "~1.13.2",
     "uniqid": "^5.2.0",
     "v-calendar": "^2.3.0",
