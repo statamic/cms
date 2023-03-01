@@ -29,13 +29,13 @@ import './bootstrap/mixins';
 import './bootstrap/components';
 import './bootstrap/fieldtypes';
 import './bootstrap/directives';
+import './bootstrap/tooltips';
 
 import axios from 'axios';
 import PortalVue from "portal-vue";
 import VModal from "vue-js-modal";
 import Vuex from 'vuex';
 import StatamicStore from './store';
-import VTooltip from 'v-tooltip'
 import vSelect from 'vue-select'
 import VCalendar from 'v-calendar';
 
@@ -72,7 +72,6 @@ window.moment = Vue.moment = Vue.prototype.$moment = Moment;
 
 Vue.use(PortalVue)
 Vue.use(VModal, { componentName: 'vue-modal' })
-Vue.use(VTooltip)
 Vue.use(Vuex);
 Vue.use(VCalendar);
 
