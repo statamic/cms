@@ -1192,7 +1192,6 @@ param2: "the inner partial param2"
 Inner Partial: {{ view.param1 }}-{{ view.param2 }}
 PARTIAL;
 
-
         $this->viewShouldReturnRaw('test', $partial);
         $this->viewShouldReturnRaw('test_two', $partialTwo);
 
