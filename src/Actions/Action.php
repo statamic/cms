@@ -14,10 +14,23 @@ abstract class Action implements Arrayable
 
     protected static $binding = 'actions';
 
+    protected $items;
     protected $confirm = true;
     protected $dangerous = false;
     protected $fields = [];
     protected $context = [];
+
+    public function __construct()
+    {
+        $this->items = collect();
+    }
+
+    public function items($items)
+    {
+        $this->items = collect($items);
+
+        return $this;
+    }
 
     public function visibleTo($item)
     {
@@ -102,7 +115,7 @@ abstract class Action implements Arrayable
             'warningText' => $this->warningText(),
             'dangerous' => $this->dangerous,
             'fields' => $this->fields()->toPublishArray(),
-            'values' => $this->fields()->values(),
+            'values' => $this->fields()->preProcess()->values(),
             'meta' => $this->fields()->meta(),
             'context' => $this->context,
         ];

@@ -48,6 +48,20 @@ class GlideTest extends TestCase
         $this->assertEquals('https://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag(true));
     }
 
+    /**
+     * @test
+     */
+    public function it_outputs_a_data_url()
+    {
+        $this->createImageInPublicDirectory();
+
+        $tag = <<<'EOT'
+{{ glide:data_url :src="foo" }}
+EOT;
+
+        $this->assertStringStartsWith('data:image/jpeg;base64', (string) Parse::template($tag, ['foo' => 'bar.jpg']));
+    }
+
     public function relativeRouteUrl($app)
     {
         $this->configureGlideCacheDiskWithUrl($app, '/glide');

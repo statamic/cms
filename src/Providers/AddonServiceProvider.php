@@ -13,11 +13,14 @@ use Statamic\Actions\Action;
 use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Fieldset;
+use Statamic\Facades\File;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Tags;
 use Statamic\UpdateScripts\UpdateScript;
@@ -103,6 +106,11 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $externalScripts = [];
 
     /**
+     * @var list<string> - URLs of Vite entry points
+     */
+    protected $vite = null;
+
+    /**
      * Map of path on disk to name in the public directory. The file will be published
      * as `vendor/{packageName}/{value}`.
      *
@@ -131,6 +139,11 @@ abstract class AddonServiceProvider extends ServiceProvider
      * @var list<class-string<UpdateScript>>
      */
     protected $updateScripts = [];
+
+    /**
+     * @var string
+     */
+    protected $fieldsetNamespace;
 
     /**
      * @var string
@@ -173,6 +186,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootPolicies()
                 ->bootStylesheets()
                 ->bootScripts()
+                ->bootVite()
                 ->bootPublishables()
                 ->bootConfig()
                 ->bootTranslations()
@@ -180,6 +194,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootMiddleware()
                 ->bootUpdateScripts()
                 ->bootViews()
+                ->bootFieldsets()
                 ->bootPublishAfterInstall()
                 ->bootAddon();
         });
@@ -316,6 +331,15 @@ abstract class AddonServiceProvider extends ServiceProvider
 
         foreach ($this->externalScripts as $url) {
             $this->registerExternalScript($url);
+        }
+
+        return $this;
+    }
+
+    protected function bootVite()
+    {
+        if ($this->vite) {
+            $this->registerVite($this->vite);
         }
 
         return $this;
@@ -516,6 +540,33 @@ abstract class AddonServiceProvider extends ServiceProvider
         Statamic::script($name, "{$filename}.js?v={$version}");
     }
 
+    public function registerVite($config)
+    {
+        $name = $this->getAddon()->packageName();
+        $directory = $this->getAddon()->directory();
+
+        if (is_string($config) || ! Arr::isAssoc($config)) {
+            $config = ['input' => $config];
+        }
+
+        $publicDirectory = $config['publicDirectory'] ?? 'public';
+        $buildDirectory = $config['buildDirectory'] ?? 'build';
+        $hotFile = $config['hotFile'] ?? "{$directory}{$publicDirectory}/hot";
+        $input = $config['input'];
+
+        $publishSource = "{$directory}{$publicDirectory}/{$buildDirectory}/";
+        $publishTarget = public_path("vendor/{$name}/{$buildDirectory}/");
+        $this->publishes([
+            $publishSource => $publishTarget,
+        ], $this->getAddon()->slug());
+
+        Statamic::vite($name, [
+            'hotFile' => $hotFile,
+            'buildDirectory' => "vendor/{$name}/{$buildDirectory}",
+            'input' => $input,
+        ]);
+    }
+
     public function registerExternalScript(string $url)
     {
         Statamic::externalScript($url);
@@ -539,7 +590,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         Statamic::externalStyle($url);
     }
 
-    protected function schedule($schedule)
+    protected function schedule(Schedule $schedule)
     {
         //
     }
@@ -586,6 +637,20 @@ abstract class AddonServiceProvider extends ServiceProvider
                 '--force' => true,
             ]);
         });
+
+        return $this;
+    }
+
+    protected function bootFieldsets()
+    {
+        if (! file_exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
+            return $this;
+        }
+
+        Fieldset::addNamespace(
+            $this->fieldsetNamespace ?? $this->getAddon()->slug(),
+            $path
+        );
 
         return $this;
     }

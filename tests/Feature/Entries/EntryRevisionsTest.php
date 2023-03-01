@@ -21,6 +21,9 @@ class EntryRevisionsTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
+    private $dir;
+    private $collection;
+
     public function setUp(): void
     {
         parent::setUp();

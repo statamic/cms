@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Utility;
+use Statamic\Http\Middleware\RequireStatamicPro;
 use Statamic\Statamic;
 
 Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
@@ -134,7 +135,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('assets/actions', 'ActionController@run')->name('assets.actions.run');
         Route::post('assets/actions/list', 'ActionController@bulkActions')->name('assets.actions.bulk');
         Route::get('assets/browse', 'BrowserController@index')->name('assets.browse.index');
-        Route::get('assets/browse/search/{asset_container}/{path?}', 'BrowserController@search');
+        Route::get('assets/browse/search/{asset_container}/{path?}', 'BrowserController@search')->where('path', '.*');
         Route::post('assets/browse/folders/{asset_container}/actions', 'FolderActionController@run')->name('assets.folders.actions.run');
         Route::get('assets/browse/folders/{asset_container}/{path?}', 'BrowserController@folder')->where('path', '.*');
         Route::get('assets/browse/{asset_container}/{path?}/edit', 'BrowserController@edit')->where('path', '.*')->name('assets.browse.edit');
@@ -199,8 +200,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('account', 'AccountController')->name('account');
         Route::resource('user-groups', 'UserGroupsController');
         Route::resource('roles', 'RolesController');
-        Route::resource('preferences', 'PreferenceController')->except('destroy');
-        Route::post('preferences/{key}/delete', 'PreferenceController@destroy')->name('preferences.destroy');
     });
 
     Route::post('user-exists', 'Users\UserWizardController')->name('user.exists');
@@ -220,11 +219,44 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
         Route::get('relationship/filters', 'RelationshipFieldtypeController@filters')->name('relationship.filters');
         Route::post('markdown', 'MarkdownFieldtypeController@preview')->name('markdown.preview');
+        Route::post('files/upload', 'FilesFieldtypeController@upload')->name('files.upload');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.', 'namespace' => 'API'], function () {
         Route::resource('addons', 'AddonsController');
         Route::resource('templates', 'TemplatesController');
+    });
+
+    Route::group(['prefix' => 'preferences', 'as' => 'preferences.', 'namespace' => 'Preferences'], function () {
+        Route::get('/', 'PreferenceController@index')->name('index');
+        Route::get('edit', 'UserPreferenceController@edit')->name('user.edit');
+        Route::patch('/', 'UserPreferenceController@update')->name('user.update');
+
+        Route::middleware([RequireStatamicPro::class, 'can:manage preferences'])->group(function () {
+            Route::get('roles/{role}/edit', 'RolePreferenceController@edit')->name('role.edit');
+            Route::patch('roles/{role}', 'RolePreferenceController@update')->name('role.update');
+            Route::get('default/edit', 'DefaultPreferenceController@edit')->name('default.edit');
+            Route::patch('default', 'DefaultPreferenceController@update')->name('default.update');
+        });
+
+        Route::post('js', 'PreferenceController@store')->name('store');
+        Route::delete('js/{key}', 'PreferenceController@destroy')->name('destroy');
+
+        Route::group(['prefix' => 'nav', 'as' => 'nav.', 'namespace' => 'Nav'], function () {
+            Route::get('/', 'NavController@index')->name('index');
+            Route::get('edit', 'UserNavController@edit')->name('user.edit');
+            Route::patch('/', 'UserNavController@update')->name('user.update');
+            Route::delete('/', 'UserNavController@destroy')->name('user.destroy');
+
+            Route::middleware([RequireStatamicPro::class, 'can:manage preferences'])->group(function () {
+                Route::get('roles/{role}/edit', 'RoleNavController@edit')->name('role.edit');
+                Route::patch('roles/{role}', 'RoleNavController@update')->name('role.update');
+                Route::delete('roles/{role}', 'RoleNavController@destroy')->name('role.destroy');
+                Route::get('default/edit', 'DefaultNavController@edit')->name('default.edit');
+                Route::patch('default', 'DefaultNavController@update')->name('default.update');
+                Route::delete('default', 'DefaultNavController@destroy')->name('default.destroy');
+            });
+        });
     });
 
     Route::get('session-timeout', 'SessionTimeoutController')->name('session.timeout');

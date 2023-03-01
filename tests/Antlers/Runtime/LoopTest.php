@@ -8,9 +8,14 @@ use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
 use Tests\Antlers\ParserTestCase;
+use Tests\FakesContent;
+use Tests\FakesViews;
 
 class LoopTest extends ParserTestCase
 {
+    use FakesViews,
+        FakesContent;
+
     public function test_non_sequential_numeric_keys_are_not_treated_as_associative_arrays()
     {
         // Non-sequential numeric keys are not treated as associative arrays
@@ -148,34 +153,90 @@ EOT;
         $this->assertTrue($isPaired);
     }
 
-    public function test_runtime_does_not_attempt_evaluate_modifiers_twice()
+    public function test_modified_value_is_used_each_iteration()
     {
-        mt_srand(1234);
-
         $data = [
-            'widths' => [
-                '25',
-                '50',
-                '75',
-            ],
+            'items' => ['a', 'b', 'c'],
         ];
 
+        // without mirroring modifier in closing tag
         $template = <<<'EOT'
-{{ loop from="1" to="10" }}<{{ value }}><{{ widths | shuffle | limit:1 }}width-{{ value }}{{ /widths }}><{{ value }}>{{ unless last }}|{{ /unless}}{{ /loop }}
+{{ loop from="1" to="3" }}<{{ value }}{{ items | limit:1 }}{{ value }}{{ /items }}{{ value }}>{{ /loop }}
 EOT;
 
+        $expected = '<1a1><2a2><3a3>'; // only "a" should be output in each iteration since limit:1 is used.
+
+        $this->assertSame($expected, $this->renderString($template, $data, true));
+
+        // mirror modifiers in closing tag
+        $template = <<<'EOT'
+{{ loop from="1" to="3" }}<{{ value }}{{ items | limit:1 }}{{ value }}{{ /items | limit:1 }}{{ value }}>{{ /loop }}
+EOT;
+
+        $this->assertSame($expected, $this->renderString($template, $data, true));
+    }
+
+    public function test_runtime_maintains_scope_on_nested_loops()
+    {
+        $this->createPage('home', [
+            'with' => [
+                'title' => 'Home Page',
+                'template' => 'home',
+            ],
+        ]);
+
+        $this->createPage('about', ['with' => ['title' => 'About Page']]);
+        $this->createPage('contact', ['with' => ['title' => 'Contact Page']]);
+
+        $template = <<<'TEMPLATE'
+<start:{{ title }}>
+{{ test = -1; }}
+{{ outer = [1] }}
+<outer_start:{{ title }}>{{ test = 0; }}
+{{ pages = {collection:pages} }}
+<inside_loop:{{ title }}>
+{{ partial:test }}{{ test = 1; }}
+{{ /pages }}
+<outer_end:{{ title }}>
+{{ /outer }}
+<end:{{ title }}:{{ test }}>
+TEMPLATE;
+
+        $partial = <<<'PARTIAL'
+<partial:{{ title }}>
+PARTIAL;
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('home', $template);
+        $this->viewShouldReturnRaw('test', $partial);
         $expected = <<<'EXPECTED'
-<1><width-75><1>|<2><width-75><2>|<3><width-50><3>|<4><width-75><4>|<5><width-25><5>|<6><width-75><6>|<7><width-75><7>|<8><width-50><8>|<9><width-50><9>|<10><width-50><10>
+<start:Home Page>
+
+
+<outer_start:Home Page>
+
+<inside_loop:About Page>
+<partial:About Page>
+
+<inside_loop:Contact Page>
+<partial:Contact Page>
+
+<inside_loop:Home Page>
+<partial:Home Page>
+
+<outer_end:Home Page>
+
+<end:Home Page:1>
 EXPECTED;
 
-        $this->assertSame($expected, $this->renderString($template, $data, true));
+        $response = $this->get('/home')
+            ->assertStatus(200);
 
-        mt_srand(1234);
-
-        $template = <<<'EOT'
-{{ loop from="1" to="10" }}<{{ value }}><{{ widths | shuffle | limit:1 }}width-{{ value }}{{ /widths | shuffle | limit:1 }}><{{ value }}>{{ unless last }}|{{ /unless }}{{ /loop }}
-EOT;
-
-        $this->assertSame($expected, $this->renderString($template, $data, true));
+        $responseContent = trim($response->getContent());
+        $this->assertSame(
+            StringUtilities::normalizeLineEndings($expected),
+            StringUtilities::normalizeLineEndings($responseContent)
+        );
     }
 }

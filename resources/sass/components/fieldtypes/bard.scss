@@ -16,6 +16,10 @@
     @apply p-1 min-h-48;
 }
 
+.bard-editor .bard-invalid {
+    @apply p-1 bg-red-lighter text-red text-xs whitespace-no-wrap;
+}
+
 // Modes
 .bard-editor.mode\:read-only .ProseMirror {
     @apply bg-grey-30 text-grey-70;
@@ -25,9 +29,19 @@
     min-height: 80px;
 }
 
+.bard-editor.mode\:inline .ProseMirror {
+    @apply p-1;
+    min-height: 38px;
+    p {
+        margin-bottom: 0;
+        line-height: 1.375; // 22px
+    }
+}
+
 // Responive Wangjangling
 @screen md {
     .bard-editor .ProseMirror { @apply p-2; }
+    .bard-editor .bard-invalid { @apply px-2; }
 }
 
 .bard-fixed-toolbar {
@@ -115,14 +129,8 @@
 }
 
 .bard-floating-toolbar {
-    @apply flex bg-black rounded-full absolute shadow-lg px-0 opacity-0 invisible;
-    transform: translateX(-50%) translateY(-10px);
+    @apply flex bg-black rounded-full shadow-lg px-0;
     white-space: nowrap;
-    z-index: 1000;
-
-    &.active {
-        @apply opacity-100 visible;
-    }
 
     &:before {
         content: '';
@@ -178,6 +186,10 @@
     }
 }
 
+.bard-set:active .sortable-handle:hover ~ * .popover {
+    display: none;
+}
+
 .bard-set.has-error > .replicator-set-header label {
     color: $color_red;
 }
@@ -186,10 +198,6 @@
   ========================================================================== */
 
 .bard-set-selector {
-    position: absolute;
-    left: -20px;
-    margin-top: -6px;
-    z-index: 6;
     // transition: all .15s ease-in-out;
 
     .dropdown-menu {
@@ -229,9 +237,9 @@
         > p > code, > pre code {
             @apply bg-grey-30;
         }
-        
+
         // To remove min height from nested bard fields inside bard in fullscreen mode.
-        * > .ProseMirror { 
+        * > .ProseMirror {
             min-height: auto;
         }
     }
@@ -480,6 +488,17 @@
         line-height: 1.8;
     }
 }
+
+/* Placeholder
+========================================================================== */
+
+.bard-fieldtype .ProseMirror > p.is-editor-empty:first-child::before {
+    @apply text-grey-60;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+}  
 
 /* Link toolbar
   ========================================================================== */

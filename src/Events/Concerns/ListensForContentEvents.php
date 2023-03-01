@@ -16,6 +16,7 @@ trait ListensForContentEvents
         \Statamic\Events\AssetFolderDeleted::class,
         \Statamic\Events\AssetFolderSaved::class,
         \Statamic\Events\AssetSaved::class,
+        \Statamic\Events\AssetReuploaded::class,
         \Statamic\Events\AssetReferencesUpdated::class,
         \Statamic\Events\BlueprintDeleted::class,
         \Statamic\Events\BlueprintSaved::class,
@@ -50,6 +51,7 @@ trait ListensForContentEvents
         \Statamic\Events\UserGroupDeleted::class,
         \Statamic\Events\UserGroupSaved::class,
         \Statamic\Events\UserSaved::class,
+        \Statamic\Events\DefaultPreferencesSaved::class,
         \Statamic\Events\DuplicateIdRegenerated::class,
     ];
 }

@@ -118,6 +118,10 @@ export default {
 
         storeState() {
             return this.$store.state.publish[this.storeName] || {};
+        },
+
+        replicatorPreview() {
+            return `${this.config.display}: ${__n(':count set|:count sets', this.value.length)}`;
         }
     },
 
@@ -144,7 +148,7 @@ export default {
         addSet(handle, index) {
             const set = {
                 ...this.meta.defaults[handle],
-                _id: `set-${uniqid()}`,
+                _id: uniqid(),
                 type: handle,
                 enabled: true,
             };
@@ -167,7 +171,7 @@ export default {
             const old = this.value[index];
             const set = {
                 ...old,
-                _id: `set-${uniqid()}`,
+                _id: uniqid(),
             };
 
             this.updateSetPreviews(set._id, {});

@@ -2,9 +2,7 @@
 
 namespace Statamic\GraphQL\Types;
 
-use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\GraphQL;
-use Statamic\Fields\Value;
 
 class ReplicatorSetType extends \Rebing\GraphQL\Support\Type
 {
@@ -20,23 +18,22 @@ class ReplicatorSetType extends \Rebing\GraphQL\Support\Type
 
     public function fields(): array
     {
-        return $this->fieldtype->fields($this->handle)->toGql()
+        $fields = $this->fieldtype->fields($this->handle)->toGql();
+
+        return $fields
             ->merge([
+                'id' => [
+                    'type' => GraphQL::string(),
+                ],
                 'type' => [
                     'type' => GraphQL::nonNull(GraphQL::string()),
                 ],
             ])
-            ->map(function ($field) {
-                $field['resolve'] = function ($row, $args, $context, $info) {
-                    $value = $row[$info->fieldName];
-
-                    $value = $value instanceof Value ? $value->value() : $value;
-
-                    if ($value instanceof Builder) {
-                        $value = $value->get();
-                    }
-
-                    return $value;
+            ->map(function ($field) use ($fields) {
+                $field['resolve'] = function ($row, $args, $context, $info) use ($fields) {
+                    return ($resolver = $fields[$info->fieldName]['resolve'] ?? null)
+                        ? $resolver($row, $args, $context, $info)
+                        : $row[$info->fieldName];
                 };
 
                 return $field;

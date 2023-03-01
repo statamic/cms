@@ -2,6 +2,7 @@
 
 namespace Tests\Antlers\Runtime;
 
+use Illuminate\Support\Facades\Log;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
 
@@ -84,5 +85,24 @@ EOT;
 EOT;
 
         $this->assertSame('<The Content>', $this->renderString($template, ['content' => 'The Content'], true));
+    }
+
+    public function test_named_slots_do_not_end_up_in_the_log_as_loopable_variable_warnnig()
+    {
+        $template = <<<'EOT'
+{{ partial:card }}
+{{ slot:bottom }}
+<span>I am the new content!</span>
+{{ /slot:bottom }}
+
+Test description.
+{{ /partial:card }}
+EOT;
+
+        Log::shouldReceive('debug')->never();
+
+        $this->renderString($template, [
+            'title' => 'Test Title',
+        ], true);
     }
 }

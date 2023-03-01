@@ -20,6 +20,10 @@ class EntryRepositoryTest extends TestCase
 {
     use UnlinksPaths;
 
+    private $stache;
+    private $directory;
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -149,15 +153,29 @@ class EntryRepositoryTest extends TestCase
         $this->assertNull($this->repo->findBySlug('unknown-slug', 'unknown-collection'));
     }
 
-    /** @test */
-    public function it_gets_entry_by_uri()
+    /**
+     * @test
+     * @dataProvider entryByUriProvider
+     */
+    public function it_gets_entry_by_uri($uri, $expectedTitle)
     {
-        $entry = $this->repo->findByUri('/alphabetical/bravo');
+        $entry = $this->repo->findByUri($uri);
 
-        $this->assertInstanceOf(Entry::class, $entry);
-        $this->assertEquals('Bravo', $entry->get('title'));
+        if ($expectedTitle) {
+            $this->assertInstanceOf(Entry::class, $entry);
+            $this->assertEquals($expectedTitle, $entry->get('title'));
+        } else {
+            $this->assertNull($entry);
+        }
+    }
 
-        $this->assertNull($this->repo->findByUri('/unknown'));
+    public function entryByUriProvider()
+    {
+        return [
+            'case sensitive' => ['/alphabetical/bravo', 'Bravo'],
+            'case insensitive' => ['/alphabetical/BrAvO', null],
+            'missing' => ['/unknown', null],
+        ];
     }
 
     /** @test */

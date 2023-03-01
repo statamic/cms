@@ -68,7 +68,7 @@ class Columns extends Collection
             ->keyBy(function ($column, $key) use ($preferred) {
                 $preferredKey = array_search($column->field(), $preferred ?? []);
 
-                return $preferredKey !== false ? '_'.$preferredKey : $key + 1;
+                return $preferredKey !== false ? $preferredKey : $key + 10000;
             })
             ->sortKeys()
             ->map(function ($column) use ($preferred) {

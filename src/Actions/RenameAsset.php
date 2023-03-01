@@ -35,7 +35,11 @@ class RenameAsset extends Action
 
     public function run($assets, $values)
     {
-        return $assets->each->rename($values['filename'], true);
+        $ids = $assets->each->rename($values['filename'], true)->map->id()->all();
+
+        return [
+            'ids' => $ids,
+        ];
     }
 
     protected function fieldItems()
@@ -45,6 +49,8 @@ class RenameAsset extends Action
                 'type' => 'text',
                 'validate' => 'required', // TODO: Better filename validation
                 'classes' => 'mousetrap',
+                'focus' => true,
+                'placeholder' => $this->items->containsOneItem() ? $this->items->first()->filename() : null,
             ],
         ];
     }
