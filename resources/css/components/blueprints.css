@@ -22,7 +22,7 @@
 }
 
 .blueprint-section-field {
-    @apply relative mb-2 px-1 z-10 outline-none;
+    @apply relative mb-2 px-1 z-10 outline-none text-sm;
 
     .blueprint-section-field-inner {
         @apply relative border rounded bg-gray-200 shadow-sm flex outline-none z-10;
