@@ -20,6 +20,7 @@
         cursor: grab;
         background-color: hsla(210, 30%, 95%, .5);
         background-image: url('../../svg/drag-dots.svg');
+        background-size: 7px 17px;
         background-position: center center;
         background-repeat: no-repeat;
         &:hover { @apply bg-gray-300; }

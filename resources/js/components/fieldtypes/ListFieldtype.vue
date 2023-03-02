@@ -33,7 +33,9 @@
                     </span>
                     <span v-else @click.prevent="editItem(index)">
                         <span class="sortable-handle">{{ item.value }}</span>
-                        <i class="delete" @click="deleteItem(index)"></i>
+                        <button class="delete" @click="deleteItem(index)">
+                            <svg-icon name="delete-x" />
+                        </button>
                     </span>
                 </template>
             </li>
@@ -139,9 +141,9 @@ export default {
 
             const value = event.clipboardData.getData('text');
             if (!value.includes("\n")) {
-                return;                
+                return;
             }
-            
+
             value.split("\n").forEach((item) => {
                 this.data.push(this.newSortableValue(item));
             });
