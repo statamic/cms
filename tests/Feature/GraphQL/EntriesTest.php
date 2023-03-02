@@ -247,7 +247,11 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @environment-setup disableQueries
+     * @environment-setup allowFiltersOnAllCollections
+     */
     public function it_filters_entries()
     {
         $this->createEntries();
@@ -302,7 +306,11 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @environment-setup disableQueries
+     * @environment-setup allowFiltersOnAllCollections
+     */
     public function it_filters_entries_with_equalto_shorthand()
     {
         $this->createEntries();
@@ -332,7 +340,11 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @environment-setup disableQueries
+     * @environment-setup allowFiltersOnAllCollections
+     */
     public function it_filters_entries_with_multiple_conditions_of_the_same_type()
     {
         $this->createEntries();
@@ -481,7 +493,11 @@ GQL;
             ]]]]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @environment-setup disableQueries
+     * @environment-setup allowFiltersOnAllCollections
+     */
     public function it_only_shows_published_entries_by_default()
     {
         $this->createEntries();
@@ -588,5 +604,14 @@ GQL;
                 ->assertExactJson(['data' => ['entries' => ['data' => [
                     ['id' => '1', 'title' => 'Standard Blog Post'],
                 ]]]]);
+    }
+
+    protected function allowFiltersOnAllCollections($app)
+    {
+        $app->config->set('statamic.graphql.resources.collections', [
+            '*' => [
+                'allowed_filters' => ['title', 'status', 'published'],
+            ],
+        ]);
     }
 }
