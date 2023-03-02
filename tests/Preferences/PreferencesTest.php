@@ -25,7 +25,7 @@ class PreferencesTest extends TestCase
     public function it_registers_with_string_and_field_definition()
     {
         $preferences = new Preferences;
-        $this->assertEquals([], $preferences->sections()->all());
+        $this->assertEquals([], $preferences->tabs()->all());
 
         $preferences->register('foo', ['type' => 'text']);
 
@@ -36,14 +36,14 @@ class PreferencesTest extends TestCase
                     'foo' => ['type' => 'text'],
                 ],
             ],
-        ], $preferences->sections()->all());
+        ], $preferences->tabs()->all());
     }
 
     /** @test */
     public function it_registers_by_returning_array_from_extend_closure()
     {
         $preferences = new Preferences;
-        $this->assertEquals([], $preferences->sections()->all());
+        $this->assertEquals([], $preferences->tabs()->all());
 
         $preferences->extend(function () {
             return [
@@ -72,7 +72,7 @@ class PreferencesTest extends TestCase
             ];
         });
 
-        $this->assertEquals([], $preferences->sections()->all());
+        $this->assertEquals([], $preferences->tabs()->all());
 
         $preferences->boot();
 
@@ -90,7 +90,7 @@ class PreferencesTest extends TestCase
                     'baz' => ['type' => 'text'],
                 ],
             ],
-        ], $preferences->sections()->all());
+        ], $preferences->tabs()->all());
     }
 
     /** @test */
@@ -125,7 +125,7 @@ class PreferencesTest extends TestCase
 
         $preferences->boot();
 
-        $fields = collect($preferences->sections()->get('general')['fields'])->keys()->all();
+        $fields = collect($preferences->tabs()->get('general')['fields'])->keys()->all();
 
         $this->assertEquals(['three', 'one', 'two'], $fields);
     }

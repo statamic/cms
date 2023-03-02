@@ -9,7 +9,7 @@
                 </div>
             </header>
 
-            <div class="card p-0 mb-6 configure-section publish-fields @container">
+            <div class="card p-0 mb-6 configure-tab publish-fields @container">
 
                 <form-group
                     handle="title"

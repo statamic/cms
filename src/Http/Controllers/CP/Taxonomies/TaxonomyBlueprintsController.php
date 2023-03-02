@@ -49,7 +49,7 @@ class TaxonomyBlueprintsController extends CpController
     {
         $request->validate([
             'title' => 'required',
-            'sections' => 'array',
+            'tabs' => 'array',
         ]);
 
         $this->updateBlueprint($request, $taxonomy->termBlueprint($blueprint));

@@ -15,13 +15,13 @@ class FieldsetFactory
         return $this;
     }
 
-    public function withSections($sections)
+    public function withTabs($tabs)
     {
         if (! $this->contents) {
             $this->contents = [];
         }
 
-        $this->contents['sections'] = $sections;
+        $this->contents['tabs'] = $tabs;
 
         return $this;
     }

@@ -186,7 +186,7 @@ return [
     'session_expiry_logging_out_in_seconds' => 'Du har vært inaktiv en stund og vil bli logget ut om :seconds sekunder. Klikk for å forlenge økten.',
     'session_expiry_new_window' => 'Åpner et nytt vindu. Kom tilbake når du har logget deg inn.',
     'show_slugs_instructions' => 'Om permalenker skal vises i trevisningen eller ikke.',
-    'tab_sections_instructions' => 'Feltene i hver inndeling grupperes i faner. Opprett nye felter, bruk eksisterende felter om igjen eller importer hele grupper med felter fra eksisterende feltsett.',
+    'tabs_instructions' => 'Feltene i hver inndeling grupperes i faner. Opprett nye felter, bruk eksisterende felter om igjen eller importer hele grupper med felter fra eksisterende feltsett.',
     'taxonomies_blueprints_instructions' => 'Betingelser i denne taksonomien kan bruke en hvilken som helst av disse blueprintene.',
     'taxonomies_collections_instructions' => 'Samlingene som bruker denne taksonomien.',
     'taxonomies_preview_targets_instructions' => 'URL-ene som skal kunne vises i forhåndsvisning. Les mer i [dokumentasjon](https://statamic.dev/live-preview#preview-targets).',

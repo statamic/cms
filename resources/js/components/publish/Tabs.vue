@@ -4,7 +4,7 @@
     <div>
 
         <!-- Tabs -->
-        <div 
+        <div
             v-if="showTabs"
             class="tabs-container flex items-center"
             :class="{ 'offset-for-sidebar': shouldShowSidebar }"
@@ -24,21 +24,21 @@
                 @mousewheel.prevent="scrollTabs"
                 @scroll="updateScrollHints"
             >
-                <button v-for="section in mainSections"
+                <button v-for="tab in mainTabs"
                     class="tab-button"
-                    :ref="section.handle + '-tab'"
-                    :key="section.handle"
+                    :ref="tab.handle + '-tab'"
+                    :key="tab.handle"
                     :class="{
-                        'active': isActive(section.handle),
-                        'has-error': sectionHasError(section.handle),
+                        'active': isActive(tab.handle),
+                        'has-error': tabHasError(tab.handle),
                     }"
                     role="tab"
-                    :id="tabId(section.handle)"
-                    :aria-controls="tabPanelId(section.handle)"
-                    :aria-selected="isActive(section.handle)"
-                    :tabindex="isActive(section.handle) ? 0 : -1"
-                    @click="setActive(section.handle)"
-                    v-text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
+                    :id="tabId(tab.handle)"
+                    :aria-controls="tabPanelId(tab.handle)"
+                    :aria-selected="isActive(tab.handle)"
+                    :tabindex="isActive(tab.handle) ? 0 : -1"
+                    @click="setActive(tab.handle)"
+                    v-text="tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`"
                 />
             </div>
 
@@ -47,11 +47,11 @@
 
             <dropdown-list class="ml-2" v-cloak v-if="showHiddenTabsDropdown">
                 <dropdown-item
-                    v-for="(section, index) in mainSections"
+                    v-for="(tab, index) in mainTabs"
                     v-show="shouldShowInDropdown(index)"
-                    :key="section.handle"
-                    :text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
-                    @click.prevent="setActive(section.handle)"
+                    :key="tab.handle"
+                    :text="tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`"
+                    @click.prevent="setActive(tab.handle)"
                 />
             </dropdown-list>
         </div>
@@ -60,20 +60,20 @@
         <div class="flex justify-between">
 
             <!-- Main -->
-            <div ref="publishSectionWrapper" class="publish-section-wrapper w-full min-w-0">
+            <div ref="publishTabWrapper" class="publish-tab-wrapper w-full min-w-0">
                 <div
-                    class="publish-section tab-panel w-full"
+                    class="publish-tab tab-panel w-full"
                     :class="showTabs && 'rounded-tl-none'"
                     :role="showTabs && 'tabpanel'"
-                    :id="showTabs && tabPanelId(section.handle)"
-                    :aria-labelledby="showTabs && tabId(section.handle)"
+                    :id="showTabs && tabPanelId(tab.handle)"
+                    :aria-labelledby="showTabs && tabId(tab.handle)"
                     tabindex="0"
-                    :key="section.handle"
-                    v-for="section in mainSections"
-                    v-show="isActive(section.handle)"
+                    :key="tab.handle"
+                    v-for="tab in mainTabs"
+                    v-show="isActive(tab.handle)"
                 >
                     <publish-fields
-                        :fields="section.fields"
+                        :fields="tab.fields"
                         :read-only="readOnly"
                         :syncable="syncable"
                         :can-toggle-labels="canToggleLabels"
@@ -89,16 +89,16 @@
 
             <!-- Sidebar(ish) -->
             <div :class="{ 'publish-sidebar': shouldShowSidebar }">
-                <div class="publish-section">
-                    <div class="publish-section-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
+                <div class="publish-tab">
+                    <div class="publish-tab-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
                         <portal :to="actionsPortal" :disabled="shouldShowSidebar">
                             <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
                         </portal>
                     </div>
 
                     <publish-fields
-                        v-if="layoutReady && shouldShowSidebar && sidebarSection"
-                        :fields="sidebarSection.fields"
+                        v-if="layoutReady && shouldShowSidebar && sidebarTab"
+                        :fields="sidebarTab.fields"
                         :read-only="readOnly"
                         :syncable="syncable"
                         :can-toggle-labels="canToggleLabels"
@@ -113,7 +113,7 @@
             </div>
         </div>
 
-        <portal-target :name="actionsPortal" class="publish-section publish-section-actions-footer" />
+        <portal-target :name="actionsPortal" class="publish-tab publish-tab-actions-footer" />
 
     </div>
     </element-container>
@@ -139,7 +139,7 @@ export default {
         const state = this.$store.state.publish[this.storeName];
 
         return {
-            active: state.blueprint.sections[0].handle,
+            active: state.blueprint.tabs[0].handle,
             layoutReady: false,
             shouldShowSidebar: false,
             hiddenTabs: [],
@@ -155,26 +155,26 @@ export default {
             return this.$store.state.publish[this.storeName];
         },
 
-        sections() {
-            return this.state.blueprint.sections;
+        tabs() {
+            return this.state.blueprint.tabs;
         },
 
         inStack() {
             return this.actionsPortal !== 'publish-actions-base';
         },
 
-        mainSections() {
-            if (this.layoutReady && ! this.shouldShowSidebar) return this.sections;
+        mainTabs() {
+            if (this.layoutReady && ! this.shouldShowSidebar) return this.tabs;
 
-            return this.sections.filter(section => section.handle !== 'sidebar');
+            return this.tabs.filter(tab => tab.handle !== 'sidebar');
         },
 
-        sidebarSection() {
-            return this.sections.find(section => section.handle === 'sidebar');
+        sidebarTab() {
+            return this.tabs.find(tab => tab.handle === 'sidebar');
         },
 
         numberOfTabs() {
-            return this.mainSections.length;
+            return this.mainTabs.length;
         },
 
         showTabs() {
@@ -189,14 +189,14 @@ export default {
             return this.state.errors;
         },
 
-        sectionsWithErrors() {
+        tabsWithErrors() {
             const handles = Object.keys(this.errors).map((fieldHandle) => {
                 const topFieldHandle = fieldHandle.split('.')[0];
-                const section = this.sections.find(section =>
-                    section.fields.some(field => field.handle === topFieldHandle)
+                const tab = this.tabs.find(tab =>
+                    tab.fields.some(field => field.handle === topFieldHandle)
                 );
 
-                return section && section.handle
+                return tab && tab.handle
             });
 
             return _.uniq(handles);
@@ -226,8 +226,8 @@ export default {
 
     methods: {
 
-        sectionHasError(handle) {
-            return this.sectionsWithErrors.includes(handle);
+        tabHasError(handle) {
+            return this.tabsWithErrors.includes(handle);
         },
 
         setActive(handle) {
@@ -256,13 +256,13 @@ export default {
         },
 
         tabIndex(handle) {
-            return this.mainSections.findIndex(section => section.handle === (handle || this.active));
+            return this.mainTabs.findIndex(tab => tab.handle === (handle || this.active));
         },
 
         tabAt(index) {
-            const section = this.mainSections[index];
+            const tab = this.mainTabs[index];
 
-            return section ? section.handle : undefined;
+            return tab ? tab.handle : undefined;
         },
 
         setActiveTabFromHash() {
@@ -346,7 +346,7 @@ export default {
 
             if (side === 'left') {
                 this.$refs.tabs.scrollLeft = tab.offsetLeft - offset;
-            } 
+            }
             else {
                 this.$refs.tabs.scrollLeft = tab.offsetLeft + tab.offsetWidth - this.$refs.tabs.clientWidth + offset + 8;
             }
@@ -367,7 +367,7 @@ export default {
             this.shouldShowSidebar = (this.enableSidebar && width > 920);
 
             if (!this.layoutReady) return;
-                
+
             this.$nextTick(() => {
                 this.updateScrollHints();
                 this.updateHiddenTabs();
@@ -396,8 +396,8 @@ export default {
 
             if ((viewportRect.left - tabRect.left) > tolerance) {
                 return 'left';
-            } 
-            
+            }
+
             if ((tabRect.right - viewportRect.right) > tolerance) {
                 return 'right';
             }

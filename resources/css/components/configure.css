@@ -2,7 +2,7 @@
    CONFIGURE COMPONENT: A variation of the publish component
    ========================================================================== */
 
-   .configure-section {
+   .configure-tab {
        .publish-fields .form-group:not(:last-child) {
            @apply border-b;
        }

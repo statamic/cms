@@ -29,18 +29,18 @@
             </div>
         </div>
 
-        <div class="content mt-10 mb-4" v-if="useSections">
-            <h2>{{ __('Tab Sections') }}</h2>
-            <p class="max-w-lg">{{ __('messages.tab_sections_instructions') }}</p>
-            <div v-if="errors.sections">
-                <small class="help-block text-red" v-for="(error, i) in errors.sections" :key="i" v-text="error" />
+        <div class="content mt-10 mb-4" v-if="useTabs">
+            <h2>{{ __('Tabs') }}</h2>
+            <p class="max-w-lg">{{ __('messages.tabs_instructions') }}</p>
+            <div v-if="errors.tabs">
+                <small class="help-block text-red" v-for="(error, i) in errors.tabs" :key="i" v-text="error" />
             </div>
         </div>
 
-        <sections
-            :single-section="!useSections"
-            :initial-sections="blueprint.sections"
-            @updated="sectionsUpdated"
+        <tabs
+            :single-tab="!useTabs"
+            :initial-tabs="blueprint.tabs"
+            @updated="tabsUpdated"
         />
 
     </div>
@@ -48,26 +48,26 @@
 </template>
 
 <script>
-import Sections from './Sections.vue';
+import Tabs from './Tabs.vue';
 
 export default {
 
     components: {
-        Sections,
+        Tabs,
     },
 
     props: {
         action: String,
         initialBlueprint: Object,
         showTitle: Boolean,
-        useSections: { type: Boolean, default: true },
+        useTabs: { type: Boolean, default: true },
         isFormBlueprint: { type: Boolean, default: false },
     },
 
     data() {
         return {
             blueprint: this.initializeBlueprint(),
-            sections: [],
+            tabs: [],
             errors: {}
         }
     },
@@ -85,8 +85,8 @@ export default {
 
     watch: {
 
-        sections(sections) {
-            this.blueprint.sections = sections;
+        tabs(tabs) {
+            this.blueprint.tabs = tabs;
         },
 
         blueprint: {
@@ -108,8 +108,8 @@ export default {
             return blueprint;
         },
 
-        sectionsUpdated(sections) {
-            this.sections = sections;
+        tabsUpdated(tabs) {
+            this.tabs = tabs;
         },
 
         save() {

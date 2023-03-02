@@ -22,7 +22,7 @@ class AugmentedUserTest extends AugmentedTestCase
 
         $blueprint = User::blueprint();
         $contents = $blueprint->contents();
-        $contents['sections']['main']['fields'] = array_merge($contents['sections']['main']['fields'], [
+        $contents['tabs']['main']['fields'] = array_merge($contents['tabs']['main']['fields'], [
             ['handle' => 'two', 'field' => ['type' => 'text']],
             ['handle' => 'four', 'field' => ['type' => 'text']],
             ['handle' => 'unused_in_bp', 'field' => ['type' => 'text']],

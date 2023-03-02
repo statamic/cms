@@ -11,7 +11,7 @@ export default {
             default: true
         },
         isEditing: Boolean,
-        isSectionExpanded: Boolean
+        isTabExpanded: Boolean
     }
 
 }

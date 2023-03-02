@@ -64,8 +64,8 @@ export default {
         },
 
         makeSortable() {
-            new Sortable(this.$el.querySelector('.blueprint-section-draggable-zone'), {
-                draggable: '.blueprint-section-field',
+            new Sortable(this.$el.querySelector('.blueprint-tab-draggable-zone'), {
+                draggable: '.blueprint-tab-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true },
                 plugins: [Plugins.SwapAnimation]

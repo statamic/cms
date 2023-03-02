@@ -165,7 +165,7 @@ return [
     'session_expiry_logging_out_in_seconds' => 'Budete odhlášeni za :seconds sekund.',
     'session_expiry_new_window' => 'Otevřete nové okno',
     'show_slugs_instructions' => 'Zobrazit slugs v přehledu stránek.',
-    'tab_sections_instructions' => 'Pole v jednotlivých oddílech jsou seskupena do karet. Můžete vytvářet nová pole, znovu používat stávající pole nebo importovat celé skupiny polí z existujících sad polí.',
+    'tabs_instructions' => 'Pole v jednotlivých oddílech jsou seskupena do karet. Můžete vytvářet nová pole, znovu používat stávající pole nebo importovat celé skupiny polí z existujících sad polí.',
     'taxonomies_blueprints_instructions' => 'Termíny v této taxonomii mohou používat kterýkoli z těchto vzorů.',
     'taxonomies_collections_instructions' => 'Sbírky, ve kterých se tato taxonomie používá.',
     'taxonomies_preview_targets_instructions' => 'Adresy URL, které lze zobrazit v živém náhledu. Více informací najdete v [Dokumentaci](https://statamic.dev/live-preview#preview-targets).',

@@ -186,7 +186,7 @@ return [
     'session_expiry_logging_out_in_seconds' => 'Vous avez été inactif pendant un certain temps et vous serez déconnecté dans :seconds secondes. Cliquez pour prolonger votre session.',
     'session_expiry_new_window' => 'S’ouvre dans une nouvelle fenêtre. Revenez une fois que serez reconnecté.',
     'show_slugs_instructions' => 'Afficher les identifiants dans la vue arborescente ?',
-    'tab_sections_instructions' => 'Les champs de chaque section seront regroupés dans des onglets. Créez de nouveaux champs, réutilisez des champs existants ou importez des groupes entiers de champs à partir de jeux de champs existants.',
+    'tabs_instructions' => 'Les champs de chaque section seront regroupés dans des onglets. Créez de nouveaux champs, réutilisez des champs existants ou importez des groupes entiers de champs à partir de jeux de champs existants.',
     'taxonomies_blueprints_instructions' => 'Les termes de cette taxonomie peuvent utiliser n’importe lequel de ces Blueprints.',
     'taxonomies_collections_instructions' => 'Les collections qui utilisent cette taxonomie.',
     'taxonomies_preview_targets_instructions' => 'Les URLs qui seront visibles dans l’Aperçu en direct. Apprenez-en plus dans la [documentation](https://statamic.dev/live-preview#preview-targets).',

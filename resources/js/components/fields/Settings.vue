@@ -58,9 +58,9 @@
                 <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue, setFieldMeta }">
 
                     <publish-fields
-                        v-if="blueprint.sections.length"
+                        v-if="blueprint.tabs.length"
                         class="w-full"
-                        :fields="blueprint.sections[0].fields"
+                        :fields="blueprint.tabs[0].fields"
                         @updated="(handle, value) => {
                             updateField(handle, value, setFieldValue);
                             if (handle === 'handle') isHandleModified = true

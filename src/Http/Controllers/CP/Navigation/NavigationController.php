@@ -209,7 +209,7 @@ class NavigationController extends CpController
             ];
         }
 
-        return Blueprint::makeFromSections($contents);
+        return Blueprint::makeFromTabs($contents);
     }
 
     public function destroy($nav)

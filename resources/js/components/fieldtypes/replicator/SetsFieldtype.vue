@@ -2,13 +2,13 @@
 
     <div>
 
-        <sections
-            :initial-sections="sections"
-            :require-section="config.require_section"
+        <tabs
+            :initial-tabs="tabs"
+            :require-tab="config.require_tab"
             :can-define-localizable="false"
-            :add-section-text="__('Add Set')"
-            :new-section-text="__('New Set')"
-            @updated="sectionsUpdated"
+            :add-tab-text="__('Add Set')"
+            :new-tab-text="__('New Set')"
+            @updated="tabsUpdated"
         />
 
     </div>
@@ -16,26 +16,26 @@
 </template>
 
 <script>
-import Sections from '../../blueprints/Sections.vue';
+import Tabs from '../../blueprints/Tabs.vue';
 
 export default {
 
     mixins: [Fieldtype],
 
     components: {
-        Sections
+        Tabs
     },
 
     data() {
         return {
-            sections: this.value
+            tabs: this.value
         }
     },
 
     methods: {
 
-        sectionsUpdated(sections) {
-            this.sections = sections;
+        tabsUpdated(tabs) {
+            this.tabs = tabs;
         }
 
     }

@@ -149,7 +149,7 @@ return [
     'session_expiry_logged_out_for_inactivity' => 'Anda telah keluar karena Anda tidak aktif untuk sementara waktu.',
     'session_expiry_logging_out_in_seconds' => 'Anda sudah tidak aktif untuk sementara waktu dan akan keluar dalam :seconds detik. Klik untuk memperpanjang sesi Anda.',
     'session_expiry_new_window' => 'Buka di jendela baru. Kembalilah setelah Anda masuk.',
-    'tab_sections_instructions' => 'Bidang di setiap bagian akan dikelompokkan menjadi beberapa tab. Buat bidang baru, gunakan kembali bidang yang ada, atau impor seluruh grup bidang dari fieldsets yang ada.',
+    'tabs_instructions' => 'Bidang di setiap bagian akan dikelompokkan menjadi beberapa tab. Buat bidang baru, gunakan kembali bidang yang ada, atau impor seluruh grup bidang dari fieldsets yang ada.',
     'taxonomies_blueprints_instructions' => 'Istilah dalam taksonomi ini dapat menggunakan salah satu dari cetak biru ini.',
     'taxonomies_collections_instructions' => 'Koleksi yang menggunakan taksonomi ini.',
     'taxonomy_configure_handle_instructions' => 'Digunakan untuk mereferensikan taksonomi ini di frontend. Tidak sepele untuk berubah nanti.',

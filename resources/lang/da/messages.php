@@ -150,7 +150,7 @@ return [
     'session_expiry_logged_out_for_inactivity' => 'Du er logget ud, fordi du har været inaktiv i et stykke tid.',
     'session_expiry_logging_out_in_seconds' => 'Du har været inaktiv i et stykke tid og bliver logget ud på :seconds sekunder. Klik for at udvide din session.',
     'session_expiry_new_window' => 'Åbner i nyt vindue. Kom tilbage, når du er logget ind.',
-    'tab_sections_instructions' => 'Felterne i hvert afsnit grupperes i faner. Opret nye felter, genbrug eksisterende felter, eller importer hele grupper af felter fra eksisterende feltsæt.',
+    'tabs_instructions' => 'Felterne i hvert afsnit grupperes i faner. Opret nye felter, genbrug eksisterende felter, eller importer hele grupper af felter fra eksisterende feltsæt.',
     'taxonomies_blueprints_instructions' => 'Vilkår i denne taksonomi kan bruge en hvilken som helst af disse blueprints.',
     'taxonomies_collections_instructions' => 'De samlinger, der bruger denne taksonomi.',
     'taxonomy_configure_handle_instructions' => 'Bruges til at henvise til denne taksonomi på frontend. Det er besværligt at ændre senere.',

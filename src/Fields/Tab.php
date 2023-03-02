@@ -5,7 +5,7 @@ namespace Statamic\Fields;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Section
+class Tab
 {
     protected $handle;
     protected $contents = [];

@@ -20,7 +20,7 @@ trait ManagesBlueprints
                 'id' => $blueprint->handle(),
                 'handle' => $blueprint->handle(),
                 'title' => $blueprint->title(),
-                'sections' => $blueprint->sections()->count(),
+                'tabs' => $blueprint->tabs()->count(),
                 'fields' => $blueprint->fields()->all()->count(),
                 'hidden' => $blueprint->hidden(),
                 'edit_url' => $this->editUrl($item, $blueprint),
@@ -31,10 +31,10 @@ trait ManagesBlueprints
 
     private function setBlueprintContents(Request $request, Blueprint $blueprint)
     {
-        $sections = collect($request->sections)->mapWithKeys(function ($section) {
-            return [array_pull($section, 'handle') => [
-                'display' => $section['display'],
-                'fields' => $this->sectionFields($section['fields']),
+        $tabs = collect($request->tabs)->mapWithKeys(function ($tab) {
+            return [array_pull($tab, 'handle') => [
+                'display' => $tab['display'],
+                'fields' => $this->tabFields($tab['fields']),
             ]];
         })->all();
 
@@ -42,7 +42,7 @@ trait ManagesBlueprints
             ->setHidden($request->hidden)
             ->setContents(array_merge($blueprint->contents(), array_filter([
                 'title' => $request->title,
-                'sections' => $sections,
+                'tabs' => $tabs,
             ])));
 
         return $blueprint;
@@ -54,7 +54,7 @@ trait ManagesBlueprints
             $blueprint->validateUniqueHandles();
         } catch (DuplicateFieldException $exception) {
             throw ValidationException::withMessages([
-                'sections' => __('statamic::validation.duplicate_field_handle', ['handle' => $exception->getHandle()]),
+                'tabs' => __('statamic::validation.duplicate_field_handle', ['handle' => $exception->getHandle()]),
             ]);
         }
     }
@@ -68,7 +68,7 @@ trait ManagesBlueprints
         $blueprint->save();
     }
 
-    private function sectionFields(array $fields)
+    private function tabFields(array $fields)
     {
         return collect($fields)->map(function ($field) {
             return FieldTransformer::fromVue($field);
@@ -81,18 +81,18 @@ trait ManagesBlueprints
             'title' => $blueprint->title(),
             'handle' => $blueprint->handle(),
             'hidden' => $blueprint->hidden(),
-            'sections' => $blueprint->sections()->map(function ($section, $i) {
-                return array_merge($this->sectionToVue($section), ['_id' => $i]);
+            'tabs' => $blueprint->tabs()->map(function ($tab, $i) {
+                return array_merge($this->tabToVue($tab), ['_id' => $i]);
             })->values()->all(),
         ];
     }
 
-    private function sectionToVue($section): array
+    private function tabToVue($tab): array
     {
         return [
-            'handle' => $section->handle(),
-            'display' => $section->display(),
-            'fields' => collect($section->contents()['fields'])->map(function ($field, $i) {
+            'handle' => $tab->handle(),
+            'display' => $tab->display(),
+            'fields' => collect($tab->contents()['fields'])->map(function ($field, $i) {
                 return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
             })->all(),
         ];
@@ -111,7 +111,7 @@ trait ManagesBlueprints
             ->setNamespace($namespace)
             ->setContents([
                 'title' => $request->title,
-                'sections' => [
+                'tabs' => [
                     'main' => [
                         'display' => __('Main'),
                         'fields' => [],

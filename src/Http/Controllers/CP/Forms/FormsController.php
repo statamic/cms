@@ -190,7 +190,7 @@ class FormsController extends CpController
 
     protected function editFormBlueprint($form)
     {
-        return Blueprint::makeFromSections([
+        return Blueprint::makeFromTabs([
             'name' => [
                 'display' => __('Name'),
                 'fields' => [

@@ -85,7 +85,7 @@ class ParserTestCase extends TestCase
     {
         if (self::$testBlueprint == null) {
             $blueprintContents = YAML::parse(file_get_contents(__DIR__.'/../__fixtures__/blueprints/article.yaml'));
-            $blueprintFields = collect($blueprintContents['sections']['main']['fields'])->keyBy(function ($item) {
+            $blueprintFields = collect($blueprintContents['tabs']['main']['fields'])->keyBy(function ($item) {
                 return $item['handle'];
             })->map(function ($item) {
                 return $item['field'];

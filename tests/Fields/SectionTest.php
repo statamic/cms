@@ -5,15 +5,15 @@ namespace Tests\Fields;
 use Facades\Statamic\Fields\FieldRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
-use Statamic\Fields\Section;
+use Statamic\Fields\Tab;
 use Tests\TestCase;
 
-class SectionTest extends TestCase
+class TabTest extends TestCase
 {
     /** @test */
     public function it_gets_the_handle()
     {
-        $section = new Section('test');
+        $section = new Tab('test');
 
         $this->assertEquals('test', $section->handle());
     }
@@ -21,7 +21,7 @@ class SectionTest extends TestCase
     /** @test */
     public function it_gets_contents()
     {
-        $section = new Section('test');
+        $section = new Tab('test');
         $this->assertEquals([], $section->contents());
 
         $contents = [
@@ -37,7 +37,7 @@ class SectionTest extends TestCase
     /** @test */
     public function it_gets_the_display_text()
     {
-        $section = (new Section('test'))->setContents([
+        $section = (new Tab('test'))->setContents([
             'display' => 'The Display Text',
         ]);
 
@@ -47,7 +47,7 @@ class SectionTest extends TestCase
     /** @test */
     public function the_display_text_falls_back_to_a_humanized_handle()
     {
-        $section = new Section('the_section_handle');
+        $section = new Tab('the_section_handle');
 
         $this->assertEquals('The section handle', $section->display());
     }
@@ -55,7 +55,7 @@ class SectionTest extends TestCase
     /** @test */
     public function it_gets_fields()
     {
-        $section = new Section('test');
+        $section = new Tab('test');
         tap($section->fields(), function ($fields) {
             $this->assertInstanceOf(Fields::class, $fields);
             $this->assertCount(0, $fields->all());
@@ -112,8 +112,8 @@ class SectionTest extends TestCase
                 'validate' => 'min:2',
             ]));
 
-        $section = (new Section('test'))->setContents([
-            'display' => 'Test Section',
+        $section = (new Tab('test'))->setContents([
+            'display' => 'Test Tab',
             'instructions' => 'Does stuff',
             'fields' => [
                 [
@@ -128,7 +128,7 @@ class SectionTest extends TestCase
         ]);
 
         $this->assertEquals([
-            'display' => 'Test Section',
+            'display' => 'Test Tab',
             'handle' => 'test',
             'instructions' => 'Does stuff',
             'fields' => [

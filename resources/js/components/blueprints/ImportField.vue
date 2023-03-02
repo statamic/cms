@@ -1,7 +1,7 @@
 <template>
 
-    <div class="blueprint-section-field blueprint-section-import blueprint-section-field-w-full">
-        <div class="blueprint-section-field-inner">
+    <div class="blueprint-tab-field blueprint-tab-import blueprint-tab-field-w-full">
+        <div class="blueprint-tab-field-inner">
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-4 py-2 pl-2">

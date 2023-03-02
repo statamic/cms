@@ -165,7 +165,7 @@ return [
     'session_expiry_logging_out_in_seconds' => '您已经一段时间没有活动，将在:seconds秒内注销。单击以扩展您的会话。',
     'session_expiry_new_window' => '在一个新窗口中打开。登录后再回来。',
     'show_slugs_instructions' => '是否在树视图中显示别名。',
-    'tab_sections_instructions' => '每个区段中的字段将一起分组为标签。创建新字段，重用现有字段或从现有字段集中导入整个字段组。',
+    'tabs_instructions' => '每个区段中的字段将一起分组为标签。创建新字段，重用现有字段或从现有字段集中导入整个字段组。',
     'taxonomies_blueprints_instructions' => '该分类中的术语可以使用任何这些蓝图。',
     'taxonomies_collections_instructions' => '使用此分类的集合。',
     'taxonomies_preview_targets_instructions' => '在实时预览中可查看的 URL。 在 [文档](https://statamic.dev/live-preview#preview-targets) 中了解更多信息。',
