@@ -1462,8 +1462,14 @@ class NodeProcessor
                         $currentIsolationState = GlobalRuntimeState::$requiresRuntimeIsolation;
                         GlobalRuntimeState::$requiresRuntimeIsolation = true;
 
+                        $args = [];
+
+                        if ($methodToCall == 'wildcard') {
+                            $args = [$tagMethod];
+                        }
+
                         try {
-                            $output = call_user_func([$tag, $methodToCall]);
+                            $output = call_user_func([$tag, $methodToCall], ...$args);
                         } catch (Exception $e) {
                             throw $e;
                         } finally {

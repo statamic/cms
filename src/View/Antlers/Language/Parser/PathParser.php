@@ -254,6 +254,15 @@ class PathParser
                 $this->cur == self::DotPathSeparator || $this->currentIndex == $this->lastIndex)) {
                 if ($this->next == null || ctype_space($this->next)) {
                     if ($this->cur == self::ColonSeparator) {
+                        if (count($parts) > 0 && $parts[count($parts) - 1] instanceof PathNode) {
+                            $lastPart = $parts[count($parts) - 1];
+
+                            if ($lastPart->delimiter == self::ColonSeparator) {
+                                $lastPart->delimiter .= $this->cur;
+                                continue;
+                            }
+                        }
+
                         if (count($currentChars) == 0) {
                             throw ErrorFactory::makeSyntaxError(
                                 AntlersErrorCodes::TYPE_UNEXPECTED_BRANCH_SEPARATOR,

@@ -27,4 +27,14 @@ EOT;
         // Before the fix, "My content" would be rendered at the end of the string.
         $this->assertSame('outer inner', $this->renderString($template));
     }
+
+    public function test_double_colons_may_be_used_in_tag_method_part()
+    {
+        $this->expectExceptionMessage('No hint path defined for [some].');
+        $template = <<<'ANTLERS'
+{{ partial:some::template/path /}}
+ANTLERS;
+
+        $this->renderString($template, [], true);
+    }
 }
