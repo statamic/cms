@@ -10,7 +10,8 @@
 
 .list-fieldtype li {
 	padding: 0 16px;
-	background: url('../../../svg/bullet.svg') no-repeat 0px 8px;
+	background: url('../../../svg/bullet.svg') no-repeat 3px 9px;
+    background-size: 5px;
 	margin-bottom: 8px;
     font-size: 16px;
 	position: relative;
@@ -30,7 +31,8 @@
 	}
 
 	input {
-		background: #fff url('../../../svg/bullet.svg') no-repeat 0 8px;
+		background: #fff url('../../../svg/bullet.svg') no-repeat 3px 9px;
+        background-size: 5px;
 		box-shadow: none;
         padding: 0 16px;
         height: auto !important;
@@ -40,19 +42,18 @@
 	}
 
     .delete {
-	    background: #fff url(../../../svg/delete-x.svg) no-repeat 0 0;
-	    width: 12px;
-	    height: 12px;
-	    display: inline-block;
-	    opacity: 0;
-		top: 6px;
-		left: -1px;
-		position: absolute;
-	    cursor: pointer;
+        @apply text-gray-600 absolute cursor-pointer inline-block opacity-0;
+	    width: 10px;
+	    height: 10px;
+		top: 1px;
+        left: 1px;
 	}
 
 	&:hover .delete {
-		opacity: 1;
+        opacity: 1;
+        &:hover {
+            @apply text-gray-800;
+        }
 	}
 }
 
