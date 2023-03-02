@@ -66,7 +66,7 @@ EOT;
     public function it_can_search_for_plus_signs()
     {
         $comb = new Comb([
-            ['content' => '+Content']
+            ['content' => '+Content'],
         ]);
 
         $result = $comb->lookUp('+');
