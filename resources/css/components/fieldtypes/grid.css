@@ -48,6 +48,7 @@
             width: 1%;
             cursor: grab;
             background: theme('colors.gray.200') url('../../../svg/drag-dots.svg') center center no-repeat;
+            background-size: 7px 17px;
             &:hover { @apply bg-gray-300; }
         }
     }
