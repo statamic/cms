@@ -18,6 +18,7 @@
     @apply flex-none;
     cursor: move;
     background: rgba(0, 0, 0, 0.01) url('../../svg/drag-dots.svg') 50% 50% no-repeat;
+    background-size: 7px 17px;
 }
 
 .blueprint-section-field {
