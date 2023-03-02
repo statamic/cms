@@ -506,6 +506,10 @@ class NodeProcessor
      */
     private function shouldProcessAsTag(AntlersNode $node)
     {
+        if ($node->pathReference == null && $node->name != null && Str::startsWith($node->name->name, '[')) {
+            return false;
+        }
+
         if ($node->pathReference != null) {
             if ($node->pathReference->isStrictTagReference) {
                 return true;

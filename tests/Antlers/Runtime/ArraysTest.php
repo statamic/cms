@@ -420,4 +420,9 @@ EOT;
 
         $this->assertSame($expected, trim($this->renderString($template)));
     }
+
+    public function test_arrays_as_the_tag_name()
+    {
+        $this->assertSame('array', $this->renderString('{{ [1, 2, 3, 4] | type_of }}', [], true));
+    }
 }
