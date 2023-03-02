@@ -247,6 +247,40 @@ GQL;
             ]]]]);
     }
 
+    /** @test */
+    public function it_cannot_filter_entries_by_default()
+    {
+        $this->createEntries();
+
+        $query = <<<'GQL'
+{
+    entries(filter: {
+        title: {
+            contains: "rad",
+            ends_with: "!"
+        }
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                ]],
+                'data' => [
+                    'entries' => null,
+                ],
+            ]);
+    }
+
     /**
      * @test
      * @environment-setup disableQueries
