@@ -14,7 +14,7 @@ class YamlTest extends TestCase
     public function it_converts_single_array_items_to_arrays()
     {
         $field = (new Yaml)->setField(new Field('test', [
-            'type' => 'yaml',
+            'type' => 'yaml'
         ]));
 
         $expected = [
