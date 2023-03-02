@@ -33,7 +33,7 @@ class Yaml extends Fieldtype
 
     public function process($data)
     {
-        if (substr_count($data, "\n") > 0 || substr_count($data, ': ') > 0) {
+        if (substr_count($data, "\n") > 0 || substr_count($data, ': ') > 0 || substr_count($data, '- ') > 0) {
             $data = \Statamic\Facades\YAML::parse($data);
         }
 
