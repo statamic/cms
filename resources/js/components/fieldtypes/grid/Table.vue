@@ -22,6 +22,7 @@
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            append-to="body"
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
             @input="(rows) => $emit('sorted', rows)"
