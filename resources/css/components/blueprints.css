@@ -18,10 +18,11 @@
     @apply flex-none;
     cursor: move;
     background: rgba(0, 0, 0, 0.01) url('../../svg/drag-dots.svg') 50% 50% no-repeat;
+    background-size: 7px 17px;
 }
 
 .blueprint-tab-field {
-    @apply relative mb-2 px-1 z-10 outline-none;
+    @apply relative mb-2 px-1 z-10 outline-none text-sm;
 
     .blueprint-tab-field-inner {
         @apply relative border rounded bg-gray-200 shadow-sm flex outline-none z-10;

@@ -19,7 +19,6 @@
         }
 
         /*  Drag interaction */
-        &.draggable-mirror,
         &.draggable-source--is-dragging {
             /*  @apply bg-white; */
             cursor: grabbing;

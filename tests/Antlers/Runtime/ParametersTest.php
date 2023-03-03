@@ -289,4 +289,23 @@ EOT;
             ],
         ]));
     }
+
+    public function test_single_array_values_inside_parameters()
+    {
+        (new class extends Tags
+        {
+            protected static $handle = 'test';
+
+            public function index()
+            {
+                return $this->params->get('param');
+            }
+        })::register();
+
+        $template = <<<'EOT'
+{{ test :param="[123]" }}{{ index}}:{{ value }}{{ /test }}
+EOT;
+
+        $this->assertSame('0:123', $this->renderString($template, [], true));
+    }
 }

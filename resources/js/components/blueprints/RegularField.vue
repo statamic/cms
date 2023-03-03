@@ -111,9 +111,9 @@ export default {
         },
 
         widthClass() {
-            if (! this.isTabExpanded) return 'w-full';
+            if (! this.isTabExpanded) return 'blueprint-tab-field-w-full';
 
-            return `${tailwind_width_class(this.width)}`;
+            return `blueprint-tab-field-${tailwind_width_class(this.width)}`;
         },
 
         localizable: {
