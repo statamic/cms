@@ -26,6 +26,10 @@ export default {
         handleClass: {
             default: 'sortable-handle',
         },
+        mirror: {
+            type: Boolean,
+            default: true
+        },
         appendTo: {
             default: null,
         },
@@ -101,6 +105,10 @@ export default {
         this.$on('hook:destroyed', () => {
             sortable.destroy()
         })
+
+        if (this.mirror === false) {
+            sortable.on('mirror:create', (e) => e.cancel());
+        }
     }
 
 }

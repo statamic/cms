@@ -35,6 +35,7 @@
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            append-to="body"
             constrain-dimensions
             @input="sorted($event)"
             @dragstart="$emit('focus')"

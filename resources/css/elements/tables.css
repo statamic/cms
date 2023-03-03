@@ -141,10 +141,6 @@
         }
 	}
 
-	.sortable-row.draggable-mirror {
-		display: none;
-	}
-
     .date-index-field {
         @apply whitespace-nowrap;
     }
