@@ -5,8 +5,8 @@
         :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
 
-        <div class="replicator-set-header" :class="{ [sortableHandleClass]: grid.isReorderable }">
-            <div class="item-move cursor-grab sortable-handle" data-drag-handle />
+        <div class="replicator-set-header">
+            <div class="item-move cursor-grab sortable-handle" :class="{ [sortableHandleClass]: grid.isReorderable }" />
             <div class="py-2 pl-2 replicator-set-header-inner flex justify-end items-end w-full">
                 <button v-if="canDelete" class="flex self-end group items-center" @click="$emit('removed', index)" :aria-label="__('Delete Row')">
                     <svg-icon name="trash" class="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
