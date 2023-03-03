@@ -350,16 +350,16 @@ class Glide extends Tags
      */
     private function allowedFileFormats()
     {
-        $extras = collect(config('statamic.assets.image_manipulation.extra_input_formats', []))
+        $others = collect(config('statamic.assets.image_manipulation.other_formats', []))
             ->flatten()
             ->all();
 
         $driver = config('statamic.assets.image_manipulation.driver');
 
         if ($driver == 'gd') {
-            return array_merge(['jpeg', 'jpg', 'png', 'gif', 'webp'], $extras);
+            return array_merge(['jpeg', 'jpg', 'png', 'gif', 'webp'], $others);
         } elseif ($driver == 'imagick') {
-            return array_merge(['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'], $extras);
+            return array_merge(['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'], $others);
         }
 
         throw new \Exception("Unsupported image manipulation driver [$driver]");

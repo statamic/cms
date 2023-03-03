@@ -308,11 +308,11 @@ class ImageGenerator
             $mime = File::mimeType($path);
         }
 
-        $extras = collect(config('statamic.assets.image_manipulation.extra_input_formats', []))
+        $others = collect(config('statamic.assets.image_manipulation.other_formats', []))
             ->keys()
             ->all();
 
-        if ($mime !== null && strncmp($mime, 'image/', 6) !== 0 && ! in_array($mime, $extras)) {
+        if ($mime !== null && strncmp($mime, 'image/', 6) !== 0 && ! in_array($mime, $others)) {
             throw new \Exception("Image [{$path}] does not actually appear to be an image.");
         }
     }

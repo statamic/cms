@@ -101,13 +101,16 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        |
+        | Other Input File Formats
         |--------------------------------------------------------------------------
         |
+        | Define any additional input file formats you'd like to process through
+        | the {{ glide }} tag. You should ensure your server and selected image
+        | driver support all formats specified.
         |
         */
 
-        'extra_input_formats' => [
+        'other_formats' => [
             // 'application/eps' => ['eps'],
         ],
 
