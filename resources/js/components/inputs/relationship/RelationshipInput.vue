@@ -268,7 +268,7 @@ export default {
                 const val = [...this.value];
                 val.splice(e.newIndex, 0, val.splice(e.oldIndex, 1)[0]);
                 this.update(val);
-            })
+            }).on('mirror:create', e => e.cancel());
         },
 
         itemCreated(item) {
