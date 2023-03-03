@@ -37,12 +37,6 @@
     }
 }
 
-/*  Use specific selector because we don't want it to happen */
-/*  when used inside  a grid field configuratormajig. */
-.blueprint-tab .blueprint-tab-field-actions > div {
-    @apply w-1/2;
-}
-
 .blueprint-tab-import {
     &:before {
         content: '';
@@ -88,5 +82,3 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
-
-
