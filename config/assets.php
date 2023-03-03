@@ -111,7 +111,7 @@ return [
         */
 
         'other_formats' => [
-            // 'application/eps' => ['eps'],
+            // 'application/postscript' => ['eps'],
         ],
 
     ],
