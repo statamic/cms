@@ -1,14 +1,9 @@
 <template>
 
-    <div class="blueprint-tab @container"
-        :class="{
-            'w-full md:w-1/2': !isEditing && !isSingle,
-            'w-full': isEditing || isSingle
-        }"
-    >
+    <div class="blueprint-tab @container w-full">
         <div class="blueprint-tab-card card p-0 h-full flex rounded-t flex-col">
 
-            <div class="bg-gray-200 border-b text-sm flex rounded-t" v-if="!isSingle">
+            <div class="bg-gray-200 border-b text-sm flex rounded-t">
                 <div class="blueprint-drag-handle blueprint-tab-drag-handle w-4 border-r"></div>
                 <div class="p-3 py-2 flex-1">
                     <span class="font-medium mr-2">
@@ -19,9 +14,6 @@
                     </span>
                 </div>
                 <div class="flex items-center px-3">
-                    <button @click.prevent="toggleEditing" class="flex items-center text-gray-600 hover:text-gray-950 mr-2">
-                        <svg-icon class="h-4 w-4" :name="isEditing ? 'shrink' : 'expand'" />
-                    </button>
                     <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-600 hover:text-gray-950" v-if="deletable">
                         <svg-icon class="h-4 w-4" name="trash" />
                     </button>
@@ -33,7 +25,6 @@
                 class="p-4"
                 :fields="tab.fields"
                 :editing-field="editingField"
-                :is-tab-expanded="isEditing || isSingle"
                 :suggestable-condition-fields="suggestableConditionFields"
                 :can-define-localizable="canDefineLocalizable"
                 @field-created="fieldCreated"
@@ -73,7 +64,7 @@ export default {
             type: Object,
             required: true
         },
-        isSingle: {
+        isSingle: { // was used for sections, but will be used for tabs in the future
             type: Boolean,
             default: false
         },
@@ -85,7 +76,6 @@ export default {
 
     data() {
         return {
-            isEditing: false,
             editingField: null,
             handleSyncedWithDisplay: false
         }
@@ -149,10 +139,6 @@ export default {
             if (this.$refs.displayInput) {
                 this.$refs.displayInput.select();
             }
-        },
-
-        toggleEditing() {
-            this.isEditing = ! this.isEditing
         }
 
     }

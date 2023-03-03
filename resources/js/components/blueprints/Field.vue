@@ -10,8 +10,7 @@ export default {
             type: Boolean,
             default: true
         },
-        isEditing: Boolean,
-        isTabExpanded: Boolean
+        isEditing: Boolean
     }
 
 }

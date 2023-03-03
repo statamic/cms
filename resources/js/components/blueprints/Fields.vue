@@ -13,7 +13,6 @@
                 :key="field._id"
                 :field="field"
                 :is-editing="editingField === field._id"
-                :is-tab-expanded="isTabExpanded"
                 :suggestable-condition-fields="suggestableConditionFields"
                 :can-define-localizable="canDefineLocalizable"
                 @edit="$emit('field-editing', field._id)"
@@ -88,7 +87,6 @@ export default {
     props: {
         fields: Array,
         editingField: {},
-        isTabExpanded: Boolean,
         suggestableConditionFields: Array,
         excludeFieldset: String,
     },
