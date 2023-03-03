@@ -256,7 +256,7 @@ export default {
             this.sortable = new Sortable(this.$refs.items, {
                 draggable: '.item',
                 handle: '.item-move',
-                mirror: { constrainDimensions: true, xAxis: false },
+                mirror: { constrainDimensions: true, xAxis: false, appendTo: 'body' },
                 swapAnimation: { vertical: true },
                 plugins: [Plugins.SwapAnimation],
                 delay: 200
@@ -268,7 +268,7 @@ export default {
                 const val = [...this.value];
                 val.splice(e.newIndex, 0, val.splice(e.oldIndex, 1)[0]);
                 this.update(val);
-            }).on('mirror:create', e => e.cancel());
+            });
         },
 
         itemCreated(item) {
