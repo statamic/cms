@@ -18,9 +18,4 @@
             @apply border-red bg-red-lighter text-red;
         }
     }
-
-    /*  Drag interaction */
-    &.draggable-source--is-dragging {
-        opacity: 0.5;
-    }
 }
