@@ -99,7 +99,3 @@ code.parent-url {
     top: 0;
     z-index: 1000;
 }
-
-.publish-tab:not(:empty) {
-    @apply shadow bg-white rounded-md w-full;
-}

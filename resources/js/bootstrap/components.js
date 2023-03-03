@@ -12,6 +12,7 @@ import Field from '../components/publish/Field.vue';
 import FieldMeta from '../components/publish/FieldMeta.vue';
 import ConfigureTabs from '../components/configure/Tabs.vue';
 import PublishTabs from '../components/publish/Tabs.vue';
+import PublishSections from '../components/publish/Sections.vue';
 import PublishValidationErrors from '../components/publish/ValidationErrors.vue';
 import FormGroup from '../components/publish/FormGroup.vue';
 import LivePreview from '../components/live-preview/LivePreview.vue';
@@ -79,6 +80,7 @@ Vue.component('publish-field', Field);
 Vue.component('publish-field-meta', FieldMeta);
 Vue.component('configure-tabs', ConfigureTabs);
 Vue.component('publish-tabs', PublishTabs);
+Vue.component('publish-sections', PublishSections);
 Vue.component('publish-validation-errors', PublishValidationErrors);
 Vue.component('form-group', FormGroup);
 

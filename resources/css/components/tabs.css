@@ -4,7 +4,7 @@
 
 
 .tabs-container {
-    @apply relative;
+    @apply relative mb-5;
 
     &.offset-for-sidebar {
         width: calc(100% - 320px);

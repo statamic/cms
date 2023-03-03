@@ -6,9 +6,9 @@
                     <h2 v-text="tab.display" class="text-base" />
                     <p v-html="tab.instructions" />
                 </div>
-                <div class="card p-0 mb-10 configure-tab">
-                    <publish-fields
-                        :fields="tab.fields"
+                <div class="">
+                    <publish-sections
+                        :sections="tab.sections"
                         :read-only="readOnly"
                         :syncable="syncable"
                         @updated="(handle, value) => $emit('updated', handle, value)"
