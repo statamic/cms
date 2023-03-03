@@ -67,10 +67,6 @@
     tr.draggable-source--is-dragging td {
         @apply bg-gray-100;
     }
-
-    .draggable-mirror {
-        @apply bg-white border-t border-b shadow;
-    }
 }
 
 .table-fieldtype-table .row-controls {

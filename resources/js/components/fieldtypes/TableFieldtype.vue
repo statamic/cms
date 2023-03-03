@@ -32,6 +32,7 @@
                         :vertical="true"
                         item-class="sortable-row"
                         handle-class="table-drag-handle"
+                        :mirror="false"
                         @dragstart="$emit('focus')"
                         @dragend="$emit('blur')"
                     >
