@@ -1,7 +1,7 @@
 <template>
 
     <div
-        class="shadow-sm mb-4 rounded border"
+        class="replicator-set shadow-sm mb-4 rounded border"
         :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
 
@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <div class="publish-fields @container">
+        <div class="replicator-set-body">
             <set-field
                 v-for="field in fields"
                 v-show="showField(field, fieldPath(field.handle))"
