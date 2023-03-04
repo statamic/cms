@@ -70,10 +70,10 @@ class UserGroupRepository extends BaseRepository
             return parent::find($id);
         }
 
-        return Blink::once("eloquent-groups-{$handle}", function () use ($handle) {
-            $model = UserGroupModel::whereHandle($handle)->first();
+        return Blink::once("eloquent-groups-{$id}", function () use ($id) {
+            $model = UserGroupModel::whereHandle($id)->first();
 
-            return $model ? (new UserGroup)->fromModel($model) : null;
+            return $model ? (new UserGroup)->fromModel($id) : null;
         });
     }
 
