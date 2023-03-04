@@ -1,7 +1,7 @@
 <template>
 
-    <div class="blueprint-tab-field" :class="widthClass">
-        <div class="blueprint-tab-field-inner">
+    <div class="blueprint-section-field" :class="widthClass">
+        <div class="blueprint-section-field-inner">
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-4 py-2 pl-2">
@@ -111,7 +111,7 @@ export default {
         },
 
         widthClass() {
-            return `blueprint-tab-field-${tailwind_width_class(this.width)}`;
+            return `blueprint-section-field-${tailwind_width_class(this.width)}`;
         },
 
         localizable: {

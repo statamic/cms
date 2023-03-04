@@ -2,7 +2,7 @@
 
     <div class="flex flex-col text-sm">
 
-        <div class="blueprint-tab-draggable-zone -mx-1"
+        <div class="blueprint-section-draggable-zone -mx-1"
             :class="{ 'flex flex-wrap flex-1': fields.length }"
         >
             <slot name="empty-state" v-if="!fields.length" />
@@ -22,7 +22,7 @@
             />
         </div>
 
-        <div class="blueprint-tab-field-actions flex mt-2 -mx-1">
+        <div class="blueprint-section-field-actions flex mt-2 -mx-1">
             <div class="px-1">
                 <link-fields
                     :exclude-fieldset="excludeFieldset"

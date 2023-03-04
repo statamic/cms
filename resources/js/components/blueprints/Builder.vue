@@ -37,9 +37,9 @@
             </div>
         </div>
 
-        <tabs
+        <sections
             :single-tab="!useTabs"
-            :initial-tabs="blueprint.tabs"
+            :initial-sections="blueprint.tabs"
             @updated="tabsUpdated"
         />
 
@@ -48,12 +48,12 @@
 </template>
 
 <script>
-import Tabs from './Tabs.vue';
+import Sections from './Sections.vue';
 
 export default {
 
     components: {
-        Tabs,
+        Sections,
     },
 
     props: {
