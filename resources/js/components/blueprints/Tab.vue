@@ -1,16 +1,16 @@
 <template>
 
-    <div class="blueprint-tab @container w-full">
-        <div class="blueprint-tab-card card p-0 h-full flex rounded-t flex-col">
+    <div class="blueprint-section @container w-full">
+        <div class="blueprint-section-card card p-0 h-full flex rounded-t flex-col">
 
             <div class="bg-gray-200 border-b text-sm flex rounded-t">
-                <div class="blueprint-drag-handle blueprint-tab-drag-handle w-4 border-r"></div>
+                <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
                 <div class="p-3 py-2 flex-1">
                     <span class="font-medium mr-2">
-                        <input ref="displayInput" type="text" v-model="tab.display" class="bg-transparent w-full outline-none" />
+                        <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
                     </span>
                     <span class="font-mono text-xs text-gray-700 mr-2">
-                        <input type="text" v-model="tab.handle" @input="handleSyncedWithDisplay = false" class="bg-transparent w-full outline-none" />
+                        <input type="text" v-model="section.handle" @input="handleSyncedWithDisplay = false" class="bg-transparent w-full outline-none" />
                     </span>
                 </div>
                 <div class="flex items-center px-3">
@@ -23,7 +23,7 @@
 
             <fields
                 class="p-4"
-                :fields="tab.fields"
+                :fields="section.fields"
                 :editing-field="editingField"
                 :suggestable-condition-fields="suggestableConditionFields"
                 :can-define-localizable="canDefineLocalizable"
@@ -60,7 +60,7 @@ export default {
     },
 
     props: {
-        tab: {
+        section: {
             type: Object,
             required: true
         },
@@ -83,22 +83,22 @@ export default {
 
     computed: {
         suggestableConditionFields() {
-            return this.tab.fields.map(field => field.handle);
+            return this.section.fields.map(field => field.handle);
         }
     },
 
     watch: {
 
-        tab: {
+        section: {
             deep: true,
-            handler(tab) {
-                this.$emit('updated', tab);
+            handler(section) {
+                this.$emit('updated', section);
             }
         },
 
-        'tab.display': function(display) {
+        'section.display': function(display) {
             if (this.handleSyncedWithDisplay) {
-                this.tab.handle = this.$slugify(display, '_');
+                this.section.handle = this.$slugify(display, '_');
             }
         }
 
@@ -107,7 +107,7 @@ export default {
     created() {
         // This logic isn't ideal, but it was better than passing along a 'isNew' boolean and having
         // to deal with stripping it out and making it not new, etc. Good enough for a quick win.
-        if (!this.tab.handle || this.tab.handle == 'new_tab' || this.tab.handle == 'new_set') {
+        if (!this.section.handle || this.section.handle == 'new_section' || this.section.handle == 'new_set') {
             this.handleSyncedWithDisplay = true;
         }
     },
@@ -115,7 +115,7 @@ export default {
     methods: {
 
         fieldLinked(field) {
-            this.tab.fields.push(field);
+            this.section.fields.push(field);
             this.$toast.success(__('Field added'));
 
             if (field.type === 'reference') {
@@ -124,15 +124,15 @@ export default {
         },
 
         fieldCreated(field) {
-            this.tab.fields.push(field);
+            this.section.fields.push(field);
         },
 
         fieldUpdated(i, field) {
-            this.tab.fields.splice(i, 1, field);
+            this.section.fields.splice(i, 1, field);
         },
 
         deleteField(i) {
-            this.tab.fields.splice(i, 1);
+            this.section.fields.splice(i, 1);
         },
 
         focus() {
