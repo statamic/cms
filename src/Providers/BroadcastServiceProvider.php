@@ -30,7 +30,7 @@ class BroadcastServiceProvider extends ServiceProvider
 
     protected function enabled()
     {
-        return in_array(
+        return config('statamic.broadcasting.enabled') && in_array(
             \App\Providers\BroadcastServiceProvider::class,
             array_keys($this->app->getLoadedProviders())
         );
