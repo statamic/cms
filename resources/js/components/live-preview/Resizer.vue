@@ -17,6 +17,11 @@ export default {
 
         resizeEnd() {
             this.$emit('resize-end');
+
+            // Fieldtypes that need to update based on preview
+            // resize event (like Code Fieldtype) need to be informed
+            this.$root.$emit('live-preview-resize-end');
+
             window.removeEventListener('mousemove', this.resizing, false);
             window.removeEventListener('mouseup', this.resizeEnd, false);
         },

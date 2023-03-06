@@ -127,6 +127,9 @@ export default {
 
         // CodeMirror also needs to be manually refreshed when made visible in the DOM
         this.$events.$on('tab-switched', this.refresh);
+
+        // Refresh on preview resize
+        this.$root.$on('live-preview-resize-end', this.refresh);
     },
 
     watch: {
