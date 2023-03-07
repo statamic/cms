@@ -43,6 +43,21 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Additional Image Formats
+        |--------------------------------------------------------------------------
+        |
+        | Define any additional image file formats you would like Statamic to
+        | process. You should ensure that both your server and the selected
+        | image manipulation driver properly support your chosen formats.
+        |
+        */
+
+        'additional_formats' => [
+            // 'heic',
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
         | Save Cached Images
         |--------------------------------------------------------------------------
         |
@@ -98,21 +113,6 @@ return [
         */
 
         'generate_presets_on_upload' => true,
-
-        /*
-        |--------------------------------------------------------------------------
-        | Other Input File Formats
-        |--------------------------------------------------------------------------
-        |
-        | Define any additional input file formats you'd like to process through
-        | the {{ glide }} tag. You should ensure your server and selected image
-        | driver support all formats specified.
-        |
-        */
-
-        'other_formats' => [
-            // 'heic',
-        ],
 
     ],
 

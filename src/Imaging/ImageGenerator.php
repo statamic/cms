@@ -308,7 +308,7 @@ class ImageGenerator
             $mime = File::mimeType($path);
         }
 
-        $others = config('statamic.assets.image_manipulation.other_formats', []);
+        $others = config('statamic.assets.image_manipulation.additional_formats', []);
 
         if ($mime !== null && strncmp($mime, 'image/', 6) !== 0 && ! in_array(pathinfo($path, PATHINFO_EXTENSION), $others)) {
             throw new \Exception("Image [{$path}] does not actually appear to be an image.");
@@ -357,14 +357,14 @@ class ImageGenerator
      */
     public static function allowedFileFormats()
     {
-        $others = config('statamic.assets.image_manipulation.other_formats', []);
+        $additional = config('statamic.assets.image_manipulation.additional_formats', []);
 
         $driver = config('statamic.assets.image_manipulation.driver');
 
         if ($driver == 'gd') {
-            return array_merge(['jpeg', 'jpg', 'png', 'gif', 'webp'], $others);
+            return array_merge(['jpeg', 'jpg', 'png', 'gif', 'webp'], $additional);
         } elseif ($driver == 'imagick') {
-            return array_merge(['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'], $others);
+            return array_merge(['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'], $additional);
         }
 
         throw new \Exception("Unsupported image manipulation driver [$driver]");
