@@ -111,7 +111,7 @@ return [
         */
 
         'other_formats' => [
-            // 'image/heic' => ['heic'],
+            // 'heic',
         ],
 
     ],

@@ -350,9 +350,7 @@ class Glide extends Tags
      */
     private function allowedFileFormats()
     {
-        $others = collect(config('statamic.assets.image_manipulation.other_formats', []))
-            ->flatten()
-            ->all();
+        $others = config('statamic.assets.image_manipulation.other_formats', []);
 
         $driver = config('statamic.assets.image_manipulation.driver');
 
