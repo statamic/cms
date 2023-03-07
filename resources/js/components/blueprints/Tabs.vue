@@ -20,8 +20,8 @@
             :key="tab._id"
             v-show="currentTab === tab._id"
         >
-            <h3>{{ tab.display }}</h3>
-            <h3>{{ tab.handle }}</h3>
+            <input type="text" v-model="tab.display" class="input-text" />
+            <input type="text" v-model="tab.handle" class="input-text font-mono text-sm" />
 
             <sections
                 ref="sections"
