@@ -109,7 +109,7 @@ export default {
 
         handleShowFilters() {
             this.showFilters = true;
-            this.$refs.search.focus();
+            this.$nextTick(() => this.$refs.search.focus());
         },
 
         unselectAllItems() {
