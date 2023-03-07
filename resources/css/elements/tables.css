@@ -16,7 +16,7 @@
 }
 
 .data-list-bulk-actions {
-	@apply bg-white absolute w-full py-3 z-10;
+	@apply bg-white absolute w-full py-2 z-10;
 	padding-left: 56px;
 }
 
