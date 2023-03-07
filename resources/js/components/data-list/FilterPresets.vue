@@ -16,14 +16,14 @@
                 </button>
             </template>
 
-            <button class="pill-tab" @click="savePreset" >
+            <button class="pill-tab" @click="createNewEmptyPreset" >
                 <svg-icon name="add-bold" class="w-3 h-3"/>
             </button>
         </div>
 
         <confirmation-modal
             :buttonText="__('Save')"
-            :title="__('Name this view')"
+            :title="__('Create New View')"
             v-if="showSaveModal"
             @cancel="showSaveModal = false"
             @confirm="handleSavePreset"
@@ -121,6 +121,11 @@ export default {
             this.handleSavePreset();
         },
 
+        createNewEmptyPreset() {
+            this.savingPresetName = null;
+            this.showSaveModal = true;
+        },
+
         handleSavePreset() {
             let presetHandle = this.activePreset || this.$slugify(this.savingPresetName, '_');
 
@@ -130,7 +135,7 @@ export default {
                     this.showSaveModal = false;
                     this.getPresets();
                     this.viewPreset(presetHandle);
-                    this.hasActiveFilters ? this.$emit('hide-filters') : this.$emit('show-filters');
+                    this.hasActiveFilters ? this.refreshPreset() : this.$emit('show-filters');
                 })
                 .catch(error => {
                     this.$toast.error(__('Unable to save view'));
@@ -141,6 +146,12 @@ export default {
         refreshPresets() {
             this.getPresets();
             this.viewAll();
+        },
+
+        refreshPreset() {
+            this.getPresets();
+            this.$emit('hide-filters');
+            this.viewPreset(this.activePreset);
         },
 
         viewAll() {
