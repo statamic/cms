@@ -142,7 +142,10 @@ input.input-text-minimal:read-only,
 
 .radio-fieldtype .option,
 .checkboxes-fieldtype .option {
-    @apply mt-3 flex items-center;
+    @apply flex items-center;
+    &:not(:first-child) {
+        @apply mt-3;
+    }
 
     input {
         @apply leading-normal mr-1;

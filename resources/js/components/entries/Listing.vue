@@ -38,7 +38,7 @@
                         <div class="flex ml-2 space-x-2">
                             <button class="btn py-1 px-2 h-8" v-text="__('Cancel')" v-show="showFilters" @click="filtersHide" />
                             <button class="btn py-1 px-2 h-8" v-text="__('Save')" v-show="showFilters && isDirty" @click="$refs.presets.savePreset()" />
-                            <button class="btn flex items-center py-1 px-2 h-8" @click="showFilters = true" v-if="! showFilters" v-tooltip="__('Show Filter Controls')">
+                            <button class="btn flex items-center py-1 px-2 h-8 w-12" @click="showFilters = true" v-if="! showFilters" v-tooltip="__('Show Filter Controls')">
                                 <svg-icon name="search" class="w-4 h-4" />
                                 <svg-icon name="filter-lines" class="w-4 h-4" />
                             </button>

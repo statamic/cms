@@ -45,8 +45,8 @@
 
         th {
             @apply font-medium px-4 py-2;
-            &:first-child { @apply rounded-tl; }
-			&:last-child { @apply rounded-tr; }
+            &:first-child { @apply rounded-tl-lg; }
+			&:last-child { @apply rounded-tr-lg; }
 			&:hover {
 				@apply text-gray-900;
 			}
