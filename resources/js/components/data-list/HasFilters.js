@@ -116,7 +116,12 @@ export default {
 
         handleShowFilters() {
             this.showFilters = true;
-            this.$nextTick(() => this.$refs.search.focus());
+
+            this.$nextTick(function () {
+                if (this.$refs.search) {
+                    this.$refs.search.focus();
+                }
+            });
         },
 
         unselectAllItems() {
