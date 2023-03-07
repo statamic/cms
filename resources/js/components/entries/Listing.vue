@@ -19,11 +19,11 @@
                 <div class="card p-0 relative">
                     <div class="flex items-center justify-between p-2 text-sm border-b">
 
-                        <data-list-search class="h-8" @keydown.f="showFilters = true" v-if="showFilters" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+                        <data-list-search class="h-8" v-if="showFilters" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
 
                         <data-list-filter-presets
-                            v-show="!reordering && ! showFilters"
                             ref="presets"
+                            v-show="!reordering && ! showFilters"
                             :active-preset="activePreset"
                             :active-preset-payload="activePresetPayload"
                             :active-filters="activeFilters"
