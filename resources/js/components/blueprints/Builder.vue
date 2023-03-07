@@ -40,6 +40,7 @@
         <tabs
             v-if="useTabs"
             :initial-tabs="blueprint.tabs"
+            @updated="tabsUpdated"
         />
 
     </div>

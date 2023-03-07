@@ -63,6 +63,14 @@ export default {
         }
     },
 
+    watch: {
+
+        tabs(tabs) {
+            this.$emit('updated', tabs);
+        }
+
+    },
+
     mounted() {
         // this.ensureTab();
         this.makeSortable();

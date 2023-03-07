@@ -34,7 +34,7 @@ trait ManagesBlueprints
         $tabs = collect($request->tabs)->mapWithKeys(function ($tab) {
             return [array_pull($tab, 'handle') => [
                 'display' => $tab['display'],
-                'fields' => $this->tabFields($tab['fields']),
+                'sections' => $this->tabSections($tab['sections']),
             ]];
         })->all();
 
@@ -68,10 +68,16 @@ trait ManagesBlueprints
         $blueprint->save();
     }
 
-    private function tabFields(array $fields)
+    private function tabSections(array $sections)
     {
-        return collect($fields)->map(function ($field) {
-            return FieldTransformer::fromVue($field);
+        return collect($sections)->map(function ($section) {
+            return [
+                'display' => $section['display'] ?? null,
+                'instructions' => $section['instructions'] ?? null,
+                'fields' => collect($section['fields'])
+                    ->map(fn ($field) => FieldTransformer::fromVue($field))
+                    ->all(),
+            ];
         })->all();
     }
 
