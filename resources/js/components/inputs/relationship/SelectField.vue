@@ -38,7 +38,7 @@
                     item-class="sortable-item"
                     handle-class="sortable-item"
                     :value="items"
-                    :delay="0"
+                    :delay="75"
                     @input="input"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
