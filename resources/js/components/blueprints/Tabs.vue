@@ -6,12 +6,12 @@
             <div
                 v-for="tab in tabs"
                 :key="tab._id"
-                class="blueprint-tab card py-2 mr-2"
+                class="blueprint-tab card px-5 py-2 mr-2 cursor-pointer"
+                :class="{ 'bg-blue-100': currentTab === tab._id }"
                 @click="selectTab(tab._id)"
                 @mouseenter="mouseEnteredTab(tab._id)"
             >
                 {{ tab.display }}
-                ({{ tab._id }})
             </div>
         </div>
 
@@ -101,7 +101,8 @@ export default {
                 draggable: '.blueprint-tab',
                 mirror: { constrainDimensions: true },
                 swapAnimation: { horizontal: true },
-                plugins: [Plugins.SwapAnimation]
+                plugins: [Plugins.SwapAnimation],
+                distance: 10,
             }).on('sortable:stop', e => {
                 this.tabs.splice(e.newIndex, 0, this.tabs.splice(e.oldIndex, 1)[0]);
             }).on('mirror:create', (e) => e.cancel());
