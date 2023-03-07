@@ -7,10 +7,10 @@
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
                 <div class="p-3 py-2 flex-1">
                     <span class="font-medium mr-2">
-                        <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
+                        <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" :placeholder="`${__('Title')} (${__('Optional')})`" />
                     </span>
-                    <span class="font-mono text-xs text-gray-700 mr-2">
-                        <input type="text" v-model="section.handle" @input="handleSyncedWithDisplay = false" class="bg-transparent w-full outline-none" />
+                    <span class="text-xs text-gray-700 mr-2">
+                        <input type="text" v-model="section.instructions" class="bg-transparent w-full outline-none" :placeholder="`${__('Instructions')} (${__('Optional')})`" />
                     </span>
                 </div>
                 <div class="flex items-center px-3">
@@ -82,7 +82,6 @@ export default {
     data() {
         return {
             editingField: null,
-            handleSyncedWithDisplay: false
         }
     },
 
@@ -99,22 +98,8 @@ export default {
             handler(section) {
                 this.$emit('updated', section);
             }
-        },
-
-        'section.display': function(display) {
-            if (this.handleSyncedWithDisplay) {
-                this.section.handle = this.$slugify(display, '_');
-            }
         }
 
-    },
-
-    created() {
-        // This logic isn't ideal, but it was better than passing along a 'isNew' boolean and having
-        // to deal with stripping it out and making it not new, etc. Good enough for a quick win.
-        if (!this.section.handle || this.section.handle == 'new_section' || this.section.handle == 'new_set') {
-            this.handleSyncedWithDisplay = true;
-        }
     },
 
     methods: {
