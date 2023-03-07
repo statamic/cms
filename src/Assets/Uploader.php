@@ -3,12 +3,11 @@
 namespace Statamic\Assets;
 
 use Statamic\Facades\Glide;
+use Statamic\Imaging\ImageGenerator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Uploader
 {
-    const AVOID_PROCESSING_EXTENSIONS = ['svg', 'pdf'];
-
     public function upload(UploadedFile $file)
     {
         $source = $this->processSourceFile($file);
@@ -26,7 +25,7 @@ abstract class Uploader
             return $file->getRealPath();
         }
 
-        if (in_array($file->guessExtension(), static::AVOID_PROCESSING_EXTENSIONS)) {
+        if (! in_array($file->guessExtension(), ImageGenerator::allowedFileFormats())) {
             return $file->getRealPath();
         }
 
@@ -39,7 +38,6 @@ abstract class Uploader
         try {
             return $cache.'/'.$server->makeImage($file->getFilename(), ['p' => $preset]);
         } catch (\Exception $exception) {
-            // Glide can't process the file, ie. it's not an image.
             return $file->getRealPath();
         }
     }
