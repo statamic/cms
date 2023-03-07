@@ -168,10 +168,9 @@ export default {
 
         fieldHasBeenDropped(e) {
             const oldTabId = e.oldContainer.dataset.tab;
-            const newTabId = e.newContainer.dataset.tab;
-            const oldTab = this.tabs.find(tab => tab._id === oldTabId);
-            const newTab = this.tabs.find(tab => tab._id === newTabId);
-            const oldSection = oldTab.sections.find(section => section._id === e.oldContainer.dataset.section);
+            let newTabId = e.newContainer.dataset.tab;
+            let newTab = this.tabs.find(tab => tab._id === newTabId);
+            let newIndex = e.newIndex
             let newSection;
 
             if (e.newContainer.parentElement.classList.contains('blueprint-add-section-button')) {
@@ -180,8 +179,21 @@ export default {
                 newSection = newTab.sections.find(section => section._id === e.newContainer.dataset.section);
             }
 
+            if (this.lastInteractedTab !== this.currentTab
+            && this.currentTab !== newTabId) {
+                // Dragged over tab but haven't dragged into a droppable spot yet.
+                // In this case we'll assume they want to dropped into the first section of that tab.
+                newTabId = this.currentTab;
+                newTab = this.tabs.find(tab => tab._id === newTabId);
+                newSection = newTab.sections[0];
+                newIndex = 0;
+            }
+
+            const oldTab = this.tabs.find(tab => tab._id === oldTabId);
+            const oldSection = oldTab.sections.find(section => section._id === e.oldContainer.dataset.section);
+
             const field = oldSection.fields.splice(e.oldIndex, 1)[0];
-            newSection.fields.splice(e.newIndex, 0, field);
+            newSection.fields.splice(newIndex, 0, field);
 
             this.updateTab(oldTabId, oldTab);
             this.updateTab(newTabId, newTab);
