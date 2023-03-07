@@ -46,7 +46,7 @@ return [
     'edit_{global}_globals' => 'Wijzig :global globals',
     'group_assets' => 'Assets',
     'configure_asset_containers' => 'Beheer asset-containers',
-    'configure_asset_containers_desc' => 'Geeft teogang tot alle rechten behorende bij assets',
+    'configure_asset_containers_desc' => 'Geeft toegang tot alle rechten behorende bij assets',
     'view_{container}_assets' => 'Bekijk :container assets',
     'upload_{container}_assets' => 'Upload nieuwe assets',
     'edit_{container}_assets' => 'Wijzig assets',
