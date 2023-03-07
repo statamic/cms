@@ -1,6 +1,6 @@
 <template>
     <table ref="table" tabindex="0" class="data-table" :class="{ 'opacity-50': loading, 'select-none' : shifting }" @keydown.shift="shiftDown" @keyup="clearShift">
-        <thead v-if="allowBulkActions || allowColumnPicker || visibleColumns.length > 1">
+        <thead v-if="allowBulkActions || visibleColumns.length > 1">
             <tr>
                 <th class="checkbox-column" v-if="allowBulkActions || reorderable">
                     <data-list-toggle-all ref="toggleAll" v-if="allowBulkActions && !singleSelect" />
