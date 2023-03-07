@@ -107,6 +107,11 @@ export default {
             this.showFilters = true;
         },
 
+        handleShowFilters() {
+            this.showFilters = true;
+            this.$refs.search.focus();
+        },
+
         unselectAllItems() {
             if (this.$refs.dataList) {
                 this.$refs.dataList.clearSelections();
