@@ -25,7 +25,11 @@ class UserRole extends Filter
 
     public function apply($query, $values)
     {
-        $query->where('role', $values['role']);
+        if ($values['role'] === 'super') {
+            $query->where('super', true);
+        } else {
+            $query->where('roles/'.$values['role'], true);
+        }
     }
 
     public function badge($values)

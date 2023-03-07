@@ -2,11 +2,12 @@ export default {
 
     data() {
         return {
+            activeFilterBadges: {},
+            activeFilters: {},
             activePreset: null,
             activePresetPayload: {},
             searchQuery: '',
-            activeFilters: {},
-            activeFilterBadges: {},
+            showFilters: false,
         }
     },
 
@@ -22,10 +23,44 @@ export default {
             return count;
         },
 
+        canSave() {
+            return this.isDirty && this.preferencesPrefix;
+        },
+
+        isDirty() {
+            if (! this.isFiltering) return false;
+
+            if (this.activePreset) {
+                return this.activePresetPayload.query != this.searchQuery
+                    || ! _.isEqual(this.activePresetPayload.filters || {}, this.activeFilters);
+            }
+
+            return true;
+        },
+
+        isFiltering() {
+            return ! _.isEmpty(this.activeFilters) || this.searchQuery || this.activePreset;
+        },
+
         hasActiveFilters() {
             return this.activeFilterCount > 0;
-        }
+        },
 
+        searchPlaceholder() {
+            if (this.activePreset) {
+                return __('Searching in: ') + this.activePresetPayload.display;
+            }
+
+            return __('Search');
+        },
+
+    },
+
+    created() {
+        this.$keys.bind('f', e => {
+            e.preventDefault();
+            this.handleShowFilters();
+        });
     },
 
     methods: {
@@ -65,8 +100,28 @@ export default {
             this.activePreset = null;
             this.activePresetPayload = {};
             this.searchQuery = '';
+            this.showFilters = false;
             this.activeFilters = {};
             this.activeFilterBadges = {};
+        },
+
+        filtersHide() {
+            this.showFilters = false;
+            this.searchQuery = '';
+        },
+
+        filtersShow() {
+            this.showFilters = true;
+        },
+
+        handleShowFilters() {
+            this.showFilters = true;
+
+            this.$nextTick(function () {
+                if (this.$refs.search) {
+                    this.$refs.search.focus();
+                }
+            });
         },
 
         unselectAllItems() {

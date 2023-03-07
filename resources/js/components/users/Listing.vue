@@ -1,4 +1,4 @@
-    <template>
+<template>
     <div>
 
         <div v-if="initializing" class="card loading">
@@ -8,16 +8,63 @@
         <data-list
             v-if="!initializing"
             ref="dataList"
-            :columns="columns"
             :rows="items"
+            :columns="columns"
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0 relative">
-                    <div class="data-list-header">
-                        <data-list-search v-model="searchQuery" />
+                    <div class="flex items-center justify-between p-2 text-sm border-b">
+
+                        <data-list-search class="h-8" v-if="showFilters" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+
+                        <data-list-filter-presets
+                            ref="presets"
+                            v-show="! showFilters"
+                            :active-preset="activePreset"
+                            :active-preset-payload="activePresetPayload"
+                            :active-filters="activeFilters"
+                            :has-active-filters="hasActiveFilters"
+                            :preferences-prefix="preferencesPrefix"
+                            :search-query="searchQuery"
+                            @selected="selectPreset"
+                            @reset="filtersReset"
+                            @hide-filters="filtersHide"
+                            @show-filters="filtersShow"
+                        />
+                        <div class="flex ml-2 space-x-2">
+                            <button class="btn py-1 px-2 h-8" v-text="__('Cancel')" v-show="showFilters" @click="filtersHide" />
+                            <button class="btn py-1 px-2 h-8" v-text="__('Save')" v-show="showFilters && isDirty" @click="$refs.presets.savePreset()" />
+                            <button class="btn flex items-center py-1 px-2 h-8" @click="handleShowFilters" v-if="! showFilters" v-tooltip="__('Show Filter Controls')">
+                                <svg-icon name="search" class="w-4 h-4" />
+                                <svg-icon name="filter-lines" class="w-4 h-4" />
+                            </button>
+                            <data-list-column-picker :preferences-key="preferencesKey('columns')" />
+                        </div>
+                    </div>
+
+                   <div v-show="showFilters">
+                        <data-list-filters
+                            ref="filters"
+                            :filters="filters"
+                            :active-preset="activePreset"
+                            :active-preset-payload="activePresetPayload"
+                            :active-filters="activeFilters"
+                            :active-filter-badges="activeFilterBadges"
+                            :active-count="activeFilterCount"
+                            :search-query="searchQuery"
+                            :is-searching="showFilters"
+                            :saves-presets="true"
+                            :preferences-prefix="preferencesPrefix"
+                            @filter-changed="filterChanged"
+                            @search-changed="searchChanged"
+                            @saved="$refs.presets.setPreset($event)"
+                            @deleted="$refs.presets.refreshPresets()"
+                            @restore-preset="$refs.presets.viewPreset($event)"
+                            @reset="filtersReset"
+                        />
                     </div>
 
                     <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />

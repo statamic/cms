@@ -11,7 +11,6 @@ abstract class Filter extends Scope implements Arrayable
     use HasTitle, HasFields;
 
     protected $context = [];
-    protected $pinned = false;
 
     public function visibleTo($key)
     {
@@ -59,7 +58,6 @@ abstract class Filter extends Scope implements Arrayable
             'handle' => $this->handle(),
             'title' => $this->title(),
             'extra' => $this->extra(),
-            'pinned' => $this->pinned(),
             'auto_apply' => $this->autoApply(),
             'fields' => $this->fields()->toPublishArray(),
             'meta' => $this->fields()->meta(),

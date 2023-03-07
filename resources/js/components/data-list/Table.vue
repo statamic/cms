@@ -1,6 +1,6 @@
 <template>
     <table ref="table" tabindex="0" class="data-table" :class="{ 'opacity-50': loading, 'select-none' : shifting }" @keydown.shift="shiftDown" @keyup="clearShift">
-        <thead v-if="allowBulkActions || allowColumnPicker || visibleColumns.length > 1">
+        <thead v-if="allowBulkActions || visibleColumns.length > 1">
             <tr>
                 <th class="checkbox-column" v-if="allowBulkActions || reorderable">
                     <data-list-toggle-all ref="toggleAll" v-if="allowBulkActions && !singleSelect" />
@@ -25,9 +25,7 @@
                     <template v-if="type === 'entries'">{{ __('Collection') }}</template>
                     <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
                 </th>
-                <th class="actions-column">
-                    <data-list-column-picker :preferences-key="columnPreferencesKey" v-if="allowColumnPicker" />
-                </th>
+                <th class="actions-column" />
             </tr>
         </thead>
         <sortable-list
@@ -123,13 +121,6 @@ export default {
         reorderable: {
             type: Boolean,
             default: false
-        },
-        allowColumnPicker: {
-            type: Boolean,
-            default: false
-        },
-        columnPreferencesKey: {
-            type: String,
         },
         type: {
             type: String

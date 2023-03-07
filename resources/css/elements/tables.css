@@ -16,7 +16,7 @@
 }
 
 .data-list-bulk-actions {
-	@apply bg-white absolute w-full py-3 z-10;
+	@apply bg-white absolute w-full py-2 z-10;
 	padding-left: 56px;
 }
 
@@ -37,16 +37,16 @@
 	overflow-x: auto;
 
     thead {
-		@apply text-sm text-gray-700 text-gray-900;
+		@apply bg-gray-100 text-xs text-gray-700 text-gray-900;
 
 		tr {
 			@apply border-b;
 		}
 
         th {
-            @apply font-medium px-4 py-3;
-            &:first-child { @apply rounded-tl; }
-			&:last-child { @apply rounded-tr; }
+            @apply font-medium px-4 py-2;
+            &:first-child { @apply rounded-tl-lg; }
+			&:last-child { @apply rounded-tr-lg; }
 			&:hover {
 				@apply text-gray-900;
 			}
@@ -127,12 +127,10 @@
         }
 
         &.current-column {
-            @apply font-bold;
             svg { opacity: 1; }
         }
 
         svg {
-            /*  transition: all 150ms ease; */
             opacity: 0;
         }
 

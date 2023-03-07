@@ -64,8 +64,8 @@ abstract class UserRepository implements RepositoryContract
         $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address', 'listable' => true]);
 
         if (Statamic::pro()) {
-            $blueprint->ensureField('roles', ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true]);
-            $blueprint->ensureField('groups', ['type' => 'user_groups', 'mode' => 'select', 'width' => 50, 'listable' => true]);
+            $blueprint->ensureField('roles', ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true, 'filterable' => false]);
+            $blueprint->ensureField('groups', ['type' => 'user_groups', 'mode' => 'select', 'width' => 50, 'listable' => true, 'filterable' => false]);
         } else {
             $blueprint->removeField('roles');
             $blueprint->removeField('groups');

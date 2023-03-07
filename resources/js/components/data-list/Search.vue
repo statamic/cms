@@ -2,17 +2,31 @@
     <input
         type="text"
         ref="input"
-        :placeholder="__('Search...')"
+        :placeholder="__(placeholder)"
         :value="value"
         @input="emitEvent"
         @keyup.esc="reset"
+        autofocus
         class="input-text flex-1 bg-white text-sm">
 </template>
 
 <script>
 export default {
 
-    props: ['value'],
+    props: [
+        'value'
+    ],
+
+    props: {
+        placeholder: {
+            type: String,
+            default: 'Search...'
+        },
+        value: {
+            type: String,
+            default: ''
+        }
+    },
 
     methods: {
         emitEvent: _.debounce(function (event) {

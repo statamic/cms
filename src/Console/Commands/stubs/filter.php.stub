@@ -7,13 +7,6 @@ use Statamic\Query\Scopes\Filter;
 class DummyClass extends Filter
 {
     /**
-     * Pin the filter.
-     *
-     * @var bool
-     */
-    public $pinned = false;
-
-    /**
      * Define the filter's title.
      *
      * @return string

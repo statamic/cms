@@ -97,7 +97,7 @@ button {
     }
 
     &:focus {
-        @apply focus-outline bg-gray-300;
+        @apply ring-2 outline-none;
     }
 
     &:active, &:focus:active {
