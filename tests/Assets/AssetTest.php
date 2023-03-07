@@ -1644,8 +1644,21 @@ class AssetTest extends TestCase
         $this->assertEquals(15, $meta['height']);
     }
 
-    /** @test */
-    public function it_doesnt_error_when_uploading_non_glideable_file_with_glide_config()
+    protected function nonGlideableFileFormats()
+    {
+        return [
+            ['txt'], // not an image
+            ['md'],  // not an image
+            ['svg'], // doesn't work with imagick
+            ['pdf'], // doesn't work with imagick
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider nonGlideableFileFormats
+     **/
+    public function it_doesnt_process_or_error_when_uploading_non_glideable_file_with_glide_config($extension)
     {
         Event::fake();
 
@@ -1656,18 +1669,20 @@ class AssetTest extends TestCase
 
         $this->container->sourcePreset('small');
 
-        $asset = (new Asset)->container($this->container)->path('path/to/readme.md')->syncOriginal();
+        $asset = (new Asset)->container($this->container)->path("path/to/file.{$extension}")->syncOriginal();
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
-        Storage::disk('test')->assertMissing('path/to/readme.md');
+        Storage::disk('test')->assertMissing("path/to/file.{$extension}");
 
-        $return = $asset->upload(UploadedFile::fake()->create('readme.md'));
+        Facades\Glide::shouldReceive('server')->never();
+
+        $return = $asset->upload(UploadedFile::fake()->create("file.{$extension}"));
 
         $this->assertEquals($asset, $return);
         $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
         $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
-        Storage::disk('test')->assertExists('path/to/readme.md');
-        $this->assertEquals('path/to/readme.md', $asset->path());
+        Storage::disk('test')->assertExists("path/to/file.{$extension}");
+        $this->assertEquals("path/to/file.{$extension}", $asset->path());
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
             return $event->asset = $asset;
         });
