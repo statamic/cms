@@ -7,7 +7,8 @@
                 v-for="tab in tabs"
                 :key="tab._id"
                 class="blueprint-tab card py-2 mr-2"
-                @click="currentTab = tab._id"
+                @click="selectTab(tab._id)"
+                @mouseenter="mouseEnteredTab(tab._id)"
             >
                 {{ tab.display }}
                 ({{ tab._id }})
@@ -16,12 +17,9 @@
 
         <div
             v-for="(tab, i) in tabs"
-            class="card mb-5"
+            :key="tab._id"
+            v-show="currentTab === tab._id"
         >
-
-            <div v-if="currentTab === tab._id">
-                (Current tab)
-            </div>
             <h3>{{ tab.display }}</h3>
             <h3>{{ tab.handle }}</h3>
 
@@ -61,6 +59,7 @@ export default {
         return {
             tabs: this.initialTabs,
             currentTab: this.initialTabs[0]._id,
+            lastInteractedTab: null
         }
     },
 
@@ -106,9 +105,13 @@ export default {
             sortableSections = new Sortable(document.querySelectorAll('.blueprint-sections'), {
                 draggable: '.blueprint-section',
                 handle: '.blueprint-section-drag-handle',
-                mirror: { constrainDimensions: true },
+                mirror: { constrainDimensions: true, appendTo: 'body' },
                 plugins: [Plugins.SwapAnimation]
-            }).on('sortable:stop', e => this.sectionHasBeenDropped(e));
+            })
+            .on('drag:start', e => this.lastInteractedTab = this.currentTab)
+            .on('drag:stop', e => this.lastInteractedTab = null)
+            .on('sortable:sort', e => this.lastInteractedTab = this.currentTab)
+            .on('sortable:stop', e => this.sectionHasBeenDropped(e));
         },
 
 
@@ -120,7 +123,10 @@ export default {
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
                 plugins: [Plugins.SwapAnimation]
-            }).on('sortable:stop', e => this.fieldHasBeenDropped(e));
+            })
+            .on('drag:start', e => this.lastInteractedTab = this.currentTab)
+            .on('drag:stop', e => this.lastInteractedTab = null)
+            .on('sortable:stop', e => this.fieldHasBeenDropped(e));
         },
 
         sectionsUpdated(tabId, sections) {
@@ -130,9 +136,18 @@ export default {
 
         sectionHasBeenDropped(e) {
             const oldTabId = e.oldContainer.dataset.tab;
-            const newTabId = e.newContainer.dataset.tab;
             const oldIndex = e.oldIndex;
-            const newIndex = e.newIndex;
+            let newTabId = e.newContainer.dataset.tab;
+            let newIndex = e.newIndex;
+
+            if (this.lastInteractedTab !== this.currentTab
+            && this.currentTab !== newTabId) {
+                // Dragged over tab but haven't dragged into a droppable spot yet.
+                // In this case we'll assume they want to drop it at the top of the tab.
+                newTabId = this.currentTab;
+                newIndex = 0;
+            }
+
             const hasMovedTabs = oldTabId !== newTabId;
 
             if (hasMovedTabs) {
@@ -177,7 +192,15 @@ export default {
         updateTab(tabId, tab) {
             const index = this.tabs.findIndex(tab => tab._id === tabId);
             this.tabs.splice(index, 1, tab);
-        }
+        },
+
+        selectTab(tabId) {
+            this.currentTab = tabId;
+        },
+
+        mouseEnteredTab(tabId) {
+            if (this.lastInteractedTab) this.selectTab(tabId);
+        },
 
     }
 
