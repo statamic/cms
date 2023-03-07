@@ -1,28 +1,20 @@
 <template>
     <div class="w-full" v-if="isFiltering || isSearching">
         <div class="flex flex-wrap px-3 border-b pt-2">
-            <popover v-if="filters.length">
+
+            <!-- Field filter (requires custom selection UI) -->
+            <popover v-if="fieldFilter">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
-                        {{ __('Filter') }}
+                        {{ __('Field') }}
                         <svg-icon name="chevron-down-xs" class="w-2 h-2 mx-2" />
                     </button>
                 </template>
                 <template #default="{ close: closePopover, afterClosed: afterPopoverClosed }">
                     <div class="flex flex-col text-left w-64">
                         <h6 class="p-4 pb-0" v-text="__('Show everything where:')"/>
-                        <div v-if="showFilterSelection" class="p-4 pt-2">
-                            <button
-                                v-for="filter in unpinnedFilters"
-                                :key="filter.handle"
-                                v-text="filter.title"
-                                class="btn w-full mt-2"
-                                @click="creating = filter.handle"
-                            />
-                        </div>
                         <div class="filter-fields text-sm">
                             <field-filter
-                                v-show="showFieldFilter"
                                 ref="fieldFilter"
                                 :config="fieldFilter"
                                 :values="activeFilters.fields || {}"
@@ -46,7 +38,9 @@
                     </div>
                 </template>
             </popover>
-            <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle" placement="bottom-end">
+
+            <!-- Standard non-field filters -->
+            <popover v-if="standardFilters.length" v-for="filter in standardFilters" :key="filter.handle" placement="bottom-end">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2">
                         {{ filter.title }}
@@ -66,6 +60,7 @@
                 </template>
             </popover>
 
+            <!-- Active filter badges -->
             <div class="filter-badge mr-2 mb-2" v-for="(badge, handle) in fieldFilterBadges">
                 <span>{{ badge }}</span>
                 <button @click="removeFieldFilter(handle)" v-tooltip="__('Remove Filter')">&times;</button>
@@ -74,6 +69,7 @@
                 <span>{{ badge }}</span>
                 <button @click="removeStandardFilter(handle)" v-tooltip="__('Remove Filter')">&times;</button>
             </div>
+
         </div>
     </div>
 
@@ -136,26 +132,6 @@ export default {
 
         standardFilters() {
             return this.filters.filter(filter => filter.handle !== 'fields');
-        },
-
-        pinnedFilters() {
-            return this.filters.filter(filter => filter.pinned);
-        },
-
-        unpinnedFilters() {
-            return this.filters.filter(filter => ! filter.pinned);
-        },
-
-        showFilterSelection() {
-            if (this.fieldFilter && this.unpinnedFilters.length === 1) return false;
-
-            return ! this.creating;
-        },
-
-        showFieldFilter() {
-            if (this.fieldFilter && this.unpinnedFilters.length === 1) return true;
-
-            return this.creating === 'fields';
         },
 
         fieldFilterBadges() {
