@@ -17,16 +17,39 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0 relative">
-                    <data-list-filter-presets
-                        v-if="!reordering"
-                        ref="presets"
-                        :active-preset="activePreset"
-                        :preferences-prefix="preferencesPrefix"
-                        @selected="selectPreset"
-                        @reset="filtersReset"
-                    />
-                    <div class="data-list-header" v-if="!reordering">
+                    <div class="flex items-center justify-between p-2 text-sm border-b">
+
+                        <data-list-search class="h-8" @keydown.f="showFilters = true" v-if="showFilters" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+
+                        <data-list-filter-presets
+                            v-show="!reordering && ! showFilters"
+                            ref="presets"
+                            :active-preset="activePreset"
+                            :active-preset-payload="activePresetPayload"
+                            :active-filters="activeFilters"
+                            :has-active-filters="hasActiveFilters"
+                            :preferences-prefix="preferencesPrefix"
+                            :search-query="searchQuery"
+                            @selected="selectPreset"
+                            @reset="filtersReset"
+                            @hide-filters="filtersHide"
+                            @show-filters="filtersShow"
+                        />
+
+                        <!-- Leave until last, final location TBD -->
+                        <div class="flex ml-2 space-x-2">
+                            <button class="btn py-1 px-2 h-8" v-text="__('Cancel')" v-show="showFilters" @click="filtersHide" />
+                            <button class="btn py-1 px-2 h-8" v-text="__('Save')" v-show="showFilters && isDirty" @click="$refs.presets.savePreset()" />
+                            <button class="btn flex items-center py-1 px-2 h-8" @click="showFilters = true" v-if="! showFilters" v-tooltip="__('Search & Filter')">
+                                <svg-icon name="search" class="w-4 h-4" />
+                                <svg-icon name="filter-lines" class="w-4 h-4" />
+                            </button>
+                            <data-list-column-picker :preferences-key="preferencesKey('columns')" />
+                        </div>
+                    </div>
+                    <div v-show="!reordering && showFilters">
                         <data-list-filters
+                            ref="filters"
                             :filters="filters"
                             :active-preset="activePreset"
                             :active-preset-payload="activePresetPayload"
@@ -34,6 +57,7 @@
                             :active-filter-badges="activeFilterBadges"
                             :active-count="activeFilterCount"
                             :search-query="searchQuery"
+                            :is-searching="showFilters"
                             :saves-presets="true"
                             :preferences-prefix="preferencesPrefix"
                             @filter-changed="filterChanged"
@@ -61,8 +85,6 @@
                         :reorderable="reordering"
                         :sortable="!reordering"
                         :toggle-selection-on-row-click="true"
-                        :allow-column-picker="true"
-                        :column-preferences-key="preferencesKey('columns')"
                         @sorted="sorted"
                         @reordered="reordered"
                     >
@@ -101,7 +123,6 @@
                 />
             </div>
         </data-list>
-
     </div>
 </template>
 
@@ -215,7 +236,6 @@ export default {
                     this.$toast.error(__('Something went wrong'));
                 });
         },
-
     }
 
 }

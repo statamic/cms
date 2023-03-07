@@ -88,3 +88,15 @@
 @screen md {
     .tabs .tab-button { @apply text-base; }
 }
+
+.pill-tab {
+    @apply text-gray-700 flex items-center focus:outline-none px-2 py-1 rounded;
+
+    &:hover {
+        @apply text-gray-900;
+    }
+
+    &.active {
+        @apply bg-blue-100 text-blue-900;
+    }
+}

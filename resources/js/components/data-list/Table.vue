@@ -25,9 +25,7 @@
                     <template v-if="type === 'entries'">{{ __('Collection') }}</template>
                     <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
                 </th>
-                <th class="actions-column">
-                    <data-list-column-picker :preferences-key="columnPreferencesKey" v-if="allowColumnPicker" />
-                </th>
+                <th class="actions-column" />
             </tr>
         </thead>
         <sortable-list
@@ -123,13 +121,6 @@ export default {
         reorderable: {
             type: Boolean,
             default: false
-        },
-        allowColumnPicker: {
-            type: Boolean,
-            default: false
-        },
-        columnPreferencesKey: {
-            type: String,
         },
         type: {
             type: String

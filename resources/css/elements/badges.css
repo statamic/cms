@@ -27,19 +27,23 @@
 }
 
 .filter-badge {
-    @apply text-2xs text-gray-800 bg-gray-300 flex items-center;
-    height: 1.625rem; /*  24px */
+    @apply text-2xs text-gray-800 bg-white border flex items-center rounded-full;
+    height: 1.625rem;
     padding-left: 10px;
 
     button {
-        @apply px-2 text-base text-gray-500 flex items-center rounded;
+        @apply px-2 text-base text-gray-600 flex items-center rounded;
 
         &:hover {
-            @apply text-gray-700;
+            @apply text-gray-800;
         }
 
         &:focus {
             @apply focus-outline;
         }
+    }
+
+    &.filter-badge-control {
+        @apply bg-gray-200 border border-gray-500 border-dashed hover:border-gray-600 hover:bg-gray-300;
     }
 }
