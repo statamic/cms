@@ -121,6 +121,8 @@
 </template>
 
 <script>
+import { uniq } from 'underscore';
+
 export default {
 
     inject: ['storeName'],
@@ -190,16 +192,21 @@ export default {
         },
 
         tabsWithErrors() {
-            const handles = Object.keys(this.errors).map((fieldHandle) => {
-                const topFieldHandle = fieldHandle.split('.')[0];
-                const tab = this.tabs.find(tab =>
-                    tab.fields.some(field => field.handle === topFieldHandle)
-                );
-
-                return tab && tab.handle
+            let fields = {};
+            Object.values(this.tabs).forEach(tab => {
+                tab.sections.forEach(section => {
+                    section.fields.forEach(field => {
+                        fields[field.handle] = tab.handle;
+                    });
+                });
             });
 
-            return _.uniq(handles);
+            let tabs = Object.keys(this.errors)
+                .map(handle => handle.split('.')[0])
+                .filter(handle => fields[handle])
+                .map(handle => fields[handle]);
+
+            return uniq(tabs);
         },
 
         actionsPortal() {
