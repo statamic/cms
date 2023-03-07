@@ -336,29 +336,7 @@ class Glide extends Tags
      */
     private function isResizable($item)
     {
-        return in_array(strtolower(Path::extension($item)), $this->allowedFileFormats());
-    }
-
-    /**
-     * The list of allowed file formats based on the configured driver.
-     *
-     * @see http://image.intervention.io/getting_started/formats
-     *
-     * @return array
-     *
-     * @throws \Exception
-     */
-    private function allowedFileFormats()
-    {
-        $driver = config('statamic.assets.image_manipulation.driver');
-
-        if ($driver == 'gd') {
-            return ['jpeg', 'jpg', 'png', 'gif', 'webp'];
-        } elseif ($driver == 'imagick') {
-            return ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
-        }
-
-        throw new \Exception("Unsupported image manipulation driver [$driver]");
+        return in_array(strtolower(Path::extension($item)), ImageGenerator::allowedFileFormats());
     }
 
     private function useAbsoluteUrls()

@@ -308,7 +308,9 @@ class ImageGenerator
             $mime = File::mimeType($path);
         }
 
-        if ($mime !== null && strncmp($mime, 'image/', 6) !== 0) {
+        $others = config('statamic.assets.image_manipulation.other_formats', []);
+
+        if ($mime !== null && strncmp($mime, 'image/', 6) !== 0 && ! in_array(pathinfo($path, PATHINFO_EXTENSION), $others)) {
             throw new \Exception("Image [{$path}] does not actually appear to be an image.");
         }
     }
@@ -342,5 +344,29 @@ class ImageGenerator
             'path' => Str::after($parsed['path'], '/'),
             'base' => $parsed['scheme'].'://'.$parsed['host'],
         ];
+    }
+
+    /**
+     * The list of allowed file formats based on the configured driver.
+     *
+     * @see https://image.intervention.io/v2/introduction/formats
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public static function allowedFileFormats()
+    {
+        $others = config('statamic.assets.image_manipulation.other_formats', []);
+
+        $driver = config('statamic.assets.image_manipulation.driver');
+
+        if ($driver == 'gd') {
+            return array_merge(['jpeg', 'jpg', 'png', 'gif', 'webp'], $others);
+        } elseif ($driver == 'imagick') {
+            return array_merge(['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'], $others);
+        }
+
+        throw new \Exception("Unsupported image manipulation driver [$driver]");
     }
 }

@@ -99,6 +99,21 @@ return [
 
         'generate_presets_on_upload' => true,
 
+        /*
+        |--------------------------------------------------------------------------
+        | Other Input File Formats
+        |--------------------------------------------------------------------------
+        |
+        | Define any additional input file formats you'd like to process through
+        | the {{ glide }} tag. You should ensure your server and selected image
+        | driver support all formats specified.
+        |
+        */
+
+        'other_formats' => [
+            // 'heic',
+        ],
+
     ],
 
     /*
