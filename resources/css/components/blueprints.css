@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .blueprint-section {
-    @apply p-2 min-h-40 outline-none;
+    @apply p-2 min-h-40 outline-none w-full;
 
     &.draggable-source--is-dragging {
         opacity: 0.5;

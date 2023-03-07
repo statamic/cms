@@ -13,6 +13,21 @@ class Section
         $this->contents = $contents;
     }
 
+    public function display()
+    {
+        return $this->contents['display'] ?? null;
+    }
+
+    public function instructions()
+    {
+        return $this->contents['instructions'] ?? null;
+    }
+
+    public function contents(): array
+    {
+        return $this->contents;
+    }
+
     public function toPublishArray()
     {
         return [

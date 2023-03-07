@@ -4,6 +4,8 @@
 
         <div class="blueprint-section-draggable-zone -mx-1"
             :class="{ 'flex flex-wrap flex-1': fields.length }"
+            :data-tab="tabId"
+            :data-section="sectionId"
         >
             <slot name="empty-state" v-if="!fields.length" />
 
@@ -85,6 +87,8 @@ export default {
     },
 
     props: {
+        tabId: String,
+        sectionId: String,
         fields: Array,
         editingField: {},
         suggestableConditionFields: Array,

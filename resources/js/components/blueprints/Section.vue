@@ -1,6 +1,6 @@
 <template>
 
-    <div class="blueprint-section @container w-full">
+    <div class="blueprint-section @container">
         <div class="blueprint-section-card card p-0 h-full flex rounded-t flex-col">
 
             <div class="bg-gray-200 border-b text-sm flex rounded-t">
@@ -23,6 +23,8 @@
 
             <fields
                 class="p-4"
+                :tab-id="tabId"
+                :section-id="section._id"
                 :fields="section.fields"
                 :editing-field="editingField"
                 :suggestable-condition-fields="suggestableConditionFields"
@@ -60,6 +62,9 @@ export default {
     },
 
     props: {
+        tabId: {
+            type: String
+        },
         section: {
             type: Object,
             required: true
