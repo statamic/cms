@@ -1650,7 +1650,7 @@ class AssetTest extends TestCase
             ['txt'], // not an image
             ['md'],  // not an image
             ['svg'], // doesn't work with imagick without extra server config
-            ['svg'], // doesn't work with imagick without extra server config
+            ['pdf'], // doesn't work with imagick without extra server config
             ['eps'], // doesn't work with imagick without extra server config
         ];
     }
