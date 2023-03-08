@@ -1718,9 +1718,20 @@ class AssetTest extends TestCase
         $file = UploadedFile::fake()->image('asset.eps', 20, 30);
 
         // Ensure a glide server is instantiated and `makeImage()` is called...
-        Facades\Glide::shouldReceive('server->makeImage')->once();
+        Facades\Glide::shouldReceive('server->makeImage')
+            ->andReturn($file->getFilename())
+            ->once();
 
+        // Since we're mocking the glide server, and since the uploader's `write()` method expects
+        // this location, we need to force it into that storage path for this test to pass...
+        $file->move(storage_path('statamic/glide/tmp'));
+
+        // Perform the upload...
         $return = $asset->upload($file);
+
+        // Now we'll delete that temporary UploadedFile, because we moved it into the app's storage above, and
+        // it's normally not supposed to be there. This is necessary to prevent state issues across tests...
+        File::delete($file->getPath());
 
         $this->assertEquals($asset, $return);
         $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
