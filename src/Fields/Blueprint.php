@@ -243,7 +243,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
         }
 
         $targetSectionIndex = $existingField['section']
-            ?? ($prepend ? 0 : count($contents['tabs'][$tab]['sections']) - 1);
+            ?? ($prepend ? 0 : count($contents['tabs'][$tab]['sections'] ?? []) - 1);
 
         $fields = collect($tabs[$tab]['sections'][$targetSectionIndex]['fields'] ?? [])->keyBy(function ($field) {
             return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
