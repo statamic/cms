@@ -9,6 +9,7 @@ use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\FieldTransformer;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 trait ManagesBlueprints
@@ -71,13 +72,13 @@ trait ManagesBlueprints
     private function tabSections(array $sections)
     {
         return collect($sections)->map(function ($section) {
-            return [
+            return Arr::removeNullValues([
                 'display' => $section['display'] ?? null,
                 'instructions' => $section['instructions'] ?? null,
                 'fields' => collect($section['fields'])
                     ->map(fn ($field) => FieldTransformer::fromVue($field))
                     ->all(),
-            ];
+            ]);
         })->all();
     }
 
@@ -106,13 +107,13 @@ trait ManagesBlueprints
 
     private function sectionToVue($section, $sectionIndex, $tab): array
     {
-        return [
+        return Arr::removeNullValues([
             'display' => $section->display(),
             'instructions' => $section->instructions(),
             'fields' => collect($section->contents()['fields'])->map(function ($field, $i) use ($tab, $sectionIndex) {
                 return array_merge(FieldTransformer::toVue($field), ['_id' => $tab->handle().'-'.$sectionIndex.'-'.$i]);
             })->all(),
-        ];
+        ]);
     }
 
     private function storeBlueprint(Request $request, string $namespace)
