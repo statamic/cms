@@ -552,7 +552,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     {
         return collect($this->contents['tabs'][$tab]['sections'])->flatMap(function ($section, $sectionIndex) {
             return collect($section['fields'])->map(function ($field, $fieldIndex) use ($sectionIndex) {
-                return ['fieldIndex' => $fieldIndex, 'sectionIndex' => $sectionIndex, ...$field];
+                return $field + ['fieldIndex' => $fieldIndex, 'sectionIndex' => $sectionIndex];
             });
         })->keyBy('handle');
     }
