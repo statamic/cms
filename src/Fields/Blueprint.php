@@ -179,17 +179,27 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
         $config = $ensured['config'];
         $tab = $ensured['tab'] ?? array_keys($contents['tabs'])[0] ?? 'main';
         $prepend = $ensured['prepend'];
+        $addedTab = false;
 
-        $tabs = collect($contents['tabs']);
+        // If ensuring into a new tab, make sure it exists.
+        if (! isset($contents['tabs'][$tab])) {
+            $addedTab = true;
+            $contents['tabs'][$tab] = ['sections' => [['fields' => []]]];
+        }
+
+        $tabs = collect($contents['tabs'] ?? []);
 
         // Get all the fields, and mark which tab they're in.
         $allFields = $tabs->flatMap(function ($tab, $tabHandle) {
-            return collect($tab['fields'] ?? [])->keyBy(function ($field) {
-                return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
-            })->map(function ($field) use ($tabHandle) {
-                $field['tab'] = $tabHandle;
+            return collect($tab['sections'] ?? [])->flatMap(function ($section, $sectionIndex) use ($tabHandle) {
+                return collect($section['fields'] ?? [])->keyBy(function ($field) {
+                    return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
+                })->map(function ($field) use ($tabHandle, $sectionIndex) {
+                    $field['tab'] = $tabHandle;
+                    $field['section'] = $sectionIndex;
 
-                return $field;
+                    return $field;
+                });
             });
         });
 
@@ -206,6 +216,13 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
         // If a field with that handle is in the contents, its either an inline field or a referenced field...
         $existingField = $allFields->get($handle);
         if ($exists = $existingField !== null) {
+            // If we added the tab early but it turns out this field already existed, remove the tab so it
+            // it doesn't end up in the contents.
+            if ($addedTab) {
+                $tabs->forget($tab);
+                unset($contents['tabs'][$tab]);
+            }
+
             // Since it already exists, maintain the position in that tab.
             $tab = $existingField['tab'];
 
@@ -224,7 +241,11 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
                 $field = ['handle' => $handle, 'field' => $config];
             }
         }
-        $fields = collect($tabs[$tab]['fields'] ?? [])->keyBy(function ($field) {
+
+        $targetSectionIndex = $existingField['section']
+            ?? ($prepend ? 0 : count($contents['tabs'][$tab]['sections']) - 1);
+
+        $fields = collect($tabs[$tab]['sections'][$targetSectionIndex]['fields'] ?? [])->keyBy(function ($field) {
             return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
         });
 
@@ -233,7 +254,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
                 $importKey = 'import:'.$importedField['partial'];
                 $field = $allFields->get($importKey);
                 $tab = $field['tab'];
-                $fields = collect($tabs[$tab]['fields'])->keyBy(function ($field) {
+                $fields = collect($tabs[$tab]['sections'][$targetSectionIndex]['fields'])->keyBy(function ($field) {
                     return (isset($field['import'])) ? 'import:'.$field['import'] : $field['handle'];
                 });
                 $importedConfig = $importedField['field']->config();
@@ -241,6 +262,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
                 $config = Arr::except($config, array_keys($importedConfig));
                 $field['config'][$handle] = $config;
                 unset($field['tab']);
+                unset($field['section']);
                 $fields->put($importKey, $field);
                 $imported = true;
             } else {
@@ -259,7 +281,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
             }
         }
 
-        $contents['tabs'][$tab]['fields'] = $fields->values()->all();
+        $contents['tabs'][$tab]['sections'][$targetSectionIndex]['fields'] = $fields->values()->all();
 
         return $contents;
     }
@@ -510,41 +532,48 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
 
     public function removeFieldFromTab($handle, $tab)
     {
-        $fields = collect($this->contents['tabs'][$tab]['fields'] ?? []);
+        $fields = $this->getTabFields($tab);
 
         // See if field already exists in tab.
-        if ($this->hasFieldInTab($handle, $tab)) {
-            $fieldKey = $fields->search(function ($field) use ($handle) {
-                return Arr::get($field, 'handle') === $handle;
-            });
-        } else {
+        if (! $this->hasFieldInTab($handle, $tab)) {
             return $this;
         }
 
+        $fieldKey = $fields[$handle]['fieldIndex'];
+        $sectionIndex = $fields[$handle]['sectionIndex'];
+
         // Pull it out.
-        Arr::pull($this->contents['tabs'][$tab]['fields'], $fieldKey);
+        Arr::pull($this->contents['tabs'][$tab]['sections'][$sectionIndex]['fields'], $fieldKey);
 
         return $this->resetFieldsCache();
     }
 
+    private function getTabFields($tab)
+    {
+        return collect($this->contents['tabs'][$tab]['sections'])->flatMap(function ($section, $sectionIndex) {
+            return collect($section['fields'])->map(function ($field, $fieldIndex) use ($sectionIndex) {
+                return ['fieldIndex' => $fieldIndex, 'sectionIndex' => $sectionIndex, ...$field];
+            });
+        })->keyBy('handle');
+    }
+
     protected function ensureFieldInTabHasConfig($handle, $tab, $config)
     {
-        $fields = collect($this->contents['tabs'][$tab]['fields'] ?? []);
+        $fields = $this->getTabFields($tab);
 
         // See if field already exists in tab.
-        if ($this->hasFieldInTab($handle, $tab)) {
-            $fieldKey = $fields->search(function ($field) use ($handle) {
-                return Arr::get($field, 'handle') === $handle;
-            });
-        } else {
+        if (! $this->hasFieldInTab($handle, $tab)) {
             return $this;
         }
 
+        $fieldKey = $fields[$handle]['fieldIndex'];
+        $sectionKey = $fields[$handle]['sectionIndex'];
+
         // Get existing field config.
-        $existingConfig = Arr::get($this->contents['tabs'][$tab]['fields'][$fieldKey], 'field', []);
+        $existingConfig = Arr::get($this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey], 'field', []);
 
         // Merge in new field config.
-        $this->contents['tabs'][$tab]['fields'][$fieldKey]['field'] = array_merge($existingConfig, $config);
+        $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey]['field'] = array_merge($existingConfig, $config);
 
         return $this->resetFieldsCache();
     }
@@ -597,7 +626,13 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     {
         if ($fields = Arr::pull($this->contents, 'fields')) {
             $this->contents['tabs'] = [
-                'main' => ['fields' => $fields],
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => $fields,
+                        ],
+                    ],
+                ],
             ];
         }
 
