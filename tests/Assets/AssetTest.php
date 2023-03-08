@@ -1644,7 +1644,7 @@ class AssetTest extends TestCase
         $this->assertEquals(15, $meta['height']);
     }
 
-    protected function nonGlideableFileExtensions()
+    public function nonGlideableFileExtensions()
     {
         return [
             ['txt'], // not an image
