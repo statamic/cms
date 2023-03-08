@@ -76,25 +76,30 @@ class UpdateBlueprintTest extends TestCase
                         '_id' => 'id-one',
                         'handle' => 'one',
                         'display' => 'Tab One',
-                        'fields' => [
+                        'sections' => [
                             [
-                                '_id' => 'id-s1-f1',
-                                'handle' => 'one-one',
-                                'type' => 'reference',
-                                'field_reference' => 'somefieldset.somefield',
-                                'config' => [
-                                    'foo' => 'bar',
-                                    'baz' => 'qux', // not in config_overrides so it shouldn't get saved
-                                ],
-                                'config_overrides' => ['foo'],
-                            ],
-                            [
-                                '_id' => 'id-s1-f1',
-                                'handle' => 'one-two',
-                                'type' => 'inline',
-                                'config' => [
-                                    'type' => 'text',
-                                    'foo' => 'bar',
+                                '_id' => 'id-t1-s1',
+                                'fields' => [
+                                    [
+                                        '_id' => 'id-s1-f1',
+                                        'handle' => 'one-one',
+                                        'type' => 'reference',
+                                        'field_reference' => 'somefieldset.somefield',
+                                        'config' => [
+                                            'foo' => 'bar',
+                                            'baz' => 'qux', // not in config_overrides so it shouldn't get saved
+                                        ],
+                                        'config_overrides' => ['foo'],
+                                    ],
+                                    [
+                                        '_id' => 'id-s1-f1',
+                                        'handle' => 'one-two',
+                                        'type' => 'inline',
+                                        'config' => [
+                                            'type' => 'text',
+                                            'foo' => 'bar',
+                                        ],
+                                    ],
                                 ],
                             ],
                         ],
@@ -109,37 +114,45 @@ class UpdateBlueprintTest extends TestCase
             'tabs' => [
                 'one' => [
                     'display' => 'Tab One',
-                    'fields' => [
+                    'sections' => [
                         [
-                            'handle' => 'title',
-                            'field' => [
-                                'type' => 'text',
-                                'required' => true,
-                            ],
-                        ],
-                        [
-                            'handle' => 'one-one',
-                            'field' => 'somefieldset.somefield',
-                            'config' => [
-                                'foo' => 'bar',
-                            ],
-                        ],
-                        [
-                            'handle' => 'one-two',
-                            'field' => [
-                                'type' => 'text',
-                                'foo' => 'bar',
+                            'fields' => [
+                                [
+                                    'handle' => 'title',
+                                    'field' => [
+                                        'type' => 'text',
+                                        'required' => true,
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'one-one',
+                                    'field' => 'somefieldset.somefield',
+                                    'config' => [
+                                        'foo' => 'bar',
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'one-two',
+                                    'field' => [
+                                        'type' => 'text',
+                                        'foo' => 'bar',
+                                    ],
+                                ],
                             ],
                         ],
                     ],
                 ],
                 'sidebar' => [
-                    'fields' => [
+                    'sections' => [
                         [
-                            'handle' => 'slug',
-                            'field' => [
-                                'type' => 'slug',
-                                'localizable' => true,
+                            'fields' => [
+                                [
+                                    'handle' => 'slug',
+                                    'field' => [
+                                        'type' => 'slug',
+                                        'localizable' => true,
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -237,34 +250,39 @@ class UpdateBlueprintTest extends TestCase
                         '_id' => 'id-one',
                         'handle' => 'one',
                         'display' => 'Tab One',
-                        'fields' => [
+                        'sections' => [
                             [
-                                '_id' => 'id-s1-f1',
-                                'handle' => 'one-one',
-                                'type' => 'reference',
-                                'field_reference' => 'somefieldset.somefield',
-                                'config' => [
-                                    'foo' => 'bar',
-                                    'width' => 100,
-                                ],
-                                'config_overrides' => ['width'],
-                            ],
-                            [
-                                '_id' => 'id-s1-f2',
-                                'handle' => 'one-two',
-                                'type' => 'inline',
-                                'config' => [
-                                    'type' => 'text',
-                                    'width' => 100,
-                                ],
-                            ],
-                            [
-                                '_id' => 'id-s1-f3',
-                                'handle' => 'one-three',
-                                'type' => 'inline',
-                                'config' => [
-                                    'type' => 'text',
-                                    'width' => 50,
+                                '_id' => 'id-s1',
+                                'fields' => [
+                                    [
+                                        '_id' => 'id-s1-f1',
+                                        'handle' => 'one-one',
+                                        'type' => 'reference',
+                                        'field_reference' => 'somefieldset.somefield',
+                                        'config' => [
+                                            'foo' => 'bar',
+                                            'width' => 100,
+                                        ],
+                                        'config_overrides' => ['width'],
+                                    ],
+                                    [
+                                        '_id' => 'id-s1-f2',
+                                        'handle' => 'one-two',
+                                        'type' => 'inline',
+                                        'config' => [
+                                            'type' => 'text',
+                                            'width' => 100,
+                                        ],
+                                    ],
+                                    [
+                                        '_id' => 'id-s1-f3',
+                                        'handle' => 'one-three',
+                                        'type' => 'inline',
+                                        'config' => [
+                                            'type' => 'text',
+                                            'width' => 50,
+                                        ],
+                                    ],
                                 ],
                             ],
                         ],
@@ -278,43 +296,51 @@ class UpdateBlueprintTest extends TestCase
             'tabs' => [
                 'one' => [
                     'display' => 'Tab One',
-                    'fields' => [
+                    'sections' => [
                         [
-                            'handle' => 'title',
-                            'field' => [
-                                'type' => 'text',
-                                'required' => true,
-                            ],
-                        ],
-                        [
-                            'handle' => 'one-one',
-                            'field' => 'somefieldset.somefield',
-                            'config' => [
-                                'width' => 100,
-                            ],
-                        ],
-                        [
-                            'handle' => 'one-two',
-                            'field' => [
-                                'type' => 'text',
-                            ],
-                        ],
-                        [
-                            'handle' => 'one-three',
-                            'field' => [
-                                'type' => 'text',
-                                'width' => 50,
+                            'fields' => [
+                                [
+                                    'handle' => 'title',
+                                    'field' => [
+                                        'type' => 'text',
+                                        'required' => true,
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'one-one',
+                                    'field' => 'somefieldset.somefield',
+                                    'config' => [
+                                        'width' => 100,
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'one-two',
+                                    'field' => [
+                                        'type' => 'text',
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'one-three',
+                                    'field' => [
+                                        'type' => 'text',
+                                        'width' => 50,
+                                    ],
+                                ],
                             ],
                         ],
                     ],
                 ],
                 'sidebar' => [
-                    'fields' => [
+                    'sections' => [
                         [
-                            'handle' => 'slug',
-                            'field' => [
-                                'type' => 'slug',
-                                'localizable' => true,
+                            'fields' => [
+                                [
+                                    'handle' => 'slug',
+                                    'field' => [
+                                        'type' => 'slug',
+                                        'localizable' => true,
+                                    ],
+                                ],
                             ],
                         ],
                     ],
@@ -353,34 +379,39 @@ class UpdateBlueprintTest extends TestCase
                         '_id' => 'id-one',
                         'handle' => 'one',
                         'display' => 'Tab One',
-                        'fields' => [
+                        'sections' => [
                             [
-                                '_id' => 'id-s1-f1',
-                                'handle' => 'one-one',
-                                'type' => 'reference',
-                                'field_reference' => 'somefieldset.somefield',
-                                'config' => [
-                                    'foo' => 'bar',
-                                    'localizable' => false,
-                                ],
-                                'config_overrides' => ['localizable'],
-                            ],
-                            [
-                                '_id' => 'id-s1-f2',
-                                'handle' => 'one-two',
-                                'type' => 'inline',
-                                'config' => [
-                                    'type' => 'text',
-                                    'localizable' => false,
-                                ],
-                            ],
-                            [
-                                '_id' => 'id-s1-f3',
-                                'handle' => 'one-three',
-                                'type' => 'inline',
-                                'config' => [
-                                    'type' => 'text',
-                                    'localizable' => true,
+                                '_id' => 'id-t1-s1',
+                                'fields' => [
+                                    [
+                                        '_id' => 'id-s1-f1',
+                                        'handle' => 'one-one',
+                                        'type' => 'reference',
+                                        'field_reference' => 'somefieldset.somefield',
+                                        'config' => [
+                                            'foo' => 'bar',
+                                            'localizable' => false,
+                                        ],
+                                        'config_overrides' => ['localizable'],
+                                    ],
+                                    [
+                                        '_id' => 'id-s1-f2',
+                                        'handle' => 'one-two',
+                                        'type' => 'inline',
+                                        'config' => [
+                                            'type' => 'text',
+                                            'localizable' => false,
+                                        ],
+                                    ],
+                                    [
+                                        '_id' => 'id-s1-f3',
+                                        'handle' => 'one-three',
+                                        'type' => 'inline',
+                                        'config' => [
+                                            'type' => 'text',
+                                            'localizable' => true,
+                                        ],
+                                    ],
                                 ],
                             ],
                         ],
@@ -394,43 +425,51 @@ class UpdateBlueprintTest extends TestCase
             'tabs' => [
                 'one' => [
                     'display' => 'Tab One',
-                    'fields' => [
+                    'sections' => [
                         [
-                            'handle' => 'title',
-                            'field' => [
-                                'type' => 'text',
-                                'required' => true,
-                            ],
-                        ],
-                        [
-                            'handle' => 'one-one',
-                            'field' => 'somefieldset.somefield',
-                            'config' => [
-                                'localizable' => false,
-                            ],
-                        ],
-                        [
-                            'handle' => 'one-two',
-                            'field' => [
-                                'type' => 'text',
-                            ],
-                        ],
-                        [
-                            'handle' => 'one-three',
-                            'field' => [
-                                'type' => 'text',
-                                'localizable' => true,
+                            'fields' => [
+                                [
+                                    'handle' => 'title',
+                                    'field' => [
+                                        'type' => 'text',
+                                        'required' => true,
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'one-one',
+                                    'field' => 'somefieldset.somefield',
+                                    'config' => [
+                                        'localizable' => false,
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'one-two',
+                                    'field' => [
+                                        'type' => 'text',
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'one-three',
+                                    'field' => [
+                                        'type' => 'text',
+                                        'localizable' => true,
+                                    ],
+                                ],
                             ],
                         ],
                     ],
                 ],
                 'sidebar' => [
-                    'fields' => [
+                    'sections' => [
                         [
-                            'handle' => 'slug',
-                            'field' => [
-                                'type' => 'slug',
-                                'localizable' => true,
+                            'fields' => [
+                                [
+                                    'handle' => 'slug',
+                                    'field' => [
+                                        'type' => 'slug',
+                                        'localizable' => true,
+                                    ],
+                                ],
                             ],
                         ],
                     ],

@@ -140,10 +140,14 @@ class BlueprintTest extends TestCase
         $this->assertEquals([
             'tabs' => [
                 'main' => [
-                    'fields' => [
+                    'sections' => [
                         [
-                            'handle' => 'one',
-                            'field' => ['type' => 'text'],
+                            'fields' => [
+                                [
+                                    'handle' => 'one',
+                                    'field' => ['type' => 'text'],
+                                ],
+                            ],
                         ],
                     ],
                 ],
@@ -320,18 +324,26 @@ class BlueprintTest extends TestCase
             'tabs' => [
                 'tab_one' => [
                     'instructions' => 'Does stuff',
-                    'fields' => [
+                    'sections' => [
                         [
-                            'handle' => 'one',
-                            'field' => 'fieldset_one.field_one',
+                            'fields' => [
+                                [
+                                    'handle' => 'one',
+                                    'field' => 'fieldset_one.field_one',
+                                ],
+                            ],
                         ],
                     ],
                 ],
                 'tab_two' => [
-                    'fields' => [
+                    'sections' => [
                         [
-                            'handle' => 'two',
-                            'field' => 'fieldset_one.field_two',
+                            'fields' => [
+                                [
+                                    'handle' => 'two',
+                                    'field' => 'fieldset_one.field_two',
+                                ],
+                            ],
                         ],
                     ],
                 ],
@@ -346,26 +358,30 @@ class BlueprintTest extends TestCase
                     'display' => 'Tab one',
                     'handle' => 'tab_one',
                     'instructions' => 'Does stuff',
-                    'fields' => [
+                    'sections' => [
                         [
-                            'handle' => 'one',
-                            'prefix' => null,
-                            'type' => 'text',
-                            'display' => 'One',
-                            'instructions' => 'One instructions',
-                            'required' => true,
-                            'validate' => 'required|min:2',
-                            'component' => 'text',
-                            'placeholder' => null,
-                            'character_limit' => 0,
-                            'input_type' => 'text',
-                            'prepend' => null,
-                            'append' => null,
-                            'antlers' => false,
-                            'default' => null,
-                            'visibility' => 'visible',
-                            'read_only' => false, // deprecated
-                            'always_save' => false,
+                            'fields' => [
+                                [
+                                    'handle' => 'one',
+                                    'prefix' => null,
+                                    'type' => 'text',
+                                    'display' => 'One',
+                                    'instructions' => 'One instructions',
+                                    'required' => true,
+                                    'validate' => 'required|min:2',
+                                    'component' => 'text',
+                                    'placeholder' => null,
+                                    'character_limit' => 0,
+                                    'input_type' => 'text',
+                                    'prepend' => null,
+                                    'append' => null,
+                                    'antlers' => false,
+                                    'default' => null,
+                                    'visibility' => 'visible',
+                                    'read_only' => false, // deprecated
+                                    'always_save' => false,
+                                ],
+                            ],
                         ],
                     ],
                 ],
@@ -373,23 +389,27 @@ class BlueprintTest extends TestCase
                     'display' => 'Tab two',
                     'handle' => 'tab_two',
                     'instructions' => null,
-                    'fields' => [
+                    'sections' => [
                         [
-                            'handle' => 'two',
-                            'prefix' => null,
-                            'type' => 'textarea',
-                            'display' => 'Two',
-                            'instructions' => 'Two instructions',
-                            'required' => false,
-                            'validate' => 'min:2',
-                            'placeholder' => null,
-                            'character_limit' => null,
-                            'component' => 'textarea',
-                            'antlers' => false,
-                            'default' => null,
-                            'visibility' => 'visible',
-                            'read_only' => false, // deprecated
-                            'always_save' => false,
+                            'fields' => [
+                                [
+                                    'handle' => 'two',
+                                    'prefix' => null,
+                                    'type' => 'textarea',
+                                    'display' => 'Two',
+                                    'instructions' => 'Two instructions',
+                                    'required' => false,
+                                    'validate' => 'min:2',
+                                    'placeholder' => null,
+                                    'character_limit' => null,
+                                    'component' => 'textarea',
+                                    'antlers' => false,
+                                    'default' => null,
+                                    'visibility' => 'visible',
+                                    'read_only' => false, // deprecated
+                                    'always_save' => false,
+                                ],
+                            ],
                         ],
                     ],
                 ],
@@ -433,8 +453,12 @@ class BlueprintTest extends TestCase
             'title' => 'Test',
             'tabs' => [
                 'tab_one' => [
-                    'fields' => [
-                        ['import' => 'partial', 'prefix' => 'nested_'],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['import' => 'partial', 'prefix' => 'nested_'],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -448,44 +472,48 @@ class BlueprintTest extends TestCase
                     'display' => 'Tab one',
                     'handle' => 'tab_one',
                     'instructions' => null,
-                    'fields' => [
+                    'sections' => [
                         [
-                            'handle' => 'nested_one',
-                            'prefix' => 'nested_',
-                            'type' => 'text',
-                            'display' => 'Nested One',
-                            'placeholder' => null,
-                            'input_type' => 'text',
-                            'character_limit' => 0,
-                            'prepend' => null,
-                            'append' => null,
-                            'component' => 'text',
-                            'instructions' => null,
-                            'required' => false,
-                            'antlers' => false,
-                            'default' => null,
-                            'visibility' => 'visible',
-                            'read_only' => false, // deprecated
-                            'always_save' => false,
-                        ],
-                        [
-                            'handle' => 'nested_deeper_two',
-                            'prefix' => 'nested_deeper_',
-                            'type' => 'text',
-                            'display' => 'Nested Deeper Two',
-                            'placeholder' => null,
-                            'input_type' => 'text',
-                            'character_limit' => 0,
-                            'prepend' => null,
-                            'append' => null,
-                            'component' => 'text',
-                            'instructions' => null,
-                            'required' => false,
-                            'antlers' => false,
-                            'default' => null,
-                            'visibility' => 'visible',
-                            'read_only' => false, // deprecated
-                            'always_save' => false,
+                            'fields' => [
+                                [
+                                    'handle' => 'nested_one',
+                                    'prefix' => 'nested_',
+                                    'type' => 'text',
+                                    'display' => 'Nested One',
+                                    'placeholder' => null,
+                                    'input_type' => 'text',
+                                    'character_limit' => 0,
+                                    'prepend' => null,
+                                    'append' => null,
+                                    'component' => 'text',
+                                    'instructions' => null,
+                                    'required' => false,
+                                    'antlers' => false,
+                                    'default' => null,
+                                    'visibility' => 'visible',
+                                    'read_only' => false, // deprecated
+                                    'always_save' => false,
+                                ],
+                                [
+                                    'handle' => 'nested_deeper_two',
+                                    'prefix' => 'nested_deeper_',
+                                    'type' => 'text',
+                                    'display' => 'Nested Deeper Two',
+                                    'placeholder' => null,
+                                    'input_type' => 'text',
+                                    'character_limit' => 0,
+                                    'prepend' => null,
+                                    'append' => null,
+                                    'component' => 'text',
+                                    'instructions' => null,
+                                    'required' => false,
+                                    'antlers' => false,
+                                    'default' => null,
+                                    'visibility' => 'visible',
+                                    'read_only' => false, // deprecated
+                                    'always_save' => false,
+                                ],
+                            ],
                         ],
                     ],
                 ],
@@ -584,8 +612,17 @@ class BlueprintTest extends TestCase
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'existing_in_section_one', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                    [
+                        'fields' => [
+                            ['handle' => 'existing_in_section_two', 'field' => ['type' => 'text']],
+                        ],
+                    ],
                 ],
             ],
         ]]);
@@ -593,13 +630,23 @@ class BlueprintTest extends TestCase
         $return = $blueprint->ensureField('new', ['type' => 'textarea']);
 
         $this->assertEquals($blueprint, $return);
-        $this->assertTrue($blueprint->hasField('existing'));
+        $this->assertTrue($blueprint->hasField('existing_in_section_one'));
+        $this->assertTrue($blueprint->hasField('existing_in_section_two'));
         $this->assertTrue($blueprint->hasField('new'));
         $this->assertEquals(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'existing', 'field' => ['type' => 'text']],
-                    ['handle' => 'new', 'field' => ['type' => 'textarea']],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'existing_in_section_one', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                    [
+                        'fields' => [
+                            ['handle' => 'existing_in_section_two', 'field' => ['type' => 'text']],
+                            ['handle' => 'new', 'field' => ['type' => 'textarea']],
+                        ],
+                    ],
                 ],
             ],
         ]], $blueprint->contents());
@@ -611,8 +658,12 @@ class BlueprintTest extends TestCase
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'existing', 'field' => ['type' => 'text']],
+                        ],
+                    ],
                 ],
             ],
         ]]);
@@ -624,13 +675,21 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('new'));
         $this->assertEquals(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'existing', 'field' => ['type' => 'text']],
+                        ],
+                    ],
                 ],
             ],
             'tab_two' => [
-                'fields' => [
-                    ['handle' => 'new', 'field' => ['type' => 'textarea']],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'new', 'field' => ['type' => 'textarea']],
+                        ],
+                    ],
                 ],
             ],
         ]], $blueprint->contents());
@@ -642,14 +701,26 @@ class BlueprintTest extends TestCase
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'title', 'field' => ['type' => 'text']],
-                    ['handle' => 'author', 'field' => ['type' => 'text', 'do_not_touch_other_config' => true]],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                    [
+                        'fields' => [
+                            ['handle' => 'author', 'field' => ['type' => 'text', 'do_not_touch_other_config' => true]],
+                        ],
+                    ],
                 ],
             ],
             'tab_two' => [
-                'fields' => [
-                    ['handle' => 'content', 'field' => ['type' => 'text']],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'content', 'field' => ['type' => 'text']],
+                        ],
+                    ],
                 ],
             ],
         ]]);
@@ -668,13 +739,19 @@ class BlueprintTest extends TestCase
         $this->assertEquals($expectedConfig, $fields->get('author')->config());
     }
 
+    // todo: duplicate or tweak above test but make the target field not in the first section.
+
     /** @test */
     public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists()
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'existing', 'field' => ['type' => 'text']],
+                        ],
+                    ],
                 ],
             ],
         ]]);
@@ -685,8 +762,12 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('existing'));
         $this->assertEquals(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'existing', 'field' => ['type' => 'text', 'foo' => 'bar']],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'existing', 'field' => ['type' => 'text', 'foo' => 'bar']],
+                        ],
+                    ],
                 ],
             ],
         ]], $blueprint->contents());
@@ -698,9 +779,13 @@ class BlueprintTest extends TestCase
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'first', 'field' => ['type' => 'text']],
-                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'first', 'field' => ['type' => 'text']],
+                            ['handle' => 'existing', 'field' => ['type' => 'text']],
+                        ],
+                    ],
                 ],
             ],
         ]]);
@@ -711,9 +796,13 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('existing'));
         $this->assertEquals(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'first', 'field' => ['type' => 'text']],
-                    ['handle' => 'existing', 'field' => ['type' => 'text', 'foo' => 'bar']],
+                'sections'=> [
+                    [
+                        'fields' => [
+                            ['handle' => 'first', 'field' => ['type' => 'text']],
+                            ['handle' => 'existing', 'field' => ['type' => 'text', 'foo' => 'bar']],
+                        ],
+                    ],
                 ],
             ],
         ]], $blueprint->contents());
@@ -725,8 +814,12 @@ class BlueprintTest extends TestCase
     {
         $blueprint = (new Blueprint)->setContents(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'existing', 'field' => ['type' => 'text']],
+                        ],
+                    ],
                 ],
             ],
         ]]);
@@ -737,8 +830,12 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('existing'));
         $this->assertEquals(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'existing', 'field' => ['type' => 'text', 'foo' => 'bar']],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'existing', 'field' => ['type' => 'text', 'foo' => 'bar']],
+                        ],
+                    ],
                 ],
             ],
         ]], $blueprint->contents());
@@ -759,8 +856,12 @@ class BlueprintTest extends TestCase
 
         $blueprint = (new Blueprint)->setContents(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'from_partial', 'field' => 'the_partial.the_field'],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'from_partial', 'field' => 'the_partial.the_field'],
+                        ],
+                    ],
                 ],
             ],
         ]]);
@@ -771,8 +872,12 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('from_partial'));
         $this->assertEquals(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['handle' => 'from_partial', 'field' => 'the_partial.the_field', 'config' => ['foo' => 'bar']],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'from_partial', 'field' => 'the_partial.the_field', 'config' => ['foo' => 'bar']],
+                        ],
+                    ],
                 ],
             ],
         ]], $blueprint->contents());
@@ -793,8 +898,12 @@ class BlueprintTest extends TestCase
 
         $blueprint = (new Blueprint)->setContents(['tabs' => [
             'tab_one' => [
-                'fields' => [
-                    ['import' => 'the_partial'],
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['import' => 'the_partial'],
+                        ],
+                    ],
                 ],
             ],
         ]]);
@@ -805,11 +914,15 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('one'));
         $this->assertEquals(['tabs' => [
             'tab_one' => [
-                'fields' => [
+                'sections' => [
                     [
-                        'import' => 'the_partial',
-                        'config' => [
-                            'one' => ['foo' => 'bar'],
+                        'fields' => [
+                            [
+                                'import' => 'the_partial',
+                                'config' => [
+                                    'one' => ['foo' => 'bar'],
+                                ],
+                            ],
                         ],
                     ],
                 ],
@@ -825,13 +938,21 @@ class BlueprintTest extends TestCase
             'title' => 'Test',
             'tabs' => [
                 'tab_one' => [
-                    'fields' => [
-                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'one', 'field' => ['type' => 'text']],
+                            ],
+                        ],
                     ],
                 ],
                 'tab_two' => [
-                    'fields' => [
-                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'two', 'field' => ['type' => 'text']],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -858,13 +979,21 @@ class BlueprintTest extends TestCase
             'title' => 'Test',
             'tabs' => [
                 'tab_one' => [
-                    'fields' => [
-                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                    'sections'=> [
+                        [
+                            'fields' => [
+                                ['handle' => 'one', 'field' => ['type' => 'text']],
+                            ],
+                        ],
                     ],
                 ],
                 'tab_two' => [
-                    'fields' => [
-                        ['handle' => 'two', 'field' => ['type' => 'text', 'foo' => 'bar']],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'two', 'field' => ['type' => 'text', 'foo' => 'bar']],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -901,14 +1030,22 @@ class BlueprintTest extends TestCase
             'title' => 'Test',
             'tabs' => [
                 'tab_one' => [
-                    'fields' => [
-                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'one', 'field' => ['type' => 'text']],
+                            ],
+                        ],
                     ],
                 ],
                 'tab_two' => [
-                    'fields' => [
-                        ['handle' => 'two', 'field' => ['type' => 'text']],
-                        ['handle' => 'three', 'field' => ['type' => 'text']],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'two', 'field' => ['type' => 'text']],
+                                ['handle' => 'three', 'field' => ['type' => 'text']],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -937,15 +1074,23 @@ class BlueprintTest extends TestCase
             'title' => 'Test',
             'tabs' => [
                 'tab_one' => [
-                    'fields' => [
-                        ['handle' => 'one', 'field' => ['type' => 'text']],
-                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'one', 'field' => ['type' => 'text']],
+                                ['handle' => 'two', 'field' => ['type' => 'text']],
+                            ],
+                        ],
                     ],
                 ],
                 'tab_two' => [
-                    'fields' => [
-                        ['handle' => 'three', 'field' => ['type' => 'text']],
-                        ['handle' => 'four', 'field' => ['type' => 'text']],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'three', 'field' => ['type' => 'text']],
+                                ['handle' => 'four', 'field' => ['type' => 'text']],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -979,15 +1124,23 @@ class BlueprintTest extends TestCase
             'title' => 'Test',
             'tabs' => [
                 'tab_one' => [
-                    'fields' => [
-                        ['handle' => 'one', 'field' => ['type' => 'text']],
-                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'one', 'field' => ['type' => 'text']],
+                                ['handle' => 'two', 'field' => ['type' => 'text']],
+                            ],
+                        ],
                     ],
                 ],
                 'tab_two' => [
-                    'fields' => [
-                        ['handle' => 'three', 'field' => ['type' => 'text']],
-                        ['handle' => 'four', 'field' => ['type' => 'text']],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'three', 'field' => ['type' => 'text']],
+                                ['handle' => 'four', 'field' => ['type' => 'text']],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -1019,13 +1172,21 @@ class BlueprintTest extends TestCase
             'title' => 'Test',
             'tabs' => [
                 'tab_one' => [
-                    'fields' => [
-                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'one', 'field' => ['type' => 'text']],
+                            ],
+                        ],
                     ],
                 ],
                 'tab_two' => [
-                    'fields' => [
-                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'one', 'field' => ['type' => 'text']],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -1054,13 +1215,21 @@ class BlueprintTest extends TestCase
             'title' => 'Test',
             'tabs' => [
                 'tab_one' => [
-                    'fields' => [
-                        ['import' => 'test'],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['import' => 'test'],
+                            ],
+                        ],
                     ],
                 ],
                 'tab_two' => [
-                    'fields' => [
-                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'one', 'field' => ['type' => 'text']],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -1090,9 +1259,13 @@ class BlueprintTest extends TestCase
                 'title' => 'Test',
                 'tabs' => [
                     'tab_one' => [
-                        'fields' => [
-                            ['import' => 'test', 'prefix' => 'first_'],
-                            ['import' => 'test', 'prefix' => 'second_'],
+                        'sections' => [
+                            [
+                                'fields' => [
+                                    ['import' => 'test', 'prefix' => 'first_'],
+                                    ['import' => 'test', 'prefix' => 'second_'],
+                                ],
+                            ],
                         ],
                     ],
                 ],
