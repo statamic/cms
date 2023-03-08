@@ -47,8 +47,8 @@ class Tab
         }
 
         $fields = collect($sections)->reduce(function ($carry, $section) {
-            return array_merge($carry, Arr::get($section, 'fields', []));
-        }, []);
+            return $carry->merge(Arr::get($section, 'fields', []));
+        }, collect())->all();
 
         return new Fields($fields);
     }
@@ -79,7 +79,7 @@ class Tab
             'display' => $this->display(),
             'instructions' => $this->instructions(),
             'handle' => $this->handle,
-            'sections' => $this->sections()->map->toPublishArray(),
+            'sections' => $this->sections()->map->toPublishArray()->all(),
         ];
     }
 
