@@ -636,6 +636,19 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
             ];
         }
 
+        if ($sections = Arr::pull($this->contents, 'sections')) {
+            $this->contents['tabs'] = collect($sections)->map(function ($section) {
+                return array_filter([
+                    'display' => $section['display'] ?? null,
+                    'sections' => [
+                        [
+                            'fields' => $section['fields'],
+                        ],
+                    ],
+                ]);
+            })->all();
+        }
+
         return $this;
     }
 

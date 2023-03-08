@@ -156,6 +156,65 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function it_converts_top_level_sections_into_tabs()
+    {
+        $blueprint = new Blueprint;
+        $this->assertEquals(['tabs' => ['main' => ['fields' => []]]], $blueprint->contents());
+
+        $blueprint->setContents([
+            'sections' => [
+                'one' => [
+                    'display' => 'One',
+                    'fields' => [
+                        [
+                            'handle' => 'alfa',
+                            'field' => ['type' => 'text'],
+                        ],
+                    ],
+                ],
+                'two' => [
+                    'fields' => [
+                        [
+                            'handle' => 'bravo',
+                            'field' => ['type' => 'text'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            'tabs' => [
+                'one' => [
+                    'display' => 'One',
+                    'sections' => [
+                        [
+                            'fields' => [
+                                [
+                                    'handle' => 'alfa',
+                                    'field' => ['type' => 'text'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'two' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                [
+                                    'handle' => 'bravo',
+                                    'field' => ['type' => 'text'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], $blueprint->contents());
+    }
+
+    /** @test */
     public function it_can_check_if_has_field()
     {
         FieldsetRepository::shouldReceive('find')
