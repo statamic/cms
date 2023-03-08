@@ -336,7 +336,7 @@ class Glide extends Tags
      */
     private function isResizable($item)
     {
-        return in_array(strtolower(Path::extension($item)), ImageGenerator::allowedFileFormats());
+        return ImageGenerator::isAllowedExtension(Path::extension($item));
     }
 
     private function useAbsoluteUrls()

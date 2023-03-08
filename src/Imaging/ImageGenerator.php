@@ -347,26 +347,32 @@ class ImageGenerator
     }
 
     /**
-     * The list of allowed file formats based on the configured driver.
+     * Check if an extension is allowed by the configured image manipulation driver.
      *
      * @see https://image.intervention.io/v2/introduction/formats
      *
-     * @return array
+     * @param  string  $extension
+     * @return bool
      *
      * @throws \Exception
      */
-    public static function allowedFileFormats()
+    public static function isAllowedExtension($extension)
     {
-        $additional = config('statamic.assets.image_manipulation.additional_formats', []);
-
         $driver = config('statamic.assets.image_manipulation.driver');
 
         if ($driver == 'gd') {
-            return array_merge(['jpeg', 'jpg', 'png', 'gif', 'webp'], $additional);
+            $allowed = ['jpeg', 'jpg', 'png', 'gif', 'webp'];
         } elseif ($driver == 'imagick') {
-            return array_merge(['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'], $additional);
+            $allowed = ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
+        } else {
+            throw new \Exception("Unsupported image manipulation driver [$driver]");
         }
 
-        throw new \Exception("Unsupported image manipulation driver [$driver]");
+        $additional = config('statamic.assets.image_manipulation.additional_extensions', []);
+
+        return collect($allowed)
+            ->merge($additional)
+            ->map(fn ($extension) => Str::lower($extension))
+            ->contains(Str::lower($extension));
     }
 }

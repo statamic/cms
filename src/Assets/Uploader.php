@@ -25,7 +25,7 @@ abstract class Uploader
             return $file->getRealPath();
         }
 
-        if (! in_array($file->guessExtension(), ImageGenerator::allowedFileFormats())) {
+        if (! ImageGenerator::isAllowedExtension($file->getClientOriginalExtension())) {
             return $file->getRealPath();
         }
 
