@@ -43,16 +43,16 @@ return [
 
         /*
         |--------------------------------------------------------------------------
-        | Additional Image Formats
+        | Additional Image Extensions
         |--------------------------------------------------------------------------
         |
-        | Define any additional image file formats you would like Statamic to
+        | Define any additional image file extensions you would like Statamic to
         | process. You should ensure that both your server and the selected
-        | image manipulation driver properly support your chosen formats.
+        | image manipulation driver properly supports these extensions.
         |
         */
 
-        'additional_formats' => [
+        'additional_extensions' => [
             // 'heic',
         ],
 
