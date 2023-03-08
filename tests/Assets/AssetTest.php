@@ -1644,19 +1644,20 @@ class AssetTest extends TestCase
         $this->assertEquals(15, $meta['height']);
     }
 
-    protected function nonGlideableFileFormats()
+    protected function nonGlideableFileExtensions()
     {
         return [
             ['txt'], // not an image
             ['md'],  // not an image
-            ['svg'], // doesn't work with imagick
-            ['pdf'], // doesn't work with imagick
+            ['svg'], // doesn't work with imagick without extra server config
+            ['svg'], // doesn't work with imagick without extra server config
+            ['eps'], // doesn't work with imagick without extra server config
         ];
     }
 
     /**
      * @test
-     * @dataProvider nonGlideableFileFormats
+     * @dataProvider nonGlideableFileExtensions
      **/
     public function it_doesnt_process_or_error_when_uploading_non_glideable_file_with_glide_config($extension)
     {
@@ -1674,6 +1675,7 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->assertMissing("path/to/file.{$extension}");
 
+        // Ensure a glide server is never instantiated for these extensions...
         Facades\Glide::shouldReceive('server')->never();
 
         $return = $asset->upload(UploadedFile::fake()->create("file.{$extension}"));
@@ -1687,6 +1689,54 @@ class AssetTest extends TestCase
             return $event->asset = $asset;
         });
         Event::assertDispatched(AssetSaved::class);
+    }
+
+    /** @test */
+    public function it_can_process_a_custom_image_format()
+    {
+        Event::fake();
+
+        config(['statamic.assets.image_manipulation.presets.small' => [
+            'w' => '15',
+            'h' => '15',
+        ]]);
+
+        // Normally eps files (for example) are not supported by gd or imagick. However, imagick does
+        // does actually support over 100 formats with extra configuration (eg. via ghostscript).
+        // Thus, we allow the user to configure additional extensions in their assets config.
+        config(['statamic.assets.image_manipulation.additional_extensions' => [
+            'eps',
+        ]]);
+
+        $this->container->sourcePreset('small');
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.eps')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing('path/to/asset.eps');
+
+        $file = UploadedFile::fake()->image('asset.eps', 20, 30);
+
+        // Ensure a glide server is instantiated and `makeImage()` is called...
+        Facades\Glide::shouldReceive('server->makeImage')->once();
+
+        $return = $asset->upload($file);
+
+        $this->assertEquals($asset, $return);
+        $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
+        $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
+        Storage::disk('test')->assertExists('path/to/asset.eps');
+        $this->assertEquals('path/to/asset.eps', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+        Event::assertDispatched(AssetSaved::class);
+        $meta = $asset->meta();
+
+        // Normally we assert changes to the meta, but we cannot in this test because we can't guarantee
+        // the test suite has imagick with ghostscript installed (required for eps files, for example).
+        // $this->assertEquals(10, $meta['width']);
+        // $this->assertEquals(15, $meta['height']);
     }
 
     /** @test */
