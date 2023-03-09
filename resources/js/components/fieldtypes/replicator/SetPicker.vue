@@ -13,23 +13,21 @@
                 </button>
             </div>
             <div class="p-1">
-                <div v-if="showGroups" v-for="group in sets" :key="group.handle" class="cursor-pointer rounded">
-                    <div @click="selectGroup(group.handle)" class="flex items-center group px-2 py-1.5 hover:bg-gray-200 rounded-md">
+                <div v-for="item in items" :key="item.handle" class="cursor-pointer rounded">
+                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 hover:bg-gray-200 rounded-md">
                         <div class="h-10 w-10 rounded bg-white border border-gray-600 mr-2 p-2.5">
                             <svg-icon name="folder-generic" class="text-gray-800" />
                         </div>
                         <div class="flex-1">
-                            <div class="text-md font-medium text-gray-800 truncate w-52">{{ group.display || group.handle }}</div>
-                            <div v-if="group.instructions" class="text-2xs text-gray-700 truncate w-52">{{ group.instructions }}</div>
+                            <div class="text-md font-medium text-gray-800 truncate w-52">{{ item.display || item.handle }}</div>
+                            <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ item.instructions }}</div>
                         </div>
                         <svg-icon name="chevron-right-thin" class="text-gray-600 group-hover:text-gray-800" />
                     </div>
-                </div>
-                <div v-for="set in visibleSets" :key="set.handle" class="cursor-pointer rounded">
-                    <div @click="addSet(set.handle)" class="flex items-center group px-2 py-1.5 hover:bg-gray-200 rounded-md">
+                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="flex items-center group px-2 py-1.5 hover:bg-gray-200 rounded-md">
                         <div class="flex-1">
-                            <div class="text-md font-medium text-gray-800 truncate w-52">{{ set.display || set.handle }}</div>
-                            <div v-if="set.instructions" class="text-2xs text-gray-700 truncate w-52">{{ set.instructions }}</div>
+                            <div class="text-md font-medium text-gray-800 truncate w-52">{{ item.display || item.handle }}</div>
+                            <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ item.instructions }}</div>
                         </div>
                     </div>
                 </div>
@@ -101,6 +99,23 @@ export default {
             }
 
             return sets;
+        },
+
+        items() {
+            let items = [];
+
+            if (this.showGroups) {
+                this.sets.forEach(group => {
+                    items.push({ ...group, type: 'group' });
+                });
+            }
+
+            this.visibleSets.forEach(set => {
+                items.push({ ...set, type: 'set' });
+            });
+
+            return items;
+
         },
 
         noSearchResults() {
