@@ -13,8 +13,8 @@
                 </button>
             </div>
             <div class="p-1">
-                <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-300': selectionIndex === i }">
-                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 hover:bg-gray-200 rounded-md">
+                <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200': selectionIndex === i }" @mouseover="selectionIndex = i">
+                    <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
                         <div class="h-10 w-10 rounded bg-white border border-gray-600 mr-2 p-2.5">
                             <svg-icon name="folder-generic" class="text-gray-800" />
                         </div>
@@ -24,7 +24,7 @@
                         </div>
                         <svg-icon name="chevron-right-thin" class="text-gray-600 group-hover:text-gray-800" />
                     </div>
-                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="flex items-center group px-2 py-1.5 hover:bg-gray-200 rounded-md">
+                    <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
                         <div class="flex-1">
                             <div class="text-md font-medium text-gray-800 truncate w-52">{{ item.display || item.handle }}</div>
                             <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ item.instructions }}</div>
