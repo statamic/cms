@@ -1,5 +1,5 @@
 <template>
-    <popover ref="popover">
+    <popover ref="popover" scroll strategy="fixed">
 
         <template slot="trigger">
             <button
@@ -10,32 +10,35 @@
             </button>
         </template>
 
-        <div class="column-picker">
+        <div class="column-picker rounded-t-md bg-gray-100 w-64">
+            <header v-text="__('Displayed Columns')" class="border-b px-2 py-2 text-sm bg-white rounded-t-md font-medium"/>
             <sortable-list
                 v-model="selectedColumns"
                 :vertical="true"
-                item-class="column-picker-item"
-                handle-class="column-picker-item"
+                item-class="item"
+                handle-class="item"
                 append-to=".popover-content"
             >
-                <div class="outline-none text-left px-2 py-2">
-                    <h6 v-text="__('Displayed Columns')" class="p-2"/>
-                    <div class="column-picker-item sortable" v-for="column in selectedColumns" :key="column.field">
-                        <label>
+                <div class="flex flex-col space-y-1 px-2 p-3 select-none">
+                    <div class="item sortable cursor-grab" v-for="column in selectedColumns" :key="column.field">
+                        <div class="item-move py-1">&nbsp;</div>
+                        <div class="flex flex-1 ml-2 items-center p-0">
                             <input type="checkbox" class="mr-2" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
                             {{ column.label }}
-                        </label>
+                        </div>
                     </div>
                 </div>
             </sortable-list>
 
-            <div v-if="hiddenColumns.length" class="outline-none text-left px-2 pb-2">
-                <h6 v-text="__('Available Columns')" class="px-2 pb-2"/>
-                <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field">
-                    <label class="cursor-pointer">
-                        <input type="checkbox" class="mr-2" v-model="column.visible" @change="columnToggled(column) "/>
-                        {{ column.label }}
-                    </label>
+            <div v-if="hiddenColumns.length" class="outline-none text-left">
+                <header v-text="__('Available Columns')" class="border-y px-2 py-2 text-sm bg-white font-medium"/>
+                <div class="flex flex-col space-y-1 py-2 px-3 select-none">
+                    <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" class="mr-2" v-model="column.visible" @change="columnToggled(column) "/>
+                            {{ column.label }}
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
