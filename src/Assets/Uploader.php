@@ -2,8 +2,8 @@
 
 namespace Statamic\Assets;
 
+use Facades\Statamic\Imaging\Validator;
 use Statamic\Facades\Glide;
-use Statamic\Imaging\ImageGenerator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Uploader
@@ -23,9 +23,9 @@ abstract class Uploader
     {
         if (! $preset = $this->preset()) {
             return $file->getRealPath();
-        } elseif (! ImageGenerator::isAllowedExtension($file->getClientOriginalExtension())) {
-            return $file->getRealPath();
-        } elseif (! ImageGenerator::isAllowedMimeType($file->getClientOriginalExtension(), $file->getClientMimeType())) {
+        }
+
+        if (! Validator::isValidImage($file->getClientOriginalExtension(), $file->getClientMimeType())) {
             return $file->getRealPath();
         }
 

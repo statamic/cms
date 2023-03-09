@@ -41,7 +41,7 @@ class Validator
      *
      * @throws \Exception
      */
-    protected function isAllowedExtension($extension)
+    public function isAllowedExtension($extension)
     {
         $driver = config('statamic.assets.image_manipulation.driver');
 
@@ -75,8 +75,6 @@ class Validator
         }
 
         $allowedMimetypesForExtension = (new MimeTypes)->getMimeTypes($extension);
-
-        ray($extension, $mimeType, $allowedMimetypesForExtension)->orange();
 
         return in_array($mimeType, $allowedMimetypesForExtension);
     }
