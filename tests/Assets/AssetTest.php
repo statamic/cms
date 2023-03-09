@@ -5,6 +5,7 @@ namespace Tests\Assets;
 use BadMethodCallException;
 use Carbon\Carbon;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Statamic\Imaging\ImageValidator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
@@ -1579,6 +1580,9 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
+        // This should only get called when glide processing source image on upload...
+        ImageValidator::shouldReceive('isValidImage')->never();
+
         $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
 
         $this->assertEquals($asset, $return);
@@ -1626,6 +1630,11 @@ class AssetTest extends TestCase
 
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        ImageValidator::shouldReceive('isValidImage')
+            ->with('jpg', 'image/jpeg')
+            ->andReturnTrue()
+            ->once();
 
         $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 20, 30));
 
