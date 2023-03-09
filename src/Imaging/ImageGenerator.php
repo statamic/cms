@@ -2,6 +2,7 @@
 
 namespace Statamic\Imaging;
 
+use Facades\Statamic\Imaging\Validator;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\FileNotFoundException as FlysystemFileNotFoundException;
 use League\Flysystem\Filesystem;
@@ -17,7 +18,6 @@ use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Support\Str;
-use Symfony\Component\Mime\MimeTypes;
 
 class ImageGenerator
 {
@@ -311,12 +311,8 @@ class ImageGenerator
             $extension = File::extension($path);
         }
 
-        if (! static::isAllowedExtension($extension)) {
-            throw new \Exception("Image [{$path}] extension is not configured for manipulation.");
-        }
-
-        if (! static::isAllowedMimeType($extension, $mime)) {
-            throw new \Exception("Image [{$path}] does not actually appear to be an image.");
+        if (! Validator::isValidImage($extension, $mime)) {
+            throw new \Exception("Image [{$path}] does not actually appear to be a valid image.");
         }
     }
 
@@ -349,56 +345,5 @@ class ImageGenerator
             'path' => Str::after($parsed['path'], '/'),
             'base' => $parsed['scheme'].'://'.$parsed['host'],
         ];
-    }
-
-    /**
-     * Check if an extension is allowed by the configured image manipulation driver.
-     *
-     * @see https://image.intervention.io/v2/introduction/formats
-     *
-     * @param  string  $extension
-     * @return bool
-     *
-     * @throws \Exception
-     */
-    public static function isAllowedExtension($extension)
-    {
-        $driver = config('statamic.assets.image_manipulation.driver');
-
-        if ($driver == 'gd') {
-            $allowed = ['jpeg', 'jpg', 'png', 'gif', 'webp'];
-        } elseif ($driver == 'imagick') {
-            $allowed = ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
-        } else {
-            throw new \Exception("Unsupported image manipulation driver [$driver]");
-        }
-
-        $additional = config('statamic.assets.image_manipulation.additional_extensions', []);
-
-        return collect($allowed)
-            ->merge($additional)
-            ->map(fn ($extension) => Str::lower($extension))
-            ->contains(Str::lower($extension));
-    }
-
-    /**
-     * Check if mimetype is allowed for specific extension.
-     *
-     * @param  string  $extension
-     * @param  string  $mimeType
-     * @return bool
-     */
-    public static function isAllowedMimeType($extension, $mimeType)
-    {
-        ray($extension, $mimeType)->blue();
-        if ($mimeType === null) {
-            return false;
-        }
-
-        $allowedMimetypesForExtension = (new MimeTypes)->getMimeTypes($extension);
-
-        ray($extension, $mimeType, $allowedMimetypesForExtension)->orange();
-
-        return in_array($mimeType, $allowedMimetypesForExtension);
     }
 }
