@@ -2,9 +2,8 @@
 
 namespace Statamic\Http\Resources\CP\Entries;
 
-use Statamic\CP\Column;
-use Statamic\Http\Resources\CP\Entries\ListedEntry;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Statamic\CP\Column;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
 class Entries extends ResourceCollection

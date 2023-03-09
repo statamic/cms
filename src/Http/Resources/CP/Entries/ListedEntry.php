@@ -72,8 +72,6 @@ class ListedEntry extends JsonResource
                 ->preProcessIndex()
                 ->value();
 
-
-
             return [$key => $value];
         });
     }
