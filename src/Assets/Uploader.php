@@ -23,9 +23,9 @@ abstract class Uploader
     {
         if (! $preset = $this->preset()) {
             return $file->getRealPath();
-        }
-
-        if (! ImageGenerator::isAllowedExtension($file->getClientOriginalExtension())) {
+        } elseif (! ImageGenerator::isAllowedExtension($file->getClientOriginalExtension())) {
+            return $file->getRealPath();
+        } elseif (! ImageGenerator::isAllowedMimeType($file->getClientOriginalExtension(), $file->getClientMimeType())) {
             return $file->getRealPath();
         }
 
