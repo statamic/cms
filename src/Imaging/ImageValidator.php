@@ -16,10 +16,6 @@ class ImageValidator
      */
     public function isValidImage($extension, $mimeType)
     {
-        if ($mimeType === null) {
-            return false;
-        }
-
         if (! $this->isAllowedExtension($extension)) {
             return false;
         }
