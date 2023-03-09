@@ -52,7 +52,7 @@
             </bubble-menu>
 
             <floating-menu class="bard-set-selector" :editor="editor" :tippy-options="{ offset: calcFloatingOffset, zIndex: 6 }" :should-show="shouldShowSetButton" v-if="editor">
-                <set-picker :sets="setConfigs" @added="addSet">
+                <set-picker :sets="groupConfigs" @added="addSet">
                     <template #trigger>
                         <button type="button" class="btn-round group flex items-center justify-center" :aria-label="__('Add Set')" v-tooltip="__('Add Set')">
                             <svg-icon name="micro-plus" class="w-3 h-3 text-gray-800 group-hover:text-black" />

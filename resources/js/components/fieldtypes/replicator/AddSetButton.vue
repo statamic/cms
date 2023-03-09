@@ -1,7 +1,7 @@
 <template>
 
     <div class="replicator-set-picker">
-        <set-picker v-if="sets.length > 1" :sets="sets" :placement="last ? 'bottom-start' : 'auto'" @added="addSet">
+        <set-picker v-if="sets.length > 1" :sets="groups" :placement="last ? 'bottom-start' : 'auto'" @added="addSet">
             <template #trigger>
                 <div class="text-center">
                     <button v-if="last" class="btn-round flex items-center justify-center" v-tooltip.right="__('Add Set')" :aria-label="__('Add Set')">
@@ -32,6 +32,7 @@ export default {
 
     props: {
         sets: Array,
+        groups: Array,
         index: Number,
         last: Boolean,
     },

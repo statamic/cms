@@ -72,6 +72,7 @@
                     <template v-slot:picker v-if="canAddSet">
                         <add-set-button
                             class="replicator-set-picker-between"
+                            :groups="groupConfigs"
                             :sets="setConfigs"
                             :index="index"
                             @added="addSet" />
@@ -82,6 +83,7 @@
 
         <add-set-button v-if="canAddSet"
             :last="true"
+            :groups="groupConfigs"
             :sets="setConfigs"
             :index="value.length"
             @added="addSet" />
