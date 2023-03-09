@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Antlers\Language\Nodes;
 
+use Illuminate\Support\Str;
 use Statamic\Facades\Antlers;
 use Statamic\Tags\TagNotFoundException;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
@@ -419,6 +420,13 @@ class AntlersNode extends AbstractNode
         return $result;
     }
 
+    protected function looksLikeAnArray($value)
+    {
+        $value = trim($value);
+
+        return Str::startsWith($value, DocumentParser::LeftBracket) && Str::endsWith($value, DocumentParser::RightBracket);
+    }
+
     public function getSingleParameterValue(ParameterNode $param, NodeProcessor $processor, $data = [])
     {
         $value = $param->value;
@@ -426,8 +434,15 @@ class AntlersNode extends AbstractNode
         if ($param->isVariableReference) {
             $pathToParse = $this->reduceParameterInterpolations($param, $processor->cloneProcessor()->setIsProvidingParameterContent(true), $param->value, $data);
 
-            // Only use the full Antlers parser here if the string contains characters like |, (, {, }, etc.
-            if (StringUtilities::containsSymbolicCharacters($pathToParse)) {
+            // Only use the full Antlers parser here if the string
+            // contains characters like |, (, {, }, etc. or if
+            // it starts with [ and ends with ]. We cannot
+            // send every value through the full Antlers
+            // parser. This would be a breaking change
+            // related to previous parameter value
+            // behavior, and the new query builder
+            // where they are actually query tags.
+            if ($this->looksLikeAnArray($value) || StringUtilities::containsSymbolicCharacters($pathToParse)) {
                 $value = Antlers::parser()->getVariable($pathToParse, $data, null);
             } else {
                 $pathParser = new PathParser();

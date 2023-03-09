@@ -42,6 +42,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\Multisite::class,
         Commands\SiteClear::class,
         Commands\UpdatesRun::class,
+        Commands\ImportUsers::class,
     ];
 
     public function boot()

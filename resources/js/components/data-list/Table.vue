@@ -32,6 +32,7 @@
         <sortable-list
             :value="rows"
             :vertical="true"
+            :mirror="false"
             item-class="sortable-row"
             handle-class="table-drag-handle"
             @input="$emit('reordered', $event)"
