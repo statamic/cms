@@ -6,8 +6,8 @@
         </template>
         <template #default>
             <div class="set-picker-header p-3 border-b text-xs flex items-center">
-                <input type="text" class="py-1 px-2 border rounded w-full" :placeholder="__('Search Sets')" v-show="!selectedGroup" />
-                <button v-show="selectedGroup" @click="unselectGroup" class="text-gray-700 hover:text-gray-900">
+                <input type="text" class="py-1 px-2 border rounded w-full" :placeholder="__('Search Sets')" v-show="showSearch" />
+                <button v-show="showGroupBreadcrumb" @click="unselectGroup" class="text-gray-700 hover:text-gray-900">
                     <svg-icon name="chevron-left" class="w-2 h-2 mx-1" />
                     {{ selectedGroupDisplayText }}
                 </button>
@@ -60,6 +60,18 @@ export default {
 
     computed: {
 
+        showSearch() {
+            return !this.hasMultipleGroups || !this.selectedGroup;
+        },
+
+        showGroupBreadcrumb() {
+            return this.hasMultipleGroups && this.selectedGroup;
+        },
+
+        hasMultipleGroups() {
+            return this.sets.length > 1;
+        },
+
         selectedGroup() {
             return this.sets.find(group => group.handle === this.selectedGroupHandle);
         },
@@ -68,6 +80,12 @@ export default {
             return this.selectedGroup ? this.selectedGroup.display || this.selectedGroup.handle : null;
         }
 
+    },
+
+    created() {
+        if (this.sets.length === 1) {
+            this.selectedGroupHandle = this.sets[0].handle;
+        }
     },
 
     methods: {
