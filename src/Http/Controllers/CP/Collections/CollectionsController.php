@@ -75,6 +75,11 @@ class CollectionsController extends CpController
 
         $columns = $blueprint
             ->columns()
+            ->prepend(Column::make('status')
+                ->listable(true)
+                ->visible(true)
+                ->defaultVisibility(true)
+                ->sortable(false), 'status')
             ->setPreferred("collections.{$collection->handle()}.columns")
             ->rejectUnlisted()
             ->values();

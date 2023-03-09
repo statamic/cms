@@ -33,6 +33,7 @@ class ListedEntry extends JsonResource
         return [
             'id' => $entry->id(),
             'published' => $entry->published(),
+            'status' => $entry->status(),
             'private' => $entry->private(),
             'date' => $this->when($collection->dated(), function () {
                 return $this->resource->date()->inPreferredFormat();
@@ -60,12 +61,18 @@ class ListedEntry extends JsonResource
                 $value = $extra[$key] ?? $this->resource->value($key);
             }
 
-            $value = $this->blueprint
-                ->field($key)
-                ->setValue($value)
+            $field = $this->blueprint->field($key);
+
+            if (! $field) {
+                return [$key => $value];
+            }
+
+            $value = $field->setValue($value)
                 ->setParent($this->resource)
                 ->preProcessIndex()
                 ->value();
+
+
 
             return [$key => $value];
         });
