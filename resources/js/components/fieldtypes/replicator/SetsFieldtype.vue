@@ -6,8 +6,10 @@
             :initial-tabs="tabs"
             :require-tab="config.require_tab"
             :can-define-localizable="false"
-            :add-tab-text="__('Add Set')"
-            :new-tab-text="__('New Set')"
+            :add-tab-text="__('Add Set Group')"
+            :new-tab-text="__('New Set Group')"
+            :add-section-text="__('Add Set')"
+            :new-section-text="__('New Set')"
             @updated="tabsUpdated"
         />
 

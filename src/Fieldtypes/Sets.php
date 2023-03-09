@@ -6,7 +6,6 @@ use Statamic\CP\FieldtypeFactory;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;
-use Statamic\Support\Arr;
 
 class Sets extends Fieldtype
 {
@@ -19,14 +18,25 @@ class Sets extends Fieldtype
      */
     public function preProcess($data)
     {
-        return collect($data)->map(function ($set, $handle) {
-            $set['_id'] = $handle;
-            $set['handle'] = $handle;
-            $set['fields'] = collect($set['fields'])->map(function ($field, $i) {
-                return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
-            })->all();
+        // todo: handle converting old format of sets to new format
 
-            return $set;
+        return collect($data)->map(function ($group, $groupHandle) {
+            return [
+                '_id' => $groupId = 'group-'.$groupHandle,
+                'handle' => $groupHandle,
+                'display' => $group['display'] ?? null,
+                'sections' => collect($group['sets'] ?? [])->map(function ($set, $setHandle) use ($groupId) {
+                    return [
+                        '_id' => $setId = $groupId.'-section-'.$setHandle,
+                        'handle' => $setHandle,
+                        'display' => $set['display'] ?? null,
+                        'instructions' => $set['instructions'] ?? null,
+                        'fields' => collect($set['fields'])->map(function ($field, $i) use ($setId) {
+                            return array_merge(FieldTransformer::toVue($field), ['_id' => $setId.'-'.$i]);
+                        })->all(),
+                    ];
+                })->values()->all(),
+            ];
         })->values()->all();
     }
 
@@ -36,16 +46,20 @@ class Sets extends Fieldtype
      */
     public function preProcessConfig($data)
     {
-        return collect($data)
-            ->map(function ($config, $name) {
-                return array_merge($config, [
-                    'handle' => $name,
-                    'id' => $name,
-                    'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
-                ]);
-            })
-            ->values()
-            ->all();
+        return collect($data)->map(function ($group, $groupHandle) {
+            return array_merge($group, [
+                'handle' => $groupHandle,
+                'sets' => collect($group['sets'])->map(function ($config, $name) {
+                    return array_merge($config, [
+                        'handle' => $name,
+                        'id' => $name,
+                        'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
+                    ]);
+                })
+                ->values()
+                ->all(),
+            ]);
+        })->values()->all();
     }
 
     /**
@@ -53,19 +67,27 @@ class Sets extends Fieldtype
      * Replicator's "sets" array into what should be saved to the Blueprint/Fieldset's YAML.
      * Triggered in the AJAX request when you click "finish" when editing a Replicator field.
      */
-    public function process($sets)
+    public function process($tabs)
     {
-        return collect($sets)
-            ->mapWithKeys(function ($set) {
-                $handle = Arr::pull($set, 'handle');
-                $set = Arr::except($set, '_id');
-                $set['fields'] = collect($set['fields'])->map(function ($field) {
-                    return FieldTransformer::fromVue($field);
-                })->all();
-
-                return [$handle => $set];
-            })
-            ->all();
+        return collect($tabs)->mapWithKeys(function ($tab) {
+            return [
+                $tab['handle'] => [
+                    'display' => $tab['display'],
+                    'sets' => collect($tab['sections'])->mapWithKeys(function ($section) {
+                        return [
+                            $section['handle'] => [
+                                'display' => $section['display'],
+                                'instructions' => $section['instructions'] ?? null,
+                                'fields' => collect($section['fields'])->map(function ($field) {
+                                    return FieldTransformer::fromVue($field);
+                                })->all(),
+                            ],
+                        ];
+                    })->all(),
+                ],
+            ];
+        })
+        ->all();
     }
 
     private function moveOutNameKey($fields)

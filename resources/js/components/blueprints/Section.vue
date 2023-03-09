@@ -9,6 +9,9 @@
                     <span class="font-medium mr-2">
                         <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" :placeholder="`${__('Title')} (${__('Optional')})`" />
                     </span>
+                    <span class="font-mono text-xs text-gray-700 mr-2"><!-- should only be shown if a prop is passed saying handle is necessary -->
+                        <input type="text" v-model="section.handle" class="bg-transparent w-full outline-none" :placeholder="`${__('Handle')}`" />
+                    </span>
                     <span class="text-xs text-gray-700 mr-2">
                         <input type="text" v-model="section.instructions" class="bg-transparent w-full outline-none" :placeholder="`${__('Instructions')} (${__('Optional')})`" />
                     </span>

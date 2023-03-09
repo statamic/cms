@@ -13,6 +13,7 @@
             >
                 {{ tab.display }}
             </div>
+            <div class="card px-5 py-2 cursor-pointer" @click="addTab" v-text="addTabText" />
         </div>
 
         <div
@@ -27,6 +28,8 @@
                 ref="sections"
                 :tab-id="tab._id"
                 :initial-sections="tab.sections"
+                :new-section-text="newSectionText"
+                :add-section-text="addSectionText"
                 @updated="sectionsUpdated(tab._id, $event)"
             />
 
@@ -39,6 +42,7 @@
 <script>
 import {Sortable, Plugins} from '@shopify/draggable';
 import Sections from './Sections.vue';
+import uniqid from 'uniqid';
 
 let sortableTabs, sortableSections, sortableFields;
 
@@ -53,12 +57,26 @@ export default {
             type: Array,
             required: true
         },
+        addSectionText: {
+            type: String,
+        },
+        newSectionText: {
+            type: String,
+        },
+        addTabText: {
+            type: String,
+            default: () => __('Add Tab')
+        },
+        newTabText: {
+            type: String,
+            default: () => __('New Tab')
+        },
     },
 
     data() {
         return {
             tabs: this.initialTabs,
-            currentTab: this.initialTabs[0]._id,
+            currentTab: this.initialTabs.length ? this.initialTabs[0]._id : null,
             lastInteractedTab: null
         }
     },
@@ -222,6 +240,19 @@ export default {
         mouseEnteredTab(tabId) {
             if (this.lastInteractedTab) this.selectTab(tabId);
         },
+
+        addTab() {
+            const id = uniqid();
+
+            this.tabs.push({
+                _id: id,
+                display: this.newTabText,
+                handle: this.$slugify(this.newTabText, '_'),
+                sections: []
+            });
+
+            this.selectTab(id);
+        }
 
     }
 

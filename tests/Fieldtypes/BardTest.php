@@ -577,9 +577,13 @@ class BardTest extends TestCase
         $field = (new Field('test', [
             'type' => 'bard',
             'sets' => [
-                'main' => [
-                    'fields' => [
-                        ['handle' => 'things', 'field' => ['type' => 'array']],
+                'group_one' => [
+                    'sets' => [
+                        'main' => [
+                            'fields' => [
+                                ['handle' => 'things', 'field' => ['type' => 'array']],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -605,15 +609,19 @@ class BardTest extends TestCase
         $field = (new Field('test', [
             'type' => 'bard',
             'sets' => [
-                'main' => [
-                    'fields' => [
-                        [
-                            'handle' => 'things',
-                            'field' => [
-                                'type' => 'grid',
-                                'min_rows' => 2,
-                                'fields' => [
-                                    ['handle' => 'one', 'field' => ['type' => 'text']],
+                'group_one' => [
+                    'sets' => [
+                        'main' => [
+                            'fields' => [
+                                [
+                                    'handle' => 'things',
+                                    'field' => [
+                                        'type' => 'grid',
+                                        'min_rows' => 2,
+                                        'fields' => [
+                                            ['handle' => 'one', 'field' => ['type' => 'text']],
+                                        ],
+                                    ],
                                 ],
                             ],
                         ],

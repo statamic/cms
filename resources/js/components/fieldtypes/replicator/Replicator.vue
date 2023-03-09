@@ -101,6 +101,7 @@ import ReplicatorSet from './Set.vue';
 import SetPicker from './SetPicker.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
+import reduce from 'underscore/modules/reduce';
 
 export default {
 
@@ -138,6 +139,12 @@ export default {
         },
 
         setConfigs() {
+            return reduce(this.groupConfigs, (sets, group) => {
+                return sets.concat(group.sets);
+            }, []);
+        },
+
+        groupConfigs() {
             return this.config.sets;
         },
 
