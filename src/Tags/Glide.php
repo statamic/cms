@@ -134,7 +134,7 @@ class Glide extends Tags
         return $items->map(function ($item) {
             $data = ['url' => $this->generateGlideUrl($item)];
 
-            if ($this->isResizable($item)) {
+            if ($this->isValidExtension($item)) {
                 $path = $this->generateImage($item);
                 $attrs = Attributes::from(GlideManager::cacheDisk()->getDriver(), $path);
                 $data = array_merge($data, $attrs);
@@ -192,7 +192,7 @@ class Glide extends Tags
     private function generateGlideUrl($item)
     {
         try {
-            $url = $this->isResizable($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
+            $url = $this->isValidExtension($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
 
@@ -330,14 +330,14 @@ class Glide extends Tags
     }
 
     /**
-     * Checks if a file at a given path is resizable.
+     * Checks if a file at a given path has valid extension for glide manipulation.
      *
      * @param  string  $item
      * @return bool
      */
-    private function isResizable($item)
+    private function isValidExtension($item)
     {
-        return ImageValidator::isAllowedExtension(Path::extension($item));
+        return ImageValidator::isValidExtension(Path::extension($item));
     }
 
     private function useAbsoluteUrls()

@@ -18,8 +18,8 @@ class ImageValidatorTest extends TestCase
             'eps',
         ]]);
 
-        // We'll test `isAllowedExtension()` functionality separately below, and just mock here...
-        ImageValidator::shouldReceive('isAllowedExtension')->andReturnTrue()->times(23);
+        // We'll test `isValidExtension()` functionality separately below, and just mock here...
+        ImageValidator::shouldReceive('isValidExtension')->andReturnTrue()->times(23);
         ImageValidator::makePartial();
 
         $this->assertTrue(ImageValidator::isValidImage('jpg', 'image/jpeg'));
@@ -54,21 +54,21 @@ class ImageValidatorTest extends TestCase
     {
         config(['statamic.assets.image_manipulation.driver' => 'gd']);
 
-        $this->assertTrue(ImageValidator::isAllowedExtension('jpeg'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('jpg'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('png'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('gif'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('webp'));
+        $this->assertTrue(ImageValidator::isValidExtension('jpeg'));
+        $this->assertTrue(ImageValidator::isValidExtension('jpg'));
+        $this->assertTrue(ImageValidator::isValidExtension('png'));
+        $this->assertTrue(ImageValidator::isValidExtension('gif'));
+        $this->assertTrue(ImageValidator::isValidExtension('webp'));
 
         // Supported by imagick only...
-        $this->assertFalse(ImageValidator::isAllowedExtension('tif'));
-        $this->assertFalse(ImageValidator::isAllowedExtension('bmp'));
-        $this->assertFalse(ImageValidator::isAllowedExtension('psd'));
+        $this->assertFalse(ImageValidator::isValidExtension('tif'));
+        $this->assertFalse(ImageValidator::isValidExtension('bmp'));
+        $this->assertFalse(ImageValidator::isValidExtension('psd'));
 
         // Supported by imagick only, but requires `additional_extensions` configuration...
-        $this->assertFalse(ImageValidator::isAllowedExtension('svg'));
-        $this->assertFalse(ImageValidator::isAllowedExtension('pdf'));
-        $this->assertFalse(ImageValidator::isAllowedExtension('eps'));
+        $this->assertFalse(ImageValidator::isValidExtension('svg'));
+        $this->assertFalse(ImageValidator::isValidExtension('pdf'));
+        $this->assertFalse(ImageValidator::isValidExtension('eps'));
     }
 
     /** @test */
@@ -76,19 +76,19 @@ class ImageValidatorTest extends TestCase
     {
         config(['statamic.assets.image_manipulation.driver' => 'imagick']);
 
-        $this->assertTrue(ImageValidator::isAllowedExtension('jpeg'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('jpg'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('png'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('gif'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('webp'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('tif'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('bmp'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('psd'));
+        $this->assertTrue(ImageValidator::isValidExtension('jpeg'));
+        $this->assertTrue(ImageValidator::isValidExtension('jpg'));
+        $this->assertTrue(ImageValidator::isValidExtension('png'));
+        $this->assertTrue(ImageValidator::isValidExtension('gif'));
+        $this->assertTrue(ImageValidator::isValidExtension('webp'));
+        $this->assertTrue(ImageValidator::isValidExtension('tif'));
+        $this->assertTrue(ImageValidator::isValidExtension('bmp'));
+        $this->assertTrue(ImageValidator::isValidExtension('psd'));
 
         // Supported by imagick, but requires `additional_extensions` configuration...
-        $this->assertFalse(ImageValidator::isAllowedExtension('svg'));
-        $this->assertFalse(ImageValidator::isAllowedExtension('pdf'));
-        $this->assertFalse(ImageValidator::isAllowedExtension('eps'));
+        $this->assertFalse(ImageValidator::isValidExtension('svg'));
+        $this->assertFalse(ImageValidator::isValidExtension('pdf'));
+        $this->assertFalse(ImageValidator::isValidExtension('eps'));
     }
 
     /** @test */
@@ -102,21 +102,21 @@ class ImageValidatorTest extends TestCase
             'eps',
         ]]);
 
-        $this->assertTrue(ImageValidator::isAllowedExtension('jpeg'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('jpg'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('png'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('gif'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('webp'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('tif'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('bmp'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('psd'));
+        $this->assertTrue(ImageValidator::isValidExtension('jpeg'));
+        $this->assertTrue(ImageValidator::isValidExtension('jpg'));
+        $this->assertTrue(ImageValidator::isValidExtension('png'));
+        $this->assertTrue(ImageValidator::isValidExtension('gif'));
+        $this->assertTrue(ImageValidator::isValidExtension('webp'));
+        $this->assertTrue(ImageValidator::isValidExtension('tif'));
+        $this->assertTrue(ImageValidator::isValidExtension('bmp'));
+        $this->assertTrue(ImageValidator::isValidExtension('psd'));
 
         // Should now be supported due to `additional_extensions` config...
-        $this->assertTrue(ImageValidator::isAllowedExtension('svg'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('pdf'));
-        $this->assertTrue(ImageValidator::isAllowedExtension('eps'));
+        $this->assertTrue(ImageValidator::isValidExtension('svg'));
+        $this->assertTrue(ImageValidator::isValidExtension('pdf'));
+        $this->assertTrue(ImageValidator::isValidExtension('eps'));
 
         // Not configured, should still be false...
-        $this->assertFalse(ImageValidator::isAllowedExtension('exe'));
+        $this->assertFalse(ImageValidator::isValidExtension('exe'));
     }
 }

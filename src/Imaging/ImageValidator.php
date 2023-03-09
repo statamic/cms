@@ -16,11 +16,11 @@ class ImageValidator
      */
     public function isValidImage($extension, $mimeType)
     {
-        if (! $this->isAllowedExtension($extension)) {
+        if (! $this->isValidExtension($extension)) {
             return false;
         }
 
-        if (! $this->isAllowedMimeType($extension, $mimeType)) {
+        if (! $this->isValidMimeType($extension, $mimeType)) {
             return false;
         }
 
@@ -37,7 +37,7 @@ class ImageValidator
      *
      * @throws \Exception
      */
-    public function isAllowedExtension($extension)
+    public function isValidExtension($extension)
     {
         $driver = config('statamic.assets.image_manipulation.driver');
 
@@ -64,7 +64,7 @@ class ImageValidator
      * @param  string  $mimeType
      * @return bool
      */
-    protected function isAllowedMimeType($extension, $mimeType)
+    protected function isValidMimeType($extension, $mimeType)
     {
         $allowedMimetypesForExtension = (new MimeTypes)->getMimeTypes($extension);
 
