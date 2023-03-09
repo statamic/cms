@@ -1,12 +1,12 @@
 <template>
 
-    <popover ref="popover" class="set-picker" :scroll="true" :autoclose="false" :placement="placement">
+    <popover ref="popover" class="set-picker" :scroll="true" :autoclose="false" :placement="placement" @opened="opened">
         <template #trigger>
             <slot name="trigger" />
         </template>
         <template #default>
             <div class="set-picker-header p-3 border-b text-xs flex items-center">
-                <input type="text" class="py-1 px-2 border rounded w-full" :placeholder="__('Search Sets')" v-show="showSearch" v-model="search" />
+                <input ref="search" type="text" class="py-1 px-2 border rounded w-full" :placeholder="__('Search Sets')" v-show="showSearch" v-model="search" />
                 <button v-show="showGroupBreadcrumb" @click="unselectGroup" class="text-gray-700 hover:text-gray-900">
                     <svg-icon name="chevron-left" class="w-2 h-2 mx-1" />
                     {{ selectedGroupDisplayText }}
@@ -129,6 +129,10 @@ export default {
 
         unselectGroup() {
             this.selectedGroupHandle = null;
+        },
+
+        opened() {
+            this.$refs.search.focus();
         }
 
     }

@@ -86,7 +86,9 @@ export default {
         open() {
             this.isOpen = true;
             this.escBinding = this.$keys.bind('esc', e => this.close())
-            this.popper && this.popper.update();
+            this.popper && this.popper.update().then(() => {
+                setTimeout(() => this.$emit('opened'), 100); // after animation. there's probably a better way to do this.
+            })
         },
         close() {
             this.isOpen = false;
