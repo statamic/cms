@@ -20,26 +20,30 @@ export default {
     mixins: [ clickaway ],
 
     props: {
-        disabled: {
+        autoclose: {
             type: Boolean,
             default: false
         },
-        placement: {
-            type: String,
-            default: 'bottom',
+        disabled: {
+            type: Boolean,
+            default: false
         },
         offset: {
             type: Array,
             default: () => [0, 10]
         },
+        placement: {
+            type: String,
+            default: 'bottom-end',
+        },
         scroll: {
             type: Boolean,
             default: false
         },
-        autoclose: {
-            type: Boolean,
-            default: false
-        }
+        strategy: {
+            type: String,
+            default: 'absolute'
+        },
     },
 
     data() {
@@ -63,6 +67,7 @@ export default {
         bindPopper() {
             this.popper = createPopper(this.$refs.trigger, this.$refs.popover, {
                 placement: this.placement,
+                strategy: this.strategy,
                 modifiers: [
                     {
                         name: 'offset',

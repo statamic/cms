@@ -1,15 +1,17 @@
 <template>
 
-    <div class="text-2xs">
+    <div class="flex flex-wrap">
         <div
             v-for="(item, i) in value"
             :key="item.id"
-            class="flex items-center"
-            :class="{ 'mb-2': i < value.length-1 }"
+            class="relationship-index-field-item"
+            :class="{ 'mb-1.5': i < value.length-1 }"
         >
-            <div v-if="item.published && item.published !== null"
-                class="little-dot mr-2" :class="[item.published ? 'bg-green' : 'bg-gray-400']" />
-            <a :href="item.edit_url">{{ item.title }}</a>
+            <div class="flex items-center shrink">
+                <div v-if="item.published && item.published !== null"
+                    class="little-dot h-1 w-1 mr-1" :class="[item.published ? 'bg-green' : 'bg-gray-400']" />
+                <a :href="item.edit_url" :title="item.title" v-text="item.title" />
+            </div>
         </div>
     </div>
 

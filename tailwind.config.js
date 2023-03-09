@@ -69,6 +69,8 @@ module.exports = {
                 DEFAULT: '#fbfab0',
                 dark: '#e8dc1e',
             },
+            lime: colors.green,
+            amber: colors.amber,
         },
         screens: {
             'sm': '576px',
@@ -152,6 +154,8 @@ module.exports = {
                 240: '60rem',
             },
             zIndex: {
+                1: '1',
+                2: '2',
                 5: '5',
                 200: '200',
                 top: '1001',
@@ -162,6 +166,7 @@ module.exports = {
     },
     plugins: [
         require('@tailwindcss/container-queries'),
+        require('@tailwindcss/line-clamp'),
         require('@tailwindcss/typography'),
     ],
     important: true,

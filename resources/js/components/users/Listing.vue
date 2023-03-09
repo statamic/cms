@@ -97,7 +97,7 @@
                             <span v-for="group in (groups || [])" class="badge-pill-sm mr-1">{{ group.title }}</span>
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
-                            <dropdown-list>
+                            <dropdown-list placement="left-start" scroll>
                                 <dropdown-item :text="__('Edit')" :redirect="user.edit_url" v-if="user.editable" />
                                 <dropdown-item :text="__('View')" :redirect="user.edit_url" v-else />
                                 <data-list-inline-actions
