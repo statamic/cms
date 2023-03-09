@@ -5,7 +5,7 @@ namespace Statamic\Imaging;
 use Statamic\Support\Str;
 use Symfony\Component\Mime\MimeTypes;
 
-class Validator
+class ImageValidator
 {
     /**
      * Check if image has valid extension and mimetype.

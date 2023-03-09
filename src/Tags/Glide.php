@@ -3,7 +3,7 @@
 namespace Statamic\Tags;
 
 use Facades\Statamic\Imaging\Attributes;
-use Facades\Statamic\Imaging\Validator;
+use Facades\Statamic\Imaging\ImageValidator;
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
@@ -337,7 +337,7 @@ class Glide extends Tags
      */
     private function isResizable($item)
     {
-        return Validator::isAllowedExtension(Path::extension($item));
+        return ImageValidator::isAllowedExtension(Path::extension($item));
     }
 
     private function useAbsoluteUrls()

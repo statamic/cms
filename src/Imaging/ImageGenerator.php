@@ -2,7 +2,7 @@
 
 namespace Statamic\Imaging;
 
-use Facades\Statamic\Imaging\Validator;
+use Facades\Statamic\Imaging\ImageValidator;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\FileNotFoundException as FlysystemFileNotFoundException;
 use League\Flysystem\Filesystem;
@@ -311,7 +311,7 @@ class ImageGenerator
             $extension = File::extension($path);
         }
 
-        if (! Validator::isValidImage($extension, $mime)) {
+        if (! ImageValidator::isValidImage($extension, $mime)) {
             throw new \Exception("Image [{$path}] does not actually appear to be a valid image.");
         }
     }
