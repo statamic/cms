@@ -1,6 +1,6 @@
 <template>
 
-    <popover ref="popover" class="set-picker" :scroll="true" :autoclose="false" :placement="placement" @opened="opened">
+    <popover ref="popover" class="set-picker" :scroll="true" :autoclose="false" :placement="placement" @opened="opened" @closed="closed">
         <template #trigger>
             <slot name="trigger" />
         </template>
@@ -13,7 +13,7 @@
                 </button>
             </div>
             <div class="p-1">
-                <div v-for="item in items" :key="item.handle" class="cursor-pointer rounded">
+                <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-300': selectionIndex === i }">
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 hover:bg-gray-200 rounded-md">
                         <div class="h-10 w-10 rounded bg-white border border-gray-600 mr-2 p-2.5">
                             <svg-icon name="folder-generic" class="text-gray-800" />
@@ -54,7 +54,9 @@ export default {
     data() {
         return {
             selectedGroupHandle: null,
-            search: null
+            search: null,
+            selectionIndex: 0,
+            keybindings: [],
         }
     },
 
@@ -124,6 +126,14 @@ export default {
 
     },
 
+    watch: {
+
+        search() {
+            this.selectionIndex = 0;
+        }
+
+    },
+
     created() {
         if (this.sets.length === 1) {
             this.selectedGroupHandle = this.sets[0].handle;
@@ -135,11 +145,13 @@ export default {
         addSet(handle) {
             this.$emit('added', handle);
             this.unselectGroup();
+            this.search = null;
             this.$refs.popover.close();
         },
 
         selectGroup(handle) {
             this.selectedGroupHandle = handle;
+            this.selectionIndex = 0;
         },
 
         unselectGroup() {
@@ -148,6 +160,44 @@ export default {
 
         opened() {
             this.$refs.search.focus();
+            this.bindKeys();
+        },
+
+        closed() {
+            this.unbindKeys();
+        },
+
+        bindKeys() {
+            this.keybindings = [
+                this.$keys.bindGlobal('up', e => this.keypressUp(e)),
+                this.$keys.bindGlobal('down', e => this.keypressDown(e)),
+                this.$keys.bindGlobal('enter', e => this.keypressEnter(e)),
+            ];
+        },
+
+        unbindKeys() {
+            this.keybindings.forEach(binding => binding.destroy());
+            this.keybindings = [];
+        },
+
+        keypressUp(e) {
+            e.preventDefault();
+            this.selectionIndex = this.selectionIndex === 0 ? this.items.length - 1 : this.selectionIndex - 1;
+        },
+
+        keypressDown(e) {
+            e.preventDefault();
+            this.selectionIndex = this.selectionIndex === this.items.length-1 ? 0 : this.selectionIndex + 1;
+        },
+
+        keypressEnter(e) {
+            e.preventDefault();
+            const item = this.items[this.selectionIndex];
+            if (item.type === 'group') {
+                this.selectGroup(item.handle);
+            } else {
+                this.addSet(item.handle);
+            }
         }
 
     }

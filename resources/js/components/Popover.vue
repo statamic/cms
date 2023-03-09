@@ -95,6 +95,7 @@ export default {
             if (this.escBinding) {
                 this.escBinding.destroy();
             }
+            this.$emit('closed');
         },
         leave() {
             if (this.autoclose) {
