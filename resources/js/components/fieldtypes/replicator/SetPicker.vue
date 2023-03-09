@@ -1,24 +1,33 @@
 <template>
 
-    <div class="replicator-set-picker">
-        <dropdown-list class="align-left inline-block" placement="bottom-start" v-if="sets.length > 1" :scroll="true">
-            <template v-slot:trigger>
-                <button v-if="last" class="btn-round flex items-center justify-center" v-tooltip.right="__('Add Set')" :aria-label="__('Add Set')">
-                    <svg-icon name="micro-plus" class="w-3 h-3 text-gray-800 group-hover:text-black" />
+    <popover class="set-picker" :scroll="true" :autoclose="false" :placement="placement">
+        <template #trigger>
+            <slot name="trigger" />
+        </template>
+        <template #default>
+            <div class="set-picker-header p-3 border-b text-xs flex items-center">
+                <input type="text" class="py-1 px-2 border rounded w-full" :placeholder="__('Search Sets')" v-show="showSearch" />
+                <button v-show="!showSearch" class="text-gray-700 hover:text-gray-900">
+                    <svg-icon name="chevron-left" class="w-2 h-2 mx-1" />
+                    {{ __('Set Group Name')}}
                 </button>
-                <button v-else class="dropdown-icon group" v-tooltip.right="__('Add Set')" :aria-label="__('Add Set')">
-                    <svg-icon name="micro-plus" class="w-2.5 h-2.5 text-gray-600 group-hover:text-gray-900 transition duration-150" />
-                </button>
-            </template>
-
-            <div v-for="set in sets" :key="set.handle">
-                <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
             </div>
-        </dropdown-list>
-        <button v-else :class="{'btn-round flex items-center justify-center': last, 'dropdown-icon': !last }" v-tooltip.right="__('Add Set')" :aria-label="__('Add Set')" @click="addSet(sets[0].handle)">
-            <svg-icon name="micro-plus" class="w-3 h-3 text-gray-800 group-hover:text-black" />
-        </button>
-    </div>
+            <div class="p-1">
+                <div v-for="set in sets" :key="set.handle" class="rounded">
+                    <dropdown-item @click="addSet(set.handle)" class="flex items-center group px-2 py-1.5 hover:bg-gray-200 rounded-md">
+                        <div class="h-10 w-10 rounded bg-white border border-gray-600 mr-2 p-2.5">
+                            <svg-icon name="folder-generic" class="text-gray-800" />
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-md font-medium text-gray-800 truncate w-52">{{ set.display || set.handle }}</div>
+                            <div v-if="set.instructions" class="text-2xs text-gray-700 truncate w-52">{{ set.instructions }}</div>
+                        </div>
+                        <svg-icon name="chevron-right-thin" class="text-gray-600 group-hover:text-gray-800" />
+                    </dropdown-item>
+                </div>
+            </div>
+        </template>
+    </popover>
 
 </template>
 
@@ -27,14 +36,22 @@ export default {
 
     props: {
         sets: Array,
-        index: Number,
-        last: Boolean,
+        placement: {
+            type: String,
+            default: 'bottom-start',
+        }
+    },
+
+    data() {
+        return {
+            showSearch: true,
+        }
     },
 
     methods: {
 
         addSet(handle) {
-            this.$emit('added', handle, this.index);
+            this.$emit('added', handle);
         }
 
     }

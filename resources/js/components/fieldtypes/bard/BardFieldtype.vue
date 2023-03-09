@@ -52,17 +52,13 @@
             </bubble-menu>
 
             <floating-menu class="bard-set-selector" :editor="editor" :tippy-options="{ offset: calcFloatingOffset, zIndex: 6 }" :should-show="shouldShowSetButton" v-if="editor">
-                <dropdown-list>
-                    <template v-slot:trigger>
+                <set-picker :sets="setConfigs" @added="addSet">
+                    <template #trigger>
                         <button type="button" class="btn-round group flex items-center justify-center" :aria-label="__('Add Set')" v-tooltip="__('Add Set')">
                             <svg-icon name="micro-plus" class="w-3 h-3 text-gray-800 group-hover:text-black" />
                         </button>
                     </template>
-
-                    <div v-for="set in setConfigs" :key="set.handle">
-                        <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
-                    </div>
-                </dropdown-list>
+                </set-picker>
             </floating-menu>
 
             <div class="bard-invalid" v-if="invalid" v-html="__('Invalid content')"></div>
@@ -115,6 +111,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
 import Underline from '@tiptap/extension-underline';
 import BardSource from './Source.vue';
+import SetPicker from '../replicator/SetPicker.vue';
 import { DocumentBlock, DocumentInline } from './Document';
 import { Set } from './Set'
 import { Small } from './Small';
@@ -135,6 +132,7 @@ export default {
         BubbleMenu,
         BardSource,
         BardToolbarButton,
+        SetPicker,
         EditorContent,
         FloatingMenu,
         LinkToolbarButton,
