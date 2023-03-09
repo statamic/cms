@@ -6,12 +6,15 @@
             <div
                 v-for="tab in tabs"
                 :key="tab._id"
-                class="blueprint-tab card px-5 py-2 mr-2 cursor-pointer"
+                class="blueprint-tab card px-5 py-2 mr-2 cursor-pointer flex"
                 :class="{ 'bg-blue-100': currentTab === tab._id }"
                 @click="selectTab(tab._id)"
                 @mouseenter="mouseEnteredTab(tab._id)"
             >
                 {{ tab.display }}
+                <div @click="removeTab(tab._id)">
+                    <svg-icon name="delete-x" class="w-2 h-2 ml-2 text-gray-600 hover:text-gray-800" />
+                </div>
             </div>
             <div class="card px-5 py-2 cursor-pointer" @click="addTab" v-text="addTabText" />
         </div>
@@ -252,7 +255,13 @@ export default {
             });
 
             this.selectTab(id);
-        }
+        },
+
+        removeTab(tabId) {
+            this.tabs = this.tabs.filter(tab => tab._id !== tabId);
+
+            this.selectTab(this.tabs.length ? this.tabs[0]._id : null);
+        },
 
     }
 
