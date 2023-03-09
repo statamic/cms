@@ -19,7 +19,7 @@ class ImageValidatorTest extends TestCase
         ]]);
 
         // We'll test `isAllowedExtension()` functionality separately below, and just mock here...
-        ImageValidator::shouldReceive('isAllowedExtension')->andReturnTrue()->times(18);
+        ImageValidator::shouldReceive('isAllowedExtension')->andReturnTrue()->times(23);
         ImageValidator::makePartial();
 
         $this->assertTrue(ImageValidator::isValidImage('jpg', 'image/jpeg'));
@@ -40,6 +40,13 @@ class ImageValidatorTest extends TestCase
         $this->assertTrue(ImageValidator::isValidImage('pdf', 'image/pdf'));
         $this->assertTrue(ImageValidator::isValidImage('eps', 'application/postscript'));
         $this->assertTrue(ImageValidator::isValidImage('eps', 'image/x-eps'));
+
+        // Show that mimetype validation catches improper mime types, for the purpose of catching malicious files...
+        $this->assertFalse(ImageValidator::isValidImage('jpg', ''));
+        $this->assertFalse(ImageValidator::isValidImage('jpg', null));
+        $this->assertFalse(ImageValidator::isValidImage('jpg', 'application/octet-stream')); // exe file
+        $this->assertFalse(ImageValidator::isValidImage('jpg', 'application/x-msdownload')); // exe file
+        $this->assertFalse(ImageValidator::isValidImage('jpg', 'application/vnd.microsoft.portable-executable')); // exe file
     }
 
     /** @test */
