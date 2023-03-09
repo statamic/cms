@@ -16,7 +16,7 @@
             @visible-columns-updated="visibleColumns = $event"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0 relative">
+                <div class="card overflow-hidden p-0 relative">
                     <div class="flex items-center justify-between p-2 text-sm border-b">
 
                         <data-list-search class="h-8" v-if="showFilters" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
@@ -93,7 +93,7 @@
                             <span class="font-mono text-2xs">{{ term.slug }}</span>
                         </template>
                         <template slot="actions" slot-scope="{ row: term, index }">
-                            <dropdown-list>
+                            <dropdown-list placement="left-start" scroll>
                                 <dropdown-item :text="__('View')" :redirect="term.permalink" />
                                 <dropdown-item :text="__('Edit')" :redirect="term.edit_url" />
                                 <div class="divider" />

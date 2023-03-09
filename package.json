@@ -90,6 +90,7 @@
     "@babel/preset-env": "^7.20.2",
     "@rollup/plugin-inject": "^5.0.3",
     "@tailwindcss/container-queries": "^0.1.0",
+    "@tailwindcss/line-clamp": "^0.4.2",
     "@tailwindcss/typography": "^0.5.9",
     "@vitejs/plugin-vue2": "^2.2.0",
     "autoprefixer": "^10.4.0",
