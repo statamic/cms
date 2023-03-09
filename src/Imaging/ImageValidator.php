@@ -70,10 +70,6 @@ class ImageValidator
      */
     protected function isAllowedMimeType($extension, $mimeType)
     {
-        if ($mimeType === null) {
-            return false;
-        }
-
         $allowedMimetypesForExtension = (new MimeTypes)->getMimeTypes($extension);
 
         return in_array($mimeType, $allowedMimetypesForExtension);
