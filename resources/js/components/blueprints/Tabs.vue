@@ -74,6 +74,10 @@ export default {
             type: String,
             default: () => __('New Tab')
         },
+        requireTab: {
+            type: Boolean,
+            default: true
+        }
     },
 
     data() {
@@ -93,7 +97,7 @@ export default {
     },
 
     mounted() {
-        // this.ensureTab();
+        this.ensureTab();
         this.makeSortable();
     },
 
