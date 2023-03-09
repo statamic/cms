@@ -17,6 +17,7 @@ use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Support\Str;
+use Symfony\Component\Mime\MimeTypes;
 
 class ImageGenerator
 {
@@ -291,7 +292,7 @@ class ImageGenerator
     }
 
     /**
-     * Ensure that the image is actually an image.
+     * Ensure that the image is actually an image and is allowed to be manipulated.
      *
      * @throws \Exception
      */
@@ -300,17 +301,21 @@ class ImageGenerator
         if ($this->asset) {
             $path = $this->asset->path();
             $mime = $this->asset->mimeType();
+            $extension = $this->asset->extension();
         } else {
             $path = public_path($this->path);
             if (! File::exists($path)) {
                 throw $this->isUsingFlysystemOne() ? new FlysystemFileNotFoundException($path) : UnableToReadFile::fromLocation($path);
             }
             $mime = File::mimeType($path);
+            $extension = File::extension($path);
         }
 
-        $others = config('statamic.assets.image_manipulation.additional_extensions', []);
+        if (! static::isAllowedExtension($extension)) {
+            throw new \Exception("Image [{$path}] extension is not configured for manipulation.");
+        }
 
-        if ($mime !== null && strncmp($mime, 'image/', 6) !== 0 && ! in_array(pathinfo($path, PATHINFO_EXTENSION), $others)) {
+        if (! static::isAllowedMimeType($extension, $mime)) {
             throw new \Exception("Image [{$path}] does not actually appear to be an image.");
         }
     }
@@ -374,5 +379,26 @@ class ImageGenerator
             ->merge($additional)
             ->map(fn ($extension) => Str::lower($extension))
             ->contains(Str::lower($extension));
+    }
+
+    /**
+     * Check if mimetype is allowed for specific extension.
+     *
+     * @param  string  $extension
+     * @param  string  $mimeType
+     * @return bool
+     */
+    public static function isAllowedMimeType($extension, $mimeType)
+    {
+        ray($extension, $mimeType)->blue();
+        if ($mimeType === null) {
+            return false;
+        }
+
+        $allowedMimetypesForExtension = (new MimeTypes)->getMimeTypes($extension);
+
+        ray($extension, $mimeType, $allowedMimetypesForExtension)->orange();
+
+        return in_array($mimeType, $allowedMimetypesForExtension);
     }
 }
