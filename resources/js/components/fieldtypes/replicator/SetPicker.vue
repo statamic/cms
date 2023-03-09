@@ -33,6 +33,9 @@
                         </div>
                     </div>
                 </div>
+                <div v-if="noSearchResults" class="text-center text-gray-600 text-xs p-3">
+                    {{ __('No results') }}
+                </div>
             </div>
         </template>
     </popover>
@@ -98,6 +101,10 @@ export default {
             }
 
             return sets;
+        },
+
+        noSearchResults() {
+            return this.search && this.visibleSets.length === 0;
         }
 
     },
