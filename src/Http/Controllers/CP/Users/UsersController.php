@@ -74,6 +74,10 @@ class UsersController extends CpController
         $users = $query
             ->orderBy(request('sort', 'email'), request('order', 'asc'))
             ->paginate(request('perPage'));
+        
+        if (request('search') && Search::indexes()->has('users')) {
+            $users->setCollection($users->getCollection()->map->getSearchable());
+        }
 
         return (new Users($users))
             ->blueprint(User::blueprint())
