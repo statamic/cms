@@ -22,7 +22,7 @@ class Git extends Process
     public function isRepo()
     {
         // $this->withoutLoggingErrors(function ($process) {
-        $process->root();
+        $this->root();
         // });
 
         return ! $this->hasErrorOutput();
