@@ -179,7 +179,7 @@ class StaticWarm extends Command
                 return null;
             }
 
-            return $entry->absoluteUrl();
+            return $entry->absoluteUrlWithoutRedirect();
         })->filter();
 
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Entries");
