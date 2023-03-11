@@ -37,7 +37,7 @@
     @apply uppercase text-4xs ml-2 text-white rounded-sm;
     height: 16px;
 
-    &.publish { @apply bg-green-light; }
+    &.publish { @apply bg-green-600; }
     &.revision,
     &.restore { @apply text-gray-700; }
     &.unpublish { @apply bg-red; }
@@ -49,7 +49,7 @@
 }
 
 .revision-item.status-published {
-    .revision-item-bullet { @apply bg-green; }
+    .revision-item-bullet { @apply bg-green-600; }
 }
 
 .revision-item.status-working-copy {

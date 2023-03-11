@@ -38,11 +38,6 @@ module.exports = {
                 950: '#141a1f',
                 DEFAULT: '#73808c',
             },
-            green: {
-                dark: '#3A804D',
-                light: '#64BD63',
-                DEFAULT: '#479967',
-            },
             orange: {
                 light: '#fcc062',
                 DEFAULT: '#f5a82f',
@@ -69,7 +64,7 @@ module.exports = {
                 DEFAULT: '#fbfab0',
                 dark: '#e8dc1e',
             },
-            lime: colors.green,
+            green: colors.green,
             amber: colors.amber,
         },
         screens: {

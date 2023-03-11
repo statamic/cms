@@ -205,7 +205,7 @@
         <h6 class="mb-4">Other Colors (needs simplifying)</h6>
         <div class="flex text-sm text-center">
             <div class="text-black bg-blue p-6 flex-1">Blue</div>
-            <div class="text-black bg-green p-6 flex-1">Green</div>
+            <div class="text-black bg-green-600 p-6 flex-1">Green</div>
             <div class="text-black bg-red p-6 flex-1">Red</div>
             <div class="text-black bg-orange-light border border-orange p-6 m-1 flex-1">Orange</div>
             <div class="text-black bg-yellow border border-yellow-dark p-6 m-1 flex-1">Yellow</div>
@@ -227,7 +227,7 @@
                 </div>
                 <div class="text-4xl mb-4">89</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green mr-2">@cp_svg('performance-increase')</span>
+                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('performance-increase')</span>
                     <span class="leading-none text-sm">8.54% Increase</span>
                 </div>
             </div>
@@ -242,7 +242,7 @@
                 </div>
                 <div class="text-4xl mb-4">35</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green mr-2">@cp_svg('performance-increase')</span>
+                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('performance-increase')</span>
                     <span class="leading-none text-sm">2.15% Increase</span>
                 </div>
             </div>
@@ -257,7 +257,7 @@
                 </div>
                 <div class="text-4xl mb-4 text-gray-400">251</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green mr-2">@cp_svg('performance-increase')</span>
+                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('performance-increase')</span>
                     <span class="leading-none text-gray-400 text-sm">8.54% Increase</span>
                 </div>
             </div>

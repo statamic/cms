@@ -26,7 +26,7 @@
     }
     &.dark { }
     &.blue { @apply bg-blue; }
-    &.green { @apply bg-green; }
+    &.green { @apply bg-green-600; }
     &.red { @apply bg-red; }
 }
 

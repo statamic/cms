@@ -123,7 +123,7 @@ export default {
             if (this.limitExceeded) {
                 return 'text-red';
             } else if (this.limitReached) {
-                return 'text-green';
+                return 'text-green-600';
             }
 
             return 'text-gray';

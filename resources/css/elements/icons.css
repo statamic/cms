@@ -21,29 +21,9 @@ svg {
 	width: 7px;
     flex-shrink: 0;
 
-    &.published { @apply bg-green-light }
+    &.published { @apply bg-green-600 }
     &.draft, &.expired { @apply bg-gray-600 }
     &.scheduled, &.hollow { @apply bg-transparent border border-gray-600 }
-}
-
-.icon-status-draft {
-	@apply bg-gray-700;
-}
-
-.icon-status-hidden {
-    @apply border border-gray-700;
-}
-
-.icon-status-live {
-	@apply bg-green;
-}
-
-.icon-status-error {
-	@apply bg-red;
-}
-
-.icon-status-warning {
-    @apply bg-yellow-dark;
 }
 
 .icon-header-avatar {

@@ -345,10 +345,19 @@ table.control {
     @apply inline-block text-xs bg-gray-300 text-gray-800 shrink rounded-full px-2 py-0.5 text-center justify-center;
 
     &.status-published:not(.status-private) {
-        @apply text-lime-900 bg-lime-200 ;
+        @apply text-green-900 bg-green-200 ;
     }
 
     &.status-scheduled {
         @apply text-amber-900 bg-amber-200;
+    }
+}
+
+.role-index-field, .groups-index-field {
+    @apply flex flex-wrap -mb-1.5;
+
+    .role-index-field-item,
+    .groups-index-field-item {
+        @apply rounded bg-gray-100 border px-1 inline-block text-2xs line-clamp-1 mb-1;
     }
 }

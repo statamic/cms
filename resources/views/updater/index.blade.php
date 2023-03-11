@@ -34,7 +34,7 @@
                     <td class="w-64"><a href="{{ route('statamic.cp.updater.product', 'statamic') }}" class="text-blue font-bold">Statamic</a></td>
                     <td>{{ $statamic->currentVersion() }}</td>
                     @if ($count = $statamic->availableUpdatesCount())
-                        <td class="text-right"><span class="badge-sm bg-green btn-sm">{{ trans_choice('1 update|:count updates', $count) }}</span></td>
+                        <td class="text-right"><span class="badge-sm bg-green-600 btn-sm">{{ trans_choice('1 update|:count updates', $count) }}</span></td>
                     @else
                         <td class="text-right">{{ __('Up to date') }}</td>
                     @endif
@@ -52,7 +52,7 @@
                     <td>{{ $addon -> version() }}</td>
                     @if ($count = $addon->changelog()->availableUpdatesCount())
                     <td class="text-right"><span
-                            class="badge-sm bg-green btn-sm">{{ trans_choice('1 update|:count updates', $count) }}</span></td>
+                            class="badge-sm bg-green-600 btn-sm">{{ trans_choice('1 update|:count updates', $count) }}</span></td>
                     @else
                     <td class="text-right">{{ __('Up to date') }}</td>
                     @endif

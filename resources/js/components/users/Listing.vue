@@ -89,12 +89,16 @@
                             </a>
                         </template>
                         <template slot="cell-roles" slot-scope="{ row: user, value: roles }">
-                            <span v-if="user.super" class="badge-pill-sm mr-1">{{ __('Super Admin') }}</span>
-                            <span v-if="!roles || roles.length === 0" />
-                            <span v-for="role in (roles || [])" class="badge-pill-sm mr-1">{{ role.title }}</span>
+                            <div class="role-index-field">
+                                <div v-if="user.super" class="role-index-field-item mr-1">{{ __('Super Admin') }}</div>
+                                <div v-if="!roles || roles.length === 0" />
+                                <div v-for="(role, i) in (roles || [])" class="role-index-field-item" :class="{ 'mb-1.5': i < roles.length-1 }">{{ role.title }}</div>
+                            </div>
                         </template>
                         <template slot="cell-groups" slot-scope="{ row: user, value: groups }">
-                            <span v-for="group in (groups || [])" class="badge-pill-sm mr-1">{{ group.title }}</span>
+                            <div class="groups-index-field">
+                                <div v-for="group in (groups || [])" class="groups-index-field-item mr-1 mb-1.5">{{ group.title }}</div>
+                            </div>
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list placement="left-start" scroll>
