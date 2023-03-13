@@ -185,7 +185,7 @@
                     </transition>
                 </div>
                 <template v-slot:buttons>
-                    <button
+                   <button
                         v-if="!readOnly"
                         class="ml-4"
                         :class="{
