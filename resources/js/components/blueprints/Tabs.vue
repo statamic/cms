@@ -26,6 +26,7 @@
         >
             <input type="text" v-model="tab.display" class="input-text" />
             <input type="text" v-model="tab.handle" class="input-text font-mono text-sm" />
+            <input type="text" v-model="tab.instructions" class="input-text text-sm" v-if="showTabInstructionsField" />
 
             <sections
                 ref="sections"
@@ -77,6 +78,10 @@ export default {
         requireTab: {
             type: Boolean,
             default: true
+        },
+        showTabInstructionsField: {
+            type: Boolean,
+            default: false
         }
     },
 

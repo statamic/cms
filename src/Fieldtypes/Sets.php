@@ -25,6 +25,7 @@ class Sets extends Fieldtype
                 '_id' => $groupId = 'group-'.$groupHandle,
                 'handle' => $groupHandle,
                 'display' => $group['display'] ?? null,
+                'instructions' => $group['instructions'] ?? null,
                 'sections' => collect($group['sets'] ?? [])->map(function ($set, $setHandle) use ($groupId) {
                     return [
                         '_id' => $setId = $groupId.'-section-'.$setHandle,
@@ -73,6 +74,7 @@ class Sets extends Fieldtype
             return [
                 $tab['handle'] => [
                     'display' => $tab['display'],
+                    'instructions' => $tab['instructions'],
                     'sets' => collect($tab['sections'])->mapWithKeys(function ($section) {
                         return [
                             $section['handle'] => [
