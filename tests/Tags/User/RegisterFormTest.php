@@ -62,7 +62,7 @@ class RegisterFormTest extends TestCase
     {{ /fields }}
 {{ /user:register_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
@@ -88,7 +88,7 @@ EOT
     {{ /fields }}
 {{ /user:register_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 

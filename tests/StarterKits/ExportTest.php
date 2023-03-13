@@ -229,7 +229,7 @@ EOT
 }
 
 EOT
-        , $this->files->get($this->exportPath('composer.json')));
+            , $this->files->get($this->exportPath('composer.json')));
     }
 
     /** @test */
@@ -474,7 +474,7 @@ EOT
 }
 
 EOT
-        , $this->files->get($this->exportPath('composer.json')));
+            , $this->files->get($this->exportPath('composer.json')));
     }
 
     /** @test */
@@ -508,7 +508,7 @@ EOT
 }
 
 EOT
-        , $this->files->get($this->exportPath('composer.json')));
+            , $this->files->get($this->exportPath('composer.json')));
     }
 
     private function exportPath($path = null)

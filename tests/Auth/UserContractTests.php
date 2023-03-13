@@ -148,6 +148,7 @@ trait UserContractTests
 
     /**
      * @test
+     *
      * @dataProvider queryBuilderProvider
      **/
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)

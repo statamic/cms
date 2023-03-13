@@ -62,6 +62,7 @@ class CacherTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider bypassCacheProvider
      */
     public function it_bypasses_cache_when_using_a_valid_token($endpoint, $headers)
@@ -83,6 +84,7 @@ class CacherTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider bypassCacheProvider
      */
     public function it_doesnt_bypass_cache_when_using_an_invalid_token($endpoint, $headers)
@@ -115,6 +117,7 @@ class CacherTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup setCustomExpiry
      */
     public function it_caches_endpoint_using_configured_expiry()
