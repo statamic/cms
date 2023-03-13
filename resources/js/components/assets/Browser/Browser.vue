@@ -44,7 +44,7 @@
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
                     <div slot-scope="{ filteredRows: rows }" :class="modeClass">
-                        <div class="card p-0" :class="{ 'rounded-tl-none': showContainerTabs, 'select-none' : shifting }">
+                        <div class="card overflow-hidden p-0" :class="{ 'rounded-tl-none': showContainerTabs, 'select-none' : shifting }">
                             <div class="relative w-full">
 
                                 <div class="data-list-header">
@@ -90,6 +90,7 @@
                                 class="-mt-px"
                             />
 
+                            <div class="overflow-x-auto overflow-y-hidden">
                             <data-list-table
                                 v-if="mode === 'table' && ! containerIsEmpty"
                                 :allow-bulk-actions="true"
@@ -121,8 +122,8 @@
                                         <td />
                                         <td />
 
-                                        <td class="actions-column" :colspan="columns.length">
-                                            <dropdown-list v-if="folderActions(folder).length">
+                                        <th class="actions-column" :colspan="columns.length">
+                                            <dropdown-list placement="left-start" scroll v-if="folderActions(folder).length">
                                                 <!-- TODO: Folder edit -->
                                                 <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
 
@@ -143,7 +144,7 @@
                                                 @closed="editedFolderPath = null"
                                                 @updated="folderUpdated(i, $event)"
                                             />
-                                        </td>
+                                        </th>
                                     </tr>
                                 </template>
 
@@ -157,7 +158,7 @@
                                 </template>
 
                                 <template slot="actions" slot-scope="{ row: asset }">
-                                    <dropdown-list>
+                                    <dropdown-list placement="left-start" scroll>
                                         <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
@@ -171,6 +172,7 @@
                                 </template>
 
                             </data-list-table>
+                            </div>
 
                             <!-- Grid Mode -->
                             <div v-if="mode === 'grid' && ! containerIsEmpty">

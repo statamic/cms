@@ -120,7 +120,7 @@
 
                     @updated="values = { ...$event, focus: values.focus }"
                 >
-                    <div class="w-full sm:p-4 md:py-0 md:w-1/3 md:grow h1/2 md:h-full overflow-scroll" slot-scope="{ setFieldValue, setFieldMeta }">
+                    <div class="w-full sm:p-4 md:pt-px md:w-1/3 md:grow h-1/2 md:h-full overflow-scroll" slot-scope="{ setFieldValue, setFieldMeta }">
 
                         <div v-if="saving" class="loading">
                             <loading-graphic text="Saving" />

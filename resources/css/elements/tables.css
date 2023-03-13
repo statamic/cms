@@ -160,7 +160,7 @@
     }
 
     tbody th.actions-column {
-        @apply p-0 pl-4 text-right sticky -right-px z-1;
+        @apply p-0 pl-2 text-right sticky -right-px z-1;
         background-image: linear-gradient(to left, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%);
         min-width: 45px;
         width: 45px;
