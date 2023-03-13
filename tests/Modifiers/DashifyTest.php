@@ -19,6 +19,7 @@ class DashifyTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider undashyThings
      */
     public function it_returns_a_lowercase_and_trimmed_string_separated_by_dashes($expected, $input): void

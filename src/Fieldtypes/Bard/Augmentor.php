@@ -155,7 +155,7 @@ class Augmentor
 
             $values = $this->fieldtype->fields($set['type'])->addValues($set)->{$augmentMethod}()->values()->all();
 
-            return array_merge($values, ['id' => $set['id'], 'type' => $set['type']]);
+            return array_merge($values, ['id' => $set['id'] ?? null, 'type' => $set['type']]);
         })->all();
     }
 

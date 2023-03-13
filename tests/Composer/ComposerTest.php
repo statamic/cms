@@ -46,6 +46,7 @@ class ComposerTest extends TestCase
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_can_list_installed_packages_with_details()
@@ -65,6 +66,7 @@ class ComposerTest extends TestCase
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_can_get_installed_version_of_a_package_directly_from_composer_lock()
@@ -74,6 +76,7 @@ class ComposerTest extends TestCase
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_can_check_if_package_is_installed()
@@ -84,6 +87,7 @@ class ComposerTest extends TestCase
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_can_get_installed_path_of_a_package()
@@ -101,6 +105,7 @@ class ComposerTest extends TestCase
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_gracefully_fails_when_lock_file_does_not_exist()
@@ -119,6 +124,7 @@ class ComposerTest extends TestCase
      *
      * @group integration
      * @group slow
+     *
      * @test
      */
     public function it_can_require_update_downgrade_and_remove_a_package()
@@ -219,6 +225,7 @@ class ComposerTest extends TestCase
      *
      * @group integration
      * @group slow
+     *
      * @test
      */
     public function it_can_require_and_remove_multiple_packages_in_one_shot()

@@ -86,6 +86,7 @@ class StatamicTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider formatsWithTime
      **/
     public function it_doesnt_append_time_if_system_date_format_already_has_time_in_it($format)
@@ -105,6 +106,7 @@ class StatamicTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider formatsWithTime
      **/
     public function it_doesnt_append_time_if_cp_date_format_already_has_time_in_it($format)
@@ -258,7 +260,9 @@ class StatamicTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env customAssetUrl
+     *
      * @dataProvider cpAssetUrlProvider
      */
     public function it_gets_a_cp_asset_url($url, $expected)
@@ -276,7 +280,9 @@ class StatamicTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env customAssetUrl
+     *
      * @dataProvider vendorPackageAssetUrlProvider
      */
     public function it_gets_the_vendor_package_asset_url($arguments, $expected)
@@ -297,6 +303,7 @@ class StatamicTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useFixtureTranslations
      **/
     public function it_makes_breadcrumbs()
