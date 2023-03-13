@@ -6,6 +6,7 @@ use Statamic\CP\FieldtypeFactory;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;
+use Statamic\Support\Arr;
 
 class Sets extends Fieldtype
 {
@@ -16,11 +17,22 @@ class Sets extends Fieldtype
      * <sets-fieldtype> Vue component is expecting, within either the Blueprint
      * or Fieldset builders in the AJAX request performed when opening the field.
      */
-    public function preProcess($data)
+    public function preProcess($sets)
     {
-        // todo: handle converting old format of sets to new format
+        $sets = collect($sets);
 
-        return collect($data)->map(function ($group, $groupHandle) {
+        // If the first set has a "fields" key, it would be the legacy format.
+        // We'll put it in a "main" group so it's compatible with the new format.
+        if (Arr::has($sets->first(), 'fields')) {
+            $sets = collect([
+                'main' => [
+                    'display' => __('Main'),
+                    'sets' => $sets->all(),
+                ],
+            ]);
+        }
+
+        return collect($sets)->map(function ($group, $groupHandle) {
             return [
                 '_id' => $groupId = 'group-'.$groupHandle,
                 'handle' => $groupHandle,
@@ -45,9 +57,21 @@ class Sets extends Fieldtype
      * Converts the "sets" array of a Replicator (or Bard) field into what
      * the <replicator-fieldtype> is expecting in its config.sets array.
      */
-    public function preProcessConfig($data)
+    public function preProcessConfig($sets)
     {
-        return collect($data)->map(function ($group, $groupHandle) {
+        $sets = collect($sets);
+
+        // If the first set has a "fields" key, it would be the legacy format.
+        // We'll put it in a "main" group so it's compatible with the new format.
+        if (Arr::has($sets->first(), 'fields')) {
+            $sets = collect([
+                'main' => [
+                    'sets' => $sets->all(),
+                ],
+            ]);
+        }
+
+        return collect($sets)->map(function ($group, $groupHandle) {
             return array_merge($group, [
                 'handle' => $groupHandle,
                 'sets' => collect($group['sets'])->map(function ($config, $name) {

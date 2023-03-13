@@ -213,7 +213,20 @@ class Replicator extends Fieldtype
 
     protected function flattenedSetsConfig()
     {
-        return collect($this->config('sets'))->flatMap(function ($section) {
+        $sets = collect($this->config('sets'));
+
+        // If the first set has a "fields" key, it would be the legacy format.
+        // We'll put it in a "main" group so it's compatible with the new format.
+        // This also happens in the "sets" fieldtype.
+        if (Arr::has($sets->first(), 'fields')) {
+            $sets = collect([
+                'main' => [
+                    'sets' => $sets->all(),
+                ],
+            ]);
+        }
+
+        return $sets->flatMap(function ($section) {
             return $section['sets'];
         });
     }

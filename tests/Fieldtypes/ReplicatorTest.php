@@ -300,6 +300,27 @@ class ReplicatorTest extends TestCase
     }
 
     /** @test */
+    public function it_preloads_preprocessed_default_values_with_old_config()
+    {
+        $field = (new Field('test', [
+            'type' => 'replicator',
+            'sets' => [
+                'main' => [
+                    'fields' => [
+                        ['handle' => 'things', 'field' => ['type' => 'array']],
+                    ],
+                ],
+            ],
+        ]));
+
+        $expected = [
+            'things' => [],
+        ];
+
+        $this->assertEquals($expected, $field->fieldtype()->preload()['defaults']['main']);
+    }
+
+    /** @test */
     public function it_preloads_new_meta_with_preprocessed_values()
     {
         RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
