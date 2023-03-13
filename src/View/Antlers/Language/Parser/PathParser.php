@@ -354,9 +354,9 @@ class PathParser
             }
 
             if ($isParsingString == false && (
-                    $cur == DocumentParser::String_Terminator_SingleQuote ||
-                    $cur == DocumentParser::String_Terminator_DoubleQuote
-                )) {
+                $cur == DocumentParser::String_Terminator_SingleQuote ||
+                $cur == DocumentParser::String_Terminator_DoubleQuote
+            )) {
                 $isParsingString = true;
                 $terminator = $cur;
                 $nestedChars[] = $cur;

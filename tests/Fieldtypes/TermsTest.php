@@ -125,8 +125,7 @@ class TermsTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class
-        {
+        $parent = new class {
             // Class does not implement "Localizable"
         };
 
@@ -143,8 +142,7 @@ class TermsTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class
-        {
+        $parent = new class {
             // Class does not implement "Localizable"
         };
 
@@ -270,8 +268,7 @@ class TermsTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class
-        {
+        $parent = new class {
             // Class does not implement "Localizable"
         };
 
@@ -304,8 +301,7 @@ class TermsTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class
-        {
+        $parent = new class {
             // Class does not implement "Localizable"
         };
 
@@ -336,6 +332,7 @@ class TermsTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider collectionAttachmentProvider
      **/
     public function it_attaches_collection_during_augmentation($expectCollection, $parentIsEntry, $handle, $isRootLevel, $collectionUsesTaxonomy)
@@ -352,8 +349,7 @@ class TermsTest extends TestCase
         if ($parentIsEntry) {
             $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
         } else {
-            $parent = new class
-            {
+            $parent = new class {
                 // Class does not implement "Localizable"
             };
         }

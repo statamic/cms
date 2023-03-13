@@ -32,7 +32,7 @@ EOT;
             'condition' => true,
         ];
 
-        $this->assertSame('<The Title>', trim(($this->renderString($template, $data, true))));
+        $this->assertSame('<The Title>', trim($this->renderString($template, $data, true)));
     }
 
     public function test_interpolation_inside_dynamic_access()

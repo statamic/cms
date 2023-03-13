@@ -15,6 +15,7 @@ class DateFormatTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider formatProvider
      **/
     public function it_converts_from_php_to_iso($php, $iso)

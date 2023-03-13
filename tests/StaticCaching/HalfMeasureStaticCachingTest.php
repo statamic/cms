@@ -317,6 +317,7 @@ EOT;
 
     /**
      * @test
+     *
      * @define-env bladeViewPaths
      */
     public function it_can_keep_parts_dynamic_using_blade()

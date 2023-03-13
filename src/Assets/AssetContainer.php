@@ -618,4 +618,9 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     {
         return Facades\AssetContainer::{$method}(...$parameters);
     }
+
+    public function __toString()
+    {
+        return $this->handle();
+    }
 }
