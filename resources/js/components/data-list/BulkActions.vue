@@ -3,8 +3,9 @@
     <div v-if="showAlways || hasSelections" class="data-list-bulk-actions">
         <div class="input-group input-group-sm relative z-10">
             <div class="input-group-prepend">
-                <div class="text-gray-700"
+                <div class="text-gray-700 hidden md:inline-block"
                     v-text="__n(`:count item selected|:count items selected`, selections.length)" />
+                <div class="text-gray-700 md:hidden" v-text="selections.length" />
             </div>
 
             <data-list-action
@@ -19,7 +20,7 @@
                 <button
                     slot-scope="{ action, select }"
                     class="input-group-item"
-                    :class="{'text-red': action.dangerous, 'rounded-r': index + 1 === sortedActions.length }"
+                    :class="{'text-red-500': action.dangerous, 'rounded-r': index + 1 === sortedActions.length }"
                     @click="select"
                     v-text="__(action.title)" />
             </data-list-action>

@@ -49,7 +49,7 @@
                                 <span>×</span>
                             </button>
                             <button v-else type="button" class="vs__deselect">
-                                <span class="opacity-50">×</span>
+                                <span class="text-gray-500">×</span>
                             </button>
                         </span>
                     </div>
@@ -121,9 +121,9 @@ export default {
 
         limitIndicatorColor() {
             if (this.limitExceeded) {
-                return 'text-red';
+                return 'text-red-500';
             } else if (this.limitReached) {
-                return 'text-green';
+                return 'text-green-600';
             }
 
             return 'text-gray';

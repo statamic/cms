@@ -1,5 +1,5 @@
 <template>
-    <div class="popover-container" :class="{'popover-open': isOpen}" v-on-clickaway="close" @mouseleave="leave">
+    <div class="popover-container" :class="{'popover-open': isOpen}" v-on-clickaway="clickawayClose" @mouseleave="leave">
         <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$scopedSlots.default">
             <slot name="trigger"></slot>
         </div>
@@ -20,26 +20,34 @@ export default {
     mixins: [ clickaway ],
 
     props: {
-        disabled: {
+        autoclose: {
             type: Boolean,
             default: false
         },
-        placement: {
-            type: String,
-            default: 'bottom-end',
+        clickaway: {
+            type: Boolean,
+            default: true
+        },
+        disabled: {
+            type: Boolean,
+            default: false
         },
         offset: {
             type: Array,
             default: () => [0, 10]
         },
+        placement: {
+            type: String,
+            default: 'bottom-end',
+        },
         scroll: {
             type: Boolean,
             default: false
         },
-        autoclose: {
-            type: Boolean,
-            default: false
-        }
+        strategy: {
+            type: String,
+            default: 'absolute'
+        },
     },
 
     data() {
@@ -63,6 +71,7 @@ export default {
         bindPopper() {
             this.popper = createPopper(this.$refs.trigger, this.$refs.popover, {
                 placement: this.placement,
+                strategy: this.strategy,
                 modifiers: [
                     {
                         name: 'offset',
@@ -88,11 +97,17 @@ export default {
             this.escBinding = this.$keys.bind('esc', e => this.close())
             this.popper && this.popper.update();
         },
+        clickawayClose() {
+            if (this.clickaway) {
+                this.close();
+            }
+        },
         close() {
             this.isOpen = false;
             if (this.escBinding) {
                 this.escBinding.destroy();
             }
+            this.$emit('closed');
         },
         leave() {
             if (this.autoclose) {

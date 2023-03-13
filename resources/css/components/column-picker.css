@@ -3,17 +3,10 @@
 }
 
 .column-picker-item {
-    @apply bg-white text-sm outline-none flex items-center rounded select-none;
-    padding: 4px 8px;
-    margin: -1px 0;
+    @apply text-sm outline-none flex items-center select-none h-full;
 
     &.sortable {
-        cursor: grab;
-
-        label {
-            cursor: grab;
-        }
-
+        @apply rounded bg-white border;
         &:hover  {
             @apply bg-gray-200;
         }

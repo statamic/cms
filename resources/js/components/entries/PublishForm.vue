@@ -136,7 +136,7 @@
                                 >
                                     <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
                                     <div class="mb-1 flex items-center" v-if="published">
-                                        <span class="text-green w-6 text-center">&check;</span>
+                                        <span class="text-green-600 w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('Entry has a published version')"></span>
                                     </div>
                                     <div class="mb-1 flex items-center" v-else>
@@ -144,7 +144,7 @@
                                         <span class="text-2xs" v-text="__('Entry has not been published')"></span>
                                     </div>
                                     <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
-                                        <span class="text-green w-6 text-center">&check;</span>
+                                        <span class="text-green-600 w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('This is the published version')"></span>
                                     </div>
                                     <div class="mb-1 flex items-center" v-if="isDirty">
@@ -171,9 +171,9 @@
                                     >
                                         <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
                                             <span class="little-dot mr-2" :class="{
-                                                'bg-green': option.published,
+                                                'bg-green-600': option.published,
                                                 'bg-gray-500': !option.published,
-                                                'bg-red': !option.exists
+                                                'bg-red-500': !option.exists
                                             }" />
                                             {{ option.name }}
                                             <loading-graphic

@@ -17,7 +17,7 @@
         </popover>
         <div v-else>
             <button @click="remove" class="h-6 w-6 block outline-none p-1 text-gray hover:text-gray-800" v-tooltip="__('Unpin from Favorites')" :aria-label="__('Unpin from Favorites')">
-                <svg-icon name="pin" class="text-green"></svg-icon>
+                <svg-icon name="pin" class="text-green-600"></svg-icon>
             </button>
         </div>
     </div>

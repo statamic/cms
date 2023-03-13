@@ -60,7 +60,7 @@
                             <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Download') }}</span>
                         </button>
 
-                        <button v-if="allowDeleting && canRunAction('delete')" @click="runAction('delete')" class="flex bg-gray-750 hover:bg-gray-900 hover:text-red-light rounded items-center text-center px-3 py-1.5">
+                        <button v-if="allowDeleting && canRunAction('delete')" @click="runAction('delete')" class="flex bg-gray-750 hover:bg-gray-900 hover:text-red-400 rounded items-center text-center px-3 py-1.5">
                             <svg-icon name="trash-line" class="h-4" />
                             <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Delete') }}</span>
                         </button>
@@ -120,14 +120,14 @@
 
                     @updated="values = { ...$event, focus: values.focus }"
                 >
-                    <div class="w-full sm:p-4 md:py-0 md:w-1/3 md:grow h1/2 md:h-full overflow-scroll" slot-scope="{ setFieldValue, setFieldMeta }">
+                    <div class="w-full sm:p-4 md:pt-px md:w-1/3 md:grow h-1/2 md:h-full overflow-scroll" slot-scope="{ setFieldValue, setFieldMeta }">
 
                         <div v-if="saving" class="loading">
                             <loading-graphic text="Saving" />
                         </div>
 
                         <div class="card p-0">
-                            <div v-if="error" class="bg-red text-white p-4 shadow mb-4" v-text="error" />
+                            <div v-if="error" class="bg-red-500 text-white p-4 shadow mb-4" v-text="error" />
                             <publish-fields
                                 :fields="fields"
                                 :read-only="readOnly"
@@ -268,7 +268,6 @@ export default {
     },
 
     mounted() {
-        document.body.classList.add('overflow-hidden')
         this.$modal.show('asset-editor');
         this.load();
     },
@@ -363,7 +362,6 @@ export default {
         close() {
             this.$modal.hide('asset-editor');
             this.$emit('closed');
-            document.body.classList.remove('overflow-hidden')
         },
 
         shouldClose() {

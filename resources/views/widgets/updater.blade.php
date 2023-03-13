@@ -7,7 +7,7 @@
             <span>{{ __('Updates') }}</span>
         </h2>
         @if ($count)
-            <a href="{{ cp_route('updater') }}" class="badge-sm bg-green text-white">
+            <a href="{{ cp_route('updater') }}" class="badge-sm bg-green-600 text-white">
                 {{ trans_choice('1 update available|:count updates available', $count) }}
             </a>
         @endif

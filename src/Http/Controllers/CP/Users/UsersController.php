@@ -69,7 +69,9 @@ class UsersController extends CpController
             ? UserGroup::find($request->group)->queryUsers()
             : $this->indexQuery();
 
-        $activeFilterBadges = $this->queryFilters($query, $request->filters);
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'blueprints' => ['user'],
+        ]);
 
         $users = $query
             ->orderBy(request('sort', 'email'), request('order', 'asc'))
