@@ -17,6 +17,7 @@
                 :can-define-localizable="canDefineLocalizable"
                 :deletable="isSectionDeletable(i)"
                 :tab-id="tabId"
+                :show-handle-field="showSectionHandleField"
                 @updated="updateSection(i, $event)"
                 @deleted="deleteSection(i)"
             />
@@ -77,6 +78,10 @@ export default {
         requireSection: {
             type: Boolean,
             default: true
+        },
+        showSectionHandleField: {
+            type: Boolean,
+            default: false
         }
     },
 

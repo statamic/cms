@@ -11,6 +11,7 @@
             :add-section-text="__('Add Set')"
             :new-section-text="__('New Set')"
             show-tab-instructions-field
+            show-section-handle-field
             @updated="tabsUpdated"
         />
 

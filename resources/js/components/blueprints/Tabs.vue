@@ -34,6 +34,7 @@
                 :initial-sections="tab.sections"
                 :new-section-text="newSectionText"
                 :add-section-text="addSectionText"
+                :show-section-handle-field="showSectionHandleField"
                 @updated="sectionsUpdated(tab._id, $event)"
             />
 
@@ -82,7 +83,11 @@ export default {
         showTabInstructionsField: {
             type: Boolean,
             default: false
-        }
+        },
+        showSectionHandleField: {
+            type: Boolean,
+            default: false
+        },
     },
 
     data() {

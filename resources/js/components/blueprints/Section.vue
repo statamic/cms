@@ -9,7 +9,7 @@
                     <span class="font-medium mr-2">
                         <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" :placeholder="`${__('Title')} (${__('Optional')})`" />
                     </span>
-                    <span class="font-mono text-xs text-gray-700 mr-2"><!-- should only be shown if a prop is passed saying handle is necessary -->
+                    <span class="font-mono text-xs text-gray-700 mr-2" v-if="showHandleField">
                         <input type="text" v-model="section.handle" class="bg-transparent w-full outline-none" :placeholder="`${__('Handle')}`" />
                     </span>
                     <span class="text-xs text-gray-700 mr-2">
@@ -79,6 +79,10 @@ export default {
         deletable: {
             type: Boolean,
             default: true
+        },
+        showHandleField: {
+            type: Boolean,
+            default: false
         }
     },
 
