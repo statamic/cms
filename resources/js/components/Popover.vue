@@ -1,5 +1,5 @@
 <template>
-    <div class="popover-container" :class="{'popover-open': isOpen}" v-on-clickaway="close" @mouseleave="leave">
+    <div class="popover-container" :class="{'popover-open': isOpen}" v-on-clickaway="clickawayClose" @mouseleave="leave">
         <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$scopedSlots.default">
             <slot name="trigger"></slot>
         </div>
@@ -23,6 +23,10 @@ export default {
         autoclose: {
             type: Boolean,
             default: false
+        },
+        clickaway: {
+            type: Boolean,
+            default: true
         },
         disabled: {
             type: Boolean,
@@ -93,11 +97,17 @@ export default {
             this.escBinding = this.$keys.bind('esc', e => this.close())
             this.popper && this.popper.update();
         },
+        clickawayClose() {
+            if (this.clickaway) {
+                this.close();
+            }
+        },
         close() {
             this.isOpen = false;
             if (this.escBinding) {
                 this.escBinding.destroy();
             }
+            this.$emit('closed');
         },
         leave() {
             if (this.autoclose) {
