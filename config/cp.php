@@ -37,7 +37,7 @@ return [
     |
     */
 
-    'always_show_filters' => true,
+    'always_show_filters' => false,
 
     /*
     |--------------------------------------------------------------------------

@@ -31,7 +31,6 @@
                             @reset="filtersReset"
                             @hide-filters="filtersHide"
                             @show-filters="filtersShow"
-                            class="mr-2"
                         />
 
                         <data-list-search class="h-8" v-if="showFilters" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
