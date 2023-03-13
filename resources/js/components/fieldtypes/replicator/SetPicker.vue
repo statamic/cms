@@ -1,6 +1,16 @@
 <template>
 
-    <popover ref="popover" class="set-picker" :scroll="true" :autoclose="false" :placement="placement" @opened="opened" @closed="closed">
+    <popover
+        ref="popover"
+        class="set-picker"
+        scroll
+        :autoclose="false"
+        :placement="placement"
+        :disabled="!hasMultipleSets"
+        @opened="opened"
+        @closed="closed"
+        @click="triggerWasClicked"
+    >
         <template #trigger>
             <slot name="trigger" />
         </template>
@@ -72,6 +82,12 @@ export default {
 
         showGroups() {
             return this.hasMultipleGroups && !this.selectedGroup && !this.search;
+        },
+
+        hasMultipleSets() {
+            return this.sets.reduce((count, group) => {
+                return count + group.sets.length;
+            }, 0) > 1;
         },
 
         hasMultipleGroups() {
@@ -197,6 +213,12 @@ export default {
                 this.selectGroup(item.handle);
             } else {
                 this.addSet(item.handle);
+            }
+        },
+
+        triggerWasClicked() {
+            if (! this.hasMultipleSets) {
+                this.addSet(this.sets[0].sets[0].handle);
             }
         }
 

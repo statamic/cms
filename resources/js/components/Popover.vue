@@ -89,6 +89,7 @@ export default {
             this.popper && this.popper.update().then(() => {
                 setTimeout(() => this.$emit('opened'), 100); // after animation. there's probably a better way to do this.
             })
+            this.$emit('click');
         },
         close() {
             this.isOpen = false;
