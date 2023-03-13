@@ -10,6 +10,7 @@ class CodeTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider processValues
      **/
     public function it_processes_values($isSelectable, $value, $expected)
@@ -32,6 +33,7 @@ class CodeTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider preProcessValues
      **/
     public function it_preprocesses_values($value, $expected)

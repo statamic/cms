@@ -569,7 +569,6 @@ class NodeProcessor
 
         if ($managerResults[0] === true) {
             if ($node->isPaired() && ! $this->isLoopable($resolvedValue)) {
-
                 // Safe to do this since there is no ambiguity here.
                 return $node->isTagNode;
             }
@@ -987,7 +986,7 @@ class NodeProcessor
     {
         $environment = new Environment();
         $environment->setProcessor($this);
-        $environment->cascade($this->cascade)->setData(($this->getActiveData()));
+        $environment->cascade($this->cascade)->setData($this->getActiveData());
 
         return $environment->evaluate([$deferredNode]);
     }

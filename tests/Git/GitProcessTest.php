@@ -36,6 +36,7 @@ class GitProcessTest extends TestCase
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_can_get_git_root()
@@ -58,6 +59,7 @@ class GitProcessTest extends TestCase
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_can_check_if_folder_is_in_git_repo()
@@ -74,6 +76,7 @@ class GitProcessTest extends TestCase
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_can_get_git_status_of_parent_repo()
@@ -97,6 +100,7 @@ EOT;
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_can_get_git_status_of_specific_sub_paths()
