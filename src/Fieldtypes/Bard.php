@@ -79,7 +79,7 @@ class Bard extends Replicator
                 'display' => __('Sets'),
                 'instructions' => __('statamic::fieldtypes.bard.config.sets'),
                 'type' => 'sets',
-                'require_tab' => false,
+                'require_set' => false,
             ],
             'buttons' => [
                 'display' => __('Buttons'),

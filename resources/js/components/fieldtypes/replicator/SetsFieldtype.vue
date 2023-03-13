@@ -4,7 +4,7 @@
 
         <tabs
             :initial-tabs="tabs"
-            :require-tab="config.require_tab"
+            :require-section="config.require_set"
             :can-define-localizable="false"
             :add-tab-text="__('Add Set Group')"
             :new-tab-text="__('New Set Group')"

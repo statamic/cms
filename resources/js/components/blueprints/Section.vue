@@ -17,7 +17,7 @@
                     </span>
                 </div>
                 <div class="flex items-center px-3">
-                    <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-600 hover:text-gray-950" v-if="deletable">
+                    <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-600 hover:text-gray-950">
                         <svg-icon class="h-4 w-4" name="trash" />
                     </button>
                 </div>
@@ -71,14 +71,6 @@ export default {
         section: {
             type: Object,
             required: true
-        },
-        isSingle: { // was used for sections, but will be used for tabs in the future
-            type: Boolean,
-            default: false
-        },
-        deletable: {
-            type: Boolean,
-            default: true
         },
         showHandleField: {
             type: Boolean,

@@ -13,16 +13,14 @@
                 v-for="(section, i) in sections"
                 :key="section._id"
                 :section="section"
-                :is-single="singleSection"
                 :can-define-localizable="canDefineLocalizable"
-                :deletable="isSectionDeletable(i)"
                 :tab-id="tabId"
                 :show-handle-field="showSectionHandleField"
                 @updated="updateSection(i, $event)"
                 @deleted="deleteSection(i)"
             />
 
-            <div class="blueprint-add-section-container w-full md:w-1/2" v-if="!singleSection">
+            <div class="blueprint-add-section-container w-full md:w-1/2">
                 <button class="blueprint-add-section-button outline-none" @click="addSection">
                     <div class="text-center flex items-center leading-none">
                         <div class="text-2xl mr-1">+</div>
@@ -124,12 +122,10 @@ export default {
             this.sections.splice(i, 1, section);
         },
 
-        isSectionDeletable(i) {
-            if (this.sections.length > 1) return true;
-
-            if (i > 0) return true;
-
-            return !this.requireSection;
+        ensureSection() {
+            if (this.requireSection && this.sections.length === 0) {
+                this.addSection();
+            }
         }
 
     }

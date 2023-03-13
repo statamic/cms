@@ -38,7 +38,7 @@
         </div>
 
         <tabs
-            v-if="useTabs"
+            :single-tab="!useTabs"
             :initial-tabs="blueprint.tabs"
             @updated="tabsUpdated"
         />

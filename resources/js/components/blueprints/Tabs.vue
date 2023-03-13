@@ -16,7 +16,7 @@
                     <svg-icon name="delete-x" class="w-2 h-2 ml-2 text-gray-600 hover:text-gray-800" />
                 </div>
             </div>
-            <div class="card px-5 py-2 cursor-pointer" @click="addTab" v-text="addTabText" />
+            <div v-if="!singleTab" class="card px-5 py-2 cursor-pointer" @click="addTab" v-text="addTabText" />
         </div>
 
         <div
@@ -76,7 +76,11 @@ export default {
             type: String,
             default: () => __('New Tab')
         },
-        requireTab: {
+        singleTab: {
+            type: Boolean,
+            default: false
+        },
+        requireSection: {
             type: Boolean,
             default: true
         },
@@ -114,7 +118,7 @@ export default {
     methods: {
 
         ensureTab() {
-            if (this.requireTab && this.tabs.length === 0) {
+            if (this.requireSection && this.tabs.length === 0) {
                 this.addTab();
             }
         },
@@ -122,9 +126,7 @@ export default {
         makeSortable() {
             if (! this.singleTab) this.makeTabsSortable();
 
-            // if (! this.singleSection) { // can/should sections be singular now?
-                this.makeSectionsSortable();
-            // }
+            this.makeSectionsSortable();
 
             this.makeFieldsSortable();
         },
@@ -269,12 +271,16 @@ export default {
             });
 
             this.selectTab(id);
+
+            this.$nextTick(() => this.$refs.sections.find(vm => vm.tabId === id).addSection());
         },
 
         removeTab(tabId) {
             this.tabs = this.tabs.filter(tab => tab._id !== tabId);
 
             this.selectTab(this.tabs.length ? this.tabs[0]._id : null);
+
+            this.ensureTab();
         },
 
     }
