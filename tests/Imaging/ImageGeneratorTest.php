@@ -263,6 +263,7 @@ class ImageGeneratorTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider guzzleWatermarkProvider
      */
     public function the_watermark_disk_is_a_guzzle_adapter_when_a_url_is_provided($protocol)
