@@ -7,7 +7,8 @@ export default {
             activePreset: null,
             activePresetPayload: {},
             searchQuery: '',
-            showFilters: false,
+            showFilters: this.$config.get('alwaysShowFilters'),
+            alwaysShowFilters: this.$config.get('alwaysShowFilters'),
         }
     },
 

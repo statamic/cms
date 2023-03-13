@@ -18,11 +18,9 @@
                 <div class="card overflow-hidden p-0 relative">
                     <div class="flex items-center justify-between p-2 text-sm border-b">
 
-                        <data-list-search class="h-8" v-if="showFilters" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
-
                         <data-list-filter-presets
                             ref="presets"
-                            v-show="! showFilters"
+                            v-show="alwaysShowFilters || ! showFilters"
                             :active-preset="activePreset"
                             :active-preset-payload="activePresetPayload"
                             :active-filters="activeFilters"
@@ -33,9 +31,13 @@
                             @reset="filtersReset"
                             @hide-filters="filtersHide"
                             @show-filters="filtersShow"
+                            class="mr-2"
                         />
+
+                        <data-list-search class="h-8" v-if="showFilters" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+
                         <div class="flex ml-2 space-x-2">
-                            <button class="btn py-1 px-2 h-8" v-text="__('Cancel')" v-show="showFilters" @click="filtersHide" />
+                            <button class="btn py-1 px-2 h-8" v-text="__('Cancel')" v-show="! alwaysShowFilters && showFilters" @click="filtersHide" />
                             <button class="btn py-1 px-2 h-8" v-text="__('Save')" v-show="showFilters && isDirty" @click="$refs.presets.savePreset()" />
                             <button class="btn flex items-center py-1 px-2 h-8 w-12" @click="handleShowFilters" v-if="! showFilters" v-tooltip="__('Show Filter Controls (F)')">
                                 <svg-icon name="search" class="w-4 h-4" />
