@@ -5,7 +5,7 @@
      be within the context of a publish form to continue working
      once it has been portaled out. -->
 <div :class="{ 'publish-fields': fullScreenMode }">
-<div :class="{ wrapperClasses: fullScreenMode }">
+<div :class="fullScreenMode && wrapperClasses">
 
     <div
         class="bard-fieldtype-wrapper"

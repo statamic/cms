@@ -229,6 +229,10 @@
         * > .ProseMirror {
             min-height: auto;
         }
+
+        &:focus {
+            @apply ring-0;
+        }
     }
 
     .bard-set-selector {
