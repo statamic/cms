@@ -72,7 +72,7 @@
                             <form method="POST" action="{{ cp_route('utilities.search') }}">
                                 @csrf
                                 <input type="hidden" name="indexes[]" value="{{ $index->name() }}">
-                                <button type="submit" class="btn btn-sm">{{ __('Update') }}</button>
+                                <button type="submit" class="btn btn-xs">{{ __('Update') }}</button>
                             </form>
                         </td>
                     </tr>

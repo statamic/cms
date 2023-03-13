@@ -149,10 +149,10 @@
 
         <h6 class="mb-4">Small</h6>
         <div class="flex">
-            <button class="mr-4 btn btn-sm">Default Button</button>
-            <button class="mr-4 btn-primary btn-sm">Primary Button</button>
-            <button class="mr-4 btn-danger btn-sm">Danger Button</button>
-            <button class="btn-flat btn-sm">Flat Button</button>
+            <button class="mr-4 btn btn-xs">Default Button</button>
+            <button class="mr-4 btn-primary btn-xs">Primary Button</button>
+            <button class="mr-4 btn-danger btn-xs">Danger Button</button>
+            <button class="btn-flat btn-xs">Flat Button</button>
         </div>
     </div>
 

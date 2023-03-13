@@ -36,9 +36,9 @@
                         <data-list-search class="h-8" v-if="showFilters" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
 
                         <div class="flex ml-2 space-x-2">
-                            <button class="btn py-1 px-2 h-8" v-text="__('Cancel')" v-show="! alwaysShowFilters && showFilters" @click="filtersHide" />
-                            <button class="btn py-1 px-2 h-8" v-text="__('Save')" v-show="showFilters && isDirty" @click="$refs.presets.savePreset()" />
-                            <button class="btn flex items-center py-1 px-2 h-8 w-12" @click="handleShowFilters" v-if="! showFilters" v-tooltip="__('Show Filter Controls (F)')">
+                            <button class="btn btn-sm" v-text="__('Cancel')" v-show="! alwaysShowFilters && showFilters" @click="filtersHide" />
+                            <button class="btn btn-sm" v-text="__('Save')" v-show="showFilters && isDirty" @click="$refs.presets.savePreset()" />
+                            <button class="btn flex items-center btn-sm w-12" @click="handleShowFilters" v-if="! showFilters" v-tooltip="__('Show Filter Controls (F)')">
                                 <svg-icon name="search" class="w-4 h-4" />
                                 <svg-icon name="filter-lines" class="w-4 h-4" />
                             </button>

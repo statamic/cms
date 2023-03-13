@@ -111,8 +111,11 @@ button {
 
 /* Size Variations
   ========================================================================== */
-
 .btn-sm {
+    @apply py-1 px-2 h-8;
+}
+
+.btn-xs {
     @apply text-2xs;
     line-height: 0;
     height: 1.625rem; /*  24px */
