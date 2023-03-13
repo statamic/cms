@@ -22,11 +22,11 @@
                 <div class="form-group">
                     <label v-text="__('messages.session_expiry_enter_password')" />
                     <small
-                        class="help-block text-red"
+                        class="help-block text-rose-500"
                         v-if="errors.email"
                         v-text="errors.email[0]" />
                     <small
-                        class="help-block text-red"
+                        class="help-block text-rose-500"
                         v-if="errors.password"
                         v-text="errors.password[0]" />
                     <div class="flex items-center">

@@ -206,12 +206,19 @@
         <div class="flex text-sm text-center">
             <div class="text-black bg-blue p-6 flex-1">Blue</div>
             <div class="text-black bg-green-600 p-6 flex-1">Green</div>
-            <div class="text-black bg-red p-6 flex-1">Red</div>
             <div class="text-black bg-orange-light border border-orange p-6 m-1 flex-1">Orange</div>
             <div class="text-black bg-yellow border border-yellow-dark p-6 m-1 flex-1">Yellow</div>
             <div class="text-black bg-yellow-dark p-6 m-1 flex-1">Yellow Dark</div>
             <div class="text-black bg-pink border border-pink-dark m-1 p-6 flex-1">Pink</div>
             <div class="text-black bg-purple-light border border-purple p-6 flex-1">Purple</div>
+        </div>
+
+        <h6 class="my-4">Reds</h6>
+        <div class="flex text-sm text-center space-x-1">
+            <div class="text-black bg-rose-100 border border-rose-200 p-6 flex-1">Red Lighter</div>
+            <div class="text-black bg-rose-400 p-6 flex-1">Red Light</div>
+            <div class="text-black bg-rose-500 p-6 flex-1">Red</div>
+            <div class="text-black bg-rose-700 p-6 flex-1">Red Dark</div>
         </div>
     </div>
 

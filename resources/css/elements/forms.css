@@ -205,7 +205,7 @@ input.input-text-minimal:read-only,
 
 
 label .required {
-    @apply text-red;
+    @apply text-rose-500;
     font-style: normal;
 
     + .localizable-icon {

@@ -60,7 +60,7 @@
                             <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Download') }}</span>
                         </button>
 
-                        <button v-if="allowDeleting && canRunAction('delete')" @click="runAction('delete')" class="flex bg-gray-750 hover:bg-gray-900 hover:text-red-light rounded items-center text-center px-3 py-1.5">
+                        <button v-if="allowDeleting && canRunAction('delete')" @click="runAction('delete')" class="flex bg-gray-750 hover:bg-gray-900 hover:text-rose-400 rounded items-center text-center px-3 py-1.5">
                             <svg-icon name="trash-line" class="h-4" />
                             <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Delete') }}</span>
                         </button>
@@ -127,7 +127,7 @@
                         </div>
 
                         <div class="card p-0">
-                            <div v-if="error" class="bg-red text-white p-4 shadow mb-4" v-text="error" />
+                            <div v-if="error" class="bg-rose-500 text-white p-4 shadow mb-4" v-text="error" />
                             <publish-fields
                                 :fields="fields"
                                 :read-only="readOnly"

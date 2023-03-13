@@ -44,9 +44,9 @@
 
     &.invalid {
         .replicator-set-header-inner {
-            @apply bg-red-lighter;
+            @apply bg-rose-100;
             label {
-                @apply text-red;
+                @apply text-rose-500;
             }
         }
     }
@@ -79,11 +79,11 @@
 }
 
 .replicator-set.has-error > .replicator-set-header label {
-    @apply text-red;
+    @apply text-rose-500;
 }
 
 .replicator-set-body > .has-error > label {
-    @apply text-red;
+    @apply text-rose-500;
 }
 
 .replicator-fullscreen {

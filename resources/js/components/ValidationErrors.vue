@@ -1,6 +1,6 @@
 <template>
 
-    <div v-if="hasErrors" class="bg-red text-white p-4 rounded-md shadow mb-4">
+    <div v-if="hasErrors" class="bg-rose-500 text-white p-4 rounded-md shadow mb-4">
         <p v-for="(error, i) in flattenedErrors" :key="i">{{ error }}</p>
     </div>
 

@@ -66,6 +66,7 @@ module.exports = {
             },
             green: colors.green,
             amber: colors.amber,
+            rose: colors.red,
         },
         screens: {
             'sm': '576px',

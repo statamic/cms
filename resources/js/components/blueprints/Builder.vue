@@ -14,7 +14,7 @@
                 <label class="block">{{ __('Title') }}</label>
                 <small class="help-block">{{ __('messages.blueprints_title_instructions') }}</small>
                 <div v-if="errors.title">
-                    <small class="help-block text-red" v-for="(error, i) in errors.title" :key="i" v-text="error" />
+                    <small class="help-block text-rose-500" v-for="(error, i) in errors.title" :key="i" v-text="error" />
                 </div>
                 <input type="text" name="title" class="input-text" v-model="blueprint.title" autofocus="autofocus">
             </div>
@@ -23,7 +23,7 @@
                 <label class="block">{{ __('Hidden') }}</label>
                 <small class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</small>
                 <div v-if="errors.hidden">
-                    <small class="help-block text-red" v-for="(error, i) in errors.hidden" :key="i" v-text="error" />
+                    <small class="help-block text-rose-500" v-for="(error, i) in errors.hidden" :key="i" v-text="error" />
                 </div>
                 <toggle-input name="hidden" v-model="blueprint.hidden" />
             </div>
@@ -33,7 +33,7 @@
             <h2>{{ __('Tab Sections') }}</h2>
             <p class="max-w-lg">{{ __('messages.tab_sections_instructions') }}</p>
             <div v-if="errors.sections">
-                <small class="help-block text-red" v-for="(error, i) in errors.sections" :key="i" v-text="error" />
+                <small class="help-block text-rose-500" v-for="(error, i) in errors.sections" :key="i" v-text="error" />
             </div>
         </div>
 

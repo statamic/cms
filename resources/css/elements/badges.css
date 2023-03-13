@@ -16,7 +16,7 @@
 }
 
 .badge-updates {
-    @apply text-3xs not-italic bg-red text-white rounded-full leading-normal;
+    @apply text-3xs not-italic bg-rose-500 text-white rounded-full leading-normal;
     padding: 2px 6px 1px;
 }
 

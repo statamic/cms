@@ -13,7 +13,7 @@
         >
             <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-4': warningText || action.fields.length }" />
 
-            <div v-if="warningText" v-text="warningText" class="text-red" :class="{ 'mb-4': action.fields.length }" />
+            <div v-if="warningText" v-text="warningText" class="text-rose-500" :class="{ 'mb-4': action.fields.length }" />
 
             <publish-container
                 v-if="action.fields.length"

@@ -165,7 +165,7 @@
                                         <span class="little-dot mr-2" :class="{
                                             'bg-green-600': option.published,
                                             'bg-gray-500': !option.published,
-                                            'bg-red': !option.exists
+                                            'bg-rose-500': !option.exists
                                         }" />
                                         {{ option.name }}
                                         <loading-graphic

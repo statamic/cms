@@ -18,7 +18,7 @@
 }
 
 .bard-editor .bard-invalid {
-    @apply p-2 @lg:px-4 bg-red-lighter text-red text-xs whitespace-nowrap;
+    @apply p-2 @lg:px-4 bg-rose-100 text-rose-500 text-xs whitespace-nowrap;
 }
 
 /*  Modes */
@@ -187,7 +187,7 @@
 }
 
 .bard-set.has-error > .replicator-set-header label {
-    @apply text-red;
+    @apply text-rose-500;
 }
 
 /* The set selection options for each text block

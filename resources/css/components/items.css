@@ -15,7 +15,7 @@
 
     &.invalid {
         .item-inner {
-            @apply border-red bg-red-lighter text-red;
+            @apply border-rose-300 bg-rose-100 text-rose-500;
         }
     }
 

@@ -72,18 +72,20 @@ button {
 
 /*  Danger/delete button */
 .btn-danger {
-    background: linear-gradient(180deg, #e53e3e, #c53030);
-    border: 1px solid #9b2c2c;
-    box-shadow: inset 0 1px 0 0 #f56565, 0 1px 0 0 rgba(25,30,35,.05), 0 0 0 0 transparent;
-    color: white;
+    @apply text-white bg-gradient-to-b from-rose-500 to-rose-600 border border-rose-600 border-b-rose-900;
+    box-shadow: inset 0 1px 0 0 theme('colors.rose.400'), 0 1px 0 0 rgba(0, 0, 0,.05), 0 0 0 0 transparent;
 
     &:hover:not(:disabled), &:active:not(:disabled) {
-        background: linear-gradient(180deg, #c53030, #9b2c2c);
-        border-color: #742a2a;
+        @apply from-rose-600 to-rose-700 border border-rose-700 border-b-rose-900;
     }
 
     &:disabled {
-        @apply text-red-lighter opacity-75;
+        @apply text-rose-100 opacity-75;
+    }
+
+    &:focus {
+        @apply ring-rose-500 ring-1 ring-offset-1;
+        /* box-shadow: 0 5px 20px theme(colors.rose.400 / 0.5); */
     }
 }
 
@@ -114,6 +116,7 @@ button {
 
 .btn-sm {
     @apply text-2xs;
+    line-height: 0;
     height: 1.625rem; /*  24px */
     padding: 4px 10px;
 }

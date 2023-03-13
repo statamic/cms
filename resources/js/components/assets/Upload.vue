@@ -1,9 +1,9 @@
 <template>
 
-    <div class="flex items-center my-4" :class="{'text-red': status == 'error'}">
+    <div class="flex items-center my-4" :class="{'text-rose-500': status == 'error'}">
 
         <div class="mx-2 flex items-center">
-            <svg-icon name="micro-warning" class="text-red h-4 w-4" v-if="status === 'error'" />
+            <svg-icon name="micro-warning" class="text-rose-500 h-4 w-4" v-if="status === 'error'" />
             <loading-graphic v-else :inline="true" text="" />
         </div>
 
