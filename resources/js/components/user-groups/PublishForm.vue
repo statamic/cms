@@ -29,7 +29,7 @@
                     v-model="handle"
                 />
 
-                <div class="text-xs text-rose-500 p-6 pt-0" v-if="initialHandle && handle != initialHandle">
+                <div class="text-xs text-red-500 p-6 pt-0" v-if="initialHandle && handle != initialHandle">
                     {{ __('messages.role_change_handle_warning') }}
                 </div>
 
@@ -53,7 +53,7 @@
                                 @input="roles = $event" />
                         </div>
                     </publish-field-meta>
-                    <small class="help-block text-rose-500 mt-2 mb-0" v-if="errors.roles" v-text="errors.roles[0]" />
+                    <small class="help-block text-red-500 mt-2 mb-0" v-if="errors.roles" v-text="errors.roles[0]" />
                 </div>
 
             </div>

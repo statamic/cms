@@ -172,7 +172,7 @@
                                             <span class="little-dot mr-2" :class="{
                                                 'bg-green-600': option.published,
                                                 'bg-gray-500': !option.published,
-                                                'bg-rose-500': !option.exists
+                                                'bg-red-500': !option.exists
                                             }" />
                                             {{ option.name }}
                                             <loading-graphic :size="14" text="" class="ml-2" v-if="localizing === option.handle" />

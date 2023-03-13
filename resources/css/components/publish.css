@@ -55,7 +55,7 @@ code.parent-url {
     }
 
     .has-error > .field-inner > label {
-        @apply text-rose-500;
+        @apply text-red-500;
     }
 
     .field-inner {

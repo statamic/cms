@@ -121,7 +121,7 @@ export default {
 
         limitIndicatorColor() {
             if (this.limitExceeded) {
-                return 'text-rose-500';
+                return 'text-red-500';
             } else if (this.limitReached) {
                 return 'text-green-600';
             }

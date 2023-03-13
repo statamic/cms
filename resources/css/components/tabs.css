@@ -66,10 +66,10 @@
     }
 
     .tab-button.has-error {
-        @apply text-rose-500;
+        @apply text-red-500;
 
         &.active {
-            box-shadow: theme('colors.rose.400') 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
+            box-shadow: theme('colors.red.400') 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
         }
     }
 }

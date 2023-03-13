@@ -31,7 +31,7 @@
                     v-model="handle"
                 />
 
-                <div class="text-xs text-rose-500 p-6 pt-0" v-if="initialHandle && handle != initialHandle">
+                <div class="text-xs text-red-500 p-6 pt-0" v-if="initialHandle && handle != initialHandle">
                     {{ __('messages.role_change_handle_warning') }}
                 </div>
 

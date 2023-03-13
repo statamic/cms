@@ -21,7 +21,7 @@
                 <label class="font-bold text-base mb-1" for="email">{{ __('Email Address') }}*</label>
                 <input type="email" v-model="user.email" id="email" class="input-text" required autofocus tabindex="1">
 
-                <div class="text-2xs text-rose-500 mt-2 flex items-center" v-if="userExists">
+                <div class="text-2xs text-red-500 mt-2 flex items-center" v-if="userExists">
                     <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
                     {{ __('This user already exists.') }}
                 </div>

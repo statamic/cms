@@ -124,12 +124,12 @@
 
 
 .session-expiry-stripe {
-    @apply px-4 py-2 text-xs top-0 text-center bg-rose-500 text-white cursor-pointer w-full outline-none fixed;
+    @apply px-4 py-2 text-xs top-0 text-center bg-red-500 text-white cursor-pointer w-full outline-none fixed;
     z-index: 999;
     height: 48px;
 
     &:hover {
-        @apply bg-rose-700;
+        @apply bg-red-700;
     }
 
     &:active, &:focus {

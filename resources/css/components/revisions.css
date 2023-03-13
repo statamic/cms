@@ -40,7 +40,7 @@
     &.publish { @apply bg-green-600; }
     &.revision,
     &.restore { @apply text-gray-700; }
-    &.unpublish { @apply bg-rose-500; }
+    &.unpublish { @apply bg-red-500; }
 }
 
 .revision-item-note {

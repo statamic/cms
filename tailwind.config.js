@@ -53,20 +53,14 @@ module.exports = {
                 DEFAULT: '#c471ed',
                 dark: '#a855cd',
             },
-            red: {
-                lighter: '#fce9e9',
-                light: '#ed7c78',
-                DEFAULT: '#e7514b',
-                dark: '#cb4743',
-            },
             yellow: {
                 light: '#ffffe0',
                 DEFAULT: '#fbfab0',
                 dark: '#e8dc1e',
             },
-            green: colors.green,
             amber: colors.amber,
-            rose: colors.red,
+            green: colors.green,
+            red: colors.red,
         },
         screens: {
             'sm': '576px',

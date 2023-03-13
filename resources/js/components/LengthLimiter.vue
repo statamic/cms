@@ -16,7 +16,7 @@ export default {
             return (this.value) ? this.value.length : 0
         },
         limitIndicatorColor() {
-            return this.limitReached ? 'text-rose-500' : 'text-gray'
+            return this.limitReached ? 'text-red-500' : 'text-gray'
         }
     }
 

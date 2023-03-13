@@ -20,7 +20,7 @@
             <div class="
                 py-3 px-4 text-sm w-full rounded-md
                 @if ($licenses->isOnTestDomain()) bg-gray-800 text-gray-300 @endif
-                @if ($licenses->isOnPublicDomain()) bg-rose-500 text-white @endif
+                @if ($licenses->isOnPublicDomain()) bg-red-500 text-white @endif
             ">
                 @if ($licenses->isOnTestDomain())
                     <div class="flex items-center justify-between">

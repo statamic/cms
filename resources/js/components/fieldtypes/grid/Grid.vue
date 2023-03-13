@@ -12,10 +12,10 @@
 
         <section :class="{'p-4': fullScreenMode}">
 
-            <small v-if="hasExcessRows" class="help-block text-rose-500">
+            <small v-if="hasExcessRows" class="help-block text-red-500">
                 {{ __('Max Rows') }}: {{ maxRows }}
             </small>
-            <small v-else-if="hasNotEnoughRows" class="help-block text-rose-500">
+            <small v-else-if="hasNotEnoughRows" class="help-block text-red-500">
                 {{ __('Min Rows') }}: {{ minRows }}
             </small>
 

@@ -25,7 +25,7 @@
     }
 
     &.error i {
-        @apply bg-rose-500;
+        @apply bg-red-500;
     }
 
     &.default i {

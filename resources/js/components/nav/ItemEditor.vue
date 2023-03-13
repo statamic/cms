@@ -17,20 +17,20 @@
 
                 <div class="publish-field mb-8" :class="{ 'has-error': validateDisplay }">
                     <div class="field-inner">
-                        <label class="text-sm font-medium mb-2">{{ __('Display') }} <span class="text-rose-500">*</span></label>
+                        <label class="text-sm font-medium mb-2">{{ __('Display') }} <span class="text-red-500">*</span></label>
                         <text-input v-model="config.display" :focus="true" />
-                        <div v-if="validateDisplay" class="help-block text-rose-500 mt-2"><p>{{ __('statamic::validation.required') }}</p></div>
+                        <div v-if="validateDisplay" class="help-block text-red-500 mt-2"><p>{{ __('statamic::validation.required') }}</p></div>
                     </div>
                 </div>
 
                 <div class="publish-field mb-8" :class="{ 'has-error': validateUrl }">
                     <div class="field-inner">
-                        <label class="text-sm font-medium mb-2">{{ __('URL') }} <span class="text-rose-500">*</span></label>
+                        <label class="text-sm font-medium mb-2">{{ __('URL') }} <span class="text-red-500">*</span></label>
                         <div class="help-block -mt-2">
                             <p v-text="__('Enter any internal or external URL.')"></p>
                         </div>
                         <text-input v-model="config.url" />
-                        <div v-if="validateUrl" class="help-block text-rose-500 mt-2"><p>{{ __('statamic::validation.required') }}</p></div>
+                        <div v-if="validateUrl" class="help-block text-red-500 mt-2"><p>{{ __('statamic::validation.required') }}</p></div>
                     </div>
                 </div>
 

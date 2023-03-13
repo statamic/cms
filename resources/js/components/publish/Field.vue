@@ -52,7 +52,7 @@
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
 
         <slot name="fieldtype" v-if="!loadingMeta">
-            <div class="text-xs text-rose-500" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
+            <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
             <component
                 v-else
                 :is="fieldtypeComponent"
@@ -76,7 +76,7 @@
             v-html="instructions" />
 
         <div v-if="hasError">
-            <small class="help-block text-rose-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
     </div>
     </publish-field-meta>

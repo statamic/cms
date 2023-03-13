@@ -39,13 +39,13 @@
             <div class="mb-8">
                 <label class="mb-2" for="input-email">{{ __('Email') }}</label>
                 <input type="text" class="input-text input-text" name="email" value="{{ old('email') }}" autofocus id="input-email">
-                @if ($hasError('email'))<div class="text-rose-500 text-xs mt-2">{{ $errors->first('email') }}</div>@endif
+                @if ($hasError('email'))<div class="text-red-500 text-xs mt-2">{{ $errors->first('email') }}</div>@endif
             </div>
 
             <div class="mb-8">
                 <label class="mb-2" for="input-password">{{ __('Password') }}</label>
                 <input type="password" class="input-text input-text" name="password" id="input-password">
-                @if ($hasError('password'))<div class="text-rose-500 text-xs mt-2">{{ $errors->first('password') }}</div>@endif
+                @if ($hasError('password'))<div class="text-red-500 text-xs mt-2">{{ $errors->first('password') }}</div>@endif
             </div>
             <div class="flex justify-between items-center">
                 <label for="remember-me" class="flex items-center cursor-pointer">
