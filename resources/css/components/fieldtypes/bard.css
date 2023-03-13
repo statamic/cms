@@ -40,17 +40,12 @@
 }
 
 .bard-fixed-toolbar {
-    @apply bg-white shadow-none rounded-t border-b text-sm flex items-start justify-between;
-    position: sticky;
-    padding: 4px 8px;
-    z-index: 5;
-    top: 0;
+    @apply bg-white shadow-none rounded-t border-b text-sm flex items-start justify-between px-1 py-2 z-5 top-0;
+    /* position: sticky; */
+
 
     .bard-toolbar-button {
-        @apply text-gray-800 rounded px-1 flex text-center justify-center items-center text-base text-center;
-        height: 32px;
-        width: 32px;
-        margin: 0;
+        @apply text-gray-800 rounded px-1 flex text-center justify-center items-center text-base h-8 w-8 m-0;
         svg {
             @apply w-auto h-4;
         }
@@ -84,11 +79,7 @@
     @apply bg-black rounded-full shadow-lg px-4;
 
     button {
-        @apply text-gray-700 rounded px-1 flex items-center justify-center text-base text-center bg-transparent;
-        height: 32px;
-        width: 32px;
-        margin: 0 2px;
-        outline: none;
+        @apply text-gray-700 rounded px-1 flex items-center justify-center text-base text-center bg-transparent h-8 w-8 my-0 mx-0.5 outline-none;
         svg {
             @apply w-auto h-4;
         }
@@ -500,19 +491,20 @@
   ========================================================================== */
 
   .bard-link-toolbar {
-    @apply bg-white rounded absolute leading-none shadow mt-2;
+    /* @apply bg-white rounded absolute leading-none shadow mt-2;
     z-index: 100;
     width: 300px;
     top: 100%;
+    right: 0; */
 
-    &:before {
+    /* &:before {
         content: '';
         border: 6px solid transparent;
         border-bottom-color: white;
         position: absolute;
         bottom: 100%;
         left: 10px;
-    }
+    } */
 
     .input {
         @apply p-0 text-xs h-8 bg-transparent shadow-none border-none;

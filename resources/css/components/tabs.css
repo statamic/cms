@@ -100,3 +100,15 @@
         @apply bg-blue-100 text-blue-900;
     }
 }
+
+.button-tab {
+    @apply text-gray-700 inline-block focus:outline-none px-2 py-1 mr-1;
+
+    &:hover {
+        @apply text-blue;
+    }
+
+    &.active {
+        @apply bg-blue-100 text-blue-800 rounded;
+    }
+}
