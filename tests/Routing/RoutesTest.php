@@ -123,6 +123,7 @@ class RoutesTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider undefinedLayoutRouteProvider
      **/
     public function it_renders_a_view_without_a_layout($route)

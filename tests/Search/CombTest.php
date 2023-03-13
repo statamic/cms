@@ -10,6 +10,7 @@ class CombTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider searchesProvider
      **/
     public function it_searches($term, $expected)

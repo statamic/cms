@@ -296,6 +296,7 @@ class AssetTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider reAddRemovedData
      **/
     public function it_doesnt_try_to_re_remove_newly_added_data_from_meta($reAddRemovedData)
@@ -382,6 +383,7 @@ class AssetTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider queryBuilderProvider
      **/
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
