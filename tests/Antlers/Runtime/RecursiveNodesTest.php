@@ -1024,7 +1024,7 @@ EOT;
     {{ /children }}
 {{ /records }}
 EOT
-);
+        );
 
         // The parseNodes will throw an exception if it fails to parse correctly.
         // We will just assert true is true to shut up the risky assertions warning.

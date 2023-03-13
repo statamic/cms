@@ -767,6 +767,7 @@ class FrontendTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider redirectProvider
      */
     public function redirect_is_followed($dataValue, $augmentedValue, $expectedStatus, $expectedLocation)

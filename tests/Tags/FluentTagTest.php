@@ -34,6 +34,7 @@ class FluentTagTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider fluentTagProvider
      **/
     public function it_handles_params_fluently($usedTag, $expectedTagName, $expectedTag, $expectedTagMethod, $expectedClassMethod)

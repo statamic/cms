@@ -80,6 +80,7 @@ class UrlTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider ancestorProvider
      **/
     public function it_checks_whether_a_url_is_an_ancestor_of_another($child, $parent, $isAncestor)
@@ -119,6 +120,7 @@ class UrlTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider relativeProvider
      **/
     public function makes_urls_relative($url, $expected)
