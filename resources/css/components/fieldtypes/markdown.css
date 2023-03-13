@@ -108,7 +108,7 @@
     .markdown-modes button {
         @apply text-gray-700;
         &.active {
-            @apply text-white;
+            @apply text-white bg-black;
         }
     }
 

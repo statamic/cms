@@ -207,7 +207,7 @@
     }
 
     .bard-fixed-toolbar {
-        @apply shadow h-12 justify-center;
+        @apply shadow h-12;
         padding: 7px 8px;
         top: 0;
         z-index: 999;
