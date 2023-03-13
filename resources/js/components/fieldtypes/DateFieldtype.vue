@@ -1,5 +1,5 @@
 <template>
-    <div class="datetime">
+    <div class="datetime min-w-[145px]">
 
         <button type="button" class="btn flex mb-2 md:mb-0 items-center pl-3" v-if="!isReadOnly && config.inline === false && !hasDate" @click="addDate" tabindex="0">
             <svg-icon name="calendar" class="w-4 h-4 mr-2"></svg-icon>
@@ -7,7 +7,8 @@
     	</button>
 
         <div v-if="hasDate || config.inline"
-            class="date-time-container flex-col @xs:flex-row"
+            class="date-time-container flex flow-col @sm:flex-row"
+            :class="config.time_seconds_enabled ? 'space-x-1' : 'space-x-3'"
         >
 
             <div class="flex-1 date-container">
@@ -86,7 +87,7 @@
                 </v-date-picker>
             </div>
 
-            <div v-if="config.time_enabled && !isRange" class="time-container mt-2 @xs:ml-2 @xs:mt-0 time-fieldtype">
+            <div v-if="config.time_enabled && !isRange" class="time-container @xs:ml-2 @xs:mt-0 time-fieldtype">
 				<time-fieldtype
                     v-if="hasTime"
                     ref="time"
