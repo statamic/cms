@@ -441,19 +441,19 @@ export default {
          */
         shortcut: function(e) {
             var key = e.keyCode;
-            var meta = e.metaKey === true;
+            var mod = e.metaKey === true || e.ctrlKey === true;
 
-            if (meta && key === 66) { // cmd+b
+            if (mod && key === 66) { // cmd+b
                 this.bold();
                 e.preventDefault();
             }
 
-            if (meta && key === 73) { // cmd+i
+            if (mod && key === 73) { // cmd+i
                 this.italic();
                 e.preventDefault();
             }
 
-            if (meta && key === 75) { // cmd+k
+            if (mod && key === 75) { // cmd+k
                 this.insertLink();
                 e.preventDefault();
             }
