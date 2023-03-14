@@ -1,20 +1,22 @@
 <template>
-
     <div>
-
-        <div ref="tabs" class="mb-5 flex">
-            <tab
-                v-for="tab in tabs"
-                :key="tab._id"
-                :tab="tab"
-                :current-tab="currentTab"
-                @selected="selectTab(tab._id)"
-                @removed="removeTab(tab._id)"
-                @mouseenter="mouseEnteredTab(tab._id)"
-            />
-            <div v-if="!singleTab" class="card px-5 py-2 cursor-pointer" @click="addTab" v-text="addTabText" />
+        <div class="tabs-container mb-5">
+            <div ref="tabs" class="tabs flex-1
+            flex space-x-3 overflow-auto" role="tablist">
+                <tab
+                    v-for="tab in tabs"
+                    :key="tab._id"
+                    :tab="tab"
+                    :current-tab="currentTab"
+                    @selected="selectTab(tab._id)"
+                    @removed="removeTab(tab._id)"
+                    @mouseenter="mouseEnteredTab(tab._id)"
+                />
+                <div class="fade-left" v-if="canScrollLeft" />
+                <div class="fade-right" :class="{ 'mr-8': showHiddenTabsDropdown }" v-if="canScrollRight" />
+            </div>
+            <button v-if="!singleTab" class="tab-button" @click="addTab" v-text="addTabText" />
         </div>
-
         <tab-content
             v-for="tab in tabs"
             ref="tabContent"
@@ -27,9 +29,7 @@
             :add-section-text="addSectionText"
             @updated="updateTab(tab._id, $event)"
         />
-
     </div>
-
 </template>
 
 <script>
@@ -88,7 +88,11 @@ export default {
         return {
             tabs: this.initialTabs,
             currentTab: this.initialTabs.length ? this.initialTabs[0]._id : null,
-            lastInteractedTab: null
+            lastInteractedTab: null,
+            hiddenTabs: [],
+            tabsAreScrolled: false,
+            canScrollLeft: false,
+            canScrollRight: false,
         }
     },
 

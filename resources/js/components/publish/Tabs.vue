@@ -4,13 +4,9 @@
     <div>
 
         <!-- Tabs -->
-        <div
-            v-if="showTabs"
-            class="tabs-container flex items-center"
-            :class="{ 'offset-for-sidebar': shouldShowSidebar }"
-        >
+        <div v-if="showTabs" class="flex items-center mb-6">
             <div
-                class="publish-tabs tabs shrink"
+                class="tabs-container"
                 :class="{ 'tabs-scrolled': canScrollLeft }"
                 ref="tabs"
                 role="tablist"

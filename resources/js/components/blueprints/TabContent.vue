@@ -1,23 +1,21 @@
 <template>
-
-
-    <div>
+    <div
+        role="tabpanel"
+        :aria-labelledby="`tab-${tab._id}`"
+        :id="`tab-section-${tab._id}`">
         <input type="text"
             :value="tab.display"
             @input="fieldUpdated('display', $event.target.value)"
             class="input-text" />
-
         <input type="text"
             :value="tab.handle"
             @input="fieldUpdated('handle', $event.target.value)"
             class="input-text font-mono text-sm" />
-
         <input type="text"
             :value="tab.instructions"
             @input="fieldUpdated('instructions', $event.target.value)"
             class="input-text text-sm"
             v-if="showInstructions" />
-
         <sections
             ref="sections"
             :tab-id="tab._id"
@@ -27,9 +25,7 @@
             :show-section-handle-field="showSectionHandleField"
             @updated="sectionsUpdated($event)"
         />
-
     </div>
-
 </template>
 
 <script>

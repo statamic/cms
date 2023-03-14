@@ -2,13 +2,12 @@
    TABS
    ========================================================================== */
 
-
 .tabs-container {
-    @apply relative mb-5;
+    @apply w-full border-b text-md relative flex;
 
-    &.offset-for-sidebar {
+    /* &.offset-for-sidebar {
         width: calc(100% - 320px);
-    }
+    } */
 
    .fade-left, .fade-right {
         @apply absolute w-4 inset-y-0 from-gray-300 pointer-events-none z-10;
@@ -24,70 +23,48 @@
 }
 
 .tabs {
-    @apply flex items-end overflow-hidden px-2 -ml-2;
-    height: 48px;
+    @apply flex space-x-3 overflow-auto relative;
+}
 
-    &-scrolled {
+
+/* .tabs { */
+    /* @apply flex items-end overflow-hidden px-2 -ml-2; */
+    /* @apply flex flex-wrap space-x-3; */
+    /* height: 48px; */
+
+    /* &-scrolled {
         @apply pl-0 ml-0;
-    }
+    } */
 
     .tab-button {
-        @apply whitespace-nowrap bg-gray-100 py-1 px-4 shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-gray-300 select-none;
-        height: 94%;
-        min-height: 94%;
-    }
-
-    .tab-button:hover {
-        @apply bg-white;
-    }
-    .tab-button:active {
-        @apply bg-white text-blue;
-    }
-
-    .tab-button:focus {
-        @apply bg-white text-blue border-b-0 ring-1 ring-inset;
-    }
-
-    .tab-button.active {
-        @apply bg-white text-blue border-t-2 border-blue relative h-full min-h-full border-b-0 outline-none;
-        z-index: 1;
-    }
-
-    .tab-button:focus {
-        @apply border-t;
-    }
-
-    .tab-button.ghost {
-        @apply bg-transparent relative h-full min-h-full shadow-none border-none text-gray-500 px-6;
-        min-width: 0;
+        @apply flex items-center px-2 py-2 text-gray-700 select-none border-b-2 border-transparent whitespace-nowrap shrink-0;
+        /* @apply whitespace-nowrap bg-gray-100 py-1 px-4 shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-gray-300 select-none; */
+        /* height: 94%; */
+        /* min-height: 94%; */
         &:hover {
-            @apply text-blue;
+            @apply text-gray-800;
         }
-    }
-
-    .tab-button.has-error {
-        @apply text-red-500;
-
         &.active {
-            box-shadow: theme('colors.red.400') 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
+            @apply text-blue-500 border-blue-500;
+        }
+        &.has-error {
+            @apply text-red-500;
+
+            &.active {
+                box-shadow: theme('colors.red.400') 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
+            }
         }
     }
-}
 
-
-@screen md {
-    .tabs .tab-button {
-        min-width: 120px;
-    }
-}
+/* } */
 
 
 /* Responsive Wangjangling
   ========================================================================== */
 
-@screen md {
+/* @screen md {
     .tabs .tab-button { @apply text-base; }
-}
+} */
 
 .pill-tab {
     @apply text-gray-700 flex items-center focus:outline-none px-2 py-1 rounded;
