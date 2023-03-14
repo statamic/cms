@@ -1,11 +1,10 @@
 <template>
-
-    <div class="publish-sections">
+    <div class="publish-sections flex flex-col space-y-7">
         <div class="mb-5" v-for="(section, i) in sections" :key="i">
-            <div class="card p-0 mb-5">
-                <div class="p-5 border-b border-gray-400" v-if="section.display">
-                    <label v-text="section.display" class="text-lg font-bold" />
-                    <div class="help-block" v-if="section.instructions"><p v-html="section.instructions" /></div>
+            <div class="card p-0">
+                <div class="px-5 pt-4 pb-3 border-b border-gray-400" v-if="section.display">
+                    <label v-text="section.display" class="text-base font-semibold" />
+                    <div class="help-block" v-if="section.instructions"><p v-html="$options.filters.markdown(section.instructions)" /></div>
                 </div>
                 <publish-fields
                     :fields="section.fields"
@@ -22,7 +21,6 @@
             </div>
         </div>
     </div>
-
 </template>
 
 <script>
