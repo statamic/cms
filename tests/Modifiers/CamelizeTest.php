@@ -20,6 +20,7 @@ class CamelizeTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider camelFarm
      */
     public function it_camelizes_underscores($expected, $input): void

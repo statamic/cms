@@ -16,6 +16,7 @@ class TaxonomiesTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup disableQueries
      **/
     public function query_only_works_if_enabled()

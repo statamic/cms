@@ -606,7 +606,6 @@ class PathDataManager
                         }
 
                         if (count($path->pathParts) > 1 && $this->isPair == false) {
-
                             // If we have more steps in the path to take, but we are
                             // not a tag pair, we need to reduce anyway so we
                             // can descend further into the nested values.
@@ -630,7 +629,6 @@ class PathDataManager
                                 }
 
                                 if (count($path->pathParts) > 1 && $this->isPair == false) {
-
                                     // If we have more steps in the path to take, but we are
                                     // not a tag pair, we need to reduce anyway so we
                                     // can descend further into the nested values.
@@ -1005,7 +1003,7 @@ class PathDataManager
             if (! $isPair) {
                 $returnValue = $value->antlersValue($parser, $data);
             } else {
-                $returnValue = self::reduce(($value->antlersValue($parser, $data)));
+                $returnValue = self::reduce($value->antlersValue($parser, $data));
             }
             $returnValue = self::guardRuntimeReturnValue($returnValue);
 
