@@ -17,11 +17,6 @@ trait Searchable
         return method_exists($this, $field) ? $this->$field() : $this->get($field);
     }
 
-    public function searchableInCp(): bool
-    {
-        return true;
-    }
-
     public function getCpSearchResultTitle()
     {
         return $this->title;
