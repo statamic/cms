@@ -27,7 +27,7 @@ class Select extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.select.config.options'),
                 'type' => 'array',
                 'key_header' => __('Key'),
-                'value_header' => __('Label').' ('.__('Optional').')',
+                'value_header' => __('Label') . ' (' . __('Optional') . ')',
                 'add_button' => __('Add Option'),
             ],
             'multiple' => [
@@ -43,6 +43,9 @@ class Select extends Fieldtype
                 'min' => 1,
                 'type' => 'integer',
                 'width' => 50,
+                'show_when' => [
+                    'multiple' => true,
+                ],
             ],
             'clearable' => [
                 'display' => __('Clearable'),
