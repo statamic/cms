@@ -16,10 +16,9 @@ class SearchController extends CpController
             ->search($request->query('q'))
             ->get()
             ->filter(function (Result $item) {
-                return $item->getSearchable()->searchableInCp();
-            })
-            ->filter(function (Result $item) {
-                return User::current()->can('view', $item->getSearchable());
+                $searchable = $item->getSearchable();
+
+                return $searchable->searchableInCp() && User::current()->can('view', $searchable);
             })
             ->take(10)
             ->map(function (Result $result) {
