@@ -62,7 +62,7 @@ class DefaultInvalidator implements Invalidator
     protected function invalidateEntryUrls($entry)
     {
         $entry->descendants()->push($entry)->each(function ($entry) {
-            if ($url = $entry->absoluteUrl()) {
+            if ($url = $entry->absoluteUrlWithoutRedirect()) {
                 $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
             }
         });
@@ -120,7 +120,7 @@ class DefaultInvalidator implements Invalidator
 
         return [
             Arr::get($parsed, 'path', '/'),
-            $parsed['scheme'].'://'.$parsed['host'],
+            $parsed['scheme'] . '://' . $parsed['host'],
         ];
     }
 }
