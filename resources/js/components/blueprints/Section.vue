@@ -10,7 +10,7 @@
                         <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" :placeholder="`${__('Title')} (${__('Optional')})`" />
                     </span>
                     <span class="font-mono text-xs text-gray-700 mr-2" v-if="showHandleField">
-                        <input type="text" v-model="section.handle" class="bg-transparent w-full outline-none" :placeholder="`${__('Handle')}`" />
+                        <input type="text" v-model="section.handle" class="bg-transparent w-full outline-none" :placeholder="`${__('Handle')}`" @input="handleSyncedWithDisplay = false" />
                     </span>
                     <span class="text-xs text-gray-700 mr-2">
                         <input type="text" v-model="section.instructions" class="bg-transparent w-full outline-none" :placeholder="`${__('Instructions')} (${__('Optional')})`" />
@@ -81,6 +81,7 @@ export default {
     data() {
         return {
             editingField: null,
+            handleSyncedWithDisplay: false,
         }
     },
 
@@ -97,8 +98,22 @@ export default {
             handler(section) {
                 this.$emit('updated', section);
             }
+        },
+
+        'section.display': function(display) {
+            if (this.handleSyncedWithDisplay) {
+                this.section.handle = this.$slugify(display, '_');
+            }
         }
 
+    },
+
+    created() {
+        // This logic isn't ideal, but it was better than passing along a 'isNew' boolean and having
+        // to deal with stripping it out and making it not new, etc. Good enough for a quick win.
+        if (!this.section.handle || this.section.handle == 'new_section' || this.section.handle == 'new_set') {
+            this.handleSyncedWithDisplay = true;
+        }
     },
 
     methods: {
