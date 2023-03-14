@@ -3,42 +3,30 @@
     <div>
 
         <div ref="tabs" class="mb-5 flex">
-            <div
+            <tab
                 v-for="tab in tabs"
                 :key="tab._id"
-                class="blueprint-tab card px-5 py-2 mr-2 cursor-pointer flex"
-                :class="{ 'bg-blue-100': currentTab === tab._id }"
-                @click="selectTab(tab._id)"
+                :tab="tab"
+                :current-tab="currentTab"
+                @selected="selectTab(tab._id)"
+                @removed="removeTab(tab._id)"
                 @mouseenter="mouseEnteredTab(tab._id)"
-            >
-                {{ tab.display }}
-                <div @click="removeTab(tab._id)">
-                    <svg-icon name="delete-x" class="w-2 h-2 ml-2 text-gray-600 hover:text-gray-800" />
-                </div>
-            </div>
+            />
             <div v-if="!singleTab" class="card px-5 py-2 cursor-pointer" @click="addTab" v-text="addTabText" />
         </div>
 
-        <div
-            v-for="(tab, i) in tabs"
+        <tab-content
+            v-for="tab in tabs"
+            ref="tabContent"
             :key="tab._id"
+            :tab="tab"
             v-show="currentTab === tab._id"
-        >
-            <input type="text" v-model="tab.display" class="input-text" />
-            <input type="text" v-model="tab.handle" class="input-text font-mono text-sm" />
-            <input type="text" v-model="tab.instructions" class="input-text text-sm" v-if="showTabInstructionsField" />
-
-            <sections
-                ref="sections"
-                :tab-id="tab._id"
-                :initial-sections="tab.sections"
-                :new-section-text="newSectionText"
-                :add-section-text="addSectionText"
-                :show-section-handle-field="showSectionHandleField"
-                @updated="sectionsUpdated(tab._id, $event)"
-            />
-
-        </div>
+            :show-instructions="showTabInstructionsField"
+            :show-section-handle-field="showSectionHandleField"
+            :new-section-text="newSectionText"
+            :add-section-text="addSectionText"
+            @updated="updateTab(tab._id, $event)"
+        />
 
     </div>
 
@@ -46,15 +34,17 @@
 
 <script>
 import {Sortable, Plugins} from '@shopify/draggable';
-import Sections from './Sections.vue';
 import uniqid from 'uniqid';
+import Tab from './Tab.vue';
+import TabContent from './TabContent.vue';
 
 let sortableTabs, sortableSections, sortableFields;
 
 export default {
 
     components: {
-        Sections
+        Tab,
+        TabContent,
     },
 
     props: {
@@ -175,11 +165,6 @@ export default {
             .on('sortable:stop', e => this.fieldHasBeenDropped(e));
         },
 
-        sectionsUpdated(tabId, sections) {
-            const tab = this.tabs.find(tab => tab._id === tabId);
-            this.updateTab(tabId, {...tab, sections});
-        },
-
         sectionHasBeenDropped(e) {
             const oldTabId = e.oldContainer.dataset.tab;
             const oldIndex = e.oldIndex;
@@ -220,7 +205,7 @@ export default {
             let newSection;
 
             if (e.newContainer.parentElement.classList.contains('blueprint-add-section-button')) {
-                newSection = this.$refs.sections.find(vm => vm.tabId === newTabId).addSection();
+                newSection = this.$refs.tabContent.find(vm => vm.tab._id === newTabId).addSection();
             } else {
                 newSection = newTab.sections.find(section => section._id === e.newContainer.dataset.section);
             }
@@ -272,7 +257,7 @@ export default {
 
             this.selectTab(id);
 
-            this.$nextTick(() => this.$refs.sections.find(vm => vm.tabId === id).addSection());
+            this.$nextTick(() => this.$refs.tabContent.find(vm => vm.tab._id === id).addSection());
         },
 
         removeTab(tabId) {
