@@ -35,7 +35,6 @@ use Statamic\Http\Controllers\CP\Collections\ReorderCollectionBlueprintsControll
 use Statamic\Http\Controllers\CP\Collections\ReorderEntriesController;
 use Statamic\Http\Controllers\CP\Collections\RestoreEntryRevisionController;
 use Statamic\Http\Controllers\CP\Collections\ScaffoldCollectionController;
-use Statamic\Http\Controllers\CP\ComposerOutputController;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\DashboardController;
 use Statamic\Http\Controllers\CP\DuplicatesController;
@@ -237,13 +236,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('fieldtypes', [FieldtypesController::class, 'index']);
     });
 
-    Route::get('composer/check', [ComposerOutputController::class, 'check']);
-
     Route::get('updater', [UpdaterController::class, 'index'])->name('updater');
     Route::get('updater/count', [UpdaterController::class, 'count']);
     Route::get('updater/{product}', [UpdateProductController::class, 'show'])->name('updater.product');
     Route::get('updater/{product}/changelog', [UpdateProductController::class, 'changelog']);
-    Route::post('updater/{product}/install', [UpdateProductController::class, 'install']);
 
     Route::group(['prefix' => 'duplicates'], function () {
         Route::get('/', [DuplicatesController::class, 'index'])->name('duplicates');

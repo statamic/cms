@@ -3,7 +3,6 @@ import vSelect from 'vue-select'
 import AssetManager from '../components/assets/AssetManager.vue';
 import Browser from '../components/assets/Browser/Browser.vue';
 import UpdatesBadge from '../components/UpdatesBadge.vue';
-import ComposerOutput from '../components/ComposerOutput.vue';
 import Container from '../components/publish/Container.vue';
 import PublishForm from '../components/publish/PublishForm.vue';
 import Fields from '../components/publish/Fields.vue';
@@ -68,7 +67,6 @@ Vue.component('v-select', vSelect)
 Vue.component('asset-manager', AssetManager);
 Vue.component('asset-browser', Browser);
 Vue.component('updates-badge', UpdatesBadge);
-Vue.component('composer-output', ComposerOutput);
 
 // Publish
 Vue.component('publish-container', Container);

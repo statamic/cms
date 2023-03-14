@@ -11,11 +11,6 @@
             </div>
             <div v-if="release.canUpdate && showActions">
                 <button v-if="release.type === 'current'" class="btn opacity-50" disabled v-text="__('Current Version')" />
-                <button v-else-if="release.latest" @click="confirmationPrompt = release" class="btn" v-text="__('Update to Latest')" />
-                <button v-else @click="confirmationPrompt = release" class="btn">
-                    <template v-if="release.type === 'upgrade'">{{ __('Update to :version', { version: release.version }) }}</template>
-                    <template v-if="release.type === 'downgrade'">{{ __('Downgrade to :version', { version: release.version }) }}</template>
-                </button>
             </div>
         </div>
         <div class="card-body">

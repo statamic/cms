@@ -5,14 +5,7 @@
                 <span v-text="name" />
                 <span v-if="currentVersion" class="font-normal text-gray-700">{{ currentVersion }}</span>
             </h1>
-            <button v-if="(composer.processing || lastInstallLog) && ! modalOpen" class="btn" @click="modalOpen = true">
-                <template v-if="composer.processing">
-                    {{ composer.status }}
-                    <loading-graphic />
-                </template>
-                <template v-else>{{ __('Last Install Log' ) }}</template>
-            </button>
-            <button v-if="canUpdateToLatestVersion" class="btn-primary ml-4" @click="updateToLatest()">{{ __('Update to Latest') }}</button>
+            <button v-if="!onLatestVersion" class="btn-primary ml-4" @click="showUpdateInstructions()">{{ __('Update') }}</button>
             <div v-if="onLatestVersion" v-text="__('Up to date')" />
         </div>
 
@@ -48,24 +41,21 @@
             :release="release"
             :package-name="name"
             :show-actions="showActions"
-            @install="installExplicitVersion(release.version)"
         />
 
         <modal
             v-if="modalOpen"
-            name="updater-composer-output"
+            name="show-update-instructions"
             v-slot="{ close: closeModal }"
-            :close-on-click="!composer.processing"
             :pivot-y="0.5"
             :overflow="false"
-            width="75%"
-            @opened="$events.$emit('start-composer')"
+            width="50%"
             @closed="modalOpen = false"
         >
             <div class="p-6 relative">
-                <composer-output :package="package" />
+                #TODO
+                <pre v-text="package"></pre>
                 <button
-                    v-if="!composer.processing"
                     class="btn-close absolute top-0 right-0 mt-4 mr-4"
                     :aria-label="__('Close')"
                     @click="closeModal"
@@ -95,7 +85,6 @@
                 gettingChangelog: true,
                 changelog: [],
                 currentVersion: null,
-                lastInstallLog: null,
                 modalOpen: false,
                 latestRelease: null,
                 showingUnlicensedReleases: false,
@@ -107,12 +96,8 @@
                 return {timeout: Statamic.$config.get('ajaxTimeout')};
             },
 
-            composer() {
-                return this.$store.state.statamic.composer;
-            },
-
             showActions() {
-                return ! this.gettingChangelog && ! this.composer.processing;
+                return ! this.gettingChangelog;
             },
 
             onLatestVersion() {
@@ -134,15 +119,10 @@
             latestVersion() {
                 return this.latestRelease && this.latestRelease.version;
             },
-
-            canUpdateToLatestVersion() {
-                return this.latestVersion && this.latestVersion.canUpdate && this.showActions && ! this.onLatestVersion;
-            }
         },
 
         created() {
             this.getChangelog();
-            this.$events.$on('composer-finished', this.composerFinished);
         },
 
         methods: {
@@ -154,39 +134,11 @@
                     this.changelog = response.data.changelog;
                     this.currentVersion = response.data.currentVersion;
                     this.latestRelease = response.data.changelog[0];
-                    this.lastInstallLog = response.data.lastInstallLog;
                 });
             },
 
-            updateToLatest() {
-                this.installExplicitVersion(this.latestVersion);
-            },
-
-            installExplicitVersion(version) {
-                this.$axios.post(cp_url(`/updater/${this.slug}/install`), {'version': version}, this.toEleven);
-
-                this.$store.commit('statamic/composer', {
-                    processing: true,
-                    status: __('Installing :package version :version', {
-                        package: this.package,
-                        version: version
-                    }),
-                    package: this.package,
-                });
-
+            showUpdateInstructions() {
                 this.modalOpen = true;
-            },
-
-            composerFinished() {
-                this.getChangelog();
-
-                this.$store.commit('statamic/composer', {
-                    processing: false,
-                    status: __('Installation complete!'),
-                    package: this.package,
-                });
-
-                this.$events.$emit('recount-updates');
             },
         }
     }
