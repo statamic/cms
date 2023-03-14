@@ -16,6 +16,9 @@ class SearchController extends CpController
             ->search($request->query('q'))
             ->get()
             ->filter(function (Result $item) {
+                return $item->getSearchable()->searchableInCp();
+            })
+            ->filter(function (Result $item) {
                 return User::current()->can('view', $item->getSearchable());
             })
             ->take(10)
@@ -26,6 +29,7 @@ class SearchController extends CpController
                     'url' => $result->getCpUrl(),
                     'badge' => $result->getCpBadge(),
                 ];
-            });
+            })
+            ->values();
     }
 }
