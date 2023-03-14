@@ -61,6 +61,20 @@ export default {
         },
     },
 
+    data() {
+        return {
+            handleSyncedWithDisplay: false,
+        }
+    },
+
+    created() {
+        // This logic isn't ideal, but it was better than passing along a 'isNew' boolean and having
+        // to deal with stripping it out and making it not new, etc. Good enough for a quick win.
+        if (!this.tab.handle || this.tab.handle == 'new_tab' || this.tab.handle == 'new_set_group') {
+            this.handleSyncedWithDisplay = true;
+        }
+    },
+
     methods: {
 
         addSection() {
@@ -74,6 +88,15 @@ export default {
 
         fieldUpdated(handle, value) {
             let tab = {...this.tab, ...{ [handle]: value }};
+
+            if (handle === 'display' && this.handleSyncedWithDisplay) {
+                tab.handle = this.$slugify(value, '_');
+            }
+
+            if (handle === 'handle') {
+                this.handleSyncedWithDisplay = false;
+            }
+
             this.$emit('updated', tab);
         }
 
