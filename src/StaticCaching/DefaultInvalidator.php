@@ -120,7 +120,7 @@ class DefaultInvalidator implements Invalidator
 
         return [
             Arr::get($parsed, 'path', '/'),
-            $parsed['scheme'] . '://' . $parsed['host'],
+            $parsed['scheme'].'://'.$parsed['host'],
         ];
     }
 }
