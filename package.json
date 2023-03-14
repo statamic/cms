@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.5.3",
-    "@shopify/draggable": "^1.0.0-beta.8",
+    "@shopify/draggable": "^1.0.0-beta.12",
     "@simonwep/pickr": "^1.7.4",
     "@tiptap/core": "^2.0.0-beta.217",
     "@tiptap/extension-blockquote": "^2.0.0-beta.217",
@@ -90,6 +90,7 @@
     "@babel/preset-env": "^7.20.2",
     "@rollup/plugin-inject": "^5.0.3",
     "@tailwindcss/container-queries": "^0.1.0",
+    "@tailwindcss/line-clamp": "^0.4.2",
     "@tailwindcss/typography": "^0.5.9",
     "@vitejs/plugin-vue2": "^2.2.0",
     "autoprefixer": "^10.4.0",

@@ -38,6 +38,7 @@
                     item-class="sortable-item"
                     handle-class="sortable-item"
                     :value="items"
+                    :delay="75"
                     @input="input"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
@@ -57,6 +58,15 @@
     </div>
 
 </template>
+
+<style scoped>
+    .draggable-mirror {
+        display: none !important;
+    }
+    .draggable-source--is-dragging {
+        @apply opacity-75 bg-transparent border-dashed
+    }
+</style>
 
 <script>
 import { SortableList, SortableItem } from '../../sortable/Sortable';

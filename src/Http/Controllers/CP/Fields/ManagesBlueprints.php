@@ -9,6 +9,7 @@ use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\FieldTransformer;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 trait ManagesBlueprints
@@ -34,7 +35,7 @@ trait ManagesBlueprints
         $tabs = collect($request->tabs)->mapWithKeys(function ($tab) {
             return [array_pull($tab, 'handle') => [
                 'display' => $tab['display'],
-                'fields' => $this->tabFields($tab['fields']),
+                'sections' => $this->tabSections($tab['sections']),
             ]];
         })->all();
 
@@ -68,10 +69,16 @@ trait ManagesBlueprints
         $blueprint->save();
     }
 
-    private function tabFields(array $fields)
+    private function tabSections(array $sections)
     {
-        return collect($fields)->map(function ($field) {
-            return FieldTransformer::fromVue($field);
+        return collect($sections)->map(function ($section) {
+            return Arr::removeNullValues([
+                'display' => $section['display'] ?? null,
+                'instructions' => $section['instructions'] ?? null,
+                'fields' => collect($section['fields'])
+                    ->map(fn ($field) => FieldTransformer::fromVue($field))
+                    ->all(),
+            ]);
         })->all();
     }
 
@@ -92,10 +99,21 @@ trait ManagesBlueprints
         return [
             'handle' => $tab->handle(),
             'display' => $tab->display(),
-            'fields' => collect($tab->contents()['fields'])->map(function ($field, $i) {
-                return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
-            })->all(),
+            'sections' => $tab->sections()->map(function ($section, $i) use ($tab) {
+                return array_merge($this->sectionToVue($section, $i, $tab), ['_id' => $tab->handle().'-'.$i]);
+            })->values()->all(),
         ];
+    }
+
+    private function sectionToVue($section, $sectionIndex, $tab): array
+    {
+        return Arr::removeNullValues([
+            'display' => $section->display(),
+            'instructions' => $section->instructions(),
+            'fields' => collect($section->contents()['fields'])->map(function ($field, $i) use ($tab, $sectionIndex) {
+                return array_merge(FieldTransformer::toVue($field), ['_id' => $tab->handle().'-'.$sectionIndex.'-'.$i]);
+            })->all(),
+        ]);
     }
 
     private function storeBlueprint(Request $request, string $namespace)

@@ -52,7 +52,7 @@
                         <div class="flex-1" v-text="actionInfoText" />
                     </div>
 
-                    <div class="text-gray text-xs flex mb-6 text-red" v-if="action === 'schedule'">
+                    <div class="text-gray text-xs flex mb-6 text-red-500" v-if="action === 'schedule'">
                         <div class="pt-px w-4 mr-2">
                             <svg-icon name="info-circle" class="pt-px" />
                         </div>

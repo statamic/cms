@@ -104,7 +104,17 @@ class BlueprintRepository
             return compact('handle', 'field');
         })->values()->all();
 
-        return $this->make()->setContents(['fields' => $fields]);
+        return $this->make()->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => $fields,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     public function makeFromTabs($tabs)

@@ -5,7 +5,7 @@
      be within the context of a publish form to continue working
      once it has been portaled out. -->
 <div :class="{ 'publish-fields': fullScreenMode }">
-<div :class="{ wrapperClasses: fullScreenMode }">
+<div :class="fullScreenMode && wrapperClasses">
 
     <div
         class="bard-fieldtype-wrapper"
@@ -15,7 +15,7 @@
     >
 
         <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar">
-            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">
+            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed" :class="{'justify-center': fullScreenMode}">
                 <component
                     v-for="button in visibleButtons(buttons)"
                     :key="button.name"
@@ -28,7 +28,7 @@
                     <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
                         <svg-icon name="show-source" class="w-4 h-4 "/>
                     </button>
-                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && config.sets.length > 0">
+                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && setConfigs.length > 0">
                         <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
                     </button>
                     <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
@@ -52,17 +52,13 @@
             </bubble-menu>
 
             <floating-menu class="bard-set-selector" :editor="editor" :tippy-options="{ offset: calcFloatingOffset, zIndex: 6 }" :should-show="shouldShowSetButton" v-if="editor">
-                <dropdown-list>
-                    <template v-slot:trigger>
+                <set-picker :sets="groupConfigs" @added="addSet">
+                    <template #trigger>
                         <button type="button" class="btn-round group flex items-center justify-center" :aria-label="__('Add Set')" v-tooltip="__('Add Set')">
                             <svg-icon name="micro-plus" class="w-3 h-3 text-gray-800 group-hover:text-black" />
                         </button>
                     </template>
-
-                    <div v-for="set in config.sets" :key="set.handle">
-                        <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
-                    </div>
-                </dropdown-list>
+                </set-picker>
             </floating-menu>
 
             <div class="bard-invalid" v-if="invalid" v-html="__('Invalid content')"></div>
@@ -84,6 +80,7 @@
 
 <script>
 import uniqid from 'uniqid';
+import reduce from 'underscore/modules/reduce';
 import { BubbleMenu, Editor, EditorContent, FloatingMenu } from '@tiptap/vue-2';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
@@ -114,6 +111,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
 import Underline from '@tiptap/extension-underline';
 import BardSource from './Source.vue';
+import SetPicker from '../replicator/SetPicker.vue';
 import { DocumentBlock, DocumentInline } from './Document';
 import { Set } from './Set'
 import { Small } from './Small';
@@ -134,6 +132,7 @@ export default {
         BubbleMenu,
         BardSource,
         BardToolbarButton,
+        SetPicker,
         EditorContent,
         FloatingMenu,
         LinkToolbarButton,
@@ -156,8 +155,7 @@ export default {
             pageHeader: null,
             escBinding: null,
             provide: {
-                setConfigs: this.config.sets,
-                isReadOnly: this.readOnly,
+                bard: this.makeBardProvide(),
                 storeName: this.storeName
             }
         }
@@ -182,7 +180,7 @@ export default {
         },
 
         hasExtraButtons() {
-            return this.allowSource || this.config.sets.length > 0 || this.config.fullscreen;
+            return this.allowSource || this.setConfigs.length > 0 || this.config.fullscreen;
         },
 
         readingTime() {
@@ -255,7 +253,7 @@ export default {
                     text += ` ${node.text || ''}`;
                 } else if (node.type === 'set') {
                     const handle = node.attrs.values.type;
-                    const set = this.config.sets.find(set => set.handle === handle);
+                    const set = this.setConfigs.find(set => set.handle === handle);
                     text += ` [${set ? set.display : handle}]`;
                 }
                 if (text.length > 150) {
@@ -274,7 +272,17 @@ export default {
 
         wrapperClasses() {
             return `form-group publish-field publish-field__${this.handle} bard-fieldtype`;
-        }
+        },
+
+        setConfigs() {
+            return reduce(this.groupConfigs, (sets, group) => {
+                return sets.concat(group.sets);
+            }, []);
+        },
+
+        groupConfigs() {
+            return this.config.sets;
+        },
 
     },
 
@@ -469,7 +477,7 @@ export default {
             const isEmptyTextBlock = $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
 
             const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock;
-            return this.config.sets.length && (this.config.always_show_set_button || isActive);
+            return this.setConfigs.length && (this.config.always_show_set_button || isActive);
         },
 
         calcFloatingOffset({ reference }) {
@@ -669,6 +677,15 @@ export default {
             if (this.pageHeader) {
                 this.pageHeader.style['pointer-events'] = ignore ? 'none' : 'all';
             }
+        },
+
+        makeBardProvide() {
+            const bard = {};
+            Object.defineProperties(bard, {
+                setConfigs: { get: () => this.setConfigs },
+                isReadOnly: { get: () => this.readOnly },
+            });
+            return bard;
         }
 
     }

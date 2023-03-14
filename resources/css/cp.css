@@ -61,7 +61,6 @@
 @import "components/fieldtypes/environment";
 @import "components/fieldtypes/grid";
 @import "components/fieldtypes/hidden";
-@import "components/fieldtypes/list";
 @import "components/fieldtypes/markdown";
 @import "components/fieldtypes/partial";
 @import "components/fieldtypes/relationship";

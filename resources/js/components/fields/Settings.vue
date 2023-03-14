@@ -60,7 +60,7 @@
                     <publish-fields
                         v-if="blueprint.tabs.length"
                         class="w-full"
-                        :fields="blueprint.tabs[0].fields"
+                        :fields="blueprint.tabs[0].sections[0].fields"
                         @updated="(handle, value) => {
                             updateField(handle, value, setFieldValue);
                             if (handle === 'handle') isHandleModified = true

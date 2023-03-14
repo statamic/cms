@@ -38,6 +38,7 @@ class JavascriptComposer
             'user' => $this->user($user),
             'paginationSize' => config('statamic.cp.pagination_size'),
             'paginationSizeOptions' => config('statamic.cp.pagination_size_options'),
+            'alwaysShowFilters' => config('statamic.cp.always_show_filters'),
             'translationLocale' => app('translator')->locale(),
             'translations' => app('translator')->toJson(),
             'sites' => $this->sites(),

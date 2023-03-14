@@ -1,6 +1,6 @@
 <template>
 <fullscreen :enabled="fullScreenMode" target-class="markdown-fieldtype">
-    <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
+    <div class="markdown-fieldtype-wrapper @container/markdown" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
 
         <uploader
             ref="uploader"
@@ -86,7 +86,7 @@
                         </div>
                     </div>
 
-                    <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview prose"></div>
+                    <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview prose-sm @md/markdown:prose-base"></div>
                 </div>
             </div>
         </uploader>
@@ -441,19 +441,19 @@ export default {
          */
         shortcut: function(e) {
             var key = e.keyCode;
-            var meta = e.metaKey === true;
+            var mod = e.metaKey === true || e.ctrlKey === true;
 
-            if (meta && key === 66) { // cmd+b
+            if (mod && key === 66) { // cmd+b
                 this.bold();
                 e.preventDefault();
             }
 
-            if (meta && key === 73) { // cmd+i
+            if (mod && key === 73) { // cmd+i
                 this.italic();
                 e.preventDefault();
             }
 
-            if (meta && key === 75) { // cmd+k
+            if (mod && key === 75) { // cmd+k
                 this.insertLink();
                 e.preventDefault();
             }

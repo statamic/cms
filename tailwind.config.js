@@ -38,11 +38,6 @@ module.exports = {
                 950: '#141a1f',
                 DEFAULT: '#73808c',
             },
-            green: {
-                dark: '#3A804D',
-                light: '#64BD63',
-                DEFAULT: '#479967',
-            },
             orange: {
                 light: '#fcc062',
                 DEFAULT: '#f5a82f',
@@ -58,17 +53,14 @@ module.exports = {
                 DEFAULT: '#c471ed',
                 dark: '#a855cd',
             },
-            red: {
-                lighter: '#fce9e9',
-                light: '#ed7c78',
-                DEFAULT: '#e7514b',
-                dark: '#cb4743',
-            },
             yellow: {
                 light: '#ffffe0',
                 DEFAULT: '#fbfab0',
                 dark: '#e8dc1e',
             },
+            amber: colors.amber,
+            green: colors.green,
+            red: colors.red,
         },
         screens: {
             'sm': '576px',
@@ -152,6 +144,8 @@ module.exports = {
                 240: '60rem',
             },
             zIndex: {
+                1: '1',
+                2: '2',
                 5: '5',
                 200: '200',
                 top: '1001',
@@ -162,6 +156,7 @@ module.exports = {
     },
     plugins: [
         require('@tailwindcss/container-queries'),
+        require('@tailwindcss/line-clamp'),
         require('@tailwindcss/typography'),
     ],
     important: true,

@@ -2,8 +2,10 @@
 
     <div class="flex flex-col text-sm">
 
-        <div class="blueprint-tab-draggable-zone -mx-1"
+        <div class="blueprint-section-draggable-zone -mx-1"
             :class="{ 'flex flex-wrap flex-1': fields.length }"
+            :data-tab="tabId"
+            :data-section="sectionId"
         >
             <slot name="empty-state" v-if="!fields.length" />
 
@@ -13,7 +15,6 @@
                 :key="field._id"
                 :field="field"
                 :is-editing="editingField === field._id"
-                :is-tab-expanded="isTabExpanded"
                 :suggestable-condition-fields="suggestableConditionFields"
                 :can-define-localizable="canDefineLocalizable"
                 @edit="$emit('field-editing', field._id)"
@@ -23,7 +24,7 @@
             />
         </div>
 
-        <div class="blueprint-tab-field-actions flex mt-2 -mx-1">
+        <div class="blueprint-section-field-actions flex mt-2 -mx-1">
             <div class="px-1">
                 <link-fields
                     :exclude-fieldset="excludeFieldset"
@@ -86,9 +87,10 @@ export default {
     },
 
     props: {
+        tabId: String,
+        sectionId: String,
         fields: Array,
         editingField: {},
-        isTabExpanded: Boolean,
         suggestableConditionFields: Array,
         excludeFieldset: String,
     },

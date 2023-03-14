@@ -55,7 +55,7 @@ code.parent-url {
     }
 
     .has-error > .field-inner > label {
-        @apply text-red;
+        @apply text-red-500;
     }
 
     .field-inner {
@@ -98,8 +98,4 @@ code.parent-url {
     position: sticky;
     top: 0;
     z-index: 1000;
-}
-
-.publish-tab:not(:empty) {
-    @apply shadow bg-white rounded-md w-full;
 }

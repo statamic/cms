@@ -16,7 +16,7 @@
                 <label class="block">{{ __('Title') }}</label>
                 <small class="help-block">{{ __('messages.fieldsets_title_instructions') }}</small>
                 <div v-if="errors.title">
-                    <small class="help-block text-red" v-for="(error, i) in errors.title" :key="i" v-text="error" />
+                    <small class="help-block text-red-500" v-for="(error, i) in errors.title" :key="i" v-text="error" />
                 </div>
                 <input type="text" name="title" class="input-text" v-model="fieldset.title" autofocus="autofocus">
             </div>
@@ -32,7 +32,6 @@
                 :fields="fieldset.fields"
                 :editing-field="editingField"
                 :exclude-fieldset="fieldset.handle"
-                :is-tab-expanded="true"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-linked="fieldLinked"

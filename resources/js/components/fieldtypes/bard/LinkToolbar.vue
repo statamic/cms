@@ -1,33 +1,25 @@
 <template>
 
     <div class="bard-link-toolbar">
-
         <div>
-
             <!-- Link type select -->
             <div class="flex items-center px-4 py-2 border-b">
 
-                <label
-                    class="mr-3 flex items-center font-normal"
-                    v-for="type in visibleLinkTypes"
-                    :for="type.type"
-                    :key="type.type"
+                <button
+                    class="button-tab"
+                    v-for="visibleLinkType in visibleLinkTypes"
+                    :class="{active: visibleLinkType.type === linkType}"
+                    :for="visibleLinkType.type"
+                    :key="visibleLinkType.type"
+                    :id="visibleLinkType.type"
+                    @click="setLinkType(visibleLinkType.type)"
                 >
-                    <input
-                        class="mr-1 top-0"
-                        type="radio"
-                        name="link-type"
-                        :id="type.type"
-                        :checked="type.type === linkType"
-                        @click="setLinkType(type.type)"
-                    />
-                    {{ type.title }}
-                </label>
-
+                    {{ visibleLinkType.title }}
+                </button>
             </div>
 
             <div class="px-4 py-4 border-b">
-                <div class="h-8 mb-4 p-2 border rounded border-gray-500 flex items-center">
+                <div class="h-8 mb-4 p-2 border rounded border-gray-500 flex items-center hover:border-gray-600">
 
                     <!-- URL input -->
                     <input
@@ -37,12 +29,13 @@
                         ref="urlInput"
                         class="input h-auto text-sm"
                         placeholder="URL"
+                        @keydown.enter.prevent="commit"
                     />
 
                     <!-- Data input -->
                     <div
                         v-else
-                        class="w-full flex justify-between"
+                        class="w-full flex items-center justify-between cursor-pointer"
                         @click="openSelector"
                     >
 
@@ -58,11 +51,13 @@
                         </div>
 
                         <button
+                        class="flex items-center"
                             v-tooltip="`${__('Browse')}...`"
                             :aria-label="`${__('Browse')}...`"
                             @click="openSelector"
                         >
-                            <svg-icon :name="linkType === 'asset' ? 'folder-image' : 'folder-generic'" class="h-4 w-4" />
+                            <svg-icon v-show="linkType === 'asset'" name="folder-image" class="h-4 w-4" />
+                            <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="h-4 w-4" />
                         </button>
 
                     </div>
@@ -70,7 +65,7 @@
                 </div>
 
                 <!-- Title attribute -->
-                <div class="h-8 mb-4 p-2 border rounded border-gray-500 flex items-center" >
+                <div class="h-8 mb-4 p-2 border rounded border-gray-500 flex items-center hover:border-gray-600" >
                     <input
                         type="text"
                         ref="input"
@@ -80,15 +75,17 @@
                     />
                 </div>
 
-                <label for="target-blank" class="flex items-center font-normal">
+                <label for="target-blank" class="flex items-center font-normal cursor-pointer text-gray-800 hover:text-black">
                     <input class="checkbox mr-2" type="checkbox" v-model="targetBlank" id="target-blank">
                     {{ __('Open in new window') }}
                 </label>
             </div>
 
-            <div class="flex items-center justify-end space-x-1 font-normal px-4 py-3">
+            <footer class="bg-gray-100 rounded-b-md flex items-center justify-end space-x-3 font-normal p-2">
+                <button @click="$emit('canceled')" class="text-xs text-gray-600 hover:text-gray-800">
+                    {{ __('Cancel') }}
+                </button>
                 <button
-                    v-tooltip="__('Remove Link')"
                     :aria-label="__('Remove Link')"
                     @click="remove"
                     class="btn btn-sm"
@@ -102,9 +99,9 @@
                     @click="commit"
                     class="btn btn-sm"
                 >
-                    {{ __('OK') }}
+                    {{ __('Save') }}
                 </button>
-            </div>
+            </footer>
 
         </div>
 

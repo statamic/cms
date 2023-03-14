@@ -63,7 +63,7 @@
             <div ref="publishTabWrapper" class="publish-tab-wrapper w-full min-w-0">
                 <div
                     class="publish-tab tab-panel w-full"
-                    :class="showTabs && 'rounded-tl-none'"
+                    :class="showTabs"
                     :role="showTabs && 'tabpanel'"
                     :id="showTabs && tabPanelId(tab.handle)"
                     :aria-labelledby="showTabs && tabId(tab.handle)"
@@ -72,8 +72,8 @@
                     v-for="tab in mainTabs"
                     v-show="isActive(tab.handle)"
                 >
-                    <publish-fields
-                        :fields="tab.fields"
+                    <publish-sections
+                        :sections="tab.sections"
                         :read-only="readOnly"
                         :syncable="syncable"
                         :can-toggle-labels="canToggleLabels"
@@ -90,15 +90,15 @@
             <!-- Sidebar(ish) -->
             <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                 <div class="publish-tab">
-                    <div class="publish-tab-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
+                    <div class="publish-tab-actions card p-0 mb-5" :class="{ 'as-sidebar': shouldShowSidebar }">
                         <portal :to="actionsPortal" :disabled="shouldShowSidebar">
                             <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
                         </portal>
                     </div>
 
-                    <publish-fields
+                    <publish-sections
                         v-if="layoutReady && shouldShowSidebar && sidebarTab"
-                        :fields="sidebarTab.fields"
+                        :sections="sidebarTab.sections"
                         :read-only="readOnly"
                         :syncable="syncable"
                         :can-toggle-labels="canToggleLabels"
@@ -121,6 +121,8 @@
 </template>
 
 <script>
+import { uniq } from 'underscore';
+
 export default {
 
     inject: ['storeName'],
@@ -190,16 +192,21 @@ export default {
         },
 
         tabsWithErrors() {
-            const handles = Object.keys(this.errors).map((fieldHandle) => {
-                const topFieldHandle = fieldHandle.split('.')[0];
-                const tab = this.tabs.find(tab =>
-                    tab.fields.some(field => field.handle === topFieldHandle)
-                );
-
-                return tab && tab.handle
+            let fields = {};
+            Object.values(this.tabs).forEach(tab => {
+                tab.sections.forEach(section => {
+                    section.fields.forEach(field => {
+                        fields[field.handle] = tab.handle;
+                    });
+                });
             });
 
-            return _.uniq(handles);
+            let tabs = Object.keys(this.errors)
+                .map(handle => handle.split('.')[0])
+                .filter(handle => fields[handle])
+                .map(handle => fields[handle]);
+
+            return uniq(tabs);
         },
 
         actionsPortal() {

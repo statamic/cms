@@ -186,13 +186,13 @@ class Replicator extends Fieldtype
             return [$set['_id'] => (new Fields($config))->addValues($set)->meta()->put('_', '_')];
         })->toArray();
 
-        $defaults = collect($this->config('sets'))->map(function ($set) {
+        $defaults = collect($this->flattenedSetsConfig())->map(function ($set) {
             return (new Fields($set['fields']))->all()->map(function ($field) {
                 return $field->fieldtype()->preProcess($field->defaultValue());
             })->all();
         })->all();
 
-        $new = collect($this->config('sets'))->map(function ($set, $handle) use ($defaults) {
+        $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
             return (new Fields($set['fields']))->addValues($defaults[$handle])->meta()->put('_', '_');
         })->toArray();
 
@@ -209,6 +209,26 @@ class Replicator extends Fieldtype
             'collapsed' => [],
             'previews' => $previews,
         ];
+    }
+
+    protected function flattenedSetsConfig()
+    {
+        $sets = collect($this->config('sets'));
+
+        // If the first set has a "fields" key, it would be the legacy format.
+        // We'll put it in a "main" group so it's compatible with the new format.
+        // This also happens in the "sets" fieldtype.
+        if (Arr::has($sets->first(), 'fields')) {
+            $sets = collect([
+                'main' => [
+                    'sets' => $sets->all(),
+                ],
+            ]);
+        }
+
+        return $sets->flatMap(function ($section) {
+            return $section['sets'];
+        });
     }
 
     public function toGqlType()

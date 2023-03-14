@@ -36,7 +36,7 @@
             v-html="instructions" />
 
         <div v-if="hasError">
-            <small class="help-block text-red mt-2" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block text-red-500 mt-2" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
 
     </div>
