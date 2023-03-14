@@ -42,6 +42,10 @@ export default {
         constrainDimensions: {
             type: Boolean
         },
+        delay: {
+            type: Number,
+            default: 200
+        },
         disabled: {
             type: Boolean,
             default: false
@@ -54,7 +58,7 @@ export default {
             let options = Object.assign({}, {
                 draggable: `.${CSS.escape(this.itemClass)}`,
                 handle: `.${CSS.escape(this.handleClass)}`,
-                delay: 200,
+                delay: this.delay,
                 swapAnimation: { vertical: this.vertical, horizontal: !this.vertical },
                 plugins: [Plugins.SwapAnimation],
                 mirror: {

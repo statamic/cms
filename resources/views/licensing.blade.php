@@ -50,7 +50,7 @@
             <table class="data-table">
                 <tr>
                     <td class="w-64 font-bold">
-                        <span class="little-dot {{ $site->valid() ? 'bg-green' : 'bg-red' }} mr-2"></span>
+                        <span class="little-dot {{ $site->valid() ? 'bg-green-600' : 'bg-red-500' }} mr-2"></span>
                         {{ $site->key() ?? __('No license key') }}
                     </td>
                     <td class="relative">
@@ -59,7 +59,7 @@
                             <span class="text-2xs">({{ trans_choice('and :count more', $site->additionalDomainCount()) }})</span>
                         @endif
                     </td>
-                    <td class="text-right text-red">{{ $site->invalidReason() }}</td>
+                    <td class="text-right text-red-500">{{ $site->invalidReason() }}</td>
                 </tr>
             </table>
         </div>
@@ -69,11 +69,11 @@
             <table class="data-table">
                 <tr>
                     <td class="w-64 font-bold">
-                        <span class="little-dot {{ $statamic->valid() ? 'bg-green' : 'bg-red' }} mr-2"></span>
+                        <span class="little-dot {{ $statamic->valid() ? 'bg-green-600' : 'bg-red-500' }} mr-2"></span>
                         Statamic @if ($statamic->pro())<span class="text-pink">Pro</span>@else Free @endif
                     </td>
                     <td>{{ $statamic->version() }}</td>
-                    <td class="text-right text-red">{{ $statamic->invalidReason() }}</td>
+                    <td class="text-right text-red-500">{{ $statamic->invalidReason() }}</td>
                 </tr>
             </table>
         </div>
@@ -87,12 +87,12 @@
                 @foreach ($addons as $addon)
                     <tr>
                         <td class="w-64 mr-2">
-                            <span class="little-dot {{ $addon->valid() ? 'bg-green' : 'bg-red' }} mr-2"></span>
+                            <span class="little-dot {{ $addon->valid() ? 'bg-green-600' : 'bg-red-500' }} mr-2"></span>
                             <span class="font-bold"><a href="{{ $addon->addon()->marketplaceUrl() }}" class="text-gray hover:text-blue">{{ $addon->name() }}</a></span>
                             @if ($addon->edition())<span class="badge uppercase font-bold text-gray-600">{{ $addon->edition() ?? '' }}</span>@endif
                         </td>
                         <td>{{ $addon->version() }}</td>
-                        <td class="text-right text-red">{{ $addon->invalidReason() }}</td>
+                        <td class="text-right text-red-500">{{ $addon->invalidReason() }}</td>
                     </tr>
                 @endforeach
             </table>
@@ -106,7 +106,7 @@
                 @foreach ($unlistedAddons as $addon)
                     <tr>
                         <td class="w-64 font-bold mr-2">
-                            <span class="little-dot bg-green mr-2"></span>
+                            <span class="little-dot bg-green-600 mr-2"></span>
                             {{ $addon->name() }}
                         </td>
                         <td>{{ $addon->version() }}</td>

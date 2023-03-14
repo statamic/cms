@@ -5,7 +5,7 @@
      be within the context of a publish form to continue working
      once it has been portaled out. -->
 <div :class="{ 'publish-fields': fullScreenMode }">
-<div :class="{ wrapperClasses: fullScreenMode }">
+<div :class="fullScreenMode && wrapperClasses">
 
     <div
         class="bard-fieldtype-wrapper"
@@ -15,7 +15,7 @@
     >
 
         <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar">
-            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed">
+            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed" :class="{'justify-center': fullScreenMode}">
                 <component
                     v-for="button in visibleButtons(buttons)"
                     :key="button.name"

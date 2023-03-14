@@ -28,7 +28,7 @@
                 <h4 v-text="__('messages.addon_has_more_releases_beyond_license_heading')" />
                 <p v-text="__('messages.addon_has_more_releases_beyond_license_body')" />
             </div>
-            <button class="btn btn-sm" v-text="__('View additional releases')" />
+            <button class="btn btn-xs" v-text="__('View additional releases')" />
         </div>
 
         <template v-if="showingUnlicensedReleases">

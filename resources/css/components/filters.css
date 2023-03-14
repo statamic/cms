@@ -15,7 +15,7 @@
     }
 
     a.active:after {
-        @apply bg-red block;
+        @apply bg-red-500 block;
         content: "";
         width: 4px;
         height: 4px;

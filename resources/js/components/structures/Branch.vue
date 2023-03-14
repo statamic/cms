@@ -112,7 +112,7 @@ export default {
         getStatusClass() {
             switch (this.page.status) {
                 case 'published':
-                    return 'bg-green';
+                    return 'bg-green-600';
                 case 'draft':
                     return 'bg-gray-400';
                 default:

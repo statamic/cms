@@ -271,7 +271,7 @@ export default {
             if (entry.published && entry.private) {
                 return 'bg-transparent border border-gray-600';
             } else if (entry.published) {
-                return 'bg-green';
+                return 'bg-green-600';
             } else {
                 return 'bg-gray-400';
             }
