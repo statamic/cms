@@ -3,7 +3,6 @@
 namespace Statamic\Updater;
 
 use Statamic\Statamic;
-use Statamic\Support\Str;
 
 class CoreChangelog extends Changelog
 {
