@@ -2,9 +2,11 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\AllowedFiltersConfig;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
+use Statamic\GraphQL\Middleware\AllowedFilters;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\GraphQL\Types\UserType;
@@ -22,6 +24,7 @@ class UsersQuery extends Query
 
     protected $middleware = [
         ResolvePage::class,
+        AllowedFilters::class,
     ];
 
     public function type(): Type
@@ -88,5 +91,10 @@ class UsersQuery extends Query
 
             $query->orderBy($sort, $order);
         }
+    }
+
+    public function allowedFilters($args)
+    {
+        return AllowedFiltersConfig::allowedForUsers('graphql');
     }
 }
