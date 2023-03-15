@@ -25,16 +25,6 @@
     z-index: 1;
 }
 
-.live-preview .publish-tabs {
-    @apply bg-gray-300 ml-0 pl-0;
-    .tab-button {
-        border-radius: 0;
-        height: 100%;
-        min-width: 100px;
-        border: none;
-    }
-}
-
 .live-preview .tabs-container {
     @apply bg-gray-300;
 }
