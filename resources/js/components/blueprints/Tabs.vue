@@ -4,18 +4,21 @@
             <div ref="tabs" class="tabs flex-1
             flex space-x-3 overflow-auto" role="tablist">
                 <tab
+                    ref="tab"
                     v-for="tab in tabs"
                     :key="tab._id"
                     :tab="tab"
                     :current-tab="currentTab"
+                    :show-instructions="showTabInstructionsField"
                     @selected="selectTab(tab._id)"
                     @removed="removeTab(tab._id)"
+                    @updated="updateTab(tab._id, $event)"
                     @mouseenter="mouseEnteredTab(tab._id)"
                 />
                 <div class="fade-left" v-if="canScrollLeft" />
                 <div class="fade-right" :class="{ 'mr-8': showHiddenTabsDropdown }" v-if="canScrollRight" />
             </div>
-            <button v-if="!singleTab" class="tab-button" @click="addTab" v-text="addTabText" />
+            <button v-if="!singleTab" class="tab-button" @click="addAndEditTab" v-text="addTabText" />
         </div>
         <tab-content
             v-for="tab in tabs"
@@ -23,7 +26,6 @@
             :key="tab._id"
             :tab="tab"
             v-show="currentTab === tab._id"
-            :show-instructions="showTabInstructionsField"
             :show-section-handle-field="showSectionHandleField"
             :new-section-text="newSectionText"
             :add-section-text="addSectionText"
@@ -262,6 +264,11 @@ export default {
             this.selectTab(id);
 
             this.$nextTick(() => this.$refs.tabContent.find(vm => vm.tab._id === id).addSection());
+        },
+
+        addAndEditTab() {
+            this.addTab();
+            this.$nextTick(() => this.$refs.tab.find(vm => vm.tab._id === this.currentTab).edit());
         },
 
         removeTab(tabId) {
