@@ -4,9 +4,9 @@
     <div>
 
         <!-- Tabs -->
-        <div v-if="showTabs" class="flex items-center mb-6">
+        <div v-if="showTabs" class="tabs-container flex items-center mb-6">
             <div
-                class="tabs-container"
+                class="publish-tabs tabs"
                 :class="{ 'tabs-scrolled': canScrollLeft }"
                 ref="tabs"
                 role="tablist"
@@ -37,9 +37,9 @@
                     v-text="tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`"
                 />
             </div>
-
             <div class="fade-left" v-if="canScrollLeft" />
             <div class="fade-right" :class="{ 'mr-8': showHiddenTabsDropdown }" v-if="canScrollRight" />
+
 
             <dropdown-list class="ml-2" v-cloak v-if="showHiddenTabsDropdown">
                 <dropdown-item

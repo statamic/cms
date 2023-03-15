@@ -23,7 +23,7 @@
 }
 
 .tabs {
-    @apply flex space-x-3 overflow-auto relative;
+    @apply flex space-x-2 overflow-hidden relative w-full max-w-full;
 }
 
 
