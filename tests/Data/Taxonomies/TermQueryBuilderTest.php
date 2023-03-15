@@ -575,13 +575,13 @@ class TermQueryBuilderTest extends TestCase
         Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
         Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
         Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
-        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4', 'taxonomy-5']])->save();
         Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
 
-        $entries = Term::query()->whereJsonLength('test_taxonomy', 1)->get();
+        $entries = Term::query()->whereJsonLength('test_taxonomy', 1)->orWhereJsonLength('test_taxonomy', 3)->get();
 
-        $this->assertCount(2, $entries);
-        $this->assertEquals(['2', '5'], $entries->map->slug()->all());
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['2', '5', '4'], $entries->map->slug()->all());
     }
 
     /** @test */

@@ -14,6 +14,7 @@ use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Tiptap\Core\Node;
 
 class BardTest extends TestCase
 {
@@ -127,6 +128,111 @@ class BardTest extends TestCase
     public function it_doesnt_augment_when_saved_as_html()
     {
         $this->assertEquals('<p>Paragraph</p>', $this->bard()->augment('<p>Paragraph</p>'));
+    }
+
+    /** @test */
+    public function it_augments_tiptap_v1_snake_case_types_to_v2_camel_case_types()
+    {
+        Augmentor::addExtension('customNode', new class extends Node
+        {
+            public static $name = 'customNode';
+
+            public function renderHTML($node, $HTMLAttributes = [])
+            {
+                return [
+                    'div',
+                    ['type' => $node->attrs->type],
+                    0,
+                ];
+            }
+        });
+
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    [
+                        'type' => 'text',
+                        'text' => 'This is ',
+                    ],
+                    [
+                        'type' => 'text',
+                        'marks' => [
+                            ['type' => 'bold'],
+                        ],
+                        'text' => 'bold',
+                    ],
+                    [
+                        'type' => 'text',
+                        'text' => ' text.',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'custom_node',
+                'attrs' => [
+                    'type' => 'custom_type_attribute', // shouldn't be camel cased
+                ],
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => '123',
+                    'values' => [
+                        'type' => 'my_set',
+                        'text' => 'test',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'bullet_list',
+                'content' => [
+                    [
+                        'type' => 'list_item',
+                        'content' => [
+                            [
+                                'type' => 'paragraph',
+                                'content' => [
+                                    [
+                                        'type' => 'text',
+                                        'text' => 'This is a list item.',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $expected = [
+            [
+                'type' => 'text',
+                'text' => '<p>This is <strong>bold</strong> text.</p><div type="custom_type_attribute"></div>',
+            ],
+            [
+                'id' => '123',
+                'type' => 'my_set',
+                'text' => 'test',
+            ],
+            [
+                'type' => 'text',
+                'text' => '<ul><li><p>This is a list item.</p></li></ul>',
+            ],
+        ];
+
+        $augmented = $this->bard([
+            'sets' => [
+                'my_set' => [
+                    'fields' => [
+                        ['handle' => 'text', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ])->augment($data);
+
+        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
+        $this->assertEquals($expected, collect($augmented)->toArray());
     }
 
     /** @test */
@@ -704,6 +810,130 @@ EOT;
         $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is block text."}]}]';
 
         $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
+    }
+
+    /** @test */
+    public function it_converts_tiptap_v1_snake_case_types_to_v2_camel_case_types()
+    {
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    [
+                        'type' => 'text',
+                        'text' => 'This is ',
+                    ],
+                    [
+                        'type' => 'text',
+                        'marks' => [
+                            ['type' => 'bold'],
+                        ],
+                        'text' => 'bold',
+                    ],
+                    [
+                        'type' => 'text',
+                        'text' => ' text.',
+                    ],
+                ],
+            ],
+
+            [
+                'type' => 'custom_node',
+                'attrs' => [
+                    'type' => 'custom_type_attribute', // shouldn't be camel cased
+                ],
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => '123',
+                    'values' => [
+                        'type' => 'my_set',
+                        'text' => 'test',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'bullet_list',
+                'content' => [
+                    [
+                        'type' => 'list_item',
+                        'content' => [
+                            [
+                                'type' => 'paragraph',
+                                'content' => [
+                                    [
+                                        'type' => 'text',
+                                        'text' => 'This is a list item.',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $expected = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    [
+                        'type' => 'text',
+                        'text' => 'This is ',
+                    ],
+                    [
+                        'type' => 'text',
+                        'marks' => [
+                            ['type' => 'bold'],
+                        ],
+                        'text' => 'bold',
+                    ],
+                    [
+                        'type' => 'text',
+                        'text' => ' text.',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'customNode',
+                'attrs' => [
+                    'type' => 'custom_type_attribute',
+                ],
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => '123',
+                    'values' => [
+                        'type' => 'my_set',
+                        'text' => 'test',
+                    ],
+                    'enabled' => true,
+                ],
+            ],
+            [
+                'type' => 'bulletList',
+                'content' => [
+                    [
+                        'type' => 'listItem',
+                        'content' => [
+                            [
+                                'type' => 'paragraph',
+                                'content' => [
+                                    [
+                                        'type' => 'text',
+                                        'text' => 'This is a list item.',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, json_decode($this->bard()->preProcess($data), true));
     }
 
     private function bard($config = [])

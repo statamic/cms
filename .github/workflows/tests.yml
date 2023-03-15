@@ -35,6 +35,13 @@ jobs:
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
+      - name: Update apt sources
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo gem install apt-spy2
+          sudo apt-spy2 fix --commit --launchpad --country=US
+          sudo apt-get update
+
       - name: Install French Locale
         run: sudo apt-get install language-pack-fr
         if: matrix.os == 'ubuntu-latest'

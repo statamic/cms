@@ -162,8 +162,8 @@ class AntlersNodeParser
 
             if ($hasFoundName == false) {
                 if ($isParsingString == false && (
-                        $this->cur == DocumentParser::String_Terminator_DoubleQuote ||
-                        $this->cur == DocumentParser::String_Terminator_SingleQuote)) {
+                    $this->cur == DocumentParser::String_Terminator_DoubleQuote ||
+                    $this->cur == DocumentParser::String_Terminator_SingleQuote)) {
                     $terminator = $this->cur;
                     $isParsingString = true;
                     $nameContent[] = $this->cur;
@@ -224,12 +224,7 @@ class AntlersNodeParser
 
         try {
             if ($parseName) {
-                $node->originalPathReferenceContent = $name;
                 $node->pathReference = $this->pathParser->parse($name);
-
-                if (! empty($node->interpolationRegions)) {
-                    $node->pathReferenceContainsDynamicVariables = Str::contains($name, array_keys($node->interpolationRegions));
-                }
 
                 if ($node->pathReference->isStrictTagReference) {
                     // Remove the leading # symbol to not frustrate everyone with "tag not found" errors.
@@ -540,9 +535,9 @@ class AntlersNodeParser
             }
 
             if ($hasFoundName && (
-                    ($terminator != null && $current == $terminator) ||
-                    ($terminator == null && ctype_space($current))
-                )) {
+                ($terminator != null && $current == $terminator) ||
+                ($terminator == null && ctype_space($current))
+            )) {
                 $content = implode($currentChars);
                 $hasFoundName = false;
                 $terminator = null;

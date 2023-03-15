@@ -1,5 +1,110 @@
 # Release Notes
 
+## 3.4.5 (2023-02-28)
+
+### What's new
+- Add console import for file based users to database. [#6729](https://github.com/statamic/cms/issues/6729) by @ryanmitchell
+
+### What's improved
+- Dutch translations. [#7553](https://github.com/statamic/cms/issues/7553) by @oakeddev
+- Display actual time in past revision history. [#7544](https://github.com/statamic/cms/issues/7544) by @jacksleight
+- Use `@tiptap/pm` package, and export state. [#7574](https://github.com/statamic/cms/issues/7574) by @jacksleight
+
+### What's fixed
+- Fix Antlers tag parameters not understanding arrays with single values. [#7563](https://github.com/statamic/cms/issues/7563) by @JohnathonKoster
+- Fix Antlers new array key variable assignment. [#7594](https://github.com/statamic/cms/issues/7594) by @JohnathonKoster
+- Fix Antlers value changes being lost after calling tags. [#7596](https://github.com/statamic/cms/issues/7596) by @JohnathonKoster
+- Fix active nav item check on CP urls with an hash fragments. [#7616](https://github.com/statamic/cms/issues/7616) by @jesseleite
+- Fix save issue when slug starts with extension. [#7590](https://github.com/statamic/cms/issues/7590) by @jasonvarga
+- Fix read only dynamic mode array fieldtype. [#7577](https://github.com/statamic/cms/issues/7577) by @jacksleight
+- Fix CP Nav preferences builder when top level section is empty. [#7551](https://github.com/statamic/cms/issues/7551) by @jesseleite
+- Refactor randomness out of test. [#7584](https://github.com/statamic/cms/issues/7584) by @jasonvarga
+
+
+
+## 3.4.4 (2023-02-15)
+
+### What's new
+- Added a `vite:asset` tag. [#7477](https://github.com/statamic/cms/issues/7477) by @mwagena
+
+### What's improved
+- French translations [#7503](https://github.com/statamic/cms/issues/7503) by @ebeauchamps
+
+### What's fixed
+- Fix pagination in the `taxonomy` tag. [#7531](https://github.com/statamic/cms/issues/7531) by @ryanmitchell
+- Updated Tiptap in order to fix tables, code blocks, etc. [#7514](https://github.com/statamic/cms/issues/7514) by @jasonvarga
+- Fix issue where you couldn't select text in nested Bard fields in Firefox. [#7525](https://github.com/statamic/cms/issues/7525) by @o1y
+- Fix inability to position cursor after a link in Bard. [#7528](https://github.com/statamic/cms/issues/7528) by @o1y
+- Fix missing dropcursor in Bard. [#7518](https://github.com/statamic/cms/issues/7518) by @o1y
+- Fix Bard set popover flicker. [#7535](https://github.com/statamic/cms/issues/7535) by @o1y
+- Fix issue where pasting links into Bard would strip out attributes. [#7517](https://github.com/statamic/cms/issues/7517) by @o1y
+- Fix typo in preference start page instructions. [#7538](https://github.com/statamic/cms/issues/7538) by @ryanmitchell
+- Fix docs URL on Updater page. [#7539](https://github.com/statamic/cms/issues/7539) by @joshuablum
+- Prevent deprecation warnings in translate commands. [#7537](https://github.com/statamic/cms/issues/7537) by @ryanmitchell
+- Fix issue where you couldn't position the cursor between Bard sets. [#7516](https://github.com/statamic/cms/issues/7516) by @o1y
+- Fix augmentation issue in Antlers when using the scope parameter. [#7436](https://github.com/statamic/cms/issues/7436) by @JohnathonKoster
+
+
+
+## 3.4.3 (2023-02-08)
+
+### What's new
+- Contextual keyword snippets for `local` search driver. [#7144](https://github.com/statamic/cms/issues/7144) by @jacksleight
+- Support adding computed values to multiple collections at once. [#7165](https://github.com/statamic/cms/issues/7165) by @jacksleight
+- Custom Bard button active and visible callbacks. [#7479](https://github.com/statamic/cms/issues/7479) by @jacksleight
+
+### What's improved
+- Antlers logs will include the file and line numbers. [#7438](https://github.com/statamic/cms/issues/7438) by @JohnathonKoster
+- Add view and visit url options to collection listing dropdowns. [#7469](https://github.com/statamic/cms/issues/7469) by @arthurperton
+- Cache result of schema call to avoid duplication. [#7466](https://github.com/statamic/cms/issues/7466) by @ryanmitchell
+- Norwegian translations. [#7472](https://github.com/statamic/cms/issues/7472) by @espenlg
+- French translations. [#7463](https://github.com/statamic/cms/issues/7463) by @ebeauchamps
+
+### What's fixed
+- Fix `nocache` tag when using URLs with multiple query parameters. [#7486](https://github.com/statamic/cms/issues/7486) by @arthurperton
+- Fix `nocache` tag behavior when using the `ignore_query_string` setting. [#7488](https://github.com/statamic/cms/issues/7488) by @arthurperton
+- Fix `orWhereJsonLength()` method in the query builders. [#7462](https://github.com/statamic/cms/issues/7462) by @arthurperton
+- Fix bard toolbar button active states. [#7470](https://github.com/statamic/cms/issues/7470) by @jacksleight
+- Fix queue worker state issues around assets and stache indexes. [#7467](https://github.com/statamic/cms/issues/7467) by @jesseleite
+- Fix underline in Bard not outputting any HTML tags. [#7494](https://github.com/statamic/cms/issues/7494) by @mauricewijnia
+- Fix Bard and Replicator dropdown positioning when in secondary sections. [#7478](https://github.com/statamic/cms/issues/7478) by @arthurperton
+- Fix a few search issues. [#7481](https://github.com/statamic/cms/issues/7481) by @jasonvarga
+- Fix warning when a search index is empty. [#7492](https://github.com/statamic/cms/issues/7492) by @simonworkhouse
+- Workaround for GitHub Actions network issue. [#7482](https://github.com/statamic/cms/issues/7482) by @jasonvarga
+
+
+
+## 3.4.2 (2023-02-02)
+
+### What's improved
+- Move `always_save` field setting toggle to conditions tab. [#7417](https://github.com/statamic/cms/issues/7417) by @jesseleite
+- Add toggle for `sometimes` rule in validation builder [#7416](https://github.com/statamic/cms/issues/7416) by @jesseleite
+- Auto-focus search input when opening selectors in Bard link or standalone link fieldtype. [#7425](https://github.com/statamic/cms/issues/7425) by @duncanmcclean
+- French translations. [#7453](https://github.com/statamic/cms/issues/7453) by @ebeauchamps
+- Dutch translations. [#7442](https://github.com/statamic/cms/issues/7442) by @stephanbouman
+
+### What's fixed
+- Fix GraphQL nested fields. [#7431](https://github.com/statamic/cms/issues/7431) by @jasonvarga
+- Fix custom Bard extension type attributes. [#7450](https://github.com/statamic/cms/issues/7450) by @jacksleight
+- Fix mismatched search results. [#7445](https://github.com/statamic/cms/issues/7445) by @jasonvarga
+- Fix create entry form not redirecting on save. [#7444](https://github.com/statamic/cms/issues/7444) by @jasonvarga
+
+
+
+## 3.4.1 (2023-01-30)
+
+### What's improved
+- Dutch translations. [#7418](https://github.com/statamic/cms/issues/7418) by @oakeddev
+- German translations. [#7422](https://github.com/statamic/cms/issues/7422) by @helloDanuk
+
+### What's fixed
+- Fix Bard backwards compatibility. [#7433](https://github.com/statamic/cms/issues/7433) by @jasonvarga
+- Fix preferences listing errors when using Eloquent users. [#7430](https://github.com/statamic/cms/issues/7430) by @jesseleite
+- Prevent Vite error when missing alias in app config file. [#7429](https://github.com/statamic/cms/issues/7429) by @jacksleight
+- Revert "Easier Dynamic Antlers Tags and Variables (#7164)" [#7435](https://github.com/statamic/cms/issues/7435) by @jasonvarga
+
+
+
 ## 3.4.0 (2023-01-27)
 
 ### What's new
@@ -30,11 +135,25 @@
 
 
 
+## 3.3.68 (2023-02-02)
+
+### What's fixed
+- Fix create entry form not redirecting on save. [#7443](https://github.com/statamic/cms/issues/7443) by @jasonvarga
+
+
+
+## 3.3.67 (2023-01-30)
+
+### What's fixed
+- Reverted "Dynamic Antlers Tags and Variables" [#7420](https://github.com/statamic/cms/issues/7420) by @edalzell
+
+
+
 ## 3.3.66 (2023-01-26)
 
 ### What's new
 - Support Vite assets in the Control Panel. [#6869](https://github.com/statamic/cms/issues/6869) by @jacksleight
-- Dynamic Antlers Tags and Variables. [#7164](https://github.com/statamic/cms/issues/7164) by @JohnathonKoster
+- ~~Dynamic Antlers Tags and Variables.~~ Reverted in 3.3.67/3.4.1 [#7164](https://github.com/statamic/cms/issues/7164) by @JohnathonKoster
 - SVG tag allows adding `title` and `desc` elements. [#7348](https://github.com/statamic/cms/issues/7348) by @jackmcdade
 
 ### What's improved

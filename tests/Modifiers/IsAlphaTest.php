@@ -21,6 +21,7 @@ class IsAlphaTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider strings
      */
     public function it_returns_true_if_the_string_contains_only_alphabetical_chars($expected, $input): void

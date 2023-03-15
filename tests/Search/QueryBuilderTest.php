@@ -50,16 +50,19 @@ class QueryBuilderTest extends TestCase
         $resultA->shouldReceive('setRawResult')->with(['reference' => 'entry::a', 'search_score' => 2])->once()->andReturnSelf();
         $resultA->shouldReceive('setScore')->with(2)->once()->andReturnSelf();
         $resultA->shouldReceive('getScore')->andReturn(2)->once();
+        $resultA->shouldReceive('getReference')->andReturn('entry::a')->once();
         $resultB = Mockery::mock(SearchResult::class);
         $resultB->shouldReceive('setIndex')->once()->andReturnSelf();
         $resultB->shouldReceive('setRawResult')->with(['reference' => 'user::b', 'search_score' => 1])->once()->andReturnSelf();
         $resultB->shouldReceive('setScore')->with(1)->once()->andReturnSelf();
         $resultB->shouldReceive('getScore')->andReturn(1)->once();
+        $resultB->shouldReceive('getReference')->andReturn('user::b')->once();
         $resultC = Mockery::mock(SearchResult::class);
         $resultC->shouldReceive('setIndex')->once()->andReturnSelf();
         $resultC->shouldReceive('setRawResult')->with(['reference' => 'entry::c', 'search_score' => 3])->once()->andReturnSelf();
         $resultC->shouldReceive('setScore')->with(3)->once()->andReturnSelf();
         $resultC->shouldReceive('getScore')->andReturn(3)->once();
+        $resultC->shouldReceive('getReference')->andReturn('entry::c')->once();
 
         $a = Mockery::mock(Searchable::class);
         $a->shouldReceive('toSearchResult')->andReturn($resultA);
@@ -69,7 +72,7 @@ class QueryBuilderTest extends TestCase
         $c->shouldReceive('toSearchResult')->andReturn($resultC);
 
         $foo = Mockery::mock(ProvidesSearchables::class);
-        $foo->shouldReceive('find')->with(['a', 'c'])->andReturn(collect([$a, $c]));
+        $foo->shouldReceive('find')->with(['a', 'c'])->andReturn(collect([$c, $a])); // return it in the wrong order to make sure it gets ordered by score
         $this->app->instance(\Statamic\Search\Searchables\Entries::class, $foo);
 
         $bar = Mockery::mock(ProvidesSearchables::class);
@@ -435,14 +438,14 @@ class QueryBuilderTest extends TestCase
             ['reference' => 'a', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']],
             ['reference' => 'b', 'test_taxonomy' => ['taxonomy-3']],
             ['reference' => 'c', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']],
-            ['reference' => 'd', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']],
+            ['reference' => 'd', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4', 'taxonomy-5']],
             ['reference' => 'e', 'test_taxonomy' => ['taxonomy-5']],
         ]);
 
-        $results = (new FakeQueryBuilder($items))->withoutData()->whereJsonLength('test_taxonomy', 1)->get();
+        $results = (new FakeQueryBuilder($items))->withoutData()->whereJsonLength('test_taxonomy', 1)->orWhereJsonLength('test_taxonomy', 3)->get();
 
-        $this->assertCount(2, $results);
-        $this->assertEquals(['b', 'e'], $results->map->reference->all());
+        $this->assertCount(3, $results);
+        $this->assertEquals(['b', 'e', 'd'], $results->map->reference->all());
     }
 
     /** @test **/

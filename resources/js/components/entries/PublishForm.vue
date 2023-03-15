@@ -101,17 +101,17 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-2 flex items-center -mx-1">
+                                    <div class="p-2 flex items-center -mx-1" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
                                             class="flex items-center justify-center btn-flat w-full mx-1 px-1"
-                                            v-if="isBase && livePreviewUrl"
+                                            v-if="showLivePreviewButton"
                                             @click="openLivePreview">
                                             <svg-icon name="synchronize" class="w-5 h-5 mr-1" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
                                             class="flex items-center justify-center btn-flat w-full mx-1 px-1"
-                                            v-if="permalink"
+                                            v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">
                                             <svg-icon name="external-link" class="w-4 h-4 mr-1" />
@@ -120,12 +120,20 @@
                                     </div>
                                 </div>
 
-                                <div class="flex items-center border-t justify-between px-2 py-1" v-if="!revisionsEnabled">
+                                <div
+                                    v-if="!revisionsEnabled"
+                                    class="flex items-center justify-between px-2 py-1"
+                                    :class="{ 'border-t': showLivePreviewButton || showVisitUrlButton }"
+                                >
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
                                     <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
                                 </div>
 
-                                <div class="border-t p-2" v-if="revisionsEnabled && !isCreating">
+                                <div
+                                    v-if="revisionsEnabled && !isCreating"
+                                    class="p-2"
+                                    :class="{ 'border-t': showLivePreviewButton || showVisitUrlButton }"
+                                >
                                     <label class="publish-field-label font-medium mb-1" v-text="__('Revisions')"/>
                                     <div class="mb-sm flex items-center" v-if="published">
                                         <span class="text-green w-6 text-center">&check;</span>
@@ -410,6 +418,14 @@ export default {
             return _.findWhere(this.localizations, { active: true }).livePreviewUrl;
         },
 
+        showLivePreviewButton() {
+            return !this.isCreating && this.isBase && this.livePreviewUrl;
+        },
+
+        showVisitUrlButton() {
+            return !!this.permalink;
+        },
+
         isBase() {
             return this.publishContainer === 'base';
         },
@@ -569,7 +585,7 @@ export default {
 
                     this.quickSave = false;
                     this.isAutosave = false;
-                }).catch(e => {});
+                }).catch(e => console.error(e));
         },
 
         confirmPublish() {

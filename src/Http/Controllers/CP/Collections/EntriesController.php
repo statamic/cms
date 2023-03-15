@@ -49,6 +49,10 @@ class EntriesController extends CpController
 
         $entries = $query->paginate(request('perPage'));
 
+        if (request('search') && $collection->hasSearchIndex()) {
+            $entries->setCollection($entries->getCollection()->map->getSearchable());
+        }
+
         return (new Entries($entries))
             ->blueprint($collection->entryBlueprint())
             ->columnPreferenceKey("collections.{$collection->handle()}.columns")

@@ -59,7 +59,7 @@
                     </div>
                 </td>
                 <td class="text-right text-2xs text-grey-50">
-                    @if (!empty(auth()->user()->preferences()))
+                    @if (!empty(Statamic\Facades\User::current()->preferences()))
                         {{ __('Modified') }}
                     @endif
                 </td>

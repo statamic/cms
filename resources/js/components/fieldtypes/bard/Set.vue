@@ -211,6 +211,12 @@ export default {
             return `${prefix}.${this.index}.attrs.values.${field.handle}`;
         },
 
+    },
+
+    updated() {
+        // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
+        // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
+        this.$el.setAttribute('draggable', false);
     }
 }
 </script>

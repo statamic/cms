@@ -25,6 +25,7 @@ class CustomMiddlewareTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup addCustomMiddlewareWithMethod
      **/
     public function a_custom_middleware_can_be_added_to_the_default_schema()
@@ -41,6 +42,7 @@ class CustomMiddlewareTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup addCustomMiddlewareThroughConfig
      **/
     public function a_custom_middleware_can_be_added_to_the_default_schema_through_config()

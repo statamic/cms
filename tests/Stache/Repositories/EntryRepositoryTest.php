@@ -155,6 +155,7 @@ class EntryRepositoryTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider entryByUriProvider
      */
     public function it_gets_entry_by_uri($uri, $expectedTitle)

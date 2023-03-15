@@ -44,6 +44,7 @@ class BardServiceProvider extends ServiceProvider
             'tableRow' => new \Tiptap\Nodes\TableRow(),
             'text' => new \Tiptap\Nodes\Text(),
             'textAlign' => new \Tiptap\Extensions\TextAlign(['types' => ['heading', 'paragraph']]),
+            'underline' => new \Tiptap\Marks\Underline(),
         ]);
     }
 }

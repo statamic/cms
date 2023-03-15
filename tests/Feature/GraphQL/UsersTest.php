@@ -29,6 +29,7 @@ class UsersTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup disableQueries
      **/
     public function query_only_works_if_enabled()
@@ -259,6 +260,7 @@ GQL;
 
     /**
      * @test
+     *
      * @dataProvider userPasswordFilterProvider
      */
     public function it_doesnt_allow_filtering_users_by_password($filter)

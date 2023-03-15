@@ -143,14 +143,6 @@ class FieldsController extends CpController
                 'type' => 'select',
                 'width' => 33,
             ],
-            'always_save' => [
-                'display' => __('Always Save'),
-                'instructions' => __('statamic::messages.fields_always_save_instructions'),
-                'type' => 'toggle',
-                'validate' => 'boolean',
-                'default' => false,
-                'width' => 50,
-            ],
             'duplicate' => [
                 'display' => __('Duplicate'),
                 'instructions' => __('statamic::messages.fields_duplicate_instructions'),
