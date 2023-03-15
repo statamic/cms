@@ -48,12 +48,13 @@
             v-slot="{ close: closeModal }"
             :pivot-y="0.5"
             :overflow="false"
-            width="50%"
+            width="25%"
             @closed="modalOpen = false"
         >
             <div class="p-6 relative">
-                #TODO
-                <pre v-text="package"></pre>
+                To update to the lastest version please run:
+                <code class="inline-block my-2">composer update <span v-text="package" /></code>
+                Learn more about <a href="https://statamic.dev/updating">Updating</a>
                 <button
                     class="btn-close absolute top-0 right-0 mt-4 mr-4"
                     :aria-label="__('Close')"

@@ -248,8 +248,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::get('addons', [AddonsController::class, 'index'])->name('addons.index');
-    Route::post('addons/install', [AddonsController::class, 'install']);
-    Route::post('addons/uninstall', [AddonsController::class, 'uninstall']);
     Route::post('addons/editions', AddonEditionsController::class);
 
     Route::post('forms/actions', [ActionController::class, 'run'])->name('forms.actions.run');
