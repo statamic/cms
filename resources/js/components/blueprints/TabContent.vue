@@ -1,8 +1,8 @@
 <template>
     <div
         role="tabpanel"
-        :aria-labelledby="tabPanelId"
-        :id="tabPanelId">
+        :aria-labelledby="`tab-${tab._id}`"
+        :id="`tab-panel-${tab._id}`">
         <input type="text"
             :value="tab.display"
             @input="fieldUpdated('display', $event.target.value)"
@@ -61,21 +61,6 @@ export default {
         return {
             handleSyncedWithDisplay: false,
         }
-    },
-
-    computed: {
-        tabId() {
-            return `${this.pascalCase(this.tab.handle)}Tab`;
-        },
-        tabPanelId() {
-            return `${this.pascalCase(this.tab.handle)}TabPanel`;
-        },
-        pascalCase(handle) {
-            return handle
-                .split('_')
-                .map(word => word.slice(0, 1).toUpperCase() + word.slice(1))
-                .join('');
-        },
     },
 
     created() {

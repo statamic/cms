@@ -4,9 +4,9 @@
         class="tab-button"
         role="tab"
         :class="{ 'active': isActive }"
-        :aria-controls="`tab-section-${tab._id}`"
+        :aria-controls="`tab-panel-${tab._id}`"
         :aria-selected="isActive"
-        :id="tabId"
+        :id="`tab-${tab._id}`"
         :tabindex="isActive ? 0 : -1"
         @click="$emit('selected')"
         @mouseenter="$emit('mouseenter')"
@@ -35,15 +35,6 @@ export default {
     computed: {
         isActive() {
             return this.currentTab === this.tab._id;
-        },
-        tabId() {
-            return `${this.pascalCase(this.tab.handle)}Tab`;
-        },
-        pascalCase(handle) {
-            return handle
-                .split('_')
-                .map(word => word.slice(0, 1).toUpperCase() + word.slice(1))
-                .join('');
         },
     }
 
