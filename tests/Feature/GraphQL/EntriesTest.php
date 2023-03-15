@@ -254,7 +254,155 @@ GQL;
 
         $query = <<<'GQL'
 {
-    entries(filter: {
+    entries(collection: "blog", filter: {
+        title: {
+            contains: "rad",
+            ends_with: "!"
+        }
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                ]],
+                'data' => [
+                    'entries' => null,
+                ],
+            ]);
+    }
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     * @environment-setup allowTitleFilterOnAllCollections
+     */
+    public function it_can_configure_allowed_filters_on_all_collections_at_once()
+    {
+        $this->createEntries();
+
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->create();
+
+        EntryFactory::collection('blog')
+            ->id('7')
+            ->slug('as-cool-as-radcliffe')
+            ->data(['title' => 'I wish I was as cool as Daniel Radcliffe!'])
+            ->create();
+
+        EntryFactory::collection('blog')
+            ->id('8')
+            ->slug('i-hate-radishes')
+            ->data(['title' => 'I hate radishes.'])
+            ->create();
+
+        $query = <<<'GQL'
+{
+    entries(collection: "blog", filter: {
+        title: {
+            contains: "cool",
+        }
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                [
+                    'id' => '7',
+                    'title' => 'I wish I was as cool as Daniel Radcliffe!',
+                ],
+            ]]]]);
+    }
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     * @environment-setup allowStatusFilterOnBlogCollection
+     */
+    public function it_can_configure_allowed_filters_on_a_specific_collection()
+    {
+        $this->createEntries();
+
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->create();
+
+        EntryFactory::collection('blog')
+            ->id('7')
+            ->slug('as-cool-as-radcliffe')
+            ->data(['title' => 'I wish I was as cool as Daniel Radcliffe!'])
+            ->published(false)
+            ->create();
+
+        EntryFactory::collection('blog')
+            ->id('8')
+            ->slug('i-hate-radishes')
+            ->data(['title' => 'I hate radishes.'])
+            ->create();
+
+        $query = <<<'GQL'
+{
+    entries(collection: "blog", filter: {
+        status: {
+            is: "draft"
+        }
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                [
+                    'id' => '7',
+                    'title' => 'I wish I was as cool as Daniel Radcliffe!',
+                ],
+            ]]]]);
+    }
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     * @environment-setup allowTitleFilterOnAllCollections
+     * @environment-setup disableFiltersOnBlogCollection
+     */
+    public function it_can_disable_filtering_on_a_specific_collection()
+    {
+        $this->createEntries();
+
+        $query = <<<'GQL'
+{
+    entries(collection: "blog", filter: {
         title: {
             contains: "rad",
             ends_with: "!"
@@ -286,7 +434,7 @@ GQL;
      * @environment-setup disableQueries
      * @environment-setup allowFiltersOnAllCollections
      */
-    public function it_filters_entries()
+    public function it_filters_entries_with_multiple_conditions()
     {
         $this->createEntries();
 
@@ -345,40 +493,6 @@ GQL;
      * @environment-setup disableQueries
      * @environment-setup allowFiltersOnAllCollections
      */
-    public function it_filters_entries_with_equalto_shorthand()
-    {
-        $this->createEntries();
-
-        $query = <<<'GQL'
-{
-    entries(filter: {
-        title: "Hamburger"
-    }) {
-        data {
-            id
-            title
-        }
-    }
-}
-GQL;
-
-        $this
-            ->withoutExceptionHandling()
-            ->post('/graphql', ['query' => $query])
-            ->assertGqlOk()
-            ->assertExactJson(['data' => ['entries' => ['data' => [
-                [
-                    'id' => '5',
-                    'title' => 'Hamburger',
-                ],
-            ]]]]);
-    }
-
-    /**
-     * @test
-     * @environment-setup disableQueries
-     * @environment-setup allowFiltersOnAllCollections
-     */
     public function it_filters_entries_with_multiple_conditions_of_the_same_type()
     {
         $this->createEntries();
@@ -425,6 +539,40 @@ GQL;
                 [
                     'id' => '8',
                     'title' => 'This is both rad and awesome',
+                ],
+            ]]]]);
+    }
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     * @environment-setup allowFiltersOnAllCollections
+     */
+    public function it_filters_entries_with_equalto_shorthand()
+    {
+        $this->createEntries();
+
+        $query = <<<'GQL'
+{
+    entries(filter: {
+        title: "Hamburger"
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                [
+                    'id' => '5',
+                    'title' => 'Hamburger',
                 ],
             ]]]]);
     }
@@ -642,10 +790,29 @@ GQL;
 
     protected function allowFiltersOnAllCollections($app)
     {
-        $app->config->set('statamic.graphql.resources.collections', [
-            '*' => [
-                'allowed_filters' => ['title', 'status', 'published'],
-            ],
+        $app->config->set('statamic.graphql.resources.collections.*', [
+            'allowed_filters' => ['title', 'status', 'published'],
+        ]);
+    }
+
+    protected function allowTitleFilterOnAllCollections($app)
+    {
+        $app->config->set('statamic.graphql.resources.collections.*', [
+            'allowed_filters' => ['title'],
+        ]);
+    }
+
+    protected function allowStatusFilterOnBlogCollection($app)
+    {
+        $app->config->set('statamic.graphql.resources.collections.blog', [
+            'allowed_filters' => ['status'],
+        ]);
+    }
+
+    protected function disableFiltersOnBlogCollection($app)
+    {
+        $app->config->set('statamic.graphql.resources.collections.blog', [
+            'allowed_filters' => false,
         ]);
     }
 }
