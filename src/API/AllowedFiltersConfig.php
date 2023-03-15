@@ -45,4 +45,20 @@ class AllowedFiltersConfig
             }, collect($config[$collections[0]]['allowed_filters'] ?? []))
             ->all();
     }
+
+    /**
+     * Get allowed filters for users query.
+     *
+     * @param  string  $configFile
+     * @return array
+     */
+    public function allowedForUsers($configFile)
+    {
+        $config = config("statamic.{$configFile}.resources.users.allowed_filters");
+
+        // Use explicitly configured `allowed_filters` array, otherwise no filters should be allowed.
+        return is_array($config)
+            ? $config
+            : [];
+    }
 }

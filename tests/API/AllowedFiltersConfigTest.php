@@ -140,5 +140,33 @@ class AllowedFiltersConfigTest extends TestCase
         $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, ['blog', 'pages']));
         $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, '*'));
     }
+
+    /**
+     * @test
+     * @dataProvider configFileProvider
+     */
+    public function no_user_filters_are_allowed_by_default($configFile)
+    {
+        Config::set("statamic.{$configFile}.resources.users", false);
+
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForUsers($configFile));
+
+        Config::set("statamic.{$configFile}.resources.users", true);
+
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForUsers($configFile));
+    }
+
+    /**
+     * @test
+     * @dataProvider configFileProvider
+     */
+    public function it_allows_user_filters_when_configured($configFile)
+    {
+        Config::set("statamic.{$configFile}.resources.users.allowed_filters", [
+            'name',
+            'email',
+        ]);
+
+        $this->assertEqualsCanonicalizing(['name', 'email'], AllowedFiltersConfig::allowedForUsers($configFile));
     }
 }
