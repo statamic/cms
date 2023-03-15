@@ -142,7 +142,24 @@ class ApiController extends Controller
      */
     protected function getFilters()
     {
+        if (! method_exists($this, 'allowedFilters')) {
+            return collect();
+        }
+
         $filters = collect(request()->filter ?? []);
+
+        $allowedFilters = collect($this->allowedFilters());
+
+        $forbidden = $filters
+            ->keys()
+            ->map(fn ($param) => explode(':', $param)[0])
+            ->filter(fn ($param) => ! $allowedFilters->contains($param));
+
+        if ($forbidden->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'filter' => Str::plural('Forbidden filter', $forbidden).': '.$forbidden->join(', '),
+            ]);
+        }
 
         if ($this->filterPublished && $this->doesntHaveFilter('status') && $this->doesntHaveFilter('published')) {
             $filters->put('status:is', 'published');
@@ -157,7 +174,7 @@ class ApiController extends Controller
      * @param  string  $field
      * @return bool
      */
-    public function doesntHaveFilter($field)
+    protected function doesntHaveFilter($field)
     {
         return ! collect(request()->filter ?? [])
             ->map(function ($value, $param) {
