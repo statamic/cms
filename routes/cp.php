@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\AddonEditionsController;
 use Statamic\Http\Controllers\CP\AddonsController;
+use Statamic\Http\Controllers\CP\API\AddonsController as AddonsApiController;
 use Statamic\Http\Controllers\CP\API\TemplatesController;
 use Statamic\Http\Controllers\CP\Assets\ActionController;
 use Statamic\Http\Controllers\CP\Assets\AssetContainerBlueprintController;
@@ -292,7 +293,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
-        Route::resource('addons', AddonsController::class);
+        Route::resource('addons', AddonsApiController::class);
         Route::resource('templates', TemplatesController::class);
     });
 
