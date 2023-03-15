@@ -24,39 +24,30 @@
 
 .tabs {
     @apply flex space-x-2 overflow-hidden relative w-full max-w-full;
+    &-scrolled {
+        @apply pl-0 ml-0;
+    }
 }
 
+.tab-button {
+    @apply flex items-center px-2 py-2 text-gray-700 select-none border-b-2 border-transparent whitespace-nowrap shrink-0;
+    &:hover {
+        @apply text-gray-800;
+    }
+    &:focus-visible {
+        @apply ring-inset ring-2 ring-blue-500 outline-none rounded-t;
+    }
+    &.active {
+        @apply text-blue-500 border-blue-500;
+    }
+    &.has-error {
+        @apply text-red-500;
 
-/* .tabs { */
-    /* @apply flex items-end overflow-hidden px-2 -ml-2; */
-    /* @apply flex flex-wrap space-x-3; */
-    /* height: 48px; */
-
-    /* &-scrolled {
-        @apply pl-0 ml-0;
-    } */
-
-    .tab-button {
-        @apply flex items-center px-2 py-2 text-gray-700 select-none border-b-2 border-transparent whitespace-nowrap shrink-0;
-        /* @apply whitespace-nowrap bg-gray-100 py-1 px-4 shrink-0 leading-tight text-xs w-auto relative flex items-center justify-center rounded-t-md shadow border-b border-gray-300 select-none; */
-        /* height: 94%; */
-        /* min-height: 94%; */
-        &:hover {
-            @apply text-gray-800;
-        }
         &.active {
-            @apply text-blue-500 border-blue-500;
-        }
-        &.has-error {
-            @apply text-red-500;
-
-            &.active {
-                box-shadow: theme('colors.red.400') 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
-            }
+            box-shadow: theme('colors.red.400') 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
         }
     }
-
-/* } */
+}
 
 
 /* Responsive Wangjangling
