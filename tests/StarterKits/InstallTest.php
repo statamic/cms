@@ -26,10 +26,6 @@ class InstallTest extends TestCase
     {
         parent::setUp();
 
-        if (version_compare(app()->version(), '7', '<')) {
-            $this->markTestSkipped();
-        }
-
         $this->files = app(Filesystem::class);
 
         $this->restoreSite();
