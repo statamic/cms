@@ -31,7 +31,6 @@
                 :release="release"
                 :package-name="name"
                 :show-actions="showActions"
-                @install="installExplicitVersion(release.version)"
             />
         </template>
 

@@ -6,27 +6,13 @@
                 <h1>{{ release.version }}</h1>
                 <h5 class="date" v-text="__('Released on :date', { date: release.date })" />
             </div>
-            <div v-if="!release.canUpdate">
-                <button class="btn opacity-50" disabled v-text="__('Manual upgrade required')" />
-            </div>
-            <div v-if="release.canUpdate && showActions">
+            <div v-if="showActions">
                 <button v-if="release.type === 'current'" class="btn opacity-50" disabled v-text="__('Current Version')" />
             </div>
         </div>
         <div class="card-body">
             <div v-html="body"></div>
         </div>
-
-        <confirmation-modal
-            v-if="confirmationPrompt"
-            :title="confirmationTitle"
-            :bodyText="confirmationText"
-            :buttonText="__('Confirm')"
-            :danger="true"
-            @confirm="confirm"
-            @cancel="confirmationPrompt = null"
-        >
-        </confirmation-modal>
     </div>
 
 </template>
@@ -40,29 +26,7 @@ export default {
         showActions: { type: Boolean }
     },
 
-    data() {
-        return {
-            confirmationPrompt: null,
-        }
-    },
-
     computed: {
-        confirmationTitle() {
-            let attrs = { name: this.packageName }
-
-            return this.confirmationPrompt.type === 'downgrade'
-                ? __('Downgrade :name', attrs)
-                : __('Update :name', attrs)
-        },
-
-        confirmationText() {
-            let attrs = { version: this.confirmationPrompt.version }
-
-            return this.confirmationPrompt.type === 'downgrade'
-                ? __('Are you sure you want to downgrade to :version?', attrs)
-                : __('Are you sure you want to update to :version?', attrs)
-        },
-
         body() {
             return markdown(this.release.body)
                 .replaceAll('[new]', '<span class="label" style="background: #5bc0de;">NEW</span>')
@@ -71,15 +35,6 @@ export default {
                 .replaceAll('[na]', '<span class="label" style="background: #e8e8e8;">N/A</span>')
         }
     },
-
-    methods: {
-
-        confirm() {
-            this.confirmationPrompt = null;
-            this.$nextTick(() => this.$emit('install'));
-        }
-
-    }
 
 }
 </script>
