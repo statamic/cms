@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Illuminate\Validation\ValidationException;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
@@ -45,28 +46,18 @@ class ApiController extends Controller
             return;
         }
 
-        foreach ($config as $resource) {
-            $this->abortIfRouteResourceDisabled($this->routeResourceKey, $resource);
-        }
-    }
-
-    /**
-     * Abort if route resource is disabled.
-     *
-     * @param  string  $routeSegment
-     * @param  string  $resource
-     */
-    protected function abortIfRouteResourceDisabled($routeSegment, $resource)
-    {
-        if (! $handle = request()->route($routeSegment)) {
-            return;
-        }
+        $handle = request()->route($this->routeResourceKey);
 
         if (! is_string($handle)) {
             $handle = $handle->handle();
         }
 
-        if ($handle && $handle !== $resource) {
+        $config = collect($config)
+            ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => true] : [$key => $value])
+            ->reject(fn ($config, $resource) => $resource === '*')
+            ->get($handle);
+
+        if (! $config) {
             throw new NotFoundHttpException;
         }
     }
