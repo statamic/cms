@@ -2,8 +2,8 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\AllowedFiltersConfig;
 use GraphQL\Type\Definition\Type;
-use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Middleware\AllowedFilters;
@@ -76,20 +76,6 @@ class EntriesQuery extends Query
 
     public function allowedFilters($args)
     {
-        $config = config('statamic.graphql.resources.collections');
-
-        if ($config === true) {
-            return collect();
-        }
-
-        $collections = collect($args['collection'] ?? Collection::handles());
-
-        // Get the "allowed_filters" from all the collections, filtering out any that don't appear in all of them.
-        // And a collection named "*" will apply to all collections.
-        return $collections
-            ->map(fn ($collection) => $config[$collection]['allowed_filters'] ?? [])
-            ->reduce(function ($carry, $allowedFilters) use ($config) {
-                return $carry->intersect($allowedFilters)->merge($config['*']['allowed_filters'] ?? []);
-            }, collect($config[$collections[0]]['allowed_filters'] ?? []));
+        return AllowedFiltersConfig::allowedForCollectionEntries('graphql', $args['collection'] ?? '*');
     }
 }
