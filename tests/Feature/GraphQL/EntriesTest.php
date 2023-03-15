@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\AllowedFiltersConfig;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
@@ -268,6 +269,11 @@ GQL;
 }
 GQL;
 
+        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
+            ->with('graphql', ['blog'])
+            ->andReturn([])
+            ->once();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -281,12 +287,8 @@ GQL;
             ]);
     }
 
-    /**
-     * @test
-     * @environment-setup disableQueries
-     * @environment-setup allowTitleFilterOnAllCollections
-     */
-    public function it_can_configure_allowed_filters_on_all_collections_at_once()
+    /** @test */
+    public function it_can_filter_collection_entries_when_configuration_allows_for_it()
     {
         $this->createEntries();
 
@@ -323,6 +325,11 @@ GQL;
 }
 GQL;
 
+        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
+            ->with('graphql', ['blog'])
+            ->andReturn(['title'])
+            ->once();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -335,12 +342,8 @@ GQL;
             ]]]]);
     }
 
-    /**
-     * @test
-     * @environment-setup disableQueries
-     * @environment-setup allowStatusFilterOnBlogCollection
-     */
-    public function it_can_configure_allowed_filters_on_a_specific_collection()
+    /** @test */
+    public function it_can_filter_all_entries_when_configuration_allows_for_it()
     {
         $this->createEntries();
 
@@ -354,7 +357,6 @@ GQL;
             ->id('7')
             ->slug('as-cool-as-radcliffe')
             ->data(['title' => 'I wish I was as cool as Daniel Radcliffe!'])
-            ->published(false)
             ->create();
 
         EntryFactory::collection('blog')
@@ -365,9 +367,9 @@ GQL;
 
         $query = <<<'GQL'
 {
-    entries(collection: "blog", filter: {
-        status: {
-            is: "draft"
+    entries(filter: {
+        title: {
+            contains: "cool",
         }
     }) {
         data {
@@ -377,6 +379,11 @@ GQL;
     }
 }
 GQL;
+
+        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
+            ->with('graphql', '*')
+            ->andReturn(['title'])
+            ->once();
 
         $this
             ->withoutExceptionHandling()
@@ -390,50 +397,7 @@ GQL;
             ]]]]);
     }
 
-    /**
-     * @test
-     * @environment-setup disableQueries
-     * @environment-setup allowTitleFilterOnAllCollections
-     * @environment-setup disableFiltersOnBlogCollection
-     */
-    public function it_can_disable_filtering_on_a_specific_collection()
-    {
-        $this->createEntries();
-
-        $query = <<<'GQL'
-{
-    entries(collection: "blog", filter: {
-        title: {
-            contains: "rad",
-            ends_with: "!"
-        }
-    }) {
-        data {
-            id
-            title
-        }
-    }
-}
-GQL;
-
-        $this
-            ->withoutExceptionHandling()
-            ->post('/graphql', ['query' => $query])
-            ->assertJson([
-                'errors' => [[
-                    'message' => 'validation',
-                ]],
-                'data' => [
-                    'entries' => null,
-                ],
-            ]);
-    }
-
-    /**
-     * @test
-     * @environment-setup disableQueries
-     * @environment-setup allowFiltersOnAllCollections
-     */
+    /** @test */
     public function it_filters_entries_with_multiple_conditions()
     {
         $this->createEntries();
@@ -472,6 +436,11 @@ GQL;
 }
 GQL;
 
+        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
+            ->with('graphql', '*')
+            ->andReturn(['title'])
+            ->once();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -488,11 +457,7 @@ GQL;
             ]]]]);
     }
 
-    /**
-     * @test
-     * @environment-setup disableQueries
-     * @environment-setup allowFiltersOnAllCollections
-     */
+    /** @test */
     public function it_filters_entries_with_multiple_conditions_of_the_same_type()
     {
         $this->createEntries();
@@ -531,6 +496,11 @@ GQL;
 }
 GQL;
 
+        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
+            ->with('graphql', '*')
+            ->andReturn(['title'])
+            ->once();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -543,11 +513,7 @@ GQL;
             ]]]]);
     }
 
-    /**
-     * @test
-     * @environment-setup disableQueries
-     * @environment-setup allowFiltersOnAllCollections
-     */
+    /** @test */
     public function it_filters_entries_with_equalto_shorthand()
     {
         $this->createEntries();
@@ -564,6 +530,11 @@ GQL;
     }
 }
 GQL;
+
+        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
+            ->with('graphql', '*')
+            ->andReturn(['title'])
+            ->once();
 
         $this
             ->withoutExceptionHandling()
@@ -675,13 +646,12 @@ GQL;
             ]]]]);
     }
 
-    /**
-     * @test
-     * @environment-setup disableQueries
-     * @environment-setup allowFiltersOnAllCollections
-     */
+    /** @test */
     public function it_only_shows_published_entries_by_default()
     {
+        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
+            ->andReturn(['published', 'status']);
+
         $this->createEntries();
         Entry::find(1)->date(now()->addMonths(2))->save();
         Entry::find(2)->published(false)->save();
@@ -786,33 +756,5 @@ GQL;
                 ->assertExactJson(['data' => ['entries' => ['data' => [
                     ['id' => '1', 'title' => 'Standard Blog Post'],
                 ]]]]);
-    }
-
-    protected function allowFiltersOnAllCollections($app)
-    {
-        $app->config->set('statamic.graphql.resources.collections.*', [
-            'allowed_filters' => ['title', 'status', 'published'],
-        ]);
-    }
-
-    protected function allowTitleFilterOnAllCollections($app)
-    {
-        $app->config->set('statamic.graphql.resources.collections.*', [
-            'allowed_filters' => ['title'],
-        ]);
-    }
-
-    protected function allowStatusFilterOnBlogCollection($app)
-    {
-        $app->config->set('statamic.graphql.resources.collections.blog', [
-            'allowed_filters' => ['status'],
-        ]);
-    }
-
-    protected function disableFiltersOnBlogCollection($app)
-    {
-        $app->config->set('statamic.graphql.resources.collections.blog', [
-            'allowed_filters' => false,
-        ]);
     }
 }
