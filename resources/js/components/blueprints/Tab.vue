@@ -1,7 +1,7 @@
 <template>
 
     <button
-        class="tab-button"
+        class="blueprint-tab tab-button"
         role="tab"
         :class="{ 'active': isActive }"
         :aria-controls="`tab-panel-${tab._id}`"
