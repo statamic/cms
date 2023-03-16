@@ -10,17 +10,33 @@ class YamlTest extends TestCase
 {
     /**
      * @test
+     *
+     * @dataProvider processProvider
      */
-    public function it_converts_single_array_items_to_arrays()
+    public function it_processes($value, $expected)
     {
-        $field = (new Yaml)->setField(new Field('test', [
-            'type' => 'yaml',
-        ]));
+        $this->assertSame($expected, $this->fieldtype()->process($value));
+    }
 
-        $expected = [
-            'one',
+    public function processProvider()
+    {
+        return [
+            'string' => ['alfa', 'alfa'],
+            'multiline string' => ["alfa\nbravo", "alfa\nbravo"],
+            'empty' => ['', null],
+            'associative array' => ["alfa: bravo\ncharlie: delta", ['alfa' => 'bravo', 'charlie' => 'delta']],
+            'single item associative array' => ['alfa: bravo', ['alfa' => 'bravo']],
+            'numeric array' => ["- alfa\n- bravo", ['alfa', 'bravo']],
+            'single item numeric array' => ['- alfa', ['alfa']],
+
+            // If we were checking for "- " to determine if it's yaml, we'd get these wrong.
+            'string with dash space' => ['alfa - bravo', 'alfa - bravo'],
+            'multiline string with dash space' => ["alfa\n- bravo", "alfa\n- bravo"],
         ];
+    }
 
-        $this->assertSame($expected, $field->process('- one'));
+    private function fieldtype()
+    {
+        return (new Yaml)->setField(new Field('test', ['type' => 'yaml']));
     }
 }
