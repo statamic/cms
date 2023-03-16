@@ -5,7 +5,7 @@
                 <span v-text="name" />
                 <span v-if="currentVersion" class="font-normal text-gray-700 ml-2">{{ currentVersion }}</span>
             </h1>
-            <button v-if="!onLatestVersion" class="btn-primary ml-4" @click="showUpdateInstructions()">{{ __('Update') }}</button>
+            <button v-if="!onLatestVersion" class="btn-primary ml-4" @click="this.modalOpen = true">{{ __('Update') }}</button>
             <div v-if="onLatestVersion" v-text="__('Up to date')" />
         </div>
 
@@ -129,10 +129,6 @@
                     this.currentVersion = response.data.currentVersion;
                     this.latestRelease = response.data.changelog[0];
                 });
-            },
-
-            showUpdateInstructions() {
-                this.modalOpen = true;
             },
         }
     }
