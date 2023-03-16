@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\AddonEditionsController;
 use Statamic\Http\Controllers\CP\AddonsController;
+use Statamic\Http\Controllers\CP\API\AddonsController as AddonsApiController;
 use Statamic\Http\Controllers\CP\API\TemplatesController;
 use Statamic\Http\Controllers\CP\Assets\ActionController;
 use Statamic\Http\Controllers\CP\Assets\AssetContainerBlueprintController;
@@ -35,7 +36,6 @@ use Statamic\Http\Controllers\CP\Collections\ReorderCollectionBlueprintsControll
 use Statamic\Http\Controllers\CP\Collections\ReorderEntriesController;
 use Statamic\Http\Controllers\CP\Collections\RestoreEntryRevisionController;
 use Statamic\Http\Controllers\CP\Collections\ScaffoldCollectionController;
-use Statamic\Http\Controllers\CP\ComposerOutputController;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\DashboardController;
 use Statamic\Http\Controllers\CP\DuplicatesController;
@@ -237,13 +237,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('fieldtypes', [FieldtypesController::class, 'index']);
     });
 
-    Route::get('composer/check', [ComposerOutputController::class, 'check']);
-
     Route::get('updater', [UpdaterController::class, 'index'])->name('updater');
     Route::get('updater/count', [UpdaterController::class, 'count']);
     Route::get('updater/{product}', [UpdateProductController::class, 'show'])->name('updater.product');
     Route::get('updater/{product}/changelog', [UpdateProductController::class, 'changelog']);
-    Route::post('updater/{product}/install', [UpdateProductController::class, 'install']);
 
     Route::group(['prefix' => 'duplicates'], function () {
         Route::get('/', [DuplicatesController::class, 'index'])->name('duplicates');
@@ -251,8 +248,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::get('addons', [AddonsController::class, 'index'])->name('addons.index');
-    Route::post('addons/install', [AddonsController::class, 'install']);
-    Route::post('addons/uninstall', [AddonsController::class, 'uninstall']);
     Route::post('addons/editions', AddonEditionsController::class);
 
     Route::post('forms/actions', [ActionController::class, 'run'])->name('forms.actions.run');
@@ -296,7 +291,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
-        Route::resource('addons', AddonsController::class);
+        Route::resource('addons', AddonsApiController::class);
         Route::resource('templates', TemplatesController::class);
     });
 
