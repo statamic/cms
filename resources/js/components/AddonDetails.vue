@@ -3,8 +3,8 @@
         <div class="flex items-center mb-6">
             <h1 class="flex-1" v-text="addon.name" />
             <a :href="addon.url" target="_blank" class="btn mr-4" v-text="__('View on Marketplace')" />
-            <button v-if="addon.installed" class="btn" @click="showComposerInstructions()" v-text="__('Uninstall')" />
-            <button v-else class="btn btn-primary" @click="showComposerInstructions()" v-text="__('Install')" />
+            <button v-if="addon.installed" class="btn" @click="showComposerInstructions" v-text="__('Uninstall')" />
+            <button v-else class="btn btn-primary" @click="showComposerInstructions" v-text="__('Install')" />
         </div>
         <modal
             v-if="modalOpen"
