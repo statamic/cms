@@ -24,16 +24,18 @@ class StatusQueryBuilder implements Builder
 
     protected $builder;
     protected $queryFallbackStatus = true;
+    protected $fallbackStatus;
 
-    public function __construct(Builder $builder)
+    public function __construct(Builder $builder, $status = 'published')
     {
         $this->builder = $builder;
+        $this->fallbackStatus = $status;
     }
 
     public function get($columns = ['*'])
     {
         if ($this->queryFallbackStatus) {
-            $this->builder->where('status', 'published');
+            $this->builder->where('status', $this->fallbackStatus);
         }
 
         return $this->builder->get($columns);

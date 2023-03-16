@@ -48,6 +48,18 @@ class StatusQueryBuilderTest extends TestCase
         $this->assertEquals('results', $results);
     }
 
+    /** @test */
+    public function the_fallback_query_status_value_can_be_set_in_the_constructor()
+    {
+        $builder = $this->mock(Builder::class);
+        $builder->shouldReceive('where')->with('status', 'potato')->once()->andReturnSelf();
+        $builder->shouldReceive('get')->once()->andReturn('results');
+
+        $results = (new StatusQueryBuilder($builder, 'potato'))->get();
+
+        $this->assertEquals('results', $results);
+    }
+
     /**
      * @test
      *
