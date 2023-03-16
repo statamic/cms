@@ -147,7 +147,57 @@ GQL;
     }
 
     /** @test */
-    public function it_filters_users()
+    public function it_cannot_filter_users_by_default()
+    {
+        $this->createUsers();
+        User::find('3')->set('bio', 'That was so rad!')->save();
+        User::find('4')->set('bio', 'I wish I was as cool as Daniel Radcliffe!')->save();
+        User::find('5')->set('bio', 'I hate radishes.')->save();
+
+        $blueprint = Blueprint::makeFromFields(['bio' => ['type' => 'text']]);
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $query = <<<'GQL'
+{
+    users(filter: {
+        bio: {
+            contains: "rad",
+            ends_with: "!"
+        }
+    }) {
+        data {
+            id
+            bio
+        }
+    }
+}
+GQL;
+
+        AllowedFiltersConfig::shouldReceive('allowedForUsers')
+            ->with('graphql')
+            ->andReturn([])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'filter' => ['Forbidden: bio'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'users' => null,
+                ],
+            ]);
+    }
+
+    /** @test */
+    public function it_can_filters_users_when_configuration_allows_for_it()
     {
         $this->createUsers();
         User::find('3')->set('bio', 'That was so rad!')->save();
