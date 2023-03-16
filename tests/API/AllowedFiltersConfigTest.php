@@ -149,11 +149,11 @@ class AllowedFiltersConfigTest extends TestCase
     {
         Config::set("statamic.{$configFile}.resources.users", false);
 
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForUsers($configFile));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForResource($configFile, 'users'));
 
         Config::set("statamic.{$configFile}.resources.users", true);
 
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForUsers($configFile));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForResource($configFile, 'users'));
     }
 
     /**
@@ -167,6 +167,6 @@ class AllowedFiltersConfigTest extends TestCase
             'email',
         ]);
 
-        $this->assertEqualsCanonicalizing(['name', 'email'], AllowedFiltersConfig::allowedForUsers($configFile));
+        $this->assertEqualsCanonicalizing(['name', 'email'], AllowedFiltersConfig::allowedForResource($configFile, 'users'));
     }
 }

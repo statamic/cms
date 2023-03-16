@@ -38,7 +38,7 @@ class UsersController extends ApiController
 
     protected function allowedFilters()
     {
-        return collect(AllowedFiltersConfig::allowedForUsers('api'))
+        return collect(AllowedFiltersConfig::allowedForResource('api', 'users'))
             ->reject(fn ($field) => in_array($field, ['password', 'password_hash']))
             ->all();
     }

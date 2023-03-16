@@ -173,8 +173,8 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForUsers')
-            ->with('graphql')
+        AllowedFiltersConfig::shouldReceive('allowedForResource')
+            ->with('graphql', 'users')
             ->andReturn([])
             ->once();
 
@@ -223,8 +223,8 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForUsers')
-            ->with('graphql')
+        AllowedFiltersConfig::shouldReceive('allowedForResource')
+            ->with('graphql', 'users')
             ->andReturn(['bio'])
             ->once();
 
@@ -262,8 +262,8 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForUsers')
-            ->with('graphql')
+        AllowedFiltersConfig::shouldReceive('allowedForResource')
+            ->with('graphql', 'users')
             ->andReturn(['email'])
             ->once();
 
@@ -307,8 +307,8 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForUsers')
-            ->with('graphql')
+        AllowedFiltersConfig::shouldReceive('allowedForResource')
+            ->with('graphql', 'users')
             ->andReturn(['bio'])
             ->once();
 

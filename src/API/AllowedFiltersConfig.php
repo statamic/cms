@@ -8,6 +8,23 @@ use Statamic\Support\Arr;
 class AllowedFiltersConfig
 {
     /**
+     * Get allowed filters for resource.
+     *
+     * @param  string  $configFile
+     * @param  string  $configResourceKey
+     * @return array
+     */
+    public function allowedForResource($configFile, $configResourceKey)
+    {
+        $config = config("statamic.{$configFile}.resources.{$configResourceKey}.allowed_filters");
+
+        // Use explicitly configured `allowed_filters` array, otherwise no filters should be allowed.
+        return is_array($config)
+            ? $config
+            : [];
+    }
+
+    /**
      * Get allowed filters for collection entries query.
      *
      * @param  string  $configFile
@@ -44,21 +61,5 @@ class AllowedFiltersConfig
                 return $carry->intersect($allowedFilters)->merge($config['*']['allowed_filters'] ?? []);
             }, collect($config[$collections[0]]['allowed_filters'] ?? []))
             ->all();
-    }
-
-    /**
-     * Get allowed filters for users query.
-     *
-     * @param  string  $configFile
-     * @return array
-     */
-    public function allowedForUsers($configFile)
-    {
-        $config = config("statamic.{$configFile}.resources.users.allowed_filters");
-
-        // Use explicitly configured `allowed_filters` array, otherwise no filters should be allowed.
-        return is_array($config)
-            ? $config
-            : [];
     }
 }
