@@ -16,11 +16,11 @@
             <div class="prose">
                 <template v-if="addon.installed">
                     <p v-text="`${__('messages.addon_uninstall_command')}:`" />
-                    <pre><code>composer remove <span v-text="package" /></code></pre>
+                    <code-block copyable :text="`composer remove ${package}`" />
                 </template>
                 <template v-else>
                     <p v-text="`${__('messages.addon_install_command')}:`" />
-                    <pre><code>composer require <span v-text="package" /></code></pre>
+                    <code-block copyable :text="`composer require ${package}`" />
                 </template>
                 <p>{{ __('Learn more about') }} <a href="https://statamic.dev/addons">{{ __('Addons') }}</a>.</p>
             </div>

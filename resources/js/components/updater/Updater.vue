@@ -51,7 +51,7 @@
         >
             <div class="prose">
                 <p>To update to the latest version please run:</p>
-                <pre><code>composer update <span v-text="package" /></code></pre>
+                <code-block copyable :text="`composer update ${package}`" />
                 <p>{{ __('Learn more about') }} <a href="https://statamic.dev/updating" target="_blank">{{ __('Updates') }}</a>.</p>
             </div>
         </confirmation-modal>

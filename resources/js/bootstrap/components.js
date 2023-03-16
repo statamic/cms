@@ -59,6 +59,7 @@ import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
 import panes from '../components/panes/Pane.vue';
 import Fullscreen from '../components/Fullscreen.vue';
+import CodeBlock from '../components/CodeBlock.vue';
 
 // Third Party
 Vue.component('v-select', vSelect)
@@ -126,6 +127,7 @@ Vue.component('breadcrumbs', Breadcrumbs);
 Vue.component('create-entry-button', CreateEntryButton);
 Vue.component('popover', Popover);
 Vue.component('fullscreen', Fullscreen);
+Vue.component('code-block', CodeBlock);
 
 // Recursive
 Vue.component('role-permission-tree', PermissionTree);
