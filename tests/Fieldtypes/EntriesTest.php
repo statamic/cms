@@ -92,7 +92,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    public function it_includes_drafts_when_pre_processing()
+    public function it_includes_drafts_when_pre_processing_for_index()
     {
         $preProcessed = $this->fieldtype()->preProcessIndex([456, 'invalid', '123', 'draft', 'scheduled', 'expired']);
 
