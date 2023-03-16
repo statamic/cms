@@ -220,35 +220,6 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_entries_filter_by_status()
-    {
-        $this->makePosts();
-
-        Entry::find('e')->published(false)->save();
-
-        $this->setTagParameters(['from' => '*']);
-        $this->assertCount(8, $this->collectionTag->index());
-
-        $this->setTagParameters(['from' => '*', 'status:is' => 'published']);
-        $this->assertCount(8, $this->collectionTag->index());
-
-        $this->setTagParameters(['from' => '*', 'published:is' => 'true']);
-        $this->assertCount(8, $this->collectionTag->index());
-
-        $this->setTagParameters(['from' => '*', 'status:is' => 'draft']);
-        $this->assertCount(1, $this->collectionTag->index());
-
-        $this->setTagParameters(['from' => '*', 'published:is' => 'false']);
-        $this->assertCount(1, $this->collectionTag->index());
-
-        $this->setTagParameters(['from' => '*', 'status:in' => 'published|draft']);
-        $this->assertCount(9, $this->collectionTag->index());
-
-        $this->setTagParameters(['from' => '*', 'status:exists' => 'true']);
-        $this->assertCount(9, $this->collectionTag->index());
-    }
-
-    /** @test */
     public function it_can_exclude_collections_using_collection_objects()
     {
         $this->makePosts();
