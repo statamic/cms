@@ -42,26 +42,19 @@
             :show-actions="showActions"
         />
 
-        <modal
+        <confirmation-modal
             v-if="modalOpen"
-            name="show-update-instructions"
-            v-slot="{ close: closeModal }"
-            :pivot-y="0.5"
-            :overflow="false"
-            width="25%"
-            @closed="modalOpen = false"
+            :title="__('Update')"
+            :cancellable="false"
+            :button-text="__('OK')"
+            @confirm="modalOpen = false"
         >
-            <div class="p-6 relative">
-                To update to the lastest version please run:
-                <code class="inline-block my-2">composer update <span v-text="package" /></code>
-                Learn more about <a href="https://statamic.dev/updating">Updating</a>
-                <button
-                    class="btn-close absolute top-0 right-0 mt-4 mr-4"
-                    :aria-label="__('Close')"
-                    @click="closeModal"
-                    v-html="'&times'" />
+            <div class="prose">
+                <p>To update to the latest version please run:</p>
+                <pre><code>composer update <span v-text="package" /></code></pre>
+                <p>{{ __('Learn more about') }} <a href="https://statamic.dev/updating" target="_blank">{{ __('Updates') }}</a>.</p>
             </div>
-        </modal>
+        </confirmation-modal>
     </div>
 </template>
 

@@ -6,32 +6,25 @@
             <button v-if="addon.installed" class="btn" @click="showComposerInstructions" v-text="__('Uninstall')" />
             <button v-else class="btn btn-primary" @click="showComposerInstructions" v-text="__('Install')" />
         </div>
-        <modal
+        <confirmation-modal
             v-if="modalOpen"
-            name="show-composer-instructions"
-            v-slot="{ close: closeModal }"
-            :pivot-y="0.5"
-            :overflow="false"
-            width="25%"
-            @closed="modalOpen = false"
+            :title="__('Addons')"
+            :cancellable="false"
+            :button-text="__('OK')"
+            @confirm="modalOpen = false"
         >
-            <div class="p-6 relative">
-                <span v-if="addon.installed">
-                    To uninstall this addon please run:
-                    <code class="inline-block my-2">composer remove <span v-text="package" /></code>
-                </span>
-                <span v-else>
-                    To install this addon please run:
-                    <code class="inline-block my-2">composer require <span v-text="package" /></code>
-                </span>
-                Learn more about <a href="https://statamic.dev/addons">Addons</a>
-                <button
-                    class="btn-close absolute top-0 right-0 mt-4 mr-4"
-                    aria-label="Close"
-                    @click="closeModal"
-                    v-html="'&times'" />
+            <div class="prose">
+                <template v-if="addon.installed">
+                    <p v-text="`${__('messages.addon_uninstall_command')}:`" />
+                    <pre><code>composer remove <span v-text="package" /></code></pre>
+                </template>
+                <template v-else>
+                    <p v-text="`${__('messages.addon_install_command')}:`" />
+                    <pre><code>composer require <span v-text="package" /></code></pre>
+                </template>
+                <p>{{ __('Learn more about') }} <a href="https://statamic.dev/addons">{{ __('Addons') }}</a>.</p>
             </div>
-        </modal>
+        </confirmation-modal>
         <div>
             <div class="card mb-6 flex items-center">
                 <div class="flex-1 text-lg">

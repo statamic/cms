@@ -11,7 +11,7 @@
                 </slot>
             </div>
             <div class="p-4 bg-gray-200 border-t flex items-center justify-end text-sm">
-                <button class="text-gray hover:text-gray-900" @click="$emit('cancel')" v-text="__(cancelText)" />
+                <button class="text-gray hover:text-gray-900" @click="$emit('cancel')" v-text="__(cancelText)" v-if="cancellable" />
                 <button class="ml-4" :class="buttonClass" v-text="buttonText" @click="$emit('confirm')" />
             </div>
         </div>
@@ -31,6 +31,10 @@ export default {
         buttonText: {
             type: String,
             default: 'Confirm'
+        },
+        cancellable: {
+            type: Boolean,
+            default: true
         },
         cancelText: {
             type: String,
