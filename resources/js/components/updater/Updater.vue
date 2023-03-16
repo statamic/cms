@@ -3,7 +3,7 @@
         <div class="flex items-center mb-6">
             <h1 class="flex-1">
                 <span v-text="name" />
-                <span v-if="currentVersion" class="font-normal text-gray-700">{{ currentVersion }}</span>
+                <span v-if="currentVersion" class="font-normal text-gray-700 ml-2">{{ currentVersion }}</span>
             </h1>
             <button v-if="!onLatestVersion" class="btn-primary ml-4" @click="showUpdateInstructions()">{{ __('Update') }}</button>
             <div v-if="onLatestVersion" v-text="__('Up to date')" />
