@@ -49,7 +49,7 @@
             @confirm="modalOpen = false"
         >
             <div class="prose">
-                <p>To update to the latest version please run:</p>
+                <p v-text="`${__('messages.update_to_latest_command')}:`" />
                 <code-block copyable :text="`composer update ${package}`" />
                 <p>{{ __('Learn more about') }} <a href="https://statamic.dev/updating" target="_blank">{{ __('Updates') }}</a>.</p>
             </div>

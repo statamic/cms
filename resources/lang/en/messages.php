@@ -202,6 +202,7 @@ return [
     'taxonomy_next_steps_create_term_description' => 'Create the first term or stub out a handful of placeholder terms, it\'s up to you.',
     'taxonomy_next_steps_documentation_description' => 'Learn more about taxonomies, how they work, and how to configure them.',
     'try_again_in_seconds' => '{0,1}Try again now.|Try again in :count seconds.',
+    'update_to_latest_command' => 'To update to the latest version, run the following command',
     'updates_available' => 'Updates are available!',
     'user_groups_handle_instructions' => 'Used to reference this user group on the frontend. It\'s non-trivial to change later.',
     'user_groups_intro' => 'User groups allow you to organize users and apply permission-based roles in aggregate.',
