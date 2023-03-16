@@ -1,7 +1,7 @@
 <template>
     <modal name="confirmation-modal" :pivotY="0.1" :overflow="false">
         <div class="confirmation-modal flex flex-col h-full">
-            <div class="text-lg font-medium p-4 pb-0">
+            <div v-if="title" class="text-lg font-medium p-4 pb-0">
                 {{ __(title) }}
             </div>
             <div class="flex-1 px-4 py-6 text-gray">
@@ -22,8 +22,7 @@
 export default {
     props: {
         title: {
-            type: String,
-            required: true
+            type: String
         },
         bodyText: {
             type: String

@@ -44,7 +44,6 @@
 
         <confirmation-modal
             v-if="modalOpen"
-            :title="__('Update')"
             :cancellable="false"
             :button-text="__('OK')"
             @confirm="modalOpen = false"

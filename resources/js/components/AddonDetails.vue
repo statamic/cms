@@ -8,7 +8,6 @@
         </div>
         <confirmation-modal
             v-if="modalOpen"
-            :title="__('Addons')"
             :cancellable="false"
             :button-text="__('OK')"
             @confirm="modalOpen = false"
