@@ -23,8 +23,7 @@ class StatusQueryBuilder implements Builder
     ];
 
     protected $builder;
-    protected $anyStatus = false;
-    protected $hasQueriedStatus = false;
+    protected $queryFallbackStatus = true;
 
     public function __construct(Builder $builder)
     {
@@ -33,7 +32,7 @@ class StatusQueryBuilder implements Builder
 
     public function get($columns = ['*'])
     {
-        if (! $this->anyStatus && ! $this->hasQueriedStatus) {
+        if ($this->queryFallbackStatus) {
             $this->builder->where('status', 'published');
         }
 
@@ -48,7 +47,7 @@ class StatusQueryBuilder implements Builder
     public function __call($method, $parameters)
     {
         if (in_array($method, self::METHODS) && in_array(array_first($parameters), ['status', 'published'])) {
-            $this->hasQueriedStatus = true;
+            $this->queryFallbackStatus = false;
         }
 
         $result = $this->forwardCallTo($this->builder, $method, $parameters);
@@ -62,7 +61,7 @@ class StatusQueryBuilder implements Builder
 
     public function whereAnyStatus()
     {
-        $this->anyStatus = true;
+        $this->queryFallbackStatus = false;
 
         return $this;
     }
