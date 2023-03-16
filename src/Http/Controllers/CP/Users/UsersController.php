@@ -186,6 +186,10 @@ class UsersController extends CpController
             $blueprint->ensureField('groups', ['visibility' => 'read_only']);
         }
 
+        if (User::current()->isSuper()) {
+            $blueprint->ensureField('Super Admin', ['type' => 'toggle']);
+        }
+
         $values = $user->data()
             ->merge($user->computedData())
             ->merge(['email' => $user->email()]);
