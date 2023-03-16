@@ -36,6 +36,8 @@ class ApiController extends Controller
             return;
         }
 
+        // TODO: Use AllowedResourcesConfig?
+
         $config = config("statamic.api.resources.{$this->resourceConfigKey}", false);
 
         if ($config !== true && ! is_array($config)) {
@@ -46,7 +48,9 @@ class ApiController extends Controller
             return;
         }
 
-        $handle = request()->route($this->routeResourceKey);
+        if (! $handle = request()->route($this->routeResourceKey)) {
+            return;
+        }
 
         if (! is_string($handle)) {
             $handle = $handle->handle();
@@ -143,8 +147,9 @@ class ApiController extends Controller
 
         $forbidden = $filters
             ->keys()
-            ->map(fn ($param) => explode(':', $param)[0])
-            ->filter(fn ($param) => ! $allowedFilters->contains($param));
+            ->map(fn ($param) => explode(':', $param))
+            ->map(fn ($parts) => $parts[0] === 'taxonomy' ? $parts[0].':'.$parts[1] : $parts[0])
+            ->filter(fn ($field) => ! $allowedFilters->contains($field));
 
         if ($forbidden->isNotEmpty()) {
             throw ValidationException::withMessages([

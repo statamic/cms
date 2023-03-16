@@ -95,6 +95,8 @@ class UsersQuery extends Query
 
     public function allowedFilters($args)
     {
-        return AllowedFiltersConfig::allowedForUsers('graphql');
+        return collect(AllowedFiltersConfig::allowedForUsers('graphql'))
+            ->reject(fn ($field) => in_array($field, ['password', 'password_hash']))
+            ->all();
     }
 }

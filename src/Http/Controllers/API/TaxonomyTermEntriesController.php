@@ -2,6 +2,8 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Facades\Statamic\API\AllowedFiltersConfig;
+use Facades\Statamic\API\AllowedResourcesConfig;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Term;
 use Statamic\Http\Resources\API\EntryResource;
@@ -9,6 +11,7 @@ use Statamic\Http\Resources\API\EntryResource;
 class TaxonomyTermEntriesController extends ApiController
 {
     protected $filterPublished = true;
+    protected $allowedCollections;
 
     protected function abortIfDisabled()
     {
@@ -31,7 +34,9 @@ class TaxonomyTermEntriesController extends ApiController
 
         $query = $term->queryEntries();
 
-        foreach ($this->allowedCollections() as $collection) {
+        $this->allowedCollections = $this->allowedCollections();
+
+        foreach ($this->allowedCollections as $collection) {
             $query->where('collection', $collection);
         }
 
@@ -40,13 +45,6 @@ class TaxonomyTermEntriesController extends ApiController
         return app(EntryResource::class)::collection(
             $this->filterSortAndPaginate($query->with($with))
         );
-    }
-
-    private function allowedCollections()
-    {
-        $entriesConfig = config('statamic.api.resources.collections');
-
-        return is_array($entriesConfig) ? $entriesConfig : [];
     }
 
     private function getRelationshipFieldsFromCollections($taxonomy)
@@ -60,5 +58,15 @@ class TaxonomyTermEntriesController extends ApiController
                 ->flatMap(fn ($blueprint) => $blueprint->fields()->all())
                 ->filter->isRelationship()->keys()->all();
         })->all();
+    }
+
+    private function allowedCollections()
+    {
+        return AllowedResourcesConfig::allowedForCollectionEntries('api');
+    }
+
+    protected function allowedFilters()
+    {
+        return AllowedFiltersConfig::allowedForCollectionEntries('api', $this->allowedCollections);
     }
 }

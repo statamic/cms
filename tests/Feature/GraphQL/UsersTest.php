@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\AllowedFiltersConfig;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Config;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -171,6 +173,11 @@ GQL;
 }
 GQL;
 
+        AllowedFiltersConfig::shouldReceive('allowedForUsers')
+            ->with('graphql')
+            ->andReturn(['bio'])
+            ->once();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -204,6 +211,11 @@ GQL;
     }
 }
 GQL;
+
+        AllowedFiltersConfig::shouldReceive('allowedForUsers')
+            ->with('graphql')
+            ->andReturn(['email'])
+            ->once();
 
         $this
             ->withoutExceptionHandling()
@@ -245,6 +257,11 @@ GQL;
 }
 GQL;
 
+        AllowedFiltersConfig::shouldReceive('allowedForUsers')
+            ->with('graphql')
+            ->andReturn(['bio'])
+            ->once();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -261,8 +278,12 @@ GQL;
      * @test
      * @dataProvider userPasswordFilterProvider
      */
-    public function it_doesnt_allow_filtering_users_by_password($filter)
+    public function it_doesnt_allow_filtering_users_by_password($field, $filter)
     {
+        Config::set('statamic.graphql.resources.users', [
+            'allowed_filters' => ['password', 'password_hash'],
+        ]);
+
         User::make()->id('one')->email('one@domain.com')->passwordHash('abc')->save();
         User::make()->id('two')->email('two@domain.com')->passwordHash('def')->save();
 
@@ -279,22 +300,30 @@ GQL;
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
-            ->assertGqlOk()
-            ->assertExactJson(['data' => ['users' => ['data' => [
-                ['id' => 'one'],
-                ['id' => 'two'], // this one would be filtered out if the password was allowed
-            ]]]]);
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'filter' => ["Forbidden: {$field}"],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'users' => null,
+                ],
+            ]);
     }
 
     public function userPasswordFilterProvider()
     {
         return [
-            'password' => ['{ password: "abc" }'],
-            'password:is' => ['{ password: {is: "abc"} }'],
-            'password:regex' => ['{ password: {regex: "abc"} }'],
-            'password_hash' => ['{ password_hash: "abc" }'],
-            'password_hash:is' => ['{ password_hash: {is: "abc"} }'],
-            'password_hash:regex' => ['{ password_hash: {regex: "abc"} }'],
+            'password' => ['password', '{ password: "abc" }'],
+            'password:is' => ['password', '{ password: {is: "abc"} }'],
+            'password:regex' => ['password', '{ password: {regex: "abc"} }'],
+            'password_hash' => ['password_hash', '{ password_hash: "abc" }'],
+            'password_hash:is' => ['password_hash', '{ password_hash: {is: "abc"} }'],
+            'password_hash:regex' => ['password_hash', '{ password_hash: {regex: "abc"} }'],
         ];
     }
 

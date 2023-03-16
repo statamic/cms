@@ -280,6 +280,11 @@ GQL;
             ->assertJson([
                 'errors' => [[
                     'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'filter' => ['Forbidden: title'],
+                        ],
+                    ],
                 ]],
                 'data' => [
                     'entries' => null,
