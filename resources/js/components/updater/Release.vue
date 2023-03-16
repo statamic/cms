@@ -77,10 +77,10 @@ export default {
 
         confirmationText() {
             if (this.release.latest) {
-                return `${__('messages.update_to_latest_command')}:`;
+                return `${__('messages.updater_update_to_latest_command')}:`;
             }
 
-            return `${__('messages.require_version_command')}:`;
+            return `${__('messages.updater_require_version_command')}:`;
         },
 
         command() {
