@@ -153,32 +153,24 @@ EOT;
         $this->assertTrue($isPaired);
     }
 
-    public function test_runtime_does_not_attempt_evaluate_modifiers_twice()
+    public function test_modified_value_is_used_each_iteration()
     {
-        mt_srand(1234);
-
         $data = [
-            'widths' => [
-                '25',
-                '50',
-                '75',
-            ],
+            'items' => ['a', 'b', 'c'],
         ];
 
+        // without mirroring modifier in closing tag
         $template = <<<'EOT'
-{{ loop from="1" to="10" }}<{{ value }}><{{ widths | shuffle | limit:1 }}width-{{ value }}{{ /widths }}><{{ value }}>{{ unless last }}|{{ /unless}}{{ /loop }}
+{{ loop from="1" to="3" }}<{{ value }}{{ items | limit:1 }}{{ value }}{{ /items }}{{ value }}>{{ /loop }}
 EOT;
 
-        $expected = <<<'EXPECTED'
-<1><width-75><1>|<2><width-75><2>|<3><width-50><3>|<4><width-75><4>|<5><width-25><5>|<6><width-75><6>|<7><width-75><7>|<8><width-50><8>|<9><width-50><9>|<10><width-50><10>
-EXPECTED;
+        $expected = '<1a1><2a2><3a3>'; // only "a" should be output in each iteration since limit:1 is used.
 
         $this->assertSame($expected, $this->renderString($template, $data, true));
 
-        mt_srand(1234);
-
+        // mirror modifiers in closing tag
         $template = <<<'EOT'
-{{ loop from="1" to="10" }}<{{ value }}><{{ widths | shuffle | limit:1 }}width-{{ value }}{{ /widths | shuffle | limit:1 }}><{{ value }}>{{ unless last }}|{{ /unless }}{{ /loop }}
+{{ loop from="1" to="3" }}<{{ value }}{{ items | limit:1 }}{{ value }}{{ /items | limit:1 }}{{ value }}>{{ /loop }}
 EOT;
 
         $this->assertSame($expected, $this->renderString($template, $data, true));

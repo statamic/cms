@@ -20,6 +20,10 @@ class EntryRepositoryTest extends TestCase
 {
     use UnlinksPaths;
 
+    private $stache;
+    private $directory;
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -151,6 +155,7 @@ class EntryRepositoryTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider entryByUriProvider
      */
     public function it_gets_entry_by_uri($uri, $expectedTitle)

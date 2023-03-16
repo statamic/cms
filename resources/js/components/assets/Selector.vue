@@ -12,6 +12,7 @@
                     :restrict-folder-navigation="restrictFolderNavigation"
                     :max-files="maxFiles"
                     :autoselect-uploads="true"
+                    :autofocus-search="true"
                     @selections-updated="selectionsUpdated"
                     @asset-doubleclicked="select">
 

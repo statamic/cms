@@ -48,7 +48,7 @@
                             <div class="relative w-full">
 
                                 <div class="data-list-header">
-                                    <data-list-search v-model="searchQuery" />
+                                    <data-list-search ref="search" v-model="searchQuery" />
 
                                     <template v-if="! hasSelections">
                                         <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-2" @click="creatingFolder = true">
@@ -320,6 +320,7 @@ export default {
         maxFiles: Number,
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
+        autofocusSearch: Boolean,
     },
 
     data() {
@@ -456,6 +457,12 @@ export default {
         parameters(after, before) {
             if (JSON.stringify(before) === JSON.stringify(after)) return;
             this.loadAssets();
+        },
+
+        initializing(isInitializing, wasInitializing) {
+            if (wasInitializing && this.autofocusSearch) {
+                this.$nextTick(() => this.$refs.search.focus());
+            }
         },
 
         loading(loading) {

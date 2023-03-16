@@ -14,6 +14,8 @@ class BrowserTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
+    private $tempDir;
+
     public function setUp(): void
     {
         parent::setUp();

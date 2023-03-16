@@ -29,7 +29,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         if ($this->shouldPreventNavBeingBuilt) {
-            \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn([]);
+            \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
             $this->addToAssertionCount(-1); // Dont want to assert this
         }
 
@@ -74,8 +74,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         foreach ($configs as $config) {
             $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
         }
-
-        $app['config']->set('statamic.antlers.version', 'runtime');
     }
 
     protected function getEnvironmentSetUp($app)
@@ -113,6 +111,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'driver' => 'file',
             'path' => storage_path('framework/cache/outpost-data'),
         ]);
+
+        $app['config']->set('statamic.search.indexes.default.driver', 'null');
 
         $viewPaths = $app['config']->get('view.paths');
         $viewPaths[] = __DIR__.'/__fixtures__/views/';
