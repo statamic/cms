@@ -1,4 +1,6 @@
 <template>
+
+<element-container @resized="refresh">
     <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
 
         <uploader
@@ -117,6 +119,8 @@
         <vue-countable :text="data" :elementId="'myId'" @change="change"></vue-countable>
 
     </div>
+</element-container>
+
 </template>
 
 <script>
@@ -524,6 +528,12 @@ export default {
                 this.$root.$off('livepreview.closed', throttled);
                 this.$root.$off('livepreview.resizing', throttled);
             });
+        },
+
+        refresh() {
+            this.$nextTick(function() {
+                this.codemirror.refresh();
+            })
         }
 
     },
