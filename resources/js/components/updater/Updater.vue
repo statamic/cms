@@ -39,6 +39,7 @@
             :key="release.version"
             :release="release"
             :package-name="name"
+            :package="package"
             :show-actions="showActions"
         />
 
