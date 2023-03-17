@@ -20,7 +20,7 @@
 
         <confirmation-modal
             v-if="editing"
-            :title="__('Edit')"
+            :title="__('Edit Tab')"
             @confirm="editConfirmed"
             @cancel="editCancelled"
         >

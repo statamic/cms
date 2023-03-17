@@ -1,8 +1,8 @@
 <template>
     <div>
-        <div class="tabs-container mb-5">
+        <div class="tabs-container mb-5 relative">
             <div ref="tabs" class="tabs flex-1
-            flex space-x-3 overflow-auto" role="tablist">
+            flex space-x-3 overflow-auto pr-6" role="tablist">
                 <tab
                     ref="tab"
                     v-for="tab in tabs"
@@ -16,9 +16,11 @@
                     @mouseenter="mouseEnteredTab(tab._id)"
                 />
                 <div class="fade-left" v-if="canScrollLeft" />
-                <div class="fade-right" :class="{ 'mr-8': showHiddenTabsDropdown }" v-if="canScrollRight" />
             </div>
-            <button v-if="!singleTab" class="tab-button" @click="addAndEditTab" v-text="addTabText" />
+            <div class="fade-right right-10" />
+            <button v-if="!singleTab" class="btn-round ml-2 flex items-center justify-center relative top-1" @click="addAndEditTab" v-tooltip="addTabText">
+                <svg-icon name="add-bold" class="w-3 h-3" />
+            </button>
         </div>
         <tab-content
             v-for="tab in tabs"

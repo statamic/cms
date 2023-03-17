@@ -2,6 +2,10 @@
    MODALS
    ========================================================================== */
 
+.v--modal {
+    @apply rounded-lg !important;
+}
+
 .v--modal-overlay {
     z-index: 10000 !important;
     background: hsla(210, 20%, 10%, .15) !important;
