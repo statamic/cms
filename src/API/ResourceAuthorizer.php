@@ -4,7 +4,7 @@ namespace Statamic\API;
 
 use Statamic\Facades\Collection;
 
-class AllowedResourcesConfig
+class ResourceAuthorizer
 {
     /**
      * Get allowed filters for collection entries query.

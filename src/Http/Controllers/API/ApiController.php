@@ -36,7 +36,7 @@ class ApiController extends Controller
             return;
         }
 
-        // TODO: Use AllowedResourcesConfig?
+        // TODO: Use ResourceAuthorizer?
 
         $config = config("statamic.api.resources.{$this->resourceConfigKey}", false);
 

@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
-use Facades\Statamic\API\AllowedResourcesConfig;
+use Facades\Statamic\API\ResourceAuthorizer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Term;
 use Statamic\Http\Resources\API\EntryResource;
@@ -62,7 +62,7 @@ class TaxonomyTermEntriesController extends ApiController
 
     private function allowedCollections()
     {
-        return AllowedResourcesConfig::allowedForCollectionEntries('api');
+        return ResourceAuthorizer::allowedForCollectionEntries('api');
     }
 
     protected function allowedFilters()
