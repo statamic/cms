@@ -76,6 +76,6 @@ class EntriesQuery extends Query
 
     public function allowedFilters($args)
     {
-        return AllowedFiltersConfig::allowedForCollectionEntries('graphql', $args['collection'] ?? '*');
+        return AllowedFiltersConfig::allowedForSubResources('graphql', 'collections', $args['collection'] ?? '*');
     }
 }

@@ -46,6 +46,6 @@ class CollectionTreeController extends ApiController
 
     protected function allowedFilters()
     {
-        return AllowedFiltersConfig::allowedForCollectionEntries('api', $this->collectionHandle);
+        return AllowedFiltersConfig::allowedForSubResources('api', 'collections', $this->collectionHandle);
     }
 }

@@ -67,6 +67,6 @@ class TaxonomyTermEntriesController extends ApiController
 
     protected function allowedFilters()
     {
-        return AllowedFiltersConfig::allowedForCollectionEntries('api', $this->allowedCollections);
+        return AllowedFiltersConfig::allowedForSubResources('api', 'collections', $this->allowedCollections);
     }
 }

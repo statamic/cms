@@ -269,8 +269,8 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
-            ->with('graphql', ['blog'])
+        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', ['blog'])
             ->andReturn([])
             ->once();
 
@@ -330,8 +330,8 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
-            ->with('graphql', ['blog'])
+        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', ['blog'])
             ->andReturn(['title'])
             ->once();
 
@@ -385,8 +385,8 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
-            ->with('graphql', '*')
+        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', '*')
             ->andReturn(['title'])
             ->once();
 
@@ -441,8 +441,8 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
-            ->with('graphql', '*')
+        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', '*')
             ->andReturn(['title'])
             ->once();
 
@@ -501,8 +501,8 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
-            ->with('graphql', '*')
+        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', '*')
             ->andReturn(['title'])
             ->once();
 
@@ -536,8 +536,8 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
-            ->with('graphql', '*')
+        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', '*')
             ->andReturn(['title'])
             ->once();
 
@@ -654,7 +654,7 @@ GQL;
     /** @test */
     public function it_only_shows_published_entries_by_default()
     {
-        AllowedFiltersConfig::shouldReceive('allowedForCollectionEntries')
+        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
             ->andReturn(['published', 'status']);
 
         $this->createEntries();

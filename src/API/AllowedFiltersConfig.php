@@ -2,7 +2,7 @@
 
 namespace Statamic\API;
 
-use Statamic\Facades\Collection;
+use Statamic\Facades;
 use Statamic\Support\Arr;
 
 class AllowedFiltersConfig
@@ -10,13 +10,15 @@ class AllowedFiltersConfig
     /**
      * Get allowed filters for resource.
      *
+     * For example, which filters are allowed when querying against users?
+     *
      * @param  string  $configFile
-     * @param  string  $configResourceKey
+     * @param  string  $queriedResource
      * @return array
      */
-    public function allowedForResource($configFile, $configResourceKey)
+    public function allowedForResource($configFile, $queriedResource)
     {
-        $config = config("statamic.{$configFile}.resources.{$configResourceKey}.allowed_filters");
+        $config = config("statamic.{$configFile}.resources.{$queriedResource}.allowed_filters");
 
         // Use explicitly configured `allowed_filters` array, otherwise no filters should be allowed.
         return is_array($config)
@@ -25,41 +27,59 @@ class AllowedFiltersConfig
     }
 
     /**
-     * Get allowed filters for collection entries query.
+     * Get allowed filters for sub-resource(s).
+     *
+     * For example, which filters are allowed when querying for `pages` and `articles` collection entries in a graphql query?
      *
      * @param  string  $configFile
-     * @param  string|array  $collectionHandles
+     * @param  string  $queriedResource
+     * @param  string|array  $queriedHandles
      * @return array
      */
-    public function allowedForCollectionEntries($configFile, $collectionHandles)
+    public function allowedForSubResources($configFile, $queriedResource, $queriedHandles)
     {
-        $config = config("statamic.{$configFile}.resources.collections", false);
+        $config = config("statamic.{$configFile}.resources.{$queriedResource}", false);
 
-        // If collections config is just a basic `true`, then no filters should be allowed by default.
+        // If resource config is just a basic `true`, then no filters should be allowed by default.
         if ($config === true) {
             return [];
         }
 
-        // Determine which collections are being queried.
-        $collections = collect($collectionHandles === '*' ? Collection::handles() : $collectionHandles);
+        // Determine which resources are being queried.
+        $resources = collect($queriedHandles === '*' ? $this->getAllHandlesFor($queriedResource) : $queriedHandles);
 
-        // Determine if any of our queried collections are explicitly disabled.
-        $disabled = $collections
-            ->filter(fn ($collection) => Arr::get($config, "{$collection}.allowed_filters") === false)
+        // Determine if any of our queried resources are explicitly disabled.
+        $disabled = $resources
+            ->filter(fn ($resource) => Arr::get($config, "{$resource}.allowed_filters") === false)
             ->isNotEmpty();
 
-        // If any queried collection is explicitly disabled, then no filters should be allowed.
+        // If any queried resource is explicitly disabled, then no filters should be allowed.
         if ($disabled) {
             return [];
         }
 
         // Determine `allowed_filters` by filtering out any that don't appear in all of them.
-        // And a collection named `*` will apply to all collections.
-        return $collections
-            ->map(fn ($collection) => $config[$collection]['allowed_filters'] ?? [])
+        // And a resource named `*` will apply to all resources at once.
+        return $resources
+            ->map(fn ($resource) => $config[$resource]['allowed_filters'] ?? [])
             ->reduce(function ($carry, $allowedFilters) use ($config) {
                 return $carry->intersect($allowedFilters)->merge($config['*']['allowed_filters'] ?? []);
-            }, collect($config[$collections[0]]['allowed_filters'] ?? []))
+            }, collect($config[$resources[0]]['allowed_filters'] ?? []))
             ->all();
+    }
+
+    /**
+     * Get all possible handles for resource (for when evaluating `*` config).
+     *
+     * @param  string  $resource
+     * @return array
+     */
+    protected function getAllHandlesFor($resource)
+    {
+        if ($resource === 'collections') {
+            return Facades\Collection::handles()->all();
+        }
+
+        return [];
     }
 }

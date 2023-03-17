@@ -36,17 +36,17 @@ class AllowedFiltersConfigTest extends TestCase
     {
         Config::set("statamic.{$configFile}.resources.collections", false);
 
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'blog'));
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'pages'));
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, ['blog', 'pages']));
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, '*'));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'blog'));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'pages'));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', ['blog', 'pages']));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', '*'));
 
         Config::set("statamic.{$configFile}.resources.collections", true);
 
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'blog'));
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'pages'));
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, ['blog', 'pages']));
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, '*'));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'blog'));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'pages'));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', ['blog', 'pages']));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', '*'));
     }
 
     /**
@@ -61,10 +61,10 @@ class AllowedFiltersConfigTest extends TestCase
             ],
         ]);
 
-        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'blog'));
-        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'pages'));
-        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, ['blog', 'pages']));
-        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, '*'));
+        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'blog'));
+        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'pages'));
+        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', ['blog', 'pages']));
+        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', '*'));
     }
 
     /**
@@ -79,10 +79,10 @@ class AllowedFiltersConfigTest extends TestCase
             ],
         ]);
 
-        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'blog'));
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'pages'));
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, ['blog', 'pages']));
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, '*'));
+        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'blog'));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'pages'));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', ['blog', 'pages']));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', '*'));
 
         Config::set("statamic.{$configFile}.resources.collections", [
             'blog' => [
@@ -93,10 +93,10 @@ class AllowedFiltersConfigTest extends TestCase
             ],
         ]);
 
-        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'blog'));
-        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'pages'));
-        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, ['blog', 'pages']));
-        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, '*'));
+        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'blog'));
+        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'pages'));
+        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', ['blog', 'pages']));
+        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', '*'));
     }
 
     /**
@@ -114,10 +114,10 @@ class AllowedFiltersConfigTest extends TestCase
             ],
         ]);
 
-        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'blog'));
-        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'pages'));
-        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, ['blog', 'pages']));
-        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, '*'));
+        $this->assertEqualsCanonicalizing(['title', 'slug'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'blog'));
+        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'pages'));
+        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', ['blog', 'pages']));
+        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', '*'));
     }
 
     /**
@@ -135,10 +135,10 @@ class AllowedFiltersConfigTest extends TestCase
             ],
         ]);
 
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'blog'));
-        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForCollectionEntries($configFile, 'pages'));
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, ['blog', 'pages']));
-        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForCollectionEntries($configFile, '*'));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'blog'));
+        $this->assertEqualsCanonicalizing(['title'], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', 'pages'));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', ['blog', 'pages']));
+        $this->assertEqualsCanonicalizing([], AllowedFiltersConfig::allowedForSubResources($configFile, 'collections', '*'));
     }
 
     /**
