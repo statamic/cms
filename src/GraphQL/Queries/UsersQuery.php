@@ -2,7 +2,7 @@
 
 namespace Statamic\GraphQL\Queries;
 
-use Facades\Statamic\API\AllowedFiltersConfig;
+use Facades\Statamic\API\FilterAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
@@ -95,7 +95,7 @@ class UsersQuery extends Query
 
     public function allowedFilters($args)
     {
-        return collect(AllowedFiltersConfig::allowedForResource('graphql', 'users'))
+        return collect(FilterAuthorizer::allowedForResource('graphql', 'users'))
             ->reject(fn ($field) => in_array($field, ['password', 'password_hash']))
             ->all();
     }

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
-use Facades\Statamic\API\AllowedFiltersConfig;
+use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Config;
@@ -174,7 +174,7 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForResource')
+        FilterAuthorizer::shouldReceive('allowedForResource')
             ->with('graphql', 'users')
             ->andReturn([])
             ->once();
@@ -224,7 +224,7 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForResource')
+        FilterAuthorizer::shouldReceive('allowedForResource')
             ->with('graphql', 'users')
             ->andReturn(['bio'])
             ->once();
@@ -263,7 +263,7 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForResource')
+        FilterAuthorizer::shouldReceive('allowedForResource')
             ->with('graphql', 'users')
             ->andReturn(['email'])
             ->once();
@@ -308,7 +308,7 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForResource')
+        FilterAuthorizer::shouldReceive('allowedForResource')
             ->with('graphql', 'users')
             ->andReturn(['bio'])
             ->once();

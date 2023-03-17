@@ -2,7 +2,7 @@
 
 namespace Statamic\GraphQL\Queries;
 
-use Facades\Statamic\API\AllowedFiltersConfig;
+use Facades\Statamic\API\FilterAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
@@ -76,6 +76,6 @@ class EntriesQuery extends Query
 
     public function allowedFilters($args)
     {
-        return AllowedFiltersConfig::allowedForSubResources('graphql', 'collections', $args['collection'] ?? '*');
+        return FilterAuthorizer::allowedForSubResources('graphql', 'collections', $args['collection'] ?? '*');
     }
 }

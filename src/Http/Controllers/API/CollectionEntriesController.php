@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Facades\Statamic\API\AllowedFiltersConfig;
+use Facades\Statamic\API\FilterAuthorizer;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Entry;
 use Statamic\Http\Resources\API\EntryResource;
@@ -82,6 +82,6 @@ class CollectionEntriesController extends ApiController
 
     protected function allowedFilters()
     {
-        return AllowedFiltersConfig::allowedForSubResources('api', 'collections', $this->collectionHandle);
+        return FilterAuthorizer::allowedForSubResources('api', 'collections', $this->collectionHandle);
     }
 }

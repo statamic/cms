@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
-use Facades\Statamic\API\AllowedFiltersConfig;
+use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
@@ -270,7 +270,7 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
             ->with('graphql', 'collections', ['blog'])
             ->andReturn([])
             ->once();
@@ -331,7 +331,7 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
             ->with('graphql', 'collections', ['blog'])
             ->andReturn(['title'])
             ->once();
@@ -386,7 +386,7 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
             ->with('graphql', 'collections', '*')
             ->andReturn(['title'])
             ->once();
@@ -442,7 +442,7 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
             ->with('graphql', 'collections', '*')
             ->andReturn(['title'])
             ->once();
@@ -502,7 +502,7 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
             ->with('graphql', 'collections', '*')
             ->andReturn(['title'])
             ->once();
@@ -537,7 +537,7 @@ GQL;
 }
 GQL;
 
-        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
             ->with('graphql', 'collections', '*')
             ->andReturn(['title'])
             ->once();
@@ -655,7 +655,7 @@ GQL;
     /** @test */
     public function it_only_shows_published_entries_by_default()
     {
-        AllowedFiltersConfig::shouldReceive('allowedForSubResources')
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
             ->andReturn(['published', 'status']);
 
         $this->createEntries();

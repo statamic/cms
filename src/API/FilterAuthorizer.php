@@ -5,12 +5,12 @@ namespace Statamic\API;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 
-class AllowedFiltersConfig
+class FilterAuthorizer
 {
     /**
      * Get allowed filters for resource.
      *
-     * For example, which filters are allowed when querying against users?
+     * For example, which filters are allowed when querying against the `users` resource?
      *
      * @param  string  $configFile
      * @param  string  $queriedResource
@@ -29,7 +29,7 @@ class AllowedFiltersConfig
     /**
      * Get allowed filters for sub-resource(s).
      *
-     * For example, which filters are allowed when querying for `pages` and `articles` collection entries in a graphql query?
+     * For example, which filters are allowed when querying against `pages` and `articles` entries within the `collections` resource?
      *
      * @param  string  $configFile
      * @param  string  $queriedResource
@@ -46,7 +46,7 @@ class AllowedFiltersConfig
         }
 
         // Determine which resources are being queried.
-        $resources = collect($queriedHandles === '*' ? $this->getAllHandlesFor($queriedResource) : $queriedHandles);
+        $resources = collect($queriedHandles === '*' ? $this->getAllHandlesForResource($queriedResource) : $queriedHandles);
 
         // Determine if any of our queried resources are explicitly disabled.
         $disabled = $resources
@@ -74,7 +74,7 @@ class AllowedFiltersConfig
      * @param  string  $resource
      * @return array
      */
-    protected function getAllHandlesFor($resource)
+    protected function getAllHandlesForResource($resource)
     {
         if ($resource === 'collections') {
             return Facades\Collection::handles()->all();
