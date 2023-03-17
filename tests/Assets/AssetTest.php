@@ -1668,6 +1668,7 @@ class AssetTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider nonGlideableFileExtensions
      **/
     public function it_doesnt_process_or_error_when_uploading_non_glideable_file_with_glide_config($extension)
