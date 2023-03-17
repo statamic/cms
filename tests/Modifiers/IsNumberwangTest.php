@@ -27,6 +27,7 @@ class IsNumberwangTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider numbers
      */
     public function is_it_or_is_not_numberwang($expected, $input): void

@@ -329,12 +329,10 @@ class FieldtypeTest extends TestCase
     /** @test */
     public function it_will_only_append_config_fields_to_the_intended_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype
-        {
+        $fieldtype = new class extends Fieldtype {
         };
 
-        $fieldtypeWithAppendedConfig = new class extends Fieldtype
-        {
+        $fieldtypeWithAppendedConfig = new class extends Fieldtype {
         };
 
         $fieldtypeWithAppendedConfig::appendConfigField('group', ['type' => 'text']);
@@ -402,6 +400,7 @@ class FieldtypeTest extends TestCase
 
     /**
      * @test
+     *
      * @group graphql
      **/
     public function it_gets_the_graphql_type_of_string_by_default()

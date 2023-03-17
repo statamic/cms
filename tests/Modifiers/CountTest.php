@@ -19,6 +19,7 @@ class CountTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider arraysToCount
      */
     public function it_counts_number_of_items_in_array($expected, $input): void
