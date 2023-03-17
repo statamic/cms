@@ -63,7 +63,6 @@ return [
     'edit_roles' => 'Modifica ruoli',
     'group_updates' => 'Aggiornamenti',
     'view_updates' => 'Visualizza gli aggiornamenti',
-    'perform_updates' => 'Esegui aggiornamenti',
     'group_utilities' => 'Utilità',
     'access_utility' => ':title',
     'access_utility_desc' => 'Consente l\'accesso alle utilità di :title',

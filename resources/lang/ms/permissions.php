@@ -76,7 +76,6 @@ return [
 
     'group_updates' => 'Kemas kini',
     'view_updates' => 'Lihat Kemas kini',
-    'perform_updates' => 'Lakukan kemas kini',
 
     'group_utilities' => 'Utilities',
     'access_utility' => ':title',

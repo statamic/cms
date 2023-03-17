@@ -76,7 +76,6 @@ return [
 
     'group_updates' => 'Uppdateringar',
     'view_updates' => 'Visa uppdateringar',
-    'perform_updates' => 'Utför uppdateringar',
 
     'group_utilities' => 'Verktyg',
     'access_utility' => ':title',
