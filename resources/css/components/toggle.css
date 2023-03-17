@@ -68,13 +68,13 @@
 }
 
 .toggle-container.on {
-    @apply bg-green-light border-green;
+    @apply bg-green-500 border-green-600;
     .toggle-slider {
         width: 44px;
     }
 
     .toggle-knob:focus {
-        box-shadow: 0 0 10px rgba(#64BD63, .7);
+        box-shadow: 0 0 10px theme(colors.green.500/70);
     }
 }
 

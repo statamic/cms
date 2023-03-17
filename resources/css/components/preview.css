@@ -59,6 +59,7 @@
     z-index: 1;
     cursor: ew-resize;
     background: theme('colors.gray.200') url('../../svg/drag-dots.svg') center center no-repeat;
+    background-size: 7px 17px;
 }
 
 

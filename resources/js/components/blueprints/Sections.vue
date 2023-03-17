@@ -120,7 +120,7 @@ export default {
             sortableFields = new Sortable(document.querySelectorAll('.blueprint-section-draggable-zone'), {
                 draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
-                mirror: { constrainDimensions: true },
+                mirror: { constrainDimensions: true, appendTo: 'body' },
                 plugins: [Plugins.SwapAnimation]
             }).on('sortable:stop', e => {
                 if (e.newContainer.parentElement.classList.contains('blueprint-add-section-button')) {

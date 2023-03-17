@@ -113,6 +113,7 @@ class DataRepositoryTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider findByRequestUrlProvider
      */
     public function it_finds_by_request_url($requestUrl, $entryId)
@@ -127,6 +128,7 @@ class DataRepositoryTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider findByRequestUrlNoRootSiteProvider
      */
     public function it_finds_by_request_url_with_no_root_site($requestUrl, $entryId)

@@ -5,7 +5,6 @@ import Alpine from 'alpinejs'
 import * as Globals from './bootstrap/globals'
 import { default as underscore } from 'underscore'
 import Cookies from 'cookies-js';
-import rangy from 'rangy';
 
 let global_functions = Object.keys(Globals)
 global_functions.forEach(fnName => { window[fnName] = Globals[fnName] })
@@ -19,7 +18,6 @@ window.Alpine = Alpine
 window.Vue = Vue;
 window.Statamic = Statamic;
 window._ = underscore;
-window.rangy = rangy;
 
 import './bootstrap/polyfills';
 import './bootstrap/underscore-mixins';
@@ -29,14 +27,13 @@ import './bootstrap/mixins';
 import './bootstrap/components';
 import './bootstrap/fieldtypes';
 import './bootstrap/directives';
+import './bootstrap/tooltips';
 
 import axios from 'axios';
 import PortalVue from "portal-vue";
 import VModal from "vue-js-modal";
 import Vuex from 'vuex';
 import StatamicStore from './store';
-import Popover  from 'vue-js-popover'
-import VTooltip from 'v-tooltip'
 import vSelect from 'vue-select'
 import VCalendar from 'v-calendar';
 
@@ -71,10 +68,8 @@ Vue.prototype.$keys = Statamic.$keys;
 import Moment from 'moment';
 window.moment = Vue.moment = Vue.prototype.$moment = Moment;
 
-Vue.use(Popover, { tooltip: true })
 Vue.use(PortalVue)
 Vue.use(VModal, { componentName: 'vue-modal' })
-Vue.use(VTooltip)
 Vue.use(Vuex);
 Vue.use(VCalendar);
 

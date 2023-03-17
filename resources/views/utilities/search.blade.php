@@ -23,7 +23,7 @@
 
     <div class="card p-0">
         @if ($errors->has('indexes'))
-            <p class="p-4"><small class="help-block text-red">{{ $errors->first() }}</small></p>
+            <p class="p-4"><small class="help-block text-red-500">{{ $errors->first() }}</small></p>
         @endif
 
         <table class="data-table">
@@ -72,7 +72,7 @@
                             <form method="POST" action="{{ cp_route('utilities.search') }}">
                                 @csrf
                                 <input type="hidden" name="indexes[]" value="{{ $index->name() }}">
-                                <button type="submit" class="btn btn-sm">{{ __('Update') }}</button>
+                                <button type="submit" class="btn btn-xs">{{ __('Update') }}</button>
                             </form>
                         </td>
                     </tr>

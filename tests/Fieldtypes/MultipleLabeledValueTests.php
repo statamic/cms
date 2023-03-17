@@ -129,6 +129,7 @@ trait MultipleLabeledValueTests
 
     /**
      * @test
+     *
      * @dataProvider noMultipleOptionsProvider
      */
     public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents_with_no_options($options)

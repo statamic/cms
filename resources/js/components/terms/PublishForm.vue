@@ -8,7 +8,7 @@
                 <div class="flex items-center">
                     <span v-if="! isCreating"
                         class="little-dot mr-2"
-                        :class="{ 'bg-green-light': published, 'bg-gray-600': !published }" />
+                        :class="{ 'bg-green-600': published, 'bg-gray-600': !published }" />
                     <span v-html="$options.filters.striptags(title)" />
                 </div>
             </h1>
@@ -101,7 +101,7 @@
 
                                 <div :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-4 flex items-center -mx-2">
+                                    <div class="p-4 flex items-center -mx-2" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
                                             class="flex items-center justify-center btn-flat w-full mx-2 px-2"
                                             v-if="isBase"
@@ -111,7 +111,7 @@
                                         </button>
                                         <a
                                             class="flex items-center justify-center btn-flat w-full mx-2 px-2"
-                                            v-if="permalink"
+                                            v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">
                                             <svg-icon name="external-link" class="w-4 h-4 mr-2" />
@@ -130,7 +130,7 @@
                                 <div class="border-t p-4" v-if="revisionsEnabled">
                                     <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
                                     <div class="mb-1 flex items-center" v-if="published">
-                                        <span class="text-green w-6 text-center">&check;</span>
+                                        <span class="text-green-600 w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('Entry has a published version')"></span>
                                     </div>
                                     <div class="mb-1 flex items-center" v-else="published">
@@ -146,7 +146,7 @@
                                         <span class="text-2xs" v-text="__('Entry has unpublished changes')"></span>
                                     </div>
                                     <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
-                                        <span class="text-green w-6 text-center">&check;</span>
+                                        <span class="text-green-600 w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('This is the published version')"></span>
                                     </div>
                                     <button
@@ -170,9 +170,9 @@
                                     >
                                         <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
                                             <span class="little-dot mr-2" :class="{
-                                                'bg-green': option.published,
+                                                'bg-green-600': option.published,
                                                 'bg-gray-500': !option.published,
-                                                'bg-red': !option.exists
+                                                'bg-red-500': !option.exists
                                             }" />
                                             {{ option.name }}
                                             <loading-graphic :size="14" text="" class="ml-2" v-if="localizing === option.handle" />
@@ -344,6 +344,14 @@ export default {
 
         livePreviewUrl() {
             return _.findWhere(this.localizations, { active: true }).url + '/preview';
+        },
+
+        showLivePreviewButton() {
+            return !this.isCreating && this.isBase && this.livePreviewUrl;
+        },
+
+        showVisitUrlButton() {
+            return !!this.permalink;
         },
 
         isBase() {

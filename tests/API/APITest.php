@@ -25,6 +25,7 @@ class APITest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider entryNotFoundProvider
      */
     public function it_handles_not_found_entries($url, $requestShouldSucceed)
@@ -330,6 +331,7 @@ class APITest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider userPasswordFilterProvider
      */
     public function it_doesnt_allow_filtering_users_by_password($filter)
@@ -412,6 +414,7 @@ class APITest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider termNotFoundProvider
      */
     public function it_handles_not_found_terms($url, $requestShouldSucceed)

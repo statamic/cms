@@ -111,9 +111,9 @@ export default {
         },
 
         widthClass() {
-            if (! this.isSectionExpanded) return 'w-full';
+            if (! this.isSectionExpanded) return 'blueprint-section-field-w-full';
 
-            return `${tailwind_width_class(this.width)}`;
+            return `blueprint-section-field-${tailwind_width_class(this.width)}`;
         },
 
         localizable: {

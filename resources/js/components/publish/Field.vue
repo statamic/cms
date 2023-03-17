@@ -51,30 +51,8 @@
 
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
 
-        <portal to="modal" v-if="fullscreen">
-            <div class="absolute inset-0 h-full w-full bg-black/10 z-10">
-                <slot name="fieldtype" v-if="!loadingMeta" v-else>
-                    <div class="text-xs text-red" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
-                    <component
-                        v-else
-                        :is="fieldtypeComponent"
-                        :config="config"
-                        :value="value"
-                        :meta="meta"
-                        :handle="config.handle"
-                        :name-prefix="namePrefix"
-                        :field-path-prefix="fieldPathPrefix"
-                        :read-only="isReadOnly"
-                        @input="$emit('input', $event)"
-                        @meta-updated="$emit('meta-updated', $event)"
-                        @focus="focused"
-                        @blur="blurred"
-                    /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
-                </slot>
-            </div>
-        </portal>
-        <slot name="fieldtype" v-if="!loadingMeta" v-else>
-            <div class="text-xs text-red" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
+        <slot name="fieldtype" v-if="!loadingMeta">
+            <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
             <component
                 v-else
                 :is="fieldtypeComponent"
@@ -92,14 +70,13 @@
             /> <!-- TODO: name prop should include prefixing when used recursively like inside a grid. -->
         </slot>
 
-
         <div
             class="help-block mt-2"
             v-if="instructions && config.instructions_position === 'below'"
             v-html="instructions" />
 
         <div v-if="hasError">
-            <small class="help-block text-red mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
     </div>
     </publish-field-meta>
@@ -133,8 +110,7 @@ export default {
 
     data() {
         return {
-            showHandle: false,
-            fullscreen: false
+            showHandle: false
         }
     },
 

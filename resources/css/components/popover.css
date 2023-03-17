@@ -34,27 +34,6 @@
     position: relative;
 }
 
-/*  Supporting elements */
-.rotating-dots {
-    @apply relative cursor-pointer;
-    transition: .12s ease-out;
-    /*  top: 1px; */
-}
-
-.rotating-dots-button {
-    @apply  text-gray-700 rounded-full flex items-center justify-center;
-    height: 24px;
-    width: 24px;
-
-    &:hover {
-        @apply text-gray-950;
-    }
-
-    &:focus {
-        @apply focus-outline;
-    }
-}
-
 /*  When open */
 .popover-open {
     .popover {
@@ -69,5 +48,25 @@
 
     .rotating-dots {
         transform: rotate(90deg);
+    }
+}
+
+/*  Supporting elements */
+.rotating-dots {
+    @apply relative cursor-pointer;
+    transition: .12s ease-out;
+}
+
+.rotating-dots-button {
+    @apply  text-gray-700 rounded-full flex items-center justify-center;
+    height: 24px;
+    width: 24px;
+
+    &:hover {
+        @apply text-gray-950;
+    }
+
+    &:focus {
+        @apply focus-outline;
     }
 }

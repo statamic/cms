@@ -8,24 +8,34 @@
 <div :class="{ wrapperClasses: fullScreenMode }">
 <div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-white': fullScreenMode }">
 
-    <header class="bg-white border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
-        <h2 v-text="config.display" />
-        <button class="btn-close absolute top-2 right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
+    <header class="bg-white fixed top-0 inset-x-0 border-b p-3 pl-4 flex items-center justify-between shadow z-max" v-if="fullScreenMode">
+        <h2 v-text="config.display" class="flex-1" />
+            <div class="flex items-center">
+                <div class="btn-group">
+                    <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
+                        <svg-icon name="arrows-horizontal-expand" class="h-3.5 px-1 text-gray-750" />
+                    </button>
+                    <button @click="collapseAll" class="btn btn-icon flex items-center" v-tooltip="__('Collapse Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
+                        <svg-icon name="arrows-horizontal-collapse" class="h-3.5 px-1 text-gray-750" />
+                    </button>
+                </div>
+                <button class="btn-close ml-2" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
+            </div>
     </header>
 
-    <section :class="{'p-4 bg-gray-200 h-full': fullScreenMode}">
+    <section :class="{'mt-12 p-4 bg-gray-200': fullScreenMode}">
 
-        <div class="flex justify-end">
+        <div class="flex justify-end" v-if="! fullScreenMode">
             <div class="btn-group">
                 <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
-                    <svg-icon name="arrows-horizontal-expand" class="h-3.5 w-3.5" />
+                    <svg-icon name="arrows-horizontal-expand" class="h-3.5 px-0.5 text-gray-750" />
                 </button>
                 <button @click="collapseAll" class="btn btn-icon flex items-center" v-tooltip="__('Collapse Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
-                    <svg-icon name="arrows-horizontal-collapse" class="h-3.5 w-3.5" />
+                    <svg-icon name="arrows-horizontal-collapse" class="h-3.5 px-0.5 text-gray-750" />
                 </button>
                 <button @click="fullScreenMode = !fullScreenMode" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
-                    <svg-icon name="expand-2" class="h-3.5 w-3.5" v-show="! fullScreenMode" />
-                    <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="fullScreenMode" />
+                    <svg-icon name="expand-2" class="h-3.5 px-0.5 text-gray-750" v-show="! fullScreenMode" />
+                    <svg-icon name="shrink-all" class="h-3.5 px-0.5 text-gray-750" v-show="fullScreenMode" />
                 </button>
             </div>
         </div>
@@ -35,6 +45,7 @@
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            append-to="body"
             constrain-dimensions
             @input="sorted($event)"
             @dragstart="$emit('focus')"

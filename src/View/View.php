@@ -57,6 +57,7 @@ class View
     {
         return array_merge($this->cascade(), $this->data, [
             'current_template' => $this->template(),
+            'current_layout' => $this->layout(),
         ]);
     }
 

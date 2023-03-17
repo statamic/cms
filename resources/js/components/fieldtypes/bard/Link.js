@@ -1,5 +1,5 @@
 import { Mark, getAttributes, getMarkRange, markPasteRule } from '@tiptap/core';
-import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
+import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
 
 export const Link = Mark.create({
 

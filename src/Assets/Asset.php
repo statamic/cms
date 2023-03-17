@@ -42,14 +42,14 @@ use Symfony\Component\Mime\MimeTypes;
 class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues, SearchableContract
 {
     use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
-    TracksQueriedRelations,
-    Searchable, ContainsData {
-        set as traitSet;
-        get as traitGet;
-        remove as traitRemove;
-        data as traitData;
-        merge as traitMerge;
-    }
+        TracksQueriedRelations,
+        Searchable, ContainsData {
+            set as traitSet;
+            get as traitGet;
+            remove as traitRemove;
+            data as traitData;
+            merge as traitMerge;
+        }
 
     protected $container;
     protected $path;

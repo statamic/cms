@@ -162,8 +162,8 @@ class AntlersNodeParser
 
             if ($hasFoundName == false) {
                 if ($isParsingString == false && (
-                        $this->cur == DocumentParser::String_Terminator_DoubleQuote ||
-                        $this->cur == DocumentParser::String_Terminator_SingleQuote)) {
+                    $this->cur == DocumentParser::String_Terminator_DoubleQuote ||
+                    $this->cur == DocumentParser::String_Terminator_SingleQuote)) {
                     $terminator = $this->cur;
                     $isParsingString = true;
                     $nameContent[] = $this->cur;
@@ -535,9 +535,9 @@ class AntlersNodeParser
             }
 
             if ($hasFoundName && (
-                    ($terminator != null && $current == $terminator) ||
-                    ($terminator == null && ctype_space($current))
-                )) {
+                ($terminator != null && $current == $terminator) ||
+                ($terminator == null && ctype_space($current))
+            )) {
                 $content = implode($currentChars);
                 $hasFoundName = false;
                 $terminator = null;

@@ -26,8 +26,8 @@
     }
     &.dark { }
     &.blue { @apply bg-blue; }
-    &.green { @apply bg-green; }
-    &.red { @apply bg-red; }
+    &.green { @apply bg-green-600; }
+    &.red { @apply bg-red-500; }
 }
 
 .metric.simple {

@@ -376,4 +376,48 @@ EOT;
 
         $this->assertSame('<dance><party>', trim($this->renderString($template)));
     }
+
+    public function test_creation_of_new_array_elements()
+    {
+        $template = <<<'EOT'
+{{ the_array = ['One', 'Two'] }}
+One: {{ the_array.0 }}
+Two: {{ the_array.1 }}
+{{ the_array.2 = 'Three'; }}
+One: {{ the_array.0 }}
+Two: {{ the_array.1 }}
+Three: {{ the_array.2 }}
+{{ the_array = [] }}
+One: {{ the_array.0 }}
+Two: {{ the_array.1 }}
+Three: {{ the_array.2 }}
+{{ the_array.a.deeply.nested.path = 'One!'; }}
+{{ the_array.a.deeply.nested.more = 'Two!'; }}
+{{ the_array.a.deeply.nested.even_more = 'Three!'; }}
+One: {{ the_array.a.deeply.nested.path }}
+Two: {{ the_array.a.deeply.nested.more }}
+Three: {{ the_array.a.deeply.nested.even_more }}
+EOT;
+
+        $expected = <<<'EOT'
+One: One
+Two: Two
+
+One: One
+Two: Two
+Three: Three
+
+One: 
+Two: 
+Three: 
+
+
+
+One: One!
+Two: Two!
+Three: Three!
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template)));
+    }
 }

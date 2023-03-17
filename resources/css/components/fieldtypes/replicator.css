@@ -25,6 +25,7 @@
         @apply w-4 border-r rounded-tl p-2;
         cursor: grab;
         background: transparent url('../../../svg/drag-dots.svg') center center no-repeat;
+        background-size: 7px 17px;
         &:hover { @apply bg-gray-200; }
     }
 
@@ -43,9 +44,9 @@
 
     &.invalid {
         .replicator-set-header-inner {
-            @apply bg-red-lighter;
+            @apply bg-red-100;
             label {
-                @apply text-red;
+                @apply text-red-500;
             }
         }
     }
@@ -78,11 +79,11 @@
 }
 
 .replicator-set.has-error > .replicator-set-header label {
-    @apply text-red;
+    @apply text-red-500;
 }
 
 .replicator-set-body > .has-error > label {
-    @apply text-red;
+    @apply text-red-500;
 }
 
 .replicator-fullscreen {

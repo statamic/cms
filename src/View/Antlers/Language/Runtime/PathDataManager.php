@@ -356,14 +356,18 @@ class PathDataManager
     public function setRuntimeValue(VariableReference $path, &$data, $value)
     {
         // Run through the getData routine to build up the dynamic path.
-        $this->getData($path, $data);
+        $result = $this->getDataWithExistence($path, $data);
         $lastPath = $this->lastPath();
+
+        if ($result[0] === false && mb_strlen($lastPath) > 0) {
+            $lastPath = $path->originalContent;
+        }
 
         if (Str::contains($lastPath, '{method:')) {
             throw new VariableAccessException('Cannot set method value with path: "'.$path->originalContent.'"');
         }
 
-        Arr::set($data, $this->lastPath(), $value);
+        Arr::set($data, $lastPath, $value);
     }
 
     /**
@@ -602,7 +606,6 @@ class PathDataManager
                         }
 
                         if (count($path->pathParts) > 1 && $this->isPair == false) {
-
                             // If we have more steps in the path to take, but we are
                             // not a tag pair, we need to reduce anyway so we
                             // can descend further into the nested values.
@@ -626,7 +629,6 @@ class PathDataManager
                                 }
 
                                 if (count($path->pathParts) > 1 && $this->isPair == false) {
-
                                     // If we have more steps in the path to take, but we are
                                     // not a tag pair, we need to reduce anyway so we
                                     // can descend further into the nested values.
@@ -1001,7 +1003,7 @@ class PathDataManager
             if (! $isPair) {
                 $returnValue = $value->antlersValue($parser, $data);
             } else {
-                $returnValue = self::reduce(($value->antlersValue($parser, $data)));
+                $returnValue = self::reduce($value->antlersValue($parser, $data));
             }
             $returnValue = self::guardRuntimeReturnValue($returnValue);
 

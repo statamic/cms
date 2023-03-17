@@ -434,7 +434,7 @@ class Comb
                 array_push($output, $record);
             }
 
-            // find categorized data
+        // find categorized data
         } else {
             foreach ($this->haystack as $category => $records) {
                 foreach ($records as $item) {
@@ -870,7 +870,7 @@ class Comb
                 array_push($parts['chunks'], $query);
             }
 
-            // perform a boolean search -- require words, disallow words
+        // perform a boolean search -- require words, disallow words
         } elseif ($this->query_mode === self::QUERY_BOOLEAN) {
             $words = preg_split("/\s+/i", $query);
 
@@ -903,7 +903,7 @@ class Comb
                 array_push($parts['chunks'], $query);
             }
 
-            // search for the entire query as one thing
+        // search for the entire query as one thing
         } else {
             $parts['chunks'] = [strtolower($query)];
         }

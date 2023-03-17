@@ -101,17 +101,17 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-4 flex items-center -mx-2">
+                                    <div class="p-4 flex items-center -mx-2" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
                                             class="flex items-center justify-center btn-flat w-full mx-2 px-2"
-                                            v-if="isBase && livePreviewUrl"
+                                            v-if="showLivePreviewButton"
                                             @click="openLivePreview">
                                             <svg-icon name="synchronize" class="h-4 w-4 mr-2" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
                                             class="flex items-center justify-center btn-flat w-full mx-2 px-2"
-                                            v-if="permalink"
+                                            v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">
                                             <svg-icon name="external-link" class="w-4 h-4 mr-2" />
@@ -120,15 +120,23 @@
                                     </div>
                                 </div>
 
-                                <div class="flex items-center border-t justify-between px-4 py-2" v-if="!revisionsEnabled">
+                                <div
+                                    v-if="!revisionsEnabled"
+                                    class="flex items-center justify-between px-4 py-2"
+                                    :class="{ 'border-t': showLivePreviewButton || showVisitUrlButton }"
+                                >
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
                                     <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
                                 </div>
 
-                                <div class="border-t p-4" v-if="revisionsEnabled && !isCreating">
+                                <div
+                                    v-if="revisionsEnabled && !isCreating"
+                                    class="p-4"
+                                    :class="{ 'border-t': showLivePreviewButton || showVisitUrlButton }"
+                                >
                                     <label class="publish-field-label font-medium mb-2" v-text="__('Revisions')"/>
                                     <div class="mb-1 flex items-center" v-if="published">
-                                        <span class="text-green w-6 text-center">&check;</span>
+                                        <span class="text-green-600 w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('Entry has a published version')"></span>
                                     </div>
                                     <div class="mb-1 flex items-center" v-else>
@@ -136,7 +144,7 @@
                                         <span class="text-2xs" v-text="__('Entry has not been published')"></span>
                                     </div>
                                     <div class="mb-1 flex items-center" v-if="!isWorkingCopy && published">
-                                        <span class="text-green w-6 text-center">&check;</span>
+                                        <span class="text-green-600 w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('This is the published version')"></span>
                                     </div>
                                     <div class="mb-1 flex items-center" v-if="isDirty">
@@ -163,9 +171,9 @@
                                     >
                                         <div class="flex-1 flex items-center" :class="{ 'line-through': !option.exists }">
                                             <span class="little-dot mr-2" :class="{
-                                                'bg-green': option.published,
+                                                'bg-green-600': option.published,
                                                 'bg-gray-500': !option.published,
-                                                'bg-red': !option.exists
+                                                'bg-red-500': !option.exists
                                             }" />
                                             {{ option.name }}
                                             <loading-graphic
@@ -407,6 +415,14 @@ export default {
 
         livePreviewUrl() {
             return _.findWhere(this.localizations, { active: true }).livePreviewUrl;
+        },
+
+        showLivePreviewButton() {
+            return !this.isCreating && this.isBase && this.livePreviewUrl;
+        },
+
+        showVisitUrlButton() {
+            return !!this.permalink;
         },
 
         isBase() {

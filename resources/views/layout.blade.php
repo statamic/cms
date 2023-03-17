@@ -44,8 +44,6 @@
 
             <keyboard-shortcuts-modal></keyboard-shortcuts-modal>
 
-            <tooltip :pointer="true"></tooltip>
-
             <portal-targets></portal-targets>
 
             <portal-target name="live-preview"></portal-target>

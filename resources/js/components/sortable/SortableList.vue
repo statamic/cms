@@ -26,6 +26,10 @@ export default {
         handleClass: {
             default: 'sortable-handle',
         },
+        mirror: {
+            type: Boolean,
+            default: true
+        },
         appendTo: {
             default: null,
         },
@@ -37,6 +41,10 @@ export default {
         },
         constrainDimensions: {
             type: Boolean
+        },
+        delay: {
+            type: Number,
+            default: 200
         },
         disabled: {
             type: Boolean,
@@ -50,7 +58,7 @@ export default {
             let options = Object.assign({}, {
                 draggable: `.${CSS.escape(this.itemClass)}`,
                 handle: `.${CSS.escape(this.handleClass)}`,
-                delay: 200,
+                delay: this.delay,
                 swapAnimation: { vertical: this.vertical, horizontal: !this.vertical },
                 plugins: [Plugins.SwapAnimation],
                 mirror: {
@@ -101,6 +109,10 @@ export default {
         this.$on('hook:destroyed', () => {
             sortable.destroy()
         })
+
+        if (this.mirror === false) {
+            sortable.on('mirror:create', (e) => e.cancel());
+        }
     }
 
 }
