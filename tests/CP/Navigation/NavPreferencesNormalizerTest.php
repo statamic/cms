@@ -256,6 +256,7 @@ class NavPreferencesNormalizerTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider modifiers
      **/
     public function it_defaults_action_to_modify_when_modifying_in_original_section($modifier)

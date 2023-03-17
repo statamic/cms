@@ -68,7 +68,7 @@ class ProfileFormTest extends TestCase
     {{ /fields }}
 {{ /user:profile_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
@@ -96,7 +96,7 @@ EOT
     {{ /fields }}
 {{ /user:profile_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 

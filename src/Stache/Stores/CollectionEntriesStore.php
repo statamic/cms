@@ -128,9 +128,9 @@ class CollectionEntriesStore extends ChildStore
     {
         [$collection, $site] = $this->extractAttributesFromPath($path);
 
-        $collection = Collection::findByHandle($collection);
-
-        $this->removeEntryFromStructure($collection, $id);
+        if ($collection = Collection::findByHandle($collection)) {
+            $this->removeEntryFromStructure($collection, $id);
+        }
     }
 
     protected function removeEntryFromStructure($collection, $id)

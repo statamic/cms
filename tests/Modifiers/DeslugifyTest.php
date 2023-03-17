@@ -17,6 +17,7 @@ class DeslugifyTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider slackingSlugs
      */
     public function it_replaces_all_hyphens_and_underscores_with_spaces($expected, $input): void

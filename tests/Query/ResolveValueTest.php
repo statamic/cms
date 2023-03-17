@@ -11,6 +11,7 @@ class ResolveValueTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider resolvesValueProvider
      **/
     public function it_resolves_values($item, $field, $expected)
@@ -57,6 +58,7 @@ class ResolveValueTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider delegatesToClassProvider
      **/
     public function it_delegates_resolving_to_the_queryable_class($field, $expected)
