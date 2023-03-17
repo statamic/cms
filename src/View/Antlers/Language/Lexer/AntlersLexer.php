@@ -1111,6 +1111,17 @@ class AntlersLexer
                         }
                     }
 
+                    if ($this->next == DocumentParser::Punctuation_Colon && $this->lastNode instanceof VariableNode) {
+                        $this->lastNode->name .= '::';
+                        if ($this->lastNode->endPosition != null) {
+                            $this->lastNode->endPosition->index += 2;
+                            $this->lastNode->endPosition->offset += 2;
+                            $this->lastNode->endPosition->char += 2;
+                        }
+                        $this->currentIndex += 1;
+                        continue;
+                    }
+
                     $branchSeparator = new InlineBranchSeparator();
                     $branchSeparator->content = ':';
                     $branchSeparator->startPosition = $node->lexerRelativeOffset($this->currentIndex);

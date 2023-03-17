@@ -112,7 +112,7 @@ class ParserErrorsTest extends ParserTestCase
     {
         $this->assertThrowsParserError(<<<'EOT'
 {{
-    datetime:parse("October 12, 2001"):
+    datetime:parse("October 12, 2001")::
             addDays(10):
             toAtomString()
 }}
