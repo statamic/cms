@@ -33,7 +33,7 @@ class OAuthController
 
     protected function successRedirectUrl()
     {
-        $default = '/';
+        $default = cp_route('index');
 
         $previous = session('_previous.url');
 
@@ -43,6 +43,9 @@ class OAuthController
 
         parse_str($query, $query);
 
-        return array_get($query, 'redirect', $default);
+        $referer = array_get($query, 'redirect', $default);
+
+        // Only use the referer, if it's a url to the control panel.
+        return Str::contains($referer, '/'.config('statamic.cp.route')) ? $referer : $default;
     }
 }
