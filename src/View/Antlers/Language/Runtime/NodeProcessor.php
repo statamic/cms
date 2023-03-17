@@ -1464,6 +1464,7 @@ class NodeProcessor
                         $beforeAssignments = $this->runtimeAssignments;
                         $currentIsolationState = GlobalRuntimeState::$requiresRuntimeIsolation;
                         GlobalRuntimeState::$requiresRuntimeIsolation = true;
+                        GlobalRuntimeState::$evaulatingTagContents = true;
 
                         $args = [];
 
@@ -1477,6 +1478,7 @@ class NodeProcessor
                             throw $e;
                         } finally {
                             GlobalRuntimeState::$requiresRuntimeIsolation = $currentIsolationState;
+                            GlobalRuntimeState::$evaulatingTagContents = false;
                         }
 
                         $afterAssignments = $this->runtimeAssignments;
