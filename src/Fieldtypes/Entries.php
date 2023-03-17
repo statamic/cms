@@ -239,7 +239,7 @@ class Entries extends Relationship
             ->filter()
             ->all();
 
-        $query = (new StatusQueryBuilder((new OrderedQueryBuilder(Entry::query(), $ids))))
+        $query = (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
             ->whereIn('id', $ids);
 
         return $this->config('max_items') === 1 ? $query->first() : $query;
