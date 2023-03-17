@@ -6,7 +6,7 @@ use Facades\Statamic\API\AllowedFiltersConfig;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
-use Statamic\GraphQL\Middleware\AllowedFilters;
+use Statamic\GraphQL\Middleware\AuthorizeFilters;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\EntryInterface;
@@ -23,7 +23,7 @@ class EntriesQuery extends Query
 
     protected $middleware = [
         ResolvePage::class,
-        AllowedFilters::class,
+        AuthorizeFilters::class,
     ];
 
     public function type(): Type

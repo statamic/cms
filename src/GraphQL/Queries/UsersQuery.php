@@ -6,7 +6,7 @@ use Facades\Statamic\API\AllowedFiltersConfig;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
-use Statamic\GraphQL\Middleware\AllowedFilters;
+use Statamic\GraphQL\Middleware\AuthorizeFilters;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\GraphQL\Types\UserType;
@@ -24,7 +24,7 @@ class UsersQuery extends Query
 
     protected $middleware = [
         ResolvePage::class,
-        AllowedFilters::class,
+        AuthorizeFilters::class,
     ];
 
     public function type(): Type

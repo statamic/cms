@@ -7,7 +7,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Validation\ValidationException;
 use Rebing\GraphQL\Support\Middleware;
 
-class AllowedFilters extends Middleware
+class AuthorizeFilters extends Middleware
 {
     public function handle($root, $args, $context, ResolveInfo $info, Closure $next)
     {
