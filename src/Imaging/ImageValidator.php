@@ -64,7 +64,7 @@ class ImageValidator
      * @param  string  $mimeType
      * @return bool
      */
-    protected function isValidMimeType($extension, $mimeType)
+    private function isValidMimeType($extension, $mimeType)
     {
         $allowedMimetypesForExtension = (new MimeTypes)->getMimeTypes($extension);
 
