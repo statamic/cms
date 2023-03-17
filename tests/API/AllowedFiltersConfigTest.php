@@ -30,6 +30,7 @@ class AllowedFiltersConfigTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider configFileProvider
      */
     public function no_collection_entries_filters_are_allowed_by_default($configFile)
@@ -51,6 +52,7 @@ class AllowedFiltersConfigTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider configFileProvider
      */
     public function it_allows_collection_entries_filters_when_configured_on_all_collections($configFile)
@@ -69,6 +71,7 @@ class AllowedFiltersConfigTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider configFileProvider
      */
     public function it_allows_collection_entries_filters_when_configured_on_specific_collections($configFile)
@@ -101,6 +104,7 @@ class AllowedFiltersConfigTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider configFileProvider
      */
     public function it_merges_collection_entries_filters_with_all_collections_config($configFile)
@@ -122,6 +126,7 @@ class AllowedFiltersConfigTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider configFileProvider
      */
     public function it_allows_disabling_collection_entries_filters_on_specific_collections($configFile)
@@ -143,6 +148,7 @@ class AllowedFiltersConfigTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider configFileProvider
      */
     public function no_user_filters_are_allowed_by_default($configFile)
@@ -158,6 +164,7 @@ class AllowedFiltersConfigTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider configFileProvider
      */
     public function it_allows_user_filters_when_configured($configFile)

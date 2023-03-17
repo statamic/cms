@@ -60,6 +60,7 @@ class APITest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider exampleFilters
      */
     public function it_cannot_filter_entries_by_default($filter)
