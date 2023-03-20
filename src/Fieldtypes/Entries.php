@@ -297,10 +297,12 @@ class Entries extends Relationship
 
     protected function getItemsForPreProcessIndex($values): SupportCollection
     {
-        if (! $augmented = $this->augment($values)->whereAnyStatus()) {
+        if (! $augmented = $this->augment($values)) {
             return collect();
         }
 
-        return $this->config('max_items') === 1 ? collect([$augmented]) : $augmented->get();
+        return $this->config('max_items') === 1
+            ? collect([$augmented])
+            : $augmented->whereAnyStatus()->get();
     }
 }
