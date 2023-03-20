@@ -57,7 +57,13 @@ class TagIdentifier
 
     public function getRuntimeMethodName()
     {
-        return Str::camel($this->getMethodName());
+        $methodName = Str::camel($this->getMethodName());
+
+        if (Str::contains($methodName, '::')) {
+            return 'wildcard';
+        }
+
+        return $methodName;
     }
 
     public function getContent()
