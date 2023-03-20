@@ -1,5 +1,15 @@
 # Release Notes
 
+## 3.4.7 (2023-03-20)
+
+### What's improved
+- Italian translations. [#7725](https://github.com/statamic/cms/issues/7725) by @netwaretcs
+
+### What's fixed
+- Fix whereAnyStatus error. [#7730](https://github.com/statamic/cms/issues/7730) by @jasonvarga
+
+
+
 ## 3.4.6 (2023-03-17)
 
 ### What's new
