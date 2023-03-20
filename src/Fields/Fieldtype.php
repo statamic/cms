@@ -223,8 +223,6 @@ abstract class Fieldtype implements Arrayable
                     ->values()->all(),
             ],
         ];
-
-        throw new \Exception('todo: handle config sections when not using sectionsm');
     }
 
     private function configFieldsUseSections()
