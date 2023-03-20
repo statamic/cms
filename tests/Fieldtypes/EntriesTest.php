@@ -92,6 +92,24 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
+    public function it_returns_collection_when_preprocessing_index_and_max_items_is_1()
+    {
+        $preProcessed = $this
+            ->fieldtype(['max_items' => 1])
+            ->preProcessIndex('123');
+
+        $this->assertEquals(['123'], $preProcessed->map(fn ($entry) => $entry['id'])->all());
+    }
+
+    /** @test */
+    public function it_returns_empty_collection_when_preprocessing_index_and_max_items_is_1_and_the_value_is_null()
+    {
+        $preProcessed = $this->fieldtype(['max_items' => 1])->preProcessIndex(null);
+
+        $this->assertEquals([], $preProcessed->all());
+    }
+
+    /** @test */
     public function it_includes_drafts_when_pre_processing_for_index()
     {
         $preProcessed = $this->fieldtype()->preProcessIndex([456, 'invalid', '123', 'draft', 'scheduled', 'expired']);
@@ -141,7 +159,8 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -160,7 +179,8 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -280,7 +300,8 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -314,7 +335,8 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
