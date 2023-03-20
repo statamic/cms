@@ -185,13 +185,15 @@ abstract class Fieldtype implements Arrayable
     private function configSections()
     {
         $fields = $this->configFieldItems();
-        $extras = collect($this->extraConfigFieldItems())
-            ->map(fn ($field, $handle) => compact('handle', 'field'))
-            ->values()->all();
+        $extras = $this->extraConfigFieldItems();
 
         if (empty($fields) && empty($extras)) {
             return [];
         }
+
+        $extras = collect($extras)
+            ->map(fn ($field, $handle) => compact('handle', 'field'))
+            ->values()->all();
 
         if (! $this->configFieldsUseSections()) {
             return [
