@@ -237,6 +237,11 @@ class UsersController extends CpController
         foreach ($values as $key => $value) {
             $user->set($key, $value);
         }
+
+        if (User::current()->isSuper() && User::current() != $user) {
+            $user->super = $request->super;
+        }
+
         $user->email($request->email);
 
         if (User::current()->can('assign roles')) {
