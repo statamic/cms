@@ -195,9 +195,9 @@ abstract class Fieldtype implements Arrayable
 
         if ($this->configFieldsUseSections()) {
             $sections = collect($fields)->map(function ($section) {
-                $section['fields'] = collect($section['fields'])->map(function ($field, $handle) {
-                    return compact('handle', 'field');
-                })->values()->all();
+                $section['fields'] = collect($section['fields'])
+                    ->map(fn ($field, $handle) => compact('handle', 'field'))
+                    ->values()->all();
 
                 return $section;
             });
