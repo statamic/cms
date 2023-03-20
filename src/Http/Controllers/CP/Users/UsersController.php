@@ -186,8 +186,8 @@ class UsersController extends CpController
             $blueprint->ensureField('groups', ['visibility' => 'read_only']);
         }
 
-        if (User::current()->isSuper()) {
-            $blueprint->ensureField('Super Admin', ['type' => 'toggle']);
+        if (User::current()->isSuper() && User::current() != $user) {
+            $blueprint->ensureField('super', ['type' => 'toggle']);
         }
 
         $values = $user->data()
