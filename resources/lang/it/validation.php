@@ -36,7 +36,7 @@ return [
     'gte.numeric' => 'Deve essere maggiore o uguale :value.',
     'gte.file' => 'Deve essere maggiore o uguale :value kilobyte.',
     'gte.string' => 'Deve essere maggiore o uguale :value caratteri :value.',
-    'gte.array' => 'Deve contenere almeno :value elementi',
+    'gte.array' => 'Deve contenere almeno :value elementi.',
     'image' => 'Deve essere un\'immagine.',
     'in' => 'Questo non è valido',
     'in_array' => 'Questo campo non esiste in :other.',
