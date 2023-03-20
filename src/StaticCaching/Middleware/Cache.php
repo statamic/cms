@@ -8,9 +8,11 @@ use Illuminate\Support\Collection;
 use Statamic\Facades\File;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\NoLock;
 use Symfony\Component\Lock\Store\FlockStore;
 
 class Cache
@@ -128,6 +130,10 @@ class Cache
 
     private function createLock($request)
     {
+        if ($this->cacher instanceof NullCacher) {
+            return new NoLock;
+        }
+
         File::makeDirectory($dir = storage_path('statamic/static-caching-locks'));
 
         $locks = new LockFactory(new FlockStore($dir));
