@@ -46,7 +46,7 @@
                 </div>
             </div>
 
-            <div class="card" v-if="!loading">
+            <div v-if="!loading">
 
                 <publish-container
                     :name="publishContainer"
@@ -59,10 +59,8 @@
                 >
                     <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue, setFieldMeta }">
 
-                        <publish-fields
-                            v-if="blueprint.tabs.length"
-                            class="w-full"
-                            :fields="blueprint.tabs[0].sections[0].fields"
+                        <publish-sections
+                            :sections="blueprint.tabs[0].sections"
                             @updated="(handle, value) => {
                                 updateField(handle, value, setFieldValue);
                                 if (handle === 'handle') isHandleModified = true
@@ -73,20 +71,24 @@
                     </div>
                 </publish-container>
 
-                <div class="publish-fields" v-show="activeTab === 'conditions'">
-                    <field-conditions-builder
-                        :config="config"
-                        :suggestable-fields="suggestableConditionFields"
-                        @updated="updateFieldConditions"
-                        @updated-always-save="updateAlwaysSave" />
+                <div class="card p-0" v-show="activeTab === 'conditions'">
+                    <div class="publish-fields @container">
+                        <field-conditions-builder
+                            :config="config"
+                            :suggestable-fields="suggestableConditionFields"
+                            @updated="updateFieldConditions"
+                            @updated-always-save="updateAlwaysSave" />
+                    </div>
                 </div>
 
-                <div class="publish-fields" v-show="activeTab === 'validation'">
-                    <field-validation-builder
-                        :config="config"
-                        @updated="updateField('validate', $event)" />
-
+                <div class="card p-0" v-show="activeTab === 'validation'">
+                    <div class="publish-fields @container">
+                        <field-validation-builder
+                            :config="config"
+                            @updated="updateField('validate', $event)" />
+                    </div>
                 </div>
+
             </div>
         </section>
     </div>

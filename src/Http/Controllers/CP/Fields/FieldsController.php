@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
+use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
 class FieldsController extends CpController
@@ -83,7 +84,7 @@ class FieldsController extends CpController
             'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
         ];
 
-        $prepends = collect([
+        $fields = collect([
             'display' => [
                 'display' => __('Display'),
                 'instructions' => __('statamic::messages.fields_display_instructions'),
@@ -151,12 +152,17 @@ class FieldsController extends CpController
                 'width' => 50,
                 'default' => true,
             ],
+        ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
+
+        return Blueprint::make()->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => array_merge(
+                        [['fields' => $fields]],
+                        $blueprint->contents()['tabs']['main']['sections'],
+                    ),
+                ],
+            ],
         ]);
-
-        foreach ($prepends->reverse() as $handle => $prepend) {
-            $blueprint->ensureFieldPrepended($handle, $prepend);
-        }
-
-        return $blueprint;
     }
 }
