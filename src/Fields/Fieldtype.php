@@ -202,12 +202,14 @@ abstract class Fieldtype implements Arrayable
                 return $section;
             });
 
-            if ($sections->containsOneItem()) {
-                $section = $sections[0];
-                $section['fields'] = array_merge($section['fields'], $extras);
-                $sections[0] = $section;
-            } else {
-                $sections['extra'] = ['fields' => $extras];
+            if (! empty($extras)) {
+                if ($sections->containsOneItem()) {
+                    $section = $sections[0];
+                    $section['fields'] = array_merge($section['fields'], $extras);
+                    $sections[0] = $section;
+                } else {
+                    $sections[] = ['fields' => $extras];
+                }
             }
 
             return $sections->all();
