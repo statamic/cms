@@ -134,6 +134,6 @@ class Cache
 
         $key = $this->cacher->getUrl($request);
 
-        return $locks->createLock($key);
+        return $locks->createLock($key, 30);
     }
 }
