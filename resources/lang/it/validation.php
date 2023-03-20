@@ -1,7 +1,7 @@
 <?php
 
 return [
-    
+
     /*
     |--------------------------------------------------------------------------
     | Validation Language Lines
@@ -12,7 +12,7 @@ return [
     | as the size rules. Feel free to tweak each of these messages here.
     |
     */
-    
+
     'accepted' => 'Deve essere accettato',
     'active_url' => 'Questo non è un URL valido.',
     'after' => 'Deve essere una data successiva a :date.',
@@ -23,7 +23,7 @@ return [
     'array' => 'Deve essere un array.',
     'before' => 'Deve essere una data precedente a :date.',
     'before_or_equal' => 'Deve essere una data precedente o uguale a :date.',
-        'between'              => [
+    'between'              => [
         'numeric' => 'Deve essere compreso tra :min e :max.',
         'file'    => 'Deve essere compreso tra :min e :max kilobyte :max.',
         'string'  => 'Deve essere compreso tra :min e :max caratteri.',
@@ -43,7 +43,7 @@ return [
     'exists' => 'Questo non è valido',
     'file' => 'Deve essere un file.',
     'filled' => 'Deve contenere un valore',
-        'gt'                   => [
+    'gt'                   => [
         'numeric' => 'Deve essere maggiore di :value.',
         'file'    => 'Deve essere maggiore di :value kilobyte.',
         'string'  => 'Deve essere maggiore di :value caratteri :value.',
@@ -83,7 +83,7 @@ return [
     ],
     'mimes' => 'Deve essere un file di tipo :values.',
     'mimetypes' => 'Deve essere un file di tipo :values.',
-        'min'                  => [
+    'min'                  => [
         'numeric' => 'Deve essere almeno :min.',
         'file'    => 'Deve essere almeno :min kilobyte :min.',
         'string'  => 'Deve essere almeno :min caratteri :min.',
@@ -102,7 +102,7 @@ return [
     'required_without' => 'Questo campo è obbligatorio quando :values non sono presenti.',
     'required_without_all' => 'Questo campo è obbligatorio quando nessuno dei :values è presente.',
     'same' => 'Questo campo e :other devono corrispondere.',
-        'size'                 => [
+    'size'                 => [
         'numeric' => 'Deve essere :size.',
         'file'    => 'Deve essere :size kilobyte.',
         'string'  => 'Deve essere :size caratteri.',
@@ -113,7 +113,7 @@ return [
     'unique' => 'Questo valore è già stato utilizzato.',
     'uploaded' => 'Caricamento non riuscito.',
     'url' => 'Il formato non è valido.',
-    
+
     /*
     |--------------------------------------------------------------------------
     | Custom Statamic Validation Language Lines
@@ -122,7 +122,7 @@ return [
     | Here you may validation messages for the custom rules provided by Statamic.
     |
     */
-    
+
     'unique_entry_value' => 'Questo valore è già stato utilizzato.',
     'unique_term_value' => 'Questo valore è già stato utilizzato.',
     'unique_user_value' => 'Questo valore è già stato utilizzato.',
@@ -135,7 +135,7 @@ return [
     'reserved' => 'Questa è una parola riservata.',
     'parent_causes_root_children' => 'Questo fa sì che la pagina principale abbia dei figli.',
     'parent_cannot_be_itself' => 'Non può essere il proprio genitore.',
-    
+
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines
@@ -146,13 +146,13 @@ return [
     | specify a specific custom language line for a given attribute rule.
     |
     */
-    
+
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Attributes
@@ -165,5 +165,5 @@ return [
     */
 
     'attributes' => [],
-    
+
 ];
