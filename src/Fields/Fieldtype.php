@@ -193,36 +193,36 @@ abstract class Fieldtype implements Arrayable
             return [];
         }
 
-        if ($this->configFieldsUseSections()) {
-            $sections = collect($fields)->map(function ($section) {
-                $section['fields'] = collect($section['fields'])
-                    ->map(fn ($field, $handle) => compact('handle', 'field'))
-                    ->values()->all();
-
-                return $section;
-            });
-
-            if (! empty($extras)) {
-                if ($sections->containsOneItem()) {
-                    $section = $sections[0];
-                    $section['fields'] = array_merge($section['fields'], $extras);
-                    $sections[0] = $section;
-                } else {
-                    $sections[] = ['fields' => $extras];
-                }
-            }
-
-            return $sections->all();
+        if (! $this->configFieldsUseSections()) {
+            return [
+                [
+                    'fields' => collect($fields)
+                        ->map(fn ($field, $handle) => compact('handle', 'field'))
+                        ->merge($extras)
+                        ->values()->all(),
+                ],
+            ];
         }
 
-        return [
-            [
-                'fields' => collect($fields)
-                    ->map(fn ($field, $handle) => compact('handle', 'field'))
-                    ->merge($extras)
-                    ->values()->all(),
-            ],
-        ];
+        $sections = collect($fields)->map(function ($section) {
+            $section['fields'] = collect($section['fields'])
+                ->map(fn ($field, $handle) => compact('handle', 'field'))
+                ->values()->all();
+
+            return $section;
+        });
+
+        if (! empty($extras)) {
+            if ($sections->containsOneItem()) {
+                $section = $sections[0];
+                $section['fields'] = array_merge($section['fields'], $extras);
+                $sections[0] = $section;
+            } else {
+                $sections[] = ['fields' => $extras];
+            }
+        }
+
+        return $sections->all();
     }
 
     private function configFieldsUseSections()
