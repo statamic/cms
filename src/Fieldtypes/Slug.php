@@ -25,6 +25,13 @@ class Slug extends Text
                 'default' => true,
                 'width' => 50,
             ],
+            'show_regenerate' => [
+                'display' => __('Show Regenerate Button'),
+                'type' => 'toggle',
+                'instructions' => __('statamic::fieldtypes.slug.config.show_regenerate'),
+                'default' => false,
+                'width' => 50,
+            ],
         ];
     }
 }
