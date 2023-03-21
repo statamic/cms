@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="tabs-container mb-5 relative">
+        <div v-if="!singleTab" class="tabs-container mb-5 relative">
             <div ref="tabs" class="tabs flex-1
             flex space-x-3 overflow-auto pr-6" role="tablist">
                 <tab
@@ -18,7 +18,7 @@
                 <div class="fade-left" v-if="canScrollLeft" />
             </div>
             <div class="fade-right right-10" />
-            <button v-if="!singleTab" class="btn-round ml-2 flex items-center justify-center relative top-1" @click="addAndEditTab" v-tooltip="addTabText">
+            <button class="btn-round ml-2 flex items-center justify-center relative top-1" @click="addAndEditTab" v-tooltip="addTabText">
                 <svg-icon name="add-bold" class="w-3 h-3" />
             </button>
         </div>
