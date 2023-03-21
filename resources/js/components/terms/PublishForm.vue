@@ -89,7 +89,6 @@
                             v-show="sectionsVisible"
                             :read-only="readOnly"
                             :syncable="hasOrigin"
-                            :can-toggle-labels="true"
                             @updated="setFieldValue"
                             @meta-updated="setFieldMeta"
                             @synced="syncField"

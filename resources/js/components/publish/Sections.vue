@@ -76,7 +76,6 @@
                         :fields="section.fields"
                         :read-only="readOnly"
                         :syncable="syncable"
-                        :can-toggle-labels="canToggleLabels"
                         @updated="(handle, value) => $emit('updated', handle, value)"
                         @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
                         @synced="$emit('synced', $event)"
@@ -101,7 +100,6 @@
                         :fields="sidebarSection.fields"
                         :read-only="readOnly"
                         :syncable="syncable"
-                        :can-toggle-labels="canToggleLabels"
                         @updated="(handle, value) => $emit('updated', handle, value)"
                         @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
                         @synced="$emit('synced', $event)"
@@ -128,7 +126,6 @@ export default {
     props: {
         readOnly: Boolean,
         syncable: Boolean,
-        canToggleLabels: Boolean,
         enableSidebar: {
             type: Boolean,
             default: true

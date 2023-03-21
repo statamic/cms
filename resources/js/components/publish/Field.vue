@@ -105,13 +105,6 @@ export default {
         syncable: Boolean,
         namePrefix: String,
         fieldPathPrefix: String,
-        canToggleLabel: Boolean,
-    },
-
-    data() {
-        return {
-            showHandle: false
-        }
     },
 
     inject: {
@@ -199,7 +192,6 @@ export default {
         },
 
         labelText() {
-            if (this.showHandle) return this.config.handle
             return this.config.display
                 || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
         }
@@ -220,11 +212,6 @@ export default {
             }
         },
 
-        toggleLabel() {
-            if (this.canToggleLabel) {
-                this.showHandle = ! this.showHandle
-            }
-        },
         renderMarkdownAndLinks(text) {
             var renderer = new marked.Renderer();
 
