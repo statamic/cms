@@ -133,7 +133,7 @@ class AppServiceProvider extends ServiceProvider
                 ->setDirectory(resource_path('blueprints'))
                 ->setFallback('default', function () {
                     return \Statamic\Facades\Blueprint::makeFromFields([
-                        'content' => ['type' => 'markdown', 'localizable' => true],
+                        'content' => ['type' => 'markdown', 'display' => __('Content'), 'localizable' => true],
                     ]);
                 });
         });
