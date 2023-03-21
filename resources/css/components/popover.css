@@ -30,6 +30,7 @@
 
 .popover-container {
     position: relative;
+    z-index: 9999;
 }
 
 /*  When open */

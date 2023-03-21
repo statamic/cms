@@ -1,13 +1,23 @@
 <template>
-    <div class="popover-container" :class="{'popover-open': isOpen}" v-on-clickaway="clickawayClose" @mouseleave="leave">
+    <div :class="{'popover-open': isOpen}" v-on-clickaway="clickawayClose" @mouseleave="leave">
         <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$scopedSlots.default">
             <slot name="trigger"></slot>
         </div>
-        <div ref="popover" class="popover" v-if="!disabled">
-            <div class="popover-content bg-white shadow-popover rounded-md">
-                <slot :close="close" :after-closed="afterClosed" />
+
+        <portal
+            v-if="isOpen"
+            :to="portalTargetName"
+            :target-class="`popover-container ${targetClass || ''}`"
+        >
+            <div :class="`${isOpen ? 'popover-open' : ''}`">
+                <div ref="popover" class="popover" v-if="!disabled">
+                    <div class="popover-content bg-white shadow-popover rounded-md">
+                        <slot :close="close" :after-closed="afterClosed" />
+                    </div>
+                </div>
             </div>
-        </div>
+        </portal>
+
     </div>
 </template>
 
@@ -51,7 +61,25 @@ export default {
             escBinding: null,
             closedCallbacks: [],
             cleanupAutoUpdater: null,
+            portalTarget: null,
         }
+    },
+
+    computed: {
+        portalTargetName() {
+            return this.portalTarget ? this.portalTarget.name : null;
+        },
+        targetClass() {
+            return this.$vnode.data.staticClass;
+        }
+    },
+
+    created() {
+        this.createPortalTarget();
+    },
+
+    beforeDestroy() {
+        this.destroyPortalTarget();
     },
 
     methods: {
@@ -77,7 +105,9 @@ export default {
         open() {
             this.isOpen = true;
             this.escBinding = this.$keys.bind('esc', e => this.close());
-            this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger, this.$refs.popover, this.computePosition);
+            this.$nextTick(() => {
+                this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger, this.$refs.popover, this.computePosition);
+            });
         },
         clickawayClose() {
             if (this.clickaway) {
@@ -106,6 +136,16 @@ export default {
         afterClosed(callback) {
             this.closedCallbacks.push(callback);
         },
+        createPortalTarget() {
+            let key = `popover-${this._uid}`;
+            let portalTarget = { key, name: key };
+            this.$root.portals.push(portalTarget);
+            this.portalTarget = portalTarget;
+        },
+        destroyPortalTarget() {
+            const i = _.findIndex(this.$root.portals, (portal) => portal.key === this.portalTarget.key);
+            this.$root.portals.splice(i, 1);
+        }
     }
 }
 </script>
