@@ -8,13 +8,12 @@ use Statamic\Fields\Fieldtype;
 class IconPicker extends Fieldtype
 {
     protected $categories = ['media'];
-    protected $icons;
 
     public function preload(): array
     {
         $folder = $this->config('folder', 'resources/svg');
 
-        $this->icons = collect(Folder::getFilesByType(statamic_path($folder), 'svg'))->map(function ($file) {
+        $icons = collect(Folder::getFilesByType(statamic_path($folder), 'svg'))->map(function ($file) {
             return pathinfo($file)['filename'];
         });
 
