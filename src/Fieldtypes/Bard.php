@@ -30,50 +30,14 @@ class Bard extends Replicator
     {
         return [
             [
+                'display' => __('Editor'),
+                'instructions' => __('statamic::fieldtypes.bard.config.section.editor.instructions'),
                 'fields' => [
-                    'collapse' => [
-                        'display' => __('Collapse'),
-                        'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
-                        'type' => 'select',
-                        'cast_booleans' => true,
-                        'width' => 50,
-                        'options' => [
-                            'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
-                            'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
-                            'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
-                        ],
-                        'default' => false,
-                    ],
-                    'placeholder' => [
-                        'display' => __('Placeholder'),
-                        'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
-                        'type' => 'text',
-                        'width' => 50,
-                    ],
-                    'character_limit' => [
-                        'display' => __('Character Limit'),
-                        'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
-                        'type' => 'text',
-                        'width' => 50,
-                    ],
-                    'previews' => [
-                        'display' => __('Field Previews'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.previews'),
-                        'type' => 'toggle',
-                        'default' => true,
-                        'width' => 50,
-                    ],
-                    'smart_typography' => [
-                        'display' => __('Smart Typography'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.smart_typography'),
-                        'type' => 'toggle',
-                        'default' => false,
-                        'width' => 50,
-                    ],
                     'buttons' => [
                         'display' => __('Buttons'),
                         'instructions' => __('statamic::fieldtypes.bard.config.buttons'),
                         'type' => 'bard_buttons_setting',
+                        'full_width_setting' => true,
                         'default' => [
                             'h2',
                             'h3',
@@ -88,6 +52,12 @@ class Bard extends Replicator
                             'table',
                         ],
                     ],
+                    'smart_typography' => [
+                        'display' => __('Smart Typography'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.smart_typography'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
                     'save_html' => [
                         'display' => __('Save as HTML'),
                         'instructions' => __('statamic::fieldtypes.bard.config.save_html'),
@@ -97,7 +67,6 @@ class Bard extends Replicator
                         'display' => __('Inline'),
                         'instructions' => __('statamic::fieldtypes.bard.config.inline'),
                         'type' => 'toggle',
-                        'width' => 50,
                     ],
                     'toolbar_mode' => [
                         'display' => __('Toolbar Mode'),
@@ -108,48 +77,30 @@ class Bard extends Replicator
                             'fixed' => __('Fixed'),
                             'floating' => __('Floating'),
                         ],
-                        'width' => 50,
                     ],
                     'reading_time' => [
                         'display' => __('Show Reading Time'),
                         'instructions' => __('statamic::fieldtypes.bard.config.reading_time'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 50,
-                    ],
-                    'fullscreen' => [
-                        'display' => __('Allow Fullscreen Mode'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.fullscreen'),
-                        'type' => 'toggle',
-                        'default' => true,
-                        'width' => 50,
                     ],
                     'allow_source' => [
                         'display' => __('Allow Source Mode'),
                         'instructions' => __('statamic::fieldtypes.bard.config.allow_source'),
                         'type' => 'toggle',
                         'default' => true,
-                        'width' => 50,
                     ],
                     'enable_input_rules' => [
                         'display' => __('Enable Input Rules'),
                         'instructions' => __('statamic::fieldtypes.bard.config.enable_input_rules'),
                         'type' => 'toggle',
                         'default' => true,
-                        'width' => 50,
                     ],
                     'enable_paste_rules' => [
                         'display' => __('Enable Paste Rules'),
                         'instructions' => __('statamic::fieldtypes.bard.config.enable_paste_rules'),
                         'type' => 'toggle',
                         'default' => true,
-                        'width' => 50,
-                    ],
-                    'antlers' => [
-                        'display' => 'Antlers',
-                        'instructions' => __('statamic::fieldtypes.any.config.antlers'),
-                        'type' => 'toggle',
-                        'width' => 50,
                     ],
                     'remove_empty_nodes' => [
                         'display' => __('Remove Empty Nodes'),
@@ -162,50 +113,44 @@ class Bard extends Replicator
                             'trim' => __('Remove empty nodes at the start and end'),
                         ],
                         'default' => 'false',
-                        'width' => 50,
                     ],
-                ],
-            ],
-            [
-                'display' => 'Sets',
-                'fields' => [
-                    'always_show_set_button' => [
-                        'display' => __('Always Show Set Button'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
+                    'placeholder' => [
+                        'display' => __('Placeholder'),
+                        'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                        'type' => 'text',
+                    ],
+                    'character_limit' => [
+                        'display' => __('Character Limit'),
+                        'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
+                        'type' => 'integer',
+                    ],
+                    'antlers' => [
+                        'display' => 'Antlers',
+                        'instructions' => __('statamic::fieldtypes.any.config.antlers'),
                         'type' => 'toggle',
-                        'default' => false,
-                        'width' => 50,
-                    ],
-                    'sets' => [
-                        'display' => __('Sets'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.sets'),
-                        'type' => 'sets',
-                        'require_set' => false,
                     ],
                 ],
             ],
             [
-                'display' => 'Links',
+                'display' => __('Links'),
+                'instructions' => __('statamic::fieldtypes.bard.config.section.links.instructions'),
                 'fields' => [
                     'link_noopener' => [
                         'display' => __('Link Noopener'),
                         'instructions' => __('statamic::fieldtypes.bard.config.link_noopener'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 50,
                     ],
                     'link_noreferrer' => [
                         'display' => __('Link Noreferrer'),
                         'instructions' => __('statamic::fieldtypes.bard.config.link_noreferrer'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 50,
                     ],
                     'target_blank' => [
                         'display' => __('Target Blank'),
                         'type' => 'toggle',
                         'default' => false,
-                        'width' => 50,
                         'instructions' => __('statamic::fieldtypes.bard.config.target_blank'),
                     ],
                     'link_collections' => [
@@ -223,6 +168,43 @@ class Bard extends Replicator
                         'if' => [
                             'buttons' => 'contains_any anchor, image',
                         ],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Sets'),
+                'instructions' => __('statamic::fieldtypes.bard.config.section.sets.instructions'),
+                'fields' => [
+                    'always_show_set_button' => [
+                        'display' => __('Always Show Set Button'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'collapse' => [
+                        'display' => __('Collapse'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
+                        'type' => 'select',
+                        'cast_booleans' => true,
+                        'options' => [
+                            'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
+                            'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
+                            'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+                        ],
+                        'default' => false,
+                    ],
+                    'previews' => [
+                        'display' => __('Field Previews'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.previews'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'sets' => [
+                        'display' => __('Sets'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.sets'),
+                        'type' => 'sets',
+                        'full_width_setting' => true,
+                        'require_set' => false,
                     ],
                 ],
             ],

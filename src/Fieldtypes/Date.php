@@ -24,79 +24,91 @@ class Date extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            // @TODO hook up multiple mode
-            'mode' => [
-                'display' => __('Mode'),
-                'instructions' => __('statamic::fieldtypes.date.config.mode'),
-                'type' => 'select',
-                'default' => 'single',
-                'width' => 50,
-                'options' => [
-                    'single' => __('Single'),
-                    // 'multiple' => __('Multiple'),
-                    'range' => __('Range'),
-                ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.date.config.mode'),
+                        'type' => 'select',
+                        'default' => 'single',
+                        'options' => [
+                            'single' => __('Single'),
+                            // 'multiple' => __('Multiple'), // @TODO hook up
+                            'range' => __('Range'),
+                        ],
+                    ],
+                    'inline' => [
+                        'display' => __('Inline'),
+                        'instructions' => __('statamic::fieldtypes.date.config.inline'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'full_width' => [
+                        'display' => __('Full Width'),
+                        'instructions' => __('statamic::fieldtypes.date.config.full_width'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'if' => [
+                            'inline' => true,
+                        ],
+                    ],
+                    'columns' => [
+                        'display' => __('Columns'),
+                        'instructions' => __('statamic::fieldtypes.date.config.columns'),
+                        'type' => 'integer',
+                        'default' => 1,
+                    ],
+                    'rows' => [
+                        'display' => __('Rows'),
+                        'instructions' => __('statamic::fieldtypes.date.config.rows'),
+                        'type' => 'integer',
+                        'default' => 1,
+                    ],
+                ]
             ],
-            'format' => [
-                'display' => __('Format'),
-                'instructions' => __('statamic::fieldtypes.date.config.format'),
-                'type' => 'text',
-                'width' => 50,
+            [
+                'display' => __('Timepicker'),
+                'fields' => [
+                    'time_enabled'  => [
+                        'display' => __('Time Enabled'),
+                        'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'time_seconds_enabled'  => [
+                        'display' => __('Show Seconds'),
+                        'instructions' => __('statamic::fieldtypes.date.config.time_seconds_enabled'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                ]
             ],
-            'earliest_date' => [
-                'display' => __('Earliest Date'),
-                'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
-                'type' => 'date',
-                'width' => 50,
+            [
+                'display' => __('Boundaries'),
+                'fields' => [
+                    'earliest_date' => [
+                        'display' => __('Earliest Date'),
+                        'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
+                        'type' => 'date',
+                    ],
+                    'latest_date' => [
+                        'display' => __('Latest Date'),
+                        'instructions' => __('statamic::fieldtypes.date.config.latest_date'),
+                        'type' => 'date',
+                    ],
+                ]
             ],
-            'latest_date' => [
-                'display' => __('Latest Date'),
-                'instructions' => __('statamic::fieldtypes.date.config.latest_date'),
-                'type' => 'date',
-                'width' => 50,
-            ],
-            'time_enabled'  => [
-                'display' => __('Time Enabled'),
-                'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'time_seconds_enabled'  => [
-                'display' => __('Show Seconds'),
-                'instructions' => __('statamic::fieldtypes.date.config.time_seconds_enabled'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'full_width' => [
-                'display' => __('Full Width'),
-                'instructions' => __('statamic::fieldtypes.date.config.full_width'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'inline' => [
-                'display' => __('Inline'),
-                'instructions' => __('statamic::fieldtypes.date.config.inline'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'columns' => [
-                'display' => __('Columns'),
-                'instructions' => __('statamic::fieldtypes.date.config.columns'),
-                'type' => 'integer',
-                'default' => 1,
-                'width' => 50,
-            ],
-            'rows' => [
-                'display' => __('Rows'),
-                'instructions' => __('statamic::fieldtypes.date.config.rows'),
-                'type' => 'integer',
-                'default' => 1,
-                'width' => 50,
-            ],
+            [
+                'display' => __('Data Format'),
+                'fields' => [
+                    'format' => [
+                        'display' => __('Format'),
+                        'instructions' => __('statamic::fieldtypes.date.config.format'),
+                        'type' => 'text',
+                    ],
+                ]
+            ]
         ];
     }
 
