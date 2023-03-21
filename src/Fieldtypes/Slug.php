@@ -26,8 +26,8 @@ class Slug extends Text
                         'instructions' => __('statamic::fieldtypes.slug.config.generate'),
                         'default' => true,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }

@@ -55,8 +55,8 @@ class Users extends Relationship
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'users',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

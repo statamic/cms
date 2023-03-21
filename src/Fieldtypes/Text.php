@@ -51,7 +51,7 @@ class Text extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
                         'type' => 'integer',
                     ],
-                ]
+                ],
             ],
             [
                 'display' => 'Appearance',
@@ -66,7 +66,7 @@ class Text extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.text.config.append'),
                         'type' => 'text',
                     ],
-                ]
+                ],
             ],
             [
                 'display' => 'Antlers',
@@ -76,8 +76,8 @@ class Text extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.any.config.antlers'),
                         'type' => 'toggle',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

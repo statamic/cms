@@ -90,8 +90,8 @@ class Terms extends Relationship
                         'type' => 'taxonomies',
                         'mode' => 'select',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

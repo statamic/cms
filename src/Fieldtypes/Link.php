@@ -35,8 +35,8 @@ class Link extends Fieldtype
                         'mode' => 'select',
                         'max_items' => 1,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

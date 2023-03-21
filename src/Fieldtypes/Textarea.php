@@ -32,7 +32,7 @@ class Textarea extends Fieldtype
                         'type' => 'textarea',
                     ],
 
-                ]
+                ],
             ],
             [
                 'display' => __('Antlers'),
@@ -43,8 +43,8 @@ class Textarea extends Fieldtype
                         'type' => 'toggle',
                     ],
 
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

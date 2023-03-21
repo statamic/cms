@@ -30,7 +30,7 @@ class Grid extends Fieldtype
                         'type' => 'fields',
                         'full_width_setting' => true,
                     ],
-                ]
+                ],
             ],
             [
                 'display' => __('Appearance & Behavior'),
@@ -66,8 +66,8 @@ class Grid extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

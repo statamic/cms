@@ -79,8 +79,8 @@ class Assets extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

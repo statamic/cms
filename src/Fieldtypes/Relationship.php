@@ -50,8 +50,8 @@ abstract class Relationship extends Fieldtype
                             'typeahead' => __('Typeahead Field'),
                         ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

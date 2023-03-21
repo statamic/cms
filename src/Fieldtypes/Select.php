@@ -38,7 +38,7 @@ class Select extends Fieldtype
                         'type' => 'toggle',
                         'default' => false,
                     ],
-                ]
+                ],
             ],
             [
                 'display' => __('Selection'),
@@ -73,7 +73,7 @@ class Select extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
-                ]
+                ],
             ],
             [
                 'display' => __('Data'),
@@ -89,8 +89,8 @@ class Select extends Fieldtype
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'text',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }

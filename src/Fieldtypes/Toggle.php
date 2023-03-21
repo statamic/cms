@@ -29,8 +29,8 @@ class Toggle extends Fieldtype
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'toggle',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

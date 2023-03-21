@@ -33,8 +33,8 @@ class Revealer extends Fieldtype
                         'type' => 'text',
                         'default' => '',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

@@ -40,7 +40,7 @@ class Range extends Fieldtype
                         'input_type' => 'number',
                         'default' => null,
                     ],
-                ]
+                ],
             ],
             [
                 'display' => __('Appearance'),
@@ -55,8 +55,8 @@ class Range extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.range.config.append'),
                         'type' => 'text',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

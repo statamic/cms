@@ -57,8 +57,8 @@ class Color extends Fieldtype
                         ],
                         'default' => 'hex',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }

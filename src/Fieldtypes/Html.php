@@ -21,8 +21,8 @@ class Html extends Fieldtype
                         'type' => 'code',
                         'mode' => 'htmlmixed',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }

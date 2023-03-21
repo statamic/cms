@@ -53,7 +53,7 @@ class Markdown extends Fieldtype
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'markdown',
                     ],
-                ]
+                ],
             ],
             [
                 'display' => 'Assets',
@@ -79,7 +79,7 @@ class Markdown extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.markdown.config.restrict'),
                         'type' => 'toggle',
                     ],
-                    ]
+                ],
             ],
             [
                 'display' => 'Antlers',
@@ -89,8 +89,8 @@ class Markdown extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.any.config.antlers'),
                         'type' => 'toggle',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

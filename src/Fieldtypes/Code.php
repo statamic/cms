@@ -103,8 +103,8 @@ class Code extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

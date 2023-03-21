@@ -21,7 +21,7 @@ class Integer extends Fieldtype
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'text',
                     ],
-                ]
+                ],
             ],
             [
                 'display' => __('Appearance'),
@@ -37,8 +37,8 @@ class Integer extends Fieldtype
                         'type' => 'text',
                     ],
 
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

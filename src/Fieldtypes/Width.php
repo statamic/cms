@@ -30,8 +30,8 @@ class Width extends Fieldtype
                         'default' => 100,
                         'width' => 50,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }

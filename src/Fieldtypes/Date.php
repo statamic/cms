@@ -65,7 +65,7 @@ class Date extends Fieldtype
                         'type' => 'integer',
                         'default' => 1,
                     ],
-                ]
+                ],
             ],
             [
                 'display' => __('Timepicker'),
@@ -82,7 +82,7 @@ class Date extends Fieldtype
                         'type' => 'toggle',
                         'default' => false,
                     ],
-                ]
+                ],
             ],
             [
                 'display' => __('Boundaries'),
@@ -97,7 +97,7 @@ class Date extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.date.config.latest_date'),
                         'type' => 'date',
                     ],
-                ]
+                ],
             ],
             [
                 'display' => __('Data Format'),
@@ -107,8 +107,8 @@ class Date extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.date.config.format'),
                         'type' => 'text',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

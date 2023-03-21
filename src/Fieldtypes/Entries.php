@@ -88,8 +88,8 @@ class Entries extends Relationship
                         'type' => 'collections',
                         'mode' => 'select',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

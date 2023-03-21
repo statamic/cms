@@ -33,8 +33,8 @@ class Template extends Fieldtype
                         'type' => 'template_folder',
                         'max_items' => 1,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 

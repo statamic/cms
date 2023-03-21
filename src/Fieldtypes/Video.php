@@ -24,8 +24,8 @@ class Video extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
                         'type' => 'text',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }

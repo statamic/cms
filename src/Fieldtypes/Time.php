@@ -25,8 +25,8 @@ class Time extends Fieldtype
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'text',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }

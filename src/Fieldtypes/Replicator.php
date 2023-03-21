@@ -48,7 +48,7 @@ class Replicator extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
                         'type' => 'integer',
                     ],
-                ]
+                ],
             ],
             [
                 'display' => __('Manage Sets'),
@@ -60,8 +60,8 @@ class Replicator extends Fieldtype
                         'hide_meta' => true,
                         'full_width_setting' => true,
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
