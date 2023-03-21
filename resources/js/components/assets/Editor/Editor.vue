@@ -117,7 +117,7 @@
                     :blueprint="fieldset"
                     :values="values"
                     :meta="meta"
-
+                    :errors="errors"
                     @updated="values = { ...$event, focus: values.focus }"
                 >
                     <div class="w-full sm:p-4 md:pt-px md:w-1/3 md:grow h-1/2 md:h-full overflow-scroll" slot-scope="{ setFieldValue, setFieldMeta }">
