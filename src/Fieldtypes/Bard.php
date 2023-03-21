@@ -175,38 +175,43 @@ class Bard extends Replicator
                 'display' => __('Sets'),
                 'instructions' => __('statamic::fieldtypes.bard.config.section.sets.instructions'),
                 'fields' => [
-                    'always_show_set_button' => [
-                        'display' => __('Always Show Set Button'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
-                        'type' => 'toggle',
-                        'default' => false,
-                    ],
-                    'collapse' => [
-                        'display' => __('Collapse'),
-                        'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
-                        'type' => 'select',
-                        'cast_booleans' => true,
-                        'options' => [
-                            'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
-                            'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
-                            'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
-                        ],
-                        'default' => false,
-                    ],
-                    'previews' => [
-                        'display' => __('Field Previews'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.previews'),
-                        'type' => 'toggle',
-                        'default' => true,
-                    ],
                     'sets' => [
                         'display' => __('Sets'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.sets'),
+                        'hide_meta' => true,
                         'type' => 'sets',
                         'full_width_setting' => true,
                         'require_set' => false,
                     ],
                 ],
+                [
+                    'display' => __('Set Behavior'),
+                    'fields' => [
+                        'always_show_set_button' => [
+                            'display' => __('Always Show Set Button'),
+                            'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
+                            'type' => 'toggle',
+                            'default' => false,
+                        ],
+                        'collapse' => [
+                            'display' => __('Collapse'),
+                            'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
+                            'type' => 'select',
+                            'cast_booleans' => true,
+                            'options' => [
+                                'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
+                                'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
+                                'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+                            ],
+                            'default' => false,
+                        ],
+                        'previews' => [
+                            'display' => __('Field Previews'),
+                            'instructions' => __('statamic::fieldtypes.bard.config.previews'),
+                            'type' => 'toggle',
+                            'default' => true,
+                        ],
+                    ]
+                ]
             ],
         ];
     }
