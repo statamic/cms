@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Facades\GraphQL;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class Field implements Arrayable
 {
@@ -80,7 +79,7 @@ class Field implements Arrayable
 
     public function display()
     {
-        return array_get($this->config, 'display', __(Str::slugToTitle($this->handle)));
+        return array_get($this->config, 'display');
     }
 
     public function instructions()
