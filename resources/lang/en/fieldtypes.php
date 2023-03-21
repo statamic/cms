@@ -78,6 +78,7 @@ return [
     'hidden.title' => 'Hidden',
     'html.title' => 'HTML',
     'integer.title' => 'Integer',
+    'icon_picker.config.folder' => 'Specify the system folder path to use for this field.',
     'link.config.collections' => 'Entries from these collections will be available. Leaving this empty will make entries from routable collections available.',
     'link.config.container' => 'Choose which asset container to use for this field.',
     'link.title' => 'Link',

@@ -269,6 +269,15 @@
 	opacity: 1
 }
 
+.icon_picker-fieldtype {
+    .vs__search {
+        display: none;
+    }
+    .vs__selected-options {
+        min-width: 44px;
+    }
+}
+
 /* Animation */
 @-webkit-keyframes vSelectSpinner {
 	0% {
