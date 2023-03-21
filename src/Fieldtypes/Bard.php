@@ -210,8 +210,8 @@ class Bard extends Replicator
                             'type' => 'toggle',
                             'default' => true,
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
     }
