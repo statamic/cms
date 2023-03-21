@@ -9,8 +9,9 @@
         <div class="field-inner">
             <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span
+                    v-if="config.display"
                     :class="{ 'text-gray-600': syncable && isSynced }"
-                    v-text="labelText"
+                    v-text="config.display"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
                 <i class="required ml-1" v-if="config.required">*</i>
@@ -190,11 +191,6 @@ export default {
 
             return Object.keys(this.storeState.errors ?? []).some(handle => handle.startsWith(prefix));
         },
-
-        labelText() {
-            return this.config.display
-                || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
-        }
 
     },
 
