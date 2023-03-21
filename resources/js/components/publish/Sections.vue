@@ -1,11 +1,11 @@
 <template>
-    <div class="publish-sections flex flex-col space-y-7">
-        <div class="mb-5" v-for="(section, i) in sections" :key="i">
+    <div class="publish-sections">
+        <div class="mb-8" v-for="(section, i) in sections" :key="i">
             <div class="card p-0">
-                <div class="px-5 pt-4 pb-3 border-b border-gray-400" v-if="section.display">
+                <header class="publish-section-header" v-if="section.display">
                     <label v-text="section.display" class="text-base font-semibold" />
                     <div class="help-block" v-if="section.instructions"><p v-html="$options.filters.markdown(section.instructions)" /></div>
-                </div>
+                </header>
                 <publish-fields
                     :fields="section.fields"
                     :read-only="readOnly"

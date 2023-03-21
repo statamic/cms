@@ -10,31 +10,39 @@
         </header>
 
         <div class="publish-form card p-0 @container" v-if="showTitle">
-            <div class="form-group">
-                <label class="block">{{ __('Title') }}</label>
-                <small class="help-block">{{ __('messages.blueprints_title_instructions') }}</small>
-                <div v-if="errors.title">
-                    <small class="help-block text-red-500" v-for="(error, i) in errors.title" :key="i" v-text="error" />
+            <div class="form-group config-field">
+                <div class="field-inner">
+                    <label class="block">{{ __('Title') }}</label>
+                    <p class="help-block">{{ __('messages.blueprints_title_instructions') }}</p>
+                    <div v-if="errors.title">
+                        <p class="help-block text-red-500" v-for="(error, i) in errors.title" :key="i" v-text="error" />
+                    </div>
                 </div>
-                <input type="text" name="title" class="input-text" v-model="blueprint.title" autofocus="autofocus">
+                <div>
+                    <input type="text" name="title" class="input-text" v-model="blueprint.title" autofocus="autofocus">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label class="block">{{ __('Hidden') }}</label>
-                <small class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</small>
-                <div v-if="errors.hidden">
-                    <small class="help-block text-red-500" v-for="(error, i) in errors.hidden" :key="i" v-text="error" />
+            <div class="form-group config-field">
+                <div class="field-inner">
+                    <label class="block">{{ __('Hidden') }}</label>
+                    <p class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</p>
+                    <div v-if="errors.hidden">
+                        <p class="help-block text-red-500" v-for="(error, i) in errors.hidden" :key="i" v-text="error" />
+                    </div>
                 </div>
-                <toggle-input name="hidden" v-model="blueprint.hidden" />
+                <div>
+                    <toggle-input name="hidden" v-model="blueprint.hidden" />
+                </div>
             </div>
         </div>
 
         <div class="content mt-10 mb-4" v-if="useTabs">
-            <h2>{{ __('Tabs') }}</h2>
+            <!--<h2>{{ __('Tabs') }}</h2>
             <p class="max-w-lg">{{ __('messages.tabs_instructions') }}</p>
             <div v-if="errors.tabs">
-                <small class="help-block text-red-500" v-for="(error, i) in errors.tabs" :key="i" v-text="error" />
-            </div>
+                <p class="help-block text-red-500" v-for="(error, i) in errors.tabs" :key="i" v-text="error" />
+            </div>-->
         </div>
 
         <tabs

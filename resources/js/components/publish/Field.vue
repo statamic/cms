@@ -6,7 +6,7 @@
         :initial-meta="meta"
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
-        <div class="field-inner">
+        <div class="field-inner" v-show="! config.hide_meta">
             <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span
                     :class="{ 'text-gray-600': syncable && isSynced }"
@@ -115,7 +115,8 @@ export default {
     },
 
     inject: {
-        storeName: { default: null }
+        storeName: { default: null },
+        isInsideConfigFields: { default: false },
     },
 
     computed: {
@@ -156,10 +157,11 @@ export default {
             return [
                 'form-group publish-field',
                 `publish-field__` + this.config.handle,
-                `${this.config.component || this.config.type}-fieldtype`,
-                `${tailwind_width_class(this.config.width)}`,
+                `${this.config.component || this.config.type}-fieldtype`,,
                 this.isReadOnly ? 'read-only-field' : '',
+                this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
                 this.config.classes || '',
+                this.config.full_width_setting ? 'full-width-setting' : '',
                 { 'has-error': this.hasError || this.hasNestedError }
             ];
         },

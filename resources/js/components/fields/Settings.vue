@@ -46,13 +46,14 @@
                 </div>
             </div>
 
-            <div v-if="!loading">
+            <div v-if="!loading" class="field-settings">
 
                 <publish-container
                     :name="publishContainer"
                     :blueprint="blueprint"
                     :values="values"
                     :meta="meta"
+                    :is-config="true"
                     :errors="errors"
                     :is-root="true"
                     @updated="values = $event"
@@ -61,6 +62,7 @@
 
                         <publish-sections
                             :sections="blueprint.tabs[0].sections"
+
                             @updated="(handle, value) => {
                                 updateField(handle, value, setFieldValue);
                                 if (handle === 'handle') isHandleModified = true
@@ -118,6 +120,10 @@ export default {
         type: String,
         root: Boolean,
         suggestableConditionFields: Array,
+    },
+
+    provide: {
+        isInsideConfigFields: true,
     },
 
     model: {
