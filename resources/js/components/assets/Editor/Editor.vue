@@ -126,15 +126,14 @@
                             <loading-graphic text="Saving" />
                         </div>
 
-                        <div class="card p-0">
-                            <div v-if="error" class="bg-red-500 text-white p-4 shadow mb-4" v-text="error" />
-                            <publish-fields
-                                :fields="fields"
-                                :read-only="readOnly"
-                                @updated="setFieldValue"
-                                @meta-updated="setFieldMeta"
-                            />
-                        </div>
+                        <div v-if="error" class="bg-red-500 text-white p-4 shadow mb-4" v-text="error" />
+
+                        <publish-sections
+                            :sections="fieldset.tabs[0].sections"
+                            @updated="setFieldValue"
+                            @meta-updated="setFieldMeta"
+                        />
+
                     </div>
                 </publish-container>
             </div>
