@@ -41,6 +41,52 @@ class AuthRedirectTest extends TestCase
     }
 
     /** @test */
+    public function the_previous_url_method_does_return_the_wrong_referer_link()
+    {
+        $this
+            ->from('https://github.com/')
+            ->get('/cp/collections')
+            ->assertRedirect('/cp/auth/login');
+
+        // Green.
+        $this->assertSame('http://localhost/cp/collections', session()->previousUrl());
+
+        // Fails.
+        $this->assertSame('/cp/collections', url()->previous());
+    }
+
+    /** @test */
+    public function the_session_saves_the_correct_previous_url()
+    {
+        $this
+            ->from('https://github.com/')
+            ->get('/cp/collections')
+            ->assertRedirect('/cp/auth/login');
+
+        // Saves the url as absolute url.
+        $this->assertSame('http://localhost/cp/collections', session()->previousUrl());
+    }
+
+    /** @test */
+    public function set_correct_previous_if_logged_in()
+    {
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->from('http://github.com')
+            ->get('/cp/collections')
+            ->assertSessionHas(['_previous.url' => 'http://localhost/cp/collections']);
+
+        // Green.
+        $this->assertSame('http://localhost/cp/collections', session()->previousUrl());
+
+        // Fails. Would redirect to github if logged in as well.
+        $this->assertSame('http://localhost/cp/collections', url()->previous());
+    }
+
+    /** @test */
     public function it_redirects_to_cp_index_without_referrer()
     {
         $this->setTestRoles(['test' => ['access cp']]);

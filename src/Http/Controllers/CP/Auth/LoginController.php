@@ -136,7 +136,7 @@ class LoginController extends CpController
 
     protected function getReferrer()
     {
-        $referrer = url()->previous();
+        $referrer = session()->previousUrl();
 
         return $referrer === cp_route('unauthorized') ? cp_route('index') : $referrer;
     }
