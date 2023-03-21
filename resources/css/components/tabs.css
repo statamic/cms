@@ -18,6 +18,10 @@
     }
 }
 
+.card .tabs-container .fade-left, .card .tabs-container .fade-right {
+    @apply from-white;
+}
+
 .tabs {
     @apply flex space-x-2 overflow-hidden relative w-full max-w-full;
     &-scrolled {
