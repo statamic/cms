@@ -98,7 +98,7 @@ class Sets extends Fieldtype
             return [
                 $tab['handle'] => [
                     'display' => $tab['display'],
-                    'instructions' => $tab['instructions'],
+                    'instructions' => $tab['instructions'] ?? null,
                     'sets' => collect($tab['sections'])->mapWithKeys(function ($section) {
                         return [
                             $section['handle'] => [
