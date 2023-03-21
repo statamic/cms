@@ -1,15 +1,15 @@
 <template>
     <div class="table-field">
-        <table class="table-fieldtype-table">
-            <sortable-list
-                v-model="data"
-                :vertical="true"
-                item-class="sortable-row"
-                handle-class="sortable-handle"
-                :mirror="false"
-                @dragstart="$emit('focus')"
-                @dragend="$emit('blur')"
-            >
+        <sortable-list
+            v-model="data"
+            :vertical="true"
+            item-class="sortable-row"
+            handle-class="sortable-handle"
+            :mirror="false"
+            @dragstart="$emit('focus')"
+            @dragend="$emit('blur')"
+        >
+            <table class="table-fieldtype-table" v-show="data.length">
                 <tbody>
                     <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
                         <td class="sortable-handle table-drag-handle" v-if="!isReadOnly" :class="{'rounded-tl': index === 0 }"></td>
@@ -33,8 +33,8 @@
                         </td>
                     </tr>
                 </tbody>
-            </sortable-list>
-        </table>
+            </table>
+        </sortable-list>
 
         <button class="btn" @click="addItem" v-if="!isReadOnly">
             {{ addButton }}
