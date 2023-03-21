@@ -84,7 +84,7 @@ export default {
         },
 
         display() {
-            return this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1)
+            return this.field.display;
         },
 
         instructions() {
