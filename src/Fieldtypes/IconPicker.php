@@ -10,7 +10,7 @@ class IconPicker extends Fieldtype
     protected $categories = ['media'];
     protected $icons;
 
-    public function preload():array
+    public function preload(): array
     {
         $folder = $this->config('folder', 'resources/svg');
 
@@ -19,7 +19,7 @@ class IconPicker extends Fieldtype
         });
 
         return [
-            'icons' => $icons->all()
+            'icons' => $icons->all(),
         ];
     }
 
