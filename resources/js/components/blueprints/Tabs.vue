@@ -1,8 +1,7 @@
 <template>
     <div>
-        <div v-if="!singleTab" class="tabs-container mb-5 relative">
-            <div ref="tabs" class="tabs flex-1
-            flex space-x-3 overflow-auto pr-6" role="tablist">
+        <div v-if="!singleTab && tabs.length > 0" class="tabs-container mb-5 relative">
+            <div ref="tabs" class="tabs flex-1 flex space-x-3 overflow-auto pr-6" role="tablist">
                 <tab
                     ref="tab"
                     v-for="tab in tabs"
@@ -22,6 +21,7 @@
                 <svg-icon name="add-bold" class="w-3 h-3" />
             </button>
         </div>
+        <button class="btn" @click="addAndEditTab" v-text="addTabText" v-else></button>
         <tab-content
             v-for="tab in tabs"
             ref="tabContent"
