@@ -101,7 +101,7 @@
                             </div>
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
-                            <dropdown-list placement="left-start" scroll>
+                            <dropdown-list placement="right-start" fixed>
                                 <dropdown-item :text="__('Edit')" :redirect="user.edit_url" v-if="user.editable" />
                                 <dropdown-item :text="__('View')" :redirect="user.edit_url" v-else />
                                 <data-list-inline-actions

@@ -123,7 +123,7 @@
                                         <td />
 
                                         <th class="actions-column" :colspan="columns.length">
-                                            <dropdown-list placement="left-start" scroll v-if="folderActions(folder).length">
+                                            <dropdown-list fixed placement="left-start" v-if="folderActions(folder).length">
                                                 <!-- TODO: Folder edit -->
                                                 <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
 
@@ -158,7 +158,7 @@
                                 </template>
 
                                 <template slot="actions" slot-scope="{ row: asset }">
-                                    <dropdown-list placement="left-start" scroll>
+                                    <dropdown-list placement="left-start" fixed>
                                         <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions

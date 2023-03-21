@@ -1,5 +1,5 @@
 <template>
-    <popover ref="popover" scroll strategy="fixed">
+    <popover ref="popover" fixed>
 
         <template slot="trigger">
             <button
