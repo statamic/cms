@@ -43,7 +43,7 @@ export default {
     methods: {
 
         addSection() {
-            this.$refs.sections.addSection();
+            return this.$refs.sections.addSection();
         },
 
         sectionsUpdated(sections) {
