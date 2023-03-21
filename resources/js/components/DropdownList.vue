@@ -1,5 +1,5 @@
 <template>
-    <popover class="dropdown-list" :disabled="disabled" :placement="placement" :scroll="scroll" :autoclose="autoclose" :strategy="strategy">
+    <popover class="dropdown-list" :disabled="disabled" :placement="placement" :autoclose="autoclose" :fixed="fixed">
         <template #trigger>
             <slot name="trigger">
                 <button class="rotating-dots-button" :aria-label="__('Open Dropdown')">
@@ -22,7 +22,7 @@ export default {
             type: String,
             default: 'bottom-end'
         },
-        scroll: {
+        fixed: {
             type: Boolean,
             default: false
         },
@@ -30,11 +30,7 @@ export default {
             type: Boolean,
             default: false
         }
-    },
-    computed: {
-        strategy() {
-            return this.scroll ? 'fixed' : 'absolute';
-        }
     }
+
 }
 </script>
