@@ -344,7 +344,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
                 return Column::make()
                     ->field($field->handle())
                     ->fieldtype($field->fieldtype()->indexComponent())
-                    ->label(__($field->display()))
+                    ->label(__($field->display() ?? $field->handle()))
                     ->listable($field->isListable())
                     ->defaultVisibility($field->isVisibleOnListing())
                     ->visible($field->isVisibleOnListing())
