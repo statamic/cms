@@ -173,7 +173,12 @@ export default {
         },
 
         opened() {
+            // Focus the search input. For some reason the page jumps to the top
+            // when it gets focus, so we need to scroll back to where we were.
+            const scrollPosition = window.scrollY;
             this.$refs.search.focus();
+            window.scrollTo(0, scrollPosition);
+
             this.bindKeys();
         },
 
