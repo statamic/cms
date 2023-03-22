@@ -6,15 +6,14 @@ use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Term;
 use Statamic\GraphQL\Middleware\ResolvePage;
+use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\GraphQL\Types\TermInterface;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Tags\Concerns\QueriesConditions;
 
 class TermsQuery extends Query
 {
-    use QueriesConditions;
+    use FiltersQuery;
 
     protected $attributes = [
         'name' => 'terms',
@@ -57,27 +56,6 @@ class TermsQuery extends Query
         }
 
         return $query->paginate($args['limit'] ?? 1000);
-    }
-
-    private function filterQuery($query, $filters)
-    {
-        foreach ($filters as $field => $definitions) {
-            if (! is_array($definitions)) {
-                $definitions = [['equals' => $definitions]];
-            }
-
-            if (Arr::assoc($definitions)) {
-                $definitions = collect($definitions)->map(function ($value, $key) {
-                    return [$key => $value];
-                })->values()->all();
-            }
-
-            foreach ($definitions as $definition) {
-                $condition = array_keys($definition)[0];
-                $value = array_values($definition)[0];
-                $this->queryCondition($query, $field, $condition, $value);
-            }
-        }
     }
 
     private function sortQuery($query, $sorts)
