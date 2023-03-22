@@ -148,12 +148,6 @@ export default {
 
     },
 
-    created() {
-        if (this.sets.length === 1) {
-            this.selectedGroupHandle = this.sets[0].handle;
-        }
-    },
-
     methods: {
 
         addSet(handle) {
@@ -178,6 +172,10 @@ export default {
             const scrollPosition = window.scrollY;
             this.$refs.search.focus();
             window.scrollTo(0, scrollPosition);
+
+            if (this.sets.length === 1) {
+                this.selectedGroupHandle = this.sets[0].handle;
+            }
 
             this.bindKeys();
         },
