@@ -1,5 +1,5 @@
 <template>
-    <popover class="dropdown-list" :disabled="disabled" :placement="placement" :autoclose="autoclose" :fixed="fixed">
+    <popover class="dropdown-list" :disabled="disabled" :placement="placement" :autoclose="autoclose">
         <template #trigger>
             <slot name="trigger">
                 <button class="rotating-dots-button" :aria-label="__('Open Dropdown')">
@@ -21,10 +21,6 @@ export default {
         placement: {
             type: String,
             default: 'bottom-end'
-        },
-        fixed: {
-            type: Boolean,
-            default: false
         },
         autoclose: {
             type: Boolean,

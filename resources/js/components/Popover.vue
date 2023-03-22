@@ -50,9 +50,6 @@ export default {
             type: String,
             default: 'bottom-end',
         },
-        fixed: {
-            type: Boolean
-        },
     },
 
     data() {
@@ -85,7 +82,6 @@ export default {
         computePosition() {
             computePosition(this.$refs.trigger, this.$refs.popover, {
                 placement: this.placement,
-                strategy: this.fixed ? 'fixed' : 'absolute',
                 middleware: [
                     offset({ mainAxis: this.offset[0], crossAxis: this.offset[1] }),
                     flip(), // If you place it on the right, and there's not enough room, it'll flip to the left, etc.
@@ -93,7 +89,6 @@ export default {
                 ],
             }).then(({ x, y, strategy }) => {
                 Object.assign(this.$refs.popover.style, {
-                    position: strategy,
                     transform: `translate(${Math.round(x)}px, ${Math.round(y)}px)`, // Round to avoid blurry text
                 });
             });
