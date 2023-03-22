@@ -114,7 +114,7 @@ export default {
 
             // This UI only supports the first tab
             const blueprint = clone(this.blueprint);
-            const fields = blueprint.tabs[0].fields;
+            const fields = blueprint.tabs[0].sections[0].fields;
 
             if (this.type == 'url' && isMissingField(fields, 'url')) {
                 fields.unshift({

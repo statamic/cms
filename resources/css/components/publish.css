@@ -76,6 +76,10 @@ code.parent-url {
     @apply flex items-center;
 }
 
+.publish-section-header {
+    @apply px-5 pt-4 pb-3 border-b border-gray-400 bg-gray-100 rounded-t-lg;
+}
+
 .publish-sidebar {
     @apply shrink-0;
     margin-left: 20px;

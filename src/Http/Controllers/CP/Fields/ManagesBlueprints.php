@@ -110,10 +110,11 @@ trait ManagesBlueprints
         return Arr::removeNullValues([
             'display' => $section->display(),
             'instructions' => $section->instructions(),
+        ]) + [
             'fields' => collect($section->contents()['fields'])->map(function ($field, $i) use ($tab, $sectionIndex) {
                 return array_merge(FieldTransformer::toVue($field), ['_id' => $tab->handle().'-'.$sectionIndex.'-'.$i]);
             })->all(),
-        ]);
+        ];
     }
 
     private function storeBlueprint(Request $request, string $namespace)

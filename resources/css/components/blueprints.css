@@ -63,7 +63,7 @@
 }
 
 .blueprint-add-section-button {
-    @apply relative w-full border border-gray-500 border-dashed rounded flex justify-center items-center text-gray-700;
+    @apply relative w-full border border-gray-500 border-dashed rounded-lg flex justify-center items-center text-gray-700;
 
     &:hover {
         @apply border-gray text-gray-950;

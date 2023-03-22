@@ -22,34 +22,45 @@ class Replicator extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'collapse' => [
-                'display' => __('Collapse'),
-                'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
-                'type' => 'select',
-                'cast_booleans' => true,
-                'width' => 33,
-                'options' => [
-                    'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
-                    'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
-                    'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'collapse' => [
+                        'display' => __('Collapse'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
+                        'type' => 'select',
+                        'cast_booleans' => true,
+                        'options' => [
+                            'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
+                            'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
+                            'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+                        ],
+                        'default' => false,
+                    ],
+                    'previews' => [
+                        'display' => __('Field Previews'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.previews'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'max_sets' => [
+                        'display' => __('Max Sets'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
+                        'type' => 'integer',
+                    ],
                 ],
-                'default' => false,
             ],
-            'previews' => [
-                'display' => __('Field Previews'),
-                'instructions' => __('statamic::fieldtypes.replicator.config.previews'),
-                'type' => 'toggle',
-                'width' => 33,
-                'default' => true,
-            ],
-            'max_sets' => [
-                'display' => __('Max Sets'),
-                'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
-                'type' => 'integer',
-                'width' => 33,
-            ],
-            'sets' => [
-                'type' => 'sets',
+            [
+                'display' => __('Manage Sets'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.sets'),
+                'fields' => [
+                    'sets' => [
+                        'display' => __('Sets'),
+                        'type' => 'sets',
+                        'hide_meta' => true,
+                        'full_width_setting' => true,
+                    ],
+                ],
             ],
         ];
     }

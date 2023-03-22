@@ -1,35 +1,39 @@
 <template>
-
     <div>
-
-        <div ref="tabs" class="mb-5 flex">
-            <tab
-                v-for="tab in tabs"
-                :key="tab._id"
-                :tab="tab"
-                :current-tab="currentTab"
-                @selected="selectTab(tab._id)"
-                @removed="removeTab(tab._id)"
-                @mouseenter="mouseEnteredTab(tab._id)"
-            />
-            <div v-if="!singleTab" class="card px-5 py-2 cursor-pointer" @click="addTab" v-text="addTabText" />
+        <div v-if="!singleTab && tabs.length > 0" class="tabs-container mb-5 relative">
+            <div ref="tabs" class="tabs flex-1 flex space-x-3 overflow-auto pr-6" role="tablist">
+                <tab
+                    ref="tab"
+                    v-for="tab in tabs"
+                    :key="tab._id"
+                    :tab="tab"
+                    :current-tab="currentTab"
+                    :show-instructions="showTabInstructionsField"
+                    @selected="selectTab(tab._id)"
+                    @removed="removeTab(tab._id)"
+                    @updated="updateTab(tab._id, $event)"
+                    @mouseenter="mouseEnteredTab(tab._id)"
+                />
+                <div class="fade-left" v-if="canScrollLeft" />
+            </div>
+            <div class="fade-right right-10" />
+            <button class="btn-round ml-2 flex items-center justify-center relative top-1" @click="addAndEditTab" v-tooltip="addTabText">
+                <svg-icon name="add-bold" class="w-3 h-3" />
+            </button>
         </div>
-
+        <button class="btn" @click="addAndEditTab" v-text="addTabText" v-else></button>
         <tab-content
             v-for="tab in tabs"
             ref="tabContent"
             :key="tab._id"
             :tab="tab"
             v-show="currentTab === tab._id"
-            :show-instructions="showTabInstructionsField"
             :show-section-handle-field="showSectionHandleField"
             :new-section-text="newSectionText"
             :add-section-text="addSectionText"
             @updated="updateTab(tab._id, $event)"
         />
-
     </div>
-
 </template>
 
 <script>
@@ -88,7 +92,11 @@ export default {
         return {
             tabs: this.initialTabs,
             currentTab: this.initialTabs.length ? this.initialTabs[0]._id : null,
-            lastInteractedTab: null
+            lastInteractedTab: null,
+            hiddenTabs: [],
+            tabsAreScrolled: false,
+            canScrollLeft: false,
+            canScrollRight: false,
         }
     },
 
@@ -258,6 +266,11 @@ export default {
             this.selectTab(id);
 
             this.$nextTick(() => this.$refs.tabContent.find(vm => vm.tab._id === id).addSection());
+        },
+
+        addAndEditTab() {
+            this.addTab();
+            this.$nextTick(() => this.$refs.tab.find(vm => vm.tab._id === this.currentTab).edit());
         },
 
         removeTab(tabId) {

@@ -33,7 +33,8 @@ class Section
         return Arr::removeNullValues([
             'display' => $this->contents['display'] ?? null,
             'instructions' => $this->contents['instructions'] ?? null,
+        ]) + [
             'fields' => (new Fields(Arr::get($this->contents, 'fields', [])))->toPublishArray(),
-        ]);
+        ];
     }
 }
