@@ -62,7 +62,7 @@ class TaxonomyTermEntriesController extends ApiController
 
     private function allowedCollections()
     {
-        return ResourceAuthorizer::allowedForCollectionEntries('api');
+        return ResourceAuthorizer::allowedSubResources('api', 'collections');
     }
 
     protected function allowedFilters()
