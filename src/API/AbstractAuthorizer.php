@@ -18,6 +18,26 @@ abstract class AbstractAuthorizer
             return Facades\Collection::handles()->all();
         }
 
+        if ($resource === 'navs') {
+            return Facades\Nav::all()->map->handle()->all();
+        }
+
+        if ($resource === 'taxonomies') {
+            return Facades\Taxonomy::handles()->all();
+        }
+
+        if ($resource === 'assets') {
+            return Facades\AssetContainer::all()->map->handle()->all();
+        }
+
+        if ($resource === 'globals') {
+            return Facades\GlobalSet::all()->map->handle()->all();
+        }
+
+        if ($resource === 'forms') {
+            return Facades\Form::all()->map->handle()->all();
+        }
+
         return false;
     }
 
