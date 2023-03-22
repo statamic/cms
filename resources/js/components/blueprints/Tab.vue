@@ -13,7 +13,7 @@
     >
         {{ tab.display }}
 
-        <dropdown-list v-if="isActive" ref="dropdown" scroll class="text-left">
+        <dropdown-list v-if="isActive" ref="dropdown" placement="bottom-start" class="text-left">
             <dropdown-item @click="edit" v-text="__('Edit')" />
             <dropdown-item @click="remove" class="warning" v-text="__('Delete')" />
         </dropdown-list>
