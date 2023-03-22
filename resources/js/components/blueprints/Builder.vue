@@ -37,14 +37,6 @@
             </div>
         </div>
 
-        <div class="content mt-10 mb-4" v-if="useTabs">
-            <!--<h2>{{ __('Tabs') }}</h2>
-            <p class="max-w-lg">{{ __('messages.tabs_instructions') }}</p>
-            <div v-if="errors.tabs">
-                <p class="help-block text-red-500" v-for="(error, i) in errors.tabs" :key="i" v-text="error" />
-            </div>-->
-        </div>
-
         <tabs
             :single-tab="!useTabs"
             :initial-tabs="blueprint.tabs"
