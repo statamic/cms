@@ -38,10 +38,6 @@ class AssetsQuery extends Query
     {
         $query = Asset::query()->where('container', $args['container']);
 
-        if ($filters = $args['filter'] ?? null) {
-            $this->filterQuery($query, $filters);
-        }
-
         if ($sort = $args['sort'] ?? null) {
             $this->sortQuery($query, $sort);
         }
