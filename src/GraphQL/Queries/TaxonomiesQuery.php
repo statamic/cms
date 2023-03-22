@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Taxonomy;
@@ -20,6 +21,8 @@ class TaxonomiesQuery extends Query
 
     public function resolve($root, $args)
     {
-        return Taxonomy::all();
+        return Taxonomy::all()->filter(function ($taxonomy) {
+            return in_array($taxonomy->handle(), ResourceAuthorizer::allowedSubResources('graphql', 'taxonomies'));
+        });
     }
 }
