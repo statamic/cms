@@ -49,9 +49,7 @@ class EntriesQuery extends Query
     {
         $query = Entry::query();
 
-        if ($collection = $args['collection'] ?? null) {
-            $query->whereIn('collection', $collection);
-        }
+        $query->whereIn('collection', $args['collection'] ?? $this->allowedSubResources());
 
         $this->filterQuery($query, $args['filter'] ?? []);
 
