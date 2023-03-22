@@ -514,7 +514,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             $path => public_path("vendor/{$name}/js/{$filename}.js"),
         ], $this->getAddon()->slug());
 
-        Statamic::script($name, "{$filename}.js?v={$version}");
+        Statamic::script($name, "{$filename}.js?v=".md5($version));
     }
 
     public function registerVite($config)
@@ -559,7 +559,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             $path => public_path("vendor/{$name}/css/{$filename}.css"),
         ], $this->getAddon()->slug());
 
-        Statamic::style($name, "{$filename}.css?v={$version}");
+        Statamic::style($name, "{$filename}.css?v=".md5($version));
     }
 
     public function registerExternalStylesheet(string $url)

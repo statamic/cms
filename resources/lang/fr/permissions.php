@@ -70,7 +70,6 @@ return [
     'assign_roles' => 'Affecter des rôles aux utilisateurs',
     'group_updates' => 'Mises à jour',
     'view_updates' => 'Voir les mises à jour',
-    'perform_updates' => 'Effectuer des mises à jour',
     'group_utilities' => 'Utilitaires',
     'access_utility' => ':title',
     'access_utility_desc' => 'Permet d’accéder à l’utilitaire :title',

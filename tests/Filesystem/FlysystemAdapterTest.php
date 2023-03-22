@@ -18,10 +18,6 @@ class FlysystemAdapterTest extends TestCase
     {
         parent::setUp();
 
-        if (version_compare(app()->version(), '8.48.0', '<')) {
-            $this->markTestSkipped();
-        }
-
         mkdir($this->tempDir = __DIR__.'/tmp');
 
         $this->adapter = $this->makeAdapter();

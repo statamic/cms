@@ -3,14 +3,14 @@ import vSelect from 'vue-select'
 import AssetManager from '../components/assets/AssetManager.vue';
 import Browser from '../components/assets/Browser/Browser.vue';
 import UpdatesBadge from '../components/UpdatesBadge.vue';
-import ComposerOutput from '../components/ComposerOutput.vue';
 import Container from '../components/publish/Container.vue';
 import PublishForm from '../components/publish/PublishForm.vue';
 import Fields from '../components/publish/Fields.vue';
 import FieldsContainer from '../components/publish/FieldsContainer.vue'; // deprecated
 import Field from '../components/publish/Field.vue';
 import FieldMeta from '../components/publish/FieldMeta.vue';
-import ConfigureSections from '../components/configure/Sections.vue';
+import ConfigureTabs from '../components/configure/Tabs.vue';
+import PublishTabs from '../components/publish/Tabs.vue';
 import PublishSections from '../components/publish/Sections.vue';
 import PublishValidationErrors from '../components/publish/ValidationErrors.vue';
 import FormGroup from '../components/publish/FormGroup.vue';
@@ -60,6 +60,7 @@ import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
 import panes from '../components/panes/Pane.vue';
 import Fullscreen from '../components/Fullscreen.vue';
+import CodeBlock from '../components/CodeBlock.vue';
 
 // Third Party
 Vue.component('v-select', vSelect)
@@ -68,7 +69,6 @@ Vue.component('v-select', vSelect)
 Vue.component('asset-manager', AssetManager);
 Vue.component('asset-browser', Browser);
 Vue.component('updates-badge', UpdatesBadge);
-Vue.component('composer-output', ComposerOutput);
 
 // Publish
 Vue.component('publish-container', Container);
@@ -77,7 +77,8 @@ Vue.component('publish-fields', Fields);
 Vue.component('publish-fields-container', FieldsContainer);
 Vue.component('publish-field', Field);
 Vue.component('publish-field-meta', FieldMeta);
-Vue.component('configure-sections', ConfigureSections);
+Vue.component('configure-tabs', ConfigureTabs);
+Vue.component('publish-tabs', PublishTabs);
 Vue.component('publish-sections', PublishSections);
 Vue.component('publish-validation-errors', PublishValidationErrors);
 Vue.component('form-group', FormGroup);
@@ -128,6 +129,7 @@ Vue.component('breadcrumbs', Breadcrumbs);
 Vue.component('create-entry-button', CreateEntryButton);
 Vue.component('popover', Popover);
 Vue.component('fullscreen', Fullscreen);
+Vue.component('code-block', CodeBlock);
 
 // Recursive
 Vue.component('role-permission-tree', PermissionTree);

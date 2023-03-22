@@ -3,29 +3,27 @@
         <div class="flex items-center mb-6">
             <h1 class="flex-1" v-text="addon.name" />
             <a :href="addon.url" target="_blank" class="btn mr-4" v-text="__('View on Marketplace')" />
-            <button v-if="addon.installed" class="btn" :disabled="processing" @click="uninstall" v-text="__('Uninstall')" />
-            <button v-else class="btn btn-primary" :disabled="processing" @click="install" v-text="__('Install')" />
+            <button v-if="addon.installed" class="btn" @click="showComposerInstructions" v-text="__('Uninstall')" />
+            <button v-else class="btn btn-primary" @click="showComposerInstructions" v-text="__('Install')" />
         </div>
-        <modal
-            name="addon-composer-output"
-            v-if="showComposer"
-            v-slot="{ close: closeModal }"
-            :close-on-click="!composer.processing"
-            :pivot-y="0.5"
-            :overflow="false"
-            width="75%"
-            @closed="showComposer = false"
+        <confirmation-modal
+            v-if="modalOpen"
+            :cancellable="false"
+            :button-text="__('OK')"
+            @confirm="modalOpen = false"
         >
-            <div class="p-6 relative">
-                <composer-output :package="package" />
-                <button
-                    v-if="!composer.processing"
-                    class="btn-close absolute top-0 right-0 mt-4 mr-4"
-                    aria-label="Close"
-                    @click="closeModal"
-                    v-html="'&times'" />
+            <div class="prose">
+                <template v-if="addon.installed">
+                    <p v-text="`${__('messages.addon_uninstall_command')}:`" />
+                    <code-block copyable :text="`composer remove ${package}`" />
+                </template>
+                <template v-else>
+                    <p v-text="`${__('messages.addon_install_command')}:`" />
+                    <code-block copyable :text="`composer require ${package}`" />
+                </template>
+                <p>{{ __('Learn more about') }} <a href="https://statamic.dev/addons">{{ __('Addons') }}</a>.</p>
             </div>
-        </modal>
+        </confirmation-modal>
         <div>
             <div class="card mb-6 flex items-center">
                 <div class="flex-1 text-lg">
@@ -65,7 +63,7 @@ import AddonEditions from './addons/Editions.vue';
         data() {
             return {
                 waitingForRefresh: false,
-                showComposer: false,
+                modalOpen: false,
                 downloads: null,
             }
         },
@@ -77,14 +75,6 @@ import AddonEditions from './addons/Editions.vue';
 
             package() {
                 return this.addon.package;
-            },
-
-            composer() {
-                return this.$store.state.statamic.composer;
-            },
-
-            processing() {
-                return this.composer.processing || this.waitingForRefresh;
             },
 
             description() {
@@ -100,58 +90,15 @@ import AddonEditions from './addons/Editions.vue';
         },
 
         created() {
-            this.$events.$on('composer-finished', this.composerFinished);
             this.$events.$on('addon-refreshed', this.addonRefreshed);
-            this.$store.commit('statamic/composer', {});
             this.getDownloadCount();
         },
 
         destroyed() {
-            this.$events.$off('composer-finished', this.composerFinished);
             this.$events.$off('addon-refreshed', this.addonRefreshed);
         },
 
         methods: {
-            install() {
-                this.$axios.post(cp_url('addons/install'), {'addon': this.package}, this.toEleven);
-
-                this.waitingForRefresh = true;
-                this.showComposer = true;
-
-                this.$store.commit('statamic/composer', {
-                    processing: true,
-                    status: __('Installing :package', { package: this.package }),
-                    package: this.package,
-                });
-
-                setTimeout(() => this.$events.$emit('start-composer'), 100);
-            },
-
-            uninstall() {
-                this.$axios.post(cp_url('addons/uninstall'), {'addon': this.package}, this.toEleven);
-
-                this.waitingForRefresh = true;
-                this.showComposer = true;
-
-                this.$store.commit('statamic/composer', {
-                    processing: true,
-                    status: __('Uninstalling :package', { package: this.package }),
-                    package: this.package,
-                });
-
-                setTimeout(() => this.$events.$emit('start-composer'), 100);
-            },
-
-            composerFinished() {
-                this.$store.commit('statamic/composer', {
-                    processing: false,
-                    status: __('Operation complete'),
-                    package: this.package,
-                });
-
-                this.$toast.success(__('Operation complete'));
-            },
-
             addonRefreshed() {
                 this.waitingForRefresh = false;
             },
@@ -160,7 +107,11 @@ import AddonEditions from './addons/Editions.vue';
                 this.$axios.get(`https://packagist.org/packages/${this.addon.package}.json`).then(response => {
                     this.downloads = response.data.package.downloads.total;
                 });
-            }
+            },
+
+            showComposerInstructions() {
+                this.modalOpen = true;
+            },
         }
     }
 </script>

@@ -37,14 +37,14 @@
             @updated="values = $event"
         >
             <div slot-scope="{ container, setFieldValue, setFieldMeta }">
-                <publish-sections
+                <publish-tabs
                     :enable-sidebar="false"
                     :can-toggle-labels="true"
                     @updated="setFieldValue"
                     @meta-updated="setFieldMeta"
                     @focus="container.$emit('focus', $event)"
                     @blur="container.$emit('blur', $event)"
-                ></publish-sections>
+                ></publish-tabs>
             </div>
         </publish-container>
 

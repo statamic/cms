@@ -1,5 +1,6 @@
 <template>
 <fullscreen :enabled="fullScreenMode" target-class="markdown-fieldtype">
+<element-container @resized="refresh">
     <div class="markdown-fieldtype-wrapper @container/markdown" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
 
         <uploader
@@ -116,6 +117,7 @@
         <vue-countable :text="data" :elementId="'myId'" @change="change"></vue-countable>
 
     </div>
+</element-container>
 </fullscreen>
 </template>
 
@@ -581,6 +583,12 @@ export default {
             });
 
             this.trackHeightUpdates();
+        },
+
+        refresh() {
+            this.$nextTick(function() {
+                this.codemirror.refresh();
+            })
         }
 
     },

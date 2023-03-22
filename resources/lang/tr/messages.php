@@ -171,7 +171,7 @@ return [
     'session_expiry_logging_out_in_seconds' => 'Bir süredir aktif değilsiniz ve :saniye saniye içinde oturumunuz kapatılacak. Oturumunuzu uzatmak için tıklayın.',
     'session_expiry_new_window' => 'Yeni bir pencerede açılır. Giriş yaptıktan sonra tekrar gelin.',
     'show_slugs_instructions' => 'Ağaç görünümünde kalıcı bağlantıların gösterilip gösterilmeyeceği.',
-    'tab_sections_instructions' => 'Her bölümdeki alanlar sekmeler halinde gruplandırılacaktır. Yeni alanlar oluşturun, mevcut alanları yeniden kullanın veya mevcut alan kümelerinden tüm alan gruplarını içe aktarın.',
+    'tabs_instructions' => 'Her bölümdeki alanlar sekmeler halinde gruplandırılacaktır. Yeni alanlar oluşturun, mevcut alanları yeniden kullanın veya mevcut alan kümelerinden tüm alan gruplarını içe aktarın.',
     'taxonomies_blueprints_instructions' => 'Bu sınıflandırmadaki terimler bu planlardan herhangi birini kullanabilir.',
     'taxonomies_collections_instructions' => 'Bu taksonomiyi kullanan koleksiyonlar.',
     'taxonomies_preview_targets_instructions' => 'Canlı Önizleme\'de görüntülenebilecek URL\'ler. [Belgelerde](https://statamic.dev/live-preview#preview-targets) daha fazla bilgi edinin.',

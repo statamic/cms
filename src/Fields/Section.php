@@ -3,28 +3,24 @@
 namespace Statamic\Fields;
 
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class Section
 {
-    protected $handle;
-    protected $contents = [];
+    protected $contents;
 
-    public function __construct($handle)
-    {
-        $this->handle = $handle;
-    }
-
-    public function handle(): ?string
-    {
-        return $this->handle;
-    }
-
-    public function setContents(array $contents)
+    public function __construct($contents)
     {
         $this->contents = $contents;
+    }
 
-        return $this;
+    public function display()
+    {
+        return $this->contents['display'] ?? null;
+    }
+
+    public function instructions()
+    {
+        return $this->contents['instructions'] ?? null;
     }
 
     public function contents(): array
@@ -32,28 +28,13 @@ class Section
         return $this->contents;
     }
 
-    public function fields(): Fields
-    {
-        return new Fields(Arr::get($this->contents, 'fields', []));
-    }
-
     public function toPublishArray()
     {
-        return [
-            'display' => $this->display(),
-            'instructions' => $this->instructions(),
-            'handle' => $this->handle,
-            'fields' => $this->fields()->toPublishArray(),
+        return Arr::removeNullValues([
+            'display' => $this->contents['display'] ?? null,
+            'instructions' => $this->contents['instructions'] ?? null,
+        ]) + [
+            'fields' => (new Fields(Arr::get($this->contents, 'fields', [])))->toPublishArray(),
         ];
-    }
-
-    public function display()
-    {
-        return array_get($this->contents, 'display', __(Str::humanize($this->handle)));
-    }
-
-    public function instructions()
-    {
-        return array_get($this->contents, 'instructions');
     }
 }

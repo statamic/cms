@@ -528,7 +528,7 @@ class Comb
 
             // loop over each query chunk
             foreach ($params['chunks'] as $j => $chunk) {
-                $escaped_chunk = str_replace('#', '\#', $chunk);
+                $escaped_chunk = preg_quote($chunk, '#');
                 $regex = [
                     'whole' => '#^'.$escaped_chunk.'$#i',
                     'partial' => '#'.$escaped_chunk.'#i',
@@ -1043,7 +1043,7 @@ class Comb
         $length = $this->snippet_length;
 
         $escaped_chunks = collect($chunks)
-            ->map(fn ($chunk) => str_replace('#', '\#', $chunk))
+            ->map(fn ($chunk) => preg_quote($chunk, '#'))
             ->join('|');
         $regex = '#(.*?)('.$escaped_chunks.')(.{0,'.$length.'}(?:\s|$))#i';
         if (! preg_match_all($regex, $value, $matches, PREG_SET_ORDER)) {

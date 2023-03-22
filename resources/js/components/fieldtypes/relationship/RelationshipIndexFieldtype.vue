@@ -8,7 +8,7 @@
             :class="{ 'mb-1.5': i < value.length-1 }"
         >
             <div class="flex items-center shrink">
-                <div v-if="item.published && item.published !== null"
+                <div v-if="item.hasOwnProperty('published') && item.published !== null"
                     class="little-dot h-1 w-1 mr-1" :class="[item.published ? 'bg-green-600' : 'bg-gray-400']" />
                 <a :href="item.edit_url" :title="item.title" v-text="item.title" />
             </div>
