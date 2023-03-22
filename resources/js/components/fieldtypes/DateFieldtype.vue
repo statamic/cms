@@ -158,11 +158,15 @@ export default {
         },
 
         timeString() {
-            return Vue.moment(this.value).format('HH:mm:ss');
+            return Vue.moment(this.value).format(this.config.time_seconds_enabled ? 'HH:mm:ss' : 'HH:mm');
         },
 
         format() {
-            return (this.hasTime) ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD';
+            if (this.hasTime) {
+                return this.config.time_seconds_enabled ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD HH:mm';
+            }
+
+            return 'YYYY-MM-DD';
         },
 
         displayFormat() {
@@ -211,7 +215,7 @@ export default {
 
         setTime(timeString) {
             timeString = this.formatTime(timeString);
-            console.log(timeString);
+            // console.log(timeString);
             const [hour, minute, second] = timeString.split(':');
 
             const moment = Vue.moment(this.value) // clone before mutating

@@ -1,6 +1,6 @@
 <template>
     <div class="time-fieldtype-container">
-        <div class="input-group" :class="{'w-[120px]': showSeconds || config.seconds_enabled, 'w-[96px]': ! showSeconds && ! config.seconds_enabled}">
+        <div class="input-group" :class="{'w-[120px]': useSeconds, 'w-[96px]': ! useSeconds}">
             <div class="input-group-prepend flex items-center" v-tooltip="__('24 Hour Format')">
                 <svg-icon name="time" class="w-4 h-4" />
             </div>
@@ -9,7 +9,7 @@
                 ref="time"
                 class="input-text"
                 :readonly="isReadOnly"
-                v-mask="mask"
+                v-mask="timeMask"
                 v-model="time"
                 placeholder="23:45"
                 @keydown.esc="clear"
@@ -38,20 +38,46 @@ export default {
 
     data() {
         return {
-            time: this.value
+            time: this.value,
         };
     },
 
     watch: {
         time(time) {
-            this.updateTime(time);
+            if (time !== this.value) {
+                this.updateTime(time);
+            }
         },
     },
 
     computed: {
-        mask() {
-            return this.showSeconds || this.config.seconds_enabled ? [/[0-2]/, /[0-9]/, ':', /[0-5]/, /[0-9]/, ':', /[0-5]/, /[0-9]/] : [/[0-2]/, /[0-9]/, ':', /[0-5]/, /[0-9]/];
+        useSeconds() {
+            return this.showSeconds || this.config.seconds_enabled;
         },
+
+        timeMask() {
+            return (value) => {
+                const hours = [
+                    /[0-2]/,
+                    value.charAt(0) === '2' ? /[0-3]/ : /[0-9]/,
+                ];
+                const minutes = [/[0-5]/, /[0-9]/];
+                const masks = [...hours, ':', ...minutes];
+                const seconds = [/[0-5]/, /[0-9]/];
+
+                if (this.useSeconds) {
+                    masks.push(':', ...seconds);
+                }
+
+                if ((this.useSeconds) && value.length > 5) {
+                    return [...hours, ':', ...minutes, ':', ...seconds];
+                } else if (value.length > 2) {
+                    return [...hours, ':', ...minutes];
+                } else {
+                    return hours;
+                }
+            }
+        }
     },
 
     methods: {
@@ -69,7 +95,7 @@ export default {
 
             if (parts.length === 2) {
                 parts[1] = parts[1].padStart(2, '0');
-                if (this.showSeconds || this.config.seconds_enabled) {
+                if (this.useSeconds) {
                     parts[2] = '00';
                 }
             }
@@ -82,7 +108,6 @@ export default {
 
             this.update(time);
         },
-
     }
 
 };
