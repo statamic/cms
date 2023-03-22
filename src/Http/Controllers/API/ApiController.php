@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Illuminate\Validation\ValidationException;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
@@ -36,15 +37,11 @@ class ApiController extends Controller
             return;
         }
 
-        // TODO: Use ResourceAuthorizer?
-
-        $config = config("statamic.api.resources.{$this->resourceConfigKey}", false);
-
-        if ($config !== true && ! is_array($config)) {
+        if (! ResourceAuthorizer::isAllowed('api', $this->resourceConfigKey)) {
             throw new NotFoundHttpException;
         }
 
-        if (! $this->routeResourceKey || ! is_array($config)) {
+        if (! $this->routeResourceKey) {
             return;
         }
 
@@ -56,12 +53,7 @@ class ApiController extends Controller
             $handle = $handle->handle();
         }
 
-        $config = collect($config)
-            ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => true] : [$key => $value])
-            ->reject(fn ($config, $resource) => $resource === '*')
-            ->get($handle);
-
-        if (! $config) {
+        if (! in_array($handle, ResourceAuthorizer::allowedSubResources('api', $this->resourceConfigKey))) {
             throw new NotFoundHttpException;
         }
     }
