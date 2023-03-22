@@ -3,8 +3,6 @@
     <popover
         ref="popover"
         class="set-picker"
-        scroll
-        :autoclose="false"
         :placement="placement"
         :disabled="!hasMultipleSets"
         @opened="opened"
