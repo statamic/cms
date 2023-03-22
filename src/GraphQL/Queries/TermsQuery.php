@@ -2,9 +2,13 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Term;
+use Statamic\GraphQL\Middleware\AuthorizeFilters;
+use Statamic\GraphQL\Middleware\AuthorizeSubResources;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\JsonArgument;
@@ -20,7 +24,9 @@ class TermsQuery extends Query
     ];
 
     protected $middleware = [
+        AuthorizeSubResources::class,
         ResolvePage::class,
+        AuthorizeFilters::class,
     ];
 
     public function type(): Type
@@ -43,9 +49,7 @@ class TermsQuery extends Query
     {
         $query = Term::query();
 
-        if ($taxonomy = $args['taxonomy'] ?? null) {
-            $query->whereIn('taxonomy', $taxonomy);
-        }
+        $query->whereIn('taxonomy', $args['taxonomy'] ?? $this->allowedSubResources());
 
         if ($filters = $args['filter'] ?? null) {
             $this->filterQuery($query, $filters);
@@ -69,5 +73,20 @@ class TermsQuery extends Query
 
             $query->orderBy($sort, $order);
         }
+    }
+
+    public function subResourceArg()
+    {
+        return 'taxonomy';
+    }
+
+    public function allowedSubResources()
+    {
+        return ResourceAuthorizer::allowedSubResources('graphql', 'taxonomies');
+    }
+
+    public function allowedFilters($args)
+    {
+        return FilterAuthorizer::allowedForSubResources('graphql', 'taxonomies', $args['taxonomy'] ?? '*');
     }
 }
