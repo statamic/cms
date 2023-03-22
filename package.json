@@ -11,7 +11,7 @@
     "frontend-build": "vite build -c vite-frontend.config.js"
   },
   "dependencies": {
-    "@popperjs/core": "^2.5.3",
+    "@floating-ui/dom": "^1.2.5",
     "@shopify/draggable": "^1.0.0-beta.12",
     "@simonwep/pickr": "^1.7.4",
     "@tiptap/core": "^2.0.0-beta.217",
@@ -47,7 +47,6 @@
     "@tiptap/pm": "^2.0.0-beta.217",
     "@tiptap/vue-2": "^2.0.0-beta.217",
     "alpinejs": "^3.1.1",
-    "ansi-to-html": "^0.6.14",
     "autosize": "~3.0.12",
     "axios": "^0.21.2",
     "body-scroll-lock": "^2.6.4",

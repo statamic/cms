@@ -5,6 +5,7 @@ namespace Statamic\Support;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr as IlluminateArr;
+use Statamic\Fields\Value;
 
 /** @mixin \Illuminate\Support\Arr */
 class Arr
@@ -51,6 +52,10 @@ class Arr
         }
 
         return collect($array)->map(function ($value) use ($scope) {
+            if ($value instanceof Value) {
+                $value = $value->value();
+            }
+
             if ($value instanceof Arrayable) {
                 $value = $value->toArray();
             }

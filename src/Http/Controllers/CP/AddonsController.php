@@ -2,8 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Facades\Statamic\Extend\AddonInstaller;
-use Illuminate\Http\Request;
 use Statamic\Facades\Addon;
 
 class AddonsController extends CpController
@@ -19,15 +17,5 @@ class AddonsController extends CpController
             'title' => __('Addons'),
             'addonCount' => Addon::all()->count(),
         ]);
-    }
-
-    public function install(Request $request)
-    {
-        return AddonInstaller::install($request->addon);
-    }
-
-    public function uninstall(Request $request)
-    {
-        return AddonInstaller::uninstall($request->addon);
     }
 }

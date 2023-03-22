@@ -78,7 +78,6 @@ return [
 
     'group_updates' => 'Frissítések',
     'view_updates' => 'Frissítések megtekintése',
-    'perform_updates' => 'Frissítések végrehajtása',
 
     'group_utilities' => 'Segédprogramok',
     'access_utility' => ':title',

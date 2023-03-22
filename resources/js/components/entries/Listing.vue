@@ -99,7 +99,7 @@
                                 <div class="slug-index-field" :title="entry.slug">{{ entry.slug }}</div>
                             </template>
                             <template slot="actions" slot-scope="{ row: entry, index }">
-                                <dropdown-list placement="left-start" scroll>
+                                <dropdown-list placement="left-start">
                                     <dropdown-item :text="__('View')" :external-link="entry.permalink" v-if="entry.viewable && entry.permalink" />
                                     <dropdown-item :text="__('Edit')" :redirect="entry.edit_url" v-if="entry.editable" />
                                     <div class="divider" v-if="entry.actions.length" />

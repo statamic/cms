@@ -130,6 +130,7 @@
 
                         <publish-sections
                             :sections="fieldset.tabs[0].sections"
+                            :read-only="readOnly"
                             @updated="setFieldValue"
                             @meta-updated="setFieldMeta"
                         />

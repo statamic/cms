@@ -7,10 +7,8 @@
     visibility: hidden;
     z-index: 999;
     position: absolute;
-    top: auto;
-    bottom: auto;
-    left: auto;
-    right: auto;
+    top: 0;
+    left: 0;
 
     &::before {
         content: '';
@@ -32,6 +30,8 @@
 
 .popover-container {
     position: relative;
+    z-index: 9999;
+    pointer-events: none;
 }
 
 /*  When open */
