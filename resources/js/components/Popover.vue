@@ -12,7 +12,7 @@
             <div :class="`${isOpen ? 'popover-open' : ''}`">
                 <div ref="popover" class="popover" v-if="!disabled">
                     <div class="popover-content bg-white shadow-popover rounded-md">
-                        <slot :close="close" :after-closed="afterClosed" />
+                        <slot :close="close" />
                     </div>
                 </div>
             </div>
@@ -59,7 +59,6 @@ export default {
         return {
             isOpen: false,
             escBinding: null,
-            closedCallbacks: [],
             cleanupAutoUpdater: null,
             portalTarget: null,
         }
@@ -130,13 +129,6 @@ export default {
             if (this.autoclose) {
                 this.close();
             }
-        },
-        destroyPopper() {
-            // run any after-closed callbacks
-            this.closedCallbacks.forEach(callback => callback());
-        },
-        afterClosed(callback) {
-            this.closedCallbacks.push(callback);
         },
         createPortalTarget() {
             let key = `popover-${this._uid}`;
