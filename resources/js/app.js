@@ -36,6 +36,7 @@ import Vuex from 'vuex';
 import StatamicStore from './store';
 import vSelect from 'vue-select'
 import VCalendar from 'v-calendar';
+import VueMask from 'v-mask'
 
 // Customize vSelect UI components
 vSelect.props.components.default = () => ({
@@ -72,6 +73,7 @@ Vue.use(PortalVue)
 Vue.use(VModal, { componentName: 'vue-modal' })
 Vue.use(Vuex);
 Vue.use(VCalendar);
+Vue.use(VueMask);
 
 Vue.component(vSelect)
 

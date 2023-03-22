@@ -75,6 +75,7 @@
     "underscore": "~1.13.2",
     "uniqid": "^5.2.0",
     "v-calendar": "^2.3.0",
+    "v-mask": "^2.3.0",
     "validator": "^13.7.0",
     "vue": "^2.7.14",
     "vue-clickaway": "~2.2.2",
