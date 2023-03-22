@@ -66,15 +66,9 @@ class ApiController extends Controller
      */
     protected function filterAllowedResources($items)
     {
-        $allowedResources = config("statamic.api.resources.{$this->resourceConfigKey}");
+        $allowedResources = ResourceAuthorizer::allowedSubResources('api', $this->resourceConfigKey);
 
-        if (! is_array($allowedResources)) {
-            return $items;
-        }
-
-        return $items->filter(function ($item) use ($allowedResources) {
-            return in_array($item->handle(), $allowedResources);
-        });
+        return $items->filter(fn ($item) => in_array($item->handle(), $allowedResources));
     }
 
     /**
