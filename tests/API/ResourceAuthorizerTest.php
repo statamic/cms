@@ -39,11 +39,6 @@ class ResourceAuthorizerTest extends TestCase
 
         $this->assertFalse(ResourceAuthorizer::isAllowed($configFile, 'collections'));
         $this->assertEqualsCanonicalizing([], ResourceAuthorizer::allowedSubResources($configFile, 'collections'));
-
-        Config::set("statamic.{$configFile}.resources.collections", []);
-
-        $this->assertFalse(ResourceAuthorizer::isAllowed($configFile, 'collections'));
-        $this->assertEqualsCanonicalizing([], ResourceAuthorizer::allowedSubResources($configFile, 'collections'));
     }
 
     /**
@@ -72,7 +67,7 @@ class ResourceAuthorizerTest extends TestCase
             ],
         ]);
 
-        $this->assertFalse(ResourceAuthorizer::isAllowed($configFile, 'collections'));
+        $this->assertTrue(ResourceAuthorizer::isAllowed($configFile, 'collections'));
         $this->assertEqualsCanonicalizing([], ResourceAuthorizer::allowedSubResources($configFile, 'collections'));
     }
 

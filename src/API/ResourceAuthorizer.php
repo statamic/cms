@@ -17,15 +17,7 @@ class ResourceAuthorizer extends AbstractAuthorizer
      */
     public function isAllowed($configFile, $queriedResource)
     {
-        if (config("statamic.{$configFile}.resources.{$queriedResource}", false) === false) {
-            return false;
-        }
-
-        if ($this->hasSubResources($queriedResource)) {
-            return (bool) $this->allowedSubResources($configFile, $queriedResource);
-        }
-
-        return true;
+        return config("statamic.{$configFile}.resources.{$queriedResource}", false) !== false;
     }
 
     /**
