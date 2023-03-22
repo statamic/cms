@@ -2,6 +2,7 @@
 
 namespace Statamic\Assets;
 
+use Facades\Statamic\Imaging\ImageValidator;
 use Statamic\Facades\Glide;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -24,6 +25,10 @@ abstract class Uploader
             return $file->getRealPath();
         }
 
+        if (! ImageValidator::isValidImage($file->getClientOriginalExtension(), $file->getClientMimeType())) {
+            return $file->getRealPath();
+        }
+
         $server = Glide::server([
             'source' => $file->getPath(),
             'cache' => $cache = storage_path('statamic/glide/tmp'),
@@ -33,7 +38,6 @@ abstract class Uploader
         try {
             return $cache.'/'.$server->makeImage($file->getFilename(), ['p' => $preset]);
         } catch (\Exception $exception) {
-            // Glide can't process the file, ie. it's not an image.
             return $file->getRealPath();
         }
     }

@@ -63,7 +63,6 @@ return [
     'edit_roles' => 'Urejanje vlog',
     'group_updates' => 'Posodobitve',
     'view_updates' => 'Oglejte si posodobitve',
-    'perform_updates' => 'Izvajajte posodobitve',
     'group_utilities' => 'Pripomočki',
     'access_utility' => ':title',
     'access_utility_desc' => 'Omogoča dostop do :title pripomočka za :title',

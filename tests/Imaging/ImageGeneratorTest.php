@@ -2,6 +2,7 @@
 
 namespace Tests\Imaging;
 
+use Facades\Statamic\Imaging\ImageValidator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
@@ -50,6 +51,10 @@ class ImageGeneratorTest extends TestCase
 
         $this->assertCount(0, $this->generatedImagePaths());
 
+        ImageValidator::shouldReceive('isValidImage')
+            ->andReturnTrue()
+            ->once(); // Only one manipulation should happen because of cache.
+
         // Generate the image twice to make sure it's cached.
         foreach (range(1, 2) as $i) {
             $path = $this->makeGenerator()->generateByAsset(
@@ -92,6 +97,10 @@ class ImageGeneratorTest extends TestCase
         $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
         $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
 
+        ImageValidator::shouldReceive('isValidImage')
+            ->andReturnTrue()
+            ->times(2); // Two manipulations should get cached.
+
         // Generate the image twice to make sure it's cached.
         foreach (range(1, 2) as $i) {
             $this->makeGenerator()->generateByAsset(
@@ -126,6 +135,10 @@ class ImageGeneratorTest extends TestCase
         $image = UploadedFile::fake()->image('', 30, 60);
         $contents = file_get_contents($image->getPathname());
         File::put(public_path($imagePath), $contents);
+
+        ImageValidator::shouldReceive('isValidImage')
+            ->andReturnTrue()
+            ->once(); // Only one manipulation should happen because of cache.
 
         // Generate the image twice to make sure it's cached.
         foreach (range(1, 2) as $i) {
@@ -290,18 +303,6 @@ class ImageGeneratorTest extends TestCase
         $watermark = collect($manipulators)->first(fn ($m) => $m instanceof Watermark);
 
         return $watermark->getWatermarks();
-    }
-
-    /** @test */
-    public function it_validates_an_asset()
-    {
-        $this->markTestIncomplete();
-    }
-
-    /** @test */
-    public function it_validates_an_image()
-    {
-        $this->markTestIncomplete();
     }
 
     private function makeGenerator()

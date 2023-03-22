@@ -19,7 +19,7 @@
                     <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
                 </div>
             </header>
-            <configure-sections
+            <configure-tabs
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
                 :enable-sidebar="false"/>

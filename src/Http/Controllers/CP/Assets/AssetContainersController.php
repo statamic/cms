@@ -301,7 +301,7 @@ class AssetContainersController extends CpController
             ],
         ]);
 
-        return Blueprint::makeFromSections($fields);
+        return Blueprint::makeFromTabs($fields);
     }
 
     private function expandedGlidePresetOptions()

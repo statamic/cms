@@ -506,6 +506,10 @@ class NodeProcessor
      */
     private function shouldProcessAsTag(AntlersNode $node)
     {
+        if ($node->pathReference == null && $node->name != null && Str::startsWith($node->name->name, '[')) {
+            return false;
+        }
+
         if ($node->pathReference != null) {
             if ($node->pathReference->isStrictTagReference) {
                 return true;
@@ -1460,13 +1464,21 @@ class NodeProcessor
                         $beforeAssignments = $this->runtimeAssignments;
                         $currentIsolationState = GlobalRuntimeState::$requiresRuntimeIsolation;
                         GlobalRuntimeState::$requiresRuntimeIsolation = true;
+                        GlobalRuntimeState::$evaulatingTagContents = true;
+
+                        $args = [];
+
+                        if ($methodToCall == 'wildcard') {
+                            $args = [$tagMethod];
+                        }
 
                         try {
-                            $output = call_user_func([$tag, $methodToCall]);
+                            $output = call_user_func([$tag, $methodToCall], ...$args);
                         } catch (Exception $e) {
                             throw $e;
                         } finally {
                             GlobalRuntimeState::$requiresRuntimeIsolation = $currentIsolationState;
+                            GlobalRuntimeState::$evaulatingTagContents = false;
                         }
 
                         $afterAssignments = $this->runtimeAssignments;

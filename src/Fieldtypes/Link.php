@@ -19,18 +19,23 @@ class Link extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'collections' => [
-                'display' => __('Collections'),
-                'instructions' => __('statamic::fieldtypes.link.config.collections'),
-                'type' => 'collections',
-                'mode' => 'select',
-            ],
-            'container' => [
-                'display' => __('Container'),
-                'instructions' => __('statamic::fieldtypes.link.config.container'),
-                'type' => 'asset_container',
-                'mode' => 'select',
-                'max_items' => 1,
+            [
+                'display' => __('Behavior'),
+                'fields' => [
+                    'collections' => [
+                        'display' => __('Collections'),
+                        'instructions' => __('statamic::fieldtypes.link.config.collections'),
+                        'type' => 'collections',
+                        'mode' => 'select',
+                    ],
+                    'container' => [
+                        'display' => __('Container'),
+                        'instructions' => __('statamic::fieldtypes.link.config.container'),
+                        'type' => 'asset_container',
+                        'mode' => 'select',
+                        'max_items' => 1,
+                    ],
+                ],
             ],
         ];
     }

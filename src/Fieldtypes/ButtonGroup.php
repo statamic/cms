@@ -14,17 +14,22 @@ class ButtonGroup extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'options' => [
+            [
                 'display' => __('Options'),
-                'instructions' => __('statamic::fieldtypes.radio.config.options'),
-                'type' => 'array',
-                'value_header' => __('Label').' ('.__('Optional').')',
-            ],
-            'default' => [
-                'display' => __('Default Value'),
-                'instructions' => __('statamic::messages.fields_default_instructions'),
-                'type' => 'text',
-                'width' => 50,
+                'fields' => [
+                    'options' => [
+                        'display' => __('Options'),
+                        'instructions' => __('statamic::fieldtypes.radio.config.options'),
+                        'type' => 'array',
+                        'value_header' => __('Label').' ('.__('Optional').')',
+                        'add_button' => __('Add Option'),
+                    ],
+                    'default' => [
+                        'display' => __('Default Value'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'text',
+                    ],
+                ],
             ],
         ];
     }

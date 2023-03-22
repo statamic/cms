@@ -11,7 +11,7 @@
     <blueprint-builder
         action="{{ cp_route('forms.blueprint.update', $form->handle()) }}"
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
-        :use-sections="false"
+        :use-tabs="false"
         :is-form-blueprint="true"
     ></blueprint-builder>
 

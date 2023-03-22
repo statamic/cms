@@ -3,14 +3,14 @@
         <div class="flex flex-wrap px-3 border-b pt-2">
 
             <!-- Field filter (requires custom selection UI) -->
-            <popover v-if="fieldFilter" scroll strategy="fixed">
+            <popover v-if="fieldFilter" placement="bottom-start" :clickaway="false" @closed="fieldFilterClosed">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
                         {{ __('Field') }}
                         <svg-icon name="chevron-down-xs" class="w-2 h-2 mx-2" />
                     </button>
                 </template>
-                <template #default="{ close: closePopover, afterClosed: afterPopoverClosed }">
+                <template #default="{ close: closePopover }">
                     <div class="flex flex-col text-left w-64">
                         <div class="filter-fields text-sm">
                             <field-filter
@@ -18,7 +18,6 @@
                                 :config="fieldFilter"
                                 :values="activeFilters.fields || {}"
                                 :badges="fieldFilterBadges"
-                                :popover-closed="afterPopoverClosed"
                                 @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
                                 @cleared="creating = false"
                                 @closed="closePopover"
@@ -39,7 +38,7 @@
             </popover>
 
             <!-- Standard non-field filters -->
-            <popover v-if="standardFilters.length" v-for="filter in standardFilters" :key="filter.handle" scroll strategy="fixed">
+            <popover v-if="standardFilters.length" v-for="filter in standardFilters" :key="filter.handle" placement="bottom-start">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2">
                         {{ filter.title }}
@@ -196,7 +195,11 @@ export default {
         resetFilterPopover() {
             this.creating = false;
 
-            this.$refs.fieldFilter.resetInitialValues();
+            setTimeout(() => this.$refs.fieldFilter?.resetInitialValues(), 100); // wait for popover to appear
+        },
+
+        fieldFilterClosed() {
+            this.$refs.fieldFilter.popoverClosed();
         },
 
         removeFieldFilter(handle) {
