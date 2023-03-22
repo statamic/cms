@@ -8,6 +8,7 @@ use Statamic\Fields\Fieldtype;
 class IconPicker extends Fieldtype
 {
     protected $categories = ['media'];
+    protected $selectable = false;
 
     public function preload(): array
     {
