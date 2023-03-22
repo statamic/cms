@@ -3,6 +3,7 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Config;
@@ -29,13 +30,13 @@ class UsersTest extends TestCase
         User::make()->id('7')->email('g@example.com')->set('name', 'Fred')->save();
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableQueries
-     **/
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'users')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'users')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{users}'])
@@ -43,7 +44,7 @@ class UsersTest extends TestCase
     }
 
     /** @test */
-    public function it_queries_users()
+    public function it_queries_all_users()
     {
         $this->createUsers();
 
@@ -57,6 +58,10 @@ class UsersTest extends TestCase
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'users')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'users')->never();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()
