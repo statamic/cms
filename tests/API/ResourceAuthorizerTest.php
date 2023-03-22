@@ -131,6 +131,18 @@ class ResourceAuthorizerTest extends TestCase
      *
      * @dataProvider configFileProvider
      */
+    public function users_are_not_allowed_by_default($configFile)
+    {
+        Config::set("statamic.{$configFile}.resources.users", false);
+
+        $this->assertFalse(ResourceAuthorizer::isAllowed($configFile, 'users'));
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider configFileProvider
+     */
     public function can_enable_users_via_boolean($configFile)
     {
         Config::set("statamic.{$configFile}.resources.users", true);
