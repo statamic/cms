@@ -157,7 +157,7 @@ return [
     'session_expiry_logging_out_in_seconds' => 'Du har varit inaktiv ett tag och kommer att loggas ut om :seconds sekunder. Klicka för att förlänga din session.',
     'session_expiry_new_window' => 'Öppnas i ett nytt fönster. Kom tillbaka när du har loggat in.',
     'show_slugs_instructions' => 'Om sniglar ska visas i trädvyn.',
-    'tab_sections_instructions' => 'Fälten i varje avsnitt kommer att grupperas i flikar. Skapa nya fält, återanvänd befintliga fält eller importera hela grupper av fält från befintliga fältuppsättningar.',
+    'tabs_instructions' => 'Fälten i varje avsnitt kommer att grupperas i flikar. Skapa nya fält, återanvänd befintliga fält eller importera hela grupper av fält från befintliga fältuppsättningar.',
     'taxonomies_blueprints_instructions' => 'Termer i denna taxonomi kan använda vilken som helst av dessa ritningar.',
     'taxonomies_collections_instructions' => 'Samlingarna som använder denna taxonomi.',
     'taxonomy_configure_handle_instructions' => 'Används för att referera till denna taxonomi på frontend. Det är inte trivialt att ändra senare.',

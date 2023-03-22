@@ -17,7 +17,6 @@ class Lists extends Fieldtype
                 'display' => __('Default Value'),
                 'instructions' => __('statamic::messages.fields_default_instructions'),
                 'type' => 'list',
-                'width' => 50,
             ],
         ];
     }

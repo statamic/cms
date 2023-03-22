@@ -26,6 +26,11 @@ export default {
             type: Boolean,
             default: false
         }
+    },
+    computed: {
+        strategy() {
+            return this.scroll ? 'fixed' : 'absolute';
+        }
     }
 
 }

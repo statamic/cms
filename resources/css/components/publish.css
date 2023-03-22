@@ -76,12 +76,16 @@ code.parent-url {
     @apply flex items-center;
 }
 
+.publish-section-header {
+    @apply px-5 pt-4 pb-3 border-b border-gray-400 bg-gray-100 rounded-t-lg;
+}
+
 .publish-sidebar {
     @apply shrink-0;
     margin-left: 20px;
     width: 300px;
 
-    .publish-section-actions {
+    .publish-tab-actions {
         @apply border-b;
     }
 
@@ -90,7 +94,7 @@ code.parent-url {
     }
 }
 
-.publish-section-actions-footer {
+.publish-tab-actions-footer {
     @apply mt-6;
 }
 
@@ -98,8 +102,4 @@ code.parent-url {
     position: sticky;
     top: 0;
     z-index: 1000;
-}
-
-.publish-section:not(:empty) {
-    @apply shadow bg-white rounded-md w-full;
 }

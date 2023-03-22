@@ -149,7 +149,7 @@ return [
     'session_expiry_logged_out_for_inactivity' => 'Terminamos a sua sessão porque está inactivo há algum tempo.',
     'session_expiry_logging_out_in_seconds' => 'Está inactivo há algum tempo e será desconectado em :seconds segundos. Clique para prolongar a sua sessão.',
     'session_expiry_new_window' => 'Abre em uma nova janela. Volte depois de iniciar a sessão.',
-    'tab_sections_instructions' => 'Os campos em cada secção serão agrupados em guias. Crie novos campos, reutilize campos existentes ou importe grupos inteiros de campos de conjuntos de campos existentes.',
+    'tabs_instructions' => 'Os campos em cada secção serão agrupados em guias. Crie novos campos, reutilize campos existentes ou importe grupos inteiros de campos de conjuntos de campos existentes.',
     'taxonomies_blueprints_instructions' => 'Os termos nesta taxonomia podem usar qualquer um desses diagramas.',
     'taxonomies_collections_instructions' => 'As coleções que usam essa taxonomia.',
     'taxonomy_configure_handle_instructions' => 'Usado para referenciar essa taxonomia no frontend. Não é trivial mudar mais tarde.',

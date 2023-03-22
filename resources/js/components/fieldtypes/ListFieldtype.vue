@@ -1,6 +1,6 @@
 <template>
     <div class="table-field">
-        <table class="table-fieldtype-table">
+        <table class="table-fieldtype-table" v-if="data.length > 0">
             <sortable-list
                 v-model="data"
                 :vertical="true"

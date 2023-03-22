@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'popover-open': isOpen}" v-on-clickaway="clickawayClose" @mouseleave="leave">
+    <div :class="{'popover-open': isOpen}" @mouseleave="leave">
         <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$scopedSlots.default">
             <slot name="trigger"></slot>
         </div>
@@ -9,7 +9,7 @@
             :to="portalTargetName"
             :target-class="`popover-container ${targetClass || ''}`"
         >
-            <div :class="`${isOpen ? 'popover-open' : ''}`">
+            <div :class="`${isOpen ? 'popover-open' : ''}`" v-on-clickaway="clickawayClose">
                 <div ref="popover" class="popover" v-if="!disabled">
                     <div class="popover-content bg-white shadow-popover rounded-md">
                         <slot :close="close" />
@@ -109,6 +109,7 @@ export default {
             this.escBinding = this.$keys.bind('esc', e => this.close());
             this.$nextTick(() => {
                 this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger, this.$refs.popover, this.computePosition);
+                this.$emit('opened');
             });
         },
 

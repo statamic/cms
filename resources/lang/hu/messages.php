@@ -171,7 +171,7 @@ return [
     'session_expiry_logging_out_in_seconds' => 'Egy ideje inaktív, ezért :seconds másodperc múlva automatikusan kijelentkeztetjük. Ennek elkerüléséhez kattintson ide!',
     'session_expiry_new_window' => 'Új ablakban nyílik meg. Jöjjön vissza, miután bejelentkezett.',
     'show_slugs_instructions' => 'Megjelenjenek-e a "slug"-ok a fa nézetben.',
-    'tab_sections_instructions' => 'Az egyes szekciók mezői fülekbe (tabs) lesznek csoportosítva.',
+    'tabs_instructions' => 'Az egyes szekciók mezői fülekbe (tabs) lesznek csoportosítva.',
     'taxonomies_blueprints_instructions' => 'A taxonómia kifejezései ezen Blueprintek bármelyikét felhasználhatják.',
     'taxonomies_collections_instructions' => 'Azok a gyűjtemények, amelyek ezt a taxonómiát használják.',
     'taxonomies_preview_targets_instructions' => 'Az élő előnézetben megtekinthető URL-ek. További információ a [dokumentációban](https://statamic.dev/live-preview#preview-targets).',

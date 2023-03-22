@@ -1,28 +1,23 @@
 <template>
 
-    <div class="blueprint-section @container"
-        :class="{
-            'w-full md:w-1/2': !isEditing && !isSingle,
-            'w-full': isEditing || isSingle
-        }"
-    >
+    <div class="blueprint-section @container">
         <div class="blueprint-section-card card p-0 h-full flex rounded-t flex-col">
 
-            <div class="bg-gray-200 border-b text-sm flex rounded-t" v-if="!isSingle">
+            <div class="bg-gray-200 border-b text-sm flex rounded-t">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
                 <div class="p-3 py-2 flex-1">
                     <span class="font-medium mr-2">
-                        <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
+                        <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" :placeholder="`${__('Title')} (${__('Optional')})`" />
                     </span>
-                    <span class="font-mono text-xs text-gray-700 mr-2">
-                        <input type="text" v-model="section.handle" @input="handleSyncedWithDisplay = false" class="bg-transparent w-full outline-none" />
+                    <span class="font-mono text-xs text-gray-700 mr-2" v-if="showHandleField">
+                        <input type="text" v-model="section.handle" class="bg-transparent w-full outline-none" :placeholder="`${__('Handle')}`" @input="handleSyncedWithDisplay = false" />
+                    </span>
+                    <span class="text-xs text-gray-700 mr-2">
+                        <input type="text" v-model="section.instructions" class="bg-transparent w-full outline-none" :placeholder="`${__('Instructions')} (${__('Optional')})`" />
                     </span>
                 </div>
                 <div class="flex items-center px-3">
-                    <button @click.prevent="toggleEditing" class="flex items-center text-gray-600 hover:text-gray-950 mr-2">
-                        <svg-icon class="h-4 w-4" :name="isEditing ? 'shrink' : 'expand'" />
-                    </button>
-                    <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-600 hover:text-gray-950" v-if="deletable">
+                    <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-600 hover:text-gray-950">
                         <svg-icon class="h-4 w-4" name="trash" />
                     </button>
                 </div>
@@ -31,9 +26,10 @@
 
             <fields
                 class="p-4"
+                :tab-id="tabId"
+                :section-id="section._id"
                 :fields="section.fields"
                 :editing-field="editingField"
-                :is-section-expanded="isEditing || isSingle"
                 :suggestable-condition-fields="suggestableConditionFields"
                 :can-define-localizable="canDefineLocalizable"
                 @field-created="fieldCreated"
@@ -69,25 +65,23 @@ export default {
     },
 
     props: {
+        tabId: {
+            type: String
+        },
         section: {
             type: Object,
             required: true
         },
-        isSingle: {
+        showHandleField: {
             type: Boolean,
             default: false
-        },
-        deletable: {
-            type: Boolean,
-            default: true
         }
     },
 
     data() {
         return {
-            isEditing: false,
             editingField: null,
-            handleSyncedWithDisplay: false
+            handleSyncedWithDisplay: false,
         }
     },
 
@@ -149,10 +143,6 @@ export default {
             if (this.$refs.displayInput) {
                 this.$refs.displayInput.select();
             }
-        },
-
-        toggleEditing() {
-            this.isEditing = ! this.isEditing
         }
 
     }

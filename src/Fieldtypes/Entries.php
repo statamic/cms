@@ -56,20 +56,42 @@ class Entries extends Relationship
 
     protected function configFieldItems(): array
     {
-        return array_merge(parent::configFieldItems(), [
-            'create' => [
-                'display' => __('Allow Creating'),
-                'instructions' => __('statamic::fieldtypes.entries.config.create'),
-                'type' => 'toggle',
-                'default' => true,
-                'width' => 50,
+        return [
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
+                    ],
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                        'type' => 'radio',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                    ],
+                    'create' => [
+                        'display' => __('Allow Creating'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.create'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'collections' => [
+                        'display' => __('Collections'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.collections'),
+                        'type' => 'collections',
+                        'mode' => 'select',
+                    ],
+                ],
             ],
-            'collections' => [
-                'display' => __('Collections'),
-                'type' => 'collections',
-                'mode' => 'select',
-            ],
-        ]);
+        ];
     }
 
     public function getIndexItems($request)
