@@ -18,7 +18,7 @@ class StaticWarmJob implements ShouldQueue
 
     public $tries = 1;
 
-    public function __construct(Request $request, array $options)
+    public function __construct(Request $request, array $options = [])
     {
         $this->request = $request;
         $this->options = $options;
