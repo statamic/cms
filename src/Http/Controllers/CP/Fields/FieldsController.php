@@ -95,6 +95,8 @@ class FieldsController extends CpController
                 'display' => __('Handle'),
                 'instructions' => __('statamic::messages.fields_handle_instructions'),
                 'type' => 'slug',
+                'from' => 'display',
+                'separator' => '_',
                 'validate' => 'required|not_in:'.implode(',', $reserved),
             ],
             'instructions' => [
