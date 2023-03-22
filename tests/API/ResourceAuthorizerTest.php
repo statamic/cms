@@ -114,6 +114,22 @@ class ResourceAuthorizerTest extends TestCase
      *
      * @dataProvider configFileProvider
      */
+    public function can_enable_individual_collections_via_array_values($configFile)
+    {
+        // We suggest enabling via booleans, as shown in above test, but still allow this for backwards compatibility
+        Config::set("statamic.{$configFile}.resources.collections", [
+            'blog',
+        ]);
+
+        $this->assertTrue(ResourceAuthorizer::isAllowed($configFile, 'collections'));
+        $this->assertEqualsCanonicalizing(['blog'], ResourceAuthorizer::allowedSubResources($configFile, 'collections'));
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider configFileProvider
+     */
     public function can_enable_individual_collections_via_array_config($configFile)
     {
         Config::set("statamic.{$configFile}.resources.collections", [
