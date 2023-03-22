@@ -103,6 +103,8 @@ export default {
             this.isOpen ? this.close() : this.open();
         },
         open() {
+            if (this.disabled) return;
+
             this.isOpen = true;
             this.escBinding = this.$keys.bind('esc', e => this.close());
             this.$nextTick(() => {
