@@ -2,10 +2,9 @@
 
 namespace Statamic\API;
 
-use Statamic\Facades;
 use Statamic\Support\Arr;
 
-class FilterAuthorizer
+class FilterAuthorizer extends AbstractAuthorizer
 {
     /**
      * Get allowed filters for resource.
@@ -66,20 +65,5 @@ class FilterAuthorizer
                 return $carry->intersect($allowedFilters)->merge($config['*']['allowed_filters'] ?? []);
             }, collect($config[$resources[0]]['allowed_filters'] ?? []))
             ->all();
-    }
-
-    /**
-     * Get all possible handles for resource (for when evaluating `*` config).
-     *
-     * @param  string  $resource
-     * @return array
-     */
-    protected function getAllHandlesForResource($resource)
-    {
-        if ($resource === 'collections') {
-            return Facades\Collection::handles()->all();
-        }
-
-        return [];
     }
 }

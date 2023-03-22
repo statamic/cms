@@ -2,10 +2,9 @@
 
 namespace Statamic\API;
 
-use Statamic\Facades\Collection;
 use Statamic\Support\Arr;
 
-class ResourceAuthorizer
+class ResourceAuthorizer extends AbstractAuthorizer
 {
     /**
      * Check if resource is allowed to be queried.
@@ -22,7 +21,11 @@ class ResourceAuthorizer
             return false;
         }
 
-        return (bool) $this->allowedSubResources($configFile, $queriedResource);
+        if ($this->hasSubResources($queriedResource)) {
+            return (bool) $this->allowedSubResources($configFile, $queriedResource);
+        }
+
+        return true;
     }
 
     /**
@@ -43,7 +46,7 @@ class ResourceAuthorizer
         }
 
         if ($config === true || Arr::get($config, '*.enabled') === true) {
-            return Collection::handles()->all();
+            return $this->getAllHandlesForResource($queriedResource);
         }
 
         return collect($config)

@@ -125,4 +125,30 @@ class ResourceAuthorizerTest extends TestCase
         $this->assertTrue(ResourceAuthorizer::isAllowed($configFile, 'collections'));
         $this->assertEqualsCanonicalizing(['blog'], ResourceAuthorizer::allowedSubResources($configFile, 'collections'));
     }
+
+    /**
+     * @test
+     *
+     * @dataProvider configFileProvider
+     */
+    public function can_enable_users_via_boolean($configFile)
+    {
+        Config::set("statamic.{$configFile}.resources.users", true);
+
+        $this->assertTrue(ResourceAuthorizer::isAllowed($configFile, 'users'));
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider configFileProvider
+     */
+    public function can_enable_users_via_array_config($configFile)
+    {
+        Config::set("statamic.{$configFile}.resources.users", [
+            'allowed_filters' => ['title'],
+        ]);
+
+        $this->assertTrue(ResourceAuthorizer::isAllowed($configFile, 'users'));
+    }
 }
