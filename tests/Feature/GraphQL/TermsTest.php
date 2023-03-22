@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Taxonomy;
@@ -56,13 +58,13 @@ class TermsTest extends TestCase
         return $this;
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableQueries
-     **/
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'taxonomies')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'taxonomies')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{terms}'])
@@ -70,7 +72,7 @@ class TermsTest extends TestCase
     }
 
     /** @test */
-    public function it_queries_terms()
+    public function it_queries_all_terms()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
 
@@ -84,6 +86,10 @@ class TermsTest extends TestCase
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'taxonomies')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'taxonomies')->andReturn(Taxonomy::handles()->all())->twice();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()
@@ -259,7 +265,86 @@ GQL;
     }
 
     /** @test */
-    public function it_filters_terms()
+    public function it_cannot_filter_terms_by_default()
+    {
+        $this->createTaxonomies()->createTerms()->createBlueprints();
+
+        $query = <<<'GQL'
+{
+    terms(taxonomy: "tags", filter: {
+        title: {
+            contains: "a",
+            ends_with: "o"
+        }
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'taxonomies', ['tags'])
+            ->andReturn(['tags'])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'filter' => ['Forbidden: title'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'terms' => null,
+                ],
+            ]);
+    }
+
+    /** @test */
+    public function it_can_filter_taxonomy_terms_when_configuration_allows_for_it()
+    {
+        $this->createTaxonomies()->createTerms()->createBlueprints();
+
+        $query = <<<'GQL'
+{
+    terms(taxonomy: "tags", filter: {
+        title: {
+            contains: "a",
+            ends_with: "o"
+        }
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'taxonomies', ['tags'])
+            ->andReturn(['title'])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['terms' => ['data' => [
+                ['id' => 'tags::bravo', 'title' => 'Tag Bravo'],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_can_filter_all_terms_when_configuration_allows_for_it()
     {
         $this->createTaxonomies()->createTerms()->createBlueprints();
 
@@ -278,6 +363,11 @@ GQL;
     }
 }
 GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'taxonomies', '*')
+            ->andReturn(['title'])
+            ->once();
 
         $this
             ->withoutExceptionHandling()
@@ -306,6 +396,11 @@ GQL;
     }
 }
 GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'taxonomies', '*')
+            ->andReturn(['slug'])
+            ->once();
 
         $this
             ->withoutExceptionHandling()
@@ -337,6 +432,11 @@ GQL;
     }
 }
 GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'taxonomies', '*')
+            ->andReturn(['title'])
+            ->once();
 
         $this
             ->withoutExceptionHandling()
