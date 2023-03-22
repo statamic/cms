@@ -2,21 +2,28 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\FilterAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\Asset;
 use Statamic\Facades\GraphQL;
+use Statamic\GraphQL\Middleware\AuthorizeFilters;
 use Statamic\GraphQL\Middleware\ResolvePage;
+use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\AssetInterface;
+use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\Support\Str;
 
 class AssetsQuery extends Query
 {
+    use FiltersQuery;
+
     protected $attributes = [
         'name' => 'assets',
     ];
 
     protected $middleware = [
         ResolvePage::class,
+        AuthorizeFilters::class,
     ];
 
     public function type(): Type
@@ -30,6 +37,7 @@ class AssetsQuery extends Query
             'container' => GraphQL::nonNull(GraphQL::string()),
             'limit' => GraphQL::int(),
             'page' => GraphQL::int(),
+            'filter' => GraphQL::type(JsonArgument::NAME),
             'sort' => GraphQL::listOf(GraphQL::string()),
         ];
     }
@@ -37,6 +45,10 @@ class AssetsQuery extends Query
     public function resolve($root, $args)
     {
         $query = Asset::query()->where('container', $args['container']);
+
+        if ($filters = $args['filter'] ?? null) {
+            $this->filterQuery($query, $filters);
+        }
 
         if ($sort = $args['sort'] ?? null) {
             $this->sortQuery($query, $sort);
@@ -56,5 +68,10 @@ class AssetsQuery extends Query
 
             $query->orderBy($sort, $order);
         }
+    }
+
+    public function allowedFilters($args)
+    {
+        return FilterAuthorizer::allowedForSubResources('graphql', 'assets', $args['container'] ?? '*');
     }
 }
