@@ -3,9 +3,11 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -25,13 +27,13 @@ class EntriesTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableQueries
-     **/
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{entries}'])
@@ -39,7 +41,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    public function it_queries_entries()
+    public function it_queries_all_entries()
     {
         $this->createEntries();
 
@@ -54,6 +56,10 @@ class EntriesTest extends TestCase
 }
 GQL;
 
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn(Collection::handles()->all())->twice();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -65,6 +71,74 @@ GQL;
                 ['id' => '4', 'title' => 'Event Two'],
                 ['id' => '5', 'title' => 'Hamburger'],
             ]]]]);
+    }
+
+    /** @test */
+    public function it_queries_only_entries_on_allowed_sub_resources()
+    {
+        $this->createEntries();
+
+        $query = <<<'GQL'
+{
+    entries {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn(['events'])->twice();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '3', 'title' => 'Event One'],
+                ['id' => '4', 'title' => 'Event Two'],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource()
+    {
+        $this->createEntries();
+
+        $query = <<<'GQL'
+{
+    entries(collection: "blog") {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn(['events'])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'collection' => ['Forbidden: blog'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'entries' => null,
+                ],
+            ]);
     }
 
     /** @test */
