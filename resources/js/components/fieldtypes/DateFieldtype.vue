@@ -210,6 +210,8 @@ export default {
         },
 
         setTime(timeString) {
+            timeString = this.formatTime(timeString);
+            console.log(timeString);
             const [hour, minute, second] = timeString.split(':');
 
             const moment = Vue.moment(this.value) // clone before mutating
@@ -220,6 +222,27 @@ export default {
             if (moment.isValid()) {
                 this.update(moment.format(this.format));
             }
+        },
+
+        formatTime(time) {
+            let parts = time.split(':');
+
+            if (parts.length === 1) {
+                parts[0] = parts[0].padStart(2, '0');
+                parts[1] = '00';
+                parts[2] = '00';
+            }
+
+            if (parts.length === 2) {
+                parts[1] = parts[1].padStart(2, '0');
+                parts[2] = '00';
+            }
+
+            if (parts.length === 3) {
+                parts[2] = parts[2].padStart(2, '0');
+            }
+
+            return parts.join(':');
         },
 
         addDate() {

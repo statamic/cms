@@ -1,52 +1,26 @@
 <template>
     <div class="time-fieldtype-container">
-        <div class="input-group">
-            <div class="input-group-prepend flex items-center">
+        <div class="input-group" :class="{'w-[120px]': showSeconds || config.seconds_enabled, 'w-[96px]': ! showSeconds && ! config.seconds_enabled}">
+            <div class="input-group-prepend flex items-center" v-tooltip="__('24 Hour Format')">
                 <svg-icon name="time" class="w-4 h-4" />
             </div>
-            <div
-                class="input-text flex items-center px-1 w-auto"
-                :class="{ 'read-only': isReadOnly }"
-            >
-                <template v-for="(part, index) in parts">
-                    <span
-                        v-if="index > 0"
-                        class="colon"
-                        :key="`${part}-colon`"
-                    >:</span>
-                    <input
-                        type="text"
-                        min="00"
-                        placeholder="00"
-                        tabindex="0"
-                        ref="inputs"
-                        :key="`${part}-input`"
-                        :value="inputValue(index)"
-                        :class="`input-time input-${part}`"
-                        :max="maxes[index]"
-                        :readonly="isReadOnly"
-                        @input="updatePart(index, $event.target.value)"
-                        @keydown.up.prevent="incrementPart(index, 1)"
-                        @keydown.down.prevent="incrementPart(index, -1)"
-                        @keydown.esc="clear"
-                        @keydown.186.prevent="focusNextPart(index) /* colon */"
-                        @keydown.190.prevent="focusNextPart(index) /* dot */"
-                        @focus="$emit('focus')"
-                        @blur="$emit('blur')"
-                    />
-                </template>
-            </div>
+            <input
+                type="text"
+                ref="time"
+                class="input-text"
+                :readonly="isReadOnly"
+                v-mask="mask"
+                v-model="time"
+                placeholder="23:45"
+                @keydown.esc="clear"
+                @focus="focused"
+                @blur="$emit('blur')"
+            />
         </div>
-        <button class="text-xl text-gray-600 hover:text-gray-800 h-4 w-4 p-2 flex items-center outline-none" tabindex="0"
-              v-if="! required && ! isReadOnly"
-              @click="clear" @keyup.enter.space="clear">
-              &times;
-        </button>
     </div>
 </template>
 
 <script>
-
 export default {
 
     mixins: [Fieldtype],
@@ -64,87 +38,49 @@ export default {
 
     data() {
         return {
-            maxes: [23, 59, 59],
+            time: this.value
         };
     },
 
+    watch: {
+        time(time) {
+            this.updateTime(time);
+        },
+    },
+
     computed: {
-
-        partCount() {
-            return this.showSeconds || this.config.seconds_enabled ? 3 : 2;
+        mask() {
+            return this.showSeconds || this.config.seconds_enabled ? [/[0-2]/, /[0-9]/, ':', /[0-5]/, /[0-9]/, ':', /[0-5]/, /[0-9]/] : [/[0-2]/, /[0-9]/, ':', /[0-5]/, /[0-9]/];
         },
-
-        parts() {
-            return ['hour', 'minute', 'second'].slice(0, this.partCount);
-        },
-
-        time() {
-            const time = Array(this.partCount).fill(0);
-
-            if (this.value) {
-                this.value.split(':').forEach((e, i) => { time[i] = parseInt(e); });
-            }
-
-            return time;
-        },
-
     },
 
     methods: {
-
-        inputValue(index) {
-            if (this.value) {
-                return this.pad(this.time[index]);
-            }
-
-            return '';
-        },
-
-        updatePart(index, value) {
-            const time = [...this.time];
-            time[index] = Math.max(0, Math.min(this.maxes[index], value));
-            this.updateWithTime(time);
-        },
-
-        incrementPart(index, delta) {
-            let value = this.time[index] + delta;
-
-            const wrap = this.maxes[index] + 1
-            while (value < 0) value += wrap
-            while (value >= wrap) value -= wrap
-
-            this.updatePart(index, value);
-        },
-
-        clear() {
-            this.update(null);
-        },
-
-        updateWithTime(time) {
-            this.update(this.timeToString(time));
-            this.$forceUpdate();
-        },
-
-        timeToString(time) {
-            return time.map(e => this.pad(e)).join(':');
-        },
-
-        pad(value) {
-            return ('00' + value).slice(-2);
-        },
-
-        focusNextPart(index) {
-            this.focusPart(index + 1 === this.partCount ? 0 : index + 1);
-        },
-
-        focusPart(index) {
-            const input = this.$refs.inputs[index];
-            input.focus();
-            input.select();
+        focused() {
+            this.$refs.time.select();
+            this.$emit('focus');
         },
 
         focus() {
-             this.$refs.inputs[0].focus();
+             this.$refs.time.focus();
+        },
+
+        updateTime(time) {
+            let parts = time.split(':');
+
+            if (parts.length === 2) {
+                parts[1] = parts[1].padStart(2, '0');
+                if (this.showSeconds || this.config.seconds_enabled) {
+                    parts[2] = '00';
+                }
+            }
+
+            if (parts.length === 3) {
+                parts[2] = parts[2].padStart(2, '0');
+            }
+
+            time = parts.join(':');
+
+            this.update(time);
         },
 
     }
