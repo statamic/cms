@@ -4,7 +4,7 @@
         <set-picker :sets="groups" :placement="last ? 'bottom-start' : 'auto'" @added="addSet">
             <template #trigger>
                 <div class="text-center">
-                    <button :class="{ 'btn-round flex items-center justify-center': last }">
+                    <button :class="{ 'btn-round flex items-center justify-center': last }" @click="addSetButtonClicked">
                         <svg-icon name="micro-plus"
                             :class="{
                                 'w-3 h-3 text-gray-800 group-hover:text-black': last,
@@ -38,6 +38,12 @@ export default {
 
         addSet(handle) {
             this.$emit('added', handle, this.index);
+        },
+
+        addSetButtonClicked() {
+            if (this.sets.length === 1) {
+                this.addSet(this.sets[0].handle);
+            }
         }
 
     }
