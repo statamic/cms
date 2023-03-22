@@ -62,12 +62,15 @@ export default {
     },
 
     computed: {
+
         portalTargetName() {
             return this.portalTarget ? this.portalTarget.name : null;
         },
+
         targetClass() {
             return this.$vnode.data.staticClass;
         }
+
     },
 
     created() {
@@ -79,6 +82,7 @@ export default {
     },
 
     methods: {
+
         computePosition() {
             computePosition(this.$refs.trigger, this.$refs.popover, {
                 placement: this.placement,
@@ -87,15 +91,17 @@ export default {
                     flip(), // If you place it on the right, and there's not enough room, it'll flip to the left, etc.
                     shift({ padding: 5 }), // If it'll end up positioned offscreen, it'll shift it enough to display it fully.
                 ],
-            }).then(({ x, y, strategy }) => {
+            }).then(({ x, y }) => {
                 Object.assign(this.$refs.popover.style, {
                     transform: `translate(${Math.round(x)}px, ${Math.round(y)}px)`, // Round to avoid blurry text
                 });
             });
         },
+
         toggle() {
             this.isOpen ? this.close() : this.open();
         },
+
         open() {
             if (this.disabled) return;
 
@@ -105,32 +111,32 @@ export default {
                 this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger, this.$refs.popover, this.computePosition);
             });
         },
+
         clickawayClose() {
-            if (this.clickaway) {
-                this.close();
-            }
+            if (this.clickaway) this.close();
         },
+
         close() {
-            if (!this.isOpen) return;
+            if (! this.isOpen) return;
 
             this.isOpen = false;
-            if (this.escBinding) {
-                this.escBinding.destroy();
-            }
             this.$emit('closed');
             this.cleanupAutoUpdater();
+
+            if (this.escBinding) this.escBinding.destroy();
         },
+
         leave() {
-            if (this.autoclose) {
-                this.close();
-            }
+            if (this.autoclose) this.close();
         },
+
         createPortalTarget() {
             let key = `popover-${this._uid}`;
             let portalTarget = { key, name: key };
             this.$root.portals.push(portalTarget);
             this.portalTarget = portalTarget;
         },
+
         destroyPortalTarget() {
             const i = _.findIndex(this.$root.portals, (portal) => portal.key === this.portalTarget.key);
             this.$root.portals.splice(i, 1);
