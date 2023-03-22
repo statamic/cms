@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\GraphQL;
@@ -23,6 +24,8 @@ class GlobalSetsQuery extends Query
     {
         $site = Site::default()->handle();
 
-        return GlobalSet::all()->map->in($site);
+        return GlobalSet::all()->map->in($site)->filter(function ($set) {
+            return in_array($set->handle(), ResourceAuthorizer::allowedSubResources('graphql', 'globals'));
+        });
     }
 }
