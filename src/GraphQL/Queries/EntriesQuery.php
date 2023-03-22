@@ -17,7 +17,9 @@ use Statamic\Support\Str;
 
 class EntriesQuery extends Query
 {
-    use FiltersQuery;
+    use FiltersQuery {
+        filterQuery as traitFilterQuery;
+    }
 
     protected $attributes = [
         'name' => 'entries',
@@ -56,6 +58,15 @@ class EntriesQuery extends Query
         $this->sortQuery($query, $args['sort'] ?? []);
 
         return $query->paginate($args['limit'] ?? 1000);
+    }
+
+    private function filterQuery($query, $filters)
+    {
+        if (! isset($filters['status']) && ! isset($filters['published'])) {
+            $filters['status'] = 'published';
+        }
+
+        $this->traitFilterQuery($query, $filters);
     }
 
     private function sortQuery($query, $sorts)

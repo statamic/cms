@@ -11,7 +11,9 @@ use Statamic\GraphQL\Types\JsonArgument;
 
 class EntryQuery extends Query
 {
-    use FiltersQuery;
+    use FiltersQuery {
+        filterQuery as traitFilterQuery;
+    }
 
     protected $attributes = [
         'name' => 'entry',
@@ -61,5 +63,14 @@ class EntryQuery extends Query
         $this->filterQuery($query, $args['filter'] ?? []);
 
         return $query->limit(1)->get()->first();
+    }
+
+    private function filterQuery($query, $filters)
+    {
+        if (! isset($filters['status']) && ! isset($filters['published'])) {
+            $filters['status'] = 'published';
+        }
+
+        $this->traitFilterQuery($query, $filters);
     }
 }
