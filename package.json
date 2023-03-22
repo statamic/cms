@@ -11,7 +11,7 @@
     "frontend-build": "vite build -c vite-frontend.config.js"
   },
   "dependencies": {
-    "@popperjs/core": "^2.5.3",
+    "@floating-ui/dom": "^1.2.5",
     "@shopify/draggable": "^1.0.0-beta.8",
     "@simonwep/pickr": "^1.7.4",
     "@tiptap/core": "^2.0.0-beta.217",

@@ -6,7 +6,7 @@
                     <a :href="collection.entries_url">{{ collection.title }}</a>
                 </template>
                 <template slot="actions" slot-scope="{ row: collection, index }">
-                    <dropdown-list scroll placement="left-start">
+                    <dropdown-list placement="left-start">
                         <dropdown-item :text="__('View')" :redirect="collection.entries_url" />
                         <dropdown-item v-if="collection.url" :text="__('Visit URL')" :external-link="collection.url"  />
                         <dropdown-item v-if="collection.editable" :text="__('Edit Collection')" :redirect="collection.edit_url" />

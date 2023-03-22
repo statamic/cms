@@ -93,7 +93,7 @@
                             <span class="font-mono text-2xs">{{ term.slug }}</span>
                         </template>
                         <template slot="actions" slot-scope="{ row: term, index }">
-                            <dropdown-list placement="left-start" scroll>
+                            <dropdown-list placement="left-start">
                                 <dropdown-item :text="__('View')" :redirect="term.permalink" />
                                 <dropdown-item :text="__('Edit')" :redirect="term.edit_url" />
                                 <div class="divider" />
