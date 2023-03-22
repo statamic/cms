@@ -3,28 +3,48 @@
 namespace Statamic\API;
 
 use Statamic\Facades\Collection;
+use Statamic\Support\Arr;
 
 class ResourceAuthorizer
 {
     /**
-     * Get allowed filters for collection entries query.
+     * Check if resource is allowed to be queried.
+     *
+     * For example, is the `users` resource allowed to be queried?
      *
      * @param  string  $configFile
+     * @param  string  $queriedResource
+     * @return bool
+     */
+    public function isAllowed($configFile, $queriedResource)
+    {
+        if (config("statamic.{$configFile}.resources.{$queriedResource}", false) === 'false') {
+            return false;
+        }
+
+        return (bool) $this->allowedSubResources($configFile, $queriedResource);
+    }
+
+    /**
+     * Get allowed sub-resource(s) for the resource being queried.
+     *
+     * For example, which specific collections are allowed to be queried within the `collections` resource?
+     *
+     * @param  string  $configFile
+     * @param  string  $queriedResource
      * @return array
      */
-    public function allowedForCollectionEntries($configFile)
+    public function allowedSubResources($configFile, $queriedResource)
     {
-        $config = config("statamic.{$configFile}.resources.collections", false);
+        $config = config("statamic.{$configFile}.resources.{$queriedResource}", false);
 
         if (! $config) {
             return [];
         }
 
-        if ($config === true) {
+        if ($config === true || Arr::get($config, '*.enabled') === true) {
             return Collection::handles()->all();
         }
-
-        // TODO: handle `'*' => ['enabled' => true]` config...
 
         return collect($config)
             ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => true] : [$key => $value])
@@ -32,16 +52,5 @@ class ResourceAuthorizer
             ->reject(fn ($config, $resource) => $config === false)
             ->keys()
             ->all();
-    }
-
-    /**
-     * Get allowed filters for users query.
-     *
-     * @param  string  $configFile
-     * @return array
-     */
-    public function allowedForUsers($configFile)
-    {
-        return config('statamic.graphql.resources.users', false);
     }
 }
