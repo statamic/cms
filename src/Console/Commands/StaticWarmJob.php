@@ -14,16 +14,18 @@ class StaticWarmJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable;
 
     public Request $request;
+    public array $options;
 
     public $tries = 1;
 
-    public function __construct(Request $request)
+    public function __construct(Request $request, array $options)
     {
         $this->request = $request;
+        $this->options = $options;
     }
 
     public function handle(Client $client)
     {
-        $client->send($this->request);
+        $client->send($this->request, $this->options);
     }
 }

@@ -32,6 +32,7 @@ class StaticWarm extends Command
         {--queue : Queue the requests}
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
+        {--inertia : Add X-Inertia header to requests }
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
@@ -70,12 +71,14 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        $client = new Client([
+        $options = [
             'verify' => ! $this->laravel->isLocal(),
             'auth' => $this->option('user') && $this->option('password')
                 ? [$this->option('user'), $this->option('password')]
                 : null,
-        ]);
+            'headers' => $this->option('inertia') ? ['X-Inertia' => 'true'] : null,
+        ];
+        $client = new Client($options);
 
         $this->output->newLine();
         $this->line('Compiling URLs...');
@@ -89,7 +92,7 @@ class StaticWarm extends Command
             $this->line(sprintf('Adding %s requests onto %squeue...', count($requests), $queue ? $queue.' ' : ''));
 
             foreach ($requests as $request) {
-                StaticWarmJob::dispatch($request)->onQueue($queue);
+                StaticWarmJob::dispatch($request, $options)->onQueue($queue);
             }
         } else {
             $this->line('Visiting '.count($requests).' URLs...');
@@ -144,9 +147,7 @@ class StaticWarm extends Command
 
     private function requests()
     {
-        return $this->uris()->map(function ($uri) {
-            return new Request('GET', $uri);
-        })->all();
+        return $this->uris()->map(fn ($uri) => new Request('GET', $uri))->all();
     }
 
     private function uris(): Collection
