@@ -70,7 +70,6 @@ return [
     'assign_roles' => 'Tildel roller til brukere',
     'group_updates' => 'Oppdateringer',
     'view_updates' => 'Vis oppdateringer',
-    'perform_updates' => 'Utfør oppdateringer',
     'group_utilities' => 'Hjelpeprogrammer',
     'access_utility' => ':title',
     'access_utility_desc' => 'Gir tilgang til hjelpeprogrammet :title',
