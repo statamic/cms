@@ -109,6 +109,7 @@ export default {
             this.escBinding = this.$keys.bind('esc', e => this.close());
             this.$nextTick(() => {
                 this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger, this.$refs.popover, this.computePosition);
+                this.$emit('opened');
             });
         },
 
