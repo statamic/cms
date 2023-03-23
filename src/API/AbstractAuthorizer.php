@@ -14,28 +14,19 @@ abstract class AbstractAuthorizer
      */
     protected function getAllHandlesForResource($resource)
     {
-        if ($resource === 'collections') {
-            return Facades\Collection::handles()->all();
-        }
-
-        if ($resource === 'navs') {
-            return Facades\Nav::all()->map->handle()->all();
-        }
-
-        if ($resource === 'taxonomies') {
-            return Facades\Taxonomy::handles()->all();
-        }
-
-        if ($resource === 'assets') {
-            return Facades\AssetContainer::all()->map->handle()->all();
-        }
-
-        if ($resource === 'globals') {
-            return Facades\GlobalSet::all()->map->handle()->all();
-        }
-
-        if ($resource === 'forms') {
-            return Facades\Form::all()->map->handle()->all();
+        switch ($resource) {
+            case 'collections':
+                return Facades\Collection::handles()->all();
+            case 'navs':
+                return Facades\Nav::all()->map->handle()->all();
+            case 'taxonomies':
+                return Facades\Taxonomy::handles()->all();
+            case 'assets':
+                return Facades\AssetContainer::all()->map->handle()->all();
+            case 'globals':
+                return Facades\GlobalSet::all()->map->handle()->all();
+            case 'forms':
+                return Facades\Form::all()->map->handle()->all();
         }
 
         return false;
