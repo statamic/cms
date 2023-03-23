@@ -132,8 +132,8 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     public function ensureTermBlueprintFields($blueprint)
     {
         $blueprint
-            ->ensureFieldPrepended('title', ['type' => 'text', 'display' => __('Title'), 'required' => true])
-            ->ensureField('slug', ['type' => 'slug', 'display' => __('Slug'), 'required' => true], 'sidebar');
+            ->ensureFieldPrepended('title', ['type' => 'text', 'required' => true])
+            ->ensureField('slug', ['type' => 'slug', 'required' => true], 'sidebar');
 
         return $blueprint;
     }

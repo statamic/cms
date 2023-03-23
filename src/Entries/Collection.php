@@ -331,23 +331,21 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     public function ensureEntryBlueprintFields($blueprint)
     {
         $blueprint->ensureFieldPrepended('title', [
-            'display' => __('Title'),
             'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
             'required' => ! $auto,
         ]);
 
         if ($this->requiresSlugs()) {
-            $blueprint->ensureField('slug', ['type' => 'slug', 'display' => __('Slug'), 'localizable' => true], 'sidebar');
+            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true], 'sidebar');
         }
 
         if ($this->dated()) {
-            $blueprint->ensureField('date', ['type' => 'date', 'display' => __('Date'), 'required' => true], 'sidebar');
+            $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
         }
 
         if ($this->hasStructure() && ! $this->orderable()) {
             $blueprint->ensureField('parent', [
                 'type' => 'entries',
-                'display' => __('Parent'),
                 'collections' => [$this->handle()],
                 'max_items' => 1,
                 'listable' => false,
