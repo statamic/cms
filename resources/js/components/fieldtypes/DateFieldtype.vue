@@ -215,7 +215,6 @@ export default {
 
         setTime(timeString) {
             timeString = this.formatTime(timeString);
-            // console.log(timeString);
             const [hour, minute, second] = timeString.split(':');
 
             const moment = Vue.moment(this.value) // clone before mutating
