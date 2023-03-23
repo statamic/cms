@@ -5,7 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\Folder;
 use Statamic\Fields\Fieldtype;
 
-class IconPicker extends Fieldtype
+class Icon extends Fieldtype
 {
     protected $categories = ['media'];
     protected $selectable = false;
@@ -31,7 +31,7 @@ class IconPicker extends Fieldtype
                 'fields' => [
                     'folder' => [
                         'display' => __('Folder'),
-                        'instructions' => __('statamic::fieldtypes.icon_picker.config.folder'),
+                        'instructions' => __('statamic::fieldtypes.icon.config.folder'),
                         'type' => 'text',
                     ],
                     'default' => [

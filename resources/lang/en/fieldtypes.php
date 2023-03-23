@@ -83,7 +83,7 @@ return [
     'html.title' => 'HTML',
     'html.config.html_instruct' => 'Manage the HTML to be displayed in the publish form.',
     'integer.title' => 'Integer',
-    'icon_picker.config.folder' => 'Specify the system folder path to use for this field.',
+    'icon.config.folder' => 'Specify the system folder path to use for this field.',
     'link.config.collections' => 'Entries from these collections will be available. Leaving this empty will make entries from routable collections available.',
     'link.config.container' => 'Choose which asset container to use for this field.',
     'link.title' => 'Link',

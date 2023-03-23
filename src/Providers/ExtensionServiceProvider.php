@@ -67,7 +67,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Grid::class,
         Fieldtypes\Hidden::class,
         Fieldtypes\Html::class,
-        Fieldtypes\IconPicker::class,
+        Fieldtypes\Icon::class,
         Fieldtypes\Integer::class,
         Fieldtypes\Link::class,
         Fieldtypes\Lists::class,
