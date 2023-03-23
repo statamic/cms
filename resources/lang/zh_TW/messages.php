@@ -157,7 +157,7 @@ return [
     'session_expiry_logging_out_in_seconds' => '你已經有一段時間未進行任何動作，:seconds 秒後將被登出。按一下這裡來繼續工作階段。',
     'session_expiry_new_window' => '在新視窗中開啟。登入後再回來。',
     'show_slugs_instructions' => '控制是否要在樹狀檢視中顯示 Slug。',
-    'tab_sections_instructions' => '在各個段落中的欄位都將被分組在一起，放置於同一個頁籤內。建立新欄位、重複使用現有欄位、或是從現有欄位組匯入整組欄位。',
+    'tabs_instructions' => '在各個段落中的欄位都將被分組在一起，放置於同一個頁籤內。建立新欄位、重複使用現有欄位、或是從現有欄位組匯入整組欄位。',
     'taxonomies_blueprints_instructions' => '此分類中的字詞組可用於下列任意藍圖。',
     'taxonomies_collections_instructions' => '使用此分類的條目集。',
     'taxonomy_configure_handle_instructions' => '用於在前端參照到此分類。設定後將難以修改。',

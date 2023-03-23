@@ -6,7 +6,7 @@
         :initial-meta="meta"
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
-        <div class="field-inner">
+        <div class="field-inner" v-show="! config.hide_meta">
             <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span
                     v-if="config.display"
@@ -16,13 +16,13 @@
                 />
                 <i class="required ml-1" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-2 mr-2" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly && !isSection" class="text-gray-500 font-normal text-2xs mx-1">
+                <span v-if="isReadOnly && !isTab" class="text-gray-500 font-normal text-2xs mx-1">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
-                <svg-icon name="translate" class="h-4 ml-1 w-4 text-gray-600" v-if="isLocalizable && !isSection" v-tooltip.top="__('Localizable field')" />
+                <svg-icon name="translate" class="h-4 ml-1 w-4 text-gray-600" v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')" />
 
                 <button
-                    v-if="!isReadOnly && !isSection"
+                    v-if="!isReadOnly && !isTab"
                     v-show="syncable && isSynced"
                     class="outline-none"
                     :class="{ flex: syncable && isSynced }"
@@ -33,7 +33,7 @@
                 </button>
 
                 <button
-                    v-if="!isReadOnly && !isSection"
+                    v-if="!isReadOnly && !isTab"
                     v-show="syncable && !isSynced"
                     class="outline-none"
                     :class="{ flex: syncable && !isSynced }"
@@ -109,7 +109,8 @@ export default {
     },
 
     inject: {
-        storeName: { default: null }
+        storeName: { default: null },
+        isInsideConfigFields: { default: false },
     },
 
     computed: {
@@ -142,18 +143,19 @@ export default {
             return this.$config.get('sites').length > 1 && this.config.localizable;
         },
 
-        isSection() {
-            return this.config.type === 'section';
+        isTab() {
+            return this.config.type === 'tab';
         },
 
         classes() {
             return [
                 'form-group publish-field',
                 `publish-field__` + this.config.handle,
-                `${this.config.component || this.config.type}-fieldtype`,
-                `${tailwind_width_class(this.config.width)}`,
+                `${this.config.component || this.config.type}-fieldtype`,,
                 this.isReadOnly ? 'read-only-field' : '',
+                this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
                 this.config.classes || '',
+                this.config.full_width_setting ? 'full-width-setting' : '',
                 { 'has-error': this.hasError || this.hasNestedError }
             ];
         },

@@ -18,7 +18,7 @@
                 <button v-if="action" type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
-            <publish-sections
+            <publish-tabs
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
                 :enable-sidebar="hasSidebar"
@@ -48,7 +48,7 @@ export default {
             currentValues: this.values,
             error: null,
             errors: {},
-            hasSidebar: this.blueprint.sections.map(section => section.handle).includes('sidebar'),
+            hasSidebar: this.blueprint.tabs.map(tab => tab.handle).includes('sidebar'),
         }
     },
 

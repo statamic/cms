@@ -14,23 +14,26 @@ class Revealer extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'mode' => [
-                'display' => __('Mode'),
-                'instructions' => __('statamic::fieldtypes.revealer.config.mode'),
-                'type' => 'select',
-                'options' => [
-                    'button' => __('Button'),
-                    'toggle' => __('Toggle'),
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.revealer.config.mode'),
+                        'type' => 'select',
+                        'options' => [
+                            'button' => __('Button'),
+                            'toggle' => __('Toggle'),
+                        ],
+                        'default' => 'button',
+                    ],
+                    'input_label' => [
+                        'display' => __('Input Label'),
+                        'instructions' => __('statamic::fieldtypes.revealer.config.input_label'),
+                        'type' => 'text',
+                        'default' => '',
+                    ],
                 ],
-                'default' => 'button',
-                'width' => 50,
-            ],
-            'input_label' => [
-                'display' => __('Input Label'),
-                'instructions' => __('statamic::fieldtypes.revealer.config.input_label'),
-                'type' => 'text',
-                'default' => '',
-                'width' => 50,
             ],
         ];
     }

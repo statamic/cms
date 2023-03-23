@@ -280,6 +280,31 @@ class ReplicatorTest extends TestCase
         $field = (new Field('test', [
             'type' => 'replicator',
             'sets' => [
+                'group_one' => [
+                    'sets' => [
+                        'main' => [
+                            'fields' => [
+                                ['handle' => 'things', 'field' => ['type' => 'array']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]));
+
+        $expected = [
+            'things' => [],
+        ];
+
+        $this->assertEquals($expected, $field->fieldtype()->preload()['defaults']['main']);
+    }
+
+    /** @test */
+    public function it_preloads_preprocessed_default_values_with_old_config()
+    {
+        $field = (new Field('test', [
+            'type' => 'replicator',
+            'sets' => [
                 'main' => [
                     'fields' => [
                         ['handle' => 'things', 'field' => ['type' => 'array']],
@@ -308,15 +333,19 @@ class ReplicatorTest extends TestCase
         $field = (new Field('test', [
             'type' => 'replicator',
             'sets' => [
-                'main' => [
-                    'fields' => [
-                        [
-                            'handle' => 'things',
-                            'field' => [
-                                'type' => 'grid',
-                                'min_rows' => 2,
-                                'fields' => [
-                                    ['handle' => 'one', 'field' => ['type' => 'text']],
+                'group_one' => [
+                    'sets' => [
+                        'main' => [
+                            'fields' => [
+                                [
+                                    'handle' => 'things',
+                                    'field' => [
+                                        'type' => 'grid',
+                                        'min_rows' => 2,
+                                        'fields' => [
+                                            ['handle' => 'one', 'field' => ['type' => 'text']],
+                                        ],
+                                    ],
                                 ],
                             ],
                         ],

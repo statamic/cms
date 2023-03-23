@@ -12,8 +12,8 @@ class Preferences
     protected $dotted = [];
     protected $preventMergingChildren = [];
     protected $fields = [];
-    protected $sections = [];
-    protected $pendingSection = null;
+    protected $tabs = [];
+    protected $pendingTab = null;
     protected $extensions = [];
 
     /**
@@ -172,10 +172,10 @@ class Preferences
             $return = $callback($this);
 
             if (is_array($return)) {
-                foreach ($return as $handle => $section) {
-                    $display = $this->sections[$handle] ?? $section['display'] ?? $handle;
-                    $this->section($handle, $display, function () use ($section) {
-                        foreach ($section['fields'] as $handle => $field) {
+                foreach ($return as $handle => $tab) {
+                    $display = $this->tabs[$handle] ?? $tab['display'] ?? $handle;
+                    $this->tab($handle, $display, function () use ($tab) {
+                        foreach ($tab['fields'] as $handle => $field) {
                             $this->register($handle, $field);
                         }
                     });
@@ -199,39 +199,39 @@ class Preferences
     {
         $preference = (new Preference)->handle($handle)->field($field);
 
-        if ($this->pendingSection) {
-            $preference->section($this->pendingSection);
+        if ($this->pendingTab) {
+            $preference->tab($this->pendingTab);
         }
 
         return $preference;
     }
 
-    public function sections()
+    public function tabs()
     {
         return collect($this->fields)
-            ->groupBy->section()
-            ->map(fn ($fields, $section) => [
-                'display' => $this->sections[$section] ?? __('General'),
+            ->groupBy->tab()
+            ->map(fn ($fields, $tab) => [
+                'display' => $this->tabs[$tab] ?? __('General'),
                 'fields' => $fields->keyBy->handle()->map->field()->all(),
             ]);
     }
 
-    public function section($handle, $label, $permissions = null)
+    public function tab($handle, $label, $permissions = null)
     {
-        throw_if($this->pendingSection, new \Exception('Cannot nest preference sections'));
+        throw_if($this->pendingTab, new \Exception('Cannot nest preference tabs'));
 
         if (func_num_args() === 3) {
-            $this->sections[$handle] = $label;
+            $this->tabs[$handle] = $label;
         }
 
         if (func_num_args() === 2) {
             $permissions = $label;
         }
 
-        $this->pendingSection = $handle;
+        $this->pendingTab = $handle;
 
         $permissions($this);
 
-        $this->pendingSection = null;
+        $this->pendingTab = null;
     }
 }
