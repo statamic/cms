@@ -2,7 +2,7 @@
 
     <div class="p-4 m-0" :class="classes">
 
-        <label class="block">
+        <label class="block" v-if="showLabel">
             <span v-if="showLabelText">{{ display }}</span>
             <i class="required" v-if="field.required">*</i>
             <span v-if="isReadOnly" class="text-gray-500 font-normal text-2xs mx-1" v-text="__('Read Only')" />
@@ -124,6 +124,12 @@ export default {
                 this.field.classes || '',
                 { 'has-error': this.hasError || this.hasNestedError }
             ];
+        },
+
+        showLabel() {
+            return this.showLabelText // Need to see the label
+                || this.isReadOnly // Need to see the "Read Only" text
+                || this.field.required; // Need to see the asterisk
         },
 
         showLabelText() {
