@@ -7,7 +7,7 @@
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner" v-show="! config.hide_meta">
-            <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
+            <label v-if="showLabel" class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span
                     v-if="showLabelText"
                     :class="{ 'text-gray-600': syncable && isSynced }"
@@ -45,7 +45,7 @@
             </label>
 
             <div
-                class="help-block -mt-2"
+                class="help-block" :class="{ '-mt-2': showLabel }"
                 v-if="instructions && config.instructions_position !== 'below'"
                 v-html="instructions" />
         </div>
@@ -201,6 +201,15 @@ export default {
 
          showLabelText() {
             return !this.config.hide_display;
+         },
+
+         showLabel() {
+            return this.showLabelText // Need to see the text
+                || this.isReadOnly // Need to see the "Read Only" text
+                || this.config.required // Need to see the asterisk
+                || this.isLocked // Need to see the avatar
+                || this.isLocalizable // Need to see the icon
+                || this.syncable // Need to see the icon
          }
 
     },
