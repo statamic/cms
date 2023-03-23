@@ -9,6 +9,7 @@
         <div class="field-inner" v-show="! config.hide_meta">
             <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span
+                    v-if="showLabelText"
                     :class="{ 'text-gray-600': syncable && isSynced }"
                     v-text="labelText"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
@@ -196,7 +197,11 @@ export default {
         labelText() {
              return this.config.display
                  || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
-        }
+         },
+
+         showLabelText() {
+            return !this.config.hide_display;
+         }
 
     },
 
