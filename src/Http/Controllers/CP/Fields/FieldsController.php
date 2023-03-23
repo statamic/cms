@@ -30,7 +30,7 @@ class FieldsController extends CpController
 
         $blueprint = $this
             ->blueprint($fieldtype->configBlueprint())
-            ->ensureField('hide_display', ['type' => 'toggle', 'avisibility' => 'hidden']);
+            ->ensureField('hide_display', ['type' => 'toggle', 'visibility' => 'hidden']);
 
         $fields = $blueprint
             ->fields()
