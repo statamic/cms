@@ -6,7 +6,7 @@
         :initial-meta="meta"
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
-        <div class="field-inner" v-show="! config.hide_meta">
+        <div class="field-inner">
             <label v-if="showLabel" class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span
                     v-if="showLabelText"
