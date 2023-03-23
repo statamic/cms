@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class FallbackProtectorTest extends TestCase
 {
+    private $protector;
+
     public function setUp(): void
     {
         parent::setUp();

@@ -132,19 +132,16 @@
             },
 
             latestVersion() {
-                return this.latestRelease.version;
+                return this.latestRelease && this.latestRelease.version;
             },
 
             canUpdateToLatestVersion() {
-                return this.latestVersion.canUpdate && this.showActions && ! this.onLatestVersion;
+                return this.latestVersion && this.latestVersion.canUpdate && this.showActions && ! this.onLatestVersion;
             }
         },
 
-        mounted() {
-            this.getChangelog();
-        },
-
         created() {
+            this.getChangelog();
             this.$events.$on('composer-finished', this.composerFinished);
         },
 

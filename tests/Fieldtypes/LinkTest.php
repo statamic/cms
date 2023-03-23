@@ -14,7 +14,7 @@ class LinkTest extends TestCase
     public function it_augments_to_url()
     {
         ResolveRedirect::shouldReceive('resolve')
-            ->with('entry::test', $parent = new Entry)
+            ->with('entry::test', $parent = new Entry, true)
             ->once()
             ->andReturn('/the-redirect');
 
@@ -31,7 +31,7 @@ class LinkTest extends TestCase
         // invalid entries come back from the ResolveRedirect class as a 404 integer
 
         ResolveRedirect::shouldReceive('resolve')
-            ->with('entry::test', $parent = new Entry)
+            ->with('entry::test', $parent = new Entry, true)
             ->once()
             ->andReturn(404);
 

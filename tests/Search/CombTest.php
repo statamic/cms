@@ -10,6 +10,7 @@ class CombTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider searchesProvider
      **/
     public function it_searches($term, $expected)
@@ -26,6 +27,53 @@ class CombTest extends TestCase
         }
 
         $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('data.title')->all());
+    }
+
+    /**
+     * @test
+     **/
+    public function it_extracts_snippets()
+    {
+        $content = <<<'EOT'
+I would choose pizza. I think. But how then would I stream Teenage Mutant Ninja Turtles?
+Perhaps a wired ethernet connection to my Apple TV would be an acceptable loophole. Who
+designed this question anyway? Did they mean to imply all pizza, or just wireless
+pizza? Wifi is definitely more convenient but I could probably survive just fine
+wiring my whole house with Cat5. Or Cat6. Or whatever the latest is, it's hard to pizza.
+EOT;
+
+        $comb = new Comb([
+            ['content' => $content],
+        ]);
+
+        try {
+            $results = $comb->lookUp('pizza');
+        } catch (NoResultsFound $e) {
+            $results = [];
+        }
+
+        $expected = [[
+            'I would choose pizza. I think. But how then would I stream Teenage Mutant Ninja Turtles? Perhaps a',
+            'question anyway? Did they mean to imply all pizza, or just wireless pizza? Wifi is definitely more',
+            'just fine wiring my whole house with Cat5. Or Cat6. Or whatever the latest is, it\'s hard to pizza.',
+        ]];
+
+        $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('snippets.content')->all());
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_search_for_plus_signs()
+    {
+        $comb = new Comb([
+            ['content' => '+Content'],
+        ]);
+
+        $result = $comb->lookUp('+');
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertSame(1, $result['info']['total_results']);
     }
 
     public function searchesProvider()

@@ -205,7 +205,9 @@ class Grid extends Fieldtype
         $method = $shallow ? 'shallowAugment' : 'augment';
 
         return collect($value)->map(function ($row) use ($method) {
-            return new Values($this->fields()->addValues($row)->{$method}()->values()->all());
+            $values = $this->fields()->addValues($row)->{$method}()->values();
+
+            return new Values($values->merge(['id' => $row['id'] ?? null])->all());
         })->all();
     }
 

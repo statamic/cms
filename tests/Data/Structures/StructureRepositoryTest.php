@@ -11,6 +11,8 @@ use Tests\TestCase;
 
 class StructureRepositoryTest extends TestCase
 {
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();

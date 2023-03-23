@@ -9,6 +9,7 @@ class GetSuffixFromPathTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider paths
      **/
     public function it_gets_the_suffix_from_a_path($expected, $path)

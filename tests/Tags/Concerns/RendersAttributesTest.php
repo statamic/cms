@@ -9,6 +9,8 @@ use Tests\TestCase;
 
 class RendersAttributesTest extends TestCase
 {
+    private $tag;
+
     public function setUp(): void
     {
         parent::setUp();

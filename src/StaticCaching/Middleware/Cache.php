@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
@@ -61,14 +62,18 @@ class Cache
     {
         $cachedResponse = clone $response;
 
-        $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse, $response));
+        if ($response instanceof Response) {
+            $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse, $response));
+        }
 
         $this->cacher->cachePage($request, $cachedResponse);
     }
 
     private function makeReplacements($response)
     {
-        $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->replaceInCachedResponse($response));
+        if ($response instanceof Response) {
+            $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->replaceInCachedResponse($response));
+        }
     }
 
     private function getReplacers(): Collection

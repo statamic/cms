@@ -5,6 +5,7 @@ namespace Tests\Antlers\Sandbox;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -1061,5 +1062,57 @@ EOT;
 EOT;
 
         $this->assertSame('<Zero><One><Two><Three><Four>', trim($this->renderString($template)));
+    }
+
+    public function test_updated_arrays_are_not_reset_by_tags()
+    {
+        Collection::make('pages')->routes(['en' => '{slug}'])->save();
+        EntryFactory::collection('pages')->id('1')->slug('one')->data(['title' => 'One', 'template' => 'template'])->create();
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+
+        $template = <<<'EOT'
+{{ the_array = ['One', 10, 30, 40, 50, 60]; }}
+Value: {{ the_array.0 }}
+{{ the_array.0 = 'Two'; }}
+{{ the_array.1 *= 5; }}
+{{ the_array.2 -= 5; }}
+{{ the_array.3 %= 2; }}
+{{ the_array.4 /= 5; }}
+{{ the_array.5 += 10; }}
+Value: {{ the_array.0 }}
+{{ loop from="0" to="3" }}{{ index }}{{ /loop }}
+Value0: {{ the_array.0 }}
+Value1: {{ the_array.1 }}
+Value2: {{ the_array.2 }}
+Value3: {{ the_array.3 }}
+Value4: {{ the_array.4 }}
+Value5: {{ the_array.5 }}
+EOT;
+
+        $this->viewShouldReturnRaw('template', $template);
+
+        $responseOne = $this->get('one')->assertOk();
+
+        $expected = <<<'EXPECTED'
+Value: One
+
+
+
+
+
+
+Value: Two
+0123
+Value0: Two
+Value1: 50
+Value2: 25
+Value3: 0
+Value4: 10
+Value5: 70
+EXPECTED;
+
+        $this->assertSame($expected, StringUtilities::normalizeLineEndings(trim($responseOne->getContent())));
     }
 }

@@ -56,7 +56,11 @@ class AssetsController extends CpController
 
         $asset->save();
 
-        return ['success' => true, 'message' => 'Asset updated', 'asset' => new AssetResource($asset)];
+        return [
+            'success' => true,
+            'message' => 'Asset updated',
+            'asset' => (new AssetResource($asset))->resolve()['data'],
+        ];
     }
 
     public function store(Request $request)

@@ -49,6 +49,10 @@ class EntriesController extends CpController
 
         $entries = $query->paginate(request('perPage'));
 
+        if (request('search') && $collection->hasSearchIndex()) {
+            $entries->setCollection($entries->getCollection()->map->getSearchable());
+        }
+
         return (new Entries($entries))
             ->blueprint($collection->entryBlueprint())
             ->columnPreferenceKey("collections.{$collection->handle()}.columns")
@@ -146,6 +150,7 @@ class EntriesController extends CpController
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish', $entry),
             'previewTargets' => $collection->previewTargets()->all(),
+            'autosaveInterval' => $collection->autosaveInterval(),
         ];
 
         if ($request->wantsJson()) {
@@ -212,9 +217,11 @@ class EntriesController extends CpController
 
         $entry->slug($this->resolveSlug($request));
 
-        if ($collection->structure() && ! $collection->orderable()) {
+        if ($structure = $collection->structure()) {
             $tree = $entry->structure()->in($entry->locale());
+        }
 
+        if ($structure && ! $collection->orderable()) {
             $this->validateParent($entry, $tree, $parent);
 
             $entry->afterSave(function ($entry) use ($parent, $tree) {
@@ -322,6 +329,7 @@ class EntriesController extends CpController
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
             'previewTargets' => $collection->previewTargets()->all(),
+            'autosaveInterval' => $collection->autosaveInterval(),
         ];
 
         if ($request->wantsJson()) {
@@ -370,8 +378,11 @@ class EntriesController extends CpController
             $entry->date($this->toCarbonInstanceForSaving($request->date));
         }
 
-        if (($structure = $collection->structure()) && ! $collection->orderable()) {
+        if ($structure = $collection->structure()) {
             $tree = $structure->in($site->handle());
+        }
+
+        if ($structure && ! $collection->orderable()) {
             $parent = $values['parent'] ?? null;
             $entry->afterSave(function ($entry) use ($parent, $tree) {
                 if ($parent && optional($tree->page($parent))->isRoot()) {
@@ -495,7 +506,7 @@ class EntriesController extends CpController
         // If there's no parent selected, the entry will be at end of the top level, which is fine.
         // If the entry being edited is not the root, then we don't have anything to worry about.
         // If the parent is the root, that's fine, and is handled during the tree update later.
-        if (! $parent || ! $entry->isRoot()) {
+        if (! $parent || ! $entry->page()->isRoot()) {
             return;
         }
 

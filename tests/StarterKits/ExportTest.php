@@ -13,6 +13,7 @@ class ExportTest extends TestCase
     protected $files;
     protected $configPath;
     protected $exportPath;
+    protected $postInstallHookPath;
 
     public function setUp(): void
     {
@@ -228,7 +229,7 @@ EOT
 }
 
 EOT
-        , $this->files->get($this->exportPath('composer.json')));
+            , $this->files->get($this->exportPath('composer.json')));
     }
 
     /** @test */
@@ -473,7 +474,7 @@ EOT
 }
 
 EOT
-        , $this->files->get($this->exportPath('composer.json')));
+            , $this->files->get($this->exportPath('composer.json')));
     }
 
     /** @test */
@@ -507,7 +508,7 @@ EOT
 }
 
 EOT
-        , $this->files->get($this->exportPath('composer.json')));
+            , $this->files->get($this->exportPath('composer.json')));
     }
 
     private function exportPath($path = null)

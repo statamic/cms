@@ -21,6 +21,7 @@ class SpacelessTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider stringsWithSpaces
      */
     public function it_removes_excess_whitespace_and_linebreaks_from_string($expected, $input): void

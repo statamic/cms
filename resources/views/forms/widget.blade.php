@@ -1,6 +1,13 @@
 <div class="card p-0 overflow-hidden">
     <div class="flex justify-between items-center p-2">
-        <h2><a href="{{ $form->showUrl() }}">{{ $title }}</a></h2>
+        <h2>
+            <a class="flex items-center" href="{{ $form->showUrl() }}">
+                <div class="h-6 w-6 mr-1 text-grey-80">
+                    @cp_svg('drawer-file')
+                </div>
+                <span>{{ $title }}</span>
+            </a>
+        </h2>
     </div>
     <div>
         @if ( ! $submissions)

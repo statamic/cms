@@ -9,6 +9,7 @@ class GetSlugFromPathTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider paths
      **/
     public function it_gets_the_slug_from_a_path($expected, $path)

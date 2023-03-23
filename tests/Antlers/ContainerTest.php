@@ -23,6 +23,7 @@ class ContainerTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useRegexParser
      **/
     public function it_resolves_regex_parser_using_contract()
@@ -32,6 +33,7 @@ class ContainerTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useRuntimeParser
      **/
     public function it_resolves_runtime_parser_using_contract()
@@ -41,6 +43,7 @@ class ContainerTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useRegexParser
      **/
     public function it_resolves_regex_parser_using_class()
@@ -50,6 +53,7 @@ class ContainerTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useRuntimeParser
      **/
     public function it_resolves_runtime_parser_using_class()

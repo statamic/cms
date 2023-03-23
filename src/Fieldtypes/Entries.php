@@ -16,6 +16,7 @@ use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Query\StatusQueryBuilder;
 use Statamic\Support\Arr;
 
 class Entries extends Relationship
@@ -79,6 +80,10 @@ class Entries extends Relationship
 
         if (! isset($filters['collection'])) {
             $query->whereIn('collection', $this->getConfiguredCollections());
+        }
+
+        if ($blueprints = $this->config('blueprints')) {
+            $query->whereIn('blueprint', $blueprints);
         }
 
         $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext());
@@ -210,7 +215,7 @@ class Entries extends Relationship
             return $this->invalidItemArray($id);
         }
 
-        return (new EntryResource($entry))->resolve();
+        return (new EntryResource($entry))->resolve()['data'];
     }
 
     protected function collect($value)
@@ -234,9 +239,8 @@ class Entries extends Relationship
             ->filter()
             ->all();
 
-        $query = (new OrderedQueryBuilder(Entry::query(), $ids))
-            ->whereIn('id', $ids)
-            ->where('status', 'published');
+        $query = (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
+            ->whereIn('id', $ids);
 
         return $this->config('max_items') === 1 ? $query->first() : $query;
     }
@@ -297,6 +301,8 @@ class Entries extends Relationship
             return collect();
         }
 
-        return $this->config('max_items') === 1 ? collect([$augmented]) : $augmented->get();
+        return $this->config('max_items') === 1
+            ? collect([$augmented])
+            : $augmented->whereAnyStatus()->get();
     }
 }

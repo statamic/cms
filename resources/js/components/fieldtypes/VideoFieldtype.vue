@@ -58,7 +58,9 @@ export default {
             let embed_url = this.data;
 
             if (embed_url.includes('youtube')) {
-                embed_url = embed_url.replace('watch?v=', 'embed/');
+                embed_url = embed_url.includes('shorts/')
+                    ? embed_url.replace('shorts/', 'embed/')
+                    : embed_url.replace('watch?v=', 'embed/');
             }
 
             if (embed_url.includes('youtu.be')) {
@@ -82,7 +84,7 @@ export default {
         },
 
         isUrl() {
-            let regex = new RegExp('^(https?|ftp)://[^\s/$.?#].[^\s]*$', 'i')
+            let regex = new RegExp('^(https?|ftp):\/\/[^\s/$.?#].*$', 'i')
 
             return regex.test(this.data);
         },

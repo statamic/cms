@@ -12,7 +12,11 @@
             :searchable="true"
             :push-tags="false"
             :multiple="false"
-            :value="value" />
+            :value="value">
+            <template #no-options>
+                <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No templates to choose from.')" />
+            </template>
+        </v-select>
     </div>
 </template>
 

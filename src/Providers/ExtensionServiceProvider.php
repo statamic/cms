@@ -30,6 +30,10 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\DeleteMultisiteEntry::class,
         Actions\DownloadAsset::class,
         Actions\DownloadAssetFolder::class,
+        Actions\DuplicateAsset::class,
+        Actions\DuplicateEntry::class,
+        Actions\DuplicateForm::class,
+        Actions\DuplicateTerm::class,
         Actions\Publish::class,
         Actions\Unpublish::class,
         Actions\SendPasswordReset::class,
@@ -212,6 +216,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\UseDedicatedTrees::class,
         Updates\AddUniqueSlugValidation::class,
         Updates\AddGraphQLPermission::class,
+        Updates\AddAssignRolesAndGroupsPermissions::class,
+        Updates\AddDefaultPreferencesToGitConfig::class,
     ];
 
     public function register()

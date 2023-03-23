@@ -86,6 +86,7 @@ export default {
         open() {
             this.isOpen = true;
             this.escBinding = this.$keys.bind('esc', e => this.close())
+            this.popper && this.popper.update();
         },
         close() {
             this.isOpen = false;

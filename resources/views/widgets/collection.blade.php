@@ -9,7 +9,11 @@
             </a>
         </h2>
         @can('create', ['Statamic\Contracts\Entries\Entry', $collection])
-        <a href="{{ $collection->createEntryUrl() }}" class="text-blue hover:text-blue-dark text-sm">{{ $button }}</a>
+        <create-entry-button
+            button-class="btn-primary"
+            url="{{ $collection->createEntryUrl() }}"
+            :blueprints="{{ $blueprints->toJson() }}"
+            text="{{ $button }}"></create-entry-button>
         @endcan
     </div>
     <collection-widget

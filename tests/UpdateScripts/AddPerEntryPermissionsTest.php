@@ -73,5 +73,7 @@ class AddPerEntryPermissionsTest extends TestCase
         $this->assertTrue(Role::find('webmaster')->isSuper());
         $this->assertEquals($expectedAuthor, Role::find('author')->permissions()->all());
         $this->assertEquals($expectedBlogAdmin, Role::find('blog_admin')->permissions()->all());
+
+        Role::all()->each->delete(); // Clean up
     }
 }

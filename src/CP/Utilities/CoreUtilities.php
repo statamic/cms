@@ -10,13 +10,14 @@ use Statamic\Http\Controllers\CP\Utilities\GitController;
 use Statamic\Http\Controllers\CP\Utilities\PhpInfoController;
 use Statamic\Http\Controllers\CP\Utilities\UpdateSearchController;
 use Statamic\Statamic;
+
 use function Statamic\trans as __;
 
 class CoreUtilities
 {
     public static function boot()
     {
-        Utility::make('cache')
+        Utility::register('cache')
             ->action([CacheController::class, 'index'])
             ->title(__('Cache Manager'))
             ->icon('cache')
@@ -26,28 +27,25 @@ class CoreUtilities
             ->routes(function ($router) {
                 $router->post('cache/{cache}', [CacheController::class, 'clear'])->name('clear');
                 $router->post('cache/{cache}/warm', [CacheController::class, 'warm'])->name('warm');
-            })
-            ->register();
+            });
 
-        Utility::make('phpinfo')
+        Utility::register('phpinfo')
             ->action(PhpInfoController::class)
             ->title(__('PHP Info'))
             ->icon('php')
             ->description(__('statamic::messages.phpinfo_utility_description'))
-            ->docsUrl(Statamic::docsUrl('utilities/phpinfo'))
-            ->register();
+            ->docsUrl(Statamic::docsUrl('utilities/phpinfo'));
 
-        Utility::make('search')
+        Utility::register('search')
             ->view('statamic::utilities.search')
             ->title(__('Search'))
             ->icon('search-utility')
             ->description(__('statamic::messages.search_utility_description'))
             ->routes(function ($router) {
                 $router->post('/', [UpdateSearchController::class, 'update'])->name('update');
-            })
-            ->register();
+            });
 
-        Utility::make('email')
+        Utility::register('email')
             ->view('statamic::utilities.email')
             ->title(__('Email'))
             ->icon('email-utility')
@@ -55,10 +53,9 @@ class CoreUtilities
             ->docsUrl(Statamic::docsUrl('utilities/email'))
             ->routes(function ($router) {
                 $router->post('/', [EmailController::class, 'send']);
-            })
-            ->register();
+            });
 
-        Utility::make('licensing')
+        Utility::register('licensing')
             ->action([LicensingController::class, 'show'])
             ->title(__('Licensing'))
             ->icon('licensing')
@@ -66,11 +63,10 @@ class CoreUtilities
             ->docsUrl(Statamic::docsUrl('licensing'))
             ->routes(function ($router) {
                 $router->get('refresh', [LicensingController::class, 'refresh'])->name('refresh');
-            })
-            ->register();
+            });
 
         if (config('statamic.git.enabled') && Statamic::pro()) {
-            Utility::make('git')
+            Utility::register('git')
                 ->action([GitController::class, 'index'])
                 ->title('Git')
                 ->icon('git')
@@ -78,8 +74,7 @@ class CoreUtilities
                 ->docsUrl(Statamic::docsUrl('utilities/git'))
                 ->routes(function ($router) {
                     $router->post('/', [GitController::class, 'commit'])->name('commit');
-                })
-                ->register();
+                });
         }
     }
 }

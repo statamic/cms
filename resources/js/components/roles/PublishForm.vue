@@ -33,6 +33,7 @@
                 </div>
 
                 <form-group
+                    v-if="canAssignSuper"
                     class="toggle-fieldtype"
                     fieldtype="toggle"
                     handle="super"
@@ -74,6 +75,7 @@ export default {
         initialHandle: String,
         initialPermissions: Array,
         initialSuper: Boolean,
+        canAssignSuper: Boolean,
         action: String,
         method: String,
         breadcrumbUrl: String,

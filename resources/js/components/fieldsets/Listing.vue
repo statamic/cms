@@ -12,6 +12,7 @@
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="fieldset.edit_url" />
                         <dropdown-item
+                            v-if="fieldset.is_deletable"
                             :text="__('Delete')"
                             class="warning"
                             @click="$refs[`deleter_${fieldset.id}`].confirm()"
@@ -43,8 +44,8 @@ export default {
             rows: this.initialRows,
             columns: [
                 { label: __('Title'), field: 'title' },
-                { label: __('Handle'), field: 'handle' },
-                { label: __('Fields'), field: 'fields' },
+                { label: __('Handle'), field: 'handle', width: '25%' },
+                { label: __('Fields'), field: 'fields', width: '15%' },
             ]
         }
     }
