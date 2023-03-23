@@ -93,8 +93,21 @@ export default {
         updateTime(time) {
             let parts = time.split(':');
 
+            if (parts.length === 1) {
+                parts[0] = parts[0].padStart(2, '0');
+                parts[1] = '00';
+                if (this.useSeconds) {
+                    parts[2] = '00';
+                }
+            }
+
             if (parts.length === 2) {
                 parts[1] = parts[1].padStart(2, '0');
+
+                if (parts[1].length > 2) {
+                    parts[1] = parts[1].slice(0, 2);
+                }
+
                 if (this.useSeconds) {
                     parts[2] = '00';
                 }
@@ -102,11 +115,14 @@ export default {
 
             if (parts.length === 3) {
                 parts[2] = parts[2].padStart(2, '0');
+                if (parts[2].length > 2) {
+                    parts[2] = parts[2].slice(0, 2);
+                }
             }
 
             time = parts.join(':');
 
-            this.update(time);
+            this.updateDebounced(time);
         },
     }
 
