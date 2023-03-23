@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .blueprint-section {
-    @apply p-2 min-h-40 outline-none;
+    @apply p-2 min-h-40 outline-none w-full;
 
     &.draggable-source--is-dragging {
         opacity: 0.5;
@@ -37,12 +37,6 @@
     }
 }
 
-/*  Use specific selector because we don't want it to happen */
-/*  when used inside  a grid field configuratormajig. */
-.blueprint-section .blueprint-section-field-actions > div {
-    @apply w-1/2;
-}
-
 .blueprint-section-import {
     &:before {
         content: '';
@@ -69,7 +63,7 @@
 }
 
 .blueprint-add-section-button {
-    @apply relative w-full border border-gray-500 border-dashed rounded flex justify-center items-center text-gray-700;
+    @apply relative w-full border border-gray-500 border-dashed rounded-lg flex justify-center items-center text-gray-700;
 
     &:hover {
         @apply border-gray text-gray-950;
@@ -88,5 +82,3 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
-
-

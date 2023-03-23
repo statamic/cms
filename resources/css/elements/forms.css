@@ -162,6 +162,9 @@ input.input-text-minimal:read-only,
 
     .option {
         @apply mr-4 mb-3;
+        &:first-child {
+            @apply mt-3;
+        }
     }
 }
 

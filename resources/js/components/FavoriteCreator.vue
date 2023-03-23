@@ -1,6 +1,6 @@
 <template>
     <div>
-        <popover v-if="isNotYetFavorited" ref="popper" placement="auto-end" :offset="[28, 10]">
+        <popover v-if="isNotYetFavorited" ref="popper" placement="bottom-end" :offset="[10, 28]">
             <template slot="trigger">
                 <button @click="shown" slot="reference" class="h-6 w-6 block outline-none p-1 text-gray hover:text-gray-800" v-tooltip="__('Pin to Favorites')" :aria-label="__('Pin to Favorites')">
                     <svg-icon name="pin"></svg-icon>

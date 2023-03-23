@@ -63,7 +63,6 @@ export default {
         config: Object,
         values: Object,
         badges: Object,
-        popoverClosed: Function
     },
 
     data() {
@@ -142,15 +141,15 @@ export default {
         this.reset();
 
         this.$refs.fieldSelect.$refs.search.focus();
-
-        this.popoverClosed(() => {
-            if (! this.badges[this.field]) {
-                this.resetAll();
-            }
-        });
     },
 
     methods: {
+
+        popoverClosed() {
+            if (! this.badges[this.field]) {
+                this.resetAll();
+            }
+        },
 
         reset() {
             if (this.field) this.$emit('changed', this.initialValues);

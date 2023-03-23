@@ -80,8 +80,9 @@
                     @previews-updated="updateSetPreviews(set._id, $event)"
                 >
                     <template v-slot:picker v-if="canAddSet">
-                        <set-picker
+                        <add-set-button
                             class="replicator-set-picker-between"
+                            :groups="groupConfigs"
                             :sets="setConfigs"
                             :index="index"
                             @added="addSet" />
@@ -90,8 +91,9 @@
             </div>
         </sortable-list>
 
-        <set-picker v-if="canAddSet"
+        <add-set-button v-if="canAddSet"
             :last="true"
+            :groups="groupConfigs"
             :sets="setConfigs"
             :index="value.length"
             @added="addSet" />
@@ -108,9 +110,10 @@
 <script>
 import uniqid from 'uniqid';
 import ReplicatorSet from './Set.vue';
-import SetPicker from './SetPicker.vue';
+import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
+import reduce from 'underscore/modules/reduce';
 
 export default {
 
@@ -119,7 +122,7 @@ export default {
     components: {
         ReplicatorSet,
         SortableList,
-        SetPicker,
+        AddSetButton,
     },
 
     inject: ['storeName'],
@@ -148,6 +151,12 @@ export default {
         },
 
         setConfigs() {
+            return reduce(this.groupConfigs, (sets, group) => {
+                return sets.concat(group.sets);
+            }, []);
+        },
+
+        groupConfigs() {
             return this.config.sets;
         },
 
