@@ -54,7 +54,7 @@
 
 <script>
 import ChangePassword from './ChangePassword.vue';
-import HasHiddenFields from '../data-list/HasHiddenFields';
+import HasHiddenFields from '../publish/HasHiddenFields';
 
 export default {
 

@@ -18,6 +18,7 @@ class HasLowerCaseTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider strings
      */
     public function it_returns_true_if_the_string_has_lowercase_char_false_if_does_not($expected, $input): void

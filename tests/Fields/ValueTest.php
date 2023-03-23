@@ -11,6 +11,7 @@ class ValueTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider isRelationshipFieldtypeProvider
      **/
     public function it_gets_whether_its_a_relationship_through_the_fieldtype($isRelationship, $fieldtype)
@@ -157,6 +158,8 @@ class ValueTest extends TestCase
 class DummyAugmentable implements \Statamic\Contracts\Data\Augmentable
 {
     use \Statamic\Data\HasAugmentedData;
+
+    private $id;
 
     public function __construct($id)
     {

@@ -14,6 +14,10 @@ class UpdateAssetReferencesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $container;
+    private $assetHoff;
+    private $assetNorris;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -311,6 +315,7 @@ class UpdateAssetReferencesTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup disableUpdateReferences
      **/
     public function it_can_be_disabled()

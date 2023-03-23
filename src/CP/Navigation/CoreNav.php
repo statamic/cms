@@ -16,7 +16,6 @@ use Statamic\Facades\Form as FormAPI;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
 use Statamic\Facades\Nav as NavAPI;
 use Statamic\Facades\Role as RoleAPI;
-use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\User;
@@ -26,11 +25,6 @@ use Statamic\Statamic;
 
 class CoreNav
 {
-    const ALLOWED_TOP_LEVEL = [
-        'Dashboard',
-        'Playground',
-    ];
-
     /**
      * Make default nav items.
      */
@@ -74,8 +68,8 @@ class CoreNav
             ->children(function () {
                 return CollectionAPI::all()->sortBy->title()->map(function ($collection) {
                     return Nav::item($collection->title())
-                              ->url($collection->showUrl())
-                              ->can('view', $collection);
+                        ->url($collection->showUrl())
+                        ->can('view', $collection);
                 });
             });
 
@@ -86,8 +80,8 @@ class CoreNav
             ->children(function () {
                 return NavAPI::all()->sortBy->title()->map(function ($nav) {
                     return Nav::item($nav->title())
-                              ->url($nav->showUrl())
-                              ->can('view', $nav);
+                        ->url($nav->showUrl())
+                        ->can('view', $nav);
                 });
             });
 
@@ -98,8 +92,8 @@ class CoreNav
             ->children(function () {
                 return TaxonomyAPI::all()->sortBy->title()->map(function ($taxonomy) {
                     return Nav::item($taxonomy->title())
-                              ->url($taxonomy->showUrl())
-                              ->can('view', $taxonomy);
+                        ->url($taxonomy->showUrl())
+                        ->can('view', $taxonomy);
                 });
             });
 
@@ -128,8 +122,8 @@ class CoreNav
                     }
 
                     return Nav::item($globalSet->title())
-                              ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
-                              ->can('view', $globalSet);
+                        ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
+                        ->can('view', $globalSet);
                 })->filter();
             });
 
@@ -246,7 +240,7 @@ class CoreNav
             ->children(function () {
                 return UserGroupAPI::all()->sortBy->title()->map(function ($userGroup) {
                     return Nav::item($userGroup->title())
-                              ->url($userGroup->showUrl());
+                        ->url($userGroup->showUrl());
                 });
             });
 
@@ -260,20 +254,6 @@ class CoreNav
                         ->url($role->editUrl());
                 });
             });
-
-        return $this;
-    }
-
-    /**
-     * @TODO AREAS
-     *
-     * @return $this
-     */
-    protected function makeUnusedSection()
-    {
-        // Nav::site('Preferences')
-        //     ->route('')
-        //     ->icon('hammer-wrench');
 
         return $this;
     }

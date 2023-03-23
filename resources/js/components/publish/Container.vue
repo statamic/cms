@@ -106,6 +106,7 @@ export default {
                     errors: {},
                     isRoot: initial.isRoot,
                     preloadedAssets: [],
+                    autosaveInterval: null,
                 },
                 mutations: {
                     setFieldValue(state, payload) {
@@ -173,6 +174,15 @@ export default {
                     },
                     setPreloadedAssets(state, assets) {
                         state.preloadedAssets = assets;
+                    },
+                    setAutosaveInterval(state, interval) {
+                        if (state.autosaveInterval) {
+                            clearInterval(state.autosaveInterval);
+                        }
+                        state.autosaveInterval = interval;
+                    },
+                    clearAutosaveInterval(state) {
+                        clearInterval(state.autosaveInterval);
                     }
                 },
                 actions: {

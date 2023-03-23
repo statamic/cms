@@ -179,6 +179,7 @@ class TaxonomyTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider additionalPreviewTargetProvider
      */
     public function it_gets_and_sets_preview_targets($throughFacade)

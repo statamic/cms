@@ -17,6 +17,8 @@ use Tests\TestCase;
 
 class FeatureTest extends TestCase
 {
+    private $stache;
+
     public function setUp(): void
     {
         parent::setUp();

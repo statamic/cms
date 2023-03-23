@@ -9,6 +9,8 @@ use Tests\TestCase;
 
 class RepositoryTest extends TestCase
 {
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();

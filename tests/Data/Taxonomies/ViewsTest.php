@@ -16,6 +16,10 @@ class ViewsTest extends TestCase
     use FakesViews;
     use PreventSavingStacheItemsToDisk;
 
+    private $blogEntry;
+    private $frenchBlogEntry;
+    private $blogCollection;
+
     public function setUp(): void
     {
         parent::setUp();

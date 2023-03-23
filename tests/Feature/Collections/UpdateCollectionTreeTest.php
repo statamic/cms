@@ -17,6 +17,7 @@ class UpdateCollectionTreeTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider collectionTreeDataProvider
      */
     public function it_updates_the_tree($collectionHandle)

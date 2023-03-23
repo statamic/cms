@@ -4,6 +4,7 @@ namespace Statamic\Stache\Stores;
 
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\AssetContainer;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 
 class ContainerAssetsStore extends ChildStore
@@ -53,7 +54,7 @@ class ContainerAssetsStore extends ChildStore
 
     public function paths()
     {
-        if ($this->paths) {
+        if ($this->paths && ! Statamic::isWorker()) {
             return $this->paths;
         }
 

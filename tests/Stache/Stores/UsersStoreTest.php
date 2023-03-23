@@ -12,6 +12,9 @@ use Tests\TestCase;
 
 class UsersStoreTest extends TestCase
 {
+    private $tempDir;
+    private $store;
+
     public function setUp(): void
     {
         parent::setUp();

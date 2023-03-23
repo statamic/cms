@@ -1127,8 +1127,8 @@ class CoreModifiers extends Modifier
     public function isBetween($value, $params, $context)
     {
         return $this->carbon($value)->between(
-                $this->carbon($this->getFromContext($context, $params, 0)),
-                $this->carbon($this->getFromContext($context, $params, 1))
+            $this->carbon($this->getFromContext($context, $params, 0)),
+            $this->carbon($this->getFromContext($context, $params, 1))
         );
     }
 

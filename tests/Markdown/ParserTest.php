@@ -7,6 +7,10 @@ use Tests\TestCase;
 
 class ParserTest extends TestCase
 {
+    private $parser;
+    private $smileyExtension;
+    private $frownyExtension;
+
     public function setUp(): void
     {
         parent::setUp();

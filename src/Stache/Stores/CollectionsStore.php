@@ -57,7 +57,8 @@ class CollectionsStore extends BasicStore
             ->sortDirection(array_get($data, 'sort_dir'))
             ->taxonomies(array_get($data, 'taxonomies'))
             ->propagate(array_get($data, 'propagate'))
-            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])));
+            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])))
+            ->autosaveInterval(array_get($data, 'autosave'));
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
             $collection
