@@ -32,7 +32,7 @@ class StaticWarm extends Command
         {--queue : Queue the requests}
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
-        {--inertia : Add X-Inertia header to requests }
+        {--inertia : Add X-Inertia headers to requests }
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
@@ -76,7 +76,9 @@ class StaticWarm extends Command
             'auth' => $this->option('user') && $this->option('password')
                 ? [$this->option('user'), $this->option('password')]
                 : null,
-            'headers' => $this->option('inertia') ? ['X-Inertia' => 'true'] : null,
+            'headers' => $this->option('inertia')
+                ? ['X-Inertia' => 'true', 'X-Inertia-Version' => app(\Inertia\Middleware::class)->version(request())]
+                : null,
         ];
         $client = new Client($options);
 
