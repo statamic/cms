@@ -21,8 +21,8 @@ class AssetContainersQuery extends Query
 
     public function resolve($root, $args)
     {
-        return AssetContainer::all()->filter(function ($container) {
-            return in_array($container->handle(), ResourceAuthorizer::allowedSubResources('graphql', 'assets'));
-        });
+        $allowed = ResourceAuthorizer::allowedSubResources('graphql', 'assets');
+
+        return AssetContainer::all()->filter(fn ($container) => in_array($container->handle(), $allowed));
     }
 }
