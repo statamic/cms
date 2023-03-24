@@ -17,12 +17,14 @@
             @search:blur="$emit('blur')">
             <template slot="option" slot-scope="option">
                 <div class="flex items-center">
-                    <svg-icon :name="option.label" class="w-5 h-5" />
+                    <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="w-5 h-5" />
+                    <div v-if="option.html" v-html="option.html" class="w-4 h-4" />
                     <span class="text-xs ml-4 text-gray-700 truncate">{{ option.label }}</span>
                 </div>
             </template>
             <template slot="selected-option" slot-scope="option">
-                <svg-icon :name="value" class="w-5 h-5"></svg-icon>
+                <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="w-5 h-5" />
+                <div v-if="option.html" v-html="option.html" class="w-5 h-5" />
             </template>
         </v-select>
     </div>
@@ -36,10 +38,11 @@ export default {
     computed: {
           options() {
             let options = [];
-            for (let svg in this.meta.icons) {
+            for (let [name, html] of Object.entries(this.meta.icons)) {
                 options.push({
-                    value: this.meta.icons[svg],
-                    label: this.meta.icons[svg]
+                    value: name,
+                    label: name,
+                    html
                 });
             }
             return options;

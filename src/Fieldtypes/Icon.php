@@ -2,24 +2,39 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\File;
 use Statamic\Facades\Folder;
+use Statamic\Facades\Path;
 use Statamic\Fields\Fieldtype;
 
 class Icon extends Fieldtype
 {
     protected $categories = ['media'];
-    protected $selectable = false;
     protected $icon = 'icon_picker';
 
     public function preload(): array
     {
-        $folder = $this->config('folder', 'resources/svg');
+        $hasConfiguredDirectory = true;
 
-        $icons = collect(Folder::getFilesByType(statamic_path($folder), 'svg'))->map(function ($file) {
-            return pathinfo($file)['filename'];
-        });
+        if (! $directory = $this->config('directory')) {
+            $hasConfiguredDirectory = false;
+            $directory = statamic_path('resources/svg/icons');
+        }
+
+        $folder = $this->config(
+            'folder',
+            $hasConfiguredDirectory ? null : 'default' // Only apply a default folder if using Statamic icons.
+        );
+
+        $path = Path::tidy($directory.'/'.$folder);
+
+        $icons = collect(Folder::getFilesByType($path, 'svg'))->mapWithKeys(fn ($path) => [
+            pathinfo($path)['filename'] => $hasConfiguredDirectory ? File::get($path) : null,
+        ]);
 
         return [
+            'native' => ! $hasConfiguredDirectory,
+            'set' => $folder,
             'icons' => $icons->all(),
         ];
     }
@@ -30,6 +45,11 @@ class Icon extends Fieldtype
             [
                 'display' => __('Selection'),
                 'fields' => [
+                    'directory' => [
+                        'display' => __('Directory'),
+                        'instructions' => __('statamic::fieldtypes.icon.config.directory'),
+                        'type' => 'text',
+                    ],
                     'folder' => [
                         'display' => __('Folder'),
                         'instructions' => __('statamic::fieldtypes.icon.config.folder'),
