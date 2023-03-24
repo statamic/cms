@@ -1,6 +1,6 @@
 # Release Notes
 
-## 4.0.0-alpha.1 (2023-03-24)
+## 4.0.0-alpha.1 (2023-03-27)
 
 ### What's new
 - Laravel 10 support. [#7540](https://github.com/statamic/cms/issues/7540)
