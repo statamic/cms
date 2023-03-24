@@ -241,6 +241,7 @@ export default {
         },
 
         updateTab(tabId, tab) {
+            console.log(tabId, tab);
             const index = this.tabs.findIndex(tab => tab._id === tabId);
             this.tabs.splice(index, 1, tab);
         },
@@ -260,6 +261,8 @@ export default {
                 _id: id,
                 display: this.newTabText,
                 handle: this.$slugify(this.newTabText, '_'),
+                instructions: null,
+                icon: null,
                 sections: []
             });
 

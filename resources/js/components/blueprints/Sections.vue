@@ -103,6 +103,8 @@ export default {
             const section = {
                 _id: uniqid(),
                 display: this.newSectionText,
+                instructions: null,
+                icon: null,
                 handle: this.$slugify(this.newSectionText, '_'),
                 fields: []
             };

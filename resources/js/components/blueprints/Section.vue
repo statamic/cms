@@ -15,6 +15,16 @@
                     <span class="text-xs text-gray-700 mr-2">
                         <input type="text" v-model="section.instructions" class="bg-transparent w-full outline-none" :placeholder="`${__('Instructions')} (${__('Optional')})`" />
                     </span>
+
+                    <div v-if="showHandleField">
+                        <publish-field-meta
+                            :config="{ handle: 'icon', type: 'icon' }"
+                            :initial-value="section.icon"
+                            v-slot="{ meta, value, loading }"
+                        >
+                            <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="section.icon = $event" />
+                        </publish-field-meta>
+                    </div>
                 </div>
                 <div class="flex items-center px-3">
                     <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-600 hover:text-gray-950">
