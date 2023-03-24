@@ -1,9 +1,9 @@
 <template>
     <div class="time-fieldtype-container">
         <div class="input-group" :class="{'w-[120px]': useSeconds, 'w-[96px]': ! useSeconds}">
-            <div class="input-group-prepend flex items-center" v-tooltip="__('24 Hour Format')">
+            <button class="input-group-prepend flex items-center" v-tooltip="__('Set to now')" @click="setToNow">
                 <svg-icon name="time" class="w-4 h-4" />
-            </div>
+            </button>
             <input
                 type="text"
                 ref="time"
@@ -48,6 +48,12 @@ export default {
                 this.updateTime(time);
             }
         },
+        value: {
+            immediate: true,
+            handler(value) {
+                this.time = value;
+            }
+        },
     },
 
     computed: {
@@ -58,7 +64,7 @@ export default {
         timeMask() {
             return (value) => {
                 const hours = [
-                    /[0-2]/,
+                    /[0-9]/,
                     value.charAt(0) === '2' ? /[0-3]/ : /[0-9]/,
                 ];
                 const minutes = [/[0-5]/, /[0-9]/];
@@ -93,36 +99,26 @@ export default {
         updateTime(time) {
             let parts = time.split(':');
 
-            if (parts.length === 1) {
+            if (parts.length === 1 && time > 2) {
                 parts[0] = parts[0].padStart(2, '0');
-                parts[1] = '00';
-                if (this.useSeconds) {
-                    parts[2] = '00';
-                }
-            }
-
-            if (parts.length === 2) {
-                parts[1] = parts[1].padStart(2, '0');
-
-                if (parts[1].length > 2) {
-                    parts[1] = parts[1].slice(0, 2);
-                }
-
-                if (this.useSeconds) {
-                    parts[2] = '00';
-                }
-            }
-
-            if (parts.length === 3) {
-                parts[2] = parts[2].padStart(2, '0');
-                if (parts[2].length > 2) {
-                    parts[2] = parts[2].slice(0, 2);
-                }
             }
 
             time = parts.join(':');
 
             this.updateDebounced(time);
+        },
+
+        setToNow() {
+            let date = new Date();
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            let seconds = date.getSeconds();
+
+            if (this.useSeconds) {
+                this.time = `${hours}:${minutes}:${seconds}`;
+            } else {
+                this.time = `${hours}:${minutes}`;
+            }
         },
     }
 
