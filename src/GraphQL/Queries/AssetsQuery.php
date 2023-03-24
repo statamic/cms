@@ -3,10 +3,12 @@
 namespace Statamic\GraphQL\Queries;
 
 use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\Asset;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Middleware\AuthorizeFilters;
+use Statamic\GraphQL\Middleware\AuthorizeSubResources;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\AssetInterface;
@@ -22,6 +24,7 @@ class AssetsQuery extends Query
     ];
 
     protected $middleware = [
+        AuthorizeSubResources::class,
         ResolvePage::class,
         AuthorizeFilters::class,
     ];
@@ -68,6 +71,16 @@ class AssetsQuery extends Query
 
             $query->orderBy($sort, $order);
         }
+    }
+
+    public function subResourceArg()
+    {
+        return 'container';
+    }
+
+    public function allowedSubResources()
+    {
+        return ResourceAuthorizer::allowedSubResources('graphql', 'assets');
     }
 
     public function allowedFilters($args)
