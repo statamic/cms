@@ -11,7 +11,7 @@
                 :readonly="isReadOnly"
                 v-mask="timeMask"
                 v-model="time"
-                placeholder="23:45"
+                :placeholder="useSeconds ? '__ : __ : __' : '__ : __'"
                 @keydown.esc="clear"
                 @focus="focused"
                 @blur="$emit('blur')"
