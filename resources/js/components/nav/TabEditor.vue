@@ -12,23 +12,27 @@
                     v-html="'&times'" />
             </div>
 
-            <div class="flex-1 overflow-auto p-6">
-                <div class="publish-fields">
+            <div class="flex-1 overflow-auto">
+                <div class="px-2">
+                    <div class="publish-fields @container">
 
-                <div class="publish-field mb-8" :class="{ 'has-error': validate }">
-                    <div class="field-inner">
-                        <label class="text-sm font-medium mb-2">{{ __('Display') }} <span class="text-red-500">*</span></label>
-                        <text-input v-model="tab" :focus="true" />
-                        <div v-if="validate" class="help-block text-red-500 mt-2"><p>{{ __('statamic::validation.required') }}</p></div>
+                        <div class="form-group publish-field w-full" :class="{ 'has-error': validate }">
+                            <div class="field-inner">
+                                <label class="text-sm font-medium mb-2">{{ __('Display') }} <span class="text-red-500">*</span></label>
+                                <text-input v-model="tab" :focus="true" />
+                                <div v-if="validate" class="help-block text-red-500 mt-2"><p>{{ __('statamic::validation.required') }}</p></div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-
-                <button
-                    class="btn-primary w-full mt-6"
-                    :class="{ 'opacity-50': false }"
-                    :disabled="false"
-                    @click="save"
-                    v-text="__('Save')" />
+                <div class="p-6">
+                    <button
+                        class="btn-primary w-full"
+                        :class="{ 'opacity-50': false }"
+                        :disabled="false"
+                        @click="save"
+                        v-text="__('Save')" />
                 </div>
             </div>
 
