@@ -9,6 +9,7 @@ class Icon extends Fieldtype
 {
     protected $categories = ['media'];
     protected $selectable = false;
+    protected $icon = 'icon_picker';
 
     public function preload(): array
     {
