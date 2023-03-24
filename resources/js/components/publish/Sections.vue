@@ -10,7 +10,6 @@
                     :fields="section.fields"
                     :read-only="readOnly"
                     :syncable="syncable"
-                    :can-toggle-labels="canToggleLabels"
                     @updated="(handle, value) => $emit('updated', handle, value)"
                     @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
                     @synced="$emit('synced', $event)"
@@ -34,7 +33,6 @@ export default {
         readOnly: Boolean,
         syncable: Boolean,
         syncableFields: Array,
-        canToggleLabels: Boolean,
         namePrefix: String,
     }
 

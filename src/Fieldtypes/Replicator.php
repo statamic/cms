@@ -57,7 +57,7 @@ class Replicator extends Fieldtype
                     'sets' => [
                         'display' => __('Sets'),
                         'type' => 'sets',
-                        'hide_meta' => true,
+                        'hide_display' => true,
                         'full_width_setting' => true,
                     ],
                 ],
