@@ -106,6 +106,74 @@ GQL;
     }
 
     /** @test */
+    public function it_queries_only_terms_on_allowed_sub_resources()
+    {
+        $this->createTaxonomies()->createTerms()->createBlueprints();
+
+        $query = <<<'GQL'
+{
+    terms {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'taxonomies')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'taxonomies')->andReturn(['categories'])->twice();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['terms' => ['data' => [
+                ['id' => 'categories::alpha', 'title' => 'Category Alpha'],
+                ['id' => 'categories::bravo', 'title' => 'Category Bravo'],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource()
+    {
+        $this->createTaxonomies()->createTerms()->createBlueprints();
+
+        $query = <<<'GQL'
+{
+    terms(taxonomy: "tags") {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'taxonomies')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'taxonomies')->andReturn(['categories'])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'taxonomy' => ['Forbidden: tags'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'terms' => null,
+                ],
+            ]);
+    }
+
+    /** @test */
     public function it_paginates_terms()
     {
         $this->createTaxonomies()->createBlueprints();
