@@ -241,7 +241,6 @@ export default {
         },
 
         updateTab(tabId, tab) {
-            console.log(tabId, tab);
             const index = this.tabs.findIndex(tab => tab._id === tabId);
             this.tabs.splice(index, 1, tab);
         },
