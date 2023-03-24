@@ -21,8 +21,8 @@ class CollectionsQuery extends Query
 
     public function resolve($root, $args)
     {
-        return Collection::all()->filter(function ($collection) {
-            return in_array($collection->handle(), ResourceAuthorizer::allowedSubResources('graphql', 'collections'));
-        });
+        $allowed = ResourceAuthorizer::allowedSubResources('graphql', 'collections');
+
+        return Collection::all()->filter(fn ($collection) => in_array($collection->handle(), $allowed));
     }
 }
