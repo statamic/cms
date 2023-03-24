@@ -4,7 +4,7 @@
         <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
             <div class="bg-gray-200 px-6 py-2 border-b border-gray-300 text-lg font-medium flex items-center justify-between">
-                {{ creating ? __('Add Tab') : __('Edit Tab') }}
+                {{ creating ? __('Add Section') : __('Edit Section') }}
                 <button
                     type="button"
                     class="btn-close"
@@ -19,7 +19,7 @@
                         <div class="form-group publish-field w-full" :class="{ 'has-error': validate }">
                             <div class="field-inner">
                                 <label class="text-sm font-medium mb-2">{{ __('Display') }} <span class="text-red-500">*</span></label>
-                                <text-input v-model="tab" :focus="true" />
+                                <text-input v-model="section" :focus="true" />
                                 <div v-if="validate" class="help-block text-red-500 mt-2"><p>{{ __('statamic::validation.required') }}</p></div>
                             </div>
                         </div>
@@ -48,12 +48,12 @@ export default {
 
     props: {
         creating: false,
-        tabItem: {},
+        sectionItem: {},
     },
 
     data() {
         return {
-            tab: data_get(this.tabItem, 'text') || '',
+            section: data_get(this.sectionItem, 'text') || '',
             saveKeyBinding: null,
             validate: false,
         }
@@ -75,12 +75,12 @@ export default {
         save() {
             this.validate = false;
 
-            if (! this.tab) {
+            if (! this.section) {
                 this.validate = true;
                 return;
             }
 
-            this.$emit('updated', this.tab, this.tabItem);
+            this.$emit('updated', this.section, this.sectionItem);
         },
 
     },
