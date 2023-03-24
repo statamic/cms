@@ -103,9 +103,7 @@ export default {
                 parts[0] = parts[0].padStart(2, '0');
             }
 
-            time = parts.join(':');
-
-            this.updateDebounced(time);
+            this.updateDebounced(parts.join(':'));
         },
 
         setToNow() {
