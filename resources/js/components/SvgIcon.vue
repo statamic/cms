@@ -10,6 +10,10 @@ const splitIcon = function(icon) {
     return icon.split('/');
 }
 
+const fallbackIconImport = function() {
+    return import('./../../svg/icons/default/image.svg');
+}
+
 export default {
     props: {
         name: String,
@@ -21,9 +25,9 @@ export default {
                 const [set, file] = splitIcon(this.name);
                 return import(`./../../svg/icons/${set}/${file}.svg`)
                     .catch(e => {
+                        if (! this.default) return fallbackIconImport();
                         const [set, file] = splitIcon(this.default);
-                        return import(`./../../svg/icons/${set}/${file}.svg`)
-                            .catch(e => import('./../../svg/icons/default/image.svg'))
+                        return import(`./../../svg/icons/${set}/${file}.svg`).catch(e => fallbackIconImport());
                     });
             });
         }
