@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\AssetContainer;
@@ -31,6 +32,10 @@ class AssetsTest extends TestCase
      **/
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{assets}'])
@@ -55,6 +60,10 @@ class AssetsTest extends TestCase
 }
 GQL;
 
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(['test'])->once();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -63,6 +72,47 @@ GQL;
                 ['path' => 'a.txt'],
                 ['path' => 'b.txt'],
             ]]]]);
+    }
+
+    /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource()
+    {
+        Storage::fake('test', ['url' => '/assets']);
+        Storage::disk('test')->put('a.txt', '');
+        Storage::disk('test')->put('b.txt', '');
+        AssetContainer::make('one')->disk('test')->save();
+        AssetContainer::make('two')->disk('test')->save();
+
+        $query = <<<'GQL'
+{
+    assets(container: "two") {
+        data {
+            path
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(['one'])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'container' => ['Forbidden: two'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'assets' => null,
+                ],
+            ]);
     }
 
     /** @test */
