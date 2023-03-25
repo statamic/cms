@@ -74,12 +74,13 @@ export default {
 
     props: {
         actions: Object,
-        published: Boolean
+        published: Boolean,
+        canManagePublishState: Boolean,
     },
 
     data() {
         return {
-            action: 'publish',
+            action: this.canManagePublishState ? 'publish' : 'revision',
             revisionMessage: null,
             saving: false,
         }
@@ -88,17 +89,19 @@ export default {
     computed: {
 
         options() {
-            let options = [
-                { value: 'publish', label: 'Publish Now', },
-            ];
+            const options = [];
 
-            if (this.published) {
-                options.push({ value: 'unpublish', label: 'Unpublish' });
+            if (this.canManagePublishState) {
+                options.push({ value: 'publish', label: __('Publish Now') });
+
+                if (this.published) {
+                    options.push({ value: 'unpublish', label: __('Unpublish') });
+                }
             }
 
-            return options.concat([
-                { value: 'revision', label: 'Create Revision', },
-            ]);
+            options.push({ value: 'revision', label: __('Create Revision') });
+
+            return options;
         },
 
         actionInfoText() {

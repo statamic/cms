@@ -43,6 +43,21 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Additional Image Extensions
+        |--------------------------------------------------------------------------
+        |
+        | Define any additional image file extensions you would like Statamic to
+        | process. You should ensure that both your server and the selected
+        | image manipulation driver properly supports these extensions.
+        |
+        */
+
+        'additional_extensions' => [
+            // 'heic',
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
         | Save Cached Images
         |--------------------------------------------------------------------------
         |
@@ -78,6 +93,7 @@ return [
         | Rather than specifying your manipulation params in your templates with
         | the glide tag, you may define them here and reference their handles.
         | They may also be automatically generated when you upload assets.
+        | Containers can be configured to warm these caches on upload.
         |
         */
 

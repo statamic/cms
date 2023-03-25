@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\Yaml\ParseException;
 
 class Yaml extends Fieldtype
 {
@@ -33,15 +34,15 @@ class Yaml extends Fieldtype
 
     public function process($data)
     {
-        if (substr_count($data, "\n") > 0 || substr_count($data, ': ') > 0) {
-            $data = \Statamic\Facades\YAML::parse($data);
-        }
-
         if (empty($data)) {
-            $data = null;
+            return null;
         }
 
-        return $data;
+        try {
+            return \Statamic\Facades\YAML::parse($data);
+        } catch (ParseException $e) {
+            return $data;
+        }
     }
 
     public function toGqlType()

@@ -49,6 +49,10 @@ class EntriesController extends CpController
 
         $entries = $query->paginate(request('perPage'));
 
+        if (request('search') && $collection->hasSearchIndex()) {
+            $entries->setCollection($entries->getCollection()->map->getSearchable());
+        }
+
         return (new Entries($entries))
             ->blueprint($collection->entryBlueprint())
             ->columnPreferenceKey("collections.{$collection->handle()}.columns")
@@ -146,6 +150,7 @@ class EntriesController extends CpController
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish', $entry),
             'previewTargets' => $collection->previewTargets()->all(),
+            'autosaveInterval' => $collection->autosaveInterval(),
         ];
 
         if ($request->wantsJson()) {
@@ -318,6 +323,7 @@ class EntriesController extends CpController
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
             'previewTargets' => $collection->previewTargets()->all(),
+            'autosaveInterval' => $collection->autosaveInterval(),
         ];
 
         if ($request->wantsJson()) {

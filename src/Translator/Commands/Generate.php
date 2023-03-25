@@ -24,6 +24,9 @@ class Generate extends Command
     protected $additionalStrings;
     protected $additionalKeys;
     protected $excludedKeys;
+    protected $manualFiles;
+    protected $input;
+    protected $output;
 
     public function __construct(MethodDiscovery $discovery, Filesystem $files, array $manualFiles, array $ignored, array $additionalStrings, array $additionalKeys, array $excludedKeys)
     {

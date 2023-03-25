@@ -10,6 +10,8 @@ class MakeModifierTest extends TestCase
 {
     use Concerns\CleansUpGeneratedPaths;
 
+    private $files;
+
     public function setUp(): void
     {
         parent::setUp();

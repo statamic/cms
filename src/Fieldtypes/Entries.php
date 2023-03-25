@@ -16,6 +16,7 @@ use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Query\StatusQueryBuilder;
 use Statamic\Support\Arr;
 
 class Entries extends Relationship
@@ -238,9 +239,8 @@ class Entries extends Relationship
             ->filter()
             ->all();
 
-        $query = (new OrderedQueryBuilder(Entry::query(), $ids))
-            ->whereIn('id', $ids)
-            ->where('status', 'published');
+        $query = (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
+            ->whereIn('id', $ids);
 
         return $this->config('max_items') === 1 ? $query->first() : $query;
     }
@@ -301,6 +301,8 @@ class Entries extends Relationship
             return collect();
         }
 
-        return $this->config('max_items') === 1 ? collect([$augmented]) : $augmented->get();
+        return $this->config('max_items') === 1
+            ? collect([$augmented])
+            : $augmented->whereAnyStatus()->get();
     }
 }

@@ -67,7 +67,7 @@ class PasswordFormTest extends TestCase
     {{ /fields }}
 {{ /user:password_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 

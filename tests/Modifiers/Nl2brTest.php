@@ -17,6 +17,7 @@ class Nl2brTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider strings
      */
     public function it_replaces_linebreaks_with_br_tags($expected, $input): void

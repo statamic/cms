@@ -17,6 +17,8 @@ class QueriesConditionsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $collection;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -517,7 +519,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($value)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($value)
             {
@@ -550,7 +552,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($values)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($values)
             {
@@ -583,7 +585,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($values)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($values)
             {
@@ -610,7 +612,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($value)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($value)
             {
@@ -639,7 +641,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($value)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($value)
             {
