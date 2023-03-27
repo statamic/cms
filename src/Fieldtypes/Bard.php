@@ -177,7 +177,7 @@ class Bard extends Replicator
                 'fields' => [
                     'sets' => [
                         'display' => __('Sets'),
-                        'hide_meta' => true,
+                        'hide_display' => true,
                         'type' => 'sets',
                         'full_width_setting' => true,
                         'require_set' => false,

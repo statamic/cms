@@ -39,7 +39,6 @@
             <div slot-scope="{ container, setFieldValue, setFieldMeta }">
                 <publish-tabs
                     :enable-sidebar="false"
-                    :can-toggle-labels="true"
                     @updated="setFieldValue"
                     @meta-updated="setFieldMeta"
                     @focus="container.$emit('focus', $event)"
