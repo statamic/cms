@@ -10,7 +10,7 @@
                         <svg-icon class="h-4 w-4 mr-2 text-gray-700" :name="section.icon ? `plump/${section.icon}` : 'folder-generic'" />
                         <div class="mr-2" v-text="section.display"></div>
                     </div>
-                    <button class="flex items-center text-gray-700 hover:text-gray-950 mr-3" @click="startEditingSection">
+                    <button class="flex items-center text-gray-700 hover:text-gray-950 mr-3" @click="edit">
                         <svg-icon class="h-4 w-4" name="pencil" />
                     </button>
                     <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-700 hover:text-gray-950">
@@ -172,7 +172,7 @@ export default {
             }
         },
 
-        startEditingSection() {
+        edit() {
             this.editingSection = {
                 display: this.section.display,
                 handle: this.section.handle,
