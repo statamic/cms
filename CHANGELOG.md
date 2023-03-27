@@ -11,6 +11,7 @@
 - Tailwind Container Queries plugin, used to control fields widths. [#7557](https://github.com/statamic/cms/issues/7557)
 - A "fullscreen" Vue component, used to make bring fullscreen mode to a bunch of fieldtypes. [#7569](https://github.com/statamic/cms/issues/7569)
 - Width fieldtype. [#7582](https://github.com/statamic/cms/issues/7582)
+- Icon fieldtype. [#7582](https://github.com/statamic/cms/issues/7740)
 
 ### What's improved
 - A myriad of UI improvements. [#7559](https://github.com/statamic/cms/issues/7559)
