@@ -54,6 +54,7 @@ export function data_delete(obj, path) {
         if (! (key in obj)) obj[key] = shouldBeArray ? [] : {};
         obj = obj[key];
     }
+    if (Array.isArray(obj)) throw new Error('Cannot delete an array key');
     delete obj[parts[0]];
 }
 

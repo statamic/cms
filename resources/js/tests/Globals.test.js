@@ -125,3 +125,14 @@ test('it_can_delete_value_from_data_using_dotted_path', () => {
         },
     });
 });
+
+
+test('it throws error when trying to delete an array item', () => {
+    let data = {
+        foo: ['alfa', 'bravo', 'charlie'],
+    };
+
+    expect(() => {
+        data_delete(data, 'foo.1');
+    }).toThrow('Cannot delete an array key');
+});
