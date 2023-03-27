@@ -8,7 +8,7 @@
                 <div class="p-2 flex-1 flex items-center">
                     <div class="flex items-center flex-1">
                         <svg-icon class="h-4 w-4 mr-2 text-gray-700" :name="section.icon ? `plump/${section.icon}` : 'folder-generic'" />
-                        <div class="mr-2" v-text="section.display"></div>
+                        <a class="mr-2" @click="edit" v-text="section.display" />
                     </div>
                     <button class="flex items-center text-gray-700 hover:text-gray-950 mr-3" @click="edit">
                         <svg-icon class="h-4 w-4" name="pencil" />
