@@ -35,6 +35,19 @@
                             </div>
                         </div>
 
+                        <div class="form-group publish-field w-full" :class="{ 'has-error': validateUrl }">
+                            <div class="field-inner">
+                                <label class="text-sm font-medium mb-2">{{ __('Icon') }}</label>
+                                <publish-field-meta
+                                    :config="{ handle: 'icon', type: 'icon' }"
+                                    :initial-value="config.icon"
+                                    v-slot="{ meta, value, loading }"
+                                >
+                                    <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="config.icon = $event" />
+                                </publish-field-meta>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
