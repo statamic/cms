@@ -28,6 +28,7 @@
                     :meta="meta"
                     :errors="errors"
                     :localized-fields="localizedFields"
+                    class="px-2"
                     @updated="values = $event"
                 >
                     <div slot-scope="{ container, setFieldMeta }">
