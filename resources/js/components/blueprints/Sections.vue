@@ -16,6 +16,7 @@
                 :can-define-localizable="canDefineLocalizable"
                 :tab-id="tabId"
                 :show-handle-field="showSectionHandleField"
+                :edit-text="editSectionText"
                 @updated="updateSection(i, $event)"
                 @deleted="deleteSection(i)"
             />
@@ -64,6 +65,10 @@ export default {
         addSectionText: {
             type: String,
             default: () => __('Add Section')
+        },
+        editSectionText: {
+            type: String,
+            default: () => __('Edit Section')
         },
         newSectionText: {
             type: String,

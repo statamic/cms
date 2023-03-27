@@ -22,7 +22,7 @@
 
         <confirmation-modal
             v-if="editing"
-            :title="__('Edit Tab')"
+            :title="editText"
             @opened="$refs.title.focus()"
             @confirm="editConfirmed"
             @cancel="editCancelled"
@@ -82,6 +82,9 @@ export default {
             type: Boolean,
             default: false,
         },
+        editText: {
+            type: String,
+        }
     },
 
     data() {

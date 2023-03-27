@@ -7,8 +7,10 @@
             :require-section="config.require_set"
             :can-define-localizable="false"
             :add-tab-text="__('Add Set Group')"
+            :edit-tab-text="__('Edit Set Group')"
             :new-tab-text="__('New Set Group')"
             :add-section-text="__('Add Set')"
+            :edit-section-text="__('Edit Set')"
             :new-section-text="__('New Set')"
             show-tab-instructions-field
             show-section-handle-field

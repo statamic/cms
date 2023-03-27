@@ -21,7 +21,7 @@
 
             <confirmation-modal
                 v-if="editingSection"
-                :title="__('Edit Set')"
+                :title="editText"
                 @opened="$refs.displayInput.focus()"
                 @confirm="editConfirmed"
                 @cancel="editCancelled"
@@ -103,6 +103,9 @@ export default {
         showHandleField: {
             type: Boolean,
             default: false
+        },
+        editText: {
+            type: String,
         }
     },
 
