@@ -2,9 +2,7 @@
     <div class="flex icon-fieldtype-wrapper">
         <v-select
             ref="input"
-            append-to-body
             class="w-full"
-            :calculate-position="withPopper"
             :name="name"
             :clearable="false"
             :disabled="config.disabled || isReadOnly"
