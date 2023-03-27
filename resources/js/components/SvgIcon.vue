@@ -19,8 +19,18 @@ export default {
         name: String,
         default: String,
     },
-    computed: {
-        icon() {
+    data() {
+        return {
+            icon: this.evaluateIcon(),
+        }
+    },
+    watch: {
+        name() {
+            this.icon = this.evaluateIcon();
+        }
+    },
+    methods: {
+        evaluateIcon() {
             return defineAsyncComponent(() => {
                 const [set, file] = splitIcon(this.name);
                 return import(`./../../svg/icons/${set}/${file}.svg`)
