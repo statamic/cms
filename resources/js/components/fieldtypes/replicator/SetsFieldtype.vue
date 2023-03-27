@@ -39,7 +39,7 @@ export default {
     methods: {
 
         tabsUpdated(tabs) {
-            this.tabs = tabs;
+            this.update(tabs);
         }
 
     }
