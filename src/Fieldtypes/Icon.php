@@ -14,19 +14,7 @@ class Icon extends Fieldtype
 
     public function preload(): array
     {
-        $hasConfiguredDirectory = true;
-
-        if (! $directory = $this->config('directory')) {
-            $hasConfiguredDirectory = false;
-            $directory = statamic_path('resources/svg/icons');
-        }
-
-        $folder = $this->config(
-            'folder',
-            $hasConfiguredDirectory ? null : 'default' // Only apply a default folder if using Statamic icons.
-        );
-
-        $path = Path::tidy($directory.'/'.$folder);
+        [$path, $directory, $folder, $hasConfiguredDirectory] = $this->resolveParts();
 
         $icons = collect(Folder::getFilesByType($path, 'svg'))->mapWithKeys(fn ($path) => [
             pathinfo($path)['filename'] => $hasConfiguredDirectory ? File::get($path) : null,
@@ -62,6 +50,37 @@ class Icon extends Fieldtype
                     ],
                 ],
             ],
+        ];
+    }
+
+    public function augment($value)
+    {
+        [$path] = $this->resolveParts();
+
+        return File::get($path.'/'.$value.'.svg');
+    }
+
+    private function resolveParts()
+    {
+        $hasConfiguredDirectory = true;
+
+        if (! $directory = $this->config('directory')) {
+            $hasConfiguredDirectory = false;
+            $directory = statamic_path('resources/svg/icons');
+        }
+
+        $folder = $this->config(
+            'folder',
+            $hasConfiguredDirectory ? null : 'default' // Only apply a default folder if using Statamic icons.
+        );
+
+        $path = Path::tidy($directory.'/'.$folder);
+
+        return [
+            $path,
+            $directory,
+            $folder,
+            $hasConfiguredDirectory,
         ];
     }
 }
