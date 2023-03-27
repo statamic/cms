@@ -137,6 +137,7 @@ return [
     'slug.title' => 'Slug',
     'slug.config.from' => 'Target field to create a slug from.',
     'slug.config.generate' => 'Create a slug automatically from target `from` field.',
+    'slug.config.show_regenerate' => 'Show the regenerate button to re-slugify from the target field.',
     'structures.title' => 'Structures',
     'table.title' => 'Table',
     'taggable.title' => 'Taggable',

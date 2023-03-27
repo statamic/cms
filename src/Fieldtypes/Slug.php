@@ -26,6 +26,13 @@ class Slug extends Text
                         'instructions' => __('statamic::fieldtypes.slug.config.generate'),
                         'default' => true,
                     ],
+                    'show_regenerate' => [
+                        'display' => __('Show Regenerate Button'),
+                        'type' => 'toggle',
+                        'instructions' => __('statamic::fieldtypes.slug.config.show_regenerate'),
+                        'default' => false,
+                        'width' => 50,
+                    ],
                 ],
             ],
         ];
