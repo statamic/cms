@@ -23,6 +23,7 @@
         <confirmation-modal
             v-if="editing"
             :title="__('Edit Tab')"
+            @opened="$refs.title.focus()"
             @confirm="editConfirmed"
             @cancel="editCancelled"
         >
@@ -114,7 +115,6 @@ export default {
 
         edit() {
             this.editing = true;
-            setTimeout(() => this.$refs.title.focus(), 100); // better as an @opened event on the modal
         },
 
         editConfirmed() {
