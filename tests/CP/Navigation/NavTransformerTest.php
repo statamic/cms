@@ -53,6 +53,7 @@ class NavTransformerTest extends TestCase
                             'action' => '@create',
                             'display' => 'Custom Item',
                             'url' => '/custom-item',
+                            'icon' => 'custom',
                         ],
                     ],
                 ],
@@ -65,6 +66,7 @@ class NavTransformerTest extends TestCase
                     'action' => '@create',
                     'display' => 'Custom Item',
                     'url' => '/custom-item',
+                    'icon' => 'custom',
                 ],
             ],
         ];
@@ -449,6 +451,7 @@ class NavTransformerTest extends TestCase
                         'manipulations' => [
                             'action' => '@modify',
                             'display' => 'Favourite Collections',
+                            'icon' => 'favourite',
                         ],
                     ],
                     [
@@ -474,6 +477,7 @@ class NavTransformerTest extends TestCase
                 'content::collections' => [
                     'action' => '@modify',
                     'display' => 'Favourite Collections',
+                    'icon' => 'favourite',
                 ],
                 'content::taxonomies' => [
                     'action' => '@modify',
@@ -1209,7 +1213,7 @@ class NavTransformerTest extends TestCase
     /** @test */
     public function it_can_transform_complex_json_payload_copied_from_actual_vue_submission()
     {
-        $transformed = $this->transform(json_decode('[{"display":"Top Level","display_original":"Top Level","action":false,"items":[{"id":"top_level::dashboard","manipulations":[],"children":[]},{"id":"content::collections::posts","manipulations":{"action":"@alias"},"children":[]},{"id":"tools::updates","manipulations":{"action":"@move"},"children":[]},{"id":"new_top_level_item","manipulations":{"action":"@create","display":"New Top Level Item","url":"\/new-top-level-item"},"children":[{"id":"new_child_item","manipulations":{"action":"@create","display":"New Child Item","url":"\/new-child-item"},"children":[]}]}]},{"display":"Fields","display_original":"Fields","action":false,"items":[{"id":"fields::blueprints","manipulations":{"display":"Blueprints Renamed","action":"@modify"},"children":[]},{"id":"fields::fieldsets","manipulations":[],"children":[]}]},{"display":"Content Renamed","display_original":"Content","action":false,"items":[{"id":"content::collections::pages","manipulations":{"action":"@move"},"children":[]},{"id":"content::collections","manipulations":{"action":"@modify"},"children":[{"id":"content::collections::posts","manipulations":{"display":"Posterinos","action":"@modify"},"children":[]}]},{"id":"content::navigation","manipulations":[],"children":[{"id":"content::navigation::nav_test","manipulations":[],"children":[]}]},{"id":"content::taxonomies","manipulations":[],"children":[]},{"id":"content::assets","manipulations":[],"children":[{"id":"content::assets::assets","manipulations":[],"children":[]},{"id":"content::assets::essthree","manipulations":[],"children":[]}]}]},{"display":"Custom Section","display_original":"Custom Section","action":"@create","items":[{"id":"custom_section::new_item","manipulations":{"action":"@create","display":"New Item","url":"\/new-item"},"children":[]},{"id":"content::taxonomies::tags","manipulations":{"action":"@move"},"children":[]},{"id":"content::globals","manipulations":{"action":"@move"},"children":[{"id":"content::globals::global","manipulations":[],"children":[]}]}]},{"display":"Tools","display_original":"Tools","action":false,"items":[{"id":"tools::forms","manipulations":[],"children":[{"id":"tools::forms::test","manipulations":[],"children":[]}]},{"id":"tools::addons","manipulations":[],"children":[]},{"id":"tools::utilities","manipulations":[],"children":[{"id":"tools::utilities::cache","manipulations":[],"children":[]},{"id":"tools::utilities::email","manipulations":[],"children":[]},{"id":"tools::utilities::licensing","manipulations":[],"children":[]},{"id":"tools::utilities::php_info","manipulations":[],"children":[]},{"id":"tools::utilities::search","manipulations":[],"children":[]}]}]},{"display":"Users","display_original":"Users","action":false,"items":[{"id":"users::users","manipulations":[],"children":[]},{"id":"users::groups","manipulations":[],"children":[]},{"id":"users::permissions","manipulations":[],"children":[{"id":"users::permissions::author","manipulations":[],"children":[]},{"id":"users::permissions::not_social_media_manager","manipulations":[],"children":[]},{"id":"users::permissions::social_media_manager","manipulations":[],"children":[]}]}]}]', true));
+        $transformed = $this->transform(json_decode('[{"display":"Top Level","display_original":"Top Level","action":false,"items":[{"id":"top_level::dashboard","manipulations":[],"children":[]},{"id":"content::collections::posts","manipulations":{"action":"@alias"},"children":[]},{"id":"tools::updates","manipulations":{"action":"@move"},"children":[]},{"id":"new_top_level_item","manipulations":{"action":"@create","display":"New Top Level Item","url":"\/new-top-level-item","icon":"custom"},"children":[{"id":"new_child_item","manipulations":{"action":"@create","display":"New Child Item","url":"\/new-child-item"},"children":[]}]}]},{"display":"Fields","display_original":"Fields","action":false,"items":[{"id":"fields::blueprints","manipulations":{"display":"Blueprints Renamed","action":"@modify"},"children":[]},{"id":"fields::fieldsets","manipulations":[],"children":[]}]},{"display":"Content Renamed","display_original":"Content","action":false,"items":[{"id":"content::collections::pages","manipulations":{"action":"@move"},"children":[]},{"id":"content::collections","manipulations":{"action":"@modify"},"children":[{"id":"content::collections::posts","manipulations":{"display":"Posterinos","action":"@modify"},"children":[]}]},{"id":"content::navigation","manipulations":[],"children":[{"id":"content::navigation::nav_test","manipulations":[],"children":[]}]},{"id":"content::taxonomies","manipulations":[],"children":[]},{"id":"content::assets","manipulations":[],"children":[{"id":"content::assets::assets","manipulations":[],"children":[]},{"id":"content::assets::essthree","manipulations":[],"children":[]}]}]},{"display":"Custom Section","display_original":"Custom Section","action":"@create","items":[{"id":"custom_section::new_item","manipulations":{"action":"@create","display":"New Item","url":"\/new-item"},"children":[]},{"id":"content::taxonomies::tags","manipulations":{"action":"@move"},"children":[]},{"id":"content::globals","manipulations":{"action":"@move"},"children":[{"id":"content::globals::global","manipulations":[],"children":[]}]}]},{"display":"Tools","display_original":"Tools","action":false,"items":[{"id":"tools::forms","manipulations":[],"children":[{"id":"tools::forms::test","manipulations":[],"children":[]}]},{"id":"tools::addons","manipulations":[],"children":[]},{"id":"tools::utilities","manipulations":[],"children":[{"id":"tools::utilities::cache","manipulations":[],"children":[]},{"id":"tools::utilities::email","manipulations":[],"children":[]},{"id":"tools::utilities::licensing","manipulations":[],"children":[]},{"id":"tools::utilities::php_info","manipulations":[],"children":[]},{"id":"tools::utilities::search","manipulations":[],"children":[]}]}]},{"display":"Users","display_original":"Users","action":false,"items":[{"id":"users::users","manipulations":[],"children":[]},{"id":"users::groups","manipulations":[],"children":[]},{"id":"users::permissions","manipulations":[],"children":[{"id":"users::permissions::author","manipulations":[],"children":[]},{"id":"users::permissions::not_social_media_manager","manipulations":[],"children":[]},{"id":"users::permissions::social_media_manager","manipulations":[],"children":[]}]}]}]', true));
 
         $expected = [
             'reorder' => true,
@@ -1221,6 +1225,7 @@ class NavTransformerTest extends TestCase
                         'action' => '@create',
                         'display' => 'New Top Level Item',
                         'url' => '/new-top-level-item',
+                        'icon' => 'custom',
                         'children' => [
                             'top_level::new_top_level_item::new_child_item' => [
                                 'action' => '@create',
