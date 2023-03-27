@@ -1,5 +1,6 @@
 import { tidy_url } from '../bootstrap/globals'
-import { data_get, data_set, data_delete } from '../bootstrap/globals'
+import { data_get } from '../bootstrap/globals'
+import { data_set } from '../bootstrap/globals'
 
 test('it tidies urls', () => {
     expect(tidy_url('foo/bar')).toBe('foo/bar');

@@ -1,5 +1,6 @@
 import { clone } from  '../../bootstrap/globals.js'
-import { data_get, data_set } from  '../../bootstrap/globals.js'
+import { data_get } from  '../../bootstrap/globals.js'
+import { data_set } from  '../../bootstrap/globals.js'
 import isObject from 'underscore/modules/isObject.js'
 
 function data_delete(obj, path) {
