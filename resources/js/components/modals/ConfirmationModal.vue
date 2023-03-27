@@ -1,5 +1,5 @@
 <template>
-    <modal name="confirmation-modal" :pivotY="0.1" :overflow="false">
+    <modal name="confirmation-modal" :pivotY="0.1" :overflow="false" @opened="$emit('opened')">
         <div class="confirmation-modal flex flex-col h-full">
             <header v-if="title" class="text-lg font-semibold p-5 pb-0 flex items-center justify-between">
                 {{ __(title) }}

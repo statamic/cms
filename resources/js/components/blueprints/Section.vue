@@ -21,6 +21,7 @@
 
             <confirmation-modal
                 v-if="editingSection"
+                @opened="$refs.displayInput.focus()"
                 @confirm="editConfirmed"
                 @cancel="editCancelled"
             >
@@ -164,12 +165,6 @@ export default {
 
         deleteField(i) {
             this.section.fields.splice(i, 1);
-        },
-
-        focus() {
-            if (this.$refs.displayInput) {
-                this.$refs.displayInput.select();
-            }
         },
 
         edit() {
