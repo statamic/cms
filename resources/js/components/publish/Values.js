@@ -1,6 +1,5 @@
 import { clone } from  '../../bootstrap/globals.js'
-import { data_get } from  '../../bootstrap/globals.js'
-import { data_set } from  '../../bootstrap/globals.js'
+import { data_get, data_set, data_delete } from  '../../bootstrap/globals.js'
 import isObject from 'underscore/modules/isObject.js'
 
 export default class Values {
@@ -73,11 +72,10 @@ export default class Values {
         if (this.missingValue(dottedKey)) return;
 
         let values = clone(this.values);
-        let jsPath = this.dottedKeyToJsPath('values.' + dottedKey);
-        let fieldValue = eval(jsPath);
+        let fieldValue = data_get(values, dottedKey);
         let decodedFieldValue = JSON.parse(fieldValue);
 
-        eval(jsPath + ' = decodedFieldValue');
+        data_set(values, dottedKey, decodedFieldValue);
 
         this.values = values;
     }
@@ -86,11 +84,10 @@ export default class Values {
         if (this.missingValue(dottedKey)) return;
 
         let values = clone(this.values);
-        let jsPath = this.dottedKeyToJsPath('values.' + dottedKey);
-        let fieldValue = eval(jsPath);
+        let fieldValue = data_get(values, dottedKey);
         let encodedFieldValue = JSON.stringify(fieldValue);
 
-        eval(jsPath + ' = encodedFieldValue');
+        data_set(values, dottedKey, encodedFieldValue);
 
         this.values = values;
     }
@@ -113,9 +110,8 @@ export default class Values {
         if (this.missingValue(dottedKey)) return;
 
         let values = clone(this.values);
-        let jsPath = this.dottedKeyToJsPath('values.' + dottedKey);
 
-        eval('delete ' + jsPath);
+        data_delete(values, dottedKey);
 
         this.values = values;
     }

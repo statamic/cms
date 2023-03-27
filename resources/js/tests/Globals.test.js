@@ -1,6 +1,5 @@
 import { tidy_url } from '../bootstrap/globals'
-import { data_get } from '../bootstrap/globals'
-import { data_set } from '../bootstrap/globals'
+import { data_get, data_set, data_delete } from '../bootstrap/globals'
 
 test('it tidies urls', () => {
     expect(tidy_url('foo/bar')).toBe('foo/bar');
@@ -76,4 +75,53 @@ test('it_can_set_value_to_data_using_dotted_path', () => {
     };
 
     expect(data).toStrictEqual(expected);
+});
+
+test('it_can_delete_value_from_data_using_dotted_path', () => {
+    let data = {
+        foo: 'alpha',
+        nested: {
+            foo: 'beta',
+            array_value: [
+                {foo: 'charlie'},
+                {foo: 'delta'},
+            ],
+        },
+    };
+
+    data_delete(data, 'nested.array_value.1.foo');
+
+    expect(data).toStrictEqual({
+        foo: 'alpha',
+        nested: {
+            foo: 'beta',
+            array_value: [
+                {foo: 'charlie'},
+                {},
+            ],
+        },
+    });
+
+    data_delete(data, 'foo');
+
+    expect(data).toStrictEqual({
+        nested: {
+            foo: 'beta',
+            array_value: [
+                {foo: 'charlie'},
+                {},
+            ],
+        },
+    });
+
+    data_delete(data, 'nested.foo');
+
+    expect(data).toStrictEqual({
+        nested: {
+            array_value: [
+                {foo: 'charlie'},
+                {},
+            ],
+        },
+    });
 });
