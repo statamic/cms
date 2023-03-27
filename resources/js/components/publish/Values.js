@@ -1,6 +1,17 @@
 import { clone } from  '../../bootstrap/globals.js'
-import { data_get, data_set, data_delete } from  '../../bootstrap/globals.js'
+import { data_get, data_set } from  '../../bootstrap/globals.js'
 import isObject from 'underscore/modules/isObject.js'
+
+function data_delete(obj, path) {
+    var parts = path.split('.');
+    while (parts.length - 1) {
+        var key = parts.shift();
+        var shouldBeArray = parts.length ? new RegExp('^[0-9]+$').test(parts[0]) : false;
+        if (! (key in obj)) obj[key] = shouldBeArray ? [] : {};
+        obj = obj[key];
+    }
+    delete obj[parts[0]];
+}
 
 export default class Values {
     constructor(values, jsonFields) {

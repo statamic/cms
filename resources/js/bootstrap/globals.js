@@ -46,18 +46,6 @@ export function data_set(obj, path, value) {
     obj[parts[0]] = value;
 };
 
-export function data_delete(obj, path) {
-    var parts = path.split('.');
-    while (parts.length - 1) {
-        var key = parts.shift();
-        var shouldBeArray = parts.length ? new RegExp('^[0-9]+$').test(parts[0]) : false;
-        if (! (key in obj)) obj[key] = shouldBeArray ? [] : {};
-        obj = obj[key];
-    }
-    if (Array.isArray(obj)) throw new Error('Cannot delete an array key');
-    delete obj[parts[0]];
-}
-
 export function clone(value) {
     if (value === undefined) return undefined;
 
