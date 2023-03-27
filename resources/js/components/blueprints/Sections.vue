@@ -21,7 +21,7 @@
             />
 
             <div class="blueprint-add-section-container w-full">
-                <button class="blueprint-add-section-button outline-none" @click="addSection">
+                <button class="blueprint-add-section-button outline-none" @click="addAndEditSection">
                     <div class="text-center flex items-center leading-none">
                         <svg-icon name="micro-plus" class="h-3 w-3 mr-2" />
                         <div v-text="addSectionText" />
@@ -112,6 +112,14 @@ export default {
             this.sections.push(section);
 
             return section;
+        },
+
+        addAndEditSection() {
+            const section = this.addSection();
+
+            this.$nextTick(() => {
+                this.$refs.section.find(vm => vm.section._id === section._id).edit();
+            });
         },
 
         deleteSection(i) {
