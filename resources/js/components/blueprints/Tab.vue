@@ -11,6 +11,8 @@
         @click="$emit('selected')"
         @mouseenter="$emit('mouseenter')"
     >
+        <svg-icon v-if="tab.icon" :name="`plump/${tab.icon}`" class="w-4 h-4 mr-1" />
+
         {{ tab.display }}
 
         <dropdown-list v-if="isActive" ref="dropdown" placement="bottom-start" class="text-left">
@@ -20,7 +22,8 @@
 
         <confirmation-modal
             v-if="editing"
-            :title="__('Edit Tab')"
+            :title="editText"
+            @opened="$refs.title.focus()"
             @confirm="editConfirmed"
             @cancel="editCancelled"
         >
@@ -46,6 +49,17 @@
                         @input="fieldUpdated('instructions', $event.target.value)"
                         class="input-text text-sm" />
                 </div>
+
+                <div class="form-group w-full" v-if="showInstructions">
+                    <label v-text="__('Icon')" />
+                    <publish-field-meta
+                        :config="{ handle: 'icon', type: 'icon', folder: 'plump' }"
+                        :initial-value="icon"
+                        v-slot="{ meta, value, loading }"
+                    >
+                        <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="fieldUpdated('icon', $event)" />
+                    </publish-field-meta>
+                </div>
             </div>
         </confirmation-modal>
     </button>
@@ -68,6 +82,9 @@ export default {
             type: Boolean,
             default: false,
         },
+        editText: {
+            type: String,
+        }
     },
 
     data() {
@@ -75,6 +92,7 @@ export default {
             handle: this.tab.handle,
             display: this.tab.display,
             instructions: this.tab.instructions,
+            icon: this.tab.icon,
             editing: false,
             handleSyncedWithDisplay: false,
         }
@@ -100,7 +118,6 @@ export default {
 
         edit() {
             this.editing = true;
-            setTimeout(() => this.$refs.title.focus(), 100); // better as an @opened event on the modal
         },
 
         editConfirmed() {
@@ -108,6 +125,8 @@ export default {
                 ...this.tab,
                 handle: this.handle,
                 display: this.display,
+                instructions: this.instructions,
+                icon: this.icon,
             });
             this.editing = false;
         },

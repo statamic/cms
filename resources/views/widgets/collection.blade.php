@@ -3,7 +3,7 @@
         <h2>
             <a class="flex items-center" href="{{ $collection->showUrl() }}">
                 <div class="h-6 w-6 mr-2 text-gray-800">
-                    @cp_svg('content-writing')
+                    @cp_svg('icons/default/content-writing')
                 </div>
                 <span>{{ $title }}</span>
             </a>

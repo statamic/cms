@@ -9,6 +9,7 @@
                     :tab="tab"
                     :current-tab="currentTab"
                     :show-instructions="showTabInstructionsField"
+                    :edit-text="editTabText"
                     @selected="selectTab(tab._id)"
                     @removed="removeTab(tab._id)"
                     @updated="updateTab(tab._id, $event)"
@@ -30,6 +31,7 @@
             v-show="currentTab === tab._id"
             :show-section-handle-field="showSectionHandleField"
             :new-section-text="newSectionText"
+            :edit-section-text="editSectionText"
             :add-section-text="addSectionText"
             @updated="updateTab(tab._id, $event)"
         />
@@ -59,12 +61,19 @@ export default {
         addSectionText: {
             type: String,
         },
+        editSectionText: {
+            type: String,
+        },
         newSectionText: {
             type: String,
         },
         addTabText: {
             type: String,
             default: () => __('Add Tab')
+        },
+        editTabText: {
+            type: String,
+            default: () => __('Edit Tab')
         },
         newTabText: {
             type: String,
@@ -260,6 +269,8 @@ export default {
                 _id: id,
                 display: this.newTabText,
                 handle: this.$slugify(this.newTabText, '_'),
+                instructions: null,
+                icon: null,
                 sections: []
             });
 

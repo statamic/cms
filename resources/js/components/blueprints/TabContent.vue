@@ -9,6 +9,7 @@
             :initial-sections="tab.sections"
             :new-section-text="newSectionText"
             :add-section-text="addSectionText"
+            :edit-section-text="editSectionText"
             :show-section-handle-field="showSectionHandleField"
             @updated="sectionsUpdated($event)"
         />
@@ -33,6 +34,9 @@ export default {
             default: false,
         },
         addSectionText: {
+            type: String,
+        },
+        editSectionText: {
             type: String,
         },
         newSectionText: {

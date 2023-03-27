@@ -38,12 +38,14 @@ class Sets extends Fieldtype
                 'handle' => $groupHandle,
                 'display' => $group['display'] ?? null,
                 'instructions' => $group['instructions'] ?? null,
+                'icon' => $group['icon'] ?? null,
                 'sections' => collect($group['sets'] ?? [])->map(function ($set, $setHandle) use ($groupId) {
                     return [
                         '_id' => $setId = $groupId.'-section-'.$setHandle,
                         'handle' => $setHandle,
                         'display' => $set['display'] ?? null,
                         'instructions' => $set['instructions'] ?? null,
+                        'icon' => $set['icon'] ?? null,
                         'fields' => collect($set['fields'])->map(function ($field, $i) use ($setId) {
                             return array_merge(FieldTransformer::toVue($field), ['_id' => $setId.'-'.$i]);
                         })->all(),
@@ -99,11 +101,13 @@ class Sets extends Fieldtype
                 $tab['handle'] => [
                     'display' => $tab['display'],
                     'instructions' => $tab['instructions'] ?? null,
+                    'icon' => $tab['icon'] ?? null,
                     'sets' => collect($tab['sections'])->mapWithKeys(function ($section) {
                         return [
                             $section['handle'] => [
                                 'display' => $section['display'],
                                 'instructions' => $section['instructions'] ?? null,
+                                'icon' => $section['icon'] ?? null,
                                 'fields' => collect($section['fields'])->map(function ($field) {
                                     return FieldTransformer::fromVue($field);
                                 })->all(),
