@@ -11,6 +11,8 @@
         @click="$emit('selected')"
         @mouseenter="$emit('mouseenter')"
     >
+        <svg-icon v-if="tab.icon" :name="`plump/${tab.icon}`" class="w-4 h-4 mr-1" />
+
         {{ tab.display }}
 
         <dropdown-list v-if="isActive" ref="dropdown" placement="bottom-start" class="text-left">
