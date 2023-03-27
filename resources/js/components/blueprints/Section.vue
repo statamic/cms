@@ -5,6 +5,7 @@
 
             <div class="bg-gray-200 border-b text-sm flex rounded-t">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
+                <!--
                 <div class="p-3 py-2 flex-1">
                     <span class="font-medium mr-2">
                         <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" :placeholder="`${__('Title')} (${__('Optional')})`" />
@@ -18,7 +19,7 @@
 
                     <div v-if="showHandleField">
                         <publish-field-meta
-                            :config="{ handle: 'icon', type: 'icon' }"
+                            :config="{ handle: 'icon', type: 'icon', folder: 'plump' }"
                             :initial-value="section.icon"
                             v-slot="{ meta, value, loading }"
                         >
@@ -26,8 +27,17 @@
                         </publish-field-meta>
                     </div>
                 </div>
-                <div class="flex items-center px-3">
-                    <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-600 hover:text-gray-950">
+                -->
+                <div class="p-2 flex-1 flex items-center">
+                    <div class="flex items-center flex-1">
+                        <!-- if showing icon -->
+                        <svg-icon class="h-4 w-4 mr-2 text-gray-700" :name="section.icon ?? 'folder-generic'" />
+                        <div class="mr-2" v-text="section.display"></div>
+                    </div>
+                    <button class="flex items-center text-gray-700 hover:text-gray-950 mr-3">
+                        <svg-icon class="h-4 w-4" name="pencil" />
+                    </button>
+                    <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-700 hover:text-gray-950">
                         <svg-icon class="h-4 w-4" name="trash" />
                     </button>
                 </div>
