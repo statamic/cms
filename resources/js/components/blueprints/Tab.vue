@@ -50,7 +50,7 @@
                 <div class="form-group w-full" v-if="showInstructions">
                     <label v-text="__('Icon')" />
                     <publish-field-meta
-                        :config="{ handle: 'icon', type: 'icon' }"
+                        :config="{ handle: 'icon', type: 'icon', folder: 'plump' }"
                         :initial-value="icon"
                         v-slot="{ meta, value, loading }"
                     >
