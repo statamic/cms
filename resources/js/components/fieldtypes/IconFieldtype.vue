@@ -4,7 +4,7 @@
             ref="input"
             class="w-full"
             :name="name"
-            :clearable="false"
+            clearable
             :disabled="config.disabled || isReadOnly"
             :options="options"
             :placeholder="config.placeholder || 'Search ...'"
