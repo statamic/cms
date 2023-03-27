@@ -21,6 +21,7 @@
 
             <confirmation-modal
                 v-if="editingSection"
+                :title="__('Edit Set')"
                 @opened="$refs.displayInput.focus()"
                 @confirm="editConfirmed"
                 @cancel="editCancelled"
