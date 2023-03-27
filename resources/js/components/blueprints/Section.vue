@@ -25,7 +25,7 @@
                 @confirm="editConfirmed"
                 @cancel="editCancelled"
             >
-                <div class="publish-fields @container">
+                <div class="publish-fields">
                     <div class="form-group w-full">
                         <label v-text="__('Display')" />
                         <input ref="displayInput" type="text" class="input-text" v-model="editingSection.display" />
