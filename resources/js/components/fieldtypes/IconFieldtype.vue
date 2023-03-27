@@ -11,7 +11,7 @@
             :searchable="true"
             :multiple="false"
             :close-on-select="true"
-            :value="this.value"
+            :value="selectedOption"
             :create-option="(value) => ({ value, label: value })"
             @input="vueSelectUpdated"
             @search:focus="$emit('focus')"
@@ -40,7 +40,7 @@ export default {
     mixins: [Fieldtype],
 
     computed: {
-          options() {
+        options() {
             let options = [];
             for (let [name, html] of Object.entries(this.meta.icons)) {
                 options.push({
@@ -50,6 +50,10 @@ export default {
                 });
             }
             return options;
+        },
+
+        selectedOption() {
+            return this.options.find(option => option.value === this.value);
         }
     },
 
