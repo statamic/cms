@@ -9,8 +9,8 @@ button {
 /*  Base button styles that shouldn't need overriding */
 [class^="btn"], [class*=" btn"] {
     @apply cursor-pointer select-none h-auto rounded relative;
-    @apply leading-normal inline-block align-middle whitespace-nowrap;
-    @apply text-center text-sm subpixel-antialiased;
+    @apply leading-none inline-flex align-middle whitespace-nowrap;
+    @apply text-center text-sm subpixel-antialiased items-center;
 
     height: 2.375rem; /*  38px */
     letter-spacing: -0.01em;
