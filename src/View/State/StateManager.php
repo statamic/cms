@@ -3,6 +3,7 @@
 namespace Statamic\View\State;
 
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 
 class StateManager
 {
@@ -38,6 +39,8 @@ class StateManager
     public static function resetState()
     {
         GlobalRuntimeState::resetGlobalState();
+
+        RuntimeParser::resetStaticState();
 
         foreach (self::$resetsState as $className => $throwAway) {
             $className::resetStaticState();
