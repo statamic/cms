@@ -202,7 +202,7 @@
    ========================================================================== */
 
 .bard-fullscreen {
-    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none;
+    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none pt-16;
     z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
                 /*  too high and it'll be over the top of stacks, etc. */
 
@@ -211,7 +211,7 @@
     }
 
     .bard-fixed-toolbar {
-        @apply shadow h-12;
+        @apply shadow h-12 fixed w-full;
         padding: 7px 8px;
         top: 0;
         z-index: 999;
