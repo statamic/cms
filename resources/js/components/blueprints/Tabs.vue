@@ -22,7 +22,7 @@
                 <svg-icon name="add-bold" class="w-3 h-3" />
             </button>
         </div>
-        <button class="btn" @click="addAndEditTab" v-text="addTabText" v-else></button>
+        <button class="btn" @click="addAndEditTab" v-text="addTabText" v-else-if="!singleTab"></button>
         <tab-content
             v-for="tab in tabs"
             ref="tabContent"
