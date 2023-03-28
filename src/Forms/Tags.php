@@ -63,6 +63,7 @@ class Tags extends BaseTags
 
         $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
 
+        $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
         $data['fields'] = $this->getFields($this->sessionHandle(), $jsDriver);
         $data['honeypot'] = $form->honeypot();
 
@@ -210,15 +211,41 @@ class Tags extends BaseTags
     }
 
     /**
-     * Get fields with extra data for looping over and rendering.
+     * Get sections of fields, using sections defined in blueprint.
      *
      * @param  string  $sessionHandle
      * @param  JsDriver  $jsDriver
      * @return array
      */
-    protected function getFields($sessionHandle, $jsDriver)
+    protected function getSections($sessionHandle, $jsDriver)
     {
-        return $this->form()->fields()
+        // TODO: Add blueprint helper method for this?
+        $sections = $this->form()->blueprint()->contents()['tabs']['main']['sections'];
+
+        return collect($sections)
+            ->map(function ($section) use ($sessionHandle, $jsDriver) {
+                // TODO: Should this be done by blueprint helper method as well?
+                $fields = new \Statamic\Fields\Fields($section['fields']);
+
+                return [
+                    'display' => $section['display'],
+                    'fields' => $this->getFields($sessionHandle, $jsDriver, $fields->all()),
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * Get fields with extra data for looping over and rendering.
+     *
+     * @param  string  $sessionHandle
+     * @param  JsDriver  $jsDriver
+     * @param  array|null  $fields
+     * @return array
+     */
+    protected function getFields($sessionHandle, $jsDriver, $fields = null)
+    {
+        return collect($fields ?? $this->form()->fields())
             ->map(function ($field) use ($sessionHandle, $jsDriver) {
                 return $this->getRenderableField($field, $sessionHandle, function ($data, $field) use ($jsDriver) {
                     return $jsDriver
