@@ -18,13 +18,13 @@
                             class="warning"
                             @click="$refs[`deleter_${collection.id}`].confirm()"
                         >
-                            <resource-deleter
-                                :ref="`deleter_${collection.id}`"
-                                :resource="collection"
-                                @deleted="removeRow(collection)">
-                            </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>
+                    <resource-deleter
+                        :ref="`deleter_${collection.id}`"
+                        :resource="collection"
+                        @deleted="removeRow(collection)">
+                    </resource-deleter>
                 </template>
             </data-list-table>
         </div>

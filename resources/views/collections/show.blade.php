@@ -46,17 +46,18 @@
                 <dropdown-item :text="__('Scaffold Views')" redirect="{{ cp_route('collections.scaffold', $collection->handle()) }}"></dropdown-item>
             @endcan
             @can('delete', $collection)
-                <dropdown-item :text="__('Delete Collection')" class="warning" @click="$refs.deleter.confirm()">
-                    <resource-deleter
-                        ref="deleter"
-                        resource-title="{{ $collection->title() }}"
-                        route="{{ cp_route('collections.destroy', $collection->handle()) }}"
-                        redirect="{{ cp_route('collections.index') }}"
-                    ></resource-deleter>
-                </dropdown-item>
+                <dropdown-item :text="__('Delete Collection')" class="warning" @click="$refs.deleter.confirm()"></dropdown-item>
             @endcan
         </template>
         @endif
+        @can('delete', $collection)
+        <resource-deleter
+            ref="deleter"
+            resource-title="{{ $collection->title() }}"
+            route="{{ cp_route('collections.destroy', $collection->handle()) }}"
+            redirect="{{ cp_route('collections.index') }}"
+        ></resource-deleter>
+        @endcan
     </collection-view>
 
 @endsection

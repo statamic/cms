@@ -14,13 +14,13 @@
                             class="warning"
                             @click="$refs[`deleter_${structure.id}`].confirm()"
                         >
-                            <resource-deleter
-                                :ref="`deleter_${structure.id}`"
-                                :resource="structure"
-                                @deleted="removeRow(structure)">
-                            </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>
+                    <resource-deleter
+                        :ref="`deleter_${structure.id}`"
+                        :resource="structure"
+                        @deleted="removeRow(structure)">
+                    </resource-deleter>
                 </template>
             </data-list-table>
         </div>

@@ -21,15 +21,17 @@
                 @endcan
                 @can('delete', $taxonomy)
                     <dropdown-item :text="__('Delete Taxonomy')" class="warning" @click="$refs.deleter.confirm()">
-                        <resource-deleter
-                            ref="deleter"
-                            resource-title="{{ $taxonomy->title() }}"
-                            route="{{ cp_route('taxonomies.destroy', $taxonomy->handle()) }}"
-                            redirect="{{ cp_route('taxonomies.index') }}"
-                        ></resource-deleter>
                     </dropdown-item>
                 @endcan
             </dropdown-list>
+            @can('delete', $taxonomy)
+                <resource-deleter
+                    ref="deleter"
+                    resource-title="{{ $taxonomy->title() }}"
+                    route="{{ cp_route('taxonomies.destroy', $taxonomy->handle()) }}"
+                    redirect="{{ cp_route('taxonomies.index') }}"
+                ></resource-deleter>
+            @endcan
 
             @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
                 <create-term-button
