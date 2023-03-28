@@ -23,7 +23,7 @@
             <div class="p-1">
                 <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200': selectionIndex === i }" @mouseover="selectionIndex = i">
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
-                        <div class="h-10 w-10 rounded bg-white border border-gray-600 mr-2 p-2.5">
+                        <div class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2">
                             <svg-icon :name="item.icon ? `plump/${item.icon}` : 'folder-generic'" class="text-gray-800" />
                         </div>
                         <div class="flex-1">
@@ -33,7 +33,7 @@
                         <svg-icon name="chevron-right-thin" class="text-gray-600 group-hover:text-gray-800" />
                     </div>
                     <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
-                        <div class="h-10 w-10 rounded bg-white border border-gray-600 mr-2 p-1.5">
+                        <div class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2">
                             <svg-icon :name="item.icon ? `plump/${item.icon}` : 'add'" class="text-gray-800" />
                         </div>
                         <div class="flex-1">
