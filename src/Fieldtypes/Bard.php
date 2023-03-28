@@ -84,6 +84,12 @@ class Bard extends Replicator
                         'type' => 'toggle',
                         'default' => false,
                     ],
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
                     'allow_source' => [
                         'display' => __('Allow Source Mode'),
                         'instructions' => __('statamic::fieldtypes.bard.config.allow_source'),
