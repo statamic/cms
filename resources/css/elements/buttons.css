@@ -246,7 +246,7 @@ td .btn-icon {
   ========================================================================== */
 
 .btn-close {
-    @apply ml-4 p-0 text-xl text-gray-600 rounded-full w-8 h-8 outline-none shrink-0 leading-none;
+    @apply ml-4 text-center p-0 text-xl text-gray-600 rounded-full w-8 h-8 outline-none shrink-0 leading-none inline-flex items-center justify-center;
 
     &:hover {
         @apply bg-gray-400;
