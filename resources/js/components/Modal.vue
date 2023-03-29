@@ -61,10 +61,12 @@ export default {
 
     mounted() {
         this.modal = this.$modals.open(this.name);
+        this.$root.hideOverflow = true;
     },
 
     destroyed() {
         this.close();
+        this.$root.hideOverflow = false;
     },
 
     methods: {
