@@ -15,10 +15,13 @@
         <template #default>
             <div class="set-picker-header p-3 border-b text-xs flex items-center">
                 <input ref="search" type="text" class="py-1 px-2 border rounded w-full" :placeholder="__('Search Sets')" v-show="showSearch" v-model="search" />
-                <button v-show="showGroupBreadcrumb" @click="unselectGroup" class="text-gray-700 hover:text-gray-900">
-                    <svg-icon name="chevron-left" class="w-2 h-2 mx-1" />
-                    {{ selectedGroupDisplayText }}
-                </button>
+                <div v-if="showGroupBreadcrumb" class="flex items-center text-gray-700 font-medium">
+                    <button @click="unselectGroup" class=" hover:text-gray-900 ml-2.5 rounded">
+                        {{ __('Groups') }}
+                    </button>
+                    <svg-icon name="chevron-right" class="w-4 h-4" />
+                    <span>{{ selectedGroupDisplayText }}</span>
+                </div>
             </div>
             <div class="p-1">
                 <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200': selectionIndex === i }" @mouseover="selectionIndex = i">
