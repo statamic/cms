@@ -109,9 +109,7 @@ class Assets extends Fieldtype
     {
         $max_files = (int) $this->config('max_files');
 
-        $values = collect($data)->map(function ($id) {
-            return Asset::find($id)->path();
-        });
+        $values = collect($data)->map(fn ($id) => Asset::find($id))->filter()->map->path();
 
         return $this->config('max_files') === 1 ? $values->first() : $values->all();
     }
