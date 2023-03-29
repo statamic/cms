@@ -299,7 +299,11 @@ export default {
 
         autofocus() {
             if (this.linkType === 'url') {
-                this.$nextTick(() => { this.$refs.urlInput.focus() });
+                this.$nextTick(() => {
+                    setTimout(() => {
+                        this.$refs.urlInput.focus();
+                    }, 50);
+                });
             }
         },
 
