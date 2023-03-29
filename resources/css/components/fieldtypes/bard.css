@@ -211,7 +211,7 @@
     }
 
     .bard-fixed-toolbar {
-        @apply shadow h-12 fixed w-full;
+        @apply shadow h-12 fixed w-full bg-gradient-to-b from-white to-gray-100;
         padding: 7px 8px;
         top: 0;
         z-index: 999;
