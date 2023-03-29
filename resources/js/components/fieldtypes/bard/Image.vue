@@ -139,12 +139,10 @@ export default {
 
         openSelector() {
             this.showingSelector = true;
-            this.$root.hideOverflow = true;
         },
 
         closeSelector() {
             this.showingSelector = false;
-            this.$root.hideOverflow = false;
         },
 
         assetsSelected(selections) {
