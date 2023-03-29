@@ -213,9 +213,9 @@
                                          </dropdown-list>
                                     </div>
                                     <!-- Assets -->
-                                    <button class="asset-tile outline-none group relative" v-for="(asset, index) in assets" :key="asset.id" :class="{ 'selected': isSelected(asset.id) }" @click="toggleSelection(asset.id, index, $event)" @dblclick="$emit('edit-asset', asset)">
+                                    <button class="asset-tile outline-none group relative" v-for="(asset, index) in assets" :key="asset.id" :class="{ 'selected': isSelected(asset.id) }">
                                         <div class="asset-thumb-container">
-                                            <div class="asset-thumb">
+                                            <div class="asset-thumb" @click="toggleSelection(asset.id, index, $event)" @dblclick="$emit('edit-asset', asset)">
                                                 <img v-if="asset.is_image" :src="asset.thumbnail" loading="lazy" :class="{'p-4 h-full w-full': asset.extension === 'svg'}" />
                                                 <file-icon
                                                     v-else
@@ -227,7 +227,7 @@
                                         <div class="asset-meta">
                                             <div class="asset-filename px-2 py-1 text-center" v-text="asset.basename" :title="asset.basename" />
                                         </div>
-                                        <dropdown-list autoclose class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
+                                        <dropdown-list class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
                                              <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                              <div class="divider" v-if="asset.actions.length" />
                                              <data-list-inline-actions
