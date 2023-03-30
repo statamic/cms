@@ -1,6 +1,6 @@
 <template>
 
-    <modal name="remove-page-confirmation" :pivotY="0.1" :overflow="false">
+    <modal name="remove-page-confirmation" :overflow="false">
         <div class="confirmation-modal flex flex-col h-full">
             <div class="text-lg font-medium p-4 pb-0">
                 {{ __('Remove Page') }}

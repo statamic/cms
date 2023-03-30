@@ -2,12 +2,15 @@
    MODALS
    ========================================================================== */
 
-.v--modal {
+.vm--modal {
     @apply rounded-lg !important;
 }
 
-.v--modal-overlay {
+.vm--container {
     z-index: 10000 !important;
+}
+
+.vm--overlay {
     background: hsla(210, 20%, 10%, .15) !important;
 }
 
@@ -15,6 +18,6 @@
     @apply p-0 mb-6;
 }
 
-.v--modal-overlay.disable-overflow .v--modal {
-    overflow: initial;
+.vm--container.disable-overflow .vm--modal {
+    overflow: initial !important;
 }

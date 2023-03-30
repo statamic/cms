@@ -16,6 +16,11 @@
         {{ tab.display }}
 
         <dropdown-list v-if="isActive" ref="dropdown" placement="bottom-start" class="text-left">
+            <template #trigger>
+                <button class="ml-2 hover:text-gray-900 active:text-gray-900" :aria-label="__('Open Dropdown')">
+                    <svg-icon name="chevron-down-xs" class="w-2" />
+                </button>
+            </template>
             <dropdown-item @click="edit" v-text="__('Edit')" />
             <dropdown-item @click="remove" class="warning" v-text="__('Delete')" />
         </dropdown-list>

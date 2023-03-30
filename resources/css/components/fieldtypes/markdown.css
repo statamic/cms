@@ -195,15 +195,14 @@
 }
 
 .markdown-fieldtype-wrapper.markdown-fullscreen {
-    @apply fixed bg-white inset-0 h-screen rounded-none;
-    padding-top: 52px; /*  offset the nav */
+    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none pt-16;
+    /* padding-top: 52px;  offset the nav */
     z-index: 998;
     will-change: transform;
 
     .markdown-toolbar {
-        @apply fixed top-0 w-full px-6 py-2 h-13 shadow text-base flex items-center justify-between;
-        background: linear-gradient(180deg, #fff, #f9fafb);
-        border-bottom: 1px solid #c4cdd6;
+        @apply fixed top-0 w-full px-6 py-2 h-12 shadow text-base flex items-center justify-between;
+        @apply bg-gradient-to-b from-white to-gray-100;
     }
 
     .mode-wrap {
@@ -215,11 +214,18 @@
         }
     }
 
-    .CodeMirror {
-        @apply max-w-xl bg-transparent mx-auto relative p-8 shadow-none text-base;
+    .editor {
+        @apply bg-white shadow max-w-xl mx-auto rounded relative my-6 px-2 md:px-8 md:pt-8;
 
         .CodeMirror-scroll {
             @apply m-0;
+        }
+    }
+
+    .CodeMirror {
+        @apply outline-none bg-transparent shadow-none;
+        &:focus, &:focus-within {
+            @apply ring-0 !important;
         }
     }
 

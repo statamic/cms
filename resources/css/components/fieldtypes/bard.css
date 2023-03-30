@@ -40,9 +40,7 @@
 }
 
 .bard-fixed-toolbar {
-    @apply bg-white shadow-none rounded-t border-b text-sm flex items-start justify-between px-1 py-2 z-5 top-0;
-    /* position: sticky; */
-
+    @apply bg-white shadow-none rounded-t border-b text-sm flex items-start justify-between p-1 z-5 top-0;
 
     .bard-toolbar-button {
         @apply text-gray-800 rounded px-1 flex text-center justify-center items-center text-base h-8 w-8 m-0;
@@ -202,7 +200,7 @@
    ========================================================================== */
 
 .bard-fullscreen {
-    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none;
+    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none pt-16;
     z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
                 /*  too high and it'll be over the top of stacks, etc. */
 
@@ -211,7 +209,7 @@
     }
 
     .bard-fixed-toolbar {
-        @apply shadow h-12;
+        @apply shadow h-12 fixed w-full bg-gradient-to-b from-white to-gray-100;
         padding: 7px 8px;
         top: 0;
         z-index: 999;
@@ -499,20 +497,6 @@
   ========================================================================== */
 
   .bard-link-toolbar {
-    /* @apply bg-white rounded absolute leading-none shadow mt-2;
-    z-index: 100;
-    width: 300px;
-    top: 100%;
-    right: 0; */
-
-    /* &:before {
-        content: '';
-        border: 6px solid transparent;
-        border-bottom-color: white;
-        position: absolute;
-        bottom: 100%;
-        left: 10px;
-    } */
 
     .input {
         @apply p-0 text-xs h-8 bg-transparent shadow-none border-none;
