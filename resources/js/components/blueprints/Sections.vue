@@ -117,7 +117,7 @@ export default {
         makeFieldsSortable() {
             if (sortableFields) sortableFields.destroy();
 
-            sortableFields = new Sortable(document.querySelectorAll('.blueprint-section-draggable-zone'), {
+            sortableFields = new Sortable(this.$el.querySelectorAll('.blueprint-section-draggable-zone'), {
                 draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true },
