@@ -5,13 +5,12 @@
         </div>
 
         <portal
-            v-if="isOpen"
             :to="portalTargetName"
             :target-class="`popover-container ${targetClass || ''}`"
         >
         <provider :variables="provide">
-            <div :class="`${isOpen ? 'popover-open' : ''}`" v-on-clickaway="clickawayClose">
-                <div ref="popover" class="popover" v-if="!disabled">
+            <div :class="`${isOpen ? 'popover-open' : ''}`">
+                <div ref="popover" class="popover" v-if="!disabled" v-on-clickaway="clickawayClose">
                     <div class="popover-content bg-white shadow-popover rounded-md">
                         <slot :close="close" />
                     </div>
@@ -123,8 +122,15 @@ export default {
             });
         },
 
-        clickawayClose() {
-            if (this.clickaway) this.close();
+        clickawayClose(e) {
+            // If disabled or closed, do nothing.
+            if (! this.clickaway || ! this.isOpen) return;
+
+            // If clicking within the popover, or inside the trigger, do nothing.
+            // These need to be checked separately, because the popover contents away.
+            if (this.$refs.popover.contains(e.target) || this.$el.contains(e.target)) return;
+
+            this.close();
         },
 
         close() {
