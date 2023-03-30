@@ -155,7 +155,7 @@ export default {
         makeSectionsSortable() {
             if (sortableSections) sortableSections.destroy();
 
-            sortableSections = new Sortable(document.querySelectorAll('.blueprint-sections'), {
+            sortableSections = new Sortable(this.$el.querySelectorAll('.blueprint-sections'), {
                 draggable: '.blueprint-section',
                 handle: '.blueprint-section-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
