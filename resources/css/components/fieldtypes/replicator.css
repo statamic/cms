@@ -64,6 +64,10 @@
 .replicator-fieldtype {
     @apply py-6 px-0 bg-gray-200 border-t border-b;
 
+    &:first-child {
+        @apply border-t-0;
+    }
+
     > .field-inner {
         @apply ml-6;
     }
