@@ -30,11 +30,10 @@ use Statamic\View\Antlers\Language\Parser\PathParser;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
-use Statamic\View\State\ResetsState;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
-class RuntimeParser implements Parser, ResetsState
+class RuntimeParser implements Parser
 {
     /**
      * The current DocumentParser instance.
@@ -124,11 +123,6 @@ class RuntimeParser implements Parser, ResetsState
         $this->nodeProcessor = $nodeProcessor;
         $this->antlersLexer = $lexer;
         $this->antlersParser = $antlersParser;
-    }
-
-    public static function resetStaticState()
-    {
-        self::$standardRenderNodeCache = [];
     }
 
     /**
