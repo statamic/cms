@@ -1183,7 +1183,7 @@ class NodeProcessor
                 }
 
                 if ($node instanceof AntlersNode) {
-                    if ($node->isNodeAbandoned) {
+                    if ($node->isAbandoned()) {
                         if ($this->isTracingEnabled()) {
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                         }
@@ -1668,7 +1668,7 @@ class NodeProcessor
                     }
 
                     if ($node->name->name == 'once') {
-                        $node->isNodeAbandoned = true;
+                        $node->abandon();
 
                         $results = $this->cloneProcessor()->setData($this->getActiveData())->reduce($node->children);
 
