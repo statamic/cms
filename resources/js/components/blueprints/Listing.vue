@@ -22,13 +22,13 @@
                             class="warning"
                             @click="$refs[`deleter_${blueprint.id}`].confirm()"
                         >
+                            <resource-deleter
+                                :ref="`deleter_${blueprint.id}`"
+                                :resource="blueprint"
+                                @deleted="removeRow(blueprint)">
+                            </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>
-                    <resource-deleter
-                        :ref="`deleter_${blueprint.id}`"
-                        :resource="blueprint"
-                        @deleted="removeRow(blueprint)">
-                    </resource-deleter>
                 </template>
             </data-list-table>
         </div>

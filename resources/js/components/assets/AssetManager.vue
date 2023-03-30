@@ -21,13 +21,13 @@
                     class="warning"
                     @click="$refs.deleter.confirm()"
                 >
+                    <resource-deleter
+                        ref="deleter"
+                        :resource-title="container.title"
+                        :route="container.delete_url">
+                    </resource-deleter>
                 </dropdown-item>
             </dropdown-list>
-            <resource-deleter
-                ref="deleter"
-                :resource-title="container.title"
-                :route="container.delete_url">
-            </resource-deleter>
 
             <a :href="createContainerUrl" class="btn ml-4" v-if="canCreateContainers">{{ __('Create Container') }}</a>
         </div>

@@ -17,13 +17,13 @@
                             class="warning"
                             @click="$refs[`deleter_${fieldset.id}`].confirm()"
                         >
+                            <resource-deleter
+                                :ref="`deleter_${fieldset.id}`"
+                                :resource="fieldset"
+                                @deleted="removeRow(fieldset)">
+                            </resource-deleter>
                         </dropdown-item>
                     </dropdown-list>
-                    <resource-deleter
-                        :ref="`deleter_${fieldset.id}`"
-                        :resource="fieldset"
-                        @deleted="removeRow(fieldset)">
-                    </resource-deleter>
                 </template>
             </data-list-table>
         </div>

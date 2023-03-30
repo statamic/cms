@@ -16,17 +16,16 @@
                     <dropdown-item :text="__('Edit User Group')" redirect="{{ $group->editUrl() }}"></dropdown-item>
                 @endcan
                 @can('delete', $group)
-                    <dropdown-item :text="__('Delete User Group')" class="warning" @click="$refs.deleter.confirm()"></dropdown-item>
+                    <dropdown-item :text="__('Delete User Group')" class="warning" @click="$refs.deleter.confirm()">
+                        <resource-deleter
+                            ref="deleter"
+                            resource-title="{{ $group->title() }}"
+                            route="{{ cp_route('user-groups.destroy', $group->handle()) }}"
+                            redirect="{{ cp_route('user-groups.index') }}"
+                        ></resource-deleter>
+                    </dropdown-item>
                 @endcan
             </dropdown-list>
-            @can('delete', $group)
-                <resource-deleter
-                    ref="deleter"
-                    resource-title="{{ $group->title() }}"
-                    route="{{ cp_route('user-groups.destroy', $group->handle()) }}"
-                    redirect="{{ cp_route('user-groups.index') }}"
-                ></resource-deleter>
-            @endcan
         </div>
     </header>
 
