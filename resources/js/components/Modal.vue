@@ -17,7 +17,8 @@ export default {
         adaptive: { type: Boolean, default: true },
         draggable: { type: Boolean, default: false },
         clickToClose: { type: Boolean, default: false },
-        pivotY: { type: Number, default: 0.1 },
+        shiftY: { type: Number, default: 0.1 },
+        focusTrap: {type: Boolean, default: true},
         height: { default: 'auto' },
         width: {},
         overflow: { type: Boolean, default: true},
@@ -40,7 +41,8 @@ export default {
                 clickToClose: this.clickToClose,
                 draggable: this.draggable,
                 height: this.height,
-                pivotY: this.pivotY,
+                shiftY: this.shiftY,
+                focusTrap: this.focusTrap,
                 width: this.width,
                 scrollable: this.scrollable,
             }
@@ -59,10 +61,12 @@ export default {
 
     mounted() {
         this.modal = this.$modals.open(this.name);
+        this.$root.hideOverflow = true;
     },
 
     destroyed() {
         this.close();
+        this.$root.hideOverflow = false;
     },
 
     methods: {

@@ -32,7 +32,7 @@
                         <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
                     </button>
                     <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
-                        <svg-icon name="shrink-all" class="w-4 h-4" v-show="fullScreenMode" />
+                        <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
                         <svg-icon name="expand-2" class="w-4 h-4" v-show="!fullScreenMode" />
                     </button>
             </div>

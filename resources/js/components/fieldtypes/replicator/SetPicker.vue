@@ -15,15 +15,18 @@
         <template #default>
             <div class="set-picker-header p-3 border-b text-xs flex items-center">
                 <input ref="search" type="text" class="py-1 px-2 border rounded w-full" :placeholder="__('Search Sets')" v-show="showSearch" v-model="search" />
-                <button v-show="showGroupBreadcrumb" @click="unselectGroup" class="text-gray-700 hover:text-gray-900">
-                    <svg-icon name="chevron-left" class="w-2 h-2 mx-1" />
-                    {{ selectedGroupDisplayText }}
-                </button>
+                <div v-if="showGroupBreadcrumb" class="flex items-center text-gray-700 font-medium">
+                    <button @click="unselectGroup" class=" hover:text-gray-900 ml-2.5 rounded">
+                        {{ __('Groups') }}
+                    </button>
+                    <svg-icon name="chevron-right" class="w-4 h-4" />
+                    <span>{{ selectedGroupDisplayText }}</span>
+                </div>
             </div>
             <div class="p-1">
                 <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200': selectionIndex === i }" @mouseover="selectionIndex = i">
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
-                        <div class="h-10 w-10 rounded bg-white border border-gray-600 mr-2 p-2.5">
+                        <div class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2">
                             <svg-icon :name="item.icon ? `plump/${item.icon}` : 'folder-generic'" class="text-gray-800" />
                         </div>
                         <div class="flex-1">
@@ -33,7 +36,7 @@
                         <svg-icon name="chevron-right-thin" class="text-gray-600 group-hover:text-gray-800" />
                     </div>
                     <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
-                        <div class="h-10 w-10 rounded bg-white border border-gray-600 mr-2 p-1.5">
+                        <div class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2">
                             <svg-icon :name="item.icon ? `plump/${item.icon}` : 'add'" class="text-gray-800" />
                         </div>
                         <div class="flex-1">

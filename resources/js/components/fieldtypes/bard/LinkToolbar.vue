@@ -19,7 +19,7 @@
             </div>
 
             <div class="px-4 py-4 border-b">
-                <div class="h-8 mb-4 p-2 border rounded border-gray-500 flex items-center hover:border-gray-600">
+                <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center">
 
                     <!-- URL input -->
                     <input
@@ -65,7 +65,7 @@
                 </div>
 
                 <!-- Title attribute -->
-                <div class="h-8 mb-4 p-2 border rounded border-gray-500 flex items-center hover:border-gray-600" >
+                <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
                     <input
                         type="text"
                         ref="input"
@@ -299,7 +299,11 @@ export default {
 
         autofocus() {
             if (this.linkType === 'url') {
-                this.$nextTick(() => { this.$refs.urlInput.focus() });
+                this.$nextTick(() => {
+                    setTimout(() => {
+                        this.$refs.urlInput.focus();
+                    }, 50);
+                });
             }
         },
 
