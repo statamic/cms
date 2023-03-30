@@ -5,7 +5,6 @@
         </div>
 
         <portal
-            v-if="isOpen"
             :to="portalTargetName"
             :target-class="`popover-container ${targetClass || ''}`"
         >
