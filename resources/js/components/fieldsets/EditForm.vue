@@ -32,7 +32,7 @@
             <h2 v-text="__('Fields')" />
         </div>
 
-        <div class="card" :class="{ 'pt-2': !fields.length }">
+        <div class="card @container" :class="{ 'pt-2': !fields.length }">
             <fields
                 :fields="fieldset.fields"
                 :editing-field="editingField"
