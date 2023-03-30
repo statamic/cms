@@ -14,13 +14,14 @@
                             :text="__('Delete')"
                             class="warning"
                             @click="$refs[`deleter_${taxonomy.id}`].confirm()"
-                        />
+                        >
+                            <resource-deleter
+                                :ref="`deleter_${taxonomy.id}`"
+                                :resource="taxonomy"
+                                @deleted="removeRow(taxonomy)">
+                            </resource-deleter>
+                        </dropdown-item>
                     </dropdown-list>
-                    <resource-deleter
-                        :ref="`deleter_${taxonomy.id}`"
-                        :resource="taxonomy"
-                        @deleted="removeRow(taxonomy)"
-                    ></resource-deleter>
                 </template>
             </data-list-table>
         </div>
