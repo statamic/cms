@@ -125,10 +125,10 @@ export default {
         },
 
         makeSortable() {
-            new Sortable(this.$el.querySelector('.blueprint-tab-draggable-zone'), {
-                draggable: '.blueprint-tab-field',
+            new Sortable(this.$el.querySelector('.blueprint-section-draggable-zone'), {
+                draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
-                mirror: { constrainDimensions: true },
+                mirror: { constrainDimensions: true, appendTo: 'body' },
                 plugins: [Plugins.SwapAnimation]
             }).on('sortable:stop', e => {
                 this.fieldset.fields.splice(e.newIndex, 0, this.fieldset.fields.splice(e.oldIndex, 1)[0]);
