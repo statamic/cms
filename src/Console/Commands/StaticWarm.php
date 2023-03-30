@@ -71,7 +71,7 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        $options = [
+        $client = new Client($options = [
             'verify' => ! $this->laravel->isLocal(),
             'auth' => $this->option('user') && $this->option('password')
                 ? [$this->option('user'), $this->option('password')]
@@ -79,8 +79,7 @@ class StaticWarm extends Command
             'headers' => $this->option('inertia')
                 ? ['X-Inertia' => 'true', 'X-Inertia-Version' => app(\Inertia\Middleware::class)->version(request())]
                 : null,
-        ];
-        $client = new Client($options);
+        ]);
 
         $this->output->newLine();
         $this->line('Compiling URLs...');
@@ -149,7 +148,9 @@ class StaticWarm extends Command
 
     private function requests()
     {
-        return $this->uris()->map(fn ($uri) => new Request('GET', $uri))->all();
+        return $this->uris()->map(function ($uri) {
+            return new Request('GET', $uri);
+        })->all();
     }
 
     private function uris(): Collection
