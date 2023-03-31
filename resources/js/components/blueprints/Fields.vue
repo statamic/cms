@@ -111,18 +111,14 @@ export default {
         fieldtypeSelected(field) {
             this.isSelectingNewFieldtype = false;
 
-            const handle = field.type;
-
             const pending = {
                 _id: uniqid(),
                 type: 'inline',
                 fieldtype: field.type,
                 icon: field.icon,
-                handle,
                 config: {
                     ...field,
                     isNew: true,
-                    handle
                 }
             };
 

@@ -209,8 +209,9 @@ export default {
             // and id keys. This will be 'field_n' etc, where n would be the total root
             // level, grid, or set fields depending on the event listener location.
             let field = {
-                display: `${fieldtype.title} ${__('Field')}`,
                 type: fieldtype.handle,
+                display: `${fieldtype.title} ${__('Field')}`,
+                handle: null, // The handle will be generated from the display by the "slug" fieldtype.
                 icon: fieldtype.icon,
                 instructions: null,
                 localizable: false,

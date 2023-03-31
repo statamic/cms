@@ -100,6 +100,7 @@ class FieldsController extends CpController
                 'from' => 'display',
                 'separator' => '_',
                 'validate' => 'required|not_in:'.implode(',', $reserved),
+                'show_regenerate' => true,
             ],
             'instructions' => [
                 'display' => __('Instructions'),

@@ -1,7 +1,7 @@
 <template>
 
     <div class="replicator-set-picker">
-        <set-picker :sets="groups" :placement="last ? 'bottom-start' : 'auto'" @added="addSet">
+        <set-picker :sets="groups" :placement="last ? 'bottom-start' : 'bottom'" @added="addSet">
             <template #trigger>
                 <div class="text-center">
                     <button :class="{ 'btn-round flex items-center justify-center': last }" @click="addSetButtonClicked">
