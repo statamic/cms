@@ -86,16 +86,6 @@
     }
 }
 
-.pane-slide-enter-active,
-.pane-slide-leave-active {
-    transition: all 0.3s ease;
-}
-.pane-slide-enter,
-.pane-slide-leave-to {
-    transform: translateX(24rem);
-}
-
-
 [v-cloak],
 [x-cloak] {
     display: none
