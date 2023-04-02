@@ -157,7 +157,7 @@ button {
   ========================================================================== */
 
 .btn-group {
-    @apply flex items-center p-0;
+    @apply flex items-center justify-start p-0;
     height: 2.375rem;
 
     button {
