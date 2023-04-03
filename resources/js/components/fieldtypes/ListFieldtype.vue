@@ -36,7 +36,7 @@
             </sortable-list>
         </table>
 
-        <button class="btn" @click="addItem" v-if="!isReadOnly">
+        <button class="btn btn-sm" @click="addItem" v-if="!isReadOnly">
             {{ addButton }}
         </button>
     </div>
