@@ -2,7 +2,7 @@
 
     <v-portal
         name="popover"
-        :to="portalTargetName"
+        :to="portal.id"
         :target-class="targetClass"
         :disabled="disabled"
     >
@@ -40,24 +40,16 @@ export default {
 
     data() {
         return {
-            portalTarget: null,
+            portal: null,
         }
     },
 
-    computed: {
-
-        portalTargetName() {
-            return this.portalTarget ? this.portalTarget.id : null;
-        },
-
-    },
-
     created() {
-        this.portalTarget = this.$portals.create(this.name);
+        this.portal = this.$portals.create(this.name);
     },
 
     beforeDestroy() {
-        this.portalTarget.destroy();
+        this.portal.destroy();
     }
 
 }
