@@ -1,13 +1,13 @@
 <template>
 
     <div>
-        <portal :to="livePreviewFieldsPortal" :disabled="!previewing">
+        <vue-portal :to="livePreviewFieldsPortal" :disabled="!previewing">
             <provider :variables="provides">
                 <slot name="default" />
             </provider>
-        </portal>
+        </vue-portal>
 
-        <portal v-if="previewing" :to="portalTargetName" target-class="live-preview-portal">
+        <portal v-if="previewing" name="live-preview" target-class="live-preview-portal">
             <div class="live-preview fixed flex flex-col">
 
                 <transition name="live-preview-header-slide">
@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import Provider from './Provider.vue';
+import Provider from '../portals/Provider.vue';
 import Resizer from './Resizer.vue';
 import UpdatesIframe from './UpdatesIframe';
 
