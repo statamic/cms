@@ -93,6 +93,8 @@ export default {
     methods: {
 
         computePosition() {
+            if (! this.$refs.trigger) return;
+
             computePosition(this.$refs.trigger.firstChild, this.$refs.popover, {
                 placement: this.placement,
                 middleware: [
