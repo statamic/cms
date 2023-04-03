@@ -380,10 +380,12 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             return $this->value('order');
         }
 
-        return $this->structure()->in($this->locale())
-            ->flattenedPages()
-            ->map->reference()
-            ->flip()->get($this->id) + 1;
+        $entries = $this->structure()->in($this->locale())->flattenedPages();
+        if ($this->id) {
+            return $entries->map->reference()->flip()->get($this->id) + 1;
+        }
+
+        return $entries->count() + 1;
     }
 
     public function template($template = null)
