@@ -14,6 +14,11 @@ class ViewRegion extends Region
         $this->key = str_random(32);
     }
 
+    public function placeholder(): string
+    {
+        return view($this->view, $this->context);
+    }
+
     public function key(): string
     {
         return $this->key;
