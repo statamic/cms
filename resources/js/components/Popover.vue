@@ -73,7 +73,7 @@ export default {
     computed: {
 
         portalTargetName() {
-            return this.portalTarget ? this.portalTarget.name : null;
+            return this.portalTarget ? this.portalTarget.id : null;
         },
 
         targetClass() {
@@ -83,11 +83,11 @@ export default {
     },
 
     created() {
-        this.createPortalTarget();
+        this.portalTarget = this.$portals.create('popover');
     },
 
     beforeDestroy() {
-        this.destroyPortalTarget();
+        this.portalTarget.destroy();
     },
 
     methods: {

@@ -54,7 +54,7 @@ export default {
         },
 
         portal() {
-            return this.modal ? this.modal.key : null;
+            return this.modal ? this.modal.id : null;
         },
 
     },

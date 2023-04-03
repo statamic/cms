@@ -4,7 +4,6 @@ import uniqid from 'uniqid'
 class ModalBus {
     constructor(instance) {
         this.instance = instance;
-        this.portals = instance.$root.portals;
     }
 
     count() {
@@ -12,15 +11,10 @@ class ModalBus {
     }
 
     add(name) {
-        const portal = {
+        return this.instance.$portals.create('modal', {
             type: 'modal',
-            key: uniqid(),
             name
-        };
-
-        this.portals.push(portal);
-
-        return portal;
+        });
     }
 
     open(name) {
@@ -30,8 +24,8 @@ class ModalBus {
     }
 
     remove(name) {
-        const i = _.findIndex(this.portals, (modal) => modal.name === name);
-        this.portals.splice(i, 1);
+        const id = _.find(this.instance.$portals.all(), (modal) => modal.data.name === name).id;
+        this.instance.$portals.destroy(id);
     }
 
     close(name) {
@@ -40,7 +34,7 @@ class ModalBus {
     }
 
     modals() {
-        return this.portals.filter(portal => portal.type === 'stack');
+        return this.portals.filter(portal => portal.type === 'modal');
     }
 }
 

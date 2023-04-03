@@ -166,7 +166,7 @@
 
         </template>
 
-        <portal to="outside">
+        <portal :to="portalTargetName">
             <focal-point-editor
                 v-if="showFocalPointEditor && isFocalPointEditorEnabled"
                 :data="values.focus"
@@ -240,11 +240,16 @@ export default {
             error: null,
             errors: {},
             actions: [],
+            portalTarget: null,
         }
     },
 
 
     computed: {
+
+        portalTargetName() {
+            return this.portalTarget ? this.portalTarget.id : null;
+        },
 
         isImage() {
             if (! this.asset) return false;
@@ -270,6 +275,15 @@ export default {
     mounted() {
         this.$modal.show('asset-editor');
         this.load();
+    },
+
+
+    created() {
+        this.portalTarget = this.$portals.create('asset-editor');
+    },
+
+    beforeDestroy() {
+        this.portalTarget.destroy();
     },
 
     events: {

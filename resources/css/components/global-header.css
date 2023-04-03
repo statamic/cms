@@ -4,7 +4,7 @@
 
 .global-header {
     @apply bg-white shadow pr-4 h-13 items-center flex relative w-full;
-    z-index: 997; /*  Let Live Preview stack on top */
+    z-index: 2; /* The search focus overlay sits underneath using z-index 1. */
 }
 
 /* Responsive Wangjangling

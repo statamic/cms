@@ -7,7 +7,7 @@
             </provider>
         </portal>
 
-        <portal v-if="previewing" to="live-preview">
+        <portal v-if="previewing" :to="portalTargetName" target-class="live-preview-portal">
             <div class="live-preview fixed flex flex-col">
 
                 <transition name="live-preview-header-slide">
@@ -122,6 +122,7 @@ export default {
             keybinding: null,
             token: null,
             target: 0,
+            portalTarget: null,
         }
     },
 
@@ -163,6 +164,10 @@ export default {
 
         inputs() {
             return this.$config.get('livePreview.inputs', {});
+        },
+
+        portalTargetName() {
+            return this.portalTarget ? this.portalTarget.id : null;
         },
 
         livePreviewFieldsPortal() {
@@ -212,6 +217,8 @@ export default {
     },
 
     created() {
+        this.portalTarget = this.$portals.create('live-preview');
+
         this.editorWidth = localStorage.getItem(widthLocalStorageKey) || 400
 
         this.keybinding = this.$keys.bindGlobal('mod+shift+p', () => {
@@ -221,6 +228,7 @@ export default {
 
     beforeDestroy() {
         this.closePopout();
+        this.portalTarget.destroy();
     },
 
     destroyed() {

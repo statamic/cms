@@ -17,7 +17,7 @@
     </div>
 
     <div class="sm:px-8 w-full flex-1 lg:flex items-center lg:justify-center mx-auto max-w-full">
-        <global-search endpoint="{{ cp_route('search') }}" placeholder="{{ __('Search...') }}">
+        <global-search ref="globalSearch" endpoint="{{ cp_route('search') }}" placeholder="{{ __('Search...') }}">
         </global-search>
     </div>
 
@@ -112,3 +112,5 @@
         </dropdown-list>
     </div>
 </div>
+
+<div v-if="$refs.globalSearch?.focused" v-cloak class="fixed inset-0 h-full w-full bg-black/10 z-1"></div>

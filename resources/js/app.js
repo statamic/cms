@@ -86,6 +86,7 @@ Statamic.$store = new Vuex.Store({
 
 import './components/ToastBus';
 import './components/ModalBus';
+import './components/portals/Portals';
 import './components/stacks/Stacks';
 import './components/panes/Panes';
 import './components/ProgressBar';
@@ -139,7 +140,7 @@ import AssetContainerCreateForm from './components/asset-containers/CreateForm.v
 import AssetContainerEditForm from './components/asset-containers/EditForm.vue';
 import NavBuilder from './components/nav/Builder.vue';
 import Updater from './components/updater/Updater.vue';
-import PortalTargets from './components/PortalTargets.vue';
+import PortalTargets from './components/portals/PortalTargets.vue';
 
 
 Statamic.app({
@@ -198,7 +199,6 @@ Statamic.app({
     },
 
     data: {
-        showLoginModal: false,
         navOpen: true,
         mobileNavOpen: false,
         showBanner: true,
