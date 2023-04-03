@@ -93,7 +93,9 @@ export default {
     methods: {
 
         computePosition() {
-            computePosition(this.$refs.trigger, this.$refs.popover, {
+            if (! this.$refs.trigger) return;
+
+            computePosition(this.$refs.trigger.firstChild, this.$refs.popover, {
                 placement: this.placement,
                 middleware: [
                     offset({ mainAxis: this.offset[0], crossAxis: this.offset[1] }),
@@ -117,8 +119,12 @@ export default {
             this.isOpen = true;
             this.escBinding = this.$keys.bind('esc', e => this.close());
             this.$nextTick(() => {
-                this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger, this.$refs.popover, this.computePosition);
+                this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger.firstChild, this.$refs.popover, this.computePosition);
                 this.$emit('opened');
+
+                this.$refs.popover.addEventListener('transitionend', () => {
+                    this.$emit('opened');
+                }, { once: true });
             });
         },
 
@@ -131,6 +137,7 @@ export default {
             if (this.$refs.popover.contains(e.target) || this.$el.contains(e.target)) return;
 
             this.close();
+            this.$emit('clicked-away', e);
         },
 
         close() {
