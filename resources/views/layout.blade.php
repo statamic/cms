@@ -14,10 +14,11 @@
         <div id="main"
             class="@yield('content-class')"
             :class="{
-            'nav-closed': ! navOpen,
-            'nav-mobile-open': mobileNavOpen,
-            'showing-license-banner': showBanner
-        }">
+                'nav-closed': ! navOpen,
+                'nav-mobile-open': mobileNavOpen,
+                'showing-license-banner': showBanner
+            }"
+        >
             @include('statamic::partials.nav-main')
             @include('statamic::partials.nav-mobile')
 
