@@ -1,10 +1,10 @@
 <template>
 
-    <vue-portal :to="portal">
-        <vue-modal v-bind="modalProps" :delay="25" @opened="modalOpened" @closed="modalClosed" :class="{'disable-overflow': overflow === false}" v-show="isTopmostPortal">
+    <v-portal :to="portal">
+        <v-modal v-bind="modalProps" :delay="25" @opened="modalOpened" @closed="modalClosed" :class="{'disable-overflow': overflow === false}" v-show="isTopmostPortal">
             <slot :close="close" />
-        </vue-modal>
-    </vue-portal>
+        </v-modal>
+    </v-portal>
 
 </template>
 

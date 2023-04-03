@@ -1,6 +1,6 @@
 <template>
 
-    <vue-portal
+    <v-portal
         name="popover"
         :to="portalTargetName"
         :target-class="targetClass"
@@ -9,7 +9,7 @@
         <provider :variables="provide">
            <slot />
         </provider>
-    </vue-portal>
+    </v-portal>
 
 </template>
 

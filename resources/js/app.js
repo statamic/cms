@@ -68,8 +68,8 @@ Vue.prototype.$keys = Statamic.$keys;
 import Moment from 'moment';
 window.moment = Vue.moment = Vue.prototype.$moment = Moment;
 
-Vue.use(PortalVue, { portalName: 'vue-portal' })
-Vue.use(VModal, { componentName: 'vue-modal' })
+Vue.use(PortalVue, { portalName: 'v-portal' })
+Vue.use(VModal, { componentName: 'v-modal' })
 Vue.use(Vuex);
 Vue.use(VCalendar);
 

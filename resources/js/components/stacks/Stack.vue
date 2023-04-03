@@ -1,6 +1,6 @@
 <template>
 
-    <vue-portal :to="portal" :order="depth" target-class="stack">
+    <v-portal :to="portal" :order="depth" target-class="stack">
         <div class="stack-container"
             :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering, 'p-2 shadow-lg': full }"
             :style="{ left: `${leftOffset}px` }"
@@ -17,7 +17,7 @@
                 </div>
             </transition>
         </div>
-    </vue-portal>
+    </v-portal>
 
 </template>
 

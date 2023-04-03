@@ -1,11 +1,11 @@
 <template>
 
     <div>
-        <vue-portal :to="livePreviewFieldsPortal" :disabled="!previewing">
+        <v-portal :to="livePreviewFieldsPortal" :disabled="!previewing">
             <provider :variables="provides">
                 <slot name="default" />
             </provider>
-        </vue-portal>
+        </v-portal>
 
         <portal v-if="previewing" name="live-preview" target-class="live-preview-portal">
             <div class="live-preview fixed flex flex-col">

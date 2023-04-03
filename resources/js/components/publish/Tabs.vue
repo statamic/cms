@@ -86,9 +86,9 @@
             <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                 <div class="publish-tab">
                     <div class="publish-tab-actions card p-0 mb-5" :class="{ 'as-sidebar': shouldShowSidebar }">
-                        <vue-portal :to="actionsPortal" :disabled="shouldShowSidebar">
+                        <v-portal :to="actionsPortal" :disabled="shouldShowSidebar">
                             <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
-                        </vue-portal>
+                        </v-portal>
                     </div>
 
                     <publish-sections
