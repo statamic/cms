@@ -1,5 +1,5 @@
 <template>
-    <fullscreen :enabled="fullScreenMode" target-class="table-fieldtype">
+    <portal name="table-fullscreen" :disabled="!fullScreenMode" target-class="table-fieldtype">
         <div class="table-fieldtype-container" :class="{'table-fullscreen bg-white': fullScreenMode }">
             <header class="bg-gray-200 border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
                 <h2 v-text="config.display" />
@@ -81,7 +81,7 @@
             >
             </confirmation-modal>
         </div>
-    </fullscreen>
+    </portal>
 </template>
 
 <script>

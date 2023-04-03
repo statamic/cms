@@ -1,6 +1,6 @@
 <template>
 
-<fullscreen :enabled="fullScreenMode" :provide="provide">
+<portal name="grid-fullscreen" :disabled="!fullScreenMode" :provide="provide">
 
     <element-container @resized="containerWidth = $event.width">
     <div class="grid-fieldtype-container" :class="{'grid-fullscreen bg-white': fullScreenMode }">
@@ -48,7 +48,7 @@
     </div>
     </element-container>
 
-</fullscreen>
+</portal>
 
 </template>
 
