@@ -58,7 +58,6 @@ import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.
 import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
-import panes from '../components/panes/Pane.vue';
 import Fullscreen from '../components/Fullscreen.vue';
 import CodeBlock from '../components/CodeBlock.vue';
 
@@ -143,5 +142,3 @@ Vue.component('resource-deleter', ResourceDeleter);
 
 Vue.component('stack', Stack);
 Vue.component('stack-test', StackTest);
-
-Vue.component('pane', panes);
