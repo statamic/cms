@@ -1,60 +1,57 @@
 <template>
 
-    <div :class="classes" class="replicator-set">
-
+    <div>
         <slot name="picker" />
+        <div :class="classes" class="replicator-set">
 
-        <div class="replicator-set-header" :class="{ 'p-2': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
-            <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
-            <div class="flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2 cursor-pointer"/>
-                <div
-                    v-if="config.instructions"
-                    v-show="!collapsed"
-                    v-html="instructions"
-                    class="help-block mt-2 -mb-2" />
-
-                <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-8">
-                    <div
-                        v-html="previewText"
-                        class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
+            <div class="replicator-set-header" :class="{ 'p-2': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
+                <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
+                <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
+                    <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2 cursor-pointer"/>
+                    <div class="flex items-center" v-if="config.instructions && !collapsed">
+                        <svg-icon name="micro-circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(config.instructions), html:true }" />
+                    </div>
+                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-8">
+                        <div
+                            v-html="previewText"
+                            class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
+                    </div>
+                </div>
+                <div class="replicator-set-controls" v-if="!isReadOnly">
+                    <toggle-fieldtype
+                        handle="set-enabled"
+                        class="toggle-sm mr-2"
+                        @input="toggleEnabledState"
+                        :value="values.enabled"
+                        v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
+                    <dropdown-list>
+                        <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
+                        <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
+                        <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
+                    </dropdown-list>
                 </div>
             </div>
-            <div class="replicator-set-controls" v-if="!isReadOnly">
-                <toggle-fieldtype
-                    handle="set-enabled"
-                    class="toggle-sm mr-4"
-                    @input="toggleEnabledState"
-                    :value="values.enabled"
-                    v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
-                <dropdown-list class="-mt-1">
-                    <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
-                    <dropdown-item :text="__('Duplicate Set')" @click="duplicate" v-if="canAddSet" />
-                    <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
-                </dropdown-list>
+
+            <div class="replicator-set-body publish-fields" v-show="!collapsed">
+                <set-field
+                    v-for="field in fields"
+                    v-show="showField(field, fieldPath(field))"
+                    :key="field.handle"
+                    :field="field"
+                    :meta="meta[field.handle]"
+                    :value="values[field.handle]"
+                    :parent-name="parentName"
+                    :set-index="index"
+                    :field-path="fieldPath(field)"
+                    :read-only="isReadOnly"
+                    @updated="updated(field.handle, $event)"
+                    @meta-updated="metaUpdated(field.handle, $event)"
+                    @focus="$emit('focus')"
+                    @blur="$emit('blur')"
+                    @replicator-preview-updated="previewUpdated(field.handle, $event)"
+                />
             </div>
         </div>
-
-        <div class="replicator-set-body publish-fields" v-show="!collapsed">
-            <set-field
-                v-for="field in fields"
-                v-show="showField(field, fieldPath(field))"
-                :key="field.handle"
-                :field="field"
-                :meta="meta[field.handle]"
-                :value="values[field.handle]"
-                :parent-name="parentName"
-                :set-index="index"
-                :field-path="fieldPath(field)"
-                :read-only="isReadOnly"
-                @updated="updated(field.handle, $event)"
-                @meta-updated="metaUpdated(field.handle, $event)"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
-                @replicator-preview-updated="previewUpdated(field.handle, $event)"
-            />
-        </div>
-
     </div>
 
 </template>

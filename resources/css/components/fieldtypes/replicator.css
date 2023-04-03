@@ -7,11 +7,7 @@
 }
 
 .replicator-set {
-    @apply mt-10 shadow-set rounded bg-white outline-none relative;
-
-    &:last-child {
-        @apply mb-10;
-    }
+    @apply shadow-set rounded bg-white outline-none relative;
 }
 
 .replicator-set-header {
@@ -35,11 +31,6 @@
 
     .replicator-set-controls {
         @apply flex items-center;
-
-        .toggle-sm {
-            position: relative;
-            bottom: 1px;
-        }
     }
 
     &.invalid {
@@ -56,30 +47,20 @@
     @apply flex flex-wrap;
 }
 
-.replicator-set-picker-between {
-    @apply absolute top-0 -mt-8 w-full;
+.replicator-set-picker {
+    @apply py-4;
 }
 
-/*  Extra contrast when full width */
-.replicator-fieldtype {
-    @apply py-6 px-0 bg-gray-200 border-t border-b;
-
-    &:first-child {
-        @apply border-t-0;
-    }
-
-    > .field-inner {
-        @apply ml-6;
-    }
-
-    .replicator-fieldtype-container {
-        @apply px-6;
-    }
+.replicator-set-picker.between {
+    @apply opacity-0 hover:opacity-100;
+    max-height: 16px;
+    transform: translateX(-8px);
+    transition: max-height 300ms ease-in-out, opacity 300ms ease 75ms, transform 200ms ease-in-out 10ms;
 }
 
-/*  Avoid double borders */
-.section-fieldtype + .replicator-fieldtype {
-    border-top: 0;
+.replicator-set-picker.between:hover {
+    max-height: 64px;
+    transform: translateX(0);
 }
 
 .replicator-set.has-error > .replicator-set-header label {
