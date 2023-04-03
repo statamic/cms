@@ -60,7 +60,6 @@ import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
 import panes from '../components/panes/Pane.vue';
-import Fullscreen from '../components/Fullscreen.vue';
 import CodeBlock from '../components/CodeBlock.vue';
 
 // Third Party
@@ -129,7 +128,6 @@ Vue.component('breadcrumb', Breadcrumb);
 Vue.component('breadcrumbs', Breadcrumbs);
 Vue.component('create-entry-button', CreateEntryButton);
 Vue.component('popover', Popover);
-Vue.component('fullscreen', Fullscreen);
 Vue.component('portal', Portal);
 Vue.component('code-block', CodeBlock);
 
