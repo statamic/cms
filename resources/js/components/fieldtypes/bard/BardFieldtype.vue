@@ -51,10 +51,31 @@
                     :editor="editor" />
             </bubble-menu>
 
-            <floating-menu class="bard-set-selector" :editor="editor" :tippy-options="{ offset: calcFloatingOffset, zIndex: 6 }" :should-show="shouldShowSetButton" v-if="editor">
-                <set-picker :sets="groupConfigs" @added="addSet">
+            <floating-menu
+                class="bard-set-selector"
+                :editor="editor"
+                :should-show="shouldShowSetButton"
+                :is-showing="showAddSetButton"
+                v-if="editor"
+                v-slot="{ x, y }"
+                @shown="showAddSetButton = true"
+                @hidden="showAddSetButton = false"
+            >
+                <set-picker
+                    v-if="showAddSetButton"
+                    :sets="groupConfigs"
+                    @added="addSet"
+                    @clicked-away="clickedAwayFromSetPicker"
+                >
                     <template #trigger>
-                        <button type="button" class="btn-round group flex items-center justify-center" :aria-label="__('Add Set')" v-tooltip="__('Add Set')" @click="addSetButtonClicked">
+                        <button
+                            type="button"
+                            class="btn-round group flex items-center justify-center absolute top-[-6px] -left-9 z-1"
+                            :style="{ transform: `translate(${x}px, ${y}px)` }"
+                            :aria-label="__('Add Set')"
+                            v-tooltip="__('Add Set')"
+                            @click="addSetButtonClicked"
+                        >
                             <svg-icon name="micro-plus" class="w-3 h-3 text-gray-800 group-hover:text-black" />
                         </button>
                     </template>
@@ -81,7 +102,8 @@
 <script>
 import uniqid from 'uniqid';
 import reduce from 'underscore/modules/reduce';
-import { BubbleMenu, Editor, EditorContent, FloatingMenu } from '@tiptap/vue-2';
+import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-2';
+import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
 import BulletList from '@tiptap/extension-bullet-list';
@@ -154,6 +176,7 @@ export default {
             invalid: false,
             pageHeader: null,
             escBinding: null,
+            showAddSetButton: false,
             provide: {
                 bard: this.makeBardProvide(),
                 storeName: this.storeName
@@ -303,7 +326,10 @@ export default {
                 // blur event immediately. We need to make sure that the newly focused element is outside
                 // of Bard. We use a timeout because activeElement only exists after the blur event.
                 setTimeout(() => {
-                    if (!this.$el.contains(document.activeElement)) this.$emit('blur');
+                    if (!this.$el.contains(document.activeElement)) {
+                        this.$emit('blur');
+                        this.showAddSetButton = false;
+                    }
                 }, 1);
             },
             onUpdate: () => {
@@ -478,11 +504,6 @@ export default {
 
             const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock;
             return this.setConfigs.length && (this.config.always_show_set_button || isActive);
-        },
-
-        calcFloatingOffset({ reference }) {
-            let x = reference.x + reference.width + 20;
-            return [0, -x];
         },
 
         initToolbarButtons() {
@@ -692,7 +713,12 @@ export default {
             if (this.setConfigs.length === 1) {
                 this.addSet(this.setConfigs[0].handle);
             }
-        }
+        },
+
+        clickedAwayFromSetPicker($event) {
+            if (this.$el.contains($event.target)) return;
+            this.showAddSetButton = false;
+        },
 
     }
 }

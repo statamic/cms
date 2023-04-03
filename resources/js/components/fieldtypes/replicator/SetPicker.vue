@@ -8,6 +8,7 @@
         @opened="opened"
         @closed="closed"
         @click="triggerWasClicked"
+        @clicked-away="$emit('clicked-away', $event)"
     >
         <template #trigger>
             <slot name="trigger" />
