@@ -22,10 +22,10 @@ class GlobalSetsQuery extends Query
 
     public function resolve($root, $args)
     {
+        $allowed = ResourceAuthorizer::allowedSubResources('graphql', 'globals');
+
         $site = Site::default()->handle();
 
-        return GlobalSet::all()->map->in($site)->filter(function ($set) {
-            return in_array($set->handle(), ResourceAuthorizer::allowedSubResources('graphql', 'globals'));
-        });
+        return GlobalSet::all()->map->in($site)->filter(fn ($set) => in_array($set->handle(), $allowed));
     }
 }
