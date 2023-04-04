@@ -1,16 +1,18 @@
 <template>
-    <div class="flex items-center">
-        <v-swatches
-            fallback-input-type="color"
-            swatch-size="38"
-            v-model="color"
-            :disabled="isReadOnly"
-            :show-fallback="config.allow_any"
-            :swatches="config.swatches"
-        >
-        </v-swatches>
+    <div class="input-group max-w-[130px]">
+        <div class="input-group-prepend px-px" v-tooltip="__('Pick Color')">
+            <v-swatches
+                fallback-input-type="color"
+                swatch-size="38"
+                v-model="color"
+                :disabled="isReadOnly"
+                :show-fallback="config.allow_any"
+                :swatches="config.swatches"
+            >
+            </v-swatches>
+        </div>
         <input
-            class="input-text ml-2 w-24 font-mono"
+            class="input-text font-mono"
             maxlength="7"
             type="text"
             v-model="color"

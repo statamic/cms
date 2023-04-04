@@ -47,9 +47,7 @@ fieldset[disabled] .vue-swatches {
 }
 
 .vue-swatches__trigger__wrapper {
-    @apply inline-block cursor-pointer border rounded m-0;
-    height: 2.375rem !important;
-    width: 2.375rem !important;
+    @apply inline-block cursor-pointer rounded m-0;
     padding: 2px !important;
 }
 
@@ -59,7 +57,7 @@ fieldset[disabled] .vue-swatches {
     width: 2rem !important;
 
     &.vue-swatches--is-empty {
-        @apply border-2;
+        @apply border;
     }
     &.vue-swatches--is-disabled {
         @apply cursor-not-allowed;
@@ -98,15 +96,15 @@ fieldset[disabled] .vue-swatches {
     font-size: 14px;
 }
 .vue-swatches__fallback__input {
-    @apply cursor-pointer input-text p-1 w-full;
+    @apply cursor-pointer input-text w-full rounded;
+    padding: 2px;
 }
 
 .vue-swatches__fallback__button {
-    @apply bg-blue text-sm font-normal rounded !important ;
+    @apply text-sm font-normal rounded p-0 !important;
     @apply btn-primary;
-    padding: 6px 8px !important;
     height: 2.375rem !important;
-    width: 2.375rem !important;
+    width: 3rem !important;
 }
 
 /* Transitions */
@@ -114,17 +112,21 @@ fieldset[disabled] .vue-swatches {
 .vue-swatches-show-hide-leave-active {
     transition: all 0.3s ease;
 }
+
 .vue-swatches-show-hide-enter,
 .vue-swatches-show-hide-leave-active {
     opacity: 0;
 }
+
 /* Shared Styles (Swatch.vue, Check.vue) */
 .vue-swatches--has-children-centered {
     @apply flex items-center justify-center;
 }
+
 .vue-swatches__diagonal__wrapper {
     @apply w-full h-full;
 }
+
 .vue-swatches__diagonal {
     width: 75%;
     height: 75%;
