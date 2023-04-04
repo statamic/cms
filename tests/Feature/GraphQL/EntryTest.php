@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
@@ -353,7 +354,7 @@ GQL;
     }
 
     /** @test */
-    public function it_filters_an_entry()
+    public function it_cannot_filter_entry_by_default()
     {
         EntryFactory::collection('blog')
             ->id('6')
@@ -364,18 +365,65 @@ GQL;
 
         $query = <<<'GQL'
 {
-    entry(id: "6", filter: { status: { is: "published" } }) {
-        id
+    entry(id: "6", filter: { status: { is: "draft" } }) {
         title
     }
 }
 GQL;
 
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', 'blog')
+            ->andReturn([])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'filter' => ['Forbidden: status'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'entry' => null,
+                ],
+            ]);
+    }
+
+    /** @test */
+    public function it_can_filter_entry_when_configuration_allows_for_it()
+    {
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->published(false)
+            ->create();
+
+        $query = <<<'GQL'
+{
+    entry(id: "6", filter: { status: { is: "draft" } }) {
+        title
+    }
+}
+GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', 'blog')
+            ->andReturn(['status'])
+            ->once();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertGqlOk()
-            ->assertExactJson(['data' => ['entry' => null]]);
+            ->assertExactJson(['data' => ['entry' => [
+                'title' => 'That was so rad!',
+            ]]]);
     }
 
     /** @test */
@@ -385,23 +433,29 @@ GQL;
             ->id('6')
             ->slug('that-was-so-rad')
             ->data(['title' => 'That was so rad!'])
-            ->published(true)
+            ->published(false)
             ->create();
 
         $query = <<<'GQL'
 {
     entry(id: "6", filter: { status: "draft" }) {
-        id
         title
     }
 }
 GQL;
 
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', 'blog')
+            ->andReturn(['status'])
+            ->once();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertGqlOk()
-            ->assertExactJson(['data' => ['entry' => null]]);
+            ->assertExactJson(['data' => ['entry' => [
+                'title' => 'That was so rad!',
+            ]]]);
     }
 
     /** @test */
@@ -416,18 +470,29 @@ GQL;
 
         $query = <<<'GQL'
 {
-    entry(id: "6", filter: { status: "published", title: { doesnt_contain: "rad" } }) {
-        id
+    entry(id: "6", filter: {
+        title: [
+            { contains: "rad" },
+            { contains: "so" },
+        ]
+    }) {
         title
     }
 }
 GQL;
 
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', 'blog')
+            ->andReturn(['title'])
+            ->once();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertGqlOk()
-            ->assertExactJson(['data' => ['entry' => null]]);
+            ->assertExactJson(['data' => ['entry' => [
+                'title' => 'That was so rad!',
+            ]]]);
     }
 
     /** @test */
@@ -576,6 +641,9 @@ GQL;
     /** @test */
     public function it_only_shows_published_entries_by_default()
     {
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->andReturn(['published', 'status']);
+
         EntryFactory::collection('blog')
             ->id('6')
             ->slug('that-was-so-rad')

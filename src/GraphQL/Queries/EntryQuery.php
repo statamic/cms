@@ -2,7 +2,9 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\FilterAuthorizer;
 use Facades\Statamic\API\ResourceAuthorizer;
+use Facades\Statamic\GraphQL\Middleware\AuthorizeFilters;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades;
@@ -67,16 +69,37 @@ class EntryQuery extends Query
             $query->where('site', $site);
         }
 
-        $this->filterQuery($query, $args['filter'] ?? []);
+        $filters = $args['filter'] ?? null;
+
+        $this->filterQuery($query, $filters);
 
         $entry = $query->limit(1)->get()->first();
 
-        // The middleware will take care of authorization when using `collection` arg,
+        // The `AuthorizeSubResources` middleware will authorize when using `collection` arg,
         // but this is still required when the user queries entry using other args.
         if ($entry && ! in_array($collection = $entry->collection()->handle(), $this->allowedSubResources())) {
             throw ValidationException::withMessages([
                 'collection' => 'Forbidden: '.$collection,
             ]);
+        }
+
+        // We cannot use the `AuthorizeFilters` middleware on this query, because
+        // you can get an entry by `id`, `slug`, `uri`, etc. so we'll get the
+        // queried entry's collection and authorize filters manually here.
+        if ($entry && $filters) {
+            $allowedFilters = collect($this->allowedFilters([
+                'collection' => $entry->collection()->handle(),
+            ]));
+
+            $forbidden = collect($filters)
+                ->keys()
+                ->filter(fn ($filter) => ! $allowedFilters->contains($filter));
+
+            if ($forbidden->isNotEmpty()) {
+                throw ValidationException::withMessages([
+                    'filter' => 'Forbidden: '.$forbidden->join(', '),
+                ]);
+            }
         }
 
         return $entry;
@@ -99,5 +122,10 @@ class EntryQuery extends Query
     public function allowedSubResources()
     {
         return ResourceAuthorizer::allowedSubResources('graphql', 'collections');
+    }
+
+    public function allowedFilters($args)
+    {
+        return FilterAuthorizer::allowedForSubResources('graphql', 'collections', $args['collection'] ?? '*');
     }
 }
