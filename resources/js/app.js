@@ -85,7 +85,6 @@ Statamic.$store = new Vuex.Store({
 });
 
 import './components/ToastBus';
-import './components/ModalBus';
 import './components/portals/Portals';
 import './components/stacks/Stacks';
 import './components/ProgressBar';
@@ -203,7 +202,6 @@ Statamic.app({
         showBanner: true,
         portals: [],
         appendedComponents: [],
-        hideOverflow: false,
     },
 
     computed: {
@@ -218,18 +216,6 @@ Statamic.app({
 
         wrapperClass() {
             return this.$config.get('wrapperClass', 'max-w-xl');
-        }
-
-    },
-
-    watch: {
-
-        hideOverflow(hide) {
-            if (hide) {
-                document.body.style.setProperty('overflow', 'hidden')
-            } else {
-                document.body.style.removeProperty('overflow');
-            }
         }
 
     },
