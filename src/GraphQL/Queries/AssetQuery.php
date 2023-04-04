@@ -45,7 +45,7 @@ class AssetQuery extends Query
 
         // The middleware will take care of authorization when using `container` arg,
         // but this is still required when the user queries by the asset `id` arg.
-        if (! in_array($container = $asset->container()->handle(), $this->allowedSubResources())) {
+        if ($asset && ! in_array($container = $asset->container()->handle(), $this->allowedSubResources())) {
             throw ValidationException::withMessages([
                 'container' => 'Forbidden: '.$container,
             ]);

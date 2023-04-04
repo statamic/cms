@@ -182,6 +182,10 @@ GQL;
 }
 GQL;
 
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(AssetContainer::all()->map->handle()->all())->twice();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -235,6 +239,10 @@ GQL;
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(AssetContainer::all()->map->handle()->all())->twice();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()
