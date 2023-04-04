@@ -21,9 +21,9 @@ class Sets extends Fieldtype
     {
         $sets = collect($sets);
 
-        // If the first set has a "fields" key, it would be the legacy format.
+        // If the first set doesn't have a "sets" key, it would be the legacy format.
         // We'll put it in a "main" group so it's compatible with the new format.
-        if (Arr::has($sets->first(), 'fields')) {
+        if (! Arr::has($sets->first(), 'sets')) {
             $sets = collect([
                 'main' => [
                     'display' => __('Main'),

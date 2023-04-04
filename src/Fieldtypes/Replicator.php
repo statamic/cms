@@ -108,7 +108,7 @@ class Replicator extends Fieldtype
     public function fields($set)
     {
         return new Fields(
-            $this->flattenedSetsConfig()[$set]['fields'],
+            Arr::get($this->flattenedSetsConfig(), "$set.fields"),
             $this->field()->parent(),
             $this->field()
         );
@@ -226,10 +226,10 @@ class Replicator extends Fieldtype
     {
         $sets = collect($this->config('sets'));
 
-        // If the first set has a "fields" key, it would be the legacy format.
+        // If the first set doesn't have a nested "set" key, it would be the legacy format.
         // We'll put it in a "main" group so it's compatible with the new format.
         // This also happens in the "sets" fieldtype.
-        if (Arr::has($sets->first(), 'fields')) {
+        if (! Arr::has($sets->first(), 'sets')) {
             $sets = collect([
                 'main' => [
                     'sets' => $sets->all(),
