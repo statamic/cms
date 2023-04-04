@@ -1,15 +1,51 @@
 <template>
-    <div class="color-picker"></div>
+    <div class="flex items-center">
+        <v-swatches
+            fallback-input-type="color"
+            swatch-size="38"
+            v-model="color"
+            :disabled="isReadOnly"
+            :show-fallback="config.allow_any"
+            :swatches="config.swatches"
+        >
+        </v-swatches>
+        <input
+            class="input-text ml-2 w-24 font-mono"
+            maxlength="7"
+            type="text"
+            v-model="color"
+            v-if="config.allow_any"
+            :readonly="isReadOnly"
+        />
+    </div>
 </template>
 
 <script>
-import '@simonwep/pickr/dist/themes/classic.min.css';
-import '@simonwep/pickr/dist/themes/nano.min.css';
-import Pickr from '@simonwep/pickr';
+import VSwatches from 'vue-swatches'
 
 export default {
 
     mixins: [Fieldtype],
+
+    components: { VSwatches },
+
+    data () {
+        return {
+            color: this.config.default
+        }
+    },
+
+    watch: {
+
+        value(value) {
+            this.color = value;
+        },
+
+        color(color) {
+            this.updateDebounced(color);
+        }
+
+    },
 
     computed: {
 
@@ -22,52 +58,7 @@ export default {
     },
 
     mounted() {
-        const pickr = new Pickr ({
-            el: this.$el,
-            disabled: this.isReadOnly,
-            lockOpacity: this.config.lock_opacity,
-            default: this.value ?? this.config.default ?? null,
-            defaultRepresentation: this.config.default_color_mode,
-            components: {
-
-                // Main components
-                preview: true,
-                opacity: true,
-                hue: true,
-
-                // Input / output Options
-                interaction: {
-                    hex: this.config.color_modes.includes('hex'),
-                    rgba: this.config.color_modes.includes('rgba'),
-                    hsla: this.config.color_modes.includes('hsla'),
-                    hsva: this.config.color_modes.includes('hsva'),
-                    cmyk: this.config.color_modes.includes('cmyk'),
-                    input: true,
-                    clear: true,
-                    save: true
-                }
-            },
-            outputPrecision: 1,
-            strings: {
-                save: __('Save'),
-                clear: __('Clear')
-            },
-            swatches: this.config.swatches,
-            theme: this.config.theme || 'classic'
-        });
-
-        pickr.on('save', (...args) => {
-            var rep = args[1].getColorRepresentation();
-            if (args[0] && rep) {
-                // Dynamically call toHEX(), toRGBA(), etc
-                this.update(args[0]['to' + rep]().toString(0));
-            } else {
-                // Color was manually cleared
-                this.update(null);
-            }
-            pickr.hide();
-        });
-    }
-
+        this.color = this.value
+    },
 };
 </script>
