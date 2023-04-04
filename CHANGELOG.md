@@ -1,5 +1,27 @@
 # Release Notes
 
+## 4.0.0-alpha.2 (2023-04-04)
+
+### What's new
+- Ability to promote a user to super from within the CP. [#7716](https://github.com/statamic/cms/issues/7716)
+
+### What's improved
+- A bunch of UI improvements. [#7819](https://github.com/statamic/cms/issues/7819) [#7803](https://github.com/statamic/cms/issues/7803)
+- Portal improvements. [#7821](https://github.com/statamic/cms/issues/7821)
+
+### What's fixed
+- Fix taggable fieldtype not being deletable [#7824](https://github.com/statamic/cms/issues/7824)
+- Bard set picker positioning. [#7818](https://github.com/statamic/cms/issues/7818)
+- Avoid removing popover contents when closed. [#7794](https://github.com/statamic/cms/issues/7794)
+- Fix errors related to minification. [#7776](https://github.com/statamic/cms/issues/7776)
+- A variety of other misc fixes. [#7806](https://github.com/statamic/cms/issues/7806)
+
+### What's changed
+- Panes have been removed. [#7812](https://github.com/statamic/cms/issues/7812)
+- PortalVue's component has been renamed to `<v-portal>` since Statamic now has a `<portal>` component.
+
+
+
 ## 4.0.0-alpha.1 (2023-03-27)
 
 ### What's new
