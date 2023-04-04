@@ -521,7 +521,7 @@ class Bard extends Replicator
             return $item['type'] === 'set';
         })->mapWithKeys(function ($set) {
             $values = $set['attrs']['values'];
-            $config = $this->config("sets.{$values['type']}.fields", []);
+            $config = Arr::get($this->flattenedSetsConfig(), "{$values['type']}.fields", []);
 
             return [$set['attrs']['id'] => (new Fields($config))->addValues($values)->meta()->put('_', '_')];
         })->toArray();
