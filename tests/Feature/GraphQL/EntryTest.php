@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
@@ -29,17 +30,97 @@ class EntryTest extends TestCase
         $this->createEntries();
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableQueries
-     **/
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{entry}'])
             ->assertSee('Cannot query field \"entry\" on type \"Query\"', false);
+    }
+
+    /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource_with_collection_arg()
+    {
+        $query = <<<'GQL'
+{
+    entry(collection: "events") {
+        title
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn([])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'collection' => ['Forbidden: events'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'entry' => null,
+                ],
+            ]);
+    }
+
+    public function findEventOneByArg()
+    {
+        return [
+            ['id: "3"'],
+            ['slug: "event-one"'],
+            ['uri: "/events/event-one"'],
+        ];
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider findEventOneByArg
+     */
+    public function it_cannot_query_against_non_allowed_sub_resource_with_other_args($arg)
+    {
+        $query = <<<"GQL"
+{
+    entry({$arg}) {
+        title
+        uri
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn([])->twice();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'collection' => ['Forbidden: events'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'entry' => null,
+                ],
+            ]);
     }
 
     /** @test */
@@ -73,6 +154,10 @@ class EntryTest extends TestCase
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn(Collection::handles()->all())->twice();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()
@@ -119,6 +204,10 @@ GQL;
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn(Collection::handles()->all())->twice();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()
