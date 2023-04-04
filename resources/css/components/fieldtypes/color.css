@@ -1,11 +1,139 @@
-.color-fieldtype .pickr {
-    @apply clickable;
-    @apply inline-block rounded p-1;
+/* VCheck */
+.vue-swatches__check__wrapper {
+    @apply absolute w-full h-full;
+}
 
-    .pcr-button {
-        @apply border-2 border-white;
-        &:focus {
-            @apply outline-none;
-        }
+.vue-swatches__check__circle {
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.15);
+}
+.vue-swatches__check__path {
+    fill: white;
+}
+
+/* VSwatch */
+.vue-swatches__swatch {
+    @apply relative inline-block rounded !important;
+    font-size: 0;
+    &:hover,
+    &:focus {
+      opacity: 0.9;
+      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.75);
+      outline: none;
     }
+    &.vue-swatches__swatch--border {
+      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.75);
+    }
+    &.vue-swatches__swatch--selected {
+      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.75);
+    }
+    &__label {
+        @apply absolute inset-x-0 text-gray-700 text-center font-bold;
+    }
+    .vue-swatches__diagonal__wrapper {
+      position: absolute;
+    }
+}
+
+/* VSwatches */
+fieldset[disabled] .vue-swatches {
+    pointer-events: none;
+}
+
+.vue-swatches {
+    @apply relative flex items-center outline-none;
+}
+
+.vue-swatches__trigger__wrapper {
+    @apply inline-block cursor-pointer border rounded m-0;
+    height: 2.375rem !important;
+    width: 2.375rem !important;
+    padding: 2px !important;
+}
+
+.vue-swatches__trigger {
+    @apply rounded-sm !important;
+    height: 2rem !important;
+    width: 2rem !important;
+
+    &.vue-swatches--is-empty {
+        @apply border-2;
+    }
+    &.vue-swatches--is-disabled {
+        @apply cursor-not-allowed;
+    }
+}
+
+.vue-swatches__container {
+    box-sizing: content-box;
+
+    &.vue-swatches--inline {
+        font-size: 0;
+    }
+
+    &:not(.vue-swatches--inline) {
+        @apply absolute block overflow-auto rounded-md shadow;
+        z-index: 2;
+    }
+}
+
+.vue-swatches__wrapper {
+    background-color: inherit;
+    box-sizing: content-box;
+}
+
+.vue-swatches__row {
+    font-size: 0;
+}
+
+.vue-swatches__fallback__wrapper {
+    @apply flex;
+}
+
+.vue-swatches__fallback__input--wrapper {
+    padding-right: 10px;
+    width: 100%;
+    font-size: 14px;
+}
+.vue-swatches__fallback__input {
+    @apply cursor-pointer input-text p-1 w-full;
+}
+
+.vue-swatches__fallback__button {
+    @apply bg-blue text-sm font-normal rounded !important ;
+    @apply btn-primary;
+    padding: 6px 8px !important;
+    height: 2.375rem !important;
+    width: 2.375rem !important;
+}
+
+/* Transitions */
+.vue-swatches-show-hide-enter-active,
+.vue-swatches-show-hide-leave-active {
+    transition: all 0.3s ease;
+}
+.vue-swatches-show-hide-enter,
+.vue-swatches-show-hide-leave-active {
+    opacity: 0;
+}
+/* Shared Styles (Swatch.vue, Check.vue) */
+.vue-swatches--has-children-centered {
+    @apply flex items-center justify-center;
+}
+.vue-swatches__diagonal__wrapper {
+    @apply w-full h-full;
+}
+.vue-swatches__diagonal {
+    width: 75%;
+    height: 75%;
+    background: linear-gradient(
+        to top right,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0) calc(50% - 2.4px),
+        rgba(222, 8, 10, 1) 50%,
+        rgba(0, 0, 0, 0) calc(50% + 2.4px),
+        rgba(0, 0, 0, 0) 100%
+    );
 }

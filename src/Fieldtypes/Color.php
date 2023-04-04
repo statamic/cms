@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Support\Str;
 
 class Color extends Fieldtype
 {
@@ -20,45 +21,19 @@ class Color extends Fieldtype
                         'type' => 'list',
                         'add_button' => __('Add Color'),
                     ],
-                    'theme' => [
-                        'display' => __('Theme'),
-                        'instructions' => __('statamic::fieldtypes.color.config.theme'),
-                        'type' => 'select',
-                        'default' => 'classic',
-                        'options' => [
-                            'classic' => __('Classic'),
-                            'nano' => __('Mini'),
-                        ],
-                    ],
-                    'lock_opacity' => [
-                        'display' => __('Lock Opacity'),
-                        'instructions' => __('statamic::fieldtypes.color.config.lock_opacity'),
+                    'allow_any' => [
+                        'display' => __('Allow Any Color'),
+                        'instructions' => __('statamic::fieldtypes.color.config.allow_any'),
                         'type' => 'toggle',
-                        'default' => false,
-                    ],
-                    'default_color_mode' => [
-                        'display' => __('Default Color Mode'),
-                        'instructions' => __('statamic::fieldtypes.color.config.default_color_mode'),
-                        'type' => 'select',
-                        'options' => ['HEXA', 'RGBA', 'HSLA', 'HSVA', 'CMYK'],
-                        'default' => 'HEXA',
-                    ],
-                    'color_modes' => [
-                        'display' => __('Color Modes'),
-                        'instructions' => __('statamic::fieldtypes.color.config.color_modes'),
-                        'type' => 'checkboxes',
-                        'inline' => 'true',
-                        'options' => [
-                            'hex' => 'HEXA',
-                            'rgba' => 'RGBA',
-                            'hsla' => 'HSLA',
-                            'hsva' => 'HSVA',
-                            'cmyk' => 'CMYK',
-                        ],
-                        'default' => 'hex',
+                        'default' => true,
                     ],
                 ],
             ],
         ];
+    }
+
+    public function process($data)
+    {
+        return Str::ensureLeft($data, '#');
     }
 }
