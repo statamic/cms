@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Statamic\Facades\Form;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -18,16 +19,24 @@ class FormsTest extends TestCase
     {
         parent::setUp();
 
-        Form::all()->each->delete();
+        Form::make('contact')->title('Contact Us')->save();
+        Form::make('support')->title('Request Support')->save();
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableQueries
-     **/
+    public function tearDown(): void
+    {
+        Form::all()->each->delete();
+
+        parent::tearDown();
+    }
+
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'forms')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'forms')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{forms}'])
@@ -37,9 +46,6 @@ class FormsTest extends TestCase
     /** @test */
     public function it_queries_forms()
     {
-        Form::make('contact')->title('Contact Us')->save();
-        Form::make('support')->title('Request Support')->save();
-
         $query = <<<'GQL'
 {
     forms {
@@ -49,6 +55,10 @@ class FormsTest extends TestCase
 }
 GQL;
 
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'forms')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'forms')->andReturn(Form::all()->map->handle()->all())->once();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -56,6 +66,31 @@ GQL;
             ->assertExactJson(['data' => ['forms' => [
                 ['handle' => 'contact', 'title' => 'Contact Us'],
                 ['handle' => 'support', 'title' => 'Request Support'],
+            ]]]);
+    }
+
+    /** @test */
+    public function it_queries_only_allowed_sub_resources()
+    {
+        $query = <<<'GQL'
+{
+    forms {
+        handle
+        title
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'forms')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'forms')->andReturn(['contact'])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['forms' => [
+                ['handle' => 'contact', 'title' => 'Contact Us'],
             ]]]);
     }
 }
