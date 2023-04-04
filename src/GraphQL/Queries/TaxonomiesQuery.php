@@ -21,8 +21,8 @@ class TaxonomiesQuery extends Query
 
     public function resolve($root, $args)
     {
-        return Taxonomy::all()->filter(function ($taxonomy) {
-            return in_array($taxonomy->handle(), ResourceAuthorizer::allowedSubResources('graphql', 'taxonomies'));
-        });
+        $allowed = ResourceAuthorizer::allowedSubResources('graphql', 'taxonomies');
+
+        return Taxonomy::all()->filter(fn ($taxonomy) => in_array($taxonomy->handle(), $allowed));
     }
 }
