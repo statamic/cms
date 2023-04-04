@@ -3,7 +3,7 @@
     <popover
         ref="popover"
         class="set-picker"
-        :placement="placement"
+        placement="bottom-start"
         :disabled="!hasMultipleSets"
         @opened="opened"
         @closed="closed"
@@ -59,11 +59,7 @@
 export default {
 
     props: {
-        sets: Array,
-        placement: {
-            type: String,
-            default: 'bottom-start',
-        }
+        sets: Array
     },
 
     data() {
