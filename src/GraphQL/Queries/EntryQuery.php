@@ -2,9 +2,12 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Validation\ValidationException;
 use Statamic\Facades;
 use Statamic\Facades\GraphQL;
+use Statamic\GraphQL\Middleware\AuthorizeSubResources;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\JsonArgument;
@@ -17,6 +20,10 @@ class EntryQuery extends Query
 
     protected $attributes = [
         'name' => 'entry',
+    ];
+
+    protected $middleware = [
+        AuthorizeSubResources::class,
     ];
 
     public function type(): Type
@@ -62,7 +69,17 @@ class EntryQuery extends Query
 
         $this->filterQuery($query, $args['filter'] ?? []);
 
-        return $query->limit(1)->get()->first();
+        $entry = $query->limit(1)->get()->first();
+
+        // The middleware will take care of authorization when using `collection` arg,
+        // but this is still required when the user queries entry using other args.
+        if ($entry && ! in_array($collection = $entry->collection()->handle(), $this->allowedSubResources())) {
+            throw ValidationException::withMessages([
+                'collection' => 'Forbidden: '.$collection,
+            ]);
+        }
+
+        return $entry;
     }
 
     private function filterQuery($query, $filters)
@@ -72,5 +89,15 @@ class EntryQuery extends Query
         }
 
         $this->traitFilterQuery($query, $filters);
+    }
+
+    public function subResourceArg()
+    {
+        return 'collection';
+    }
+
+    public function allowedSubResources()
+    {
+        return ResourceAuthorizer::allowedSubResources('graphql', 'collections');
     }
 }
