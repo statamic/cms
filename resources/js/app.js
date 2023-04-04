@@ -88,7 +88,6 @@ import './components/ToastBus';
 import './components/ModalBus';
 import './components/portals/Portals';
 import './components/stacks/Stacks';
-import './components/panes/Panes';
 import './components/ProgressBar';
 import './components/DirtyState';
 import './components/Config';
@@ -203,7 +202,6 @@ Statamic.app({
         mobileNavOpen: false,
         showBanner: true,
         portals: [],
-        panes: [],
         appendedComponents: [],
         hideOverflow: false,
     },
