@@ -68,8 +68,8 @@ Vue.prototype.$keys = Statamic.$keys;
 import Moment from 'moment';
 window.moment = Vue.moment = Vue.prototype.$moment = Moment;
 
-Vue.use(PortalVue)
-Vue.use(VModal, { componentName: 'vue-modal' })
+Vue.use(PortalVue, { portalName: 'v-portal' })
+Vue.use(VModal, { componentName: 'v-modal' })
 Vue.use(Vuex);
 Vue.use(VCalendar);
 
@@ -85,7 +85,7 @@ Statamic.$store = new Vuex.Store({
 });
 
 import './components/ToastBus';
-import './components/ModalBus';
+import './components/portals/Portals';
 import './components/stacks/Stacks';
 import './components/ProgressBar';
 import './components/DirtyState';
@@ -138,7 +138,7 @@ import AssetContainerCreateForm from './components/asset-containers/CreateForm.v
 import AssetContainerEditForm from './components/asset-containers/EditForm.vue';
 import NavBuilder from './components/nav/Builder.vue';
 import Updater from './components/updater/Updater.vue';
-import PortalTargets from './components/PortalTargets.vue';
+import PortalTargets from './components/portals/PortalTargets.vue';
 
 
 Statamic.app({
@@ -197,13 +197,11 @@ Statamic.app({
     },
 
     data: {
-        showLoginModal: false,
         navOpen: true,
         mobileNavOpen: false,
         showBanner: true,
         portals: [],
         appendedComponents: [],
-        hideOverflow: false,
     },
 
     computed: {
@@ -218,18 +216,6 @@ Statamic.app({
 
         wrapperClass() {
             return this.$config.get('wrapperClass', 'max-w-xl');
-        }
-
-    },
-
-    watch: {
-
-        hideOverflow(hide) {
-            if (hide) {
-                document.body.style.setProperty('overflow', 'hidden')
-            } else {
-                document.body.style.removeProperty('overflow');
-            }
         }
 
     },

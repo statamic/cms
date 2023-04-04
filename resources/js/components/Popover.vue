@@ -5,10 +5,10 @@
         </div>
 
         <portal
-            :to="portalTargetName"
+            name="popover"
             :target-class="`popover-container ${targetClass || ''}`"
+            :provide="provide"
         >
-        <provider :variables="provide">
             <div :class="`${isOpen ? 'popover-open' : ''}`">
                 <div ref="popover" class="popover" v-if="!disabled" v-on-clickaway="clickawayClose">
                     <div class="popover-content bg-white shadow-popover rounded-md">
@@ -16,7 +16,6 @@
                     </div>
                 </div>
             </div>
-        </provider>
         </portal>
 
     </div>
@@ -25,15 +24,10 @@
 <script>
 import { mixin as clickaway } from 'vue-clickaway';
 import { computePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom';
-import Provider from './live-preview/Provider.vue';
 
 export default {
 
     mixins: [ clickaway ],
-
-    components: {
-        Provider,
-    },
 
     props: {
         autoclose: {
@@ -72,22 +66,10 @@ export default {
 
     computed: {
 
-        portalTargetName() {
-            return this.portalTarget ? this.portalTarget.name : null;
-        },
-
         targetClass() {
             return this.$vnode.data.staticClass;
         }
 
-    },
-
-    created() {
-        this.createPortalTarget();
-    },
-
-    beforeDestroy() {
-        this.destroyPortalTarget();
     },
 
     methods: {
@@ -152,18 +134,6 @@ export default {
 
         leave() {
             if (this.autoclose) this.close();
-        },
-
-        createPortalTarget() {
-            let key = `popover-${this._uid}`;
-            let portalTarget = { key, name: key };
-            this.$root.portals.push(portalTarget);
-            this.portalTarget = portalTarget;
-        },
-
-        destroyPortalTarget() {
-            const i = _.findIndex(this.$root.portals, (portal) => portal.key === this.portalTarget.key);
-            this.$root.portals.splice(i, 1);
         },
 
         makeProvide() {

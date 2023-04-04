@@ -1,15 +1,16 @@
 <template>
 
-    <portal :to="portal">
-        <vue-modal v-bind="modalProps" :delay="25" @opened="modalOpened" @closed="modalClosed" :class="{'disable-overflow': overflow === false}" v-show="isTopmostPortal">
+    <portal name="modal">
+        <v-modal v-bind="modalProps" :delay="25" @opened="modalOpened" @closed="modalClosed">
             <slot :close="close" />
-        </vue-modal>
+        </v-modal>
     </portal>
 
 </template>
 
 <script>
 import uniqid from 'uniqid';
+import { disableBodyScroll, enableBodyScroll } from 'body-scroll-lock';
 
 export default {
 
@@ -21,7 +22,6 @@ export default {
         focusTrap: {type: Boolean, default: true},
         height: { default: 'auto' },
         width: {},
-        overflow: { type: Boolean, default: true},
         scrollable: { type: Boolean, default: false}
     },
 
@@ -48,25 +48,16 @@ export default {
             }
         },
 
-        isTopmostPortal() {
-            const portals = this.$root.portals;
-            return portals[portals.length - 1] === this.modal;
-        },
-
-        portal() {
-            return this.modal ? this.modal.key : null;
-        },
-
     },
 
     mounted() {
-        this.modal = this.$modals.open(this.name);
-        this.$root.hideOverflow = true;
+        this.$nextTick(() => this.$modal.show(this.name));
+        if (!this.scrollable) disableBodyScroll(this.$el);
     },
 
-    destroyed() {
+    beforeDestroy() {
+        enableBodyScroll(this.$el);
         this.close();
-        this.$root.hideOverflow = false;
     },
 
     methods: {
@@ -80,7 +71,7 @@ export default {
         },
 
         close() {
-            this.$modals.remove(this.name);
+            this.$modal.hide(this.name);
             this.$emit('closed');
         }
 

@@ -1,6 +1,6 @@
 <template>
 
-    <modal name="delete-entry-confirmation" :overflow="false">
+    <modal name="delete-entry-confirmation">
         <div class="confirmation-modal flex flex-col h-full">
             <div class="text-lg font-medium p-4 pb-0">
                 {{ __('Delete Entry') }}

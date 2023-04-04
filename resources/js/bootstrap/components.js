@@ -50,6 +50,7 @@ import Breadcrumb from '../components/Breadcrumb.vue';
 import Breadcrumbs from '../components/Breadcrumbs.vue';
 import CreateEntryButton from '../components/entries/CreateEntryButton.vue';
 import Popover from '../components/Popover.vue';
+import Portal from '../components/portals/Portal.vue';
 import PermissionTree from '../components/roles/PermissionTree.vue';
 import Modal from '../components/Modal.vue';
 import ConfirmationModal from '../components/modals/ConfirmationModal.vue';
@@ -58,7 +59,6 @@ import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.
 import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
-import Fullscreen from '../components/Fullscreen.vue';
 import CodeBlock from '../components/CodeBlock.vue';
 
 // Third Party
@@ -127,7 +127,7 @@ Vue.component('breadcrumb', Breadcrumb);
 Vue.component('breadcrumbs', Breadcrumbs);
 Vue.component('create-entry-button', CreateEntryButton);
 Vue.component('popover', Popover);
-Vue.component('fullscreen', Fullscreen);
+Vue.component('portal', Portal);
 Vue.component('code-block', CodeBlock);
 
 // Recursive

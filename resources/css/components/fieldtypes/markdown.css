@@ -197,7 +197,6 @@
 .markdown-fieldtype-wrapper.markdown-fullscreen {
     @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none pt-16;
     /* padding-top: 52px;  offset the nav */
-    z-index: 998;
     will-change: transform;
 
     .markdown-toolbar {

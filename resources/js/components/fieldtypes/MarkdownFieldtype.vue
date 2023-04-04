@@ -1,5 +1,5 @@
 <template>
-<fullscreen :enabled="fullScreenMode" target-class="markdown-fieldtype">
+<portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
 <element-container @resized="refresh">
     <div class="markdown-fieldtype-wrapper @container/markdown" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
 
@@ -118,7 +118,7 @@
 
     </div>
 </element-container>
-</fullscreen>
+</portal>
 </template>
 
 <script>

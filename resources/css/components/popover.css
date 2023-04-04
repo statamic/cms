@@ -5,7 +5,6 @@
 .popover {
     pointer-events: none;
     visibility: hidden;
-    z-index: 999;
     position: absolute;
     top: 0;
     left: 0;
@@ -29,8 +28,6 @@
 }
 
 .popover-container {
-    position: relative;
-    z-index: 9999;
     pointer-events: none;
 }
 

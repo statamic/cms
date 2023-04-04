@@ -1,9 +1,9 @@
 <template>
-    <div :class="{ 'stacks-on-stacks': hasStacks }">
+    <div class="portal-targets" :class="{ 'stacks-on-stacks': hasStacks }">
         <portal-target
-            v-for="(portal) in portals"
-            :key="portal.key"
-            :name="portal.key"
+            v-for="(portal, i) in portals"
+            :key="portal.id"
+            :name="portal.id"
         />
     </div>
 </template>
@@ -16,7 +16,7 @@ export default {
     computed: {
 
         portals() {
-            return this.$root.portals;
+            return this.$portals.all();
         },
 
         hasStacks() {
@@ -38,7 +38,7 @@ export default {
         initStacks() {
             this.$events.$on('stacks.hit-area-clicked', (depth) => {
                 for (let count = this.$stacks.count(); count > depth; count--) {
-                    if (! this.$stacks.stacks()[count-1].vm.runCloseCallback()) {
+                    if (! this.$stacks.stacks()[count-1].data.vm.runCloseCallback()) {
                         return;
                     }
                 }

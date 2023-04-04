@@ -166,7 +166,8 @@
 
         </template>
 
-        <portal to="outside">
+        <portal name="asset-editor">
+            <div>
             <focal-point-editor
                 v-if="showFocalPointEditor && isFocalPointEditorEnabled"
                 :data="values.focus"
@@ -181,6 +182,7 @@
                 :url="actionUrl"
                 @started="actionStarted"
                 @completed="actionCompleted" />
+            </div>
         </portal>
 
     </div>
