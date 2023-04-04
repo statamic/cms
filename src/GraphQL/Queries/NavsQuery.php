@@ -21,8 +21,8 @@ class NavsQuery extends Query
 
     public function resolve($root, $args)
     {
-        return Nav::all()->filter(function ($nav) {
-            return in_array($nav->handle(), ResourceAuthorizer::allowedSubResources('graphql', 'navs'));
-        });
+        $allowed = ResourceAuthorizer::allowedSubResources('graphql', 'navs');
+
+        return Nav::all()->filter(fn ($nav) => in_array($nav->handle(), $allowed));
     }
 }
