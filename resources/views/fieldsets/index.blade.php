@@ -22,7 +22,7 @@
         @include('statamic::partials.empty-state', [
             'title' => __('Fieldsets'),
             'description' => __('statamic::messages.fieldset_intro'),
-            'svg' => 'empty/form',
+            'svg' => 'empty/fieldsets',
             'button_text' => __('Create Fieldset'),
             'button_url' => cp_route('fieldsets.create'),
         ])
