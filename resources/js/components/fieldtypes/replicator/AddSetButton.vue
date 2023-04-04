@@ -4,7 +4,7 @@
         <set-picker :sets="groups" :placement="last ? 'bottom-start' : 'bottom'" @added="addSet">
             <template #trigger>
                 <div class="replicator-set-picker-button-wrapper">
-                    <button class="btn-round flex items-center justify-center" :class="{ 'h5 w-5': ! last }" @click="addSetButtonClicked">
+                    <button class="btn-round flex items-center justify-center" :class="{ 'h-5 w-5': ! last }" @click="addSetButtonClicked">
                         <svg-icon name="micro-plus"
                             :class="{
                                 'w-3 h-3 text-gray-800 group-hover:text-black': last,
