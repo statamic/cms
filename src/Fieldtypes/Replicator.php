@@ -108,7 +108,7 @@ class Replicator extends Fieldtype
     public function fields($set)
     {
         return new Fields(
-            $this->config("sets.$set.fields"),
+            $this->flattenedSetsConfig()[$set]['fields'],
             $this->field()->parent(),
             $this->field()
         );
@@ -192,7 +192,7 @@ class Replicator extends Fieldtype
     public function preload()
     {
         $existing = collect($this->field->value())->mapWithKeys(function ($set) {
-            $config = $this->config("sets.{$set['type']}.fields", []);
+            $config = $this->flattenedSetsConfig()[$set['type']]['fields'];
 
             return [$set['_id'] => (new Fields($config))->addValues($set)->meta()->put('_', '_')];
         })->toArray();
