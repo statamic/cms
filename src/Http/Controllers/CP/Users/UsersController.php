@@ -186,6 +186,10 @@ class UsersController extends CpController
             $blueprint->ensureField('groups', ['visibility' => 'read_only']);
         }
 
+        if (User::current()->isSuper() && User::current() != $user) {
+            $blueprint->ensureField('super', ['type' => 'toggle']);
+        }
+
         $values = $user->data()
             ->merge($user->computedData())
             ->merge(['email' => $user->email()]);
@@ -233,6 +237,11 @@ class UsersController extends CpController
         foreach ($values as $key => $value) {
             $user->set($key, $value);
         }
+
+        if (User::current()->isSuper() && User::current() != $user) {
+            $user->super = $request->super;
+        }
+
         $user->email($request->email);
 
         if (User::current()->can('assign roles')) {
