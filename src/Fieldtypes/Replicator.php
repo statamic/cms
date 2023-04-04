@@ -177,7 +177,7 @@ class Replicator extends Fieldtype
         return collect($values)->reject(function ($set, $key) {
             return array_get($set, 'enabled', true) === false;
         })->map(function ($set) use ($shallow) {
-            if (! $this->config("sets.{$set['type']}.fields")) {
+            if (! Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields")) {
                 return $set;
             }
 
