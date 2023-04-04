@@ -21,8 +21,8 @@ class FormsQuery extends Query
 
     public function resolve($root, $args)
     {
-        return Form::all()->filter(function ($form) {
-            return in_array($form->handle(), ResourceAuthorizer::allowedSubResources('graphql', 'forms'));
-        });
+        $allowed = ResourceAuthorizer::allowedSubResources('graphql', 'forms');
+
+        return Form::all()->filter(fn ($form) => in_array($form->handle(), $allowed));
     }
 }
