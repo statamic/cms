@@ -82,7 +82,7 @@ export default {
 
     mixins: [ValidatesFieldConditions, ManagesPreviewText],
 
-    inject: ['setConfigs', 'isReadOnly'],
+    inject: ['bard'],
 
     computed: {
 
@@ -112,6 +112,14 @@ export default {
 
         config() {
             return _.findWhere(this.setConfigs, { handle: this.values.type }) || {};
+        },
+
+        setConfigs() {
+            return this.bard.setConfigs;
+        },
+
+        isReadOnly() {
+            return this.bard.isReadOnly;
         },
 
         enabled: {

@@ -28,6 +28,7 @@
                     :meta="meta"
                     :errors="errors"
                     :localized-fields="localizedFields"
+                    class="px-2"
                     @updated="values = $event"
                 >
                     <div slot-scope="{ container, setFieldMeta }">
@@ -112,9 +113,9 @@ export default {
                 return ! isMissingField(fields, handle);
             }
 
-            // This UI only supports the first section
+            // This UI only supports the first tab
             const blueprint = clone(this.blueprint);
-            const fields = blueprint.sections[0].fields;
+            const fields = blueprint.tabs[0].sections[0].fields;
 
             if (this.type == 'url' && isMissingField(fields, 'url')) {
                 fields.unshift({
@@ -139,12 +140,12 @@ export default {
                 });
             }
 
-            return { ...blueprint, sections: [{ fields }] };
+            return { ...blueprint, tabs: [{ fields }] };
         },
 
         fields() {
-            return _.chain(this.adjustedBlueprint.sections)
-                .map(section => section.fields)
+            return _.chain(this.adjustedBlueprint.tabs)
+                .map(tab => tab.fields)
                 .flatten(true)
                 .value();
         }

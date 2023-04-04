@@ -3,7 +3,7 @@
         <h2>
             <a class="flex items-center" href="{{ $form->showUrl() }}">
                 <div class="h-6 w-6 mr-2 text-gray-800">
-                    @cp_svg('drawer-file')
+                    @cp_svg('icons/default/drawer-file')
                 </div>
                 <span>{{ $title }}</span>
             </a>

@@ -12,11 +12,7 @@
 /* Fancy blur effect */
 #nprogress .peg {
     @apply block absolute right-0 w-full h-full opacity-100;
-    box-shadow: 0 0 10px theme('colors.blue.DEFAULT'), 0 0 5px theme('colors.blue.DEFAULT');
-
-    -webkit-transform: rotate(3deg) translate(0px, -4px);
-    -ms-transform: rotate(3deg) translate(0px, -4px);
-    transform: rotate(3deg) translate(0px, -4px);
+    box-shadow: 0 0 5px theme('colors.blue.DEFAULT'), 0 0 2px theme('colors.blue.DEFAULT');
 }
 
 .nprogress-custom-parent {

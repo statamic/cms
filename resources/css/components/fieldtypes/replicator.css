@@ -24,7 +24,7 @@
     .sortable-handle {
         @apply w-4 border-r rounded-tl p-2;
         cursor: grab;
-        background: transparent url('../../../svg/drag-dots.svg') center center no-repeat;
+        background: transparent url('../../../svg/icons/default/drag-dots.svg') center center no-repeat;
         background-size: 7px 17px;
         &:hover { @apply bg-gray-200; }
     }
@@ -57,12 +57,16 @@
 }
 
 .replicator-set-picker-between {
-    @apply absolute top-0 -mt-8 w-full text-center;
+    @apply absolute top-0 -mt-8 w-full;
 }
 
 /*  Extra contrast when full width */
 .replicator-fieldtype {
     @apply py-6 px-0 bg-gray-200 border-t border-b;
+
+    &:first-child {
+        @apply border-t-0;
+    }
 
     > .field-inner {
         @apply ml-6;

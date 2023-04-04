@@ -99,7 +99,7 @@
                                 <div class="slug-index-field" :title="entry.slug">{{ entry.slug }}</div>
                             </template>
                             <template slot="actions" slot-scope="{ row: entry, index }">
-                                <dropdown-list placement="left-start" scroll>
+                                <dropdown-list placement="left-start">
                                     <dropdown-item :text="__('View')" :external-link="entry.permalink" v-if="entry.viewable && entry.permalink" />
                                     <dropdown-item :text="__('Edit')" :redirect="entry.edit_url" v-if="entry.editable" />
                                     <div class="divider" v-if="entry.actions.length" />
@@ -210,13 +210,15 @@ export default {
 
         getStatusTooltip(entry) {
             if (entry.status === 'published') {
-                return __('messages.status_published_with_date', {date: entry.date})
+                return entry.collection.dated
+                    ? __('messages.status_published_with_date', {date: entry.date})
+                    : null; // The label is sufficient.
             } else if (entry.status === 'scheduled') {
                 return __('messages.status_scheduled_with_date', {date: entry.date})
             } else if (entry.status === 'expired') {
                 return __('messages.status_expired_with_date', {date: entry.date})
             } else if (entry.status === 'draft') {
-                return __('Draft');
+                return null; // The label is sufficient.
             }
         },
 

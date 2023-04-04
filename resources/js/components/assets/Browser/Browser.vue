@@ -47,26 +47,26 @@
                         <div class="card overflow-hidden p-0" :class="{ 'rounded-tl-none': showContainerTabs, 'select-none' : shifting }">
                             <div class="relative w-full">
 
-                                <div class="data-list-header">
-                                    <data-list-search ref="search" v-model="searchQuery" />
+                                <div class="flex items-center justify-between p-2 text-sm">
+                                    <data-list-search class="h-8" ref="search" v-model="searchQuery" />
 
                                     <template v-if="! hasSelections">
-                                        <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-4" @click="creatingFolder = true">
+                                        <button v-if="canCreateFolders" class="btn btn-sm ml-3" @click="creatingFolder = true">
                                             <svg-icon name="folder-add" class="h-4 w-4 mr-2" />
                                             <span>{{ __('Create Folder') }}</span>
                                         </button>
 
-                                        <button v-if="canUpload" class="btn-flat btn-icon-only ml-4" @click="openFileBrowser">
+                                        <button v-if="canUpload" class="btn btn-sm ml-3" @click="openFileBrowser">
                                             <svg-icon name="upload" class="h-4 w-4 mr-2 text-current" />
                                             <span>{{ __('Upload') }}</span>
                                         </button>
                                     </template>
 
-                                    <div class="btn-group ml-4">
-                                        <button class="btn-flat px-4" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
+                                    <div class="btn-group ml-3">
+                                        <button class="btn btn-sm" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                             <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                         </button>
-                                        <button class="btn-flat px-4" @click="setMode('table')" :class="{'active': mode === 'table'}">
+                                        <button class="btn btn-sm" @click="setMode('table')" :class="{'active': mode === 'table'}">
                                             <svg-icon name="assets-mode-table" class="h-4 w-4" />
                                         </button>
                                     </div>
@@ -123,7 +123,7 @@
                                         <td />
 
                                         <th class="actions-column" :colspan="columns.length">
-                                            <dropdown-list placement="left-start" scroll v-if="folderActions(folder).length">
+                                            <dropdown-list placement="left-start" v-if="folderActions(folder).length">
                                                 <!-- TODO: Folder edit -->
                                                 <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
 
@@ -158,7 +158,7 @@
                                 </template>
 
                                 <template slot="actions" slot-scope="{ row: asset }">
-                                    <dropdown-list placement="left-start" scroll>
+                                    <dropdown-list placement="left-start">
                                         <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
@@ -213,9 +213,9 @@
                                          </dropdown-list>
                                     </div>
                                     <!-- Assets -->
-                                    <button class="asset-tile outline-none group relative" v-for="(asset, index) in assets" :key="asset.id" :class="{ 'selected': isSelected(asset.id) }" @click="toggleSelection(asset.id, index, $event)" @dblclick="$emit('edit-asset', asset)">
+                                    <button class="asset-tile outline-none group relative" v-for="(asset, index) in assets" :key="asset.id" :class="{ 'selected': isSelected(asset.id) }">
                                         <div class="asset-thumb-container">
-                                            <div class="asset-thumb">
+                                            <div class="asset-thumb" @click="toggleSelection(asset.id, index, $event)" @dblclick="$emit('edit-asset', asset)">
                                                 <img v-if="asset.is_image" :src="asset.thumbnail" loading="lazy" :class="{'p-4 h-full w-full': asset.extension === 'svg'}" />
                                                 <file-icon
                                                     v-else
@@ -227,7 +227,7 @@
                                         <div class="asset-meta">
                                             <div class="asset-filename px-2 py-1 text-center" v-text="asset.basename" :title="asset.basename" />
                                         </div>
-                                        <dropdown-list autoclose class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
+                                        <dropdown-list class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
                                              <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                              <div class="divider" v-if="asset.actions.length" />
                                              <data-list-inline-actions

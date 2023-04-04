@@ -27,6 +27,7 @@
                 :name="name"
                 :can-delete-rows="canDeleteRows"
                 :can-add-rows="canAddRows"
+                :allow-fullscreen="config.fullscreen"
                 @updated="updated"
                 @meta-updated="updateRowMeta"
                 @removed="removed"

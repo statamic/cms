@@ -149,7 +149,7 @@ return [
     'session_expiry_logged_out_for_inactivity' => 'Odjavljeni ste bili, ker ste bili nekaj časa neaktivni.',
     'session_expiry_logging_out_in_seconds' => 'Nekaj časa ste bili neaktivni in se boste odjavili v :seconds sekundah. Kliknite, če želite podaljšati sejo.',
     'session_expiry_new_window' => 'Odpre se v novem oknu. Vrnite se, ko se prijavite.',
-    'tab_sections_instructions' => 'Polja v vsakem odseku bodo združena v zavihke. Ustvarite nova polja, znova uporabite obstoječa polja ali uvozite celotne skupine polj iz obstoječih naborov polj.',
+    'tabs_instructions' => 'Polja v vsakem odseku bodo združena v zavihke. Ustvarite nova polja, znova uporabite obstoječa polja ali uvozite celotne skupine polj iz obstoječih naborov polj.',
     'taxonomies_blueprints_instructions' => 'Izrazi v tej taksonomiji lahko uporabljajo katerega koli od teh načrtov.',
     'taxonomies_collections_instructions' => 'Zbirke, ki uporabljajo to taksonomijo.',
     'taxonomy_configure_handle_instructions' => 'Uporablja se za sklicevanje na to taksonomijo na sprednji strani. Pozneje se spreminjati ni trivialno.',

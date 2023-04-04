@@ -41,10 +41,9 @@
                 </div>
             </div>
 
-            <publish-sections
+            <publish-tabs
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
-                :can-toggle-labels="canToggleLabels"
                 :enable-sidebar="hasSidebar"
                 :read-only="readOnly" />
         </div>
@@ -63,7 +62,6 @@ export default {
         name: { type: String, default: 'base' },
         breadcrumbs: Array,
         action: String,
-        canToggleLabels: { type: Boolean, default: true },
         readOnly: { type: Boolean, default: false },
         reloadOnSave: { type: Boolean, default: false },
         saveAsOptions: { type: Array, default: () => [] },
@@ -75,7 +73,7 @@ export default {
             currentValues: this.values,
             error: null,
             errors: {},
-            hasSidebar: this.blueprint.sections.map(section => section.handle).includes('sidebar'),
+            hasSidebar: this.blueprint.tabs.map(tab => tab.handle).includes('sidebar'),
         }
     },
 

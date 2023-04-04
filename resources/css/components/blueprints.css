@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .blueprint-section {
-    @apply p-2 min-h-40 outline-none;
+    @apply p-2 min-h-40 outline-none w-full;
 
     &.draggable-source--is-dragging {
         opacity: 0.5;
@@ -17,7 +17,7 @@
 .blueprint-drag-handle {
     @apply flex-none;
     cursor: move;
-    background: rgba(0, 0, 0, 0.01) url('../../svg/drag-dots.svg') 50% 50% no-repeat;
+    background: rgba(0, 0, 0, 0.01) url('../../svg/icons/default/drag-dots.svg') 50% 50% no-repeat;
     background-size: 7px 17px;
 }
 
@@ -35,12 +35,6 @@
     &.draggable-mirror {
         @apply shadow-lg;
     }
-}
-
-/*  Use specific selector because we don't want it to happen */
-/*  when used inside  a grid field configuratormajig. */
-.blueprint-section .blueprint-section-field-actions > div {
-    @apply w-1/2;
 }
 
 .blueprint-section-import {
@@ -69,7 +63,7 @@
 }
 
 .blueprint-add-section-button {
-    @apply relative w-full border border-gray-500 border-dashed rounded flex justify-center items-center text-gray-700;
+    @apply relative w-full border border-gray-500 border-dashed rounded-lg flex justify-center items-center text-gray-700;
 
     &:hover {
         @apply border-gray text-gray-950;
@@ -88,5 +82,3 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 }
-
-

@@ -15,7 +15,7 @@
     <div class="flex flex-wrap">
         <a href="{{ cp_route('collections.edit', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
             <div class="h-8 w-8 mr-4 text-gray-800">
-                @cp_svg('hammer-wrench')
+                @cp_svg('icons/default/hammer-wrench')
             </div>
             <div class="flex-1 mb-4 md:mb-0 md:mr-6">
                 <h3 class="mb-2 text-blue">{{ __('Configure Collection') }} &rarr;</h3>
@@ -29,7 +29,7 @@
             class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group"
         >
             <div class="h-8 w-8 mr-4 text-gray-800">
-                @cp_svg('content-writing')
+                @cp_svg('icons/default/content-writing')
             </div>
             <div class="flex-1 mb-4 md:mb-0 md:mr-6">
                 <h3 class="mb-2 text-blue">{{ $collection->createLabel() }} @if (!$multipleBlueprints)&rarr;@endif</h3>
@@ -44,7 +44,7 @@
         @if ($multipleBlueprints)</div>@else</a>@endif
         <a href="{{ cp_route('collections.blueprints.index', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
             <div class="h-8 w-8 mr-4 text-gray-800">
-                @cp_svg('blueprint')
+                @cp_svg('icons/default/blueprint')
             </div>
             <div class="flex-1 mb-4 md:mb-0 md:mr-6">
                 <h3 class="mb-2 text-blue">{{ __('Configure Blueprints') }} &rarr;</h3>
@@ -53,7 +53,7 @@
         </a>
         <a href="{{ cp_route('collections.scaffold', $collection->handle()) }}" class="w-full lg:w-1/2 p-4 flex items-start hover:bg-gray-200 rounded-md group">
             <div class="h-8 w-8 mr-4 text-gray-800">
-                @cp_svg('crane')
+                @cp_svg('icons/default/crane')
             </div>
             <div class="flex-1 mb-4 md:mb-0 md:mr-6">
                 <h3 class="mb-2 text-blue">{{ __('Scaffold Views') }} &rarr;</h3>

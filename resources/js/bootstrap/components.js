@@ -9,7 +9,8 @@ import Fields from '../components/publish/Fields.vue';
 import FieldsContainer from '../components/publish/FieldsContainer.vue'; // deprecated
 import Field from '../components/publish/Field.vue';
 import FieldMeta from '../components/publish/FieldMeta.vue';
-import ConfigureSections from '../components/configure/Sections.vue';
+import ConfigureTabs from '../components/configure/Tabs.vue';
+import PublishTabs from '../components/publish/Tabs.vue';
 import PublishSections from '../components/publish/Sections.vue';
 import PublishValidationErrors from '../components/publish/ValidationErrors.vue';
 import FormGroup from '../components/publish/FormGroup.vue';
@@ -57,7 +58,6 @@ import KeyboardShortcutsModal from '../components/modals/KeyboardShortcutsModal.
 import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
-import panes from '../components/panes/Pane.vue';
 import Fullscreen from '../components/Fullscreen.vue';
 import CodeBlock from '../components/CodeBlock.vue';
 
@@ -76,7 +76,8 @@ Vue.component('publish-fields', Fields);
 Vue.component('publish-fields-container', FieldsContainer);
 Vue.component('publish-field', Field);
 Vue.component('publish-field-meta', FieldMeta);
-Vue.component('configure-sections', ConfigureSections);
+Vue.component('configure-tabs', ConfigureTabs);
+Vue.component('publish-tabs', PublishTabs);
 Vue.component('publish-sections', PublishSections);
 Vue.component('publish-validation-errors', PublishValidationErrors);
 Vue.component('form-group', FormGroup);
@@ -141,5 +142,3 @@ Vue.component('resource-deleter', ResourceDeleter);
 
 Vue.component('stack', Stack);
 Vue.component('stack-test', StackTest);
-
-Vue.component('pane', panes);

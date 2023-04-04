@@ -5,7 +5,7 @@
 </head>
 
 <body>
-      <div id="statamic" :style="{ marginRight: panes.length ? `24rem` : null }">
+      <div id="statamic">
 
       @include('statamic::partials.session-expiry')
       @include('statamic::partials.licensing-alerts')
@@ -47,8 +47,6 @@
             <portal-targets></portal-targets>
 
             <portal-target name="live-preview"></portal-target>
-
-            <portal-target name="pane" :slim="true"></portal-target>
 
             <portal-target name="outside"></portal-target>
       </div>

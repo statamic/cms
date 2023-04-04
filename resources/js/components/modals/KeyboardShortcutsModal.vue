@@ -1,5 +1,5 @@
 <template>
-    <modal v-if="open" name="keyboard-shortcuts" width="380" height="auto" :adaptive="true" :pivotY=".1" @closed="open = false" v-on-clickaway="close">
+    <modal v-if="open" name="keyboard-shortcuts" width="380" height="auto" :adaptive="true" @closed="open = false" v-on-clickaway="close">
         <h1 class="p-4 bg-gray-200 border-b text-center">
             {{ __('Keyboard Shortcuts') }}
         </h1>

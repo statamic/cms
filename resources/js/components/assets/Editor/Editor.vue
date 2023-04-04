@@ -117,7 +117,7 @@
                     :blueprint="fieldset"
                     :values="values"
                     :meta="meta"
-
+                    :errors="errors"
                     @updated="values = { ...$event, focus: values.focus }"
                 >
                     <div class="w-full sm:p-4 md:pt-px md:w-1/3 md:grow h-1/2 md:h-full overflow-scroll" slot-scope="{ setFieldValue, setFieldMeta }">
@@ -126,15 +126,15 @@
                             <loading-graphic text="Saving" />
                         </div>
 
-                        <div class="card p-0">
-                            <div v-if="error" class="bg-red-500 text-white p-4 shadow mb-4" v-text="error" />
-                            <publish-fields
-                                :fields="fields"
-                                :read-only="readOnly"
-                                @updated="setFieldValue"
-                                @meta-updated="setFieldMeta"
-                            />
-                        </div>
+                        <div v-if="error" class="bg-red-500 text-white p-4 shadow mb-4" v-text="error" />
+
+                        <publish-sections
+                            :sections="fieldset.tabs[0].sections"
+                            :read-only="readOnly"
+                            @updated="setFieldValue"
+                            @meta-updated="setFieldMeta"
+                        />
+
                     </div>
                 </publish-container>
             </div>
@@ -306,7 +306,9 @@ export default {
                 this.actions = data.actions;
 
                 this.fieldset = data.blueprint;
-                this.fields = _.chain(this.fieldset.sections)
+                this.fields = _.chain(this.fieldset.tabs)
+                    .map(tab => tab.sections)
+                    .flatten(true)
                     .map(section => section.fields)
                     .flatten(true)
                     .value();

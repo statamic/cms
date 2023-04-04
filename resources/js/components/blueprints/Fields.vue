@@ -4,6 +4,8 @@
 
         <div class="blueprint-section-draggable-zone -mx-1"
             :class="{ 'flex flex-wrap flex-1': fields.length }"
+            :data-tab="tabId"
+            :data-section="sectionId"
         >
             <slot name="empty-state" v-if="!fields.length" />
 
@@ -13,7 +15,6 @@
                 :key="field._id"
                 :field="field"
                 :is-editing="editingField === field._id"
-                :is-section-expanded="isSectionExpanded"
                 :suggestable-condition-fields="suggestableConditionFields"
                 :can-define-localizable="canDefineLocalizable"
                 @edit="$emit('field-editing', field._id)"
@@ -86,9 +87,10 @@ export default {
     },
 
     props: {
+        tabId: String,
+        sectionId: String,
         fields: Array,
         editingField: {},
-        isSectionExpanded: Boolean,
         suggestableConditionFields: Array,
         excludeFieldset: String,
     },
@@ -109,18 +111,14 @@ export default {
         fieldtypeSelected(field) {
             this.isSelectingNewFieldtype = false;
 
-            const handle = field.type;
-
             const pending = {
                 _id: uniqid(),
                 type: 'inline',
                 fieldtype: field.type,
                 icon: field.icon,
-                handle,
                 config: {
                     ...field,
                     isNew: true,
-                    handle
                 }
             };
 

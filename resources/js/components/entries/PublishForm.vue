@@ -84,12 +84,11 @@
                         v-on="component.events"
                     />
 
-                    <transition name="live-preview-sections-drop">
-                        <publish-sections
-                            v-show="sectionsVisible"
+                    <transition name="live-preview-tabs-drop">
+                        <publish-tabs
+                            v-show="tabsVisible"
                             :read-only="readOnly"
                             :syncable="hasOrigin"
-                            :can-toggle-labels="true"
                             @updated="setFieldValue"
                             @meta-updated="setFieldMeta"
                             @synced="syncField"
@@ -101,20 +100,20 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-4 flex items-center -mx-2" v-if="showLivePreviewButton || showVisitUrlButton">
+                                    <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
-                                            class="flex items-center justify-center btn-flat w-full mx-2 px-2"
+                                            class="flex items-center justify-center btn w-full"
                                             v-if="showLivePreviewButton"
                                             @click="openLivePreview">
-                                            <svg-icon name="synchronize" class="h-4 w-4 mr-2" />
+                                            <svg-icon name="synchronize" class="h-4 w-4 mr-2 shrink-0" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
-                                            class="flex items-center justify-center btn-flat w-full mx-2 px-2"
+                                            class="flex items-center justify-center btn w-full"
                                             v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">
-                                            <svg-icon name="external-link" class="w-4 h-4 mr-2" />
+                                            <svg-icon name="external-link" class="w-4 h-4 mr-2 shrink-0" />
                                             <span>{{ __('Visit URL') }}</span>
                                         </a>
                                     </div>
@@ -189,7 +188,7 @@
                                 </div>
 
                             </template>
-                        </publish-sections>
+                        </publish-tabs>
                     </transition>
                 </div>
                 <template v-slot:buttons>
@@ -364,7 +363,7 @@ export default {
             error: null,
             errors: {},
             isPreviewing: false,
-            sectionsVisible: true,
+            tabsVisible: true,
             state: 'new',
             revisionMessage: null,
             showRevisionHistory: false,
@@ -695,18 +694,18 @@ export default {
         },
 
         openLivePreview() {
-            this.sectionsVisible = false;
+            this.tabsVisible = false;
             this.$wait(200)
                 .then(() => {
                     this.isPreviewing = true;
                     return this.$wait(300);
                 })
-                .then(() => this.sectionsVisible = true);
+                .then(() => this.tabsVisible = true);
         },
 
         closeLivePreview() {
             this.isPreviewing = false;
-            this.sectionsVisible = true;
+            this.tabsVisible = true;
         },
 
         publishActionCompleted({ published, isWorkingCopy, response }) {
