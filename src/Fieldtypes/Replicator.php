@@ -222,7 +222,7 @@ class Replicator extends Fieldtype
         ];
     }
 
-    protected function flattenedSetsConfig()
+    public function flattenedSetsConfig()
     {
         $sets = collect($this->config('sets'));
 
