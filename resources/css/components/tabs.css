@@ -6,7 +6,7 @@
     @apply w-full border-b text-md relative flex;
 
    .fade-left, .fade-right {
-        @apply absolute w-4 inset-y-0 from-gray-300 pointer-events-none z-10;
+        @apply absolute w-4 inset-y-0 from-gray-300 pointer-events-none z-2;
     }
 
     .fade-left {
