@@ -213,9 +213,16 @@
                                          </dropdown-list>
                                     </div>
                                     <!-- Assets -->
-                                    <button class="asset-tile outline-none group relative" v-for="(asset, index) in assets" :key="asset.id" :class="{ 'selected': isSelected(asset.id) }">
+                                    <button
+                                        class="asset-tile outline-none group relative"
+                                        v-for="(asset, index) in assets"
+                                        :key="asset.id"
+                                        :class="{ 'selected': isSelected(asset.id) }"
+                                        @click="toggleSelection(asset.id, index, $event)"
+                                        @dblclick="$emit('edit-asset', asset)"
+                                    >
                                         <div class="asset-thumb-container">
-                                            <div class="asset-thumb" @click="toggleSelection(asset.id, index, $event)" @dblclick="$emit('edit-asset', asset)">
+                                            <div class="asset-thumb">
                                                 <img v-if="asset.is_image" :src="asset.thumbnail" loading="lazy" :class="{'p-4 h-full w-full': asset.extension === 'svg'}" />
                                                 <file-icon
                                                     v-else
