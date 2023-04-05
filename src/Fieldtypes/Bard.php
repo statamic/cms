@@ -378,12 +378,12 @@ class Bard extends Replicator
     {
         $values = parent::preProcessRow($row['attrs']['values'], $index);
 
-        unset($values['_id']);
+        $generatedId = Arr::pull($values, '_id');
 
         return [
             'type' => 'set',
             'attrs' => [
-                'id' => $row['attrs']['id'] ?? str_random(8),
+                'id' => $row['attrs']['id'] ?? $generatedId,
                 'enabled' => $row['attrs']['enabled'] ?? true,
                 'values' => Arr::except($values, 'enabled'),
             ],
