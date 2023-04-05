@@ -3,8 +3,10 @@
         <v-select
             ref="input"
             class="w-full"
-            :name="name"
+            append-to-body
+            :calculate-position="withPopper"
             clearable
+            :name="name"
             :disabled="config.disabled || isReadOnly"
             :options="options"
             :placeholder="config.placeholder || 'Search ...'"
@@ -35,7 +37,9 @@
 </template>
 
 <script>
+import { createPopper } from '@popperjs/core'
 export default {
+
 
     mixins: [Fieldtype],
 
@@ -68,7 +72,26 @@ export default {
             } else {
                 this.update(null);
             }
-        }
+        },
+
+        withPopper(dropdownList, component, { width }) {
+
+            dropdownList.style.width = width
+
+            const popper = createPopper(component.$refs.toggle, dropdownList, {
+                placement: 'bottom-start',
+                modifiers: [
+                    {
+                        name: 'offset',
+                        options: {
+                            offset: [0, -1],
+                        },
+                    },
+                ],
+            })
+
+            return () => popper.destroy()
+        },
     }
 };
 </script>
