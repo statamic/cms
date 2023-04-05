@@ -4,7 +4,7 @@
             ref="input"
             class="w-full"
             append-to-body
-            :calculate-position="withPopper"
+            :calculate-position="positionOptions"
             clearable
             :name="name"
             :disabled="config.disabled || isReadOnly"
@@ -37,9 +37,9 @@
 </template>
 
 <script>
-import { createPopper } from '@popperjs/core'
-export default {
+import { computePosition, offset } from '@floating-ui/dom';
 
+export default {
 
     mixins: [Fieldtype],
 
@@ -74,23 +74,21 @@ export default {
             }
         },
 
-        withPopper(dropdownList, component, { width }) {
-
+        positionOptions(dropdownList, component, { width }) {
             dropdownList.style.width = width
 
-            const popper = createPopper(component.$refs.toggle, dropdownList, {
-                placement: 'bottom-start',
-                modifiers: [
-                    {
-                        name: 'offset',
-                        options: {
-                            offset: [0, -1],
-                        },
-                    },
-                ],
-            })
-
-            return () => popper.destroy()
+            computePosition(component.$refs.toggle, dropdownList, {
+                placement: 'bottom',
+                middleware: [
+                    offset({ mainAxis: 0, crossAxis: -1 }),
+                ]
+            }).then(({ x, y }) => {
+                Object.assign(dropdownList.style, {
+                    // Round to avoid blurry text
+                    left: `${Math.round(x)}px`,
+                    top: `${Math.round(y)}px`,
+                });
+            });
         },
     }
 };

@@ -3,6 +3,8 @@
         <v-select
             ref="input"
             class="flex-1"
+            append-to-body
+            :calculate-position="positionOptions"
             :name="name"
             :clearable="config.clearable"
             :disabled="config.disabled || isReadOnly || (config.multiple && limitReached)"
@@ -63,6 +65,7 @@
 
 <script>
 import HasInputOptions from './HasInputOptions.js'
+import { computePosition, offset } from '@floating-ui/dom';
 
 export default {
 
@@ -145,7 +148,24 @@ export default {
                     this.update(null);
                 }
             }
-        }
+        },
+
+        positionOptions(dropdownList, component, { width }) {
+            dropdownList.style.width = width
+
+            computePosition(component.$refs.toggle, dropdownList, {
+                placement: 'bottom',
+                middleware: [
+                    offset({ mainAxis: 0, crossAxis: -1 }),
+                ]
+            }).then(({ x, y }) => {
+                Object.assign(dropdownList.style, {
+                    // Round to avoid blurry text
+                    left: `${Math.round(x)}px`,
+                    top: `${Math.round(y)}px`,
+                });
+            });
+        },
     }
 };
 </script>
