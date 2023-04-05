@@ -3,7 +3,7 @@
 
     <div class="mb-5">
         <button @click="grid.toggleFullScreen" class="flex items-center w-full h-full justify-center text-gray-500 hover:text-gray-700">
-            <svg-icon name="expand-2" class="h-3.5 w-3.5" v-show="! grid.fullScreenMode" />
+            <svg-icon name="expand-bold" class="h-3.5 w-3.5" v-show="! grid.fullScreenMode" />
             <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="grid.fullScreenMode" />
         </button>
     </div>

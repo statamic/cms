@@ -21,11 +21,11 @@
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >
-                    <svg-icon name="chevron-down-xs" class="h-1.5" />
+                    <svg-icon name="micro/chevron-down-xs" class="h-1.5" />
                 </button>
 
                 <div v-if="page.collection" class="ml-4 flex items-center">
-                    <svg-icon name="content-writing" class="w-4 h-4" />
+                    <svg-icon name="light/content-writing" class="w-4 h-4" />
                     <div class="ml-1">
                         <a :href="page.collection.create_url" v-text="__('Add')" />
                         <span class="text-gray">/</span>

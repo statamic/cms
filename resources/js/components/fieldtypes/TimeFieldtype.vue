@@ -2,7 +2,7 @@
     <div class="time-fieldtype-container">
         <div class="input-group">
             <div class="input-group-prepend flex items-center">
-                <svg-icon name="time" class="w-4 h-4" />
+                <svg-icon name="light/time" class="w-4 h-4" />
             </div>
             <div
                 class="input-text flex items-center px-1 w-auto"

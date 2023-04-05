@@ -161,7 +161,7 @@ class NavItem
                 return $value ?? Statamic::svg('entries');
             })
             ->setter(function ($value) {
-                return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/default/'.$value);
+                return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
             })
             ->args(func_get_args());
     }

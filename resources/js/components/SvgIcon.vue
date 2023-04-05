@@ -6,12 +6,12 @@
 import { defineAsyncComponent } from 'vue';
 
 const splitIcon = function(icon) {
-    if (! icon.includes('/')) icon = 'default/' + icon;
+    if (! icon.includes('/')) icon = 'regular/' + icon;
     return icon.split('/');
 }
 
 const fallbackIconImport = function() {
-    return import('./../../svg/icons/default/image.svg');
+    return import('./../../svg/icons/regular/image.svg');
 }
 
 export default {

@@ -39,8 +39,8 @@
                             <button class="btn btn-sm" v-text="__('Cancel')" v-show="! alwaysShowFilters && showFilters" @click="filtersHide" />
                             <button class="btn btn-sm" v-text="__('Save')" v-show="showFilters && isDirty" @click="$refs.presets.savePreset()" />
                             <button class="btn flex items-center btn-sm w-12" @click="handleShowFilters" v-if="! showFilters" v-tooltip="__('Show Filter Controls (F)')">
-                                <svg-icon name="search" class="w-4 h-4" />
-                                <svg-icon name="filter-lines" class="w-4 h-4" />
+                                <svg-icon name="light/search" class="w-4 h-4" />
+                                <svg-icon name="light/filter-lines" class="w-4 h-4" />
                             </button>
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                         </div>

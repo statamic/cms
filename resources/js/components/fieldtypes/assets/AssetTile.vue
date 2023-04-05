@@ -58,7 +58,7 @@
                         class="btn btn-icon"
                         :alt="__('Open in a new window')"
                     >
-                        <svg-icon name="external-link" class="h-4 my-2" />
+                        <svg-icon name="light/external-link" class="h-4 my-2" />
                     </button>
 
                     <button

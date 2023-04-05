@@ -14,7 +14,7 @@
                         <svg-icon class="h-4 w-4" name="pencil" />
                     </button>
                     <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-700 hover:text-gray-950">
-                        <svg-icon class="h-4 w-4" name="trash" />
+                        <svg-icon class="h-4 w-4" name="micro/trash" />
                     </button>
                 </div>
             </div>

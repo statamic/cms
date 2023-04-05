@@ -12,7 +12,7 @@ class SvgTagTest extends TestCase
     {
         parent::setUp();
 
-        File::copy(__DIR__.'/../../resources/svg/icons/default/users.svg', resource_path('users.svg'));
+        File::copy(__DIR__.'/../../resources/svg/icons/regular/users.svg', resource_path('users.svg'));
     }
 
     private function tag($tag)
