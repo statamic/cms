@@ -15,6 +15,7 @@
             <sortable-list
                 v-model="selectedColumns"
                 :vertical="true"
+                :distance="10"
                 item-class="item"
                 handle-class="item"
                 append-to=".popover-content"
