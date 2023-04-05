@@ -4,7 +4,7 @@
             ref="input"
             class="w-full"
             append-to-body
-            :calculate-position="withPopper"
+            :calculate-position="positionOptions"
             clearable
             :name="name"
             :disabled="config.disabled || isReadOnly"
@@ -74,7 +74,7 @@ export default {
             }
         },
 
-        withPopper(dropdownList, component, { width }) {
+        positionOptions(dropdownList, component, { width }) {
             dropdownList.style.width = width
 
             computePosition(component.$refs.toggle, dropdownList, {
