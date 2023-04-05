@@ -203,7 +203,7 @@ GQL;
     }
 
     /** @test */
-    public function it_can_filters_users_when_configuration_allows_for_it()
+    public function it_can_filter_users_when_configuration_allows_for_it()
     {
         $this->createUsers();
         User::find('3')->set('bio', 'That was so rad!')->save();
