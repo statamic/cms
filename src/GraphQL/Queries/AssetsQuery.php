@@ -85,6 +85,6 @@ class AssetsQuery extends Query
 
     public function allowedFilters($args)
     {
-        return FilterAuthorizer::allowedForSubResources('graphql', 'assets', $args['container'] ?? '*');
+        return FilterAuthorizer::allowedForSubResources('graphql', 'assets', $args['container']);
     }
 }
