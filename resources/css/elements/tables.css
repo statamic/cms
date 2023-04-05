@@ -16,7 +16,7 @@
 }
 
 .data-list-bulk-actions {
-	@apply bg-white absolute w-full py-2 z-10;
+	@apply bg-white absolute w-full py-2 z-1;
 	padding-left: 56px;
 }
 
@@ -141,7 +141,7 @@
 /* Sticky Meta Columns */
 .data-table {
     thead th.checkbox-column {
-        @apply p-0 pr-2 sticky -left-px;
+        @apply p-0 pr-2 sticky z-1 -left-px;
         background-image: linear-gradient(to right, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
         width: 45px;
         min-width: 45px;
@@ -167,11 +167,11 @@
     }
 
     tbody tr.row-selected .checkbox-column {
-        background-image: linear-gradient(to left, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
+        background-image: linear-gradient(to right, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
     }
 
     tbody tr.row-selected .actions-column {
-        background-image: linear-gradient(to right, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
+        background-image: linear-gradient(to left, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
     }
 
     tbody tr:hover .checkbox-column {
