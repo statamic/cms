@@ -1,6 +1,7 @@
 <template>
     <div :class="{'popover-open': isOpen}" @mouseleave="leave">
-        <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$scopedSlots.default">
+
+        <div @click.stop="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$scopedSlots.default">
             <slot name="trigger"></slot>
         </div>
 
