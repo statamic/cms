@@ -33,7 +33,7 @@ export default {
 
     data () {
         return {
-            color: this.config.default
+            color: this.value
         }
     },
 
@@ -57,10 +57,7 @@ export default {
                 : null;
         }
 
-    },
+    }
 
-    mounted() {
-        this.color = this.value
-    },
 };
 </script>
