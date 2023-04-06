@@ -600,7 +600,7 @@ class Bard extends Replicator
 
     public function addGqlTypes()
     {
-        $types = collect($this->config('sets'))
+        $types = collect($this->flattenedSetsConfig())
             ->each(function ($set, $handle) {
                 $this->fields($handle)->all()->each(function ($field) {
                     $field->fieldtype()->addGqlTypes();
