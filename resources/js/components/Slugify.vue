@@ -42,11 +42,8 @@ export default {
             if (to !== this.slug) this.shouldSlugify = false;
         },
 
-        slug: {
-            immediate: true,
-            handler(slug) {
-                this.$emit('slugified', slug);
-            }
+        slug(slug) {
+            this.$emit('slugified', slug);
         }
 
     },
