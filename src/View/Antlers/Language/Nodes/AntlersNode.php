@@ -21,13 +21,6 @@ use Throwable;
 class AntlersNode extends AbstractNode
 {
     /**
-     * Indicates if the runtime has abandoned this node.
-     *
-     * @var bool
-     */
-    public $isNodeAbandoned = false;
-
-    /**
      * Indicates if the parsed node is an Antlers comment.
      *
      * @var bool
@@ -673,5 +666,15 @@ class AntlersNode extends AbstractNode
     public function rawContent()
     {
         return $this->rawStart.$this->content.$this->rawEnd;
+    }
+
+    public function isAbandoned()
+    {
+        return in_array($this->refId, GlobalRuntimeState::$abandonedNodes);
+    }
+
+    public function abandon()
+    {
+        GlobalRuntimeState::$abandonedNodes[] = $this->refId;
     }
 }

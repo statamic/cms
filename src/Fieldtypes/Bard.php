@@ -84,6 +84,12 @@ class Bard extends Replicator
                         'type' => 'toggle',
                         'default' => false,
                     ],
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
                     'allow_source' => [
                         'display' => __('Allow Source Mode'),
                         'instructions' => __('statamic::fieldtypes.bard.config.allow_source'),
@@ -177,7 +183,7 @@ class Bard extends Replicator
                 'fields' => [
                     'sets' => [
                         'display' => __('Sets'),
-                        'hide_meta' => true,
+                        'hide_display' => true,
                         'type' => 'sets',
                         'full_width_setting' => true,
                         'require_set' => false,
@@ -372,12 +378,12 @@ class Bard extends Replicator
     {
         $values = parent::preProcessRow($row['attrs']['values'], $index);
 
-        unset($values['_id']);
+        $generatedId = Arr::pull($values, '_id');
 
         return [
             'type' => 'set',
             'attrs' => [
-                'id' => $row['attrs']['id'] ?? str_random(8),
+                'id' => $row['attrs']['id'] ?? $generatedId,
                 'enabled' => $row['attrs']['enabled'] ?? true,
                 'values' => Arr::except($values, 'enabled'),
             ],
@@ -515,7 +521,7 @@ class Bard extends Replicator
             return $item['type'] === 'set';
         })->mapWithKeys(function ($set) {
             $values = $set['attrs']['values'];
-            $config = $this->config("sets.{$values['type']}.fields", []);
+            $config = Arr::get($this->flattenedSetsConfig(), "{$values['type']}.fields", []);
 
             return [$set['attrs']['id'] => (new Fields($config))->addValues($values)->meta()->put('_', '_')];
         })->toArray();
@@ -594,7 +600,7 @@ class Bard extends Replicator
 
     public function addGqlTypes()
     {
-        $types = collect($this->config('sets'))
+        $types = collect($this->flattenedSetsConfig())
             ->each(function ($set, $handle) {
                 $this->fields($handle)->all()->each(function ($field) {
                     $field->fieldtype()->addGqlTypes();

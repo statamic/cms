@@ -12,7 +12,7 @@
         >
             <template #selected-option="option">
                 <div class="flex items-center px-2 text-sm text-gray hover:text-gray-800 anti">
-                    <svg-icon name="sites" class="site-selector-icon mr-2 h-4 w-4" />
+                    <svg-icon name="sites" class="mr-2 h-4 w-4" />
                     <div class="whitespace-nowrap">{{ option.name }}</div>
                 </div>
             </template>

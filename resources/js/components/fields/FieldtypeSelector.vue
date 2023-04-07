@@ -24,7 +24,7 @@
                             <button class="bg-white border border-gray-500 flex items-center group w-full rounded hover:border-gray-600 shadow-sm hover:shadow-md pr-3"
                                 @click="select(fieldtype)">
                                 <div class="p-2 flex items-center border-r border-gray-500 group-hover:border-gray-600 bg-gray-200 rounded-l">
-                                    <svg-icon class="h-5 w-5 text-gray-800" :name="fieldtype.icon" default="generic-field"></svg-icon>
+                                    <svg-icon class="h-5 w-5 text-gray-800" :name="`light/${fieldtype.icon}`" default="light/generic-field"></svg-icon>
                                 </div>
                                 <span class="pl-3 text-gray-800 text-md group-hover:text-gray-900">{{ fieldtype.text }}</span>
                             </button>
@@ -209,8 +209,9 @@ export default {
             // and id keys. This will be 'field_n' etc, where n would be the total root
             // level, grid, or set fields depending on the event listener location.
             let field = {
-                display: `${fieldtype.title} ${__('Field')}`,
                 type: fieldtype.handle,
+                display: `${fieldtype.title} ${__('Field')}`,
+                handle: null, // The handle will be generated from the display by the "slug" fieldtype.
                 icon: fieldtype.icon,
                 instructions: null,
                 localizable: false,

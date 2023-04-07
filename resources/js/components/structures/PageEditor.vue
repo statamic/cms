@@ -28,6 +28,7 @@
                     :meta="meta"
                     :errors="errors"
                     :localized-fields="localizedFields"
+                    class="px-2"
                     @updated="values = $event"
                 >
                     <div slot-scope="{ container, setFieldMeta }">
@@ -54,7 +55,7 @@
 
                     <div class="text-xs mt-4" v-if="type === 'entry'">
                         <a :href="editEntryUrl" target="_blank" class="flex items-center justify-center text-blue hover:text-blue underline">
-                            <svg-icon name="external-link" class="w-4 h-4 mr-2" />
+                            <svg-icon name="light/external-link" class="w-4 h-4 mr-2" />
                             {{ __('Edit Entry') }}
                         </a>
                     </div>

@@ -122,7 +122,7 @@
             <template #branch-icon="{ branch }">
                 <svg-icon v-if="isRedirectBranch(branch)"
                     class="inline-block w-4 h-4 text-gray-500"
-                    name="external-link"
+                    name="light/external-link"
                     v-tooltip="__('Redirect')" />
             </template>
 

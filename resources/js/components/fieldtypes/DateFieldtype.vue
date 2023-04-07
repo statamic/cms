@@ -2,7 +2,7 @@
     <div class="datetime min-w-[145px]">
 
         <button type="button" class="btn flex mb-2 md:mb-0 items-center pl-3" v-if="!isReadOnly && config.inline === false && !hasDate" @click="addDate" tabindex="0">
-            <svg-icon name="calendar" class="w-4 h-4 mr-2"></svg-icon>
+            <svg-icon name="light/calendar" class="w-4 h-4 mr-2"></svg-icon>
     		{{ __('Add Date') }}
     	</button>
 
@@ -39,7 +39,7 @@
                         >
                             <div class="input-group">
                                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
-                                    <svg-icon name="calendar" class="w-4 h-4" />
+                                    <svg-icon name="light/calendar" class="w-4 h-4" />
                                 </div>
                                 <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
                                     <input
@@ -51,12 +51,12 @@
                                 </div>
                             </div>
 
-                            <svg-icon name="micro-arrow-right" class="w-6 h-6 my-1 mx-2 text-gray-700 hidden @md:block" />
-                            <svg-icon name="micro-arrow-right" class="w-3.5 h-3.5 my-2 mx-2.5 rotate-90 text-gray-700 @md:hidden" />
+                            <svg-icon name="micro/arrow-right" class="w-6 h-6 my-1 mx-2 text-gray-700 hidden @md:block" />
+                            <svg-icon name="micro/arrow-right" class="w-3.5 h-3.5 my-2 mx-2.5 rotate-90 text-gray-700 @md:hidden" />
 
                             <div class="input-group">
                                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
-                                    <svg-icon name="calendar" class="w-4 h-4" />
+                                    <svg-icon name="light/calendar" class="w-4 h-4" />
                                 </div>
                                 <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
                                     <input
@@ -72,7 +72,7 @@
                         <!-- Single date input -->
                         <div v-else class="input-group">
                             <div class="input-group-prepend flex items-center" v-if="!config.inline">
-                                <svg-icon name="calendar" class="w-4 h-4" />
+                                <svg-icon name="light/calendar" class="w-4 h-4" />
                             </div>
                             <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
                                 <input

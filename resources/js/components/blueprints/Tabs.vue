@@ -9,6 +9,7 @@
                     :tab="tab"
                     :current-tab="currentTab"
                     :show-instructions="showTabInstructionsField"
+                    :edit-text="editTabText"
                     @selected="selectTab(tab._id)"
                     @removed="removeTab(tab._id)"
                     @updated="updateTab(tab._id, $event)"
@@ -18,7 +19,7 @@
             </div>
             <div class="fade-right right-10" />
             <button class="btn-round ml-2 flex items-center justify-center relative top-1" @click="addAndEditTab" v-tooltip="addTabText">
-                <svg-icon name="add-bold" class="w-3 h-3" />
+                <svg-icon name="add" class="w-3 h-3" />
             </button>
         </div>
         <button class="btn" @click="addAndEditTab" v-text="addTabText" v-else></button>
@@ -30,6 +31,7 @@
             v-show="currentTab === tab._id"
             :show-section-handle-field="showSectionHandleField"
             :new-section-text="newSectionText"
+            :edit-section-text="editSectionText"
             :add-section-text="addSectionText"
             @updated="updateTab(tab._id, $event)"
         />
@@ -59,12 +61,19 @@ export default {
         addSectionText: {
             type: String,
         },
+        editSectionText: {
+            type: String,
+        },
         newSectionText: {
             type: String,
         },
         addTabText: {
             type: String,
             default: () => __('Add Tab')
+        },
+        editTabText: {
+            type: String,
+            default: () => __('Edit Tab')
         },
         newTabText: {
             type: String,
@@ -146,7 +155,7 @@ export default {
         makeSectionsSortable() {
             if (sortableSections) sortableSections.destroy();
 
-            sortableSections = new Sortable(document.querySelectorAll('.blueprint-sections'), {
+            sortableSections = new Sortable(this.$el.querySelectorAll('.blueprint-sections'), {
                 draggable: '.blueprint-section',
                 handle: '.blueprint-section-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
@@ -260,6 +269,8 @@ export default {
                 _id: id,
                 display: this.newTabText,
                 handle: this.$slugify(this.newTabText, '_'),
+                instructions: null,
+                icon: null,
                 sections: []
             });
 

@@ -1,16 +1,17 @@
 <template>
     <div :class="{'popover-open': isOpen}" @mouseleave="leave">
+
         <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$scopedSlots.default">
             <slot name="trigger"></slot>
         </div>
 
         <portal
-            v-if="isOpen"
-            :to="portalTargetName"
+            name="popover"
             :target-class="`popover-container ${targetClass || ''}`"
+            :provide="provide"
         >
-            <div :class="`${isOpen ? 'popover-open' : ''}`" v-on-clickaway="clickawayClose">
-                <div ref="popover" class="popover" v-if="!disabled">
+            <div :class="`${isOpen ? 'popover-open' : ''}`">
+                <div ref="popover" class="popover" v-if="!disabled" v-on-clickaway="clickawayClose">
                     <div class="popover-content bg-white shadow-popover rounded-md">
                         <slot :close="close" />
                     </div>
@@ -50,6 +51,10 @@ export default {
             type: String,
             default: 'bottom-end',
         },
+        stopPropagation: {
+            type: Boolean,
+            default: true
+        },
     },
 
     data() {
@@ -58,14 +63,13 @@ export default {
             escBinding: null,
             cleanupAutoUpdater: null,
             portalTarget: null,
+            provide: {
+                popover: this.makeProvide(),
+            },
         }
     },
 
     computed: {
-
-        portalTargetName() {
-            return this.portalTarget ? this.portalTarget.name : null;
-        },
 
         targetClass() {
             return this.$vnode.data.staticClass;
@@ -73,18 +77,12 @@ export default {
 
     },
 
-    created() {
-        this.createPortalTarget();
-    },
-
-    beforeDestroy() {
-        this.destroyPortalTarget();
-    },
-
     methods: {
 
         computePosition() {
-            computePosition(this.$refs.trigger, this.$refs.popover, {
+            if (! this.$refs.trigger) return;
+
+            computePosition(this.$refs.trigger.firstChild, this.$refs.popover, {
                 placement: this.placement,
                 middleware: [
                     offset({ mainAxis: this.offset[0], crossAxis: this.offset[1] }),
@@ -98,7 +96,9 @@ export default {
             });
         },
 
-        toggle() {
+        toggle(e) {
+            if (this.stopPropagation) e.stopPropagation();
+
             this.isOpen ? this.close() : this.open();
         },
 
@@ -108,13 +108,25 @@ export default {
             this.isOpen = true;
             this.escBinding = this.$keys.bind('esc', e => this.close());
             this.$nextTick(() => {
-                this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger, this.$refs.popover, this.computePosition);
+                this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger.firstChild, this.$refs.popover, this.computePosition);
                 this.$emit('opened');
+
+                this.$refs.popover.addEventListener('transitionend', () => {
+                    this.$emit('opened');
+                }, { once: true });
             });
         },
 
-        clickawayClose() {
-            if (this.clickaway) this.close();
+        clickawayClose(e) {
+            // If disabled or closed, do nothing.
+            if (! this.clickaway || ! this.isOpen) return;
+
+            // If clicking within the popover, or inside the trigger, do nothing.
+            // These need to be checked separately, because the popover contents away.
+            if (this.$refs.popover.contains(e.target) || this.$el.contains(e.target)) return;
+
+            this.close();
+            this.$emit('clicked-away', e);
         },
 
         close() {
@@ -131,16 +143,12 @@ export default {
             if (this.autoclose) this.close();
         },
 
-        createPortalTarget() {
-            let key = `popover-${this._uid}`;
-            let portalTarget = { key, name: key };
-            this.$root.portals.push(portalTarget);
-            this.portalTarget = portalTarget;
-        },
-
-        destroyPortalTarget() {
-            const i = _.findIndex(this.$root.portals, (portal) => portal.key === this.portalTarget.key);
-            this.$root.portals.splice(i, 1);
+        makeProvide() {
+            const provide = {};
+            Object.defineProperties(provide, {
+                vm: { get: () => this },
+            });
+            return provide;
         }
     }
 }

@@ -2,19 +2,14 @@
    MODALS
    ========================================================================== */
 
-.v--modal {
+.vm--modal {
     @apply rounded-lg !important;
 }
 
-.v--modal-overlay {
-    z-index: 10000 !important;
+.vm--overlay {
     background: hsla(210, 20%, 10%, .15) !important;
 }
 
 .confirmation-modal .publish-fields .form-group {
     @apply p-0 mb-6;
-}
-
-.v--modal-overlay.disable-overflow .v--modal {
-    overflow: initial;
 }

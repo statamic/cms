@@ -13,7 +13,7 @@
                     <div class="p-6">
                         <h2><a href="{{ cp_route('blueprints.index') }}" class="text-gray-900 hover:text-blue">{{ __('Blueprints') }}</a></h2>
                         <p>{{ __('statamic::messages.fields_blueprints_description') }}</p>
-                        <p><a href="{{ Statamic::docsUrl('blueprints') }}" class="font-bold text-blue">{{ __('Read the Docs') }}</a><span class="inline-block text-blue w-4 h-4 ml-2">@cp_svg('external-link')</span></p>
+                        <p><a href="{{ Statamic::docsUrl('blueprints') }}" class="font-bold text-blue">{{ __('Read the Docs') }}</a><span class="inline-block text-blue w-4 h-4 ml-2">@cp_svg('icons/light/external-link')</span></p>
                     </div>
                     <div class="flex p-6 border-t items-center">
                         <a href="{{ cp_route('blueprints.create') }}" class="btn-primary mr-4">{{ __('Create Blueprint') }}</a>
@@ -30,7 +30,7 @@
                     <div class="p-6">
                         <h2>{{ __('Fieldsets') }}</h2>
                         <p>{{ __('statamic::messages.fields_fieldsets_description') }}</p>
-                        <p><a href="{{ Statamic::docsUrl('fieldsets') }}" class="font-bold text-blue">{{ __('Read the Docs') }}</a><span class="inline-block text-blue w-4 h-4 ml-2">@cp_svg('external-link')</span></p>
+                        <p><a href="{{ Statamic::docsUrl('fieldsets') }}" class="font-bold text-blue">{{ __('Read the Docs') }}</a><span class="inline-block text-blue w-4 h-4 ml-2">@cp_svg('icons/light/external-link')</span></p>
                     </div>
                     <div class="flex p-6 border-t items-center">
                         <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary mr-4">{{ __('Create Fieldset') }}</a>

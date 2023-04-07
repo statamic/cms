@@ -32,6 +32,7 @@
                     item-class="sortable-item"
                     handle-class="sortable-item"
                     :value="value"
+                    :distance="10"
                     @input="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">

@@ -28,7 +28,9 @@ class FieldsController extends CpController
 
         $fieldtype = FieldtypeRepository::find($request->type);
 
-        $blueprint = $this->blueprint($fieldtype->configBlueprint());
+        $blueprint = $this
+            ->blueprint($fieldtype->configBlueprint())
+            ->ensureField('hide_display', ['type' => 'toggle', 'visibility' => 'hidden']);
 
         $fields = $blueprint
             ->fields()
@@ -88,7 +90,7 @@ class FieldsController extends CpController
             'display' => [
                 'display' => __('Display Label'),
                 'instructions' => __('statamic::messages.fields_display_instructions'),
-                'type' => 'text',
+                'type' => 'field_display',
                 'autoselect' => true,
             ],
             'handle' => [
@@ -98,6 +100,7 @@ class FieldsController extends CpController
                 'from' => 'display',
                 'separator' => '_',
                 'validate' => 'required|not_in:'.implode(',', $reserved),
+                'show_regenerate' => true,
             ],
             'instructions' => [
                 'display' => __('Instructions'),

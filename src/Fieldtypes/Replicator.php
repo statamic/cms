@@ -57,7 +57,7 @@ class Replicator extends Fieldtype
                     'sets' => [
                         'display' => __('Sets'),
                         'type' => 'sets',
-                        'hide_meta' => true,
+                        'hide_display' => true,
                         'full_width_setting' => true,
                     ],
                 ],
@@ -108,7 +108,7 @@ class Replicator extends Fieldtype
     public function fields($set)
     {
         return new Fields(
-            $this->config("sets.$set.fields"),
+            Arr::get($this->flattenedSetsConfig(), "$set.fields"),
             $this->field()->parent(),
             $this->field()
         );
@@ -177,7 +177,7 @@ class Replicator extends Fieldtype
         return collect($values)->reject(function ($set, $key) {
             return array_get($set, 'enabled', true) === false;
         })->map(function ($set) use ($shallow) {
-            if (! $this->config("sets.{$set['type']}.fields")) {
+            if (! Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields")) {
                 return $set;
             }
 
@@ -192,7 +192,7 @@ class Replicator extends Fieldtype
     public function preload()
     {
         $existing = collect($this->field->value())->mapWithKeys(function ($set) {
-            $config = $this->config("sets.{$set['type']}.fields", []);
+            $config = $this->flattenedSetsConfig()[$set['type']]['fields'];
 
             return [$set['_id'] => (new Fields($config))->addValues($set)->meta()->put('_', '_')];
         })->toArray();
@@ -222,14 +222,14 @@ class Replicator extends Fieldtype
         ];
     }
 
-    protected function flattenedSetsConfig()
+    public function flattenedSetsConfig()
     {
         $sets = collect($this->config('sets'));
 
-        // If the first set has a "fields" key, it would be the legacy format.
+        // If the first set doesn't have a nested "set" key, it would be the legacy format.
         // We'll put it in a "main" group so it's compatible with the new format.
         // This also happens in the "sets" fieldtype.
-        if (Arr::has($sets->first(), 'fields')) {
+        if (! Arr::has($sets->first(), 'sets')) {
             $sets = collect([
                 'main' => [
                     'sets' => $sets->all(),
@@ -249,7 +249,7 @@ class Replicator extends Fieldtype
 
     public function addGqlTypes()
     {
-        $types = collect($this->config('sets'))
+        $types = collect($this->flattenedSetsConfig())
             ->each(function ($set, $handle) {
                 $this->fields($handle)->all()->each(function ($field) {
                     $field->fieldtype()->addGqlTypes();

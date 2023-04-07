@@ -12,7 +12,7 @@
             <tr>
                 <td>
                     <div class="flex items-center">
-                        <div class="w-4 h-4 mr-4">@cp_svg('earth')</div>
+                        <div class="w-4 h-4 mr-4">@cp_svg('icons/light/earth')</div>
                         <a href="{{ cp_route('preferences.default.edit') }}">{{ __('Default') }}</a>
                     </div>
                 </td>
@@ -33,7 +33,7 @@
                     <tr>
                         <td>
                             <div class="flex items-center">
-                                <div class="w-4 h-4 mr-4">@cp_svg('shield-key')</div>
+                                <div class="w-4 h-4 mr-4">@cp_svg('icons/light/shield-key')</div>
                                 <a href="{{ cp_route('preferences.role.edit', [$role->handle()]) }}">{{ __($role->title()) }}</a>
                             </div>
                         </td>
@@ -54,7 +54,7 @@
             <tr>
                 <td>
                     <div class="flex items-center">
-                        <div class="w-4 h-4 mr-4">@cp_svg('user')</div>
+                        <div class="w-4 h-4 mr-4">@cp_svg('icons/light/user')</div>
                         <a href="{{ cp_route('preferences.user.edit') }}">{{ __('My Preferences') }}</a>
                     </div>
                 </td>

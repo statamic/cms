@@ -6,19 +6,21 @@
         :initial-meta="meta"
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
-        <div class="field-inner" v-show="! config.hide_meta">
-            <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
+        <div class="field-inner">
+            <label v-if="showLabel" class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span
+                    v-if="showLabelText"
+                    class="mr-1"
                     :class="{ 'text-gray-600': syncable && isSynced }"
                     v-text="labelText"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
-                <i class="required ml-1" v-if="config.required">*</i>
+                <i class="required mr-1" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-2 mr-2" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly && !isTab" class="text-gray-500 font-normal text-2xs mx-1">
+                <span v-if="isReadOnly && !isTab" class="text-gray-500 font-normal text-2xs mr-1">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
-                <svg-icon name="translate" class="h-4 ml-1 w-4 text-gray-600" v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')" />
+                <svg-icon name="translate" class="h-4 mr-1 w-4 text-gray-600" v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')" />
 
                 <button
                     v-if="!isReadOnly && !isTab"
@@ -27,7 +29,7 @@
                     :class="{ flex: syncable && isSynced }"
                     @click="$emit('desynced')"
                 >
-                    <svg-icon name="hyperlink" class="h-4 w-4 ml-1.5 mb-1 text-gray-600"
+                    <svg-icon name="light/hyperlink" class="h-4 w-4 mr-1.5 mb-1 text-gray-600"
                         v-tooltip.top="__('messages.field_synced_with_origin')" />
                 </button>
 
@@ -38,13 +40,13 @@
                     :class="{ flex: syncable && !isSynced }"
                     @click="$emit('synced')"
                 >
-                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-1.5 mb-1 text-gray-600"
+                    <svg-icon name="hyperlink-broken" class="h-4 w-4 mr-1.5 mb-1 text-gray-600"
                         v-tooltip.top="__('messages.field_desynced_from_origin')" />
                 </button>
             </label>
 
             <div
-                class="help-block -mt-2"
+                class="help-block" :class="{ '-mt-2': showLabel }"
                 v-if="instructions && config.instructions_position !== 'below'"
                 v-html="instructions" />
         </div>
@@ -105,13 +107,6 @@ export default {
         syncable: Boolean,
         namePrefix: String,
         fieldPathPrefix: String,
-        canToggleLabel: Boolean,
-    },
-
-    data() {
-        return {
-            showHandle: false
-        }
     },
 
     inject: {
@@ -201,10 +196,22 @@ export default {
         },
 
         labelText() {
-            if (this.showHandle) return this.config.handle
-            return this.config.display
-                || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
-        }
+             return this.config.display
+                 || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
+         },
+
+         showLabelText() {
+            return !this.config.hide_display;
+         },
+
+         showLabel() {
+            return this.showLabelText // Need to see the text
+                || this.isReadOnly // Need to see the "Read Only" text
+                || this.config.required // Need to see the asterisk
+                || this.isLocked // Need to see the avatar
+                || this.isLocalizable // Need to see the icon
+                || this.syncable // Need to see the icon
+         }
 
     },
 
@@ -222,11 +229,6 @@ export default {
             }
         },
 
-        toggleLabel() {
-            if (this.canToggleLabel) {
-                this.showHandle = ! this.showHandle
-            }
-        },
         renderMarkdownAndLinks(text) {
             var renderer = new marked.Renderer();
 

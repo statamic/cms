@@ -77,7 +77,11 @@ code.parent-url {
 }
 
 .publish-section-header {
-    @apply px-5 pt-4 pb-3 border-b border-gray-400 bg-gray-100 rounded-t-lg;
+    @apply border-b border-gray-400 bg-gray-100 rounded-t-lg;
+}
+
+.publish-section-header-inner {
+    @apply px-3 @sm:px-4 @lg:px-6 pt-4 pb-3;
 }
 
 .publish-sidebar {

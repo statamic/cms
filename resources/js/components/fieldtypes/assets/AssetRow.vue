@@ -44,7 +44,7 @@
                 @click="remove"
                 :aria-label="__('Remove Asset')"
             >
-                <svg-icon name="trash" class="w-6 h-6" />
+                <svg-icon name="micro/trash" class="w-6 h-6" />
             </button>
 
             <asset-editor

@@ -6,6 +6,7 @@
                 :vertical="true"
                 item-class="sortable-row"
                 handle-class="sortable-handle"
+                :mirror="false"
                 @dragstart="$emit('focus')"
                 @dragend="$emit('blur')"
             >
@@ -35,7 +36,7 @@
             </sortable-list>
         </table>
 
-        <button class="btn" @click="addItem" v-if="!isReadOnly">
+        <button class="btn btn-sm" @click="addItem" v-if="!isReadOnly">
             {{ addButton }}
         </button>
     </div>

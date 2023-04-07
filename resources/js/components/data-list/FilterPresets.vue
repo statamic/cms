@@ -17,7 +17,7 @@
             </template>
 
             <button class="pill-tab" @click="createNewEmptyPreset" >
-                <svg-icon name="add-bold" class="w-3 h-3"/>
+                <svg-icon name="add" class="w-3 h-3"/>
             </button>
         </div>
 

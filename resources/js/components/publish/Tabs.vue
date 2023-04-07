@@ -72,7 +72,6 @@
                         :sections="tab.sections"
                         :read-only="readOnly"
                         :syncable="syncable"
-                        :can-toggle-labels="canToggleLabels"
                         @updated="(handle, value) => $emit('updated', handle, value)"
                         @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
                         @synced="$emit('synced', $event)"
@@ -87,9 +86,9 @@
             <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                 <div class="publish-tab">
                     <div class="publish-tab-actions card p-0 mb-5" :class="{ 'as-sidebar': shouldShowSidebar }">
-                        <portal :to="actionsPortal" :disabled="shouldShowSidebar">
+                        <v-portal :to="actionsPortal" :disabled="shouldShowSidebar">
                             <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
-                        </portal>
+                        </v-portal>
                     </div>
 
                     <publish-sections
@@ -97,7 +96,6 @@
                         :sections="sidebarTab.sections"
                         :read-only="readOnly"
                         :syncable="syncable"
-                        :can-toggle-labels="canToggleLabels"
                         @updated="(handle, value) => $emit('updated', handle, value)"
                         @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
                         @synced="$emit('synced', $event)"
@@ -126,7 +124,6 @@ export default {
     props: {
         readOnly: Boolean,
         syncable: Boolean,
-        canToggleLabels: Boolean,
         enableSidebar: {
             type: Boolean,
             default: true

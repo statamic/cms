@@ -44,7 +44,11 @@ export default {
         },
         delay: {
             type: Number,
-            default: 200
+            default: 0
+        },
+        distance: {
+            type: Number,
+            default: 0
         },
         disabled: {
             type: Boolean,
@@ -59,6 +63,7 @@ export default {
                 draggable: `.${CSS.escape(this.itemClass)}`,
                 handle: `.${CSS.escape(this.handleClass)}`,
                 delay: this.delay,
+                distance: this.distance,
                 swapAnimation: { vertical: this.vertical, horizontal: !this.vertical },
                 plugins: [Plugins.SwapAnimation],
                 mirror: {

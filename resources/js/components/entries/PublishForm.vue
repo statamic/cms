@@ -89,7 +89,6 @@
                             v-show="tabsVisible"
                             :read-only="readOnly"
                             :syncable="hasOrigin"
-                            :can-toggle-labels="true"
                             @updated="setFieldValue"
                             @meta-updated="setFieldMeta"
                             @synced="syncField"
@@ -101,20 +100,20 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-4 flex items-center -mx-2" v-if="showLivePreviewButton || showVisitUrlButton">
+                                    <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
-                                            class="flex items-center justify-center btn-flat w-full mx-2 px-2"
+                                            class="flex items-center justify-center btn w-full"
                                             v-if="showLivePreviewButton"
                                             @click="openLivePreview">
-                                            <svg-icon name="synchronize" class="h-4 w-4 mr-2" />
+                                            <svg-icon name="light/synchronize" class="h-4 w-4 mr-2 shrink-0" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
-                                            class="flex items-center justify-center btn-flat w-full mx-2 px-2"
+                                            class="flex items-center justify-center btn w-full"
                                             v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">
-                                            <svg-icon name="external-link" class="w-4 h-4 mr-2" />
+                                            <svg-icon name="light/external-link" class="w-4 h-4 mr-2 shrink-0" />
                                             <span>{{ __('Visit URL') }}</span>
                                         </a>
                                     </div>
@@ -211,7 +210,7 @@
                         :disabled="!canPublish"
                         @click="confirmingPublish = true">
                         <span v-text="__('Publish')" />
-                        <svg-icon name="chevron-down-xs" class="ml-2 w-2" />
+                        <svg-icon name="micro/chevron-down-xs" class="ml-2 w-2" />
                     </button>
                 </template>
             </live-preview>
@@ -235,7 +234,7 @@
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
                 <span v-text="__('Publish')" />
-                <svg-icon name="chevron-down-xs" class="ml-2 w-2" />
+                <svg-icon name="micro/chevron-down-xs" class="ml-2 w-2" />
             </button>
         </div>
 

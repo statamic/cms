@@ -65,11 +65,11 @@ export default {
         buttonIcon() {
             switch(true) {
                 case this.currentOption === 'listing':
-                    return {name: 'micro-arrow-go-back', class: 'w-3'};
+                    return {name: 'micro/arrow-go-back', class: 'w-3'};
                 case this.currentOption === 'continue_editing':
-                    return {name: 'chevron-down-xs', class: 'w-2'};
+                    return {name: 'micro/chevron-down-xs', class: 'w-2'};
                 case this.currentOption === 'create_another':
-                    return {name: 'micro-add-circle', class: 'w-3'};
+                    return {name: 'micro/add-circle', class: 'w-3'};
             }
         },
 

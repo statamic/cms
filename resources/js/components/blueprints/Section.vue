@@ -5,24 +5,52 @@
 
             <div class="bg-gray-200 border-b text-sm flex rounded-t">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
-                <div class="p-3 py-2 flex-1">
-                    <span class="font-medium mr-2">
-                        <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" :placeholder="`${__('Title')} (${__('Optional')})`" />
-                    </span>
-                    <span class="font-mono text-xs text-gray-700 mr-2" v-if="showHandleField">
-                        <input type="text" v-model="section.handle" class="bg-transparent w-full outline-none" :placeholder="`${__('Handle')}`" @input="handleSyncedWithDisplay = false" />
-                    </span>
-                    <span class="text-xs text-gray-700 mr-2">
-                        <input type="text" v-model="section.instructions" class="bg-transparent w-full outline-none" :placeholder="`${__('Instructions')} (${__('Optional')})`" />
-                    </span>
-                </div>
-                <div class="flex items-center px-3">
-                    <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-600 hover:text-gray-950">
-                        <svg-icon class="h-4 w-4" name="trash" />
+                <div class="p-2 flex-1 flex items-center">
+                    <a class="flex items-center flex-1 group" @click="edit">
+                        <svg-icon class="h-4 w-4 mr-2 text-gray-700 group-hover:text-blue-500" :name="section.icon ? `plump/${section.icon}` : 'folder-generic'" />
+                        <div class="mr-2" v-text="section.display" />
+                    </a>
+                    <button class="flex items-center text-gray-700 hover:text-gray-950 mr-3" @click="edit">
+                        <svg-icon class="h-4 w-4" name="pencil" />
+                    </button>
+                    <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-700 hover:text-gray-950">
+                        <svg-icon class="h-4 w-4" name="micro/trash" />
                     </button>
                 </div>
             </div>
 
+            <confirmation-modal
+                v-if="editingSection"
+                :title="editText"
+                @opened="$refs.displayInput.focus()"
+                @confirm="editConfirmed"
+                @cancel="editCancelled"
+            >
+                <div class="publish-fields">
+                    <div class="form-group w-full">
+                        <label v-text="__('Display')" />
+                        <input ref="displayInput" type="text" class="input-text" v-model="editingSection.display" />
+                    </div>
+                    <div class="form-group w-full" v-if="showHandleField">
+                        <label v-text="__('Handle')" />
+                        <input type="text" class="input-text font-mono text-sm" v-model="editingSection.handle" @input="handleSyncedWithDisplay = false" />
+                    </div>
+                    <div class="form-group w-full">
+                        <label v-text="__('Instructions')" />
+                        <input type="text" class="input-text" v-model="editingSection.instructions" />
+                    </div>
+                    <div class="form-group w-full" v-if="showHandleField">
+                        <label v-text="__('Icon')" />
+                        <publish-field-meta
+                            :config="{ handle: 'icon', type: 'icon', folder: 'plump' }"
+                            :initial-value="editingSection.icon"
+                            v-slot="{ meta, value, loading }"
+                        >
+                            <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="editingSection.icon = $event" />
+                        </publish-field-meta>
+                    </div>
+                </div>
+            </confirmation-modal>
 
             <fields
                 class="p-4"
@@ -75,11 +103,15 @@ export default {
         showHandleField: {
             type: Boolean,
             default: false
+        },
+        editText: {
+            type: String,
         }
     },
 
     data() {
         return {
+            editingSection: false,
             editingField: null,
             handleSyncedWithDisplay: false,
         }
@@ -139,10 +171,22 @@ export default {
             this.section.fields.splice(i, 1);
         },
 
-        focus() {
-            if (this.$refs.displayInput) {
-                this.$refs.displayInput.select();
-            }
+        edit() {
+            this.editingSection = {
+                display: this.section.display,
+                handle: this.section.handle,
+                instructions: this.section.instructions,
+                icon: this.section.icon,
+            };
+        },
+
+        editConfirmed() {
+            this.$emit('updated', {...this.section, ...this.editingSection});
+            this.editingSection = false;
+        },
+
+        editCancelled() {
+            this.editingSection = false;
         }
 
     }

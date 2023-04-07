@@ -8,11 +8,11 @@
                     <svg-icon class="flex-none text-gray-700 h-4 w-4 mr-2" name="paperclip" v-tooltip="__('Linked fieldset')" />
                     <a class="break-all" @click="$emit('edit')">
                         <span v-text="__('Fieldset')" />
-                        <span class="font-mono text-3xs text-gray-600">{{ field.fieldset }}</span>
+                        <span class="font-mono text-3xs text-gray-600 ml-2">{{ field.fieldset }}</span>
                     </a>
                 </div>
                 <div class="flex-none pr-2 flex">
-                    <button @click.prevent="$emit('deleted')" class="text-gray-600 hover:text-gray-950"><svg-icon name="trash" class="w-4 h-4" /></button>
+                    <button @click.prevent="$emit('deleted')" class="text-gray-600 hover:text-gray-950"><svg-icon name="micro/trash" class="w-4 h-4" /></button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"

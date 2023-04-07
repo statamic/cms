@@ -7,11 +7,7 @@
 }
 
 .replicator-set {
-    @apply mt-10 shadow-set rounded bg-white outline-none relative;
-
-    &:last-child {
-        @apply mb-10;
-    }
+    @apply shadow-set rounded bg-white outline-none relative;
 }
 
 .replicator-set-header {
@@ -24,7 +20,7 @@
     .sortable-handle {
         @apply w-4 border-r rounded-tl p-2;
         cursor: grab;
-        background: transparent url('../../../svg/drag-dots.svg') center center no-repeat;
+        background: transparent url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
         background-size: 7px 17px;
         &:hover { @apply bg-gray-200; }
     }
@@ -35,11 +31,6 @@
 
     .replicator-set-controls {
         @apply flex items-center;
-
-        .toggle-sm {
-            position: relative;
-            bottom: 1px;
-        }
     }
 
     &.invalid {
@@ -56,26 +47,18 @@
     @apply flex flex-wrap;
 }
 
-.replicator-set-picker-between {
-    @apply absolute top-0 -mt-8 w-full;
+.replicator-set-picker {
+    @apply py-2;
 }
 
-/*  Extra contrast when full width */
-.replicator-fieldtype {
-    @apply py-6 px-0 bg-gray-200 border-t border-b;
-
-    > .field-inner {
-        @apply ml-6;
-    }
-
-    .replicator-fieldtype-container {
-        @apply px-6;
-    }
+.replicator-set-picker.between {
+    @apply opacity-0 hover:opacity-100;
+    transform: translateX(-8px);
+    transition: opacity 100ms ease, transform 100ms ease;
 }
 
-/*  Avoid double borders */
-.section-fieldtype + .replicator-fieldtype {
-    border-top: 0;
+.replicator-set-picker.between:hover {
+    transform: translateX(-4px);
 }
 
 .replicator-set.has-error > .replicator-set-header label {
@@ -88,6 +71,4 @@
 
 .replicator-fullscreen {
     @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none;
-    z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
-                /*  too high and it'll be over the top of stacks, etc. */
 }

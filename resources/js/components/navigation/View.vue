@@ -30,7 +30,7 @@
                             @click="addLink"
                         >
                             {{ __('Add Nav Item') }}
-                            <svg-icon name="chevron-down-xs" class="w-2 ml-4" v-if="hasCollections" />
+                            <svg-icon name="micro/chevron-down-xs" class="w-2 ml-4" v-if="hasCollections" />
                         </button>
                     </template>
                     <dropdown-item :text="__('Add Nav Item')" @click="linkPage()" />
@@ -97,9 +97,9 @@
             </template>
 
             <template #branch-icon="{ branch }">
-                <svg-icon v-if="isEntryBranch(branch)" class="inline-block w-4 h-4 text-gray-500" name="hyperlink" v-tooltip="__('Entry link')" />
-                <svg-icon v-if="isLinkBranch(branch)" class="inline-block w-4 h-4 text-gray-500" name="external-link" v-tooltip="__('External link')" />
-                <svg-icon v-if="isTextBranch(branch)" class="inline-block w-4 h-4 text-gray-500" name="file-text" v-tooltip="__('Text')" />
+                <svg-icon v-if="isEntryBranch(branch)" class="inline-block w-4 h-4 text-gray-500" name="light/hyperlink" v-tooltip="__('Entry link')" />
+                <svg-icon v-if="isLinkBranch(branch)" class="inline-block w-4 h-4 text-gray-500" name="light/external-link" v-tooltip="__('External link')" />
+                <svg-icon v-if="isTextBranch(branch)" class="inline-block w-4 h-4 text-gray-500" name="light/file-text" v-tooltip="__('Text')" />
             </template>
 
             <template #branch-options="{ branch, removeBranch, orphanChildren, vm, depth }">

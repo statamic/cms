@@ -3,7 +3,7 @@
         <popover v-if="isNotYetFavorited" ref="popper" placement="bottom-end" :offset="[10, 28]">
             <template slot="trigger">
                 <button @click="shown" slot="reference" class="h-6 w-6 block outline-none p-1 text-gray hover:text-gray-800" v-tooltip="__('Pin to Favorites')" :aria-label="__('Pin to Favorites')">
-                    <svg-icon name="pin"></svg-icon>
+                    <svg-icon name="light/pin"></svg-icon>
                 </button>
             </template>
             <div class="p-4 pb-2">
@@ -17,7 +17,7 @@
         </popover>
         <div v-else>
             <button @click="remove" class="h-6 w-6 block outline-none p-1 text-gray hover:text-gray-800" v-tooltip="__('Unpin from Favorites')" :aria-label="__('Unpin from Favorites')">
-                <svg-icon name="pin" class="text-green-600"></svg-icon>
+                <svg-icon name="light/pin" class="text-green-600"></svg-icon>
             </button>
         </div>
     </div>

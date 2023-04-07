@@ -12,14 +12,14 @@
                 v-model="slug"
                 classes="font-mono text-xs"
                 :isReadOnly="isReadOnly"
-                :append="value"
+                :append="config.show_regenerate && value"
                 :name="slug"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             >
-                <template v-slot:append>
+                <template v-slot:append v-if="config.show_regenerate">
                     <button class="input-group-append items-center flex" @click="sync" v-tooltip="__('Regenerate from: ' + config.from)">
-                        <svg-icon name="synchronize" class="w-5 h-5" />
+                        <svg-icon name="light/synchronize" class="w-5 h-5" />
                     </button>
                 </template>
             </text-input>

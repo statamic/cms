@@ -19,6 +19,7 @@
                     <button type="submit" class="btn-primary" {{ $statuses ? '': 'disabled' }}>{{ __('Commit') }}</button>
                 </div>
             </form>
+        </div>
     </header>
 
     <div class="card p-0">
