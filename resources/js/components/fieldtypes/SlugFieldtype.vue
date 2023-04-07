@@ -97,6 +97,10 @@ export default {
         this.$events.$off('localization.created', this.handleLocalizationCreated);
     },
 
+    mounted() {
+        if (this.config.required && !this.value) this.update(this.$refs.slugify.slug);
+    },
+
     methods: {
 
         handleLocalizationCreated({ store }) {

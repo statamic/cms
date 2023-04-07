@@ -91,7 +91,6 @@ class FieldsController extends CpController
                 'display' => __('Display Label'),
                 'instructions' => __('statamic::messages.fields_display_instructions'),
                 'type' => 'field_display',
-                'autoselect' => true,
             ],
             'handle' => [
                 'display' => __('Handle'),

@@ -2,7 +2,7 @@
   "name": "statamic",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "rm -rf resources/dist/build && vite",
     "build": "vite build",
     "svgo": "svgo -f ./resources/svg/  -r",
     "test": "cross-env NODE_ENV=test jest --silent",
