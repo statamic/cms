@@ -44,8 +44,6 @@ import uniqid from 'uniqid';
 import Tab from './Tab.vue';
 import TabContent from './TabContent.vue';
 
-let sortableTabs, sortableSections, sortableFields;
-
 export default {
 
     components: {
@@ -106,6 +104,9 @@ export default {
             tabsAreScrolled: false,
             canScrollLeft: false,
             canScrollRight: false,
+            sortableTabs: null,
+            sortableSections: null,
+            sortableFields: null,
         }
     },
 
@@ -139,9 +140,9 @@ export default {
         },
 
         makeTabsSortable() {
-            if (sortableTabs) sortableTabs.destroy();
+            if (this.sortableTabs) this.sortableTabs.destroy();
 
-            sortableTabs = new Sortable(this.$refs.tabs, {
+            this.sortableTabs = new Sortable(this.$refs.tabs, {
                 draggable: '.blueprint-tab',
                 mirror: { constrainDimensions: true },
                 swapAnimation: { horizontal: true },
@@ -153,9 +154,9 @@ export default {
         },
 
         makeSectionsSortable() {
-            if (sortableSections) sortableSections.destroy();
+            if (this.sortableSections) this.sortableSections.destroy();
 
-            sortableSections = new Sortable(this.$el.querySelectorAll('.blueprint-sections'), {
+            this.sortableSections = new Sortable(this.$el.querySelectorAll('.blueprint-sections'), {
                 draggable: '.blueprint-section',
                 handle: '.blueprint-section-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
@@ -168,9 +169,9 @@ export default {
 
 
         makeFieldsSortable() {
-            if (sortableFields) sortableFields.destroy();
+            if (this.sortableFields) this.sortableFields.destroy();
 
-            sortableFields = new Sortable(this.$el.querySelectorAll('.blueprint-section-draggable-zone'), {
+            this.sortableFields = new Sortable(this.$el.querySelectorAll('.blueprint-section-draggable-zone'), {
                 draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
