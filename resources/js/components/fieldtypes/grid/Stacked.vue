@@ -1,10 +1,9 @@
 <template>
 <div>
-
-    <div class="mb-5">
-        <button @click="grid.toggleFullScreen" class="flex items-center w-full h-full justify-center text-gray-500 hover:text-gray-700">
-            <svg-icon name="expand-bold" class="h-3.5 w-3.5" v-show="! grid.fullScreenMode" />
-            <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="grid.fullScreenMode" />
+    <div class="flex justify-end absolute top-3 right-3 @md:right-6" v-if="! grid.fullScreenMode">
+        <button @click="grid.toggleFullScreen" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
+            <svg-icon name="expand-bold" class="h-3.5 px-0.5 text-gray-750" v-show="! grid.fullScreenMode" />
+            <svg-icon name="shrink-all" class="h-3.5 px-0.5 text-gray-750" v-show="grid.fullScreenMode" />
         </button>
     </div>
 
