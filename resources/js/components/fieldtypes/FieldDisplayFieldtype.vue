@@ -52,6 +52,10 @@ export default {
 
     },
 
+    mounted() {
+        this.$refs.input.select();
+    },
+
     methods: {
 
         toggleHidden() {
