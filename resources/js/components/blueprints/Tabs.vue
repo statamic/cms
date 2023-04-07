@@ -159,7 +159,6 @@ export default {
                 draggable: '.blueprint-section',
                 handle: '.blueprint-section-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
-                plugins: [Plugins.SwapAnimation]
             })
             .on('drag:start', e => this.lastInteractedTab = this.currentTab)
             .on('drag:stop', e => this.lastInteractedTab = null)
@@ -175,7 +174,6 @@ export default {
                 draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
-                plugins: [Plugins.SwapAnimation]
             })
             .on('drag:start', e => this.lastInteractedTab = this.currentTab)
             .on('drag:stop', e => this.lastInteractedTab = null)
