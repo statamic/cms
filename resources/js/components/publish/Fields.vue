@@ -1,6 +1,6 @@
 <template>
 
-    <div class="publish-fields">
+    <div class="publish-fields @container">
 
         <publish-field
             v-for="field in fields"
