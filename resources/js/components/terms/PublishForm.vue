@@ -43,7 +43,7 @@
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
                     <span v-text="__('Publish')" />
-                    <svg-icon name="chevron-down-xs" class="ml-2 w-2" />
+                    <svg-icon name="micro/chevron-down-xs" class="ml-2 w-2" />
                 </button>
             </div>
 
@@ -105,7 +105,7 @@
                                             class="flex items-center justify-center btn-flat w-full mx-2 px-2"
                                             v-if="isBase"
                                             @click="openLivePreview">
-                                            <svg-icon name="synchronize" class="h-4 w-4 mr-2" />
+                                            <svg-icon name="light/synchronize" class="h-4 w-4 mr-2" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
@@ -113,7 +113,7 @@
                                             v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">
-                                            <svg-icon name="external-link" class="w-4 h-4 mr-2" />
+                                            <svg-icon name="light/external-link" class="w-4 h-4 mr-2" />
                                             <span>{{ __('Visit URL') }}</span>
                                         </a>
                                     </div>
@@ -207,7 +207,7 @@
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
                 <span v-text="__('Publish')" />
-                <svg-icon name="chevron-down-xs" class="ml-2 w-2" />
+                <svg-icon name="micro/chevron-down-xs" class="ml-2 w-2" />
             </button>
         </div>
 

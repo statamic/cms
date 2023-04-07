@@ -7,7 +7,7 @@
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
                         {{ __('Field') }}
-                        <svg-icon name="chevron-down-xs" class="w-2 h-2 mx-2" />
+                        <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
                     </button>
                 </template>
                 <template #default="{ close: closePopover }">
@@ -42,7 +42,7 @@
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2">
                         {{ filter.title }}
-                        <svg-icon name="chevron-down-xs" class="w-2 h-2 mx-2" />
+                        <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
                     </button>
                 </template>
                 <template #default="{ close: closePopover }">

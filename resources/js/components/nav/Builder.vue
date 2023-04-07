@@ -18,7 +18,7 @@
                     <template #trigger>
                         <button class="btn flex items-center pr-4">
                             {{ __('Add Item') }}
-                            <svg-icon name="chevron-down-xs" class="w-2 ml-4" />
+                            <svg-icon name="micro/chevron-down-xs" class="w-2 ml-4" />
                         </button>
                     </template>
                     <dropdown-item :text="__('Add Nav Item')" @click="addItem(topLevelTreeData)" />
@@ -36,7 +36,7 @@
                     <dropdown-list v-if="hasSaveAsOptions" class="ml-0">
                         <template #trigger>
                             <button class="btn-primary rounded-l-none flex items-center">
-                                <svg-icon name="chevron-down-xs" class="w-2" />
+                                <svg-icon name="micro/chevron-down-xs" class="w-2" />
                             </button>
                         </template>
                         <h6 class="p-2">{{ __('Save to') }}...</h6>

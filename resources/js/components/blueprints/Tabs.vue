@@ -19,7 +19,7 @@
             </div>
             <div class="fade-right right-10" />
             <button class="btn-round ml-2 flex items-center justify-center relative top-1" @click="addAndEditTab" v-tooltip="addTabText">
-                <svg-icon name="add-bold" class="w-3 h-3" />
+                <svg-icon name="add" class="w-3 h-3" />
             </button>
         </div>
         <button class="btn" @click="addAndEditTab" v-text="addTabText" v-else></button>

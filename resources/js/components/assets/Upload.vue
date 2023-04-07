@@ -3,7 +3,7 @@
     <div class="flex items-center my-4" :class="{'text-red-500': status == 'error'}">
 
         <div class="mx-2 flex items-center">
-            <svg-icon name="micro-warning" class="text-red-500 h-4 w-4" v-if="status === 'error'" />
+            <svg-icon name="micro/warning" class="text-red-500 h-4 w-4" v-if="status === 'error'" />
             <loading-graphic v-else :inline="true" text="" />
         </div>
 
@@ -20,7 +20,7 @@
         <div class="px-2" v-if="status === 'error'">
             {{ error }}
             <button @click.prevent="clear" class="flex items-center text-gray-700 hover:text-gray-800">
-                <svg-icon name="micro-circle-with-cross" class="h-4 w-4" />
+                <svg-icon name="micro/circle-with-cross" class="h-4 w-4" />
             </button>
         </div>
 

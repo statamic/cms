@@ -21,7 +21,7 @@
                     <button @click="unselectGroup" class=" hover:text-gray-900 ml-2.5 rounded">
                         {{ __('Groups') }}
                     </button>
-                    <svg-icon name="chevron-right" class="w-4 h-4" />
+                    <svg-icon name="micro/chevron-right" class="w-4 h-4" />
                     <span>{{ selectedGroupDisplayText }}</span>
                 </div>
             </div>
@@ -35,11 +35,11 @@
                             <div class="text-md font-medium text-gray-800 truncate w-52">{{ item.display || item.handle }}</div>
                             <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ item.instructions }}</div>
                         </div>
-                        <svg-icon name="chevron-right-thin" class="text-gray-600 group-hover:text-gray-800" />
+                        <svg-icon name="micro/chevron-right-thin" class="text-gray-600 group-hover:text-gray-800" />
                     </div>
                     <div v-if="item.type === 'set'" @click="addSet(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
                         <div class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2">
-                            <svg-icon :name="item.icon ? `plump/${item.icon}` : 'add'" class="text-gray-800" />
+                            <svg-icon :name="item.icon ? `plump/${item.icon}` : 'light/add'" class="text-gray-800" />
                         </div>
                         <div class="flex-1">
                             <div class="text-md font-medium text-gray-800 truncate w-52">{{ item.display || item.handle }}</div>

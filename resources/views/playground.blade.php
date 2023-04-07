@@ -79,7 +79,7 @@
                 <dropdown-list>
                     <template v-slot:trigger>
                         <button class="btn">
-                            <svg-icon name="chevron-down-xs" class="w-2" />
+                            <svg-icon name="micro/chevron-down-xs" class="w-2" />
                         </button>
                     </template>
                     <li>
@@ -93,7 +93,7 @@
                 <dropdown-list>
                     <template v-slot:trigger>
                         <button class="btn-primary">
-                            <svg-icon name="chevron-down-xs" class="w-2" />
+                            <svg-icon name="micro/chevron-down-xs" class="w-2" />
                         </button>
                     </template>
                     <li>
@@ -107,7 +107,7 @@
                 <dropdown-list>
                     <template v-slot:trigger>
                         <button class="btn-danger">
-                            <svg-icon name="chevron-down-xs" class="w-2" />
+                            <svg-icon name="micro/chevron-down-xs" class="w-2" />
                         </button>
                     </template>
                     <li>
@@ -121,7 +121,7 @@
                 <dropdown-list>
                     <template v-slot:trigger>
                         <button class="btn-flat">
-                            <svg-icon name="chevron-down-xs" class="w-2" />
+                            <svg-icon name="micro/chevron-down-xs" class="w-2" />
                         </button>
                     </template>
                     <li>
@@ -234,7 +234,7 @@
                 </div>
                 <div class="text-4xl mb-4">89</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('icons/default/performance-increase')</span>
+                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('icons/light/performance-increase')</span>
                     <span class="leading-none text-sm">8.54% Increase</span>
                 </div>
             </div>
@@ -249,7 +249,7 @@
                 </div>
                 <div class="text-4xl mb-4">35</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('icons/default/performance-increase')</span>
+                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('icons/light/performance-increase')</span>
                     <span class="leading-none text-sm">2.15% Increase</span>
                 </div>
             </div>
@@ -264,7 +264,7 @@
                 </div>
                 <div class="text-4xl mb-4 text-gray-400">251</div>
                 <div class="flex items-center ">
-                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('icons/default/performance-increase')</span>
+                    <span class="w-4 h-4 text-green-500 mr-2">@cp_svg('icons/light/performance-increase')</span>
                     <span class="leading-none text-gray-400 text-sm">8.54% Increase</span>
                 </div>
             </div>

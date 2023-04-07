@@ -1,7 +1,7 @@
 <template>
     <div class="global-search" :class="{'dirty': isDirty}" v-on-clickaway="reset" v-cloak>
         <div class="state-container w-4 h-4 text-gray-500 flex items-center" @click="focus">
-            <svg-icon name="magnifying-glass"></svg-icon>
+            <svg-icon name="light/magnifying-glass"></svg-icon>
         </div>
         <label class="sr-only" v-text="__('Global Search')" for="global-search" />
         <input type="text"
@@ -26,7 +26,7 @@
         <div v-show="focused && (hasResults || hasFavorites)" class="global-search-results">
 
             <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-2 flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
-                <svg-icon :name="getResultIcon(result)" class="icon"></svg-icon>
+                <svg-icon :name="`light/${getResultIcon(result)}`" class="icon"></svg-icon>
                 <div class="flex-1 ml-2 title" v-html="result.title"></div>
                 <span class="rounded px-1 py-px text-2xs uppercase bg-gray-200 text-gray" v-text="result.badge" />
             </div>
@@ -36,7 +36,7 @@
 
                 <div v-for="(favorite, index) in favorites" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousemove="setActive(index)">
                     <div class="flex items-center flex-1 p-2" @click="hit">
-                        <svg-icon name="pin" class="w-4 h-4"></svg-icon>
+                        <svg-icon name="light/pin" class="w-4 h-4"></svg-icon>
                         <div class="ml-2 title" v-text="favorite.name"></div>
                     </div>
                     <div class="p-2 text-gray-600 hover:text-gray-800" @click="removeFavorite(favorite)">&times;</div>

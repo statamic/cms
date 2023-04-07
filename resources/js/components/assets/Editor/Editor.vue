@@ -18,7 +18,7 @@
                 <button class="flex items-center p-4 group" @click="open" v-tooltip.right="__('Open in a new window')" :aria-label="__('Open in a new window')">
                     <svg-icon name="folder-image" class="text-gray-700 h-5 w-5" />
                     <span class="ml-2 text-sm text-gray-800 group-hover:text-blue">{{ asset.path }}</span>
-                    <svg-icon name="chevron-right" class="text-gray-700 h-5 w-5 group-hover:text-blue" />
+                    <svg-icon name="micro/chevron-right" class="text-gray-700 h-5 w-5 group-hover:text-blue" />
                 </button>
                 <button class="btn-close absolute top-2 right-2.5" @click="close" :aria-label="__('Close Editor')">&times;</button>
             </div>
@@ -61,7 +61,7 @@
                         </button>
 
                         <button v-if="allowDeleting && canRunAction('delete')" @click="runAction('delete')" class="flex bg-gray-750 hover:bg-gray-900 hover:text-red-400 rounded items-center text-center px-3 py-1.5">
-                            <svg-icon name="trash-line" class="h-4" />
+                            <svg-icon name="trash" class="h-4" />
                             <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Delete') }}</span>
                         </button>
                     </div>

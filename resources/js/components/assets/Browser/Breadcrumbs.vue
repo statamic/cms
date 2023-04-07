@@ -7,7 +7,7 @@
             @click="selectFolder(index)"
             class="group flex items-center"
         >
-            <svg-icon name="chevron-right" class="text-gray-700 h-4 w-4 mr-1" v-if="index !== 0" />
+            <svg-icon name="micro/chevron-right" class="text-gray-700 h-4 w-4 mr-1" v-if="index !== 0" />
             <svg-icon name="folder-home" class="mr-2 h-5 w-5 text-blue-400 group-hover:text-blue-600" v-if="part === '/'" />
             <svg-icon name="folder" class="mr-2 h-5 w-5 text-blue-400 group-hover:text-blue-600" v-else />
             <span class="text-gray-700 text-2xs group-hover:text-gray-800" v-if="part !== '/'" v-text="part" />

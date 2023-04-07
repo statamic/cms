@@ -7,7 +7,7 @@
                     class="text-button text-blue hover:text-gray-800 mr-6 flex items-center outline-none"
                     @click="create"
                 >
-                    <svg-icon name="content-writing" class="mr-1 h-4 w-4 flex items-center"></svg-icon>
+                    <svg-icon name="light/content-writing" class="mr-1 h-4 w-4 flex items-center"></svg-icon>
                     {{ __('Create & Link Item') }}
                 </button>
             </template>

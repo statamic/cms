@@ -55,7 +55,7 @@
                                         @click="remove(i)"
                                         class="flex items-center p-2 w-full h-full text-gray-600 hover:text-gray-900"
                                     >
-                                        <svg-icon name="trash" class="w-6 h-6" />
+                                        <svg-icon name="micro/trash" class="w-6 h-6" />
                                     </button>
                                 </td>
                             </tr>

@@ -12,7 +12,7 @@
                     </a>
                 </div>
                 <div class="flex-none pr-2 flex">
-                    <button @click.prevent="$emit('deleted')" class="text-gray-600 hover:text-gray-950"><svg-icon name="trash" class="w-4 h-4" /></button>
+                    <button @click.prevent="$emit('deleted')" class="text-gray-600 hover:text-gray-950"><svg-icon name="micro/trash" class="w-4 h-4" /></button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
                             ref="settings"
