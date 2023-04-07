@@ -32,7 +32,7 @@
         opacity: 0.5;
     }
 
-    &.draggable-mirror {
+    &.draggable-mirror .blueprint-section-field-inner {
         @apply shadow-lg;
     }
 }
