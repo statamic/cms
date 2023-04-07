@@ -123,6 +123,12 @@ export default {
         this.makeSortable();
     },
 
+    destroyed() {
+        if (this.sortableTabs) this.sortableTabs.destroy();
+        if (this.sortableSections) this.sortableSections.destroy();
+        if (this.sortableFields) this.sortableFields.destroy();
+    },
+
     methods: {
 
         ensureTab() {
