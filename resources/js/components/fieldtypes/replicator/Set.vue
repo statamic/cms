@@ -1,8 +1,8 @@
 <template>
 
-    <div>
+    <div :class="sortableItemClass">
         <slot name="picker" />
-        <div :class="classes" class="replicator-set">
+        <div class="replicator-set" :class="{ 'has-error': this.hasError }">
 
             <div class="replicator-set-header" :class="{ 'p-2': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
@@ -152,13 +152,6 @@ export default {
         isInvalid() {
             return Object.keys(this.config).length === 0;
         },
-
-        classes() {
-            return [
-                this.sortableItemClass,
-                { 'has-error': this.hasError }
-            ];
-        }
 
     },
 
