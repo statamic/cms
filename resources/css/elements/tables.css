@@ -326,7 +326,7 @@ table.control {
 .relationship-index-field {
     min-width: 10vw;
     .relationship-index-field-item {
-        @apply rounded bg-gray-100 border px-1 flex items-center text-2xs;
+        @apply rounded bg-gray-100 border px-1 flex items-center text-2xs mr-1;
         a {
             @apply line-clamp-1;
         }
