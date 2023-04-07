@@ -1,5 +1,5 @@
 <template>
-    <div class="publish-sections">
+    <div class="publish-sections @container">
         <div class="mb-8" v-for="(section, i) in sections" :key="i">
             <div class="card p-0">
                 <header class="publish-section-header" v-if="section.display">
