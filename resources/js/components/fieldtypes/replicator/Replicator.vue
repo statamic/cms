@@ -92,6 +92,7 @@
         </sortable-list>
 
         <add-set-button v-if="canAddSet"
+            class="mt-3"
             :last="true"
             :groups="groupConfigs"
             :sets="setConfigs"

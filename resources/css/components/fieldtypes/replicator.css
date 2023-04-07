@@ -48,19 +48,17 @@
 }
 
 .replicator-set-picker {
-    @apply py-4;
+    @apply py-2;
 }
 
 .replicator-set-picker.between {
     @apply opacity-0 hover:opacity-100;
-    max-height: 16px;
     transform: translateX(-8px);
-    transition: max-height 300ms ease-in-out, opacity 300ms ease 75ms, transform 200ms ease-in-out 10ms;
+    transition: opacity 100ms ease, transform 100ms ease;
 }
 
 .replicator-set-picker.between:hover {
-    max-height: 64px;
-    transform: translateX(0);
+    transform: translateX(-4px);
 }
 
 .replicator-set.has-error > .replicator-set-header label {
@@ -73,6 +71,4 @@
 
 .replicator-fullscreen {
     @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none;
-    z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
-                /*  too high and it'll be over the top of stacks, etc. */
 }

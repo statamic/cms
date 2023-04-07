@@ -1,7 +1,7 @@
 <template>
 
     <node-view-wrapper>
-        <div class="bard-set whitespace-normal my-6 rounded bg-white border shadow"
+        <div class="bard-set whitespace-normal my-6 rounded bg-white border shadow-md"
             :class="{ 'border-blue-400': selected, 'has-error': hasError }"
             contenteditable="false" @copy.stop @paste.stop @cut.stop
         >
