@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <div class="replicator-set-body publish-fields">
+        <div class="replicator-set-body publish-fields @container">
             <set-field
                 v-for="field in fields"
                 v-show="showField(field, fieldPath(field.handle))"
