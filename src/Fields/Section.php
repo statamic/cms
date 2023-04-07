@@ -13,12 +13,12 @@ class Section
         $this->contents = $contents;
     }
 
-    public function display()
+    public function display(): ?string
     {
         return $this->contents['display'] ?? null;
     }
 
-    public function instructions()
+    public function instructions(): ?string
     {
         return $this->contents['instructions'] ?? null;
     }
@@ -28,13 +28,18 @@ class Section
         return $this->contents;
     }
 
-    public function toPublishArray()
+    public function fields(): Fields
+    {
+        return new Fields(Arr::get($this->contents, 'fields', []));
+    }
+
+    public function toPublishArray(): array
     {
         return Arr::removeNullValues([
-            'display' => $this->contents['display'] ?? null,
-            'instructions' => $this->contents['instructions'] ?? null,
+            'display' => $this->display(),
+            'instructions' => $this->instructions(),
         ]) + [
-            'fields' => (new Fields(Arr::get($this->contents, 'fields', [])))->toPublishArray(),
+            'fields' => $this->fields()->toPublishArray(),
         ];
     }
 }
