@@ -335,7 +335,7 @@ class APITest extends TestCase
      *
      * @dataProvider userPasswordFilterProvider
      */
-    public function it_doesnt_allow_filtering_users_by_password($filter)
+    public function it_never_allows_filtering_users_by_password($filter)
     {
         Facades\Config::set('statamic.api.resources.users', [
             'allowed_filters' => ['password', 'password_hash'],
