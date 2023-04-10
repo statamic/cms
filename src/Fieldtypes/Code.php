@@ -105,6 +105,17 @@ class Code extends Fieldtype
                     ],
                 ],
             ],
+            [
+                'display' => __('Antlers'),
+                'fields' => [
+                    'antlers' => [
+                        'display' => __('Allow Antlers'),
+                        'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                        'type' => 'toggle',
+                    ],
+
+                ],
+            ],
         ];
     }
 
