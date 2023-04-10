@@ -34,11 +34,10 @@ class Provider
 
     public function findOrCreateUser($socialite): StatamicUser
     {
-        if ($user = User::findByOAuthId($this->name, $socialite->getId())) {
-            return $user;
-        }
-
-        if ($user = User::findByEmail($socialite->getEmail())) {
+        if (
+            ($user = User::findByOAuthId($this->name, $socialite->getId())) ||
+            ($user = User::findByEmail($socialite->getEmail()))
+        ) {
             return $this->mergeUser($user, $socialite);
         }
 
