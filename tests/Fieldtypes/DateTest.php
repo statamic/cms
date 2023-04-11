@@ -211,7 +211,7 @@ class DateTest extends TestCase
             'null when required with boolean with time enabled' => [
                 ['required' => true, 'time_enabled' => true],
                 null,
-                ['date' => '2010-12-25', 'time' => '13:43'], // current datetime
+                ['date' => '2010-12-25', 'time' => 'now'], // current datetime - time needs to be localized on the client side
             ],
             'null when required with validation' => [
                 ['validate' => ['required']],
@@ -221,7 +221,7 @@ class DateTest extends TestCase
             'null when required with validation with time enabled' => [
                 ['validate' => ['required'], 'time_enabled' => true],
                 null,
-                ['date' => '2010-12-25', 'time' => '13:43'], // current datetime
+                ['date' => '2010-12-25', 'time' => 'now'], // current datetime - time needs to be localized on the client side
             ],
             'date with default format' => [
                 [],

@@ -184,6 +184,12 @@ export default {
     },
 
     created() {
+        if (this.value.time === 'now') {
+            // Probably shouldn't be modifying a prop, but luckily it all works nicely, without
+            // needing to create an "update value without triggering dirty state" flow yet.
+            this.value.time = Vue.moment().format(this.hasSeconds ? 'HH:mm:ss' : 'HH:mm');
+        }
+
         this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
     },
 

@@ -129,7 +129,12 @@ class Date extends Fieldtype
                 return ['date' => null, 'time' => null];
             }
 
-            return $this->splitDateTimeForPreProcessSingle(Carbon::now());
+            return [
+                // We want the current date and time to be rendered, but since we don't
+                // know the users timezone, we'll let the front-end handle it.
+                'date' => now()->startOfDay()->format(self::DEFAULT_DATE_FORMAT),
+                'time' => $this->config('time_enabled') ? 'now' : null, // This will get replaced with the current time in Vue component.
+            ];
         }
 
         // If the value is an array, this field probably used to be a range. In this case, we'll use the start date.
