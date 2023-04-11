@@ -1,5 +1,40 @@
 # Release Notes
 
+## 4.0.0-alpha.3 (2023-04-11)
+
+### What's new
+- Redesigned and simplified the `color` fieldtype. [#7828](https://github.com/statamic/cms/issues/7828) [#7830](https://github.com/statamic/cms/issues/7830)
+- Ability to get the fields of a blueprint section. [#7852](https://github.com/statamic/cms/issues/7852)
+
+### What's improved
+- Relationship fields in listings will show first 2 items with a toggle to show them all. [#7871](https://github.com/statamic/cms/issues/7871)
+- Reorganize icons and add social ones. [#7854](https://github.com/statamic/cms/issues/7854) [#7864](https://github.com/statamic/cms/issues/7864)
+- Use floating ui to position select options. [#7847](https://github.com/statamic/cms/issues/7847)
+- Update Tiptap to stable. [#7848](https://github.com/statamic/cms/issues/7848)
+
+### What's fixed
+- Assorted UI fixes. [#7873](https://github.com/statamic/cms/issues/7873) [#7849](https://github.com/statamic/cms/issues/7849) [#7843](https://github.com/statamic/cms/issues/7843)
+- More assorted fixes. [#7872](https://github.com/statamic/cms/issues/7872)
+- Fix fullscreen button on grid stacked mode. [#7869](https://github.com/statamic/cms/issues/7869)
+- Fix some container related padding issues. [#7868](https://github.com/statamic/cms/issues/7868)
+- Fix Replicator sorting. [#7867](https://github.com/statamic/cms/issues/7867)
+- Fix Bard and Replicator in GraphQL when using set groups. [#7863](https://github.com/statamic/cms/issues/7863)
+- Fix Replicator set pickers not closing when opening a second one. [#7862](https://github.com/statamic/cms/issues/7862)
+- Fix unnecessary navigate-away dialog. [#7857](https://github.com/statamic/cms/issues/7857)
+- Fix global site selector styles. [#7853](https://github.com/statamic/cms/issues/7853)
+- Fix Replicator issues. [#7827](https://github.com/statamic/cms/issues/7827)
+- Bard/Replicator set picker now has a max-height and is scrollable. [#7845](https://github.com/statamic/cms/issues/7845)
+- Fix fieldset import label spacing. [#7846](https://github.com/statamic/cms/issues/7846)
+- Popovers now stop click propagation. [#7844](https://github.com/statamic/cms/issues/7844)
+- Fix icon dropdown inside modals. [#7841](https://github.com/statamic/cms/issues/7841)
+- Fix data-list columns not being removable. [#7829](https://github.com/statamic/cms/issues/7829)
+- Fix tab fade element z-index. [#7831](https://github.com/statamic/cms/issues/7831)
+
+### What's changed
+- The `color` fieldtype now only supports hex values.
+
+
+
 ## 4.0.0-alpha.2 (2023-04-04)
 
 ### What's new
