@@ -16,18 +16,17 @@
                     :attributes="attrs"
                     :class="{ 'w-full': !config.inline }"
                     :columns="$screens({ default: 1, lg: config.columns })"
-                    :input-debounce="1000"
                     :is-expanded="name === 'date' || config.full_width"
                     :is-range="isRange"
                     :is-required="config.required"
                     :locale="$config.get('locale').replace('_', '-')"
                     :masks="{ input: [displayFormat] }"
-                    :min-date="config.earliest_date"
-                    :max-date="config.latest_date"
+                    :min-date="config.earliest_date.date"
+                    :max-date="config.latest_date.date"
                     :model-config="modelConfig"
                     :popover="{ visibility: 'focus' }"
                     :rows="$screens({ default: 1, lg: config.rows })"
-                    :update-on-input="true"
+                    :update-on-input="false"
                     :value="datePickerValue"
                     @input="setDate"
                 >
@@ -46,6 +45,8 @@
                                         class="input-text-minimal p-0 bg-transparent leading-none"
                                         :value="inputValue.start"
                                         :readonly="isReadOnly"
+                                        @focus="focusedField = $event.target"
+                                        @blur="focusedField = null"
                                         v-on="!isReadOnly && inputEvents.start"
                                     />
                                 </div>
@@ -63,6 +64,8 @@
                                         class="input-text-minimal p-0 bg-transparent leading-none"
                                         :value="inputValue.end"
                                         :readonly="isReadOnly"
+                                        @focus="focusedField = $event.target"
+                                        @blur="focusedField = null"
                                         v-on="!isReadOnly && inputEvents.end"
                                     />
                                 </div>
@@ -76,9 +79,12 @@
                             </div>
                             <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
                                 <input
+                                    ref="singleDateInput"
                                     class="input-text-minimal p-0 bg-transparent leading-none"
                                     :value="inputValue"
                                     :readonly="isReadOnly"
+                                    @focus="focusedField = $event.target"
+                                    @blur="focusedField = null"
                                     v-on="!isReadOnly && inputEvents"
                                 />
                             </div>
@@ -92,7 +98,7 @@
                     v-if="hasTime"
                     ref="time"
                     handle=""
-                    :value="timeString"
+                    :value="value.time"
                     :required="config.time_enabled"
                     :show-seconds="config.time_seconds_enabled"
                     :read-only="isReadOnly"
@@ -112,6 +118,8 @@ export default {
 
     mixins: [Fieldtype],
 
+    inject: ['storeName'],
+
     data() {
         return {
             attrs: [
@@ -124,14 +132,15 @@ export default {
                     dates: new Date()
                 }
             ],
-            containerWidth: null
+            containerWidth: null,
+            focusedField: null
         }
     },
 
     computed: {
 
         hasDate() {
-            return this.config.required || this.value;
+            return this.config.required || this.value.date;
         },
 
         hasTime() {
@@ -154,18 +163,17 @@ export default {
         },
 
         datePickerValue() {
-            return this.isRange ? this.value : this.value.replace(' ', 'T');
-        },
+            if (this.isRange) return this.value.date;
 
-        timeString() {
-            return Vue.moment(this.value).format(this.config.time_seconds_enabled ? 'HH:mm:ss' : 'HH:mm');
+            // The calendar component will do `new Date(datePickerValue)` under the hood.
+            // If you pass a date without a time, it will treat it as UTC. By adding a time,
+            // it will behave as local time. The date that comes from the server will be what
+            // we expect. The time is handled separately by the nested time fieldtype.
+            // https://github.com/statamic/cms/pull/6688
+            return this.value.date+'T00:00:00';
         },
 
         format() {
-            if (this.hasTime) {
-                return this.config.time_seconds_enabled ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD HH:mm';
-            }
-
             return 'YYYY-MM-DD';
         },
 
@@ -175,57 +183,40 @@ export default {
 
     },
 
+    created() {
+        this.$events.$on(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
+    },
+
+    destroyed() {
+        this.$events.$off(`container.${this.storeName}.saving`, this.triggerChangeOnFocusedField);
+    },
+
 
     methods: {
 
+        triggerChangeOnFocusedField() {
+            if (!this.focusedField) return;
+
+            this.focusedField.dispatchEvent(new Event('change'));
+        },
+
         setDate(date) {
             if (!date) {
-                this.update(null);
+                this.update({ date: null, time: null });
                 return;
             }
 
-            if (this.isRange) {
-                this.setDateRange(date);
-            } else {
-                this.setSingleDate(date);
-            }
-        },
-
-        setSingleDate(date) {
-            const moment = Vue.moment(date);
-
-            if (this.hasTime) {
-                const timeMoment = Vue.moment(this.value);
-                moment
-                    .hour(timeMoment.hour())
-                    .minute(timeMoment.minute())
-                    .second(this.hasSeconds ? timeMoment.second() : 0);
-            }
-
-            if (moment.isValid()) {
-                this.update(moment.format(this.format));
-            }
-        },
-
-        setDateRange(range) {
-            if (Vue.moment(range.start).isValid() && Vue.moment(range.end).isValid()) {
-                this.update(range);
-            }
+            this.update({ ...this.value, date });
         },
 
         setTime(time) {
-            let parts = time.split(':');
-
-            if (parts.length === 1 && time > 2) {
-                parts[0] = parts[0].padStart(2, '0');
-            }
-
-            this.updateDebounced(parts.join(':'));
+            this.update({ ...this.value, time });
         },
 
         addDate() {
             const now = Vue.moment().format(this.format);
-            this.update(this.isRange ? { start: now, end: now } : now);
+            const date = this.isRange ? { start: now, end: now } : now;
+            this.update({ date, time: null });
         },
 
     },
