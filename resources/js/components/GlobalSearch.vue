@@ -1,7 +1,7 @@
 <template>
     <div class="global-search" :class="{'dirty': isDirty}" v-on-clickaway="reset" v-cloak>
         <div class="state-container w-4 h-4 text-gray-500 flex items-center" @click="focus">
-            <svg-icon name="light/magnifying-glass"></svg-icon>
+            <svg-icon name="light/magnifying-glass" class="w-4 h-4"></svg-icon>
         </div>
         <label class="sr-only" v-text="__('Global Search')" for="global-search" />
         <input type="text"
