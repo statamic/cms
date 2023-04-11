@@ -125,10 +125,10 @@ class Date extends Fieldtype
     private function preProcessSingle($value)
     {
         if (! $value) {
-            if (! $this->isRequired()) {
-                return ['date' => null, 'time' => null];
-            }
+            return ['date' => null, 'time' => null];
+        }
 
+        if ($value === 'now') {
             return [
                 // We want the current date and time to be rendered, but since we don't
                 // know the users timezone, we'll let the front-end handle it.

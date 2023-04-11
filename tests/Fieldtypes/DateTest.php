@@ -203,24 +203,14 @@ class DateTest extends TestCase
                 null,
                 ['date' => null, 'time' => null],
             ],
-            'null when required with boolean' => [
-                ['required' => true],
-                null,
+            'now' => [
+                [],
+                'now', // this would happen if the value was null, but default was "now"
                 ['date' => '2010-12-25', 'time' => null], // current date
             ],
-            'null when required with boolean with time enabled' => [
-                ['required' => true, 'time_enabled' => true],
-                null,
-                ['date' => '2010-12-25', 'time' => 'now'], // current datetime - time needs to be localized on the client side
-            ],
-            'null when required with validation' => [
-                ['validate' => ['required']],
-                null,
-                ['date' => '2010-12-25', 'time' => null], // current date
-            ],
-            'null when required with validation with time enabled' => [
-                ['validate' => ['required'], 'time_enabled' => true],
-                null,
+            'now, with time enabled' => [
+                ['time_enabled' => true],
+                'now', // this would happen if the value was null, but default was "now"
                 ['date' => '2010-12-25', 'time' => 'now'], // current datetime - time needs to be localized on the client side
             ],
             'date with default format' => [
