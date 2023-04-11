@@ -19,7 +19,7 @@
             </div>
 
             <div v-if="!isUsingOauth" class="publish-fields">
-                <div class="form-group">
+                <div class="form-group w-full">
                     <label v-text="__('messages.session_expiry_enter_password')" />
                     <small
                         class="help-block text-red-500"

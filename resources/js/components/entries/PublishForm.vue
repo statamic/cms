@@ -98,6 +98,8 @@
                         >
                             <template #actions="{ shouldShowSidebar }">
 
+                            <div :class="{'card': !shouldShowSidebar}">
+
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
                                     <div class="p-3 flex items-center space-x-2" v-if="showLivePreviewButton || showVisitUrlButton">
@@ -126,6 +128,8 @@
                                 >
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
                                     <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
+                                </div>
+
                                 </div>
 
                                 <div
