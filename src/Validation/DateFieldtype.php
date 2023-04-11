@@ -8,7 +8,8 @@ use Statamic\Support\Arr;
 
 class DateFieldtype implements InvokableRule
 {
-    protected $fieldtype;
+    private $fieldtype;
+    private $fail;
 
     public function __construct($fieldtype)
     {
@@ -17,19 +18,21 @@ class DateFieldtype implements InvokableRule
 
     public function __invoke($attribute, $value, $fail)
     {
+        $this->fail = $fail;
+
         if (! is_array($value)) {
             return $fail('statamic::validation.array')->translate();
         }
 
         if ($this->fieldtype->config('mode') === 'single') {
             if (! Arr::has($value, 'date')) {
-                return $fail('statamic::validation.date_fieldtype_date_required')->translate();
+                return $this->fail('date_required');
             }
 
             $date = $value['date'];
 
             if ($this->fieldtype->isRequired() && ! $date) {
-                return $fail('statamic::validation.date_fieldtype_date_required')->translate();
+                return $this->fail('date_required');
             }
 
             if ($date && ! $this->validDateFormat($date)) {
@@ -41,7 +44,7 @@ class DateFieldtype implements InvokableRule
             $date = $value['date'];
 
             if (! $date && $this->fieldtype->isRequired()) {
-                return $fail('statamic::validation.date_fieldtype_date_required')->translate();
+                return $this->fail('date_required');
             }
 
             if (! $date) {
@@ -49,30 +52,30 @@ class DateFieldtype implements InvokableRule
             }
 
             if (! Arr::has($date, 'start')) {
-                return $fail('statamic::validation.date_fieldtype_start_date_required')->translate();
+                return $this->fail('start_date_required');
             }
             if (! Arr::has($date, 'end')) {
-                return $fail('statamic::validation.date_fieldtype_end_date_required')->translate();
+                return $this->fail('end_date_required');
             }
 
             if ($this->fieldtype->isRequired() && ! $date['start'] && ! $date['end']) {
-                return $fail('statamic::validation.date_fieldtype_date_required')->translate();
+                return $this->fail('date_required');
             }
 
             if (! $date['start'] && $date['end']) {
-                return $fail('statamic::validation.date_fieldtype_start_date_required')->translate();
+                return $this->fail('start_date_required');
             }
 
             if (! $date['end'] && $date['start']) {
-                return $fail('statamic::validation.date_fieldtype_end_date_required')->translate();
+                return $this->fail('end_date_required');
             }
 
             if ($date['start'] && ! $this->validDateFormat($date['start'])) {
-                return $fail('statamic::validation.date_fieldtype_start_date_invalid')->translate();
+                return $this->fail('start_date_invalid');
             }
 
             if ($date['end'] && ! $this->validDateFormat($date['end'])) {
-                return $fail('statamic::validation.date_fieldtype_end_date_invalid')->translate();
+                return $this->fail('end_date_invalid');
             }
         }
 
@@ -81,13 +84,13 @@ class DateFieldtype implements InvokableRule
         }
 
         if (! Arr::has($value, 'time')) {
-            return $fail('statamic::validation.date_fieldtype_time_required')->translate();
+            return $this->fail('time_required');
         }
 
         $time = $value['time'];
 
         if ($this->fieldtype->isRequired() && ! $time) {
-            return $fail('statamic::validation.date_fieldtype_time_required')->translate();
+            return $this->fail('time_required');
         }
 
         if ($time && ! $this->validTimeFormat($time)) {
@@ -121,5 +124,10 @@ class DateFieldtype implements InvokableRule
     private function timeEnabled()
     {
         return $this->fieldtype->config('time_enabled');
+    }
+
+    private function fail($message)
+    {
+        call_user_func($this->fail, 'statamic::validation.date_fieldtype_'.$message)->translate();
     }
 }
