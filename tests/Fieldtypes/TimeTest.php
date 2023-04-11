@@ -3,6 +3,8 @@
 namespace Tests\Fieldtypes;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Date;
 use Statamic\Fieldtypes\Time;
@@ -52,6 +54,66 @@ class TimeTest extends TestCase
                 [],
                 '15:24',
                 '15:24',
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider validationProvider
+     */
+    public function it_validates($config, $input, $expected)
+    {
+        $field = $this->fieldtype($config)->field();
+        $messages = [];
+
+        try {
+            Validator::validate(['test' => $input], $field->rules(), [], $field->validationAttributes());
+        } catch (ValidationException $e) {
+            $messages = $e->validator->errors()->all();
+        }
+
+        $this->assertEquals($expected, $messages);
+    }
+
+    public function validationProvider()
+    {
+        return [
+            'valid time' => [
+                [],
+                '14:00',
+                [],
+            ],
+            'valid time with seconds' => [
+                ['seconds_enabled' => true],
+                '14:00:00',
+                [],
+            ],
+            'invalid time format' => [
+                [],
+                'not formatted like a time',
+                ['Not a valid time.'],
+            ],
+            '12 hour time' => [
+                [],
+                '1:00',
+                ['Not a valid time.'],
+            ],
+            'invalid hour' => [
+                [],
+                '25:00',
+                ['Not a valid time.'],
+            ],
+            'invalid minute' => [
+                [],
+                '14:65',
+                ['Not a valid time.'],
+            ],
+            'invalid second' => [
+                ['seconds_enabled' => true],
+                '13:00:60',
+                ['Not a valid time.'],
             ],
         ];
     }

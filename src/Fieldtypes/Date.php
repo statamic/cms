@@ -12,6 +12,7 @@ use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 use Statamic\Statamic;
 use Statamic\Support\DateFormat;
+use Statamic\Validation\DateFieldtype as ValidationRule;
 
 class Date extends Fieldtype
 {
@@ -185,7 +186,7 @@ class Date extends Fieldtype
         return ['date' => $range, 'time' => null];
     }
 
-    private function isRequired()
+    public function isRequired()
     {
         return in_array('required', $this->field->rules()[$this->field->handle()]);
     }
@@ -343,5 +344,10 @@ class Date extends Fieldtype
         } catch (InvalidFormatException|InvalidArgumentException $e) {
             return Carbon::parse($value);
         }
+    }
+
+    public function rules(): array
+    {
+        return [new ValidationRule($this)];
     }
 }

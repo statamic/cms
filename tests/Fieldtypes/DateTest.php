@@ -3,6 +3,8 @@
 namespace Tests\Fieldtypes;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Preference;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Date;
@@ -426,6 +428,196 @@ class DateTest extends TestCase
 
         $this->assertEquals('Y-m-d', $fieldtype->indexDisplayFormat());
         $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider validationProvider
+     */
+    public function it_validates($config, $input, $expected)
+    {
+        $field = $this->fieldtype($config)->field();
+        $messages = [];
+
+        try {
+            Validator::validate(['test' => $input], $field->rules(), [], $field->validationAttributes());
+        } catch (ValidationException $e) {
+            $messages = $e->validator->errors()->all();
+        }
+
+        $this->assertEquals($expected, $messages);
+    }
+
+    public function validationProvider()
+    {
+        return [
+            'valid date' => [
+                [],
+                ['date' => '2012-01-29'],
+                [],
+            ],
+            'not an array' => [
+                [],
+                'a string',
+                ['Must be an array.'],
+            ],
+            'missing date' => [
+                [],
+                [],
+                ['Date is required.'],
+            ],
+            'null date when not required' => [
+                [],
+                ['date' => null],
+                [],
+            ],
+            'null required date via bool' => [
+                ['required' => true],
+                ['date' => null],
+                ['Date is required.'],
+            ],
+            'null required date via validate' => [
+                ['validate' => 'required'],
+                ['date' => null],
+                ['Date is required.'],
+            ],
+            'invalid date format' => [
+                [],
+                ['date' => 'marchtember oneteenth'],
+                ['Not a valid date.'],
+            ],
+            'invalid date' => [
+                [],
+                ['date' => '2010-06-50'],
+                ['Not a valid date.'],
+            ],
+            'valid date range' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-01-29', 'end' => '2012-01-30']],
+                [],
+            ],
+            'null date in range mode' => [
+                ['mode' => 'range'],
+                ['date' => null],
+                [],
+            ],
+            'null date in range mode required via bool' => [
+                ['mode' => 'range', 'required' => true],
+                ['date' => null],
+                ['Date is required.'],
+            ],
+            'null date in range mode required via validate' => [
+                ['mode' => 'range', 'validate' => 'required'],
+                ['date' => null],
+                ['Date is required.'],
+            ],
+            'missing start date' => [
+                ['mode' => 'range'],
+                ['date' => ['end' => '2012-01-30']],
+                ['Start date is required.'],
+            ],
+            'missing end date' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-01-29']],
+                ['End date is required.'],
+            ],
+            'null start date' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => null, 'end' => '2012-01-30']],
+                ['Start date is required.'],
+            ],
+            'null end date' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-01-29', 'end' => null]],
+                ['End date is required.'],
+            ],
+            'both dates null' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => null, 'end' => null]],
+                [], // valid because not required
+            ],
+            'both dates null, required via bool' => [
+                ['mode' => 'range', 'required' => true],
+                ['date' => ['start' => null, 'end' => null]],
+                ['Date is required.'],
+            ],
+            'both dates null, required via validate' => [
+                ['mode' => 'range', 'validate' => 'required'],
+                ['date' => ['start' => null, 'end' => null]],
+                ['Date is required.'],
+            ],
+            'invalid start date' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2010-06-50', 'end' => '2012-01-30']],
+                ['Not a valid start date.'],
+            ],
+            'invalid end date' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-01-29', 'end' => '2010-06-50']],
+                ['Not a valid end date.'],
+            ],
+            'invalid start date format' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => 'marchtember oneteenth', 'end' => '2012-01-30']],
+                ['Not a valid start date.'],
+            ],
+            'invalid end date format' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-01-29', 'end' => 'marchtember oneteenth']],
+                ['Not a valid end date.'],
+            ],
+            'valid date and time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '13:00'],
+                [],
+            ],
+            'missing time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29'],
+                ['Time is required.'],
+            ],
+            'null time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => null],
+                [],
+            ],
+            'null required time via bool' => [
+                ['time_enabled' => true, 'required' => true],
+                ['date' => '2012-01-29', 'time' => null],
+                ['Time is required.'],
+            ],
+            'null required time via validate' => [
+                ['time_enabled' => true, 'validate' => 'required'],
+                ['date' => '2012-01-29', 'time' => null],
+                ['Time is required.'],
+            ],
+            'invalid time format' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => 'not formatted like a time'],
+                ['Not a valid time.'],
+            ],
+            '12 hour time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '1:00'],
+                ['Not a valid time.'],
+            ],
+            'invalid hour' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '25:00'],
+                ['Not a valid time.'],
+            ],
+            'invalid minute' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '14:65'],
+                ['Not a valid time.'],
+            ],
+            'invalid second' => [
+                ['time_enabled' => true, 'time_seconds_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '13:00:60'],
+                ['Not a valid time.'],
+            ],
+        ];
     }
 
     public function fieldtype($config = [])

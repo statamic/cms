@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Validation\TimeFieldtype as ValidationRule;
 
 class Time extends Fieldtype
 {
@@ -28,5 +29,10 @@ class Time extends Fieldtype
                 ],
             ],
         ];
+    }
+
+    public function rules(): array
+    {
+        return [new ValidationRule($this)];
     }
 }
