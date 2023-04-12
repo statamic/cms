@@ -13,6 +13,8 @@
                 v-model="inputValue"
                 :placeholder="useSeconds ? '__ : __ : __' : '__ : __'"
                 @keydown.esc="clear"
+                @keydown.up.prevent="incrementPart"
+                @keydown.down.prevent="decrementPart"
                 @focus="focused"
                 @blur="$emit('blur')"
                 @change="updateActualValue"
@@ -172,6 +174,54 @@ export default {
             this.update(this.useSeconds
                 ? `${hours}:${minutes}:${seconds}`
                 : `${hours}:${minutes}`);
+        },
+
+        adjustPart(e, direction, callback) {
+            const caretPosition = e.target.selectionStart;
+            const time = this.inputValue.split(':');
+
+            let part = 0;
+            if (caretPosition > 5) {
+                part = 2;
+            } else if (caretPosition > 2) {
+                part = 1;
+            }
+
+            const current = parseInt(time[part]);
+            const newValue = current + (direction === 'increment' ? 1 : -1);
+
+            const returned = callback(part, newValue);
+            if (returned) {
+                time[part] = returned;
+            } else {
+                time[part] = String(newValue).padStart(2, '0');
+            }
+
+            this.update(time.join(':'));
+
+            // Set the caret position back to where it was
+            this.$nextTick(() => {
+                e.target.selectionStart = caretPosition;
+                e.target.selectionEnd = caretPosition;
+            });
+        },
+
+        incrementPart(e) {
+            this.adjustPart(e, 'increment', (part, value) => {
+                if ((part === 0 && value > 23) || (part !== 0 && value > 59)) {
+                    return '00';
+                }
+            });
+        },
+
+        decrementPart(e) {
+            this.adjustPart(e, 'decrement', (part, value) => {
+                if (part === 0 && value == -1) {
+                    return '23';
+                } else if (part !== 0 && value == -1) {
+                    return '59';
+                }
+            });
         },
     }
 
