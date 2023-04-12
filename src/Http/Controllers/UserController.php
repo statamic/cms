@@ -20,6 +20,11 @@ class UserController extends Controller
 
     private $request;
 
+    public function __construct()
+    {
+        $this->middleware(\Statamic\Http\Middleware\Localize::class);
+    }
+
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -150,7 +155,7 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'current_password' => ['required', 'current_password'],
-            'password'         => ['required', 'confirmed', PasswordDefaults::rules()],
+            'password' => ['required', 'confirmed', PasswordDefaults::rules()],
         ]);
 
         if ($validator->fails()) {
