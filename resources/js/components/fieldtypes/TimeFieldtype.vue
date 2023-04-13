@@ -109,7 +109,7 @@ export default {
 
             let parts = this.inputValue.split(':');
             if (parts.length === 1) parts.push('00');
-            if (parts.length === 2) parts.push('00');
+            if (parts.length === 2 && this.useSeconds) parts.push('00');
             parts = parts.map(part => part.padStart(2, '0'));
 
             let newValue = parts.join(':');
