@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\ResetsPasswords;
 use Statamic\Contracts\Auth\User;
+use Statamic\Http\Middleware\Localize;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 
 class ResetPasswordController extends Controller
@@ -17,6 +18,7 @@ class ResetPasswordController extends Controller
     public function __construct()
     {
         $this->middleware(RedirectIfAuthenticated::class);
+        $this->middleware(Localize::class);
     }
 
     public function showResetForm(Request $request, $token = null)
