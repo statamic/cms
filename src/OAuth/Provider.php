@@ -95,11 +95,15 @@ class Provider
     public function withUserData(Closure $callback)
     {
         $this->userDataCallback = $callback;
+
+        return $this;
     }
 
     public function withUser(Closure $callback)
     {
         $this->userCallback = $callback;
+
+        return $this;
     }
 
     public function loginUrl()
