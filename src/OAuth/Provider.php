@@ -74,7 +74,7 @@ class Provider
 
     public function mergeUser($user, $socialite): StatamicUser
     {
-        collect($this->userData($socialite))->each(fn ($value, $key) => $user->set($key, $value));
+        collect($this->userData($socialite, $user))->each(fn ($value, $key) => $user->set($key, $value));
 
         $user->save();
 
@@ -83,10 +83,10 @@ class Provider
         return $user;
     }
 
-    public function userData($socialite)
+    public function userData($socialite, $existingUser = null)
     {
         if ($this->userDataCallback) {
-            return call_user_func($this->userDataCallback, $socialite);
+            return call_user_func($this->userDataCallback, $socialite, $existingUser);
         }
 
         return ['name' => $socialite->getName()];
