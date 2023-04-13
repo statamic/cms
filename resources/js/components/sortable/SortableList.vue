@@ -54,18 +54,25 @@ export default {
             type: Boolean,
             default: false
         },
+        animate: {
+            type: Boolean,
+            default: true
+        }
     },
 
     computed: {
 
         computedOptions() {
+            let plugins = [];
+            if (this.animate) plugins.push(Plugins.SwapAnimation);
+
             let options = Object.assign({}, {
                 draggable: `.${CSS.escape(this.itemClass)}`,
                 handle: `.${CSS.escape(this.handleClass)}`,
                 delay: this.delay,
                 distance: this.distance,
                 swapAnimation: { vertical: this.vertical, horizontal: !this.vertical },
-                plugins: [Plugins.SwapAnimation],
+                plugins,
                 mirror: {
                     constrainDimensions: this.constrainDimensions
                 },
