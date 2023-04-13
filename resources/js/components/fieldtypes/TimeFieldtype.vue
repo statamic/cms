@@ -9,9 +9,6 @@
                 ref="time"
                 class="input-text"
                 :readonly="isReadOnly"
-                v-mask="timeMask"
-                v-model="inputValue"
-                :placeholder="useSeconds ? '__ : __ : __' : '__ : __'"
                 @keydown.esc="clear"
                 @keydown.up.prevent="incrementPart"
                 @keydown.down.prevent="decrementPart"
@@ -24,6 +21,8 @@
 </template>
 
 <script>
+import IMask from 'imask';
+
 export default {
 
     mixins: [Fieldtype],
@@ -44,19 +43,19 @@ export default {
     data() {
         return {
             inputValue: this.value,
+            mask: null,
         };
     },
 
     watch: {
-        // When a user types in the text input field, this value will be updated.
-        // This is not the actual value of the fieldtype, which only gets updated on the change event.
-        inputValue(value, oldValue) {
-            this.updateInputValue(value);
+        // We use this instead of v-model or :value because the mask library wants to be in control of the value.
+        inputValue(value) {
+            this.mask.value = value;
         },
         // When the value is changed via the prop (e.g. through collaboration or other JS manually
         // setting the value) we'll want to make sure it's reflected correctly here.
         value(value) {
-            this.updateInputValue(value);
+            this.inputValue = value;
             this.updateActualValue();
         },
     },
@@ -64,30 +63,6 @@ export default {
     computed: {
         useSeconds() {
             return this.showSeconds || this.config.seconds_enabled;
-        },
-
-        timeMask() {
-            return (value) => {
-                const hours = [
-                    /[0-9]/,
-                    value.charAt(0) === '2' ? /[0-3]/ : /[0-9]/,
-                ];
-                const minutes = [/[0-5]/, /[0-9]/];
-                const masks = [...hours, ':', ...minutes];
-                const seconds = [/[0-5]/, /[0-9]/];
-
-                if (this.useSeconds) {
-                    masks.push(':', ...seconds);
-                }
-
-                if ((this.useSeconds) && value.length > 5) {
-                    return [...hours, ':', ...minutes, ':', ...seconds];
-                } else if (value.length > 2) {
-                    return [...hours, ':', ...minutes];
-                } else {
-                    return hours;
-                }
-            }
         }
     },
 
@@ -95,8 +70,20 @@ export default {
         this.$events.$on(`container.${this.storeName}.saving`, this.updateActualValue);
     },
 
+    mounted() {
+        // The mask will replace the need for binding the value to the input.
+        this.mask = IMask(this.$refs.time, {
+            mask: this.useSeconds ? '0[0]:`0[0]:`00' : '0[0]:`00'
+        });
+
+        // We use this instead of v-model or @input because input would be early and give us the raw value.
+        // In this event listener, we get masked value (with colons/guides). // e.g. 032 vs. 03:2
+        this.mask.on('accept', e => this.inputValue = this.mask.value);
+    },
+
     destroyed() {
         this.$events.$off(`container.${this.storeName}.saving`, this.updateActualValue);
+        this.mask.destroy();
     },
 
     methods: {
@@ -109,26 +96,11 @@ export default {
              this.$refs.time.focus();
         },
 
-        // If you type 3-9 as the first digit, it will prepend a 0.
-        updateInputValue(time) {
-            if (! time) {
-                this.inputValue = '';
-                return;
-            }
-
-            let parts = time.split(':');
-
-            if (parts.length === 1 && time > 2) {
-                parts[0] = parts[0].padStart(2, '0');
-            }
-
-            this.inputValue = parts.join(':');
-        },
-
         // This will take the value of the input, add appropriate padding, and update the actual fieldtype value.
         // e.g. 03:2    -> 03:02:00
         //      03:20   -> 03:20:00
         //      03:20:4 -> 03:20:04
+        //      3:2:4   -> 03:02:04
         updateActualValue() {
             if (! this.inputValue) {
                 this.update(null);
@@ -136,33 +108,13 @@ export default {
             }
 
             let parts = this.inputValue.split(':');
+            if (parts.length === 1) parts.push('00');
+            if (parts.length === 2) parts.push('00');
+            parts = parts.map(part => part.padStart(2, '0'));
 
-            if (parts.length === 1) {
-                parts[0] = parts[0].padStart(2, '0');
-                parts[1] = '00';
-                if (this.useSeconds) {
-                    parts[2] = '00';
-                }
-            }
-
-            if (parts.length === 2) {
-                parts[1] = parts[1].padStart(2, '0');
-                if (parts[1].length > 2) {
-                    parts[1] = parts[1].substr(0, 2);
-                }
-                if (this.useSeconds) {
-                    parts[2] = '00';
-                }
-            }
-
-            if (parts.length === 3) {
-                parts[2] = parts[2].padStart(2, '0');
-                if (parts[2].length > 2) {
-                    parts[2] = parts[2].substr(0, 2);
-                }
-            }
-
-            this.update(parts.join(':'));
+            let newValue = parts.join(':');
+            this.update(newValue);
+            this.inputValue = newValue;
         },
 
         setToNow() {
