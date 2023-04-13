@@ -97,6 +97,7 @@
                             @blur="container.$emit('blur', $event)"
                         >
                             <template #actions="{ shouldShowSidebar }">
+                            <div :class="{'card p-0': !shouldShowSidebar}">
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
@@ -186,7 +187,7 @@
                                         <div class="badge-sm bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
                                     </div>
                                 </div>
-
+                            </div>
                             </template>
                         </publish-tabs>
                     </transition>

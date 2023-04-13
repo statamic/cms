@@ -79,8 +79,10 @@
 }
 
 .toggle-container.on.read-only {
-    .toggle-slider {
-        @apply bg-gray-500;
+    @apply bg-gray-500 border-gray-600;
+
+    .toggle-knob:focus {
+        box-shadow: 0 0 10px theme(colors.gray.500/70);
     }
 }
 
