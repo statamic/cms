@@ -28,7 +28,7 @@
             <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-2 flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
                 <svg-icon :name="`light/${getResultIcon(result)}`" class="icon"></svg-icon>
                 <div class="flex-1 ml-2 title" v-html="result.title"></div>
-                <span class="rounded px-1 py-px text-2xs uppercase bg-gray-200 text-gray" v-text="result.badge" />
+                <span class="rounded px-1 text-2xs border bg-gray-200 text-gray" v-text="result.badge" />
             </div>
 
             <div v-if="! hasResults && hasFavorites">
