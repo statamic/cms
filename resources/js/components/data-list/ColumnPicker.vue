@@ -124,7 +124,7 @@ export default {
             toArray.push(fromArray[currentIndex]);
             fromArray.splice(currentIndex, 1);
 
-            this.hiddenColumns = _.sortBy(this.hiddenColumns, column => column.defaultOrder);
+            this.hiddenColumns = _.sortBy(this.hiddenColumns, column => column.label);
         },
 
         save() {
