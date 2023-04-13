@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .vm--modal {
-    @apply rounded-lg !important;
+    @apply rounded-lg overflow-scroll !important;
 }
 
 .vm--overlay {
