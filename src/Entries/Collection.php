@@ -340,7 +340,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         }
 
         if ($this->dated()) {
-            $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
+            $blueprint->ensureField('date', ['type' => 'date', 'required' => true, 'default' => 'now'], 'sidebar');
         }
 
         if ($this->hasStructure() && ! $this->orderable()) {

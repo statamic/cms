@@ -1,52 +1,29 @@
 <template>
     <div class="time-fieldtype-container">
-        <div class="input-group">
-            <div class="input-group-prepend flex items-center">
+        <div class="input-group" :class="{'w-[120px]': useSeconds, 'w-[96px]': ! useSeconds}">
+            <button class="input-group-prepend flex items-center" v-tooltip="__('Set to now')" @click="setToNow">
                 <svg-icon name="light/time" class="w-4 h-4" />
-            </div>
-            <div
-                class="input-text flex items-center px-1 w-auto"
-                :class="{ 'read-only': isReadOnly }"
-            >
-                <template v-for="(part, index) in parts">
-                    <span
-                        v-if="index > 0"
-                        class="colon"
-                        :key="`${part}-colon`"
-                    >:</span>
-                    <input
-                        type="text"
-                        min="00"
-                        placeholder="00"
-                        tabindex="0"
-                        ref="inputs"
-                        :key="`${part}-input`"
-                        :value="inputValue(index)"
-                        :class="`input-time input-${part}`"
-                        :max="maxes[index]"
-                        :readonly="isReadOnly"
-                        @input="updatePart(index, $event.target.value)"
-                        @keydown.up.prevent="incrementPart(index, 1)"
-                        @keydown.down.prevent="incrementPart(index, -1)"
-                        @keydown.esc="clear"
-                        @keydown.186.prevent="focusNextPart(index) /* colon */"
-                        @keydown.190.prevent="focusNextPart(index) /* dot */"
-                        @focus="$emit('focus')"
-                        @blur="$emit('blur')"
-                    />
-                </template>
-            </div>
+            </button>
+            <input
+                type="text"
+                ref="time"
+                class="input-text"
+                :readonly="isReadOnly"
+                v-mask="timeMask"
+                v-model="inputValue"
+                :placeholder="useSeconds ? '__ : __ : __' : '__ : __'"
+                @keydown.esc="clear"
+                @keydown.up.prevent="incrementPart"
+                @keydown.down.prevent="decrementPart"
+                @focus="focused"
+                @blur="$emit('blur')"
+                @change="updateActualValue"
+            />
         </div>
-        <button class="text-xl text-gray-600 hover:text-gray-800 h-4 w-4 p-2 flex items-center outline-none" tabindex="0"
-              v-if="! required && ! isReadOnly"
-              @click="clear" @keyup.enter.space="clear">
-              &times;
-        </button>
     </div>
 </template>
 
 <script>
-
 export default {
 
     mixins: [Fieldtype],
@@ -62,91 +39,190 @@ export default {
         },
     },
 
+    inject: ['storeName'],
+
     data() {
         return {
-            maxes: [23, 59, 59],
+            inputValue: this.value,
         };
     },
 
+    watch: {
+        // When a user types in the text input field, this value will be updated.
+        // This is not the actual value of the fieldtype, which only gets updated on the change event.
+        inputValue(value, oldValue) {
+            this.updateInputValue(value);
+        },
+        // When the value is changed via the prop (e.g. through collaboration or other JS manually
+        // setting the value) we'll want to make sure it's reflected correctly here.
+        value(value) {
+            this.updateInputValue(value);
+            this.updateActualValue();
+        },
+    },
+
     computed: {
-
-        partCount() {
-            return this.showSeconds || this.config.seconds_enabled ? 3 : 2;
+        useSeconds() {
+            return this.showSeconds || this.config.seconds_enabled;
         },
 
-        parts() {
-            return ['hour', 'minute', 'second'].slice(0, this.partCount);
-        },
+        timeMask() {
+            return (value) => {
+                const hours = [
+                    /[0-9]/,
+                    value.charAt(0) === '2' ? /[0-3]/ : /[0-9]/,
+                ];
+                const minutes = [/[0-5]/, /[0-9]/];
+                const masks = [...hours, ':', ...minutes];
+                const seconds = [/[0-5]/, /[0-9]/];
 
-        time() {
-            const time = Array(this.partCount).fill(0);
+                if (this.useSeconds) {
+                    masks.push(':', ...seconds);
+                }
 
-            if (this.value) {
-                this.value.split(':').forEach((e, i) => { time[i] = parseInt(e); });
+                if ((this.useSeconds) && value.length > 5) {
+                    return [...hours, ':', ...minutes, ':', ...seconds];
+                } else if (value.length > 2) {
+                    return [...hours, ':', ...minutes];
+                } else {
+                    return hours;
+                }
             }
+        }
+    },
 
-            return time;
-        },
+    created() {
+        this.$events.$on(`container.${this.storeName}.saving`, this.updateActualValue);
+    },
 
+    destroyed() {
+        this.$events.$off(`container.${this.storeName}.saving`, this.updateActualValue);
     },
 
     methods: {
-
-        inputValue(index) {
-            if (this.value) {
-                return this.pad(this.time[index]);
-            }
-
-            return '';
-        },
-
-        updatePart(index, value) {
-            const time = [...this.time];
-            time[index] = Math.max(0, Math.min(this.maxes[index], value));
-            this.updateWithTime(time);
-        },
-
-        incrementPart(index, delta) {
-            let value = this.time[index] + delta;
-
-            const wrap = this.maxes[index] + 1
-            while (value < 0) value += wrap
-            while (value >= wrap) value -= wrap
-
-            this.updatePart(index, value);
-        },
-
-        clear() {
-            this.update(null);
-        },
-
-        updateWithTime(time) {
-            this.update(this.timeToString(time));
-            this.$forceUpdate();
-        },
-
-        timeToString(time) {
-            return time.map(e => this.pad(e)).join(':');
-        },
-
-        pad(value) {
-            return ('00' + value).slice(-2);
-        },
-
-        focusNextPart(index) {
-            this.focusPart(index + 1 === this.partCount ? 0 : index + 1);
-        },
-
-        focusPart(index) {
-            const input = this.$refs.inputs[index];
-            input.focus();
-            input.select();
+        focused() {
+            this.$refs.time.select();
+            this.$emit('focus');
         },
 
         focus() {
-             this.$refs.inputs[0].focus();
+             this.$refs.time.focus();
         },
 
+        // If you type 3-9 as the first digit, it will prepend a 0.
+        updateInputValue(time) {
+            if (! time) {
+                this.inputValue = '';
+                return;
+            }
+
+            let parts = time.split(':');
+
+            if (parts.length === 1 && time > 2) {
+                parts[0] = parts[0].padStart(2, '0');
+            }
+
+            this.inputValue = parts.join(':');
+        },
+
+        // This will take the value of the input, add appropriate padding, and update the actual fieldtype value.
+        // e.g. 03:2    -> 03:02:00
+        //      03:20   -> 03:20:00
+        //      03:20:4 -> 03:20:04
+        updateActualValue() {
+            if (! this.inputValue) {
+                this.update(null);
+                return;
+            }
+
+            let parts = this.inputValue.split(':');
+
+            if (parts.length === 1) {
+                parts[0] = parts[0].padStart(2, '0');
+                parts[1] = '00';
+                if (this.useSeconds) {
+                    parts[2] = '00';
+                }
+            }
+
+            if (parts.length === 2) {
+                parts[1] = parts[1].padStart(2, '0');
+                if (parts[1].length > 2) {
+                    parts[1] = parts[1].substr(0, 2);
+                }
+                if (this.useSeconds) {
+                    parts[2] = '00';
+                }
+            }
+
+            if (parts.length === 3) {
+                parts[2] = parts[2].padStart(2, '0');
+                if (parts[2].length > 2) {
+                    parts[2] = parts[2].substr(0, 2);
+                }
+            }
+
+            this.update(parts.join(':'));
+        },
+
+        setToNow() {
+            const date = new Date();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+
+            this.update(this.useSeconds
+                ? `${hours}:${minutes}:${seconds}`
+                : `${hours}:${minutes}`);
+        },
+
+        adjustPart(e, direction, callback) {
+            const caretPosition = e.target.selectionStart;
+            const time = this.inputValue.split(':');
+
+            let part = 0;
+            if (caretPosition > 5) {
+                part = 2;
+            } else if (caretPosition > 2) {
+                part = 1;
+            }
+
+            const current = parseInt(time[part]);
+            const newValue = current + (direction === 'increment' ? 1 : -1);
+
+            const returned = callback(part, newValue);
+            if (returned) {
+                time[part] = returned;
+            } else {
+                time[part] = String(newValue).padStart(2, '0');
+            }
+
+            this.update(time.join(':'));
+
+            // Set the caret position back to where it was
+            this.$nextTick(() => {
+                e.target.selectionStart = caretPosition;
+                e.target.selectionEnd = caretPosition;
+            });
+        },
+
+        incrementPart(e) {
+            this.adjustPart(e, 'increment', (part, value) => {
+                if ((part === 0 && value > 23) || (part !== 0 && value > 59)) {
+                    return '00';
+                }
+            });
+        },
+
+        decrementPart(e) {
+            this.adjustPart(e, 'decrement', (part, value) => {
+                if (part === 0 && value == -1) {
+                    return '23';
+                } else if (part !== 0 && value == -1) {
+                    return '59';
+                }
+            });
+        },
     }
 
 };
