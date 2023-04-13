@@ -1,9 +1,5 @@
-.column-picker {
-
-}
-
 .column-picker-item {
-    @apply text-sm outline-none flex items-center select-none h-full;
+    @apply text-sm outline-none flex items-center select-none;
 
     &.sortable {
         @apply rounded bg-white border;
