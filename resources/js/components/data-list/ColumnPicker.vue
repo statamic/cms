@@ -152,7 +152,7 @@ export default {
             this.$preferences.remove(this.preferencesKey)
                 .then(response => {
                     this.saving = false;
-                    this.$refs.popover.close();
+                    this.open = false;
                     this.$toast.success(__('Columns have been reset to their defaults.'));
                 })
                 .catch(error => {
