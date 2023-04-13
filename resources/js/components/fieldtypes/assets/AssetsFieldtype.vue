@@ -61,6 +61,7 @@
                         @dragend="$emit('blur')"
                         :constrain-dimensions="true"
                         :disabled="isReadOnly"
+                        :distance="10"
                     >
                         <div class="asset-grid-listing border rounded overflow-hidden rounded-t-none" ref="assets">
                             <asset-tile
@@ -86,6 +87,7 @@
                                 :vertical="true"
                                 :constrain-dimensions="true"
                                 :disabled="isReadOnly"
+                                :distance="10"
                             >
                                 <tbody ref="assets">
                                     <tr is="assetRow"
