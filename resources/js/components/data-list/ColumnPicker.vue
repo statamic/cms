@@ -106,7 +106,7 @@ export default {
         setLocalColumns() {
             this.selectedColumns = this.sharedState.columns.filter(column => column.visible);
             let hiddenColumns = this.sharedState.columns.filter(column => ! column.visible);
-            this.hiddenColumns = _.sortBy(hiddenColumns, column => column.label);
+            this.hiddenColumns = _.sortBy(hiddenColumns, column => column.label.toLowerCase());
         },
 
         setSharedStateColumns() {
@@ -124,7 +124,7 @@ export default {
             toArray.push(fromArray[currentIndex]);
             fromArray.splice(currentIndex, 1);
 
-            this.hiddenColumns = _.sortBy(this.hiddenColumns, column => column.label);
+            this.hiddenColumns = _.sortBy(this.hiddenColumns, column => column.label.toLowerCase());
         },
 
         save() {
