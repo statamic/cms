@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\SendsPasswordResetEmails;
 use Statamic\Facades\URL;
+use Statamic\Http\Middleware\Localize;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 
 class ForgotPasswordController extends Controller
@@ -18,6 +19,7 @@ class ForgotPasswordController extends Controller
     public function __construct()
     {
         $this->middleware(RedirectIfAuthenticated::class);
+        $this->middleware(Localize::class);
     }
 
     public function showLinkRequestForm()
