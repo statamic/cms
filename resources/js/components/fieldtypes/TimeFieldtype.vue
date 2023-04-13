@@ -77,7 +77,7 @@ export default {
         });
 
         // Bind initial value to mask.
-        this.mask.value = this.inputValue;
+        this.mask.value = new String(this.inputValue);
 
         // We use this instead of v-model or @input because input would be early and give us the raw value.
         // In this event listener, we get masked value (with colons/guides). // e.g. 032 vs. 03:2
