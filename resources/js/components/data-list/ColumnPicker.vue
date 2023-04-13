@@ -8,9 +8,9 @@
             <svg-icon name="light/settings-horizontal" class="w-4 h-4" />
         </button>
 
-        <modal v-if="open" name="column-picker" @closed="open = false" adaptive draggable click-to-close>
+        <modal v-if="open" name="column-picker" @closed="open = false" adaptive draggable=".modal-drag-handle" click-to-close>
 
-            <header class="p-4 bg-gray-200 border-b flex items-center justify-between cursor-grab active:cursor-grabbing">
+            <header class="modal-drag-handle p-4 bg-gray-200 border-b flex items-center justify-between cursor-grab active:cursor-grabbing">
                 <h2>{{ __('Customize Columns') }}</h2>
                 <button class="btn-close" @click="open = false" :aria-label="__('Close Editor')">&times;</button>
             </header>
