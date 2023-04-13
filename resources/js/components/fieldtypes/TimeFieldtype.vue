@@ -76,6 +76,9 @@ export default {
             mask: this.useSeconds ? '0[0]:`0[0]:`00' : '0[0]:`00'
         });
 
+        // Bind initial value to mask.
+        this.mask.value = this.inputValue;
+
         // We use this instead of v-model or @input because input would be early and give us the raw value.
         // In this event listener, we get masked value (with colons/guides). // e.g. 032 vs. 03:2
         this.mask.on('accept', e => this.inputValue = this.mask.value);
