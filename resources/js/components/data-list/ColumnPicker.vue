@@ -40,6 +40,7 @@
                         item-class="item"
                         handle-class="item"
                         append-to=".modal-body"
+                        constrain-dimensions
                     >
                         <div class="flex flex-col space-y-1 px-3 p-3 select-none shadow-inner">
                             <div class="item sortable cursor-grab" v-for="column in selectedColumns" :key="column.field">
