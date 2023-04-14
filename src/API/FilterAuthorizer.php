@@ -68,7 +68,7 @@ class FilterAuthorizer extends AbstractAuthorizer
             ->map(fn ($resource) => $config[$resource]['allowed_filters'] ?? [])
             ->reduce(function ($carry, $allowedFilters) use ($config) {
                 return $carry->intersect($allowedFilters)->merge($config['*']['allowed_filters'] ?? []);
-            }, collect($config[$resources[0]]['allowed_filters'] ?? []))
+            }, collect($config[$resources[0] ?? '']['allowed_filters'] ?? []))
             ->all();
     }
 }

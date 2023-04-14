@@ -134,22 +134,40 @@ class FilterAuthorizerTest extends TestCase
     {
         Config::set("statamic.{$configFile}.resources", [
             'collections' => [
-                '*' => ['allowed_filters' => ['title', 'slug']],
+                '*' => [
+                    'enabled' => true,
+                    'allowed_filters' => ['title', 'slug'],
+                ],
             ],
             'navs' => [
-                '*' => ['allowed_filters' => ['title']],
+                '*' => [
+                    'enabled' => true,
+                    'allowed_filters' => ['title'],
+                ],
             ],
             'taxonomies' => [
-                '*' => ['allowed_filters' => ['title', 'color']],
+                '*' => [
+                    'enabled' => true,
+                    'allowed_filters' => ['title', 'color'],
+                ],
             ],
             'assets' => [
-                '*' => ['allowed_filters' => ['path']],
+                '*' => [
+                    'enabled' => true,
+                    'allowed_filters' => ['path'],
+                ],
             ],
             'globals' => [
-                '*' => ['allowed_filters' => ['site_name']],
+                '*' => [
+                    'enabled' => true,
+                    'allowed_filters' => ['site_name'],
+                ],
             ],
             'forms' => [
-                '*' => ['allowed_filters' => ['title']],
+                '*' => [
+                    'enabled' => true,
+                    'allowed_filters' => ['title'],
+                ],
             ],
         ]);
 
@@ -188,21 +206,27 @@ class FilterAuthorizerTest extends TestCase
         Config::set("statamic.{$configFile}.resources", [
             'collections' => [
                 'blog' => ['allowed_filters' => ['title', 'slug']],
+                'pages' => true,
             ],
             'navs' => [
                 'footer' => ['allowed_filters' => ['title']],
+                'main' => true,
             ],
             'taxonomies' => [
                 'tags' => ['allowed_filters' => ['title', 'color']],
+                'topics' => true,
             ],
             'assets' => [
                 'avatars' => ['allowed_filters' => ['path']],
+                'main' => true,
             ],
             'globals' => [
                 'branding' => ['allowed_filters' => ['site_name']],
+                'socials' => true,
             ],
             'forms' => [
                 'contact' => ['allowed_filters' => ['title']],
+                'newsletter' => true,
             ],
         ]);
 
@@ -267,6 +291,7 @@ class FilterAuthorizerTest extends TestCase
             'blog' => [
                 'allowed_filters' => ['slug'],
             ],
+            'pages' => true,
         ]);
 
         $this->assertEqualsCanonicalizing(['title', 'slug'], FilterAuthorizer::allowedForSubResources($configFile, 'collections', 'blog'));
