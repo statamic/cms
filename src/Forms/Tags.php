@@ -219,18 +219,12 @@ class Tags extends BaseTags
      */
     protected function getSections($sessionHandle, $jsDriver)
     {
-        // TODO: Add blueprint helper method for this?
-        $sections = $this->form()->blueprint()->contents()['tabs']['main']['sections'];
-
-        return collect($sections)
+        return $this->form()->blueprint()->tabs()->first()->sections()
             ->map(function ($section) use ($sessionHandle, $jsDriver) {
-                // TODO: Should this be done by blueprint helper method as well?
-                $fields = new \Statamic\Fields\Fields($section['fields']);
-
                 return [
-                    'display' => Arr::get($section, 'display'),
-                    'instructions' => Arr::get($section, 'instructions'),
-                    'fields' => $this->getFields($sessionHandle, $jsDriver, $fields->all()),
+                    'display' => $section->display(),
+                    'instructions' => $section->instructions(),
+                    'fields' => $this->getFields($sessionHandle, $jsDriver, $section->fields()->all()),
                 ];
             })
             ->all();
