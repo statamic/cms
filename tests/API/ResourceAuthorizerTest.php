@@ -153,6 +153,27 @@ class ResourceAuthorizerTest extends TestCase
      *
      * @dataProvider configFileProvider
      */
+    public function disabling_sub_resource_overrides_wildcard_config($configFile)
+    {
+        Facades\Collection::make('products')->save();
+
+        Config::set("statamic.{$configFile}.resources.collections", [
+            '*' => [
+                'enabled' => true,
+                'allowed_filters' => ['title', 'slug'],
+            ],
+            'pages' => false,
+        ]);
+
+        $this->assertTrue(ResourceAuthorizer::isAllowed($configFile, 'collections'));
+        $this->assertEqualsCanonicalizing(['blog', 'products'], ResourceAuthorizer::allowedSubResources($configFile, 'collections'));
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider configFileProvider
+     */
     public function can_enable_individual_sub_resources_via_boolean($configFile)
     {
         Config::set("statamic.{$configFile}.resources", [

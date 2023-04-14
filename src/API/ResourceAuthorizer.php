@@ -38,7 +38,9 @@ class ResourceAuthorizer extends AbstractAuthorizer
         }
 
         if ($config === true || Arr::get($config, '*.enabled') === true) {
-            return $this->getAllHandlesForResource($queriedResource);
+            $config = collect($this->getAllHandlesForResource($queriedResource))
+                ->mapWithKeys(fn ($subResource) => [$subResource => true])
+                ->merge(is_array($config) ? $config : []);
         }
 
         return collect($config)
