@@ -18,8 +18,7 @@ class ForgotPasswordController extends Controller
 
     public function __construct()
     {
-        $this->middleware(RedirectIfAuthenticated::class);
-        $this->middleware(Localize::class);
+        $this->middleware([RedirectIfAuthenticated::class, Localize::class]);
     }
 
     public function showLinkRequestForm()
