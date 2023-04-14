@@ -112,4 +112,4 @@
     </div>
 </div>
 
-<div v-if="$refs.globalSearch?.focused" v-cloak class="fixed inset-0 h-full w-full bg-black/10 z-1"></div>
+<div v-if="$refs.globalSearch?.focused" v-cloak class="fixed inset-0 h-full w-full bg-black/10 z-2"></div>
