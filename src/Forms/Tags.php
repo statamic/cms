@@ -229,6 +229,7 @@ class Tags extends BaseTags
 
                 return [
                     'display' => Arr::get($section, 'display'),
+                    'instructions' => Arr::get($section, 'instructions'),
                     'fields' => $this->getFields($sessionHandle, $jsDriver, $fields->all()),
                 ];
             })
