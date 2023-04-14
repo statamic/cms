@@ -45,9 +45,14 @@ class FilterAuthorizer extends AbstractAuthorizer
         }
 
         // Determine which resources are being queried.
-        $resources = collect($queriedHandles === '*' ? $this->getAllHandlesForResource($queriedResource) : $queriedHandles);
+        // Querying against `*` will apply to all enabled resources at once.
+        $resources = collect(
+            $queriedHandles === '*'
+                ? (new ResourceAuthorizer)->allowedSubResources($configFile, $queriedResource)
+                : $queriedHandles
+        );
 
-        // Determine if any of our queried resources are explicitly disabled.
+        // Determine if any of our queried resources have filters explicitly disabled.
         $disabled = $resources
             ->filter(fn ($resource) => Arr::get($config, "{$resource}.allowed_filters") === false)
             ->isNotEmpty();
@@ -58,7 +63,7 @@ class FilterAuthorizer extends AbstractAuthorizer
         }
 
         // Determine `allowed_filters` by filtering out any that don't appear in all of them.
-        // And a resource named `*` will apply to all resources at once.
+        // A resource named `*` will apply to all enabled resources at once.
         return $resources
             ->map(fn ($resource) => $config[$resource]['allowed_filters'] ?? [])
             ->reduce(function ($carry, $allowedFilters) use ($config) {
