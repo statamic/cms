@@ -22,7 +22,7 @@
             <confirmation-modal
                 v-if="editingSection"
                 :title="editText"
-                @opened="$refs.displayInput.focus()"
+                @opened="$refs.displayInput.select()"
                 @confirm="editConfirmed"
                 @cancel="editCancelled"
             >
