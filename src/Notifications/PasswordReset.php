@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Statamic\Auth\Passwords\PasswordReset as PasswordResetManager;
+use Statamic\Http\Middleware\Localize;
 
 class PasswordReset extends Notification
 {
@@ -16,6 +17,7 @@ class PasswordReset extends Notification
     public function __construct($token)
     {
         $this->token = $token;
+        $this->middleware([Localize::class]);
     }
 
     /**
