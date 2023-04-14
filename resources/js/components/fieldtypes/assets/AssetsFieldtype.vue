@@ -61,7 +61,9 @@
                         @dragend="$emit('blur')"
                         :constrain-dimensions="true"
                         :disabled="isReadOnly"
-                        :distance="20"
+                        :distance="10"
+                        :animate="false"
+                        append-to="body"
                     >
                         <div class="asset-grid-listing border rounded overflow-hidden rounded-t-none" ref="assets">
                             <asset-tile
@@ -71,6 +73,7 @@
                                 :is-solo="soloAsset"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
+                                class="grid-listing-asset-tile"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
                                 @id-changed="idChanged(asset.id, $event)">
@@ -85,9 +88,9 @@
                                 item-class="asset-row"
                                 handle-class="asset-row"
                                 :vertical="true"
-                                :constrain-dimensions="true"
                                 :disabled="isReadOnly"
                                 :distance="10"
+                                :mirror="false"
                             >
                                 <tbody ref="assets">
                                     <tr is="assetRow"

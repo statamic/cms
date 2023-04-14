@@ -135,6 +135,13 @@ return [
     'reserved' => 'This is a reserved word.',
     'parent_causes_root_children' => 'This would cause the root page to have children.',
     'parent_cannot_be_itself' => 'Cannot be its own parent.',
+    'time' => 'Not a valid time.',
+    'date_fieldtype_date_required' => 'Date is required.',
+    'date_fieldtype_time_required' => 'Time is required.',
+    'date_fieldtype_start_date_required' => 'Start date is required.',
+    'date_fieldtype_start_date_invalid' => 'Not a valid start date.',
+    'date_fieldtype_end_date_required' => 'End date is required.',
+    'date_fieldtype_end_date_invalid' => 'Not a valid end date.',
 
     /*
     |--------------------------------------------------------------------------

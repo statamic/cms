@@ -508,6 +508,8 @@ export default {
         },
 
         runBeforeSaveHook() {
+            this.$refs.container.saving();
+
             Statamic.$hooks.run('entry.saving', {
                 collection: this.collectionHandle,
                 values: this.values,

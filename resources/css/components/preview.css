@@ -1,6 +1,5 @@
 .live-preview {
     @apply inset-0;
-    z-index: 998; /*  arbitrary under stacks. */
 }
 
 .live-preview-header {

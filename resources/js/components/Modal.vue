@@ -16,7 +16,7 @@ export default {
 
     props: {
         adaptive: { type: Boolean, default: true },
-        draggable: { type: Boolean, default: false },
+        draggable: { default: false },
         clickToClose: { type: Boolean, default: false },
         shiftY: { type: Number, default: 0.1 },
         focusTrap: {type: Boolean, default: true},
