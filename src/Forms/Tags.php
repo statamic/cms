@@ -228,7 +228,7 @@ class Tags extends BaseTags
                 $fields = new \Statamic\Fields\Fields($section['fields']);
 
                 return [
-                    'display' => $section['display'],
+                    'display' => Arr::get($section, 'display'),
                     'fields' => $this->getFields($sessionHandle, $jsDriver, $fields->all()),
                 ];
             })
