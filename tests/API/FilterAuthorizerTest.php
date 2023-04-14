@@ -280,6 +280,35 @@ class FilterAuthorizerTest extends TestCase
      *
      * @dataProvider configFileProvider
      */
+    public function it_properly_handles_disabled_sub_resources_when_merging_filters($configFile)
+    {
+        // Add a third collection, but do not enable it as sub-resource in config...
+        Facades\Collection::make('products')->save();
+
+        Config::set("statamic.{$configFile}.resources.collections", [
+            'blog' => [
+                'allowed_filters' => ['title', 'status'],
+            ],
+            'pages' => [
+                'allowed_filters' => ['title'],
+            ],
+        ]);
+
+        $this->assertEqualsCanonicalizing(['title', 'status'], FilterAuthorizer::allowedForSubResources($configFile, 'collections', 'blog'));
+        $this->assertEqualsCanonicalizing(['title'], FilterAuthorizer::allowedForSubResources($configFile, 'collections', 'pages'));
+        $this->assertEqualsCanonicalizing([], FilterAuthorizer::allowedForSubResources($configFile, 'collections', 'products'));
+        $this->assertEqualsCanonicalizing(['title'], FilterAuthorizer::allowedForSubResources($configFile, 'collections', ['blog', 'pages']));
+        $this->assertEqualsCanonicalizing([], FilterAuthorizer::allowedForSubResources($configFile, 'collections', ['blog', 'pages', 'products']));
+
+        // When querying against `*`, it should only consider enabled sub-resources...
+        $this->assertEqualsCanonicalizing(['title'], FilterAuthorizer::allowedForSubResources($configFile, 'collections', '*'));
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider configFileProvider
+     */
     public function it_allows_disabling_filters_on_specific_sub_resources_when_using_wildcard_config($configFile)
     {
         Config::set("statamic.{$configFile}.resources.collections", [
