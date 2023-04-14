@@ -27,7 +27,7 @@
                     <dropdown-list v-if="hasSaveAsOptions" class="ml-0">
                         <template #trigger>
                             <button class="btn-primary rounded-l-none flex items-center">
-                                <svg-icon name="chevron-down-xs" class="w-2" />
+                                <svg-icon name="micro/chevron-down-xs" class="w-2" />
                             </button>
                         </template>
                         <h6 class="p-2">{{ __('Save to') }}...</h6>

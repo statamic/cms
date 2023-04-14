@@ -1,5 +1,5 @@
 <template>
-<fullscreen :enabled="fullScreenMode" target-class="markdown-fieldtype">
+<portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
 <element-container @resized="refresh">
     <div class="markdown-fieldtype-wrapper @container/markdown" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
 
@@ -38,7 +38,7 @@
                             <svg-icon name="dark-mode" class="w-4 h-4" />
                         </button>
                         <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')" :aria-label="__('Toggle FullScreen Mode')">
-                            <svg-icon name="expand-2" class="w-4 h-4" v-show="!fullScreenMode" />
+                            <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
                             <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
                         </button>
                     </div>
@@ -118,7 +118,7 @@
 
     </div>
 </element-container>
-</fullscreen>
+</portal>
 </template>
 
 <script>

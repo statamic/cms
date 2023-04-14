@@ -2,14 +2,17 @@
    STACKS ON STACKS ON STACKS
    ========================================================================== */
 
-.stacks-on-stacks {
-    @apply fixed inset-0;
-    z-index: 10000;
+.portal-targets {
+    /* position on top of global header (z-index 3) but ignore clicks */
+    @apply fixed inset-0 pointer-events-none;
+    z-index: 4;
 
-    > .vue-portal-target {
-        @apply absolute inset-0;
+    .vue-portal-target {
+        @apply pointer-events-auto; /* allow clicks that we disabled above */
     }
+}
 
+.stacks-on-stacks {
     .stack-container {
         @apply absolute inset-0;
         transition: left .3s ease;
@@ -17,7 +20,6 @@
 
     .stack-overlay {
         @apply bg-black absolute inset-0;
-        z-index: 99;
         opacity: 0.2;
         pointer-events: none;
         transition: all .3s ease;
@@ -31,12 +33,10 @@
 
     .stack-hit-area {
         @apply absolute inset-0 cursor-pointer;
-        z-index: 100;
     }
 
     .stack-content {
         @apply h-full relative shadow-lg;
-        z-index: 101;
         transition: all 0.2s ease;
 
         &.stack-slide-enter,

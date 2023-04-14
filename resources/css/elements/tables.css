@@ -16,7 +16,7 @@
 }
 
 .data-list-bulk-actions {
-	@apply bg-white absolute w-full py-2 z-10;
+	@apply bg-white absolute w-full py-2 z-1;
 	padding-left: 56px;
 }
 
@@ -141,37 +141,37 @@
 /* Sticky Meta Columns */
 .data-table {
     thead th.checkbox-column {
-        @apply p-0 pr-2 z-10 sticky -left-px;
+        @apply p-0 pr-2 sticky z-1 -left-px;
         background-image: linear-gradient(to right, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
         width: 45px;
         min-width: 45px;
     }
 
     thead th.actions-column {
-        @apply p-0 pl-2 text-right sticky z-1 -right-px;
+        @apply p-0 pl-2 text-right sticky -right-px;
         background-image: linear-gradient(to left, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
         width: 45px;
         min-width: 45px;
     }
 
     tbody th.checkbox-column {
-        @apply z-1 px-3 sticky -left-px;
+        @apply px-3 sticky -left-px;
         background-image: linear-gradient(to right, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%);
     }
 
     tbody th.actions-column {
-        @apply p-0 pl-2 text-right sticky -right-px z-1;
+        @apply p-0 pl-2 text-right sticky -right-px;
         background-image: linear-gradient(to left, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%);
         min-width: 45px;
         width: 45px;
     }
 
     tbody tr.row-selected .checkbox-column {
-        background-image: linear-gradient(to left, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
+        background-image: linear-gradient(to right, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
     }
 
     tbody tr.row-selected .actions-column {
-        background-image: linear-gradient(to right, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
+        background-image: linear-gradient(to left, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
     }
 
     tbody tr:hover .checkbox-column {
@@ -227,7 +227,7 @@
 td.table-drag-handle {
 	@apply w-3 border-r h-full p-2;
 	cursor: grab;
-	background: theme('colors.gray.200') url('../../svg/icons/default/drag-dots.svg') center center no-repeat;
+	background: theme('colors.gray.200') url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
     background-size: 7px 17px;
 	&:hover { @apply bg-gray-300; }
 }
@@ -326,7 +326,7 @@ table.control {
 .relationship-index-field {
     min-width: 10vw;
     .relationship-index-field-item {
-        @apply rounded bg-gray-100 border px-1 flex items-center text-2xs;
+        @apply rounded bg-gray-100 border px-1 flex items-center text-2xs mr-1;
         a {
             @apply line-clamp-1;
         }

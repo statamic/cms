@@ -91,7 +91,6 @@ class FieldsController extends CpController
                 'display' => __('Display Label'),
                 'instructions' => __('statamic::messages.fields_display_instructions'),
                 'type' => 'field_display',
-                'autoselect' => true,
             ],
             'handle' => [
                 'display' => __('Handle'),
@@ -100,6 +99,7 @@ class FieldsController extends CpController
                 'from' => 'display',
                 'separator' => '_',
                 'validate' => 'required|not_in:'.implode(',', $reserved),
+                'show_regenerate' => true,
             ],
             'instructions' => [
                 'display' => __('Instructions'),

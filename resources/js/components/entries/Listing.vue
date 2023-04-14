@@ -39,8 +39,8 @@
                             <button class="btn btn-sm" v-text="__('Cancel')" v-show="! alwaysShowFilters && showFilters" @click="filtersHide" />
                             <button class="btn btn-sm" v-text="__('Save')" v-show="showFilters && isDirty" @click="$refs.presets.savePreset()" />
                             <button class="btn flex items-center btn-sm w-12" @click="handleShowFilters" v-if="! showFilters" v-tooltip="__('Show Filter Controls (F)')">
-                                <svg-icon name="search" class="w-4 h-4" />
-                                <svg-icon name="filter-lines" class="w-4 h-4" />
+                                <svg-icon name="light/search" class="w-4 h-4" />
+                                <svg-icon name="light/filter-lines" class="w-4 h-4" />
                             </button>
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                         </div>
@@ -210,13 +210,15 @@ export default {
 
         getStatusTooltip(entry) {
             if (entry.status === 'published') {
-                return __('messages.status_published_with_date', {date: entry.date})
+                return entry.collection.dated
+                    ? __('messages.status_published_with_date', {date: entry.date})
+                    : null; // The label is sufficient.
             } else if (entry.status === 'scheduled') {
                 return __('messages.status_scheduled_with_date', {date: entry.date})
             } else if (entry.status === 'expired') {
                 return __('messages.status_expired_with_date', {date: entry.date})
             } else if (entry.status === 'draft') {
-                return __('Draft');
+                return null; // The label is sufficient.
             }
         },
 

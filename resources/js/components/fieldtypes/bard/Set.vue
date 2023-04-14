@@ -1,7 +1,7 @@
 <template>
 
     <node-view-wrapper>
-        <div class="bard-set whitespace-normal my-6 rounded bg-white border shadow"
+        <div class="bard-set whitespace-normal my-6 rounded bg-white border shadow-md"
             :class="{ 'border-blue-400': selected, 'has-error': hasError }"
             contenteditable="false" @copy.stop @paste.stop @cut.stop
         >
@@ -35,7 +35,7 @@
                     </dropdown-list>
                 </div>
             </div>
-            <div class="replicator-set-body" v-if="!collapsed && index !== undefined">
+            <div class="replicator-set-body publish-fields @container" v-if="!collapsed && index !== undefined">
                 <set-field
                     v-for="field in fields"
                     v-show="showField(field, fieldPath(field))"

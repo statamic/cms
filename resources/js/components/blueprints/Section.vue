@@ -14,7 +14,7 @@
                         <svg-icon class="h-4 w-4" name="pencil" />
                     </button>
                     <button @click.prevent="$emit('deleted')" class="flex items-center text-gray-700 hover:text-gray-950">
-                        <svg-icon class="h-4 w-4" name="trash" />
+                        <svg-icon class="h-4 w-4" name="micro/trash" />
                     </button>
                 </div>
             </div>
@@ -22,7 +22,7 @@
             <confirmation-modal
                 v-if="editingSection"
                 :title="editText"
-                @opened="$refs.displayInput.focus()"
+                @opened="$refs.displayInput.select()"
                 @confirm="editConfirmed"
                 @cancel="editCancelled"
             >
@@ -132,9 +132,9 @@ export default {
             }
         },
 
-        'section.display': function(display) {
-            if (this.handleSyncedWithDisplay) {
-                this.section.handle = this.$slugify(display, '_');
+        'editingSection.display': function(display) {
+            if (this.editingSection && this.handleSyncedWithDisplay) {
+                this.editingSection.handle = this.$slugify(display, '_');
             }
         }
 

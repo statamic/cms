@@ -3,7 +3,7 @@
     <div>
 
         <button class="btn flex w-full justify-center items-center" @click="open = true">
-            <svg-icon name="hyperlink" class="mr-2 w-4 h-4" />
+            <svg-icon name="light/hyperlink" class="mr-2 w-4 h-4" />
             <span>{{ __('Link Existing') }}</span>
         </button>
 

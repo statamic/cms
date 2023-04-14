@@ -2,7 +2,7 @@
     <header class="flex justify-between items-center p-4 border-b">
         <h2 class="flex items-center">
             <div class="h-6 w-6 mr-2 text-gray-800">
-                @cp_svg('icons/default/loading-bar')
+                @cp_svg('icons/light/loading-bar')
             </div>
             <span>{{ __('Updates') }}</span>
         </h2>

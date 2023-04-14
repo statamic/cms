@@ -15,7 +15,7 @@
 
                 <div class="btn-group mr-4" v-if="canUseStructureTree && !treeIsDirty">
                     <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
-                        <svg-icon name="structures" class="h-4 w-4"/>
+                        <svg-icon name="light/structures" class="h-4 w-4"/>
                     </button>
                     <button class="btn flex items-center px-4" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
@@ -122,7 +122,7 @@
             <template #branch-icon="{ branch }">
                 <svg-icon v-if="isRedirectBranch(branch)"
                     class="inline-block w-4 h-4 text-gray-500"
-                    name="external-link"
+                    name="light/external-link"
                     v-tooltip="__('Redirect')" />
             </template>
 

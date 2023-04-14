@@ -66,6 +66,12 @@ class Grid extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
                 ],
             ],
         ];

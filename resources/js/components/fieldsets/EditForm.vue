@@ -10,15 +10,20 @@
             </div>
         </header>
 
-        <div class="publish-form card p-0 mb-10">
-
-            <div class="form-group">
-                <label class="block">{{ __('Title') }}</label>
-                <small class="help-block">{{ __('messages.fieldsets_title_instructions') }}</small>
-                <div v-if="errors.title">
-                    <small class="help-block text-red-500" v-for="(error, i) in errors.title" :key="i" v-text="error" />
+        <div class="publish-form card p-0 @container mb-8">
+            <div class="publish-fields">
+                <div class="form-group w-full">
+                    <div class="field-inner">
+                        <label class="block">{{ __('Title') }}</label>
+                        <small class="help-block -mt-2">{{ __('messages.fieldsets_title_instructions') }}</small>
+                        <div v-if="errors.title">
+                            <small class="help-block text-red-500" v-for="(error, i) in errors.title" :key="i" v-text="error" />
+                        </div>
+                    </div>
+                    <div>
+                        <input type="text" name="title" class="input-text" v-model="fieldset.title" autofocus="autofocus">
+                    </div>
                 </div>
-                <input type="text" name="title" class="input-text" v-model="fieldset.title" autofocus="autofocus">
             </div>
 
         </div>
@@ -27,7 +32,7 @@
             <h2 v-text="__('Fields')" />
         </div>
 
-        <div class="card" :class="{ 'pt-2': !fields.length }">
+        <div class="card @container" :class="{ 'pt-2': !fields.length }">
             <fields
                 :fields="fieldset.fields"
                 :editing-field="editingField"
@@ -120,10 +125,10 @@ export default {
         },
 
         makeSortable() {
-            new Sortable(this.$el.querySelector('.blueprint-tab-draggable-zone'), {
-                draggable: '.blueprint-tab-field',
+            new Sortable(this.$el.querySelector('.blueprint-section-draggable-zone'), {
+                draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
-                mirror: { constrainDimensions: true },
+                mirror: { constrainDimensions: true, appendTo: 'body' },
                 plugins: [Plugins.SwapAnimation]
             }).on('sortable:stop', e => {
                 this.fieldset.fields.splice(e.newIndex, 0, this.fieldset.fields.splice(e.oldIndex, 1)[0]);

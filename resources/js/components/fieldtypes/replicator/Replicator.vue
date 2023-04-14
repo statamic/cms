@@ -1,12 +1,12 @@
 <template>
 
-<fullscreen :enabled="fullScreenMode" :provide="provide">
+<portal name="replicator-fullscreen" :disabled="!fullScreenMode" :provide="provide">
 <!-- These wrappers allow any css that expected the field to
      be within the context of a publish form to continue working
      once it has been portaled out. -->
 <div :class="{ 'publish-fields': fullScreenMode }">
 <div :class="{ wrapperClasses: fullScreenMode }">
-<div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-white': fullScreenMode }">
+<div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-gray-200': fullScreenMode }">
 
     <header class="bg-white fixed top-0 inset-x-0 border-b p-3 pl-4 flex items-center justify-between shadow z-max" v-if="fullScreenMode">
         <h2 v-text="config.display" class="flex-1" />
@@ -25,7 +25,7 @@
 
     <section :class="{'mt-12 p-4 bg-gray-200': fullScreenMode}">
 
-        <div class="flex justify-end" v-if="! fullScreenMode">
+        <div class="flex justify-end absolute top-3 right-3 @md:right-6" v-if="! fullScreenMode">
             <div class="btn-group">
                 <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
                     <svg-icon name="arrows-horizontal-expand" class="h-3.5 px-0.5 text-gray-750" />
@@ -34,7 +34,7 @@
                     <svg-icon name="arrows-horizontal-collapse" class="h-3.5 px-0.5 text-gray-750" />
                 </button>
                 <button @click="fullScreenMode = !fullScreenMode" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
-                    <svg-icon name="expand-2" class="h-3.5 px-0.5 text-gray-750" v-show="! fullScreenMode" />
+                    <svg-icon name="expand-bold" class="h-3.5 px-0.5 text-gray-750" v-show="! fullScreenMode" />
                     <svg-icon name="shrink-all" class="h-3.5 px-0.5 text-gray-750" v-show="fullScreenMode" />
                 </button>
             </div>
@@ -81,7 +81,7 @@
                 >
                     <template v-slot:picker v-if="canAddSet">
                         <add-set-button
-                            class="replicator-set-picker-between"
+                            class="between"
                             :groups="groupConfigs"
                             :sets="setConfigs"
                             :index="index"
@@ -92,6 +92,7 @@
         </sortable-list>
 
         <add-set-button v-if="canAddSet"
+            class="mt-3"
             :last="true"
             :groups="groupConfigs"
             :sets="setConfigs"
@@ -103,7 +104,7 @@
 </div>
 </div>
 </div>
-</fullscreen>
+</portal>
 
 </template>
 

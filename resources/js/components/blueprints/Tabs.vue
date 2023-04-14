@@ -19,7 +19,7 @@
             </div>
             <div class="fade-right right-10" />
             <button class="btn-round ml-2 flex items-center justify-center relative top-1" @click="addAndEditTab" v-tooltip="addTabText">
-                <svg-icon name="add-bold" class="w-3 h-3" />
+                <svg-icon name="add" class="w-3 h-3" />
             </button>
         </div>
         <button class="btn" @click="addAndEditTab" v-text="addTabText" v-else-if="!singleTab"></button>
@@ -43,8 +43,6 @@ import {Sortable, Plugins} from '@shopify/draggable';
 import uniqid from 'uniqid';
 import Tab from './Tab.vue';
 import TabContent from './TabContent.vue';
-
-let sortableTabs, sortableSections, sortableFields;
 
 export default {
 
@@ -106,6 +104,9 @@ export default {
             tabsAreScrolled: false,
             canScrollLeft: false,
             canScrollRight: false,
+            sortableTabs: null,
+            sortableSections: null,
+            sortableFields: null,
         }
     },
 
@@ -120,6 +121,12 @@ export default {
     mounted() {
         this.ensureTab();
         this.makeSortable();
+    },
+
+    destroyed() {
+        if (this.sortableTabs) this.sortableTabs.destroy();
+        if (this.sortableSections) this.sortableSections.destroy();
+        if (this.sortableFields) this.sortableFields.destroy();
     },
 
     methods: {
@@ -139,9 +146,9 @@ export default {
         },
 
         makeTabsSortable() {
-            if (sortableTabs) sortableTabs.destroy();
+            if (this.sortableTabs) this.sortableTabs.destroy();
 
-            sortableTabs = new Sortable(this.$refs.tabs, {
+            this.sortableTabs = new Sortable(this.$refs.tabs, {
                 draggable: '.blueprint-tab',
                 mirror: { constrainDimensions: true },
                 swapAnimation: { horizontal: true },
@@ -153,13 +160,12 @@ export default {
         },
 
         makeSectionsSortable() {
-            if (sortableSections) sortableSections.destroy();
+            if (this.sortableSections) this.sortableSections.destroy();
 
-            sortableSections = new Sortable(document.querySelectorAll('.blueprint-sections'), {
+            this.sortableSections = new Sortable(this.$el.querySelectorAll('.blueprint-sections'), {
                 draggable: '.blueprint-section',
                 handle: '.blueprint-section-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
-                plugins: [Plugins.SwapAnimation]
             })
             .on('drag:start', e => this.lastInteractedTab = this.currentTab)
             .on('drag:stop', e => this.lastInteractedTab = null)
@@ -169,13 +175,12 @@ export default {
 
 
         makeFieldsSortable() {
-            if (sortableFields) sortableFields.destroy();
+            if (this.sortableFields) this.sortableFields.destroy();
 
-            sortableFields = new Sortable(this.$el.querySelectorAll('.blueprint-section-draggable-zone'), {
+            this.sortableFields = new Sortable(this.$el.querySelectorAll('.blueprint-section-draggable-zone'), {
                 draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true, appendTo: 'body' },
-                plugins: [Plugins.SwapAnimation]
             })
             .on('drag:start', e => this.lastInteractedTab = this.currentTab)
             .on('drag:stop', e => this.lastInteractedTab = null)

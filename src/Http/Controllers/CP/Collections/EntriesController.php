@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
@@ -203,16 +202,16 @@ class EntriesController extends CpController
             $entry->blueprint($explicitBlueprint);
         }
 
-        $values = $values->except(['slug', 'date', 'published']);
+        $values = $values->except(['slug', 'published']);
+
+        if ($entry->collection()->dated()) {
+            $entry->date($entry->blueprint()->field('date')->fieldtype()->augment($values->pull('date')));
+        }
 
         if ($entry->hasOrigin()) {
             $entry->data($values->only($request->input('_localized')));
         } else {
             $entry->merge($values);
-        }
-
-        if ($entry->collection()->dated()) {
-            $entry->date($this->toCarbonInstanceForSaving($request->date));
         }
 
         $entry->slug($this->resolveSlug($request));
@@ -291,10 +290,6 @@ class EntriesController extends CpController
             'published' => $collection->defaultPublishState(),
         ])->merge($fields->values());
 
-        if ($collection->dated()) {
-            $values['date'] = substr(now()->toDateTimeString(), 0, 10);
-        }
-
         $viewData = [
             'title' => $collection->createLabel(),
             'actions' => [
@@ -358,19 +353,20 @@ class EntriesController extends CpController
                 'site' => $site->handle(),
             ])->validate();
 
-        $values = $fields->process()->values()->except(['slug', 'date', 'blueprint', 'published']);
+        $values = $fields->process()->values()->except(['slug', 'blueprint', 'published']);
 
         $entry = Entry::make()
             ->collection($collection)
             ->blueprint($request->_blueprint)
             ->locale($site->handle())
             ->published($request->get('published'))
-            ->slug($this->resolveSlug($request))
-            ->data($values);
+            ->slug($this->resolveSlug($request));
 
         if ($collection->dated()) {
-            $entry->date($this->toCarbonInstanceForSaving($request->date));
+            $entry->date($blueprint->field('date')->fieldtype()->augment($values->pull('date')));
         }
+
+        $entry->data($values);
 
         if ($structure = $collection->structure()) {
             $tree = $structure->in($site->handle());
@@ -483,12 +479,6 @@ class EntriesController extends CpController
             })
             ->filter()
             ->values();
-    }
-
-    protected function toCarbonInstanceForSaving($date): Carbon
-    {
-        // Since assume `Y-m-d ...` format, we can use `parse` here.
-        return Carbon::parse($date);
     }
 
     private function validateParent($entry, $tree, $parent)

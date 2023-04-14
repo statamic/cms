@@ -1,5 +1,5 @@
 <template>
-    <fullscreen :enabled="fullScreenMode" target-class="table-fieldtype">
+    <portal name="table-fullscreen" :disabled="!fullScreenMode" target-class="table-fieldtype">
         <div class="table-fieldtype-container" :class="{'table-fullscreen bg-white': fullScreenMode }">
             <header class="bg-gray-200 border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
                 <h2 v-text="config.display" />
@@ -20,7 +20,7 @@
                             </th>
                             <th class="row-controls pr-0">
                                 <button @click="fullScreenMode = !fullScreenMode" class="flex items-center w-full h-full justify-center text-gray-600 hover:text-gray-800">
-                                    <svg-icon name="expand-2" class="h-3.5 w-3.5" v-show="! fullScreenMode" />
+                                    <svg-icon name="expand-bold" class="h-3.5 w-3.5" v-show="! fullScreenMode" />
                                     <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="fullScreenMode" />
                                 </button>
                             </th>
@@ -81,7 +81,7 @@
             >
             </confirmation-modal>
         </div>
-    </fullscreen>
+    </portal>
 </template>
 
 <script>

@@ -3,8 +3,10 @@
         <v-select
             ref="input"
             class="w-full"
-            :name="name"
+            append-to-body
+            :calculate-position="positionOptions"
             clearable
+            :name="name"
             :disabled="config.disabled || isReadOnly"
             :options="options"
             :placeholder="config.placeholder || 'Search ...'"
@@ -35,6 +37,8 @@
 </template>
 
 <script>
+import { computePosition, offset } from '@floating-ui/dom';
+
 export default {
 
     mixins: [Fieldtype],
@@ -68,7 +72,24 @@ export default {
             } else {
                 this.update(null);
             }
-        }
+        },
+
+        positionOptions(dropdownList, component, { width }) {
+            dropdownList.style.width = width
+
+            computePosition(component.$refs.toggle, dropdownList, {
+                placement: 'bottom',
+                middleware: [
+                    offset({ mainAxis: 0, crossAxis: -1 }),
+                ]
+            }).then(({ x, y }) => {
+                Object.assign(dropdownList.style, {
+                    // Round to avoid blurry text
+                    left: `${Math.round(x)}px`,
+                    top: `${Math.round(y)}px`,
+                });
+            });
+        },
     }
 };
 </script>

@@ -10,7 +10,7 @@
             <h1 class="flex-1 flex items-center text-xl">
                 {{ values.display || config.display || config.handle }}
                 <small class="badge-pill bg-gray-100 ml-4 border text-xs text-gray-700 font-medium leading-none flex items-center">
-                    <svg-icon class="h-4 w-4 mr-2 inline-block text-gray-700" :name="fieldtype.icon"></svg-icon>
+                    <svg-icon class="h-4 w-4 mr-2 inline-block text-gray-700" :name="`light/${fieldtype.icon}`"></svg-icon>
                     {{ fieldtype.title }} {{ __('Fieldtype') }}
                 </small>
             </h1>
@@ -62,11 +62,7 @@
 
                         <publish-sections
                             :sections="blueprint.tabs[0].sections"
-
-                            @updated="(handle, value) => {
-                                updateField(handle, value, setFieldValue);
-                                if (handle === 'handle') isHandleModified = true
-                            }"
+                            @updated="(handle, value) => updateField(handle, value, setFieldValue)"
                             @meta-updated="setFieldMeta"
                         />
 
@@ -138,7 +134,6 @@ export default {
             error: null,
             errors: {},
             editedFields: clone(this.overrides),
-            isHandleModified: true,
             activeTab: 'settings',
             storeName: 'base',
             fieldtype: null,
@@ -192,19 +187,6 @@ export default {
     },
 
     created() {
-        // For new fields, we'll slugify the display name into the field name.
-        // If they edit the handle, we'll stop.
-        if (this.config.isNew && !this.config.isMeta) {
-            this.isHandleModified = false;
-
-            this.$watch('values.display', function(display) {
-                if (! this.isHandleModified) {
-                    const handle = this.$slugify(display, '_');
-                    this.updateField('handle', handle);
-                }
-            });
-        }
-
         this.load();
     },
 

@@ -5,7 +5,6 @@
 .nav-main {
     @apply hidden select-none bg-white shadow h-screen absolute left-0 overflow-scroll w-56;
     transition: all .3s;
-    z-index: 9998;
 
     h6 { @apply mt-6; }
 
@@ -65,7 +64,6 @@
 @screen md {
     .nav-main {
         @apply fixed flex bg-transparent shadow-none overflow-auto border-r;
-        z-index: 1;
         height: calc(100% - 52px);
         .showing-license-banner & {
             height: calc(100% - 120px);

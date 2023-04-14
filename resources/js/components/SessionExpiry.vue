@@ -4,7 +4,7 @@
 
         <button v-if="isWarning" class="session-expiry-stripe" @click="extend" v-text="warningText" />
 
-        <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true" :pivotY=".1">
+        <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true">
             <div class="flex items-center p-6 bg-gray-200 border-b text-center">
                 {{ __('Resume Your Session') }}
             </div>
@@ -19,7 +19,7 @@
             </div>
 
             <div v-if="!isUsingOauth" class="publish-fields">
-                <div class="form-group">
+                <div class="form-group w-full">
                     <label v-text="__('messages.session_expiry_enter_password')" />
                     <small
                         class="help-block text-red-500"

@@ -39,7 +39,7 @@ return [
     'collection_configure_date_behavior_unlisted' => 'Unlisted - Hidden from listings, URLs visible',
     'collection_configure_dated_instructions' => 'Publish dates can be used to schedule and expire content.',
     'collection_configure_handle_instructions' => 'Used to reference this collection on the frontend. It\'s non-trivial to change later.',
-    'collection_configure_intro' => 'A collection is a group of related entries that share behavior, attributes, and settings.',
+    'collection_configure_intro' => 'Collections are containers that hold entries that can represent articles, blog posts, products, events, or any other content type.',
     'collection_configure_layout_instructions' => 'Set this collection\'s default layout. Entries can override this setting with a `template` field named `layout`. It is unusual to change this setting.',
     'collection_configure_origin_behavior_instructions' => 'When localizing an entry, which site should be used as the origin?',
     'collection_configure_origin_behavior_option_active' => 'Use the active site of the entry being edited',
@@ -196,7 +196,7 @@ return [
     'taxonomies_collections_instructions' => 'The collections that use this taxonomy.',
     'taxonomies_preview_targets_instructions' => 'The URLs to be viewable within Live Preview. Learn more in the [documentation](https://statamic.dev/live-preview#preview-targets).',
     'taxonomy_configure_handle_instructions' => 'Used to reference this taxonomy on the frontend. It\'s non-trivial to change later.',
-    'taxonomy_configure_intro' => 'A taxonomy is a system of classifying data around a set of unique characteristics, such as category or color.',
+    'taxonomy_configure_intro' => 'A taxonomy is a system of classifying data around a set of unique characteristics, such as categories, tags, or colors.',
     'taxonomy_configure_title_instructions' => 'We recommend using a plural noun, like "Categories" or "Tags".',
     'taxonomy_next_steps_configure_description' => 'Configure names, associate collections, define blueprints, and more.',
     'taxonomy_next_steps_create_term_description' => 'Create the first term or stub out a handful of placeholder terms, it\'s up to you.',
@@ -220,4 +220,5 @@ return [
     'user_wizard_name_instructions' => 'Leave the name blank to let the user fill it in.',
     'user_wizard_roles_groups_intro' => 'Users can be assigned to roles that customize their permissions, access, and abilities throughout the Control Panel.',
     'user_wizard_super_admin_instructions' => 'Super admins have complete control and access to everything in the control panel. Grant this role wisely.',
+    'view_more_count' => 'View :count more',
 ];
