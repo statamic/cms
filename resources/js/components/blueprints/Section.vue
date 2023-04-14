@@ -22,7 +22,7 @@
             <confirmation-modal
                 v-if="editingSection"
                 :title="editText"
-                @opened="$refs.displayInput.focus()"
+                @opened="$refs.displayInput.select()"
                 @confirm="editConfirmed"
                 @cancel="editCancelled"
             >
@@ -132,9 +132,9 @@ export default {
             }
         },
 
-        'section.display': function(display) {
-            if (this.handleSyncedWithDisplay) {
-                this.section.handle = this.$slugify(display, '_');
+        'editingSection.display': function(display) {
+            if (this.editingSection && this.handleSyncedWithDisplay) {
+                this.editingSection.handle = this.$slugify(display, '_');
             }
         }
 
