@@ -40,7 +40,7 @@
 }
 
 .bard-fixed-toolbar {
-    @apply bg-white shadow-none rounded-t border-b text-sm flex items-start justify-between p-1 z-5 top-0;
+    @apply bg-white shadow-none rounded-t border-b text-sm flex items-start justify-between p-1 z-5 top-0 sticky;
 
     .bard-toolbar-button {
         @apply text-gray-800 rounded px-1 flex text-center justify-center items-center text-base h-8 w-8 m-0;
