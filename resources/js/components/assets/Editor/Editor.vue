@@ -166,24 +166,20 @@
 
         </template>
 
-        <portal name="asset-editor">
-            <div>
-            <focal-point-editor
-                v-if="showFocalPointEditor && isFocalPointEditorEnabled"
-                :data="values.focus"
-                :image="asset.preview"
-                @selected="selectFocalPoint"
-                @closed="closeFocalPointEditor" />
+        <editor-actions
+            v-if="actions.length"
+            :id="id"
+            :actions="actions"
+            :url="actionUrl"
+            @started="actionStarted"
+            @completed="actionCompleted" />
 
-            <editor-actions
-                v-if="actions.length"
-                :id="id"
-                :actions="actions"
-                :url="actionUrl"
-                @started="actionStarted"
-                @completed="actionCompleted" />
-            </div>
-        </portal>
+        <focal-point-editor
+            v-if="showFocalPointEditor && isFocalPointEditorEnabled"
+            :data="values.focus"
+            :image="asset.preview"
+            @selected="selectFocalPoint"
+            @closed="closeFocalPointEditor" />
 
     </div>
 

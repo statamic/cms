@@ -1,5 +1,6 @@
 <template>
 
+    <portal name="focal-point">
     <div class="focal-point">
         <div class="focal-point-toolbox card p-0">
             <div class="p-4">
@@ -46,6 +47,7 @@
             <focal-point-preview-frame v-if="imageDimensions" :x="x" :y="y" :z="z" :image-url="image" :image-dimensions="imageDimensions" />
         </div>
     </div>
+    </portal>
 
 </template>
 
@@ -107,8 +109,8 @@ export default {
             var imageW = rect.width;
             var imageH = rect.height;
 
-            var offsetX = e.pageX - rect.left;
-            var offsetY = e.pageY - rect.top;
+            var offsetX = e.clientX - rect.left;
+            var offsetY = e.clientY - rect.top;
 
             this.x = ((offsetX/imageW)*100).toFixed();
             this.y = ((offsetY/imageH)*100).toFixed();
