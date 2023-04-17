@@ -218,6 +218,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddGraphQLPermission::class,
         Updates\AddAssignRolesAndGroupsPermissions::class,
         Updates\AddDefaultPreferencesToGitConfig::class,
+        Updates\AddConfigureFormFieldsPermission::class,
     ];
 
     public function register()
