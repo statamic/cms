@@ -263,7 +263,6 @@
         text-size-adjust: 100%;
         margin-top: 0;
         margin-bottom: .85em;
-        color: red !important;
     }
 
     b:has(.bard-mark),
@@ -278,7 +277,6 @@
 
     a:has(.bard-mark) {
         @apply text-blue underline break-words;
-        color: purple !important;
 
         &:active,
         &:focus,
