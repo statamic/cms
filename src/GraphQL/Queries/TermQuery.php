@@ -41,7 +41,7 @@ class TermQuery extends Query
         // middleware, but should still validate whether or not the taxonomy is allowed.
         if ($term && ! in_array($taxonomy = $term->taxonomy()->handle(), $this->allowedSubResources())) {
             throw ValidationException::withMessages([
-                'id' => 'Forbidden: '.$id,
+                'id' => 'Forbidden: '.$taxonomy,
             ]);
         }
 
