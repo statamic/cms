@@ -10,6 +10,7 @@
     <div
         class="bard-fieldtype-wrapper"
         :class="{'bard-fullscreen': fullScreenMode }"
+        ref="container"
         @dragstart.stop="ignorePageHeader(true)"
         @dragend="ignorePageHeader(false)"
     >
@@ -311,42 +312,7 @@ export default {
 
     mounted() {
         this.initToolbarButtons();
-
-        const content = this.valueToContent(clone(this.value));
-
-        this.editor = new Editor({
-            extensions: this.getExtensions(),
-            content: content,
-            editable: !this.readOnly,
-            enableInputRules: this.config.enable_input_rules,
-            enablePasteRules: this.config.enable_paste_rules,
-            onFocus: () => this.$emit('focus'),
-            onBlur: () => {
-                // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
-                // blur event immediately. We need to make sure that the newly focused element is outside
-                // of Bard. We use a timeout because activeElement only exists after the blur event.
-                setTimeout(() => {
-                    if (!this.$el.contains(document.activeElement)) {
-                        this.$emit('blur');
-                        this.showAddSetButton = false;
-                    }
-                }, 1);
-            },
-            onUpdate: () => {
-                this.json = this.editor.getJSON().content;
-                this.html = this.editor.getHTML();
-            },
-            onCreate: ({ editor }) => {
-                const state = editor.view.state;
-                 if (content !== null && typeof content === 'object') {
-                     try {
-                         state.schema.nodeFromJSON(content);
-                     } catch (error) {
-                         this.invalid = true;
-                     }
-                 }
-            }
-        });
+        this.initEditor();
 
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
@@ -422,6 +388,10 @@ export default {
             this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, oldFieldPathPrefix);
             this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
         },
+
+        fullScreenMode() {
+            this.initEditor();
+        }
 
     },
 
@@ -600,6 +570,46 @@ export default {
 
         visibleButtons(buttons) {
             return buttons.filter(button => this.buttonIsVisible(button));
+        },
+
+        initEditor() {
+            if (this.editor) this.editor.destroy();
+
+            const content = this.valueToContent(clone(this.value));
+
+            this.editor = new Editor({
+                extensions: this.getExtensions(),
+                content: content,
+                editable: !this.readOnly,
+                enableInputRules: this.config.enable_input_rules,
+                enablePasteRules: this.config.enable_paste_rules,
+                onFocus: () => this.$emit('focus'),
+                onBlur: () => {
+                    // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
+                    // blur event immediately. We need to make sure that the newly focused element is outside
+                    // of Bard. We use a timeout because activeElement only exists after the blur event.
+                    setTimeout(() => {
+                        if (!this.$refs.container.contains(document.activeElement)) {
+                            this.$emit('blur');
+                            this.showAddSetButton = false;
+                        }
+                    }, 1);
+                },
+                onUpdate: () => {
+                    this.json = this.editor.getJSON().content;
+                    this.html = this.editor.getHTML();
+                },
+                onCreate: ({ editor }) => {
+                    const state = editor.view.state;
+                    if (content !== null && typeof content === 'object') {
+                        try {
+                            state.schema.nodeFromJSON(content);
+                        } catch (error) {
+                            this.invalid = true;
+                        }
+                    }
+                }
+            });
         },
 
         valueToContent(value) {
