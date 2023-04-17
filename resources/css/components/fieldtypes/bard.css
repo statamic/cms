@@ -251,233 +251,192 @@
 
 
 /* Typography
-   -
-   Selectors are specific so they don't cascade into the sets, which
-   all sit inline within the rest of the elements.
    ========================================================================== */
 .bard-fieldtype .ProseMirror {
     outline: 0;
-}
 
-.bard-fieldtype .ProseMirror > {
-    p {
+    p.bard-node {
         @apply text-gray-800;
         word-break: break-all;
         word-break: break-word;
-
         line-height: 1.7;
         text-size-adjust: 100%;
-    }
-
-
-    blockquote,
-    ol,
-    p,
-    ul {
         margin-top: 0;
         margin-bottom: .85em;
+        color: red !important;
+    }
 
-        b,
-        strong { font-weight: 700; }
+    b:has(.bard-mark),
+    strong:has(.bard-mark) {
+        font-weight: 700;
+    }
 
-        em, i { font-style: italic }
+    em:has(.bard-mark),
+    i:has(.bard-mark) {
+        font-style: italic
+    }
 
-        a {
-            @apply text-blue underline break-words;
-        }
+    a:has(.bard-mark) {
+        @apply text-blue underline break-words;
+        color: purple !important;
 
-        a:active,
-        a:focus,
-        a:hover {
+        &:active,
+        &:focus,
+        &:hover {
             outline: 0;
             text-decoration: underline;
         }
-
-        img {
-            border: 0;
-            max-width: 100%;
-        }
     }
 
-    blockquote,
-    blockquote ol li,
-    blockquote ul li,
-    ol li,
-    ul li {
-        > p {
-            margin-top: 0;
-            margin-bottom: .85em;
-        }
+    img.bard-node {
+        border: 0;
+        max-width: 100%;
     }
 
-    hr {
+    hr.bard-node {
         @apply bg-gray-600;
         height: 4px;
         padding: 0;
         margin: 1.7em 0;
         overflow: hidden;
         border: none;
+
+        &:after,
+        &:before {
+            display: table;
+            content: " ";
+        }
+
+        &:after {
+            clear: both
+        }
     }
 
-    hr:after,
-    hr:before {
-        display: table;
-        content: " ";
-    }
-
-    hr:after {
-        clear: both
-    }
-
-    h1, h2, h3, h4, h5, h6 {
+    h1.bard-node,
+    h2.bard-node,
+    h3.bard-node,
+    h4.bard-node,
+    h5.bard-node,
+    h6.bard-node {
         margin-top: 1.275em;
         margin-bottom: .85em;
-        font-weight: 700
+        font-weight: 700;
+
+        &:first-child {
+            margin-top: 0;
+        }
     }
 
-    h1 { font-size: 2em }
+    h1.bard-node {
+        font-size: 2em;
+    }
 
-    h2 { font-size: 1.75em }
+    h2.bard-node {
+        font-size: 1.75em;
+    }
 
-    h3 { font-size: 1.5em }
+    h3.bard-node {
+        font-size: 1.5em;
+    }
 
-    h4 { font-size: 1.25em }
+    h4.bard-node {
+        font-size: 1.25em;
+    }
 
-    h5 { font-size: 1em }
+    h5.bard-node {
+        font-size: 1em;
+    }
 
-    h6 {
+    h6.bard-node {
         font-size: 1em;
         @apply text-gray-700;
     }
 
-    h1:first-child,
-    h2:first-child,
-    h3:first-child,
-    h4:first-child,
-    h5:first-child,
-    h6:first-child {
-        margin-top: 0;
-    }
-
-    ul,
-    blockquote ul,
-    .tableWrapper table ul {
+    ul.bard-node {
         list-style-type: disc;
+
+        ul.bard-node {
+            list-style-type: circle;
+        }
     }
 
-    ol,
-    blockquote ol,
-    .tableWrapper table ol {
+    ol.bard-node {
         list-style-type: decimal;
+
+        ol.bard-node {
+            list-style-type: decimal;
+        }
     }
 
-    ol,
-    ul,
-    blockquote ol,
-    blockquote ul {
+    ol.bard-node,
+    ul.bard-node {
         padding: 0;
         margin: 0;
         margin-bottom: .85em;
         padding-left: 2em;
+
+        ol.bard-node,
+        ul.bard-node {
+            margin-bottom: 0;
+        }
     }
 
-    .tableWrapper table ol,
-    .tableWrapper table ul {
-        padding: 0;
-        margin: 0;
-        padding-left: 2em;
-    }
-
-    ol ol,
-    ol ul,
-    ul ol,
-    ul ul {
-        margin-top: 0;
-        margin-bottom: 0;
-        padding-left: 2em;
-    }
-
-    ul ul {
-        list-style-type: circle;
-    }
-
-    ol ol {
-        list-style-type: decimal;
-    }
-
-    ul ol {
-        list-style-type: decimal;
-    }
-
-    ol ul {
-        list-style-type: circle;
-    }
-
-    blockquote {
+    blockquote.bard-node {
         @apply text-gray-800 border-l-4 border-blue px-4;
         margin: 0 0 .85em;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
     }
 
-    blockquote:first-child {
-        margin-top: 0;
-    }
-
-    blockquote:last-child {
-        margin-bottom: 0;
-    }
-
-    .tableWrapper table,
-    blockquote > .tableWrapper table,
-    ol li > .tableWrapper table,
-    ul li > .tableWrapper table {
+    .tableWrapper.bard-node > table {
         @apply w-full overflow-hidden m-0 mb-4 bg-white text-sm ;
         border-collapse: collapse;
         table-layout: fixed;
 
-        th {
+        th.bard-node {
             @apply font-bold text-left bg-gray-200;
         }
 
-        td, th {
+        td.bard-node,
+        th.bard-node {
             @apply border align-top relative py-1 px-2;
             min-width: 1em;
-        }
-
-        .selectedCell {
-            @apply relative;
-
-            &:after {
-                @apply bg-gray-400 absolute inset-0 pointer-events-none opacity-25;
-                content: '';
+            p.bard-node,
+            ol.bard-node,
+            ul.bard-node {
+                margin-bottom: 0;
             }
-        }
-
-        a {
-            @apply text-blue underline break-words;
-        }
-
-        a:active,
-        a:focus,
-        a:hover {
-            outline: 0;
-            text-decoration: underline;
+            &.selectedCell {
+                @apply relative;
+    
+                &:after {
+                    @apply bg-gray-400 absolute inset-0 pointer-events-none opacity-25;
+                    content: '';
+                }
+            }
         }
     }
 
-    p > code {
+    code:has(.bard-mark) {
         @apply font-mono bg-gray-400 rounded-sm text-xs relative;
         padding: 2px 4px;
         top: -1px;
     }
 
-    pre {
+    pre.bard-node {
         margin-bottom: .85em;
+        > code {
+            @apply font-mono bg-gray-400 text-xs p-4 block w-full rounded;
+            line-height: 1.8;
+        }
     }
 
-    pre code {
-        @apply font-mono bg-gray-400 text-xs p-4 block w-full rounded;
-        line-height: 1.8;
-    }
 }
 
 /* Placeholder

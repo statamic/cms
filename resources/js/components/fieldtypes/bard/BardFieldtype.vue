@@ -139,6 +139,7 @@ import { Set } from './Set'
 import { Small } from './Small';
 import { Image } from './Image';
 import { Link } from './Link';
+import { CssHelper } from './CssHelper';
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
@@ -614,6 +615,7 @@ export default {
         getExtensions() {
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
+                CssHelper,
                 ...(this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak]),
                 Dropcursor,
                 Gapcursor,
