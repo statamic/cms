@@ -265,17 +265,17 @@
         margin-bottom: .85em;
     }
 
-    b:has(.bard-mark),
-    strong:has(.bard-mark) {
+    b .bard-mark,
+    strong .bard-mark {
         font-weight: 700;
     }
 
-    em:has(.bard-mark),
-    i:has(.bard-mark) {
+    em .bard-mark,
+    i .bard-mark {
         font-style: italic
     }
 
-    a:has(.bard-mark) {
+    a .bard-mark {
         @apply text-blue underline break-words;
 
         &:active,
@@ -421,7 +421,7 @@
         }
     }
 
-    code:has(.bard-mark) {
+    code .bard-mark {
         @apply font-mono bg-gray-400 rounded-sm text-xs relative;
         padding: 2px 4px;
         top: -1px;
