@@ -1,5 +1,24 @@
 # Release Notes
 
+## 4.0.0-alpha.4 (2023-04-17)
+
+### What's improved
+- Date and Time fieldtype improvements. [#7753](https://github.com/statamic/cms/issues/7753)
+- Move column customizer into a modal for better long list management. [#7905](https://github.com/statamic/cms/issues/7905)
+
+### What's fixed
+- Fix focal point editor offset issue. [#7930](https://github.com/statamic/cms/issues/7930)
+- Fix Bard fullscreen mode. [#7927](https://github.com/statamic/cms/issues/7927)
+- Fix set handle not synced with display. [#7912](https://github.com/statamic/cms/issues/7912)
+- Fix a couple of `time` fieldtype issues. [#7903](https://github.com/statamic/cms/issues/7903)
+- Misc UI fixes. [#7911](https://github.com/statamic/cms/issues/7911)
+- More Misc fixes. [#7907](https://github.com/statamic/cms/issues/7907)
+
+### What's changed
+- GraphQL and REST API filters are now opt-in. [#7717](https://github.com/statamic/cms/issues/7717)
+
+
+
 ## 4.0.0-alpha.3 (2023-04-11)
 
 ### What's new
