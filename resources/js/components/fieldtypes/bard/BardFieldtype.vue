@@ -10,6 +10,7 @@
     <div
         class="bard-fieldtype-wrapper"
         :class="{'bard-fullscreen': fullScreenMode }"
+        ref="container"
         @dragstart.stop="ignorePageHeader(true)"
         @dragend="ignorePageHeader(false)"
     >
@@ -326,7 +327,7 @@ export default {
                 // blur event immediately. We need to make sure that the newly focused element is outside
                 // of Bard. We use a timeout because activeElement only exists after the blur event.
                 setTimeout(() => {
-                    if (!this.$el.contains(document.activeElement)) {
+                    if (!this.$refs.container.contains(document.activeElement)) {
                         this.$emit('blur');
                         this.showAddSetButton = false;
                     }
