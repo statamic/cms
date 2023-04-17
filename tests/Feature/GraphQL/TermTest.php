@@ -62,7 +62,7 @@ GQL;
                     'message' => 'validation',
                     'extensions' => [
                         'validation' => [
-                            'id' => ['Forbidden: tags::bravo'],
+                            'id' => ['Forbidden: tags'],
                         ],
                     ],
                 ]],
