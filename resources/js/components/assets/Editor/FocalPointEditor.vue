@@ -1,5 +1,6 @@
 <template>
 
+    <portal name="focal-point">
     <div class="focal-point">
         <div class="focal-point-toolbox card p-0">
             <div class="p-4">
@@ -46,6 +47,7 @@
             <focal-point-preview-frame v-if="imageDimensions" :x="x" :y="y" :z="z" :image-url="image" :image-dimensions="imageDimensions" />
         </div>
     </div>
+    </portal>
 
 </template>
 
