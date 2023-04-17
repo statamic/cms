@@ -1,7 +1,7 @@
 <template>
     <div class="global-search" :class="{'dirty': isDirty}" v-on-clickaway="reset" v-cloak>
         <div class="state-container w-4 h-4 text-gray-500 flex items-center" @click="focus">
-            <svg-icon name="light/magnifying-glass"></svg-icon>
+            <svg-icon name="light/magnifying-glass" class="w-4 h-4"></svg-icon>
         </div>
         <label class="sr-only" v-text="__('Global Search')" for="global-search" />
         <input type="text"
@@ -28,7 +28,7 @@
             <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-2 flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
                 <svg-icon :name="`light/${getResultIcon(result)}`" class="icon"></svg-icon>
                 <div class="flex-1 ml-2 title" v-html="result.title"></div>
-                <span class="rounded px-1 py-px text-2xs uppercase bg-gray-200 text-gray" v-text="result.badge" />
+                <span class="rounded px-1 text-2xs border bg-gray-200 text-gray" v-text="result.badge" />
             </div>
 
             <div v-if="! hasResults && hasFavorites">

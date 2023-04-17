@@ -21,7 +21,7 @@
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
-                <div class="publish-tabs tabs rounded-none rounded-t -mx-1px shadow-none" v-if="showContainerTabs">
+                <div class="publish-tabs tabs rounded-none rounded-t mb-3 shadow-none" v-if="showContainerTabs">
                     <button class="tab-button" v-for="item in containers" :key="item.id"
                         v-text="item.title"
                         :class="{
@@ -44,7 +44,7 @@
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
                     <div slot-scope="{ filteredRows: rows }" :class="modeClass">
-                        <div class="card overflow-hidden p-0" :class="{ 'rounded-tl-none': showContainerTabs, 'select-none' : shifting }">
+                        <div class="card overflow-hidden p-0" :class="{ 'select-none' : shifting }">
                             <div class="relative w-full">
 
                                 <div class="flex items-center justify-between p-2 text-sm">
