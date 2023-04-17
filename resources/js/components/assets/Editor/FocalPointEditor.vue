@@ -107,8 +107,8 @@ export default {
             var imageW = rect.width;
             var imageH = rect.height;
 
-            var offsetX = e.pageX - rect.left;
-            var offsetY = e.pageY - rect.top;
+            var offsetX = e.clientX - rect.left;
+            var offsetY = e.clientY - rect.top;
 
             this.x = ((offsetX/imageW)*100).toFixed();
             this.y = ((offsetY/imageH)*100).toFixed();
