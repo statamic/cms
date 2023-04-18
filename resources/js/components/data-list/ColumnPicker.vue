@@ -40,6 +40,7 @@
                                 :distance="10"
                                 item-class="item"
                                 handle-class="item"
+                                append-to=".modal-body"
                                 constrain-dimensions
                             >
                                 <div class="space-y-1 px-3 p-3 select-none">
