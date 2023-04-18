@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\Passwords\PasswordDefaults;
@@ -47,7 +48,19 @@ trait ResetsPasswords
      */
     public function reset(Request $request)
     {
-        $request->validate($this->rules(), $this->validationErrorMessages());
+        $validator = Validator::make($request->all(), $this->rules(), $this->validationErrorMessages());
+
+        if (! $validator->passes()) {
+
+            $redirect = $request->has('_error_redirect')
+                ? redirect($request->input('_error_redirect'))
+                : back();
+
+            return $redirect
+                        ->withInput($request->only('email'))
+                        ->withErrors($validator->errors());
+
+        }
 
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
