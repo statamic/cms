@@ -303,6 +303,9 @@ class FileCacherTest extends TestCase
 
         $cache = $cache ?: app(Repository::class);
 
+        // The locale would be set by the service provider.
+        $config['locale'] = $config['locale'] ?? 'en';
+
         return new FileCacher($writer, $cache, $config);
     }
 }
