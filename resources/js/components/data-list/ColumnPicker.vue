@@ -44,7 +44,7 @@
                                 constrain-dimensions
                             >
                                 <div class="space-y-1 px-3 p-3 select-none">
-                                    <div class="item sortable cursor-grab" v-for="column in selectedColumns" :key="column.field">
+                                    <div class="item sortable cursor-grab" v-for="column in selectedColumns" :key="column.field" tabindex="-1">
                                         <div class="item-move py-1">&nbsp;</div>
                                         <div class="flex flex-1 ml-2 items-center p-0">
                                             <input type="checkbox" class="mr-2" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
