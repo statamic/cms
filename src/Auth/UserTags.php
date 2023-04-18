@@ -385,7 +385,7 @@ class UserTags extends Tags
         if ($errorRedirect = $this->getErrorRedirectUrl()) {
 
             if (Str::startsWith($errorRedirect, '#')) {
-                 $errorRedirect = request()->url().'?token='.$token.$errorRedirect;
+                $errorRedirect = request()->url().'?token='.$token.$errorRedirect;
             }
 
             $params['error_redirect'] = $errorRedirect;

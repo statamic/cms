@@ -51,7 +51,6 @@ trait ResetsPasswords
         $validator = Validator::make($request->all(), $this->rules(), $this->validationErrorMessages());
 
         if (! $validator->passes()) {
-
             $redirect = $request->has('_error_redirect')
                 ? redirect($request->input('_error_redirect'))
                 : back();
@@ -59,7 +58,6 @@ trait ResetsPasswords
             return $redirect
                         ->withInput($request->only('email'))
                         ->withErrors($validator->errors());
-
         }
 
         // Here we will attempt to reset the user's password. If it is successful we
