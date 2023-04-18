@@ -7,6 +7,8 @@ use Statamic\Query\Scopes\Filter;
 
 class Status extends Filter
 {
+    public $pinned = true;
+
     public static function title()
     {
         return __('Status');
