@@ -221,7 +221,8 @@
         @apply px-6 py-16 flex flex-col;
         min-height: calc(100vh - 120px);
 
-        > p > code, > pre code {
+        code .bard-mark,
+        pre.bard-node > code {
             @apply bg-gray-300;
         }
 
