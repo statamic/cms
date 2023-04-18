@@ -106,16 +106,6 @@
     padding: 16px;
 }
 
-.grid-listing-asset-tile.asset-tile {
-    @apply flex items-center flex-col justify-between cursor-pointer border rounded;
-
-    .asset-thumb-container {
-        @apply flex items-center flex-1 w-full justify-center relative;
-        aspect-ratio: 1 / 1;
-    }
-}
-
-
 
 /* Solo Asset (max_files: 1)
   ========================================================================== */
@@ -147,13 +137,18 @@
    ========================================================================== */
 
 .asset-tile {
-    @apply bg-white relative min-w-0;
+    @apply bg-white relative min-w-0 flex items-center flex-col justify-between cursor-pointer border rounded;
 
     .asset-thumb {
         @apply flex justify-center items-center;
         > img, > svg, > .svg-img {
             @apply max-h-full max-w-full absolute;
         }
+    }
+
+    .asset-thumb-container {
+        @apply flex items-center flex-1 w-full justify-center relative;
+        aspect-ratio: 1 / 1;
     }
 
     .asset-thumb-container:hover .asset-controls {

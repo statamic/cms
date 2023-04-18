@@ -73,7 +73,6 @@
                                 :is-solo="soloAsset"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
-                                class="grid-listing-asset-tile"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
                                 @id-changed="idChanged(asset.id, $event)">
