@@ -19,6 +19,7 @@ class KebabTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider strings
      */
     public function it_converts_the_value_to_kebab_case($expected, $input): void

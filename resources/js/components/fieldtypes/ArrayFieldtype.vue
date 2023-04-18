@@ -44,7 +44,7 @@
                             <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
                             <th class="w-1/4">{{ keyHeader }}</th>
                             <th class="">{{ valueHeader }}</th>
-                            <th class="row-controls"></th>
+                            <th class="row-controls" v-if="!isReadOnly"></th>
                         </tr>
                     </thead>
 
@@ -63,7 +63,7 @@
                                 <td>
                                     <input type="text" class="input-text" v-model="element.value" :readonly="isReadOnly" />
                                 </td>
-                                <td class="row-controls">
+                                <td class="row-controls" v-if="!isReadOnly">
                                     <a @click="deleteOrConfirm(index)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
                                 </td>
                             </tr>
@@ -71,7 +71,7 @@
                     </sortable-list>
                 </table>
 
-                <button class="btn" @click="addValue" :disabled="atMax">
+                <button class="btn" @click="addValue" :disabled="atMax" v-if="!isReadOnly">
                     {{ addButton }}
                 </button>
 

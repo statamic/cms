@@ -13,6 +13,7 @@ class SumTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider sums
      **/
     public function it_sums($sum, $key, $array)

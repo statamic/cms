@@ -404,13 +404,17 @@ class NavTest extends TestCase
     public function it_checks_if_active()
     {
         $hello = Nav::create('hello')->url('http://localhost/cp/hello');
+        $helloWithQueryParams = Nav::create('helloWithAnchor')->url('http://localhost/cp/hello?params');
+        $helloWithAnchor = Nav::create('helloWithAnchor')->url('http://localhost/cp/hello#anchor');
         $hell = Nav::create('hell')->url('http://localhost/cp/hell');
-        $localNotCp = Nav::create('hell')->url('/dashboard');
-        $external = Nav::create('hell')->url('http://external.com');
-        $externalSecure = Nav::create('hell')->url('https://external.com');
+        $localNotCp = Nav::create('localNotCp')->url('/dashboard');
+        $external = Nav::create('external')->url('http://external.com');
+        $externalSecure = Nav::create('externalSecure')->url('https://external.com');
 
         Request::swap(Request::create('http://localhost/cp/hell'));
         $this->assertFalse($hello->isActive());
+        $this->assertFalse($helloWithQueryParams->isActive());
+        $this->assertFalse($helloWithAnchor->isActive());
         $this->assertTrue($hell->isActive());
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
@@ -418,6 +422,8 @@ class NavTest extends TestCase
 
         Request::swap(Request::create('http://localhost/cp/hello'));
         $this->assertTrue($hello->isActive());
+        $this->assertTrue($helloWithQueryParams->isActive());
+        $this->assertTrue($helloWithAnchor->isActive());
         $this->assertFalse($hell->isActive());
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
@@ -425,6 +431,8 @@ class NavTest extends TestCase
 
         Request::swap(Request::create('http://localhost/cp/hell/test'));
         $this->assertFalse($hello->isActive());
+        $this->assertFalse($helloWithQueryParams->isActive());
+        $this->assertFalse($helloWithAnchor->isActive());
         $this->assertTrue($hell->isActive());
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
@@ -432,6 +440,26 @@ class NavTest extends TestCase
 
         Request::swap(Request::create('http://localhost/cp/hello/test'));
         $this->assertTrue($hello->isActive());
+        $this->assertTrue($helloWithQueryParams->isActive());
+        $this->assertTrue($helloWithAnchor->isActive());
+        $this->assertFalse($hell->isActive());
+        $this->assertFalse($localNotCp->isActive());
+        $this->assertFalse($external->isActive());
+        $this->assertFalse($externalSecure->isActive());
+
+        Request::swap(Request::create('http://localhost/cp/hello?params'));
+        $this->assertTrue($hello->isActive());
+        $this->assertTrue($helloWithQueryParams->isActive());
+        $this->assertTrue($helloWithAnchor->isActive());
+        $this->assertFalse($hell->isActive());
+        $this->assertFalse($localNotCp->isActive());
+        $this->assertFalse($external->isActive());
+        $this->assertFalse($externalSecure->isActive());
+
+        Request::swap(Request::create('http://localhost/cp/hello#anchor'));
+        $this->assertTrue($hello->isActive());
+        $this->assertTrue($helloWithQueryParams->isActive());
+        $this->assertTrue($helloWithAnchor->isActive());
         $this->assertFalse($hell->isActive());
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
@@ -654,6 +682,21 @@ class NavTest extends TestCase
 
         $this->assertEmpty(Nav::items());
         $this->assertCount(1, $this->build()->get('Jedi')->map->display());
+    }
+
+    /** @test */
+    public function it_ensures_top_level_section_is_always_built_when_building_with_hidden()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::extend(function ($nav) {
+            $nav->remove('Top Level', 'Dashboard'); // Remove default top level dashboard item
+        });
+
+        $nav = Nav::build(true, true)->pluck('items', 'display');
+
+        $this->assertTrue($nav->has('Top Level'));
+        $this->assertCount(0, $nav->get('Top Level'));
     }
 
     protected function build()

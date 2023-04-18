@@ -84,6 +84,8 @@ import BulletList from '@tiptap/extension-bullet-list';
 import CharacterCount from '@tiptap/extension-character-count';
 import Code from '@tiptap/extension-code';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import Dropcursor from '@tiptap/extension-dropcursor';
+import Gapcursor from '@tiptap/extension-gapcursor';
 import HardBreak from '@tiptap/extension-hard-break';
 import Heading from '@tiptap/extension-heading';
 import History from '@tiptap/extension-history';
@@ -115,9 +117,6 @@ import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
 import { lowlight } from 'lowlight/lib/common.js';
-import javascript from 'highlight.js/lib/languages/javascript'
-import css from 'highlight.js/lib/languages/css'
-import hljs from 'highlight.js/lib/highlight';
 import 'highlight.js/styles/github.css';
 
 export default {
@@ -580,6 +579,8 @@ export default {
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
                 ...(this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak]),
+                Dropcursor,
+                Gapcursor,
                 History,
                 Paragraph,
                 Placeholder.configure({ placeholder: this.config.placeholder }),

@@ -15,6 +15,12 @@ class OrderBy
      */
     public function __construct(string $sort, string $direction)
     {
+        $direction = strtolower($direction);
+
+        if (! in_array($direction, ['asc', 'desc'], true)) {
+            throw new \InvalidArgumentException('Order direction must be "asc" or "desc".');
+        }
+
         $this->sort = $sort;
         $this->direction = $direction;
     }
