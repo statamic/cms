@@ -132,7 +132,7 @@ class FileCacher extends AbstractCacher
         $paths = $this->config('path');
 
         if (! is_array($paths)) {
-            $paths = [$this->config('locale') => $paths];
+            $paths = Site::all()->mapWithKeys(fn ($site) => [$site->handle() => $paths])->all();
         }
 
         return $paths;
