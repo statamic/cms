@@ -167,7 +167,11 @@ trait ResetsPasswords
             ]);
         }
 
-        return redirect()->back()
+        $redirect = $request->has('_error_redirect')
+            ? redirect($request->input('_error_redirect'))
+            : back();
+
+        return $redirect
                     ->withInput($request->only('email'))
                     ->withErrors(['email' => trans($response)]);
     }

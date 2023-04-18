@@ -370,18 +370,25 @@ class UserTags extends Tags
             $this->params->put('redirect', request()->getPathInfo());
         }
 
-        $knownParams = ['redirect'];
-
         $action = route('statamic.password.reset.action');
         $method = 'POST';
 
         $token = Html::entities(request('token'));
-        $redirect = $this->params->get('redirect');
+
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
+
+        $params = [];
+
+        $redirect = $this->getRedirectUrl();
+
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
+            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
+        }
 
         if (! $this->parser) {
             return array_merge([
                 'attrs' => $this->formAttrs($action, $method, $knownParams),
-                'params' => array_merge($this->formMetaPrefix($this->formParams($method)), [
+                'params' => array_merge($this->formMetaPrefix($this->formParams($method, $params)), [
                     'token' => $token,
                     'redirect' => $redirect,
                 ]),
@@ -389,6 +396,8 @@ class UserTags extends Tags
         }
 
         $html = $this->formOpen($action, $method, $knownParams);
+
+        $html .= $this->formMetaFields($params);
 
         $html .= '<input type="hidden" name="token" value="'.$token.'" />';
 
