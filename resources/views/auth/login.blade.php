@@ -13,7 +13,7 @@
             <div class="login-oauth-providers">
                 @foreach ($providers as $provider)
                     <div class="provider mb-2">
-                        <a href="{{ $provider->loginUrl() }}?redirect={{ parse_url(cp_route('index'))['path'] }}" class="btn block btn-primary">
+                        <a href="{{ $provider->loginUrl() }}?redirect={{ parse_url(cp_route('index'))['path'] }}" class="btn w-full btn-primary">
                             {{ __('Log in with :provider', ['provider' => $provider->label()]) }}
                         </a>
                     </div>
@@ -21,10 +21,10 @@
             </div>
 
             @if($emailLoginEnabled)
-                <div class="text-center italic my-6">or</div>
+                <div class="text-center text-sm text-gray-700 py-6">&mdash; or &mdash;</div>
 
                 <div class="login-with-email" v-if="! showEmailLogin">
-                    <a class="btn block" @click.prevent="showEmailLogin = true">
+                    <a class="btn w-full" @click.prevent="showEmailLogin = true">
                         {{ __('Log in with email') }}
                     </a>
                 </div>
