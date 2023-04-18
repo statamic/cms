@@ -8,6 +8,7 @@ use Statamic\Http\Controllers\ForgotPasswordController;
 use Statamic\Http\Controllers\FormController;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\Http\Controllers\ResetPasswordController;
+use Statamic\Http\Controllers\OAuthController;
 use Statamic\Http\Controllers\UserController;
 use Statamic\Http\Middleware\AuthGuard;
 use Statamic\Http\Middleware\CP\AuthGuard as CPAuthGuard;
