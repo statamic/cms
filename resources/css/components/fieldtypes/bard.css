@@ -202,11 +202,11 @@
 .bard-fullscreen {
     @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none pt-16;
 
-    .bard-editor {
+    & > .bard-editor {
         @apply bg-white shadow max-w-xl mx-auto rounded relative my-6 px-8;
     }
 
-    .bard-fixed-toolbar {
+    & > .bard-fixed-toolbar {
         @apply shadow h-12 fixed w-full bg-gradient-to-b from-white to-gray-100;
         padding: 7px 8px;
         top: 0;
@@ -217,7 +217,7 @@
         }
     }
 
-    .ProseMirror {
+    & > .bard-editor > div > .ProseMirror {
         @apply px-6 py-16 flex flex-col;
         min-height: calc(100vh - 120px);
 

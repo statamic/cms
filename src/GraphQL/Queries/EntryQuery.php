@@ -2,19 +2,30 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\ResourceAuthorizer;
+use Facades\Statamic\GraphQL\Middleware\AuthorizeFilters;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Validation\ValidationException;
 use Statamic\Facades;
 use Statamic\Facades\GraphQL;
+use Statamic\GraphQL\Middleware\AuthorizeSubResources;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\JsonArgument;
 
 class EntryQuery extends Query
 {
-    use FiltersQuery;
+    use FiltersQuery {
+        filterQuery as traitFilterQuery;
+    }
 
     protected $attributes = [
         'name' => 'entry',
+    ];
+
+    protected $middleware = [
+        AuthorizeSubResources::class,
     ];
 
     public function type(): Type
@@ -58,8 +69,63 @@ class EntryQuery extends Query
             $query->where('site', $site);
         }
 
-        $this->filterQuery($query, $args['filter'] ?? []);
+        $filters = $args['filter'] ?? null;
 
-        return $query->limit(1)->get()->first();
+        $this->filterQuery($query, $filters);
+
+        $entry = $query->limit(1)->get()->first();
+
+        // The `AuthorizeSubResources` middleware will authorize when using `collection` arg,
+        // but this is still required when the user queries entry using other args.
+        if ($entry && ! in_array($collection = $entry->collection()->handle(), $this->allowedSubResources())) {
+            throw ValidationException::withMessages([
+                'collection' => 'Forbidden: '.$collection,
+            ]);
+        }
+
+        // We cannot use the `AuthorizeFilters` middleware on this query, because
+        // you can get an entry by `id`, `slug`, `uri`, etc. so we'll get the
+        // queried entry's collection and authorize filters manually here.
+        if ($entry && $filters) {
+            $allowedFilters = collect($this->allowedFilters([
+                'collection' => $entry->collection()->handle(),
+            ]));
+
+            $forbidden = collect($filters)
+                ->keys()
+                ->filter(fn ($filter) => ! $allowedFilters->contains($filter));
+
+            if ($forbidden->isNotEmpty()) {
+                throw ValidationException::withMessages([
+                    'filter' => 'Forbidden: '.$forbidden->join(', '),
+                ]);
+            }
+        }
+
+        return $entry;
+    }
+
+    private function filterQuery($query, $filters)
+    {
+        if (! isset($filters['status']) && ! isset($filters['published'])) {
+            $filters['status'] = 'published';
+        }
+
+        $this->traitFilterQuery($query, $filters);
+    }
+
+    public function subResourceArg()
+    {
+        return 'collection';
+    }
+
+    public function allowedSubResources()
+    {
+        return ResourceAuthorizer::allowedSubResources('graphql', 'collections');
+    }
+
+    public function allowedFilters($args)
+    {
+        return FilterAuthorizer::allowedForSubResources('graphql', 'collections', $args['collection'] ?? '*');
     }
 }

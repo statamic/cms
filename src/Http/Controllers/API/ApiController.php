@@ -2,6 +2,8 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Facades\Statamic\API\ResourceAuthorizer;
+use Illuminate\Validation\ValidationException;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
@@ -35,30 +37,15 @@ class ApiController extends Controller
             return;
         }
 
-        $config = config("statamic.api.resources.{$this->resourceConfigKey}", false);
-
-        if ($config !== true && ! is_array($config)) {
+        if (! ResourceAuthorizer::isAllowed('api', $this->resourceConfigKey)) {
             throw new NotFoundHttpException;
         }
 
-        if (! $this->routeResourceKey || ! is_array($config)) {
+        if (! $this->routeResourceKey) {
             return;
         }
 
-        foreach ($config as $resource) {
-            $this->abortIfRouteResourceDisabled($this->routeResourceKey, $resource);
-        }
-    }
-
-    /**
-     * Abort if route resource is disabled.
-     *
-     * @param  string  $routeSegment
-     * @param  string  $resource
-     */
-    protected function abortIfRouteResourceDisabled($routeSegment, $resource)
-    {
-        if (! $handle = request()->route($routeSegment)) {
+        if (! $handle = request()->route($this->routeResourceKey)) {
             return;
         }
 
@@ -66,7 +53,7 @@ class ApiController extends Controller
             $handle = $handle->handle();
         }
 
-        if ($handle && $handle !== $resource) {
+        if (! in_array($handle, ResourceAuthorizer::allowedSubResources('api', $this->resourceConfigKey))) {
             throw new NotFoundHttpException;
         }
     }
@@ -79,15 +66,9 @@ class ApiController extends Controller
      */
     protected function filterAllowedResources($items)
     {
-        $allowedResources = config("statamic.api.resources.{$this->resourceConfigKey}");
+        $allowedResources = ResourceAuthorizer::allowedSubResources('api', $this->resourceConfigKey);
 
-        if (! is_array($allowedResources)) {
-            return $items;
-        }
-
-        return $items->filter(function ($item) use ($allowedResources) {
-            return in_array($item->handle(), $allowedResources);
-        });
+        return $items->filter(fn ($item) => in_array($item->handle(), $allowedResources));
     }
 
     /**
@@ -142,7 +123,25 @@ class ApiController extends Controller
      */
     protected function getFilters()
     {
+        if (! method_exists($this, 'allowedFilters')) {
+            return collect();
+        }
+
         $filters = collect(request()->filter ?? []);
+
+        $allowedFilters = collect($this->allowedFilters());
+
+        $forbidden = $filters
+            ->keys()
+            ->map(fn ($param) => explode(':', $param))
+            ->map(fn ($parts) => $parts[0] === 'taxonomy' ? $parts[0].':'.$parts[1] : $parts[0])
+            ->filter(fn ($field) => ! $allowedFilters->contains($field));
+
+        if ($forbidden->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'filter' => Str::plural('Forbidden filter', $forbidden).': '.$forbidden->join(', '),
+            ]);
+        }
 
         if ($this->filterPublished && $this->doesntHaveFilter('status') && $this->doesntHaveFilter('published')) {
             $filters->put('status:is', 'published');
@@ -157,7 +156,7 @@ class ApiController extends Controller
      * @param  string  $field
      * @return bool
      */
-    public function doesntHaveFilter($field)
+    protected function doesntHaveFilter($field)
     {
         return ! collect(request()->filter ?? [])
             ->map(function ($value, $param) {
