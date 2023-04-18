@@ -33,6 +33,7 @@ class Collection extends Widget
         $columns = $blueprint
             ->columns()
             ->only($this->config('fields', []))
+            ->map(fn ($column) => $column->sortable(false))
             ->values();
 
         return view('statamic::widgets.collection', [
