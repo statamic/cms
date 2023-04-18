@@ -48,7 +48,7 @@ class FormCreateTest extends FormTestCase
     }
 
     /** @test */
-    public function it_renders_form_dynamically_with_fields_array()
+    public function it_dynamically_renders_fields_array()
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact }}
