@@ -1,6 +1,6 @@
 <template>
-    <div class="w-full" v-if="isFiltering || isSearching">
-        <div class="flex flex-wrap px-3 border-b pt-2">
+    <div class="shadow-inner bg-gray-300">
+        <div class="flex items-center flex-wrap px-3 border-b pt-2">
 
             <!-- Field filter (requires custom selection UI) -->
             <popover v-if="fieldFilter" placement="bottom-start" :stop-propagation="false" @closed="fieldFilterClosed">

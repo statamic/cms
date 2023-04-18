@@ -16,11 +16,10 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card overflow-hidden p-0 relative">
-                    <div class="flex items-center justify-between p-2 text-sm border-b">
+                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
 
                         <data-list-filter-presets
                             ref="presets"
-                            v-show="alwaysShowFilters || ! showFilters"
                             :active-preset="activePreset"
                             :active-preset-payload="activePresetPayload"
                             :active-filters="activeFilters"
@@ -29,23 +28,17 @@
                             :search-query="searchQuery"
                             @selected="selectPreset"
                             @reset="filtersReset"
-                            @hide-filters="filtersHide"
-                            @show-filters="filtersShow"
                         />
 
-                        <data-list-search class="h-8" v-if="showFilters" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+                        <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
 
-                        <div class="flex ml-2 space-x-2">
-                            <button class="btn btn-sm" v-text="__('Cancel')" v-show="! alwaysShowFilters && showFilters" @click="filtersHide" />
-                            <button class="btn btn-sm" v-text="__('Save')" v-show="showFilters && isDirty" @click="$refs.presets.savePreset()" />
-                            <button class="btn flex items-center btn-sm w-12" @click="handleShowFilters" v-if="! showFilters" v-tooltip="__('Show Filter Controls (F)')">
-                                <svg-icon name="light/search" class="w-4 h-4" />
-                                <svg-icon name="light/filter-lines" class="w-4 h-4" />
-                            </button>
+                        <div class="flex space-x-2 mt-2">
+                            <button class="btn btn-sm ml-2" v-text="__('Reset')" v-show="isDirty" @click="filtersReset" />
+                            <button class="btn btn-sm ml-2" v-text="__('Save')" v-show="isDirty" @click="$refs.presets.savePreset()" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                         </div>
                     </div>
-                    <div v-show="!reordering && showFilters">
+                    <div v-show="!reordering">
                         <data-list-filters
                             ref="filters"
                             :filters="filters"
@@ -55,7 +48,7 @@
                             :active-filter-badges="activeFilterBadges"
                             :active-count="activeFilterCount"
                             :search-query="searchQuery"
-                            :is-searching="showFilters"
+                            :is-searching="true"
                             :saves-presets="true"
                             :preferences-prefix="preferencesPrefix"
                             @filter-changed="filterChanged"

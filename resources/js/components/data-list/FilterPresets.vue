@@ -1,5 +1,5 @@
 <template>
-    <div class="pr-2">
+    <div class="pt-2 pr-2">
         <div class="flex flex-wrap items-center">
 
             <button class="pill-tab mr-1" :class="{ 'active': ! activePreset }" @click="viewAll" v-text="__('All')" />
