@@ -107,32 +107,6 @@
 }
 
 
-/* Solo Asset (max_files: 1)
-  ========================================================================== */
-
-.asset-solo-container {
-
-    .asset-tile {
-        padding: 0;
-        max-width: 300px;
-    }
-
-    .asset-tile .asset-thumb {
-        img,
-        .svg-img {
-            height: auto;
-            width: 100%;
-            max-width: 100%;
-            max-height: 100%;
-        }
-    }
-
-    .asset-tile .asset-meta {
-         max-width: 100%;
-    }
-}
-
-
  /* Asset Tile
    ========================================================================== */
 

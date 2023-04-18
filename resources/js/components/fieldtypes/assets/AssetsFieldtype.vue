@@ -70,7 +70,6 @@
                                 v-for="asset in assets"
                                 :key="asset.id"
                                 :asset="asset"
-                                :is-solo="soloAsset"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
                                 @updated="assetUpdated"
