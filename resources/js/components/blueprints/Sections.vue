@@ -39,8 +39,6 @@ import BlueprintSection from './Section.vue';
 import {Sortable, Plugins} from '@shopify/draggable';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
-let sortableSections, sortableFields;
-
 export default {
 
     mixins: [CanDefineLocalizable],
@@ -74,13 +72,20 @@ export default {
 
     data() {
         return {
-            sections: this.initialSections
+            sections: this.initialSections,
+            sortableSections: null,
+            sortableFields: null,
         }
     },
 
     mounted() {
         this.ensureSection();
         this.makeSortable();
+    },
+
+    beforeDestroy() {
+        if (this.sortableSections) this.sortableSections.destroy();
+        if (this.sortableFields) this.sortableFields.destroy();
     },
 
     watch: {
@@ -101,9 +106,9 @@ export default {
         },
 
         makeSectionsSortable() {
-            if (sortableSections) sortableSections.destroy();
+            if (this.sortableSections) this.sortableSections.destroy();
 
-            sortableSections = new Sortable(this.$refs.sections, {
+            this.sortableSections = new Sortable(this.$refs.sections, {
                 draggable: '.blueprint-section',
                 handle: '.blueprint-section-drag-handle',
                 mirror: { constrainDimensions: true },
@@ -115,9 +120,9 @@ export default {
         },
 
         makeFieldsSortable() {
-            if (sortableFields) sortableFields.destroy();
+            if (this.sortableFields) this.sortableFields.destroy();
 
-            sortableFields = new Sortable(document.querySelectorAll('.blueprint-section-draggable-zone'), {
+            this.sortableFields = new Sortable(this.$el.querySelectorAll('.blueprint-section-draggable-zone'), {
                 draggable: '.blueprint-section-field',
                 handle: '.blueprint-drag-handle',
                 mirror: { constrainDimensions: true },
