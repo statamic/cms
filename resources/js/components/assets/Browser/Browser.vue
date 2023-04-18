@@ -178,7 +178,7 @@
                             <div v-if="mode === 'grid' && ! containerIsEmpty">
                                 <div class="asset-grid-listing px-4 pt-2">
                                     <!-- Parent Folder -->
-                                    <div class="asset-tile" v-if="(folder && folder.parent_path) && !restrictFolderNavigation">
+                                    <div class="asset-tile grid-listing-asset-tile" v-if="(folder && folder.parent_path) && !restrictFolderNavigation">
                                         <div class="asset-thumb-container">
                                             <button @click="selectFolder(folder.parent_path)">
                                                 <div class="asset-thumb">
@@ -191,7 +191,7 @@
                                         </div>
                                     </div>
                                     <!-- Sub-Folders -->
-                                    <div class="asset-tile group relative" v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
+                                    <div class="asset-tile grid-listing-asset-tile group relative" v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <div class="asset-thumb-container">
                                             <button @click="selectFolder(folder.path)">
                                                 <div class="asset-thumb">
@@ -214,7 +214,7 @@
                                     </div>
                                     <!-- Assets -->
                                     <button
-                                        class="asset-tile outline-none group relative"
+                                        class="asset-tile grid-listing-asset-tile outline-none group relative"
                                         v-for="(asset, index) in assets"
                                         :key="asset.id"
                                         :class="{ 'selected': isSelected(asset.id) }"
