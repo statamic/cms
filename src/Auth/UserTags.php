@@ -7,6 +7,7 @@ use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
+use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
 
@@ -382,7 +383,12 @@ class UserTags extends Tags
         $redirect = $this->getRedirectUrl();
 
         if ($errorRedirect = $this->getErrorRedirectUrl()) {
-            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
+
+            if (Str::startsWith($errorRedirect, '#')) {
+                 $errorRedirect = request()->url().'?token='.$token.$errorRedirect;
+            }
+
+            $params['error_redirect'] = $errorRedirect;
         }
 
         if (! $this->parser) {
