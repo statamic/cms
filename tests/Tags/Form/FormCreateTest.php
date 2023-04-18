@@ -48,7 +48,7 @@ class FormCreateTest extends FormTestCase
     }
 
     /** @test */
-    public function it_renders_form_dynamically_with_fields_array()
+    public function it_dynamically_renders_fields_array()
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact }}
@@ -445,6 +445,61 @@ EOT
         ], [
             'custom' => 'fall back to default partial',
         ]);
+    }
+
+    /** @test */
+    public function it_dynamically_renders_sections_array()
+    {
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'One',
+                            'instructions' => 'One Instructions',
+                            'fields' => [
+                                ['handle' => 'alpha', 'field' => ['type' => 'text']],
+                                ['handle' => 'bravo', 'field' => ['type' => 'text']],
+                            ],
+                        ],
+                        [
+                            'display' => 'Two',
+                            'instructions' => 'Two Instructions',
+                            'fields' => [
+                                ['handle' => 'charlie', 'field' => ['type' => 'text']],
+                                ['handle' => 'delta', 'field' => ['type' => 'text']],
+                            ],
+                        ],
+                        [
+                            'display' => null,
+                            'instructions' => null,
+                            'fields' => [
+                                ['handle' => 'echo', 'field' => ['type' => 'text']],
+                                ['handle' => 'fox', 'field' => ['type' => 'text']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ sections }}
+        <div class="section">{{ if display}}{{ display }} - {{ /if }}{{ if instructions }}{{ instructions }} - {{ /if }}{{ fields | pluck('handle') | join(',') }}</div>
+    {{ /sections }}
+    <div class="fields">{{ fields | pluck('handle') | join(',') }}</div>
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="section">One - One Instructions - alpha,bravo</div>', $output);
+        $this->assertStringContainsString('<div class="section">Two - Two Instructions - charlie,delta</div>', $output);
+        $this->assertStringContainsString('<div class="section">echo,fox</div>', $output);
+
+        // Even though the fields are all nested within sections,
+        // we should still be able to get them via `{{ fields }}` array at top level...
+        $this->assertStringContainsString('<div class="fields">alpha,bravo,charlie,delta,echo,fox</div>', $output);
     }
 
     /** @test */
