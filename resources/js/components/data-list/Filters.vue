@@ -27,7 +27,7 @@
                 </template>
             </popover>
 
-            <!-- Pinned non-field filters -->
+            <!-- Standard pinned filters -->
             <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle" placement="bottom-start" :stop-propagation="false">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2">
@@ -48,7 +48,7 @@
                 </template>
             </popover>
 
-            <!-- Unpinned non-field filters -->
+            <!-- Standard unpinned filters -->
             <popover v-if="unpinnedFilters.length" placement="bottom-start" :stop-propagation="false">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
