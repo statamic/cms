@@ -22,16 +22,6 @@
                                 @cleared="creating = false"
                                 @closed="closePopover"
                             />
-                            <data-list-filter
-                                v-for="filter in standardFilters"
-                                v-if="creating === filter.handle"
-                                :key="filter.handle"
-                                :filter="filter"
-                                :values="activeFilters[filter.handle]"
-                                @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
-                                @cleared="creating = false"
-                                @closed="closePopover"
-                            />
                         </div>
                     </div>
                 </template>
