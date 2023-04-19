@@ -85,7 +85,7 @@ class EntriesStoreTest extends TestCase
     public function it_makes_entry_instances_from_files()
     {
         Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
-            (new \Statamic\Entries\Collection)->dated(true)
+            (new \Statamic\Entries\Collection)->handle('blog')->dated(true)
         );
 
         $item = $this->parent->store('blog')->makeItemFromFile(
@@ -169,8 +169,8 @@ class EntriesStoreTest extends TestCase
         $entry = Facades\Entry::make()
             ->id('123')
             ->slug('test')
-            ->date('2017-07-04')
-            ->collection('blog');
+            ->collection('blog')
+            ->date('2017-07-04');
 
         $this->parent->store('blog')->save($entry);
 
@@ -187,8 +187,8 @@ class EntriesStoreTest extends TestCase
         $entry = Facades\Entry::make()
             ->id('123')
             ->slug('test')
-            ->date('2017-07-04')
-            ->collection('blog');
+            ->collection('blog')
+            ->date('2017-07-04');
 
         $this->parent->store('blog')->save($entry);
 
@@ -211,13 +211,13 @@ class EntriesStoreTest extends TestCase
         $existingPath = $this->directory.'/blog/2017-07-04.test.md';
         file_put_contents($existingPath, $existingContents = "---\nid: existing-id\n---");
 
-        $entry = Facades\Entry::make()->id('new-id')->slug('test')->date('2017-07-04')->collection('blog');
+        $entry = Facades\Entry::make()->id('new-id')->slug('test')->collection('blog')->date('2017-07-04');
         $this->parent->store('blog')->save($entry);
         $newPath = $this->directory.'/blog/2017-07-04.test.1.md';
         $this->assertStringEqualsFile($existingPath, $existingContents);
         $this->assertStringEqualsFile($newPath, $entry->fileContents());
 
-        $anotherEntry = Facades\Entry::make()->id('another-new-id')->slug('test')->date('2017-07-04')->collection('blog');
+        $anotherEntry = Facades\Entry::make()->id('another-new-id')->slug('test')->collection('blog')->date('2017-07-04');
         $this->parent->store('blog')->save($anotherEntry);
         $anotherNewPath = $this->directory.'/blog/2017-07-04.test.2.md';
         $this->assertStringEqualsFile($existingPath, $existingContents);
@@ -243,8 +243,8 @@ class EntriesStoreTest extends TestCase
         $entry = Facades\Entry::make()
             ->id('the-id')
             ->slug('test')
-            ->date('2017-07-04')
-            ->collection('blog');
+            ->collection('blog')
+            ->date('2017-07-04');
 
         $this->parent->store('blog')->save($entry);
 
@@ -268,8 +268,8 @@ class EntriesStoreTest extends TestCase
         $entry = Facades\Entry::make()
             ->id('another-id')
             ->slug('test')
-            ->date('2017-07-04')
-            ->collection('blog');
+            ->collection('blog')
+            ->date('2017-07-04');
 
         $this->parent->store('blog')->save($entry);
 

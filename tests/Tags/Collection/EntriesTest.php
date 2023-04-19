@@ -10,6 +10,7 @@ use InvalidArgumentException;
 use Mockery;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -199,6 +200,10 @@ class EntriesTest extends TestCase
     {
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00:12'));
 
+        $this->collection->dated(true)->save();
+        $blueprint = Blueprint::makeFromFields(['date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true]])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/test')->once()->andReturn(collect([$blueprint]));
+
         $this->makeEntry('a')->date('2019-03-09')->save(); // definitely in past
         $this->makeEntry('b')->date('2019-03-10')->save(); // today
         $this->makeEntry('c')->date('2019-03-10-1259')->save(); // today, but before "now"
@@ -209,7 +214,6 @@ class EntriesTest extends TestCase
         $this->makeEntry('h')->date('2019-03-11')->save(); // definitely in future
 
         // Default date behaviors.
-        $this->collection->dated(true)->save();
         $this->assertCount(8, $this->getEntries());
         $this->assertCount(4, $this->getEntries(['show_future' => false]));
         $this->assertCount(8, $this->getEntries(['show_future' => true]));
@@ -256,6 +260,9 @@ class EntriesTest extends TestCase
     public function it_filters_by_since_and_until()
     {
         $this->collection->dated(true)->save();
+        $blueprint = Blueprint::makeFromFields(['date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true]])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/test')->once()->andReturn(collect([$blueprint]));
+
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00:12'));
 
         $this->makeEntry('a')->date('2019-03-06')->save(); // further in past

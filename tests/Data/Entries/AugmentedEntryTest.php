@@ -37,6 +37,7 @@ class AugmentedEntryTest extends AugmentedTestCase
         config(['statamic.amp.enabled' => true]);
 
         $blueprint = Blueprint::makeFromFields([
+            'date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true],
             'two' => ['type' => 'text'],
             'four' => ['type' => 'text'],
             'six' => ['type' => 'text'],
@@ -45,6 +46,7 @@ class AugmentedEntryTest extends AugmentedTestCase
         Blueprint::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
 
         $collection = tap(Collection::make('test')
+            ->dated(true)
             ->routes('/test/{slug}')
             ->cascade(['seven' => 'the "seven" value from the collection']))
             ->save();

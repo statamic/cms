@@ -825,7 +825,7 @@ class EntryTest extends TestCase
             'en' => ['url' => '/', 'locale' => 'en_US'],
         ]]);
 
-        $collection = tap(Facades\Collection::make('blog'))->save();
+        $collection = tap(Facades\Collection::make('blog')->dated(true))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.md', $entry->path());
@@ -840,7 +840,7 @@ class EntryTest extends TestCase
             'fr' => ['url' => '/', 'locale' => 'fr_FR'],
         ]]);
 
-        $collection = tap(Facades\Collection::make('blog'))->save();
+        $collection = tap(Facades\Collection::make('blog')->dated(true))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/post.md', $entry->path());
@@ -1508,13 +1508,13 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_file_contents_for_saving()
     {
-        tap(Collection::make('test'))->save();
+        tap(Collection::make('test')->dated(true))->save();
 
         $entry = (new Entry)
             ->collection('test')
             ->id('123')
             ->slug('test')
-            ->date('2018-01-01')
+            ->date('2018-01-01') // set the date to ensure it doesnt appear in contents
             ->published(false)
             ->data([
                 'title' => 'The title',
@@ -1540,7 +1540,7 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_file_contents_for_saving_a_localized_entry()
     {
-        tap(Collection::make('test'))->save();
+        tap(Collection::make('test')->dated(true))->save();
 
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
