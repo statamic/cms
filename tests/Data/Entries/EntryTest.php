@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
+use LogicException;
 use Mockery;
 use ReflectionClass;
 use Statamic\Contracts\Data\Augmentable;
@@ -824,7 +825,7 @@ class EntryTest extends TestCase
             'en' => ['url' => '/', 'locale' => 'en_US'],
         ]]);
 
-        $collection = tap(Facades\Collection::make('blog'))->save();
+        $collection = tap(Facades\Collection::make('blog')->dated(true))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.md', $entry->path());
@@ -839,7 +840,7 @@ class EntryTest extends TestCase
             'fr' => ['url' => '/', 'locale' => 'fr_FR'],
         ]]);
 
-        $collection = tap(Facades\Collection::make('blog'))->save();
+        $collection = tap(Facades\Collection::make('blog')->dated(true))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/post.md', $entry->path());
@@ -864,38 +865,137 @@ class EntryTest extends TestCase
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/123.md', $entry->path());
     }
 
-    /** @test */
-    public function it_gets_and_sets_the_date()
-    {
-        Carbon::setTestNow(Carbon::parse('2015-09-24'));
+    /**
+     * @test
+     *
+     * @dataProvider dateCollectionEntriesProvider
+     */
+    public function it_gets_dates_for_dated_collection_entries(
+        $setDate,
+        $enableTimeInBlueprint,
+        $enableSecondsInBlueprint,
+        $expectedDate,
+        $expectedToHaveTime,
+        $expectedToHaveSeconds,
+        $expectedPath,
+    ) {
+        Carbon::setTestNow(Carbon::parse('2015-09-24 13:45:23'));
 
-        $collection = tap(Facades\Collection::make('blog'))->save();
+        $collection = tap(Facades\Collection::make('test')->dated(true))->save();
+
+        $entry = (new Entry)->collection($collection)->slug('foo');
+
+        if ($setDate) {
+            $entry->date($setDate);
+        }
+
+        $fields = [];
+
+        if ($enableTimeInBlueprint) {
+            $fields['date'] = ['type' => 'date', 'time_enabled' => $enableTimeInBlueprint, 'time_seconds_enabled' => $enableSecondsInBlueprint];
+        }
+
+        $blueprint = Blueprint::makeFromFields($fields);
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'test' => $blueprint->setHandle('test'),
+        ]));
+
+        $this->assertTrue($entry->hasDate());
+        $this->assertEquals($expectedDate, $entry->date()->format('Y-m-d H:i:s'));
+        $this->assertEquals($expectedToHaveTime, $entry->hasTime());
+        $this->assertEquals($expectedToHaveSeconds, $entry->hasSeconds());
+        $this->assertEquals($expectedPath, pathinfo($entry->path(), PATHINFO_FILENAME));
+    }
+
+    public function dateCollectionEntriesProvider()
+    {
+        return [
+            'no date explicitly set, time not explicitly enabled' => [null, null, null, '2015-09-24 00:00:00', false, false, 'foo'], // By default, the date field added to dated collection blueprints does not have time enabled.
+            'no date explicitly set, time enabled, seconds enabled' => [null, true, true, '2015-09-24 13:45:23', true, true, 'foo'],
+            'no date explicitly set, time enabled, seconds disabled' => [null, true, false, '2015-09-24 13:45:00', true, false, 'foo'], // Seconds are disabled, so they should be zeroed out.
+
+            'date set, time not explicitly enabled' => ['2023-04-19', null, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
+            'date set, time enabled, seconds enabled' => ['2023-04-19', true, true, '2023-04-19 00:00:00', true, true, '2023-04-19-000000.foo'],
+            'date set, time enabled, seconds disabled' => ['2023-04-19', true, false, '2023-04-19 00:00:00', true, false, '2023-04-19-0000.foo'],
+
+            'datetime set, time not explicitly enabled' => ['2023-04-19-1425', null, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is not enabled, so it should be zeroed out.
+            'datetime set, time enabled, seconds enabled' => ['2023-04-19-1425', true, true, '2023-04-19 14:25:00', true, true, '2023-04-19-142500.foo'],
+            'datetime set, time enabled, seconds disabled' => ['2023-04-19-1425', true, false, '2023-04-19 14:25:00', true, false, '2023-04-19-1425.foo'],
+
+            'datetime with seconds set, time not explicitly enabled' => ['2023-04-19-142512', null, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is not enabled, so it should be zeroed out.
+            'datetime with seconds set, time enabled, seconds enabled' => ['2023-04-19-142512', true, true, '2023-04-19 14:25:12', true, true, '2023-04-19-142512.foo'],
+            'datetime with seconds set, time enabled, seconds disabled' => ['2023-04-19-142512', true, false, '2023-04-19 14:25:00', true, false, '2023-04-19-1425.foo'], // Seconds are disabled, so they should be zeroed out.
+
+            'date set, time disabled' => ['2023-04-19', false, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
+            'date set, time disabled, seconds enabled' => ['2023-04-19', false, true, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is disabled, so seconds should be disabled too.
+
+            'datetime set, time disabled' => ['2023-04-19-1425', false, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
+            'datetime set, time disabled, seconds enabled' => ['2023-04-19-1425', false, true, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is disabled, so seconds should be disabled too.
+
+            'datetime with seconds set, time disabled' => ['2023-04-19-142512', false, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
+            'datetime with seconds set, time disabled, seconds enabled' => ['2023-04-19-142512', false, true, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is disabled, so seconds should be disabled too.
+        ];
+    }
+
+    /** @test */
+    public function date_is_null_if_a_collection_hasnt_been_set()
+    {
+        $this->assertNull((new Entry)->date());
+    }
+
+    /** @test */
+    public function it_gets_dates_for_non_dated_collection_entries()
+    {
+        Carbon::setTestNow(Carbon::parse('2015-09-24 13:45:23'));
+
+        // Have a "date" field named "date" just to prove it doesn't affect the date() methods.
+        $blueprint = Blueprint::makeFromFields(['date' => ['type' => 'date']]);
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'test' => $blueprint->setHandle('test'),
+        ]));
+
+        $collection = tap(Facades\Collection::make('test')->dated(false))->save();
+
         $entry = (new Entry)->collection($collection);
 
-        // Without explicitly having the date set, it falls back to the last modified date (which if there's no file, is Carbon::now())
-        $this->assertInstanceOf(Carbon::class, $entry->date());
-        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-09-24 00:00')->eq($entry->date()));
         $this->assertFalse($entry->hasDate());
+        $this->assertFalse($entry->hasTime());
+        $this->assertFalse($entry->hasSeconds());
+        $this->assertNull($entry->date());
+        $this->assertNull($entry->date);
+        $this->assertNull($entry->get('date'));
+        $this->assertNull($entry->value('date'));
 
-        // Date can be provided as string without time
-        $return = $entry->date('2015-03-05');
-        $this->assertEquals($entry, $return);
-        $this->assertInstanceOf(Carbon::class, $entry->date());
-        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-03-05 00:00')->eq($entry->date()));
-        $this->assertTrue($entry->hasDate());
+        $entry->set('date', '2023-04-19');
 
-        // Date can be provided as string with time
-        $entry->date('2015-03-05-1325');
-        $this->assertInstanceOf(Carbon::class, $entry->date());
-        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-03-05 13:25')->eq($entry->date()));
-        $this->assertTrue($entry->hasDate());
+        $this->assertFalse($entry->hasDate());
+        $this->assertFalse($entry->hasTime());
+        $this->assertFalse($entry->hasSeconds());
+        $this->assertNull($entry->date());
+        $this->assertInstanceOf(Carbon::class, $entry->date);
+        $this->assertEquals('2023-04-19 00:00:00', $entry->date->format('Y-m-d H:i:s'));
+        $this->assertEquals('2023-04-19', $entry->get('date'));
+        $this->assertEquals('2023-04-19', $entry->value('date'));
+    }
 
-        // Date can be provided as carbon instance
-        $carbon = Carbon::createFromFormat('Y-m-d H:i', '2018-05-02 17:32');
-        $entry->date($carbon);
-        $this->assertInstanceOf(Carbon::class, $entry->date());
-        $this->assertTrue($carbon->eq($entry->date()));
-        $this->assertTrue($entry->hasDate());
+    /** @test */
+    public function setting_date_on_non_dated_collection_throws_exception()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot set date on non-dated collection entry.');
+
+        $collection = tap(Facades\Collection::make('test')->dated(false))->save();
+
+        (new Entry)->collection($collection)->date('2023-04-19');
+    }
+
+    /** @test */
+    public function setting_date_on_entry_that_doesnt_have_a_collection_set_throws_exception()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot set date on non-dated collection entry.');
+
+        (new Entry)->date('2023-04-19');
     }
 
     /** @test */
@@ -948,38 +1048,6 @@ class EntryTest extends TestCase
         $this->assertEquals('potato', $three->order());
         $this->assertEquals(24, $four->order());
         $this->assertEquals(24, $five->order());
-    }
-
-    /** @test */
-    public function it_gets_and_sets_the_date_for_date_collections()
-    {
-        Carbon::setTestNow(Carbon::parse('2015-09-24'));
-
-        $dateEntry = with('', function () {
-            $collection = tap(Collection::make('dated')->dated(true))->save();
-
-            return (new Entry)->collection($collection);
-        });
-
-        $numberEntry = with('', function () {
-            $collection = tap(Collection::make('ordered')->structureContents(['max_depth' => 1, 'tree' => []]))->save();
-
-            return (new Entry)->collection($collection);
-        });
-
-        $dateEntry->date('2017-01-02');
-
-        $this->assertEquals('2017-01-02 12:00am', $dateEntry->date()->format('Y-m-d h:ia'));
-        $this->assertTrue($dateEntry->hasDate());
-        $this->assertFalse($dateEntry->hasTime());
-
-        $this->assertEquals('2015-09-24 12:00am', $numberEntry->date()->format('Y-m-d h:ia'));
-        $this->assertFalse($numberEntry->hasDate());
-
-        $dateEntry->date('2017-01-02-1523');
-        $this->assertEquals('2017-01-02 03:23pm', $dateEntry->date()->format('Y-m-d h:ia'));
-        $this->assertTrue($dateEntry->hasDate());
-        $this->assertTrue($dateEntry->hasTime());
     }
 
     /** @test */
@@ -1446,13 +1514,13 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_file_contents_for_saving()
     {
-        tap(Collection::make('test'))->save();
+        tap(Collection::make('test')->dated(true))->save();
 
         $entry = (new Entry)
             ->collection('test')
             ->id('123')
             ->slug('test')
-            ->date('2018-01-01')
+            ->date('2018-01-01') // set the date to ensure it doesnt appear in contents
             ->published(false)
             ->data([
                 'title' => 'The title',
@@ -1478,7 +1546,7 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_file_contents_for_saving_a_localized_entry()
     {
-        tap(Collection::make('test'))->save();
+        tap(Collection::make('test')->dated(true))->save();
 
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');

@@ -10,6 +10,7 @@ use InvalidArgumentException;
 use Mockery;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -197,86 +198,96 @@ class EntriesTest extends TestCase
     /** @test */
     public function it_filters_by_future_and_past()
     {
-        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00:12'));
+
+        $this->collection->dated(true)->save();
+        $blueprint = Blueprint::makeFromFields(['date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true]])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/test')->once()->andReturn(collect([$blueprint]));
 
         $this->makeEntry('a')->date('2019-03-09')->save(); // definitely in past
         $this->makeEntry('b')->date('2019-03-10')->save(); // today
         $this->makeEntry('c')->date('2019-03-10-1259')->save(); // today, but before "now"
-        $this->makeEntry('d')->date('2019-03-10-1300')->save(); // today, and also "now"
-        $this->makeEntry('e')->date('2019-03-10-1301')->save(); // today, but after "now"
-        $this->makeEntry('f')->date('2019-03-11')->save(); // definitely in future
+        $this->makeEntry('d')->date('2019-03-10-1300')->save(); // today, same minute, but before "now"
+        $this->makeEntry('e')->date('2019-03-10-130012')->save(); // today, and also "now"
+        $this->makeEntry('f')->date('2019-03-10-130015')->save(); // today, same minute, but after "now"
+        $this->makeEntry('g')->date('2019-03-10-1301')->save(); // today, but after "now"
+        $this->makeEntry('h')->date('2019-03-11')->save(); // definitely in future
 
         // Default date behaviors.
-        $this->collection->dated(true)->save();
-        $this->assertCount(6, $this->getEntries());
-        $this->assertCount(3, $this->getEntries(['show_future' => false]));
-        $this->assertCount(6, $this->getEntries(['show_future' => true]));
-        $this->assertCount(6, $this->getEntries(['show_past' => true]));
-        $this->assertCount(2, $this->getEntries(['show_past' => false]));
-        $this->assertCount(2, $this->getEntries(['show_past' => false, 'show_future' => true]));
+        $this->assertCount(8, $this->getEntries());
+        $this->assertCount(4, $this->getEntries(['show_future' => false]));
+        $this->assertCount(8, $this->getEntries(['show_future' => true]));
+        $this->assertCount(8, $this->getEntries(['show_past' => true]));
+        $this->assertCount(3, $this->getEntries(['show_past' => false]));
+        $this->assertCount(3, $this->getEntries(['show_past' => false, 'show_future' => true]));
 
         // Only future
         $this->collection->dated(true)->futureDateBehavior('public')->pastDateBehavior('unlisted')->save();
-        $this->assertCount(2, $this->getEntries());
+        $this->assertCount(3, $this->getEntries());
         $this->assertCount(0, $this->getEntries(['show_future' => false]));
-        $this->assertCount(2, $this->getEntries(['show_future' => true]));
-        $this->assertCount(6, $this->getEntries(['show_past' => true]));
-        $this->assertCount(2, $this->getEntries(['show_past' => false]));
-        $this->assertCount(2, $this->getEntries(['show_past' => false, 'show_future' => true]));
+        $this->assertCount(3, $this->getEntries(['show_future' => true]));
+        $this->assertCount(8, $this->getEntries(['show_past' => true]));
+        $this->assertCount(3, $this->getEntries(['show_past' => false]));
+        $this->assertCount(3, $this->getEntries(['show_past' => false, 'show_future' => true]));
 
         $this->collection->dated(true)->futureDateBehavior('public')->pastDateBehavior('private')->save();
-        $this->assertCount(2, $this->getEntries());
+        $this->assertCount(3, $this->getEntries());
         $this->assertCount(0, $this->getEntries(['show_future' => false]));
-        $this->assertCount(2, $this->getEntries(['show_future' => true]));
-        $this->assertCount(6, $this->getEntries(['show_past' => true]));
-        $this->assertCount(2, $this->getEntries(['show_past' => false]));
-        $this->assertCount(2, $this->getEntries(['show_past' => false, 'show_future' => true]));
+        $this->assertCount(3, $this->getEntries(['show_future' => true]));
+        $this->assertCount(8, $this->getEntries(['show_past' => true]));
+        $this->assertCount(3, $this->getEntries(['show_past' => false]));
+        $this->assertCount(3, $this->getEntries(['show_past' => false, 'show_future' => true]));
 
         // Only past
         $this->collection->dated(true)->futureDateBehavior('unlisted')->pastDateBehavior('public')->save();
-        $this->assertCount(3, $this->getEntries());
-        $this->assertCount(3, $this->getEntries(['show_future' => false]));
-        $this->assertCount(6, $this->getEntries(['show_future' => true]));
-        $this->assertCount(3, $this->getEntries(['show_past' => true]));
+        $this->assertCount(4, $this->getEntries());
+        $this->assertCount(4, $this->getEntries(['show_future' => false]));
+        $this->assertCount(8, $this->getEntries(['show_future' => true]));
+        $this->assertCount(4, $this->getEntries(['show_past' => true]));
         $this->assertCount(0, $this->getEntries(['show_past' => false]));
-        $this->assertCount(2, $this->getEntries(['show_past' => false, 'show_future' => true]));
+        $this->assertCount(3, $this->getEntries(['show_past' => false, 'show_future' => true]));
 
         $this->collection->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
-        $this->assertCount(3, $this->getEntries());
-        $this->assertCount(3, $this->getEntries(['show_future' => false]));
-        $this->assertCount(6, $this->getEntries(['show_future' => true]));
-        $this->assertCount(3, $this->getEntries(['show_past' => true]));
+        $this->assertCount(4, $this->getEntries());
+        $this->assertCount(4, $this->getEntries(['show_future' => false]));
+        $this->assertCount(8, $this->getEntries(['show_future' => true]));
+        $this->assertCount(4, $this->getEntries(['show_past' => true]));
         $this->assertCount(0, $this->getEntries(['show_past' => false]));
-        $this->assertCount(2, $this->getEntries(['show_past' => false, 'show_future' => true]));
+        $this->assertCount(3, $this->getEntries(['show_past' => false, 'show_future' => true]));
     }
 
     /** @test */
     public function it_filters_by_since_and_until()
     {
         $this->collection->dated(true)->save();
-        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+        $blueprint = Blueprint::makeFromFields(['date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true]])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/test')->once()->andReturn(collect([$blueprint]));
+
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00:12'));
 
         $this->makeEntry('a')->date('2019-03-06')->save(); // further in past
         $this->makeEntry('b')->date('2019-03-09')->save(); // yesterday
         $this->makeEntry('c')->date('2019-03-10')->save(); // today
         $this->makeEntry('d')->date('2019-03-10-1259')->save(); // today, but before "now"
-        $this->makeEntry('e')->date('2019-03-10-1300')->save(); // today, and also "now"
-        $this->makeEntry('f')->date('2019-03-10-1301')->save(); // today, but after "now"
-        $this->makeEntry('g')->date('2019-03-11')->save(); // tomorrow
-        $this->makeEntry('h')->date('2019-03-13')->save(); // further in future
+        $this->makeEntry('e')->date('2019-03-10-1300')->save(); // today, same minute, but before "now"
+        $this->makeEntry('f')->date('2019-03-10-130012')->save(); // today, and also "now"
+        $this->makeEntry('g')->date('2019-03-10-130015')->save(); // today, same minute, but after "now"
+        $this->makeEntry('h')->date('2019-03-10-1301')->save(); // today, but after "now"
+        $this->makeEntry('i')->date('2019-03-11')->save(); // tomorrow
+        $this->makeEntry('j')->date('2019-03-13')->save(); // further in future
 
-        $this->assertCount(8, $this->getEntries(['show_future' => true]));
-        $this->assertCount(6, $this->getEntries(['show_future' => true, 'since' => 'yesterday']));
-        $this->assertCount(7, $this->getEntries(['show_future' => true, 'since' => '-2 days']));
-        $this->assertCount(4, $this->getEntries(['show_future' => true, 'until' => 'now']));
-        $this->assertCount(6, $this->getEntries(['show_future' => true, 'until' => 'tomorrow']));
+        $this->assertCount(10, $this->getEntries(['show_future' => true]));
+        $this->assertCount(8, $this->getEntries(['show_future' => true, 'since' => 'yesterday']));
+        $this->assertCount(9, $this->getEntries(['show_future' => true, 'since' => '-2 days']));
+        $this->assertCount(5, $this->getEntries(['show_future' => true, 'until' => 'now']));
+        $this->assertCount(8, $this->getEntries(['show_future' => true, 'until' => 'tomorrow']));
     }
 
     /** @test */
     public function it_filters_by_status()
     {
         $this->collection->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
-        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00:12'));
 
         $this->makeEntry('a')->date('2019-03-08')->published(true)->save(); // definitely in past
         $this->makeEntry('b')->date('2019-03-09')->published(false)->save(); // definitely in past
@@ -293,7 +304,7 @@ class EntriesTest extends TestCase
     public function it_filters_by_published_boolean()
     {
         $this->collection->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
-        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00:12'));
 
         $this->makeEntry('a')->date('2019-03-08')->published(true)->save(); // definitely in past
         $this->makeEntry('b')->date('2019-03-09')->published(false)->save(); // definitely in past
@@ -330,7 +341,7 @@ class EntriesTest extends TestCase
     public function it_sorts_entries()
     {
         $this->collection->dated(true)->save();
-        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00:12'));
 
         $this->makeEntry('a')->date('2019-02-06')->set('title', 'Pear')->save();
         $this->makeEntry('b')->date('2019-02-07')->set('title', 'Apple')->save();
@@ -356,7 +367,7 @@ class EntriesTest extends TestCase
     public function it_sorts_entries_by_multiple_columns()
     {
         $this->collection->dated(true)->save();
-        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00:12'));
 
         $this->makeEntry('a')->date('2019-02-06')->set('title', 'Pear')->save();
         $this->makeEntry('b')->date('2019-02-06')->set('title', 'Apple')->save();
