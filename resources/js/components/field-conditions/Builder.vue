@@ -29,12 +29,12 @@
                 v-if="hasConditions && isStandard"
                 v-for="(condition, index) in conditions"
                 :key="condition._id"
-                class="flex items-center py-4 border-t"
+                class="flex flex-wrap items-center py-4 border-t"
             >
                 <v-select
                     ref="fieldSelect"
                     v-model="conditions[index].field"
-                    class="min-w-md"
+                    class="w-full md:w-1/3 mb-2 md:mb-0"
                     :options="fieldOptions"
                     :placeholder="__('Field')"
                     :taggable="true"
@@ -50,7 +50,7 @@
                     v-model="conditions[index].operator"
                     :options="operatorOptions"
                     :placeholder="false"
-                    class="ml-4" />
+                    class="md:ml-4" />
 
                 <text-input
                     v-model="conditions[index].value"

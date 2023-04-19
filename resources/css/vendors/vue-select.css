@@ -68,7 +68,7 @@
 
 .v-select .vs__selected-options {
 	@apply appearance-none text-gray-800 text-sm;
-	@apply flex flex-wrap flex-1 rounded-l relative h-full;
+	@apply flex flex-wrap basis-1 grow rounded-l relative h-full;
 	/* box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,.05); */
 	padding: 5px 8px;
 	line-height: 1.5;
@@ -219,8 +219,11 @@
 	line-height: 1.4;
 	border-left: none;
 	box-shadow: none;
-	width: 0;
-	flex-grow: 1
+    width: 0;
+	flex-grow: 1;
+}
+
+.vs--open .vs__search {
 }
 
 .vs__search::placeholder {
