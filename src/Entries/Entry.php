@@ -440,7 +440,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('date')
             ->getter(function ($date) {
-                if (! $this->collection()->dated()) {
+                if (! optional($this->collection())->dated()) {
                     return null;
                 }
 

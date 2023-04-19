@@ -938,6 +938,12 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function date_is_null_if_a_collection_hasnt_been_set()
+    {
+        $this->assertNull((new Entry)->date());
+    }
+
+    /** @test */
     public function it_gets_dates_for_non_dated_collection_entries()
     {
         Carbon::setTestNow(Carbon::parse('2015-09-24 13:45:23'));
