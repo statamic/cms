@@ -11,6 +11,8 @@ use Statamic\Support\Arr;
 
 class Fields extends Filter
 {
+    protected $pinned = true;
+
     public static function title()
     {
         return __('Field');
