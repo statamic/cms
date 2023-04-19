@@ -27,8 +27,8 @@
                 </template>
             </popover>
 
-            <!-- Standard non-field filters -->
-            <popover v-if="standardFilters.length" v-for="filter in standardFilters" :key="filter.handle" placement="bottom-start" :stop-propagation="false">
+            <!-- Pinned non-field filters -->
+            <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle" placement="bottom-start" :stop-propagation="false">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2">
                         {{ filter.title }}
@@ -44,6 +44,42 @@
                             @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
                             @closed="closePopover"
                         />
+                    </div>
+                </template>
+            </popover>
+
+            <!-- Unpinned non-field filters -->
+            <popover v-if="unpinnedFilters.length" placement="bottom-start" :stop-propagation="false">
+                <template slot="trigger">
+                    <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
+                        {{ __('Filter') }}
+                        <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
+                    </button>
+                </template>
+                <template #default="{ close: closePopover }">
+                    <div class="filter-fields w-64">
+                        <h6 v-text="creatingFilterHeader" class="p-3 pb-0" />
+                        <div v-if="showUnpinnedFilterSelection" class="p-3 pt-1">
+                            <button
+                                v-for="filter in unpinnedFilters"
+                                :key="filter.handle"
+                                v-text="filter.title"
+                                class="btn w-full mt-1"
+                                @click="creating = filter.handle"
+                            />
+                        </div>
+                        <div v-else>
+                            <data-list-filter
+                                v-for="filter in unpinnedFilters"
+                                v-if="creating === filter.handle"
+                                :key="filter.handle"
+                                :filter="filter"
+                                :values="activeFilters[filter.handle]"
+                                @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
+                                @cleared="creating = false"
+                                @closed="closePopover"
+                            />
+                        </div>
                     </div>
                 </template>
             </popover>
@@ -120,6 +156,28 @@ export default {
 
         standardFilters() {
             return this.filters.filter(filter => filter.handle !== 'fields');
+        },
+
+        pinnedFilters() {
+            return this.standardFilters.filter(filter => filter.pinned);
+        },
+
+        unpinnedFilters() {
+            return this.standardFilters.filter(filter => ! filter.pinned);
+        },
+
+        creatingFilter() {
+            return _.find(this.unpinnedFilters, filter => filter.handle === this.creating);
+        },
+
+        creatingFilterHeader() {
+            let text = data_get(this.creatingFilter, 'title', 'Filter where');
+
+            return __(text) + ':';
+        },
+
+        showUnpinnedFilterSelection() {
+            return ! this.creating;
         },
 
         fieldFilterBadges() {
