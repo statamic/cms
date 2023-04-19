@@ -440,7 +440,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('date')
             ->getter(function ($date) {
-                if (! optional($this->collection())->dated()) {
+                if (! $this->collection()?->dated()) {
                     return null;
                 }
 
@@ -457,7 +457,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                 return $date;
             })
             ->setter(function ($date) {
-                if (! optional($this->collection())->dated()) {
+                if (! $this->collection()?->dated()) {
                     throw new LogicException('Cannot set date on non-dated collection entry.');
                 }
 
