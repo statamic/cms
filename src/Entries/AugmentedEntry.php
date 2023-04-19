@@ -91,4 +91,11 @@ class AugmentedEntry extends AbstractAugmented
     {
         return optional($this->data->origin())->id();
     }
+
+    public function date()
+    {
+        return $this->data->collection()->dated()
+            ? $this->data->date()
+            : $this->wrapValue($this->getFromData('date'), 'date');
+    }
 }

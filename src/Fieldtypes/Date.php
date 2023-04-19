@@ -350,4 +350,14 @@ class Date extends Fieldtype
     {
         return [new ValidationRule($this)];
     }
+
+    public function timeEnabled()
+    {
+        return $this->config('time_enabled');
+    }
+
+    public function secondsEnabled()
+    {
+        return $this->config('time_seconds_enabled');
+    }
 }
