@@ -4,33 +4,36 @@
         @mouseenter="isHovering = true"
         @mouseleave="isHovering = false"
     >
-        <div class="field-width-label">{{ selected }}%</div>
-
-        <div
-            v-for="width in widths"
-            :key="width"
-            @mouseenter.stop="hoveringOver = width"
-            @click="$emit('input', width)"
-            :class="[
-                'field-width-notch',
-                'notch-' + width,
-                { 'filled': selected >= width, 'selected': selected == width }
-            ]"
-        >
+        <div class="w-full flex">
+            <div
+                v-for="width in widths"
+                :key="width"
+                @mouseenter.stop="hoveringOver = width"
+                @click="$emit('input', width)"
+                :class="[
+                    'field-width-notch',
+                    'notch-' + width,
+                    { 'filled': selected >= width, 'selected': selected == width }
+                ]"
+            />
         </div>
+        <div class="field-width-label">{{ selected }}%</div>
     </div>
 </template>
 
 <script>
 export default {
 
-    props: ['value'],
+    props: [
+        'value',
+        'initialWidths'
+    ],
 
     data() {
         return {
             isHovering: false,
             hoveringOver: null,
-            widths: [25, 33, 50, 66, 75, 100]
+            widths: this.initialWidths ?? [25, 33, 50, 66, 75, 100]
         }
     },
 

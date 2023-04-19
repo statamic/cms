@@ -24,10 +24,10 @@ jobs:
         run: npm ci
 
       - name: Compile assets
-        run: npm run production
+        run: npm run build
 
       - name: Compile frontend assets
-        run: npm run frontend-prod
+        run: npm run frontend-build
 
       - name: Create dist zip
         run: cd resources && tar -czvf dist.tar.gz dist
@@ -50,6 +50,7 @@ jobs:
           tag_name: ${{ steps.changelog.outputs.version }}
           release_name: ${{ steps.changelog.outputs.version }}
           body: ${{ steps.changelog.outputs.text }}
+          prerelease: true
 
       - name: Upload dist zip to release
         uses: actions/upload-release-asset@v1.0.1

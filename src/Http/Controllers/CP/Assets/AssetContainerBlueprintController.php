@@ -28,7 +28,7 @@ class AssetContainerBlueprintController extends CpController
 
     public function update(Request $request, $container)
     {
-        $request->validate(['sections' => 'array']);
+        $request->validate(['tabs' => 'array']);
 
         $this->updateBlueprint($request, $container->blueprint());
     }

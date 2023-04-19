@@ -1,0 +1,74 @@
+/* ==========================================================================
+   REPLICATOR FIELDTYPE
+   ========================================================================== */
+
+.replicator-set-container {
+    @apply outline-none;
+}
+
+.replicator-set {
+    @apply shadow-set rounded bg-white outline-none relative;
+}
+
+.replicator-set-header {
+    @apply bg-gray-300 border-b rounded-t pr-3 flex select-none;
+
+    &.collapsed {
+        @apply rounded border-b-0;
+    }
+
+    .sortable-handle {
+        @apply w-4 border-r rounded-tl p-2;
+        cursor: grab;
+        background: transparent url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
+        background-size: 7px 17px;
+        &:hover { @apply bg-gray-200; }
+    }
+
+    img {
+        @apply inline-block;
+    }
+
+    .replicator-set-controls {
+        @apply flex items-center;
+    }
+
+    &.invalid {
+        .replicator-set-header-inner {
+            @apply bg-red-100;
+            label {
+                @apply text-red-500;
+            }
+        }
+    }
+}
+
+.replicator-set-body {
+    @apply flex flex-wrap;
+}
+
+.replicator-set-picker {
+    @apply py-2;
+}
+
+.replicator-set-picker.between {
+    @apply opacity-0 hover:opacity-100;
+    transform: translateX(-8px);
+    transition: opacity 100ms ease, transform 100ms ease;
+}
+
+.replicator-set-picker.between:hover {
+    transform: translateX(-4px);
+}
+
+.replicator-set.has-error > .replicator-set-header label {
+    @apply text-red-500;
+}
+
+.replicator-set-body > .has-error > label {
+    @apply text-red-500;
+}
+
+.replicator-fullscreen {
+    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none;
+}

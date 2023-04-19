@@ -2,45 +2,47 @@
 
     <div class="blueprint-builder">
 
-        <header class="mb-3">
+        <header class="mb-6">
             <div class="flex items-center justify-between">
                 <h1 v-text="__('Edit Blueprint')" />
                 <button type="submit" class="btn-primary" @click.prevent="save" v-text="__('Save')" />
             </div>
         </header>
 
-        <div class="publish-form card p-0" v-if="showTitle">
-            <div class="form-group">
-                <label class="block">{{ __('Title') }}</label>
-                <small class="help-block">{{ __('messages.blueprints_title_instructions') }}</small>
-                <div v-if="errors.title">
-                    <small class="help-block text-red" v-for="(error, i) in errors.title" :key="i" v-text="error" />
+        <div class="publish-form card p-0 @container mb-8" v-if="showTitle">
+            <div class="publish-fields">
+                <div class="form-group config-field">
+                    <div class="field-inner">
+                        <label class="block">{{ __('Title') }}</label>
+                        <p class="help-block">{{ __('messages.blueprints_title_instructions') }}</p>
+                        <div v-if="errors.title">
+                            <p class="help-block text-red-500" v-for="(error, i) in errors.title" :key="i" v-text="error" />
+                        </div>
+                    </div>
+                    <div>
+                        <input type="text" name="title" class="input-text" v-model="blueprint.title" autofocus="autofocus">
+                    </div>
                 </div>
-                <input type="text" name="title" class="input-text" v-model="blueprint.title" autofocus="autofocus">
-            </div>
 
-            <div class="form-group">
-                <label class="block">{{ __('Hidden') }}</label>
-                <small class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</small>
-                <div v-if="errors.hidden">
-                    <small class="help-block text-red" v-for="(error, i) in errors.hidden" :key="i" v-text="error" />
+                <div class="form-group config-field">
+                    <div class="field-inner">
+                        <label class="block">{{ __('Hidden') }}</label>
+                        <p class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</p>
+                        <div v-if="errors.hidden">
+                            <p class="help-block text-red-500" v-for="(error, i) in errors.hidden" :key="i" v-text="error" />
+                        </div>
+                    </div>
+                    <div>
+                        <toggle-input name="hidden" v-model="blueprint.hidden" />
+                    </div>
                 </div>
-                <toggle-input name="hidden" v-model="blueprint.hidden" />
             </div>
         </div>
 
-        <div class="content mt-5 mb-2" v-if="useSections">
-            <h2>{{ __('Tab Sections') }}</h2>
-            <p class="max-w-lg">{{ __('messages.tab_sections_instructions') }}</p>
-            <div v-if="errors.sections">
-                <small class="help-block text-red" v-for="(error, i) in errors.sections" :key="i" v-text="error" />
-            </div>
-        </div>
-
-        <sections
-            :single-section="!useSections"
-            :initial-sections="blueprint.sections"
-            @updated="sectionsUpdated"
+        <tabs
+            :single-tab="!useTabs"
+            :initial-tabs="blueprint.tabs"
+            @updated="tabsUpdated"
         />
 
     </div>
@@ -48,26 +50,26 @@
 </template>
 
 <script>
-import Sections from './Sections.vue';
+import Tabs from './Tabs.vue';
 
 export default {
 
     components: {
-        Sections,
+        Tabs,
     },
 
     props: {
         action: String,
         initialBlueprint: Object,
         showTitle: Boolean,
-        useSections: { type: Boolean, default: true },
+        useTabs: { type: Boolean, default: true },
         isFormBlueprint: { type: Boolean, default: false },
     },
 
     data() {
         return {
             blueprint: this.initializeBlueprint(),
-            sections: [],
+            tabs: [],
             errors: {}
         }
     },
@@ -85,8 +87,8 @@ export default {
 
     watch: {
 
-        sections(sections) {
-            this.blueprint.sections = sections;
+        tabs(tabs) {
+            this.blueprint.tabs = tabs;
         },
 
         blueprint: {
@@ -108,8 +110,8 @@ export default {
             return blueprint;
         },
 
-        sectionsUpdated(sections) {
-            this.sections = sections;
+        tabsUpdated(tabs) {
+            this.tabs = tabs;
         },
 
         save() {

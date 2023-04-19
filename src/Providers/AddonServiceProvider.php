@@ -129,6 +129,11 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $routes = [];
 
     /**
+     * @var string|null
+     */
+    protected $routeNamespace;
+
+    /**
      * Map of group name => Middlewares to apply.
      *
      * @var array<string, class-string[]>
@@ -421,6 +426,11 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
+    protected function routeNamespace()
+    {
+        return $this->routeNamespace;
+    }
+
     /**
      * Register routes from the root of the site.
      *
@@ -430,7 +440,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerWebRoutes($routes)
     {
         Statamic::pushWebRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')->group($routes);
+            Route::namespace($this->routeNamespace())->group($routes);
         });
     }
 
@@ -443,7 +453,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerCpRoutes($routes)
     {
         Statamic::pushCpRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')->group($routes);
+            Route::namespace($this->routeNamespace())->group($routes);
         });
     }
 
@@ -456,43 +466,10 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerActionRoutes($routes)
     {
         Statamic::pushActionRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')
+            Route::namespace($this->routeNamespace())
                 ->prefix($this->getAddon()->slug())
                 ->group($routes);
         });
-    }
-
-    /**
-     * Register a route group.
-     *
-     * @param  string|Closure  $routes  Either the path to a routes file, or a closure containing routes.
-     * @param  array  $attributes  Additional attributes to be applied to the route group.
-     * @return void
-     */
-    protected function registerRouteGroup($routes, array $attributes = [])
-    {
-        if (is_string($routes)) {
-            $routes = function () use ($routes) {
-                require $routes;
-            };
-        }
-
-        Statamic::routes(function () use ($attributes, $routes) {
-            Route::group($this->routeGroupAttributes($attributes), $routes);
-        });
-    }
-
-    /**
-     * The attributes to be applied to the route group.
-     *
-     * @param  array  $overrides  Any additional attributes.
-     * @return array
-     */
-    protected function routeGroupAttributes($overrides = [])
-    {
-        return array_merge($overrides, [
-            'namespace' => $this->getAddon()->namespace(),
-        ]);
     }
 
     protected function bootMiddleware()
@@ -537,7 +514,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             $path => public_path("vendor/{$name}/js/{$filename}.js"),
         ], $this->getAddon()->slug());
 
-        Statamic::script($name, "{$filename}.js?v={$version}");
+        Statamic::script($name, "{$filename}.js?v=".md5($version));
     }
 
     public function registerVite($config)
@@ -582,7 +559,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             $path => public_path("vendor/{$name}/css/{$filename}.css"),
         ], $this->getAddon()->slug());
 
-        Statamic::style($name, "{$filename}.css?v={$version}");
+        Statamic::style($name, "{$filename}.css?v=".md5($version));
     }
 
     public function registerExternalStylesheet(string $url)

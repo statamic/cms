@@ -2,32 +2,32 @@
 
     <div>
 
-        <header class="mb-3">
+        <header class="mb-6">
             <breadcrumb v-if="indexUrl" :url="indexUrl" :title="__('CP Nav Preferences')" />
 
             <div class="flex items-center">
                 <h1 class="flex-1">{{ title }}</h1>
 
-                <dropdown-list class="mr-1">
+                <dropdown-list class="mr-2">
                     <dropdown-item :text="__('Reset Nav Customizations')" class="warning" @click="confirmingReset = true"></dropdown-item>
                 </dropdown-list>
 
-                <a @click="discardChanges" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
+                <a @click="discardChanges" class="text-2xs text-blue mr-4 underline" v-if="isDirty" v-text="__('Discard changes')" />
 
                 <dropdown-list>
                     <template #trigger>
-                        <button class="btn flex items-center pr-2">
+                        <button class="btn flex items-center pr-4">
                             {{ __('Add Item') }}
-                            <svg-icon name="chevron-down-xs" class="w-2 ml-2" />
+                            <svg-icon name="micro/chevron-down-xs" class="w-2 ml-4" />
                         </button>
                     </template>
                     <dropdown-item :text="__('Add Nav Item')" @click="addItem(topLevelTreeData)" />
                     <dropdown-item :text="__('Add Section')" @click="addSection" />
                 </dropdown-list>
 
-                <div class="ml-2 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
+                <div class="ml-4 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
-                        class="btn-primary pl-2"
+                        class="btn-primary pl-4"
                         :class="{ 'disabled': !changed }"
                         :disabled="!changed"
                         @click="save"
@@ -36,13 +36,13 @@
                     <dropdown-list v-if="hasSaveAsOptions" class="ml-0">
                         <template #trigger>
                             <button class="btn-primary rounded-l-none flex items-center">
-                                <svg-icon name="chevron-down-xs" class="w-2" />
+                                <svg-icon name="micro/chevron-down-xs" class="w-2" />
                             </button>
                         </template>
-                        <h6 class="p-1">{{ __('Save to') }}...</h6>
+                        <h6 class="p-2">{{ __('Save to') }}...</h6>
                         <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)" class="group">
-                            <div class="flex items-start pr-2">
-                                <svg-icon :name="option.icon" class="text-grey flex-shrink-0 mr-1 w-4 group-hover:text-white" />
+                            <div class="flex items-start pr-4">
+                                <svg-icon :name="option.icon" class="text-gray shrink-0 mr-2 w-4 group-hover:text-white" />
                                 <span class="whitespace-normal">{{ option.label }}</span>
                             </div>
                         </dropdown-item>
@@ -51,14 +51,14 @@
             </div>
         </header>
 
-        <div class="mb-1 flex justify-end">
+        <div class="mb-2 flex justify-end">
             <a
-                class="text-2xs text-blue mr-2 underline"
+                class="text-2xs text-blue mr-4 underline"
                 v-text="__('Expand All')"
                 @click="expandAll"
             />
             <a
-                class="text-2xs text-blue mr-1 underline"
+                class="text-2xs text-blue mr-2 underline"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />
@@ -68,7 +68,7 @@
             <draggable-tree
                 draggable
                 cross-tree
-                class="mb-4"
+                class="mb-8"
                 :class="{ 'section-placeholder-inner': showTopLevelSectionPlaceholder }"
                 ref="topLevelTree"
                 :data="topLevelTreeData"

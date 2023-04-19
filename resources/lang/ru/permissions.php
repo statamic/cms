@@ -76,7 +76,6 @@ return [
 
     'group_updates' => 'Обновления',
     'view_updates' => 'Просмотр обновлений',
-    'perform_updates' => 'Выполнение обновлений',
 
     'group_utilities' => 'Утилиты',
     'access_utility' => ':title',

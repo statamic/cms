@@ -2,11 +2,11 @@
 
     <div class="flex">
         <div class="page-move w-6" />
-        <div class="flex items-center flex-1 p-1 ml-1 text-xs leading-normal">
+        <div class="flex items-center flex-1 p-2 ml-2 text-xs leading-normal">
             <div class="flex items-center flex-1" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
                 <template v-if="! isSection">
-                    <i v-if="isAlreadySvg" class="w-4 h-4 mr-1" v-html="icon"></i>
-                    <svg-icon v-else class="w-4 h-4 mr-1" :name="icon" />
+                    <i v-if="isAlreadySvg" class="w-4 h-4 mr-2" v-html="icon"></i>
+                    <svg-icon v-else class="w-4 h-4 mr-2" :name="icon" />
                 </template>
 
                 <a
@@ -16,35 +16,35 @@
 
                 <button
                     v-if="hasChildren && !isSection"
-                    class="p-1 text-grey-60 hover:text-grey-70 transition duration-100 outline-none flex"
+                    class="p-2 text-gray-600 hover:text-gray-700 transition duration-100 outline-none flex"
                     :class="{ '-rotate-90': !isOpen }"
                     @click="$emit('toggle-open')"
                 >
-                    <svg-icon name="chevron-down-xs" class="h-2.5" />
+                    <svg-icon name="micro/chevron-down-xs" class="h-1.5" />
                 </button>
 
-                <div v-if="item.collection" class="ml-2 flex items-center">
-                    <svg-icon name="content-writing" class="w-4 h-4" />
-                    <div class="ml-sm">
+                <div v-if="item.collection" class="ml-4 flex items-center">
+                    <svg-icon name="light/content-writing" class="w-4 h-4" />
+                    <div class="ml-1">
                         <a :href="item.collection.create_url" v-text="__('Add')" />
-                        <span class="text-grey">/</span>
+                        <span class="text-gray">/</span>
                         <a :href="item.collection.edit_url" v-text="__('Edit')" />
                     </div>
                 </div>
             </div>
 
-            <div class="pr-1 flex items-center">
+            <div class="pr-2 flex items-center">
                 <slot name="branch-icon" :branch="item" />
 
-                <svg-icon v-if="isRenamedSection" class="inline-block w-4 h-4 text-grey-50" name="content-writing" v-tooltip="__('Renamed Section')" />
-                <svg-icon v-else-if="isHidden" class="inline-block w-4 h-4 text-grey-50" name="hidden" v-tooltip="isSection ? __('Hidden Section') : __('Hidden Item')" />
-                <svg-icon v-else-if="isPinnedAlias" class="inline-block w-4 h-4 text-grey-50" name="pin" v-tooltip="__('Pinned Item')" />
-                <svg-icon v-else-if="isAlias" class="inline-block w-4 h-4 text-grey-50" name="duplicate-ids" v-tooltip="__('Alias Item')" />
-                <svg-icon v-else-if="isMoved" class="inline-block w-4 text-grey-50" name="flip-vertical" v-tooltip="__('Moved Item')" />
-                <svg-icon v-else-if="isModified" class="inline-block w-4 h-4 text-grey-50" name="content-writing" v-tooltip="__('Modified Item')" />
-                <svg-icon v-else-if="isCustom" class="inline-block w-4 text-grey-50" name="user-edit" v-tooltip="isSection ? __('Custom Section') : __('Custom Item')" />
+                <svg-icon v-if="isRenamedSection" class="inline-block w-4 h-4 text-gray-500" name="content-writing" v-tooltip="__('Renamed Section')" />
+                <svg-icon v-else-if="isHidden" class="inline-block w-4 h-4 text-gray-500" name="hidden" v-tooltip="isSection ? __('Hidden Section') : __('Hidden Item')" />
+                <svg-icon v-else-if="isPinnedAlias" class="inline-block w-4 h-4 text-gray-500" name="pin" v-tooltip="__('Pinned Item')" />
+                <svg-icon v-else-if="isAlias" class="inline-block w-4 h-4 text-gray-500" name="duplicate-ids" v-tooltip="__('Alias Item')" />
+                <svg-icon v-else-if="isMoved" class="inline-block w-4 text-gray-500" name="flip-vertical" v-tooltip="__('Moved Item')" />
+                <svg-icon v-else-if="isModified" class="inline-block w-4 h-4 text-gray-500" name="content-writing" v-tooltip="__('Modified Item')" />
+                <svg-icon v-else-if="isCustom" class="inline-block w-4 text-gray-500" name="user-edit" v-tooltip="isSection ? __('Custom Section') : __('Custom Item')" />
 
-                <dropdown-list class="ml-2">
+                <dropdown-list class="ml-4">
                     <slot name="branch-options"
                         :item="item"
                         :depth="depth"

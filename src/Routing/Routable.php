@@ -96,17 +96,4 @@ trait Routable
             return (new \Statamic\Routing\ResolveRedirect)($redirect, $this);
         }
     }
-
-    public function ampUrl()
-    {
-        if ($this->isRedirect()) {
-            return null;
-        }
-
-        return ! $this->ampable() ? null : vsprintf('%s/%s/%s', [
-            rtrim($this->site()->absoluteUrl(), '/'),
-            config('statamic.amp.route'),
-            ltrim($this->uri(), '/'),
-        ]);
-    }
 }

@@ -500,11 +500,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return false;
     }
 
-    public function ampable()
-    {
-        return $this->collection()->ampable();
-    }
-
     protected function revisionKey()
     {
         return vsprintf('collections/%s/%s/%s', [
@@ -685,7 +680,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             return null;
         }
 
-        return $this->structure()->in($this->locale())->page($id);
+        return $this->structure()->in($this->locale())->find($id);
     }
 
     public function route()

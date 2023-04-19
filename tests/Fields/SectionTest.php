@@ -11,51 +11,33 @@ use Tests\TestCase;
 class SectionTest extends TestCase
 {
     /** @test */
-    public function it_gets_the_handle()
+    public function it_gets_the_display()
     {
-        $section = new Section('test');
+        $this->assertNull((new Section([]))->display());
 
-        $this->assertEquals('test', $section->handle());
+        $this->assertEquals('Test', (new Section(['display' => 'Test']))->display());
+    }
+
+    /** @test */
+    public function it_gets_the_instructions()
+    {
+        $this->assertNull((new Section([]))->instructions());
+
+        $this->assertEquals('Test', (new Section(['instructions' => 'Test']))->instructions());
     }
 
     /** @test */
     public function it_gets_contents()
     {
-        $section = new Section('test');
-        $this->assertEquals([], $section->contents());
+        $section = new Section($contents = ['foo' => 'bar']);
 
-        $contents = [
-            'fields' => ['one' => ['type' => 'text']],
-        ];
-
-        $return = $section->setContents($contents);
-
-        $this->assertEquals($section, $return);
         $this->assertEquals($contents, $section->contents());
-    }
-
-    /** @test */
-    public function it_gets_the_display_text()
-    {
-        $section = (new Section('test'))->setContents([
-            'display' => 'The Display Text',
-        ]);
-
-        $this->assertEquals('The Display Text', $section->display());
-    }
-
-    /** @test */
-    public function the_display_text_falls_back_to_a_humanized_handle()
-    {
-        $section = new Section('the_section_handle');
-
-        $this->assertEquals('The section handle', $section->display());
     }
 
     /** @test */
     public function it_gets_fields()
     {
-        $section = new Section('test');
+        $section = new Section([]);
         tap($section->fields(), function ($fields) {
             $this->assertInstanceOf(Fields::class, $fields);
             $this->assertCount(0, $fields->all());
@@ -68,7 +50,7 @@ class SectionTest extends TestCase
             ->with('fieldset_one.field_two')
             ->andReturn(new Field('field_one', ['type' => 'textarea']));
 
-        $section->setContents($contents = [
+        $section = new Section([
             'fields' => [
                 [
                     'handle' => 'one',
@@ -112,7 +94,7 @@ class SectionTest extends TestCase
                 'validate' => 'min:2',
             ]));
 
-        $section = (new Section('test'))->setContents([
+        $section = new Section([
             'display' => 'Test Section',
             'instructions' => 'Does stuff',
             'fields' => [
@@ -129,7 +111,6 @@ class SectionTest extends TestCase
 
         $this->assertEquals([
             'display' => 'Test Section',
-            'handle' => 'test',
             'instructions' => 'Does stuff',
             'fields' => [
                 [

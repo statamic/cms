@@ -1,4 +1,3 @@
-import Luminous from 'luminous-lightbox';
 import AssetEditor from '../../assets/Editor/Editor.vue';
 
 export default {
@@ -77,17 +76,6 @@ export default {
             window.open(this.asset.downloadUrl);
         },
 
-        makeZoomable() {
-            const el = $(this.$el).find('a.zoom')[0];
-
-            if (! el || ! this.isImage) return;
-
-            new Luminous(el, {
-                closeOnScroll: true,
-                captionAttribute: 'title'
-            });
-        },
-
         closeEditor() {
             this.editing = false;
         },
@@ -106,11 +94,6 @@ export default {
             this.closeEditor();
         },
 
-    },
-
-
-    mounted() {
-        this.makeZoomable();
     }
 
 }

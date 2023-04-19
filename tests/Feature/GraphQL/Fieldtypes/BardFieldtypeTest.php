@@ -23,13 +23,17 @@ class BardFieldtypeTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /** @test */
-    public function it_outputs_bard_fields()
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_outputs_bard_fields($isGrouped)
     {
         $article = Blueprint::makeFromFields([
             'things' => [
                 'type' => 'bard',
-                'sets' => [
+                'sets' => $this->groupSets($isGrouped, [
                     'meal' => [
                         'fields' => [
                             ['handle' => 'food', 'field' => ['type' => 'text']],
@@ -42,7 +46,7 @@ class BardFieldtypeTest extends TestCase
                             ['handle' => 'model', 'field' => ['type' => 'text']],
                         ],
                     ],
-                ],
+                ]),
             ],
         ]);
 
@@ -347,5 +351,24 @@ GQL;
                     ],
                 ],
             ]]);
+    }
+
+    public function groupedSetsProvider()
+    {
+        return [
+            'grouped sets (new)' => [true],
+            'ungrouped sets (old)' => [false],
+        ];
+    }
+
+    private function groupSets($shouldGroup, $sets)
+    {
+        if (! $shouldGroup) {
+            return $sets;
+        }
+
+        return [
+            'group_one' => ['sets' => $sets],
+        ];
     }
 }

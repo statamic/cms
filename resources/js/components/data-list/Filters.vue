@@ -1,34 +1,23 @@
 <template>
-    <div class="w-full">
-        <div class="input-group focus-within-only">
+    <div class="w-full" v-if="isFiltering || isSearching">
+        <div class="flex flex-wrap px-3 border-b pt-2">
 
-            <popover v-if="filters.length">
+            <!-- Field filter (requires custom selection UI) -->
+            <popover v-if="fieldFilter" placement="bottom-start" :stop-propagation="false" @closed="fieldFilterClosed">
                 <template slot="trigger">
-                    <button class="input-group-prepend cursor-pointer px-2" @click="resetFilterPopover">
-                        {{ __('Filter') }}
-                        <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
+                    <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
+                        {{ __('Field') }}
+                        <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
                     </button>
                 </template>
-                <template #default="{ close: closePopover, afterClosed: afterPopoverClosed }">
+                <template #default="{ close: closePopover }">
                     <div class="flex flex-col text-left w-64">
-                        <h6 class="p-2 pb-0" v-text="__('Show everything where:')"/>
-                        <div v-if="showFilterSelection" class="p-2 pt-1">
-                            <button
-                                v-for="filter in unpinnedFilters"
-                                :key="filter.handle"
-                                v-text="filter.title"
-                                class="btn w-full mt-1"
-                                @click="creating = filter.handle"
-                            />
-                        </div>
                         <div class="filter-fields text-sm">
                             <field-filter
-                                v-show="showFieldFilter"
                                 ref="fieldFilter"
                                 :config="fieldFilter"
                                 :values="activeFilters.fields || {}"
                                 :badges="fieldFilterBadges"
-                                :popover-closed="afterPopoverClosed"
                                 @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
                                 @cleared="creating = false"
                                 @closed="closePopover"
@@ -48,43 +37,16 @@
                 </template>
             </popover>
 
-            <data-list-search ref="search" :value="searchQuery" @input="$emit('search-changed', $event)" />
-
-            <template v-if="isFiltering">
-                <popover v-if="canSave" placement="bottom-end" ref="savePopover">
-                    <template slot="trigger">
-                        <button class="input-group-item px-1.5">{{ __('Save') }}</button>
-                    </template>
-                    <div class="p-2 w-96">
-                        <h6 v-text="__('Filter preset name')" class="mb-1" />
-                        <div class="flex items-center">
-                            <input class="input-text border-r rounded-r" type="text" v-model="savingPresetName" @keydown.enter="save" ref="savedFilterName">
-                            <button class="btn-primary ml-1" @click="save" :disabled="saving || ! savingPresetName">Save</button>
-                        </div>
-                    </div>
-                </popover>
-                <button v-if="isDirty" class="input-group-item px-1.5" @click="reset">{{ __('Reset') }}</button>
-                <button v-if="activePreset" class="flex items-center input-group-item px-1.5" @click="deleting = true"><svg-icon name="trash" class="w-4 h-4" /></button>
-                <confirmation-modal
-                    v-if="deleting"
-                    :title="__('Delete Preset')"
-                    :bodyText="__('Are you sure you want to delete this preset?')"
-                    :buttonText="__('Delete')"
-                    :danger="true"
-                    @confirm="remove"
-                    @cancel="deleting = false"
-                />
-            </template>
-
-            <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle" placement="bottom-end">
+            <!-- Standard non-field filters -->
+            <popover v-if="standardFilters.length" v-for="filter in standardFilters" :key="filter.handle" placement="bottom-start" :stop-propagation="false">
                 <template slot="trigger">
-                    <button class="input-group-item px-1.5">
+                    <button class="filter-badge filter-badge-control mr-2 mb-2">
                         {{ filter.title }}
-                        <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
+                        <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
                     </button>
                 </template>
                 <template #default="{ close: closePopover }">
-                    <div class="filter-fields">
+                    <div class="filter-fields w-64">
                         <data-list-filter
                             :key="filter.handle"
                             :filter="filter"
@@ -96,17 +58,16 @@
                 </template>
             </popover>
 
-        </div>
+            <!-- Active filter badges -->
+            <div class="filter-badge mr-2 mb-2" v-for="(badge, handle) in fieldFilterBadges">
+                <span>{{ badge }}</span>
+                <button @click="removeFieldFilter(handle)" v-tooltip="__('Remove Filter')">&times;</button>
+            </div>
+            <div class="filter-badge mr-2 mb-2" v-for="(badge, handle) in standardBadges">
+                <span>{{ badge }}</span>
+                <button @click="removeStandardFilter(handle)" v-tooltip="__('Remove Filter')">&times;</button>
+            </div>
 
-        <div class="flex flex-wrap mt-1" v-if="activeCount">
-            <div class="filter-badge mr-1" v-for="(badge, handle) in fieldFilterBadges">
-                <span>{{ badge }}</span>
-                <button @click="removeFieldFilter(handle)">&times;</button>
-            </div>
-            <div class="filter-badge mr-1" v-for="(badge, handle) in standardBadges">
-                <span>{{ badge }}</span>
-                <button @click="removeStandardFilter(handle)">&times;</button>
-            </div>
         </div>
     </div>
 
@@ -136,6 +97,7 @@ export default {
         searchQuery: String,
         savesPresets: Boolean,
         preferencesPrefix: String,
+        isSearching: Boolean,
     },
 
     data() {
@@ -168,26 +130,6 @@ export default {
 
         standardFilters() {
             return this.filters.filter(filter => filter.handle !== 'fields');
-        },
-
-        pinnedFilters() {
-            return this.filters.filter(filter => filter.pinned);
-        },
-
-        unpinnedFilters() {
-            return this.filters.filter(filter => ! filter.pinned);
-        },
-
-        showFilterSelection() {
-            if (this.fieldFilter && this.unpinnedFilters.length === 1) return false;
-
-            return ! this.creating;
-        },
-
-        showFieldFilter() {
-            if (this.fieldFilter && this.unpinnedFilters.length === 1) return true;
-
-            return this.creating === 'fields';
         },
 
         fieldFilterBadges() {
@@ -253,7 +195,11 @@ export default {
         resetFilterPopover() {
             this.creating = false;
 
-            this.$refs.fieldFilter.resetInitialValues();
+            setTimeout(() => this.$refs.fieldFilter?.resetInitialValues(), 100); // wait for popover to appear
+        },
+
+        fieldFilterClosed() {
+            this.$refs.fieldFilter.popoverClosed();
         },
 
         removeFieldFilter(handle) {

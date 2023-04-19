@@ -1,7 +1,7 @@
 <template>
 
-    <div class="h-full bg-grey-10 overflow-auto">
-        <div class="bg-grey-30 px-3 py-1 border-b text-lg font-medium flex items-center justify-between">
+    <div class="h-full bg-gray-100 overflow-auto">
+        <div class="bg-gray-300 px-6 py-2 border-b text-lg font-medium flex items-center justify-between">
             {{ __('Fieldtypes') }}
             <button type="button" class="btn-close" @click="close">×</button>
         </div>
@@ -10,23 +10,23 @@
             <loading-graphic />
         </div>
 
-        <div class="py-2 px-3 border-b bg-white flex items-center" v-if="fieldtypesLoaded">
+        <div class="py-4 px-6 border-b bg-white flex items-center" v-if="fieldtypesLoaded">
             <input type="text" class="input-text flex-1 bg-white text-sm w-full" autofocus v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
         </div>
 
-        <div class="p-2" v-if="fieldtypesLoaded">
-            <div v-for="group in displayedFieldtypes" :key="group.handle" v-show="group.fieldtypes.length > 0" class="mb-4">
-                <h2 v-if="group.title" v-text="group.title" class="px-1 mb-sm" />
-                <p v-if="group.description" v-text="group.description" class="px-1 mb-1 text-grey-70 text-sm"/>
+        <div class="p-4" v-if="fieldtypesLoaded">
+            <div v-for="group in displayedFieldtypes" :key="group.handle" v-show="group.fieldtypes.length > 0" class="mb-8">
+                <h2 v-if="group.title" v-text="group.title" class="px-2 mb-1" />
+                <p v-if="group.description" v-text="group.description" class="px-2 mb-2 text-gray-700 text-sm"/>
                 <div class="fieldtype-selector">
                     <div class="fieldtype-list">
-                        <div class="p-1" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
-                            <button class="bg-white border border-grey-50 flex items-center group w-full rounded hover:border-grey-60 shadow-sm hover:shadow-md pr-1.5"
+                        <div class="p-2" v-for="fieldtype in group.fieldtypes" :key="fieldtype.handle">
+                            <button class="bg-white border border-gray-500 flex items-center group w-full rounded hover:border-gray-600 shadow-sm hover:shadow-md pr-3"
                                 @click="select(fieldtype)">
-                                <div class="p-1 flex items-center border-r border-grey-50 group-hover:border-grey-60 bg-grey-20 rounded-l">
-                                    <svg-icon class="h-5 w-5 text-grey-80" :name="fieldtype.icon" default="generic-field"></svg-icon>
+                                <div class="p-2 flex items-center border-r border-gray-500 group-hover:border-gray-600 bg-gray-200 rounded-l">
+                                    <svg-icon class="h-5 w-5 text-gray-800" :name="`light/${fieldtype.icon}`" default="light/generic-field"></svg-icon>
                                 </div>
-                                <span class="pl-1.5 text-grey-80 text-md group-hover:text-grey-90">{{ fieldtype.text }}</span>
+                                <span class="pl-3 text-gray-800 text-md group-hover:text-gray-900">{{ fieldtype.text }}</span>
                             </button>
                         </div>
                     </div>
@@ -209,8 +209,9 @@ export default {
             // and id keys. This will be 'field_n' etc, where n would be the total root
             // level, grid, or set fields depending on the event listener location.
             let field = {
-                display: `${fieldtype.title} ${__('Field')}`,
                 type: fieldtype.handle,
+                display: `${fieldtype.title} ${__('Field')}`,
+                handle: null, // The handle will be generated from the display by the "slug" fieldtype.
                 icon: fieldtype.icon,
                 instructions: null,
                 localizable: false,

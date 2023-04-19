@@ -3,7 +3,7 @@
     <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')">
         <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
-            <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+            <div class="bg-gray-200 px-6 py-2 border-b border-gray-300 text-lg font-medium flex items-center justify-between">
                 {{ headerText }}
                 <button
                     type="button"
@@ -28,6 +28,7 @@
                     :meta="meta"
                     :errors="errors"
                     :localized-fields="localizedFields"
+                    class="px-2"
                     @updated="values = $event"
                 >
                     <div slot-scope="{ container, setFieldMeta }">
@@ -49,12 +50,12 @@
                     </div>
                 </publish-container>
 
-                <div class="p-3">
+                <div class="p-6">
                     <button @click="submit" class="btn-primary w-full">{{ __('Submit') }}</button>
 
-                    <div class="text-xs mt-2" v-if="type === 'entry'">
-                        <a :href="editEntryUrl" target="_blank" class="flex items-center justify-center text-blue hover:text-blue-dark underline">
-                            <svg-icon name="external-link" class="w-4 h-4 mr-1" />
+                    <div class="text-xs mt-4" v-if="type === 'entry'">
+                        <a :href="editEntryUrl" target="_blank" class="flex items-center justify-center text-blue hover:text-blue underline">
+                            <svg-icon name="light/external-link" class="w-4 h-4 mr-2" />
                             {{ __('Edit Entry') }}
                         </a>
                     </div>
@@ -112,9 +113,9 @@ export default {
                 return ! isMissingField(fields, handle);
             }
 
-            // This UI only supports the first section
+            // This UI only supports the first tab
             const blueprint = clone(this.blueprint);
-            const fields = blueprint.sections[0].fields;
+            const fields = blueprint.tabs[0].sections[0].fields;
 
             if (this.type == 'url' && isMissingField(fields, 'url')) {
                 fields.unshift({
@@ -139,12 +140,12 @@ export default {
                 });
             }
 
-            return { ...blueprint, sections: [{ fields }] };
+            return { ...blueprint, tabs: [{ fields }] };
         },
 
         fields() {
-            return _.chain(this.adjustedBlueprint.sections)
-                .map(section => section.fields)
+            return _.chain(this.adjustedBlueprint.tabs)
+                .map(tab => tab.fields)
                 .flatten(true)
                 .value();
         }
