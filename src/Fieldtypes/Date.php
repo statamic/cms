@@ -193,7 +193,7 @@ class Date extends Fieldtype
 
     public function process($data)
     {
-        if (is_null($data['date'])) {
+        if (is_null($data) || is_null($data['date'])) {
             return null;
         }
 

@@ -126,9 +126,10 @@ class UserController extends Controller
             return $this->userProfileFailure($validator->errors());
         }
 
-        $values = $fields->process()->values()
+        $values = $fields
             ->only(array_keys($values))
-            ->except(['email', 'password', 'groups', 'roles', 'super']);
+            ->except(['email', 'password', 'groups', 'roles', 'super'])
+            ->process()->values();
 
         if ($request->email) {
             $user->email($request->email);
