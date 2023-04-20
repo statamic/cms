@@ -87,10 +87,6 @@ export default {
             this.customColor = value;
         },
 
-        color(color) {
-            this.updateDebounced(color);
-        }
-
     },
 
     computed: {
