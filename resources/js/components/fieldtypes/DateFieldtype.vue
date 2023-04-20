@@ -13,27 +13,8 @@
             class="date-time-container flex flow-col @sm:flex-row"
             :class="config.time_seconds_enabled ? 'space-x-1' : 'space-x-3'"
         >
-
-            <SinglePopover
-                v-if="isSingle && usesPopover"
-                v-bind="pickerProps"
-                @input="setDate"
-            />
-
-            <SingleInline
-                v-if="isSingle && isInline"
-                v-bind="pickerProps"
-                @input="setDate"
-            />
-
-            <RangePopover
-                v-if="isRange && usesPopover"
-                v-bind="pickerProps"
-                @input="setDate"
-            />
-
-            <RangeInline
-                v-if="isRange && isInline"
+            <component
+                :is="pickerComponent"
                 v-bind="pickerProps"
                 @input="setDate"
             />
@@ -83,6 +64,14 @@ export default {
     },
 
     computed: {
+
+        pickerComponent() {
+            if (this.isRange) {
+                return this.usesPopover ? 'RangePopover' : 'RangeInline';
+            }
+
+            return this.usesPopover ? 'SinglePopover' : 'SingleInline';
+        },
 
         hasDate() {
             return this.config.required || this.value.date;
