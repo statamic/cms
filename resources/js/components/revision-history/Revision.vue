@@ -16,7 +16,7 @@
                 <div class="flex-1">
                     <div class="revision-author text-grey-70 text-2xs">
                         <template v-if="revision.user">{{ revision.user.name || revision.user.email }} &ndash;</template>
-                        {{ date.fromNow() }}
+                        {{ date.isBefore($moment().startOf('day')) ? date.format('LT') : date.fromNow() }}
                     </div>
                 </div>
 

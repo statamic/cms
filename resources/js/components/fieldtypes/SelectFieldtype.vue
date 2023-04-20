@@ -29,13 +29,22 @@
                         v-bind="attributes"
                     >
                 </template>
+                <template #option="{ label }">
+                    <div v-if="config.label_html" v-html="label"></div>
+                    <template v-else v-text="label"></template>
+                </template>
+                <template #selected-option="{ label }">
+                    <div v-if="config.label_html" v-html="label"></div>
+                    <template v-else v-text="label"></template>
+                </template>
                 <template #no-options>
                     <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
                 </template>
                 <template #footer="{ deselect }" v-if="config.multiple">
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-1">
-                            {{ option.label }}
+                            <div v-if="config.label_html" v-html="option.label"></div>
+                            <template v-else>{{ option.label }}</template>
                             <button v-if="!readOnly" @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
                                 <span>×</span>
                             </button>

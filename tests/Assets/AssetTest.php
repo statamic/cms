@@ -5,6 +5,7 @@ namespace Tests\Assets;
 use BadMethodCallException;
 use Carbon\Carbon;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Statamic\Imaging\ImageValidator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
@@ -14,6 +15,7 @@ use Mockery;
 use ReflectionClass;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
+use Statamic\Assets\PendingMeta;
 use Statamic\Assets\ReplacementFile;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReplaced;
@@ -36,6 +38,8 @@ use Tests\TestCase;
 class AssetTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    private $container;
 
     public function setUp(): void
     {
@@ -293,6 +297,7 @@ class AssetTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider reAddRemovedData
      **/
     public function it_doesnt_try_to_re_remove_newly_added_data_from_meta($reAddRemovedData)
@@ -379,6 +384,7 @@ class AssetTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider queryBuilderProvider
      **/
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
@@ -758,7 +764,6 @@ class AssetTest extends TestCase
 
         // Saving should clear the cache and persist the new meta data to the filesystem...
         $asset->save();
-        $this->assertNull(Cache::get($asset->metaCacheKey()));
         $this->assertEquals($metaWithData, YAML::parse(Storage::disk('test')->get('foo/.meta/image.jpg.yaml')));
 
         // Then if we ask for new meta, it should cache with the newly saved data...
@@ -921,26 +926,6 @@ class AssetTest extends TestCase
             'path/to/another-asset.txt',
         ], $container->contents()->cached()->keys()->all());
         Event::assertDispatched(AssetDeleted::class);
-    }
-
-    /** @test */
-    public function it_clears_asset_glide_cache_when_deleting()
-    {
-        Storage::fake('local');
-        $disk = Storage::disk('local');
-        $disk->put('path/to/asset.txt', '');
-        $container = Facades\AssetContainer::make('test')->disk('local');
-        Facades\AssetContainer::shouldReceive('save')->with($container);
-        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
-        $asset = (new Asset)->container($container)->path('path/to/asset.txt');
-
-        // Just assert that `Glide::clearAsset()` is called on delete,
-        // since `Imaging\GlideTest.php` covers the actual functionality.
-        Facades\Glide::shouldReceive('clearAsset')->withArgs(function ($arg) use ($asset) {
-            return $arg->id() === $asset->id();
-        })->once();
-
-        $asset->delete();
     }
 
     /** @test */
@@ -1453,6 +1438,21 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_title()
+    {
+        $asset = (new Asset)
+            ->path('path/to/asset.jpg')
+            ->container($this->container);
+
+        $this->assertEquals('asset.jpg', $asset->title());
+        $this->assertEquals('asset.jpg', $asset->title);
+
+        $asset->set('title', 'custom title');
+        $this->assertEquals('custom title', $asset->title());
+        $this->assertEquals('custom title', $asset->title);
+    }
+
+    /** @test */
     public function it_compiles_augmented_array_data()
     {
         Facades\Blueprint::shouldReceive('find')
@@ -1462,7 +1462,6 @@ class AssetTest extends TestCase
         $asset = (new Asset)
             ->path('path/to/asset.jpg')
             ->container($this->container)
-            ->set('title', 'test')
             ->setSupplement('foo', 'bar');
 
         $array = $asset->toAugmentedArray();
@@ -1583,6 +1582,9 @@ class AssetTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
+        // This should only get called when glide processing source image on upload...
+        ImageValidator::shouldReceive('isValidImage')->never();
+
         $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
 
         $this->assertEquals($asset, $return);
@@ -1612,6 +1614,152 @@ class AssetTest extends TestCase
             return $event->asset = $asset;
         });
         Event::assertDispatched(AssetSaved::class);
+    }
+
+    /** @test */
+    public function it_can_upload_an_image_into_a_container_with_glide_config()
+    {
+        Event::fake();
+
+        config(['statamic.assets.image_manipulation.presets.small' => [
+            'w' => '15',
+            'h' => '15',
+        ]]);
+
+        $this->container->sourcePreset('small');
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        ImageValidator::shouldReceive('isValidImage')
+            ->with('jpg', 'image/jpeg')
+            ->andReturnTrue()
+            ->once();
+
+        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 20, 30));
+
+        $this->assertEquals($asset, $return);
+        $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
+        $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
+        Storage::disk('test')->assertExists('path/to/asset.jpg');
+        $this->assertEquals('path/to/asset.jpg', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+        Event::assertDispatched(AssetSaved::class);
+        $meta = $asset->meta();
+
+        $this->assertEquals(10, $meta['width']);
+        $this->assertEquals(15, $meta['height']);
+    }
+
+    public function nonGlideableFileExtensions()
+    {
+        return [
+            ['txt'], // not an image
+            ['md'],  // not an image
+            ['svg'], // doesn't work with imagick without extra server config
+            ['pdf'], // doesn't work with imagick without extra server config
+            ['eps'], // doesn't work with imagick without extra server config
+        ];
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider nonGlideableFileExtensions
+     **/
+    public function it_doesnt_process_or_error_when_uploading_non_glideable_file_with_glide_config($extension)
+    {
+        Event::fake();
+
+        config(['statamic.assets.image_manipulation.presets.small' => [
+            'w' => '15',
+            'h' => '15',
+        ]]);
+
+        $this->container->sourcePreset('small');
+
+        $asset = (new Asset)->container($this->container)->path("path/to/file.{$extension}")->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing("path/to/file.{$extension}");
+
+        // Ensure a glide server is never instantiated for these extensions...
+        Facades\Glide::shouldReceive('server')->never();
+
+        $return = $asset->upload(UploadedFile::fake()->create("file.{$extension}"));
+
+        $this->assertEquals($asset, $return);
+        $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
+        $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
+        Storage::disk('test')->assertExists("path/to/file.{$extension}");
+        $this->assertEquals("path/to/file.{$extension}", $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+        Event::assertDispatched(AssetSaved::class);
+    }
+
+    /** @test */
+    public function it_can_process_a_custom_image_format()
+    {
+        Event::fake();
+
+        config(['statamic.assets.image_manipulation.presets.small' => [
+            'w' => '15',
+            'h' => '15',
+        ]]);
+
+        // Normally eps files (for example) are not supported by gd or imagick. However, imagick does
+        // does actually support over 100 formats with extra configuration (eg. via ghostscript).
+        // Thus, we allow the user to configure additional extensions in their assets config.
+        config(['statamic.assets.image_manipulation.additional_extensions' => [
+            'eps',
+        ]]);
+
+        $this->container->sourcePreset('small');
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.eps')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing('path/to/asset.eps');
+
+        $file = UploadedFile::fake()->image('asset.eps', 20, 30);
+
+        // Ensure a glide server is instantiated and `makeImage()` is called...
+        Facades\Glide::shouldReceive('server->makeImage')
+            ->andReturn($file->getFilename())
+            ->once();
+
+        // Since we're mocking the glide server, and since the uploader's `write()` method expects
+        // this location, we need to force it into that storage path for this test to pass...
+        File::move($file->getRealPath(), $tempUploadedFilePath = storage_path('statamic/glide/tmp').'/'.$file->getFilename());
+
+        // Perform the upload...
+        $return = $asset->upload($file);
+
+        // Now we'll delete that temporary UploadedFile, because we moved it into the app's storage above, and
+        // it's normally not supposed to be there. This is necessary to prevent state issues across tests...
+        File::delete($tempUploadedFilePath);
+
+        $this->assertEquals($asset, $return);
+        $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
+        $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
+        Storage::disk('test')->assertExists('path/to/asset.eps');
+        $this->assertEquals('path/to/asset.eps', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+        Event::assertDispatched(AssetSaved::class);
+        $meta = $asset->meta();
+
+        // Normally we assert changes to the meta, but we cannot in this test because we can't guarantee
+        // the test suite has imagick with ghostscript installed (required for eps files, for example).
+        // $this->assertEquals(10, $meta['width']);
+        // $this->assertEquals(15, $meta['height']);
     }
 
     /** @test */
@@ -1930,6 +2078,200 @@ class AssetTest extends TestCase
 
         // The "asset" Tag will output nothing when an invalid asset src is passed. It doesn't throw an exception.
         $this->assertEquals('', Antlers::parse('{{ asset src="invalid" }}{{ basename }}{{ /asset }}', ['asset' => $asset]));
+    }
+
+    /** @test */
+    public function it_syncs_original_state_with_no_data()
+    {
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+
+        $this->assertEquals([], $asset->getRawOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => new PendingMeta('data'),
+        ], $asset->getRawOriginal());
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [],
+        ], $asset->getOriginal());
+
+        // Test that the pending meta was resolved
+        $this->assertSame($asset->getOriginal(), $asset->getRawOriginal());
+
+        Storage::disk('test')->assertMissing('path/to/.meta/test.txt.yaml');
+    }
+
+    /** @test */
+    public function it_syncs_original_state_with_no_data_but_with_data_in_meta()
+    {
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', "data:\n  foo: bar");
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+
+        $this->assertEquals([], $asset->getRawOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => new PendingMeta('data'),
+        ], $asset->getRawOriginal());
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [
+                'foo' => 'bar',
+            ],
+        ], $asset->getOriginal());
+
+        // Test that the pending meta was resolved
+        $this->assertSame($asset->getOriginal(), $asset->getRawOriginal());
+
+        Storage::disk('test')->assertExists('path/to/.meta/test.txt.yaml');
+    }
+
+    /** @test */
+    public function it_syncs_original_state_with_data()
+    {
+        $yaml = <<<'YAML'
+data:
+  alfa: bravo
+  charlie: delta
+  echo: foxtrot
+YAML;
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', $yaml);
+
+        $asset = (new Asset)
+            ->container($this->container)
+            ->path('path/to/test.txt')
+            ->set('charlie', 'brown')
+            ->remove('echo');
+
+        $this->assertEquals([], $asset->getRawOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => new PendingMeta('data'),
+        ], $asset->getRawOriginal());
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [
+                'alfa' => 'bravo',
+                'charlie' => 'brown',
+            ],
+        ], $asset->getOriginal());
+
+        // Test that the pending meta was resolved
+        $this->assertSame($asset->getOriginal(), $asset->getRawOriginal());
+
+        Storage::disk('test')->assertExists('path/to/.meta/test.txt.yaml');
+        $this->assertEquals($yaml, Storage::disk('test')->get('path/to/.meta/test.txt.yaml'));
+    }
+
+    /** @test */
+    public function it_resolves_pending_original_meta_values_when_hydrating()
+    {
+        $yaml = <<<'YAML'
+data:
+  alfa: bravo
+  charlie: delta
+  echo: foxtrot
+YAML;
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', $yaml);
+
+        $asset = (new Asset)
+            ->container($this->container)
+            ->path('path/to/test.txt')
+            ->set('charlie', 'brown');
+
+        $this->assertEquals([], $asset->getRawOriginal());
+
+        $asset->syncOriginal();
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => new PendingMeta('data'),
+        ], $asset->getRawOriginal());
+
+        // Setting would trigger hydration, which would trigger the pending original values to be resolved.
+        // We should not see this new value in the original state.
+        $asset->set('golf', 'hotel');
+
+        $this->assertEquals([
+            'path' => 'path/to/test.txt',
+            'data' => [
+                'alfa' => 'bravo',
+                'charlie' => 'brown',
+                'echo' => 'foxtrot',
+            ],
+        ], $asset->getRawOriginal());
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider warmPresetProvider
+     */
+    public function it_gets_which_presets_to_warm($extension, $orientation, $cpEnabled, $expectedWarm)
+    {
+        config(['statamic.cp.enabled' => $cpEnabled]);
+
+        Storage::fake('test');
+
+        if ($orientation === 'landscape') {
+            $width = 20;
+            $height = 10;
+        } elseif ($orientation === 'portrait') {
+            $width = 10;
+            $height = 20;
+        } elseif ($orientation === 'square') {
+            $width = 10;
+            $height = 10;
+        }
+
+        $filename = 'test.'.$extension;
+        Storage::disk('test')->put($filename, '');
+
+        if ($extension === 'jpg') {
+            Storage::disk('test')->put('.meta/'.$filename.'.yaml', YAML::dump([
+                'height' => $height,
+                'width' => $width,
+            ]));
+        }
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $container = Mockery::mock($container)->makePartial();
+        $container->shouldReceive('warmPresets')->andReturn(['one', 'two']);
+
+        $asset = (new Asset)->container($container)->path($filename);
+
+        $this->assertEquals($expectedWarm, $asset->warmPresets());
+    }
+
+    public function warmPresetProvider()
+    {
+        return [
+            'portrait' => ['jpg', 'portrait', true, ['one', 'two', 'cp_thumbnail_small_portrait']],
+            'landscape' => ['jpg', 'landscape', true, ['one', 'two', 'cp_thumbnail_small_landscape']],
+            'square' => ['jpg', 'square', true, ['one', 'two', 'cp_thumbnail_small_square']],
+            'portrait svg' => ['svg', 'portrait', true, []],
+            'landscape svg' => ['svg', 'landscape', true, []],
+            'square svg' => ['svg', 'square', true, []],
+            'non-image' => ['txt', null, true, []],
+            'cp disabled, portrait' => ['jpg', 'portrait', false, ['one', 'two']],
+            'cp disabled, landscape' => ['jpg', 'landscape', false, ['one', 'two']],
+            'cp disabled, square' => ['jpg', 'square', false, ['one', 'two']],
+            'cp disabled, portrait svg' => ['svg', 'portrait', false, []],
+            'cp disabled, landscape svg' => ['svg', 'landscape', false, []],
+            'cp disabled, square svg' => ['svg', 'square', false, []],
+            'cp disabled, non-image' => ['txt', null, false, []],
+        ];
     }
 
     private function fakeEventWithMacros()

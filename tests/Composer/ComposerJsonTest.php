@@ -9,6 +9,10 @@ use Tests\TestCase;
 
 class ComposerJsonTest extends TestCase
 {
+    private $files;
+    private $path;
+    private $backupPath;
+
     public function setUp(): void
     {
         parent::setUp();

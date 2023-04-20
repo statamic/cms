@@ -85,7 +85,7 @@
 
 <script>
 import SiteSelector from '../SiteSelector.vue';
-import HasHiddenFields from '../data-list/HasHiddenFields';
+import HasHiddenFields from '../publish/HasHiddenFields';
 
 export default {
 

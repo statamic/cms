@@ -148,7 +148,7 @@ class Git
      */
     protected function gitProcessForPath($path)
     {
-        return is_link($path)
+        return is_link($path) || is_file($path)
             ? GitProcess::create($path)->fromParent()
             : GitProcess::create($path);
     }

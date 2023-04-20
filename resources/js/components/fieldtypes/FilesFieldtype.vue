@@ -5,6 +5,7 @@
         <uploader
             ref="uploader"
             :url="meta.uploadUrl"
+            :container="config.container"
             @updated="uploadsUpdated"
             @upload-complete="uploadComplete"
             @error="uploadError"

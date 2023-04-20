@@ -38,27 +38,26 @@ export default {
         return {
             linkAttrs: null,
             showingToolbar: false,
-            getMarkAttrs: this.editor.getMarkAttrs.bind(this.editor),
         }
     },
 
     methods: {
 
-        toggleLinkToolbar() {            
+        toggleLinkToolbar() {
             this.showingToolbar = ! this.showingToolbar;
 
             if (this.showingToolbar) {
-                this.linkAttrs = this.getMarkAttrs('link');
+                this.linkAttrs = this.editor.getAttributes('link');
             } else {
-                this.editor.focus();
+                this.editor.view.dom.focus();
             }
         },
 
         setLink(attributes) {
-            this.editor.commands.link(attributes);
+            this.editor.commands.setLink(attributes);
             this.linkAttrs = null;
             this.showingToolbar = false;
-            this.editor.focus();
+            this.editor.view.dom.focus();
         }
 
     }

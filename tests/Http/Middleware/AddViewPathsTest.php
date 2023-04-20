@@ -14,6 +14,7 @@ class AddViewPathsTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider viewPathProvider
      */
     public function adds_view_paths($isAmpEnabled, $requestUrl, $expectedPaths)
@@ -23,7 +24,7 @@ class AddViewPathsTest extends TestCase
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]]);
 
-        view()->getFinder()->setPaths([
+        view()->getFinder()->setPaths($originalPaths = [
             '/path/to/views',
             '/path/to/other/views',
         ]);
@@ -33,14 +34,22 @@ class AddViewPathsTest extends TestCase
         $this->setCurrentSiteBasedOnUrl($requestUrl);
 
         $request = $this->createRequest($requestUrl);
+        $handled = false;
 
-        (new AddViewPaths())->handle($request, fn () => new Response());
+        (new AddViewPaths())->handle($request, function () use ($expectedPaths, &$handled) {
+            $this->assertEquals($expectedPaths, view()->getFinder()->getPaths());
+            $handled = true;
 
-        $this->assertEquals($expectedPaths, view()->getFinder()->getPaths());
+            return new Response;
+        });
+
+        $this->assertTrue($handled);
+        $this->assertEquals($originalPaths, view()->getFinder()->getPaths());
     }
 
     /**
      * @test
+     *
      * @dataProvider namespacedViewPathProvider
      */
     public function adds_namespaced_view_paths($requestUrl, $expectedPaths)
@@ -50,15 +59,26 @@ class AddViewPathsTest extends TestCase
             'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]]);
 
-        view()->getFinder()->replaceNamespace('foo', '/path/to/views');
+        view()->getFinder()->replaceNamespace('foo', [
+            '/path/to/views',
+            '/path/to/other',
+        ]);
+        $originalHints = view()->getFinder()->getHints()['foo'];
 
         $this->setCurrentSiteBasedOnUrl($requestUrl);
 
         $request = $this->createRequest($requestUrl);
+        $handled = false;
 
-        (new AddViewPaths())->handle($request, fn () => new Response());
+        (new AddViewPaths())->handle($request, function () use ($expectedPaths, &$handled) {
+            $this->assertEquals($expectedPaths, array_get(view()->getFinder()->getHints(), 'foo'));
+            $handled = true;
 
-        $this->assertEquals($expectedPaths, array_get(view()->getFinder()->getHints(), 'foo'));
+            return new Response;
+        });
+
+        $this->assertTrue($handled);
+        $this->assertEquals($originalHints, array_get(view()->getFinder()->getHints(), 'foo'));
     }
 
     private function setCurrentSiteBasedOnUrl($requestUrl)
@@ -113,6 +133,8 @@ class AddViewPathsTest extends TestCase
                 [
                     '/path/to/views/english',
                     '/path/to/views',
+                    '/path/to/other/english',
+                    '/path/to/other',
                 ],
             ],
             'second site' => [
@@ -120,6 +142,8 @@ class AddViewPathsTest extends TestCase
                 [
                     '/path/to/views/french',
                     '/path/to/views',
+                    '/path/to/other/french',
+                    '/path/to/other',
                 ],
             ],
         ];

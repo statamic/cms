@@ -19,7 +19,9 @@ trait Routable
     {
         return $this->fluentlyGetOrSet('slug')->getter(function ($slug) {
             if ($slug instanceof Closure) {
+                $this->slug = null;
                 $slug = $slug($this);
+                $this->slug = $slug;
             }
 
             if (! $slug) {

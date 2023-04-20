@@ -17,6 +17,7 @@ return [
     'between.array' => 'deverá conter entre :min - :max elementos.',
     'boolean' => 'deverá conter o valor verdadeiro ou falso.',
     'confirmed' => 'a confirmação não coincide.',
+    'current_password' => 'A palavra-passe está incorreta.',
     'date' => 'não contém uma data válida.',
     'date_format' => 'não respeita o formato :format.',
     'different' => 'este campo e :other deverão conter valores diferentes.',

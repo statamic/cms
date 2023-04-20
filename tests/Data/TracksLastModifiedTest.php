@@ -8,6 +8,9 @@ use Tests\TestCase;
 
 class TracksLastModifiedTest extends TestCase
 {
+    private $entry;
+    private $user;
+
     public function setUp(): void
     {
         parent::setUp();

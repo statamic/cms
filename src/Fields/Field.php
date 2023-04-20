@@ -225,6 +225,15 @@ class Field implements Arrayable
         return (bool) $this->get('filterable');
     }
 
+    public function shouldBeDuplicated()
+    {
+        if (is_null($this->get('duplicate'))) {
+            return true;
+        }
+
+        return (bool) $this->get('duplicate');
+    }
+
     public function toPublishArray()
     {
         return array_merge($this->preProcessedConfig(), [

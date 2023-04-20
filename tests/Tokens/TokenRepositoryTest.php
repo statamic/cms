@@ -12,6 +12,8 @@ use Tests\TestCase;
 
 class TokenRepositoryTest extends TestCase
 {
+    private $tokens;
+
     public function setUp(): void
     {
         parent::setUp();

@@ -11,6 +11,9 @@ class FlysystemAdapterTest extends TestCase
 {
     use FilesystemAdapterTests;
 
+    private $tempDir;
+    private $filesystem;
+
     public function setUp(): void
     {
         parent::setUp();

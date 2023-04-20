@@ -3,13 +3,13 @@
 namespace Statamic\Http\Middleware\CP;
 
 use Closure;
-use Statamic\Facades\User;
+use Statamic\Facades\Preference;
 
 class Localize
 {
     public function handle($request, Closure $next)
     {
-        $locale = User::current()->getPreference('locale') ?? app()->getLocale();
+        $locale = Preference::get('locale') ?? app()->getLocale();
 
         // Make locale config with dashes backwards compatible, as they should be underscores.
         $locale = str_replace('-', '_', $locale);

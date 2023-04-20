@@ -122,7 +122,7 @@ class DocumentParser
 
     public function getText($start, $end)
     {
-        return StringUtilities::substr($this->content, $start, ($end - $start));
+        return StringUtilities::substr($this->content, $start, $end - $start);
     }
 
     public function setIsInterpolatedParser($isInterpolation)

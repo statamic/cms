@@ -12,6 +12,8 @@ return [
     'configure_fields_desc' => 'Ability to edit blueprints, fieldsets, and their fields.',
     'configure_addons' => 'Configure Addons',
     'configure_addons_desc' => 'Ability to access the addon area to install and uninstall addons.',
+    'manage_preferences' => 'Manage Preferences',
+    'manage_preferences_desc' => 'Ability to customize global and role-specific preferences.',
 
     'group_collections' => 'Collections',
     'configure_collections' => 'Configure Collections',
@@ -73,6 +75,8 @@ return [
     'change_passwords' => 'Change passwords',
     'edit_user_groups' => 'Edit groups',
     'edit_roles' => 'Edit roles',
+    'assign_user_groups' => 'Assign groups to users',
+    'assign_roles' => 'Assign roles to users',
 
     'group_updates' => 'Updates',
     'view_updates' => 'View updates',

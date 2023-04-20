@@ -13,6 +13,8 @@ class AssetQueryBuilderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $container;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -409,13 +411,13 @@ class AssetQueryBuilderTest extends TestCase
         Asset::find('test::a.jpg')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
         Asset::find('test::b.txt')->data(['test_taxonomy' => ['taxonomy-3']])->save();
         Asset::find('test::c.txt')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
-        Asset::find('test::d.jpg')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Asset::find('test::d.jpg')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4', 'taxonomy-5']])->save();
         Asset::find('test::e.jpg')->data(['test_taxonomy' => ['taxonomy-5']])->save();
 
-        $assets = $this->container->queryAssets()->whereJsonLength('test_taxonomy', 1)->get();
+        $assets = $this->container->queryAssets()->whereJsonLength('test_taxonomy', 1)->orWhereJsonLength('test_taxonomy', 3)->get();
 
-        $this->assertCount(2, $assets);
-        $this->assertEquals(['b', 'e'], $assets->map->filename()->all());
+        $this->assertCount(3, $assets);
+        $this->assertEquals(['b', 'e', 'd'], $assets->map->filename()->all());
     }
 
     /** @test **/
@@ -530,5 +532,72 @@ class AssetQueryBuilderTest extends TestCase
         $this->assertEquals(['a.jpg', 'b.txt', 'c.txt'], $query->get()->map->path()->all());
 
         $this->assertEquals(['b.txt', 'c.txt', 'd.jpg'], $query->offset(1)->get()->map->path()->all());
+    }
+
+    /** @test */
+    public function querying_doesnt_generate_meta_files_unnecessarily()
+    {
+        $this->assertEquals([
+            'a.jpg',
+            'b.txt',
+            'c.txt',
+            'd.jpg',
+            'e.jpg',
+            'f.jpg',
+        ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
+
+        $assets = $this->container->queryAssets()->get();
+
+        $this->assertCount(6, $assets);
+        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $assets->map->filename()->all());
+
+        $this->assertEquals([
+            'a.jpg',
+            'b.txt',
+            'c.txt',
+            'd.jpg',
+            'e.jpg',
+            'f.jpg',
+        ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
+    }
+
+    /** @test */
+    public function querying_a_data_field_will_generate_meta_files()
+    {
+        Storage::disk('test')->put('.meta/b.txt.yaml', "data:\n  foo: bar");
+        Storage::disk('test')->put('.meta/d.jpg.yaml', "data:\n  foo: bar");
+        Storage::disk('test')->put('.meta/e.jpg.yaml', "data:\n  foo: notbar");
+
+        $this->assertEquals([
+            '.meta/b.txt.yaml',
+            '.meta/d.jpg.yaml',
+            '.meta/e.jpg.yaml',
+            'a.jpg',
+            'b.txt',
+            'c.txt',
+            'd.jpg',
+            'e.jpg',
+            'f.jpg',
+        ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
+
+        $assets = $this->container->queryAssets()->where('foo', 'bar')->get();
+
+        $this->assertCount(2, $assets);
+        $this->assertEquals(['b', 'd'], $assets->map->filename()->all());
+
+        $this->assertEquals([
+            '.meta/a.jpg.yaml',
+            '.meta/b.txt.yaml',
+            '.meta/c.txt.yaml',
+            '.meta/d.jpg.yaml',
+            '.meta/e.jpg.yaml',
+            '.meta/f.jpg.yaml',
+            'a.jpg',
+            'b.txt',
+            'c.txt',
+            'd.jpg',
+            'e.jpg',
+            'f.jpg',
+        ], collect(Storage::disk('test')->allFiles())->sort()->values()->all());
     }
 }

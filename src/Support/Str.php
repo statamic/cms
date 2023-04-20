@@ -90,14 +90,14 @@ class Str extends \Illuminate\Support\Str
         return strip_tags($html);
     }
 
-    public static function slug($string, $separator = '-', $language = 'en')
+    public static function slug($string, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
     {
         $string = (string) $string;
 
         // Statamic is a-OK with underscores in slugs.
         $string = str_replace('_', $placeholder = strtolower(str_random(16)), $string);
 
-        $slug = parent::slug($string, $separator, $language);
+        $slug = parent::slug($string, $separator, $language, $dictionary);
 
         return str_replace($placeholder, '_', $slug);
     }
@@ -294,6 +294,11 @@ class Str extends \Illuminate\Support\Str
     public static function replace($string, $search, $replace)
     {
         return StaticStringy::replace($string, $search, $replace);
+    }
+
+    public static function safeTruncateReverse($string, $length, $substring = '')
+    {
+        return self::reverse(self::safeTruncate(self::reverse($string), $length, $substring));
     }
 
     public static function studly($value)

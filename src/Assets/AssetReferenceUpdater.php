@@ -253,6 +253,10 @@ class AssetReferenceUpdater extends DataReferenceUpdater
 
         $bardPayload = Arr::get($data, $dottedKey, []);
 
+        if (! $bardPayload) {
+            return;
+        }
+
         $changed = collect(Arr::dot($bardPayload))
             ->filter(function ($value, $key) {
                 return preg_match('/(.*)\.(type)/', $key) && $value === 'image';
@@ -296,6 +300,10 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $dottedKey = $dottedPrefix.$field->handle();
 
         $bardPayload = Arr::get($data, $dottedKey, []);
+
+        if (! $bardPayload) {
+            return;
+        }
 
         $changed = collect(Arr::dot($bardPayload))
             ->filter(function ($value, $key) {

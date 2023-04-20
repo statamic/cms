@@ -49,6 +49,8 @@ class RenameAsset extends Action
                 'type' => 'text',
                 'validate' => 'required', // TODO: Better filename validation
                 'classes' => 'mousetrap',
+                'focus' => true,
+                'placeholder' => $this->items->containsOneItem() ? $this->items->first()->filename() : null,
             ],
         ];
     }

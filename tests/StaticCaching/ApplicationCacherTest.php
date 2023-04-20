@@ -58,14 +58,51 @@ class ApplicationCacherTest extends TestCase
         $cache = app(Repository::class);
         $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
         $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
-            'one' => '/one', 'two' => '/two',
+            'one' => '/one',
+            'onemore' => '/onemore',
+            'two' => '/two',
         ]);
         $cache->forever('static-cache:responses:one', 'html content');
+        $cache->forever('static-cache:responses:onemore', 'onemore html content');
+        $cache->forever('static-cache:responses:two', 'two html content');
 
         $cacher->invalidateUrl('/one');
 
-        $this->assertEquals(['two' => '/two'], $cacher->getUrls()->all());
+        $this->assertEquals([
+            'onemore' => '/onemore',
+            'two' => '/two',
+        ], $cacher->getUrls()->all());
         $this->assertNull($cache->get('static-cache:responses:one'));
+        $this->assertNotNull($cache->get('static-cache:responses:onemore'));
+        $this->assertNotNull($cache->get('static-cache:responses:two'));
+    }
+
+    /** @test */
+    public function invalidating_a_url_will_invalidate_all_query_string_versions_too()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
+            'one' => '/one',
+            'oneqs' => '/one?foo=bar',
+            'onemore' => '/onemore',
+            'two' => '/two',
+        ]);
+        $cache->forever('static-cache:responses:one', 'html content');
+        $cache->forever('static-cache:responses:oneqs', 'querystring html content');
+        $cache->forever('static-cache:responses:onemore', 'onemore html content');
+        $cache->forever('static-cache:responses:two', 'two html content');
+
+        $cacher->invalidateUrl('/one');
+
+        $this->assertEquals([
+            'two' => '/two',
+            'onemore' => '/onemore',
+        ], $cacher->getUrls()->all());
+        $this->assertNull($cache->get('static-cache:responses:one'));
+        $this->assertNull($cache->get('static-cache:responses:oneqs'));
+        $this->assertNotNull($cache->get('static-cache:responses:onemore'));
+        $this->assertNotNull($cache->get('static-cache:responses:two'));
     }
 
     /** @test */

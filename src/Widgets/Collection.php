@@ -29,6 +29,13 @@ class Collection extends Widget
 
         [$sortColumn, $sortDirection] = $this->parseSort($collection);
 
+        $blueprint = $collection->entryBlueprint();
+        $columns = $blueprint
+            ->columns()
+            ->only($this->config('fields', []))
+            ->map(fn ($column) => $column->sortable(false)->visible(true))
+            ->values();
+
         return view('statamic::widgets.collection', [
             'collection' => $collection,
             'filters' => Scope::filters('entries', [
@@ -36,9 +43,11 @@ class Collection extends Widget
             ]),
             'title' => $this->config('title', $collection->title()),
             'button' => $collection->createLabel(),
+            'blueprints' => $collection->entryBlueprints()->reject->hidden()->values(),
             'limit' => $this->config('limit', 5),
             'sortColumn' => $sortColumn,
             'sortDirection' => $sortDirection,
+            'columns' => $columns,
         ]);
     }
 

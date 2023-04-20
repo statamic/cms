@@ -13,6 +13,7 @@ class ExportTest extends TestCase
     protected $files;
     protected $configPath;
     protected $exportPath;
+    protected $postInstallHookPath;
 
     public function setUp(): void
     {
@@ -20,6 +21,7 @@ class ExportTest extends TestCase
 
         $this->files = app(Filesystem::class);
         $this->configPath = base_path('starter-kit.yaml');
+        $this->postInstallHookPath = base_path('StarterKitPostInstall.php');
         $this->exportPath = base_path('../cool-runnings');
 
         if ($this->files->exists($this->configPath)) {
@@ -38,6 +40,10 @@ class ExportTest extends TestCase
     {
         if ($this->files->exists($this->configPath)) {
             $this->files->delete($this->configPath);
+        }
+
+        if ($this->files->exists($this->postInstallHookPath)) {
+            $this->files->delete($this->postInstallHookPath);
         }
 
         $this->restoreComposerJson();
@@ -73,7 +79,7 @@ class ExportTest extends TestCase
         $this->assertFileHasContent("'disks' => [", $filesystemsConfig);
 
         $this->assertFileExists($composerJson);
-        $this->assertFileHasContent('<body>', $composerJson);
+        $this->assertFileHasContent('<body', $composerJson);
     }
 
     /** @test */
@@ -156,6 +162,23 @@ class ExportTest extends TestCase
     }
 
     /** @test */
+    public function it_copies_post_install_script_hook_when_available()
+    {
+        $this->setExportPaths([
+            'config',
+        ]);
+
+        $this->assertFileNotExists($postInstallHook = $this->exportPath('StarterKitPostInstall.php'));
+
+        $this->files->put(base_path('StarterKitPostInstall.php'), '<?php');
+
+        $this->exportCoolRunnings();
+
+        $this->assertFileExists($postInstallHook);
+        $this->assertFileHasContent('<?php', $postInstallHook);
+    }
+
+    /** @test */
     public function it_exports_all_dependencies_from_versionless_array()
     {
         $this->files->put(base_path('composer.json'), <<<'EOT'
@@ -206,7 +229,7 @@ EOT
 }
 
 EOT
-        , $this->files->get($this->exportPath('composer.json')));
+            , $this->files->get($this->exportPath('composer.json')));
     }
 
     /** @test */
@@ -451,7 +474,7 @@ EOT
 }
 
 EOT
-        , $this->files->get($this->exportPath('composer.json')));
+            , $this->files->get($this->exportPath('composer.json')));
     }
 
     /** @test */
@@ -485,7 +508,7 @@ EOT
 }
 
 EOT
-        , $this->files->get($this->exportPath('composer.json')));
+            , $this->files->get($this->exportPath('composer.json')));
     }
 
     private function exportPath($path = null)

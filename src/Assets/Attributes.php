@@ -3,7 +3,6 @@
 namespace Statamic\Assets;
 
 use Facades\Statamic\Assets\ExtractInfo;
-use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Arr;
 
 class Attributes
@@ -12,14 +11,6 @@ class Attributes
      * @var Asset
      */
     private $asset;
-
-    /**
-     * @param $generator ImageGenerator
-     */
-    public function __construct(ImageGenerator $generator)
-    {
-        $this->generator = $generator;
-    }
 
     public function asset(Asset $asset)
     {

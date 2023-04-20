@@ -12,6 +12,8 @@ use Tests\TestCase;
 
 class RouterMixinTest extends TestCase
 {
+    private $router;
+
     public function setUp(): void
     {
         parent::setUp();

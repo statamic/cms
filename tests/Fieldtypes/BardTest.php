@@ -2,6 +2,7 @@
 
 namespace Tests\Fieldtypes;
 
+use Facades\Statamic\Fieldtypes\RowId;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -10,12 +11,23 @@ use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
+use Statamic\Fieldtypes\Bard\Augmentor;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Tiptap\Core\Node;
 
 class BardTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    // Mocking method_exists, courtesy of https://stackoverflow.com/a/37928161
+    public static $functions;
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+        static::$functions = null;
+    }
 
     /** @test */
     public function it_augments_prosemirror_structure_to_a_template_friendly_array()
@@ -34,6 +46,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
+                    'id' => 'test1',
                     'values' => [
                         'type' => 'image',
                         'image' => 'test.jpg',
@@ -57,6 +70,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
+                    // id intentionally omitted
                     'values' => [
                         'type' => 'image',
                         'image' => 'test.jpg',
@@ -74,6 +88,7 @@ class BardTest extends TestCase
 
         $expected = [
             [
+                'id' => 'test1',
                 'type' => 'image',
                 'image' => 'test.jpg (augmented)',
                 'caption' => 'test (augmented)',
@@ -83,6 +98,7 @@ class BardTest extends TestCase
                 'text' => '<p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text.</p><p></p>',
             ],
             [
+                'id' => null,
                 'type' => 'image',
                 'image' => 'test.jpg (augmented)',
                 'caption' => 'test (augmented)',
@@ -112,6 +128,111 @@ class BardTest extends TestCase
     public function it_doesnt_augment_when_saved_as_html()
     {
         $this->assertEquals('<p>Paragraph</p>', $this->bard()->augment('<p>Paragraph</p>'));
+    }
+
+    /** @test */
+    public function it_augments_tiptap_v1_snake_case_types_to_v2_camel_case_types()
+    {
+        Augmentor::addExtension('customNode', new class extends Node
+        {
+            public static $name = 'customNode';
+
+            public function renderHTML($node, $HTMLAttributes = [])
+            {
+                return [
+                    'div',
+                    ['type' => $node->attrs->type],
+                    0,
+                ];
+            }
+        });
+
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    [
+                        'type' => 'text',
+                        'text' => 'This is ',
+                    ],
+                    [
+                        'type' => 'text',
+                        'marks' => [
+                            ['type' => 'bold'],
+                        ],
+                        'text' => 'bold',
+                    ],
+                    [
+                        'type' => 'text',
+                        'text' => ' text.',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'custom_node',
+                'attrs' => [
+                    'type' => 'custom_type_attribute', // shouldn't be camel cased
+                ],
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => '123',
+                    'values' => [
+                        'type' => 'my_set',
+                        'text' => 'test',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'bullet_list',
+                'content' => [
+                    [
+                        'type' => 'list_item',
+                        'content' => [
+                            [
+                                'type' => 'paragraph',
+                                'content' => [
+                                    [
+                                        'type' => 'text',
+                                        'text' => 'This is a list item.',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $expected = [
+            [
+                'type' => 'text',
+                'text' => '<p>This is <strong>bold</strong> text.</p><div type="custom_type_attribute"></div>',
+            ],
+            [
+                'id' => '123',
+                'type' => 'my_set',
+                'text' => 'test',
+            ],
+            [
+                'type' => 'text',
+                'text' => '<ul><li><p>This is a list item.</p></li></ul>',
+            ],
+        ];
+
+        $augmented = $this->bard([
+            'sets' => [
+                'my_set' => [
+                    'fields' => [
+                        ['handle' => 'text', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ])->augment($data);
+
+        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
+        $this->assertEquals($expected, collect($augmented)->toArray());
     }
 
     /** @test */
@@ -167,6 +288,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
+                    'id' => 'test1',
                     'enabled' => false,
                     'values' => [
                         'type' => 'test',
@@ -177,6 +299,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
+                    'id' => 'test2',
                     'values' => [
                         'type' => 'test',
                         'value' => 'two',
@@ -197,6 +320,7 @@ class BardTest extends TestCase
                 'text' => '<p>This is a paragraph.</p>',
             ],
             [
+                'id' => 'test2',
                 'type' => 'test',
                 'value' => 'two',
             ],
@@ -220,6 +344,7 @@ class BardTest extends TestCase
         $expected = [
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'This is a paragraph with '],
                     ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
@@ -228,6 +353,7 @@ class BardTest extends TestCase
             ],
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'Second '],
                     ['type' => 'text', 'text' => 'paragraph', 'marks' => [
@@ -235,9 +361,7 @@ class BardTest extends TestCase
                     ]],
                     ['type' => 'text', 'text' => '. '],
                     ['type' => 'image', 'attrs' => [
-                        'alt' => null,
                         'src' => 'asset::assets::lagoa.jpg',
-                        'title' => null,
                     ]],
                 ],
             ],
@@ -303,6 +427,8 @@ class BardTest extends TestCase
     /** @test */
     public function it_transforms_v2_formatted_content_into_prosemirror_structure()
     {
+        RowId::shouldReceive('generate')->andReturn('random-string-1');
+
         $data = [
             ['type' => 'text', 'text' => '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>'],
             ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux'],
@@ -312,6 +438,7 @@ class BardTest extends TestCase
         $expected = [
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'This is a paragraph with '],
                     ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
@@ -320,6 +447,7 @@ class BardTest extends TestCase
             ],
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'Second paragraph.'],
                 ],
@@ -327,7 +455,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
-                    'id' => 'set-2',
+                    'id' => 'random-string-1',
                     'enabled' => true,
                     'values' => [
                         'type' => 'myset',
@@ -338,6 +466,7 @@ class BardTest extends TestCase
             ],
             [
                 'type' => 'paragraph',
+                'attrs' => ['textAlign' => 'left'],
                 'content' => [
                     ['type' => 'text', 'text' => 'Another paragraph.'],
                 ],
@@ -356,6 +485,8 @@ class BardTest extends TestCase
     /** @test */
     public function it_transforms_v2_formatted_content_with_only_sets_into_prosemirror_structure()
     {
+        RowId::shouldReceive('generate')->andReturn('random-string-1');
+
         $data = [
             ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux'],
         ];
@@ -364,7 +495,7 @@ class BardTest extends TestCase
             [
                 'type' => 'set',
                 'attrs' => [
-                    'id' => 'set-0',
+                    'id' => 'random-string-1',
                     'enabled' => true,
                     'values' => [
                         'type' => 'myset',
@@ -464,6 +595,8 @@ class BardTest extends TestCase
     /** @test */
     public function it_preloads_new_meta_with_preprocessed_values()
     {
+        RowId::shouldReceive('generate')->andReturn('random1', 'random2');
+
         // For this test, use a grid field with min_rows.
         // It doesn't have to be, but it's a fieldtype that would
         // require preprocessed values to be provided down the line.
@@ -499,8 +632,8 @@ class BardTest extends TestCase
                     'one' => null, // meta for the text field
                 ],
                 'existing' => [
-                    'row-0' => ['one' => null],
-                    'row-1' => ['one' => null],
+                    'random1' => ['one' => null],
+                    'random2' => ['one' => null],
                 ],
             ],
         ];
@@ -532,7 +665,7 @@ class BardTest extends TestCase
 </p>
 EOT;
 
-        $prosemirror = (new \HtmlToProseMirror\Renderer)->render($html)['content'];
+        $prosemirror = (new Augmentor($this))->renderHtmlToProsemirror($html)['content'];
 
         $this->assertEquals([
             'entry::1' => ['title' => 'About', 'permalink' => 'http://localhost/about'],
@@ -602,6 +735,205 @@ EOT;
         $this->assertNull((new Bard)->toQueryableValue(null));
         $this->assertNull((new Bard)->toQueryableValue([]));
         $this->assertEquals([['foo' => 'bar']], (new Bard)->toQueryableValue([['foo' => 'bar']]));
+    }
+
+    /** @test */
+    public function it_augments_inline_value()
+    {
+        $data = [
+            ['type' => 'text', 'text' => 'This is inline text with '],
+            ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
+            ['type' => 'text', 'text' => ' and '],
+            ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
+            ['type' => 'text', 'text' => ' text.'],
+        ];
+
+        $expected = 'This is inline text with <strong>bold</strong> and <em>italic</em> text.';
+
+        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->augment($data));
+    }
+
+    /** @test */
+    public function it_processes_inline_value()
+    {
+        $data = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+
+        $expected = [
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->process($data));
+    }
+
+    /** @test */
+    public function it_preprocesses_inline_value()
+    {
+        $data = [
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+
+        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
+    }
+
+    /** @test */
+    public function it_preprocesses_inline_value_to_block_value()
+    {
+        $data = [
+            ['type' => 'text', 'text' => 'This is inline text.'],
+        ];
+
+        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
+
+        $this->assertEquals($expected, $this->bard(['input_mode' => 'block', 'sets' => null])->preProcess($data));
+    }
+
+    /** @test */
+    public function it_preprocesses_block_value_to_inline_value()
+    {
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'This is block text.'],
+                ],
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'This is some more block text.'],
+                ],
+            ],
+        ];
+
+        $expected = '[{"type":"paragraph","content":[{"type":"text","text":"This is block text."}]}]';
+
+        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->preProcess($data));
+    }
+
+    /** @test */
+    public function it_converts_tiptap_v1_snake_case_types_to_v2_camel_case_types()
+    {
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    [
+                        'type' => 'text',
+                        'text' => 'This is ',
+                    ],
+                    [
+                        'type' => 'text',
+                        'marks' => [
+                            ['type' => 'bold'],
+                        ],
+                        'text' => 'bold',
+                    ],
+                    [
+                        'type' => 'text',
+                        'text' => ' text.',
+                    ],
+                ],
+            ],
+
+            [
+                'type' => 'custom_node',
+                'attrs' => [
+                    'type' => 'custom_type_attribute', // shouldn't be camel cased
+                ],
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => '123',
+                    'values' => [
+                        'type' => 'my_set',
+                        'text' => 'test',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'bullet_list',
+                'content' => [
+                    [
+                        'type' => 'list_item',
+                        'content' => [
+                            [
+                                'type' => 'paragraph',
+                                'content' => [
+                                    [
+                                        'type' => 'text',
+                                        'text' => 'This is a list item.',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $expected = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    [
+                        'type' => 'text',
+                        'text' => 'This is ',
+                    ],
+                    [
+                        'type' => 'text',
+                        'marks' => [
+                            ['type' => 'bold'],
+                        ],
+                        'text' => 'bold',
+                    ],
+                    [
+                        'type' => 'text',
+                        'text' => ' text.',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'customNode',
+                'attrs' => [
+                    'type' => 'custom_type_attribute',
+                ],
+            ],
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => '123',
+                    'values' => [
+                        'type' => 'my_set',
+                        'text' => 'test',
+                    ],
+                    'enabled' => true,
+                ],
+            ],
+            [
+                'type' => 'bulletList',
+                'content' => [
+                    [
+                        'type' => 'listItem',
+                        'content' => [
+                            [
+                                'type' => 'paragraph',
+                                'content' => [
+                                    [
+                                        'type' => 'text',
+                                        'text' => 'This is a list item.',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, json_decode($this->bard()->preProcess($data), true));
     }
 
     private function bard($config = [])

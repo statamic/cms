@@ -48,7 +48,7 @@
                             <div class="relative w-full">
 
                                 <div class="data-list-header">
-                                    <data-list-search v-model="searchQuery" />
+                                    <data-list-search ref="search" v-model="searchQuery" />
 
                                     <template v-if="! hasSelections">
                                         <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-2" @click="creatingFolder = true">
@@ -320,6 +320,7 @@ export default {
         maxFiles: Number,
         initialEditingAssetId: String,
         autoselectUploads: Boolean,
+        autofocusSearch: Boolean,
     },
 
     data() {
@@ -458,6 +459,12 @@ export default {
             this.loadAssets();
         },
 
+        initializing(isInitializing, wasInitializing) {
+            if (wasInitializing && this.autofocusSearch) {
+                this.$nextTick(() => this.$refs.search.focus());
+            }
+        },
+
         loading(loading) {
             this.$progress.loading('asset-browser', loading);
         },
@@ -521,7 +528,7 @@ export default {
         selectFolder(path) {
             // Trigger re-loading of assets in the selected folder.
             this.path = path;
-            this.selectedPage = 1;
+            this.page = 1;
 
             this.$emit('navigated', this.container, this.path);
         },
@@ -529,6 +536,8 @@ export default {
         selectContainer(id) {
             this.container = this.containers[id];
             this.path = '/';
+            this.page = 1;
+
             this.$emit('navigated', this.container, this.path);
         },
 

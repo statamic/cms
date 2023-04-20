@@ -165,7 +165,7 @@ class AssetFolder implements Contract, Arrayable
             throw new \Exception('Folder cannot be moved to its own subfolder.');
         }
 
-        $name = $name ?? $this->basename();
+        $name = $this->getSafeBasename($name ?? $this->basename());
         $oldPath = $this->path();
         $newPath = Str::removeLeft(Path::tidy($parent.'/'.$name), '/');
 
@@ -183,6 +183,21 @@ class AssetFolder implements Contract, Arrayable
         $this->delete();
 
         return $folder;
+    }
+
+    /**
+     * Ensure safe basename string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    private function getSafeBasename($string)
+    {
+        if (config('statamic.assets.lowercase')) {
+            $string = strtolower($string);
+        }
+
+        return (string) $string;
     }
 
     /**

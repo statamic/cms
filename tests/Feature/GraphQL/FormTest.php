@@ -27,6 +27,7 @@ class FormTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup disableQueries
      **/
     public function query_only_works_if_enabled()
@@ -78,9 +79,10 @@ GQL;
                 'instructions' => 'Enter your name',
                 'placeholder' => 'Type here...',
                 'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
+                'width' => 50,
             ],
             'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
-            'message' => ['type' => 'textarea'],
+            'message' => ['type' => 'textarea', 'width' => 33],
         ]);
 
         BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
@@ -93,6 +95,7 @@ GQL;
             type
             display
             instructions
+            width
             config
         }
     }
@@ -111,6 +114,7 @@ GQL;
                             'type' => 'text',
                             'display' => 'Your Name',
                             'instructions' => 'Enter your name',
+                            'width' => 50,
                             'config' => [
                                 'placeholder' => 'Type here...',
                             ],
@@ -120,6 +124,7 @@ GQL;
                             'type' => 'select',
                             'display' => 'Subject',
                             'instructions' => null,
+                            'width' => 100,
                             'config' => [
                                 'options' => ['disco' => 'Disco', 'house' => 'House'],
                             ],
@@ -129,6 +134,7 @@ GQL;
                             'type' => 'textarea',
                             'display' => 'Message',
                             'instructions' => null,
+                            'width' => 33,
                             'config' => [],
                         ],
                     ],

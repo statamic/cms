@@ -7,14 +7,15 @@ use Facades\Statamic\Assets\Attributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
-use Statamic\Data\SyncsOriginalState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\AssetDeleted;
@@ -30,33 +31,72 @@ use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
+use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues
+class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues, SearchableContract
 {
     use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
-    TracksQueriedRelations,
-    SyncsOriginalState, ContainsData {
-        set as traitSet;
-        get as traitGet;
-        remove as traitRemove;
-        data as traitData;
-        merge as traitMerge;
-    }
+        TracksQueriedRelations,
+        Searchable, ContainsData {
+            set as traitSet;
+            get as traitGet;
+            remove as traitRemove;
+            data as traitData;
+            merge as traitMerge;
+        }
 
     protected $container;
     protected $path;
     protected $meta;
-    protected $syncOriginalProperties = ['path'];
     protected $withEvents = true;
     protected $shouldHydrate = true;
     protected $removedData = [];
+    protected $original = [];
+
+    public function syncOriginal()
+    {
+        $this->original = [];
+
+        foreach (['path'] as $property) {
+            $this->original[$property] = $this->{$property};
+        }
+
+        $this->original['data'] = new PendingMeta('data');
+
+        return $this;
+    }
+
+    public function getOriginal($key = null, $fallback = null)
+    {
+        $this->resolvePendingMetaOriginalValues();
+
+        return Arr::get($this->original, $key, $fallback);
+    }
+
+    private function resolvePendingMetaOriginalValues()
+    {
+        if (empty($this->original)) {
+            $this->syncOriginal();
+        }
+
+        // If it's an array, they've already been resolved.
+        if (is_array($this->original['data'])) {
+            return;
+        }
+
+        $this->original['data'] = $this->metaExists() ? $this->meta('data') : $this->data->all();
+    }
+
+    public function getRawOriginal()
+    {
+        return $this->original;
+    }
 
     public function __construct()
     {
@@ -128,6 +168,10 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $this->data = collect($this->meta['data']);
 
         $this->removedData = [];
+
+        if (! empty($this->original)) {
+            $this->resolvePendingMetaOriginalValues();
+        }
 
         return $this;
     }
@@ -239,6 +283,11 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $path = dirname($this->path()).'/.meta/'.$this->basename().'.yaml';
 
         return ltrim($path, '/');
+    }
+
+    protected function metaExists()
+    {
+        return $this->container()->metaFiles()->contains($this->metaPath());
     }
 
     public function writeMeta($meta)
@@ -631,7 +680,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function move($folder, $filename = null)
     {
-        $filename = $this->getSafeFilename($filename ?: $this->filename());
+        $filename = Uploader::getSafeFilename($filename ?: $this->filename());
         $oldPath = $this->path();
         $oldMetaPath = $this->metaPath();
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.'.'.pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
@@ -640,6 +689,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
             return $this;
         }
 
+        $this->hydrate();
         $this->disk()->rename($oldPath, $newPath);
         $this->path($newPath);
         $this->save();
@@ -785,7 +835,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function title()
     {
-        return $this->basename();
+        return $this->get('title') ?? $this->basename();
     }
 
     /**
@@ -796,29 +846,12 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function upload(UploadedFile $file)
     {
-        $ext = $file->getClientOriginalExtension();
-        $filename = $this->getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $path = Uploader::asset($this)->upload($file);
 
-        $directory = $this->folder();
-        $directory = ($directory === '.') ? '/' : $directory;
-        $path = Path::tidy($directory.'/'.$filename.'.'.$ext);
-        $path = ltrim($path, '/');
-
-        // If the file exists, we'll append a timestamp to prevent overwriting.
-        if ($this->disk()->exists($path)) {
-            $basename = $filename.'-'.Carbon::now()->timestamp.'.'.$ext;
-            $path = Str::removeLeft(Path::assemble($directory, $basename), '/');
-        }
-
-        $stream = fopen($file->getRealPath(), 'r');
-        $this->disk()->put($path, $stream);
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
-
-        $this->path($path)->syncOriginal();
-
-        $this->save();
+        $this
+            ->path($path)
+            ->syncOriginal()
+            ->save();
 
         AssetUploaded::dispatch($this);
 
@@ -859,26 +892,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     public function stream()
     {
         return $this->disk()->filesystem()->readStream($this->path());
-    }
-
-    private function getSafeFilename($string)
-    {
-        $replacements = [
-            ' ' => '-',
-            '#' => '-',
-        ];
-
-        $str = Stringy::create(urldecode($string))->toAscii();
-
-        foreach ($replacements as $from => $to) {
-            $str = $str->replace($from, $to);
-        }
-
-        if (config('statamic.assets.lowercase')) {
-            $str = strtolower($str);
-        }
-
-        return (string) $str;
     }
 
     /**
@@ -1011,5 +1024,23 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    public function getCpSearchResultBadge(): string
+    {
+        return $this->container()->title();
+    }
+
+    public function warmPresets()
+    {
+        if (! $this->isImage()) {
+            return [];
+        }
+
+        $cpPresets = config('statamic.cp.enabled') ? [
+            'cp_thumbnail_small_'.$this->orientation(),
+        ] : [];
+
+        return array_merge($this->container->warmPresets(), $cpPresets);
     }
 }

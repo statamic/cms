@@ -16,7 +16,7 @@
             <div class="editor-meta">
                 <div class="asset-editor-meta-items">
                     <div class="meta-item">
-                        <span class="meta-label">{{ __('Filename') }}</span>
+                        <span class="meta-label">{{ __('Path') }}</span>
                         <span class="meta-value">{{ asset.path }}</span>
                     </div>
                     <div class="meta-item" v-if="isImage">
@@ -123,7 +123,7 @@
                     :values="values"
                     :meta="meta"
                     :errors="errors"
-                    @updated="values = $event"
+                    @updated="values = { ...$event, focus: values.focus }"
                 >
                     <div class="editor-form" slot-scope="{ setFieldValue, setFieldMeta }">
 
@@ -187,7 +187,7 @@ import EditorActions from './EditorActions.vue';
 import FocalPointEditor from './FocalPointEditor.vue';
 import PdfViewer from './PdfViewer.vue';
 import PublishFields from '../../publish/Fields.vue';
-import HasHiddenFields from '../../data-list/HasHiddenFields';
+import HasHiddenFields from '../../publish/HasHiddenFields';
 
 export default {
 
@@ -295,7 +295,11 @@ export default {
             this.$axios.get(url).then(response => {
                 const data = response.data.data;
                 this.asset = data;
-                this.values = data.values;
+
+                // If there are no fields, it will be an empty array when PHP encodes
+                // it into JSON on the server. We'll ensure it's always an object.
+                this.values = _.isArray(data.values) ? {} : data.values;
+
                 this.meta = data.meta;
                 this.actionUrl = data.actionUrl;
                 this.actions = data.actions;

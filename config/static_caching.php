@@ -113,4 +113,16 @@ return [
         \Statamic\StaticCaching\Replacers\NoCacheReplacer::class,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Warm Queue
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define the name of the queue that requests will be pushed
+    | onto when warming the static cache using the static:warm command.
+    |
+    */
+
+    'warm_queue' => null,
+
 ];

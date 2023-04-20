@@ -4,6 +4,7 @@ namespace Statamic\View\Antlers\Language\Runtime;
 
 use Illuminate\Support\Facades\Log;
 use Statamic\Fields\Value;
+use Statamic\Modifiers\ModifierException;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Errors\AntlersErrorCodes;
@@ -115,8 +116,13 @@ class ModifierManager
                 $returnValue = $value->value();
             }
 
-            $returnValue = Modify::value($returnValue)
-                ->context($context)->$modifierName($parameters)->fetch();
+            try {
+                $returnValue = Modify::value($returnValue)
+                    ->context($context)->$modifierName($parameters)->fetch();
+            } catch (ModifierException $e) {
+                throw_if(config('app.debug'), ($prev = $e->getPrevious()) ? $prev : $e);
+                Log::notice(sprintf('Error in [%s] modifier: %s', $e->getModifier(), $e->getMessage()));
+            }
         }
 
         return $returnValue;
