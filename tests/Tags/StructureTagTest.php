@@ -8,6 +8,7 @@ use Statamic\Facades\Antlers;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -382,6 +383,45 @@ EOT;
         $this->assertEquals('[1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2]', $result);
     }
 
+    /** @test */
+    public function it_renders_a_nav_with_absolute_url()
+    {
+        $this->createCollectionAndNav();
+
+        // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
+        $template = <<<'EOT'
+<ul>
+{{ nav:test }}
+    <li>
+        <a href="{{ absolute_url }}">{{ title }}</a>
+    </li>
+{{ /nav:test }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul>
+    <li>
+        <a href="http://localhost/1">One</a>
+    </li>
+    <li>
+        <a href="http://localhost/2">Two</a>
+    </li>
+    <li>
+        <a href="http://localhost/3">Three</a>
+    </li>
+    <li>
+        <a href="">Title only</a>
+    </li>
+</ul>
+EOT;
+
+        $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
+            'foo' => 'bar', // to test that cascade is inherited.
+            'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
+        ]));
+    }
+
     private function makeNav($tree)
     {
         $nav = Nav::make('test');
@@ -403,7 +443,9 @@ EOT;
 
     private function createCollectionAndNav()
     {
-        $collection = tap(Collection::make('pages'))->save();
+        $collection = tap(Collection::make('pages'))->routes([
+            'en' => '/{id}',
+        ])->save();
 
         $one = EntryFactory::collection('pages')->id('1')->data(['title' => 'One', 'nav_title' => 'Navtitle One'])->create();
         $oneOne = EntryFactory::collection('pages')->id('1-1')->data(['title' => 'One One', 'nav_title' => 'Navtitle One One'])->create();
