@@ -27,7 +27,7 @@ abstract class Region
 
     protected function filterContext(array $context)
     {
-        foreach (['__env', 'app', 'errors'] as $var) {
+        foreach (['__env', 'app', 'errors', 'resolve', 'resolveComponentsUsing', 'forgetComponentsResolver', 'forgetFactory', 'flushCache', 'constructor'] as $var) {
             unset($context[$var]);
         }
 

@@ -34,7 +34,13 @@ class ServiceProvider extends LaravelServiceProvider
         });
 
         $this->app->singleton(Session::class, function ($app) {
-            return new Session($app['request']->getUri());
+            $uri = $app['request']->getUri();
+
+            if (config('statamic.static_caching.ignore_query_strings', false)) {
+                $uri = explode('?', $uri)[0];
+            }
+
+            return new Session($uri);
         });
 
         $this->app->bind(UrlExcluder::class, function ($app) {
@@ -70,7 +76,7 @@ class ServiceProvider extends LaravelServiceProvider
         });
 
         Blade::directive('nocache', function ($exp) {
-            return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', $__data); ?>';
+            return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>';
         });
     }
 }

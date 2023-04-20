@@ -112,7 +112,7 @@
                     :text="__('Add child nav item')"
                     @click="linkPage(vm)" />
                 <dropdown-item
-                    v-if="depth < maxDepth"
+                    v-if="depth < maxDepth && hasCollections"
                     :text="__('Add child link to entry')"
                     @click="linkEntries(vm)" />
                 <dropdown-item

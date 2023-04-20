@@ -30,7 +30,7 @@ dies: \'ist etwas YAML\'
 <pre class="language-markdown"><code>> Dies wird ein Zitat.</code></pre>
 
 <h3>Bilder</h3>
-<pre class="language-markdown"><code>![Alt Text](http://example.com/image.jpg)</code></pre>
+<pre class="language-markdown"><code>![Alt-Text](http://example.com/image.jpg)</code></pre>
 
 <h3>Ungeordnete Listen</h3>
 <pre class="language-markdown"><code>- Brötli

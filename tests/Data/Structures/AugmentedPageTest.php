@@ -90,7 +90,7 @@ class AugmentedPageTest extends AugmentedTestCase
             // entry blueprint
             'title', 'foo',
             // augmented entry keys
-            'amp_url', 'api_url', 'collection', 'date', 'edit_url', 'id', 'origin_id', 'is_entry',
+            'amp_url', 'api_url', 'collection', 'blueprint', 'date', 'edit_url', 'id', 'origin_id', 'is_entry',
             'last_modified', 'locale', 'mount', 'order', 'permalink', 'private',
             'published', 'slug', 'status', 'updated_at', 'updated_by', 'uri', 'url',
             // page blueprint
@@ -121,7 +121,7 @@ class AugmentedPageTest extends AugmentedTestCase
 
         $page = Mockery::mock(Page::class);
         $page->shouldReceive('id')->andReturn('page-id');
-        $page->shouldReceive('reference')->andReturnFalse();
+        $page->shouldReceive('reference')->andReturnNull();
         $page->shouldReceive('title')->andReturn('The Page Title');
         $page->shouldReceive('blueprint')->andReturn($blueprint);
         $page->shouldReceive('url')->andReturn('/the-url');

@@ -229,6 +229,7 @@ class ParserTestCase extends TestCase
         $processor->setData($data);
 
         $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
+        $processor->setAntlersParserInstance($runtimeParser);
 
         if ($withCoreTagsAndModifiers) {
             $runtimeParser->cascade(app(Cascade::class));

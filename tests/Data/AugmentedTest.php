@@ -13,6 +13,9 @@ use Tests\TestCase;
 
 class AugmentedTest extends TestCase
 {
+    private $thing;
+    private $blueprintThing;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -40,13 +43,26 @@ class AugmentedTest extends TestCase
     /** @test */
     public function it_gets_a_single_value_by_key()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing
-        {
+        $augmented = new class($this->thing) extends BaseAugmentedThing {
             //
         };
 
         $this->assertEqualsValue('bar', $augmented->get('foo'));
         $this->assertNullValue($augmented->get('unknown'));
+    }
+
+    /** @test */
+    public function it_can_use_null_as_a_supplement_value()
+    {
+        $augmented = new class($this->thing) extends BaseAugmentedThing {
+            //
+        };
+
+        $this->assertEqualsValue('bar', $augmented->get('foo'));
+
+        $this->thing->setSupplement('foo', null);
+
+        $this->assertNullValue($augmented->get('foo'));
     }
 
     /** @test */
@@ -60,8 +76,7 @@ class AugmentedTest extends TestCase
             }
         };
 
-        $augmented = new class($thingWithValueMethod) extends BaseAugmentedThing
-        {
+        $augmented = new class($thingWithValueMethod) extends BaseAugmentedThing {
             //
         };
 

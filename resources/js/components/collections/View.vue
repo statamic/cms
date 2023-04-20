@@ -14,10 +14,10 @@
                 </dropdown-list>
 
                 <div class="btn-group mr-2" v-if="canUseStructureTree && !treeIsDirty">
-                    <button class="btn px-2" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
+                    <button class="btn flex items-center px-2" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
                         <svg-icon name="structures" class="h-4 w-4"/>
                     </button>
-                    <button class="btn px-2" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
+                    <button class="btn flex items-center px-2" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
                     </button>
                 </div>

@@ -7,6 +7,7 @@
 
         <data-list
             v-if="!initializing"
+            ref="dataList"
             :columns="columns"
             :rows="items"
             :sort="false"

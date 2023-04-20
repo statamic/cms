@@ -5,7 +5,7 @@
         name="{{ handle }}"
         value="1"
         {{ if js_driver }}{{ js_attributes }}{{ /if }}
-        {{ if ! old && default }}checked{{ /if }}
+        {{ if value && value !== '0' }}checked{{ /if }}
         {{ if validate|contains:required }}required{{ /if }}
     >
     {{ if inline_label }}

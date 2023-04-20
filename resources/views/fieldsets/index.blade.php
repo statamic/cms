@@ -10,7 +10,12 @@
             <a href="{{ cp_route('fieldsets.create') }}" class="btn-primary">{{ __('Create Fieldset') }}</a>
         </div>
 
-        <fieldset-listing :initial-rows="{{ json_encode($fieldsets) }}"></fieldset-listing>
+        @foreach ($fieldsets as $key => $f)
+            <div class="mb-2">
+                @if ($fieldsets->count() > 1)<h3 class="pl-0 mb-1 little-heading">{{ $key }}</h3>@endif
+                <fieldset-listing :initial-rows="{{ json_encode($f) }}"></fieldset-listing>
+            </div>
+        @endforeach
 
     @else
 

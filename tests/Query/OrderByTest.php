@@ -9,6 +9,7 @@ class OrderByTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider parseProvider
      **/
     public function it_parses_string($string, $sort, $dir)

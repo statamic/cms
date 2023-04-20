@@ -84,28 +84,32 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
-    public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_taxonomy()
+    public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_singular_taxonomy()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
 
         BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect());
         BlueprintRepository::shouldReceive('find')->with('default')->andReturn(
-            $blueprint = (new Blueprint)
+            $default = (new Blueprint)
+                ->setInitialPath('this/wont/change')
                 ->setHandle('thisll_change')
+                ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
 
+        $blueprint = $taxonomy->termBlueprint();
+        $this->assertNotEquals($default, $blueprint);
+
         $blueprints = $taxonomy->termBlueprints();
         $this->assertCount(1, $blueprints);
-        $this->assertEquals([$blueprint], $blueprints->all());
+        $this->assertEquals($blueprint, $blueprints->get(0)->setParent($taxonomy));
 
-        tap($taxonomy->termBlueprint(), function ($default) use ($blueprint) {
-            $this->assertEquals($blueprint, $default);
-            $this->assertEquals('tags', $default->handle());
-            $this->assertEquals('Tags', $default->title());
-        });
+        $this->assertEquals('this/wont/change', $blueprint->initialPath());
+        $this->assertEquals('tag', $blueprint->handle());
+        $this->assertEquals('taxonomies.tags', $blueprint->namespace());
+        $this->assertEquals('Tag', $blueprint->title());
 
-        $this->assertEquals($blueprint, $taxonomy->termBlueprint('tags'));
+        $this->assertEquals($blueprint, $taxonomy->termBlueprint('tag'));
         $this->assertNull($taxonomy->termBlueprint('two'));
     }
 
@@ -175,6 +179,7 @@ class TaxonomyTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider additionalPreviewTargetProvider
      */
     public function it_gets_and_sets_preview_targets($throughFacade)

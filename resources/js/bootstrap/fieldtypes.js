@@ -29,6 +29,7 @@ Vue.component('collection_title_formats-fieldtype', require('../components/colle
 Vue.component('color-fieldtype', require('../components/fieldtypes/ColorFieldtype.vue').default);
 Vue.component('date-fieldtype', require('../components/fieldtypes/DateFieldtype.vue').default);
 Vue.component('fields-fieldtype', require('../components/fieldtypes/grid/FieldsFieldtype.vue').default);
+Vue.component('files-fieldtype', require('../components/fieldtypes/FilesFieldtype.vue').default);
 Vue.component('float-fieldtype', require('../components/fieldtypes/FloatFieldtype.vue').default);
 Vue.component('global_set_sites-fieldtype', require('../components/globals/Sites.vue').default);
 Vue.component('grid-fieldtype', require('../components/fieldtypes/grid/Grid.vue').default);
@@ -57,5 +58,6 @@ Vue.component('template-fieldtype', TemplateFieldtype);
 Vue.component('template_folder-fieldtype', require('../components/fieldtypes/TemplateFolderFieldtype.vue').default);
 Vue.component('time-fieldtype', require('../components/fieldtypes/TimeFieldtype.vue').default);
 Vue.component('toggle-fieldtype', require('../components/fieldtypes/ToggleFieldtype.vue').default);
+Vue.component('toggle-fieldtype-index', require('../components/fieldtypes/ToggleIndexFieldtype.vue').default);
 Vue.component('video-fieldtype', require('../components/fieldtypes/VideoFieldtype.vue').default);
 Vue.component('yaml-fieldtype', require('../components/fieldtypes/YamlFieldtype.vue').default);

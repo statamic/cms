@@ -23,6 +23,7 @@ class SetQueryParamTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider existingQueryParametersProvider
      */
     public function it_updates_an_existing_query_param($expected, $input, array $queryParam = [])
@@ -45,6 +46,7 @@ class SetQueryParamTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider nonExistingQueryParametersProvider
      */
     public function it_adds_a_non_existant_query_param($expected, $input, array $queryParam = [])

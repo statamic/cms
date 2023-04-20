@@ -46,8 +46,7 @@ export default {
 
     data() {
         return {
-            depth: null,
-            portal: null,
+            stack: null,
             visible: false,
             isHovering: false,
             escBinding: null,
@@ -55,6 +54,14 @@ export default {
     },
 
     computed: {
+
+        portal() {
+            return this.stack ? this.stack.key : null;
+        },
+
+        depth() {
+            return this.stack.depth;
+        },
 
         id() {
             return `${this.name}-${this._uid}`;
@@ -94,9 +101,7 @@ export default {
     },
 
     created() {
-        this.depth = this.$stacks.count() + 1;
-        this.portal = `stack-${this.depth-1}`;
-        this.$stacks.add(this);
+        this.stack = this.$stacks.add(this);
 
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => this.isHovering = true);
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => this.isHovering = false);

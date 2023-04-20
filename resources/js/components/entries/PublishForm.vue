@@ -59,6 +59,7 @@
             :site="site"
             :localized-fields="localizedFields"
             :is-root="isRoot"
+            :track-dirty-state="trackDirtyState"
             @updated="values = $event"
         >
             <live-preview
@@ -100,17 +101,17 @@
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-2 flex items-center -mx-1">
+                                    <div class="p-2 flex items-center -mx-1" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
                                             class="flex items-center justify-center btn-flat w-full mx-1 px-1"
-                                            v-if="isBase && livePreviewUrl"
+                                            v-if="showLivePreviewButton"
                                             @click="openLivePreview">
                                             <svg-icon name="synchronize" class="w-5 h-5 mr-1" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
                                             class="flex items-center justify-center btn-flat w-full mx-1 px-1"
-                                            v-if="permalink"
+                                            v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">
                                             <svg-icon name="external-link" class="w-4 h-4 mr-1" />
@@ -119,12 +120,20 @@
                                     </div>
                                 </div>
 
-                                <div class="flex items-center border-t justify-between px-2 py-1" v-if="!revisionsEnabled">
+                                <div
+                                    v-if="!revisionsEnabled"
+                                    class="flex items-center justify-between px-2 py-1"
+                                    :class="{ 'border-t': showLivePreviewButton || showVisitUrlButton }"
+                                >
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
                                     <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
                                 </div>
 
-                                <div class="border-t p-2" v-if="revisionsEnabled && !isCreating">
+                                <div
+                                    v-if="revisionsEnabled && !isCreating"
+                                    class="p-2"
+                                    :class="{ 'border-t': showLivePreviewButton || showVisitUrlButton }"
+                                >
                                     <label class="publish-field-label font-medium mb-1" v-text="__('Revisions')"/>
                                     <div class="mb-sm flex items-center" v-if="published">
                                         <span class="text-green w-6 text-center">&check;</span>
@@ -167,7 +176,11 @@
                                                 'bg-red': !option.exists
                                             }" />
                                             {{ option.name }}
-                                            <loading-graphic :size="14" text="" class="ml-1" v-if="localizing === option.handle" />
+                                            <loading-graphic
+                                                :size="14"
+                                                text=""
+                                                class="ml-1"
+                                                v-if="localizing && localizing.handle === option.handle" />
                                         </div>
                                         <div class="badge-sm bg-orange" v-if="option.origin" v-text="__('Origin')" />
                                         <div class="badge-sm bg-blue" v-if="option.active" v-text="__('Active')" />
@@ -243,10 +256,32 @@
             :collection="collectionHandle"
             :reference="initialReference"
             :publish-container="publishContainer"
+            :can-manage-publish-state="canManagePublishState"
             @closed="confirmingPublish = false"
             @saving="saving = true"
             @saved="publishActionCompleted"
         />
+
+        <confirmation-modal
+            v-if="selectingOrigin"
+            :title="__('Create Localization')"
+            :buttonText="__('Create')"
+            @cancel="cancelLocalization()"
+            @confirm="createLocalization(localizing)"
+        >
+            <div class="publish-fields">
+                <div class="form-group publish-field field-w-full">
+                    <label v-text="__('Origin')" />
+                    <div class="help-block -mt-1" v-text="__('messages.entry_origin_instructions')"></div>
+                    <select-input
+                        v-model="selectedOrigin"
+                        :options="originOptions"
+                        :placeholder="false"
+                    />
+                </div>
+            </div>
+
+        </confirmation-modal>
     </div>
 
 </template>
@@ -257,7 +292,7 @@ import PublishActions from './PublishActions';
 import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History';
 import HasPreferences from '../data-list/HasPreferences';
-import HasHiddenFields from '../data-list/HasHiddenFields';
+import HasHiddenFields from '../publish/HasHiddenFields';
 
 export default {
 
@@ -281,6 +316,7 @@ export default {
         initialTitle: String,
         initialLocalizations: Array,
         initialLocalizedFields: Array,
+        originBehavior: String,
         initialHasOrigin: Boolean,
         initialOriginValues: Object,
         initialOriginMeta: Object,
@@ -304,6 +340,7 @@ export default {
         listingUrl: String,
         collectionHasRoutes: Boolean,
         previewTargets: Array,
+        autosaveInterval: Number,
     },
 
     data() {
@@ -311,6 +348,7 @@ export default {
             actions: this.initialActions,
             saving: false,
             localizing: false,
+            trackDirtyState: true,
             fieldset: this.initialFieldset,
             title: this.initialTitle,
             values: _.clone(this.initialValues),
@@ -321,6 +359,8 @@ export default {
             originValues: this.initialOriginValues || {},
             originMeta: this.initialOriginMeta || {},
             site: this.initialSite,
+            selectingOrigin: false,
+            selectedOrigin: null,
             isWorkingCopy: this.initialIsWorkingCopy,
             error: null,
             errors: {},
@@ -344,6 +384,7 @@ export default {
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
             quickSave: false,
+            isAutosave: false,
         }
     },
 
@@ -375,6 +416,14 @@ export default {
 
         livePreviewUrl() {
             return _.findWhere(this.localizations, { active: true }).livePreviewUrl;
+        },
+
+        showLivePreviewButton() {
+            return !this.isCreating && this.isBase && this.livePreviewUrl;
+        },
+
+        showVisitUrlButton() {
+            return !!this.permalink;
         },
 
         isBase() {
@@ -419,6 +468,15 @@ export default {
 
         afterSaveOption() {
             return this.getPreference('after_save');
+        },
+
+        originOptions() {
+            return this.localizations
+                .filter(localization => localization.exists)
+                .map(localization => ({
+                    value: localization.handle,
+                    label: localization.name,
+                }));
         },
 
     },
@@ -480,7 +538,7 @@ export default {
                     document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
                 }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                if (!this.isCreating) this.$toast.success(__('Saved'));
+                if (!this.isCreating && !this.isAutosave) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);
             }).catch(error => this.handleAxiosError(error));
@@ -502,7 +560,7 @@ export default {
                         return;
                     }
 
-                    let nextAction = this.quickSave ? 'continue_editing' : this.afterSaveOption;
+                    let nextAction = this.quickSave || this.isAutosave ? 'continue_editing' : this.afterSaveOption;
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (!this.isInline && nextAction === 'create_another') {
@@ -518,6 +576,7 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
+                        this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;
@@ -525,7 +584,8 @@ export default {
                     }
 
                     this.quickSave = false;
-                }).catch(e => {});
+                    this.isAutosave = false;
+                }).catch(e => console.error(e));
         },
 
         confirmPublish() {
@@ -559,10 +619,12 @@ export default {
 
             this.$dirty.remove(this.publishContainer);
 
-            this.localizing = localization.handle;
+            this.localizing = localization;
 
             if (localization.exists) {
                 this.editLocalization(localization);
+            } else if (this.localizations.length > 2 && this.originBehavior === 'select') {
+                this.selectingOrigin = true;
             } else {
                 this.createLocalization(localization);
             }
@@ -574,6 +636,9 @@ export default {
 
         editLocalization(localization) {
             return this.$axios.get(localization.url).then(response => {
+                clearTimeout(this.trackDirtyStateTimeout);
+                this.trackDirtyState = false;
+
                 const data = response.data;
                 this.values = data.values;
                 this.originValues = data.originValues;
@@ -591,26 +656,36 @@ export default {
                 this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
-                setTimeout(() => this.$refs.container.clearDirtyState(), 150); // after any fieldtypes do a debounced update
+                this.initialPublished = data.values.published;
+
+                this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 300); // after any fieldtypes do a debounced update
             })
         },
 
         createLocalization(localization) {
+            this.selectingOrigin = false;
+
             if (this.isCreating) {
                 this.$nextTick(() => window.location = localization.url);
                 return;
             }
 
-            const url = this.activeLocalization.url + '/localize';
+            const originLocalization = this.localizations.find(e => e.handle === this.selectedOrigin);
+            const url = originLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then(response => {
                 this.editLocalization(response.data).then(() => {
-                    this.$events.$emit('localization.created', {store: this.publishContainer});
+                    this.$events.$emit('localization.created', { store: this.publishContainer });
 
                     if (this.originValues.published) {
                         this.setFieldValue('published', true);
                     }
                 });
             });
+        },
+
+        cancelLocalization() {
+            this.selectingOrigin = false;
+            this.localizing = false;
         },
 
         localizationStatusText(localization) {
@@ -676,6 +751,17 @@ export default {
                 this.localizedFields.push(handle);
 
             this.$refs.container.dirty();
+        },
+
+        setAutosaveInterval() {
+            const interval = setInterval(() => {
+                if (!this.isDirty) return;
+
+                this.isAutosave = true;
+                this.save();
+            }, this.autosaveInterval);
+
+            this.$store.commit(`publish/${this.publishContainer}/setAutosaveInterval`, interval);
         }
     },
 
@@ -694,10 +780,26 @@ export default {
         });
 
         this.$store.commit(`publish/${this.publishContainer}/setPreloadedAssets`, this.preloadedAssets);
+
+        if (typeof this.autosaveInterval === 'number') {
+            this.setAutosaveInterval();
+        }
     },
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+
+        this.selectedOrigin = this.originBehavior === 'active'
+            ? this.localizations.find(l => l.active)?.handle
+            : this.localizations.find(l => l.root)?.handle;
+    },
+
+    unmounted() {
+        clearTimeout(this.trackDirtyStateTimeout);
+    },
+
+    beforeDestroy() {
+        this.$store.commit(`publish/${this.publishContainer}/clearAutosaveInterval`);
     },
 
     destroyed() {

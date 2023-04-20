@@ -33,6 +33,7 @@ class CollectionsController extends CpController
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
+                'url' => $collection->absoluteUrl(Site::selected()->handle()),
                 'blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
                 'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
                 'deleteable' => User::current()->can('delete', $collection),
@@ -164,6 +165,7 @@ class CollectionsController extends CpController
                 ? $collection->titleFormats()->first()
                 : $collection->titleFormats()->all(),
             'preview_targets' => $collection->basePreviewTargets(),
+            'origin_behavior' => $collection->originBehavior(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($collection))
@@ -244,7 +246,9 @@ class CollectionsController extends CpController
             ->previewTargets($values['preview_targets']);
 
         if ($sites = array_get($values, 'sites')) {
-            $collection->sites($sites);
+            $collection
+                ->sites($sites)
+                ->originBehavior($values['origin_behavior']);
         }
 
         if (! $values['structured']) {
@@ -474,6 +478,17 @@ class CollectionsController extends CpController
                         'type' => 'toggle',
                         'display' => __('Propagate'),
                         'instructions' => __('statamic::messages.collection_configure_propagate_instructions'),
+                    ],
+                    'origin_behavior' => [
+                        'type' => 'select',
+                        'display' => __('Origin Behavior'),
+                        'instructions' => __('statamic::messages.collection_configure_origin_behavior_instructions'),
+                        'default' => 'select',
+                        'options' => [
+                            'select' => __('statamic::messages.collection_configure_origin_behavior_option_select'),
+                            'root' => __('statamic::messages.collection_configure_origin_behavior_option_root'),
+                            'active' => __('statamic::messages.collection_configure_origin_behavior_option_active'),
+                        ],
                     ],
                 ],
             ];

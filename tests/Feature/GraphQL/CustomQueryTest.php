@@ -22,6 +22,7 @@ class CustomQueryTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup addCustomQueryWithMethod
      **/
     public function a_custom_query_can_be_added_to_the_default_schema()
@@ -39,6 +40,7 @@ class CustomQueryTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup addCustomQueryThroughConfig
      **/
     public function a_custom_query_can_be_added_to_the_default_schema_through_config()

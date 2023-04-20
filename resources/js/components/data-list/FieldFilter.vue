@@ -23,11 +23,12 @@
                 >
                     <!-- TODO: handle showing/hiding of labels more elegantly -->
                     <publish-fields
-                        slot-scope="{ setFieldValue }"
+                        slot-scope="{ setFieldValue, setFieldMeta }"
                         :fields="filter.fields"
                         name-prefix="filter-field"
                         class="w-full no-label"
                         @updated="setFieldValue"
+                        @meta-updated="setFieldMeta"
                     />
                 </publish-container>
 
@@ -61,6 +62,8 @@ export default {
     props: {
         config: Object,
         values: Object,
+        badges: Object,
+        popoverClosed: Function
     },
 
     data() {
@@ -139,6 +142,12 @@ export default {
         this.reset();
 
         this.$refs.fieldSelect.$refs.search.focus();
+
+        this.popoverClosed(() => {
+            if (! this.badges[this.field]) {
+                this.resetAll();
+            }
+        });
     },
 
     methods: {

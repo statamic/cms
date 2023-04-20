@@ -28,6 +28,19 @@ class PrefixedFieldsTest extends ParserTestCase
         ];
     }
 
+    public function test_scope_prefixes_work_inside_conditions()
+    {
+        $template = <<<'EOT'
+{{ scope handle_prefix="prefix_" }}
+<Title: {{ title }}><Condition: {{ if title }}{{title}}{{ /if }}{{ /scope }}>
+EOT;
+
+        $this->assertSame(
+            '<Title: Prefix: Title><Condition: Prefix: Title>',
+            trim($this->renderString($template, $this->data, true))
+        );
+    }
+
     public function test_scope_prefixes_can_apply_to_array_vars()
     {
         $template = <<<'EOT'

@@ -60,10 +60,6 @@
 
         </div>
 
-        <audio ref="soundDrop">
-            <source :src="soundDropUrl" type="audio/mp3">
-        </audio>
-
     </div>
 </template>
 
@@ -100,7 +96,6 @@ export default {
             saving: false,
             pages: [],
             treeData: [],
-            soundDropUrl: this.$config.get('resourceUrl') + '/audio/click.mp3',
         }
     },
 
@@ -161,7 +156,6 @@ export default {
             tree = tree || this.$refs.tree;
 
             this.pages = tree.getPureData();
-            this.$refs.soundDrop.play();
             this.$emit('changed');
         },
 

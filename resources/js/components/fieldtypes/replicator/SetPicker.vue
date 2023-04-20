@@ -34,7 +34,7 @@ export default {
     methods: {
 
         addSet(handle) {
-            this.$emit('added', handle, this.index + 1);
+            this.$emit('added', handle, this.index);
         }
 
     }

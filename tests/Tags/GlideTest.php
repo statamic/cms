@@ -11,6 +11,7 @@ class GlideTest extends TestCase
 {
     /**
      * @test
+     *
      * @define-env relativeRouteUrl
      */
     public function it_outputs_a_relative_url_by_default_when_the_glide_route_is_relative()
@@ -24,6 +25,7 @@ class GlideTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env absoluteHttpRouteUrl
      */
     public function it_outputs_an_absolute_url_by_default_when_the_glide_route_is_absolute_http()
@@ -37,6 +39,7 @@ class GlideTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env absoluteHttpsRouteUrl
      */
     public function it_outputs_an_absolute_url_by_default_when_the_glide_route_is_absolute_https()
@@ -46,6 +49,20 @@ class GlideTest extends TestCase
         $this->assertEquals('https://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag());
         $this->assertEquals('/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag(false));
         $this->assertEquals('https://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag(true));
+    }
+
+    /**
+     * @test
+     */
+    public function it_outputs_a_data_url()
+    {
+        $this->createImageInPublicDirectory();
+
+        $tag = <<<'EOT'
+{{ glide:data_url :src="foo" }}
+EOT;
+
+        $this->assertStringStartsWith('data:image/jpeg;base64', (string) Parse::template($tag, ['foo' => 'bar.jpg']));
     }
 
     public function relativeRouteUrl($app)

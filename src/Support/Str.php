@@ -2,6 +2,7 @@
 
 namespace Statamic\Support;
 
+use Closure;
 use Statamic\Facades\Compare;
 use Stringy\StaticStringy;
 use voku\helper\ASCII;
@@ -89,14 +90,14 @@ class Str extends \Illuminate\Support\Str
         return strip_tags($html);
     }
 
-    public static function slug($string, $separator = '-', $language = 'en')
+    public static function slug($string, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
     {
         $string = (string) $string;
 
         // Statamic is a-OK with underscores in slugs.
         $string = str_replace('_', $placeholder = strtolower(str_random(16)), $string);
 
-        $slug = parent::slug($string, $separator, $language);
+        $slug = parent::slug($string, $separator, $language, $dictionary);
 
         return str_replace($placeholder, '_', $slug);
     }
@@ -217,6 +218,24 @@ class Str extends \Illuminate\Support\Str
     }
 
     /**
+     * Parse each part of a string split with a regex through a callback function.
+     *
+     * @param  string  $value
+     * @param  string  $regex
+     * @param  Closure  $callback
+     * @return string
+     */
+    public static function mapRegex($value, $regex, Closure $callback)
+    {
+        $parts = preg_split($regex, $value, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        foreach ($parts as $i => $part) {
+            $parts[$i] = $callback($part, preg_match($regex, $part));
+        }
+
+        return implode('', $parts);
+    }
+
+    /**
      * Apply multiple string modifications via array.
      *
      * @param  string  $string
@@ -275,6 +294,11 @@ class Str extends \Illuminate\Support\Str
     public static function replace($string, $search, $replace)
     {
         return StaticStringy::replace($string, $search, $replace);
+    }
+
+    public static function safeTruncateReverse($string, $length, $substring = '')
+    {
+        return self::reverse(self::safeTruncate(self::reverse($string), $length, $substring));
     }
 
     public static function studly($value)

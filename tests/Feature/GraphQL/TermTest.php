@@ -21,6 +21,7 @@ class TermTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup disableQueries
      **/
     public function query_only_works_if_enabled()
@@ -139,7 +140,7 @@ GQL;
     /** @test */
     public function it_can_add_custom_fields_to_an_implementation()
     {
-        GraphQL::addField('Term_Tags_Tags', 'one', function () {
+        GraphQL::addField('Term_Tags_Tag', 'one', function () {
             return [
                 'type' => GraphQL::string(),
                 'resolve' => function ($a) {
@@ -148,7 +149,7 @@ GQL;
             ];
         });
 
-        GraphQL::addField('Term_Tags_Tags', 'title', function () {
+        GraphQL::addField('Term_Tags_Tag', 'title', function () {
             return [
                 'type' => GraphQL::string(),
                 'resolve' => function ($a) {
@@ -164,7 +165,7 @@ GQL;
 {
     term(id: "tags::alpha") {
         id
-        ... on Term_Tags_Tags {
+        ... on Term_Tags_Tag {
             one
             title
         }
@@ -188,7 +189,7 @@ GQL;
     /** @test */
     public function adding_custom_field_to_an_implementation_does_not_add_it_to_the_interface()
     {
-        GraphQL::addField('Term_Tags_Tags', 'one', function () {
+        GraphQL::addField('Term_Tags_Tag', 'one', function () {
             return [
                 'type' => GraphQL::string(),
                 'resolve' => function ($a) {
@@ -213,7 +214,7 @@ GQL;
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertJson(['errors' => [[
-                'message' => 'Cannot query field "one" on type "TermInterface". Did you mean to use an inline fragment on "Term_Tags_Tags"?',
+                'message' => 'Cannot query field "one" on type "TermInterface". Did you mean to use an inline fragment on "Term_Tags_Tag"?',
             ]]]);
     }
 

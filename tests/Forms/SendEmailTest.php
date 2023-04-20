@@ -24,7 +24,7 @@ class SendEmailTest extends TestCase
 
         (new SendEmail(
             $submission = $form->makeSubmission(),
-            $site = Mockery::mock(Site::class),
+            $site = Mockery::mock(Site::class)->shouldReceive('lang')->andReturn('en')->getMock(),
             [
                 'from' => 'first@sender.com',
                 'to' => 'first@recipient.com',

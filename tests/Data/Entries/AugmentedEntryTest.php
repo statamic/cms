@@ -14,6 +14,7 @@ use Statamic\Entries\Entry;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
+use Statamic\Fields\Blueprint as FieldsBlueprint;
 use Tests\Data\AugmentedTestCase;
 
 class AugmentedEntryTest extends AugmentedTestCase
@@ -65,6 +66,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             ->data([
                 'one' => 'the "one" value on the entry',
                 'two' => 'the "two" value on the entry and in the blueprint',
+                'eight' => 'should be immediately overridden by the supplement',
                 'updated_by' => 'test-user',
                 'updated_at' => '1486131000',
             ])
@@ -75,7 +77,8 @@ class AugmentedEntryTest extends AugmentedTestCase
             ->date('2018-01-03-1705')
             ->blueprint('test')
             ->setSupplement('three', 'the "three" value supplemented on the entry')
-            ->setSupplement('four', 'the "four" value supplemented on the entry and in the blueprint');
+            ->setSupplement('four', 'the "four" value supplemented on the entry and in the blueprint')
+            ->setSupplement('eight', null);
 
         $mount = tap(Collection::make('mountable')->mount($entry->id()))->save();
 
@@ -98,6 +101,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             'order'         => ['type' => 'null', 'value' => null], // todo: test for when this is an int
             'is_entry'      => ['type' => 'bool', 'value' => true],
             'collection'    => ['type' => CollectionContract::class, 'value' => $collection],
+            'blueprint'     => ['type' => FieldsBlueprint::class, 'value' => $blueprint],
             'mount'         => ['type' => CollectionContract::class, 'value' => $mount],
             'locale'        => ['type' => 'string', 'value' => 'en'],
             'last_modified' => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
@@ -110,6 +114,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             'five'          => ['type' => 'string', 'value' => 'the "five" value from the origin'],
             'six'           => ['type' => 'string', 'value' => 'the "six" value from the origin and in the blueprint'],
             'seven'         => ['type' => 'string', 'value' => 'the "seven" value from the collection'],
+            'eight'         => ['type' => 'null', 'value' => null], // explicitly supplemented null
             'title'         => ['type' => 'string', 'value' => null],
             'unused_in_bp'  => ['type' => 'string', 'value' => null],
         ];

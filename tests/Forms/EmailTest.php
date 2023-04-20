@@ -19,6 +19,7 @@ class EmailTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider multipleAddressProvider
      */
     public function it_adds_recipient_from_the_config($address, $expected)
@@ -30,6 +31,7 @@ class EmailTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider singleAddressProvider
      */
     public function it_adds_sender_from_the_config($address, $expected)
@@ -41,6 +43,7 @@ class EmailTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider multipleAddressProvider
      */
     public function it_adds_reply_to_from_the_config($address, $expected)
@@ -52,6 +55,7 @@ class EmailTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider multipleAddressProvider
      */
     public function it_adds_cc_from_the_config($address, $expected)
@@ -63,6 +67,7 @@ class EmailTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider multipleAddressProvider
      */
     public function it_adds_bcc_from_the_config($address, $expected)
@@ -214,9 +219,8 @@ class EmailTest extends TestCase
 
         $makeEmail = function ($site) {
             $submission = Mockery::mock(Submission::class);
-            $submission->shouldReceive('toAugmentedArray')->andReturn([]);
 
-            return tap(new Email($submission, ['to' => 'test@test.com'], $site))->build();
+            return new Email($submission, ['to' => 'test@test.com'], $site);
         };
 
         $this->assertEquals('en', $makeEmail(Site::get('one'))->locale);

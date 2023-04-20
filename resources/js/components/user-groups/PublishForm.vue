@@ -25,7 +25,7 @@
                     {{ __('messages.role_change_handle_warning') }}
                 </div>
 
-                <div class="form-group publish-field w-full">
+                <div class="form-group publish-field w-full" v-if="$permissions.has('assign roles')">
                     <div class="field-inner">
                         <label class="publish-field-label" v-text="__('Roles')" />
                         <div class="help-block -mt-1">

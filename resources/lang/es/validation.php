@@ -30,6 +30,7 @@ return [
     ],
     'boolean'              => 'Debe ser verdadero o falso.',
     'confirmed'            => 'La confirmación no coincide.',
+    'current_password'     => 'La contraseña es incorrecta.',
     'date'                 => 'No es una fecha válida.',
     'date_format'          => 'No coincide con el formato :format.',
     'different'            => 'Este campo y :other deben ser diferentes.',
@@ -128,6 +129,9 @@ return [
     'duplicate_field_handle'    => 'El campo con un identificador de :handle no se puede usar más de una vez.',
     'one_site_without_origin'   => 'Al menos un sitio no debe tener un origen.',
     'origin_cannot_be_disabled' => 'No se puede seleccionar un origen inhabilitado.',
+    'unique_uri' => 'Este URI ya se ha tomado.',
+    'duplicate_uri' => 'URI duplicada :value',
+    'reserved' => 'Esta es una palabra reservada.',
 
     /*
     |--------------------------------------------------------------------------
@@ -144,7 +148,6 @@ return [
             'nombre-de-regla' => 'mensaje-personalizado',
         ],
     ],
-    'attributes' => [],
 
     /*
     |--------------------------------------------------------------------------

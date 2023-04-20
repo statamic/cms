@@ -31,6 +31,7 @@ class EntryTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup disableQueries
      **/
     public function query_only_works_if_enabled()
@@ -89,8 +90,8 @@ GQL;
                     'published' => true,
                     'private' => false,
                     'status' => 'published',
-                    'date' => 'November 3rd, 2017',
-                    'last_modified' => 'December 25th, 2017',
+                    'date' => '2017-11-03 00:00:00',
+                    'last_modified' => '2017-12-25 13:29:00',
                     'blueprint' => 'event',
                     'collection' => [
                         'title' => 'Events',

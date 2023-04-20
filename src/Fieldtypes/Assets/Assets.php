@@ -128,7 +128,7 @@ class Assets extends Fieldtype
     {
         return collect($items)->map(function ($url) {
             return ($asset = Asset::find($url))
-                ? (new AssetResource($asset))->resolve()
+                ? (new AssetResource($asset))->resolve()['data']
                 : null;
         })->filter()->values();
     }
@@ -223,6 +223,7 @@ class Assets extends Fieldtype
             $arr = [
                 'id' => $asset->id(),
                 'is_image' => $isImage = $asset->isImage(),
+                'is_svg' => $asset->isSvg(),
                 'extension' => $asset->extension(),
                 'url' => $asset->url(),
             ];
@@ -230,7 +231,7 @@ class Assets extends Fieldtype
             if ($isImage) {
                 $arr['thumbnail'] = cp_route('assets.thumbnails.show', [
                     'encoded_asset' => base64_encode($asset->id()),
-                    'size' => 'thumbnail',
+                    'size' => 'small',
                 ]);
             }
 

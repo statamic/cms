@@ -2,6 +2,7 @@
 
 namespace Statamic\Imaging;
 
+use Facades\Statamic\Imaging\ImageValidator;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\FileNotFoundException as FlysystemFileNotFoundException;
 use League\Flysystem\Filesystem;
@@ -141,8 +142,17 @@ class ImageGenerator
      */
     public function generateByAsset($asset, array $params)
     {
+        $manipulationCacheKey = 'asset::'.$asset->id().'::'.md5(json_encode($params));
+        $manifestCacheKey = static::assetCacheManifestKey($asset);
+
+        // Store the cache key for this manipulation in a manifest so that we can easily remove when deleting an asset.
+        Glide::cacheStore()->forever(
+            $manifestCacheKey,
+            collect(Glide::cacheStore()->get($manifestCacheKey, []))->push($manipulationCacheKey)->unique()->all()
+        );
+
         return Glide::cacheStore()->rememberForever(
-            'asset::'.$asset->id().'::'.md5(json_encode($params)),
+            $manipulationCacheKey,
             fn () => $this->doGenerateByAsset($asset, $params)
         );
     }
@@ -158,9 +168,19 @@ class ImageGenerator
         $this->server->setSourcePathPrefix($this->asset->folder());
 
         // Set the cache path so files are saved appropriately.
-        $this->server->setCachePathPrefix('containers/'.$this->asset->container()->id().'/'.$this->asset->folder());
+        $this->server->setCachePathPrefix(self::assetCachePathPrefix($this->asset).'/'.$this->asset->folder());
 
         return $this->generate($this->asset->basename());
+    }
+
+    public static function assetCacheManifestKey($asset)
+    {
+        return 'asset::'.$asset->id();
+    }
+
+    public static function assetCachePathPrefix($asset)
+    {
+        return 'containers/'.$asset->container()->id();
     }
 
     /**
@@ -259,20 +279,20 @@ class ImageGenerator
      */
     private function applyDefaultManipulations()
     {
-        $defaults = [];
+        $defaults = Glide::normalizeParameters(
+            Config::get('statamic.assets.image_manipulation.defaults') ?: []
+        );
 
         // Enable automatic cropping
         if (Config::get('statamic.assets.auto_crop') && $this->asset) {
             $defaults['fit'] = 'crop-'.$this->asset->get('focus', '50-50');
         }
 
-        // TODO: Allow user defined defaults and merge them in here.
-
         $this->server->setDefaults($defaults);
     }
 
     /**
-     * Ensure that the image is actually an image.
+     * Ensure that the image is actually an image and is allowed to be manipulated.
      *
      * @throws \Exception
      */
@@ -281,16 +301,18 @@ class ImageGenerator
         if ($this->asset) {
             $path = $this->asset->path();
             $mime = $this->asset->mimeType();
+            $extension = $this->asset->extension();
         } else {
             $path = public_path($this->path);
             if (! File::exists($path)) {
                 throw $this->isUsingFlysystemOne() ? new FlysystemFileNotFoundException($path) : UnableToReadFile::fromLocation($path);
             }
             $mime = File::mimeType($path);
+            $extension = File::extension($path);
         }
 
-        if ($mime !== null && strncmp($mime, 'image/', 6) !== 0) {
-            throw new \Exception("Image [{$path}] does not actually appear to be an image.");
+        if (! ImageValidator::isValidImage($extension, $mime)) {
+            throw new \Exception("Image [{$path}] does not actually appear to be a valid image.");
         }
     }
 

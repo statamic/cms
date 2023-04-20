@@ -73,6 +73,8 @@ return [
     'change_passwords' => 'Jelszavak módosítása',
     'edit_user_groups' => 'Csoportok szerkesztése',
     'edit_roles' => 'Szerepek szerkesztése',
+    'assign_user_groups' => 'Csoportok hozzárendelése felhasználókhoz',
+    'assign_roles' => 'Jogosultságok hozzárendelése felhasználókhoz',
 
     'group_updates' => 'Frissítések',
     'view_updates' => 'Frissítések megtekintése',
@@ -85,5 +87,8 @@ return [
     'group_misc' => 'Egyéb',
     'resolve_duplicate_ids' => 'Az ismétlődő ID-k feloldása',
     'resolve_duplicate_ids_desc' => 'Lehetővé teszi az ismétlődő ID-k megtekintését és feloldását.',
+
+    'view_graphql' => 'GraphQL',
+    'view_graphql_desc' => 'Hozzáférést biztosít a GraphQL megjelenítőhöz',
 
 ];

@@ -29,7 +29,8 @@ export default {
             default: () => true
         },
         container: String,
-        path: String
+        path: String,
+        url: { type: String, default: () => cp_url('assets') }
     },
 
 
@@ -96,7 +97,7 @@ export default {
          */
         bindUploader() {
             $(this.$el).dmUploader({
-                url: cp_url('assets'),
+                url: this.url,
 
                 extraData: this.extraData,
 

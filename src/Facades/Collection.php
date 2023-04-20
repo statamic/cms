@@ -14,6 +14,8 @@ use Statamic\Contracts\Entries\CollectionRepository;
  * @method static \Illuminate\Support\Collection handles()
  * @method static bool handleExists(string $handle)
  * @method static \Illuminate\Support\Collection whereStructured()
+ * @method static \Illuminate\Support\Collection getComputedCallbacks(string $collection)
+ * @method static void computed(string $collection, string $field, \Closure $callback)
  *
  * @see \Illuminate\Support\Collection
  * @see \Statamic\Entries\Collection

@@ -75,7 +75,7 @@
 
         @include('statamic::partials.docs-callout', [
             'topic' => __('Updates'),
-            'url' => 'updates'
+            'url' => Statamic::docsUrl('updating')
         ])
 
     @endif

@@ -4,6 +4,7 @@ namespace Statamic\Forms;
 
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
+use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
@@ -326,7 +327,15 @@ class Tags extends BaseTags
 
     protected function formHandle()
     {
-        return $this->params->get(static::HANDLE_PARAM, Arr::get($this->context, 'form'));
+        $form = $this->params->get(static::HANDLE_PARAM, Arr::get($this->context, 'form'));
+
+        if ($form instanceof FormContract) {
+            $handle = $form->handle();
+            Blink::put("form-$handle", $form);
+            $form = $handle;
+        }
+
+        return $form;
     }
 
     public function eventUrl($url, $relative = true)

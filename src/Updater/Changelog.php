@@ -4,7 +4,6 @@ namespace Statamic\Updater;
 
 use Carbon\Carbon;
 use Facades\Statamic\Marketplace\Marketplace;
-use Statamic\Updater\Presenters\GithubReleasePresenter;
 
 abstract class Changelog
 {
@@ -29,14 +28,18 @@ abstract class Changelog
      */
     public function get()
     {
-        return Marketplace::releases($this->item())->map(function ($release, $index) {
+        $type = null;
+
+        return Marketplace::releases($this->item())->map(function ($release, $index) use (&$type) {
+            $type = $type === 'downgrade' ? $type : $this->parseReleaseType($release['version'], $index);
+
             return (object) [
                 'version' => $release['version'],
-                'type' => $this->parseReleaseType($release['version'], $index),
+                'type' => $type,
                 'latest' => $index === 0,
                 'licensed' => $this->isLicensed($release['version']),
                 'date' => Carbon::parse($release['date'])->format(config('statamic.cp.date_format')),
-                'body' => (string) new GithubReleasePresenter($release['changelog']),
+                'body' => $release['changelog'],
             ];
         });
     }

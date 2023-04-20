@@ -15,6 +15,10 @@ use Tests\TestCase;
 
 class UpdateScriptTest extends TestCase
 {
+    private $files;
+    private $lockPath;
+    private $previousLockPath;
+
     public function setUp(): void
     {
         parent::setUp();

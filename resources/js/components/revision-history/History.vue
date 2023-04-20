@@ -25,7 +25,7 @@
                 v-for="group in revisions"
                 :key="group.day"
             >
-                <h6 class="revision-date" v-text="$moment.unix(group.day).format('LL')" />
+                <h6 class="revision-date" v-text="$moment.unix(group.day).isBefore($moment().startOf('day')) ? $moment.unix(group.day).format('LL') : __('Today')" />
                 <div class="revision-list">
                     <revision
                         v-for="revision in group.revisions"
@@ -63,6 +63,7 @@ export default {
         return {
             revisions: [],
             loading: true,
+            escBinding: null,
         }
     },
 
@@ -71,9 +72,13 @@ export default {
             this.loading = false;
             this.revisions = response.data.reverse();
         });
-        this.$keys.bindGlobal(['esc'], e => {
+        this.escBinding = this.$keys.bindGlobal(['esc'], e => {
             this.close();
         });
+    },
+    
+    beforeDestroy() {
+        this.escBinding.destroy();
     },
 
     methods: {

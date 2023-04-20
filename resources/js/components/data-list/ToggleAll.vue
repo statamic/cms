@@ -8,22 +8,20 @@
 export default {
     inject: ['sharedState'],
     computed: {
-        allItemsChecked() {
-            if (this.sharedState.rows.length === 0) return false;
-
-            return this.sharedState.selections.length === this.sharedState.rows.length;
-        },
         anyItemsChecked() {
             return this.sharedState.selections.length > 0;
         },
     },
     methods: {
         toggle() {
-            this.anyItemsChecked ? this.uncheckAllItems() : this.checkAllItems()
+            this.anyItemsChecked ? this.uncheckAllItems() : this.checkMaximumAmountOfItems()
         },
 
-        checkAllItems() {
-            this.sharedState.selections = _.values(_.map(this.sharedState.rows, item => item.id))
+        checkMaximumAmountOfItems() {
+            this.sharedState.selections = _.chain(this.sharedState.rows)
+                .map(item => item.id)
+                .first(this.sharedState.maxSelections ?? Infinity)
+                .value()
         },
 
         uncheckAllItems() {

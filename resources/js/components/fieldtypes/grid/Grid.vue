@@ -113,6 +113,10 @@ export default {
             return !this.isReadOnly && this.config.reorderable && this.maxRows > 1
         },
 
+        replicatorPreview() {
+            return `${this.config.display}: ${__n(':count row|:count rows', this.value.length)}`;
+        }
+
     },
 
     reactiveProvide: {
@@ -188,10 +192,6 @@ export default {
 
         sorted(rows) {
             this.update(rows);
-        },
-
-        getReplicatorPreviewText() {
-            // TODO
         },
 
         focus() {

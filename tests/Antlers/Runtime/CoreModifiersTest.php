@@ -3,7 +3,9 @@
 namespace Tests\Antlers\Runtime;
 
 use Carbon\Carbon;
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Tests\Antlers\ParserTestCase;
@@ -399,6 +401,26 @@ EOT;
 
         $this->assertSame('TEST!', $this->renderString('{{ variable }}', ['variable' => $value]));
         $this->assertSame('test', $this->renderString('{{ variable | raw }}', ['variable' => $value], true));
+    }
+
+    public function test_raw_modifier_returns_raw_value_on_antlers_enabled_field()
+    {
+        // using markdown in this test just because its augmentation is simple.
+        $fieldtype = FieldtypeRepository::find('markdown');
+        $fieldtype->setField(new Field('test', ['antlers' => true]));
+
+        $value = new Value("# heading\nparagraph {{ foo }}", 'test', $fieldtype);
+
+        $vars = [
+            'test' => $value,
+            'foo' => 'bar',
+        ];
+
+        $this->assertSame("<h1>heading</h1>\n<p>paragraph bar</p>\n", $this->renderString('{{ test }}', $vars));
+        $this->assertSame("# heading\nparagraph {{ foo }}", $this->renderString('{{ test | raw }}', $vars));
+        // Ensure other modifiers still work
+        $this->assertSame("<H1>HEADING</H1>\n<P>PARAGRAPH BAR</P>\n", $this->renderString('{{ test | upper }}', $vars));
+        $this->assertSame("# HEADING\nPARAGRAPH {{ FOO }}", $this->renderString('{{ test | raw | upper }}', $vars));
     }
 
     public function test_explode_on_tag_pairs()

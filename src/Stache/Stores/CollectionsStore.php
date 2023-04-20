@@ -51,12 +51,14 @@ class CollectionsStore extends BasicStore
             ->searchIndex(array_get($data, 'search_index'))
             ->revisionsEnabled(array_get($data, 'revisions', false))
             ->defaultPublishState($this->getDefaultPublishState($data))
+            ->originBehavior(array_get($data, 'origin_behavior', 'select'))
             ->structureContents(array_get($data, 'structure'))
             ->sortField(array_get($data, 'sort_by'))
             ->sortDirection(array_get($data, 'sort_dir'))
             ->taxonomies(array_get($data, 'taxonomies'))
             ->propagate(array_get($data, 'propagate'))
-            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])));
+            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])))
+            ->autosaveInterval(array_get($data, 'autosave'));
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
             $collection

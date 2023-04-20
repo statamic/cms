@@ -2,10 +2,12 @@
 
     <div :class="classes" class="replicator-set">
 
-        <div class="replicator-set-header" :class="{ 'p-1': isReadOnly, 'collapsed': collapsed }">
+        <slot name="picker" />
+
+        <div class="replicator-set-header" :class="{ 'p-1': isReadOnly, 'collapsed': collapsed, 'invalid': isInvalid }">
             <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
-            <div class="flex-1 p-1" :class="{'flex items-center': collapsed}" @dblclick="toggleCollapsedState">
-                <label v-text="config.display || config.handle" class="text-xs whitespace-no-wrap mr-1"/>
+            <div class="flex-1 p-1 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
+                <label v-text="display || config.handle" class="text-xs whitespace-no-wrap mr-1 cursor-pointer"/>
                 <div
                     v-if="config.instructions"
                     v-show="!collapsed"
@@ -33,7 +35,7 @@
             </div>
         </div>
 
-        <div class="replicator-set-body" v-if="!collapsed">
+        <div class="replicator-set-body" v-show="!collapsed">
             <set-field
                 v-for="field in fields"
                 v-show="showField(field, fieldPath(field))"
@@ -52,8 +54,6 @@
                 @replicator-preview-updated="previewUpdated(field.handle, $event)"
             />
         </div>
-
-        <slot name="picker" />
 
     </div>
 
@@ -150,6 +150,10 @@ export default {
 
         isHidden() {
             return this.values['#hidden'] === true;
+        },
+
+        isInvalid() {
+            return Object.keys(this.config).length === 0;
         },
 
         classes() {

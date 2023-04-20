@@ -61,7 +61,7 @@ class AugmentedTestCase extends TestCase
                     break;
 
                 default:
-                    if (isset($expectation['value'])) {
+                    if (array_key_exists('value', $expectation)) {
                         $this->assertSame(
                             $expectation['value'],
                             $actual,

@@ -21,6 +21,7 @@ class IsArrayTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider array
      */
     public function it_returns_true_if_value_is_array($expected, $input): void

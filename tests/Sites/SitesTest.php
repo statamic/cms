@@ -9,6 +9,8 @@ use Tests\TestCase;
 
 class SitesTest extends TestCase
 {
+    private $sites;
+
     protected function resolveApplicationConfiguration($app)
     {
         parent::resolveApplicationConfiguration($app);

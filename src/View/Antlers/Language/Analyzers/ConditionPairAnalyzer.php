@@ -128,7 +128,7 @@ class ConditionPairAnalyzer
 
                         if ($subNode->ref == 0 && (($subNode->isClosingTag && $subNode->name->name == 'if') ||
                                 array_key_exists($subNode->name->name, $thisValidPairs)
-                            )) {
+                        )) {
                             $canClose = true;
                         }
 

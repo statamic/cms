@@ -55,7 +55,7 @@
                 :is-root="true"
                 @updated="values = $event"
             >
-                <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue }">
+                <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue, setFieldMeta }">
 
                     <publish-fields
                         v-if="blueprint.sections.length"
@@ -65,6 +65,7 @@
                             updateField(handle, value, setFieldValue);
                             if (handle === 'handle') isHandleModified = true
                         }"
+                        @meta-updated="setFieldMeta"
                     />
 
                 </div>
@@ -74,7 +75,8 @@
                 <field-conditions-builder
                     :config="config"
                     :suggestable-fields="suggestableConditionFields"
-                    @updated="updateFieldConditions" />
+                    @updated="updateFieldConditions"
+                    @updated-always-save="updateAlwaysSave" />
             </div>
 
             <div class="publish-fields" v-show="activeTab === 'validation'">
@@ -227,6 +229,10 @@ export default {
             if (Object.keys(conditions).length > 0) {
                 this.markFieldEdited(Object.keys(conditions)[0]);
             }
+        },
+
+        updateAlwaysSave(alwaysSave) {
+            this.values.always_save = alwaysSave;
         },
 
         markFieldEdited(handle) {

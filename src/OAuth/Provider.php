@@ -34,8 +34,11 @@ class Provider
 
     public function findOrCreateUser($socialite): StatamicUser
     {
-        if ($user = User::findByOAuthId($this->name, $socialite->getId())) {
-            return $user;
+        if (
+            ($user = User::findByOAuthId($this->name, $socialite->getId())) ||
+            ($user = User::findByEmail($socialite->getEmail()))
+        ) {
+            return $this->mergeUser($user, $socialite);
         }
 
         return $this->createUser($socialite);
@@ -69,10 +72,21 @@ class Provider
             ->data($this->userData($socialite));
     }
 
-    public function userData($socialite)
+    public function mergeUser($user, $socialite): StatamicUser
+    {
+        collect($this->userData($socialite, $user))->each(fn ($value, $key) => $user->set($key, $value));
+
+        $user->save();
+
+        $this->setUserProviderId($user, $socialite->getId());
+
+        return $user;
+    }
+
+    public function userData($socialite, $existingUser = null)
     {
         if ($this->userDataCallback) {
-            return call_user_func($this->userDataCallback, $socialite);
+            return call_user_func($this->userDataCallback, $socialite, $existingUser);
         }
 
         return ['name' => $socialite->getName()];
@@ -81,11 +95,15 @@ class Provider
     public function withUserData(Closure $callback)
     {
         $this->userDataCallback = $callback;
+
+        return $this;
     }
 
     public function withUser(Closure $callback)
     {
         $this->userCallback = $callback;
+
+        return $this;
     }
 
     public function loginUrl()
