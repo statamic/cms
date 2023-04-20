@@ -12,24 +12,7 @@
         >
 
             <div class="flex-1 date-container">
-                <v-date-picker
-                    :attributes="attrs"
-                    :class="{ 'w-full': !config.inline }"
-                    :columns="$screens({ default: 1, lg: config.columns })"
-                    :is-expanded="name === 'date' || config.full_width"
-                    :is-range="isRange"
-                    :is-required="config.required"
-                    :locale="$config.get('locale').replace('_', '-')"
-                    :masks="{ input: [displayFormat] }"
-                    :min-date="config.earliest_date.date"
-                    :max-date="config.latest_date.date"
-                    :model-config="modelConfig"
-                    :popover="{ visibility: 'focus' }"
-                    :rows="$screens({ default: 1, lg: config.rows })"
-                    :update-on-input="false"
-                    :value="datePickerValue"
-                    @input="setDate"
-                >
+                <v-date-picker v-bind="datePickerBindings" v-on="datePickerEvents">
                     <template v-if="!config.inline" v-slot="{ inputValue, inputEvents }">
                         <!-- Date range inputs -->
                         <div
@@ -171,6 +154,32 @@ export default {
             // we expect. The time is handled separately by the nested time fieldtype.
             // https://github.com/statamic/cms/pull/6688
             return this.value.date+'T00:00:00';
+        },
+
+        datePickerBindings() {
+            return {
+                attributes: this.attrs,
+                class: { 'w-full': !this.config.inline },
+                columns: this.$screens({ default: 1, lg: this.config.columns }),
+                isExpanded: this.name === 'date' || this.config.full_width,
+                isRange: this.isRange,
+                isRequired: this.config.required,
+                locale: this.$config.get('locale').replace('_', '-'),
+                masks: { input: [this.displayFormat] },
+                minDate: this.config.earliest_date.date,
+                maxDate: this.config.latest_date.date,
+                modelConfig: this.modelConfig,
+                popover: { visibility: 'focus' },
+                rows: this.$screens({ default: 1, lg: this.config.rows }),
+                updateOnInput: false,
+                value: this.datePickerValue,
+            };
+        },
+
+        datePickerEvents() {
+            return {
+                input: this.setDate
+            };
         },
 
         format() {
