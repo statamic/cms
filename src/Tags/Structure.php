@@ -140,6 +140,7 @@ class Structure extends Tags
                 'is_current'  => ! is_null($url) && rtrim($url, '/') === rtrim($this->currentUrl, '/'),
                 'is_parent'   => ! is_null($url) && $this->siteAbsoluteUrl !== $absoluteUrl && URL::isAncestorOf($this->currentUrl, $url),
                 'is_external' => URL::isExternal((string) $absoluteUrl),
+                'absolute_url' => $absoluteUrl,
             ]);
         })->filter()->values();
 
