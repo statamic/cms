@@ -91,7 +91,6 @@
 			</div>
         </div>
     </div>
-    </element-container>
 
 </template>
 
