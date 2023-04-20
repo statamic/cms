@@ -4,8 +4,10 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 
 use Statamic\Support\Arr;
 
-class Number extends FieldtypeFilter
+abstract class Number extends FieldtypeFilter
 {
+    abstract protected function valueFieldtype();
+
     public function fieldItems()
     {
         return [
@@ -23,7 +25,7 @@ class Number extends FieldtypeFilter
                 'default' => '=',
             ],
             'value' => [
-                'type' => 'text',
+                'type' => $this->valueFieldtype(),
                 'placeholder' => __('Value'),
                 'if' => [
                     'operator' => 'not empty',

@@ -3,7 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
-use Statamic\Query\Scopes\Filters\Fields\Number as NumberFilter;
+use Statamic\Query\Scopes\Filters\Fields\Floatval as FloatFilter;
 
 class Floatval extends Fieldtype
 {
@@ -55,6 +55,6 @@ class Floatval extends Fieldtype
 
     public function filter()
     {
-        return new NumberFilter($this);
+        return new FloatFilter($this);
     }
 }
