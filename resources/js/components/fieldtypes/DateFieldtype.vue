@@ -6,75 +6,37 @@
     		{{ __('Add Date') }}
     	</button>
 
+        <pre>{{ value }}</pre>
+
+
         <div v-if="hasDate || config.inline"
             class="date-time-container flex flow-col @sm:flex-row"
             :class="config.time_seconds_enabled ? 'space-x-1' : 'space-x-3'"
         >
 
-            <div class="flex-1 date-container">
-                <v-date-picker v-bind="datePickerBindings" v-on="datePickerEvents">
-                    <template v-if="!config.inline" v-slot="{ inputValue, inputEvents }">
-                        <!-- Date range inputs -->
-                        <div
-                            v-if="isRange"
-                            class="w-full flex items-start @md:items-center flex-col @md:flex-row"
-                        >
-                            <div class="input-group">
-                                <div class="input-group-prepend flex items-center" v-if="!config.inline">
-                                    <svg-icon name="light/calendar" class="w-4 h-4" />
-                                </div>
-                                <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
-                                    <input
-                                        class="input-text-minimal p-0 bg-transparent leading-none"
-                                        :value="inputValue.start"
-                                        :readonly="isReadOnly"
-                                        @focus="focusedField = $event.target"
-                                        @blur="focusedField = null"
-                                        v-on="!isReadOnly && inputEvents.start"
-                                    />
-                                </div>
-                            </div>
+            <SinglePopover
+                v-if="isSingle && usesPopover"
+                v-bind="pickerProps"
+                @input="setDate"
+            />
 
-                            <svg-icon name="micro/arrow-right" class="w-6 h-6 my-1 mx-2 text-gray-700 hidden @md:block" />
-                            <svg-icon name="micro/arrow-right" class="w-3.5 h-3.5 my-2 mx-2.5 rotate-90 text-gray-700 @md:hidden" />
+            <SingleInline
+                v-if="isSingle && isInline"
+                v-bind="pickerProps"
+                @input="setDate"
+            />
 
-                            <div class="input-group">
-                                <div class="input-group-prepend flex items-center" v-if="!config.inline">
-                                    <svg-icon name="light/calendar" class="w-4 h-4" />
-                                </div>
-                                <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
-                                    <input
-                                        class="input-text-minimal p-0 bg-transparent leading-none"
-                                        :value="inputValue.end"
-                                        :readonly="isReadOnly"
-                                        @focus="focusedField = $event.target"
-                                        @blur="focusedField = null"
-                                        v-on="!isReadOnly && inputEvents.end"
-                                    />
-                                </div>
-                            </div>
-                        </div>
+            <RangePopover
+                v-if="isRange && usesPopover"
+                v-bind="pickerProps"
+                @input="setDate"
+            />
 
-                        <!-- Single date input -->
-                        <div v-else class="input-group">
-                            <div class="input-group-prepend flex items-center" v-if="!config.inline">
-                                <svg-icon name="light/calendar" class="w-4 h-4" />
-                            </div>
-                            <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
-                                <input
-                                    ref="singleDateInput"
-                                    class="input-text-minimal p-0 bg-transparent leading-none"
-                                    :value="inputValue"
-                                    :readonly="isReadOnly"
-                                    @focus="focusedField = $event.target"
-                                    @blur="focusedField = null"
-                                    v-on="!isReadOnly && inputEvents"
-                                />
-                            </div>
-                        </div>
-                    </template>
-                </v-date-picker>
-            </div>
+            <RangeInline
+                v-if="isRange && isInline"
+                v-bind="pickerProps"
+                @input="setDate"
+            />
 
             <div v-if="config.time_enabled && !isRange" class="time-container @xs:ml-2 @xs:mt-0 time-fieldtype">
 				<time-fieldtype
@@ -95,8 +57,19 @@
 </template>
 
 <script>
+import SinglePopover from './date/SinglePopover.vue';
+import SingleInline from './date/SingleInline.vue';
+import RangePopover from './date/RangePopover.vue';
+import RangeInline from './date/RangeInline.vue';
 
 export default {
+
+    components: {
+        SinglePopover,
+        SingleInline,
+        RangePopover,
+        RangeInline,
+    },
 
     mixins: [Fieldtype],
 
@@ -104,16 +77,6 @@ export default {
 
     data() {
         return {
-            attrs: [
-                {
-                    key: 'today',
-                    dot: true,
-                    popover: {
-                        label: __('Today'),
-                    },
-                    dates: new Date()
-                }
-            ],
             containerWidth: null,
             focusedField: null
         }
@@ -133,14 +96,26 @@ export default {
             return this.config.time_has_seconds;
         },
 
+        isSingle() {
+            return !this.isRange;
+        },
+
         isRange() {
             return this.config.mode === 'range';
         },
 
-        modelConfig() {
+        isInline() {
+            return this.config.inline;
+        },
+
+        usesPopover() {
+            return !this.isInline;
+        },
+
+        pickerProps() {
             return {
-                type: 'string',
-                mask: this.format,
+                isReadOnly: this.isReadOnly,
+                bindings: this.commonDatePickerBindings,
             }
         },
 
@@ -155,23 +130,36 @@ export default {
             return this.value.date+'T00:00:00';
         },
 
-        datePickerBindings() {
+        commonDatePickerBindings() {
             return {
-                attributes: this.attrs,
-                class: { 'w-full': !this.config.inline },
+                attributes: [
+                    {
+                        key: 'today',
+                        dot: true,
+                        popover: {
+                            label: __('Today'),
+                        },
+                        dates: new Date()
+                    }
+                ],
                 columns: this.$screens({ default: 1, lg: this.config.columns }),
+                rows: this.$screens({ default: 1, lg: this.config.rows }),
                 isExpanded: this.name === 'date' || this.config.full_width,
-                isRange: this.isRange,
                 isRequired: this.config.required,
                 locale: this.$config.get('locale').replace('_', '-'),
                 masks: { input: [this.displayFormat] },
                 minDate: this.config.earliest_date.date,
                 maxDate: this.config.latest_date.date,
-                modelConfig: this.modelConfig,
-                popover: { visibility: 'focus' },
-                rows: this.$screens({ default: 1, lg: this.config.rows }),
+                modelConfig: { type: 'string', mask: this.format },
                 updateOnInput: false,
                 value: this.datePickerValue,
+
+
+                // merge separately
+                class: { 'w-full': !this.config.inline }, // move to the "Popover" versions
+
+                // probably no longer needed
+                popover: { visibility: 'focus' },
             };
         },
 
