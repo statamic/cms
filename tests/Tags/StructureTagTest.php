@@ -388,7 +388,6 @@ EOT;
     {
         $this->createCollectionAndNav();
 
-        // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
         $template = <<<'EOT'
 <ul>
 {{ nav:test }}
@@ -416,10 +415,7 @@ EOT;
 </ul>
 EOT;
 
-        $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
-            'foo' => 'bar', // to test that cascade is inherited.
-            'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
-        ]));
+        $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template));
     }
 
     private function makeNav($tree)
