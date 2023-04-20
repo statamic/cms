@@ -2,29 +2,42 @@
 
     <div>
 
-        <v-date-picker
-            ref="picker"
-            v-bind="bindings"
-            @input="$emit('input', $event)"
-        />
+        <v-portal :disabled="!open" :to="portalTarget">
+            <v-date-picker
+                ref="picker"
+                v-bind="bindings"
+                v-show="open"
+                @input="dateSelected"
+            />
+        </v-portal>
 
-        <div class="input-group">
-            <div class="input-group-prepend flex items-center">
-                <svg-icon name="light/calendar" class="w-4 h-4" />
-            </div>
-            <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
-                <input
-                    class="input-text-minimal p-0 bg-transparent leading-none"
-                    :value="inputValue"
-                    v-on="inputEvents"
-                />
-                    <!-- :value="inputValue"
-                    :readonly="isReadOnly"
-                    @focus="focusedField = $event.target"
-                    @blur="focusedField = null"
-                    v-on="!isReadOnly && inputEvents" -->
-            </div>
-        </div>
+        <popover
+            ref="popover"
+            placement="bottom-start"
+            @opened="popoverStateChanged(true)"
+            @closed="popoverStateChanged(false)"
+        >
+            <template #trigger>
+                <div class="input-group">
+                    <div class="input-group-prepend flex items-center">
+                        <svg-icon name="light/calendar" class="w-4 h-4" />
+                    </div>
+                    <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
+                        <input
+                            class="input-text-minimal p-0 bg-transparent leading-none"
+                            :value="inputValue"
+                            v-on="inputEvents"
+                        />
+                            <!-- :value="inputValue"
+                            :readonly="isReadOnly"
+                            @focus="focusedField = $event.target"
+                            @blur="focusedField = null"
+                            v-on="!isReadOnly && inputEvents" -->
+                    </div>
+                </div>
+            </template>
+            <portal-target :name="portalTarget" />
+        </popover>
 
     </div>
 
@@ -39,31 +52,61 @@ export default {
 
     data() {
         return {
-            mounted: false,
+            open: false,
+            picker: null,
+            portalTarget: `date-picker-${this._uid}`,
+            inputValue: null
         }
     },
 
     computed: {
 
-        inputValue() {
-            return this.mounted ? this.$refs.picker.inputValues[0] : null;
-        },
-
         inputEvents() {
-            if (!this.mounted) return;
-
             return {
                 // Handle changing the date when typing.
-                change: (e) => this.$refs.picker.onInputUpdate(e.target.value, true, { formatInput: true }),
+                change: (e) => this.picker.onInputUpdate(e.target.value, true, { formatInput: true }),
                 // Allows hitting escape to cancel any changes.
-                keyup: (e) => this.$refs.picker.onInputKeyup(e),
-            };
+                keyup: (e) => this.picker.onInputKeyup(e),
+            }
+        },
+
+    },
+
+    watch: {
+
+        'bindings.value': function () {
+            this.$nextTick(() => this.updateInputValue());
+        },
+
+    },
+
+    methods: {
+
+        popoverStateChanged(open) {
+            this.open = open;
+            this.$nextTick(() => this.resetPicker());
+        },
+
+        updateInputValue() {
+            this.inputValue = this.picker.inputValues[0];
+        },
+
+        dateSelected(date) {
+            this.$emit('input', date)
+            this.$nextTick(() => this.$refs.popover.close());
+        },
+
+        resetPicker() {
+            this.picker = this.$refs.picker;
         }
 
     },
 
     mounted() {
-        this.mounted = true;
+        this.$nextTick(() => {
+            this.resetPicker();
+            this.updateInputValue();
+        });
     }
 
 }
