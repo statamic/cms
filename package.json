@@ -82,7 +82,6 @@
     "vue-draggable-nested-tree": "^2.2.20",
     "vue-js-modal": "^2.0.1",
     "vue-select": "^3.10.1",
-    "vue-swatches": "^2.1.1",
     "vue-toasted": "^1.1.27",
     "vuex": "^3.1.2"
   },
