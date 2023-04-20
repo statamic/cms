@@ -253,6 +253,9 @@ abstract class Tree implements Contract, Localization
             throw new \Exception("Page [{$parent}] does not exist in this structure");
         }
 
+        // Prevent a null from being added to the tree. This is only a workaround
+        // since nulls shouldn't have been passed in here in the first place.
+        // TODO: fix actual cause.
         if (is_null($page)) {
             return $this;
         }
