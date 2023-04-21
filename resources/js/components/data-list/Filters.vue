@@ -3,7 +3,7 @@
         <div class="flex flex-wrap px-3 border-b pt-2">
 
             <!-- Field filter (requires custom selection UI) -->
-            <popover v-if="fieldFilter" placement="bottom-start" :stop-propagation="false" @closed="fieldFilterClosed">
+            <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
                         {{ __('Field') }}
@@ -38,7 +38,7 @@
             </popover>
 
             <!-- Standard non-field filters -->
-            <popover v-if="standardFilters.length" v-for="filter in standardFilters" :key="filter.handle" placement="bottom-start" :stop-propagation="false">
+            <popover v-if="standardFilters.length" v-for="filter in standardFilters" :key="filter.handle" placement="bottom-start">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2">
                         {{ filter.title }}
