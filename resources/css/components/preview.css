@@ -3,11 +3,12 @@
 }
 
 .live-preview-header {
-    @apply relative pr-4 pl-6 py-2 h-13 shadow-lg flex items-center justify-between;
+    @apply relative pr-4 pl-6 py-2 h-13 shadow-md flex items-center justify-between;
     background: linear-gradient(180deg, #fff, #f9fafb);
     border-bottom: 1px solid #c4cdd6;
     z-index: 2;
 }
+
 
 .live-preview-main {
     @apply flex flex-1 overflow-scroll;
@@ -15,8 +16,17 @@
 }
 
 .live-preview-editor {
-    @apply flex relative bg-white h-full;
+    @apply flex relative bg-gray-200 h-full;
     z-index: 3;
+}
+
+.live-preview-fields {
+    @apply relative;
+    z-index: 2;
+}
+
+.live-preview .publish-tab-outer {
+    @apply @4xl/live-preview:px-6;
 }
 
 .live-preview-contents {
@@ -25,7 +35,24 @@
 }
 
 .live-preview .tabs-container {
-    @apply bg-gray-300;
+    @apply bg-gray-300 mb-0;
+    @apply @4xl/live-preview:mb-6;
+}
+
+.live-preview .publish-tabs {
+    @apply pl-4 @4xl/live-preview:pl-6;
+}
+
+.live-preview .publish-sections-section {
+    @apply mb-0 @4xl/live-preview:mb-8;
+}
+
+.live-preview .publish-section-header {
+    @apply rounded-none @4xl/live-preview:rounded-t-md;
+}
+
+.live-preview .card {
+    @apply rounded-none @4xl/live-preview:rounded-md;
 }
 
 .live-preview .publish-tab-actions-footer {
@@ -38,16 +65,11 @@
     &.device { @apply mt-4 shadow-lg rounded; }
 }
 
-.live-preview-fields {
-    @apply relative;
-    z-index: 2;
-}
-
 .live-preview-resizer {
-    @apply w-4 border-l border-r border-gray-300 shadow-sm;
+    @apply w-4 border-l border-r border-gray-400 shadow-sm;
     z-index: 1;
     cursor: ew-resize;
-    background: theme('colors.gray.200') url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
+    background: theme('colors.gray.100') url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
     background-size: 7px 17px;
 }
 
@@ -100,18 +122,4 @@
         transform: translateY(100px);
         opacity: 0;
     }
-}
-
-
-
-/*  Responsive */
-
-/*  add gray bg and padding so that it looks like a publish form, when its wide enough. */
-.live-preview-fields-wide {
-    @apply p-6 bg-gray-300;
-}
-
-/*  remove shadow of tabs when its narrow enough to be no longer be displayed as tabs. */
-.live-preview-fields-narrow .publish-tab {
-    @apply shadow-none
 }

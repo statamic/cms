@@ -4,7 +4,7 @@
     <div>
 
         <!-- Tabs -->
-        <div v-if="showTabs" class="tabs-container flex items-center mb-6">
+        <div v-if="showTabs" class="tabs-container flex items-center">
             <div
                 class="publish-tabs tabs"
                 :class="{ 'tabs-scrolled': canScrollLeft }"
@@ -53,7 +53,7 @@
         </div>
 
         <!-- Main and Sidebar -->
-        <div class="flex justify-between">
+        <div class="publish-tab-outer">
 
             <!-- Main -->
             <div ref="publishTabWrapper" class="publish-tab-wrapper w-full min-w-0">
