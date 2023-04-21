@@ -47,7 +47,7 @@ export default {
         },
         offset: {
             type: Array,
-            default: () => [10, 0]
+            default: () => [0, 0]
         },
         placement: {
             type: String,
