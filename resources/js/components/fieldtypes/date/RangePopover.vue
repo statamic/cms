@@ -17,7 +17,7 @@
 
             <div class="input-group">
                 <popover
-                    :offset="[5, 0]"
+                    :offset="[-3, 0]"
                     :clickaway="false"
                     ref="startPopover"
                     placement="bottom-start"
@@ -50,7 +50,7 @@
 
             <div class="input-group">
                 <popover
-                    :offset="[5, 0]"
+                    :offset="[-3, 0]"
                     :clickaway="false"
                     ref="endPopover"
                     placement="bottom-start"
