@@ -93,7 +93,7 @@ export default {
 
         dateSelected(date) {
             this.$emit('input', date)
-            this.$nextTick(() => this.$refs.popover.close());
+            this.$nextTick(() => this.$refs.popover?.close());
         },
 
         resetPicker() {
