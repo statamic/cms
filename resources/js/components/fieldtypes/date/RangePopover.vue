@@ -5,7 +5,7 @@
         <v-portal :disabled="!open" :to="portalTarget">
             <v-date-picker
                 ref="picker"
-                v-bind="{...bindings, isRange: true}"
+                v-bind="pickerBindings"
                 v-show="open"
                 @input="dateSelected"
             />
@@ -19,6 +19,7 @@
                 ref="startPopover"
                 placement="bottom-start"
                 class="w-full"
+                :disabled="isReadOnly"
                 @opened="startPopoverOpened"
                 @closed="startPopoverClosed"
             >
@@ -30,11 +31,11 @@
                         <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
                             <input
                                 class="input-text-minimal p-0 bg-transparent leading-none"
+                                :readonly="isReadOnly"
                                 :value="startInputValue"
                                 v-on="startInputEvents"
                             />
                                 <!-- :value="inputValue.start"
-                                :readonly="isReadOnly"
                                 @focus="focusedField = $event.target"
                                 @blur="focusedField = null"
                                 v-on="!isReadOnly && inputEvents.start" -->
@@ -52,6 +53,7 @@
                 ref="endPopover"
                 placement="bottom-start"
                 class="w-full"
+                :disabled="isReadOnly"
                 @opened="endPopoverOpened"
                 @closed="endPopoverClosed"
             >
@@ -63,11 +65,11 @@
                         <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
                             <input
                                 class="input-text-minimal p-0 bg-transparent leading-none"
+                                :readonly="isReadOnly"
                                 :value="endInputValue"
                                 v-on="endInputEvents"
                             />
                                 <!-- :value="inputValue.end"
-                                :readonly="isReadOnly"
                                 @focus="focusedField = $event.target"
                                 @blur="focusedField = null"
                                 v-on="!isReadOnly && inputEvents.end" -->
@@ -104,6 +106,14 @@ export default {
     },
 
     computed: {
+
+        pickerBindings() {
+            return {
+                ...this.bindings,
+                isRange: true,
+                disabledDates: this.isReadOnly ? { weekdays: [1, 2, 3, 4, 5, 6, 7] } : null
+            }
+        },
 
         open() {
             return this.startOpen || this.endOpen;

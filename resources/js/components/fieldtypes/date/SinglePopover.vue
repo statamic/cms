@@ -14,6 +14,7 @@
         <popover
             ref="popover"
             placement="bottom-start"
+            :disabled="isReadOnly"
             @opened="popoverStateChanged(true)"
             @closed="popoverStateChanged(false)"
         >
@@ -25,14 +26,13 @@
                     <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
                         <input
                             class="input-text-minimal p-0 bg-transparent leading-none"
+                            :readonly="isReadOnly"
                             :value="inputValue"
                             v-on="inputEvents"
                         />
                             <!-- :value="inputValue"
-                            :readonly="isReadOnly"
                             @focus="focusedField = $event.target"
-                            @blur="focusedField = null"
-                            v-on="!isReadOnly && inputEvents" -->
+                            @blur="focusedField = null" -->
                     </div>
                 </div>
             </template>
