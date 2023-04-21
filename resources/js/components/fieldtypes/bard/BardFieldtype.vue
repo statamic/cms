@@ -71,7 +71,7 @@
                     <template #trigger>
                         <button
                             type="button"
-                            class="btn-round group flex items-center justify-center absolute top-[-6px] -left-9 z-1"
+                            class="btn-round group bard-add-set-button"
                             :style="{ transform: `translate(${x}px, ${y}px)` }"
                             :aria-label="__('Add Set')"
                             v-tooltip="__('Add Set')"
