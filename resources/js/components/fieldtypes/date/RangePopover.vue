@@ -1,6 +1,6 @@
 <template>
 
-    <div>
+    <div class="w-full">
 
         <v-portal :disabled="!open" :to="portalTarget">
             <v-date-picker
@@ -18,6 +18,7 @@
             <popover
                 ref="startPopover"
                 placement="bottom-start"
+                class="w-full"
                 @opened="startPopoverOpened"
                 @closed="startPopoverClosed"
             >
@@ -50,6 +51,7 @@
             <popover
                 ref="endPopover"
                 placement="bottom-start"
+                class="w-full"
                 @opened="endPopoverOpened"
                 @closed="endPopoverClosed"
             >

@@ -140,10 +140,6 @@ export default {
                 updateOnInput: false,
                 value: this.datePickerValue,
 
-
-                // merge separately
-                class: { 'w-full': !this.config.inline }, // move to the "Popover" versions
-
                 // probably no longer needed
                 popover: { visibility: 'focus' },
             };
