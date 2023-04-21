@@ -1,9 +1,12 @@
 <template>
 
-    <v-date-picker
-        v-bind="pickerBindings"
-        @input="$emit('input', $event)"
-    />
+    <div class="relative">
+        <v-date-picker
+            v-bind="pickerBindings"
+            @input="$emit('input', $event)"
+        />
+        <div class="absolute inset-0 z-1 cursor-not-allowed" v-if="isReadOnly" />
+    </div>
 
 </template>
 
