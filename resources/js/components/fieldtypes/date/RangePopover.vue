@@ -1,6 +1,6 @@
 <template>
 
-    <div class="w-full">
+    <div class="w-full" v-on-clickaway="clickaway">
 
         <v-portal :disabled="!open" :to="portalTarget">
             <v-date-picker
@@ -15,65 +15,67 @@
             class="w-full flex items-start @md:items-center flex-col @md:flex-row"
         >
 
-            <popover
-                ref="startPopover"
-                placement="bottom-start"
-                class="w-full"
-                :disabled="isReadOnly"
-                @opened="startPopoverOpened"
-                @closed="startPopoverClosed"
-            >
-                <template #trigger>
-                    <div class="input-group">
+            <div class="input-group">
+                <popover
+                    :offset="[5, 0]"
+                    :clickaway="false"
+                    ref="startPopover"
+                    placement="bottom-start"
+                    :disabled="isReadOnly"
+                    @opened="startPopoverOpened"
+                    @closed="startPopoverClosed"
+                >
+                    <template #trigger>
                         <div class="input-group-prepend flex items-center">
                             <svg-icon name="light/calendar" class="w-4 h-4" />
                         </div>
-                        <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
-                            <input
-                                class="input-text-minimal p-0 bg-transparent leading-none"
-                                :readonly="isReadOnly"
-                                :value="startInputValue"
-                                v-on="startInputEvents"
-                                @focus="$emit('focus', $event.target)"
-                                @blur="$emit('blur')"
-                            />
-                        </div>
-                    </div>
-                </template>
-                <portal-target :name="startPortalTarget" />
-            </popover>
+                    </template>
+                    <portal-target :name="startPortalTarget" />
+                </popover>
+                <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
+                    <input
+                        class="input-text-minimal p-0 bg-transparent leading-none"
+                        :readonly="isReadOnly"
+                        :value="startInputValue"
+                        v-on="startInputEvents"
+                        @focus="startInputFocused"
+                        @blur="$emit('blur')"
+                    />
+                </div>
+            </div>
 
             <svg-icon name="micro/arrow-right" class="w-6 h-6 my-1 mx-2 text-gray-700 hidden @md:block" />
             <svg-icon name="micro/arrow-right" class="w-3.5 h-3.5 my-2 mx-2.5 rotate-90 text-gray-700 @md:hidden" />
 
 
-            <popover
-                ref="endPopover"
-                placement="bottom-start"
-                class="w-full"
-                :disabled="isReadOnly"
-                @opened="endPopoverOpened"
-                @closed="endPopoverClosed"
-            >
-                <template #trigger>
-                    <div class="input-group">
+            <div class="input-group">
+                <popover
+                    :offset="[5, 0]"
+                    :clickaway="false"
+                    ref="endPopover"
+                    placement="bottom-start"
+                    :disabled="isReadOnly"
+                    @opened="endPopoverOpened"
+                    @closed="endPopoverClosed"
+                >
+                    <template #trigger>
                         <div class="input-group-prepend flex items-center">
                             <svg-icon name="light/calendar" class="w-4 h-4" />
                         </div>
-                        <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
-                            <input
-                                class="input-text-minimal p-0 bg-transparent leading-none"
-                                :readonly="isReadOnly"
-                                :value="endInputValue"
-                                v-on="endInputEvents"
-                                @focus="$emit('focus', $event.target)"
-                                @blur="$emit('blur')"
-                            />
-                        </div>
-                    </div>
-                </template>
-                <portal-target :name="endPortalTarget" />
-            </popover>
+                    </template>
+                    <portal-target :name="endPortalTarget" />
+                </popover>
+                <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
+                    <input
+                        class="input-text-minimal p-0 bg-transparent leading-none"
+                        :readonly="isReadOnly"
+                        :value="endInputValue"
+                        v-on="endInputEvents"
+                        @focus="endInputFocused"
+                        @blur="$emit('blur')"
+                    />
+                </div>
+            </div>
 
         </div>
 
@@ -83,10 +85,11 @@
 
 <script>
 import Picker from './Picker';
+import { mixin as clickaway } from 'vue-clickaway';
 
 export default {
 
-    mixins: [Picker],
+    mixins: [Picker, clickaway],
 
     data() {
         return {
@@ -195,6 +198,23 @@ export default {
 
         resetPicker() {
             this.picker = this.$refs.picker;
+        },
+
+        startInputFocused(e) {
+            this.$refs.startPopover.open();
+            this.$emit('focus', e.target)
+        },
+
+        endInputFocused(e) {
+            this.$refs.endPopover.open();
+            this.$emit('focus', e.target)
+        },
+
+        clickaway(e) {
+            if (this.picker.$el.contains(e.target) || this.$el.contains(e.target)) return;
+
+            this.$refs.startPopover.close();
+            this.$refs.endPopover.close();
         }
 
     }

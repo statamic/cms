@@ -1,6 +1,6 @@
 <template>
 
-    <div class="w-full">
+    <div class="w-full" v-on-clickaway="clickaway">
 
         <v-portal :disabled="!open" :to="portalTarget">
             <v-date-picker
@@ -11,32 +11,34 @@
             />
         </v-portal>
 
-        <popover
-            ref="popover"
-            placement="bottom-start"
-            :disabled="isReadOnly"
-            @opened="popoverStateChanged(true)"
-            @closed="popoverStateChanged(false)"
-        >
-            <template #trigger>
-                <div class="input-group">
+        <div class="input-group">
+            <popover
+                :offset="[5, 0]"
+                :clickaway="false"
+                ref="popover"
+                placement="bottom"
+                :disabled="isReadOnly"
+                @opened="popoverStateChanged(true)"
+                @closed="popoverStateChanged(false)"
+            >
+                <template #trigger>
                     <div class="input-group-prepend flex items-center">
                         <svg-icon name="light/calendar" class="w-4 h-4" />
                     </div>
-                    <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
-                        <input
-                            class="input-text-minimal p-0 bg-transparent leading-none"
-                            :readonly="isReadOnly"
-                            :value="inputValue"
-                            v-on="inputEvents"
-                            @focus="$emit('focus', $event.target)"
-                            @blur="$emit('blur')"
-                        />
-                    </div>
-                </div>
-            </template>
-            <portal-target :name="portalTarget" />
-        </popover>
+                </template>
+                <portal-target :name="portalTarget" />
+            </popover>
+            <div class="input-text border border-gray-500 border-l-0" :class="{ 'read-only': isReadOnly }">
+                <input
+                    class="input-text-minimal p-0 bg-transparent leading-none"
+                    :readonly="isReadOnly"
+                    :value="inputValue"
+                    v-on="inputEvents"
+                    @focus="inputFocused"
+                    @blur="$emit('blur')"
+                />
+            </div>
+        </div>
 
     </div>
 
@@ -44,10 +46,11 @@
 
 <script>
 import Picker from './Picker';
+import { mixin as clickaway } from 'vue-clickaway';
 
 export default {
 
-    mixins: [Picker],
+    mixins: [Picker, clickaway],
 
     data() {
         return {
@@ -97,6 +100,17 @@ export default {
 
         resetPicker() {
             this.picker = this.$refs.picker;
+        },
+
+        inputFocused(e) {
+            this.$refs.popover.open();
+            this.$emit('focus', e.target);
+        },
+
+        clickaway(e) {
+            if (this.picker.$el.contains(e.target) || this.$el.contains(e.target)) return;
+
+            this.$refs.popover.close();
         }
 
     },
