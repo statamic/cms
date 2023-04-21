@@ -139,9 +139,6 @@ export default {
                 modelConfig: { type: 'string', mask: this.format },
                 updateOnInput: false,
                 value: this.datePickerValue,
-
-                // probably no longer needed
-                popover: { visibility: 'focus' },
             };
         },
 
