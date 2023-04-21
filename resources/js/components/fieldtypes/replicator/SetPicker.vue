@@ -5,7 +5,6 @@
         class="set-picker"
         placement="bottom-start"
         :disabled="!hasMultipleSets"
-        :stop-propagation="false"
         @opened="opened"
         @closed="closed"
         @click="triggerWasClicked"
