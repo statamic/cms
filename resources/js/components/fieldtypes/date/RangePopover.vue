@@ -41,7 +41,6 @@
                     </div>
                 </template>
                 <portal-target :name="startPortalTarget" />
-                start popover
             </popover>
 
             <svg-icon name="micro/arrow-right" class="w-6 h-6 my-1 mx-2 text-gray-700 hidden @md:block" />
@@ -74,7 +73,6 @@
                     </div>
                 </template>
                 <portal-target :name="endPortalTarget" />
-                end popover
             </popover>
 
         </div>

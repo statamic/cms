@@ -6,9 +6,6 @@
     		{{ __('Add Date') }}
     	</button>
 
-        <pre>{{ value }}</pre>
-
-
         <div v-if="hasDate || config.inline"
             class="date-time-container flex flow-col @sm:flex-row"
             :class="config.time_seconds_enabled ? 'space-x-1' : 'space-x-3'"
