@@ -34,11 +34,9 @@
                                 :readonly="isReadOnly"
                                 :value="startInputValue"
                                 v-on="startInputEvents"
+                                @focus="$emit('focus', $event.target)"
+                                @blur="$emit('blur')"
                             />
-                                <!-- :value="inputValue.start"
-                                @focus="focusedField = $event.target"
-                                @blur="focusedField = null"
-                                v-on="!isReadOnly && inputEvents.start" -->
                         </div>
                     </div>
                 </template>
@@ -68,11 +66,9 @@
                                 :readonly="isReadOnly"
                                 :value="endInputValue"
                                 v-on="endInputEvents"
+                                @focus="$emit('focus', $event.target)"
+                                @blur="$emit('blur')"
                             />
-                                <!-- :value="inputValue.end"
-                                @focus="focusedField = $event.target"
-                                @blur="focusedField = null"
-                                v-on="!isReadOnly && inputEvents.end" -->
                         </div>
                     </div>
                 </template>

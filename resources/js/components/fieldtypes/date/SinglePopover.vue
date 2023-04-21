@@ -29,10 +29,9 @@
                             :readonly="isReadOnly"
                             :value="inputValue"
                             v-on="inputEvents"
+                            @focus="$emit('focus', $event.target)"
+                            @blur="$emit('blur')"
                         />
-                            <!-- :value="inputValue"
-                            @focus="focusedField = $event.target"
-                            @blur="focusedField = null" -->
                     </div>
                 </div>
             </template>

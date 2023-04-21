@@ -14,6 +14,8 @@
                 :is="pickerComponent"
                 v-bind="pickerProps"
                 @input="setDate"
+                @focus="focusedField = $event"
+                @blur="focusedField = null"
             />
 
             <div v-if="config.time_enabled && !isRange" class="time-container @xs:ml-2 @xs:mt-0 time-fieldtype">
