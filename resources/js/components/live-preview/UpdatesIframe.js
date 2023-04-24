@@ -31,6 +31,7 @@ export default {
             }
 
             if (! shouldRefresh) {
+                // If the target is a relative url, we'll get the origin from the current window.
                 const targetOrigin = /^https?:\/\//.test(url) ? (new URL(url))?.origin : window.origin;
                 container.firstChild.contentWindow.postMessage('statamic.preview.updated', targetOrigin);
                 return;
