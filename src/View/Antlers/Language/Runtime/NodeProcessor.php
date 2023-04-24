@@ -2096,6 +2096,7 @@ class NodeProcessor
                                     $processor->setAntlersParserInstance($this->antlersParser);
                                     $processor->setData($evalData);
                                     $processor->cascade($this->cascade);
+                                    $processor->setRuntimeAssignments($this->runtimeAssignments);
 
                                     if ($this->runtimeConfiguration != null) {
                                         $processor->setRuntimeConfiguration($this->runtimeConfiguration);
@@ -2104,7 +2105,15 @@ class NodeProcessor
 
                                     $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($assocOutput));
 
+                                    $runtimeAssignmentsToProcess = $processor->getRuntimeAssignments();
+
                                     $this->popScope($node->refId);
+
+                                    if (! empty($runtimeAssignmentsToProcess)) {
+                                        $this->data = $lockData;
+                                        $this->processAssignments($runtimeAssignmentsToProcess);
+                                        $lockData = $this->data;
+                                    }
                                 } else {
                                     if (! $executedParamModifiers || $tagCallbackResult != null) {
                                         $val = $this->addLoopIterationVariables($val);
