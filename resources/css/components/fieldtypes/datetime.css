@@ -36,9 +36,9 @@
 	@apply flex;
 }
 
-/*  Dear sweet baby Jesus please forgive me for this brittle selector */
-.date-time-container .date-container > span > .vc-popover-content-wrapper {
-	left: -50px !important;
+/* Remove style from datepicker in popover since the popover has them. */
+.popover-content .vc-container {
+    @apply border-none bg-none;
 }
 
 /* Time Field

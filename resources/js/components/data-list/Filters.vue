@@ -3,7 +3,7 @@
         <div class="flex items-center flex-wrap px-3 border-b pt-2">
 
             <!-- Field filter (requires custom selection UI) -->
-            <popover v-if="fieldFilter" placement="bottom-start" :stop-propagation="false" @closed="fieldFilterClosed">
+            <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
                         {{ __('Field') }}

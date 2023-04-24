@@ -5,7 +5,6 @@
             'is-image': isImage && !canShowSvg,
             'is-svg': canShowSvg,
             'is-file': !isImage && !canShowSvg,
-            'col-span-2': isSolo
         }"
         :title="asset.filename"
     >
@@ -97,13 +96,6 @@ import Asset from "./Asset";
 
 export default {
     mixins: [Asset],
-
-    props: {
-        isSolo: {
-            type: Boolean,
-            default: false
-        }
-    },
 
     computed: {
         isInAssetBrowser() {

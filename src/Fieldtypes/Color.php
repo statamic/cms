@@ -3,7 +3,6 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
-use Statamic\Support\Str;
 
 class Color extends Fieldtype
 {
@@ -30,10 +29,5 @@ class Color extends Fieldtype
                 ],
             ],
         ];
-    }
-
-    public function process($data)
-    {
-        return Str::ensureLeft($data, '#');
     }
 }

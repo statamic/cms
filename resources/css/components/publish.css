@@ -11,6 +11,10 @@
     }
 }
 
+.publish-tab-outer {
+    @apply flex justify-between;
+}
+
 .publish-form {
     position: relative;
 
@@ -74,6 +78,10 @@ code.parent-url {
 
 .publish-field-label {
     @apply flex items-center;
+}
+
+.publish-sections-section {
+    @apply mb-8;
 }
 
 .publish-section-header {

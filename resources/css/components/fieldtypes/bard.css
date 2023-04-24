@@ -9,8 +9,8 @@
 }
 
 .bard-editor .ProseMirror {
-    @apply p-1 min-h-40 text-sm leading-tight;
-    @apply @sm/bard:p-2 text-md leading-normal;
+    @apply p-2 min-h-40 text-sm leading-tight;
+    @apply @md/bard:p-2 text-md leading-normal;
     @apply @lg/bard:p-4;
     &:focus {
         @apply ring-2 ring-inset ring-blue-200;
@@ -94,12 +94,6 @@
     top: 40px;
 }
 
-/*  Fixed toolbar inside the live preview */
-.live-preview-fields-narrow .bard-fixed-toolbar { top: 0; }
-.live-preview-fields-wide .bard-fixed-toolbar { top: -24px; }
-.live-preview-fields-narrow .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 40px; }
-.live-preview-fields-wide .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 16px; }
-
 /*  Fixed toolbar inside a stack */
 .stack-content .bard-fixed-toolbar { top: -24px; }
 
@@ -158,6 +152,10 @@
     button sup {
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     }
+}
+
+.bard-add-set-button {
+    @apply flex items-center justify-center absolute -left-6 top-[-6px] @xl/bard:-left-8 z-1;
 }
 
 .bard-footer-toolbar {

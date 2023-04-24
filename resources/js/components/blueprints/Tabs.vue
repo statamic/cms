@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="!singleTab && tabs.length > 0" class="tabs-container mb-5 relative">
+        <div v-if="!singleTab && tabs.length > 0" class="tabs-container relative">
             <div ref="tabs" class="tabs flex-1 flex space-x-3 overflow-auto pr-6" role="tablist">
                 <tab
                     ref="tab"

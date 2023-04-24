@@ -51,10 +51,6 @@ export default {
             type: String,
             default: 'bottom-end',
         },
-        stopPropagation: {
-            type: Boolean,
-            default: true
-        },
     },
 
     data() {
@@ -97,8 +93,6 @@ export default {
         },
 
         toggle(e) {
-            if (this.stopPropagation) e.stopPropagation();
-
             this.isOpen ? this.close() : this.open();
         },
 

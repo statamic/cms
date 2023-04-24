@@ -25,8 +25,8 @@
                 v-text="__('Apply')"
             ></button>
         </header>
-        <section class="py-4 px-8">
-            <div class="tabs-container mb-5">
+        <section class="py-4 px-3 md:px-8">
+            <div class="tabs-container">
                 <div class="publish-tabs tabs">
                     <button class="tab-button"
                     :class="{ 'active': activeTab === 'settings' }"
