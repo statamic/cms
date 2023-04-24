@@ -221,10 +221,6 @@
         @apply px-6 py-16 flex flex-col;
         min-height: calc(100vh - 120px);
 
-        > p > code, > pre code {
-            @apply bg-gray-300;
-        }
-
         /*  To remove min height from nested bard fields inside bard in fullscreen mode. */
         * > .ProseMirror {
             min-height: auto;
@@ -232,6 +228,12 @@
 
         &:focus {
             @apply ring-0;
+        }
+    }
+    
+    & > .bard-editor > div > .bard-content > {
+        p > code, > pre code {
+            @apply bg-gray-300;
         }
     }
 
@@ -259,7 +261,7 @@
     outline: 0;
 }
 
-.bard-fieldtype .ProseMirror > {
+.bard-fieldtype .bard-content > {
     p {
         @apply text-gray-800;
         word-break: break-all;
