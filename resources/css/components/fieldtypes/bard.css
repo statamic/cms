@@ -231,8 +231,9 @@
         }
     }
     
-    & > .bard-editor > div > .bard-content > {
-        p > code, > pre code {
+    .bard-content:not(.bard-content *) > {
+        p > code,
+        pre code {
             @apply bg-gray-300;
         }
     }
