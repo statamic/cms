@@ -27,7 +27,7 @@ export default {
 
     props: ['html'],
 
-    inject: ['setConfigs'],
+    inject: ['bard'],
 
     computed: {
 
@@ -48,7 +48,7 @@ export default {
     methods: {
 
         setDisplay(handle) {
-            const set = _.findWhere(this.setConfigs, { handle });
+            const set = _.findWhere(this.bard.setConfigs, { handle });
             return set.display || handle;
         }
 
