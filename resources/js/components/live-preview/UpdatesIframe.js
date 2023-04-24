@@ -10,15 +10,17 @@ export default {
             const container = this.$refs.contents;
 
             if (container.firstChild) {
+                let shouldRefresh = target.refresh;
+
                 const existingIFrameSource = new URL(container.firstChild.src);
                 const newIFrameSource = new URL(iframe.src);
-
                 existingIFrameSource.searchParams.delete('live-preview');
                 newIFrameSource.searchParams.delete('live-preview');
-
                 const iFrameSourceIsEqual = existingIFrameSource.toString() === newIFrameSource.toString();
 
-                const shouldRefresh = target.refresh || !iFrameSourceIsEqual;
+                if (! iFrameSourceIsEqual) {
+                    shouldRefresh = true;
+                }
 
                 if (shouldRefresh) {
                     let isSameOrigin = url.startsWith('/') || new URL(url).host === window.location.host;
