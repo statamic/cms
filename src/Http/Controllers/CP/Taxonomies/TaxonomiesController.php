@@ -286,7 +286,6 @@ class TaxonomiesController extends CpController
                                 'field' => [
                                     'display' => __('Label'),
                                     'type' => 'text',
-                                    'width' => 33,
                                 ],
                             ],
                             [
@@ -294,7 +293,6 @@ class TaxonomiesController extends CpController
                                 'field' => [
                                     'display' => __('Format'),
                                     'type' => 'text',
-                                    'width' => 33,
                                 ],
                             ],
                             [
@@ -302,7 +300,6 @@ class TaxonomiesController extends CpController
                                 'field' => [
                                     'display' => __('Refresh'),
                                     'type' => 'toggle',
-                                    'width' => 33,
                                     'instructions' => __('statamic::messages.taxonomies_preview_target_refresh_instructions'),
                                     'default' => true,
                                 ],
