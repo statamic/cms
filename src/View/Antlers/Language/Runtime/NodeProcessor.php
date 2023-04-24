@@ -277,7 +277,7 @@ class NodeProcessor
     /**
      * Sets whether the NodeProcessor is processing conditions.
      *
-     * @param  bool  $isCondition The value.
+     * @param  bool  $isCondition  The value.
      * @return $this
      */
     public function setIsConditionProcessor($isCondition)
