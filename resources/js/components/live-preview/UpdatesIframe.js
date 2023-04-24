@@ -9,45 +9,47 @@ export default {
 
             const container = this.$refs.contents;
 
-            if (container.firstChild) {
-                let shouldRefresh = target.refresh;
+            // If there's no iframe yet, just append it.
+            if (! container.firstChild) {
+                container.appendChild(iframe);
+                return;
+            }
 
-                const existingIFrameSource = new URL(container.firstChild.src);
-                const newIFrameSource = new URL(iframe.src);
-                existingIFrameSource.searchParams.delete('live-preview');
-                newIFrameSource.searchParams.delete('live-preview');
-                const iFrameSourceIsEqual = existingIFrameSource.toString() === newIFrameSource.toString();
+            let shouldRefresh = target.refresh;
 
-                if (! iFrameSourceIsEqual) {
-                    shouldRefresh = true;
-                }
+            const existingIFrameSource = new URL(container.firstChild.src);
+            const newIFrameSource = new URL(iframe.src);
+            existingIFrameSource.searchParams.delete('live-preview');
+            newIFrameSource.searchParams.delete('live-preview');
+            const iFrameSourceIsEqual = existingIFrameSource.toString() === newIFrameSource.toString();
 
-                if (shouldRefresh) {
-                    let isSameOrigin = url.startsWith('/') || new URL(url).host === window.location.host;
+            if (! iFrameSourceIsEqual) {
+                shouldRefresh = true;
+            }
 
-                    let scroll = isSameOrigin ? [
-                        container.firstChild.contentWindow.scrollX ?? 0,
-                        container.firstChild.contentWindow.scrollY ?? 0
-                    ] : null;
+            if (shouldRefresh) {
+                let isSameOrigin = url.startsWith('/') || new URL(url).host === window.location.host;
 
-                    container.replaceChild(iframe, container.firstChild);
+                let scroll = isSameOrigin ? [
+                    container.firstChild.contentWindow.scrollX ?? 0,
+                    container.firstChild.contentWindow.scrollY ?? 0
+                ] : null;
 
-                    if (isSameOrigin) {
-                        let iframeContentWindow = iframe.contentWindow;
-                        const iframeScrollUpdate = (event) => {
-                            iframeContentWindow.scrollTo(...scroll);
-                        };
+                container.replaceChild(iframe, container.firstChild);
 
-                        iframeContentWindow.addEventListener('DOMContentLoaded', iframeScrollUpdate, true);
-                        iframeContentWindow.addEventListener('load', iframeScrollUpdate, true);
-                    }
-                } else {
-                    const targetOrigin = /^https?:\/\//.test(url) ? (new URL(url))?.origin : window.origin;
+                if (isSameOrigin) {
+                    let iframeContentWindow = iframe.contentWindow;
+                    const iframeScrollUpdate = (event) => {
+                        iframeContentWindow.scrollTo(...scroll);
+                    };
 
-                    container.firstChild.contentWindow.postMessage('statamic.preview.updated', targetOrigin);
+                    iframeContentWindow.addEventListener('DOMContentLoaded', iframeScrollUpdate, true);
+                    iframeContentWindow.addEventListener('load', iframeScrollUpdate, true);
                 }
             } else {
-                container.appendChild(iframe);
+                const targetOrigin = /^https?:\/\//.test(url) ? (new URL(url))?.origin : window.origin;
+
+                container.firstChild.contentWindow.postMessage('statamic.preview.updated', targetOrigin);
             }
         },
 
