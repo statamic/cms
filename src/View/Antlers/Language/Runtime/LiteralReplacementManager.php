@@ -47,7 +47,7 @@ class LiteralReplacementManager
     /**
      * Tests if a section name bas been registered with the manager.
      *
-     * @param  string  $name The section name.
+     * @param  string  $name  The section name.
      * @return bool
      */
     public static function hasRegisteredSectionName($name)
