@@ -19,15 +19,10 @@ export default {
                 const iFrameSourceIsEqual = existingIFrameSource.toString() === newIFrameSource.toString();
 
                 if (target?.use_post_message && iFrameSourceIsEqual) {
-                    let postMessageData = target.post_message_data;
-                    try {
-                        postMessageData = JSON.parse(target.post_message_data);
-                    } catch(e) {}
-
                     const targetOrigin = /^https?:\/\//.test(url) ? (new URL(url))?.origin : window.origin;
 
                     container.firstChild.contentWindow.postMessage(
-                        postMessageData,
+                        'statamic.preview.updated',
                         targetOrigin
                     );
                 } else {

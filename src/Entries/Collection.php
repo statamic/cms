@@ -784,7 +784,9 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ? $this->defaultPreviewTargets()
             : $this->previewTargets;
 
-        return collect($targets);
+        return collect($targets)->map(function ($target) {
+            return $target + ['refresh' => $target['refresh'] ?? true];
+        });
     }
 
     public function addPreviewTargets($targets)
@@ -796,7 +798,9 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function additionalPreviewTargets()
     {
-        return Facades\Collection::additionalPreviewTargets($this->handle);
+        return Facades\Collection::additionalPreviewTargets($this->handle)->map(function ($target) {
+            return $target + ['refresh' => $target['refresh'] ?? true];
+        });
     }
 
     private function defaultPreviewTargets()
@@ -805,8 +809,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             [
                 'label' => 'Entry',
                 'format' => '{permalink}',
-                'use_post_message' => false,
-                'post_message_data' => 'live-preview-update',
+                'refresh' => true,
             ],
         ];
     }
@@ -827,8 +830,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             return [
                 'label' => $target['label'],
                 'url' => $target['format'],
-                'use_post_message' => $target['use_post_message'],
-                'post_message_data' => $target['post_message_data'] ?? 'live-preview-update',
+                'refresh' => $target['refresh'],
             ];
         })->filter()->values()->all();
     }

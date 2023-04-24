@@ -280,7 +280,6 @@ class TaxonomiesController extends CpController
                         'display' => __('Preview Targets'),
                         'instructions' => __('statamic::messages.taxonomies_preview_targets_instructions'),
                         'type' => 'grid',
-                        'mode' => 'stacked',
                         'fields' => [
                             [
                                 'handle' => 'label',
@@ -299,31 +298,13 @@ class TaxonomiesController extends CpController
                                 ],
                             ],
                             [
-                                'handle' => 'use_post_message',
+                                'handle' => 'refresh',
                                 'field' => [
-                                    'display' => __('Prevent Page Reload'),
+                                    'display' => __('Refresh'),
                                     'type' => 'toggle',
                                     'width' => 33,
-                                    'instructions' => __('statamic::messages.taxonomies_use_post_message_instructions'),
-                                    'instructions_position' => 'below',
-                                ],
-                            ],
-                            [
-                                'handle' => 'post_message_data',
-                                'field' => [
-                                    'display' => __('Post Message Data'),
-                                    'type' => 'code',
-                                    'instructions' => __('statamic::messages.taxonomies_post_message_data_instructions'),
-                                    'default' => 'live-preview-update',
-                                    'if' => [
-                                        'use_post_message' => true,
-                                    ],
-                                    'theme' => 'light',
-                                    'mode' => 'javascript',
-                                    'indent_type' => 'spaces',
-                                    'indent_size' => 2,
-                                    'line_numbers' => false,
-                                    'line_wrapping' => false,
+                                    'instructions' => __('statamic::messages.taxonomies_preview_target_refresh_instructions'),
+                                    'default' => true,
                                 ],
                             ],
                         ],

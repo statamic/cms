@@ -184,61 +184,69 @@ class TaxonomyTest extends TestCase
      */
     public function it_gets_and_sets_preview_targets($throughFacade)
     {
-        $taxonomy = (new Taxonomy)->handle('tags');
+        $taxonomy = (new Taxonomy)->handle('test');
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->previewTargets());
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->basePreviewTargets());
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->additionalPreviewTargets());
 
         $this->assertEquals([
-            ['label' => 'Term', 'format' => '{permalink}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
+            ['label' => 'Term', 'format' => '{permalink}', 'refresh' => true],
         ], $taxonomy->basePreviewTargets()->all());
 
         $return = $taxonomy->previewTargets([
-            ['label' => 'Foo', 'format' => '{foo}', 'use_post_message' => true, 'post_message_data' => '{"foo":"bar"}'],
-            ['label' => 'Bar', 'format' => '{bar}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}'], // no explicit refresh should imply its enabled
         ]);
 
         $this->assertSame($taxonomy, $return);
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}', 'use_post_message' => true, 'post_message_data' => '{"foo":"bar"}'],
-            ['label' => 'Bar', 'format' => '{bar}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
         ], $taxonomy->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}', 'use_post_message' => true, 'post_message_data' => '{"foo":"bar"}'],
-            ['label' => 'Bar', 'format' => '{bar}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
         ], $taxonomy->basePreviewTargets()->all());
 
         $this->assertEquals([], $taxonomy->additionalPreviewTargets()->all());
 
         $extra = [
-            ['label' => 'Baz', 'format' => '{baz}', 'use_post_message' => true, 'post_message_data' => 'data-updated'],
-            ['label' => 'Qux', 'format' => '{qux}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
+            ['label' => 'Qux', 'format' => '{qux}', 'refresh' => true],
+            ['label' => 'Quux', 'format' => '{quux}', 'refresh' => false],
+            ['label' => 'Flux', 'format' => '{flux}'], // no explicit refresh should imply its enabled
         ];
 
         if ($throughFacade) {
-            \Statamic\Facades\Taxonomy::addPreviewTargets('tags', $extra);
+            \Statamic\Facades\Taxonomy::addPreviewTargets('test', $extra);
         } else {
             $taxonomy->addPreviewTargets($extra);
         }
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}', 'use_post_message' => true, 'post_message_data' => '{"foo":"bar"}'],
-            ['label' => 'Bar', 'format' => '{bar}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
-            ['label' => 'Baz', 'format' => '{baz}', 'use_post_message' => true, 'post_message_data' => 'data-updated'],
-            ['label' => 'Qux', 'format' => '{qux}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
+            ['label' => 'Qux', 'format' => '{qux}', 'refresh' => true],
+            ['label' => 'Quux', 'format' => '{quux}', 'refresh' => false],
+            ['label' => 'Flux', 'format' => '{flux}', 'refresh' => true],
         ], $taxonomy->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}', 'use_post_message' => true, 'post_message_data' => '{"foo":"bar"}'],
-            ['label' => 'Bar', 'format' => '{bar}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
         ], $taxonomy->basePreviewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Baz', 'format' => '{baz}', 'use_post_message' => true, 'post_message_data' => 'data-updated'],
-            ['label' => 'Qux', 'format' => '{qux}', 'use_post_message' => false, 'post_message_data' => 'live-preview-update'],
+            ['label' => 'Qux', 'format' => '{qux}', 'refresh' => true],
+            ['label' => 'Quux', 'format' => '{quux}', 'refresh' => false],
+            ['label' => 'Flux', 'format' => '{flux}', 'refresh' => true],
         ], $taxonomy->additionalPreviewTargets()->all());
     }
 
