@@ -1,3 +1,12 @@
+const hasIframeSourceChanged = (existingSrc, newSrc) => {
+    existingSrc = new URL(existingSrc);
+    newSrc = new URL(newSrc);
+    existingSrc.searchParams.delete('live-preview');
+    newSrc.searchParams.delete('live-preview');
+
+    return existingSrc.toString() !== newSrc.toString();
+}
+
 export default {
     methods: {
         updateIframeContents(url, target) {
@@ -17,13 +26,7 @@ export default {
 
             let shouldRefresh = target.refresh;
 
-            const existingIFrameSource = new URL(container.firstChild.src);
-            const newIFrameSource = new URL(iframe.src);
-            existingIFrameSource.searchParams.delete('live-preview');
-            newIFrameSource.searchParams.delete('live-preview');
-            const iFrameSourceIsEqual = existingIFrameSource.toString() === newIFrameSource.toString();
-
-            if (! iFrameSourceIsEqual) {
+            if (hasIframeSourceChanged(container.firstChild.src, iframe.src)) {
                 shouldRefresh = true;
             }
 
