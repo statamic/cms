@@ -18,14 +18,9 @@ export default {
 
                 const iFrameSourceIsEqual = existingIFrameSource.toString() === newIFrameSource.toString();
 
-                if (target?.use_post_message && iFrameSourceIsEqual) {
-                    const targetOrigin = /^https?:\/\//.test(url) ? (new URL(url))?.origin : window.origin;
+                const shouldRefresh = target.refresh || !iFrameSourceIsEqual;
 
-                    container.firstChild.contentWindow.postMessage(
-                        'statamic.preview.updated',
-                        targetOrigin
-                    );
-                } else {
+                if (shouldRefresh) {
                     let isSameOrigin = url.startsWith('/') || new URL(url).host === window.location.host;
 
                     let scroll = isSameOrigin ? [
@@ -44,6 +39,10 @@ export default {
                         iframeContentWindow.addEventListener('DOMContentLoaded', iframeScrollUpdate, true);
                         iframeContentWindow.addEventListener('load', iframeScrollUpdate, true);
                     }
+                } else {
+                    const targetOrigin = /^https?:\/\//.test(url) ? (new URL(url))?.origin : window.origin;
+
+                    container.firstChild.contentWindow.postMessage('statamic.preview.updated', targetOrigin);
                 }
             } else {
                 container.appendChild(iframe);
