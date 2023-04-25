@@ -72,7 +72,7 @@
 
 <script>
 import { SortableList, SortableItem } from '../../sortable/Sortable';
-import { computePosition, offset } from '@floating-ui/dom';
+import { computePosition, offset, flip } from '@floating-ui/dom';
 
 export default {
 
@@ -160,6 +160,7 @@ export default {
                 placement: 'bottom',
                 middleware: [
                     offset({ mainAxis: 0, crossAxis: -1 }),
+                    flip(),
                 ]
             }).then(({ x, y }) => {
                 Object.assign(dropdownList.style, {
