@@ -30,13 +30,23 @@
         </div>
 
         <confirmation-modal
-            :buttonText="__('Save')"
+            v-if="showCreateModal"
             :title="__('Create New View')"
-            v-if="showSaveModal"
-            @cancel="showSaveModal = false"
-            @confirm="handleSavePreset"
+            :buttonText="__('Create')"
+            @cancel="showCreateModal = false"
+            @confirm="savePreset(savingPresetSlug)"
         >
-            <text-input :focus="true" v-model="savingPresetName" @keydown.enter="handleSavePreset" />
+            <text-input :focus="true" v-model="savingPresetName" @keydown.enter="savePreset(savingPresetSlug)" />
+        </confirmation-modal>
+
+        <confirmation-modal
+            v-if="showRenameModal"
+            :title="__('Rename View')"
+            :buttonText="__('Rename')"
+            @cancel="showRenameModal = false"
+            @confirm="savePreset()"
+        >
+            <text-input :focus="true" v-model="savingPresetName" @keydown.enter="savePreset()" />
         </confirmation-modal>
 
         <confirmation-modal
@@ -66,8 +76,9 @@ export default {
     data() {
         return {
             presets: [],
+            showCreateModal: false,
+            showRenameModal: false,
             showDeleteModal: false,
-            showSaveModal: false,
             savingPresetName: null,
             test: 'hello!'
         }
