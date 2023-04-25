@@ -1965,8 +1965,8 @@ class EntryTest extends TestCase
         ], $entryDe->previewTargets()->all());
 
         $collection->previewTargets([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'refresh' => true],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'refresh' => true],
         ])->save();
 
         $this->assertEquals([
