@@ -18,6 +18,7 @@ class IsNumericTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider numbers
      */
     public function it_returns_true_if_value_is_number_or_numeric_string($expected, $input): void

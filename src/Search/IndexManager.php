@@ -121,7 +121,7 @@ class IndexManager extends Manager
         return new AlgoliaIndex($client, $name, $config, $locale);
     }
 
-    protected function callLocalizedCustomCreator(array $config, string $name, string $locale)
+    protected function callLocalizedCustomCreator(array $config, string $name, ?string $locale)
     {
         return $this->customCreators[$config['driver']]($this->app, $config, $name, $locale);
     }

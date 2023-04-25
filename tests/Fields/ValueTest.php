@@ -11,6 +11,7 @@ class ValueTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider isRelationshipFieldtypeProvider
      **/
     public function it_gets_whether_its_a_relationship_through_the_fieldtype($isRelationship, $fieldtype)

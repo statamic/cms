@@ -592,12 +592,10 @@ class Parser implements ParserContract
 
             // look for tag pairs and (plugin) callbacks
             if ($name != 'content' && ! $replacement) {
-
                 // is the callback a variable in our data set?
                 [$exists, $values] = $this->getVariableExistenceAndValue($name, $data);
 
                 if ($exists) {
-
                     // is this a tag-pair?
                     if ($this->isLoopable($values)) {
                         // yes it is
@@ -761,7 +759,6 @@ class Parser implements ParserContract
 
                 // Regular old ternary
                 } else {
-
                     // Split the tag up
                     $bits = explode('? ', $match[1]);
 
