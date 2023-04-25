@@ -99,6 +99,10 @@ export default {
 
             return payload;
         },
+
+        savingPresetSlug() {
+            return this.$slugify(this.savingPresetName, '_');
+        },
     },
 
     created() {
@@ -117,7 +121,61 @@ export default {
             this.viewPreset(handle)
         },
 
+        refreshPresets() {
+            this.getPresets();
+            this.viewAll();
+        },
+
+        refreshPreset() {
+            this.setPreset(this.activePreset);
+        },
+
+        viewAll() {
+            this.$emit('reset');
+        },
+
+        viewPreset(handle) {
+            this.$emit('selected', handle, this.presets[handle]);
+        },
+
+        createPreset() {
+            this.savingPresetName = null;
+            this.showCreateModal = true;
+        },
+
+        renamePreset() {
+            this.savingPresetName = this.activePresetPayload.display;
+            this.showRenameModal = true;
+        },
+
+        savePreset(handle) {
+            let presetHandle = handle || this.activePreset;
+
+            if (! presetHandle) {
+                this.showCreateModal = true;
+                return;
+            }
+
+            this.$preferences.set(`${this.preferencesKey}.${presetHandle}`, this.presetPreferencesPayload)
+                .then(response => {
+                    this.$toast.success(__('View saved'));
+                    this.showCreateModal = false;
+                    this.showRenameModal = false;
+                    this.setPreset(presetHandle);
+                })
+                .catch(error => {
+                    this.$toast.error(__('Unable to save view'));
+                    this.showCreateModal = false;
+                    this.showRenameModal = false;
+                });
+        },
+
         deletePreset() {
+            if (! this.showDeleteModal) {
+                this.showDeleteModal = true;
+                return;
+            }
+
             this.$preferences.remove(`${this.preferencesKey}.${this.activePreset}`)
                 .then(response => {
                     this.$emit('deleted', this.activePreset);
@@ -131,55 +189,6 @@ export default {
                 });
         },
 
-        savePreset() {
-            if (!this.activePreset) {
-                this.showSaveModal = true;
-                return;
-            }
-
-            this.handleSavePreset();
-        },
-
-        createNewEmptyPreset() {
-            this.savingPresetName = null;
-            this.showSaveModal = true;
-        },
-
-        handleSavePreset() {
-            let presetHandle = this.activePreset || this.$slugify(this.savingPresetName, '_');
-
-            this.$preferences.set(`${this.preferencesKey}.${presetHandle}`, this.presetPreferencesPayload)
-                .then(response => {
-                    this.$toast.success(__('View saved'));
-                    this.showSaveModal = false;
-                    this.getPresets();
-                    this.viewPreset(presetHandle);
-                    this.hasActiveFilters ? this.refreshPreset() : this.$emit('show-filters');
-                })
-                .catch(error => {
-                    this.$toast.error(__('Unable to save view'));
-                    this.showSaveModal = false;
-                });
-        },
-
-        refreshPresets() {
-            this.getPresets();
-            this.viewAll();
-        },
-
-        refreshPreset() {
-            this.getPresets();
-            this.$emit('hide-filters');
-            this.viewPreset(this.activePreset);
-        },
-
-        viewAll() {
-            this.$emit('reset');
-        },
-
-        viewPreset(handle) {
-            this.$emit('selected', handle, this.presets[handle]);
-        },
     },
 
 }
