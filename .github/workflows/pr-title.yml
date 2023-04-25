@@ -1,0 +1,10 @@
+name: Pull Request Title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+steps:
+  - uses: deepakputhraya/action-pr-title@master
+    with:
+      regex: '^\[(?:3\.\d+|[4-9]\d?\.x|\d{2,}\.x)\]\s'
