@@ -13,10 +13,10 @@
                                 <svg-icon name="micro/chevron-down-xs" class="w-2 h-2" />
                             </button>
                         </template>
-                        <dropdown-item :text="__('Duplicate')" @click="duplicatePreset(handle)" />
-                        <dropdown-item :text="__('Rename')" @click="renamePreset(handle)" />
+                        <dropdown-item :text="__('Duplicate')" @click="createPreset" />
+                        <dropdown-item :text="__('Rename')" @click="renamePreset" />
                         <div class="divider" />
-                        <dropdown-item :text="__('Delete')" class="warning" @click="deletePreset(handle)" />
+                        <dropdown-item :text="__('Delete')" class="warning" @click="deletePreset" />
                     </dropdown-list>
                 </button>
                 <button class="pill-tab mr-1" v-else @click="viewPreset(handle)">
@@ -24,7 +24,7 @@
                 </button>
             </template>
 
-            <button class="pill-tab" @click="createNewEmptyPreset" >
+            <button class="pill-tab" @click="createPreset" >
                 <svg-icon name="add" class="w-3 h-3"/>
             </button>
         </div>
