@@ -7,9 +7,17 @@
             <template v-for="(preset, handle) in presets">
                 <button class="pill-tab active mr-1" v-if="handle === activePreset">
                     {{ preset.display }}
-                    <button class="opacity-50 hover:opacity-100" @click="showDeleteModal = true">
-                        <span class="w-2 h-2 ml-2 mr-1">&times;</span>
-                    </button>
+                    <dropdown-list class="ml-2" placement="bottom-start">
+                        <template v-slot:trigger>
+                            <button class="opacity-50 hover:opacity-100">
+                                <svg-icon name="micro/chevron-down-xs" class="w-2 h-2" />
+                            </button>
+                        </template>
+                        <dropdown-item :text="__('Duplicate')" @click="duplicatePreset(handle)" />
+                        <dropdown-item :text="__('Rename')" @click="renamePreset(handle)" />
+                        <div class="divider" />
+                        <dropdown-item :text="__('Delete')" class="warning" @click="deletePreset(handle)" />
+                    </dropdown-list>
                 </button>
                 <button class="pill-tab mr-1" v-else @click="viewPreset(handle)">
                     {{ preset.display }}
