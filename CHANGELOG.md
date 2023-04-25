@@ -1,5 +1,36 @@
 # Release Notes
 
+## 3.4.8 (2023-04-25)
+
+### What's new
+- Live Preview auto-refresh can be disabled and replaced with postMessage. [#6067](https://github.com/statamic/cms/issues/6067) by @Buffalom
+- Integer and float fieldtypes filters. [#7064](https://github.com/statamic/cms/issues/7064) by @jacksleight
+- Support for additional columns in the collection widget. [#7760](https://github.com/statamic/cms/issues/7760) by @jacksleight
+
+### What's improved
+- Added locking to the static caching middleware. [#7722](https://github.com/statamic/cms/issues/7722) by @jasonvarga
+- Query builder orderBy arguments are validated. [#7917](https://github.com/statamic/cms/issues/7917) by @nicolasbeauvais
+- Existing user gets passed into OAuth callback. [#7904](https://github.com/statamic/cms/issues/7904) by @jasonvarga
+- Support for Livewire CSRF token in full measure static caching. [#7894](https://github.com/statamic/cms/issues/7894) by @aerni
+- Log process class errors with command info. [#7877](https://github.com/statamic/cms/issues/7877) by @jesseleite
+- German translations. [#7995](https://github.com/statamic/cms/issues/7995) by @PatrickJunod
+
+### What's fixed
+- Fix issues with revealer fields within Bard and Replicator fields. [#7899](https://github.com/statamic/cms/issues/7899) by @jacksleight
+- Fix `null` sometimes being added to trees. [#6640](https://github.com/statamic/cms/issues/6640) by @AndrewHaine
+- Fix bard link extension is stripping out the domain part when pasting a url. [#7962](https://github.com/statamic/cms/issues/7962) by @o1y
+- Fix slug not being generated in appropriate language. [#7757](https://github.com/statamic/cms/issues/7757) by @flolanger
+- Fix full measure caching invalidation on multisite with a single path config value. [#7509](https://github.com/statamic/cms/issues/7509) by @arthurperton
+- Fix save button label when switching between localized entries. [#7916](https://github.com/statamic/cms/issues/7916) by @o1y
+- Fix user attributes not being merged when found by OAuth ID. [#7883](https://github.com/statamic/cms/issues/7883) by @grantholle
+- Fix focal point editor not displaying images with parenthesis. [#7896](https://github.com/statamic/cms/issues/7896) by @mynetx
+- Fix field dragging in blueprints. [#7870](https://github.com/statamic/cms/issues/7870) by @jasonvarga
+- Fix fieldset edit form draggable glitch. [#7799](https://github.com/statamic/cms/issues/7799) by @o1y
+- Fix `once` tag when used across requests. [#7805](https://github.com/statamic/cms/issues/7805) by @jasonvarga
+- Fix missing closing div. [#7777](https://github.com/statamic/cms/issues/7777) by @galengidman
+
+
+
 ## 3.4.7 (2023-03-20)
 
 ### What's improved
