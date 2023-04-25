@@ -531,13 +531,24 @@ class CollectionsController extends CpController
                             [
                                 'handle' => 'label',
                                 'field' => [
+                                    'display' => __('Label'),
                                     'type' => 'text',
                                 ],
                             ],
                             [
                                 'handle' => 'format',
                                 'field' => [
+                                    'display' => __('Format'),
                                     'type' => 'text',
+                                ],
+                            ],
+                            [
+                                'handle' => 'refresh',
+                                'field' => [
+                                    'display' => __('Refresh'),
+                                    'type' => 'toggle',
+                                    'instructions' => __('statamic::messages.collections_preview_target_refresh_instructions'),
+                                    'default' => true,
                                 ],
                             ],
                         ],

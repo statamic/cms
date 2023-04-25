@@ -1,5 +1,100 @@
 # Release Notes
 
+## 3.4.8 (2023-04-25)
+
+### What's new
+- Live Preview auto-refresh can be disabled and replaced with postMessage. [#6067](https://github.com/statamic/cms/issues/6067) by @Buffalom
+- Integer and float fieldtypes filters. [#7064](https://github.com/statamic/cms/issues/7064) by @jacksleight
+- Support for additional columns in the collection widget. [#7760](https://github.com/statamic/cms/issues/7760) by @jacksleight
+
+### What's improved
+- Added locking to the static caching middleware. [#7722](https://github.com/statamic/cms/issues/7722) by @jasonvarga
+- Query builder orderBy arguments are validated. [#7917](https://github.com/statamic/cms/issues/7917) by @nicolasbeauvais
+- Existing user gets passed into OAuth callback. [#7904](https://github.com/statamic/cms/issues/7904) by @jasonvarga
+- Support for Livewire CSRF token in full measure static caching. [#7894](https://github.com/statamic/cms/issues/7894) by @aerni
+- Log process class errors with command info. [#7877](https://github.com/statamic/cms/issues/7877) by @jesseleite
+- German translations. [#7995](https://github.com/statamic/cms/issues/7995) by @PatrickJunod
+
+### What's fixed
+- Fix issues with revealer fields within Bard and Replicator fields. [#7899](https://github.com/statamic/cms/issues/7899) by @jacksleight
+- Fix `null` sometimes being added to trees. [#6640](https://github.com/statamic/cms/issues/6640) by @AndrewHaine
+- Fix bard link extension is stripping out the domain part when pasting a url. [#7962](https://github.com/statamic/cms/issues/7962) by @o1y
+- Fix slug not being generated in appropriate language. [#7757](https://github.com/statamic/cms/issues/7757) by @flolanger
+- Fix full measure caching invalidation on multisite with a single path config value. [#7509](https://github.com/statamic/cms/issues/7509) by @arthurperton
+- Fix save button label when switching between localized entries. [#7916](https://github.com/statamic/cms/issues/7916) by @o1y
+- Fix user attributes not being merged when found by OAuth ID. [#7883](https://github.com/statamic/cms/issues/7883) by @grantholle
+- Fix focal point editor not displaying images with parenthesis. [#7896](https://github.com/statamic/cms/issues/7896) by @mynetx
+- Fix field dragging in blueprints. [#7870](https://github.com/statamic/cms/issues/7870) by @jasonvarga
+- Fix fieldset edit form draggable glitch. [#7799](https://github.com/statamic/cms/issues/7799) by @o1y
+- Fix `once` tag when used across requests. [#7805](https://github.com/statamic/cms/issues/7805) by @jasonvarga
+- Fix missing closing div. [#7777](https://github.com/statamic/cms/issues/7777) by @galengidman
+
+
+
+## 3.4.7 (2023-03-20)
+
+### What's improved
+- Italian translations. [#7725](https://github.com/statamic/cms/issues/7725) by @netwaretcs
+
+### What's fixed
+- Fix whereAnyStatus error. [#7730](https://github.com/statamic/cms/issues/7730) by @jasonvarga
+
+
+
+## 3.4.6 (2023-03-17)
+
+### What's new
+- Allow double colons inside tag method parts. [#7649](https://github.com/statamic/cms/issues/7649) by @JohnathonKoster
+- Allow image manipulation of additional formats, as well as fixing and improving validation. [#7666](https://github.com/statamic/cms/issues/7666) by @jesseleite
+- Ability to include unpublished entries, but leaving them excluded by default. [#7334](https://github.com/statamic/cms/issues/7334) by @arthurperton
+- AssetContainer instances can be cast to strings. [#7662](https://github.com/statamic/cms/issues/7662) by @jacksleight
+- Add `current_layout` variable. [#7623](https://github.com/statamic/cms/issues/7623) by @jasonvarga
+
+### What's improved
+- Improve performance of relationship select fields. [#7632](https://github.com/statamic/cms/issues/7632) by @jasonvarga
+- Norwegian translations. [#7719](https://github.com/statamic/cms/issues/7719) by @hgrimelid
+- Dutch translations. [#7667](https://github.com/statamic/cms/issues/7667) by @pevawi
+
+### What's fixed
+- Fix issue where a `section` tag wouldn't work inside a `partial` tag slot. [#7613](https://github.com/statamic/cms/issues/7613) by @JohnathonKoster
+- Fix `markdown` fieltype cursor position on resize. [#7715](https://github.com/statamic/cms/issues/7715) by @jasonvarga
+- Fix `code` fieldtype cursor position on resize. [#7665](https://github.com/statamic/cms/issues/7665) by @o1y
+- Fix searching for queries including a plus sign. [#7640](https://github.com/statamic/cms/issues/7640) by @JohnathonKoster
+- Fix being able to loop when using the `scope` modifier. [#7576](https://github.com/statamic/cms/issues/7576) by @JohnathonKoster
+- Fix ability to chain a modifier onto a hardcoded array. [#7650](https://github.com/statamic/cms/issues/7650) by @JohnathonKoster
+- Fix `yaml` fieldtype with a single array value being saved as a string. [#7639](https://github.com/statamic/cms/issues/7639) by @JohnathonKoster
+- Fix sitewide protection not being applied to 404 pages. [#7714](https://github.com/statamic/cms/issues/7714) by @jasonvarga
+- Fix error when using a custom search driver. [#7707](https://github.com/statamic/cms/issues/7707) by @edalzell
+- Fix error when an entry file is deleted and no corresponding collection exists. [#7701](https://github.com/statamic/cms/issues/7701) by @hlorofos
+- Fix error on thumbnail route when requesting a private asset with no size param [#7664](https://github.com/statamic/cms/issues/7664) by @jasonvarga
+- Fix error when you are missing a Bard set ID. [#7673](https://github.com/statamic/cms/issues/7673) by @jasonvarga
+- Fix Vite assets not being automatically published. [#7627](https://github.com/statamic/cms/issues/7627) by @duncanmcclean
+- Fix incorrect live preview state on create form by hiding the button. [#7674](https://github.com/statamic/cms/issues/7674) by @jasonvarga
+
+
+
+## 3.4.5 (2023-02-28)
+
+### What's new
+- Add console import for file based users to database. [#6729](https://github.com/statamic/cms/issues/6729) by @ryanmitchell
+
+### What's improved
+- Dutch translations. [#7553](https://github.com/statamic/cms/issues/7553) by @oakeddev
+- Display actual time in past revision history. [#7544](https://github.com/statamic/cms/issues/7544) by @jacksleight
+- Use `@tiptap/pm` package, and export state. [#7574](https://github.com/statamic/cms/issues/7574) by @jacksleight
+
+### What's fixed
+- Fix Antlers tag parameters not understanding arrays with single values. [#7563](https://github.com/statamic/cms/issues/7563) by @JohnathonKoster
+- Fix Antlers new array key variable assignment. [#7594](https://github.com/statamic/cms/issues/7594) by @JohnathonKoster
+- Fix Antlers value changes being lost after calling tags. [#7596](https://github.com/statamic/cms/issues/7596) by @JohnathonKoster
+- Fix active nav item check on CP urls with an hash fragments. [#7616](https://github.com/statamic/cms/issues/7616) by @jesseleite
+- Fix save issue when slug starts with extension. [#7590](https://github.com/statamic/cms/issues/7590) by @jasonvarga
+- Fix read only dynamic mode array fieldtype. [#7577](https://github.com/statamic/cms/issues/7577) by @jacksleight
+- Fix CP Nav preferences builder when top level section is empty. [#7551](https://github.com/statamic/cms/issues/7551) by @jesseleite
+- Refactor randomness out of test. [#7584](https://github.com/statamic/cms/issues/7584) by @jasonvarga
+
+
+
 ## 3.4.4 (2023-02-15)
 
 ### What's new

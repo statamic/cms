@@ -72,6 +72,7 @@
                 :targets="previewTargets"
                 :values="values"
                 :blueprint="fieldset.handle"
+                :reference="initialReference"
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
@@ -101,7 +102,7 @@
 
                                 <div :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-2 flex items-center -mx-1">
+                                    <div class="p-2 flex items-center -mx-1" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
                                             class="flex items-center justify-center btn-flat w-full mx-1 px-1"
                                             v-if="isBase"
@@ -111,7 +112,7 @@
                                         </button>
                                         <a
                                             class="flex items-center justify-center btn-flat w-full mx-1 px-1"
-                                            v-if="permalink"
+                                            v-if="showVisitUrlButton"
                                             :href="permalink"
                                             target="_blank">
                                             <svg-icon name="external-link" class="w-4 h-4 mr-1" />
@@ -345,6 +346,14 @@ export default {
 
         livePreviewUrl() {
             return _.findWhere(this.localizations, { active: true }).url + '/preview';
+        },
+
+        showLivePreviewButton() {
+            return !this.isCreating && this.isBase && this.livePreviewUrl;
+        },
+
+        showVisitUrlButton() {
+            return !!this.permalink;
         },
 
         isBase() {

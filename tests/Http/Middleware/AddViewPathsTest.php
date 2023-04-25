@@ -14,6 +14,7 @@ class AddViewPathsTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider viewPathProvider
      */
     public function adds_view_paths($isAmpEnabled, $requestUrl, $expectedPaths)
@@ -48,6 +49,7 @@ class AddViewPathsTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider namespacedViewPathProvider
      */
     public function adds_namespaced_view_paths($requestUrl, $expectedPaths)

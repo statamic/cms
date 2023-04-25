@@ -12,6 +12,7 @@ class ShuffleTest extends TestCase
 {
     /**
      * @test
+     *
      * @group array
      */
     public function it_shuffles_the_items_of_an_array(): void
@@ -28,6 +29,7 @@ class ShuffleTest extends TestCase
 
     /**
      * @test
+     *
      * @group array
      */
     public function it_shuffles_the_items_of_a_collection(): void

@@ -42,14 +42,35 @@ class EntriesTest extends TestCase
         EntryFactory::id('expired')->collection($collection)->slug('expired')->data(['title' => 'Expired'])->date('2021-01-01')->create();
     }
 
-    /** @test */
-    public function it_augments_to_a_query_builder()
+    /**
+     * @test
+     *
+     * @dataProvider augmentQueryBuilderProvider
+     */
+    public function it_augments_to_a_query_builder($expectedIds, $queryCallback)
     {
         $augmented = $this->fieldtype()->augment([456, 'invalid', '123', 'draft', 'scheduled', 'expired']);
 
         $this->assertInstanceOf(Builder::class, $augmented);
-        $this->assertEveryItemIsInstanceOf(Entry::class, $augmented->get());
-        $this->assertEquals(['456', '123'], $augmented->get()->map->id()->all());
+
+        $queryCallback($augmented);
+
+        $this->assertEveryItemIsInstanceOf(Entry::class, $results = $augmented->get());
+        $this->assertEquals($expectedIds, $results->map->id()->all());
+    }
+
+    public function augmentQueryBuilderProvider()
+    {
+        return [
+            'published (default, no where clause)' => [['456', '123'], fn ($q) => null],
+            'status published (explicit where status clause)' => [['456', '123'], fn ($q) => $q->where('status', 'published')],
+            'status draft' => [['draft'], fn ($q) => $q->where('status', 'draft')],
+            'status scheduled' => [['scheduled'], fn ($q) => $q->where('status', 'scheduled')],
+            'status expired' => [['expired'], fn ($q) => $q->where('status', 'expired')],
+            'any status' => [['456', '123', 'draft', 'scheduled', 'expired'], fn ($q) => $q->whereAnyStatus()],
+            'published true' => [['456', '123', 'scheduled', 'expired'], fn ($q) => $q->where('published', true)],
+            'published false' => [['draft'], fn ($q) => $q->where('published', false)],
+        ];
     }
 
     /** @test */
@@ -68,6 +89,32 @@ class EntriesTest extends TestCase
 
         $this->assertInstanceOf(Entry::class, $augmented);
         $this->assertEquals('one', $augmented->slug());
+    }
+
+    /** @test */
+    public function it_returns_collection_when_preprocessing_index_and_max_items_is_1()
+    {
+        $preProcessed = $this
+            ->fieldtype(['max_items' => 1])
+            ->preProcessIndex('123');
+
+        $this->assertEquals(['123'], $preProcessed->map(fn ($entry) => $entry['id'])->all());
+    }
+
+    /** @test */
+    public function it_returns_empty_collection_when_preprocessing_index_and_max_items_is_1_and_the_value_is_null()
+    {
+        $preProcessed = $this->fieldtype(['max_items' => 1])->preProcessIndex(null);
+
+        $this->assertEquals([], $preProcessed->all());
+    }
+
+    /** @test */
+    public function it_includes_drafts_when_pre_processing_for_index()
+    {
+        $preProcessed = $this->fieldtype()->preProcessIndex([456, 'invalid', '123', 'draft', 'scheduled', 'expired']);
+
+        $this->assertEquals([456, '123', 'draft', 'scheduled', 'expired'], $preProcessed->map(fn ($entry) => $entry['id'])->all());
     }
 
     /** @test */
@@ -112,8 +159,7 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class
-        {
+        $parent = new class {
             // Class does not implement "Localizable"
         };
 
@@ -132,8 +178,7 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class
-        {
+        $parent = new class {
             // Class does not implement "Localizable"
         };
 
@@ -253,8 +298,7 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class
-        {
+        $parent = new class {
             // Class does not implement "Localizable"
         };
 
@@ -288,8 +332,7 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class
-        {
+        $parent = new class {
             // Class does not implement "Localizable"
         };
 

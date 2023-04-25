@@ -10,6 +10,7 @@ class CombTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider searchesProvider
      **/
     public function it_searches($term, $expected)
@@ -58,6 +59,21 @@ EOT;
         ]];
 
         $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('snippets.content')->all());
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_search_for_plus_signs()
+    {
+        $comb = new Comb([
+            ['content' => '+Content'],
+        ]);
+
+        $result = $comb->lookUp('+');
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertSame(1, $result['info']['total_results']);
     }
 
     public function searchesProvider()

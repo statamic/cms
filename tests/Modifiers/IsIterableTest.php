@@ -20,6 +20,7 @@ class IsIterableTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider iterables
      */
     public function it_returns_true_if_input_is_iterable($expected, $input): void
