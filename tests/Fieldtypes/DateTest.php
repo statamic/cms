@@ -129,6 +129,11 @@ class DateTest extends TestCase
         return [
             'null' => [
                 [],
+                null,
+                null,
+            ],
+            'object with nulls' => [
+                [],
                 ['date' => null, 'time' => null],
                 null,
             ],
