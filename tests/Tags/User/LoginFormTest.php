@@ -151,7 +151,7 @@ EOT
      <p class="success">{{ success }}</p>
  {{ /user:login_form }}
  EOT
-         );
+        );
 
         preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
         preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
