@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\Scopes\Filters\Fields\Floatval as FloatFilter;
 
 class Floatval extends Fieldtype
 {
@@ -49,5 +50,10 @@ class Floatval extends Fieldtype
         }
 
         return floatval($data);
+    }
+
+    public function filter()
+    {
+        return new FloatFilter($this);
     }
 }

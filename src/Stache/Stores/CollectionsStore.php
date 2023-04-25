@@ -118,6 +118,7 @@ class CollectionsStore extends BasicStore
             return [
                 'format' => $target['url'],
                 'label' => $target['label'],
+                'refresh' => $target['refresh'] ?? true,
             ];
         })->all();
     }
