@@ -19,6 +19,7 @@
                     <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
 
                         <data-list-filter-presets
+                            v-show="allowFilterPresets"
                             ref="presets"
                             :active-preset="activePreset"
                             :active-preset-payload="activePresetPayload"
@@ -34,7 +35,7 @@
 
                         <div class="flex space-x-2 mt-2">
                             <button class="btn btn-sm ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
-                            <button class="btn btn-sm ml-2" v-text="__('Save')" v-show="isDirty" @click="$refs.presets.savePreset()" />
+                            <button class="btn btn-sm ml-2" v-text="__('Save')" v-show="allowFilterPresets && isDirty" @click="$refs.presets.savePreset()" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                         </div>
                     </div>
@@ -129,6 +130,9 @@ export default {
     props: {
         listingKey: String,
         group: String,
+        allowFilterPresets: {
+            default: true,
+        },
     },
 
     data() {
