@@ -122,7 +122,8 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     public function entry_urls_are_not_invalidated_by_an_entry_with_a_redirect()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrls')->once()->with(null);
+            $cacher->shouldReceive('invalidateUrl')->never();
+            $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -132,7 +133,16 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
             $m->shouldReceive('descendants')->andReturn(collect());
         });
 
-        $invalidator = new Invalidator($cacher);
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                    ],
+                ],
+            ],
+        ]);
 
         $this->assertNull($invalidator->invalidate($entry));
     }
