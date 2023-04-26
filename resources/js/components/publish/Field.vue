@@ -40,7 +40,7 @@
                     :class="{ flex: syncable && !isSynced }"
                     @click="$emit('synced')"
                 >
-                    <svg-icon name="hyperlink-broken" class="h-4 w-4 mr-1.5 mb-1 text-gray-600"
+                    <svg-icon name="light/hyperlink-broken" class="h-4 w-4 mr-1.5 mb-1 text-gray-600"
                         v-tooltip.top="__('messages.field_desynced_from_origin')" />
                 </button>
             </label>

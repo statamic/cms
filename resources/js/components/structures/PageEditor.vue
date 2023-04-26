@@ -1,16 +1,16 @@
 <template>
 
     <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')">
-        <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
+        <div slot-scope="{ close }" class="bg-gray-100 h-full flex flex-col">
 
-            <div class="bg-gray-200 px-6 py-2 border-b border-gray-300 text-lg font-medium flex items-center justify-between">
+            <header class="bg-white pl-6 pr-3 py-2 mb-4 border-b shadow-md text-lg font-medium flex items-center justify-between">
                 {{ headerText }}
                 <button
                     type="button"
                     class="btn-close"
                     @click="confirmClose(close)"
                     v-html="'&times'" />
-            </div>
+            </header>
 
             <div v-if="loading" class="flex-1 overflow-auto relative">
                 <div class="absolute inset-0 z-10 bg-white bg-opacity-75 flex items-center justify-center text-center">
@@ -18,7 +18,7 @@
                 </div>
             </div>
 
-            <div v-else class="flex-1 overflow-auto">
+            <div v-if="!loading" class="flex-1 overflow-auto px-1">
 
                 <publish-container
                     ref="container"
@@ -36,8 +36,9 @@
                             <loading-graphic text="" />
                         </div>
 
-                        <publish-fields
-                            :fields="fields"
+
+                        <publish-sections
+                            :sections="adjustedBlueprint.tabs[0].sections"
                             :syncable="type == 'entry'"
                             :syncable-fields="syncableFields"
                             @updated="setFieldValue"
@@ -50,15 +51,18 @@
                     </div>
                 </publish-container>
 
-                <div class="p-6">
-                    <button @click="submit" class="btn-primary w-full">{{ __('Submit') }}</button>
+            </div>
 
-                    <div class="text-xs mt-4" v-if="type === 'entry'">
-                        <a :href="editEntryUrl" target="_blank" class="flex items-center justify-center text-blue hover:text-blue underline">
-                            <svg-icon name="light/external-link" class="w-4 h-4 mr-2" />
-                            {{ __('Edit Entry') }}
-                        </a>
-                    </div>
+            <div v-if="!loading" class="bg-gray-200 p-4 border-t flex items-center justify-between flex-row-reverse">
+                <div>
+                    <button @click="confirmClose(close)" class="btn mr-2">{{ __('Cancel') }}</button>
+                    <button @click="submit" class="btn-primary">{{ __('Submit') }}</button>
+                </div>
+                <div v-if="type === 'entry'">
+                    <a :href="editEntryUrl" target="_blank" class="text-xs flex items-center justify-center text-blue hover:text-blue underline mr-4">
+                        <svg-icon name="light/external-link" class="w-4 h-4 mr-2" />
+                        {{ __('Edit Entry') }}
+                    </a>
                 </div>
 
             </div>
@@ -106,19 +110,37 @@ export default {
         },
 
         adjustedBlueprint() {
-            function isMissingField(fields, handle) {
-                return ! fields.some(field => field.handle === handle);
+            function getFields(blueprint) {
+                return _.chain(blueprint.tabs[0].sections)
+                    .map(sections => sections.fields)
+                    .flatten(true)
+                    .value();
             }
-            function hasField(fields, handle) {
-                return ! isMissingField(fields, handle);
+            function isMissingField(blueprint, handle) {
+                return ! getFields(blueprint).some(field => field.handle === handle);
+            }
+            function hasField(blueprint, handle) {
+                return ! isMissingField(blueprint, handle);
+            }
+            function getField(handle) {
+                for (let sectionIndex = 0; sectionIndex < blueprint.tabs[0].sections.length; sectionIndex++) {
+                    const section = blueprint.tabs[0].sections[sectionIndex];
+                    for (let fieldIndex = 0; fieldIndex < section.fields.length; fieldIndex++) {
+                        const field = section.fields[fieldIndex];
+                        if (field.handle === handle) {
+                            return { section: sectionIndex, field: fieldIndex };
+                        }
+                    }
+                }
+
+                return { section: null, field: null };
             }
 
             // This UI only supports the first tab
             const blueprint = clone(this.blueprint);
-            const fields = blueprint.tabs[0].sections[0].fields;
 
-            if (this.type == 'url' && isMissingField(fields, 'url')) {
-                fields.unshift({
+            if (this.type == 'url' && isMissingField(blueprint, 'url')) {
+                blueprint.tabs[0].sections[0].fields.unshift({
                     handle: 'url',
                     type: 'text',
                     display: __('URL'),
@@ -128,27 +150,21 @@ export default {
 
             // Remove the "url" field if it's been added to the blueprint by the user.
             // URL fields only make sense for URL type pages. Entries will have their own URLs.
-            if (this.type == 'entry' && hasField(fields, 'url')) {
-                fields.splice(fields.indexOf(fields.find(field => field.handle === 'url')), 1);
+            if (this.type == 'entry' && hasField(blueprint, 'url')) {
+                const {section, field} = getField('url');
+                blueprint.tabs[0].sections[section].fields.splice(field, 1);
             }
 
-            if (isMissingField(fields, 'title')) {
-                fields.unshift({
+            if (isMissingField(blueprint, 'title')) {
+                blueprint.tabs[0].sections[0].fields.unshift({
                     handle: 'title',
                     type: 'text',
                     display: __('Title')
                 });
             }
 
-            return { ...blueprint, tabs: [{ fields }] };
+            return blueprint;
         },
-
-        fields() {
-            return _.chain(this.adjustedBlueprint.tabs)
-                .map(tab => tab.fields)
-                .flatten(true)
-                .value();
-        }
     },
 
     watch: {
