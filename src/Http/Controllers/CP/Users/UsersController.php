@@ -45,19 +45,7 @@ class UsersController extends CpController
         $query = User::query();
 
         if ($search = request('search')) {
-            if (Search::indexes()->has('users')) {
-                return Search::index('users')->ensureExists()->search($search);
-            }
-
-            $query
-                ->where('email', 'like', '%'.$search.'%')
-                ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
-                    $query
-                        ->orWhere('first_name', 'like', '%'.$search.'%')
-                        ->orWhere('last_name', 'like', '%'.$search.'%');
-                }, function ($query) use ($search) {
-                    $query->orWhere('name', 'like', '%'.$search.'%');
-                });
+            $query = $this->searchUsers($search, $query);
         }
 
         return $query;
@@ -67,7 +55,11 @@ class UsersController extends CpController
     {
         $query = $request->group
             ? UserGroup::find($request->group)->queryUsers()
-            : $this->indexQuery();
+            : User::query();
+
+        if ($search = request('search')) {
+            $query = $this->searchUsers($search, $query);
+        }
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters, [
             'blueprints' => ['user'],
@@ -83,6 +75,25 @@ class UsersController extends CpController
             ->additional(['meta' => [
                 'activeFilterBadges' => $activeFilterBadges,
             ]]);
+    }
+
+    protected function searchUsers($search, $query)
+    {
+        if (Search::indexes()->has('users')) {
+            return Search::index('users')->ensureExists()->search($search);
+        }
+
+        $query
+            ->where('email', 'like', '%'.$search.'%')
+            ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
+                $query
+                    ->orWhere('first_name', 'like', '%'.$search.'%')
+                    ->orWhere('last_name', 'like', '%'.$search.'%');
+            }, function ($query) use ($search) {
+                $query->orWhere('name', 'like', '%'.$search.'%');
+            });
+
+        return $query;
     }
 
     /**
