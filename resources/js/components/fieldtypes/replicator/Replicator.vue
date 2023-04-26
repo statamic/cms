@@ -25,7 +25,7 @@
 
     <section :class="{'mt-12 p-4 bg-gray-200': fullScreenMode}">
 
-        <div class="flex justify-end absolute top-3 right-3 @md:right-6" v-if="! fullScreenMode">
+        <div class="flex justify-end" :class="{'absolute top-3 right-3 @md:right-6': !config.hide_display}" v-if="! fullScreenMode">
             <div class="btn-group">
                 <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
                     <svg-icon name="arrows-horizontal-expand" class="h-3.5 px-0.5 text-gray-750" />
