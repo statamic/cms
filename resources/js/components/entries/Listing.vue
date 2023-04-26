@@ -52,11 +52,9 @@
                             :saves-presets="true"
                             :preferences-prefix="preferencesPrefix"
                             @filter-changed="filterChanged"
-                            @search-changed="searchChanged"
                             @saved="$refs.presets.setPreset($event)"
                             @deleted="$refs.presets.refreshPresets()"
                             @restore-preset="$refs.presets.viewPreset($event)"
-                            @reset="filtersReset"
                         />
                     </div>
 
