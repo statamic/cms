@@ -19,8 +19,11 @@
             @selections-updated="selectionsUpdated"
         >
             <div slot-scope="{}" class="flex flex-col h-full">
-                <div class="bg-white border-b flex items-center justify-between bg-gray-200">
-                    <div class="p-4 flex flex-1 items-center">
+                <div class="bg-white bg-gray-200">
+                    <div class="p-2">
+                        <data-list-search class="h-8 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+                    </div>
+                    <div>
                         <data-list-filters
                             ref="filters"
                             :filters="filters"
@@ -29,8 +32,6 @@
                             :active-count="activeFilterCount"
                             :search-query="searchQuery"
                             @filter-changed="filterChanged"
-                            @search-changed="searchChanged"
-                            @reset="filtersReset"
                         />
                     </div>
                 </div>
