@@ -24,7 +24,7 @@
                 </button>
             </template>
 
-            <button class="pill-tab" @click="createPreset" >
+            <button class="pill-tab" @click="createPreset" v-tooltip="__('Create New View')">
                 <svg-icon name="add" class="w-3 h-3"/>
             </button>
         </div>
