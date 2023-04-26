@@ -58,7 +58,7 @@ class UsersController extends CpController
             : User::query();
 
         if ($search = request('search')) {
-            $query = $this->searchUsers($search, $query);
+            $query = $this->searchUsers($search, $query, ! $request->has('group'));
         }
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters, [
@@ -77,9 +77,9 @@ class UsersController extends CpController
             ]]);
     }
 
-    protected function searchUsers($search, $query)
+    protected function searchUsers($search, $query, $useIndex = true)
     {
-        if (Search::indexes()->has('users')) {
+        if ($useIndex && Search::indexes()->has('users')) {
             return Search::index('users')->ensureExists()->search($search);
         }
 
