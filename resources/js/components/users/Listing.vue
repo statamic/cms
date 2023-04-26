@@ -57,8 +57,6 @@
                         @search-changed="searchChanged"
                         @saved="$refs.presets.setPreset($event)"
                         @deleted="$refs.presets.refreshPresets()"
-                        @restore-preset="$refs.presets.viewPreset($event)"
-                        @reset="filtersReset"
                     />
 
                     <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />

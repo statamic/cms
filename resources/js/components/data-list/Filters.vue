@@ -281,12 +281,6 @@ export default {
                 });
         },
 
-        reset() {
-            return this.activePreset
-                ? this.$emit('restore-preset', this.activePreset)
-                : this.$emit('reset');
-        },
-
         remove() {
             this.$preferences.remove(this.preferencesKey)
                 .then(response => {

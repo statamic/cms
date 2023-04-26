@@ -54,7 +54,6 @@
                             @filter-changed="filterChanged"
                             @saved="$refs.presets.setPreset($event)"
                             @deleted="$refs.presets.refreshPresets()"
-                            @restore-preset="$refs.presets.viewPreset($event)"
                         />
                     </div>
 
