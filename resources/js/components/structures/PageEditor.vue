@@ -3,14 +3,14 @@
     <stack narrow name="page-tree-linker" :before-close="shouldClose" @closed="$emit('closed')">
         <div slot-scope="{ close }" class="bg-gray-100 h-full flex flex-col">
 
-            <div class="bg-gray-200 px-6 py-2 mb-4 border-b shadow-md text-lg font-medium flex items-center justify-between">
+            <header class="bg-white pl-6 pr-3 py-2 mb-4 border-b shadow-md text-lg font-medium flex items-center justify-between">
                 {{ headerText }}
                 <button
                     type="button"
                     class="btn-close"
                     @click="confirmClose(close)"
                     v-html="'&times'" />
-            </div>
+            </header>
 
             <div v-if="loading" class="flex-1 overflow-auto relative">
                 <div class="absolute inset-0 z-10 bg-white bg-opacity-75 flex items-center justify-center text-center">
