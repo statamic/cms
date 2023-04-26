@@ -127,7 +127,11 @@ export default {
         },
 
         refreshPreset() {
-            this.setPreset(this.activePreset);
+            if (this.activePreset) {
+                this.setPreset(this.activePreset);
+            } else {
+                this.viewAll();
+            }
         },
 
         viewAll() {
