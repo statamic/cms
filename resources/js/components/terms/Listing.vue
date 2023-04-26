@@ -52,7 +52,7 @@
                         :is-searching="true"
                         :saves-presets="true"
                         :preferences-prefix="preferencesPrefix"
-                        @filter-changed="filterChanged"
+                        @changed="filterChanged"
                         @saved="$refs.presets.setPreset($event)"
                         @deleted="$refs.presets.refreshPresets()"
                     />

@@ -18,7 +18,7 @@
                                 :config="fieldFilter"
                                 :values="activeFilters.fields || {}"
                                 :badges="fieldFilterBadges"
-                                @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
+                                @changed="$emit('changed', {handle: 'fields', values: $event})"
                                 @cleared="creating = false"
                                 @closed="closePopover"
                             />
@@ -41,7 +41,7 @@
                             :key="filter.handle"
                             :filter="filter"
                             :values="activeFilters[filter.handle]"
-                            @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
+                            @changed="$emit('changed', {handle: filter.handle, values: $event})"
                             @closed="closePopover"
                         />
                     </div>
@@ -75,7 +75,7 @@
                                 :key="filter.handle"
                                 :filter="filter"
                                 :values="activeFilters[filter.handle]"
-                                @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
+                                @changed="$emit('changed', {handle: filter.handle, values: $event})"
                                 @cleared="creating = false"
                                 @closed="closePopover"
                             />
@@ -255,11 +255,11 @@ export default {
 
             delete fields[handle];
 
-            this.$emit('filter-changed', {handle: 'fields', values: fields});
+            this.$emit('changed', {handle: 'fields', values: fields});
         },
 
         removeStandardFilter(handle) {
-            this.$emit('filter-changed', {handle: handle, values: null});
+            this.$emit('changed', {handle: handle, values: null});
         },
 
         save() {
