@@ -1,5 +1,40 @@
 # Release Notes
 
+## 4.0.0-alpha.5 (2023-04-26)
+
+### What's new
+- Add support for looping over blueprint sections in frontend forms [#7778](https://github.com/statamic/cms/issues/7778) by @jesseleite
+
+### What's improved
+- Nav item editor supports blueprint sections. [#7990](https://github.com/statamic/cms/issues/7990) by @jasonvarga
+- Bard content gets dedicated class name for styling. [#7997](https://github.com/statamic/cms/issues/7997) by @jacksleight
+
+### What's fixed
+- Date field handling and improvements. [#7955](https://github.com/statamic/cms/issues/7955) [#7974](https://github.com/statamic/cms/issues/7974) by @jasonvarga
+- Fix processing completely `null` date fieldtype values. [#7953](https://github.com/statamic/cms/issues/7953) by @jacksleight
+- Fix blueprint error when section is missing fields. [#7994](https://github.com/statamic/cms/issues/7994) by @SylvesterDamgaard
+- Fix select field option positioning. [#7988](https://github.com/statamic/cms/issues/7988) by @jasonvarga
+- Fix error when using Bard's view source button. [#7987](https://github.com/statamic/cms/issues/7987) by @jasonvarga
+- Revert stopping propagation of Popover clicks. [#7981](https://github.com/statamic/cms/issues/7981) by @jasonvarga
+- Misc UI fixes. [#7978](https://github.com/statamic/cms/issues/7978) by @jackmcdade
+- Fix Live Preview UI. [#7977](https://github.com/statamic/cms/issues/7977) by @jackmcdade
+- Select and Color fieldtype fixes. [#7973](https://github.com/statamic/cms/issues/7973) by @jasonvarga
+- Fix field conditions UI. [#7957](https://github.com/statamic/cms/issues/7957) by @jackmcdade
+- Fix asset grid UI. [#7943](https://github.com/statamic/cms/issues/7943) by @jasonvarga
+- Remove unnecessary tabindex target. [#7945](https://github.com/statamic/cms/issues/7945) by @jackmcdade
+- Fix business mode buttons. [#7944](https://github.com/statamic/cms/issues/7944) by @jackmcdade
+- Fix OAuth login styles. [#7942](https://github.com/statamic/cms/issues/7942) by @jackmcdade
+- Import oauth controller in web routes. [#7941](https://github.com/statamic/cms/issues/7941) by @simonolog
+- Fix Bard fullscreen mode styling. [#7938](https://github.com/statamic/cms/issues/7938) by @jasonvarga
+- Fix z-index overlap issue when replicator display label is hidden. [#8002](https://github.com/statamic/cms/issues/8002) by @jackmcdade
+- Brought over changes from 3.4
+
+### What's changed
+- Entry date behavior is based on the blueprint field.
+- Entries in non-dated collections cannot have the date set on them.
+
+
+
 ## 4.0.0-alpha.4 (2023-04-17)
 
 ### What's improved
