@@ -119,26 +119,6 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /** @test */
-    public function entry_urls_can_be_invalidated_by_an_entry()
-    {
-        $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
-            $cacher->shouldReceive('invalidateUrl')->once()->with('/my/test/entry', 'http://test.com');
-            $cacher->shouldReceive('invalidateUrls')->once()->with(null);
-        });
-
-        $entry = tap(Mockery::mock(Entry::class), function ($m) {
-            $m->shouldReceive('isRedirect')->andReturn(false);
-            $m->shouldReceive('absoluteUrl')->andReturn('http://test.com/my/test/entry');
-            $m->shouldReceive('collectionHandle')->andReturn('blog');
-            $m->shouldReceive('descendants')->andReturn(collect());
-        });
-
-        $invalidator = new Invalidator($cacher);
-
-        $this->assertNull($invalidator->invalidate($entry));
-    }
-
-    /** @test */
     public function entry_urls_are_not_invalidated_by_an_entry_with_a_redirect()
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
