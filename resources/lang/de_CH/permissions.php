@@ -10,6 +10,8 @@ return [
     'configure_fields_desc' => 'Ermöglicht das Bearbeiten von Blueprints, Fieldsets und den dazugehörigen Feldern.',
     'configure_addons' => 'Addons konfigurieren',
     'configure_addons_desc' => 'Ermöglicht den Zugriff auf den Addon-Bereich zum Installieren und Deinstallieren von Addons.',
+    'manage_preferences' => 'Voreinstellungen verwalten',
+    'manage_preferences_desc' => 'Ermöglicht globale und rollenspezifische Voreinstellungen anzupassen.',
     'group_collections' => 'Sammlungen',
     'configure_collections' => 'Sammlungen konfigurieren',
     'configure_collections_desc' => 'Gewährt Zugriff auf alle Berechtigungen im Zusammenhang mit Sammlungen.',

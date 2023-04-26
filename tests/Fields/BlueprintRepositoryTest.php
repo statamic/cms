@@ -12,6 +12,8 @@ use Tests\TestCase;
 
 class BlueprintRepositoryTest extends TestCase
 {
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();

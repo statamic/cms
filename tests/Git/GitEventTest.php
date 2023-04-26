@@ -361,6 +361,16 @@ class GitEventTest extends TestCase
     }
 
     /** @test */
+    public function it_commits_when_default_user_preferences_are_saved()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Default preferences saved')->once();
+
+        Facades\Preference::default()->set('foo', 'bar')->save();
+
+        Facades\File::delete(resource_path('preferences.yaml'));
+    }
+
+    /** @test */
     public function it_commits_when_asset_container_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset container saved')->once();

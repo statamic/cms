@@ -21,6 +21,7 @@ class PluralTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider shoppingList
      */
     public function it_returns_the_plural_form_of_an_english_word_from_context($expected, $input): void

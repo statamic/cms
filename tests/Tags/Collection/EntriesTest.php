@@ -27,6 +27,8 @@ class EntriesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $collection;
+
     public function setUp(): void
     {
         parent::setUp();

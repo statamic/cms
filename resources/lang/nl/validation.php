@@ -17,6 +17,7 @@ return [
     'between.array' => 'Moet minimaal tussen de :min en :max items bevatten.',
     'boolean' => 'Moet true of false zijn.',
     'confirmed' => 'De bevestiging komt niet overeen.',
+    'current_password' => 'Huidig wachtwoord is onjuist.',
     'date' => 'Geen geldige datum.',
     'date_format' => 'Voldoet niet aan het :format formaat.',
     'different' => 'Dit veld en :other moeten verschillend zijn.',

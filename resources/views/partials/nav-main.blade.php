@@ -3,12 +3,12 @@
 @section('nav-main')
     <nav class="nav-main" v-cloak>
         <div class="nav-main-inner">
-            @foreach ($nav as $section => $items)
-                @if ($section !== 'Top Level')
-                    <h6>{{ __($section) }}</h6>
+            @foreach ($nav as $section)
+                @if ($section['display'] !== 'Top Level')
+                    <h6>{{ __($section['display']) }}</h6>
                 @endif
-                <ul class="nav-section-{{ Statamic\Support\Str::slug($section) }}">
-                    @foreach ($items as $item)
+                <ul class="nav-section-{{ Statamic\Support\Str::slug($section['display']) }}">
+                    @foreach ($section['items'] as $item)
                         @unless ($item->view())
                             <li class="{{ $item->isActive() ? 'current' : '' }}">
                                 <a href="{{ $item->url() }}" {{ $item->attributes() }}>

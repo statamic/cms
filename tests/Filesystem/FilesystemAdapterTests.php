@@ -8,6 +8,8 @@ use Statamic\Support\FileCollection;
 
 trait FilesystemAdapterTests
 {
+    private $adapter;
+
     /** @test */
     public function it_makes_a_file_collection()
     {
@@ -297,14 +299,14 @@ trait FilesystemAdapterTests
         );
 
         $this->assertArraysHaveSameValues(
-             ['image.jpg', 'image2.jpg', 'docs/photo.jpg'],
+            ['image.jpg', 'image2.jpg', 'docs/photo.jpg'],
             $this->adapter->getFilesByType('/', 'jpg', true)->all()
         );
 
         $files = $this->adapter->getFilesByTypeRecursively('/', 'jpg');
         $this->assertInstanceOf(FileCollection::class, $files);
         $this->assertArraysHaveSameValues(
-             ['image.jpg', 'image2.jpg', 'docs/photo.jpg'],
+            ['image.jpg', 'image2.jpg', 'docs/photo.jpg'],
             $files->all()
         );
     }

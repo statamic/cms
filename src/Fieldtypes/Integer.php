@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\Scopes\Filters\Fields\Integer as IntegerFilter;
 
 class Integer extends Fieldtype
 {
@@ -16,6 +17,18 @@ class Integer extends Fieldtype
             'default' => [
                 'display' => __('Default Value'),
                 'instructions' => __('statamic::messages.fields_default_instructions'),
+                'type' => 'text',
+                'width' => 50,
+            ],
+            'prepend' => [
+                'display' => __('Prepend'),
+                'instructions' => __('statamic::fieldtypes.text.config.prepend'),
+                'type' => 'text',
+                'width' => 50,
+            ],
+            'append' => [
+                'display' => __('Append'),
+                'instructions' => __('statamic::fieldtypes.text.config.append'),
                 'type' => 'text',
                 'width' => 50,
             ],
@@ -59,5 +72,10 @@ class Integer extends Fieldtype
         }
 
         return $rules;
+    }
+
+    public function filter()
+    {
+        return new IntegerFilter($this);
     }
 }

@@ -321,6 +321,8 @@ export default {
         },
 
         scrollTabs(event) {
+            if (!this.$refs.tabs) return;
+
             this.$refs.tabs.scrollLeft += event.deltaY;
 
             this.updateHiddenTabs();
@@ -353,8 +355,8 @@ export default {
         },
 
         updateScrollHints() {
-            this.canScrollLeft = (this.$refs.tabs.scrollLeft > 0);
-            this.canScrollRight = (this.$refs.tabs.scrollLeft < (this.$refs.tabs.scrollWidth - this.$refs.tabs.clientWidth));
+            this.canScrollLeft = this.$refs.tabs && (this.$refs.tabs.scrollLeft > 0);
+            this.canScrollRight = this.$refs.tabs && (this.$refs.tabs.scrollLeft < (this.$refs.tabs.scrollWidth - this.$refs.tabs.clientWidth));
         },
 
         containerWasResized($event) {

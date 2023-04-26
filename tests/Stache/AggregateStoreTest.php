@@ -9,6 +9,8 @@ use Tests\TestCase;
 
 class AggregateStoreTest extends TestCase
 {
+    private $store;
+
     public function setUp(): void
     {
         parent::setUp();

@@ -31,6 +31,7 @@ return [
     ],
     'boolean'              => 'Must be true or false.',
     'confirmed'            => 'Confirmation does not match.',
+    'current_password'     => 'The password is incorrect.',
     'date'                 => 'Not a valid date.',
     'date_format'          => 'Does not match the format :format.',
     'different'            => 'This field and :other must be different.',

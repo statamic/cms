@@ -15,6 +15,8 @@ class DataRepositoryTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $data;
+
     // Mocking method_exists, courtesy of https://stackoverflow.com/a/37928161
     public static $functions;
 
@@ -111,6 +113,7 @@ class DataRepositoryTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider findByRequestUrlAmpDisabledProvider
      */
     public function it_finds_by_request_url($requestUrl, $entryId)
@@ -130,6 +133,7 @@ class DataRepositoryTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider findByRequestUrlAmpEnabledProvider
      */
     public function it_finds_by_request_url_with_amp_enabled($requestUrl, $entryId)
@@ -149,6 +153,7 @@ class DataRepositoryTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider findByRequestUrlNoRootSiteProvider
      */
     public function it_finds_by_request_url_with_no_root_site($requestUrl, $entryId)

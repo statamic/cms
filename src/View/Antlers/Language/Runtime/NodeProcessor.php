@@ -2,6 +2,7 @@
 
 namespace Statamic\View\Antlers\Language\Runtime;
 
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -45,7 +46,7 @@ use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
@@ -93,13 +94,6 @@ class NodeProcessor
      * @var array
      */
     protected $bufferOverwrites = [];
-
-    /**
-     * Indicates if the runtime is holding a lock to prevent scope manipulation.
-     *
-     * @var bool
-     */
-    protected $scopeLock = false;
 
     /**
      * Indicates if the current runtime instance is evaluating an interpolated document.
@@ -446,9 +440,12 @@ class NodeProcessor
      */
     public function setData($data)
     {
-        if ($this->scopeLock) {
-            return $this;
-        }
+        $this->data = [];
+        $this->previousAssignments = [];
+        $this->runtimeAssignments = [];
+        $this->canHandleInterpolations = [];
+        $this->interpolationCache = [];
+        $this->lockedData = [];
 
         if ((is_array($data) == false && (is_object($data) && ($data instanceof Arrayable) == false)) ||
             is_string($data)) {
@@ -481,10 +478,6 @@ class NodeProcessor
      */
     protected function pushScope(AntlersNode $node, $data)
     {
-        if ($this->scopeLock) {
-            return;
-        }
-
         $this->popScopes[$node->refId] = 1;
         $this->data[] = $data;
     }
@@ -513,6 +506,10 @@ class NodeProcessor
      */
     private function shouldProcessAsTag(AntlersNode $node)
     {
+        if ($node->pathReference == null && $node->name != null && Str::startsWith($node->name->name, '[')) {
+            return false;
+        }
+
         if ($node->pathReference != null) {
             if ($node->pathReference->isStrictTagReference) {
                 return true;
@@ -576,7 +573,6 @@ class NodeProcessor
 
         if ($managerResults[0] === true) {
             if ($node->isPaired() && ! $this->isLoopable($resolvedValue)) {
-
                 // Safe to do this since there is no ambiguity here.
                 return $node->isTagNode;
             }
@@ -652,10 +648,6 @@ class NodeProcessor
      */
     private function updateCurrentScope($data)
     {
-        if ($this->scopeLock) {
-            return;
-        }
-
         $dataLen = count($this->data);
 
         if ($dataLen == 0) {
@@ -708,6 +700,20 @@ class NodeProcessor
         return $bufferContent;
     }
 
+    private function getErrorLogContext(AntlersNode $node)
+    {
+        $line = null;
+
+        if ($node->startPosition != null) {
+            $line = $node->startPosition->line;
+        }
+
+        return [
+            'line' => $line,
+            'file' => GlobalRuntimeState::$currentExecutionFile,
+        ];
+    }
+
     /**
      * Tests if the provided node is internally treated like a tag.
      *
@@ -743,13 +749,13 @@ class NodeProcessor
         if ($node->isClosedBy != null && $this->isLoopable($value) == false) {
             if (! $this->isInternalTagLike($node)) {
                 $varName = $node->name->getContent();
-                Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}");
+                Log::debug("Cannot loop over non-loopable variable: {{ {$varName} }}", $this->getErrorLogContext($node));
             }
 
             return false;
         } elseif ($this->isInterpolationProcessor == false && $this->isLoopable($value) && $node->isClosedBy == null) {
             $varName = $node->name->getContent();
-            Log::debug("Cannot render an array variable as a string: {{ {$varName} }}");
+            Log::debug("Cannot render an array variable as a string: {{ {$varName} }}", $this->getErrorLogContext($node));
 
             return false;
         } elseif (is_object($value) && $node->isClosedBy == null) {
@@ -771,7 +777,7 @@ class NodeProcessor
                 );
             }
 
-            Log::debug("Cannot render an object variable as a string: {{ {$varName} }}");
+            Log::debug("Cannot render an object variable as a string: {{ {$varName} }}", $this->getErrorLogContext($node));
 
             return false;
         }
@@ -837,6 +843,7 @@ class NodeProcessor
         if ($this->antlersParser != null) {
             $processor->setAntlersParserInstance($this->antlersParser);
         }
+
         $processor->cascade($this->cascade)->setDoStackIntercept($this->doStackIntercept);
 
         if ($this->runtimeConfiguration != null) {
@@ -983,7 +990,7 @@ class NodeProcessor
     {
         $environment = new Environment();
         $environment->setProcessor($this);
-        $environment->cascade($this->cascade)->setData(($this->getActiveData()));
+        $environment->cascade($this->cascade)->setData($this->getActiveData());
 
         return $environment->evaluate([$deferredNode]);
     }
@@ -1176,7 +1183,7 @@ class NodeProcessor
                 }
 
                 if ($node instanceof AntlersNode) {
-                    if ($node->isNodeAbandoned) {
+                    if ($node->isAbandoned()) {
                         if ($this->isTracingEnabled()) {
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                         }
@@ -1455,7 +1462,25 @@ class NodeProcessor
                         }
 
                         $beforeAssignments = $this->runtimeAssignments;
-                        $output = call_user_func([$tag, $methodToCall]);
+                        $currentIsolationState = GlobalRuntimeState::$requiresRuntimeIsolation;
+                        GlobalRuntimeState::$requiresRuntimeIsolation = true;
+                        GlobalRuntimeState::$evaulatingTagContents = true;
+
+                        $args = [];
+
+                        if ($methodToCall == 'wildcard') {
+                            $args = [$tagMethod];
+                        }
+
+                        try {
+                            $output = call_user_func([$tag, $methodToCall], ...$args);
+                        } catch (Exception $e) {
+                            throw $e;
+                        } finally {
+                            GlobalRuntimeState::$requiresRuntimeIsolation = $currentIsolationState;
+                            GlobalRuntimeState::$evaulatingTagContents = false;
+                        }
+
                         $afterAssignments = $this->runtimeAssignments;
 
                         foreach ($afterAssignments as $assignedVar => $val) {
@@ -1557,7 +1582,7 @@ class NodeProcessor
 
                         if (is_object($output)) {
                             if ($output instanceof Collection) {
-                                $output = $output->all();
+                                $output = RuntimeValues::resolveWithRuntimeIsolation($output);
                             }
 
                             $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
@@ -1643,7 +1668,7 @@ class NodeProcessor
                     }
 
                     if ($node->name->name == 'once') {
-                        $node->isNodeAbandoned = true;
+                        $node->abandon();
 
                         $results = $this->cloneProcessor()->setData($this->getActiveData())->reduce($node->children);
 
@@ -2287,7 +2312,6 @@ class NodeProcessor
      */
     protected function addLoopIterationVariables($loop)
     {
-        $this->scopeLock = false;
         $index = 0;
         $total = count($loop);
         $lastIndex = $total - 1;
@@ -2305,7 +2329,7 @@ class NodeProcessor
 
         foreach ($loop as $key => &$value) {
             if ($value instanceof Augmentable) {
-                $value = RuntimeValueCache::getAugmentableValue($value);
+                $value = RuntimeValues::resolveWithRuntimeIsolation($value);
             }
 
             if ($value instanceof Values) {
@@ -2335,8 +2359,6 @@ class NodeProcessor
         }
 
         $this->data = $curData;
-
-        $this->scopeLock = false;
 
         $prev = null;
 

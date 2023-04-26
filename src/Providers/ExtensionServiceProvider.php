@@ -217,6 +217,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddUniqueSlugValidation::class,
         Updates\AddGraphQLPermission::class,
         Updates\AddAssignRolesAndGroupsPermissions::class,
+        Updates\AddDefaultPreferencesToGitConfig::class,
     ];
 
     public function register()

@@ -29,7 +29,7 @@ class Taxonomies extends Relationship
 
     public function getIndexItems($request)
     {
-        return Taxonomy::all()->map(function ($taxonomy) {
+        return Taxonomy::all()->sortBy('title')->map(function ($taxonomy) {
             return [
                 'id' => $taxonomy->handle(),
                 'title' => $taxonomy->title(),

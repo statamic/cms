@@ -33,6 +33,7 @@ class CollectionsController extends CpController
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
+                'url' => $collection->absoluteUrl(Site::selected()->handle()),
                 'blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
                 'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
                 'deleteable' => User::current()->can('delete', $collection),
@@ -530,13 +531,24 @@ class CollectionsController extends CpController
                             [
                                 'handle' => 'label',
                                 'field' => [
+                                    'display' => __('Label'),
                                     'type' => 'text',
                                 ],
                             ],
                             [
                                 'handle' => 'format',
                                 'field' => [
+                                    'display' => __('Format'),
                                     'type' => 'text',
+                                ],
+                            ],
+                            [
+                                'handle' => 'refresh',
+                                'field' => [
+                                    'display' => __('Refresh'),
+                                    'type' => 'toggle',
+                                    'instructions' => __('statamic::messages.collections_preview_target_refresh_instructions'),
+                                    'default' => true,
                                 ],
                             ],
                         ],

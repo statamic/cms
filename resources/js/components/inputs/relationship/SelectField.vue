@@ -95,7 +95,8 @@ export default {
         parameters() {
             return {
                 site: this.site,
-                paginate: false
+                paginate: false,
+                columns: 'title,id',
             }
         }
     },

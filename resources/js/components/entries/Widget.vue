@@ -47,11 +47,12 @@ export default {
 
     props: {
         collection: String,
+        additionalColumns: Array,
     },
 
     data() {
         return {
-            cols: [{ label: "Title", field: "title", visible: true }],
+            cols: [{ label: "Title", field: "title", visible: true }, ...this.additionalColumns],
             listingKey: 'entries',
             requestUrl: cp_url(`collections/${this.collection}/entries`),
         }

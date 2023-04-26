@@ -412,7 +412,9 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             ? $this->defaultPreviewTargets()
             : $this->previewTargets;
 
-        return collect($targets);
+        return collect($targets)->map(function ($target) {
+            return $target + ['refresh' => $target['refresh'] ?? true];
+        });
     }
 
     public function addPreviewTargets($targets)
@@ -424,12 +426,20 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function additionalPreviewTargets()
     {
-        return Facades\Taxonomy::additionalPreviewTargets($this->handle);
+        return Facades\Taxonomy::additionalPreviewTargets($this->handle)->map(function ($target) {
+            return $target + ['refresh' => $target['refresh'] ?? true];
+        });
     }
 
     private function defaultPreviewTargets()
     {
-        return [['label' => 'Term', 'format' => '{permalink}']];
+        return [
+            [
+                'label' => 'Term',
+                'format' => '{permalink}',
+                'refresh' => true,
+            ],
+        ];
     }
 
     private function previewTargetsForFile()
@@ -448,6 +458,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             return [
                 'label' => $target['label'],
                 'url' => $target['format'],
+                'refresh' => $target['refresh'],
             ];
         })->filter()->values()->all();
     }

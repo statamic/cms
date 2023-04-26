@@ -13,7 +13,11 @@ class UserRoles extends Tags
     {
         $roles = Role::all();
 
-        if (! $handles = $this->params->explode('handle')) {
+        if (! is_array($handles = $this->params->get('handle'))) {
+            $handles = $this->params->explode('handle');
+        }
+
+        if (empty($handles)) {
             return $roles->values();
         }
 

@@ -84,6 +84,8 @@
 </template>
 
 <script>
+import { marked } from 'marked';
+
 export default {
 
     props: {
@@ -128,7 +130,7 @@ export default {
 
         instructions() {
             return this.config.instructions
-                ? this.$options.filters.markdown(this.config.instructions)
+                ? this.renderMarkdownAndLinks(this.config.instructions)
                 : null
         },
 
@@ -222,6 +224,20 @@ export default {
             if (this.canToggleLabel) {
                 this.showHandle = ! this.showHandle
             }
+        },
+        renderMarkdownAndLinks(text) {
+            var renderer = new marked.Renderer();
+
+            renderer.link = function(href, title, text) {
+                var link = marked.Renderer.prototype.link.call(this, href, title, text);
+                return link.replace("<a","<a target='_blank' ");
+            };
+
+            marked.setOptions({
+                renderer: renderer
+            });
+
+            return marked(text);
         }
 
     }
