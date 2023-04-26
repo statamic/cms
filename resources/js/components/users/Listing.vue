@@ -28,8 +28,6 @@
                             :search-query="searchQuery"
                             @selected="selectPreset"
                             @reset="filtersReset"
-                            @hide-filters="filtersHide"
-                            @show-filters="filtersShow"
                         />
 
                         <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
@@ -54,7 +52,6 @@
                         :saves-presets="true"
                         :preferences-prefix="preferencesPrefix"
                         @filter-changed="filterChanged"
-                        @search-changed="searchChanged"
                         @saved="$refs.presets.setPreset($event)"
                         @deleted="$refs.presets.refreshPresets()"
                     />
