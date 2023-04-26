@@ -605,6 +605,10 @@ class EntryTest extends TestCase
     {
         \Event::fake(); // Don't invalidate static cache etc when saving entries.
 
+        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
+        ]]);
+
         $collection = tap((new Collection)->handle('pages')->routes('{parent_uri}/{slug}'))->save();
 
         $parent = tap((new Entry)->id('1')->locale('en')->collection($collection)->slug('parent')->set('redirect', '@child'))->save();
@@ -631,16 +635,22 @@ class EntryTest extends TestCase
         $this->assertEquals('/parent', $parent->uri());
         $this->assertEquals('/parent/child', $parent->url());
         $this->assertEquals('/parent', $parent->urlWithoutRedirect());
+        $this->assertEquals('http://domain.com/parent/child', $parent->absoluteUrl());
+        $this->assertEquals('http://domain.com/parent', $parent->absoluteUrlWithoutRedirect());
         $this->assertEquals('/parent/child', $parent->redirectUrl());
 
         $this->assertEquals('/parent/child', $child->uri());
         $this->assertEquals('/parent/child', $child->url());
         $this->assertEquals('/parent/child', $child->urlWithoutRedirect());
+        $this->assertEquals('http://domain.com/parent/child', $child->absoluteUrl());
+        $this->assertEquals('http://domain.com/parent/child', $child->absoluteUrlWithoutRedirect());
         $this->assertNull($child->redirectUrl());
 
         $this->assertEquals('/nochildren', $noChildren->uri());
         $this->assertEquals('/nochildren', $noChildren->url());
         $this->assertEquals('/nochildren', $noChildren->urlWithoutRedirect());
+        $this->assertEquals('http://domain.com/nochildren', $noChildren->absoluteUrl());
+        $this->assertEquals('http://domain.com/nochildren', $noChildren->absoluteUrlWithoutRedirect());
         $this->assertEquals(404, $noChildren->redirectUrl());
     }
 
