@@ -35,7 +35,13 @@ class AssignGroups extends Action
 
     public function run($users, $values)
     {
-        $users->each(fn ($user) => $user->groups($values['groups'])->save());
+        $users->each(function ($user) use ($values) {
+            foreach ($values['groups'] as $group) {
+                $user->addToGroup($group);
+            }
+
+            $user->save();
+        });
     }
 
     protected function fieldItems()

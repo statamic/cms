@@ -35,7 +35,13 @@ class AssignRoles extends Action
 
     public function run($users, $values)
     {
-        $users->each(fn ($user) => $user->roles($values['roles'])->save());
+        $users->each(function ($user) use ($values) {
+            foreach ($values['roles'] as $role) {
+                $user->assignRole($role);
+            }
+
+            $user->save();
+        });
     }
 
     protected function fieldItems()
