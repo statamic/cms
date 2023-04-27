@@ -192,7 +192,7 @@ class Replicator extends Fieldtype
     public function preload()
     {
         $existing = collect($this->field->value())->mapWithKeys(function ($set) {
-            $config = $this->flattenedSetsConfig()[$set['type']]['fields'];
+            $config = Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields", []);
 
             return [$set['_id'] => (new Fields($config))->addValues($set)->meta()->put('_', '_')];
         })->toArray();
