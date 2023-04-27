@@ -3,6 +3,7 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Facades\Role;
 
 class AssignRoles extends Action
 {
@@ -13,7 +14,7 @@ class AssignRoles extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof UserContract;
+        return $item instanceof UserContract && Role::all()->isNotEmpty();
     }
 
     public function authorize($authed, $user)
