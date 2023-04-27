@@ -11,6 +11,14 @@
         <div class="publish-fields p-2 pb-0 w-96">
             <form-group
                 handle="password"
+                :display="__('Current Password')"
+                v-model="currentPassword"
+                :errors="errors.current_password"
+                class="p-0 mb-3"
+                :config="{ input_type: this.inputType }"
+            />
+            <form-group
+                handle="password"
                 :display="__('Password')"
                 v-model="password"
                 :errors="errors.password"
@@ -48,6 +56,7 @@ export default {
             saving: false,
             error: null,
             errors: {},
+            currentPassword: null,
             password: null,
             confirmation: null,
             reveal: false
@@ -78,6 +87,7 @@ export default {
             this.saving = true;
 
             this.$axios.patch(this.saveUrl, {
+                current_password: this.currentPassword,
                 password: this.password,
                 password_confirmation: this.confirmation
             }).then(response => {
@@ -85,6 +95,7 @@ export default {
                 this.$refs.popper.close();
                 this.saving = false;
                 this.password = null;
+                this.currentPassword = null;
                 this.confirmation = null;
             }).catch(e => {
                 if (e.response && e.response.status === 422) {

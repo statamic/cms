@@ -13,6 +13,7 @@ class TreeResource extends JsonResource
     protected $depth;
     protected $site;
     protected $query;
+    protected $maxDepth;
 
     /**
      * Set selected fields.

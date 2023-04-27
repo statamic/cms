@@ -21,6 +21,8 @@ class ValuesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $fieldtype;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -180,6 +182,7 @@ class ValuesTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider queryBuilderProvider
      **/
     public function it_gets_a_query($builder)
@@ -213,6 +216,7 @@ class ValuesTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider queryBuilderProvider
      */
     public function completes_a_query($builder)
@@ -257,6 +261,8 @@ class ValuesTest extends TestCase
 class FakeFieldtypeThatAugmentsToMockedBuilder extends Fieldtype
 {
     protected static $handle = 'test';
+
+    private $builder;
 
     public function __construct($builder)
     {

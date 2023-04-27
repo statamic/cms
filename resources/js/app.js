@@ -143,12 +143,14 @@ Statamic.app({
         NavigationListing: require('./components/navigation/Listing.vue').default,
         NavigationCreateForm: require('./components/navigation/CreateForm.vue').default,
         NavigationEditForm: require('./components/navigation/EditForm.vue').default,
+        PreferencesEditForm: require('./components/preferences/EditForm.vue').default,
         NavigationView: require('./components/navigation/View.vue').default,
         TaxonomyCreateForm: require('./components/taxonomies/CreateForm.vue').default,
         TaxonomyEditForm: require('./components/taxonomies/EditForm.vue').default,
         TaxonomyBlueprintListing:  require('./components/taxonomies/BlueprintListing.vue').default,
         AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue').default,
         AssetContainerEditForm: require('./components/asset-containers/EditForm.vue').default,
+        NavBuilder: require('./components/nav/Builder.vue').default,
         Updater: require('./components/updater/Updater.vue').default,
         PortalTargets: require('./components/PortalTargets.vue').default,
     },
@@ -255,7 +257,9 @@ Statamic.app({
                 for (let input of inputs) {
                     input.blur();
                 }
-                inputs[0].focus();
+                if (inputs.length) {
+                    inputs[0].focus();
+                }
             }, 100);
         }
     }

@@ -15,6 +15,9 @@ use Tests\TestCase;
 
 class CollectionTreeStoreTest extends TestCase
 {
+    private $tempDir;
+    private $store;
+
     public function setUp(): void
     {
         parent::setUp();

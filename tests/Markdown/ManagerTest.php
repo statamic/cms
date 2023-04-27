@@ -10,6 +10,8 @@ use UnexpectedValueException;
 
 class ManagerTest extends TestCase
 {
+    private $parserClass;
+
     public function setUp(): void
     {
         parent::setUp();

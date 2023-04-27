@@ -64,6 +64,10 @@
     @apply min-w-0;
 }
 
+.vs__selected-options-outside .hidden-outside {
+    display: none;
+}
+
 .v-select:not(.vs--unsearchable) .vs__selected-options {
 	@apply appearance-none text-grey-80 text-sm;
 	@apply flex flex-wrap flex-1 border border-grey-50 border-r-0 rounded-l relative h-full;
@@ -171,7 +175,6 @@
 	opacity: .25;
 	cursor: text;
 }
-
 
 .v-select:not(.vs--single) .vs__selected {
 	@include clickable;

@@ -68,13 +68,13 @@ class ProfileFormTest extends TestCase
     {{ /fields }}
 {{ /user:profile_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Email Address</label><input type="email" name="email" value="test@example.com">',
             '<label>Name</label><input type="text" name="name" value="Test User">',
+            '<label>Email Address</label><input type="email" name="email" value="test@example.com">',
         ];
 
         $this->assertEquals($expected, $actual[0]);
@@ -96,12 +96,13 @@ EOT
     {{ /fields }}
 {{ /user:profile_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
             '<label>Full Name</label><input type="text" name="name" value="Test User">',
+            '<label>Email Address</label><input type="email" name="email" value="test@example.com">',
             '<label>Phone Number</label><input type="text" name="phone" value="12345">',
             '<label>Over 18 years of age?</label><input type="text" name="age" value="" required>',
         ];
@@ -276,6 +277,10 @@ EOT
                         'type' => 'text',
                         'display' => 'Full Name',
                     ],
+                ],
+                [
+                    'handle' => 'email', // Field is included by default, but we're just implying field order here.
+                    'field' => [],
                 ],
                 [
                     'handle' => 'password', // Field already exists, but we're defining custom validation rules.

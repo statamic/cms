@@ -100,6 +100,7 @@ class SendEmailsTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider noEmailsProvider
      */
     public function no_email_jobs_are_queued_if_none_are_configured($emailConfig)

@@ -57,7 +57,7 @@ class FormCreateTest extends FormTestCase
     {{ /fields }}
 {{ /form:contact }}
 EOT
-));
+        ));
 
         $this->assertStringContainsString('<label>Full Name</label><input type="text" name="name" value="">', $output);
         $this->assertStringContainsString('<label>Email Address</label><input type="email" name="email" value="" required>', $output);

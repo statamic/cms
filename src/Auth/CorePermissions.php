@@ -19,6 +19,7 @@ class CorePermissions
             $this->register('access cp');
             $this->register('configure fields');
             $this->register('configure addons');
+            $this->register('manage preferences');
         });
 
         $this->group('collections', function () {

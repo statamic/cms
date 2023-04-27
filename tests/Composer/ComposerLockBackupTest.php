@@ -9,15 +9,14 @@ use Statamic\Console\Composer\Lock;
  */
 class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
 {
+    protected $lockPath = './composer.lock';
+    protected $customLockPath = './custom/composer.lock';
+    protected $backupLockPath = './storage/statamic/updater/composer.lock.bak';
+    protected $customBackupLockPath = './custom/storage/statamic/updater/composer.lock.bak';
+
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->lockPath = './composer.lock';
-        $this->customLockPath = './custom/composer.lock';
-
-        $this->backupLockPath = './storage/statamic/updater/composer.lock.bak';
-        $this->customBackupLockPath = './custom/storage/statamic/updater/composer.lock.bak';
 
         $this->removeLockFiles();
     }

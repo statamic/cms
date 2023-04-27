@@ -10,6 +10,8 @@ return [
     'configure_fields_desc' => 'Capacité à modifier les Blueprints, les jeux de champs et leurs champs.',
     'configure_addons' => 'Configurer les addons',
     'configure_addons_desc' => 'Permet d’accéder à la section des addons pour en installer ou désinstaller.',
+    'manage_preferences' => 'Gérer les préférences',
+    'manage_preferences_desc' => 'Possibilité de personnaliser les préférences globales et celles spécifiques au rôle.',
     'group_collections' => 'Collections',
     'configure_collections' => 'Configurer les collections',
     'configure_collections_desc' => 'Permet d’accéder à toutes les autorisations liées à la collection.',

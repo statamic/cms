@@ -20,6 +20,7 @@ class IsUppercaseTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider strings
      */
     public function it_returns_true_if_string_has_only_uppercase_chars($expected, $input): void

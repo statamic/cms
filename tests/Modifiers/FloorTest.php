@@ -24,6 +24,7 @@ class FloorTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider numbersPool
      */
     public function it_rounds_a_number_down_to_next_whole_number($expected, $input): void

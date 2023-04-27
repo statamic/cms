@@ -369,14 +369,14 @@ class ReplicatorTest extends TestCase
         ]);
 
         $augmented = $field->fieldtype()->augment([
-            ['type' => 'a', 'words' => 'one'],
-            ['type' => 'a', 'words' => 'two'],
+            ['id' => '1', 'type' => 'a', 'words' => 'one'],
+            ['type' => 'a', 'words' => 'two'], // id intentionally omitted
         ]);
 
         $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
         $this->assertEquals([
-            ['type' => 'a', 'words' => 'one (augmented)'],
-            ['type' => 'a', 'words' => 'two (augmented)'],
+            ['id' => '1', 'type' => 'a', 'words' => 'one (augmented)'],
+            ['id' => null, 'type' => 'a', 'words' => 'two (augmented)'],
         ], collect($augmented)->toArray());
     }
 

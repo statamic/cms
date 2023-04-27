@@ -46,6 +46,7 @@ class FieldsetTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider titleProvider
      */
     public function it_gets_the_title($handle, $title, $expectedTitle)

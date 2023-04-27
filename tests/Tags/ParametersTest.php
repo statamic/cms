@@ -10,6 +10,11 @@ use Tests\TestCase;
 
 class ParametersTest extends TestCase
 {
+    private $params;
+    private $value;
+    private $antlersValue;
+    private $nonAntlersValue;
+
     public function setUp(): void
     {
         parent::setUp();

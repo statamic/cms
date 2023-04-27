@@ -921,6 +921,7 @@ class FieldsTest extends TestCase
 
     /**
      * @test
+     *
      * @group graphql
      **/
     public function it_gets_the_fields_as_graphql_types()
