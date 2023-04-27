@@ -6,7 +6,7 @@
             <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
-                        {{ __('Field') }}
+                        {{ fieldFilter.title }}
                         <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
                     </button>
                 </template>
