@@ -291,6 +291,7 @@ class ReplicatorTest extends TestCase
             'random-string-3',
             'random-string-4',
             'random-string-5',
+            'random-string-6',
         );
 
         // For this test, use a grid field with min_rows.
@@ -332,6 +333,12 @@ class ReplicatorTest extends TestCase
                     ['one' => 'bar'],
                 ],
             ],
+            [
+                // Ensure that if there's a set that isn't configured, it gets left as-is and doesn't
+                // throw any errors. For example, if a set is removed from the config.
+                'type' => 'nope',
+                'foo' => 'bar',
+            ],
         ]);
 
         // The preload method expects the field to already be preprocessed.
@@ -345,8 +352,12 @@ class ReplicatorTest extends TestCase
 
         // Assert about the "existing" sub-array.
         // This is meta data for subfields of existing sets.
-        $this->assertCount(1, $meta['existing']);
-        $this->assertArrayHasKey('random-string-3', $meta['existing']); // The set ID assigned during preprocess.
+        $this->assertCount(2, $meta['existing']);
+
+        // The set IDs assigned during preprocess.
+        $this->assertArrayHasKey('random-string-3', $meta['existing']);
+        $this->assertArrayHasKey('random-string-4', $meta['existing']);
+
         $this->assertEquals([
             '_' => '_', // An empty key to enforce an object in JavaScript.
             'a_text_field' => null, // the text field doesn't have meta data.
@@ -364,6 +375,11 @@ class ReplicatorTest extends TestCase
             ],
         ], $meta['existing']['random-string-3']);
 
+        $this->assertEquals([
+            '_' => '_', // An empty key to enforce an object in JavaScript.
+            // The "foo" key doesn't appear here since there's no corresponding "nope" set config.
+        ], $meta['existing']['random-string-4']);
+
         // Assert about the "defaults" sub-array.
         // These are the initial values used for subfields when a new set is added.
         $this->assertCount(1, $meta['defaults']);
@@ -371,8 +387,8 @@ class ReplicatorTest extends TestCase
         $this->assertEquals([
             'a_text_field' => 'the default',
             'a_grid_field' => [
-                ['_id' => 'random-string-4', 'one' => 'default in nested'],
                 ['_id' => 'random-string-5', 'one' => 'default in nested'],
+                ['_id' => 'random-string-6', 'one' => 'default in nested'],
             ],
         ], $meta['defaults']['main']);
 
@@ -391,8 +407,8 @@ class ReplicatorTest extends TestCase
                     'one' => null, // meta for the text field
                 ],
                 'existing' => [
-                    'random-string-4' => ['one' => null],
                     'random-string-5' => ['one' => null],
+                    'random-string-6' => ['one' => null],
                 ],
             ],
         ], $meta['new']['main']);
