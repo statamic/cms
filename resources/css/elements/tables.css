@@ -142,43 +142,59 @@
 .data-table {
     thead th.checkbox-column {
         @apply p-0 pr-2 sticky z-1 -left-px;
-        background-image: linear-gradient(to right, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
         width: 45px;
         min-width: 45px;
+        &:after {
+            @apply absolute left-0 right-0 top-0 bottom-0 -z-1 ;
+            content: '';
+            background-image: linear-gradient(to right, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
+        }
     }
 
     thead th.actions-column {
         @apply p-0 pl-2 text-right sticky -right-px;
-        background-image: linear-gradient(to left, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
         width: 45px;
         min-width: 45px;
+        &:after {
+            @apply absolute left-0 right-0 top-0 bottom-0 -z-1;
+            content: '';
+            background-image: linear-gradient(to left, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
+        }
     }
 
     tbody th.checkbox-column {
         @apply px-3 sticky -left-px;
-        background-image: linear-gradient(to right, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%);
+        &:after {
+            @apply absolute left-0 right-0 top-0 bottom-0 -z-1;
+            content: '';
+            background-image: linear-gradient(to right, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%);
+        }
     }
 
     tbody th.actions-column {
         @apply p-0 pl-2 text-right sticky -right-px;
-        background-image: linear-gradient(to left, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%);
         min-width: 45px;
         width: 45px;
+        &:after {
+            @apply absolute left-0 right-0 top-0 bottom-0 -z-1;
+            content: '';
+            background-image: linear-gradient(to left, rgba(255,255,255,1) 70%, rgba(255,255,255,0) 100%);
+        }
     }
 
-    tbody tr.row-selected .checkbox-column {
+    tbody tr.row-selected .checkbox-column:after {
         background-image: linear-gradient(to right, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
     }
 
-    tbody tr.row-selected .actions-column {
+    tbody tr.row-selected .actions-column:after {
         background-image: linear-gradient(to left, theme(colors.gray.200) 70%, theme(colors.gray.200 / 0%) 100%);
     }
 
-    tbody tr:hover .checkbox-column {
+    tbody tr:hover .checkbox-column:after {
         background-image: linear-gradient(to right, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
     }
 
-    tbody tr:hover .actions-column {
+    tbody tr:hover .actions-column:after {
         background-image: linear-gradient(to left, theme(colors.gray.100) 70%, theme(colors.gray.100 / 0%) 100%);
     }
 }

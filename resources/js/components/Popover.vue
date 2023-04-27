@@ -103,7 +103,6 @@ export default {
             this.escBinding = this.$keys.bind('esc', e => this.close());
             this.$nextTick(() => {
                 this.cleanupAutoUpdater = autoUpdate(this.$refs.trigger.firstChild, this.$refs.popover, this.computePosition);
-                this.$emit('opened');
 
                 this.$refs.popover.addEventListener('transitionend', () => {
                     this.$emit('opened');

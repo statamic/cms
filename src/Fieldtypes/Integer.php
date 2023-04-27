@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\Scopes\Filters\Fields\Integer as IntegerFilter;
 
 class Integer extends Fieldtype
 {
@@ -79,5 +80,10 @@ class Integer extends Fieldtype
         }
 
         return $rules;
+    }
+
+    public function filter()
+    {
+        return new IntegerFilter($this);
     }
 }

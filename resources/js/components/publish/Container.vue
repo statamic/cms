@@ -138,6 +138,12 @@ export default {
                             state.revealerFields.push(dottedKey);
                         }
                     },
+                    unsetRevealerField(state, dottedKey) {
+                        const index = state.revealerFields.indexOf(dottedKey);
+                        if (index !== -1) {
+                            state.revealerFields.splice(index, 1);
+                        }
+                    },
                     setMeta(state, meta) {
                         state.meta = meta;
                     },

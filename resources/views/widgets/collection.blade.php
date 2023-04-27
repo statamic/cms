@@ -18,6 +18,7 @@
     </div>
     <collection-widget
         collection="{{ $collection->handle() }}"
+        :additional-columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
         initial-sort-column="{{ $sortColumn }}"
         initial-sort-direction="{{ $sortDirection }}"

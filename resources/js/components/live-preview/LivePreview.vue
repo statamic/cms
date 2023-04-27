@@ -96,6 +96,7 @@ export default {
         values: Object,
         name: String,
         blueprint: String,
+        reference: String,
     },
 
     data() {
@@ -234,9 +235,11 @@ export default {
             this.$axios.post(this.tokenizedUrl, this.payload, { cancelToken: source.token }).then(response => {
                 this.token = response.data.token;
                 const url = response.data.url;
+                const target = this.targets[this.target];
+                const payload = { token: this.token, reference: this.reference };
                 this.poppedOut
-                    ? this.channel.postMessage({ event: 'updated', url })
-                    : this.updateIframeContents(url);
+                    ? this.channel.postMessage({ event: 'updated', url, target, payload })
+                    : this.updateIframeContents(url, target, payload);
                 this.loading = false;
             }).catch(e => {
                 if (this.$axios.isCancel(e)) return;
