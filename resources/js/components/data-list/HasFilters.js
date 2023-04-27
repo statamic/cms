@@ -7,8 +7,6 @@ export default {
             activePreset: null,
             activePresetPayload: {},
             searchQuery: '',
-            showFilters: this.$config.get('alwaysShowFilters'),
-            alwaysShowFilters: this.$config.get('alwaysShowFilters'),
         }
     },
 
@@ -101,28 +99,8 @@ export default {
             this.activePreset = null;
             this.activePresetPayload = {};
             this.searchQuery = '';
-            this.showFilters = false;
             this.activeFilters = {};
             this.activeFilterBadges = {};
-        },
-
-        filtersHide() {
-            this.showFilters = false;
-            this.searchQuery = '';
-        },
-
-        filtersShow() {
-            this.showFilters = true;
-        },
-
-        handleShowFilters() {
-            this.showFilters = true;
-
-            this.$nextTick(function () {
-                if (this.$refs.search) {
-                    this.$refs.search.focus();
-                }
-            });
         },
 
         unselectAllItems() {

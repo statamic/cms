@@ -1,12 +1,12 @@
 <template>
-    <div class="w-full" v-if="isFiltering || isSearching">
-        <div class="flex flex-wrap px-3 border-b pt-2">
+    <div class="shadow-inner bg-gray-300">
+        <div class="flex items-center flex-wrap px-3 border-b pt-2">
 
             <!-- Field filter (requires custom selection UI) -->
             <popover v-if="fieldFilter" placement="bottom-start" @closed="fieldFilterClosed">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
-                        {{ __('Field') }}
+                        {{ fieldFilter.title }}
                         <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
                     </button>
                 </template>
@@ -18,17 +18,7 @@
                                 :config="fieldFilter"
                                 :values="activeFilters.fields || {}"
                                 :badges="fieldFilterBadges"
-                                @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
-                                @cleared="creating = false"
-                                @closed="closePopover"
-                            />
-                            <data-list-filter
-                                v-for="filter in standardFilters"
-                                v-if="creating === filter.handle"
-                                :key="filter.handle"
-                                :filter="filter"
-                                :values="activeFilters[filter.handle]"
-                                @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
+                                @changed="$emit('changed', {handle: 'fields', values: $event})"
                                 @cleared="creating = false"
                                 @closed="closePopover"
                             />
@@ -37,8 +27,8 @@
                 </template>
             </popover>
 
-            <!-- Standard non-field filters -->
-            <popover v-if="standardFilters.length" v-for="filter in standardFilters" :key="filter.handle" placement="bottom-start">
+            <!-- Standard pinned filters -->
+            <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle" placement="bottom-start" :stop-propagation="false">
                 <template slot="trigger">
                     <button class="filter-badge filter-badge-control mr-2 mb-2">
                         {{ filter.title }}
@@ -51,9 +41,45 @@
                             :key="filter.handle"
                             :filter="filter"
                             :values="activeFilters[filter.handle]"
-                            @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
+                            @changed="$emit('changed', {handle: filter.handle, values: $event})"
                             @closed="closePopover"
                         />
+                    </div>
+                </template>
+            </popover>
+
+            <!-- Standard unpinned filters -->
+            <popover v-if="unpinnedFilters.length" placement="bottom-start" :stop-propagation="false">
+                <template slot="trigger">
+                    <button class="filter-badge filter-badge-control mr-2 mb-2" @click="resetFilterPopover">
+                        {{ __('Filter') }}
+                        <svg-icon name="micro/chevron-down-xs" class="w-2 h-2 mx-2" />
+                    </button>
+                </template>
+                <template #default="{ close: closePopover }">
+                    <div class="filter-fields w-64">
+                        <h6 v-text="creatingFilterHeader" class="p-3 pb-0" />
+                        <div v-if="showUnpinnedFilterSelection" class="p-3 pt-1">
+                            <button
+                                v-for="filter in unpinnedFilters"
+                                :key="filter.handle"
+                                v-text="filter.title"
+                                class="btn w-full mt-1"
+                                @click="creating = filter.handle"
+                            />
+                        </div>
+                        <div v-else>
+                            <data-list-filter
+                                v-for="filter in unpinnedFilters"
+                                v-if="creating === filter.handle"
+                                :key="filter.handle"
+                                :filter="filter"
+                                :values="activeFilters[filter.handle]"
+                                @changed="$emit('changed', {handle: filter.handle, values: $event})"
+                                @cleared="creating = false"
+                                @closed="closePopover"
+                            />
+                        </div>
                     </div>
                 </template>
             </popover>
@@ -132,6 +158,28 @@ export default {
             return this.filters.filter(filter => filter.handle !== 'fields');
         },
 
+        pinnedFilters() {
+            return this.standardFilters.filter(filter => filter.pinned);
+        },
+
+        unpinnedFilters() {
+            return this.standardFilters.filter(filter => ! filter.pinned);
+        },
+
+        creatingFilter() {
+            return _.find(this.unpinnedFilters, filter => filter.handle === this.creating);
+        },
+
+        creatingFilterHeader() {
+            let text = data_get(this.creatingFilter, 'title', 'Filter where');
+
+            return __(text) + ':';
+        },
+
+        showUnpinnedFilterSelection() {
+            return ! this.creating;
+        },
+
         fieldFilterBadges() {
             return data_get(this.activeFilterBadges, 'fields', {});
         },
@@ -207,11 +255,11 @@ export default {
 
             delete fields[handle];
 
-            this.$emit('filter-changed', {handle: 'fields', values: fields});
+            this.$emit('changed', {handle: 'fields', values: fields});
         },
 
         removeStandardFilter(handle) {
-            this.$emit('filter-changed', {handle: handle, values: null});
+            this.$emit('changed', {handle: handle, values: null});
         },
 
         save() {
@@ -231,12 +279,6 @@ export default {
                     this.$toast.error(this.isUpdatingPreset ? __('Unable to update filter preset') : __('Unable to save filter preset'));
                     this.saving = false;
                 });
-        },
-
-        reset() {
-            return this.activePreset
-                ? this.$emit('restore-preset', this.activePreset)
-                : this.$emit('reset');
         },
 
         remove() {

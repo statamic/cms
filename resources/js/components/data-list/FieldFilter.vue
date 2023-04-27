@@ -1,11 +1,11 @@
 <template>
     <div>
         <div v-if="hasAvailableFieldFilters">
-            <div class="flex flex-col p-4">
+            <div class="flex flex-col p-3">
 
                 <v-select
                     ref="fieldSelect"
-                    :placeholder="__('Select field')"
+                    :placeholder="__('Field')"
                     :options="fieldOptions"
                     :reduce="option => option.value"
                     :value="field"

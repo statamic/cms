@@ -7,6 +7,8 @@ use Statamic\Query\Scopes\Filter;
 
 class UserRole extends Filter
 {
+    protected $pinned = true;
+
     public static function title()
     {
         return __('Role');

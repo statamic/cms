@@ -16,13 +16,11 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0 relative">
-                    <div class="flex items-center justify-between p-2 text-sm border-b">
-
-                        <data-list-search class="h-8" v-if="showFilters" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
 
                         <data-list-filter-presets
+                            v-show="allowFilterPresets"
                             ref="presets"
-                            v-show="! showFilters"
                             :active-preset="activePreset"
                             :active-preset-payload="activePresetPayload"
                             :active-filters="activeFilters"
@@ -31,41 +29,33 @@
                             :search-query="searchQuery"
                             @selected="selectPreset"
                             @reset="filtersReset"
-                            @hide-filters="filtersHide"
-                            @show-filters="filtersShow"
                         />
-                        <div class="flex ml-2 space-x-2">
-                            <button class="btn py-1 px-2 h-8" v-text="__('Cancel')" v-show="showFilters" @click="filtersHide" />
-                            <button class="btn py-1 px-2 h-8" v-text="__('Save')" v-show="showFilters && isDirty" @click="$refs.presets.savePreset()" />
-                            <button class="btn flex items-center py-1 px-2 h-8" @click="handleShowFilters" v-if="! showFilters" v-tooltip="__('Show Filter Controls (F)')">
-                                <svg-icon name="light/search" class="w-4 h-4" />
-                                <svg-icon name="light/filter-lines" class="w-4 h-4" />
-                            </button>
+
+                        <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+
+                        <div class="flex space-x-2 mt-2">
+                            <button class="btn btn-sm ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
+                            <button class="btn btn-sm ml-2" v-text="__('Save')" v-show="allowFilterPresets && isDirty" @click="$refs.presets.savePreset()" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" />
                         </div>
                     </div>
 
-                   <div v-show="showFilters">
-                        <data-list-filters
-                            ref="filters"
-                            :filters="filters"
-                            :active-preset="activePreset"
-                            :active-preset-payload="activePresetPayload"
-                            :active-filters="activeFilters"
-                            :active-filter-badges="activeFilterBadges"
-                            :active-count="activeFilterCount"
-                            :search-query="searchQuery"
-                            :is-searching="showFilters"
-                            :saves-presets="true"
-                            :preferences-prefix="preferencesPrefix"
-                            @filter-changed="filterChanged"
-                            @search-changed="searchChanged"
-                            @saved="$refs.presets.setPreset($event)"
-                            @deleted="$refs.presets.refreshPresets()"
-                            @restore-preset="$refs.presets.viewPreset($event)"
-                            @reset="filtersReset"
-                        />
-                    </div>
+                    <data-list-filters
+                        ref="filters"
+                        :filters="filters"
+                        :active-preset="activePreset"
+                        :active-preset-payload="activePresetPayload"
+                        :active-filters="activeFilters"
+                        :active-filter-badges="activeFilterBadges"
+                        :active-count="activeFilterCount"
+                        :search-query="searchQuery"
+                        :is-searching="true"
+                        :saves-presets="true"
+                        :preferences-prefix="preferencesPrefix"
+                        @changed="filterChanged"
+                        @saved="$refs.presets.setPreset($event)"
+                        @deleted="$refs.presets.refreshPresets()"
+                    />
 
                     <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
 
@@ -140,6 +130,9 @@ export default {
     props: {
         listingKey: String,
         group: String,
+        allowFilterPresets: {
+            default: true,
+        },
     },
 
     data() {
