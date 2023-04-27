@@ -1,5 +1,17 @@
 # Release Notes
 
+## 4.0.0-beta.1 (2023-04-27)
+
+### What's improved
+- Listing filter refinements. [#8001](https://github.com/statamic/cms/issues/8001) by @jesseleite
+
+### What's fixed
+- Fix replicator error when value references a non-configured set. [#8011](https://github.com/statamic/cms/issues/8011) by @jasonvarga
+- Fix double popover opened event. [#8004](https://github.com/statamic/cms/issues/8004) by @jasonvarga
+- Fix Firefox data-table issues. [#8003](https://github.com/statamic/cms/issues/8003) by @jackmcdade
+
+
+
 ## 4.0.0-alpha.5 (2023-04-26)
 
 ### What's new
