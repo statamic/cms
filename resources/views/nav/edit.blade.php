@@ -8,7 +8,6 @@
     update-url="{{ $updateUrl }}"
     destroy-url="{{ $destroyUrl }}"
     :save-as-options="{{ json_encode($saveAsOptions) }}"
-    :icon-fieldtype-meta="{{ json_encode($iconFieldtypeMeta) }}"
     :nav="{{ json_encode($nav) }}"
 ></nav-builder>
 
