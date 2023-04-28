@@ -483,6 +483,7 @@ export default {
                 action: '@create',
                 display: createdConfig.display,
                 url: createdConfig.url,
+                icon: createdConfig.icon,
             };
 
             this.targetDataArray.push(item);
@@ -512,9 +513,11 @@ export default {
 
         itemUpdated(updatedConfig, item) {
             item.text = updatedConfig.display;
+            item.config.icon = updatedConfig.icon;
 
             this.updateItemManipulation(item, 'display', updatedConfig.display);
             this.updateItemManipulation(item, 'url', updatedConfig.url);
+            this.updateItemManipulation(item, 'icon', updatedConfig.icon);
             this.updateItemAction(item);
 
             this.resetItemEditor();
