@@ -80,7 +80,7 @@
                         </template>
                         <template slot="cell-roles" slot-scope="{ row: user, value: roles }">
                             <div class="role-index-field">
-                                <div v-if="user.super" class="role-index-field-item mr-1">{{ __('Super Admin') }}</div>
+                                <div v-if="user.super" class="role-index-field-item mr-1 mb-1.5">{{ __('Super Admin') }}</div>
                                 <div v-if="!roles || roles.length === 0" />
                                 <div v-for="(role, i) in (roles || [])" class="role-index-field-item mr-1 mb-1.5">{{ role.title }}</div>
                             </div>
