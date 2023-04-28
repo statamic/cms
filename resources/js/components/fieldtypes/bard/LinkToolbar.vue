@@ -300,7 +300,7 @@ export default {
         autofocus() {
             if (this.linkType === 'url') {
                 this.$nextTick(() => {
-                    setTimout(() => {
+                    setTimeout(() => {
                         this.$refs.urlInput.focus();
                     }, 50);
                 });
