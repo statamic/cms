@@ -78,7 +78,7 @@ export default {
 
     data() {
         return {
-            config: data_get(this.item, 'config', this.createNewItem()),
+            config: clone(data_get(this.item, 'config', this.createNewItem())),
             saveKeyBinding: null,
             validateDisplay: false,
             validateUrl: false,
