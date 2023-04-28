@@ -158,12 +158,21 @@ class NavItem
         return $this
             ->fluentlyGetOrSet('icon')
             ->getter(function ($value) {
-                return $value ?? Statamic::svg('entries');
-            })
-            ->setter(function ($value) {
-                return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
+                return $value ?? 'entries';
             })
             ->args(func_get_args());
+    }
+
+    /**
+     * Get icon as resolved renderable SVG.
+     *
+     * @return string
+     */
+    public function svg()
+    {
+        $value = $this->icon();
+
+        return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
     }
 
     /**
