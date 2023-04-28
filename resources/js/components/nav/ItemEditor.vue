@@ -35,6 +35,13 @@
                             </div>
                         </div>
 
+                        <div class="form-group publish-field w-full">
+                            <div class="field-inner">
+                                <label class="text-sm font-medium mb-2">{{ __('Icon') }}</label>
+                                <icon-fieldtype handle="icon" :meta="iconFieldtypeMeta" v-model="config.icon" />
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -61,6 +68,7 @@ export default {
     props: {
         creating: false,
         item: {},
+        iconFieldtypeMeta: {},
     },
 
     data() {

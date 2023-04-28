@@ -172,6 +172,7 @@
         <item-editor
             v-if="creatingItem"
             :creating="true"
+            :icon-fieldtype-meta="iconFieldtypeMeta"
             @closed="resetItemEditor"
             @updated="itemAdded"
         />
@@ -179,6 +180,7 @@
         <item-editor
             v-if="editingItem"
             :item="editingItem"
+            :icon-fieldtype-meta="iconFieldtypeMeta"
             @closed="resetItemEditor"
             @updated="itemUpdated"
         />
@@ -260,6 +262,10 @@ export default {
         saveAsOptions: {
             type: Array,
             default: () => [],
+        },
+        iconFieldtypeMeta: {
+            type: Object,
+            default: () => {},
         },
     },
 
