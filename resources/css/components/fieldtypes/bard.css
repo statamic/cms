@@ -73,6 +73,11 @@
     }
 }
 
+/* Only top-level Bard fields should have a sticky header */
+.publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar {
+    @apply sticky;
+}
+
 .bard-fixed-toolbar.dark {
     @apply bg-black rounded-full shadow-lg px-4;
 
@@ -228,7 +233,7 @@
             @apply ring-0;
         }
     }
-    
+
     .bard-content:not(.bard-set *) > {
         p > code,
         pre code {
