@@ -74,7 +74,7 @@
 }
 
 /* Only top-level Bard fields should have a sticky header */
-.publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar {
+.workspace .publish-fields:not(.replicator-set-body) > .bard-fieldtype .bard-fixed-toolbar {
     @apply sticky;
 }
 
