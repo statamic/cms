@@ -524,3 +524,22 @@
         cursor: grab;
     }
 }
+
+/* Bard Table
+  ========================================================================== */
+
+.bard-fieldtype .ProseMirror {
+    &.resize-cursor {
+        @apply cursor-col-resize;
+    }
+
+    .tableWrapper {
+        @apply overflow-x-auto;
+    }
+
+    table .column-resize-handle {
+        @apply absolute top-0 bottom-0 pointer-events-none bg-blue-200;
+        width: 3px;
+        right: -2px;
+    }
+}
