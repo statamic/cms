@@ -282,3 +282,6 @@ input[type="file"] {
     }
 }
 
+.slug-field .input-text {
+    @apply font-mono text-xs;
+}
