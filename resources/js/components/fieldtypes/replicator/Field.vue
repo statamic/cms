@@ -1,6 +1,6 @@
 <template>
 
-    <div class="p-4 m-0" :class="classes">
+    <div class="p-4 m-0 @container" :class="classes">
 
         <label class="block" v-if="showLabel">
             <span v-if="showLabelText">{{ display }}</span>

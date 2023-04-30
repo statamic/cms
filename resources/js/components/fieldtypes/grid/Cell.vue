@@ -1,7 +1,7 @@
 <template>
 
     <td class="grid-cell" :class="classes" :width="width">
-        <div v-show="showInner">
+        <div v-show="showInner" class="@container">
             <component
                 :is="fieldtypeComponent"
                 :config="field"
