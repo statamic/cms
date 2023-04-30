@@ -27,7 +27,7 @@
 .table-fieldtype-table .input-text {
     @apply bg-white border-none rounded-none shadow-none outline-none text-sm;
     &:focus {
-        @apply shadow-inner bg-gray-100;
+        @apply shadow-inner bg-gray-100 ring-0;
     }
 }
 

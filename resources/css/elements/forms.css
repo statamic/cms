@@ -28,6 +28,9 @@ select {
     @apply border;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
+    &:focus, &:focus-within {
+        @apply ring-2 ring-blue-300 outline-none;
+    }
 
     &:not(textarea) {
         height: 2.375rem;
