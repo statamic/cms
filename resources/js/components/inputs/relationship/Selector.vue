@@ -217,7 +217,7 @@ export default {
 
         initialRequest() {
             return this.request().then(() => {
-                if (this.search) this.$refs.filters.$refs.search.focus();
+                if (this.search) this.$refs.search.focus();
             });
         },
 
