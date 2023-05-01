@@ -24,10 +24,13 @@ select {
   ========================================================================== */
 
 .input-text {
-    @apply appearance-none bg-gray-100 text-gray-800 max-w-full w-full border p-2 rounded shadow-inner placeholder:text-gray-600;
+    @apply appearance-none bg-gray-100 text-gray-800 max-w-full w-full border p-2 rounded shadow-inner placeholder:text-gray-600 text-md @lg:text-base;
     @apply border;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
+    &:focus, &:focus-within {
+        @apply ring-2 ring-blue-300 outline-none;
+    }
 
     &:not(textarea) {
         height: 2.375rem;
@@ -279,3 +282,6 @@ input[type="file"] {
     }
 }
 
+.slug-field .input-text {
+    @apply font-mono text-xs;
+}

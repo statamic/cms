@@ -34,8 +34,7 @@
     @apply p-2;
     min-height: 38px;
     p {
-        margin-bottom: 0;
-        line-height: 1.375; /*  22px */
+        @apply leading-normal mb-0;
     }
 }
 
