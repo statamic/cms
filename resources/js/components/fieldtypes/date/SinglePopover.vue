@@ -15,8 +15,8 @@
             ref="popover"
             placement="bottom-start"
             :disabled="isReadOnly"
-            @opened="popoverStateChanged(true)"
-            @closed="popoverStateChanged(false)"
+            @opened="open = true"
+            @closed="open = false"
         >
             <template #trigger>
                 <div class="input-group">
@@ -35,7 +35,7 @@
                     </div>
                 </div>
             </template>
-            <portal-target :name="portalTarget" />
+            <portal-target :name="portalTarget" @change="resetPicker" />
         </popover>
 
     </div>
@@ -80,11 +80,6 @@ export default {
     },
 
     methods: {
-
-        popoverStateChanged(open) {
-            this.open = open;
-            this.$nextTick(() => this.resetPicker());
-        },
 
         updateInputValue() {
             this.inputValue = this.picker.inputValues[0];
