@@ -1,16 +1,11 @@
 <template>
 
-    <modal name="folder-editor">
-
-        <div class="flex items-center justify-between px-6 py-4 bg-gray-200 border-b text-center">
-            {{ modalTitle }}
-            <button type="button"
-                tabindex="-1"
-                class="btn-close"
-                aria-label="Close"
-                @click="cancel"
-                v-html="'&times'" />
-        </div>
+    <confirmation-modal
+        name="folder-editor"
+        :title="modalTitle"
+        @cancel="cancel"
+        @confirm="submit"
+    >
 
         <div class="publish-fields @container">
 
@@ -25,17 +20,9 @@
                 v-model="directory"
             />
 
-            <div class="px-6 pb-6">
-                <button
-                    class="btn-primary"
-                    @click.prevent="submit"
-                    v-text="buttonText"
-                />
-            </div>
-
         </div>
 
-    </modal>
+    </confirmation-modal>
 
 </template>
 
@@ -50,6 +37,8 @@ export default {
 
     data() {
         return {
+            modalTitle: __('Create Folder'),
+            buttonText: __('Create'),
             directory: this.initialDirectory,
             errors: {},
         }
@@ -59,6 +48,22 @@ export default {
 
         cancel() {
             this.$emit('closed');
+        },
+
+        submit() {
+            const url = cp_url(`asset-containers/${this.container.id}/folders`);
+            const payload = {
+                path: this.path,
+                directory: this.directory,
+                title: this.title
+            };
+
+            this.$axios.post(url, payload).then(response => {
+                this.$toast.success(__('Folder created'));
+                this.$emit('created', response.data);
+            }).catch(e => {
+                this.handleErrors(e);
+            });
         },
 
         handleErrors(e) {
