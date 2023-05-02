@@ -124,9 +124,6 @@
 
                                         <th class="actions-column" :colspan="columns.length">
                                             <dropdown-list placement="left-start" v-if="folderActions(folder).length">
-                                                <!-- TODO: Folder edit -->
-                                                <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
-
                                                 <data-list-inline-actions
                                                     :item="folder.path"
                                                     :url="folderActionUrl"
@@ -135,15 +132,6 @@
                                                     @completed="actionCompleted"
                                                 />
                                             </dropdown-list>
-
-                                            <folder-editor
-                                                v-if="editedFolderPath === folder.path"
-                                                :initial-directory="folder.basename"
-                                                :container="container"
-                                                :path="path"
-                                                @closed="editedFolderPath = null"
-                                                @updated="folderUpdated(i, $event)"
-                                            />
                                         </th>
                                     </tr>
                                 </template>
@@ -282,7 +270,7 @@
             @saved="assetSaved"
         />
 
-        <folder-creator
+        <create-folder
             v-if="creatingFolder"
             :container="container"
             :path="path"
@@ -298,8 +286,7 @@
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
-import FolderCreator from '../Folder/Create.vue';
-import FolderEditor from '../Folder/Edit.vue';
+import CreateFolder from './CreateFolder.vue';
 import HasPagination from '../../data-list/HasPagination';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
@@ -320,8 +307,7 @@ export default {
         Breadcrumbs,
         Uploader,
         Uploads,
-        FolderEditor,
-        FolderCreator,
+        CreateFolder,
     },
 
     props: {
@@ -355,7 +341,6 @@ export default {
             folder: {},
             searchQuery: '',
             editedAssetId: this.initialEditingAssetId,
-            editedFolderPath: null,
             creatingFolder: false,
             uploads: [],
             page: 1,
@@ -609,11 +594,6 @@ export default {
             this.folders.push(folder);
             this.folders = _.sortBy(this.folders, 'title');
             this.creatingFolder = false;
-        },
-
-        folderUpdated(index, newFolder) {
-            this.folders[index] = newFolder;
-            this.editedFolderPath = null;
         },
 
         sorted(column, direction) {
