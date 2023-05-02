@@ -1,5 +1,27 @@
 # Release Notes
 
+## 4.0.0-beta.2 (2023-05-02)
+
+### What's new
+- Export ProseMirror model and view. [#8032](https://github.com/statamic/cms/issues/8032) by @jacksleight
+- Add actions to assign roles and groups to users from the users listing. [#8013](https://github.com/statamic/cms/issues/8013) by @jesseleite
+
+### What's improved
+- Bring back Bard's Sticky Toolbar, but only for top-level fields. [#8022](https://github.com/statamic/cms/issues/8022) by @jackmcdade
+- Improve column resizing UI in Bard table. [#8025](https://github.com/statamic/cms/issues/8025) by @o1y
+
+### What's fixed
+- UI fixes. [#8033](https://github.com/statamic/cms/issues/8033) by @jackmcdade
+- Fix date field issues. [#8036](https://github.com/statamic/cms/issues/8036) by @jasonvarga
+- Revise asset folder creation modals. [#8034](https://github.com/statamic/cms/issues/8034) by @jasonvarga
+- Fix losing super when editing self user in CP. [#8012](https://github.com/statamic/cms/issues/8012) by @jesseleite
+- Fix relationship selector search autofocus. [#8021](https://github.com/statamic/cms/issues/8021) by @o1y
+- Text field size consistency. [#8028](https://github.com/statamic/cms/issues/8028) by @jackmcdade
+- Fix Bard Toolbar position when in fullscreen mode. [#8024](https://github.com/statamic/cms/issues/8024) by @o1y
+- Fix Reference Error when using bard toolbar link button. [#8019](https://github.com/statamic/cms/issues/8019) by @jasonvarga
+
+
+
 ## 4.0.0-beta.1 (2023-04-27)
 
 ### What's improved
