@@ -40,7 +40,7 @@
                         </div>
                     </div>
                 </template>
-                <portal-target :name="startPortalTarget" />
+                <portal-target :name="startPortalTarget" @change="resetPicker" />
             </popover>
 
             <svg-icon name="micro/arrow-right" class="w-6 h-6 my-1 mx-2 text-gray-700 hidden @md:block" />
@@ -72,7 +72,7 @@
                         </div>
                     </div>
                 </template>
-                <portal-target :name="endPortalTarget" />
+                <portal-target :name="endPortalTarget" @change="resetPicker" />
             </popover>
 
         </div>
@@ -157,13 +157,11 @@ export default {
 
             this.startOpen = true;
             this.portalTarget = this.startPortalTarget;
-            this.$nextTick(() => this.resetPicker());
         },
 
         startPopoverClosed() {
             this.startOpen = false;
             this.portalTarget = null;
-            this.$nextTick(() => this.resetPicker());
         },
 
         endPopoverOpened() {
@@ -171,13 +169,11 @@ export default {
 
             this.endOpen = true;
             this.portalTarget = this.endPortalTarget;
-            this.$nextTick(() => this.resetPicker());
         },
 
         endPopoverClosed() {
             this.endOpen = false;
             this.portalTarget = null;
-            this.$nextTick(() => this.resetPicker());
         },
 
         updateInputValues() {
