@@ -37,6 +37,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\Publish::class,
         Actions\Unpublish::class,
         Actions\SendPasswordReset::class,
+        Actions\AssignRoles::class,
+        Actions\AssignGroups::class,
         Actions\MoveAsset::class,
         Actions\RenameAsset::class,
         Actions\ReplaceAsset::class,
