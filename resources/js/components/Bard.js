@@ -10,7 +10,7 @@ class Bard {
         this.extensionReplacementCallbacks = [];
         this.buttonCallbacks = [];
     }
-    
+
     addExtension(callback) {
         this.extensionCallbacks.push(callback);
     }
