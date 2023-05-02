@@ -184,8 +184,8 @@ export default {
         dateSelected(date) {
             this.$emit('input', date)
             this.$nextTick(() => {
-                this.$refs.startPopover.close()
-                this.$refs.endPopover.close()
+                this.$refs.startPopover?.close()
+                this.$refs.endPopover?.close()
             });
         },
 
