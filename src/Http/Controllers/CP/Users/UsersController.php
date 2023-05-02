@@ -199,7 +199,7 @@ class UsersController extends CpController
             $blueprint->ensureField('groups', ['visibility' => 'read_only']);
         }
 
-        if (User::current()->isSuper() && User::current() != $user) {
+        if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
             $blueprint->ensureField('super', ['type' => 'toggle']);
         }
 
@@ -251,7 +251,7 @@ class UsersController extends CpController
             $user->set($key, $value);
         }
 
-        if (User::current()->isSuper() && User::current() != $user) {
+        if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
             $user->super = $request->super;
         }
 
