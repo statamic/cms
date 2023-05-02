@@ -3,7 +3,7 @@
         <td class="flex items-center h-full">
             <div
                 v-if="canShowSvg"
-                class="img svg-img mr-2 h-7 w-7 bg-no-repeat bg-center bg-cover text-center flex items-center justify-center"
+                class="img svg-img h-7 w-7 bg-no-repeat bg-center bg-cover text-center flex items-center justify-center"
                 :style="'background-image:url(' + thumbnail + ')'"
             ></div>
             <button
@@ -23,11 +23,14 @@
             <button
                 v-if="showFilename"
                 @click="edit"
-                class="flex items-center flex-1 ml-2 text-xs text-left truncate"
+                class="flex items-center flex-1 ml-3 text-xs text-left truncate w-full"
                 :aria-label="__('Edit Asset')"
             >
                 {{ asset.basename }}
             </button>
+            <div v-text="asset.size" class="asset-filesize text-xs text-gray-600 px-2" />
+        </td>
+        <td class="w-24">
             <button
                 class="asset-set-alt text-blue px-4 text-sm hover:text-black"
                 @click="edit"
@@ -35,7 +38,6 @@
             >
                 {{ asset.values.alt ? "✅" : __("Set Alt") }}
             </button>
-            <div v-text="asset.size" class="asset-filesize text-xs text-gray-600 px-2" />
         </td>
         <td class="p-0 w-8 text-right align-middle">
             <button
