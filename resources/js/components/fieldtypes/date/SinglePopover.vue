@@ -64,8 +64,11 @@ export default {
             return {
                 // Handle changing the date when typing.
                 change: (e) => this.picker.onInputUpdate(e.target.value, true, { formatInput: true }),
-                // Allows hitting escape to cancel any changes.
-                keyup: (e) => this.picker.onInputKeyup(e),
+                // Allows hitting escape to cancel any changes, and close the popover.
+                keyup: (e) => {
+                    this.picker.onInputKeyup(e);
+                    if (e.key === 'Escape') this.$refs.popover?.close();
+                }
             }
         },
 
