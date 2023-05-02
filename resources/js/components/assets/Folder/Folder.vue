@@ -1,11 +1,11 @@
 <template>
 
-    <modal name="folder-editor">
+    <modal name="folder-editor" :focusTrap="false">
 
         <div class="flex items-center justify-between px-6 py-4 bg-gray-200 border-b text-center">
             {{ modalTitle }}
             <button type="button"
-                tabindex="-1"
+                tabindex="0"
                 class="btn-close"
                 aria-label="Close"
                 @click="cancel"
