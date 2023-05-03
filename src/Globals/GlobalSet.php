@@ -47,7 +47,11 @@ class GlobalSet implements Contract
 
     public function blueprint()
     {
-        return Blueprint::find('globals.'.$this->handle());
+        $blink = 'global-set-blueprint-'.$this->handle();
+
+        return Facades\Blink::once($blink, function () {
+            return Blueprint::find('globals.'.$this->handle());
+        });
     }
 
     public function path()

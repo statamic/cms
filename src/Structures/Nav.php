@@ -109,11 +109,15 @@ class Nav extends Structure implements Contract
 
     public function blueprint()
     {
-        $blueprint = Blueprint::find('navigation.'.$this->handle())
-            ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('navigation');
+        $blink = 'nav-blueprint-'.$this->handle();
 
-        NavBlueprintFound::dispatch($blueprint, $this);
+        return Facades\Blink::once($blink, function () {
+            $blueprint = Blueprint::find('navigation.'.$this->handle())
+                ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('navigation');
 
-        return $blueprint;
+            NavBlueprintFound::dispatch($blueprint, $this);
+
+            return $blueprint;
+        });
     }
 }

@@ -83,11 +83,12 @@ EOT
     /** @test */
     public function it_renders_form_with_fields_array_and_custom_blueprint()
     {
+        $this->useCustomBlueprint();
+
         $this->actingAs(User::make()
             ->email('test@example.com')
             ->data(['name' => 'Test User', 'phone' => '12345'])
             ->save());
-        $this->useCustomBlueprint();
 
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ user:profile_form }}

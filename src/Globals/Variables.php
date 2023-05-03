@@ -34,6 +34,10 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         $this->supplements = collect();
     }
 
+    /**
+     * @param $set
+     * @return mixed|\Statamic\Globals\Variables|\Statamic\Globals\GlobalSet
+     */
     public function globalSet($set = null)
     {
         return $this->fluentlyGetOrSet('set')->args(func_get_args());
@@ -113,8 +117,16 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
     public function blueprint()
     {
         $blueprint = $this->globalSet()->blueprint() ?? $this->fallbackBlueprint();
+        $handle = $blueprint->handle();
 
-        GlobalVariablesBlueprintFound::dispatch($blueprint, $this);
+        if ($handle) {
+            $blink = 'variables-blueprint-dispatch-'.$blueprint->handle();
+            Facades\Blink::once($blink, function () use ($blueprint) {
+                GlobalVariablesBlueprintFound::dispatch($blueprint, $this);
+            });
+        } else {
+            GlobalVariablesBlueprintFound::dispatch($blueprint, $this);
+        }
 
         return $blueprint;
     }

@@ -296,8 +296,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
         $blueprint->setParent($entry ?? $this);
 
-        $this->dispatchEntryBlueprintFoundEvent($blueprint, $entry);
-
         return $blueprint;
     }
 
@@ -307,22 +305,15 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
         return Blink::once($blink, function () use ($blueprint) {
             if (is_null($blueprint)) {
-                return $this->entryBlueprints()->reject->hidden()->first();
+                $found = $this->entryBlueprints()->reject->hidden()->first();
+            } else {
+                $found = $this->entryBlueprints()->keyBy->handle()->get($blueprint)
+                    ?? $this->entryBlueprints()->keyBy->handle()->get(Str::singular($blueprint));
             }
 
-            return $this->entryBlueprints()->keyBy->handle()->get($blueprint)
-                ?? $this->entryBlueprints()->keyBy->handle()->get(Str::singular($blueprint));
-        });
-    }
+            EntryBlueprintFound::dispatch($found);
 
-    private function dispatchEntryBlueprintFoundEvent($blueprint, $entry)
-    {
-        $id = optional($entry)->id() ?? 'null';
-
-        $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint->handle().'-'.$id;
-
-        Blink::once($blink, function () use ($blueprint, $entry) {
-            EntryBlueprintFound::dispatch($blueprint, $entry);
+            return $found;
         });
     }
 
