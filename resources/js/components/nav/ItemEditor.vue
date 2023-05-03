@@ -35,7 +35,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group publish-field w-full">
+                        <div class="form-group publish-field w-full" v-if="! isChild">
                             <div class="field-inner">
                                 <label class="text-sm font-medium mb-2">{{ __('Icon') }}</label>
                                 <publish-field-meta
@@ -74,6 +74,7 @@ export default {
     props: {
         creating: false,
         item: {},
+        isChild: false,
     },
 
     data() {
@@ -120,6 +121,14 @@ export default {
 
             if (this.validateDisplay || this.validateUrl) {
                 return;
+            }
+
+            let config = clone(this.config);
+
+            if (this.isChild) {
+                config.icon = null;
+            } else if (! config.icon) {
+                config.icon = data_get(this.item, 'original.icon');
             }
 
             this.$emit('updated', this.config, this.item);

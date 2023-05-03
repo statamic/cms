@@ -174,6 +174,7 @@
         <item-editor
             v-if="creatingItem"
             :creating="true"
+            :is-child="isChildItemNode(creatingItem)"
             @closed="resetItemEditor"
             @updated="itemAdded"
         />
@@ -181,6 +182,7 @@
         <item-editor
             v-if="editingItem"
             :item="editingItem"
+            :is-child="isChildItemNode(editingItem)"
             @closed="resetItemEditor"
             @updated="itemUpdated"
         />
