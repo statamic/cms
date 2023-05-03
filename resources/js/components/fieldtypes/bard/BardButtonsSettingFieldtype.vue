@@ -118,7 +118,7 @@ export default {
                 distance: 10
             }).on('sortable:stop', e => {
                 this.buttons.splice(e.newIndex, 0, this.buttons.splice(e.oldIndex, 1)[0]);
-            });
+            }).on('mirror:create', (e) => e.cancel());
         },
 
         toggleButton(name) {
@@ -132,9 +132,3 @@ export default {
     }
 };
 </script>
-
-<style scoped>
-.draggable-mirror {
-    display: none;
-}
-</style>
