@@ -11,7 +11,7 @@
 
 .table-fieldtype-table thead {
     th {
-        @apply font-medium border-r p-2 border-b z-10 bg-gray-200 text-gray-900 uppercase text-2xs tracking-widest;
+        @apply font-medium border-r p-2 border-b z-10 bg-gray-200 text-gray-900 text-sm;
         display: table-cell;
         position: sticky;
         top: -1px;
