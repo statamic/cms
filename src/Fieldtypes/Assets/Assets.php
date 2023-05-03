@@ -32,6 +32,12 @@ class Assets extends Fieldtype
                         'min' => 1,
                         'type' => 'integer',
                     ],
+                    'min_files' => [
+                        'display' => __('Min Files'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.min_files'),
+                        'min' => 1,
+                        'type' => 'integer',
+                    ],
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.assets.config.mode'),
