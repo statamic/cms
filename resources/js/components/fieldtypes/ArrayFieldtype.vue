@@ -25,16 +25,18 @@
             </div>
         </div>
 
-        <table v-else-if="isKeyed" class="array-table">
-            <tbody>
-                <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
-                    <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ config.keys[element.key] || element.key }}</label></th>
-                    <td>
-                        <input type="text" class="input-text-minimal" :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly" />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div v-else-if="isKeyed" class="array-table-wrapper">
+            <table class="array-table">
+                <tbody>
+                    <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
+                        <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ config.keys[element.key] || element.key }}</label></th>
+                        <td>
+                            <input type="text" class="input-text-minimal" :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <template v-else-if="isDynamic">
             <div class="table-field">
