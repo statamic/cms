@@ -514,13 +514,7 @@ class NavTransformerTest extends TestCase
                                 'manipulations' => [
                                     'action' => '@modify',
                                     'url' => '/modified-articles-url',
-                                ],
-                            ],
-                            [
-                                'id' => 'content::globals',
-                                'manipulations' => [
-                                    'action' => '@modify',
-                                    'icon' => 'custom-svg',
+                                    'icon' => 'custom-svg', // This should get stripped out, because icons cannot be on children
                                 ],
                             ],
                         ],
@@ -541,10 +535,6 @@ class NavTransformerTest extends TestCase
                         'content::collections::articles' => [
                             'action' => '@modify',
                             'url' => '/modified-articles-url',
-                        ],
-                        'content::globals' => [
-                            'action' => '@modify',
-                            'icon' => 'custom-svg',
                         ],
                     ],
                 ],
@@ -620,6 +610,7 @@ class NavTransformerTest extends TestCase
                                 'manipulations' => [
                                     'action' => '@move',
                                     'url' => '/modified-fieldsets-url',
+                                    'icon' => 'custom-svg', // This should get stripped out, because icons cannot be on children
                                 ],
                             ],
                         ],
@@ -715,6 +706,7 @@ class NavTransformerTest extends TestCase
                                 'manipulations' => [
                                     'action' => '@alias',
                                     'url' => '/modified-fieldsets-url',
+                                    'icon' => 'custom-svg', // This should get stripped out, because icons cannot be on children
                                 ],
                             ],
                         ],
