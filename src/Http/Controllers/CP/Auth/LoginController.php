@@ -39,6 +39,7 @@ class LoginController extends CpController
             'providers' => $enabled ? OAuth::providers() : [],
             'referer' => $this->getReferrer($request),
             'hasError' => $this->hasError(),
+            'usernameKey' => $this->username(),
         ];
 
         $view = view('statamic::auth.login', $data);
@@ -143,7 +144,7 @@ class LoginController extends CpController
 
     public function username()
     {
-        return 'email';
+        return config('statamic.users.usernameKey', 'email');
     }
 
     private function hasError()

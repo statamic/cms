@@ -138,4 +138,17 @@ return [
         'web' => 'web',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Username Key
+    |--------------------------------------------------------------------------
+    |
+    | By default, Statamic will use `email` as key. However,
+    | if you want to use a different auth guard, which needs
+    | a different key you can customize it here.
+    |
+    */
+
+    'usernameKey' => 'email',
+
 ];

@@ -38,8 +38,8 @@
 
             <div class="mb-4">
                 <label class="mb-1" for="input-email">{{ __('Email') }}</label>
-                <input type="text" class="input-text input-text" name="email" value="{{ old('email') }}" autofocus id="input-email">
-                @if ($hasError('email'))<div class="text-red text-xs mt-1">{{ $errors->first('email') }}</div>@endif
+                <input type="text" class="input-text input-text" name="{{$usernameKey}}" value="{{ old($usernameKey) }}" autofocus id="input-{{$usernameKey}}">
+                @if ($hasError($usernameKey))<div class="text-red text-xs mt-1">{{ $errors->first($usernameKey) }}</div>@endif
             </div>
 
             <div class="mb-4">
