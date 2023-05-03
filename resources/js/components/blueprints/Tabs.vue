@@ -22,6 +22,7 @@
                 <svg-icon name="add" class="w-3 h-3" />
             </button>
         </div>
+        <button v-if="!singleTab && tabs.length === 0" class="btn" @click="addAndEditTab" v-text="addTabText" />
         <tab-content
             v-for="tab in tabs"
             ref="tabContent"
