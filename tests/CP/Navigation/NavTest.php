@@ -125,7 +125,7 @@ class NavTest extends TestCase
 
         $item = $this->build()->get('Utilities')->last();
 
-        $this->assertEquals('entries', $item->icon());
+        $this->assertNull($item->icon());
         $this->assertEquals(\Statamic\Statamic::svg('icons/light/entries'), $item->svg());
     }
 

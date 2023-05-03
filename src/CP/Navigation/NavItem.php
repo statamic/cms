@@ -155,12 +155,7 @@ class NavItem
      */
     public function icon($icon = null)
     {
-        return $this
-            ->fluentlyGetOrSet('icon')
-            ->getter(function ($value) {
-                return $value ?? 'entries';
-            })
-            ->args(func_get_args());
+        return $this->fluentlyGetOrSet('icon')->args(func_get_args());
     }
 
     /**
@@ -170,7 +165,7 @@ class NavItem
      */
     public function svg()
     {
-        $value = $this->icon();
+        $value = $this->icon() ?? 'entries';
 
         return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
     }
