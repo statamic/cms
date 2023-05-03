@@ -96,7 +96,9 @@ export default {
         },
 
         icon() {
-            return data_get(this.item.config, 'icon') || 'entries';
+            return data_get(this.item, 'config.icon')
+                || data_get(this.item, 'original.icon')
+                || 'entries';
         },
 
         isAlreadySvg() {
