@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\CP\FieldtypeFactory;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;
@@ -20,6 +19,10 @@ class Sets extends Fieldtype
     public function preProcess($sets)
     {
         $sets = collect($sets);
+
+        if ($sets->isEmpty()) {
+            return [];
+        }
 
         // If the first set doesn't have a "sets" key, it would be the legacy format.
         // We'll put it in a "main" group so it's compatible with the new format.
@@ -63,9 +66,13 @@ class Sets extends Fieldtype
     {
         $sets = collect($sets);
 
-        // If the first set has a "fields" key, it would be the legacy format.
+        if ($sets->isEmpty()) {
+            return [];
+        }
+
+        // If the first set doesn't have a "sets" key, it would be the legacy format.
         // We'll put it in a "main" group so it's compatible with the new format.
-        if (Arr::has($sets->first(), 'fields')) {
+        if (! Arr::has($sets->first(), 'sets')) {
             $sets = collect([
                 'main' => [
                     'sets' => $sets->all(),
@@ -118,40 +125,5 @@ class Sets extends Fieldtype
             ];
         })
         ->all();
-    }
-
-    private function moveOutNameKey($fields)
-    {
-        $processed = [];
-
-        foreach ($fields as $field) {
-            $handle = $field['handle'];
-            unset($field['handle']);
-            $processed[$handle] = $this->recursivelyProcess($field);
-        }
-
-        return $processed;
-    }
-
-    private function recursivelyProcess($config)
-    {
-        // Get the fieldtype for this field
-        $type = $config['type'];
-        $config_fieldtype = FieldtypeFactory::create($type);
-
-        // Get the fieldtype's config fieldset
-        $fieldset = $config_fieldtype->getConfigFieldset();
-
-        // Process all the fields in the fieldset
-        foreach ($fieldset->fieldtypes() as $field) {
-            // Ignore if the field isn't in the config
-            if (! in_array($field->getName(), array_keys($config))) {
-                continue;
-            }
-
-            $config[$field->getName()] = $field->process($config[$field->getName()]);
-        }
-
-        return Fieldset::cleanFieldForSaving($config);
     }
 }

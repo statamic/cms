@@ -12,20 +12,16 @@ use Tests\TestCase;
 
 class ReplicatorTest extends TestCase
 {
-    /** @test */
-    public function it_preprocesses_the_values()
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_preprocesses_with_empty_value($areSetsGrouped)
     {
-        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
-
-        FieldRepository::shouldReceive('find')
-            ->with('testfieldset.numbers')
-            ->andReturnUsing(function () {
-                return new Field('numbers', ['type' => 'integer']);
-            });
-
         $field = (new Field('test', [
             'type' => 'replicator',
-            'sets' => [
+            'sets' => $this->groupSets($areSetsGrouped, [
                 'one' => [
                     'fields' => [
                         ['handle' => 'numbers', 'field' => 'testfieldset.numbers'], // test field reference
@@ -38,7 +34,43 @@ class ReplicatorTest extends TestCase
                         ['handle' => 'food', 'field' => ['type' => 'text']], // test inline field
                     ],
                 ],
-            ],
+            ]),
+        ]));
+
+        $this->assertSame([], $field->preProcess()->value());
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_preprocesses_the_values($areSetsGrouped)
+    {
+        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+
+        FieldRepository::shouldReceive('find')
+            ->with('testfieldset.numbers')
+            ->andReturnUsing(function () {
+                return new Field('numbers', ['type' => 'integer']);
+            });
+
+        $field = (new Field('test', [
+            'type' => 'replicator',
+            'sets' => $this->groupSets($areSetsGrouped, [
+                'one' => [
+                    'fields' => [
+                        ['handle' => 'numbers', 'field' => 'testfieldset.numbers'], // test field reference
+                        ['handle' => 'words', 'field' => ['type' => 'text']], // test inline field
+                    ],
+                ],
+                'two' => [
+                    'fields' => [
+                        ['handle' => 'age', 'field' => 'testfieldset.numbers'], // test field reference
+                        ['handle' => 'food', 'field' => ['type' => 'text']], // test inline field
+                    ],
+                ],
+            ]),
         ]))->setValue([
             [
                 'type' => 'one',
