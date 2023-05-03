@@ -115,7 +115,7 @@ export default {
                 mirror: { constrainDimensions: true, xAxis: true, appendTo: 'body' },
                 swapAnimation: { horizontal: true },
                 plugins: [Plugins.SwapAnimation],
-                delay: 20
+                distance: 10
             }).on('sortable:stop', e => {
                 this.buttons.splice(e.newIndex, 0, this.buttons.splice(e.oldIndex, 1)[0]);
             });
