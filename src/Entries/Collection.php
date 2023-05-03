@@ -10,6 +10,7 @@ use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Entries\Entry as StatamicEntry;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionDeleted;
 use Statamic\Events\CollectionSaved;
@@ -23,6 +24,7 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
+use Statamic\Fields\Blueprint as StatamicBlueprint;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
@@ -266,7 +268,10 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return Facades\Entry::query()->where('collection', $this->handle());
     }
 
-    public function entryBlueprints()
+    /**
+     * @return \Illuminate\Support\Collection|\Statamic\Fields\Blueprint[]
+     */
+    public function entryBlueprints(): \Illuminate\Support\Collection
     {
         $blink = 'collection-entry-blueprints-'.$this->handle();
 
@@ -275,7 +280,10 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         });
     }
 
-    private function getEntryBlueprints()
+    /**
+     * @return \Illuminate\Support\Collection|\Statamic\Fields\Blueprint[]
+     */
+    private function getEntryBlueprints(): \Illuminate\Support\Collection
     {
         $blueprints = Blueprint::in('collections/'.$this->handle());
 
@@ -288,18 +296,18 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         });
     }
 
-    public function entryBlueprint($blueprint = null, $entry = null)
+    public function entryBlueprint(string $blueprint = null, StatamicEntry $entry = null): ?StatamicBlueprint
     {
-        if (! $blueprint = $this->getBaseEntryBlueprint($blueprint)) {
+        if (! $entryBlueprint = $this->getBaseEntryBlueprint($blueprint)) {
             return null;
         }
 
-        $blueprint->setParent($entry ?? $this);
+        $entryBlueprint->setParent($entry ?? $this);
 
-        return $blueprint;
+        return $entryBlueprint;
     }
 
-    private function getBaseEntryBlueprint($blueprint)
+    private function getBaseEntryBlueprint(string $blueprint = null): ?StatamicBlueprint
     {
         $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint;
 
@@ -317,7 +325,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         });
     }
 
-    public function fallbackEntryBlueprint()
+    public function fallbackEntryBlueprint(): StatamicBlueprint
     {
         $blueprint = (clone Blueprint::find('default'))
             ->setHandle(Str::singular($this->handle()))
@@ -330,7 +338,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return $blueprint;
     }
 
-    public function ensureEntryBlueprintFields($blueprint)
+    public function ensureEntryBlueprintFields(StatamicBlueprint $blueprint): StatamicBlueprint
     {
         $blueprint->ensureFieldPrepended('title', [
             'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
