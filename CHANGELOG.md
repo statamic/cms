@@ -1,5 +1,21 @@
 # Release Notes
 
+## 3.4.9 (2023-05-03)
+
+### What's new
+- Add `min_files` option to assets fieldtype. [#8015](https://github.com/statamic/cms/issues/8015) by @ryanmitchell
+
+### What's improved
+- French translations [#8000](https://github.com/statamic/cms/issues/8000) by @ebeauchamps
+
+### What's fixed
+- Fix iOS scroll in stacks. [#8035](https://github.com/statamic/cms/issues/8035) by @jasonvarga
+- Fix fields added to blueprints through event not being added to GraphQL. [#7249](https://github.com/statamic/cms/issues/7249) by @aerni
+- Fix invalidation and absolute URLs for entries with redirects. [#7173](https://github.com/statamic/cms/issues/7173) by @arthurperton
+- Only show Copy Asset URL action for public containers. [#8005](https://github.com/statamic/cms/issues/8005) by @jasonvarga
+
+
+
 ## 3.4.8 (2023-04-25)
 
 ### What's new
