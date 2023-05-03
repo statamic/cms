@@ -20,6 +20,10 @@ class Sets extends Fieldtype
     {
         $sets = collect($sets);
 
+        if ($sets->isEmpty()) {
+            return [];
+        }
+
         // If the first set doesn't have a "sets" key, it would be the legacy format.
         // We'll put it in a "main" group so it's compatible with the new format.
         if (! Arr::has($sets->first(), 'sets')) {
@@ -61,6 +65,10 @@ class Sets extends Fieldtype
     public function preProcessConfig($sets)
     {
         $sets = collect($sets);
+
+        if ($sets->isEmpty()) {
+            return [];
+        }
 
         // If the first set doesn't have a "sets" key, it would be the legacy format.
         // We'll put it in a "main" group so it's compatible with the new format.
