@@ -29,6 +29,10 @@
     @apply ml-1 text-gray-700;
 }
 
+.assets-fieldtype .asset-upload-control {
+    @apply hidden @xs:inline-block;
+}
+
 
 /* Inside a Grid
   ========================================================================== */
