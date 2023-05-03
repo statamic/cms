@@ -53,6 +53,7 @@
                         :vertical="true"
                         item-class="sortable-row"
                         handle-class="sortable-handle"
+                        :mirror="false"
                     >
                         <tbody>
                             <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
