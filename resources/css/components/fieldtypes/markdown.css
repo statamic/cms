@@ -73,7 +73,7 @@
     }
 
     .markdown-cheatsheet-helper {
-        @apply py-2 px-4 inline-block;
+        @apply p-2 inline-block;
     }
 
     .markdown-asset-helper {
