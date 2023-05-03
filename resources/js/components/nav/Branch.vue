@@ -4,7 +4,7 @@
         <div class="page-move w-6" />
         <div class="flex items-center flex-1 p-2 ml-2 text-xs leading-normal">
             <div class="flex items-center flex-1" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
-                <template v-if="! isSection">
+                <template v-if="! isSection && ! isChild">
                     <i v-if="isAlreadySvg" class="w-4 h-4 mr-2" v-html="icon"></i>
                     <svg-icon v-else class="w-4 h-4 mr-2" :name="'light/'+icon" />
                 </template>
@@ -70,6 +70,7 @@ export default {
         root: Boolean,
         vm: Object,
         isOpen: Boolean,
+        isChild: Boolean,
         hasChildren: Boolean,
         disableSections: Boolean,
         topLevel: Boolean,
