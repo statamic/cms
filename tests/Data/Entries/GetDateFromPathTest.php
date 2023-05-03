@@ -9,6 +9,7 @@ class GetDateFromPathTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider paths
      **/
     public function it_gets_the_date_from_a_path($expected, $path)

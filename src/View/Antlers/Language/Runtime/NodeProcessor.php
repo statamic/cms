@@ -506,6 +506,10 @@ class NodeProcessor
      */
     private function shouldProcessAsTag(AntlersNode $node)
     {
+        if ($node->pathReference == null && $node->name != null && Str::startsWith($node->name->name, '[')) {
+            return false;
+        }
+
         if ($node->pathReference != null) {
             if ($node->pathReference->isStrictTagReference) {
                 return true;
@@ -569,7 +573,6 @@ class NodeProcessor
 
         if ($managerResults[0] === true) {
             if ($node->isPaired() && ! $this->isLoopable($resolvedValue)) {
-
                 // Safe to do this since there is no ambiguity here.
                 return $node->isTagNode;
             }
@@ -987,7 +990,7 @@ class NodeProcessor
     {
         $environment = new Environment();
         $environment->setProcessor($this);
-        $environment->cascade($this->cascade)->setData(($this->getActiveData()));
+        $environment->cascade($this->cascade)->setData($this->getActiveData());
 
         return $environment->evaluate([$deferredNode]);
     }
@@ -1180,7 +1183,7 @@ class NodeProcessor
                 }
 
                 if ($node instanceof AntlersNode) {
-                    if ($node->isNodeAbandoned) {
+                    if ($node->isAbandoned()) {
                         if ($this->isTracingEnabled()) {
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                         }
@@ -1461,13 +1464,21 @@ class NodeProcessor
                         $beforeAssignments = $this->runtimeAssignments;
                         $currentIsolationState = GlobalRuntimeState::$requiresRuntimeIsolation;
                         GlobalRuntimeState::$requiresRuntimeIsolation = true;
+                        GlobalRuntimeState::$evaulatingTagContents = true;
+
+                        $args = [];
+
+                        if ($methodToCall == 'wildcard') {
+                            $args = [$tagMethod];
+                        }
 
                         try {
-                            $output = call_user_func([$tag, $methodToCall]);
+                            $output = call_user_func([$tag, $methodToCall], ...$args);
                         } catch (Exception $e) {
                             throw $e;
                         } finally {
                             GlobalRuntimeState::$requiresRuntimeIsolation = $currentIsolationState;
+                            GlobalRuntimeState::$evaulatingTagContents = false;
                         }
 
                         $afterAssignments = $this->runtimeAssignments;
@@ -1657,7 +1668,7 @@ class NodeProcessor
                     }
 
                     if ($node->name->name == 'once') {
-                        $node->isNodeAbandoned = true;
+                        $node->abandon();
 
                         $results = $this->cloneProcessor()->setData($this->getActiveData())->reduce($node->children);
 

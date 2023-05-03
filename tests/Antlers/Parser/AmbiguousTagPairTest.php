@@ -182,4 +182,33 @@ EOT;
         $this->assertNotSame($secondCollectionClose, $firstCollectionClose);
         $this->assertNotSame($secondCollectionOpen, $firstCollectionOpen);
     }
+
+    public function test_double_colon_method_parts_can_be_paired()
+    {
+        $template = <<<'ANTLERS'
+{{ partial:some::template/path }}
+    {{ partial src="something" }}
+    
+    {{ /partial }}
+{{ /partial:some::template/path }}
+ANTLERS;
+        $nodes = $this->parseNodes($template);
+
+        /** @var AntlersNode $p1 */
+        $p1 = $nodes[0];
+        /** @var AntlersNode $p2 */
+        $p2 = $nodes[2];
+        /** @var AntlersNode $p3 */
+        $p3 = $nodes[4];
+        /** @var AntlersNode $p4 */
+        $p4 = $nodes[6];
+
+        $this->assertSame($p4->isOpenedBy, $p1);
+        $this->assertNull($p4->isClosedBy);
+        $this->assertSame($p4, $p1->isClosedBy);
+
+        $this->assertSame($p3->isOpenedBy, $p2);
+        $this->assertNull($p3->isClosedBy);
+        $this->assertSame($p3, $p2->isClosedBy);
+    }
 }

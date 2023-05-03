@@ -243,6 +243,7 @@ class AddonTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider isLatestVersionProvider
      **/
     public function it_checks_if_its_the_latest_version($version, $latest, $isLatest)

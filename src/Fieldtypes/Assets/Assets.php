@@ -40,7 +40,6 @@ class Assets extends Fieldtype
                 'type' => 'asset_container',
                 'max_items' => 1,
                 'mode' => 'select',
-                'width' => 50,
                 'default' => AssetContainer::all()->count() == 1 ? AssetContainer::all()->first()->handle() : null,
             ],
             'folder' => [
@@ -77,6 +76,13 @@ class Assets extends Fieldtype
                 'type' => 'integer',
                 'width' => 50,
             ],
+            'min_files' => [
+                'display' => __('Min Files'),
+                'instructions' => __('statamic::fieldtypes.assets.config.min_files'),
+                'min' => 1,
+                'type' => 'integer',
+                'width' => 50,
+            ],
         ];
     }
 
@@ -107,8 +113,6 @@ class Assets extends Fieldtype
 
     public function process($data)
     {
-        $max_files = (int) $this->config('max_files');
-
         $values = collect($data)->map(function ($id) {
             return Asset::find($id)->path();
         });
@@ -188,6 +192,10 @@ class Assets extends Fieldtype
 
         if ($max = $this->config('max_files')) {
             $rules[] = 'max:'.$max;
+        }
+
+        if ($min = $this->config('min_files')) {
+            $rules[] = 'min:'.$min;
         }
 
         return $rules;

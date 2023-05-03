@@ -292,6 +292,7 @@ class UpdateTermReferencesTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup disableUpdateReferences
      **/
     public function it_can_be_disabled()

@@ -21,6 +21,7 @@ class CollapseWhitespaceTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider stringsWithWeirdWhitespaces
      */
     public function it_collapses_whitespaces($expected, $input): void
