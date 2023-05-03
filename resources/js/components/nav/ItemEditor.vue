@@ -102,6 +102,7 @@ export default {
             return {
                 display: '',
                 url: '',
+                icon: null,
             };
         },
 
