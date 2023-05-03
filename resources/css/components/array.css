@@ -6,8 +6,17 @@
 
 }
 
+.array-table-wrapper {
+    @apply border rounded overflow-hidden;
+    &:focus-within {
+        @apply ring-2 ring-blue-300;
+    }
+}
 .array-table {
-    @apply border rounded border-separate text-sm text-left w-full;
+    @apply rounded text-sm text-left w-full;
+    &:focus {
+        @apply outline-none;
+    }
 
     tr:not(:last-child) {
         th, td {
@@ -24,25 +33,24 @@
     }
 
     tr:first-child th {
-        @apply rounded-tl-sm;
+        @apply rounded-tl;
     }
 
     tr:first-child td,
     tr:first-child .input-text-minimal {
-        @apply rounded-tr-sm;
+        @apply rounded-tr;
     }
 
     tr:last-child th {
-        @apply rounded-bl-sm;
+        @apply rounded-bl;
     }
-    tr:last-child tr,
-
+    tr:last-child td:last-child,
     tr:last-child .input-minimal {
-        @apply rounded-br-sm;
+        @apply rounded-br;
     }
 
     &:focus-within {
-        @apply focus-outline;
+        @apply focus-none;
     }
 
     td:focus-within {
