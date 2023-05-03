@@ -28,9 +28,9 @@
             >
                 {{ asset.basename }}
             </button>
-            <div v-text="asset.size" class="asset-filesize text-xs text-gray-600 px-2" />
+            <div v-text="asset.size" class="hidden @xs:inline asset-filesize text-xs text-gray-600 px-2" />
         </td>
-        <td class="w-24">
+        <td class="w-24" v-if="showSetAlt">
             <button
                 class="asset-set-alt text-blue px-4 text-sm hover:text-black"
                 @click="edit"

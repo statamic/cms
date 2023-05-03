@@ -13,8 +13,8 @@
             <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
 
                 <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
-                    <svg-icon name="upload" class="h-8 w-8 mr-6" />
-                    <span>{{ __('Drop File to Upload') }}</span>
+                    <svg-icon name="upload" class="h-6 @md:h-8 w-6 @md:w-8 mr-2 @md:mr-6" />
+                    <span>{{ __('Drop to Upload') }}</span>
                 </div>
 
                 <div
@@ -27,6 +27,7 @@
                 >
 
                     <button
+                        :class="{'opacity-0': dragging }"
                         type="button"
                         class="btn btn-with-icon"
                         @click="openSelector"
@@ -98,6 +99,7 @@
                                         :asset="asset"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
+                                        :show-set-alt="config.show_set_alt"
                                         @updated="assetUpdated"
                                         @removed="assetRemoved"
                                         @id-changed="idChanged(asset.id, $event)">
