@@ -1,5 +1,5 @@
 <script>
-import { Upload } from './upload';
+import { Upload } from 'upload';
 import uniqid from 'uniqid';
 
 export default {
