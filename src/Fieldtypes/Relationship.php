@@ -300,4 +300,17 @@ abstract class Relationship extends Fieldtype
     {
         return $this->taggable;
     }
+
+    public function toQueryableValue($value)
+    {
+        if ($this->config('max_items') === 1 && is_array($value)) {
+            return $value[0] ?? null;
+        }
+
+        if ($this->config('max_items') !== 1 && is_string($value)) {
+            return [$value];
+        }
+
+        return $value;
+    }
 }
