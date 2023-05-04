@@ -32,6 +32,7 @@ class StaticWarm extends Command
         {--queue : Queue the requests}
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
+        {--insecure : Skip SSL verification}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
@@ -71,7 +72,7 @@ class StaticWarm extends Command
     private function warm(): void
     {
         $client = new Client([
-            'verify' => ! $this->laravel->isLocal(),
+            'verify' => ! $this->option('insecure') && ! $this->laravel->isLocal(),
             'auth' => $this->option('user') && $this->option('password')
                 ? [$this->option('user'), $this->option('password')]
                 : null,
