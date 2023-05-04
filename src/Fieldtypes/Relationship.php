@@ -303,14 +303,8 @@ abstract class Relationship extends Fieldtype
 
     public function toQueryableValue($value)
     {
-        if ($this->config('max_items') === 1 && is_array($value)) {
-            return $value[0] ?? null;
-        }
-
-        if ($this->config('max_items') !== 1 && is_string($value)) {
-            return [$value];
-        }
-
-        return $value;
+        return $this->config('max_items') === 1
+            ? collect($value)->first()
+            : collect($value)->filter()->all();
     }
 }
