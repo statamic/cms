@@ -91,6 +91,30 @@ class UsersTest extends TestCase
         ], $augmented->toArray());
     }
 
+    /** @test */
+    public function it_normalizes_queryable_value()
+    {
+        $field = $this->fieldtype();
+
+        $this->assertEquals(['123'], $field->toQueryableValue('123'));
+        $this->assertEquals(['123'], $field->toQueryableValue(['123']));
+
+        $this->assertEquals([], $this->fieldtype()->toQueryableValue([]));
+        $this->assertEquals([], $this->fieldtype()->toQueryableValue(null));
+    }
+
+    /** @test */
+    public function it_normalizes_queryable_value_when_max_items_is_one()
+    {
+        $field = $this->fieldtype(['max_items' => 1]);
+
+        $this->assertEquals('123', $field->toQueryableValue('123'));
+        $this->assertEquals('123', $field->toQueryableValue(['123']));
+
+        $this->assertNull($field->toQueryableValue([]));
+        $this->assertNull($field->toQueryableValue(null));
+    }
+
     public function fieldtype($config = [])
     {
         $field = new Field('test', array_merge([
