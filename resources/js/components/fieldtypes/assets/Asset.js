@@ -12,6 +12,10 @@ export default {
         showFilename: {
             type: Boolean,
             default: true
+        },
+        showSetAlt: {
+            type: Boolean,
+            default: true
         }
     },
 

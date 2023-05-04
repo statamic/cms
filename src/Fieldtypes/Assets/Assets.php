@@ -85,6 +85,12 @@ class Assets extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
+                    'show_set_alt' => [
+                        'display' => __('Show Set Alt'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.show_set_alt'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
                 ],
             ],
         ];

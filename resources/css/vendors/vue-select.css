@@ -68,11 +68,8 @@
 
 .v-select .vs__selected-options {
 	@apply appearance-none text-gray-800 text-sm;
-	@apply flex flex-wrap basis-1 grow rounded-l relative h-full;
-	/* box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,.05); */
-	padding: 5px 8px;
-	line-height: 1.5;
-	width: calc(100% - 34px);
+	@apply flex basis-1 grow rounded-l relative h-full py-1 pl-2 leading-normal;
+	width: calc(100% - 32px);
 
     transition: border-color .15s ease-in-out,
 				box-shadow .15s ease-in-out;
@@ -126,7 +123,7 @@
 }
 
 .vs__clear {
-	@apply text-gray-900 px-2 cursor-pointer text-base bg-transparent shadow-none;
+	@apply text-gray-900 pr-2 pl-px @xs:pl-2 cursor-pointer text-base bg-transparent shadow-none;
 	&:hover {
 		@apply text-blue;
 	}
@@ -219,8 +216,8 @@
 	line-height: 1.4;
 	border-left: none;
 	box-shadow: none;
+    flex-grow: 1;
     width: 0;
-	flex-grow: 1;
 }
 
 .vs--open .vs__search {
