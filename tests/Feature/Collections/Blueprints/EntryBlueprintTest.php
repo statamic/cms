@@ -54,7 +54,6 @@ class EntryBlueprintTest extends TestCase
         $this->assertNull($blueprint);
     }
 
-
     /** @test */
     public function it_gets_custom_collection_entry_blueprint()
     {
