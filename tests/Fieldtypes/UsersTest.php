@@ -10,12 +10,14 @@ use Statamic\Data\AugmentedCollection;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Users;
+use Tests\Fieldtypes\Concerns\TestsQueryableValueWithMaxItems;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UsersTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use TestsQueryableValueWithMaxItems;
 
     public function setUp(): void
     {
@@ -89,30 +91,6 @@ class UsersTest extends TestCase
             'email' => 'one@domain.com',
             'api_url' => 'http://localhost/api/users/123',
         ], $augmented->toArray());
-    }
-
-    /** @test */
-    public function it_normalizes_queryable_value()
-    {
-        $field = $this->fieldtype();
-
-        $this->assertEquals(['123'], $field->toQueryableValue('123'));
-        $this->assertEquals(['123'], $field->toQueryableValue(['123']));
-
-        $this->assertEquals([], $this->fieldtype()->toQueryableValue([]));
-        $this->assertEquals([], $this->fieldtype()->toQueryableValue(null));
-    }
-
-    /** @test */
-    public function it_normalizes_queryable_value_when_max_items_is_one()
-    {
-        $field = $this->fieldtype(['max_items' => 1]);
-
-        $this->assertEquals('123', $field->toQueryableValue('123'));
-        $this->assertEquals('123', $field->toQueryableValue(['123']));
-
-        $this->assertNull($field->toQueryableValue([]));
-        $this->assertNull($field->toQueryableValue(null));
     }
 
     public function fieldtype($config = [])
