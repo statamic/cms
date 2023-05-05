@@ -1,5 +1,23 @@
 # Release Notes
 
+## 4.0.0-beta.3 (2023-05-05)
+
+### What's fixed
+- Fix relationship fieldtype max items to value mismatch. [#8061](https://github.com/statamic/cms/issues/8061) by @jesseleite
+- Fix fields not being droppable onto new sections. [#8065](https://github.com/statamic/cms/issues/8065) by @jasonvarga
+- Fix date filter. [#8064](https://github.com/statamic/cms/issues/8064) by @jasonvarga
+- UI fixes. [#8058](https://github.com/statamic/cms/issues/8058) by @jackmcdade
+- Update password activation table name. [#8059](https://github.com/statamic/cms/issues/8059) by @jasonvarga
+- Remove unused config option. [#8057](https://github.com/statamic/cms/issues/8057) by @jasonvarga
+- Replace local version of upload package. [#8050](https://github.com/statamic/cms/issues/8050) by @jasonvarga
+- Fix Bard button settings drag UX. [#8043](https://github.com/statamic/cms/issues/8043) by @jackmcdade
+- Replicator and Bard sets fieldtype improvements and fixes. [#8049](https://github.com/statamic/cms/issues/8049) by @jasonvarga
+- Remove array fieldtype mirror. [#8046](https://github.com/statamic/cms/issues/8046) by @jasonvarga
+- Fix toggle listing icons. [#8054](https://github.com/statamic/cms/issues/8054) by @jasonvarga
+- Changes from 3.4
+
+
+
 ## 4.0.0-beta.2 (2023-05-02)
 
 ### What's new
