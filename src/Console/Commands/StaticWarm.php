@@ -173,7 +173,7 @@ class StaticWarm extends Command
 
     protected function shouldVerifySsl(): bool
     {
-        if($this->option('insecure')) {
+        if ($this->option('insecure')) {
             return false;
         }
 
