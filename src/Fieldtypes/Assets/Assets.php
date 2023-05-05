@@ -271,6 +271,10 @@ class Assets extends Fieldtype
 
     public function toQueryableValue($value)
     {
+        if (! $value) {
+            return null;
+        }
+
         return $this->config('max_files') === 1
             ? collect($value)->first()
             : collect($value)->filter()->all();

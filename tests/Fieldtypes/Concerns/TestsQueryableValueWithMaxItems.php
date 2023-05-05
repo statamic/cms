@@ -11,14 +11,14 @@ trait TestsQueryableValueWithMaxItems
         return [
             'max undefined, single item array' => [null, ['a'], ['a']],
             'max undefined, multiple item array' => [null, ['a', 'b'], ['a', 'b']],
-            'max undefined, empty array' => [null, [], []],
-            'max undefined, null' => [null, null, []],
+            'max undefined, empty array' => [null, [], null],
+            'max undefined, null' => [null, null, null],
             'max undefined, string' => [null, 'a', ['a']], // *
 
             'max > 1, single item array' => [2, ['a'], ['a']],
             'max > 1, multiple item array' => [2, ['a', 'b'], ['a', 'b']],
-            'max > 1, empty array' => [2, [], []],
-            'max > 1, null' => [2, null, []],
+            'max > 1, empty array' => [2, [], null],
+            'max > 1, null' => [2, null, null],
             'max > 1, string' => [2, 'a', ['a']], // *
 
             'max = 1, single item array' => [1, ['a'], 'a'], // *
