@@ -268,4 +268,11 @@ class Assets extends Fieldtype
 
         return $type;
     }
+
+    public function toQueryableValue($value)
+    {
+        return $this->config('max_files') === 1
+            ? collect($value)->first()
+            : collect($value)->filter()->all();
+    }
 }

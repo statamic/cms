@@ -16,12 +16,14 @@ use Statamic\Fieldtypes\Assets\MaxRule;
 use Statamic\Fieldtypes\Assets\MimesRule;
 use Statamic\Fieldtypes\Assets\MimetypesRule;
 use Statamic\Fieldtypes\Assets\MinRule;
+use Tests\Fieldtypes\Concerns\TestsQueryableValueWithMaxFiles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use TestsQueryableValueWithMaxFiles;
 
     public function setUp(): void
     {
