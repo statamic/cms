@@ -1,6 +1,6 @@
 <template>
 
-    <div class="relative">
+    <div class="relative w-full">
         <v-date-picker
             v-bind="pickerBindings"
             @input="$emit('input', $event)"
