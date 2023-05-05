@@ -114,6 +114,7 @@ export default {
 
         tabs(tabs) {
             this.$emit('updated', tabs);
+            this.makeSortable();
         }
 
     },
