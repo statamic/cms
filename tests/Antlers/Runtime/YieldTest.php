@@ -401,4 +401,33 @@ EOT;
 
         $this->assertSame(StringUtilities::normalizeLineEndings($expected), $this->renderString($template, $data, true));
     }
+
+    public function test_yield_can_be_used_inside_conditions()
+    {
+        $template = <<<'EOT'
+{{ if {yield:section_name} }}
+Hello, universe!
+{{ /if }}
+EOT;
+
+        $this->assertSame('', trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
+{{ section:section_name }}Some content.{{ /section:section_name }}
+
+{{ if {yield:section_name} }}
+Hello, universe!
+{{ /if }}
+EOT;
+
+        $this->assertSame('Hello, universe!', trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
+{{ if {yield:section_name} }}
+Hello, universe!
+{{ /if }}
+EOT;
+
+        $this->assertSame('', trim($this->renderString($template, [], true)));
+    }
 }
