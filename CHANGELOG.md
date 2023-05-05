@@ -1,5 +1,17 @@
 # Release Notes
 
+## 3.4.10 (2023-05-05)
+
+### What's new
+- Add `insecure` flag to skip SSL verification when warming static cache. [#8056](https://github.com/statamic/cms/issues/8056) by @o1y
+
+### What's fixed
+- Fixes checking for whether sections exist. [#7984](https://github.com/statamic/cms/issues/7984) by @JohnathonKoster
+- Fix assignments from within associative arrays/maps. [#7991](https://github.com/statamic/cms/issues/7991) by @JohnathonKoster
+- Fix Vimeo unlisted videos in `video` fieldtype. [#8062](https://github.com/statamic/cms/issues/8062) by @ryanmitchell
+
+
+
 ## 3.4.9 (2023-05-03)
 
 ### What's new
