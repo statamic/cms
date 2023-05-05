@@ -11,7 +11,7 @@
                     </button>
                 </template>
                 <template #default="{ close: closePopover }">
-                    <div class="flex flex-col text-left w-64">
+                    <div class="flex flex-col text-left min-w-[18rem]">
                         <div class="filter-fields text-sm">
                             <field-filter
                                 ref="fieldFilter"
