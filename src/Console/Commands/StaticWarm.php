@@ -171,7 +171,7 @@ class StaticWarm extends Command
             ->values();
     }
 
-    protected function shouldVerifySsl(): bool
+    private function shouldVerifySsl(): bool
     {
         if ($this->option('insecure')) {
             return false;
