@@ -35,6 +35,8 @@ class ConditionProcessor
 
         foreach ($node->logicBranches as $branch) {
             if ($branch->head->name->name == 'else') {
+                $this->processor->setIsConditionProcessor($condValueToRestore);
+
                 return $branch;
             } else {
                 // Let the processor know that it is being used
