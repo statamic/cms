@@ -1,5 +1,12 @@
 # Release Notes
 
+## 4.0.0-beta.4 (2023-05-06)
+
+### What's fixed
+- Fix combination of `yield` and `else` in Antlers templates causing blank pages. [#8067](https://github.com/statamic/cms/issues/8067) by @JohnathonKoster
+
+
+
 ## 4.0.0-beta.3 (2023-05-05)
 
 ### What's fixed
