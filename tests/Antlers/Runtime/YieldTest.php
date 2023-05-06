@@ -430,4 +430,28 @@ EOT;
 
         $this->assertSame('', trim($this->renderString($template, [], true)));
     }
+
+    public function test_condition_blocks_do_not_leak_their_condition_state()
+    {
+        $template = <<<'EOT'
+{{ if false }}
+    {{# It doesn't matter whats inside here #}}
+{{ else }}
+    Else Statement.
+{{ /if }}
+
+{{ section:seo_body }}Content{{ section:seo_body }}
+
+{{ yield:seo_body }}
+EOT;
+
+        $expected = <<<'EXPECTED'
+Else Statement.
+
+
+Content
+EXPECTED;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
 }
