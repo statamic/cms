@@ -14,7 +14,7 @@
 
 .stacks-on-stacks {
     .stack-container {
-        @apply absolute inset-0;
+        @apply absolute inset-0 z-1;
         transition: left .3s ease;
     }
 
