@@ -2,7 +2,7 @@
 
     <popover
         ref="popover"
-        class="set-picker"
+        class="set-picker select-none"
         placement="bottom-start"
         :disabled="!hasMultipleSets"
         @opened="opened"
