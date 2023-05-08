@@ -268,10 +268,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return Facades\Entry::query()->where('collection', $this->handle());
     }
 
-    /**
-     * @return \Illuminate\Support\Collection|\Statamic\Fields\Blueprint[]
-     */
-    public function entryBlueprints(): \Illuminate\Support\Collection
+    public function entryBlueprints()
     {
         $blink = 'collection-entry-blueprints-'.$this->handle();
 
@@ -280,10 +277,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         });
     }
 
-    /**
-     * @return \Illuminate\Support\Collection|\Statamic\Fields\Blueprint[]
-     */
-    private function getEntryBlueprints(): \Illuminate\Support\Collection
+    private function getEntryBlueprints()
     {
         $blueprints = Blueprint::in('collections/'.$this->handle());
 

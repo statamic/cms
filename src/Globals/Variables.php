@@ -34,10 +34,6 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         $this->supplements = collect();
     }
 
-    /**
-     * @param $set
-     * @return mixed|\Statamic\Globals\Variables|\Statamic\Globals\GlobalSet
-     */
     public function globalSet($set = null)
     {
         return $this->fluentlyGetOrSet('set')->args(func_get_args());
