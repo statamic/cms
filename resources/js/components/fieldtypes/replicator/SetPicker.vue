@@ -14,7 +14,7 @@
             <slot name="trigger" />
         </template>
         <template #default>
-            <div class="set-picker-header p-3 border-b text-xs flex items-center">
+            <div class="set-picker-header p-3 border-b text-xs flex items-center select-none">
                 <input ref="search" type="text" class="py-1 px-2 border rounded w-full" :placeholder="__('Search Sets')" v-show="showSearch" v-model="search" />
                 <div v-if="showGroupBreadcrumb" class="flex items-center text-gray-700 font-medium">
                     <button @click="unselectGroup" class=" hover:text-gray-900 ml-2.5 rounded">
@@ -24,7 +24,7 @@
                     <span>{{ selectedGroupDisplayText }}</span>
                 </div>
             </div>
-            <div class="p-1 max-h-80 overflow-auto">
+            <div class="p-1 max-h-80 overflow-auto select-none">
                 <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200': selectionIndex === i }" @mouseover="selectionIndex = i">
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
                         <div class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2">
