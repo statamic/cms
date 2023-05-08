@@ -223,11 +223,6 @@
         @apply px-6 py-16;
         min-height: calc(100vh - 120px);
 
-        /*  To remove min height from nested bard fields inside bard in fullscreen mode. */
-        * > .ProseMirror {
-            min-height: auto;
-        }
-
         &:focus {
             @apply ring-0;
         }
