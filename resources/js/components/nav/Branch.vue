@@ -4,9 +4,9 @@
         <div class="page-move w-6" />
         <div class="flex items-center flex-1 p-2 ml-2 text-xs leading-normal">
             <div class="flex items-center flex-1" :class="{ 'opacity-50': isHidden || isInHiddenSection }">
-                <template v-if="! isSection">
+                <template v-if="! isSection && ! isChild">
                     <i v-if="isAlreadySvg" class="w-4 h-4 mr-2" v-html="icon"></i>
-                    <svg-icon v-else class="w-4 h-4 mr-2" :name="icon" />
+                    <svg-icon v-else class="w-4 h-4 mr-2" :name="'light/'+icon" />
                 </template>
 
                 <a
@@ -36,13 +36,13 @@
             <div class="pr-2 flex items-center">
                 <slot name="branch-icon" :branch="item" />
 
-                <svg-icon v-if="isRenamedSection" class="inline-block w-4 h-4 text-gray-500" name="content-writing" v-tooltip="__('Renamed Section')" />
-                <svg-icon v-else-if="isHidden" class="inline-block w-4 h-4 text-gray-500" name="hidden" v-tooltip="isSection ? __('Hidden Section') : __('Hidden Item')" />
-                <svg-icon v-else-if="isPinnedAlias" class="inline-block w-4 h-4 text-gray-500" name="pin" v-tooltip="__('Pinned Item')" />
-                <svg-icon v-else-if="isAlias" class="inline-block w-4 h-4 text-gray-500" name="duplicate-ids" v-tooltip="__('Alias Item')" />
-                <svg-icon v-else-if="isMoved" class="inline-block w-4 text-gray-500" name="flip-vertical" v-tooltip="__('Moved Item')" />
-                <svg-icon v-else-if="isModified" class="inline-block w-4 h-4 text-gray-500" name="content-writing" v-tooltip="__('Modified Item')" />
-                <svg-icon v-else-if="isCustom" class="inline-block w-4 text-gray-500" name="user-edit" v-tooltip="isSection ? __('Custom Section') : __('Custom Item')" />
+                <svg-icon v-if="isRenamedSection" class="inline-block w-4 h-4 text-gray-500" name="light/content-writing" v-tooltip="__('Renamed Section')" />
+                <svg-icon v-else-if="isHidden" class="inline-block w-4 h-4 text-gray-500" name="light/hidden" v-tooltip="isSection ? __('Hidden Section') : __('Hidden Item')" />
+                <svg-icon v-else-if="isPinnedAlias" class="inline-block w-4 h-4 text-gray-500" name="light/pin" v-tooltip="__('Pinned Item')" />
+                <svg-icon v-else-if="isAlias" class="inline-block w-4 h-4 text-gray-500" name="light/duplicate-ids" v-tooltip="__('Alias Item')" />
+                <svg-icon v-else-if="isMoved" class="inline-block w-4 text-gray-500" name="regular/flip-vertical" v-tooltip="__('Moved Item')" />
+                <svg-icon v-else-if="isModified" class="inline-block w-4 h-4 text-gray-500" name="light/content-writing" v-tooltip="__('Modified Item')" />
+                <svg-icon v-else-if="isCustom" class="inline-block w-4 text-gray-500" name="light/user-edit" v-tooltip="isSection ? __('Custom Section') : __('Custom Item')" />
 
                 <dropdown-list class="ml-4">
                     <slot name="branch-options"
@@ -70,6 +70,7 @@ export default {
         root: Boolean,
         vm: Object,
         isOpen: Boolean,
+        isChild: Boolean,
         hasChildren: Boolean,
         disableSections: Boolean,
         topLevel: Boolean,
@@ -96,7 +97,9 @@ export default {
         },
 
         icon() {
-            return data_get(this.item.config, 'icon') || 'entries';
+            return data_get(this.item, 'config.icon')
+                || data_get(this.item, 'original.icon')
+                || 'entries';
         },
 
         isAlreadySvg() {

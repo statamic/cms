@@ -84,6 +84,7 @@
                     :depth="vm.level"
                     :vm="vm"
                     :is-open="item.open"
+                    :is-child="isChildItemNode(item)"
                     :has-children="item.children.length > 0"
                     :disable-sections="true"
                     :top-level="true"
@@ -134,6 +135,7 @@
                     :depth="vm.level"
                     :vm="vm"
                     :is-open="item.open"
+                    :is-child="isChildItemNode(item)"
                     :has-children="item.children.length > 0"
                     @edit="editItem(item)"
                     @toggle-open="store.toggleOpen(item)"
@@ -172,6 +174,7 @@
         <item-editor
             v-if="creatingItem"
             :creating="true"
+            :is-child="isChildItemNode(creatingItem)"
             @closed="resetItemEditor"
             @updated="itemAdded"
         />
@@ -179,6 +182,7 @@
         <item-editor
             v-if="editingItem"
             :item="editingItem"
+            :is-child="isChildItemNode(editingItem)"
             @closed="resetItemEditor"
             @updated="itemUpdated"
         />
@@ -483,6 +487,7 @@ export default {
                 action: '@create',
                 display: createdConfig.display,
                 url: createdConfig.url,
+                icon: createdConfig.icon,
             };
 
             this.targetDataArray.push(item);
@@ -512,9 +517,11 @@ export default {
 
         itemUpdated(updatedConfig, item) {
             item.text = updatedConfig.display;
+            item.config.icon = updatedConfig.icon;
 
             this.updateItemManipulation(item, 'display', updatedConfig.display);
             this.updateItemManipulation(item, 'url', updatedConfig.url);
+            this.updateItemManipulation(item, 'icon', updatedConfig.icon);
             this.updateItemAction(item);
 
             this.resetItemEditor();
