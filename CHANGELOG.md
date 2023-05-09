@@ -1,5 +1,17 @@
 # Release Notes
 
+## 4.0.0 (2023-05-09)
+
+### What's new
+- Official 4.0 release! 🎉
+
+### What's fixed
+- Fix set picker text selection when using Firefox. [#8076](https://github.com/statamic/cms/issues/8076) by @o1y
+- Fix missing gap cursor in Bard fullscreen mode. [#8074](https://github.com/statamic/cms/issues/8074) by @jasonvarga
+- Reset stacking context to prevent elements leaking into other stacks. [#8073](https://github.com/statamic/cms/issues/8073) by @jasonvarga
+
+
+
 ## 4.0.0-beta.4 (2023-05-06)
 
 ### What's fixed
