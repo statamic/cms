@@ -78,7 +78,7 @@
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
-                    distance="10"
+                    distance="5"
                     :mirror="false"
                     v-model="rules"
                 >
@@ -98,6 +98,11 @@
 
 </template>
 
+<style scoped>
+    .draggable-source--is-dragging {
+        @apply opacity-75 bg-transparent border-dashed
+    }
+</style>
 
 <script>
 import RULES from './Rules.js';

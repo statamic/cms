@@ -62,7 +62,7 @@
                         @dragend="$emit('blur')"
                         :constrain-dimensions="true"
                         :disabled="isReadOnly"
-                        :distance="10"
+                        :distance="5"
                         :animate="false"
                         append-to="body"
                     >
@@ -88,7 +88,7 @@
                                 handle-class="asset-row"
                                 :vertical="true"
                                 :disabled="isReadOnly"
-                                :distance="10"
+                                :distance="5"
                                 :mirror="false"
                             >
                                 <tbody ref="assets">
