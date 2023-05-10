@@ -9,12 +9,13 @@
 
     .vue-portal-target {
         @apply pointer-events-auto; /* allow clicks that we disabled above */
+        isolation: isolate;
     }
 }
 
 .stacks-on-stacks {
     .stack-container {
-        @apply absolute inset-0 z-1;
+        @apply absolute inset-0;
         transition: left .3s ease;
     }
 
