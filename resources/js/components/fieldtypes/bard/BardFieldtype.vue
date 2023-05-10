@@ -32,7 +32,7 @@
                     <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && setConfigs.length > 0">
                         <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
                     </button>
-                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
+                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" :aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
                         <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
                         <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
                     </button>
