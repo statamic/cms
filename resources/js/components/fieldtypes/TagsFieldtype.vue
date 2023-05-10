@@ -32,7 +32,8 @@
                     item-class="sortable-item"
                     handle-class="sortable-item"
                     :value="value"
-                    :distance="10"
+                    :distance="5"
+                    :mirror="false"
                     @input="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
@@ -47,6 +48,12 @@
             </template>
     </v-select>
 </template>
+
+<style scoped>
+    .draggable-source--is-dragging {
+        @apply opacity-75 bg-transparent border-dashed
+    }
+</style>
 
 <script>
 import HasInputOptions from './HasInputOptions.js'

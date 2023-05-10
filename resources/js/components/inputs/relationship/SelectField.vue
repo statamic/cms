@@ -41,6 +41,7 @@
                     handle-class="sortable-item"
                     :value="items"
                     :distance="5"
+                    :mirror="false"
                     @input="input"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
@@ -62,9 +63,6 @@
 </template>
 
 <style scoped>
-    .draggable-mirror {
-        display: none !important;
-    }
     .draggable-source--is-dragging {
         @apply opacity-75 bg-transparent border-dashed
     }

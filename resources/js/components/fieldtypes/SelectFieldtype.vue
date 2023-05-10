@@ -43,8 +43,16 @@
                     <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
                 </template>
                 <template #footer="{ deselect }" v-if="config.multiple">
+                    <sortable-list
+                        item-class="sortable-item"
+                        handle-class="sortable-item"
+                        :value="value"
+                        :distance="5"
+                        :mirror="false"
+                        @input="update"
+                    >
                     <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2">
+                        <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2 sortable-item">
                             <div v-if="config.label_html" v-html="option.label"></div>
                             <template v-else>{{ option.label }}</template>
                             <button v-if="!readOnly" @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
@@ -55,6 +63,7 @@
                             </button>
                         </span>
                     </div>
+                    </sortable-list>
                 </template>
         </v-select>
         <div class="text-xs ml-2 mt-3" :class="limitIndicatorColor" v-if="config.max_items">
@@ -63,13 +72,25 @@
     </div>
 </template>
 
+<style scoped>
+    .draggable-source--is-dragging {
+        @apply opacity-75 bg-transparent border-dashed
+    }
+</style>
+
 <script>
 import HasInputOptions from './HasInputOptions.js'
 import { computePosition, offset, flip } from '@floating-ui/dom';
+import { SortableList } from '../sortable/Sortable';
+
 
 export default {
 
     mixins: [Fieldtype, HasInputOptions],
+
+    components: {
+        SortableList
+    },
 
     computed: {
         selectedOptions() {
