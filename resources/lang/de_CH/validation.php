@@ -97,6 +97,13 @@ return [
     'reserved' => 'Dies ist ein reserviertes Wort.',
     'parent_causes_root_children' => 'Dadurch würde die Startseite Unterseiten bekommen.',
     'parent_cannot_be_itself' => 'Kann nicht selbst übergeordnet sein.',
+    'time' => 'Keine gültige Uhrzeit.',
+    'date_fieldtype_date_required' => 'Eine Datumsangabe ist erforderlich.',
+    'date_fieldtype_time_required' => 'Eine Zeitangabe ist erforderlich.',
+    'date_fieldtype_start_date_required' => 'Ein Anfangsdatum ist erforderlich.',
+    'date_fieldtype_start_date_invalid' => 'Kein gültiges Startdatum.',
+    'date_fieldtype_end_date_required' => 'Ein Enddatum ist erforderlich.',
+    'date_fieldtype_end_date_invalid' => 'Kein gültiges Enddatum.',
     'custom.attribute-name.rule-name' => 'benutzerdefinierte Nachricht',
     'attributes' => [],
 ];
