@@ -50,7 +50,7 @@
                                 <div class="flex items-center justify-between p-2 text-sm">
                                     <data-list-search class="h-8" ref="search" v-model="searchQuery" />
 
-                                    <template v-if="! hasSelections">
+                                    <template>
                                         <button v-if="canCreateFolders" class="btn btn-sm ml-3" @click="creatingFolder = true">
                                             <svg-icon name="folder-add" class="h-4 w-4 mr-2" />
                                             <span>{{ __('Create Folder') }}</span>
