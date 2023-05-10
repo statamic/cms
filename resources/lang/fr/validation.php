@@ -97,6 +97,13 @@ return [
     'reserved' => 'Mot réservé par le système.',
     'parent_causes_root_children' => 'La page racine aurait alors des enfants.',
     'parent_cannot_be_itself' => 'Ne peut pas être son propre parent.',
+    'time' => 'N’est pas un horaire valide.',
+    'date_fieldtype_date_required' => 'Date obligatoire.',
+    'date_fieldtype_time_required' => 'Horaire obligatoire.',
+    'date_fieldtype_start_date_required' => 'Date de début obligatoire.',
+    'date_fieldtype_start_date_invalid' => 'Date de début invalide.',
+    'date_fieldtype_end_date_required' => 'Date de fin obligatoire.',
+    'date_fieldtype_end_date_invalid' => 'Date de fin invalide.',
     'custom.attribute-name.rule-name' => 'message personnalisé',
     'attributes' => [],
 ];
