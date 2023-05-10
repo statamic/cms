@@ -82,6 +82,11 @@ class EntriesQuery extends Query
                 [$sort, $order] = explode(' ', $sort);
             }
 
+            if ($sort === 'random') {
+                $query->inRandomOrder($order);
+                return;
+            }
+
             $query->orderBy($sort, $order);
         }
     }

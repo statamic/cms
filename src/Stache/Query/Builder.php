@@ -10,6 +10,7 @@ abstract class Builder extends BaseBuilder
 {
     protected $store;
     protected $randomize = false;
+    protected $randomizeSeed = null;
 
     public function __construct(Store $store)
     {
@@ -50,9 +51,10 @@ abstract class Builder extends BaseBuilder
         return $keys->slice($this->offset, $this->limit);
     }
 
-    public function inRandomOrder()
+    public function inRandomOrder($seed = null)
     {
         $this->randomize = true;
+        $this->randomizeSeed = $seed;
 
         return $this;
     }
@@ -60,7 +62,7 @@ abstract class Builder extends BaseBuilder
     protected function orderKeys($keys)
     {
         if ($this->randomize) {
-            return $keys->shuffle();
+            return $keys->shuffle($this->randomizeSeed);
         }
 
         if (empty($this->orderBys)) {
