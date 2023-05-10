@@ -1,7 +1,7 @@
 <template>
-
+<portal name="markdown-fullscreen" :disabled="!fullScreenMode" target-class="markdown-fieldtype">
 <element-container @resized="refresh">
-    <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
+    <div class="markdown-fieldtype-wrapper @container/markdown" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
 
         <uploader
             ref="uploader"
@@ -20,34 +20,32 @@
 
                     <div class="markdown-buttons" v-if="! isReadOnly">
                         <button @click="bold" v-tooltip="__('Bold')" :aria-label="__('Bold')">
-                            <i class="fa fa-bold"></i>
+                            <svg-icon name="text-bold" class="w-4 h-4" />
                         </button>
                         <button @click="italic" v-tooltip="__('Italic')" :aria-label="__('Italic')">
-                            <i class="fa fa-italic"></i>
+                            <svg-icon name="text-italic" class="w-4 h-4" />
                         </button>
                         <button @click="insertLink('')" v-tooltip="__('Insert Link')" :aria-label="__('Insert Link')">
-                            <i class="fa fa-link"></i>
+                            <svg-icon name="insert-link" class="w-4 h-4" />
                         </button>
                         <button @click="addAsset" v-if="assetsEnabled" v-tooltip="__('Insert Asset')" :aria-label="__('Insert Asset')">
-                            <i class="fa fa-picture-o"></i>
+                            <svg-icon name="insert-image" class="w-4 h-4" />
                         </button>
                         <button @click="insertImage('')" v-else v-tooltip="__('Insert Image')" :aria-label="__('Insert Image')">
-                            <i class="fa fa-picture-o"></i>
+                            <svg-icon name="insert-image" class="w-4 h-4" />
                         </button>
                         <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
                             <svg-icon name="dark-mode" class="w-4 h-4" />
                         </button>
-                        <button @click="openFullScreen" v-tooltip="__('Fullscreen Mode')" :aria-label="__('Fullscreen Mode')" v-if="! fullScreenMode">
-                            <svg-icon name="expand" class="w-4 h-4" />
-                        </button>
-                        <button @click="closeFullScreen" v-tooltip="__('Close Fullscreen Mode')" :aria-label="__('Close Fullscreen Mode')" v-if="fullScreenMode">
-                            <svg-icon name="shrink-all" class="w-4 h-4" />
+                        <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')" :aria-label="__('Toggle FullScreen Mode')">
+                            <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
+                            <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
                         </button>
                     </div>
                 </div>
 
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-12 w-12 mb-2" />
+                    <svg-icon name="upload" class="h-12 w-12 mb-4" />
                     {{ __('Drop File to Upload') }}
                 </div>
 
@@ -72,24 +70,24 @@
                             <div class="flex w-full">
                                 <div class="markdown-cheatsheet-helper">
                                     <button class="text-link flex items-center" @click="showCheatsheet = true" :aria-label="__('Show Markdown Cheatsheet')">
-                                        <svg-icon name="markdown-icon" class="w-6 h-4 items-start mr-1" />
+                                        <svg-icon name="markdown-icon" class="w-6 h-4 items-start mr-2" />
                                         <span>{{ __('Markdown Cheatsheet') }}</span>
                                     </button>
                                 </div>
                             </div>
-                            <div v-if="fullScreenMode" class="flex items-center pr-1">
-                                <div class="whitespace-no-wrap mr-2"><span v-text="count.words" /> {{ __('Words') }}</div>
-                                <div class="whitespace-no-wrap"><span v-text="count.characters" /> {{ __('Characters') }}</div>
+                            <div v-if="fullScreenMode" class="flex items-center pr-2">
+                                <div class="whitespace-nowrap mr-4"><span v-text="count.words" /> {{ __('Words') }}</div>
+                                <div class="whitespace-nowrap"><span v-text="count.characters" /> {{ __('Characters') }}</div>
                             </div>
                         </div>
 
                         <div class="drag-notification" v-if="assetsEnabled && draggingFile">
-                            <svg-icon name="upload" class="h-12 w-12 mb-2" />
+                            <svg-icon name="upload" class="h-12 w-12 mb-4" />
                             {{ __('Drop File to Upload') }}
                         </div>
                     </div>
 
-                    <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview clean-content"></div>
+                    <div v-show="mode == 'preview'" v-html="markdownPreviewText" class="markdown-preview prose-sm @md/markdown:prose-base"></div>
                 </div>
             </div>
         </uploader>
@@ -107,9 +105,9 @@
         </stack>
 
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
-            <div class="h-full overflow-auto p-3 bg-white relative">
-                <button class="btn-close absolute top-0 right-0 mt-2 mr-4" @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;</button>
-                <div class="max-w-md mx-auto my-4 clean-content">
+            <div class="h-full overflow-auto p-6 bg-white relative">
+                <button class="btn-close absolute top-0 right-0 mt-4 mr-8" @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;</button>
+                <div class="max-w-md mx-auto my-8 prose">
                     <h2 v-text="__('Markdown Cheatsheet')"></h2>
                     <div v-html="__('markdown.cheatsheet')"></div>
                 </div>
@@ -120,27 +118,27 @@
 
     </div>
 </element-container>
-
+</portal>
 </template>
 
 <script>
-var CodeMirror = require('codemirror');
-var { marked } = require('marked');
-var PlainTextRenderer = require('marked-plaintext');
+import { marked } from 'marked';
+import PlainTextRenderer from 'marked-plaintext';
 
-require('codemirror/addon/edit/closebrackets');
-require('codemirror/addon/edit/matchbrackets');
-require('codemirror/addon/display/autorefresh');
-require('codemirror/mode/htmlmixed/htmlmixed');
-require('codemirror/mode/xml/xml');
-require('codemirror/mode/markdown/markdown');
-require('codemirror/mode/gfm/gfm');
-require('codemirror/mode/javascript/javascript');
-require('codemirror/mode/css/css');
-require('codemirror/mode/clike/clike');
-require('codemirror/mode/php/php');
-require('codemirror/mode/yaml/yaml');
-require('codemirror/addon/edit/continuelist');
+import CodeMirror from 'codemirror/lib/codemirror';
+import 'codemirror/addon/edit/closebrackets';
+import 'codemirror/addon/edit/matchbrackets';
+import 'codemirror/addon/display/autorefresh';
+import 'codemirror/mode/htmlmixed/htmlmixed';
+import 'codemirror/mode/xml/xml';
+import 'codemirror/mode/markdown/markdown';
+import 'codemirror/mode/gfm/gfm';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/css/css';
+import 'codemirror/mode/clike/clike';
+import 'codemirror/mode/php/php';
+import 'codemirror/mode/yaml/yaml';
+import 'codemirror/addon/edit/continuelist';
 
 import Selector from '../assets/Selector.vue';
 import Uploader from '../assets/Uploader.vue';
@@ -189,12 +187,10 @@ export default {
 
         fullScreenMode: {
             immediate: true,
-            handler: fullscreen => {
-                if (fullscreen) {
-                    document.body.style.setProperty("overflow", "hidden")
-                } else {
-                    document.body.style.removeProperty("overflow")
-                }
+            handler: function (fullscreen) {
+                this.$nextTick(() => {
+                    this.$nextTick(() => this.initCodeMirror());
+                });
             }
         },
 
@@ -216,6 +212,14 @@ export default {
             this.fullScreenMode = true;
             this.escBinding = this.$keys.bindGlobal('esc', this.closeFullScreen);
             this.trackHeightUpdates();
+        },
+
+        toggleFullScreen() {
+            if (this.fullScreenMode) {
+                this.closeFullScreen();
+            } else {
+                this.openFullScreen();
+            }
         },
 
         toggleDarkMode() {
@@ -439,19 +443,19 @@ export default {
          */
         shortcut: function(e) {
             var key = e.keyCode;
-            var meta = e.metaKey === true;
+            var mod = e.metaKey === true || e.ctrlKey === true;
 
-            if (meta && key === 66) { // cmd+b
+            if (mod && key === 66) { // cmd+b
                 this.bold();
                 e.preventDefault();
             }
 
-            if (meta && key === 73) { // cmd+i
+            if (mod && key === 73) { // cmd+i
                 this.italic();
                 e.preventDefault();
             }
 
-            if (meta && key === 75) { // cmd+k
+            if (mod && key === 75) { // cmd+k
                 this.insertLink();
                 e.preventDefault();
             }
@@ -530,6 +534,57 @@ export default {
             });
         },
 
+        updateMarkdownPreview() {
+            this.$axios
+                .post(this.meta.previewUrl, { value: this.data, config: this.config })
+                .then(response => this.markdownPreviewText = response.data)
+                .catch(e => this.$toast.error(e.response ? e.response.data.message : __('Something went wrong')));
+        },
+
+        initCodeMirror() {
+            var self = this;
+
+            self.codemirror = CodeMirror(this.$refs.codemirror, {
+                value: self.data,
+                mode: 'gfm',
+                dragDrop: false,
+                keyMap: 'sublime',
+                direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
+                lineWrapping: true,
+                viewportMargin: Infinity,
+                tabindex: 0,
+                autoRefresh: true,
+                readOnly: self.isReadOnly ? 'nocursor' : false,
+                inputStyle: 'contenteditable',
+                spellcheck: true,
+                extraKeys: {
+                    "Enter": "newlineAndIndentContinueMarkdownList",
+                    "Cmd-Left": "goLineLeftSmart"
+                }
+            });
+
+            self.codemirror.on('change', function (cm) {
+                self.data = cm.doc.getValue();
+            });
+
+            self.codemirror.on('focus', () => self.$emit('focus'));
+            self.codemirror.on('blur', () => self.$emit('blur'));
+
+            // Expose the array of selections to the Vue instance
+            self.codemirror.on('beforeSelectionChange', function (cm, obj) {
+                self.selections = obj.ranges;
+            });
+
+            // Update CodeMirror if we change the value independent of CodeMirror
+            this.$watch('value', function(val) {
+                if (val !== self.codemirror.doc.getValue()) {
+                    self.codemirror.doc.setValue(val);
+                }
+            });
+
+            this.trackHeightUpdates();
+        },
+
         refresh() {
             this.$nextTick(function() {
                 this.codemirror.refresh();
@@ -558,59 +613,7 @@ export default {
         replicatorPreview() {
             return marked(this.data || '', { renderer: new PlainTextRenderer })
                 .replace(/<\/?[^>]+(>|$)/g, "");
-        },
-
-        updateMarkdownPreview() {
-            this.$axios
-                .post(this.meta.previewUrl, { value: this.data, config: this.config })
-                .then(response => this.markdownPreviewText = response.data)
-                .catch(e => this.$toast.error(e.response ? e.response.data.message : __('Something went wrong')));
         }
-    },
-
-    mounted() {
-        var self = this;
-
-        self.codemirror = CodeMirror(this.$refs.codemirror, {
-            value: self.data,
-            mode: 'gfm',
-            dragDrop: false,
-            keyMap: 'sublime',
-            direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
-            lineWrapping: true,
-            viewportMargin: Infinity,
-            tabindex: 0,
-            autoRefresh: true,
-            readOnly: self.isReadOnly ? 'nocursor' : false,
-            inputStyle: 'contenteditable',
-            spellcheck: true,
-            extraKeys: {
-                "Enter": "newlineAndIndentContinueMarkdownList",
-                "Cmd-Left": "goLineLeftSmart"
-            }
-        });
-
-        self.codemirror.on('change', function (cm) {
-            self.data = cm.doc.getValue();
-        });
-
-        self.codemirror.on('focus', () => self.$emit('focus'));
-        self.codemirror.on('blur', () => self.$emit('blur'));
-
-        // Expose the array of selections to the Vue instance
-        self.codemirror.on('beforeSelectionChange', function (cm, obj) {
-            self.selections = obj.ranges;
-        });
-
-        // Update CodeMirror if we change the value independent of CodeMirror
-        this.$watch('value', function(val) {
-            if (val !== self.codemirror.doc.getValue()) {
-                self.codemirror.doc.setValue(val);
-            }
-        });
-
-        this.trackHeightUpdates();
-
     }
 
 };

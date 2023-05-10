@@ -33,6 +33,7 @@ class ListedEntry extends JsonResource
         return [
             'id' => $entry->id(),
             'published' => $entry->published(),
+            'status' => $entry->status(),
             'private' => $entry->private(),
             'date' => $this->when($collection->dated(), function () {
                 return $this->resource->date()->inPreferredFormat();
@@ -42,7 +43,7 @@ class ListedEntry extends JsonResource
 
             'permalink' => $entry->absoluteUrl(),
             'edit_url' => $entry->editUrl(),
-            'collection' => $entry->collection()->toArray(),
+            'collection' => array_merge($entry->collection()->toArray(), ['dated' => $entry->collection()->dated()]),
             'viewable' => User::current()->can('view', $entry),
             'editable' => User::current()->can('edit', $entry),
             'actions' => Action::for($entry, ['collection' => $collection->handle()]),
@@ -60,9 +61,13 @@ class ListedEntry extends JsonResource
                 $value = $extra[$key] ?? $this->resource->value($key);
             }
 
-            $value = $this->blueprint
-                ->field($key)
-                ->setValue($value)
+            $field = $this->blueprint->field($key);
+
+            if (! $field) {
+                return [$key => $value];
+            }
+
+            $value = $field->setValue($value)
                 ->setParent($this->resource)
                 ->preProcessIndex()
                 ->value();

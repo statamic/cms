@@ -1,10 +1,43 @@
 <template>
 
-    <div class="replicator-fieldtype-container">
+<portal name="replicator-fullscreen" :disabled="!fullScreenMode" :provide="provide">
+<!-- These wrappers allow any css that expected the field to
+     be within the context of a publish form to continue working
+     once it has been portaled out. -->
+<div :class="{ 'publish-fields': fullScreenMode }">
+<div :class="{ wrapperClasses: fullScreenMode }">
+<div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-gray-200': fullScreenMode }">
 
-        <div class="absolute top-0 right-0 p-3 text-2xs" v-if="config.collapse !== 'accordion' && value.length > 0">
-            <button @click="collapseAll" class="text-blue hover:text-black mr-1" v-text="__('Collapse All')" />
-            <button @click="expandAll" class="text-blue hover:text-black" v-text="__('Expand All')" />
+    <header class="bg-white fixed top-0 inset-x-0 border-b p-3 pl-4 flex items-center justify-between shadow z-max" v-if="fullScreenMode">
+        <h2 v-text="config.display" class="flex-1" />
+            <div class="flex items-center">
+                <div class="btn-group">
+                    <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
+                        <svg-icon name="arrows-horizontal-expand" class="h-3.5 px-1 text-gray-750" />
+                    </button>
+                    <button @click="collapseAll" class="btn btn-icon flex items-center" v-tooltip="__('Collapse Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
+                        <svg-icon name="arrows-horizontal-collapse" class="h-3.5 px-1 text-gray-750" />
+                    </button>
+                </div>
+                <button class="btn-close ml-2" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
+            </div>
+    </header>
+
+    <section :class="{'mt-12 p-4 bg-gray-200': fullScreenMode}">
+
+        <div class="flex justify-end" :class="{'absolute top-3 right-3 @md:right-6': !config.hide_display}" v-if="! fullScreenMode">
+            <div class="btn-group">
+                <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
+                    <svg-icon name="arrows-horizontal-expand" class="h-3.5 px-0.5 text-gray-750" />
+                </button>
+                <button @click="collapseAll" class="btn btn-icon flex items-center" v-tooltip="__('Collapse Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
+                    <svg-icon name="arrows-horizontal-collapse" class="h-3.5 px-0.5 text-gray-750" />
+                </button>
+                <button @click="fullScreenMode = !fullScreenMode" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
+                    <svg-icon name="expand-bold" class="h-3.5 px-0.5 text-gray-750" v-show="! fullScreenMode" />
+                    <svg-icon name="shrink-all" class="h-3.5 px-0.5 text-gray-750" v-show="fullScreenMode" />
+                </button>
+            </div>
         </div>
 
         <sortable-list
@@ -12,6 +45,7 @@
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            append-to="body"
             constrain-dimensions
             @input="sorted($event)"
             @dragstart="$emit('focus')"
@@ -46,8 +80,9 @@
                     @previews-updated="updateSetPreviews(set._id, $event)"
                 >
                     <template v-slot:picker v-if="canAddSet">
-                        <set-picker
-                            class="replicator-set-picker-between"
+                        <add-set-button
+                            class="between"
+                            :groups="groupConfigs"
                             :sets="setConfigs"
                             :index="index"
                             @added="addSet" />
@@ -56,22 +91,30 @@
             </div>
         </sortable-list>
 
-        <set-picker v-if="canAddSet"
+        <add-set-button v-if="canAddSet"
+            class="mt-3"
             :last="true"
+            :groups="groupConfigs"
             :sets="setConfigs"
             :index="value.length"
             @added="addSet" />
 
-    </div>
+    </section>
+
+</div>
+</div>
+</div>
+</portal>
 
 </template>
 
 <script>
 import uniqid from 'uniqid';
 import ReplicatorSet from './Set.vue';
-import SetPicker from './SetPicker.vue';
+import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList } from '../../sortable/Sortable';
+import reduce from 'underscore/modules/reduce';
 
 export default {
 
@@ -80,7 +123,7 @@ export default {
     components: {
         ReplicatorSet,
         SortableList,
-        SetPicker,
+        AddSetButton,
     },
 
     inject: ['storeName'],
@@ -89,6 +132,10 @@ export default {
         return {
             focused: false,
             collapsed: clone(this.meta.collapsed),
+            fullScreenMode: false,
+            provide: {
+                storeName: this.storeName
+            }
         }
     },
 
@@ -105,6 +152,12 @@ export default {
         },
 
         setConfigs() {
+            return reduce(this.groupConfigs, (sets, group) => {
+                return sets.concat(group.sets);
+            }, []);
+        },
+
+        groupConfigs() {
             return this.config.sets;
         },
 

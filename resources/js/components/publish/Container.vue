@@ -219,6 +219,11 @@ export default {
             this.dirty();
         },
 
+        saving() {
+            // Let fieldtypes do any pre-save work, like triggering a "change" event for the focused field.
+            this.$events.$emit(`container.${this.name}.saving`);
+        },
+
         saved() {
             this.clearDirtyState();
         },

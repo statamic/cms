@@ -3,6 +3,9 @@
 namespace Tests\Fieldtypes;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Statamic\Facades\Preference;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Date;
 use Tests\TestCase;
@@ -19,22 +22,53 @@ class DateTest extends TestCase
         Carbon::setTestNow(Carbon::createFromFormat('Y-m-d H:i', '2010-12-25 13:43'));
     }
 
-    /** @test */
-    public function it_augments_a_date()
+    /**
+     * @test
+     *
+     * @dataProvider augmentProvider
+     */
+    public function it_augments($config, $value, $expected)
     {
-        $augmented = $this->fieldtype()->augment('2012-01-04');
+        $augmented = $this->fieldtype($config)->augment($value);
 
         $this->assertInstanceOf(Carbon::class, $augmented);
-        $this->assertEquals('2012 Jan 04 00:00', $augmented->format('Y M d H:i'));
+        $this->assertEquals($expected, $augmented->format('Y M d H:i:s'));
     }
 
-    /** @test */
-    public function it_augments_a_datetime()
+    public function augmentProvider()
     {
-        $augmented = $this->fieldtype(['time_enabled' => true])->augment('2012-01-04 15:32');
+        return [
+            'date' => [
+                [],
+                '2012-01-04',
+                '2012 Jan 04 00:00:00',
+            ],
+            'date with custom format' => [
+                ['format' => 'Y--m--d'],
+                '2012--01--04',
+                '2012 Jan 04 00:00:00',
+            ],
 
-        $this->assertInstanceOf(Carbon::class, $augmented);
-        $this->assertEquals('2012 Jan 04 15:32', $augmented->format('Y M d H:i'));
+            // The time and seconds configs are important, otherwise
+            // when when parsing dates without times, the time would inherit from "now".
+            // We need to rely on the configs to know when or when not to reset the time.
+
+            'date with time' => [
+                ['time_enabled' => true],
+                '2012-01-04 15:32',
+                '2012 Jan 04 15:32:00',
+            ],
+            'date with time but seconds disabled' => [
+                ['time_enabled' => true],
+                '2012-01-04 15:32:54',
+                '2012 Jan 04 15:32:00',
+            ],
+            'date with time and seconds' => [
+                ['time_enabled' => true, 'time_seconds_enabled' => true],
+                '2012-01-04 15:32:54',
+                '2012 Jan 04 15:32:54',
+            ],
+        ];
     }
 
     /** @test */
@@ -48,6 +82,8 @@ class DateTest extends TestCase
     /** @test */
     public function it_augments_a_carbon_instance()
     {
+        // Could happen if you are using the date fieldtype to augment a manually provided value.
+
         $instance = new Carbon;
         $augmented = $this->fieldtype()->augment($instance);
 
@@ -78,56 +114,71 @@ class DateTest extends TestCase
         $this->assertNull($augmented);
     }
 
-    /** @test */
-    public function it_saves_nulls()
+    /**
+     * @test
+     *
+     * @dataProvider processProvider
+     */
+    public function it_processes_on_save($config, $value, $expected)
     {
-        $this->assertNull($this->fieldtype()->process(null));
+        $this->assertSame($expected, $this->fieldtype($config)->process($value));
     }
 
-    /** @test */
-    public function it_saves_null_ranges()
+    public function processProvider()
     {
-        $this->assertNull($this->fieldtype(['mode' => 'range'])->process(null));
-    }
-
-    /** @test */
-    public function it_saves_dates_using_default_format()
-    {
-        $this->assertEquals('2012-08-29', $this->fieldtype()->process('2012-08-29'));
-    }
-
-    /** @test */
-    public function it_saves_dates_using_custom_format()
-    {
-        $this->assertEquals('2012--08--29', $this->fieldtype(['format' => 'Y--m--d'])->process('2012-08-29'));
+        return [
+            'null' => [
+                [],
+                null,
+                null,
+            ],
+            'object with nulls' => [
+                [],
+                ['date' => null, 'time' => null],
+                null,
+            ],
+            'date with default format' => [
+                [],
+                ['date' => '2012-08-29', 'time' => null],
+                '2012-08-29',
+            ],
+            'date with custom format' => [
+                ['format' => 'Y--m--d'],
+                ['date' => '2012-08-29', 'time' => null],
+                '2012--08--29',
+            ],
+            'date with time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-08-29', 'time' => '13:43'],
+                '2012-08-29 13:43',
+            ],
+            'date with time and custom format' => [
+                ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
+                ['date' => '2012-08-29', 'time' => '13:43'],
+                '2012--08--29 13:43',
+            ],
+            'null range' => [
+                ['mode' => 'range'],
+                ['date' => null, 'time' => null],
+                null,
+            ],
+            'range with default format' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+            ],
+            'range with custom format' => [
+                ['mode' => 'range', 'format' => 'Y--m--d'],
+                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
+                ['start' => '2012--08--29', 'end' => '2013--09--27'],
+            ],
+        ];
     }
 
     /** @test */
     public function it_saves_date_as_integer_if_format_results_in_a_number()
     {
-        $this->assertSame(20120829, $this->fieldtype(['format' => 'Ymd'])->process('2012-08-29'));
-    }
-
-    /** @test */
-    public function it_saves_ranges_using_default_format()
-    {
-        $fieldtype = $this->fieldtype(['mode' => 'range']);
-
-        $this->assertEquals(
-            ['start' => '2012-08-29', 'end' => '2013-09-27'],
-            $fieldtype->process(['start' => '2012-08-29', 'end' => '2013-09-27'])
-        );
-    }
-
-    /** @test */
-    public function it_saves_ranges_using_custom_formats()
-    {
-        $fieldtype = $this->fieldtype(['mode' => 'range', 'format' => 'Y--m--d']);
-
-        $this->assertEquals(
-            ['start' => '2012--08--29', 'end' => '2013--09--27'],
-            $fieldtype->process(['start' => '2012-08-29', 'end' => '2013-09-27'])
-        );
+        $this->assertSame(20120829, $this->fieldtype(['format' => 'Ymd'])->process(['date' => '2012-08-29', 'time' => null]));
     }
 
     /** @test */
@@ -137,163 +188,196 @@ class DateTest extends TestCase
 
         $this->assertSame(
             ['start' => 20120829, 'end' => 20130927],
-            $fieldtype->process(['start' => '2012-08-29', 'end' => '2013-09-27'])
+            $fieldtype->process(['date' => ['start' => '2012-08-29', 'end' => '2013-09-27']])
         );
     }
 
-    /** @test */
-    public function it_preprocesses_a_null()
+    /**
+     * @test
+     *
+     * @dataProvider preProcessProvider
+     */
+    public function it_preprocesses($config, $value, $expected)
     {
-        $this->assertNull($this->fieldtype()->preProcess(null));
+        $this->assertSame($expected, $this->fieldtype($config)->preProcess($value));
     }
 
-    /** @test */
-    public function it_preprocesses_a_null_when_required_with_boolean()
+    public function preProcessProvider()
     {
-        $this->assertEquals('2010-12-25', $this->fieldtype(['required' => true])->preProcess(null));
+        return [
+            'null' => [
+                [],
+                null,
+                ['date' => null, 'time' => null],
+            ],
+            'now' => [
+                [],
+                'now', // this would happen if the value was null, but default was "now"
+                ['date' => '2010-12-25', 'time' => null], // current date
+            ],
+            'now, with time enabled' => [
+                ['time_enabled' => true],
+                'now', // this would happen if the value was null, but default was "now"
+                ['date' => '2010-12-25', 'time' => 'now'], // current datetime - time needs to be localized on the client side
+            ],
+            'date with default format' => [
+                [],
+                '2012-08-29',
+                ['date' => '2012-08-29', 'time' => null],
+            ],
+            'date with custom format' => [
+                ['format' => 'Y--m--d'],
+                '2012--08--29',
+                ['date' => '2012-08-29', 'time' => null],
+            ],
+            'date with time' => [
+                ['time_enabled' => true],
+                '2012-08-29 13:43',
+                ['date' => '2012-08-29', 'time' => '13:43'],
+            ],
+            'date with time and custom format' => [
+                ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
+                '2012--08--29 13:43',
+                ['date' => '2012-08-29', 'time' => '13:43'],
+            ],
+            'null range' => [
+                ['mode' => 'range'],
+                null,
+                ['date' => null, 'time' => null],
+            ],
+            'null range when required with boolean' => [
+                ['mode' => 'range', 'required' => true],
+                null,
+                ['date' => ['start' => '2010-12-25', 'end' => '2010-12-25'], 'time' => null],
+            ],
+            'null range when required with validation' => [
+                ['mode' => 'range', 'validate' => ['required']],
+                null,
+                ['date' => ['start' => '2010-12-25', 'end' => '2010-12-25'], 'time' => null],
+            ],
+            'range with default format' => [
+                ['mode' => 'range'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
+            ],
+            'range with custom format' => [
+                ['mode' => 'range', 'format' => 'Y--m--d'],
+                ['start' => '2012--08--29', 'end' => '2013--09--27'],
+                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
+            ],
+            'range where single date has been provided' => [
+                // e.g. If it was once a non-range field.
+                // Use the single date as both the start and end dates.
+                ['mode' => 'range'],
+                '2012-08-29',
+                ['date' => ['start' => '2012-08-29', 'end' => '2012-08-29'], 'time' => null],
+            ],
+            'range where single date has been provided with custom format' => [
+                ['mode' => 'range', 'format' => 'Y--m--d'],
+                '2012--08--29',
+                ['date' => ['start' => '2012-08-29', 'end' => '2012-08-29'], 'time' => null],
+            ],
+            'date where range has been provided' => [
+                // e.g. If it was once a range field. Use the start date.
+                [],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                ['date' => '2012-08-29', 'time' => null],
+            ],
+            'date where range has been provided with custom format' => [
+                ['format' => 'Y--m--d'],
+                ['start' => '2012--08--29', 'end' => '2013--09--27'],
+                ['date' => '2012-08-29', 'time' => null],
+            ],
+        ];
     }
 
-    /** @test */
-    public function it_preprocesses_a_null_when_required_with_boolean_with_time_enabled()
+    /**
+     * @test
+     *
+     * @dataProvider preProcessIndexProvider
+     */
+    public function it_preprocesses_for_index($config, $value, $expected)
     {
-        $this->assertEquals('2010-12-25 13:43', $this->fieldtype(['required' => true, 'time_enabled' => true])->preProcess(null));
+        // Show that the date format from the preference is being used, and
+        // that the fall back would have been the configured date format.
+        config(['statamic.cp.date_format' => 'custom']);
+        Preference::shouldReceive('get')->with('date_format', 'custom')->andReturn('Y/m/d');
+
+        $this->assertSame($expected, $this->fieldtype($config)->preProcessIndex($value));
     }
 
-    /** @test */
-    public function it_preprocesses_a_null_when_required_with_validation()
+    public function preProcessIndexProvider()
     {
-        $this->assertEquals('2010-12-25', $this->fieldtype(['validate' => ['required']])->preProcess(null));
-    }
-
-    /** @test */
-    public function it_preprocesses_a_null_when_required_with_validation_with_time_enabled()
-    {
-        $this->assertEquals('2010-12-25 13:43', $this->fieldtype(['validate' => ['required'], 'time_enabled' => true])->preProcess(null));
-    }
-
-    /** @test */
-    public function it_preprocesses_a_null_with_a_range()
-    {
-        $this->assertNull($this->fieldtype(['mode' => 'range'])->preProcess(null));
-    }
-
-    /** @test */
-    public function it_preprocesses_a_null_with_a_range_when_required_with_boolean()
-    {
-        $fieldtype = $this->fieldtype(['mode' => 'range', 'required' => true]);
-
-        $this->assertEquals(['start' => '2010-12-25', 'end' => '2010-12-25'], $fieldtype->preProcess(null));
-    }
-
-    /** @test */
-    public function it_preprocesses_a_null_with_a_range_when_required_with_validation()
-    {
-        $fieldtype = $this->fieldtype(['mode' => 'range', 'validate' => ['required']]);
-
-        $this->assertEquals(['start' => '2010-12-25', 'end' => '2010-12-25'], $fieldtype->preProcess(null));
-    }
-
-    /** @test */
-    public function it_preprocesses_a_date()
-    {
-        $fieldtype = $this->fieldtype();
-
-        $this->assertEquals('2021-05-19', $fieldtype->preProcess('2021-05-19'));
-    }
-
-    /** @test */
-    public function it_preprocesses_a_date_with_time_enabled()
-    {
-        $fieldtype = $this->fieldtype(['time_enabled' => true]);
-
-        $this->assertEquals('2021-05-19 23:45', $fieldtype->preProcess('2021-05-19 23:45'));
-    }
-
-    /** @test */
-    public function it_preprocesses_a_date_with_a_custom_format()
-    {
-        $fieldtype = $this->fieldtype(['format' => 'Y--m--d']);
-
-        $this->assertEquals('2021-05-19', $fieldtype->preProcess('2021--05--19'));
-    }
-
-    /** @test */
-    public function it_preprocesses_a_date_with_a_custom_format_and_time_enabled()
-    {
-        $fieldtype = $this->fieldtype(['time_enabled' => true, 'format' => 'Y--m--d--H--i']);
-
-        $this->assertEquals('2021-05-19 23:45', $fieldtype->preProcess('2021--05--19--23--45'));
-    }
-
-    /** @test */
-    public function it_preprocesses_a_range()
-    {
-        $fieldtype = $this->fieldtype(['mode' => 'range']);
-
-        $this->assertEquals(
-            ['start' => '2010-12-25', 'end' => '2013-11-25'],
-            $fieldtype->preProcess(['start' => '2010-12-25', 'end' => '2013-11-25'])
-        );
-    }
-
-    /** @test */
-    public function it_preprocesses_a_range_with_a_custom_format()
-    {
-        $fieldtype = $this->fieldtype(['mode' => 'range', 'format' => 'Y--m--d']);
-
-        $this->assertEquals(
-            ['start' => '2010-12-25', 'end' => '2013-11-25'],
-            $fieldtype->preProcess(['start' => '2010--12--25', 'end' => '2013--11--25'])
-        );
-    }
-
-    /** @test */
-    public function it_preprocesses_a_range_where_a_single_date_has_been_provided()
-    {
-        // e.g. If it was once a non-range field.
-        // Use the single date as both the start and end dates.
-
-        $fieldtype = $this->fieldtype(['mode' => 'range']);
-
-        $this->assertEquals(
-            ['start' => '2010-12-25', 'end' => '2010-12-25'],
-            $fieldtype->preProcess('2010-12-25')
-        );
-    }
-
-    /** @test */
-    public function it_preprocesses_a_range_where_a_single_date_has_been_provided_with_a_custom_format()
-    {
-        $fieldtype = $this->fieldtype(['mode' => 'range', 'format' => 'Y--m--d']);
-
-        $this->assertEquals(
-            ['start' => '2010-12-25', 'end' => '2010-12-25'],
-            $fieldtype->preProcess('2010--12--25')
-        );
-    }
-
-    /** @test */
-    public function it_preprocesses_a_date_where_a_range_has_been_provided()
-    {
-        // e.g. If it was once a range field. Use the start date.
-
-        $fieldtype = $this->fieldtype();
-
-        $this->assertEquals(
-            '2010-12-25',
-            $fieldtype->preProcess(['start' => '2010-12-25', 'end' => '2013-11-25'])
-        );
-    }
-
-    /** @test */
-    public function it_preprocesses_a_date_where_a_range_has_been_provided_with_a_custom_format()
-    {
-        $fieldtype = $this->fieldtype(['format' => 'Y--m--d']);
-
-        $this->assertEquals(
-            '2010-12-25',
-            $fieldtype->preProcess(['start' => '2010--12--25', 'end' => '2013--11--25'])
-        );
+        return [
+            'null' => [
+                [],
+                null,
+                null,
+            ],
+            'date with default format' => [
+                [],
+                '2012-08-29',
+                '2012/08/29',
+            ],
+            'date with custom format' => [
+                ['format' => 'Y--m--d'],
+                '2012--08--29',
+                '2012/08/29',
+            ],
+            'date with time' => [
+                ['time_enabled' => true],
+                '2012-08-29 13:43',
+                '2012/08/29 13:43',
+            ],
+            'date with time and custom format' => [
+                ['time_enabled' => true, 'format' => 'Y--m--d H:i'],
+                '2012--08--29 13:43',
+                '2012/08/29 13:43',
+            ],
+            'null range' => [
+                ['mode' => 'range'],
+                null,
+                null,
+            ],
+            'range with default format' => [
+                ['mode' => 'range'],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                '2012/08/29 - 2013/09/27',
+            ],
+            'range with custom format' => [
+                ['mode' => 'range', 'format' => 'Y--m--d'],
+                ['start' => '2012--08--29', 'end' => '2013--09--27'],
+                '2012/08/29 - 2013/09/27',
+            ],
+            'range where single date has been provided' => [
+                // e.g. If it was once a non-range field.
+                // Use the single date as both the start and end dates.
+                ['mode' => 'range'],
+                '2012-08-29',
+                '2012/08/29 - 2012/08/29',
+            ],
+            'range where single date has been provided with custom format' => [
+                ['mode' => 'range', 'format' => 'Y--m--d'],
+                '2012--08--29',
+                '2012/08/29 - 2012/08/29',
+            ],
+            'date where range has been provided' => [
+                // e.g. If it was once a range field. Use the start date.
+                [],
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                '2012/08/29',
+            ],
+            'date where range has been provided with custom format' => [
+                ['format' => 'Y--m--d'],
+                ['start' => '2012--08--29', 'end' => '2013--09--27'],
+                '2012/08/29',
+            ],
+            'range where time has been enabled' => [
+                ['mode' => 'range', 'time_enabled' => true], // enabling time should have no effect.
+                ['start' => '2012-08-29', 'end' => '2013-09-27'],
+                '2012/08/29 - 2013/09/27',
+            ],
+        ];
     }
 
     /** @test */
@@ -349,6 +433,196 @@ class DateTest extends TestCase
 
         $this->assertEquals('Y-m-d', $fieldtype->indexDisplayFormat());
         $this->assertEquals('Y-m-d', $fieldtype->fieldDisplayFormat());
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider validationProvider
+     */
+    public function it_validates($config, $input, $expected)
+    {
+        $field = $this->fieldtype($config)->field();
+        $messages = [];
+
+        try {
+            Validator::validate(['test' => $input], $field->rules(), [], $field->validationAttributes());
+        } catch (ValidationException $e) {
+            $messages = $e->validator->errors()->all();
+        }
+
+        $this->assertEquals($expected, $messages);
+    }
+
+    public function validationProvider()
+    {
+        return [
+            'valid date' => [
+                [],
+                ['date' => '2012-01-29'],
+                [],
+            ],
+            'not an array' => [
+                [],
+                'a string',
+                ['Must be an array.'],
+            ],
+            'missing date' => [
+                [],
+                [],
+                ['Date is required.'],
+            ],
+            'null date when not required' => [
+                [],
+                ['date' => null],
+                [],
+            ],
+            'null required date via bool' => [
+                ['required' => true],
+                ['date' => null],
+                ['Date is required.'],
+            ],
+            'null required date via validate' => [
+                ['validate' => 'required'],
+                ['date' => null],
+                ['Date is required.'],
+            ],
+            'invalid date format' => [
+                [],
+                ['date' => 'marchtember oneteenth'],
+                ['Not a valid date.'],
+            ],
+            'invalid date' => [
+                [],
+                ['date' => '2010-06-50'],
+                ['Not a valid date.'],
+            ],
+            'valid date range' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-01-29', 'end' => '2012-01-30']],
+                [],
+            ],
+            'null date in range mode' => [
+                ['mode' => 'range'],
+                ['date' => null],
+                [],
+            ],
+            'null date in range mode required via bool' => [
+                ['mode' => 'range', 'required' => true],
+                ['date' => null],
+                ['Date is required.'],
+            ],
+            'null date in range mode required via validate' => [
+                ['mode' => 'range', 'validate' => 'required'],
+                ['date' => null],
+                ['Date is required.'],
+            ],
+            'missing start date' => [
+                ['mode' => 'range'],
+                ['date' => ['end' => '2012-01-30']],
+                ['Start date is required.'],
+            ],
+            'missing end date' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-01-29']],
+                ['End date is required.'],
+            ],
+            'null start date' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => null, 'end' => '2012-01-30']],
+                ['Start date is required.'],
+            ],
+            'null end date' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-01-29', 'end' => null]],
+                ['End date is required.'],
+            ],
+            'both dates null' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => null, 'end' => null]],
+                [], // valid because not required
+            ],
+            'both dates null, required via bool' => [
+                ['mode' => 'range', 'required' => true],
+                ['date' => ['start' => null, 'end' => null]],
+                ['Date is required.'],
+            ],
+            'both dates null, required via validate' => [
+                ['mode' => 'range', 'validate' => 'required'],
+                ['date' => ['start' => null, 'end' => null]],
+                ['Date is required.'],
+            ],
+            'invalid start date' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2010-06-50', 'end' => '2012-01-30']],
+                ['Not a valid start date.'],
+            ],
+            'invalid end date' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-01-29', 'end' => '2010-06-50']],
+                ['Not a valid end date.'],
+            ],
+            'invalid start date format' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => 'marchtember oneteenth', 'end' => '2012-01-30']],
+                ['Not a valid start date.'],
+            ],
+            'invalid end date format' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-01-29', 'end' => 'marchtember oneteenth']],
+                ['Not a valid end date.'],
+            ],
+            'valid date and time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '13:00'],
+                [],
+            ],
+            'missing time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29'],
+                ['Time is required.'],
+            ],
+            'null time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => null],
+                [],
+            ],
+            'null required time via bool' => [
+                ['time_enabled' => true, 'required' => true],
+                ['date' => '2012-01-29', 'time' => null],
+                ['Time is required.'],
+            ],
+            'null required time via validate' => [
+                ['time_enabled' => true, 'validate' => 'required'],
+                ['date' => '2012-01-29', 'time' => null],
+                ['Time is required.'],
+            ],
+            'invalid time format' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => 'not formatted like a time'],
+                ['Not a valid time.'],
+            ],
+            '12 hour time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '1:00'],
+                ['Not a valid time.'],
+            ],
+            'invalid hour' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '25:00'],
+                ['Not a valid time.'],
+            ],
+            'invalid minute' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '14:65'],
+                ['Not a valid time.'],
+            ],
+            'invalid second' => [
+                ['time_enabled' => true, 'time_seconds_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '13:00:60'],
+                ['Not a valid time.'],
+            ],
+        ];
     }
 
     public function fieldtype($config = [])

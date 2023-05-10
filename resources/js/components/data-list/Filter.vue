@@ -2,7 +2,7 @@
 
     <div class="w-full no-label">
         <publish-container
-            class="p-2"
+            class="p-3"
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
             :meta="{}"
@@ -20,12 +20,12 @@
 
         <div class="flex border-t">
             <button
-                class="p-1 hover:bg-grey-10 rounded-bl text-xs flex-1"
+                class="p-2 hover:bg-gray-100 rounded-bl text-xs flex-1"
                 v-text="__('Clear')"
                 @click="resetAll"
             />
             <button
-                class="p-1 hover:bg-grey-10 flex-1 rounded-br border-l text-xs"
+                class="p-2 hover:bg-gray-100 flex-1 rounded-br border-l text-xs"
                 v-text="__('Close')"
                 @click="$emit('closed')"
             />

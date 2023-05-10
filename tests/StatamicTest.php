@@ -261,6 +261,8 @@ class StatamicTest extends TestCase
     /**
      * @test
      *
+     * @define-env customAssetUrl
+     *
      * @dataProvider cpAssetUrlProvider
      */
     public function it_gets_a_cp_asset_url($url, $expected)
@@ -271,13 +273,15 @@ class StatamicTest extends TestCase
     public function cpAssetUrlProvider()
     {
         return [
-            'slash' => ['/foo/bar.jpg', 'http://localhost/vendor/statamic/cp/foo/bar.jpg'],
-            'no slash' => ['foo/bar.jpg', 'http://localhost/vendor/statamic/cp/foo/bar.jpg'],
+            'slash' => ['/foo/bar.jpg', 'http://test-asset-url.com/vendor/statamic/cp/foo/bar.jpg'],
+            'no slash' => ['foo/bar.jpg', 'http://test-asset-url.com/vendor/statamic/cp/foo/bar.jpg'],
         ];
     }
 
     /**
      * @test
+     *
+     * @define-env customAssetUrl
      *
      * @dataProvider vendorPackageAssetUrlProvider
      */
@@ -289,11 +293,11 @@ class StatamicTest extends TestCase
     public function vendorPackageAssetUrlProvider()
     {
         return [
-            'package' => [['package', 'cp.js'], 'http://localhost/vendor/package/cp.js'],
-            'package with type' => [['package', 'test.jpg', 'images'], 'http://localhost/vendor/package/images/test.jpg'],
-            'statamic cp' => [['statamic/cp', 'cp.js'], 'http://localhost/vendor/statamic/cp/cp.js'],
-            'vendor url no slash' => [['irrelevant', 'vendor/foo/bar.js'], 'http://localhost/vendor/foo/bar.js'],
-            'vendor url with slash' => [['irrelevant', '/vendor/foo/bar.js'], 'http://localhost/vendor/foo/bar.js'],
+            'package' => [['package', 'cp.js'], 'http://test-asset-url.com/vendor/package/cp.js'],
+            'package with type' => [['package', 'test.jpg', 'images'], 'http://test-asset-url.com/vendor/package/images/test.jpg'],
+            'statamic cp' => [['statamic/cp', 'cp.js'], 'http://test-asset-url.com/vendor/statamic/cp/cp.js'],
+            'vendor url no slash' => [['irrelevant', 'vendor/foo/bar.js'], 'http://test-asset-url.com/vendor/foo/bar.js'],
+            'vendor url with slash' => [['irrelevant', '/vendor/foo/bar.js'], 'http://test-asset-url.com/vendor/foo/bar.js'],
         ];
     }
 
@@ -338,5 +342,10 @@ class StatamicTest extends TestCase
         // It should always return false when not running in console
         App::shouldReceive('runningInConsole')->andReturn(false);
         $this->assertFalse(Statamic::isWorker());
+    }
+
+    public function customAssetUrl($app)
+    {
+        $app['config']->set('app.asset_url', 'http://test-asset-url.com');
     }
 }

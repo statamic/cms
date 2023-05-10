@@ -4,6 +4,7 @@ namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Mockery;
+use Statamic\Fields\Blueprint;
 use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
@@ -341,6 +342,121 @@ class FieldtypeTest extends TestCase
         $this->assertCount(1, $fieldtypeWithAppendedConfig->configFields()->all());
     }
 
+    /**
+     * @test
+     *
+     * @dataProvider configBlueprintProvider
+     */
+    public function it_gets_the_config_blueprint($property, $expectedSections, $expectedConfigFields)
+    {
+        $fieldtype = new TestFieldtypeWithConfigFieldsProperty($property);
+
+        TestFieldtypeWithConfigFieldsProperty::appendConfigField('appended', ['type' => 'text']);
+
+        $this->assertInstanceOf(Blueprint::class, $blueprint = $fieldtype->configBlueprint());
+        $this->assertEquals(['tabs' => [
+            'main' => [
+                'sections' => $expectedSections,
+            ],
+        ]], $blueprint->contents());
+
+        $this->assertEquals($expectedConfigFields, $fieldtype->configFields()->all()->map(fn ($field) => $field->type())->all());
+    }
+
+    public function configBlueprintProvider()
+    {
+        return [
+            'linear fields results in one section' => [
+                $configFields = [
+                    'alfa' => ['type' => 'bravo'],
+                    'charlie' => ['type' => 'delta'],
+                ],
+                $expectedSections = [
+                    [
+                        'fields' => [
+                            ['handle' => 'alfa', 'field' => ['type' => 'bravo']],
+                            ['handle' => 'charlie', 'field' => ['type' => 'delta']],
+                            ['handle' => 'appended', 'field' => ['type' => 'text']], // appended field to the end of line section
+                        ],
+                    ],
+                ],
+                $expectedConfigFields = [
+                    'alfa' => 'bravo',
+                    'charlie' => 'delta',
+                    'appended' => 'text',
+                ],
+            ],
+
+            'single section' => [
+                $configFields = [
+                    [
+                        'fields' => [
+                            'alfa' => ['type' => 'bravo'],
+                            'charlie' => ['type' => 'delta'],
+                        ],
+                    ],
+                ],
+                $expectedSections = [
+                    [
+                        'fields' => [
+                            ['handle' => 'alfa', 'field' => ['type' => 'bravo']],
+                            ['handle' => 'charlie', 'field' => ['type' => 'delta']],
+                            ['handle' => 'appended', 'field' => ['type' => 'text']], // appended field to the end of lone section
+                        ],
+                    ],
+                ],
+                $expectedConfigFields = [
+                    'alfa' => 'bravo',
+                    'charlie' => 'delta',
+                    'appended' => 'text',
+                ],
+            ],
+
+            'multiple sections' => [
+                $configFields = [
+                    [
+                        'fields' => [
+                            'alfa' => ['type' => 'bravo'],
+                            'charlie' => ['type' => 'delta'],
+                        ],
+                    ],
+                    [
+                        'fields' => [
+                            'echo' => ['type' => 'foxtrot'],
+                            'golf' => ['type' => 'hotel'],
+                        ],
+                    ],
+                ],
+                $expectedSections = [
+                    [
+                        'fields' => [
+                            ['handle' => 'alfa', 'field' => ['type' => 'bravo']],
+                            ['handle' => 'charlie', 'field' => ['type' => 'delta']],
+                        ],
+                    ],
+                    [
+                        'fields' => [
+                            ['handle' => 'echo', 'field' => ['type' => 'foxtrot']],
+                            ['handle' => 'golf', 'field' => ['type' => 'hotel']],
+                        ],
+                    ],
+                    [
+                        'fields' => [
+                            ['handle' => 'appended', 'field' => ['type' => 'text']], // appended field goes into its own section
+                        ],
+                    ],
+                ],
+                $expectedConfigFields = [
+                    'alfa' => 'bravo',
+                    'charlie' => 'delta',
+                    'echo' => 'foxtrot',
+                    'golf' => 'hotel',
+                    'appended' => 'text',
+                ],
+            ],
+        ];
+    }
+
     /** @test */
     public function it_can_have_an_icon()
     {
@@ -449,4 +565,12 @@ class TestAppendConfigFields extends Fieldtype
         'foo' => ['type' => 'textarea'],
         'max_items' => ['type' => 'integer'],
     ];
+}
+
+class TestFieldtypeWithConfigFieldsProperty extends Fieldtype
+{
+    public function __construct($property)
+    {
+        $this->configFields = $property;
+    }
 }

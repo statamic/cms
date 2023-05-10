@@ -73,7 +73,6 @@ return [
 
     'group_updates' => 'Pembaruan',
     'view_updates' => 'Lihat pembaruan',
-    'perform_updates' => 'Lakukan pembaruan',
 
     'group_utilities' => 'Utilitas',
     'access_utility' => ':title',

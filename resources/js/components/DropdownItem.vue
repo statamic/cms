@@ -11,6 +11,8 @@ export default {
 
     props: ['text', 'redirect', 'externalLink'],
 
+    inject: ['popover'],
+
     computed: {
 
         href() {
@@ -32,7 +34,7 @@ export default {
 
             this.$emit('click', $event);
 
-            this.$parent.close();
+            this.popover.vm.close();
         },
 
     }

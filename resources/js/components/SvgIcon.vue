@@ -1,31 +1,45 @@
+<template>
+    <component v-if="icon" :is="icon" />
+</template>
+
 <script>
+import { defineAsyncComponent } from 'vue';
+
+const splitIcon = function(icon) {
+    if (! icon.includes('/')) icon = 'regular/' + icon;
+    return icon.split('/');
+}
+
+const fallbackIconImport = function() {
+    return import('./../../svg/icons/regular/image.svg');
+}
+
 export default {
     props: {
         name: String,
         default: String,
-        inline: {
-            type: Boolean,
-            default: true
+    },
+    data() {
+        return {
+            icon: this.evaluateIcon(),
         }
     },
-    render(createElement) {
-        let svg = (this.name.startsWith('<svg')) ? this.name : this.getInlineIcon();
-
-        const compiledTemplate = Vue.compile(svg);
-
-        return compiledTemplate.render.call(this, createElement);
+    watch: {
+        name() {
+            this.icon = this.evaluateIcon();
+        }
     },
     methods: {
-        getInlineIcon() {
-            try {
-                return require(`!!html-loader!./../../svg/${this.name}.svg`);
-            } catch (error) {
-                if (this.default) {
-                    return require(`!!html-loader!./../../svg/${this.default}.svg`);
-                }
-
-                return '';
-            }
+        evaluateIcon() {
+            return defineAsyncComponent(() => {
+                const [set, file] = splitIcon(this.name);
+                return import(`./../../svg/icons/${set}/${file}.svg`)
+                    .catch(e => {
+                        if (! this.default) return fallbackIconImport();
+                        const [set, file] = splitIcon(this.default);
+                        return import(`./../../svg/icons/${set}/${file}.svg`).catch(e => fallbackIconImport());
+                    });
+            });
         }
     }
 }

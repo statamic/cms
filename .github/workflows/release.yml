@@ -24,10 +24,10 @@ jobs:
         run: npm ci
 
       - name: Compile assets
-        run: npm run production
+        run: npm run build
 
       - name: Compile frontend assets
-        run: npm run frontend-prod
+        run: npm run frontend-build
 
       - name: Create dist zip
         run: cd resources && tar -czvf dist.tar.gz dist

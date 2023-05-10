@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
@@ -20,13 +21,21 @@ class CollectionTest extends TestCase
 
     protected $enabledQueries = ['collections'];
 
-    /**
-     * @test
-     *
-     * @environment-setup disableQueries
-     **/
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Collection::make('blog')->title('Blog Posts')->save();
+        Collection::make('events')->title('Events')->save();
+    }
+
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{collection}'])
@@ -36,9 +45,6 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_queries_a_collection_by_handle()
     {
-        Collection::make('blog')->title('Blog Posts')->save();
-        Collection::make('events')->title('Events')->save();
-
         $query = <<<'GQL'
 {
     collection(handle: "events") {
@@ -47,6 +53,10 @@ class CollectionTest extends TestCase
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn(Collection::handles()->all())->once();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()
@@ -61,8 +71,45 @@ GQL;
     }
 
     /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource()
+    {
+        $query = <<<'GQL'
+{
+    collection(handle: "events") {
+        handle
+        title
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn(['blog'])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'handle' => ['Forbidden: events'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'collection' => null,
+                ],
+            ]);
+    }
+
+    /** @test */
     public function it_queries_the_structure_and_its_tree()
     {
+        // Start with fresh slate for this test so it's easier to mock things with one pages collection...
+        Collection::all()->each->delete();
+
         Site::setConfig([
             'default' => 'en',
             'sites' => [
@@ -156,6 +203,10 @@ GQL;
 }
 GQL;
 
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn(['pages'])->once();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -237,8 +288,6 @@ GQL;
     /** @test */
     public function it_can_add_custom_fields()
     {
-        Collection::make('blog')->title('Blog Posts')->save();
-
         GraphQL::addField('Collection', 'custom', function () {
             return [
                 'type' => GraphQL::string(),
