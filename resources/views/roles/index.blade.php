@@ -5,7 +5,7 @@
 
     @unless($roles->isEmpty())
 
-        <header class="flex items-center justify-between mb-3">
+        <header class="flex items-center justify-between mb-6">
             <h1>{{ __('Roles & Permissions') }}</h1>
             <a href="{{ cp_route('roles.create') }}" class="btn-primary">{{ __('Create Role') }}</a>
         </header>

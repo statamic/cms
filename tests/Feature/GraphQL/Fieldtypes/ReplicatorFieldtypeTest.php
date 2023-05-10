@@ -23,27 +23,31 @@ class ReplicatorFieldtypeTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /** @test */
-    public function it_outputs_replicator_fields()
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_outputs_replicator_fields($isGrouped)
     {
         $article = Blueprint::makeFromFields([
             'things' => [
                 'type' => 'replicator',
-                'sets' => [
+                'sets' => $this->groupSets($isGrouped, [
                     'meal' => [
                         'fields' => [
                             ['handle' => 'food', 'field' => ['type' => 'text']],
-                            ['handle' => 'drink', 'field' => ['type' => 'text']],
+                            ['handle' => 'drink', 'field' => ['type' => 'markdown']], // using markdown to show nested fields are resolved using their fieldtype.
                         ],
                     ],
                     'car' => [
                         'fields' => [
                             ['handle' => 'make', 'field' => ['type' => 'text']],
                             ['handle' => 'model', 'field' => ['type' => 'text']],
-                            ['handle' => 'trims', 'field' => ['type' => 'entries']],
+                            ['handle' => 'trims', 'field' => ['type' => 'entries']], // using entries to query builders get resolved
                         ],
                     ],
-                ],
+                ]),
             ],
         ]);
 
@@ -60,7 +64,7 @@ class ReplicatorFieldtypeTest extends TestCase
         EntryFactory::collection('blog')->id('1')->data([
             'title' => 'Main Post',
             'things' => [
-                ['id' => '1', 'type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
+                ['id' => '1', 'type' => 'meal', 'food' => 'burger', 'drink' => 'coke _zero_'],
                 ['id' => '2', 'type' => 'car', 'make' => 'toyota', 'model' => 'corolla', 'trims' => ['trim1']],
                 ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'], // id intentionally omitted
             ],
@@ -79,6 +83,7 @@ class ReplicatorFieldtypeTest extends TestCase
                     type
                     food
                     drink
+                    drink_md: drink(format: "markdown")
                 }
                 ... on Set_Things_Car {
                     id
@@ -103,9 +108,9 @@ GQL;
                 'entry' => [
                     'title' => 'Main Post',
                     'things' => [
-                        ['id' => '1', 'type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
+                        ['id' => '1', 'type' => 'meal', 'food' => 'burger', 'drink' => "<p>coke <em>zero</em></p>\n", 'drink_md' => 'coke _zero_'],
                         ['id' => '2', 'type' => 'car', 'make' => 'toyota', 'model' => 'corolla', 'trims' => [['title' => 'Trim One']]],
-                        ['id' => null, 'type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
+                        ['id' => null, 'type' => 'meal', 'food' => 'salad', 'drink' => "<p>water</p>\n", 'drink_md' => 'water'],
                     ],
                 ],
             ]]);
@@ -293,5 +298,24 @@ GQL;
                     ],
                 ],
             ]]);
+    }
+
+    public function groupedSetsProvider()
+    {
+        return [
+            'grouped sets (new)' => [true],
+            'ungrouped sets (old)' => [false],
+        ];
+    }
+
+    private function groupSets($shouldGroup, $sets)
+    {
+        if (! $shouldGroup) {
+            return $sets;
+        }
+
+        return [
+            'group_one' => ['sets' => $sets],
+        ];
     }
 }

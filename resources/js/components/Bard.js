@@ -1,4 +1,7 @@
 import * as core from '@tiptap/core';
+import * as state from '@tiptap/pm/state';
+import * as model from '@tiptap/pm/model';
+import * as view from '@tiptap/pm/view';
 
 class Bard {
     constructor(instance) {
@@ -6,11 +9,6 @@ class Bard {
         this.extensionCallbacks = [];
         this.extensionReplacementCallbacks = [];
         this.buttonCallbacks = [];
-    }
-
-    /** @deprecated */
-    extend(callback) {
-        this.addExtension(callback);
     }
 
     addExtension(callback) {
@@ -26,7 +24,14 @@ class Bard {
     }
 
     get tiptap() {
-        return { core };
+        return {
+            core,
+            pm: {
+                state,
+                model,
+                view
+            }
+        };
     }
 }
 

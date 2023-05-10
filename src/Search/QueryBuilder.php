@@ -45,24 +45,27 @@ abstract class QueryBuilder extends BaseQueryBuilder
         $results = $this->getSearchResults($this->query);
 
         if (! $this->withData) {
-            return collect($results)
+            return $this->collect($results)
                 ->map(fn ($result) => new PlainResult($result))
                 ->each(fn (Result $result, $i) => $result->setIndex($this->index)->setScore($results[$i]['search_score'] ?? null));
         }
 
-        return collect($results)->groupBy(function ($result) {
+        return $this->collect($results)->groupBy(function ($result) {
             return Str::before($result['reference'], '::');
         })->flatMap(function ($results, $prefix) {
-            $ids = $results->map(fn ($result) => Str::after($result['reference'], $prefix.'::'))->all();
+            $results = $results->keyBy('reference');
+            $ids = $results->map(fn ($result) => Str::after($result['reference'], $prefix.'::'))->values()->all();
 
             return app(Providers::class)
                 ->getByPrefix($prefix)
                 ->find($ids)
                 ->map->toSearchResult()
-                ->each(fn (Result $result, $i) => $result
-                    ->setIndex($this->index)
-                    ->setRawResult($results[$i])
-                    ->setScore($results[$i]['search_score'] ?? null));
+                ->each(function (Result $result) use ($results) {
+                    return $result
+                        ->setIndex($this->index)
+                        ->setRawResult($raw = $results[$result->getReference()])
+                        ->setScore($raw['search_score'] ?? null);
+                });
         })
         ->sortByDesc->getScore()
         ->values();

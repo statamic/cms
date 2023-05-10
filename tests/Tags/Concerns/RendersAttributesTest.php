@@ -24,7 +24,7 @@ class RendersAttributesTest extends TestCase
         $this->assertEquals('', $this->tag->renderAttributes([]));
 
         $output = $this->tag->renderAttributes([
-            'class' => 'm-0 mb-1',
+            'class' => 'm-0 mb-2',
             ':name' => 'first_name',
             'disabled' => 'true',
             'autocomplete' => true,
@@ -32,7 +32,7 @@ class RendersAttributesTest extends TestCase
             'dont_render_nulls' => null,
         ]);
 
-        $this->assertEquals('class="m-0 mb-1" :name="first_name" disabled="true" autocomplete="true" focusable="false"', $output);
+        $this->assertEquals('class="m-0 mb-2" :name="first_name" disabled="true" autocomplete="true" focusable="false"', $output);
     }
 
     /** @test */
@@ -43,7 +43,7 @@ class RendersAttributesTest extends TestCase
         $output = $this->tag
             ->setContext(['first_name' => 'Han'])
             ->setParameters([
-                'class' => 'm-0 mb-1',
+                'class' => 'm-0 mb-2',
                 ':name' => 'first_name',
                 'attr:src' => 'avatar.jpg',
                 'focusable' => false,
@@ -53,7 +53,7 @@ class RendersAttributesTest extends TestCase
             ])
             ->renderAttributesFromParams();
 
-        $this->assertEquals('class="m-0 mb-1" name="Han" src="avatar.jpg" focusable="false" disabled="true" autocomplete="true"', $output);
+        $this->assertEquals('class="m-0 mb-2" name="Han" src="avatar.jpg" focusable="false" disabled="true" autocomplete="true"', $output);
     }
 
     /** @test */
@@ -61,23 +61,23 @@ class RendersAttributesTest extends TestCase
     {
         $output = $this->tag
             ->setParameters([
-                'class' => 'm-0 mb-1',
+                'class' => 'm-0 mb-2',
                 'src' => 'avatar.jpg',
                 'name' => 'Han',
             ])
             ->renderAttributesFromParams(['src', 'name']);
 
-        $this->assertEquals('class="m-0 mb-1"', $output);
+        $this->assertEquals('class="m-0 mb-2"', $output);
 
         $output = $this->tag
             ->setParameters([
-                'class' => 'm-0 mb-1',
+                'class' => 'm-0 mb-2',
                 'attr:src' => 'avatar.jpg',
                 'name' => 'Han',
             ])
             ->renderAttributesFromParams(['src', 'name']);
 
-        $this->assertEquals('class="m-0 mb-1" src="avatar.jpg"', $output);
+        $this->assertEquals('class="m-0 mb-2" src="avatar.jpg"', $output);
     }
 
     /** @test */
@@ -88,7 +88,7 @@ class RendersAttributesTest extends TestCase
         $output = $this->tag
             ->setContext(['first_name' => 'Han'])
             ->setParameters([
-                'class' => 'm-0 mb-1',
+                'class' => 'm-0 mb-2',
                 ':name' => 'first_name',
                 'attr:src' => 'avatar.jpg',
                 'focusable' => false,
@@ -99,7 +99,7 @@ class RendersAttributesTest extends TestCase
             ])
             ->renderAttributesFromParams();
 
-        $this->assertEquals('class="m-0 mb-1" name="Han" src="avatar.jpg" focusable="false" disabled="true" autocomplete="true" aria-hidden="true"', $output);
+        $this->assertEquals('class="m-0 mb-2" name="Han" src="avatar.jpg" focusable="false" disabled="true" autocomplete="true" aria-hidden="true"', $output);
     }
 }
 

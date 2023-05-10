@@ -429,15 +429,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function accessible()
     {
-        $config = $this->disk()->filesystem()->getConfig();
-
-        // If Flysystem 1.x, it will be an array, so wrap it with `collect()` so it can `get()` values;
-        // Otherwise it will already be a `ReadOnlyConfiguration` object with a `get()` method.
-        if (is_array($config)) {
-            $config = collect($config);
-        }
-
-        return $config->get('url') !== null;
+        return Arr::get($this->disk()->filesystem()->getConfig(), 'url') !== null;
     }
 
     /**
@@ -625,5 +617,10 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     public static function __callStatic($method, $parameters)
     {
         return Facades\AssetContainer::{$method}(...$parameters);
+    }
+
+    public function __toString()
+    {
+        return $this->handle();
     }
 }

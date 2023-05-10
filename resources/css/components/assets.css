@@ -1,0 +1,175 @@
+/* ==========================================================================
+   ASSETS
+   ========================================================================== */
+
+.asset-modal {
+	.saving {
+        @apply absolute inset-0 flex items-center rounded-sm bg-white/90;
+		z-index: 200;
+
+		.inner {
+			text-align: center;
+			padding: 50px;
+			margin: 0 auto;
+		}
+
+		i {
+			position: relative;
+			top: -1px;
+			margin-right: 10px;
+		}
+	}
+}
+
+.drag-notification {
+    @apply text-xs @sm:text-lg absolute leading-tight p-1 inset-0 text-center rounded flex items-center justify-center;
+    border: 1px dashed theme('colors.gray.600');
+    pointer-events: none;
+    z-index: 1049;
+    background: rgba(255, 255, 255, .9);
+}
+
+
+ /* Table Listing
+   ========================================================================== */
+
+.asset-table-listing {
+    @apply border rounded relative overflow-hidden;
+
+
+    table {
+        @apply select-none border-none w-full rounded-b m-0;
+    }
+    tbody tr {
+        @apply outline-none;
+    }
+
+    tbody tr:not(:last-child) {
+        @apply border-b;
+    }
+
+    tbody tr td {
+        @apply p-2;
+    }
+
+}
+
+.asset-listing .actions {
+    margin-bottom: 15px;
+    display: flex;
+
+    .search {
+        flex: 1;
+        margin-right: 15px;
+        margin-left: 0;
+    }
+
+    > .btn {
+        margin-right: 15px;
+    }
+}
+
+
+
+
+
+/* Fieldtype
+  ========================================================================== */
+
+.asset-tile.draggable-source--is-dragging { @apply opacity-50; }
+.asset-tile.draggable-mirror { @apply shadow-lg; }
+
+
+  /* Grid Listing
+  ========================================================================== */
+
+.asset-grid-listing {
+    @apply bg-white grid relative p-4 gap-4;
+    grid-template-columns: 1fr;
+}
+
+
+ /* Asset Tile
+   ========================================================================== */
+
+.asset-tile {
+    @apply bg-white relative min-w-0 flex items-center flex-col justify-between cursor-pointer border rounded;
+
+    .asset-thumb {
+        @apply flex justify-center items-center;
+        > img, > svg, > .svg-img {
+            @apply max-h-full max-w-full absolute;
+        }
+    }
+
+    .asset-thumb-container {
+        @apply flex items-center flex-1 w-full justify-center relative;
+        aspect-ratio: 1 / 1;
+    }
+
+    .asset-thumb-container:hover .asset-controls {
+        @apply block;
+    }
+
+    .asset-meta {
+        @apply border-t w-full text-2xs text-gray-700;
+    }
+
+    .asset-filename {
+        @apply truncate;
+    }
+
+    .asset-controls {
+        @apply absolute hidden;
+    }
+}
+
+.asset-tile.selected {
+    @apply border-blue;
+    box-shadow: 0 0 0 1px theme('colors.blue.DEFAULT');
+}
+
+.asset-thumbnail {
+    @apply border border-white;
+}
+
+/* The Asset Editor
+  ========================================================================== */
+
+.asset-editor {
+    .editor-preview {
+        .editor-preview-image {
+            @apply flex flex-col flex-1 p-8;
+        }
+
+        .image-wrapper {
+            flex: 1 1 auto;
+            position: relative;
+
+            > * {
+                @apply absolute w-auto h-auto max-w-full max-h-full;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                box-shadow: 0 0 32px rgba(0, 0, 0, .35);
+            }
+        }
+    }
+
+    .loading {
+        @apply absolute inset-0 z-10 bg-white/70 flex items-center justify-center rounded;
+    }
+}
+
+/* Lazyloading
+  ========================================================================== */
+
+.lazyload,
+.lazyloading {
+	opacity: 0;
+
+}
+.lazyloaded {
+	opacity: 1;
+	transition: opacity 180ms;
+}

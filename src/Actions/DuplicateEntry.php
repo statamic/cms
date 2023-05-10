@@ -79,7 +79,7 @@ class DuplicateEntry extends Action
         $parentEntry = $entry
             ->structure()
             ->in($entry->locale())
-            ->page($entry->id())
+            ->find($entry->id())
             ->parent();
 
         if (! $parentEntry) {

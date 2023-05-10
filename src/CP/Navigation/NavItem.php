@@ -125,7 +125,7 @@ class NavItem
                 $cpUrl = url(config('statamic.cp.route')).'/';
 
                 if (! $this->active && Str::startsWith($url, $cpUrl)) {
-                    $this->active = str_replace($cpUrl, '', Str::before($url, '?')).'(/(.*)?|$)';
+                    $this->active = $this->generateActivePatternForCpUrl($url);
                 }
             })
             ->value($url);
@@ -161,7 +161,7 @@ class NavItem
                 return $value ?? Statamic::svg('entries');
             })
             ->setter(function ($value) {
-                return Str::startsWith($value, '<svg') ? $value : Statamic::svg($value);
+                return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
             })
             ->args(func_get_args());
     }
@@ -428,8 +428,26 @@ class NavItem
     public static function snakeCase($string)
     {
         $string = Str::modifyMultiple($string, ['lower', 'snake']);
-        $string = Str::replace($string, '-', '_');
+        $string = Str::replace('-', '_', $string);
 
         return $string;
+    }
+
+    /**
+     * Generate active pattern for CP url.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function generateActivePatternForCpUrl($url)
+    {
+        $cpUrl = url(config('statamic.cp.route')).'/';
+
+        $url = Str::before($url, '?'); // Remove query params
+        $url = Str::before($url, '#'); // Remove anchors
+
+        $relativeUrl = str_replace($cpUrl, '', $url);
+
+        return $relativeUrl.'(/(.*)?|$)';
     }
 }

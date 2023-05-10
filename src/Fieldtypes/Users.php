@@ -30,22 +30,32 @@ class Users extends Relationship
     protected function configFieldItems(): array
     {
         return [
-            'max_items' => [
-                'display' => __('Max Items'),
-                'instructions' => __('statamic::messages.max_items_instructions'),
-                'type' => 'integer',
-                'min' => 1,
-            ],
-            'mode' => [
-                'display' => __('Mode'),
-                'type' => 'radio',
-                'options' => [
-                    'default' => __('Stack Selector'),
-                    'select' => __('Select Dropdown'),
-                    'typeahead' => __('Typeahead Field'),
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'type' => 'integer',
+                        'min' => 1,
+                    ],
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.any.config.mode'),
+                        'type' => 'radio',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                        'default' => 'select',
+                    ],
+                    'default' => [
+                        'display' => __('Default'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'users',
+                    ],
                 ],
-                'default' => 'select',
-                'width' => 50,
             ],
         ];
     }

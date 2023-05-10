@@ -37,6 +37,7 @@ class AugmentedEntryTest extends AugmentedTestCase
         config(['statamic.amp.enabled' => true]);
 
         $blueprint = Blueprint::makeFromFields([
+            'date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true],
             'two' => ['type' => 'text'],
             'four' => ['type' => 'text'],
             'six' => ['type' => 'text'],
@@ -45,8 +46,8 @@ class AugmentedEntryTest extends AugmentedTestCase
         Blueprint::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
 
         $collection = tap(Collection::make('test')
+            ->dated(true)
             ->routes('/test/{slug}')
-            ->ampable(true)
             ->cascade(['seven' => 'the "seven" value from the collection']))
             ->save();
 
@@ -74,7 +75,7 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $entry
             ->origin('origin-id')
-            ->date('2018-01-03-1705')
+            ->date('2018-01-03-170512')
             ->blueprint('test')
             ->setSupplement('three', 'the "three" value supplemented on the entry')
             ->setSupplement('four', 'the "four" value supplemented on the entry and in the blueprint')
@@ -92,12 +93,11 @@ class AugmentedEntryTest extends AugmentedTestCase
             'url'           => ['type' => 'string', 'value' => '/test/entry-slug'],
             'edit_url'      => ['type' => 'string', 'value' => 'http://localhost/cp/collections/test/entries/entry-id'],
             'permalink'     => ['type' => 'string', 'value' => 'http://localhost/test/entry-slug'],
-            'amp_url'       => ['type' => 'string', 'value' => 'http://localhost/amp/test/entry-slug'],
             'api_url'       => ['type' => 'string', 'value' => 'http://localhost/api/collections/test/entries/entry-id'],
             'status'        => ['type' => 'string', 'value' => 'published'],
             'published'     => ['type' => 'bool', 'value' => true],
             'private'       => ['type' => 'bool', 'value' => false],
-            'date'          => ['type' => Carbon::class, 'value' => '2018-01-03 17:05'],
+            'date'          => ['type' => Carbon::class, 'value' => '2018-01-03 17:05:12'],
             'order'         => ['type' => 'null', 'value' => null], // todo: test for when this is an int
             'is_entry'      => ['type' => 'bool', 'value' => true],
             'collection'    => ['type' => CollectionContract::class, 'value' => $collection],

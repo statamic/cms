@@ -9,12 +9,8 @@ use Tests\TestCase;
 
 class UtilityRepositoryTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider registerMethodProvider
-     */
-    public function it_registers_a_utility($registerMethod)
+    /** @test */
+    public function it_registers_a_utility()
     {
         $utilities = new UtilityRepository;
         $this->assertInstanceOf(Collection::class, $utilities->all());
@@ -23,17 +19,9 @@ class UtilityRepositoryTest extends TestCase
         $utility = $utilities->make('one');
         $this->assertCount(0, $utilities->all());
 
-        $utilities->$registerMethod($utility);
+        $utilities->register($utility);
         $this->assertEquals(['one' => $utility], $utilities->all()->all());
         $this->assertEquals($utility, $utilities->find('one'));
-    }
-
-    public function registerMethodProvider()
-    {
-        return [
-            'register' => ['register'],
-            'push' => ['push'], // @deprecated
-        ];
     }
 
     /** @test */

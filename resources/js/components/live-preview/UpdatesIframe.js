@@ -1,6 +1,25 @@
+const hasIframeSourceChanged = (existingSrc, newSrc) => {
+    existingSrc = new URL(existingSrc);
+    newSrc = new URL(newSrc);
+    existingSrc.searchParams.delete('live-preview');
+    newSrc.searchParams.delete('live-preview');
+
+    return existingSrc.toString() !== newSrc.toString();
+}
+
+const postMessageToIframe = (container, url, payload) => {
+    // If the target is a relative url, we'll get the origin from the current window.
+    const targetOrigin = /^https?:\/\//.test(url) ? (new URL(url))?.origin : window.origin;
+
+    container.firstChild.contentWindow.postMessage({
+        name: 'statamic.preview.updated',
+        ...payload
+    }, targetOrigin);
+}
+
 export default {
     methods: {
-        updateIframeContents(url) {
+        updateIframeContents(url, target, payload) {
             const iframe = document.createElement('iframe');
             iframe.setAttribute('frameborder', '0');
             iframe.setAttribute('src', url);
@@ -9,8 +28,20 @@ export default {
 
             const container = this.$refs.contents;
 
+            // If there's no iframe yet, just append it.
             if (! container.firstChild) {
                 container.appendChild(iframe);
+                return;
+            }
+
+            let shouldRefresh = target.refresh;
+
+            if (hasIframeSourceChanged(container.firstChild.src, iframe.src)) {
+                shouldRefresh = true;
+            }
+
+            if (! shouldRefresh) {
+                postMessageToIframe(container, url, payload);
                 return;
             }
 

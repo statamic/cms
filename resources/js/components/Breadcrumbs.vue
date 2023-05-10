@@ -6,7 +6,7 @@
             <a :href="crumb.url"
                 v-text="crumb.text"
                 class="font-bold hover:text-blue"
-            /><span v-if="i < crumbs.length-1" class="px-sm">›</span>
+            /><span v-if="i < crumbs.length-1" class="px-1">›</span>
         </span>
 
     </div>

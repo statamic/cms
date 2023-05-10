@@ -1,0 +1,20 @@
+.column-picker-item {
+    @apply text-sm outline-none flex items-center select-none;
+
+    &.sortable {
+        @apply rounded bg-white border;
+        &:hover  {
+            @apply bg-gray-200;
+        }
+
+        /*  Drag interaction */
+        &.draggable-source--is-dragging {
+            /*  @apply bg-white; */
+            cursor: grabbing;
+        }
+    }
+}
+
+.draggable--is-dragging {
+    cursor: grabbing;
+}

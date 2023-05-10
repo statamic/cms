@@ -70,7 +70,6 @@ return [
     'assign_roles' => 'Benutzer:innen Rollen zuweisen',
     'group_updates' => 'Updates',
     'view_updates' => 'Updates anzeigen',
-    'perform_updates' => 'Updates durchführen',
     'group_utilities' => 'Hilfsmittel',
     'access_utility' => ':title',
     'access_utility_desc' => 'Gewährt Zugriff auf das Hilfsmittel «:title»',

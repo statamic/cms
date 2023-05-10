@@ -11,12 +11,12 @@ class FieldTransformer
 {
     public static function fromVue(array $submitted)
     {
-        $method = $submitted['type'].'SectionField';
+        $method = $submitted['type'].'TabField';
 
         return static::$method($submitted);
     }
 
-    private static function importSectionField(array $submitted)
+    private static function importTabField(array $submitted)
     {
         return array_filter([
             'import' => $submitted['fieldset'],
@@ -24,7 +24,7 @@ class FieldTransformer
         ]);
     }
 
-    private static function inlineSectionField(array $submitted)
+    private static function inlineTabField(array $submitted)
     {
         $field = Arr::removeNullValues(array_except($submitted['config'], ['isNew']));
 
@@ -46,7 +46,7 @@ class FieldTransformer
         ]);
     }
 
-    private static function referenceSectionField(array $submitted)
+    private static function referenceTabField(array $submitted)
     {
         $config = Arr::removeNullValues(array_only($submitted['config'], $submitted['config_overrides']));
 

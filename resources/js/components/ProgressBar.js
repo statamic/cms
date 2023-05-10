@@ -1,5 +1,5 @@
 import Vue from 'vue'
-const progress = require('nprogress');
+import progress from 'nprogress';
 
 const vm = new Vue({
 

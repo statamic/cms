@@ -1,19 +1,9 @@
 <template>
-
-    <element-container @resized="width = $event.width">
-        <div class="publish-fields" :class="{ 'publish-fields-narrow': width <= 600 }">
-            <slot />
-        </div>
-    </element-container>
-
+    <!--
+        This component is deprecated.
+        You can replace any instance of it with <div class="publish-fields @container">...</div>.
+    -->
+    <div class="publish-fields @container">
+        <slot />
+    </div>
 </template>
-
-<script>
-export default {
-    data() {
-        return {
-            width: null
-        }
-    }
-}
-</script>

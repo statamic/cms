@@ -1,40 +1,54 @@
 <template>
 
+<portal name="grid-fullscreen" :disabled="!fullScreenMode" :provide="provide">
+
     <element-container @resized="containerWidth = $event.width">
-    <div class="grid-fieldtype-container">
+    <div class="grid-fieldtype-container" :class="{'grid-fullscreen bg-white': fullScreenMode }">
 
-        <small v-if="hasExcessRows" class="help-block text-red">
-            {{ __('Max Rows') }}: {{ maxRows }}
-        </small>
-        <small v-else-if="hasNotEnoughRows" class="help-block text-red">
-            {{ __('Min Rows') }}: {{ minRows }}
-        </small>
+        <header class="bg-gray-200 border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
+            <h2 v-text="config.display" />
+            <button class="btn-close absolute top-2 right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
+        </header>
 
-        <component
-            :is="component"
-            :fields="fields"
-            :rows="value"
-            :meta="meta.existing"
-            :name="name"
-            :can-delete-rows="canDeleteRows"
-            :can-add-rows="canAddRows"
-            @updated="updated"
-            @meta-updated="updateRowMeta"
-            @removed="removed"
-            @duplicate="duplicate"
-            @sorted="sorted"
-            @focus="focused = true"
-            @blur="blurred"
-        />
+        <section :class="{'p-4': fullScreenMode}">
 
-        <button
-            class="btn"
-            v-if="canAddRows"
-            v-text="addRowButtonLabel"
-            @click.prevent="addRow" />
+            <small v-if="hasExcessRows" class="help-block text-red-500">
+                {{ __('Max Rows') }}: {{ maxRows }}
+            </small>
+            <small v-else-if="hasNotEnoughRows" class="help-block text-red-500">
+                {{ __('Min Rows') }}: {{ minRows }}
+            </small>
+
+            <component
+                :is="component"
+                :fields="fields"
+                :rows="value"
+                :meta="meta.existing"
+                :name="name"
+                :can-delete-rows="canDeleteRows"
+                :can-add-rows="canAddRows"
+                :allow-fullscreen="config.fullscreen"
+                @updated="updated"
+                @meta-updated="updateRowMeta"
+                @removed="removed"
+                @duplicate="duplicate"
+                @sorted="sorted"
+                @focus="focused = true"
+                @blur="blurred"
+            />
+
+            <button
+                class="btn"
+                v-if="canAddRows"
+                v-text="addRowButtonLabel"
+                @click.prevent="addRow" />
+
+        </section>
 
     </div>
     </element-container>
+
+</portal>
 
 </template>
 
@@ -60,8 +74,15 @@ export default {
         return {
             containerWidth: null,
             focused: false,
+            fullScreenMode: false,
+            provide: {
+                grid: this.makeGridProvide(),
+                storeName: this.storeName,
+            },
         }
     },
+
+    inject: ['storeName'],
 
     computed: {
 
@@ -117,11 +138,6 @@ export default {
             return `${this.config.display}: ${__n(':count row|:count rows', this.value.length)}`;
         }
 
-    },
-
-    reactiveProvide: {
-        name: 'grid',
-        include: ['config', 'isReorderable', 'isReadOnly', 'handle', 'fieldPathPrefix']
     },
 
     watch: {
@@ -205,6 +221,24 @@ export default {
                 }
             }, 1);
         },
+
+        toggleFullScreen() {
+            this.fullScreenMode = !this.fullScreenMode;
+        },
+
+        makeGridProvide() {
+            const grid = {};
+            Object.defineProperties(grid, {
+                config: { get: () => this.config },
+                isReorderable: { get: () => this.isReorderable },
+                isReadOnly: { get: () => this.isReadOnly },
+                handle: { get: () => this.handle },
+                fieldPathPrefix: { get: () => this.fieldPathPrefix },
+                fullScreenMode: { get: () => this.fullScreenMode },
+                toggleFullScreen: { get: () => this.toggleFullScreen },
+            });
+            return grid;
+        }
 
     }
 

@@ -3,6 +3,17 @@ import { data_get } from  '../../bootstrap/globals.js'
 import { data_set } from  '../../bootstrap/globals.js'
 import isObject from 'underscore/modules/isObject.js'
 
+function data_delete(obj, path) {
+    var parts = path.split('.');
+    while (parts.length - 1) {
+        var key = parts.shift();
+        var shouldBeArray = parts.length ? new RegExp('^[0-9]+$').test(parts[0]) : false;
+        if (! (key in obj)) obj[key] = shouldBeArray ? [] : {};
+        obj = obj[key];
+    }
+    delete obj[parts[0]];
+}
+
 export default class Values {
     constructor(values, jsonFields) {
         this.values = clone(values);
@@ -73,11 +84,10 @@ export default class Values {
         if (this.missingValue(dottedKey)) return;
 
         let values = clone(this.values);
-        let jsPath = this.dottedKeyToJsPath('values.' + dottedKey);
-        let fieldValue = eval(jsPath);
+        let fieldValue = data_get(values, dottedKey);
         let decodedFieldValue = JSON.parse(fieldValue);
 
-        eval(jsPath + ' = decodedFieldValue');
+        data_set(values, dottedKey, decodedFieldValue);
 
         this.values = values;
     }
@@ -86,11 +96,10 @@ export default class Values {
         if (this.missingValue(dottedKey)) return;
 
         let values = clone(this.values);
-        let jsPath = this.dottedKeyToJsPath('values.' + dottedKey);
-        let fieldValue = eval(jsPath);
+        let fieldValue = data_get(values, dottedKey);
         let encodedFieldValue = JSON.stringify(fieldValue);
 
-        eval(jsPath + ' = encodedFieldValue');
+        data_set(values, dottedKey, encodedFieldValue);
 
         this.values = values;
     }
@@ -113,9 +122,8 @@ export default class Values {
         if (this.missingValue(dottedKey)) return;
 
         let values = clone(this.values);
-        let jsPath = this.dottedKeyToJsPath('values.' + dottedKey);
 
-        eval('delete ' + jsPath);
+        data_delete(values, dottedKey);
 
         this.values = values;
     }

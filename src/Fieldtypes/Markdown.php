@@ -16,72 +16,80 @@ class Markdown extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'container' => [
-                'display' => __('Container'),
-                'instructions' => __('statamic::fieldtypes.markdown.config.container'),
-                'type' => 'asset_container',
-                'mode' => 'select',
-                'max_items' => 1,
-                'width' => 50,
+            [
+                'display' => 'Editor',
+                'fields' => [
+                    'automatic_line_breaks' => [
+                        'display' => __('Automatic Line Breaks'),
+                        'instructions' => __('statamic::fieldtypes.markdown.config.automatic_line_breaks'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'automatic_links' => [
+                        'display' => __('Automatic Links'),
+                        'instructions' => __('statamic::fieldtypes.markdown.config.automatic_links'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'escape_markup' => [
+                        'display' => __('Escape Markup'),
+                        'instructions' => __('statamic::fieldtypes.markdown.config.escape_markup'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'smartypants' => [
+                        'display' => __('Smartypants'),
+                        'instructions' => __('statamic::fieldtypes.markdown.config.smartypants'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'parser' => [
+                        'display' => __('Parser'),
+                        'instructions' => __('statamic::fieldtypes.markdown.config.parser'),
+                        'type' => 'text',
+                    ],
+                    'default' => [
+                        'display' => __('Default Value'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'markdown',
+                    ],
+                ],
             ],
-            'folder' => [
-                'display' => __('Folder'),
-                'instructions' => __('statamic::fieldtypes.markdown.config.folder'),
-                'type' => 'asset_folder',
-                'max_items' => 1,
-                'width' => 50,
+            [
+                'display' => 'Assets',
+                'fields' => [
+                    'container' => [
+                        'display' => __('Container'),
+                        'instructions' => __('statamic::fieldtypes.markdown.config.container'),
+                        'type' => 'asset_container',
+                        'mode' => 'select',
+                        'max_items' => 1,
+                    ],
+                    'folder' => [
+                        'display' => __('Folder'),
+                        'instructions' => __('statamic::fieldtypes.markdown.config.folder'),
+                        'type' => 'asset_folder',
+                        'max_items' => 1,
+                        'if' => [
+                            'container' => 'not empty',
+                        ],
+                    ],
+                    'restrict' => [
+                        'display' => __('Restrict'),
+                        'instructions' => __('statamic::fieldtypes.markdown.config.restrict'),
+                        'type' => 'toggle',
+                    ],
+                ],
             ],
-            'restrict' => [
-                'display' => __('Restrict'),
-                'instructions' => __('statamic::fieldtypes.markdown.config.restrict'),
-                'type' => 'toggle',
-                'width' => 50,
-            ],
-            'automatic_line_breaks' => [
-                'display' => __('Automatic Line Breaks'),
-                'instructions' => __('statamic::fieldtypes.markdown.config.automatic_line_breaks'),
-                'type' => 'toggle',
-                'default' => true,
-                'width' => 50,
-            ],
-            'automatic_links' => [
-                'display' => __('Automatic Links'),
-                'instructions' => __('statamic::fieldtypes.markdown.config.automatic_links'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'escape_markup' => [
-                'display' => __('Escape Markup'),
-                'instructions' => __('statamic::fieldtypes.markdown.config.escape_markup'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'smartypants' => [
-                'display' => __('Smartypants'),
-                'instructions' => __('statamic::fieldtypes.markdown.config.smartypants'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'parser' => [
-                'display' => __('Parser'),
-                'instructions' => __('statamic::fieldtypes.markdown.config.parser'),
-                'type' => 'text',
-                'width' => 50,
-            ],
-            'antlers' => [
+            [
                 'display' => 'Antlers',
-                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
-                'type' => 'toggle',
-                'width' => 50,
-            ],
-            'default' => [
-                'display' => __('Default Value'),
-                'instructions' => __('statamic::messages.fields_default_instructions'),
-                'type' => 'markdown',
-                'width' => 100,
+                'fields' => [
+                    'antlers' => [
+                        'display' => 'Allow Antlers',
+                        'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                        'type' => 'toggle',
+                    ],
+                ],
             ],
         ];
     }

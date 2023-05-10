@@ -1,15 +1,93 @@
 <template>
-    <div class="color-picker"></div>
+    <div class="input-group max-w-[130px]">
+        <popover name="swatches" class="color-picker" placement="bottom-start">
+            <template #trigger>
+                <div
+                    class="input-group-prepend px-px"
+                    v-tooltip="__('Pick Color')"
+                >
+                    <div class="relative flex items-center outline-none">
+                        <div class="inline-block cursor-pointer rounded m-0 p-[2px]">
+                            <div
+                                class="rounded-sm w-8 h-8"
+                                :class="{ 'border': !value, 'cursor-not-allowed': isReadOnly }"
+                                :style="{ 'background-color': value }"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <template #default="{ close: closePopover }">
+                <div class="p-4">
+                    <div v-if="config.swatches.length" class="grid grid-cols-4 gap-3">
+                        <div
+                            v-for="swatch in config.swatches"
+                            class="w-10 h-10 inline-block cursor-pointer rounded flex"
+                            :style="{ 'background-color': swatch }"
+                            @click="() => { update(swatch); closePopover(); }"
+                        >
+                            <div
+                                v-if="swatch === value"
+                                class="flex items-center justify-center h-full w-full"
+                            >
+                                <div class="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center">
+                                    <svg version="1.1" role="presentation" width="12" height="12" viewBox="0 0 1792 1792" class="text-white fill-current"><path d="M1671 566q0 40-28 68l-724 724-136 136q-28 28-68 28t-68-28l-136-136-362-362q-28-28-28-68t28-68l136-136q28-28 68-28t68 28l294 295 656-657q28-28 68-28t68 28l136 136q28 28 28 68z" ></path></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="config.allow_any"
+                        class="flex items-center"
+                        :class="{ 'mt-5': config.swatches.length }"
+                    >
+                        <input
+                            class="h-10 w-full cursor-pointer input-text w-full rounded p-[2px] mr-2"
+                            type="color"
+                            :value="customColor"
+                            @input="customColorSelected"
+                        />
+                        <button
+                            class="btn btn-primary h-10 px-2"
+                            v-text="__('OK')"
+                            @click="() => { commitCustomColor(); closePopover() }"
+                        />
+                    </div>
+                </div>
+            </template>
+        </popover>
+
+        <input
+            v-if="config.allow_any"
+            class="input-text font-mono"
+            maxlength="7"
+            type="text"
+            :readonly="isReadOnly"
+            :value="customColor"
+            @input="updateDebounced($event.target.value)"
+        />
+    </div>
 </template>
 
 <script>
-import '@simonwep/pickr/dist/themes/classic.min.css';
-import '@simonwep/pickr/dist/themes/nano.min.css';
-import Pickr from '@simonwep/pickr';
-
 export default {
 
     mixins: [Fieldtype],
+
+    data () {
+        return {
+            customColor: this.value
+        }
+    },
+
+    watch: {
+
+        value(value) {
+            this.customColor = value;
+        },
+
+    },
 
     computed: {
 
@@ -21,52 +99,16 @@ export default {
 
     },
 
-    mounted() {
-        const pickr = new Pickr ({
-            el: this.$el,
-            disabled: this.isReadOnly,
-            lockOpacity: this.config.lock_opacity,
-            default: this.value ?? this.config.default ?? null,
-            defaultRepresentation: this.config.default_color_mode,
-            components: {
+    methods: {
 
-                // Main components
-                preview: true,
-                opacity: true,
-                hue: true,
+        customColorSelected(event) {
+            this.customColor = event.target.value;
+        },
 
-                // Input / output Options
-                interaction: {
-                    hex: this.config.color_modes.includes('hex'),
-                    rgba: this.config.color_modes.includes('rgba'),
-                    hsla: this.config.color_modes.includes('hsla'),
-                    hsva: this.config.color_modes.includes('hsva'),
-                    cmyk: this.config.color_modes.includes('cmyk'),
-                    input: true,
-                    clear: true,
-                    save: true
-                }
-            },
-            outputPrecision: 1,
-            strings: {
-                save: __('Save'),
-                clear: __('Clear')
-            },
-            swatches: this.config.swatches,
-            theme: this.config.theme || 'classic'
-        });
+        commitCustomColor() {
+            this.update(this.customColor);
+        }
 
-        pickr.on('save', (...args) => {
-            var rep = args[1].getColorRepresentation();
-            if (args[0] && rep) {
-                // Dynamically call toHEX(), toRGBA(), etc
-                this.update(args[0]['to' + rep]().toString(0));
-            } else {
-                // Color was manually cleared
-                this.update(null);
-            }
-            pickr.hide();
-        });
     }
 
 };

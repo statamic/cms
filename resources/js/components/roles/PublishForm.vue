@@ -1,12 +1,15 @@
 <template>
 
         <div>
-            <header class="mb-3">
+            <header class="mb-6">
                 <breadcrumb :url="breadcrumbUrl" :title="__('Roles & Permissions')" />
-                <h1 v-text="initialTitle || __('Create Role')" />
+                <div class="flex items-center justify-between">
+                    <h1 v-text="initialTitle || __('Create Role')" />
+                    <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
+                </div>
             </header>
 
-            <publish-fields-container class="card p-0 mb-3 configure-section">
+            <div class="card p-0 mb-6 configure-tab publish-fields @container">
 
                 <form-group
                     handle="title"
@@ -28,7 +31,7 @@
                     v-model="handle"
                 />
 
-                <div class="text-xs text-red p-3 pt-0" v-if="initialHandle && handle != initialHandle">
+                <div class="text-xs text-red-500 p-6 pt-0" v-if="initialHandle && handle != initialHandle">
                     {{ __('messages.role_change_handle_warning') }}
                 </div>
 
@@ -42,20 +45,14 @@
                     v-model="isSuper"
                 />
 
-            </publish-fields-container>
+            </div>
 
             <div v-if="!isSuper">
-                <div class="mt-3 content" v-for="group in permissions" :key="group.handle">
-                    <h2 class="mt-5 text-base mb-1">{{ group.label }}</h2>
+                <div class="mt-6 content" v-for="group in permissions" :key="group.handle">
+                    <h2 class="mt-10 text-base mb-2">{{ group.label }}</h2>
                     <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
                 </div>
             </div>
-
-            <div class="py-2 mt-3 border-t flex justify-between">
-                <a :href="indexUrl" class="btn" v-text="__('Cancel') "/>
-                <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
-            </div>
-
         </div>
 </template>
 

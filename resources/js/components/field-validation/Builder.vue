@@ -2,23 +2,35 @@
 
     <div class="w-full">
 
-        <div class="form-group publish-field select-fieldtype field-w-full">
-            <label class="publish-field-label">{{ __('Required') }}</label>
-            <div class="help-block -mt-1">
-                <p>{{ __('messages.field_validation_required_instructions') }}</p>
+        <div class="flex">
+
+            <div class="form-group publish-field select-fieldtype field-w-full">
+                <label class="publish-field-label">{{ __('Required') }}</label>
+                <div class="help-block -mt-2">
+                    <p>{{ __('messages.field_validation_required_instructions') }}</p>
+                </div>
+                <toggle-input v-model="isRequired" />
             </div>
-            <toggle-input v-model="isRequired" />
+
+            <div class="form-group publish-field select-fieldtype field-w-full">
+                <label class="publish-field-label">{{ __('Sometimes') }}</label>
+                <div class="help-block -mt-2">
+                    <p>{{ __('messages.field_validation_sometimes_instructions') }}</p>
+                </div>
+                <toggle-input v-model="sometimesValidate" />
+            </div>
+
         </div>
 
         <div class="form-group publish-field select-fieldtype field-w-full">
             <label class="publish-field-label">{{ __('Rules') }}</label>
-            <div class="help-block -mt-1">
+            <div class="help-block -mt-2">
                 <p>
                     {{ __('messages.field_validation_advanced_instructions') }}
                     <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
-                    <span v-if="helpBlock" class="italic text-grey-50 float-right">
+                    <span v-if="helpBlock" class="italic text-gray-500 float-right">
                         {{ __('Example') }}:
-                        <span class="italic text-blue-lighter">{{ helpBlock }}</span>
+                        <span class="italic text-blue-400">{{ helpBlock }}</span>
                     </span>
                 </p>
             </div>
@@ -47,10 +59,10 @@
                     />
                 </template>
                 <template #option="{ value, display }">
-                    {{ display }} <code class="ml-1">{{ valueWithoutTrailingColon(value) }}</code>
+                    {{ display }} <code class="ml-2">{{ valueWithoutTrailingColon(value) }}</code>
                 </template>
                 <template #no-options="{ search }">
-                    <div class="vs__dropdown-option text-left">{{ __('Add') }} <code class="ml-1">{{ search }}</code></div>
+                    <div class="vs__dropdown-option text-left">{{ __('Add') }} <code class="ml-2">{{ search }}</code></div>
                 </template>
             </v-select>
 
@@ -69,7 +81,7 @@
                     v-model="rules"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap outline-none">
-                        <span v-for="rule in rules" :key="rule" class="vs__selected mt-1 sortable-item">
+                        <span v-for="rule in rules" :key="rule" class="vs__selected mt-2 sortable-item">
                             {{ rule }}
                             <button @click="remove(rule)" type="button" :aria-label="__('Delete Rule')" class="vs__deselect">
                                 <span>×</span>
@@ -106,6 +118,7 @@ export default {
     data() {
         return {
             isRequired: false,
+            sometimesValidate: false,
             rules: [],
             selectedLaravelRule: null,
             customRule: null,
@@ -113,6 +126,7 @@ export default {
     },
 
     computed: {
+
         laravelVersion() {
             return this.$store.state.statamic.config.laravelVersion;
         },
@@ -162,14 +176,24 @@ export default {
 
             return rule.example || false;
         },
+
     },
 
     watch: {
+
         isRequired(value) {
             if (value === true) {
-                this.ensureRequired();
+                this.ensureToggleableRule('required');
             } else {
                 this.remove('required');
+            }
+        },
+
+        sometimesValidate(value) {
+            if (value === true) {
+                this.ensureToggleableRule('sometimes');
+            } else {
+                this.remove('sometimes');
             }
         },
 
@@ -178,6 +202,7 @@ export default {
 
             this.$emit('updated', value);
         },
+
     },
 
     created() {
@@ -185,6 +210,7 @@ export default {
     },
 
     methods: {
+
         getInitial() {
             this.rules = this.config.validate
                 ? this.explodeRules(this.config.validate)
@@ -195,6 +221,7 @@ export default {
             this.selectedLaravelRule = null;
             this.customRule = null;
             this.isRequired = this.rules.includes('required');
+            this.sometimesValidate = this.rules.includes('sometimes');
         },
 
         explodeRules(rules) {
@@ -213,9 +240,9 @@ export default {
             return rule;
         },
 
-        ensureRequired() {
-            if (! this.rules.includes('required')) {
-                this.rules.unshift('required');
+        ensureToggleableRule(rule) {
+            if (! this.rules.includes(rule)) {
+                this.rules.unshift(rule);
             }
         },
 

@@ -17,16 +17,13 @@
             @visible-columns-updated="visibleColumns = $event"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0 relative">
-                    <div class="data-list-header min-h-16">
-                        <data-list-filters
-                            :search-query="searchQuery"
-                            @search-changed="searchChanged"
-                            @reset="filtersReset"
-                        />
+                <div class="card overflow-hidden p-0 relative">
+                    <div class="flex flex-wrap items-center justify-between p-2 text-sm border-b">
+                        <data-list-search class="h-8 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+                        <data-list-column-picker class="ml-2" :preferences-key="preferencesKey('columns')" />
                     </div>
 
-                    <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+                    <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
 
                     <data-list-bulk-actions
                         :url="actionUrl"
@@ -61,7 +58,7 @@
                 </div>
 
                 <data-list-pagination
-                    class="mt-3"
+                    class="mt-6"
                     :resource-meta="meta"
                     :per-page="perPage"
                     :show-totals="true"
