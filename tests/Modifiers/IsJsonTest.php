@@ -18,6 +18,7 @@ class IsJsonTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider bourneJsonBourne
      */
     public function it_returns_true_if_string_is_valid_json($expected, $input): void

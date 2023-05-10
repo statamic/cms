@@ -12,6 +12,7 @@ use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 use Statamic\Statamic;
 use Statamic\Support\DateFormat;
+use Statamic\Validation\DateFieldtype as ValidationRule;
 
 class Date extends Fieldtype
 {
@@ -24,78 +25,90 @@ class Date extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            // @TODO hook up multiple mode
-            'mode' => [
-                'display' => __('Mode'),
-                'instructions' => __('statamic::fieldtypes.date.config.mode'),
-                'type' => 'select',
-                'default' => 'single',
-                'width' => 50,
-                'options' => [
-                    'single' => __('Single'),
-                    // 'multiple' => __('Multiple'),
-                    'range' => __('Range'),
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.date.config.mode'),
+                        'type' => 'select',
+                        'default' => 'single',
+                        'options' => [
+                            'single' => __('Single'),
+                            // 'multiple' => __('Multiple'), // @TODO hook up
+                            'range' => __('Range'),
+                        ],
+                    ],
+                    'inline' => [
+                        'display' => __('Inline'),
+                        'instructions' => __('statamic::fieldtypes.date.config.inline'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'full_width' => [
+                        'display' => __('Full Width'),
+                        'instructions' => __('statamic::fieldtypes.date.config.full_width'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'if' => [
+                            'inline' => true,
+                        ],
+                    ],
+                    'columns' => [
+                        'display' => __('Columns'),
+                        'instructions' => __('statamic::fieldtypes.date.config.columns'),
+                        'type' => 'integer',
+                        'default' => 1,
+                    ],
+                    'rows' => [
+                        'display' => __('Rows'),
+                        'instructions' => __('statamic::fieldtypes.date.config.rows'),
+                        'type' => 'integer',
+                        'default' => 1,
+                    ],
                 ],
             ],
-            'format' => [
-                'display' => __('Format'),
-                'instructions' => __('statamic::fieldtypes.date.config.format'),
-                'type' => 'text',
-                'width' => 50,
+            [
+                'display' => __('Timepicker'),
+                'fields' => [
+                    'time_enabled'  => [
+                        'display' => __('Time Enabled'),
+                        'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'time_seconds_enabled'  => [
+                        'display' => __('Show Seconds'),
+                        'instructions' => __('statamic::fieldtypes.date.config.time_seconds_enabled'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                ],
             ],
-            'earliest_date' => [
-                'display' => __('Earliest Date'),
-                'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
-                'type' => 'date',
-                'width' => 50,
+            [
+                'display' => __('Boundaries'),
+                'fields' => [
+                    'earliest_date' => [
+                        'display' => __('Earliest Date'),
+                        'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
+                        'type' => 'date',
+                    ],
+                    'latest_date' => [
+                        'display' => __('Latest Date'),
+                        'instructions' => __('statamic::fieldtypes.date.config.latest_date'),
+                        'type' => 'date',
+                    ],
+                ],
             ],
-            'latest_date' => [
-                'display' => __('Latest Date'),
-                'instructions' => __('statamic::fieldtypes.date.config.latest_date'),
-                'type' => 'date',
-                'width' => 50,
-            ],
-            'time_enabled'  => [
-                'display' => __('Time Enabled'),
-                'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'time_seconds_enabled'  => [
-                'display' => __('Show Seconds'),
-                'instructions' => __('statamic::fieldtypes.date.config.time_seconds_enabled'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'full_width' => [
-                'display' => __('Full Width'),
-                'instructions' => __('statamic::fieldtypes.date.config.full_width'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'inline' => [
-                'display' => __('Inline'),
-                'instructions' => __('statamic::fieldtypes.date.config.inline'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'columns' => [
-                'display' => __('Columns'),
-                'instructions' => __('statamic::fieldtypes.date.config.columns'),
-                'type' => 'integer',
-                'default' => 1,
-                'width' => 50,
-            ],
-            'rows' => [
-                'display' => __('Rows'),
-                'instructions' => __('statamic::fieldtypes.date.config.rows'),
-                'type' => 'integer',
-                'default' => 1,
-                'width' => 50,
+            [
+                'display' => __('Data Format'),
+                'fields' => [
+                    'format' => [
+                        'display' => __('Format'),
+                        'instructions' => __('statamic::fieldtypes.date.config.format'),
+                        'type' => 'text',
+                    ],
+                ],
             ],
         ];
     }
@@ -112,10 +125,17 @@ class Date extends Fieldtype
 
     private function preProcessSingle($value)
     {
-        $vueFormat = $this->defaultFormat();
-
         if (! $value) {
-            return $this->isRequired() ? Carbon::now()->format($vueFormat) : null;
+            return ['date' => null, 'time' => null];
+        }
+
+        if ($value === 'now') {
+            return [
+                // We want the current date and time to be rendered, but since we don't
+                // know the users timezone, we'll let the front-end handle it.
+                'date' => now()->startOfDay()->format(self::DEFAULT_DATE_FORMAT),
+                'time' => $this->config('time_enabled') ? 'now' : null, // This will get replaced with the current time in Vue component.
+            ];
         }
 
         // If the value is an array, this field probably used to be a range. In this case, we'll use the start date.
@@ -125,7 +145,7 @@ class Date extends Fieldtype
 
         $date = $this->parseSaved($value);
 
-        return $date->format($vueFormat);
+        return $this->splitDateTimeForPreProcessSingle($date);
     }
 
     private function preProcessRange($value)
@@ -133,10 +153,10 @@ class Date extends Fieldtype
         $vueFormat = $this->defaultFormat();
 
         if (! $value) {
-            return $this->isRequired() ? [
+            return $this->splitDateTimeForPreProcessRange($this->isRequired() ? [
                 'start' => Carbon::now()->format($vueFormat),
                 'end' => Carbon::now()->format($vueFormat),
-            ] : null;
+            ] : null);
         }
 
         // If the value is a string, this field probably used to be a single date.
@@ -145,59 +165,88 @@ class Date extends Fieldtype
             $value = ['start' => $value, 'end' => $value];
         }
 
-        return [
+        return $this->splitDateTimeForPreProcessRange([
             'start' => $this->parseSaved($value['start'])->format($vueFormat),
             'end' => $this->parseSaved($value['end'])->format($vueFormat),
+        ]);
+    }
+
+    private function splitDateTimeForPreProcessSingle(Carbon $carbon)
+    {
+        return [
+            'date' => $carbon->format(self::DEFAULT_DATE_FORMAT),
+            'time' => $this->config('time_enabled')
+                ? $carbon->format($this->config('time_seconds_enabled') ? 'H:i:s' : 'H:i')
+                : null,
         ];
     }
 
-    private function isRequired()
+    private function splitDateTimeForPreProcessRange(array $range = null)
+    {
+        return ['date' => $range, 'time' => null];
+    }
+
+    public function isRequired()
     {
         return in_array('required', $this->field->rules()[$this->field->handle()]);
     }
 
     public function process($data)
     {
+        if (is_null($data) || is_null($data['date'])) {
+            return null;
+        }
+
         return $this->config('mode') == 'range' ? $this->processRange($data) : $this->processSingle($data);
     }
 
     private function processSingle($data)
     {
-        if (is_null($data)) {
-            return $data;
-        }
-
-        $date = Carbon::parse($data);
-
-        return $this->formatAndCast($date, $this->saveFormat());
+        return $this->processDateTime($data['date'].' '.$data['time']);
     }
 
     private function processRange($data)
     {
-        if (is_null($data)) {
-            return $data;
-        }
+        $date = $data['date'];
 
         return [
-            'start' => $this->processSingle($data['start']),
-            'end' => $this->processSingle($data['end']),
+            'start' => $this->processDateTime($date['start']),
+            'end' => $this->processDateTime($date['end']),
         ];
     }
 
-    public function preProcessIndex($data)
+    private function processDateTime($value)
     {
-        if (! $data) {
+        $date = Carbon::parse($value);
+
+        return $this->formatAndCast($date, $this->saveFormat());
+    }
+
+    public function preProcessIndex($value)
+    {
+        if (! $value) {
             return;
         }
 
         if ($this->config('mode') === 'range') {
-            $start = Carbon::parse($data['start'])->format($this->indexDisplayFormat());
-            $end = Carbon::parse($data['end'])->format($this->indexDisplayFormat());
+            // If the value is a string, this field probably used to be a single date.
+            // In this case, we'll use the date for both the start and end of the range.
+            if (is_string($value)) {
+                $value = ['start' => $value, 'end' => $value];
+            }
+
+            $start = $this->parseSaved($value['start'])->format($this->indexDisplayFormat());
+            $end = $this->parseSaved($value['end'])->format($this->indexDisplayFormat());
 
             return $start.' - '.$end;
         }
 
-        return $this->parseSaved($data)->format($this->indexDisplayFormat());
+        // If the value is an array, this field probably used to be a range. In this case, we'll use the start date.
+        if (is_array($value)) {
+            $value = $value['start'];
+        }
+
+        return $this->parseSaved($value)->format($this->indexDisplayFormat());
     }
 
     private function saveFormat()
@@ -207,7 +256,7 @@ class Date extends Fieldtype
 
     public function indexDisplayFormat()
     {
-        return $this->config('time_enabled')
+        return $this->config('time_enabled') && $this->config('mode', 'single') === 'single'
             ? Statamic::cpDateTimeFormat()
             : Statamic::cpDateFormat();
     }
@@ -295,5 +344,20 @@ class Date extends Fieldtype
         } catch (InvalidFormatException|InvalidArgumentException $e) {
             return Carbon::parse($value);
         }
+    }
+
+    public function rules(): array
+    {
+        return [new ValidationRule($this)];
+    }
+
+    public function timeEnabled()
+    {
+        return $this->config('time_enabled');
+    }
+
+    public function secondsEnabled()
+    {
+        return $this->config('time_seconds_enabled');
     }
 }

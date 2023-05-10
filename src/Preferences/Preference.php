@@ -6,7 +6,7 @@ class Preference
 {
     protected $handle;
     protected $field;
-    protected $section = 'general';
+    protected $tab = 'general';
 
     public function handle(string $handle = null)
     {
@@ -30,13 +30,13 @@ class Preference
         return $this;
     }
 
-    public function section(string $section = null)
+    public function tab(string $tab = null)
     {
         if (func_num_args() === 0) {
-            return $this->section;
+            return $this->tab;
         }
 
-        $this->section = $section;
+        $this->tab = $tab;
 
         return $this;
     }

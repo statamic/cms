@@ -31,7 +31,7 @@ class MakeActionTest extends TestCase
     {
         $path = base_path('app/Actions/Delete.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:action', ['name' => 'Delete']);
 
@@ -78,7 +78,7 @@ class MakeActionTest extends TestCase
 
         Composer::shouldReceive('installedPath')->andReturn($path);
 
-        $this->assertFileNotExists($action = "$path/src/Actions/Yoda.php");
+        $this->assertFileDoesNotExist($action = "$path/src/Actions/Yoda.php");
 
         $this->artisan('statamic:make:action', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 

@@ -1,3 +1,3 @@
-module.exports = function(value) {
+export default function(value) {
     return markdown(value);
 };

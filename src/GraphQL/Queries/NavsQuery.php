@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Nav;
@@ -20,6 +21,8 @@ class NavsQuery extends Query
 
     public function resolve($root, $args)
     {
-        return Nav::all();
+        $allowed = ResourceAuthorizer::allowedSubResources('graphql', 'navs');
+
+        return Nav::all()->filter(fn ($nav) => in_array($nav->handle(), $allowed));
     }
 }

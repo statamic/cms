@@ -1,0 +1,79 @@
+/* ==========================================================================
+   FOCAL POINT EDITOR
+   ========================================================================== */
+
+.focal-point {
+    @apply absolute inset-0 bg-gray-800;
+    border: 5px solid #394045;
+}
+
+.focal-point-toolbox {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 120;
+    width: 380px;
+    overflow-y: auto;
+    max-height: 95vh;
+}
+
+.focal-point-image {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    @apply my-4;
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+}
+
+.focal-point-reticle {
+    border-radius: 50%;
+    position: absolute;
+    transition: top 0.5s ease, left 0.5s ease;
+    pointer-events: none;
+
+    &.zoomed {
+        border: 1px solid white;
+        box-shadow: 0 0 5px rgba(0,0,0,.5);
+    }
+
+    &:before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        margin: -4px 0 0 -4px;
+        box-shadow: 0 0 4px rgba(0,0,0,.75);
+    }
+}
+
+.focal-point .frame {
+    position: absolute;
+    margin: -5px 0 0 -5px;
+    border: 10px solid #394045;
+    box-sizing: content-box;
+    overflow: hidden;
+
+    .frame-image {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        transition: all 0.5s ease;
+    }
+}
+
+.focal-point {
+    .frame-1, .frame-4, .frame-7 { left: 0; width: 66.6666667%; }
+    .frame-2, .frame-5, .frame-8 { left: 66.6666667%; width: 22.2222222%; }
+    .frame-3, .frame-6, .frame-9 { left: 88.8888889%; width: 11.1111111%; }
+    .frame-1, .frame-2, .frame-3 { top: 0; height: 66.6666667%; }
+    .frame-4, .frame-5, .frame-6 { top: 66.6666667%; height: 22.2222222%; }
+    .frame-7, .frame-8, .frame-9 { top: 88.8888889%; height: 11.1111111%; }
+}

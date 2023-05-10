@@ -1,0 +1,287 @@
+/* ==========================================================================
+   BASE FORM ELEMENTS
+   ========================================================================== */
+
+label {
+    @apply text-gray-800 font-normal text-sm block leading-normal;
+}
+
+input {
+    @apply placeholder:text-gray-600;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    @apply text-lg;
+}
+
+select {
+    @apply text-base bg-gray-300 border-2 border-gray-300 cursor-pointer;
+}
+
+
+/* Text Fields
+  ========================================================================== */
+
+.input-text {
+    @apply appearance-none bg-gray-100 text-gray-800 max-w-full w-full border p-2 rounded shadow-inner placeholder:text-gray-600 text-md @lg:text-base;
+    @apply border;
+    transition: border-color .15s ease-in-out,
+                box-shadow .15s ease-in-out;
+    &:focus, &:focus-within {
+        @apply ring-2 ring-blue-300 outline-none;
+    }
+
+    &:not(textarea) {
+        height: 2.375rem;
+    }
+}
+
+/*  Used inside tables, grids, and so on */
+.input-text-minimal {
+    @apply appearance-none shadow-none bg-white w-full p-2;
+
+    &:focus {
+        @apply outline-none bg-gray-200;
+    }
+}
+
+
+/*  Needs an 'input' selector, otherwise when .input-text is used on a div, it's always considered read only. */
+input.input-text:read-only,
+textarea.input-text:read-only,
+input.input-text-minimal:read-only,
+.input-text.read-only {
+    @apply bg-gray-300 text-gray-700;
+}
+
+/* Input Groups
+  ========================================================================== */
+
+.input-group {
+    @apply appearance-none text-gray-800 w-full p-0 rounded flex items-center;
+    height: 2.375rem;
+
+    &:not(.focus-within-only):focus, &:not(.focus-within-only):focus-within {
+        @apply ring-2 ring-blue-300;
+
+        .input-text:focus, .input-group-prepend:focus, .input-group-append:focus, .input-group-item:focus {
+            outline: 0;
+            box-shadow: none;
+        }
+    }
+
+    .input-text {
+        @apply flex-1 border-gray-500 min-w-0;
+    }
+
+    .input-text:not(:first-child) {
+        @apply rounded-l-none border-l-0;
+    }
+
+    .input-text:not(:last-child) {
+        @apply rounded-r-none border-r-0;
+    }
+
+    .input-group-prepend, .input-group-append, .input-group-item {
+        @apply rounded-l px-2 border text-sm text-gray-800 select-none;
+        background: linear-gradient(180deg, #fff, #f9fafb);
+        border: 1px solid #c4cdd6;
+        box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
+        height: 2.375rem;
+        line-height: 36px;
+
+        &button {
+            @apply cursor-pointer;
+        }
+    }
+
+    &.focus-within-only {
+        .input-text:focus, .input-group-prepend:focus, .input-group-append:focus, .input-group-item:focus {
+            @apply focus-outline;
+            z-index: 1;
+        }
+    }
+
+    .input-group-item {
+        @apply rounded-l-none -mx-px;
+    }
+
+    button.input-group-item:hover:not(:disabled),
+    button.input-group-item:active:not(:disabled),
+    button.input-group-prepend:hover:not(:disabled),
+    button.input-group-prepend:active:not(:disabled),
+    button.input-group-append:hover:not(:disabled),
+    button.input-group-append:active:not(:disabled) {
+        background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+        border-color: #c4cdd5;
+    }
+
+    .input-group-append {
+        @apply rounded-l-none border-r-0; /*  Rounded on the right side */
+        &:last-child { @apply rounded-r border-r; }
+    }
+
+    > *:last-child[class*="input-group-"],
+    > *:last-child [class*="input-group-"] {
+        @apply rounded-r;
+    }
+
+}
+
+.input-group.input-group-sm {
+    height: 1.625rem;
+    .input-group-prepend, .input-group-append, .input-group-item {
+        @apply text-xs;
+        height: 1.625rem;
+        line-height: 25px;
+        padding: 0 12px;
+    }
+}
+
+
+/* Radio and Checkbox Fields
+  ========================================================================== */
+
+.radio-fieldtype .option,
+.checkboxes-fieldtype .option {
+    @apply flex items-center;
+    &:not(:first-child) {
+        @apply mt-3;
+    }
+
+    input {
+        @apply leading-normal mr-1;
+    }
+
+    label {
+        @apply font-normal leading-none flex items-center;
+    }
+}
+
+.radio-fieldtype .inline-mode,
+.checkboxes-fieldtype .inline-mode {
+    @apply flex items-center flex-wrap;
+
+    .option {
+        @apply mr-4 mb-3;
+        &:first-child {
+            @apply mt-3;
+        }
+    }
+}
+
+.radio-box {
+    @apply border rounded cursor-pointer relative p-4 h-full;
+    &.selected {
+        @apply border-blue text-blue shadow;
+    }
+}
+
+
+/* Select Fields
+  ========================================================================== */
+  .select-input-container {
+    @apply rounded relative;
+
+    select {
+        @apply text-sm text-gray-800 shadow-button cursor-pointer block w-full h-full text-left relative max-w-full;
+        @apply select-none rounded leading-normal align-middle whitespace-nowrap appearance-none subpixel-antialiased;
+
+        background: linear-gradient(180deg, #fff, #f9fafb);
+        border: 1px solid #c4cdd6;
+        height: 2.375rem; /*  38px */
+        letter-spacing: -0.01em;
+        padding: .475rem 1.75rem .475rem .75rem;
+
+        &:hover:not(:disabled), &:active:not(:disabled) {
+            background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+            border-color: #c4cdd5;
+        }
+    }
+
+    .select-input-toggle {
+        @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-900;
+
+        svg {
+            @apply fill-current h-4 w-4;
+        }
+    }
+  }
+
+
+label .required {
+    @apply text-red-500;
+    font-style: normal;
+
+    + .localizable-icon {
+        margin-left: 5px;
+    }
+}
+
+input[type="file"] {
+    padding: 16px;
+    height: auto;
+    line-height: 1;
+}
+
+.filter-control {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.15);
+    font-size: 14px;
+    line-height: 1.5;
+    position: relative;
+
+    &.search { height: 34px !important; }
+}
+
+.help-block { width: 100%; }
+
+
+/* Form groups
+  ========================================================================== */
+.form-group {
+    @apply p-3 @sm:p-4 @lg:p-6 m-0;
+
+    label {
+        font-weight: 500;
+    }
+
+    .input-with-loader + .help-block {
+        margin-top: 0;
+    }
+
+    &.form-grid,
+    .form-grid {
+        input,
+        textarea {
+            background: none;
+            box-shadow: none;
+        }
+    }
+}
+
+.form-group.inline {
+    display: flex;
+    align-items: stretch;
+    padding: 0 !important;
+    margin: 0 !important;
+
+    .form-group { flex-basis: auto; }
+
+    .major { flex: 1; }
+}
+
+.help-block {
+    @apply block mb-2 text-gray-700 text-xs;
+    a {
+        @apply text-gray-800 underline;
+        &:hover {
+            @apply text-blue;
+        }
+    }
+}
+
+.slug-field .input-text {
+    @apply font-mono text-xs;
+}

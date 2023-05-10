@@ -1231,8 +1231,7 @@ EOT;
         Log::shouldReceive('debug')->once()
             ->with('Cannot render an object variable as a string: {{ object }}');
 
-        $object = new class
-        {
+        $object = new class {
         };
 
         $this->assertEquals('', $this->renderString('{{ object }}', compact('object')));
@@ -1749,8 +1748,7 @@ EOT;
             $m->shouldNotReceive('get')->with('augmented');
         });
 
-        $fieldtype = new class extends Fieldtype
-        {
+        $fieldtype = new class extends Fieldtype {
         };
         $augmented = new Value(['drink' => 'la croix'], 'augmented', $fieldtype);
 
@@ -2213,8 +2211,7 @@ before
 after
 EOT;
         $this->assertEquals($expected, $this->renderString($template, [
-            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator
-            {
+            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator {
             }),
         ]));
     }
@@ -2427,6 +2424,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider objectInConditionProvider
      */
     public function it_uses_entries_as_conditions($object)
@@ -2453,8 +2451,7 @@ EOT;
                     return 'foo';
                 }
             }, ],
-            'without __call or __toString' => [new class()
-            {
+            'without __call or __toString' => [new class() {
                 //
             }, ],
         ];

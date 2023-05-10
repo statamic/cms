@@ -38,13 +38,13 @@
                 />
             </div>
 
-            <div class="py-1 text-xs text-grey" v-if="maxItemsReached && maxItems != 1">
+            <div class="py-2 text-xs text-gray" v-if="maxItemsReached && maxItems != 1">
                 <span>{{ __('Maximum items selected:')}}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
-            <div v-if="canSelectOrCreate" class="relationship-input-buttons relative" :class="{ 'mt-2': items.length > 0 }" >
-                <div class="flex flex-wrap items-center text-sm -mb-1">
-                    <div class="relative mb-1">
+            <div v-if="canSelectOrCreate" class="relationship-input-buttons relative" :class="{ 'mt-4': items.length > 0 }" >
+                <div class="flex flex-wrap items-center text-sm -mb-2">
+                    <div class="relative mb-2">
                         <create-button
                             v-if="canCreate && creatables.length"
                             :creatables="creatables"
@@ -54,8 +54,8 @@
                             @created="itemCreated"
                         />
                     </div>
-                    <button ref="existing" class="text-blue hover:text-grey-80 flex mb-1 outline-none" @click.prevent="isSelecting = true">
-                        <svg-icon name="hyperlink" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
+                    <button ref="existing" class="text-blue hover:text-gray-800 flex items-center mb-2 outline-none" @click.prevent="isSelecting = true">
+                        <svg-icon name="light/hyperlink" class="mr-1 h-4 w-4 flex items-center"></svg-icon>
                         {{ __('Link Existing Item') }}
                     </button>
                 </div>
@@ -256,7 +256,7 @@ export default {
             this.sortable = new Sortable(this.$refs.items, {
                 draggable: '.item',
                 handle: '.item-move',
-                mirror: { constrainDimensions: true, xAxis: false },
+                mirror: { constrainDimensions: true, xAxis: false, appendTo: 'body' },
                 swapAnimation: { vertical: true },
                 plugins: [Plugins.SwapAnimation],
                 delay: 200
@@ -268,7 +268,7 @@ export default {
                 const val = [...this.value];
                 val.splice(e.newIndex, 0, val.splice(e.oldIndex, 1)[0]);
                 this.update(val);
-            })
+            });
         },
 
         itemCreated(item) {

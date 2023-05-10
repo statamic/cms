@@ -69,6 +69,10 @@ export default {
 
             if (embed_url.includes('vimeo')) {
                 embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
+                if (embed_url.split('/').length > 5) {
+                    let hash = embed_url.substr(embed_url.lastIndexOf('/') + 1);
+                    embed_url = embed_url.substr(0, embed_url.lastIndexOf('/')) + '?h=' + hash.replace('?', '&');
+                }
             }
 
             // Make sure additional query parameters are included.

@@ -2,13 +2,13 @@
 
 namespace Tests\Imaging;
 
+use Facades\Statamic\Imaging\ImageValidator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
-use League\Flysystem\Adapter\Local;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Glide\Manipulators\Watermark;
 use League\Glide\Server;
@@ -18,7 +18,6 @@ use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Imaging\GuzzleAdapter;
 use Statamic\Imaging\ImageGenerator;
-use Statamic\Imaging\LegacyGuzzleAdapter;
 use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -51,6 +50,10 @@ class ImageGeneratorTest extends TestCase
         $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
 
         $this->assertCount(0, $this->generatedImagePaths());
+
+        ImageValidator::shouldReceive('isValidImage')
+            ->andReturnTrue()
+            ->once(); // Only one manipulation should happen because of cache.
 
         // Generate the image twice to make sure it's cached.
         foreach (range(1, 2) as $i) {
@@ -94,6 +97,10 @@ class ImageGeneratorTest extends TestCase
         $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
         $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
 
+        ImageValidator::shouldReceive('isValidImage')
+            ->andReturnTrue()
+            ->times(2); // Two manipulations should get cached.
+
         // Generate the image twice to make sure it's cached.
         foreach (range(1, 2) as $i) {
             $this->makeGenerator()->generateByAsset(
@@ -128,6 +135,10 @@ class ImageGeneratorTest extends TestCase
         $image = UploadedFile::fake()->image('', 30, 60);
         $contents = file_get_contents($image->getPathname());
         File::put(public_path($imagePath), $contents);
+
+        ImageValidator::shouldReceive('isValidImage')
+            ->andReturnTrue()
+            ->once(); // Only one manipulation should happen because of cache.
 
         // Generate the image twice to make sure it's cached.
         foreach (range(1, 2) as $i) {
@@ -265,6 +276,7 @@ class ImageGeneratorTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider guzzleWatermarkProvider
      */
     public function the_watermark_disk_is_a_guzzle_adapter_when_a_url_is_provided($protocol)
@@ -291,18 +303,6 @@ class ImageGeneratorTest extends TestCase
         $watermark = collect($manipulators)->first(fn ($m) => $m instanceof Watermark);
 
         return $watermark->getWatermarks();
-    }
-
-    /** @test */
-    public function it_validates_an_asset()
-    {
-        $this->markTestIncomplete();
-    }
-
-    /** @test */
-    public function it_validates_an_image()
-    {
-        $this->markTestIncomplete();
     }
 
     private function makeGenerator()
@@ -337,33 +337,16 @@ class ImageGeneratorTest extends TestCase
 
     private function assertLocalAdapter($adapter)
     {
-        if ($this->isUsingFlysystemV1()) {
-            return $this->assertInstanceOf(Local::class, $adapter);
-        }
-
         $this->assertInstanceOf(LocalFilesystemAdapter::class, $adapter);
     }
 
     private function assertGuzzleAdapter($adapter)
     {
-        if ($this->isUsingFlysystemV1()) {
-            return $this->assertInstanceOf(LegacyGuzzleAdapter::class, $adapter);
-        }
-
         $this->assertInstanceOf(GuzzleAdapter::class, $adapter);
-    }
-
-    private function isUsingFlysystemV1()
-    {
-        return class_exists('\League\Flysystem\Util');
     }
 
     private function getRootFromLocalAdapter($adapter)
     {
-        if ($this->isUsingFlysystemV1()) {
-            return $adapter->getPathPrefix();
-        }
-
         $reflection = new \ReflectionClass($adapter);
         $property = $reflection->getProperty('prefixer');
         $property->setAccessible(true);

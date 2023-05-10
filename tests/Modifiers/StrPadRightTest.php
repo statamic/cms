@@ -18,6 +18,7 @@ class StrPadRightTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider paddington
      */
     public function it_pads_a_string(string $expected, string $input, array $params): void

@@ -30,24 +30,27 @@ abstract class Relationship extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'max_items' => [
-                'display' => __('Max Items'),
-                'instructions' => __('statamic::messages.max_items_instructions'),
-                'min' => 1,
-                'type' => 'integer',
-                'width' => 50,
-            ],
-            'mode' => [
-                'display' => __('Mode'),
-                'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
-                'type' => 'radio',
-                'default' => 'default',
-                'options' => [
-                    'default' => __('Stack Selector'),
-                    'select' => __('Select Dropdown'),
-                    'typeahead' => __('Typeahead Field'),
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
+                    ],
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                        'type' => 'radio',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                    ],
                 ],
-                'width' => 50,
             ],
         ];
     }
@@ -296,5 +299,16 @@ abstract class Relationship extends Fieldtype
     protected function getTaggable()
     {
         return $this->taggable;
+    }
+
+    public function toQueryableValue($value)
+    {
+        if (! $value) {
+            return null;
+        }
+
+        return $this->config('max_items') === 1
+            ? collect($value)->first()
+            : collect($value)->filter()->all();
     }
 }
