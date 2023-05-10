@@ -4,9 +4,9 @@
 
         <div class="form-group publish-field select-fieldtype field-w-full">
             <label class="publish-field-label">{{ __('Conditions') }}</label>
-            <div class="help-block -mt-1"><p>{{ __('messages.field_conditions_instructions') }}</p></div>
+            <div class="help-block -mt-2"><p>{{ __('messages.field_conditions_instructions') }}</p></div>
 
-            <div class="flex items-center mb-3">
+            <div class="flex items-center mb-6">
                 <select-input
                     v-model="when"
                     :options="whenOptions"
@@ -17,24 +17,24 @@
                     v-model="type"
                     :options="typeOptions"
                     :placeholder="false"
-                    class="ml-2" />
+                    class="ml-4" />
 
                 <text-input
                     v-if="hasConditions && isCustom"
                     v-model="customMethod"
-                    class="ml-2 flex-1" />
+                    class="ml-4 flex-1" />
             </div>
 
             <div
                 v-if="hasConditions && isStandard"
                 v-for="(condition, index) in conditions"
                 :key="condition._id"
-                class="flex items-center py-2 border-t"
+                class="flex flex-wrap items-center py-4 border-t"
             >
                 <v-select
                     ref="fieldSelect"
                     v-model="conditions[index].field"
-                    class="min-w-md"
+                    class="w-full md:w-1/3 mb-2 md:mb-0"
                     :options="fieldOptions"
                     :placeholder="__('Field')"
                     :taggable="true"
@@ -50,18 +50,18 @@
                     v-model="conditions[index].operator"
                     :options="operatorOptions"
                     :placeholder="false"
-                    class="ml-2" />
+                    class="md:ml-4" />
 
                 <text-input
                     v-model="conditions[index].value"
-                    class="ml-2" />
+                    class="ml-4" />
 
-                <button @click="remove(index)" class="btn-close ml-1 group">
-                    <svg-icon name="trash" class="w-4 h-4 group-hover:text-red" />
+                <button @click="remove(index)" class="btn-close ml-2 group">
+                    <svg-icon name="micro/trash" class="w-4 h-4 group-hover:text-red-500" />
                 </button>
             </div>
 
-            <div class="border-t pt-3" v-if="hasConditions && isStandard">
+            <div class="border-t pt-6" v-if="hasConditions && isStandard">
                 <button
                     v-text="__('Add Condition')"
                     @click="add"
@@ -72,7 +72,7 @@
 
         <div class="form-group publish-field select-fieldtype field-w-full">
             <label class="publish-field-label">{{ __('Always Save') }}</label>
-            <div class="help-block -mt-1">
+            <div class="help-block -mt-2">
                 <p>{{ __('messages.field_conditions_always_save_instructions') }}</p>
             </div>
             <toggle-input v-model="alwaysSave" />

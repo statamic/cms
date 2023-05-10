@@ -3,6 +3,8 @@
         <v-select
             ref="input"
             class="flex-1"
+            append-to-body
+            :calculate-position="positionOptions"
             :name="name"
             :clearable="config.clearable"
             :disabled="config.disabled || isReadOnly || (config.multiple && limitReached)"
@@ -38,24 +40,24 @@
                     <template v-else v-text="label"></template>
                 </template>
                 <template #no-options>
-                    <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                    <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
                 </template>
                 <template #footer="{ deselect }" v-if="config.multiple">
                     <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-1">
+                        <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2">
                             <div v-if="config.label_html" v-html="option.label"></div>
                             <template v-else>{{ option.label }}</template>
                             <button v-if="!readOnly" @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
                                 <span>×</span>
                             </button>
                             <button v-else type="button" class="vs__deselect">
-                                <span class="opacity-50">×</span>
+                                <span class="text-gray-500">×</span>
                             </button>
                         </span>
                     </div>
                 </template>
         </v-select>
-        <div class="text-xs ml-1 mt-1.5" :class="limitIndicatorColor" v-if="config.max_items">
+        <div class="text-xs ml-2 mt-3" :class="limitIndicatorColor" v-if="config.max_items">
             <span v-text="currentLength"></span>/<span v-text="config.max_items"></span>
         </div>
     </div>
@@ -63,6 +65,7 @@
 
 <script>
 import HasInputOptions from './HasInputOptions.js'
+import { computePosition, offset, flip } from '@floating-ui/dom';
 
 export default {
 
@@ -121,12 +124,12 @@ export default {
 
         limitIndicatorColor() {
             if (this.limitExceeded) {
-                return 'text-red';
+                return 'text-red-500';
             } else if (this.limitReached) {
-                return 'text-green';
+                return 'text-green-600';
             }
 
-            return 'text-grey';
+            return 'text-gray';
         }
     },
 
@@ -145,7 +148,25 @@ export default {
                     this.update(null);
                 }
             }
-        }
+        },
+
+        positionOptions(dropdownList, component, { width }) {
+            dropdownList.style.width = width
+
+            computePosition(component.$refs.toggle, dropdownList, {
+                placement: 'bottom',
+                middleware: [
+                    offset({ mainAxis: 0, crossAxis: -1 }),
+                    flip(),
+                ]
+            }).then(({ x, y }) => {
+                Object.assign(dropdownList.style, {
+                    // Round to avoid blurry text
+                    left: `${Math.round(x)}px`,
+                    top: `${Math.round(y)}px`,
+                });
+            });
+        },
     }
 };
 </script>

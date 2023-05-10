@@ -70,7 +70,6 @@ return [
     'assign_roles' => 'Rollen toekennen aan gebruikers',
     'group_updates' => 'Updates',
     'view_updates' => 'Bekijk updates',
-    'perform_updates' => 'Voer updates uit',
     'group_utilities' => 'Gereedschappen',
     'access_utility' => ':title',
     'access_utility_desc' => 'Geeft toegang tot het :title gereedschap',

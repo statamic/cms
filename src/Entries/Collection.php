@@ -46,7 +46,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $dated = false;
     protected $sortField;
     protected $sortDirection;
-    protected $ampable = false;
     protected $revisions = false;
     protected $positions;
     protected $defaultPublishState = true;
@@ -196,16 +195,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
-    public function ampable($ampable = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('ampable')
-            ->getter(function ($ampable) {
-                return config('statamic.amp.enabled') && $ampable;
-            })
-            ->args(func_get_args());
-    }
-
     public function absoluteUrl($site = null)
     {
         if (! $mount = $this->mount()) {
@@ -351,7 +340,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         }
 
         if ($this->dated()) {
-            $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
+            $blueprint->ensureField('date', ['type' => 'date', 'required' => true, 'default' => 'now'], 'sidebar');
         }
 
         if ($this->hasStructure() && ! $this->orderable()) {
@@ -498,7 +487,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             'past_date_behavior' => $this->pastDateBehavior(),
             'future_date_behavior' => $this->futureDateBehavior(),
             'default_publish_state' => $this->defaultPublishState,
-            'amp' => $this->ampable,
             'sites' => $this->sites,
             'propagate' => $this->propagate(),
             'template' => $this->template,
@@ -531,7 +519,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         $array = Arr::removeNullValues(array_merge($array, [
             'route' => $route,
             'slugs' => $this->requiresSlugs() === true ? null : false,
-            'amp' => $array['amp'] ?: null,
             'date' => $this->dated ?: null,
             'sort_by' => $this->sortField,
             'sort_dir' => $this->sortDirection,

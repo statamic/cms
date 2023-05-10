@@ -12,20 +12,16 @@ use Tests\TestCase;
 
 class ReplicatorTest extends TestCase
 {
-    /** @test */
-    public function it_preprocesses_the_values()
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_preprocesses_with_empty_value($areSetsGrouped)
     {
-        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
-
-        FieldRepository::shouldReceive('find')
-            ->with('testfieldset.numbers')
-            ->andReturnUsing(function () {
-                return new Field('numbers', ['type' => 'integer']);
-            });
-
         $field = (new Field('test', [
             'type' => 'replicator',
-            'sets' => [
+            'sets' => $this->groupSets($areSetsGrouped, [
                 'one' => [
                     'fields' => [
                         ['handle' => 'numbers', 'field' => 'testfieldset.numbers'], // test field reference
@@ -38,7 +34,43 @@ class ReplicatorTest extends TestCase
                         ['handle' => 'food', 'field' => ['type' => 'text']], // test inline field
                     ],
                 ],
-            ],
+            ]),
+        ]));
+
+        $this->assertSame([], $field->preProcess()->value());
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_preprocesses_the_values($areSetsGrouped)
+    {
+        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+
+        FieldRepository::shouldReceive('find')
+            ->with('testfieldset.numbers')
+            ->andReturnUsing(function () {
+                return new Field('numbers', ['type' => 'integer']);
+            });
+
+        $field = (new Field('test', [
+            'type' => 'replicator',
+            'sets' => $this->groupSets($areSetsGrouped, [
+                'one' => [
+                    'fields' => [
+                        ['handle' => 'numbers', 'field' => 'testfieldset.numbers'], // test field reference
+                        ['handle' => 'words', 'field' => ['type' => 'text']], // test inline field
+                    ],
+                ],
+                'two' => [
+                    'fields' => [
+                        ['handle' => 'age', 'field' => 'testfieldset.numbers'], // test field reference
+                        ['handle' => 'food', 'field' => ['type' => 'text']], // test inline field
+                    ],
+                ],
+            ]),
         ]))->setValue([
             [
                 'type' => 'one',
@@ -74,8 +106,12 @@ class ReplicatorTest extends TestCase
         ], $field->preProcess()->value());
     }
 
-    /** @test */
-    public function it_preprocesses_the_values_recursively()
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_preprocesses_the_values_recursively($areSetsGrouped)
     {
         RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
 
@@ -87,7 +123,7 @@ class ReplicatorTest extends TestCase
 
         $field = (new Field('test', [
             'type' => 'replicator',
-            'sets' => [
+            'sets' => $this->groupSets($areSetsGrouped, [
                 'one' => [
                     'fields' => [
                         ['handle' => 'numbers', 'field' => 'testfieldset.numbers'],
@@ -105,7 +141,7 @@ class ReplicatorTest extends TestCase
                         ]],
                     ],
                 ],
-            ],
+            ]),
         ]))->setValue([
             [
                 'type' => 'one',
@@ -274,31 +310,21 @@ class ReplicatorTest extends TestCase
         ], $field->process()->value());
     }
 
-    /** @test */
-    public function it_preloads_preprocessed_default_values()
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_preloads($areSetsGrouped)
     {
-        $field = (new Field('test', [
-            'type' => 'replicator',
-            'sets' => [
-                'main' => [
-                    'fields' => [
-                        ['handle' => 'things', 'field' => ['type' => 'array']],
-                    ],
-                ],
-            ],
-        ]));
-
-        $expected = [
-            'things' => [],
-        ];
-
-        $this->assertEquals($expected, $field->fieldtype()->preload()['defaults']['main']);
-    }
-
-    /** @test */
-    public function it_preloads_new_meta_with_preprocessed_values()
-    {
-        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+        RowId::shouldReceive('generate')->andReturn(
+            'random-string-1',
+            'random-string-2',
+            'random-string-3',
+            'random-string-4',
+            'random-string-5',
+            'random-string-6',
+        );
 
         // For this test, use a grid field with min_rows.
         // It doesn't have to be, but it's a fieldtype that would
@@ -307,29 +333,69 @@ class ReplicatorTest extends TestCase
 
         $field = (new Field('test', [
             'type' => 'replicator',
-            'sets' => [
+            'sets' => $this->groupSets($areSetsGrouped, [
                 'main' => [
                     'fields' => [
                         [
-                            'handle' => 'things',
+                            'handle' => 'a_text_field',
+                            'field' => [
+                                'type' => 'text',
+                                'default' => 'the default',
+                            ],
+                        ],
+                        [
+                            'handle' => 'a_grid_field',
                             'field' => [
                                 'type' => 'grid',
                                 'min_rows' => 2,
                                 'fields' => [
-                                    ['handle' => 'one', 'field' => ['type' => 'text']],
+                                    ['handle' => 'one', 'field' => ['type' => 'text', 'default' => 'default in nested']],
                                 ],
                             ],
                         ],
                     ],
                 ],
+            ]),
+        ]))->setValue([
+            [
+                'type' => 'main',
+                'a_text_field' => 'hello',
+                'a_grid_field' => [
+                    ['one' => 'foo'],
+                    ['one' => 'bar'],
+                ],
             ],
-        ]));
+            [
+                // Ensure that if there's a set that isn't configured, it gets left as-is and doesn't
+                // throw any errors. For example, if a set is removed from the config.
+                'type' => 'nope',
+                'foo' => 'bar',
+            ],
+        ]);
 
-        $expected = [
-            '_' => '_',
-            'things' => [ // this array is the preloaded meta for the grid field
+        // The preload method expects the field to already be preprocessed.
+        // This will add stuff like set/row IDs to *existing* values, but not
+        // to any "new" or "default" values. That'll be handled by the fieldtype.
+        // During this preprocess step, the 2 nested grid rows, and the 1 replicator
+        // set will be assigned the first 3 random-string-n IDs.
+        $field = $field->preProcess();
+
+        $meta = $field->fieldtype()->preload();
+
+        // Assert about the "existing" sub-array.
+        // This is meta data for subfields of existing sets.
+        $this->assertCount(2, $meta['existing']);
+
+        // The set IDs assigned during preprocess.
+        $this->assertArrayHasKey('random-string-3', $meta['existing']);
+        $this->assertArrayHasKey('random-string-4', $meta['existing']);
+
+        $this->assertEquals([
+            '_' => '_', // An empty key to enforce an object in JavaScript.
+            'a_text_field' => null, // the text field doesn't have meta data.
+            'a_grid_field' => [ // this array is the preloaded meta for the grid field
                 'defaults' => [
-                    'one' => null, // default value for the text field
+                    'one' => 'default in nested', // default value for the text field
                 ],
                 'new' => [
                     'one' => null, // meta for the text field
@@ -339,9 +405,45 @@ class ReplicatorTest extends TestCase
                     'random-string-2' => ['one' => null],
                 ],
             ],
-        ];
+        ], $meta['existing']['random-string-3']);
 
-        $this->assertEquals($expected, $field->fieldtype()->preload()['new']['main']);
+        $this->assertEquals([
+            '_' => '_', // An empty key to enforce an object in JavaScript.
+            // The "foo" key doesn't appear here since there's no corresponding "nope" set config.
+        ], $meta['existing']['random-string-4']);
+
+        // Assert about the "defaults" sub-array.
+        // These are the initial values used for subfields when a new set is added.
+        $this->assertCount(1, $meta['defaults']);
+        $this->assertArrayHasKey('main', $meta['defaults']);
+        $this->assertEquals([
+            'a_text_field' => 'the default',
+            'a_grid_field' => [
+                ['_id' => 'random-string-5', 'one' => 'default in nested'],
+                ['_id' => 'random-string-6', 'one' => 'default in nested'],
+            ],
+        ], $meta['defaults']['main']);
+
+        // Assert about the "new" sub-array.
+        // This is meta data for subfields when a new set is added.
+        $this->assertCount(1, $meta['new']);
+        $this->assertArrayHasKey('main', $meta['new']);
+        $this->assertEquals([
+            '_' => '_', // An empty key to enforce an object in JavaScript.
+            'a_text_field' => null, // the text field doesn't have meta data.
+            'a_grid_field' => [ // this array is the preloaded meta for the grid field
+                'defaults' => [
+                    'one' => 'default in nested', // default value for the text field
+                ],
+                'new' => [
+                    'one' => null, // meta for the text field
+                ],
+                'existing' => [
+                    'random-string-5' => ['one' => null],
+                    'random-string-6' => ['one' => null],
+                ],
+            ],
+        ], $meta['new']['main']);
     }
 
     /** @test */
@@ -386,5 +488,24 @@ class ReplicatorTest extends TestCase
         $this->assertNull((new Replicator)->toQueryableValue(null));
         $this->assertNull((new Replicator)->toQueryableValue([]));
         $this->assertEquals([['foo' => 'bar']], (new Replicator)->toQueryableValue([['foo' => 'bar']]));
+    }
+
+    public function groupedSetsProvider()
+    {
+        return [
+            'grouped sets (new)' => [true],
+            'ungrouped sets (old)' => [false],
+        ];
+    }
+
+    private function groupSets($shouldGroup, $sets)
+    {
+        if (! $shouldGroup) {
+            return $sets;
+        }
+
+        return [
+            'group_one' => ['sets' => $sets],
+        ];
     }
 }

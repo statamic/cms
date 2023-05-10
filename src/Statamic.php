@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Cache;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
 use Statamic\Facades\Preference;
-use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
@@ -221,19 +220,6 @@ class Statamic
         $route = preg_replace('/(?<!:)\/\//', '/', $route);
 
         return $route;
-    }
-
-    public static function isAmpRequest()
-    {
-        if (! config('statamic.amp.enabled')) {
-            return false;
-        }
-
-        $url = Site::current()->relativePath(
-            str_finish(request()->getUri(), '/')
-        );
-
-        return starts_with($url, '/'.config('statamic.amp.route'));
     }
 
     public static function jsonVariables(Request $request)

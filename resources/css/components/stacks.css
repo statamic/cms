@@ -1,0 +1,63 @@
+/* ==========================================================================
+   STACKS ON STACKS ON STACKS
+   ========================================================================== */
+
+.portal-targets {
+    /* position on top of global header (z-index 3) but ignore clicks */
+    @apply fixed inset-0 pointer-events-none;
+    z-index: 4;
+
+    .vue-portal-target {
+        @apply pointer-events-auto; /* allow clicks that we disabled above */
+    }
+}
+
+.stacks-on-stacks {
+    .stack-container {
+        @apply absolute inset-0 z-1;
+        transition: left .3s ease;
+    }
+
+    .stack-overlay {
+        @apply bg-black absolute inset-0;
+        opacity: 0.2;
+        pointer-events: none;
+        transition: all .3s ease;
+
+        &.stack-overlay-fade-enter,
+        &.stack-overlay-fade-leave-to {
+            opacity: 0;
+        }
+    }
+
+
+    .stack-hit-area {
+        @apply absolute inset-0 cursor-pointer;
+    }
+
+    .stack-content {
+        @apply h-full relative shadow-lg;
+        transition: all 0.2s ease;
+
+        &.stack-slide-enter,
+        &.stack-slide-leave-to {
+            transform: translateX(10px);
+            opacity: 0;
+        }
+    }
+
+
+    .hovering .stack-content {
+        transform: translateX(-16px);
+    }
+
+    .breadcrumb svg {
+        display: none !important;
+    }
+}
+
+@media all and (max-width: 980px) {
+    .stacks-on-stacks .stack-container {
+        left: 0 !important;
+    }
+}

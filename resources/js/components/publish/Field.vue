@@ -7,44 +7,46 @@
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner">
-            <label class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
+            <label v-if="showLabel" class="publish-field-label" :class="{'font-bold': config.bold}" :for="fieldId">
                 <span
-                    :class="{ 'text-grey-60': syncable && isSynced }"
+                    v-if="showLabelText"
+                    class="mr-1"
+                    :class="{ 'text-gray-600': syncable && isSynced }"
                     v-text="labelText"
                     v-tooltip="{content: config.handle, delay: 500, autoHide: false}"
                 />
-                <i class="required ml-sm" v-if="config.required">*</i>
-                <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
-                <span v-if="isReadOnly && !isSection" class="text-grey-50 font-normal text-2xs mx-sm">
+                <i class="required mr-1" v-if="config.required">*</i>
+                <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-2 mr-2" v-tooltip="lockingUser.name" />
+                <span v-if="isReadOnly && !isTab" class="text-gray-500 font-normal text-2xs mr-1">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
-                <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="isLocalizable && !isSection" v-tooltip.top="__('Localizable field')" />
+                <svg-icon name="translate" class="h-4 mr-1 w-4 text-gray-600" v-if="isLocalizable && !isTab" v-tooltip.top="__('Localizable field')" />
 
                 <button
-                    v-if="!isReadOnly && !isSection"
+                    v-if="!isReadOnly && !isTab"
                     v-show="syncable && isSynced"
                     class="outline-none"
                     :class="{ flex: syncable && isSynced }"
                     @click="$emit('desynced')"
                 >
-                    <svg-icon name="hyperlink" class="h-4 w-4 ml-.5 mb-sm text-grey-60"
+                    <svg-icon name="light/hyperlink" class="h-4 w-4 mr-1.5 mb-1 text-gray-600"
                         v-tooltip.top="__('messages.field_synced_with_origin')" />
                 </button>
 
                 <button
-                    v-if="!isReadOnly && !isSection"
+                    v-if="!isReadOnly && !isTab"
                     v-show="syncable && !isSynced"
                     class="outline-none"
                     :class="{ flex: syncable && !isSynced }"
                     @click="$emit('synced')"
                 >
-                    <svg-icon name="hyperlink-broken" class="h-4 w-4 ml-.5 mb-sm text-grey-60"
+                    <svg-icon name="light/hyperlink-broken" class="h-4 w-4 mr-1.5 mb-1 text-gray-600"
                         v-tooltip.top="__('messages.field_desynced_from_origin')" />
                 </button>
             </label>
 
             <div
-                class="help-block -mt-1"
+                class="help-block" :class="{ '-mt-2': showLabel }"
                 v-if="instructions && config.instructions_position !== 'below'"
                 v-html="instructions" />
         </div>
@@ -52,7 +54,7 @@
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
 
         <slot name="fieldtype" v-if="!loadingMeta">
-            <div class="text-xs text-red" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
+            <div class="text-xs text-red-500" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
             <component
                 v-else
                 :is="fieldtypeComponent"
@@ -71,12 +73,12 @@
         </slot>
 
         <div
-            class="help-block mt-1"
+            class="help-block mt-2"
             v-if="instructions && config.instructions_position === 'below'"
             v-html="instructions" />
 
         <div v-if="hasError">
-            <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
     </div>
     </publish-field-meta>
@@ -105,17 +107,11 @@ export default {
         syncable: Boolean,
         namePrefix: String,
         fieldPathPrefix: String,
-        canToggleLabel: Boolean,
-    },
-
-    data() {
-        return {
-            showHandle: false
-        }
     },
 
     inject: {
-        storeName: { default: null }
+        storeName: { default: null },
+        isInsideConfigFields: { default: false },
     },
 
     computed: {
@@ -148,18 +144,19 @@ export default {
             return this.$config.get('sites').length > 1 && this.config.localizable;
         },
 
-        isSection() {
-            return this.config.type === 'section';
+        isTab() {
+            return this.config.type === 'tab';
         },
 
         classes() {
             return [
                 'form-group publish-field',
                 `publish-field__` + this.config.handle,
-                `${this.config.component || this.config.type}-fieldtype`,
-                `field-${tailwind_width_class(this.config.width)}`,
+                `${this.config.component || this.config.type}-fieldtype`,,
                 this.isReadOnly ? 'read-only-field' : '',
+                this.isInsideConfigFields ? 'config-field' : `${tailwind_width_class(this.config.width)}`,
                 this.config.classes || '',
+                this.config.full_width_setting ? 'full-width-setting' : '',
                 { 'has-error': this.hasError || this.hasNestedError }
             ];
         },
@@ -199,10 +196,22 @@ export default {
         },
 
         labelText() {
-            if (this.showHandle) return this.config.handle
-            return this.config.display
-                || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
-        }
+             return this.config.display
+                 || Vue.$options.filters.titleize(Vue.$options.filters.deslugify(this.config.handle));
+         },
+
+         showLabelText() {
+            return !this.config.hide_display;
+         },
+
+         showLabel() {
+            return this.showLabelText // Need to see the text
+                || this.isReadOnly // Need to see the "Read Only" text
+                || this.config.required // Need to see the asterisk
+                || this.isLocked // Need to see the avatar
+                || this.isLocalizable // Need to see the icon
+                || this.syncable // Need to see the icon
+         }
 
     },
 
@@ -220,11 +229,6 @@ export default {
             }
         },
 
-        toggleLabel() {
-            if (this.canToggleLabel) {
-                this.showHandle = ! this.showHandle
-            }
-        },
         renderMarkdownAndLinks(text) {
             var renderer = new marked.Renderer();
 

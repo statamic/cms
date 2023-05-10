@@ -46,14 +46,6 @@ class UtilityRepository
         return $utility;
     }
 
-    /** @deprecated */
-    public function push(Utility $utility)
-    {
-        $this->register($utility);
-
-        return $this;
-    }
-
     public function all()
     {
         return $this->utilities;

@@ -1,0 +1,81 @@
+/* ==========================================================================
+   Grid Fieldtype
+   ========================================================================== */
+
+.grid-table {
+    @apply w-full text-left border text-gray relative mb-4 outline-none shadow-sm rounded;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+}
+
+.grid-table thead {
+    th {
+        @apply font-medium px-2 py-2 border-b z-10 bg-gray-200 text-gray-900 text-sm;
+        display: table-cell;
+        position: sticky;
+        top: -1px;
+        z-index: auto;
+
+        &:first-child { @apply rounded-tl pl-3; }
+        &:last-child { @apply rounded-tr; }
+        &.grid-drag-handle-header {
+            @apply w-3;
+        }
+    }
+}
+
+.stack-container .grid-table thead th {
+    top: auto;
+}
+
+.grid-table > tbody {
+    @apply outline-none;
+
+    > tr {
+        @apply outline-none;
+    }
+
+    > tr > td {
+        @apply border-b px-2 py-3 align-top;
+
+        &:first-child.grid-cell {
+            @apply pl-3;
+        }
+
+        &.drag-handle {
+            @apply border-r h-full p-2;
+            width: 1%;
+            cursor: grab;
+            background: theme('colors.gray.200') url('../../../svg/icons/light/drag-dots.svg') center center no-repeat;
+            background-size: 7px 17px;
+            &:hover { @apply bg-gray-300; }
+        }
+    }
+
+    tr:last-child td {
+        @apply border-b-0;
+        &:first-child { @apply rounded-bl; }
+        &:last-child { @apply rounded-br; }
+    }
+
+    tr.draggable-source--is-dragging td {
+        @apply bg-gray-100;
+    }
+}
+
+.grid-table tbody .row-controls {
+    @apply pl-0 text-center;
+    width: 1%;
+    padding-top: 21px; /*  pseudo-center for text/select fields */
+}
+
+.grid-item-header {
+    @apply bg-gray-200 border-b px-4 py-2 text-sm flex items-center justify-between outline-none cursor-move;
+}
+
+.grid-fullscreen {
+    @apply fixed bg-gray-200 inset-0 min-h-screen overflow-scroll rounded-none;
+    z-index: 998; /*  to appear over the top of the rest of the stuff on the page. */
+                /*  too high and it'll be over the top of stacks, etc. */
+}

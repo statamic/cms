@@ -1,14 +1,22 @@
 <template>
 
+<portal name="bard-fullscreen" :disabled="!fullScreenMode" :provide="provide">
+<!-- These wrappers allow any css that expected the field to
+     be within the context of a publish form to continue working
+     once it has been portaled out. -->
+<div :class="{ 'publish-fields': fullScreenMode }">
+<div :class="fullScreenMode && wrapperClasses">
+
     <div
         class="bard-fieldtype-wrapper"
         :class="{'bard-fullscreen': fullScreenMode }"
+        ref="container"
         @dragstart.stop="ignorePageHeader(true)"
         @dragend="ignorePageHeader(false)"
     >
 
         <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar">
-            <div class="flex flex-wrap items-center no-select" v-if="toolbarIsFixed">
+            <div class="flex flex-wrap flex-1 items-center no-select" v-if="toolbarIsFixed" :class="{'justify-center': fullScreenMode}">
                 <component
                     v-for="button in visibleButtons(buttons)"
                     :key="button.name"
@@ -18,23 +26,20 @@
                     :config="config"
                     :bard="_self"
                     :editor="editor" />
-            </div>
-            <div class="flex items-center no-select">
-                <div class="h-10 -my-sm border-l pr-1 w-px" v-if="toolbarIsFixed && hasExtraButtons"></div>
-                <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
-                    <svg-icon name="file-code" class="w-4 h-4 "/>
-                </button>
-                <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && config.sets.length > 0">
-                    <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
-                </button>
-                <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
-                    <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
-                    <svg-icon name="expand" class="w-4 h-4" v-else />
-                </button>
+                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
+                        <svg-icon name="show-source" class="w-4 h-4 "/>
+                    </button>
+                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.collapse !== 'accordion' && setConfigs.length > 0">
+                        <svg-icon name="expand-collapse-vertical-2" class="w-4 h-4" />
+                    </button>
+                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
+                        <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
+                        <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
+                    </button>
             </div>
         </div>
 
-        <div class="bard-editor" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }" tabindex="0">
+        <div class="bard-editor @container/bard" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar, 'mode:inline': inputIsInline }" tabindex="0">
             <bubble-menu class="bard-floating-toolbar" :editor="editor" :tippy-options="{ maxWidth: 'none', zIndex: 1000 }" v-if="editor && toolbarIsFloating && !readOnly">
                 <component
                     v-for="button in visibleButtons(buttons)"
@@ -47,18 +52,35 @@
                     :editor="editor" />
             </bubble-menu>
 
-            <floating-menu class="bard-set-selector" :editor="editor" :tippy-options="{ offset: calcFloatingOffset, zIndex: 6 }" :should-show="shouldShowSetButton" v-if="editor">
-                <dropdown-list>
-                    <template v-slot:trigger>
-                        <button type="button" class="btn-round" :aria-label="__('Add Set')" v-tooltip="__('Add Set')">
-                            <span class="icon icon-plus text-grey-80 antialiased"></span>
+            <floating-menu
+                class="bard-set-selector"
+                :editor="editor"
+                :should-show="shouldShowSetButton"
+                :is-showing="showAddSetButton"
+                v-if="editor"
+                v-slot="{ x, y }"
+                @shown="showAddSetButton = true"
+                @hidden="showAddSetButton = false"
+            >
+                <set-picker
+                    v-if="showAddSetButton"
+                    :sets="groupConfigs"
+                    @added="addSet"
+                    @clicked-away="clickedAwayFromSetPicker"
+                >
+                    <template #trigger>
+                        <button
+                            type="button"
+                            class="btn-round group bard-add-set-button"
+                            :style="{ transform: `translate(${x}px, ${y}px)` }"
+                            :aria-label="__('Add Set')"
+                            v-tooltip="__('Add Set')"
+                            @click="addSetButtonClicked"
+                        >
+                            <svg-icon name="micro/plus" class="w-3 h-3 text-gray-800 group-hover:text-black" />
                         </button>
                     </template>
-
-                    <div v-for="set in config.sets" :key="set.handle">
-                        <dropdown-item :text="set.display || set.handle" @click="addSet(set.handle)" />
-                    </div>
-                </dropdown-list>
+                </set-picker>
             </floating-menu>
 
             <div class="bard-invalid" v-if="invalid" v-html="__('Invalid content')"></div>
@@ -72,12 +94,17 @@
             <div v-if="config.character_limit">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
         </div>
     </div>
+</div>
+</div>
+</portal>
 
 </template>
 
 <script>
 import uniqid from 'uniqid';
-import { BubbleMenu, Editor, EditorContent, FloatingMenu } from '@tiptap/vue-2';
+import reduce from 'underscore/modules/reduce';
+import { BubbleMenu, Editor, EditorContent } from '@tiptap/vue-2';
+import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
 import BulletList from '@tiptap/extension-bullet-list';
@@ -107,6 +134,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
 import Underline from '@tiptap/extension-underline';
 import BardSource from './Source.vue';
+import SetPicker from '../replicator/SetPicker.vue';
 import { DocumentBlock, DocumentInline } from './Document';
 import { Set } from './Set'
 import { Small } from './Small';
@@ -127,16 +155,10 @@ export default {
         BubbleMenu,
         BardSource,
         BardToolbarButton,
+        SetPicker,
         EditorContent,
         FloatingMenu,
         LinkToolbarButton,
-    },
-
-    provide() {
-        return {
-            setConfigs: this.config.sets,
-            isReadOnly: this.readOnly,
-        }
     },
 
     inject: ['storeName'],
@@ -155,6 +177,11 @@ export default {
             invalid: false,
             pageHeader: null,
             escBinding: null,
+            showAddSetButton: false,
+            provide: {
+                bard: this.makeBardProvide(),
+                storeName: this.storeName
+            }
         }
     },
 
@@ -177,7 +204,7 @@ export default {
         },
 
         hasExtraButtons() {
-            return this.allowSource || this.config.sets.length > 0 || this.config.fullscreen;
+            return this.allowSource || this.setConfigs.length > 0 || this.config.fullscreen;
         },
 
         readingTime() {
@@ -250,7 +277,7 @@ export default {
                     text += ` ${node.text || ''}`;
                 } else if (node.type === 'set') {
                     const handle = node.attrs.values.type;
-                    const set = this.config.sets.find(set => set.handle === handle);
+                    const set = this.setConfigs.find(set => set.handle === handle);
                     text += ` [${set ? set.display : handle}]`;
                 }
                 if (text.length > 150) {
@@ -267,43 +294,25 @@ export default {
             return this.config.inline;
         },
 
+        wrapperClasses() {
+            return `form-group publish-field publish-field__${this.handle} bard-fieldtype`;
+        },
+
+        setConfigs() {
+            return reduce(this.groupConfigs, (sets, group) => {
+                return sets.concat(group.sets);
+            }, []);
+        },
+
+        groupConfigs() {
+            return this.config.sets;
+        },
+
     },
 
     mounted() {
         this.initToolbarButtons();
-
-        const content = this.valueToContent(clone(this.value));
-
-        this.editor = new Editor({
-            extensions: this.getExtensions(),
-            content: content,
-            editable: !this.readOnly,
-            enableInputRules: this.config.enable_input_rules,
-            enablePasteRules: this.config.enable_paste_rules,
-            onFocus: () => this.$emit('focus'),
-            onBlur: () => {
-                // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
-                // blur event immediately. We need to make sure that the newly focused element is outside
-                // of Bard. We use a timeout because activeElement only exists after the blur event.
-                setTimeout(() => {
-                    if (!this.$el.contains(document.activeElement)) this.$emit('blur');
-                }, 1);
-            },
-            onUpdate: () => {
-                this.json = this.editor.getJSON().content;
-                this.html = this.editor.getHTML();
-            },
-            onCreate: ({ editor }) => {
-                const state = editor.view.state;
-                 if (content !== null && typeof content === 'object') {
-                     try {
-                         state.schema.nodeFromJSON(content);
-                     } catch (error) {
-                         this.invalid = true;
-                     }
-                 }
-            }
-        });
+        this.initEditor();
 
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
@@ -380,6 +389,10 @@ export default {
             this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
         },
 
+        fullScreenMode() {
+            this.initEditor();
+        }
+
     },
 
     methods: {
@@ -447,12 +460,10 @@ export default {
 
         toggleFullscreen() {
             this.fullScreenMode = !this.fullScreenMode;
-            this.$root.hideOverflow = ! this.$root.hideOverflow;
         },
 
         closeFullscreen() {
             this.fullScreenMode = false;
-            this.$root.hideOverflow = false;
         },
 
         shouldShowSetButton({ view, state }) {
@@ -462,12 +473,7 @@ export default {
             const isEmptyTextBlock = $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
 
             const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock;
-            return this.config.sets.length && (this.config.always_show_set_button || isActive);
-        },
-
-        calcFloatingOffset({ reference }) {
-            let x = reference.x + reference.width + 20;
-            return [0, -x];
+            return this.setConfigs.length && (this.config.always_show_set_button || isActive);
         },
 
         initToolbarButtons() {
@@ -566,6 +572,47 @@ export default {
             return buttons.filter(button => this.buttonIsVisible(button));
         },
 
+        initEditor() {
+            if (this.editor) this.editor.destroy();
+
+            const content = this.valueToContent(clone(this.value));
+
+            this.editor = new Editor({
+                extensions: this.getExtensions(),
+                content: content,
+                editable: !this.readOnly,
+                enableInputRules: this.config.enable_input_rules,
+                enablePasteRules: this.config.enable_paste_rules,
+                editorProps: { attributes: { class: 'bard-content' }},
+                onFocus: () => this.$emit('focus'),
+                onBlur: () => {
+                    // Since clicking into a field inside a set would also trigger a blur, we can't just emit the
+                    // blur event immediately. We need to make sure that the newly focused element is outside
+                    // of Bard. We use a timeout because activeElement only exists after the blur event.
+                    setTimeout(() => {
+                        if (!this.$refs.container.contains(document.activeElement)) {
+                            this.$emit('blur');
+                            this.showAddSetButton = false;
+                        }
+                    }, 1);
+                },
+                onUpdate: () => {
+                    this.json = this.editor.getJSON().content;
+                    this.html = this.editor.getHTML();
+                },
+                onCreate: ({ editor }) => {
+                    const state = editor.view.state;
+                    if (content !== null && typeof content === 'object') {
+                        try {
+                            state.schema.nodeFromJSON(content);
+                        } catch (error) {
+                            this.invalid = true;
+                        }
+                    }
+                }
+            });
+        },
+
         valueToContent(value) {
             // A json string is passed from PHP since that's what's submitted.
             value = JSON.parse(value);
@@ -662,7 +709,27 @@ export default {
             if (this.pageHeader) {
                 this.pageHeader.style['pointer-events'] = ignore ? 'none' : 'all';
             }
-        }
+        },
+
+        makeBardProvide() {
+            const bard = {};
+            Object.defineProperties(bard, {
+                setConfigs: { get: () => this.setConfigs },
+                isReadOnly: { get: () => this.readOnly },
+            });
+            return bard;
+        },
+
+        addSetButtonClicked() {
+            if (this.setConfigs.length === 1) {
+                this.addSet(this.setConfigs[0].handle);
+            }
+        },
+
+        clickedAwayFromSetPicker($event) {
+            if (this.$el.contains($event.target)) return;
+            this.showAddSetButton = false;
+        },
 
     }
 }

@@ -16,12 +16,14 @@ use Statamic\Fieldtypes\Assets\MaxRule;
 use Statamic\Fieldtypes\Assets\MimesRule;
 use Statamic\Fieldtypes\Assets\MimetypesRule;
 use Statamic\Fieldtypes\Assets\MinRule;
+use Tests\Fieldtypes\Concerns\TestsQueryableValueWithMaxItems;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use TestsQueryableValueWithMaxItems;
 
     public function setUp(): void
     {
@@ -182,5 +184,10 @@ class AssetsTest extends TestCase
         return (new Assets)->setField(new Field('test', array_merge([
             'type' => 'assets',
         ], $config)));
+    }
+
+    private function maxItemsConfigKey()
+    {
+        return 'max_files';
     }
 }

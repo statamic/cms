@@ -1,0 +1,92 @@
+/* ==========================================================================
+   UTILITES
+   ========================================================================== */
+
+.text-shadow {
+    text-shadow: 0 1px 2px rgba(0,0,0,.25);
+}
+
+.focus-outline {
+    @apply border border-blue-300;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,125,255,.25);
+}
+
+.focus-none {
+    /* @apply border-0; */
+    outline: 0;
+    box-shadow: none;
+}
+
+.selected-outline {
+    @apply border-blue;
+    outline: 0;
+    box-shadow: 0 0 0 2px theme('colors.blue.DEFAULT');
+}
+
+.loading {
+    text-align: center;
+    padding: 20px 0;
+
+    .icon {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    &.loading-basic {
+        text-align: left;
+        padding: 0;
+
+        .icon {
+            display: inline-block;
+            margin: -2px 5px 0 0;
+        }
+    }
+}
+
+.shadow-hover-lg {
+    @apply shadow-lg;
+    transition: box-shadow .08s ease-in-out;
+    &:hover {
+        @apply shadow-xl;
+    }
+}
+
+.w-fit-content {
+    width: fit-content;
+}
+
+.saving-overlay {
+    @apply absolute inset-0 z-200 flex items-center rounded;
+    background: rgba(255, 255, 255, .9);
+
+    .inner {
+        @apply p-10 text-center mx-auto;
+    }
+
+    i {
+        position: relative;
+        top: -1px;
+        margin-right: 10px;
+    }
+}
+
+.bg-checkerboard {
+    background-color: #FFF;
+    background-image: linear-gradient(45deg, #EDF2F6 25%, transparent 25%), linear-gradient(-45deg, #EDF2F6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #EDF2F6 75%), linear-gradient(-45deg, transparent 75%, #EDF2F6 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+}
+
+.clickable {
+    @apply text-gray-800 select-none cursor-pointer border bg-gradient-to-b from-white to-gray-100;
+
+    &:hover {
+        @apply border-gray-500 from-white to-gray-200;
+    }
+}
+
+[v-cloak],
+[x-cloak] {
+    display: none
+}

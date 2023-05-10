@@ -3,7 +3,7 @@
     <stack narrow name="publish-options" @closed="$emit('closed')">
         <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
-            <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+            <div class="bg-gray-200 px-6 py-2 border-b border-gray-300 text-lg font-medium flex items-center justify-between">
                 {{ __('Publish') }}
                 <button
                     type="button"
@@ -12,14 +12,14 @@
                     v-html="'&times'" />
             </div>
 
-            <div class="flex-1 overflow-auto p-3">
+            <div class="flex-1 overflow-auto p-6">
 
                 <div class="flex h-full items-center justify-center loading" v-if="saving">
                     <loading-graphic text="" />
                 </div>
 
                 <select-input
-                    class="mb-3"
+                    class="mb-6"
                     v-model="action"
                     :options="options"
                 />
@@ -28,32 +28,32 @@
 
                     <date-fieldtype
                         v-if="action == 'schedule'"
-                        class="mb-3"
+                        class="mb-6"
                         name="publishTime"
                         :value="publishTime" />
 
                     <textarea-input
-                        class="mb-3 text-sm"
+                        class="mb-6 text-sm"
                         v-model="revisionMessage"
                         :placeholder="__('Notes about this revision')"
                         @keydown.enter="submit"
                         :focus="true" />
 
                     <button
-                        class="btn-primary w-full mb-3"
+                        class="btn-primary w-full mb-6"
                         v-text="submitButtonText"
                         @click="submit"
                     />
 
-                    <div class="text-grey text-xs flex mb-3">
-                        <div class="pt-px w-4 mr-1">
+                    <div class="text-gray text-xs flex mb-6">
+                        <div class="pt-px w-4 mr-2">
                             <svg-icon name="info-circle" class="pt-px" />
                         </div>
                         <div class="flex-1" v-text="actionInfoText" />
                     </div>
 
-                    <div class="text-grey text-xs flex mb-3 text-red" v-if="action === 'schedule'">
-                        <div class="pt-px w-4 mr-1">
+                    <div class="text-gray text-xs flex mb-6 text-red-500" v-if="action === 'schedule'">
+                        <div class="pt-px w-4 mr-2">
                             <svg-icon name="info-circle" class="pt-px" />
                         </div>
                         <div class="flex-1">

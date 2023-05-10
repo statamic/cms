@@ -17,16 +17,16 @@
         >
             <div slot-scope="{ dragging }" class="min-h-screen">
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-12 w-12 m-2" />
+                    <svg-icon name="upload" class="h-12 w-12 m-4" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
-                <div class="publish-tabs tabs rounded-none rounded-t -mx-1px shadow-none" v-if="showContainerTabs">
+                <div class="publish-tabs tabs rounded-none rounded-t mb-3 shadow-none" v-if="showContainerTabs">
                     <button class="tab-button" v-for="item in containers" :key="item.id"
                         v-text="item.title"
                         :class="{
                             active: item.id === container.id,
-                            'border-b border-grey-30': item.id !== container.id
+                            'border-b border-gray-300': item.id !== container.id
                         }"
                         @click="selectContainer(item.id)"
                     />
@@ -44,29 +44,29 @@
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
                     <div slot-scope="{ filteredRows: rows }" :class="modeClass">
-                        <div class="card p-0" :class="{ 'rounded-tl-none': showContainerTabs, 'select-none' : shifting }">
+                        <div class="card overflow-hidden p-0" :class="{ 'select-none' : shifting }">
                             <div class="relative w-full">
 
-                                <div class="data-list-header">
-                                    <data-list-search ref="search" v-model="searchQuery" />
+                                <div class="flex items-center justify-between p-2 text-sm">
+                                    <data-list-search class="h-8" ref="search" v-model="searchQuery" />
 
                                     <template v-if="! hasSelections">
-                                        <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-2" @click="creatingFolder = true">
-                                            <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
+                                        <button v-if="canCreateFolders" class="btn btn-sm ml-3" @click="creatingFolder = true">
+                                            <svg-icon name="folder-add" class="h-4 w-4 mr-2" />
                                             <span>{{ __('Create Folder') }}</span>
                                         </button>
 
-                                        <button v-if="canUpload" class="btn-flat btn-icon-only ml-2" @click="openFileBrowser">
-                                            <svg-icon name="upload" class="h-4 w-4 mr-1 text-current" />
+                                        <button v-if="canUpload" class="btn btn-sm ml-3" @click="openFileBrowser">
+                                            <svg-icon name="upload" class="h-4 w-4 mr-2 text-current" />
                                             <span>{{ __('Upload') }}</span>
                                         </button>
                                     </template>
 
-                                    <div class="btn-group ml-2">
-                                        <button class="btn-flat px-2" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
+                                    <div class="btn-group ml-3">
+                                        <button class="btn btn-sm" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                             <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                         </button>
-                                        <button class="btn-flat px-2" @click="setMode('table')" :class="{'active': mode === 'table'}">
+                                        <button class="btn btn-sm" @click="setMode('table')" :class="{'active': mode === 'table'}">
                                             <svg-icon name="assets-mode-table" class="h-4 w-4" />
                                         </button>
                                     </div>
@@ -90,6 +90,7 @@
                                 class="-mt-px"
                             />
 
+                            <div class="overflow-x-auto overflow-y-hidden">
                             <data-list-table
                                 v-if="mode === 'table' && ! containerIsEmpty"
                                 :allow-bulk-actions="true"
@@ -104,28 +105,25 @@
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
                                             <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter group-hover:text-blue" />
+                                                <file-icon extension="folder" class="w-8 h-8 mr-2 inline-block text-blue-400 group-hover:text-blue" />
                                                 ..
                                             </a>
                                         </td>
                                         <td :colspan="columns.length" />
                                     </tr>
-                                    <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
+                                    <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation && page === 1">
                                         <td />
                                         <td @click="selectFolder(folder.path)">
                                             <a class="flex items-center cursor-pointer group">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter group-hover:text-blue" />
+                                                <file-icon extension="folder" class="w-8 h-8 mr-2 inline-block text-blue-400 group-hover:text-blue" />
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
                                         <td />
                                         <td />
 
-                                        <td class="actions-column" :colspan="columns.length">
-                                            <dropdown-list v-if="folderActions(folder).length">
-                                                <!-- TODO: Folder edit -->
-                                                <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
-
+                                        <th class="actions-column" :colspan="columns.length">
+                                            <dropdown-list placement="left-start" v-if="folderActions(folder).length">
                                                 <data-list-inline-actions
                                                     :item="folder.path"
                                                     :url="folderActionUrl"
@@ -134,30 +132,21 @@
                                                     @completed="actionCompleted"
                                                 />
                                             </dropdown-list>
-
-                                            <folder-editor
-                                                v-if="editedFolderPath === folder.path"
-                                                :initial-directory="folder.basename"
-                                                :container="container"
-                                                :path="path"
-                                                @closed="editedFolderPath = null"
-                                                @updated="folderUpdated(i, $event)"
-                                            />
-                                        </td>
+                                        </th>
                                     </tr>
                                 </template>
 
                                 <template slot="cell-basename" slot-scope="{ row: asset, checkboxId }">
                                     <div class="flex items-center w-fit-content group">
-                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-1 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
-                                        <label :for="checkboxId" class="cursor-pointer select-none group-hover:text-blue" @click.stop="$emit('edit-asset', asset)">
+                                        <asset-thumbnail :asset="asset" :square="true" class="w-8 h-8 mr-2 cursor-pointer" @click.native.stop="$emit('edit-asset', asset)" />
+                                        <label :for="checkboxId" class="cursor-pointer select-none group-hover:text-blue normal-nums" @click.stop="$emit('edit-asset', asset)">
                                             {{ asset.basename }}
                                         </label>
                                     </div>
                                 </template>
 
                                 <template slot="actions" slot-scope="{ row: asset }">
-                                    <dropdown-list>
+                                    <dropdown-list placement="left-start">
                                         <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
@@ -171,21 +160,22 @@
                                 </template>
 
                             </data-list-table>
+                            </div>
 
                             <!-- Grid Mode -->
                             <div v-if="mode === 'grid' && ! containerIsEmpty">
-                                <div class="asset-grid-listing px-2 pt-1">
+                                <div class="asset-grid-listing px-4 pt-2">
                                     <!-- Parent Folder -->
                                     <div class="asset-tile" v-if="(folder && folder.parent_path) && !restrictFolderNavigation">
                                         <div class="asset-thumb-container">
                                             <button @click="selectFolder(folder.parent_path)">
                                                 <div class="asset-thumb">
-                                                    <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue" />
+                                                    <file-icon extension="folder" class="w-full h-full text-blue-400 hover:text-blue" />
                                                 </div>
                                             </button>
                                         </div>
                                         <div class="asset-meta flex items-center">
-                                            <div class="asset-filename text-center w-full px-1 py-sm">..</div>
+                                            <div class="asset-filename text-center w-full px-2 py-1">..</div>
                                         </div>
                                     </div>
                                     <!-- Sub-Folders -->
@@ -193,12 +183,12 @@
                                         <div class="asset-thumb-container">
                                             <button @click="selectFolder(folder.path)">
                                                 <div class="asset-thumb">
-                                                    <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue" />
+                                                    <file-icon extension="folder" class="w-full h-full text-blue-400 hover:text-blue" />
                                                 </div>
                                             </button>
                                         </div>
                                         <div class="asset-meta flex items-center">
-                                            <div class="asset-filename text-center w-full px-1 py-sm" v-text="folder.basename" :title="folder.basename" />
+                                            <div class="asset-filename text-center w-full px-2 py-1" v-text="folder.basename" :title="folder.basename" />
                                         </div>
                                         <dropdown-list autoclose v-if="folderActions(folder).length" class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
                                              <data-list-inline-actions
@@ -211,21 +201,34 @@
                                          </dropdown-list>
                                     </div>
                                     <!-- Assets -->
-                                    <button class="asset-tile outline-none group relative" v-for="(asset, index) in assets" :key="asset.id" :class="{ 'selected': isSelected(asset.id) }" @click="toggleSelection(asset.id, index, $event)" @dblclick="$emit('edit-asset', asset)">
-                                        <div class="asset-thumb-container">
-                                            <div class="asset-thumb">
-                                                <img v-if="asset.is_image" :src="asset.thumbnail" loading="lazy" :class="{'p-2 h-full w-full': asset.extension === 'svg'}" />
-                                                <file-icon
-                                                    v-else
-                                                    :extension="asset.extension"
-                                                    class="p-2 h-full w-full"
-                                                />
+                                    <button
+                                        class="asset-tile outline-none group relative"
+                                        v-for="(asset, index) in assets"
+                                        :key="asset.id"
+                                        :class="{ 'selected': isSelected(asset.id) }"
+                                    >
+                                        <div
+                                            class="w-full"
+                                            @click.stop="toggleSelection(asset.id, index, $event)"
+                                            @dblclick.stop="$emit('edit-asset', asset)"
+                                        >
+                                            <div class="asset-thumb-container">
+                                                <div class="asset-thumb">
+                                                    <img v-if="asset.is_image" :src="asset.thumbnail" loading="lazy" :class="{'p-4 h-full w-full': asset.extension === 'svg'}" />
+                                                    <file-icon
+                                                        v-else
+                                                        :extension="asset.extension"
+                                                        class="p-4 h-full w-full"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div class="asset-meta">
+                                                <div class="asset-filename px-2 py-1 text-center" v-text="asset.basename" :title="asset.basename" />
                                             </div>
                                         </div>
-                                        <div class="asset-meta">
-                                            <div class="asset-filename px-1 py-sm text-center" v-text="asset.basename" :title="asset.basename" />
-                                        </div>
-                                        <dropdown-list autoclose class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
+                                        <dropdown-list
+                                            class="absolute top-1 right-2 opacity-0 group-hover:opacity-100"
+                                        >
                                              <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                              <div class="divider" v-if="asset.actions.length" />
                                              <data-list-inline-actions
@@ -240,14 +243,14 @@
                                 </div>
                             </div>
 
-                            <div class="p-2 text-grey-70"
+                            <div class="p-4 text-gray-700"
                                 v-if="containerIsEmpty"
                                 v-text="searchQuery ? __('No results') : __('This container is empty')" />
 
                         </div>
 
                         <data-list-pagination
-                            class="mt-3"
+                            class="mt-6"
                             :resource-meta="meta"
                             :per-page="perPage"
                             @page-selected="page = $event"
@@ -267,7 +270,7 @@
             @saved="assetSaved"
         />
 
-        <folder-creator
+        <create-folder
             v-if="creatingFolder"
             :container="container"
             :path="path"
@@ -283,8 +286,7 @@
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
-import FolderCreator from '../Folder/Create.vue';
-import FolderEditor from '../Folder/Edit.vue';
+import CreateFolder from './CreateFolder.vue';
 import HasPagination from '../../data-list/HasPagination';
 import HasPreferences from '../../data-list/HasPreferences';
 import Uploader from '../Uploader.vue';
@@ -305,8 +307,7 @@ export default {
         Breadcrumbs,
         Uploader,
         Uploads,
-        FolderEditor,
-        FolderCreator,
+        CreateFolder,
     },
 
     props: {
@@ -340,7 +341,6 @@ export default {
             folder: {},
             searchQuery: '',
             editedAssetId: this.initialEditingAssetId,
-            editedFolderPath: null,
             creatingFolder: false,
             uploads: [],
             page: 1,
@@ -594,11 +594,6 @@ export default {
             this.folders.push(folder);
             this.folders = _.sortBy(this.folders, 'title');
             this.creatingFolder = false;
-        },
-
-        folderUpdated(index, newFolder) {
-            this.folders[index] = newFolder;
-            this.editedFolderPath = null;
         },
 
         sorted(column, direction) {

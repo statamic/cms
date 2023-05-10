@@ -1,91 +1,94 @@
 <template>
 
-    <div class="h-full overflow-auto p-4 bg-grey-30 h-full">
+    <div class="h-full overflow-auto bg-gray-300 h-full">
 
-        <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
+        <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center ">
             <loading-graphic />
         </div>
 
-        <div v-if="!loading" class="flex items-center mb-3 -mt-1">
-            <h1 class="flex-1">
-                <small class="block text-xs text-grey-70 font-medium leading-none mt-1 flex items-center">
-                    <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-70" :name="fieldtype.icon"></svg-icon>
-                    {{ fieldtype.title }}
-                </small>
+        <header v-if="!loading" class="flex items-center sticky top-0 inset-x-0 bg-white shadow px-8 py-2 z-1 h-13">
+            <h1 class="flex-1 flex items-center text-xl">
                 {{ values.display || config.display || config.handle }}
+                <small class="badge-pill bg-gray-100 ml-4 border text-xs text-gray-700 font-medium leading-none flex items-center">
+                    <svg-icon class="h-4 w-4 mr-2 inline-block text-gray-700" :name="`light/${fieldtype.icon}`"></svg-icon>
+                    {{ fieldtype.title }} {{ __('Fieldtype') }}
+                </small>
             </h1>
             <button
-                class="text-grey-70 hover:text-grey-80 mr-3 text-sm"
+                class="text-gray-700 hover:text-gray-800 mr-6 text-sm"
                 @click.prevent="close"
                 v-text="__('Cancel')"
             ></button>
             <button
                 class="btn-primary"
                 @click.prevent="commit"
-                v-text="__('Finish')"
+                v-text="__('Apply')"
             ></button>
-        </div>
-
-        <div class="publish-tabs tabs">
-            <button class="tab-button"
-            :class="{ 'active': activeTab === 'settings' }"
-                @click="activeTab = 'settings'"
-                v-text="__('Settings')"
-            />
-            <button class="tab-button"
-            :class="{ 'active': activeTab === 'conditions' }"
-                @click="activeTab = 'conditions'"
-                v-text="__('Conditions')"
-            />
-            <button class="tab-button"
-            :class="{ 'active': activeTab === 'validation' }"
-                @click="activeTab = 'validation'"
-                v-text="__('Validation')"
-            />
-        </div>
-
-        <div class="card rounded-tl-none" v-if="!loading">
-
-            <publish-container
-                :name="publishContainer"
-                :blueprint="blueprint"
-                :values="values"
-                :meta="meta"
-                :errors="errors"
-                :is-root="true"
-                @updated="values = $event"
-            >
-                <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue, setFieldMeta }">
-
-                    <publish-fields
-                        v-if="blueprint.sections.length"
-                        class="w-full"
-                        :fields="blueprint.sections[0].fields"
-                        @updated="(handle, value) => {
-                            updateField(handle, value, setFieldValue);
-                            if (handle === 'handle') isHandleModified = true
-                        }"
-                        @meta-updated="setFieldMeta"
+        </header>
+        <section class="py-4 px-3 md:px-8">
+            <div class="tabs-container">
+                <div class="publish-tabs tabs">
+                    <button class="tab-button"
+                    :class="{ 'active': activeTab === 'settings' }"
+                        @click="activeTab = 'settings'"
+                        v-text="__('Settings')"
                     />
-
+                    <button class="tab-button"
+                    :class="{ 'active': activeTab === 'conditions' }"
+                        @click="activeTab = 'conditions'"
+                        v-text="__('Conditions')"
+                    />
+                    <button class="tab-button"
+                    :class="{ 'active': activeTab === 'validation' }"
+                        @click="activeTab = 'validation'"
+                        v-text="__('Validation')"
+                    />
                 </div>
-            </publish-container>
-
-            <div class="publish-fields" v-show="activeTab === 'conditions'">
-                <field-conditions-builder
-                    :config="config"
-                    :suggestable-fields="suggestableConditionFields"
-                    @updated="updateFieldConditions"
-                    @updated-always-save="updateAlwaysSave" />
             </div>
 
-            <div class="publish-fields" v-show="activeTab === 'validation'">
-                <field-validation-builder
-                    :config="config"
-                    @updated="updateField('validate', $event)" />
+            <div v-if="!loading" class="field-settings">
+
+                <publish-container
+                    :name="publishContainer"
+                    :blueprint="blueprint"
+                    :values="values"
+                    :meta="meta"
+                    :is-config="true"
+                    :errors="errors"
+                    :is-root="true"
+                    @updated="values = $event"
+                >
+                    <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue, setFieldMeta }">
+
+                        <publish-sections
+                            :sections="blueprint.tabs[0].sections"
+                            @updated="(handle, value) => updateField(handle, value, setFieldValue)"
+                            @meta-updated="setFieldMeta"
+                        />
+
+                    </div>
+                </publish-container>
+
+                <div class="card p-0" v-show="activeTab === 'conditions'">
+                    <div class="publish-fields @container">
+                        <field-conditions-builder
+                            :config="config"
+                            :suggestable-fields="suggestableConditionFields"
+                            @updated="updateFieldConditions"
+                            @updated-always-save="updateAlwaysSave" />
+                    </div>
+                </div>
+
+                <div class="card p-0" v-show="activeTab === 'validation'">
+                    <div class="publish-fields @container">
+                        <field-validation-builder
+                            :config="config"
+                            @updated="updateField('validate', $event)" />
+                    </div>
+                </div>
 
             </div>
-        </div>
+        </section>
     </div>
 
 </template>
@@ -115,6 +118,10 @@ export default {
         suggestableConditionFields: Array,
     },
 
+    provide: {
+        isInsideConfigFields: true,
+    },
+
     model: {
         prop: 'config',
         event: 'input'
@@ -127,7 +134,6 @@ export default {
             error: null,
             errors: {},
             editedFields: clone(this.overrides),
-            isHandleModified: true,
             activeTab: 'settings',
             storeName: 'base',
             fieldtype: null,
@@ -181,19 +187,6 @@ export default {
     },
 
     created() {
-        // For new fields, we'll slugify the display name into the field name.
-        // If they edit the handle, we'll stop.
-        if (this.config.isNew && !this.config.isMeta) {
-            this.isHandleModified = false;
-
-            this.$watch('values.display', function(display) {
-                if (! this.isHandleModified) {
-                    const handle = this.$slugify(display, '_');
-                    this.updateField('handle', handle);
-                }
-            });
-        }
-
         this.load();
     },
 
@@ -201,7 +194,7 @@ export default {
 
         configFieldClasses(field) {
             return [
-                `form-group p-2 m-0 ${field.type}-fieldtype`,
+                `form-group p-4 m-0 ${field.type}-fieldtype`,
                 tailwind_width_class(field.width)
             ];
         },

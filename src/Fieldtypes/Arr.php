@@ -14,25 +14,31 @@ class Arr extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'mode' => [
-                'display' => __('Mode'),
-                'instructions' => __('statamic::fieldtypes.array.config.mode'),
-                'type' => 'radio',
-                'default' => 'dynamic',
-                'options' => [
-                    'dynamic' => __('Dynamic'),
-                    'keyed' => __('Keyed'),
-                    'single' => __('Single'),
-                ],
-            ],
-            'keys' => [
-                'display' => __('Keys'),
-                'instructions' => __('statamic::fieldtypes.array.config.keys'),
-                'type' => 'array',
-                'key_header' => __('Key'),
-                'value_header' => __('Label').' ('.__('Optional').')',
-                'unless' => [
-                    'mode' => 'dynamic',
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.array.config.mode'),
+                        'type' => 'radio',
+                        'default' => 'dynamic',
+                        'options' => [
+                            'dynamic' => __('Dynamic'),
+                            'keyed' => __('Keyed'),
+                            'single' => __('Single'),
+                        ],
+                    ],
+                    'keys' => [
+                        'display' => __('Keys'),
+                        'instructions' => __('statamic::fieldtypes.array.config.keys'),
+                        'type' => 'array',
+                        'key_header' => __('Key'),
+                        'value_header' => __('Label').' ('.__('Optional').')',
+                        'add_button' => __('Add Key'),
+                        'unless' => [
+                            'mode' => 'dynamic',
+                        ],
+                    ],
                 ],
             ],
         ];

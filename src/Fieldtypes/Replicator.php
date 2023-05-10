@@ -22,34 +22,45 @@ class Replicator extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'collapse' => [
-                'display' => __('Collapse'),
-                'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
-                'type' => 'select',
-                'cast_booleans' => true,
-                'width' => 33,
-                'options' => [
-                    'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
-                    'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
-                    'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'collapse' => [
+                        'display' => __('Collapse'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
+                        'type' => 'select',
+                        'cast_booleans' => true,
+                        'options' => [
+                            'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
+                            'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
+                            'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+                        ],
+                        'default' => false,
+                    ],
+                    'previews' => [
+                        'display' => __('Field Previews'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.previews'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'max_sets' => [
+                        'display' => __('Max Sets'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
+                        'type' => 'integer',
+                    ],
                 ],
-                'default' => false,
             ],
-            'previews' => [
-                'display' => __('Field Previews'),
-                'instructions' => __('statamic::fieldtypes.replicator.config.previews'),
-                'type' => 'toggle',
-                'width' => 33,
-                'default' => true,
-            ],
-            'max_sets' => [
-                'display' => __('Max Sets'),
-                'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
-                'type' => 'integer',
-                'width' => 33,
-            ],
-            'sets' => [
-                'type' => 'sets',
+            [
+                'display' => __('Manage Sets'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.sets'),
+                'fields' => [
+                    'sets' => [
+                        'display' => __('Sets'),
+                        'type' => 'sets',
+                        'hide_display' => true,
+                        'full_width_setting' => true,
+                    ],
+                ],
             ],
         ];
     }
@@ -97,7 +108,7 @@ class Replicator extends Fieldtype
     public function fields($set)
     {
         return new Fields(
-            $this->config("sets.$set.fields"),
+            Arr::get($this->flattenedSetsConfig(), "$set.fields"),
             $this->field()->parent(),
             $this->field()
         );
@@ -166,7 +177,7 @@ class Replicator extends Fieldtype
         return collect($values)->reject(function ($set, $key) {
             return array_get($set, 'enabled', true) === false;
         })->map(function ($set) use ($shallow) {
-            if (! $this->config("sets.{$set['type']}.fields")) {
+            if (! Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields")) {
                 return $set;
             }
 
@@ -181,18 +192,18 @@ class Replicator extends Fieldtype
     public function preload()
     {
         $existing = collect($this->field->value())->mapWithKeys(function ($set) {
-            $config = $this->config("sets.{$set['type']}.fields", []);
+            $config = Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields", []);
 
             return [$set['_id'] => (new Fields($config))->addValues($set)->meta()->put('_', '_')];
         })->toArray();
 
-        $defaults = collect($this->config('sets'))->map(function ($set) {
+        $defaults = collect($this->flattenedSetsConfig())->map(function ($set) {
             return (new Fields($set['fields']))->all()->map(function ($field) {
                 return $field->fieldtype()->preProcess($field->defaultValue());
             })->all();
         })->all();
 
-        $new = collect($this->config('sets'))->map(function ($set, $handle) use ($defaults) {
+        $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
             return (new Fields($set['fields']))->addValues($defaults[$handle])->meta()->put('_', '_');
         })->toArray();
 
@@ -211,6 +222,26 @@ class Replicator extends Fieldtype
         ];
     }
 
+    public function flattenedSetsConfig()
+    {
+        $sets = collect($this->config('sets'));
+
+        // If the first set doesn't have a nested "set" key, it would be the legacy format.
+        // We'll put it in a "main" group so it's compatible with the new format.
+        // This also happens in the "sets" fieldtype.
+        if (! Arr::has($sets->first(), 'sets')) {
+            $sets = collect([
+                'main' => [
+                    'sets' => $sets->all(),
+                ],
+            ]);
+        }
+
+        return $sets->flatMap(function ($section) {
+            return $section['sets'];
+        });
+    }
+
     public function toGqlType()
     {
         return GraphQL::listOf(GraphQL::type($this->gqlSetsTypeName()));
@@ -218,7 +249,7 @@ class Replicator extends Fieldtype
 
     public function addGqlTypes()
     {
-        $types = collect($this->config('sets'))
+        $types = collect($this->flattenedSetsConfig())
             ->each(function ($set, $handle) {
                 $this->fields($handle)->all()->each(function ($field) {
                     $field->fieldtype()->addGqlTypes();

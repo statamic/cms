@@ -17,7 +17,6 @@ class Yaml extends Fieldtype
                 'display' => __('Default Value'),
                 'instructions' => __('statamic::messages.fields_default_instructions'),
                 'type' => 'yaml',
-                'width' => 100,
             ],
         ];
     }

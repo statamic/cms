@@ -25,17 +25,18 @@
                 >
             </template>
              <template #no-options>
-                <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
             </template>
             <template #footer="{ deselect }">
                 <sortable-list
                     item-class="sortable-item"
                     handle-class="sortable-item"
                     :value="value"
+                    :distance="10"
                     @input="update"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="tag in value" :key="tag" class="vs__selected mt-1 sortable-item">
+                        <span v-for="tag in value" :key="tag" class="vs__selected mt-2 sortable-item">
                             {{ tag }}
                             <button @click="deselect(tag)" type="button" :aria-label="__('Remove tag')" class="vs__deselect">
                                 <span>×</span>

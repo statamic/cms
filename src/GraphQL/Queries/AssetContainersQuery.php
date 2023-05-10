@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\GraphQL;
@@ -20,6 +21,8 @@ class AssetContainersQuery extends Query
 
     public function resolve($root, $args)
     {
-        return AssetContainer::all();
+        $allowed = ResourceAuthorizer::allowedSubResources('graphql', 'assets');
+
+        return AssetContainer::all()->filter(fn ($container) => in_array($container->handle(), $allowed));
     }
 }

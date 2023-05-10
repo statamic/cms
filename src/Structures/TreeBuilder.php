@@ -34,7 +34,7 @@ class TreeBuilder
         $entry = ($from && $from !== '/') ? Entry::findByUri(Str::start($from, '/'), $params['site']) : null;
 
         if ($entry) {
-            $page = $tree->page($entry->id());
+            $page = $tree->find($entry->id());
             $pages = $page->pages()->all();
         } else {
             $pages = $tree->pages()
