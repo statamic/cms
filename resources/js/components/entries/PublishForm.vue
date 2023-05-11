@@ -70,6 +70,7 @@
                 :targets="previewTargets"
                 :values="values"
                 :blueprint="fieldset.handle"
+                :reference="initialReference"
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
@@ -656,6 +657,7 @@ export default {
                 this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
+                this.initialPublished = data.values.published;
 
                 this.trackDirtyStateTimeout = setTimeout(() => this.trackDirtyState = true, 300); // after any fieldtypes do a debounced update
             })

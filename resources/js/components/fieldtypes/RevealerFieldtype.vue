@@ -47,8 +47,13 @@ export default {
         this.$store.commit(`publish/${this.storeName}/setRevealerField`, this.fieldPath);
     },
 
+    beforeDestroy() {
+        this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, this.fieldPath);
+    },
+
     watch: {
-        fieldPath(fieldPath) {
+        fieldPath(fieldPath, oldFieldPath) {
+            this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, oldFieldPath);
             this.$store.commit(`publish/${this.storeName}/setRevealerField`, fieldPath);
         }
     },

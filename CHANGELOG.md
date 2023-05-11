@@ -1,5 +1,71 @@
 # Release Notes
 
+## 3.4.11 (2023-05-06)
+
+### What's fixed
+- Fix combination of `yield` and `else` in Antlers templates causing blank pages.  [#8067](https://github.com/statamic/cms/issues/8067) by @JohnathonKoster
+
+
+
+## 3.4.10 (2023-05-05)
+
+### What's new
+- Add `insecure` flag to skip SSL verification when warming static cache. [#8056](https://github.com/statamic/cms/issues/8056) by @o1y
+
+### What's fixed
+- Fixes checking for whether sections exist. [#7984](https://github.com/statamic/cms/issues/7984) by @JohnathonKoster
+- Fix assignments from within associative arrays/maps. [#7991](https://github.com/statamic/cms/issues/7991) by @JohnathonKoster
+- Fix Vimeo unlisted videos in `video` fieldtype. [#8062](https://github.com/statamic/cms/issues/8062) by @ryanmitchell
+
+
+
+## 3.4.9 (2023-05-03)
+
+### What's new
+- Add `min_files` option to assets fieldtype. [#8015](https://github.com/statamic/cms/issues/8015) by @ryanmitchell
+
+### What's improved
+- French translations [#8000](https://github.com/statamic/cms/issues/8000) by @ebeauchamps
+
+### What's fixed
+- Fix iOS scroll in stacks. [#8035](https://github.com/statamic/cms/issues/8035) by @jasonvarga
+- Fix fields added to blueprints through event not being added to GraphQL. [#7249](https://github.com/statamic/cms/issues/7249) by @aerni
+- Fix invalidation and absolute URLs for entries with redirects. [#7173](https://github.com/statamic/cms/issues/7173) by @arthurperton
+- Only show Copy Asset URL action for public containers. [#8005](https://github.com/statamic/cms/issues/8005) by @jasonvarga
+
+
+
+## 3.4.8 (2023-04-25)
+
+### What's new
+- Live Preview auto-refresh can be disabled and replaced with postMessage. [#6067](https://github.com/statamic/cms/issues/6067) by @Buffalom
+- Integer and float fieldtypes filters. [#7064](https://github.com/statamic/cms/issues/7064) by @jacksleight
+- Support for additional columns in the collection widget. [#7760](https://github.com/statamic/cms/issues/7760) by @jacksleight
+
+### What's improved
+- Added locking to the static caching middleware. [#7722](https://github.com/statamic/cms/issues/7722) by @jasonvarga
+- Query builder orderBy arguments are validated. [#7917](https://github.com/statamic/cms/issues/7917) by @nicolasbeauvais
+- Existing user gets passed into OAuth callback. [#7904](https://github.com/statamic/cms/issues/7904) by @jasonvarga
+- Support for Livewire CSRF token in full measure static caching. [#7894](https://github.com/statamic/cms/issues/7894) by @aerni
+- Log process class errors with command info. [#7877](https://github.com/statamic/cms/issues/7877) by @jesseleite
+- German translations. [#7995](https://github.com/statamic/cms/issues/7995) by @PatrickJunod
+
+### What's fixed
+- Fix issues with revealer fields within Bard and Replicator fields. [#7899](https://github.com/statamic/cms/issues/7899) by @jacksleight
+- Fix `null` sometimes being added to trees. [#6640](https://github.com/statamic/cms/issues/6640) by @AndrewHaine
+- Fix bard link extension is stripping out the domain part when pasting a url. [#7962](https://github.com/statamic/cms/issues/7962) by @o1y
+- Fix slug not being generated in appropriate language. [#7757](https://github.com/statamic/cms/issues/7757) by @flolanger
+- Fix full measure caching invalidation on multisite with a single path config value. [#7509](https://github.com/statamic/cms/issues/7509) by @arthurperton
+- Fix save button label when switching between localized entries. [#7916](https://github.com/statamic/cms/issues/7916) by @o1y
+- Fix user attributes not being merged when found by OAuth ID. [#7883](https://github.com/statamic/cms/issues/7883) by @grantholle
+- Fix focal point editor not displaying images with parenthesis. [#7896](https://github.com/statamic/cms/issues/7896) by @mynetx
+- Fix field dragging in blueprints. [#7870](https://github.com/statamic/cms/issues/7870) by @jasonvarga
+- Fix fieldset edit form draggable glitch. [#7799](https://github.com/statamic/cms/issues/7799) by @o1y
+- Fix `once` tag when used across requests. [#7805](https://github.com/statamic/cms/issues/7805) by @jasonvarga
+- Fix missing closing div. [#7777](https://github.com/statamic/cms/issues/7777) by @galengidman
+
+
+
 ## 3.4.7 (2023-03-20)
 
 ### What's improved
