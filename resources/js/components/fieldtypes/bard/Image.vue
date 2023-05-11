@@ -3,9 +3,9 @@
     <node-view-wrapper>
         <div class="bard-inline-image-container">
             <div v-if="src">
-                <div class="p-2 text-center">
+                <div class="p-2 text-center" draggable="true" data-drag-handle>
                     <div ref="content" hidden />
-                    <img :src="src" class="block mx-auto" data-drag-handle />
+                    <img :src="src" class="block mx-auto" />
                 </div>
 
                 <div class="flex items-center p-2 border-t rounded-b" @paste.stop>
