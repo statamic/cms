@@ -50,17 +50,15 @@
                                 <div class="flex items-center justify-between p-2 text-sm">
                                     <data-list-search class="h-8" ref="search" v-model="searchQuery" />
 
-                                    <template v-if="! hasSelections">
-                                        <button v-if="canCreateFolders" class="btn btn-sm ml-3" @click="creatingFolder = true">
-                                            <svg-icon name="folder-add" class="h-4 w-4 mr-2" />
-                                            <span>{{ __('Create Folder') }}</span>
-                                        </button>
+                                    <button v-if="canCreateFolders" class="btn btn-sm ml-3" @click="creatingFolder = true">
+                                        <svg-icon name="folder-add" class="h-4 w-4 mr-2" />
+                                        <span>{{ __('Create Folder') }}</span>
+                                    </button>
 
-                                        <button v-if="canUpload" class="btn btn-sm ml-3" @click="openFileBrowser">
-                                            <svg-icon name="upload" class="h-4 w-4 mr-2 text-current" />
-                                            <span>{{ __('Upload') }}</span>
-                                        </button>
-                                    </template>
+                                    <button v-if="canUpload" class="btn btn-sm ml-3" @click="openFileBrowser">
+                                        <svg-icon name="upload" class="h-4 w-4 mr-2 text-current" />
+                                        <span>{{ __('Upload') }}</span>
+                                    </button>
 
                                     <div class="btn-group ml-3">
                                         <button class="btn btn-sm" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
