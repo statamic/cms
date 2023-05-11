@@ -69,7 +69,6 @@
 @import "components/fieldtypes/table";
 @import "components/fieldtypes/tags";
 @import "components/fieldtypes/textarea";
-@import "components/fieldtypes/time";
 @import "components/fieldtypes/width";
 @import "components/fieldtypes/video";
 @import "components/fieldtypes/yaml";
