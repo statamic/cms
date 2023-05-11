@@ -13,6 +13,7 @@ const postMessageToIframe = (container, url, payload) => {
 
     container.firstChild.contentWindow.postMessage({
         name: 'statamic.preview.updated',
+        url,
         ...payload
     }, targetOrigin);
 }
