@@ -1,5 +1,27 @@
 # Release Notes
 
+## 4.1.0 (2023-05-11)
+
+### What's new
+- Include URL in Live Preview post message. [#8100](https://github.com/statamic/cms/issues/8100) by @jacksleight
+
+### What's improved
+- French translations. [#8109](https://github.com/statamic/cms/issues/8109) by @ebeauchamps
+- German translations. [#8096](https://github.com/statamic/cms/issues/8096) by @helloDanuk
+
+### What's fixed
+- Fix confirmation modal's confirm button text. [#8111](https://github.com/statamic/cms/issues/8111) by @jasonvarga
+- Fix asset upload button disappearing if you have selections. [#8097](https://github.com/statamic/cms/issues/8097) by @jackmcdade
+- Fix template fieldtype's options appearing behind things. [#8119](https://github.com/statamic/cms/issues/8119) by @jasonvarga
+- Fix full screen mode translation casing. [#8108](https://github.com/statamic/cms/issues/8108) by @jasonvarga
+- Fix consistency of sortable items. [#8083](https://github.com/statamic/cms/issues/8083) by @jasonvarga
+- Fix items disappearing behind stacks. [#8103](https://github.com/statamic/cms/issues/8103) by @jasonvarga
+- Fix issue with Time fields inside Grid. [#8094](https://github.com/statamic/cms/issues/8094) by @jackmcdade
+- Fix asset grid tile size. [#8095](https://github.com/statamic/cms/issues/8095) by @jackmcdade
+- Fix Bard fullscreen button aria-label. [#8089](https://github.com/statamic/cms/issues/8089) by @jacksleight
+
+
+
 ## 4.0.0 (2023-05-09)
 
 ### What's new
