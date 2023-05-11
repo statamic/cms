@@ -4,6 +4,8 @@
             ref="input"
             :name="name"
             @input="update"
+            append-to-body
+            :calculate-position="positionOptions"
             :clearable="config.clearable"
             :placeholder="config.placeholder"
             :disabled="isReadOnly"
@@ -21,6 +23,8 @@
 </template>
 
 <script>
+import { computePosition, offset, flip } from '@floating-ui/dom';
+
 export default {
 
     mixins: [Fieldtype],
@@ -76,6 +80,26 @@ export default {
             this.options = options;
             this.loading = false;
         });
+    },
+
+    methods: {
+        positionOptions(dropdownList, component, { width }) {
+            dropdownList.style.width = width
+
+            computePosition(component.$refs.toggle, dropdownList, {
+                placement: 'bottom',
+                middleware: [
+                    offset({ mainAxis: 0, crossAxis: -1 }),
+                    flip(),
+                ]
+            }).then(({ x, y }) => {
+                Object.assign(dropdownList.style, {
+                    // Round to avoid blurry text
+                    left: `${Math.round(x)}px`,
+                    top: `${Math.round(y)}px`,
+                });
+            });
+        }
     }
 
 };
