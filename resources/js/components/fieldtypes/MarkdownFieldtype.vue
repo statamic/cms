@@ -37,7 +37,7 @@
                         <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
                             <svg-icon name="dark-mode" class="w-4 h-4" />
                         </button>
-                        <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')" :aria-label="__('Toggle FullScreen Mode')">
+                        <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen')" :aria-label="__('Toggle Fullscreen Mode')">
                             <svg-icon name="expand-bold" class="w-4 h-4" v-show="!fullScreenMode" />
                             <svg-icon name="arrows-shrink" class="w-4 h-4" v-show="fullScreenMode" />
                         </button>
