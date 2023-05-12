@@ -4,7 +4,7 @@
         <div
             class="bard-inline-image-container"
             :class="{
-                'outline outline-2 outline-blue-200 ' : selected,
+                'border-blue-400' : selected,
             }"
         >
             <div v-if="src" class="p-2 pb-0 text-center" draggable="true" data-drag-handle>
