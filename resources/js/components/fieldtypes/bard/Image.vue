@@ -2,29 +2,23 @@
 
     <node-view-wrapper>
         <div class="bard-inline-image-container">
-            <div v-if="src">
-                <div class="p-2 text-center" draggable="true" data-drag-handle>
-                    <div ref="content" hidden />
-                    <img :src="src" class="block mx-auto" />
-                </div>
-
-                <div class="flex items-center p-2 border-t rounded-b" @paste.stop>
-                    <text-input name="alt" v-model="alt" :prepend="__('Alt Text')" class="mr-2 flex-1" />
-                    <button class="btn-flat mr-2" @click="openSelector">
-                        {{ __('Replace') }}
-                    </button>
-                    <button class="btn-flat" @click="deleteNode">
-                        {{ __('Remove') }}
-                    </button>
-                </div>
+            <div v-if="src" class="p-2 pb-0 text-center" draggable="true" data-drag-handle>
+                <div ref="content" hidden />
+                <img :src="src" class="block mx-auto" />
             </div>
 
-            <div v-else class="text-center p-4">
-                <button class="btn-flat" @click="openSelector">
-                    {{ __('Choose Image') }}
+            <div id="asset-editor-toolbar" class="@container/toolbar flex items-center justify-center py-4 px-2 text-2xs text-white text-center space-x-1 sm:space-x-3">
+                <button v-if="!src" @click="openSelector" type="button" class="flex bg-gray-750 hover:bg-gray-900 hover:text-yellow-light rounded items-center px-3 py-1.5">
+                    <svg-icon name="folder-image" class="h-4" />
+                    <span class="ml-2 @3xl/toolbar:inline-block">{{ __('Chose Image') }}</span>
                 </button>
-                <button class="btn-flat" @click="deleteNode">
-                    {{ __('Remove') }}
+                <button v-if="src" @click="openSelector" type="button" class="flex bg-gray-750 hover:bg-gray-900 hover:text-yellow-light rounded items-center px-3 py-1.5">
+                    <svg-icon name="swap" class="h-4" />
+                    <span class="ml-2 @3xl/toolbar:inline-block">{{ __('Replace') }}</span>
+                </button>
+                <button @click="deleteNode" class="flex bg-gray-750 hover:bg-gray-900 hover:text-red-400 rounded items-center text-center px-3 py-1.5">
+                    <svg-icon name="trash" class="h-4" />
+                    <span class="ml-2 @3xl/toolbar:inline-block">{{ __('Delete') }}</span>
                 </button>
             </div>
 
