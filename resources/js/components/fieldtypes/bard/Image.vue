@@ -188,12 +188,13 @@ export default {
         setAsset(asset) {
             this.editorAsset = asset;
             this.assetId = asset.id;
-            this.alt = asset.values.alt;
+            this.alt = this.alt || asset.values.alt;
             this.loading = false;
             this.updateAttributes({ src: this.actualSrc });
         },
 
         editorAssetSaved(asset) {
+            this.alt = null
             this.setAsset(asset);
             this.closeEditor();
         },
