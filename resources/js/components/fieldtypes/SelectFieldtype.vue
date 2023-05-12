@@ -80,13 +80,13 @@
 
 <script>
 import HasInputOptions from './HasInputOptions.js'
-import { computePosition, offset, flip } from '@floating-ui/dom';
 import { SortableList } from '../sortable/Sortable';
+import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
 
 
 export default {
 
-    mixins: [Fieldtype, HasInputOptions],
+    mixins: [Fieldtype, HasInputOptions, PositionsSelectOptions],
 
     components: {
         SortableList
@@ -169,24 +169,6 @@ export default {
                     this.update(null);
                 }
             }
-        },
-
-        positionOptions(dropdownList, component, { width }) {
-            dropdownList.style.width = width
-
-            computePosition(component.$refs.toggle, dropdownList, {
-                placement: 'bottom',
-                middleware: [
-                    offset({ mainAxis: 0, crossAxis: -1 }),
-                    flip(),
-                ]
-            }).then(({ x, y }) => {
-                Object.assign(dropdownList.style, {
-                    // Round to avoid blurry text
-                    left: `${Math.round(x)}px`,
-                    top: `${Math.round(y)}px`,
-                });
-            });
         },
     }
 };

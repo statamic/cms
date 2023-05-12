@@ -5,9 +5,12 @@
         <div class="w-40 mr-4">
             <v-select
                 v-model="option"
+                append-to-body
+                :calculate-position="positionOptions"
                 :options="options"
                 :clearable="false"
                 :reduce="(option) => option.value"
+
             >
                 <template #option="{ label }">
                   {{ __(label) }}
@@ -49,9 +52,11 @@
 </template>
 
 <script>
+import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, PositionsSelectOptions],
 
     data() {
 
