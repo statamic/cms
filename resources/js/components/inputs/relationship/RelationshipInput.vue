@@ -259,7 +259,6 @@ export default {
                 mirror: { constrainDimensions: true, xAxis: false, appendTo: 'body' },
                 swapAnimation: { vertical: true },
                 plugins: [Plugins.SwapAnimation],
-                delay: 200
             }).on('drag:start', e => {
                 this.value.length === 1 ? e.cancel() : this.$emit('focus');
             }).on('drag:stop', e => {
