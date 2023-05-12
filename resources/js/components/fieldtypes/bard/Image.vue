@@ -12,18 +12,22 @@
                 <img :src="src" class="block mx-auto" />
             </div>
 
-            <div id="asset-editor-toolbar" class="@container/toolbar flex items-center justify-center py-4 px-2 text-2xs text-white text-center space-x-1 sm:space-x-3">
+            <div class="@container/toolbar flex items-center justify-center py-2 px-2 text-2xs text-white text-center space-x-1 sm:space-x-3">
                 <button v-if="!src" @click="openSelector" type="button" class="flex bg-gray-750 hover:bg-gray-900 hover:text-yellow-light rounded items-center px-3 py-1.5">
                     <svg-icon name="folder-image" class="h-4" />
-                    <span class="ml-2 @3xl/toolbar:inline-block">{{ __('Chose Image') }}</span>
+                    <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Chose Image') }}</span>
+                </button>
+                <button v-if="src" @click="edit" type="button" class="flex bg-gray-750 hover:bg-gray-900 hover:text-yellow-light rounded items-center px-3 py-1.5">
+                    <svg-icon name="pencil" class="h-4" />
+                    <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Set Alt') }}</span>
                 </button>
                 <button v-if="src" @click="openSelector" type="button" class="flex bg-gray-750 hover:bg-gray-900 hover:text-yellow-light rounded items-center px-3 py-1.5">
                     <svg-icon name="swap" class="h-4" />
-                    <span class="ml-2 @3xl/toolbar:inline-block">{{ __('Replace') }}</span>
+                    <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Replace') }}</span>
                 </button>
                 <button @click="deleteNode" class="flex bg-gray-750 hover:bg-gray-900 hover:text-red-400 rounded items-center text-center px-3 py-1.5">
                     <svg-icon name="trash" class="h-4" />
-                    <span class="ml-2 @3xl/toolbar:inline-block">{{ __('Delete') }}</span>
+                    <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Delete') }}</span>
                 </button>
             </div>
 
@@ -44,16 +48,29 @@
                     @closed="closeSelector">
                 </selector>
             </stack>
+
+            <asset-editor
+                v-if="editing"
+                :id="assetId"
+                :showToolbar="false"
+                :allow-deleting="false"
+                @closed="closeEditor"
+                @saved="editorAssetSaved"
+                @actionCompleted="actionCompleted"
+            >
+            </asset-editor>
         </div>
     </node-view-wrapper>
 
 </template>
 
 <script>
+import Asset from '../assets/Asset';
 import { NodeViewWrapper } from '@tiptap/vue-2';
 import Selector from '../../assets/Selector.vue';
 
 export default {
+    mixins: [Asset],
 
     components: {
         NodeViewWrapper,
@@ -76,7 +93,7 @@ export default {
     data() {
         return {
             assetId: null,
-            asset: null,
+            editorAsset: null,
             showingSelector: false,
             loading: false,
             alt: this.node.attrs.alt,
@@ -86,13 +103,13 @@ export default {
     computed: {
 
         src() {
-            if (this.asset) {
-                return this.asset.url;
+            if (this.editorAsset) {
+                return this.editorAsset.url;
             }
         },
 
         actualSrc() {
-            if (this.asset) {
+            if (this.editorAsset) {
                 return `asset::${this.assetId}`;
             }
 
@@ -169,13 +186,17 @@ export default {
         },
 
         setAsset(asset) {
-            this.asset = asset;
+            this.editorAsset = asset;
             this.assetId = asset.id;
-            this.alt = asset.alt || this.alt;
+            this.alt = asset.values.alt;
             this.loading = false;
             this.updateAttributes({ src: this.actualSrc });
         },
 
+        editorAssetSaved(asset) {
+            this.setAsset(asset);
+            this.closeEditor();
+        },
     },
 
     updated() {
