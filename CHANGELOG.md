@@ -1,5 +1,14 @@
 # Release Notes
 
+## 4.1.1 (2023-05-12)
+
+### What's fixed
+- Fix relationship field buttons drag delay. [#8121](https://github.com/statamic/cms/issues/8121) by @o1y
+- Fix imported Bard button config override. [#8122](https://github.com/statamic/cms/issues/8122) by @jacksleight
+- Fix link fieldtype's options appearing behind things. [#8130](https://github.com/statamic/cms/issues/8130) by @jasonvarga
+
+
+
 ## 4.1.0 (2023-05-11)
 
 ### What's new
