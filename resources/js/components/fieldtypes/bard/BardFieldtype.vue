@@ -471,8 +471,9 @@ export default {
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
             const isEmptyTextBlock = $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
+            const isAfterInlineImage = state.selection.$to.nodeBefore?.type.name === 'image'
 
-            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock;
+            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAfterInlineImage;
             return this.setConfigs.length && (this.config.always_show_set_button || isActive);
         },
 
