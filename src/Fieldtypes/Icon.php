@@ -77,7 +77,7 @@ class Icon extends Fieldtype
 
         $folder = $this->config(
             'folder',
-            $hasConfiguredDirectory ? null : 'default' // Only apply a default folder if using Statamic icons.
+            $hasConfiguredDirectory ? null : 'regular' // Only apply a default folder if using Statamic icons.
         );
 
         $path = Path::tidy($directory.'/'.$folder);
