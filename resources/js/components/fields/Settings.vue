@@ -11,7 +11,7 @@
                 {{ values.display || config.display || config.handle }}
                 <small class="badge-pill bg-gray-100 ml-4 border text-xs text-gray-700 font-medium leading-none flex items-center">
                     <svg-icon class="h-4 w-4 mr-2 inline-block text-gray-700" :name="`light/${fieldtype.icon}`"></svg-icon>
-                    {{ fieldtype.title }} {{ __('Fieldtype') }}
+                    {{ fieldtype.title }}
                 </small>
             </h1>
             <button
