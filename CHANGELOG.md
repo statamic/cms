@@ -1,5 +1,17 @@
 # Release Notes
 
+## 4.1.2 (2023-05-15)
+
+### What's improved
+- Invalid Avatar URL falls back to initials. [#8139](https://github.com/statamic/cms/issues/8139) by @jasonvarga
+- Russian translations. [#8135](https://github.com/statamic/cms/issues/8135) by @dragomano
+
+### What's fixed
+- Adjust a couple of fieldtype translations. [#8141](https://github.com/statamic/cms/issues/8141) by @jasonvarga
+- Fix icon fieldtype default. [#8140](https://github.com/statamic/cms/issues/8140) by @jasonvarga
+
+
+
 ## 4.1.1 (2023-05-12)
 
 ### What's fixed
