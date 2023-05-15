@@ -8,6 +8,7 @@
     ":count\/:max selected": ":count\/:max выбрано",
     ":file uploaded": ":file загружен",
     ":start-:end of :total": ":start-:end из :total",
+    ":title Field": ":title Поле",
     "A blueprint with that name already exists.": "Чертёж с таким именем уже существует.",
     "A fieldset with that name already exists.": "Набор полей с таким именем уже существует.",
     "A valid blueprint is required.": "Требуется действительный чертёж.",

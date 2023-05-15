@@ -210,7 +210,7 @@ export default {
             // level, grid, or set fields depending on the event listener location.
             let field = {
                 type: fieldtype.handle,
-                display: `${fieldtype.title} ${__('Field')}`,
+                display: __(':title Field', {title: fieldtype.title}),
                 handle: null, // The handle will be generated from the display by the "slug" fieldtype.
                 icon: fieldtype.icon,
                 instructions: null,
