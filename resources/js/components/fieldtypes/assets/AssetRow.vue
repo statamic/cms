@@ -66,11 +66,5 @@
 import Asset from "./Asset";
 export default {
     mixins: [Asset],
-
-    computed: {
-        needsAlt() {
-            return (this.asset.isImage || this.asset.isSvg) && !this.asset.values.alt;
-        }
-    }
 };
 </script>
