@@ -73,6 +73,7 @@
                                 :asset="asset"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
+                                :show-set-alt="config.show_set_alt"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
                                 @id-changed="idChanged(asset.id, $event)">
