@@ -604,7 +604,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             return $this;
         }
 
-        if (empty($this->scripts) && empty($this->stylesheets) && empty($this->vite)) {
+        if (empty($this->scripts) && empty($this->stylesheets) && empty($this->vite) && empty($this->publishables)) {
             return $this;
         }
 
