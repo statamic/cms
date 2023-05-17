@@ -85,11 +85,18 @@ export default {
         suggestableConditionFields() {
             let fields = this.blueprint.tabs.reduce((fields, tab) => {
                 return fields.concat(tab.sections.reduce((fields, section) => {
-                    return fields.concat(section.fields.map(field => field.handle));
+                    let sectionFields = section.fields.reduce((fields, field) => {
+                        return fields.concat(
+                            field.type === 'import'
+                                ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
+                                : [field.handle]
+                        );
+                    }, []);
+                    return fields.concat(sectionFields);
                 }, []));
             }, []);
 
-            return fields
+            return _.unique(fields);
         }
 
     },
@@ -156,6 +163,12 @@ export default {
                 suggestableFields: { get: () => this.suggestableConditionFields },
             });
             return provide;
+        },
+
+        getFieldsFromImportedFieldset(fieldset, prefix) {
+            return Statamic.$config.get(`fieldsets.${fieldset}.fields`, [])
+                .map(field => field.handle)
+                .map(handle => prefix ? `${prefix}${handle}` : handle);
         }
 
     }
