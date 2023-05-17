@@ -31,6 +31,8 @@
                 :key="condition._id"
                 class="flex flex-wrap items-center py-4 border-t"
             >
+                <div v-if="index === 0" class="help-block" v-text="__('messages.field_conditions_field_instructions')" />
+
                 <v-select
                     ref="fieldSelect"
                     v-model="conditions[index].field"
