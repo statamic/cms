@@ -87,16 +87,8 @@ export default {
             }
         },
 
-        suggestableConditionFields() {
-            let fields = this.fieldset.fields.reduce((fields, field) => {
-                return fields.concat(
-                    field.type === 'import'
-                        ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
-                        : [field.handle]
-                );
-            }, []);
-
-            return _.unique(fields);
+        fieldsForConditionSuggestions() {
+            return this.fields;
         }
 
     },

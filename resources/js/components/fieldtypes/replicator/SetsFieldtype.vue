@@ -39,27 +39,6 @@ export default {
         }
     },
 
-    computed: {
-
-        suggestableConditionFields() {
-            let fields = this.tabs.reduce((fields, tab) => {
-                return fields.concat(tab.sections.reduce((fields, section) => {
-                    let sectionFields = section.fields.reduce((fields, field) => {
-                        return fields.concat(
-                            field.type === 'import'
-                                ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
-                                : [field.handle]
-                        );
-                    }, []);
-                    return fields.concat(sectionFields);
-                }, []));
-            }, []);
-
-            return _.unique(fields);
-        }
-
-    },
-
     methods: {
 
         tabsUpdated(tabs) {

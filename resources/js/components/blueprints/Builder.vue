@@ -41,7 +41,7 @@
 
         <tabs
             :single-tab="!useTabs"
-            :initial-tabs="blueprint.tabs"
+            :initial-tabs="tabs"
             @updated="tabsUpdated"
         />
 
@@ -72,28 +72,14 @@ export default {
     data() {
         return {
             blueprint: this.initializeBlueprint(),
-            tabs: [],
             errors: {}
         }
     },
 
     computed: {
 
-        suggestableConditionFields() {
-            let fields = this.blueprint.tabs.reduce((fields, tab) => {
-                return fields.concat(tab.sections.reduce((fields, section) => {
-                    let sectionFields = section.fields.reduce((fields, field) => {
-                        return fields.concat(
-                            field.type === 'import'
-                                ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
-                                : [field.handle]
-                        );
-                    }, []);
-                    return fields.concat(sectionFields);
-                }, []));
-            }, []);
-
-            return _.unique(fields);
+        tabs() {
+            return this.blueprint.tabs;
         }
 
     },
@@ -110,10 +96,6 @@ export default {
     },
 
     watch: {
-
-        tabs(tabs) {
-            this.blueprint.tabs = tabs;
-        },
 
         blueprint: {
             deep: true,
@@ -135,7 +117,7 @@ export default {
         },
 
         tabsUpdated(tabs) {
-            this.tabs = tabs;
+            this.blueprint.tabs = tabs;
         },
 
         save() {

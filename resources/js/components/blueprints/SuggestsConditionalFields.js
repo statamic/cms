@@ -6,6 +6,30 @@ export default {
         }
     },
 
+    computed: {
+
+        fieldsForConditionSuggestions() {
+            return this.tabs.reduce((fields, tab) => {
+                return fields.concat(tab.sections.reduce((fields, section) => {
+                    return fields.concat(section.fields);
+                }, []));
+            }, []);
+        },
+
+        suggestableConditionFields() {
+            let fields = this.fieldsForConditionSuggestions.reduce((fields, field) => {
+                return fields.concat(
+                    field.type === 'import'
+                        ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
+                        : [field.handle]
+                );
+            }, []);
+
+            return _.unique(fields);
+        },
+
+    },
+
     methods: {
 
         makeConditionsProvider() {
