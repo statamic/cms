@@ -68,7 +68,7 @@ export default {
 
     provide() {
         return {
-            conditions: this.makeConditionsProvider(),
+            suggestableConditionFieldsProvider: this.makeConditionsProvider(),
         }
     },
 
