@@ -37,6 +37,7 @@
                 :fields="fieldset.fields"
                 :editing-field="editingField"
                 :exclude-fieldset="fieldset.handle"
+                :suggestable-condition-fields="suggestableConditionFields"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-linked="fieldLinked"
@@ -81,6 +82,18 @@ export default {
             set(fields) {
                 this.fieldset.fields = fields;
             }
+        },
+
+        suggestableConditionFields() {
+            let fields = this.fieldset.fields.reduce((fields, field) => {
+                return fields.concat(
+                    field.type === 'import'
+                        ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
+                        : [field.handle]
+                );
+            }, []);
+
+            return _.unique(fields);
         }
 
     },
@@ -133,6 +146,18 @@ export default {
             }).on('sortable:stop', e => {
                 this.fieldset.fields.splice(e.newIndex, 0, this.fieldset.fields.splice(e.oldIndex, 1)[0]);
             });
+        },
+
+        getFieldsFromImportedFieldset(fieldset, prefix) {
+            return Statamic.$config.get(`fieldsets.${fieldset}.fields`, [])
+                .reduce((fields, field) => {
+                    return fields.concat(
+                        field.type === 'import'
+                            ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
+                            : [field.handle]
+                    );
+                }, [])
+                .map(handle => prefix ? `${prefix}${handle}` : handle);
         }
     },
 
