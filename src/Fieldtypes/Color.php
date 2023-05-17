@@ -26,6 +26,11 @@ class Color extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
+                    'default' => [
+                        'display' => __('Default Color'),
+                        'instructions' => __('statamic::fieldtypes.color.config.default'),
+                        'type' => 'color',
+                    ],
                 ],
             ],
         ];
