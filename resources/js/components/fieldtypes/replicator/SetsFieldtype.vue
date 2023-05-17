@@ -43,7 +43,7 @@ export default {
 
         tabsUpdated(tabs) {
             this.update(tabs);
-        },
+        }
 
     }
 
