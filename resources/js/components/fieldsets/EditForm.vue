@@ -141,7 +141,7 @@ export default {
             }).on('sortable:stop', e => {
                 this.fieldset.fields.splice(e.newIndex, 0, this.fieldset.fields.splice(e.oldIndex, 1)[0]);
             });
-        },
+        }
 
     },
 
