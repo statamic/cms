@@ -134,7 +134,7 @@ export default {
             this.$toast.success(__('Saved'));
             this.errors = {};
             this.$dirty.remove('blueprints');
-        },
+        }
 
     }
 
