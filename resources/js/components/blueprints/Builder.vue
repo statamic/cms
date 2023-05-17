@@ -66,12 +66,32 @@ export default {
         isFormBlueprint: { type: Boolean, default: false },
     },
 
+    provide() {
+        return {
+            conditions: this.makeConditionsProvider(),
+        }
+    },
+
     data() {
         return {
             blueprint: this.initializeBlueprint(),
             tabs: [],
             errors: {}
         }
+    },
+
+    computed: {
+
+        suggestableConditionFields() {
+            let fields = this.blueprint.tabs.reduce((fields, tab) => {
+                return fields.concat(tab.sections.reduce((fields, section) => {
+                    return fields.concat(section.fields.map(field => field.handle));
+                }, []));
+            }, []);
+
+            return fields
+        }
+
     },
 
     created() {
@@ -128,6 +148,14 @@ export default {
             this.$toast.success(__('Saved'));
             this.errors = {};
             this.$dirty.remove('blueprints');
+        },
+
+        makeConditionsProvider() {
+            const provide = {};
+            Object.defineProperties(provide, {
+                suggestableFields: { get: () => this.suggestableConditionFields },
+            });
+            return provide;
         }
 
     }
