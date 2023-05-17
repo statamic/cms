@@ -88,7 +88,9 @@ export default {
 
     mixins: [CanDefineLocalizable],
 
-    inject: ['conditions'],
+    inject: {
+        conditions: { default: null }
+    },
 
     components: {
         Fields,
@@ -121,7 +123,7 @@ export default {
 
     computed: {
         suggestableConditionFields() {
-            return this.conditions.suggestableFields;
+            return this.conditions?.suggestableFields || [];
         }
     },
 
