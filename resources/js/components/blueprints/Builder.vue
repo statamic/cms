@@ -167,7 +167,13 @@ export default {
 
         getFieldsFromImportedFieldset(fieldset, prefix) {
             return Statamic.$config.get(`fieldsets.${fieldset}.fields`, [])
-                .map(field => field.handle)
+                .reduce((fields, field) => {
+                    return fields.concat(
+                        field.type === 'import'
+                            ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
+                            : [field.handle]
+                    );
+                }, [])
                 .map(handle => prefix ? `${prefix}${handle}` : handle);
         }
 
