@@ -29,7 +29,7 @@ class Color extends Fieldtype
                     'default' => [
                         'display' => __('Default Color'),
                         'instructions' => __('statamic::fieldtypes.color.config.default'),
-                        'type' => 'color'
+                        'type' => 'color',
                     ],
                 ],
             ],
