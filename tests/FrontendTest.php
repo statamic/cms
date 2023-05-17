@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Facades\Statamic\CP\LivePreview;
+use Facades\Statamic\View\Cascade;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
@@ -631,6 +632,8 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRaw('errors.404', 'Not found {{ response_code }} {{ site:handle }}');
 
         $this->get('unknown')->assertNotFound()->assertSee('Not found 404 en');
+
+        $this->assertEquals(404, Cascade::get('response_code'));
 
         // todo: test cascade vars are in the debugbar
     }
