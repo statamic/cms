@@ -52,6 +52,7 @@ return [
     'code.title' => 'Code',
     'collections.title' => 'Collections',
     'color.config.allow_any' => 'Allow entering any color value via picker or hex code.',
+    'color.config.default' => 'Choose a default color.',
     'color.config.swatches' => 'Pre-define colors that can be selected from a list.',
     'color.title' => 'Color',
     'date.config.columns' => 'Show multiple months at one time, in rows and columns',
