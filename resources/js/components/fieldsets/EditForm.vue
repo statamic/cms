@@ -54,8 +54,11 @@
 <script>
 import Fields from '../blueprints/Fields.vue';
 import {Sortable, Plugins} from '@shopify/draggable';
+import SuggestsConditionalFields from '../blueprints/SuggestsConditionalFields';
 
 export default {
+
+    mixins: [SuggestsConditionalFields],
 
     components: {
         Fields
@@ -148,17 +151,6 @@ export default {
             });
         },
 
-        getFieldsFromImportedFieldset(fieldset, prefix) {
-            return Statamic.$config.get(`fieldsets.${fieldset}.fields`, [])
-                .reduce((fields, field) => {
-                    return fields.concat(
-                        field.type === 'import'
-                            ? this.getFieldsFromImportedFieldset(field.fieldset, field.prefix)
-                            : [field.handle]
-                    );
-                }, [])
-                .map(handle => prefix ? `${prefix}${handle}` : handle);
-        }
     },
 
     created() {

@@ -22,20 +22,15 @@
 </template>
 
 <script>
+import SuggestsConditionalFields from '../../blueprints/SuggestsConditionalFields';
 import Tabs from '../../blueprints/Tabs.vue';
 
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, SuggestsConditionalFields],
 
     components: {
         Tabs
-    },
-
-    provide() {
-        return {
-            suggestableConditionFieldsProvider: this.makeConditionsProvider(),
-        }
     },
 
     data() {
@@ -69,14 +64,6 @@ export default {
 
         tabsUpdated(tabs) {
             this.update(tabs);
-        },
-
-        makeConditionsProvider() {
-            const provide = {};
-            Object.defineProperties(provide, {
-                suggestableFields: { get: () => this.suggestableConditionFields },
-            });
-            return provide;
         },
 
     }
