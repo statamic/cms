@@ -120,6 +120,7 @@ return [
     'replicator.config.collapse.accordion' => 'Only allow one set to be expanded at a time',
     'replicator.config.collapse.disabled' => 'All sets expanded by default',
     'replicator.config.collapse.enabled' => 'All sets collapsed by default',
+    'replicator.config.fullscreen' => 'Enable toggle for fullscreen mode.',
     'replicator.config.max_sets' => 'Set a maximum number of sets.',
     'replicator.config.previews' => 'Show a preview of the content inside a set while collapsed.',
     'replicator.config.sets' => 'Sets are configurable blocks of fields that be created and reordered as desired.',
