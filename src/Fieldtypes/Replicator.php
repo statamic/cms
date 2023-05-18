@@ -48,6 +48,12 @@ class Replicator extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
                         'type' => 'integer',
                     ],
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
                 ],
             ],
             [
