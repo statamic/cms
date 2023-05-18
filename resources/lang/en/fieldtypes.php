@@ -74,7 +74,7 @@ return [
     'form.title' => 'Form',
     'grid.config.add_row' => 'Customize the label of the "Add Row" button.',
     'grid.config.fields' => 'Each field becomes a column in the grid table.',
-    'grid.config.fullscreen' => 'Enable toggle for fullscreen mode',
+    'grid.config.fullscreen' => 'Enable toggle for fullscreen mode.',
     'grid.config.max_rows' => 'Set a maximum number of creatable rows.',
     'grid.config.min_rows' => 'Set a minimum number of creatable rows.',
     'grid.config.mode' => 'Choose your preferred layout style.',
