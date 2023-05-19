@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
+use Statamic\Exceptions\ValidationException;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Fields\DateField;
@@ -346,11 +347,6 @@ class Date extends Fieldtype
         }
     }
 
-    public function rules(): array
-    {
-        return [new ValidationRule($this)];
-    }
-
     public function timeEnabled()
     {
         return $this->config('time_enabled');
@@ -359,5 +355,45 @@ class Date extends Fieldtype
     public function secondsEnabled()
     {
         return $this->config('time_seconds_enabled');
+    }
+
+    public function preProcessValidatable($value)
+    {
+        if ($error = (new ValidationRule($this))($value)) {
+            throw ValidationException::withMessages([
+                $this->field->handle() => $error,
+            ]);
+        }
+
+        return $this->config('mode') === 'range'
+            ? $this->preProcessRangeValidatable($value['date'])
+            : $this->preProcessSingleValidatable($value);
+    }
+
+    private function preProcessSingleValidatable($value)
+    {
+        if (! $value || ! $value['date']) {
+            return null;
+        }
+
+        $time = $value['time'] ?? '00:00';
+
+        if (substr_count($time, ':') === 1) {
+            $time .= ':00';
+        }
+
+        return Carbon::createFromFormat(self::DEFAULT_DATETIME_WITH_SECONDS_FORMAT, $value['date'].' '.$time);
+    }
+
+    private function preProcessRangeValidatable($value)
+    {
+        if (! isset($value['start'])) {
+            return null;
+        }
+
+        return [
+            'start' => Carbon::createFromFormat(self::DEFAULT_DATE_FORMAT, $value['start'])->startOfDay(),
+            'end' => Carbon::createFromFormat(self::DEFAULT_DATE_FORMAT, $value['end'])->startOfDay(),
+        ];
     }
 }

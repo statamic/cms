@@ -3,10 +3,10 @@
 namespace Tests\Fieldtypes;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Preference;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Date;
 use Tests\TestCase;
 
@@ -438,15 +438,115 @@ class DateTest extends TestCase
     /**
      * @test
      *
+     * @dataProvider validatablesProvider
+     */
+    public function it_preprocess_validatables($config, $input, $expected)
+    {
+        $fieldtype = $this->fieldtype($config);
+
+        $value = $fieldtype->preProcessValidatable($input);
+
+        if ($expected === null) {
+            $this->assertNull($value);
+        } else {
+            $this->assertEquals($expected, $value->format('Y-m-d H:i:s'));
+        }
+    }
+
+    public function validatablesProvider()
+    {
+        // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
+
+        return [
+            'null date when not required' => [
+                [],
+                ['date' => null, 'time' => null],
+                null,
+            ],
+            'valid date' => [
+                [],
+                ['date' => '2012-01-29', 'time' => null],
+                '2012-01-29 00:00:00',
+            ],
+            'valid date and time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '13:00'],
+                '2012-01-29 13:00:00',
+            ],
+            'valid date and time with seconds' => [
+                ['time_enabled' => true, 'time_seconds_enabled' => true],
+                ['date' => '2012-01-29', 'time' => '13:14:15'],
+                '2012-01-29 13:14:15',
+            ],
+            'null time' => [
+                ['time_enabled' => true],
+                ['date' => '2012-01-29', 'time' => null],
+                '2012-01-29 00:00:00',
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider rangeValidatablesProvider
+     */
+    public function it_preprocess_range_validatables($config, $input, $expected)
+    {
+        $fieldtype = $this->fieldtype($config);
+
+        $value = $fieldtype->preProcessValidatable($input);
+
+        if ($expected === null) {
+            $this->assertNull($value);
+        } else {
+            $format = 'Y-m-d H:i:s';
+            $this->assertEquals($expected, [
+                'start' => $value['start']->format($format),
+                'end' => $value['end']->format($format),
+            ]);
+        }
+    }
+
+    public function rangeValidatablesProvider()
+    {
+        // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
+
+        return [
+            'valid date range' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => '2012-01-29', 'end' => '2012-01-30']],
+                [
+                    'start' => '2012-01-29 00:00:00',
+                    'end' => '2012-01-30 00:00:00',
+                ],
+            ],
+            'null date in range mode' => [
+                ['mode' => 'range'],
+                ['date' => null],
+                null,
+            ],
+            'both dates null' => [
+                ['mode' => 'range'],
+                ['date' => ['start' => null, 'end' => null]],
+                null,
+            ],
+        ];
+    }
+
+    /**
+     * @test
+     *
      * @dataProvider validationProvider
      */
     public function it_validates($config, $input, $expected)
     {
-        $field = $this->fieldtype($config)->field();
         $messages = [];
+        $field = $this->fieldtype($config)->field();
+        $fields = (new Fields)->setFields(collect([$field]))->addValues(['test' => $input]);
 
         try {
-            Validator::validate(['test' => $input], $field->rules(), [], $field->validationAttributes());
+            $fields->validate();
         } catch (ValidationException $e) {
             $messages = $e->validator->errors()->all();
         }
@@ -459,7 +559,7 @@ class DateTest extends TestCase
         return [
             'valid date' => [
                 [],
-                ['date' => '2012-01-29'],
+                ['date' => '2012-01-29', 'time' => null],
                 [],
             ],
             'not an array' => [
@@ -474,22 +574,22 @@ class DateTest extends TestCase
             ],
             'null date when not required' => [
                 [],
-                ['date' => null],
+                ['date' => null, 'time' => null],
                 [],
             ],
             'null required date via bool' => [
                 ['required' => true],
-                ['date' => null],
+                ['date' => null, 'time' => null],
                 ['Date is required.'],
             ],
             'null required date via validate' => [
                 ['validate' => 'required'],
-                ['date' => null],
+                ['date' => null, 'time' => null],
                 ['Date is required.'],
             ],
             'invalid date format' => [
                 [],
-                ['date' => 'marchtember oneteenth'],
+                ['date' => 'marchtember oneteenth', 'time' => null],
                 ['Not a valid date.'],
             ],
             'invalid date' => [

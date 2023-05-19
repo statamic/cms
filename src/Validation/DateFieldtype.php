@@ -3,25 +3,21 @@
 namespace Statamic\Validation;
 
 use DateTime;
-use Illuminate\Contracts\Validation\InvokableRule;
 use Statamic\Support\Arr;
 
-class DateFieldtype implements InvokableRule
+class DateFieldtype
 {
     private $fieldtype;
-    private $fail;
 
     public function __construct($fieldtype)
     {
         $this->fieldtype = $fieldtype;
     }
 
-    public function __invoke($attribute, $value, $fail)
+    public function __invoke($value)
     {
-        $this->fail = $fail;
-
         if (! is_array($value)) {
-            return $fail('statamic::validation.array')->translate();
+            return __('statamic::validation.array');
         }
 
         if ($this->fieldtype->config('mode') === 'single') {
@@ -36,7 +32,7 @@ class DateFieldtype implements InvokableRule
             }
 
             if ($date && ! $this->validDateFormat($date)) {
-                return $fail('statamic::validation.date')->translate();
+                return __('statamic::validation.date');
             }
         }
 
@@ -94,7 +90,7 @@ class DateFieldtype implements InvokableRule
         }
 
         if ($time && ! $this->validTimeFormat($time)) {
-            return $fail('statamic::validation.time')->translate();
+            return __('statamic::validation.time');
         }
     }
 
@@ -128,6 +124,6 @@ class DateFieldtype implements InvokableRule
 
     private function fail($message)
     {
-        call_user_func($this->fail, 'statamic::validation.date_fieldtype_'.$message)->translate();
+        return __('statamic::validation.date_fieldtype_'.$message);
     }
 }
