@@ -3,14 +3,17 @@
 namespace Tests\Git;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Log;
 use Statamic\Console\Processes\Git;
 use Statamic\Console\Processes\Process;
 use Statamic\Facades\Path;
+use Tests\Console\Concerns\SimulatesProcessErrorOutput;
 use Tests\TestCase;
 
 class GitProcessTest extends TestCase
 {
     use Concerns\PreparesTempRepos;
+    use SimulatesProcessErrorOutput;
 
     private $files;
 
@@ -127,6 +130,23 @@ EOT;
         $this->assertEquals($expectedCollectionsStatus, Git::create($this->basePath('temp/content'))->status('collections'));
         $this->assertEquals($expectedTaxonomiesStatus, Git::create($this->basePath('temp/content'))->status('taxonomies'));
         $this->assertEquals($expectedCombinedStatus, Git::create($this->basePath('temp/content'))->status(['collections', 'taxonomies']));
+    }
+
+    /** @test */
+    public function it_logs_error_output()
+    {
+        Log::shouldReceive('error')->once();
+
+        $this->simulateLoggableErrorOutput(Git::class, 'fatal: The current branch master has no upstream branch.');
+    }
+
+    /** @test */
+    public function it_doesnt_log_resolving_deltas_as_error_output()
+    {
+        Log::shouldReceive('error')->never();
+
+        $this->simulateLoggableErrorOutput(Git::class, 'remote: Resolving deltas');
+        $this->simulateLoggableErrorOutput(Git::class, 'remote: Resolving deltas: 0% (0/6)\nremote: Resolving deltas: 16% (1/6)\nremote: Resolving deltas: 33% (2/6)\nremote: Resolving deltas: 50% (3/6)\nremote: Resolving deltas: 66% (4/6)\nremote: Resolving deltas: 83% (5/6)\nremote: Resolving deltas: 100% (6/6)\nremote: Resolving deltas: 100% (6/6), completed with 5 local objects.');
     }
 
     private function showLastCommit($path)
