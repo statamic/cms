@@ -1,5 +1,20 @@
 # Release Notes
 
+## 4.2.0 (2023-05-19)
+
+### What's new
+- New addons/fieldtypes use Vite. [#8126](https://github.com/statamic/cms/issues/8126) by @jasonvarga
+- Allow custom searchables to be excluded from CP search. [#7700](https://github.com/statamic/cms/issues/7700) by @jacksleight
+
+### What's improved
+- French translations. [#8169](https://github.com/statamic/cms/issues/8169) by @ebeauchamps
+
+### What's fixed
+- Fix date validation. [#8174](https://github.com/statamic/cms/issues/8174) by @jasonvarga
+- Fix fullscreen mode buttons in Grid and Replicator. [#8168](https://github.com/statamic/cms/issues/8168) by @jasonvarga
+
+
+
 ## 4.1.3 (2023-05-17)
 
 ### What's improved
