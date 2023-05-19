@@ -52,6 +52,7 @@ return [
     'code.title' => 'Code',
     'collections.title' => 'Collections',
     'color.config.allow_any' => 'Autorisez la sélection de n’importe quelle couleur via le sélecteur ou la saisie d’un code hex.',
+    'color.config.default' => 'Choisissez une couleur par défaut.',
     'color.config.swatches' => 'Prédéfinissez les couleurs qui pourront être sélectionnées dans une liste.',
     'color.title' => 'Color',
     'date.config.columns' => 'Afficher plusieurs mois à la fois, en lignes et en colonnes.',
