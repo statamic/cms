@@ -132,7 +132,7 @@ class FileCacher extends AbstractCacher
         $paths = $this->config('path');
 
         if (! is_array($paths)) {
-            $paths = [$this->config('locale') => $paths];
+            $paths = Site::all()->mapWithKeys(fn ($site) => [$site->handle() => $paths])->all();
         }
 
         return $paths;
@@ -224,6 +224,10 @@ class FileCacher extends AbstractCacher
 
         for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
             meta.content = data.csrf;
+        }
+        
+        if (window.hasOwnProperty('livewire_token')) {
+            window.livewire_token = data.csrf
         }
 
         document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));

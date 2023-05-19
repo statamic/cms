@@ -1,9 +1,9 @@
 <div class="card p-0 overflow-hidden">
-    <div class="flex justify-between items-center p-2">
+    <div class="flex justify-between items-center p-4">
         <h2>
             <a class="flex items-center" href="{{ $form->showUrl() }}">
-                <div class="h-6 w-6 mr-1 text-grey-80">
-                    @cp_svg('drawer-file')
+                <div class="h-6 w-6 mr-2 text-gray-800">
+                    @cp_svg('icons/light/drawer-file')
                 </div>
                 <span>{{ $title }}</span>
             </a>
@@ -11,7 +11,7 @@
     </div>
     <div>
         @if ( ! $submissions)
-            <p class="text-center my-2">{{ __('This form is awaiting responses') }}</p>
+            <p class="text-center my-4">{{ __('This form is awaiting responses') }}</p>
         @else
             <table class="data-table">
                 @foreach($submissions as $submission)

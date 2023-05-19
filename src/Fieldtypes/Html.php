@@ -12,10 +12,16 @@ class Html extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'html' => [
-                'display' => 'HTML',
-                'type' => 'code',
-                'mode' => 'htmlmixed',
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'html' => [
+                        'display' => 'HTML',
+                        'instructions' => __('statamic::fieldtypes.html.config.html_instruct'),
+                        'type' => 'code',
+                        'mode' => 'htmlmixed',
+                    ],
+                ],
             ],
         ];
     }

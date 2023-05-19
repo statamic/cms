@@ -119,7 +119,7 @@ class NavTest extends TestCase
     /** @test */
     public function it_can_create_a_nav_item_with_a_bundled_svg_icon()
     {
-        File::put($svg = statamic_path('resources/svg/test.svg'), 'the totally real svg');
+        File::put($svg = statamic_path('resources/svg/icons/light/test.svg'), 'the totally real svg');
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -214,7 +214,7 @@ class NavTest extends TestCase
     /** @test */
     public function it_sets_parent_icon_on_children()
     {
-        File::put($svg = statamic_path('resources/svg/droid.svg'), '<svg>droid</svg>');
+        File::put($svg = statamic_path('resources/svg/icons/light/droid.svg'), '<svg>droid</svg>');
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
 

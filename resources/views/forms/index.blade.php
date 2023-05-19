@@ -5,7 +5,7 @@
 
     @unless($forms->isEmpty())
 
-        <div class="flex items-center mb-3">
+        <div class="flex items-center mb-6">
             <h1 class="flex-1">{{ __('Forms') }}</h1>
 
             @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Forms\Form'))

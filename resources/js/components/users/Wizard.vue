@@ -1,6 +1,6 @@
 <template>
     <div class="max-w-xl mx-auto rounded shadow bg-white">
-        <div v-if="steps.length > 1" class="max-w-lg mx-auto pt-6 relative">
+        <div v-if="steps.length > 1" class="max-w-lg mx-auto pt-16 relative">
             <div class="wizard-steps">
                 <a class="step" :class="{'complete': currentStep >= index}" v-for="(step, index) in steps" @click="goToStep(index)">
                     <div class="ball">{{ index+1 }}</div>
@@ -11,75 +11,75 @@
 
         <!-- Step: User Info -->
         <div v-if="!completed && onUserInfoStep">
-            <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">{{ __('Create User') }}</h1>
-                <p class="text-grey" v-text="__('messages.user_wizard_intro')" />
+            <div class="max-w-md mx-auto px-4 py-16 text-center">
+                <h1 class="mb-6">{{ __('Create User') }}</h1>
+                <p class="text-gray" v-text="__('messages.user_wizard_intro')" />
             </div>
 
             <!-- Email Address -->
-            <div class="max-w-md mx-auto px-2 pb-5">
-                <label class="font-bold text-base mb-sm" for="email">{{ __('Email Address') }}*</label>
+            <div class="max-w-md mx-auto px-4 pb-10">
+                <label class="font-bold text-base mb-1" for="email">{{ __('Email Address') }}*</label>
                 <input type="email" v-model="user.email" id="email" class="input-text" required autofocus tabindex="1">
 
-                <div class="text-2xs text-red mt-1 flex items-center" v-if="userExists">
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
+                <div class="text-2xs text-red-500 mt-2 flex items-center" v-if="userExists">
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
                     {{ __('This user already exists.') }}
                 </div>
-                <div class="text-2xs text-grey-60 mt-1 flex items-center" v-else>
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
+                <div class="text-2xs text-gray-600 mt-2 flex items-center" v-else>
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_email_instructions') }}
                 </div>
             </div>
 
             <!-- Name -->
-            <div v-if="! separateNameFields" class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">{{ __('Name') }}</label>
+            <div v-if="! separateNameFields" class="max-w-md mx-auto px-4 pb-20">
+                <label class="font-bold text-base mb-1" for="name">{{ __('Name') }}</label>
                 <input type="text" v-model="user.name" id="name" class="input-text" tabindex="2">
-                <div class="text-2xs text-grey-60 mt-1 flex items-center">
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
+                <div class="text-2xs text-gray-600 mt-2 flex items-center">
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_name_instructions') }}
                 </div>
             </div>
 
-            <div v-else class="max-w-md mx-auto px-2 pb-7 flex space-x-4">
+            <div v-else class="max-w-md mx-auto px-4 pb-20 flex space-x-4">
                 <div class="flex-1">
-                    <label class="font-bold text-base mb-sm" for="first_name">{{ __('First Name') }}</label>
+                    <label class="font-bold text-base mb-1" for="first_name">{{ __('First Name') }}</label>
                     <input type="text" v-model="user.first_name" id="first_name" class="input-text" tabindex="2">
-                    <div class="text-2xs text-grey-60 mt-1 flex items-center">
-                        <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
+                    <div class="text-2xs text-gray-600 mt-2 flex items-center">
+                        <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
                         {{ __('messages.user_wizard_name_instructions') }}
                     </div>
                 </div>
 
                 <div class="flex-1">
-                    <label class="font-bold text-base mb-sm" for="last_name">{{ __('Last Name') }}</label>
+                    <label class="font-bold text-base mb-1" for="last_name">{{ __('Last Name') }}</label>
                     <input type="text" v-model="user.last_name" id="last_name" class="input-text" tabindex="2">
                 </div>
             </div>
         </div>
 
         <!-- Step: Roles & Groups -->
-        <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-2 pb-2">
-            <div class="py-6 text-center">
-                <h1 class="mb-3">{{ __('Roles & Groups') }}</h1>
-                <p class="text-grey" v-text="__('messages.user_wizard_roles_groups_intro')" />
+        <div v-if="!completed && onPermissionStep" class="max-w-md mx-auto px-4 pb-4">
+            <div class="py-16 text-center">
+                <h1 class="mb-6">{{ __('Roles & Groups') }}</h1>
+                <p class="text-gray" v-text="__('messages.user_wizard_roles_groups_intro')" />
             </div>
 
             <!-- Super Admin -->
-             <div class="pb-5" v-if="canCreateSupers">
+             <div class="pb-10" v-if="canCreateSupers">
                 <div class="flex items-center">
                     <toggle-input v-model="user.super" />
-                    <label class="font-bold ml-1">{{ __('Super Admin') }}</label>
+                    <label class="font-bold ml-2">{{ __('Super Admin') }}</label>
                 </div>
-                <div class="text-2xs text-grey-60 mt-1 flex items-center">
-                    <svg-icon name="info-circle" class="h-4 w-4 mr-sm flex items-center mb-px"></svg-icon>
+                <div class="text-2xs text-gray-600 mt-2 flex items-center">
+                    <svg-icon name="info-circle" class="h-4 w-4 mr-1 flex items-center mb-px"></svg-icon>
                     {{ __('messages.user_wizard_super_admin_instructions') }}
                 </div>
             </div>
 
             <!-- Roles -->
-            <div class="pb-5" v-if="! user.super && canAssignRoles">
-                <label class="font-bold text-base mb-sm" for="role">{{ __('Roles') }}</label>
+            <div class="pb-10" v-if="! user.super && canAssignRoles">
+                <label class="font-bold text-base mb-1" for="role">{{ __('Roles') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
                     :initial-value="user.roles">
@@ -96,8 +96,8 @@
             </div>
 
             <!-- Groups -->
-            <div class="pb-5" v-if="! user.super && canAssignGroups">
-                <label class="font-bold text-base mb-sm" for="group">{{ __('Groups') }}</label>
+            <div class="pb-10" v-if="! user.super && canAssignGroups">
+                <label class="font-bold text-base mb-1" for="group">{{ __('Groups') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.groups', type: 'user_groups' }"
                     :initial-value="user.groups">
@@ -116,29 +116,29 @@
 
         <!-- Step: Invitation -->
         <div v-if="!completed && onInvitationStep">
-            <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">{{ __('Invitation') }}</h1>
-                <p class="text-grey" v-text="__('messages.user_wizard_invitation_intro')" />
+            <div class="max-w-md mx-auto px-4 py-16 text-center">
+                <h1 class="mb-6">{{ __('Invitation') }}</h1>
+                <p class="text-gray" v-text="__('messages.user_wizard_invitation_intro')" />
             </div>
 
             <!-- Send Email? -->
-            <div class="max-w-md mx-auto px-2 mb-3 flex items-center">
+            <div class="max-w-md mx-auto px-4 mb-6 flex items-center">
                 <toggle-input v-model="invitation.send" />
-                <label class="font-bold ml-1">{{ __('Send Email Invitation') }}</label>
+                <label class="font-bold ml-2">{{ __('Send Email Invitation') }}</label>
             </div>
 
-            <div class="max-w-lg mx-auto bg-grey-10 py-5 mb-7 border rounded-lg " v-if="invitation.send">
+            <div class="max-w-lg mx-auto bg-gray-100 py-10 mb-20 border rounded-lg " v-if="invitation.send">
                 <!-- Subject Line -->
-                <div class="max-w-md mx-auto px-2 pb-5">
-                    <label class="font-bold text-base mb-sm" for="email">{{ __('Email Subject') }}</label>
+                <div class="max-w-md mx-auto px-4 pb-10">
+                    <label class="font-bold text-base mb-1" for="email">{{ __('Email Subject') }}</label>
                     <input type="text" v-model="invitation.subject" class="input-text bg-white">
                 </div>
 
                 <!-- Email Content -->
-                <div class="max-w-md mx-auto px-2">
-                    <label class="font-bold text-base mb-sm" for="email">{{ __('Email Content') }}</label>
+                <div class="max-w-md mx-auto px-4">
+                    <label class="font-bold text-base mb-1" for="email">{{ __('Email Content') }}</label>
                     <textarea
-                        class="input-text min-h-48 p-2 bg-white"
+                        class="input-text min-h-40 p-4 bg-white"
                         v-model="invitation.message"
                         v-elastic
                     />
@@ -146,47 +146,47 @@
             </div>
 
             <!-- Copy Pasta -->
-            <div class="max-w-md mx-auto px-2 pb-7" v-else>
-                <p class="mb-1" v-html="__('messages.user_wizard_invitation_share_before', { email: user.email })" />
+            <div class="max-w-md mx-auto px-4 pb-20" v-else>
+                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share_before', { email: user.email })" />
             </div>
         </div>
 
         <!-- Post creation -->
         <div v-if="completed">
-            <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">{{ __('User created') }}</h1>
-                <p class="text-grey" v-html="__('messages.user_wizard_account_created')" />
+            <div class="max-w-md mx-auto px-4 py-16 text-center">
+                <h1 class="mb-6">{{ __('User created') }}</h1>
+                <p class="text-gray" v-html="__('messages.user_wizard_account_created')" />
             </div>
 
             <!-- Copy Pasta -->
-            <div class="max-w-md mx-auto px-2 pb-5">
-                <p class="mb-1" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
+            <div class="max-w-md mx-auto px-4 pb-10">
+                <p class="mb-2" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
             </div>
-            <div class="max-w-md mx-auto px-2 pb-5">
-                <label class="font-bold text-base mb-sm" for="email">{{ __('Activation URL') }}</label>
+            <div class="max-w-md mx-auto px-4 pb-10">
+                <label class="font-bold text-base mb-1" for="email">{{ __('Activation URL') }}</label>
                 <input type="text" readonly class="input-text" onclick="this.select()" :value="activationUrl" />
             </div>
-            <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="email">{{ __('Email Address') }}</label>
+            <div class="max-w-md mx-auto px-4 pb-20">
+                <label class="font-bold text-base mb-1" for="email">{{ __('Email Address') }}</label>
                 <input type="text" readonly class="input-text" onclick="this.select()" :value="user.email" />
             </div>
         </div>
 
-        <div class="border-t p-2">
+        <div class="border-t p-4">
             <div class="max-w-md mx-auto flex items-center justify-center">
-                <button tabindex="3" class="btn mx-2 w-32" @click="previous" v-if="! completed && ! onFirstStep">
+                <button tabindex="3" class="btn mx-4 w-32" @click="previous" v-if="! completed && ! onFirstStep">
                     &larr; {{ __('Previous')}}
                 </button>
-                <button tabindex="4" class="btn mx-2 w-32" :disabled="! canContinue" @click="next" v-if="! completed && ! onLastStep">
+                <button tabindex="4" class="btn mx-4 w-32" :disabled="! canContinue" @click="next" v-if="! completed && ! onLastStep">
                     {{ __('Next')}} &rarr;
                 </button>
-                <button tabindex="4" class="btn-primary mx-2" @click="submit" v-if="! completed && onLastStep">
+                <button tabindex="4" class="btn-primary mx-4" @click="submit" v-if="! completed && onLastStep">
                     {{ finishButtonText }}
                 </button>
-                <a :href="usersIndexUrl" class="btn mx-2" v-if="completed">
+                <a :href="usersIndexUrl" class="btn mx-4" v-if="completed">
                     {{ __('Back to Users') }}
                 </a>
-                <a :href="usersCreateUrl" class="btn-primary mx-2" v-if="completed">
+                <a :href="usersCreateUrl" class="btn-primary mx-4" v-if="completed">
                     {{ __('Create Another') }}
                 </a>
             </div>

@@ -1,7 +1,7 @@
 <template>
     <div class="global-search" :class="{'dirty': isDirty}" v-on-clickaway="reset" v-cloak>
-        <div class="state-container w-4 h-4 text-grey-50" @click="focus">
-            <svg-icon name="magnifying-glass"></svg-icon>
+        <div class="state-container w-4 h-4 text-gray-500 flex items-center" @click="focus">
+            <svg-icon name="light/magnifying-glass" class="w-4 h-4"></svg-icon>
         </div>
         <label class="sr-only" v-text="__('Global Search')" for="global-search" />
         <input type="text"
@@ -20,37 +20,34 @@
             tabindex="-1"
         />
 
-        <span v-if="! (isDirty || searching)" class="rounded px-sm pb-px text-2xs border text-grey-60">/</span>
+        <span v-if="! (isDirty || searching)" class="rounded px-1 pb-px text-2xs border text-gray-600">/</span>
         <loading-graphic v-if="searching" :size="14" :inline="true" text="" class="global-search-loading-indicator" />
 
         <div v-show="focused && (hasResults || hasFavorites)" class="global-search-results">
 
-            <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-1 flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
-                <svg-icon :name="getResultIcon(result)" class="icon"></svg-icon>
-                <div class="flex-1 ml-1 title" v-html="result.title"></div>
-                <span class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey" v-text="result.badge" />
+            <div v-if="hasResults" v-for="(result, index) in results" class="global-search-result-item p-2 flex items-center" :class="{ 'active': current == index }" @click="hit" @mousemove="setActive(index)">
+                <svg-icon :name="`light/${getResultIcon(result)}`" class="icon"></svg-icon>
+                <div class="flex-1 ml-2 title" v-html="result.title"></div>
+                <span class="rounded px-1 text-2xs border bg-gray-200 text-gray" v-text="result.badge" />
             </div>
 
             <div v-if="! hasResults && hasFavorites">
-                <div class="px-1.5 py-1 text-grey uppercase text-3xs">{{ __('Your Favorites') }}</div>
+                <div class="px-3 py-2 text-gray uppercase text-3xs">{{ __('Your Favorites') }}</div>
 
                 <div v-for="(favorite, index) in favorites" class="global-search-result-item flex items-center" :class="{ 'active': current == index }" @mousemove="setActive(index)">
-                    <div class="flex items-center flex-1 p-1" @click="hit">
-                        <svg-icon name="pin" class="icon w-4 h-4"></svg-icon>
-                        <div class="ml-1 title" v-text="favorite.name"></div>
+                    <div class="flex items-center flex-1 p-2" @click="hit">
+                        <svg-icon name="light/pin" class="w-4 h-4"></svg-icon>
+                        <div class="ml-2 title" v-text="favorite.name"></div>
                     </div>
-                    <div class="p-1 text-grey-60 hover:text-grey-80" @click="removeFavorite(favorite)">&times;</div>
+                    <div class="p-2 text-gray-600 hover:text-gray-800" @click="removeFavorite(favorite)">&times;</div>
                 </div>
 
-                <div class="text-grey text-xs px-1.5 py-1 border-t text-center">
-                    <b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b>
+                <div class="text-gray text-xs px-3 py-2 border-t text-center">
+                    <b class="tracking-widest uppercase text-3xs">{{ __('Pro Tip')}}:</b>
                     <span v-html="__('messages.global_search_open_using_slash')" />
                 </div>
             </div>
         </div>
-        <portal to="outside" v-if="focused">
-            <div class="absolute inset-0 h-full w-full bg-darken-10 z-10"></div>
-        </portal>
     </div>
 </template>
 

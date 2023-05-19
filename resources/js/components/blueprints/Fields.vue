@@ -2,8 +2,10 @@
 
     <div class="flex flex-col text-sm">
 
-        <div class="blueprint-section-draggable-zone -mx-sm"
+        <div class="blueprint-section-draggable-zone -mx-1"
             :class="{ 'flex flex-wrap flex-1': fields.length }"
+            :data-tab="tabId"
+            :data-section="sectionId"
         >
             <slot name="empty-state" v-if="!fields.length" />
 
@@ -13,7 +15,6 @@
                 :key="field._id"
                 :field="field"
                 :is-editing="editingField === field._id"
-                :is-section-expanded="isSectionExpanded"
                 :suggestable-condition-fields="suggestableConditionFields"
                 :can-define-localizable="canDefineLocalizable"
                 @edit="$emit('field-editing', field._id)"
@@ -23,15 +24,15 @@
             />
         </div>
 
-        <div class="blueprint-section-field-actions flex mt-1 -mx-sm">
-            <div class="px-sm">
+        <div class="blueprint-section-field-actions flex mt-2 -mx-1">
+            <div class="px-1">
                 <link-fields
                     :exclude-fieldset="excludeFieldset"
                     @linked="$emit('field-linked', $event)" />
             </div>
-            <div class="px-sm">
+            <div class="px-1">
                 <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
-                    <svg-icon name="wireframe" class="mr-1 w-4 h-4" />
+                    <svg-icon name="light/wireframe" class="mr-2 w-4 h-4" />
                     {{ __('Create Field') }}
                 </button>
             </div>
@@ -86,9 +87,10 @@ export default {
     },
 
     props: {
+        tabId: String,
+        sectionId: String,
         fields: Array,
         editingField: {},
-        isSectionExpanded: Boolean,
         suggestableConditionFields: Array,
         excludeFieldset: String,
     },
@@ -109,18 +111,14 @@ export default {
         fieldtypeSelected(field) {
             this.isSelectingNewFieldtype = false;
 
-            const handle = field.type;
-
             const pending = {
                 _id: uniqid(),
                 type: 'inline',
                 fieldtype: field.type,
                 icon: field.icon,
-                handle,
                 config: {
                     ...field,
                     isNew: true,
-                    handle
                 }
             };
 

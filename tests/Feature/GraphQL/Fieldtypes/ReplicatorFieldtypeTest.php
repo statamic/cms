@@ -23,13 +23,17 @@ class ReplicatorFieldtypeTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /** @test */
-    public function it_outputs_replicator_fields()
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_outputs_replicator_fields($isGrouped)
     {
         $article = Blueprint::makeFromFields([
             'things' => [
                 'type' => 'replicator',
-                'sets' => [
+                'sets' => $this->groupSets($isGrouped, [
                     'meal' => [
                         'fields' => [
                             ['handle' => 'food', 'field' => ['type' => 'text']],
@@ -43,7 +47,7 @@ class ReplicatorFieldtypeTest extends TestCase
                             ['handle' => 'trims', 'field' => ['type' => 'entries']], // using entries to query builders get resolved
                         ],
                     ],
-                ],
+                ]),
             ],
         ]);
 
@@ -294,5 +298,24 @@ GQL;
                     ],
                 ],
             ]]);
+    }
+
+    public function groupedSetsProvider()
+    {
+        return [
+            'grouped sets (new)' => [true],
+            'ungrouped sets (old)' => [false],
+        ];
+    }
+
+    private function groupSets($shouldGroup, $sets)
+    {
+        if (! $shouldGroup) {
+            return $sets;
+        }
+
+        return [
+            'group_one' => ['sets' => $sets],
+        ];
     }
 }
