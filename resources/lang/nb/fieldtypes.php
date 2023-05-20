@@ -166,7 +166,7 @@ return [
     'user_groups.title' => 'Brukergrupper',
     'user_roles.title' => 'Brukerroller',
     'users.title' => 'Brukere',
-    'width.config.options' => 'Angi tilgjenglige breddevalg.'
+    'width.config.options' => 'Angi tilgjenglige breddevalg.',
     'video.title' => 'Video',
     'yaml.title' => 'YAML',
 ];

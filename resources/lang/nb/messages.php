@@ -5,7 +5,7 @@ return [
     'activate_account_notification_subject' => 'Aktiver kontoen din',
     'addon_has_more_releases_beyond_license_body' => 'Du kan oppdatere, men da må du oppgradere eller kjøpe en ny lisens.',
     'addon_has_more_releases_beyond_license_heading' => 'Denne utvidelsen har flere versjoner utover din lisensgrense.',
-    'addon_install_command' => 'Kjør følgende kommando for installere denne utvidelsen'
+    'addon_install_command' => 'Kjør følgende kommando for installere denne utvidelsen',
     'addon_list_loading_error' => 'Noe gikk galt under lasting av utvidelser. Prøv igjen senere.',
     'addon_uninstall_command' => 'Kjør følgende kommando for å avinstallere denne utvidelsen',
     'asset_container_allow_uploads_instructions' => 'Når det er aktivert, kan brukere laste opp filer til denne beholderen.',
