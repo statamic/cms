@@ -110,6 +110,13 @@ class NodeProcessor
     protected $isProvidingParameterContent = false;
 
     /**
+     * Indicates if the processor is helping to evaluate conditions.
+     *
+     * @var bool
+     */
+    protected $isConditionalProcessor = false;
+
+    /**
      * @var RuntimeConfiguration|null
      */
     protected $runtimeConfiguration = null;
@@ -265,6 +272,24 @@ class NodeProcessor
         $this->isInterpolationProcessor = $isInterpolation;
 
         return $this;
+    }
+
+    /**
+     * Sets whether the NodeProcessor is processing conditions.
+     *
+     * @param  bool  $isCondition  The value.
+     * @return $this
+     */
+    public function setIsConditionProcessor($isCondition)
+    {
+        $this->isConditionalProcessor = $isCondition;
+
+        return $this;
+    }
+
+    public function getIsConditionProcessor()
+    {
+        return $this->isConditionalProcessor;
     }
 
     /**
@@ -839,6 +864,7 @@ class NodeProcessor
         $processor = new NodeProcessor($this->loader, $this->envDetails);
         $processor->allowPhp($this->allowPhp);
         $processor->setRuntimeAssignments($this->runtimeAssignments);
+        $processor->setIsConditionProcessor($this->isConditionalProcessor);
 
         if ($this->antlersParser != null) {
             $processor->setAntlersParserInstance($this->antlersParser);
@@ -1111,6 +1137,7 @@ class NodeProcessor
                                     $callback($this);
                                 }
                             }
+
                             continue;
                         }
                     }
@@ -1155,6 +1182,7 @@ class NodeProcessor
                     }
 
                     $buffer .= $this->evaluateAntlersPhpNode($node);
+
                     continue;
                 }
 
@@ -1207,6 +1235,7 @@ class NodeProcessor
                         }
 
                         $buffer .= $registeredStack;
+
                         continue;
                     } elseif (($node->name->name == 'push' || $node->name->name == 'prepend') && $node->isClosedBy != null) {
                         $currentData = $this->getActiveData();
@@ -1226,6 +1255,7 @@ class NodeProcessor
                         if ($this->isTracingEnabled()) {
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, $stackContent);
                         }
+
                         continue;
                     }
 
@@ -1243,6 +1273,7 @@ class NodeProcessor
                         if ($this->isTracingEnabled()) {
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                         }
+
                         continue;
                     } else {
                         if ($result instanceof ExecutionBranch) {
@@ -1338,6 +1369,7 @@ class NodeProcessor
                             $recursiveParent->activeDepth -= 1;
                             RecursiveNodeManager::releaseRecursiveNode($node);
                         }
+
                         continue;
                     }
 
@@ -1345,6 +1377,7 @@ class NodeProcessor
                         if ($this->isTracingEnabled()) {
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                         }
+
                         continue;
                     }
 
@@ -1382,6 +1415,7 @@ class NodeProcessor
                             if ($this->isTracingEnabled()) {
                                 $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                             }
+
                             continue;
                         }
 
@@ -1521,6 +1555,12 @@ class NodeProcessor
                         RuntimeParser::pushNodeCache($node->runtimeContent, $node->children);
 
                         if ($node->name->name == 'yield') {
+                            // If the current processor instance is a conditional processor, we
+                            // will simply return whether the section has been registered.
+                            if ($this->isConditionalProcessor) {
+                                return LiteralReplacementManager::hasRegisteredSectionName($tagMethod);
+                            }
+
                             GlobalRuntimeState::$yieldCount += 1;
                             // Wrap it in a partial thing.
                             $wrapName = 'section:'.$tagMethod.'__yield'.GlobalRuntimeState::$yieldCount;
@@ -1677,6 +1717,7 @@ class NodeProcessor
                         if ($this->isTracingEnabled()) {
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, $results);
                         }
+
                         continue;
                     }
 
@@ -1863,6 +1904,7 @@ class NodeProcessor
                             if ($this->isTracingEnabled()) {
                                 $this->runtimeConfiguration->traceManager->traceOnExit($node, $val);
                             }
+
                             continue;
                         }
                     } else {
@@ -1940,6 +1982,7 @@ class NodeProcessor
 
                                         if ($varValue == 'void::'.GlobalRuntimeState::$environmentId) {
                                             $this->data = $lockData;
+
                                             continue;
                                         }
 
@@ -2058,6 +2101,7 @@ class NodeProcessor
 
                     if ($this->isInterpolationProcessor && is_array($val)) {
                         $buffer = $val;
+
                         continue;
                     }
 
@@ -2096,6 +2140,7 @@ class NodeProcessor
                                     $processor->setAntlersParserInstance($this->antlersParser);
                                     $processor->setData($evalData);
                                     $processor->cascade($this->cascade);
+                                    $processor->setRuntimeAssignments($this->runtimeAssignments);
 
                                     if ($this->runtimeConfiguration != null) {
                                         $processor->setRuntimeConfiguration($this->runtimeConfiguration);
@@ -2104,7 +2149,15 @@ class NodeProcessor
 
                                     $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($assocOutput));
 
+                                    $runtimeAssignmentsToProcess = $processor->getRuntimeAssignments();
+
                                     $this->popScope($node->refId);
+
+                                    if (! empty($runtimeAssignmentsToProcess)) {
+                                        $this->data = $lockData;
+                                        $this->processAssignments($runtimeAssignmentsToProcess);
+                                        $lockData = $this->data;
+                                    }
                                 } else {
                                     if (! $executedParamModifiers || $tagCallbackResult != null) {
                                         $val = $this->addLoopIterationVariables($val);
@@ -2183,6 +2236,7 @@ class NodeProcessor
                             }
 
                             $this->data = $lockData;
+
                             continue;
                         }
                     }

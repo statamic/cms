@@ -1,0 +1,25 @@
+.video-fieldtype-container {
+    @apply bg-gray-200 p-4 border rounded;
+}
+
+.video-fieldtype .video-preview-wrapper {
+    @apply mt-4;
+}
+.video-fieldtype .video-preview {
+    position: relative;
+    padding: 25px 0 56.25%;
+    height: 0;
+}
+
+.video-fieldtype .video-preview iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.video-fieldtype .video-preview video {
+    width: 100% !important;
+    height: auto !important;
+}

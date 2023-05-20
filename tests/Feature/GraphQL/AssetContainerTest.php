@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Statamic\Facades\AssetContainer;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -14,13 +15,21 @@ class AssetContainerTest extends TestCase
 
     protected $enabledQueries = ['assets'];
 
-    /**
-     * @test
-     *
-     * @environment-setup disableQueries
-     **/
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        AssetContainer::make('public')->title('Public')->save();
+        AssetContainer::make('private')->title('Private')->save();
+    }
+
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{assetContainer}'])
@@ -30,9 +39,6 @@ class AssetContainerTest extends TestCase
     /** @test */
     public function it_queries_an_asset_container_by_handle()
     {
-        AssetContainer::make('public')->title('Public')->save();
-        AssetContainer::make('private')->title('Private')->save();
-
         $query = <<<'GQL'
 {
     assetContainer(handle: "private") {
@@ -41,6 +47,10 @@ class AssetContainerTest extends TestCase
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(AssetContainer::all()->map->handle()->all())->once();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()
@@ -52,5 +62,39 @@ GQL;
                     'title' => 'Private',
                 ],
             ]]);
+    }
+
+    /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource()
+    {
+        $query = <<<'GQL'
+{
+    assetContainer(handle: "private") {
+        handle
+        title
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(['public'])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'handle' => ['Forbidden: private'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'assetContainer' => null,
+                ],
+            ]);
     }
 }

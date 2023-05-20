@@ -195,8 +195,8 @@ EOT;
             animation="/visuals/pattern-0{{ count }}.json"
         }}
 
-    <div class="md:absolute md:z-10 p-6 md:p-8 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
-        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-4" }}
+    <div class="md:absolute md:z-10 p-16 md:p-30 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
+        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-8" }}
     </div>
 </figure>
 EOT;
@@ -209,7 +209,7 @@ EOT;
         $this->assertInstanceOf(AntlersNode::class, $nodes[3]);
         $this->assertInstanceOf(LiteralNode::class, $nodes[4]);
 
-        $checkString = '<div class="md:absolute md:z-10 p-6 md:p-8 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">';
+        $checkString = '<div class="md:absolute md:z-10 p-16 md:p-30 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">';
         $this->assertStringContainsString($checkString, $nodes[2]->content);
 
         $template = <<<'EOT'
@@ -218,8 +218,8 @@ EOT;
             animation="/visuals/pattern-0{{ count }}- {{two}} {{three}four}.json"
         }}
 
-    <div class="md:absolute md:z-10 p-6 md:p-8 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
-        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-4" }}
+    <div class="md:absolute md:z-10 p-16 md:p-30 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
+        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-8" }}
     </div>
 </figure>
 EOT;

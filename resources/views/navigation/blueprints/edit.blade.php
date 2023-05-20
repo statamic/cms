@@ -11,7 +11,7 @@
     <blueprint-builder
         action="{{ cp_route('navigation.blueprint.update', $nav->handle()) }}"
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
-        :use-sections="false"
+        :use-tabs="false"
     ></blueprint-builder>
 
     @include('statamic::partials.docs-callout', [

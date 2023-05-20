@@ -104,22 +104,32 @@ class BlueprintRepository
             return compact('handle', 'field');
         })->values()->all();
 
-        return $this->make()->setContents(['fields' => $fields]);
+        return $this->make()->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => $fields,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
-    public function makeFromSections($sections)
+    public function makeFromTabs($tabs)
     {
-        $sections = collect($sections)->map(function ($section, $section_handle) {
-            $fields = collect($section['fields'])->map(function ($field, $handle) {
+        $tabs = collect($tabs)->map(function ($tab, $tab_handle) {
+            $fields = collect($tab['fields'])->map(function ($field, $handle) {
                 return compact('handle', 'field');
             });
 
-            $section['fields'] = $fields;
+            $tab['fields'] = $fields;
 
-            return $section;
+            return $tab;
         })->all();
 
-        return $this->make()->setContents(compact('sections'));
+        return $this->make()->setContents(compact('tabs'));
     }
 
     public function in(string $namespace)

@@ -10,16 +10,12 @@ trait FiltersQuery
     use QueriesConditions;
 
     /**
-     * @param  \Statamic\Contracts\Entries\QueryBuilder  $query
+     * @param  \Statamic\Contracts\Query\Builder  $query
      * @param  array  $filters
      * @return void
      */
     private function filterQuery($query, $filters)
     {
-        if (! isset($filters['status']) && ! isset($filters['published'])) {
-            $filters['status'] = 'published';
-        }
-
         foreach ($filters as $field => $definitions) {
             if (! is_array($definitions)) {
                 $definitions = [['equals' => $definitions]];

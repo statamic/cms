@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use Illuminate\Testing\Assert as IlluminateAssert;
+use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
@@ -16,6 +18,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         require_once __DIR__.'/ConsoleKernel.php';
 
         parent::setUp();
+
+        $this->withoutVite();
 
         $uses = array_flip(class_uses_recursive(static::class));
 
@@ -170,8 +174,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     public static function assertArraySubset($subset, $array, bool $checkForObjectIdentity = false, string $message = ''): void
     {
-        $class = version_compare(app()->version(), 7, '>=') ? \Illuminate\Testing\Assert::class : \Illuminate\Foundation\Testing\Assert::class;
-        $class::assertArraySubset($subset, $array, $checkForObjectIdentity, $message);
+        IlluminateAssert::assertArraySubset($subset, $array, $checkForObjectIdentity, $message);
     }
 
     // This method is unavailable on earlier versions of Laravel.
@@ -183,40 +186,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         return $mock;
     }
 
-    /**
-     * @deprecated
-     */
-    public static function assertFileNotExists(string $filename, string $message = ''): void
-    {
-        method_exists(static::class, 'assertFileDoesNotExist')
-            ? static::assertFileDoesNotExist($filename, $message)
-            : parent::assertFileNotExists($filename, $message);
-    }
-
-    /**
-     * @deprecated
-     */
-    public static function assertDirectoryNotExists(string $filename, string $message = ''): void
-    {
-        method_exists(static::class, 'assertDirectoryDoesNotExist')
-            ? static::assertDirectoryDoesNotExist($filename, $message)
-            : parent::assertDirectoryNotExists($filename, $message);
-    }
-
-    public static function assertMatchesRegularExpression(string $pattern, string $string, string $message = ''): void
-    {
-        method_exists(\PHPUnit\Framework\Assert::class, 'assertMatchesRegularExpression')
-            ? parent::assertMatchesRegularExpression($pattern, $string, $message)
-            : parent::assertRegExp($pattern, $string, $message);
-    }
-
     private function addGqlMacros()
     {
-        $testResponseClass = version_compare($this->app->version(), 7, '<')
-            ? \Illuminate\Foundation\Testing\TestResponse::class
-            : \Illuminate\Testing\TestResponse::class;
-
-        $testResponseClass::macro('assertGqlOk', function () {
+        TestResponse::macro('assertGqlOk', function () {
             $this->assertOk();
 
             $json = $this->json();
@@ -231,7 +203,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             return $this;
         });
 
-        $testResponseClass::macro('assertGqlUnauthorized', function () {
+        TestResponse::macro('assertGqlUnauthorized', function () {
             $this->assertOk();
 
             $json = $this->json();

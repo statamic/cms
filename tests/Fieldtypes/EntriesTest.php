@@ -13,12 +13,14 @@ use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Entries;
+use Tests\Fieldtypes\Concerns\TestsQueryableValueWithMaxItems;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EntriesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use TestsQueryableValueWithMaxItems;
 
     public function setUp(): void
     {

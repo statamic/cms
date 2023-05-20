@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Facades\Statamic\API\FilterAuthorizer;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Entry;
 use Statamic\Http\Resources\API\EntryResource;
@@ -12,10 +13,13 @@ class CollectionEntriesController extends ApiController
     protected $resourceConfigKey = 'collections';
     protected $routeResourceKey = 'collection';
     protected $filterPublished = true;
+    protected $collectionHandle;
 
     public function index($collection)
     {
         $this->abortIfDisabled();
+
+        $this->collectionHandle = $collection->handle();
 
         $with = $collection->entryBlueprints()
             ->flatMap(fn ($blueprint) => $blueprint->fields()->all())
@@ -74,5 +78,10 @@ class CollectionEntriesController extends ApiController
         if (! $entry || $entry->collection()->id() !== $collection->id()) {
             throw new NotFoundHttpException;
         }
+    }
+
+    protected function allowedFilters()
+    {
+        return FilterAuthorizer::allowedForSubResources('api', 'collections', $this->collectionHandle);
     }
 }

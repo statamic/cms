@@ -14,23 +14,31 @@ class Integer extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'default' => [
-                'display' => __('Default Value'),
-                'instructions' => __('statamic::messages.fields_default_instructions'),
-                'type' => 'text',
-                'width' => 50,
+            [
+                'display' => __('Behavior'),
+                'fields' => [
+                    'default' => [
+                        'display' => __('Default Value'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'text',
+                    ],
+                ],
             ],
-            'prepend' => [
-                'display' => __('Prepend'),
-                'instructions' => __('statamic::fieldtypes.text.config.prepend'),
-                'type' => 'text',
-                'width' => 50,
-            ],
-            'append' => [
-                'display' => __('Append'),
-                'instructions' => __('statamic::fieldtypes.text.config.append'),
-                'type' => 'text',
-                'width' => 50,
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'prepend' => [
+                        'display' => __('Prepend'),
+                        'instructions' => __('statamic::fieldtypes.text.config.prepend'),
+                        'type' => 'text',
+                    ],
+                    'append' => [
+                        'display' => __('Append'),
+                        'instructions' => __('statamic::fieldtypes.text.config.append'),
+                        'type' => 'text',
+                    ],
+
+                ],
             ],
         ];
     }

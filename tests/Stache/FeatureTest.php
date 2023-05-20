@@ -70,16 +70,6 @@ class FeatureTest extends TestCase
         $this->assertNull(Entry::find('users-john'));
     }
 
-    /**
-     * @test
-     *
-     * @deprecated
-     **/
-    public function it_gets_entry_by_slug()
-    {
-        $this->assertEquals('Christmas', Entry::findBySlug('christmas', 'blog', 'christmas')->get('title'));
-    }
-
     /** @test */
     public function it_gets_all_taxonomies()
     {

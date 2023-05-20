@@ -139,23 +139,6 @@ class EntryRepositoryTest extends TestCase
     /**
      * @test
      *
-     * @deprecated
-     **/
-    public function it_gets_entry_by_slug()
-    {
-        $entry = $this->repo->findBySlug('bravo', 'alphabetical');
-
-        $this->assertInstanceOf(Entry::class, $entry);
-        $this->assertEquals('Bravo', $entry->get('title'));
-
-        $this->assertNull($this->repo->findBySlug('unknown-slug', 'alphabetical'));
-        $this->assertNull($this->repo->findBySlug('bravo', 'unknown-collection'));
-        $this->assertNull($this->repo->findBySlug('unknown-slug', 'unknown-collection'));
-    }
-
-    /**
-     * @test
-     *
      * @dataProvider entryByUriProvider
      */
     public function it_gets_entry_by_uri($uri, $expectedTitle)
@@ -242,6 +225,6 @@ class EntryRepositoryTest extends TestCase
 
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($item = $this->repo->find('test-blog-entry'));
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
     }
 }

@@ -13,15 +13,14 @@
         <div>
             <breadcrumbs v-if="breadcrumbs" :crumbs="breadcrumbs" />
 
-            <div class="flex items-center mb-3">
+            <div class="flex items-center mb-6">
                 <h1 class="flex-1">{{ title }}</h1>
                 <button v-if="action" type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
-            <publish-sections
+            <publish-tabs
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
-                :can-toggle-labels="canToggleLabels"
                 :enable-sidebar="hasSidebar"
                 :read-only="readOnly" />
         </div>
@@ -41,7 +40,6 @@ export default {
         breadcrumbs: Array,
         action: String,
         method: { type: String, default: 'post' },
-        canToggleLabels: { type: Boolean, default: true },
         readOnly: { type: Boolean, default: false }
     },
 
@@ -50,7 +48,7 @@ export default {
             currentValues: this.values,
             error: null,
             errors: {},
-            hasSidebar: this.blueprint.sections.map(section => section.handle).includes('sidebar'),
+            hasSidebar: this.blueprint.tabs.map(tab => tab.handle).includes('sidebar'),
         }
     },
 

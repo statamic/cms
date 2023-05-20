@@ -31,7 +31,7 @@ class MakeWidgetTest extends TestCase
     {
         $path = base_path('app/Widgets/Sloth.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:widget', ['name' => 'Sloth']);
 
@@ -44,7 +44,7 @@ class MakeWidgetTest extends TestCase
     {
         $path = base_path('app/Widgets/Sloth.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:widget', ['name' => 'Sloth']);
         $this->files->put($path, 'overwritten widget');
@@ -80,7 +80,7 @@ class MakeWidgetTest extends TestCase
 
         Composer::shouldReceive('installedPath')->andReturn($path);
 
-        $this->assertFileNotExists($widget = "$path/src/Widgets/Yoda.php");
+        $this->assertFileDoesNotExist($widget = "$path/src/Widgets/Yoda.php");
 
         $this->artisan('statamic:make:widget', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 
