@@ -192,7 +192,7 @@ return [
     'show_slugs_instructions' => 'Om permalenker skal vises i trevisningen eller ikke.',
     'status_expired_with_date' => 'Utgått den :date',
     'status_published_with_date' => 'Publisert den :date',
-    'status_scheduled_with_date' => 'Planlagt publisering den :date'
+    'status_scheduled_with_date' => 'Planlagt publisering den :date',
     'tabs_instructions' => 'Feltene i hver inndeling grupperes i faner. Opprett nye felter, bruk eksisterende felter om igjen eller importer hele grupper med felter fra eksisterende feltsett.',
     'taxonomies_blueprints_instructions' => 'Termer i denne taksonomien kan bruke en hvilken som helst av disse blueprintene.',
     'taxonomies_collections_instructions' => 'Samlingene som bruker denne taksonomien.',
