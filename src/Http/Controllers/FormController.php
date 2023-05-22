@@ -30,7 +30,7 @@ class FormController extends Controller
      */
     public function submit(Request $request, $form)
     {
-        $site = Site::findByUrl(URL::previous()) ?? Site::default();
+        $site = $request->has('site') ? Site::get($request->get('site')) : Site::findByUrl(URL::previous()) ?? Site::default();
         $fields = $form->blueprint()->fields();
         $this->validateContentType($request, $form);
         $values = array_merge($request->all(), $assets = $this->normalizeAssetsValues($fields, $request));
@@ -102,7 +102,7 @@ class FormController extends Controller
         if (request()->ajax() || request()->wantsJson()) {
             return response([
                 'success' => true,
-                'submission_created' => ! $silentFailure,
+                'submission_created' => !$silentFailure,
                 'submission' => $submission->data(),
             ]);
         }
@@ -112,7 +112,7 @@ class FormController extends Controller
         $response = $redirect ? redirect($redirect) : back();
 
         session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
-        session()->flash("form.{$submission->form()->handle()}.submission_created", ! $silentFailure);
+        session()->flash("form.{$submission->form()->handle()}.submission_created", !$silentFailure);
         session()->flash('submission', $submission);
 
         return $response;
@@ -141,7 +141,7 @@ class FormController extends Controller
 
         $response = $redirect ? redirect($redirect) : back();
 
-        return $response->withInput()->withErrors($errors, 'form.'.$form);
+        return $response->withInput()->withErrors($errors, 'form.' . $form);
     }
 
     protected function normalizeAssetsValues($fields, $request)
@@ -164,7 +164,7 @@ class FormController extends Controller
                 return $field->fieldtype()->handle() === 'assets';
             })
             ->mapWithKeys(function ($field) {
-                return [$field->handle().'.*' => 'file'];
+                return [$field->handle() . '.*' => 'file'];
             })
             ->all();
 
