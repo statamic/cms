@@ -13,8 +13,11 @@ class FlatCamp extends Command
     protected $description = ' Statamic';
 
     protected $quotes = [
-        "No, you're right. Let's do it the dumbest way possible. Because it's easier for you. - Erin Dalzell",
+        "No, you're right. Let's do it the dumbest way possible. Because it's easier for you. - Erin",
         'Butter is butter. - Convenience store lady',
+        'Christopher Columbus is from Poland. - Krzemo',
+        'Is this a safe space? - Jack',
+        'Where does Polish come from?" - Erin',
     ];
 
     public function handle()
