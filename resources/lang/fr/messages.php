@@ -73,6 +73,7 @@ return [
     'entry_origin_instructions' => 'La nouvelle traduction héritera des valeurs qu’a l’entrée dans le site sélectionné.',
     'expect_root_instructions' => 'Considérer la première page de l’arborescence comme une page "racine" ou "d’accueil".',
     'field_conditions_always_save_instructions' => 'Toujours enregistrer la valeur du champ, quelle que soit la façon dont les conditions du champ sont évaluées.',
+    'field_conditions_field_instructions' => 'Vous pouvez saisir n’importe quel identifiant de champ. Vous n’êtes pas limité aux options visibles dans le menu déroulant.',
     'field_conditions_instructions' => 'Quand afficher ou masquer ce champ.',
     'field_desynced_from_origin' => 'Désynchronisé de l’origine. Cliquez pour synchroniser et revenir à la valeur d’origine.',
     'field_synced_with_origin' => 'Synchronisé avec l’origine. Cliquez ou modifiez le champ pour désynchroniser.',
