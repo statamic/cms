@@ -1,5 +1,16 @@
 # Release Notes
 
+## 4.3.0 (2023-05-24)
+
+### What's new
+- Flat Camp! 🏕️ [#8191](https://github.com/statamic/cms/issues/8191) by @jasonvarga
+
+### What's improved
+- Norwegian translations. [#8186](https://github.com/statamic/cms/issues/8186) by @espenlg
+- French translations. [#8178](https://github.com/statamic/cms/issues/8178) by @ebeauchamps
+
+
+
 ## 4.2.0 (2023-05-19)
 
 ### What's new
