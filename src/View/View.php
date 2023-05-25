@@ -2,8 +2,8 @@
 
 namespace Statamic\View;
 
-use Facades\Statamic\View\Cascade;
 use InvalidArgumentException;
+use Statamic\Facades\Cascade;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Engine;
@@ -16,9 +16,13 @@ use Statamic\View\Events\ViewRendered;
 class View
 {
     protected $data = [];
+
     protected $layout;
+
     protected $template;
+
     protected $cascade;
+
     protected $cascadeContent;
 
     public static function make($template = null, $data = [])
