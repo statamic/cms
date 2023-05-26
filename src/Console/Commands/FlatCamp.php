@@ -48,9 +48,10 @@ class FlatCamp extends Command
         'Butter is butter. - Convenience store lady',
         'Christopher Columbus is from Poland. - Krzemo',
         'Is this a safe space? - Jack',
-        'Where does Polish come from?" - Erin',
+        'Where does Polish come from? - Erin',
         "The customs officer didn't appreciate the Saudi guy saying he was going to a training camp in the mountains. - Saud",
         'I just want to bake shop & wrap - Mug',
+        'The drone must have tried flying to its last home point. Florida. - Jack',
     ];
 
     public function handle()
