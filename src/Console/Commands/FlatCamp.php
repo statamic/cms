@@ -49,6 +49,8 @@ class FlatCamp extends Command
         'Christopher Columbus is from Poland. - Krzemo',
         'Is this a safe space? - Jack',
         'Where does Polish come from?" - Erin',
+        "The customs officer didn't appreciate the Saudi guy saying he was going to a training camp in the mountains. - Saud",
+        'I just want to bake shop & wrap - Mug',
     ];
 
     public function handle()
