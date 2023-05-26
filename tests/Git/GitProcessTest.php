@@ -135,7 +135,7 @@ EOT;
     {
         Log::shouldReceive('error')->once();
 
-        $this->simulateLoggableErrorOutput(Git::class, 'fatal: The current branch master has no upstream branch.');
+        $this->simulateLoggableErrorOutput('fatal: The current branch master has no upstream branch.');
     }
 
     /** @test */
@@ -143,8 +143,8 @@ EOT;
     {
         Log::shouldReceive('error')->never();
 
-        $this->simulateLoggableErrorOutput(Git::class, 'remote: Resolving deltas');
-        $this->simulateLoggableErrorOutput(Git::class, 'remote: Resolving deltas: 0% (0/6)\nremote: Resolving deltas: 16% (1/6)\nremote: Resolving deltas: 33% (2/6)\nremote: Resolving deltas: 50% (3/6)\nremote: Resolving deltas: 66% (4/6)\nremote: Resolving deltas: 83% (5/6)\nremote: Resolving deltas: 100% (6/6)\nremote: Resolving deltas: 100% (6/6), completed with 5 local objects.');
+        $this->simulateLoggableErrorOutput('remote: Resolving deltas');
+        $this->simulateLoggableErrorOutput('remote: Resolving deltas: 0% (0/6)\nremote: Resolving deltas: 16% (1/6)\nremote: Resolving deltas: 33% (2/6)\nremote: Resolving deltas: 50% (3/6)\nremote: Resolving deltas: 66% (4/6)\nremote: Resolving deltas: 83% (5/6)\nremote: Resolving deltas: 100% (6/6)\nremote: Resolving deltas: 100% (6/6), completed with 5 local objects.');
     }
 
     private function showLastCommit($path)
@@ -157,13 +157,9 @@ EOT;
         return __DIR__.'/__fixtures__/'.$path;
     }
 
-    private function simulateLoggableErrorOutput($processClass, $output)
+    private function simulateLoggableErrorOutput($output)
     {
-        if (! class_exists('TestProcessClass')) {
-            class_alias($processClass, 'TestProcessClass');
-        }
-
-        $process = new class($output) extends \TestProcessClass
+        $process = new class($output) extends Git
         {
             private $simulatedOutput;
 
@@ -174,7 +170,7 @@ EOT;
 
             public function getCommandLine()
             {
-                return 'TestProcessClass';
+                return 'TestGitClass';
             }
 
             public function run($command, $cacheKey = null)
