@@ -46,7 +46,7 @@ class FlatCamp extends Command
     protected $quotes = [
         "No, you're right. Let's do it the dumbest way possible. Because it's easier for you. - Erin",
         'Butter is butter. - Convenience store lady',
-        'Christopher Columbus is from Poland. - Krzemo',
+        'Christopher Columbus was from Poland. - Krzemo',
         'Is this a safe space? - Jack',
         'Where does Polish come from? - Erin',
         "The customs officer didn't appreciate the Saudi guy saying he was going to a training camp in the mountains. - Saud",
