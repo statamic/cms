@@ -372,6 +372,10 @@ class Date extends Fieldtype
 
     private function preProcessSingleValidatable($value)
     {
+        if ($value instanceof Carbon) {
+            return $value;
+        }
+
         if (! $value || ! $value['date']) {
             return null;
         }
