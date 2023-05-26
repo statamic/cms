@@ -7,13 +7,11 @@ use Illuminate\Support\Facades\Log;
 use Statamic\Console\Processes\Git;
 use Statamic\Console\Processes\Process;
 use Statamic\Facades\Path;
-use Tests\Console\Concerns\SimulatesProcessErrorOutput;
 use Tests\TestCase;
 
 class GitProcessTest extends TestCase
 {
     use Concerns\PreparesTempRepos;
-    use SimulatesProcessErrorOutput;
 
     private $files;
 
@@ -157,5 +155,36 @@ EOT;
     private function basePath($path = null)
     {
         return __DIR__.'/__fixtures__/'.$path;
+    }
+
+    private function simulateLoggableErrorOutput($processClass, $output)
+    {
+        if (! class_exists('TestProcessClass')) {
+            class_alias($processClass, 'TestProcessClass');
+        }
+
+        $process = new class($output) extends \TestProcessClass
+        {
+            private $simulatedOutput;
+
+            public function __construct($output)
+            {
+                $this->simulatedOutput = $output;
+            }
+
+            public function getCommandLine()
+            {
+                return 'TestProcessClass';
+            }
+
+            public function run($command, $cacheKey = null)
+            {
+                $this->prepareErrorOutput('err', $this->simulatedOutput);
+
+                $this->logErrorOutput($this);
+            }
+        };
+
+        $process->run('test');
     }
 }
