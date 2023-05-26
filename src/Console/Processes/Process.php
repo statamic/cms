@@ -221,7 +221,7 @@ class Process
      * @param  string  $type
      * @param  string  $buffer
      */
-    private function prepareErrorOutput($type, $buffer)
+    protected function prepareErrorOutput($type, $buffer)
     {
         if ($type !== 'err') {
             return;
@@ -239,7 +239,7 @@ class Process
      *
      * @param  SymfonyProcess  $process
      */
-    private function logErrorOutput($process)
+    protected function logErrorOutput($process)
     {
         if (! $this->logErrorOutput) {
             return;
