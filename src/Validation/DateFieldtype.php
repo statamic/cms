@@ -2,6 +2,7 @@
 
 namespace Statamic\Validation;
 
+use Carbon\Carbon;
 use DateTime;
 use Statamic\Support\Arr;
 
@@ -16,6 +17,10 @@ class DateFieldtype
 
     public function __invoke($value)
     {
+        if (is_null($value) || $value instanceof Carbon) {
+            return;
+        }
+
         if (! is_array($value)) {
             return __('statamic::validation.array');
         }

@@ -483,6 +483,13 @@ class DateTest extends TestCase
                 ['date' => '2012-01-29', 'time' => null],
                 '2012-01-29 00:00:00',
             ],
+            // A carbon instance would be passed in if it was already processed.
+            // e.g. if it was nested inside a Replicator.
+            'carbon instance' => [
+                [],
+                Carbon::parse('2012-01-29'),
+                '2012-01-29 00:00:00',
+            ],
         ];
     }
 
@@ -560,6 +567,11 @@ class DateTest extends TestCase
             'valid date' => [
                 [],
                 ['date' => '2012-01-29', 'time' => null],
+                [],
+            ],
+            'null' => [
+                [],
+                null,
                 [],
             ],
             'not an array' => [
