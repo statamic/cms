@@ -52,6 +52,7 @@ class FlatCamp extends Command
         "The customs officer didn't appreciate the Saudi guy saying he was going to a training camp in the mountains. - Saud",
         'I just want to bake shop & wrap - Mug',
         'The drone must have tried flying to its last home point. Florida. - Jack',
+        'And then you sniff like a rabbit, like this - Conrad',
     ];
 
     public function handle()
