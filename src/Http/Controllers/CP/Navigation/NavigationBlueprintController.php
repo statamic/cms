@@ -37,7 +37,7 @@ class NavigationBlueprintController extends CpController
             return $this->pageNotFound();
         }
 
-        $request->validate(['sections' => 'array']);
+        $request->validate(['tabs' => 'array']);
 
         $this->updateBlueprint($request, $nav->blueprint());
     }

@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\GlobalFactory;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -24,13 +26,13 @@ class GlobalTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableQueries
-     **/
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'globals')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'globals')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{globalSet}'])
@@ -61,6 +63,10 @@ class GlobalTest extends TestCase
 }
 GQL;
 
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'globals')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'globals')->andReturn(GlobalSet::all()->map->handle()->all())->once();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -70,6 +76,39 @@ GQL;
                 'site' => ['handle' => 'en'],
                 'twitter' => '@statamic',
             ]]]);
+    }
+
+    /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource()
+    {
+        $query = <<<'GQL'
+{
+    globalSet(handle: "social") {
+        handle
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'globals')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'globals')->andReturn([])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'handle' => ['Forbidden: social'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'globalSet' => null,
+                ],
+            ]);
     }
 
     /** @test */
@@ -102,6 +141,10 @@ GQL;
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'globals')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'globals')->andReturn(GlobalSet::all()->map->handle()->all())->once();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()

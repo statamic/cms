@@ -40,7 +40,7 @@ trait CreatesQueryableTestEntries
             ->dated(true)
             ->futureDateBehavior('private')
             ->save();
-        Collection::make('events')->routes(['en' => '/events/{slug}'])->save();
+        Collection::make('events')->routes(['en' => '/events/{slug}'])->dated(true)->save();
         Collection::make('food')->routes(['en' => '/food/{slug}'])->save();
 
         EntryFactory::collection('blog')

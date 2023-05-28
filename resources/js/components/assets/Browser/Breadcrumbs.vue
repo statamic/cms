@@ -1,15 +1,16 @@
 <template>
 
-    <div class="px-2 py-1 flex flex-wrap text-sm bg-grey-10 border-t border-b">
+    <div class="px-4 py-2 flex flex-wrap text-sm bg-gray-200 border-t border-b shadow-inner">
         <a
             v-for="(part, index) in pathParts"
             :key="index"
             @click="selectFolder(index)"
-            class="mr-1 group"
+            class="group flex items-center"
         >
-            <span v-if="index !== 0" class="px-sm text-grey-70">></span>
-            <span class="icon icon-folder text-blue-lighter group-hover:text-blue" />
-            <span class="text-grey-70 group-hover:text-grey-80">{{ part }}</span>
+            <svg-icon name="micro/chevron-right" class="text-gray-700 h-4 w-4 mr-1" v-if="index !== 0" />
+            <svg-icon name="folder-home" class="mr-2 h-5 w-5 text-blue-400 group-hover:text-blue-600" v-if="part === '/'" />
+            <svg-icon name="folder" class="mr-2 h-5 w-5 text-blue-400 group-hover:text-blue-600" v-else />
+            <span class="text-gray-700 text-2xs group-hover:text-gray-800" v-if="part !== '/'" v-text="part" />
         </a>
     </div>
 

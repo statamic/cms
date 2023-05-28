@@ -1,41 +1,41 @@
 <template>
 
     <node-view-wrapper>
-        <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow"
-            :class="{ 'border-blue-lighter': selected, 'has-error': hasError }"
+        <div class="bard-set whitespace-normal my-6 rounded bg-white border shadow-md"
+            :class="{ 'border-blue-400': selected, 'has-error': hasError }"
             contenteditable="false" @copy.stop @paste.stop @cut.stop
         >
             <div ref="content" hidden />
             <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" data-drag-handle />
-                <div class="flex-1 p-1 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
-                    <label v-text="display || config.handle" class="text-xs whitespace-no-wrap mr-1"/>
+                <div class="flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
+                    <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2"/>
                     <div
                         v-if="config.instructions"
                         v-show="!collapsed"
                         v-html="instructions"
-                        class="help-block mt-1 -mb-1" />
+                        class="help-block mt-2 -mb-2" />
 
-                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-4">
+                    <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-8">
                         <div
                             v-html="previewText"
-                            class="help-block mb-0 whitespace-no-wrap overflow-hidden text-overflow-ellipsis" />
+                            class="help-block mb-0 whitespace-nowrap overflow-hidden text-ellipsis" />
                     </div>
                 </div>
                 <div class="replicator-set-controls">
                     <toggle-fieldtype
                         handle="set-enabled"
-                        class="toggle-sm mr-2"
+                        class="toggle-sm mr-4"
                         v-model="enabled"
                         v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
-                    <dropdown-list class="-mt-sm">
+                    <dropdown-list class="-mt-1">
                         <dropdown-item :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))" @click="toggleCollapsedState" />
                         <dropdown-item :text="__('Duplicate Set')" @click="duplicate" />
                         <dropdown-item :text="__('Delete Set')" class="warning" @click="deleteNode" />
                     </dropdown-list>
                 </div>
             </div>
-            <div class="replicator-set-body" v-if="!collapsed && index !== undefined">
+            <div class="replicator-set-body publish-fields @container" v-if="!collapsed && index !== undefined">
                 <set-field
                     v-for="field in fields"
                     v-show="showField(field, fieldPath(field))"
@@ -82,7 +82,7 @@ export default {
 
     mixins: [ValidatesFieldConditions, ManagesPreviewText],
 
-    inject: ['setConfigs', 'isReadOnly'],
+    inject: ['bard'],
 
     computed: {
 
@@ -112,6 +112,14 @@ export default {
 
         config() {
             return _.findWhere(this.setConfigs, { handle: this.values.type }) || {};
+        },
+
+        setConfigs() {
+            return this.bard.setConfigs;
+        },
+
+        isReadOnly() {
+            return this.bard.isReadOnly;
         },
 
         enabled: {

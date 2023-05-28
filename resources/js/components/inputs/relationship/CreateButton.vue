@@ -4,10 +4,10 @@
         <dropdown-list :disabled="creatables.length === 1">
             <template #trigger>
                 <button
-                    class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none"
+                    class="text-button text-blue hover:text-gray-800 mr-6 flex items-center outline-none"
                     @click="create"
                 >
-                    <svg-icon name="content-writing" class="mr-sm h-4 w-4 flex items-center"></svg-icon>
+                    <svg-icon name="light/content-writing" class="mr-1 h-4 w-4 flex items-center"></svg-icon>
                     {{ __('Create & Link Item') }}
                 </button>
             </template>

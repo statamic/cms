@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <header class="mb-3">
+    <header class="mb-6">
         @include('statamic::partials.breadcrumb', [
             'url' => cp_route('forms.index'),
             'title' => __('Forms')
@@ -14,7 +14,7 @@
                 {{ $form->title() }}
             </h1>
 
-            <dropdown-list class="mr-1">
+            <dropdown-list class="mr-2">
                 @can('edit', $form)
                     <dropdown-item :text="__('Edit Form')" redirect="{{ $form->editUrl() }}"></dropdown-item>
                 @endcan
@@ -39,10 +39,10 @@
     </header>
 
     @if (! empty($form->metrics()))
-    <div class="metrics mb-3">
+    <div class="metrics mb-6">
         @foreach($form->metrics() as $metric)
-            <div class="card px-3">
-                <h3 class="mb-2 font-bold text-grey">{{ $metric->label() }}</h3>
+            <div class="card px-6">
+                <h3 class="mb-4 font-bold text-gray">{{ $metric->label() }}</h3>
                 <div class="text-4xl">{{ $metric->result() }}</div>
             </div>
         @endforeach
@@ -58,9 +58,9 @@
         v-cloak
     >
         <div slot="no-results" class="text-center border-2 border-dashed rounded-lg">
-            <div class="max-w-md mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto px-8 py-30">
                 @cp_svg('empty/form')
-                <h1 class="my-3">{{ __('No submissions') }}</h1>
+                <h1 class="my-6">{{ __('No submissions') }}</h1>
             </div>
         </div>
     </form-submission-listing>

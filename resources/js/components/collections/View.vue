@@ -2,22 +2,22 @@
 
     <div>
 
-        <header class="mb-3">
+        <header class="mb-6">
 
             <breadcrumb :url="breadcrumbUrl" :title="__('Collections')" />
 
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
 
-                <dropdown-list class="mr-1" v-if="!!this.$scopedSlots.twirldown">
+                <dropdown-list class="mr-2" v-if="!!this.$scopedSlots.twirldown">
                     <slot name="twirldown" />
                 </dropdown-list>
 
-                <div class="btn-group mr-2" v-if="canUseStructureTree && !treeIsDirty">
-                    <button class="btn flex items-center px-2" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
-                        <svg-icon name="structures" class="h-4 w-4"/>
+                <div class="btn-group mr-4" v-if="canUseStructureTree && !treeIsDirty">
+                    <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
+                        <svg-icon name="light/structures" class="h-4 w-4"/>
                     </button>
-                    <button class="btn flex items-center px-2" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
+                    <button class="btn flex items-center px-4" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
                     </button>
                 </div>
@@ -25,7 +25,7 @@
                 <template v-if="view === 'tree'">
 
                     <a
-                        class="text-2xs text-blue mr-2 underline"
+                        class="text-2xs text-blue mr-4 underline"
                         v-if="treeIsDirty"
                         v-text="__('Discard changes')"
                         @click="cancelTreeProgress"
@@ -33,14 +33,14 @@
 
                     <site-selector
                         v-if="sites.length > 1"
-                        class="mr-2"
+                        class="mr-4"
                         :sites="sites"
                         :value="site"
                         @input="site = $event.handle"
                     />
 
                     <button
-                        class="btn mr-2"
+                        class="btn mr-4"
                         :class="{ 'disabled': !treeIsDirty, 'btn-danger': deletedEntries.length }"
                         :disabled="!treeIsDirty"
                         @click="saveTree"
@@ -52,23 +52,23 @@
                 <template v-if="view === 'list' && reorderable">
                     <site-selector
                         v-if="sites.length > 1 && reordering && site"
-                        class="mr-2"
+                        class="mr-4"
                         :sites="sites"
                         :value="site"
                         @input="site = $event.handle"
                     />
 
-                    <button class="btn mr-2"
+                    <button class="btn mr-4"
                         v-if="!reordering"
                         @click="reordering = true"
                         v-text="__('Reorder')" />
 
                     <template v-if="reordering">
-                        <button class="btn ml-1"
+                        <button class="btn ml-2"
                             @click="reordering = false"
                             v-text="__('Cancel')" />
 
-                        <button class="btn-primary ml-1"
+                        <button class="btn-primary ml-2"
                             @click="$refs.list.saveOrder"
                             v-text="__('Save Order')" />
                     </template>
@@ -121,14 +121,14 @@
         >
             <template #branch-icon="{ branch }">
                 <svg-icon v-if="isRedirectBranch(branch)"
-                    class="inline-block w-4 h-4 text-grey-50"
-                    name="external-link"
+                    class="inline-block w-4 h-4 text-gray-500"
+                    name="light/external-link"
                     v-tooltip="__('Redirect')" />
             </template>
 
             <template #branch-options="{ branch, removeBranch, orphanChildren, depth }">
                 <template v-if="depth < structureMaxDepth">
-                    <h6 class="px-1" v-text="__('Create Child Entry')" v-if="blueprints.length > 1" />
+                    <h6 class="px-2" v-text="__('Create Child Entry')" v-if="blueprints.length > 1" />
                     <li class="divider" v-if="blueprints.length > 1" />
                     <dropdown-item
                         v-for="blueprint in blueprints"

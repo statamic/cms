@@ -2,19 +2,20 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\FilterAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
+use Statamic\GraphQL\Middleware\AuthorizeFilters;
 use Statamic\GraphQL\Middleware\ResolvePage;
+use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\GraphQL\Types\UserType;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Tags\Concerns\QueriesConditions;
 
 class UsersQuery extends Query
 {
-    use QueriesConditions;
+    use FiltersQuery;
 
     protected $attributes = [
         'name' => 'users',
@@ -22,6 +23,7 @@ class UsersQuery extends Query
 
     protected $middleware = [
         ResolvePage::class,
+        AuthorizeFilters::class,
     ];
 
     public function type(): Type
@@ -54,29 +56,6 @@ class UsersQuery extends Query
         return $query->paginate($args['limit'] ?? 1000);
     }
 
-    private function filterQuery($query, $filters)
-    {
-        $filters = collect($filters)->reject(fn ($_, $filter) => Str::startsWith($filter, 'password'));
-
-        foreach ($filters as $field => $definitions) {
-            if (! is_array($definitions)) {
-                $definitions = [['equals' => $definitions]];
-            }
-
-            if (Arr::assoc($definitions)) {
-                $definitions = collect($definitions)->map(function ($value, $key) {
-                    return [$key => $value];
-                })->values()->all();
-            }
-
-            foreach ($definitions as $definition) {
-                $condition = array_keys($definition)[0];
-                $value = array_values($definition)[0];
-                $this->queryCondition($query, $field, $condition, $value);
-            }
-        }
-    }
-
     private function sortQuery($query, $sorts)
     {
         foreach ($sorts as $sort) {
@@ -88,5 +67,12 @@ class UsersQuery extends Query
 
             $query->orderBy($sort, $order);
         }
+    }
+
+    public function allowedFilters($args)
+    {
+        return collect(FilterAuthorizer::allowedForResource('graphql', 'users'))
+            ->reject(fn ($field) => in_array($field, ['password', 'password_hash']))
+            ->all();
     }
 }

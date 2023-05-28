@@ -2,9 +2,12 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -24,13 +27,13 @@ class EntriesTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableQueries
-     **/
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{entries}'])
@@ -38,7 +41,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    public function it_queries_entries()
+    public function it_queries_all_entries()
     {
         $this->createEntries();
 
@@ -53,6 +56,10 @@ class EntriesTest extends TestCase
 }
 GQL;
 
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn(Collection::handles()->all())->twice();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -64,6 +71,74 @@ GQL;
                 ['id' => '4', 'title' => 'Event Two'],
                 ['id' => '5', 'title' => 'Hamburger'],
             ]]]]);
+    }
+
+    /** @test */
+    public function it_queries_only_entries_on_allowed_sub_resources()
+    {
+        $this->createEntries();
+
+        $query = <<<'GQL'
+{
+    entries {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn(['events'])->twice();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '3', 'title' => 'Event One'],
+                ['id' => '4', 'title' => 'Event Two'],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource()
+    {
+        $this->createEntries();
+
+        $query = <<<'GQL'
+{
+    entries(collection: "blog") {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'collections')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'collections')->andReturn(['events'])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'collection' => ['Forbidden: blog'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'entries' => null,
+                ],
+            ]);
     }
 
     /** @test */
@@ -249,7 +324,161 @@ GQL;
     }
 
     /** @test */
-    public function it_filters_entries()
+    public function it_cannot_filter_entries_by_default()
+    {
+        $this->createEntries();
+
+        $query = <<<'GQL'
+{
+    entries(collection: "blog", filter: {
+        title: {
+            contains: "rad",
+            ends_with: "!"
+        }
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', ['blog'])
+            ->andReturn([])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'filter' => ['Forbidden: title'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'entries' => null,
+                ],
+            ]);
+    }
+
+    /** @test */
+    public function it_can_filter_collection_entries_when_configuration_allows_for_it()
+    {
+        $this->createEntries();
+
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->create();
+
+        EntryFactory::collection('blog')
+            ->id('7')
+            ->slug('as-cool-as-radcliffe')
+            ->data(['title' => 'I wish I was as cool as Daniel Radcliffe!'])
+            ->create();
+
+        EntryFactory::collection('blog')
+            ->id('8')
+            ->slug('i-hate-radishes')
+            ->data(['title' => 'I hate radishes.'])
+            ->create();
+
+        $query = <<<'GQL'
+{
+    entries(collection: "blog", filter: {
+        title: {
+            contains: "cool",
+        }
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', ['blog'])
+            ->andReturn(['title'])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                [
+                    'id' => '7',
+                    'title' => 'I wish I was as cool as Daniel Radcliffe!',
+                ],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_can_filter_all_entries_when_configuration_allows_for_it()
+    {
+        $this->createEntries();
+
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->create();
+
+        EntryFactory::collection('blog')
+            ->id('7')
+            ->slug('as-cool-as-radcliffe')
+            ->data(['title' => 'I wish I was as cool as Daniel Radcliffe!'])
+            ->create();
+
+        EntryFactory::collection('blog')
+            ->id('8')
+            ->slug('i-hate-radishes')
+            ->data(['title' => 'I hate radishes.'])
+            ->create();
+
+        $query = <<<'GQL'
+{
+    entries(filter: {
+        title: {
+            contains: "cool",
+        }
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', '*')
+            ->andReturn(['title'])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                [
+                    'id' => '7',
+                    'title' => 'I wish I was as cool as Daniel Radcliffe!',
+                ],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_filters_entries_with_multiple_conditions()
     {
         $this->createEntries();
 
@@ -287,6 +516,11 @@ GQL;
 }
 GQL;
 
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', '*')
+            ->andReturn(['title'])
+            ->once();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -299,36 +533,6 @@ GQL;
                 [
                     'id' => '7',
                     'title' => 'I wish I was as cool as Daniel Radcliffe!',
-                ],
-            ]]]]);
-    }
-
-    /** @test */
-    public function it_filters_entries_with_equalto_shorthand()
-    {
-        $this->createEntries();
-
-        $query = <<<'GQL'
-{
-    entries(filter: {
-        title: "Hamburger"
-    }) {
-        data {
-            id
-            title
-        }
-    }
-}
-GQL;
-
-        $this
-            ->withoutExceptionHandling()
-            ->post('/graphql', ['query' => $query])
-            ->assertGqlOk()
-            ->assertExactJson(['data' => ['entries' => ['data' => [
-                [
-                    'id' => '5',
-                    'title' => 'Hamburger',
                 ],
             ]]]]);
     }
@@ -372,6 +576,11 @@ GQL;
 }
 GQL;
 
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', '*')
+            ->andReturn(['title'])
+            ->once();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -380,6 +589,41 @@ GQL;
                 [
                     'id' => '8',
                     'title' => 'This is both rad and awesome',
+                ],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_filters_entries_with_equalto_shorthand()
+    {
+        $this->createEntries();
+
+        $query = <<<'GQL'
+{
+    entries(filter: {
+        title: "Hamburger"
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'collections', '*')
+            ->andReturn(['title'])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                [
+                    'id' => '5',
+                    'title' => 'Hamburger',
                 ],
             ]]]]);
     }
@@ -485,6 +729,9 @@ GQL;
     /** @test */
     public function it_only_shows_published_entries_by_default()
     {
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->andReturn(['published', 'status']);
+
         $this->createEntries();
         Entry::find(1)->date(now()->addMonths(2))->save();
         Entry::find(2)->published(false)->save();

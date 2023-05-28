@@ -12,7 +12,7 @@ class SvgTagTest extends TestCase
     {
         parent::setUp();
 
-        File::copy(__DIR__.'/../../resources/svg/users.svg', resource_path('users.svg'));
+        File::copy(__DIR__.'/../../resources/svg/icons/light/users.svg', resource_path('users.svg'));
     }
 
     private function tag($tag)
@@ -23,13 +23,13 @@ class SvgTagTest extends TestCase
     /** @test */
     public function it_renders_svg()
     {
-        $this->assertStringStartsWith('<svg viewBox=', $this->tag('{{ svg:users }}'));
-        $this->assertStringStartsWith('<svg viewBox=', $this->tag('{{ svg src="users" }}'));
+        $this->assertStringStartsWith('<svg xmlns="', $this->tag('{{ svg:users }}'));
+        $this->assertStringStartsWith('<svg xmlns="', $this->tag('{{ svg src="users" }}'));
     }
 
     /** @test */
     public function it_renders_svg_with_additional_params()
     {
-        $this->assertStringStartsWith('<svg class="mb-1" viewBox=', $this->tag('{{ svg src="users" class="mb-1" }}'));
+        $this->assertStringStartsWith('<svg class="mb-2" xmlns="', $this->tag('{{ svg src="users" class="mb-2" }}'));
     }
 }

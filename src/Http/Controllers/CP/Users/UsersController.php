@@ -45,19 +45,7 @@ class UsersController extends CpController
         $query = User::query();
 
         if ($search = request('search')) {
-            if (Search::indexes()->has('users')) {
-                return Search::index('users')->ensureExists()->search($search);
-            }
-
-            $query
-                ->where('email', 'like', '%'.$search.'%')
-                ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
-                    $query
-                        ->orWhere('first_name', 'like', '%'.$search.'%')
-                        ->orWhere('last_name', 'like', '%'.$search.'%');
-                }, function ($query) use ($search) {
-                    $query->orWhere('name', 'like', '%'.$search.'%');
-                });
+            $query = $this->searchUsers($search, $query);
         }
 
         return $query;
@@ -67,9 +55,15 @@ class UsersController extends CpController
     {
         $query = $request->group
             ? UserGroup::find($request->group)->queryUsers()
-            : $this->indexQuery();
+            : User::query();
 
-        $activeFilterBadges = $this->queryFilters($query, $request->filters);
+        if ($search = request('search')) {
+            $query = $this->searchUsers($search, $query, ! $request->has('group'));
+        }
+
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'blueprints' => ['user'],
+        ]);
 
         $users = $query
             ->orderBy(request('sort', 'email'), request('order', 'asc'))
@@ -81,6 +75,27 @@ class UsersController extends CpController
             ->additional(['meta' => [
                 'activeFilterBadges' => $activeFilterBadges,
             ]]);
+    }
+
+    protected function searchUsers($search, $query, $useIndex = true)
+    {
+        if ($useIndex && Search::indexes()->has('users')) {
+            return Search::index('users')->ensureExists()->search($search);
+        }
+
+        $query->where(function ($query) use ($search) {
+            $query
+                ->where('email', 'like', '%'.$search.'%')
+                ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
+                    $query
+                        ->orWhere('first_name', 'like', '%'.$search.'%')
+                        ->orWhere('last_name', 'like', '%'.$search.'%');
+                }, function ($query) use ($search) {
+                    $query->orWhere('name', 'like', '%'.$search.'%');
+                });
+        });
+
+        return $query;
     }
 
     /**
@@ -184,6 +199,10 @@ class UsersController extends CpController
             $blueprint->ensureField('groups', ['visibility' => 'read_only']);
         }
 
+        if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
+            $blueprint->ensureField('super', ['type' => 'toggle']);
+        }
+
         $values = $user->data()
             ->merge($user->computedData())
             ->merge(['email' => $user->email()]);
@@ -231,6 +250,11 @@ class UsersController extends CpController
         foreach ($values as $key => $value) {
             $user->set($key, $value);
         }
+
+        if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
+            $user->super = $request->super;
+        }
+
         $user->email($request->email);
 
         if (User::current()->can('assign roles')) {

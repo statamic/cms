@@ -1,0 +1,26 @@
+/* Make clicks pass-through */
+#nprogress {
+    pointer-events: none;
+}
+
+#nprogress .bar {
+    @apply bg-blue fixed top-0 left-0 w-full;;
+    height: 2px;
+    z-index: 10000; /*  above global-header */
+}
+
+/* Fancy blur effect */
+#nprogress .peg {
+    @apply block absolute right-0 w-full h-full opacity-100;
+    box-shadow: 0 0 5px theme('colors.blue.DEFAULT'), 0 0 2px theme('colors.blue.DEFAULT');
+}
+
+.nprogress-custom-parent {
+    overflow: hidden;
+    position: relative;
+}
+
+.nprogress-custom-parent #nprogress .spinner,
+.nprogress-custom-parent #nprogress .bar {
+    position: absolute;
+}

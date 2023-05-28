@@ -83,12 +83,15 @@ class EntryFactory
     {
         $entry = Entry::make()
             ->locale($this->locale)
-            ->collection($this->createCollection())
+            ->collection($collection = $this->createCollection())
             ->slug($this->slug)
             ->data($this->data)
-            ->date($this->date)
             ->origin($this->origin)
             ->published($this->published);
+
+        if ($collection->dated()) {
+            $entry->date($this->date);
+        }
 
         if ($this->id) {
             $entry->id($this->id);

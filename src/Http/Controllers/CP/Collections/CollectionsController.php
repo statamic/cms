@@ -75,6 +75,11 @@ class CollectionsController extends CpController
 
         $columns = $blueprint
             ->columns()
+            ->put('status', Column::make('status')
+                ->listable(true)
+                ->visible(true)
+                ->defaultVisibility(true)
+                ->sortable(false))
             ->setPreferred("collections.{$collection->handle()}.columns")
             ->rejectUnlisted()
             ->values();
@@ -154,7 +159,6 @@ class CollectionsController extends CpController
             'default_publish_state' => $collection->defaultPublishState(),
             'template' => $collection->template(),
             'layout' => $collection->layout(),
-            'amp' => $collection->ampable(),
             'sites' => $collection->sites()->all(),
             'propagate' => $collection->propagate(),
             'routes' => $collection->routes()->unique()->count() === 1
@@ -233,7 +237,6 @@ class CollectionsController extends CpController
             ->layout($values['layout'])
             ->defaultPublishState($values['default_publish_state'])
             ->sortDirection($values['sort_direction'])
-            ->ampable($values['amp'])
             ->mount($values['mount'] ?? null)
             ->revisions($values['revisions'] ?? false)
             ->taxonomies($values['taxonomies'] ?? [])
@@ -411,7 +414,7 @@ class CollectionsController extends CpController
                         'type' => 'html',
                         'html' => ''.
                             '<div class="text-xs">'.
-                            '   <span class="mr-2">'.$collection->entryBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <span class="mr-4">'.$collection->entryBlueprints()->map->title()->join(', ').'</span>'.
                             '   <a href="'.cp_route('collections.blueprints.index', $collection).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
@@ -518,11 +521,6 @@ class CollectionsController extends CpController
                             return $collectionHandle === $collection->handle();
                         })->values()->all(),
                     ],
-                    'amp' => [
-                        'display' => __('Enable AMP'),
-                        'instructions' => __('statamic::messages.collections_amp_instructions'),
-                        'type' => 'toggle',
-                    ],
                     'preview_targets' => [
                         'display' => __('Preview Targets'),
                         'instructions' => __('statamic::messages.collections_preview_targets_instructions'),
@@ -557,6 +555,6 @@ class CollectionsController extends CpController
             ],
         ]);
 
-        return Blueprint::makeFromSections($fields);
+        return Blueprint::makeFromTabs($fields);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\AssetContainer;
@@ -24,13 +26,13 @@ class AssetsTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableQueries
-     **/
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{assets}'])
@@ -55,6 +57,10 @@ class AssetsTest extends TestCase
 }
 GQL;
 
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(['test'])->once();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -63,6 +69,47 @@ GQL;
                 ['path' => 'a.txt'],
                 ['path' => 'b.txt'],
             ]]]]);
+    }
+
+    /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource()
+    {
+        Storage::fake('test', ['url' => '/assets']);
+        Storage::disk('test')->put('a.txt', '');
+        Storage::disk('test')->put('b.txt', '');
+        AssetContainer::make('one')->disk('test')->save();
+        AssetContainer::make('two')->disk('test')->save();
+
+        $query = <<<'GQL'
+{
+    assets(container: "two") {
+        data {
+            path
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(['one'])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'container' => ['Forbidden: two'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'assets' => null,
+                ],
+            ]);
     }
 
     /** @test */
@@ -170,6 +217,177 @@ GQL;
                     'alt' => 'the b file',
                     'foo' => null,
                 ],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_cannot_filter_assets_by_default()
+    {
+        Storage::fake('test', ['url' => '/assets']);
+        Storage::disk('test')->put('not-image.txt', '');
+        Storage::disk('test')->put('image.jpg', '');
+        AssetContainer::make('test')->disk('test')->save();
+
+        $query = <<<'GQL'
+{
+    assets(container: "test", filter: {
+        is_image: {
+            is: true
+        }
+    }) {
+        data {
+            path
+            is_image
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(['test'])->once();
+        ResourceAuthorizer::makePartial();
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'assets', 'test')
+            ->andReturn([])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'filter' => ['Forbidden: is_image'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'assets' => null,
+                ],
+            ]);
+    }
+
+    /** @test */
+    public function it_can_filter_assets_when_configuration_allows_for_it()
+    {
+        Storage::fake('test', ['url' => '/assets']);
+        Storage::disk('test')->put('not-image.txt', '');
+        Storage::disk('test')->put('image.jpg', '');
+        AssetContainer::make('test')->disk('test')->save();
+
+        $query = <<<'GQL'
+{
+    assets(container: "test", filter: {
+        is_image: {
+            is: true
+        }
+    }) {
+        data {
+            path
+            is_image
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(['test'])->once();
+        ResourceAuthorizer::makePartial();
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'assets', 'test')
+            ->andReturn(['is_image'])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['assets' => ['data' => [
+                ['path' => 'image.jpg', 'is_image' => true],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_filters_assets_with_equalto_shorthand()
+    {
+        Storage::fake('test', ['url' => '/assets']);
+        Storage::disk('test')->put('not-image.txt', '');
+        Storage::disk('test')->put('image.jpg', '');
+        AssetContainer::make('test')->disk('test')->save();
+
+        $query = <<<'GQL'
+{
+    assets(container: "test", filter: {
+        is_image: true
+    }) {
+        data {
+            path
+            is_image
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(['test'])->once();
+        ResourceAuthorizer::makePartial();
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'assets', 'test')
+            ->andReturn(['is_image'])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['assets' => ['data' => [
+                ['path' => 'image.jpg', 'is_image' => true],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_filters_assets_with_multiple_conditions_of_the_same_type()
+    {
+        Storage::fake('test', ['url' => '/assets']);
+        Storage::disk('test')->put('not-image.txt', '');
+        Storage::disk('test')->put('favourite-image.jpg', '');
+        AssetContainer::make('test')->disk('test')->save();
+
+        $query = <<<'GQL'
+{
+    assets(container: "test", filter: {
+        path: [
+            { contains: "favourite" },
+            { contains: "image" }
+        ]
+    }) {
+        data {
+            path
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(['test'])->once();
+        ResourceAuthorizer::makePartial();
+
+        FilterAuthorizer::shouldReceive('allowedForSubResources')
+            ->with('graphql', 'assets', 'test')
+            ->andReturn(['path'])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['assets' => ['data' => [
+                ['path' => 'favourite-image.jpg'],
             ]]]]);
     }
 
