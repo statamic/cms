@@ -1,5 +1,6 @@
 <template>
-    <component v-if="icon" :is="icon" />
+    <component v-if="iconComponent" :is="iconComponent" />
+    <span v-else-if="svgIcon" v-html="svgIcon" />
 </template>
 
 <script>
@@ -21,17 +22,25 @@ export default {
     },
     data() {
         return {
-            icon: this.evaluateIcon(),
+            iconComponent: null,
+            svgIcon: null,
         }
+    },
+    mounted() {
+        this.handleIcon()
     },
     watch: {
         name() {
-            this.icon = this.evaluateIcon();
-        }
+            this.handleIcon();
+        },
     },
     methods: {
-        evaluateIcon() {
-            return defineAsyncComponent(() => {
+        handleIcon() {
+            if (this.name.includes('<svg')) {
+                return this.svgIcon = this.name;
+            }
+
+            return this.iconComponent = defineAsyncComponent(() => {
                 const [set, file] = splitIcon(this.name);
                 return import(`./../../svg/icons/${set}/${file}.svg`)
                     .catch(e => {
