@@ -39,9 +39,8 @@
                 {{ asset.values.alt ? "✅" : __("Set Alt") }}
             </button>
         </td>
-        <td class="p-0 w-8 text-right align-middle">
+        <td class="p-0 w-8 text-right align-middle" v-if="!readOnly">
             <button
-                v-if="!readOnly"
                 class="flex items-center p-1 w-6 h-8 text-gray-600 hover:text-gray-900"
                 @click="remove"
                 :aria-label="__('Remove Asset')"
