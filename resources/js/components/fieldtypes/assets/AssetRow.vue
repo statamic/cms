@@ -8,7 +8,7 @@
             ></div>
             <button
                 class="w-7 h-7 cursor-pointer whitespace-nowrap flex items-center justify-center"
-                @click="edit"
+                @click="editOrOpen"
                 v-else
             >
                 <img
@@ -22,7 +22,7 @@
             </button>
             <button
                 v-if="showFilename"
-                @click="edit"
+                @click="editOrOpen"
                 class="flex items-center flex-1 ml-3 text-xs text-left truncate w-full"
                 :aria-label="__('Edit Asset')"
             >
@@ -33,7 +33,7 @@
         <td class="w-24" v-if="showSetAlt">
             <button
                 class="asset-set-alt text-blue px-4 text-sm hover:text-black"
-                @click="edit"
+                @click="editOrOpen"
                 v-if="needsAlt"
             >
                 {{ asset.values.alt ? "✅" : __("Set Alt") }}
@@ -65,6 +65,14 @@
 <script>
 import Asset from "./Asset";
 export default {
+
     mixins: [Asset],
+
+    methods: {
+        editOrOpen() {
+            return this.readOnly ? this.open() : this.edit();
+        }
+    },
+
 };
 </script>
