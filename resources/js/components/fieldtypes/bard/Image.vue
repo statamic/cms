@@ -163,7 +163,7 @@ export default {
             }
 
             this.$axios.post(cp_url('assets-fieldtype'), {
-                params: { assets: [id] }
+                assets: [id],
             }).then(response => {
                 this.setAsset(response.data[0]);
             });
