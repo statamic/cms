@@ -387,8 +387,8 @@ export default {
 
             this.loading = true;
 
-            this.$axios.get(cp_url('assets-fieldtype'), {
-                params: { assets }
+            this.$axios.post(cp_url('assets-fieldtype'), {
+                assets
             }).then(response => {
                 this.assets = response.data;
                 this.loading = false;
