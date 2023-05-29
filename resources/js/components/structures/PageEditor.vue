@@ -56,7 +56,7 @@
             <div v-if="!loading" class="bg-gray-200 p-4 border-t flex items-center justify-between flex-row-reverse">
                 <div>
                     <button @click="confirmClose(close)" class="btn mr-2">{{ __('Cancel') }}</button>
-                    <button @click="submit" class="btn-primary">{{ __('Submit') }}</button>
+                    <button @click="submit" class="btn-primary">{{ __('Save') }}</button>
                 </div>
                 <div v-if="type === 'entry'">
                     <a :href="editEntryUrl" target="_blank" class="text-xs flex items-center justify-center text-blue hover:text-blue underline mr-4">
