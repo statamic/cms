@@ -373,7 +373,7 @@ export default {
         },
 
         loadAssetData(url) {
-            this.$axios.get(cp_url('assets-fieldtype'), {
+            this.$axios.post(cp_url('assets-fieldtype'), {
                 params: { assets: [url] }
             }).then(response => {
                 this.selectItem('asset', response.data[0])
