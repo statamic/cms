@@ -32,7 +32,8 @@ class StaticWarm extends Command
         {--queue : Queue the requests}
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
-        {--inertia : Add X-Inertia headers to requests }
+        {--inertia : Add X-Inertia headers to requests}
+        {--force : Bypass static caching strategy check}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
@@ -43,7 +44,7 @@ class StaticWarm extends Command
 
     public function handle()
     {
-        if (! config('statamic.static_caching.strategy')) {
+        if (! $this->option('force') && ! config('statamic.static_caching.strategy')) {
             $this->error('Static caching is not enabled.');
 
             return 1;
