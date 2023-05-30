@@ -308,7 +308,7 @@ export default {
         },
 
         columnShowing(column) {
-            return this.columns.find(c => c.field === column && c.visible);
+            return this.visibleColumns.find(c => c.field === column);
         },
 
     }
