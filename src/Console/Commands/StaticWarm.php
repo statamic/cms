@@ -32,6 +32,7 @@ class StaticWarm extends Command
         {--queue : Queue the requests}
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
+        {--insecure : Skip SSL verification}
         {--inertia : Add X-Inertia headers to requests}
         {--force : Bypass static caching strategy check}
     ';
@@ -72,16 +73,15 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        $options = [
-            'verify' => ! $this->laravel->isLocal(),
+        $client = new Client($options = [
+            'verify' => $this->shouldVerifySsl(),
             'auth' => $this->option('user') && $this->option('password')
                 ? [$this->option('user'), $this->option('password')]
                 : null,
             'headers' => $this->option('inertia')
                 ? ['X-Inertia' => 'true', 'X-Inertia-Version' => app(\Inertia\Middleware::class)->version(request())]
                 : null,
-        ];
-        $client = new Client($options);
+        ]);
 
         $this->output->newLine();
         $this->line('Compiling URLs...');
@@ -150,7 +150,9 @@ class StaticWarm extends Command
 
     private function requests()
     {
-        return $this->uris()->map(fn ($uri) => new Request('GET', $uri))->all();
+        return $this->uris()->map(function ($uri) {
+            return new Request('GET', $uri);
+        })->all();
     }
 
     private function uris(): Collection
@@ -172,6 +174,15 @@ class StaticWarm extends Command
             })
             ->sort()
             ->values();
+    }
+
+    private function shouldVerifySsl(): bool
+    {
+        if ($this->option('insecure')) {
+            return false;
+        }
+
+        return ! $this->laravel->isLocal();
     }
 
     protected function entryUris(): Collection

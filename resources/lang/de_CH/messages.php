@@ -76,6 +76,7 @@ return [
     'field_synced_with_origin' => 'Mit der Quelle synchronisiert. Klicke oder bearbeite das Feld, um die Synchronisierung aufzuheben.',
     'field_validation_advanced_instructions' => 'Diesem Feld eine erweiterte Validierung hinzufügen.',
     'field_validation_required_instructions' => 'Steuert, ob dieses Feld erforderlich ist oder nicht.',
+    'field_validation_sometimes_instructions' => 'Dieses Feld wird nur validiert, wenn es sichtbar oder abgeschickt ist.',
     'fields_blueprints_description' => 'Blueprints definieren die Felder für den inhaltlichen Aufbau von Sammlungen, Taxonomien, Benutzer:innen und Formularen.',
     'fields_default_instructions' => 'Standardwert festlegen',
     'fields_display_instructions' => 'Name des Feldes im Control Panel.',

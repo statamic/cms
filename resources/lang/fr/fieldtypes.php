@@ -10,6 +10,7 @@ return [
     'assets.config.container' => 'Choisissez quel conteneur de ressources à utiliser pour ce champ.',
     'assets.config.folder' => 'Le dossier à partir duquel commencer la navigation.',
     'assets.config.max_files' => 'Le nombre maxi de ressources sélectionnables.',
+    'assets.config.min_files' => 'Le nombre mini de ressources sélectionnables.',
     'assets.config.mode' => 'Choisissez votre disposition préférée.',
     'assets.config.restrict' => 'Empêchez les utilisateurs de naviguer vers d’autres dossiers.',
     'assets.config.show_filename' => 'Afficher le nom du fichier à côté de l’image de prévisualisation.',

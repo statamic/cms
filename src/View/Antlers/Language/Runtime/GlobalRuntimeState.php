@@ -103,6 +103,13 @@ class GlobalRuntimeState
     public static $tracedRuntimeAssignments = [];
 
     /**
+     * A list of IDs of all abandoned nodes.
+     *
+     * @var array
+     */
+    public static $abandonedNodes = [];
+
+    /**
      * Updates the global state with the provided Antlers runtime tag assignments.
      *
      * @param  array  $assignments  The assignments.
@@ -210,6 +217,7 @@ class GlobalRuntimeState
         self::$environmentId = StringUtilities::uuidv4();
         self::$yieldCount = 0;
         self::$yieldStacks = [];
+        self::$abandonedNodes = [];
 
         StackReplacementManager::clearStackState();
         LiteralReplacementManager::resetLiteralState();

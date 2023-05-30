@@ -72,6 +72,7 @@
                 :targets="previewTargets"
                 :values="values"
                 :blueprint="fieldset.handle"
+                :reference="initialReference"
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
