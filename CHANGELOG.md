@@ -1,5 +1,28 @@
 # Release Notes
 
+## 4.4.0 (2023-05-30)
+
+### What's new
+- Expose tiptap/vue-2 in the Bard JS API. [#8197](https://github.com/statamic/cms/issues/8197) by @jacksleight
+
+### What's improved
+- More quotes added to the Flat Camp command. [#8206](https://github.com/statamic/cms/issues/8206) by @jasonvarga
+- Improve entry status display in the entry selector stack. [#8210](https://github.com/statamic/cms/issues/8210) by @duncanmcclean
+- Change visibility of some Cascade methods. [#8204](https://github.com/statamic/cms/issues/8204) by @modrictin
+
+### What's fixed
+- Fix custom fieldtype SVGs. [#8207](https://github.com/statamic/cms/issues/8207) by @duncanmcclean
+- Fix read-only state in the assets fieldtype. [#8214](https://github.com/statamic/cms/issues/8214) by @jesseleite
+- Fix searching with asset folder fieldtype. [#8215](https://github.com/statamic/cms/issues/8215) by @duncanmcclean
+- Fix nav builder icons. [#8221](https://github.com/statamic/cms/issues/8221) by @jasonvarga
+- Fix utility handle to slug conversion. [#8213](https://github.com/statamic/cms/issues/8213) by @jasonvarga
+- Fix asset selection request query length. [#8209](https://github.com/statamic/cms/issues/8209) by @duncanmcclean
+- Fix 'resolving deltas' on git push being logged as error. [#8176](https://github.com/statamic/cms/issues/8176) by @jesseleite
+- Fix date validation. [#8205](https://github.com/statamic/cms/issues/8205) [#8219](https://github.com/statamic/cms/issues/8219) by @jasonvarga
+- Fix line breaks not being displayed in automagic form emails. [#8200](https://github.com/statamic/cms/issues/8200) by @aerni
+
+
+
 ## 4.3.0 (2023-05-24)
 
 ### What's new
