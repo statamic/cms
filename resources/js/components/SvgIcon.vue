@@ -31,6 +31,12 @@ export default {
     },
     methods: {
         evaluateIcon() {
+            if (this.name.startsWith('<svg')) {
+                return defineAsyncComponent(() => {
+                    return new Promise(resolve => resolve({ template: this.name }));
+                });
+            }
+
             return defineAsyncComponent(() => {
                 const [set, file] = splitIcon(this.name);
                 return import(`./../../svg/icons/${set}/${file}.svg`)
