@@ -36,7 +36,7 @@ export default {
     },
     methods: {
         handleIcon() {
-            if (this.name.includes('<svg')) {
+            if (this.name.startsWith('<svg')) {
                 return this.svgIcon = this.name;
             }
 
