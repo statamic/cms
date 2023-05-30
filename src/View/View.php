@@ -16,13 +16,9 @@ use Statamic\View\Events\ViewRendered;
 class View
 {
     protected $data = [];
-
     protected $layout;
-
     protected $template;
-
     protected $cascade;
-
     protected $cascadeContent;
 
     public static function make($template = null, $data = [])
