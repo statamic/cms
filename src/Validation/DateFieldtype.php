@@ -42,6 +42,11 @@ class DateFieldtype
         }
 
         if ($this->fieldtype->config('mode') === 'range') {
+            if (isset($value['start'])) {
+                // It was already processed.
+                return;
+            }
+
             $date = $value['date'];
 
             if (! $date && $this->fieldtype->isRequired()) {
