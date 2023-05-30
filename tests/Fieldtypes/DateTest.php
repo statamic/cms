@@ -538,6 +538,16 @@ class DateTest extends TestCase
                 ['date' => ['start' => null, 'end' => null]],
                 null,
             ],
+            // Start/end array with carbon instances would be passed in if it was already processed.
+            // e.g. if it was nested inside a Replicator.
+            'carbon instances' => [
+                ['mode' => 'range'],
+                ['start' => Carbon::parse('2012-01-29'), 'end' => Carbon::parse('2012-02-14')],
+                [
+                    'start' => '2012-01-29 00:00:00',
+                    'end' => '2012-02-14 00:00:00',
+                ],
+            ],
         ];
     }
 

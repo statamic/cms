@@ -365,9 +365,16 @@ class Date extends Fieldtype
             ]);
         }
 
-        return $this->config('mode') === 'range'
-            ? $this->preProcessRangeValidatable($value['date'])
-            : $this->preProcessSingleValidatable($value);
+        if ($this->config('mode', 'single') === 'single') {
+            return $this->preProcessSingleValidatable($value);
+        }
+
+        if (isset($value['start'])) {
+            // It was already processed.
+            return $value;
+        }
+
+        return $this->preProcessRangeValidatable($value['date']);
     }
 
     private function preProcessSingleValidatable($value)
