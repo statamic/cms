@@ -27,7 +27,7 @@ export default {
     watch: {
         name() {
             this.icon = this.evaluateIcon();
-        },
+        }
     },
     methods: {
         evaluateIcon() {
