@@ -25,10 +25,8 @@ class AssetFolder extends Relationship
                 return ['id' => $folder, 'title' => $folder];
             })
             ->prepend(['id' => '/', 'title' => '/'])
-            ->when($request->search, function ($folders) use ($request) {
-                return $folders->filter(function ($folder) use ($request) {
-                    return str_contains($folder['title'], $request->search);
-                });
+            ->when($request->search, function ($folders, $search) {
+                return $folders->filter(fn ($folder) => str_contains($folder['title'], $search));
             })
             ->values();
     }
