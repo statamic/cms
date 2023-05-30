@@ -41,4 +41,9 @@ class NullCacher implements Cacher
     {
         return collect();
     }
+
+    public function isExcluded($url)
+    {
+        return false;
+    }
 }
