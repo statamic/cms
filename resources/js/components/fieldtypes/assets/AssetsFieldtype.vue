@@ -73,7 +73,7 @@
                                 :asset="asset"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
-                                :show-set-alt="config.show_set_alt"
+                                :show-set-alt="showSetAlt"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
                                 @id-changed="idChanged(asset.id, $event)">
@@ -100,7 +100,7 @@
                                         :asset="asset"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
-                                        :show-set-alt="config.show_set_alt"
+                                        :show-set-alt="showSetAlt"
                                         @updated="assetUpdated"
                                         @removed="assetRemoved"
                                         @id-changed="idChanged(asset.id, $event)">
@@ -345,7 +345,11 @@ export default {
 
         isFullWidth() {
             return ! (this.config.width && this.config.width < 100)
-        }
+        },
+
+        showSetAlt() {
+            return this.config.show_set_alt && ! this.isReadOnly;
+        },
 
     },
 
