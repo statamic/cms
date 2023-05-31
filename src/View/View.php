@@ -2,8 +2,8 @@
 
 namespace Statamic\View;
 
-use Facades\Statamic\View\Cascade;
 use InvalidArgumentException;
+use Statamic\Facades\Cascade;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Engine;
