@@ -15,7 +15,6 @@ class ClassesTest extends TestCase
     {
         $this->assertSame('one two', $this->modify(['one' => true, 'two' => true])->fetch());
         $this->assertSame('one', $this->modify(['one' => true, 'two' => false])->fetch());
-
     }
 
     private function modify($value)
