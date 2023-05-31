@@ -413,16 +413,18 @@ class UserTags extends Tags
     public function can()
     {
         if (! $user = User::current()) {
-            return;
+            return $this->parser ? null : false;
         }
 
         $permissions = Arr::wrap($this->params->explode(['permission', 'do']));
 
         foreach ($permissions as $permission) {
             if ($user->can($permission)) {
-                return $this->parse();
+                return $this->parser ? $this->parse() : true;
             }
         }
+
+        return $this->parser ? null : false;
     }
 
     /**
