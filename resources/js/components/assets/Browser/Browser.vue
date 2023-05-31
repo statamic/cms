@@ -188,7 +188,7 @@
                                         <div class="asset-meta flex items-center">
                                             <div class="asset-filename text-center w-full px-2 py-1" v-text="folder.basename" :title="folder.basename" />
                                         </div>
-                                        <dropdown-list autoclose v-if="folderActions(folder).length" class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
+                                        <dropdown-list autoclose v-if="folderActions(folder).length" class="absolute top-1 right-2" hoverable>
                                              <data-list-inline-actions
                                                  :item="folder.path"
                                                  :url="folderActionUrl"
@@ -225,7 +225,8 @@
                                             </div>
                                         </div>
                                         <dropdown-list
-                                            class="absolute top-1 right-2 opacity-0 group-hover:opacity-100"
+                                            class="absolute top-1 right-2"
+                                            hoverable
                                         >
                                              <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                              <div class="divider" v-if="asset.actions.length" />

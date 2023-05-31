@@ -1,5 +1,12 @@
 <template>
-    <popover class="dropdown-list" :disabled="disabled" :placement="placement" :autoclose="autoclose">
+    <popover
+        class="dropdown-list"
+        :class="{ 'opacity-0 group-hover:opacity-100': hoverable, 'opacity-100': hoverable && open }"
+        :disabled="disabled"
+        :placement="placement"
+        :autoclose="autoclose"
+        @opened="open = true"
+        @closed="open = false">
         <template #trigger>
             <slot name="trigger">
                 <button class="rotating-dots-button" :aria-label="__('Open Dropdown')">
@@ -25,7 +32,16 @@ export default {
         autoclose: {
             type: Boolean,
             default: false
+        },
+        hoverable: {
+            type: Boolean,
+            default: false
         }
+    },
+    data() {
+        return {
+            open: false,
+        };
     },
     computed: {
         strategy() {
