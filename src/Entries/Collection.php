@@ -43,6 +43,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $propagate = false;
     protected $blueprints = [];
     protected $searchIndex;
+    protected $alwaysUseSearchIndex = false;
     protected $dated = false;
     protected $sortField;
     protected $sortDirection;
@@ -475,6 +476,16 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     public function hasSearchIndex()
     {
         return $this->searchIndex() !== null;
+    }
+
+    public function alwaysUseSearchIndex($index = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('alwaysUseSearchIndex')
+            ->getter(function ($value) {
+                return $value ? $this->hasSearchIndex() : false;
+            })
+            ->args(func_get_args());
     }
 
     public function fileData()

@@ -48,6 +48,7 @@ class CollectionsStore extends BasicStore
             ->layout(array_get($data, 'layout'))
             ->cascade(array_get($data, 'inject', []))
             ->searchIndex(array_get($data, 'search_index'))
+            ->alwaysUseSearchIndex(array_get($data, 'always_use_search_index'))
             ->revisionsEnabled(array_get($data, 'revisions', false))
             ->defaultPublishState($this->getDefaultPublishState($data))
             ->originBehavior(array_get($data, 'origin_behavior', 'select'))

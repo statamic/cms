@@ -48,7 +48,7 @@ class EntriesController extends CpController
 
         $entries = $query->paginate(request('perPage'));
 
-        if (request('search') && $collection->hasSearchIndex()) {
+        if ($collection->alwaysUseSearchIndex() || (request('search') && $collection->hasSearchIndex())) {
             $entries->setCollection($entries->getCollection()->map->getSearchable());
         }
 
@@ -72,7 +72,7 @@ class EntriesController extends CpController
             $query->where('title', 'like', '%'.$search.'%');
         }
 
-        return $query;
+        return $collection->alwaysUseSearchIndex() ? $collection->searchIndex()->ensureExists()->query() : $query;
     }
 
     public function edit(Request $request, $collection, $entry)
