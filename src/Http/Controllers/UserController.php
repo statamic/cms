@@ -117,7 +117,9 @@ class UserController extends Controller
         $fields = $fields->addValues($values);
 
         $fieldRules = $fields->validator()->withRules([
-            'email' => ['required', 'email', 'unique_user_value:'.$user->id()],
+            'email' => ['required', 'email', 'unique_user_value:{id}'],
+        ])->withReplacements([
+            'id' => $user->id(),
         ])->rules();
 
         $validator = Validator::make($values, $fieldRules);
