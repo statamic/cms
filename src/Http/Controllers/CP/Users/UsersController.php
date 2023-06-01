@@ -15,6 +15,7 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Search\Result;
 
 class UsersController extends CpController
 {
@@ -69,6 +70,10 @@ class UsersController extends CpController
             ->orderBy(request('sort', 'email'), request('order', 'asc'))
             ->paginate(request('perPage'));
 
+        if ($users->getCollection()->first() instanceof Result) {
+            $users->setCollection($users->getCollection()->map->getSearchable());
+        }
+
         return (new Users($users))
             ->blueprint(User::blueprint())
             ->columnPreferenceKey('users.columns')
@@ -80,9 +85,7 @@ class UsersController extends CpController
     protected function searchUsers($search, $query, $useIndex = true)
     {
         if ($useIndex && Search::indexes()->has('users')) {
-            $results = Search::index('users')->ensureExists()->search($search);
-            $results->setCollection($results->getCollection()->map->getSearchable());
-            return $results;
+            return Search::index('users')->ensureExists()->search($search);
         }
 
         $query->where(function ($query) use ($search) {
