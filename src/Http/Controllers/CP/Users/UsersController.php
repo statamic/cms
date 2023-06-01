@@ -80,7 +80,9 @@ class UsersController extends CpController
     protected function searchUsers($search, $query, $useIndex = true)
     {
         if ($useIndex && Search::indexes()->has('users')) {
-            return Search::index('users')->ensureExists()->search($search);
+            $results = Search::index('users')->ensureExists()->search($search);
+            $results->setCollection($results->getCollection()->map->getSearchable());
+            return $results;
         }
 
         $query->where(function ($query) use ($search) {
