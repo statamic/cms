@@ -10,7 +10,7 @@ class AugmentedEntry extends AbstractAugmented
 {
     public function keys()
     {
-        return $this->data->values()->keys()
+        return $this->data->keys()
             ->merge($this->data->supplements()->keys())
             ->merge($this->commonKeys())
             ->merge($this->blueprintFields()->keys())

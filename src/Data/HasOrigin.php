@@ -6,6 +6,21 @@ trait HasOrigin
 {
     protected $origin;
 
+    public function keys()
+    {
+        $originFallbackKeys = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues()->keys() : collect();
+
+        $originKeys = $this->hasOrigin() ? $this->origin()->keys() : collect();
+
+        $computedFields = method_exists($this, 'computedFields') ? $this->computedFields() : [];
+
+        return collect()
+            ->merge($originFallbackKeys)
+            ->merge($originKeys)
+            ->merge($this->data->keys())
+            ->merge($computedFields);
+    }
+
     public function values()
     {
         $originFallbackValues = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues() : collect();
