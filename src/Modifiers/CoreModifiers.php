@@ -328,6 +328,11 @@ class CoreModifiers extends Modifier
             ->all();
     }
 
+    public function classes($value)
+    {
+        return Arr::toCssClasses($value);
+    }
+
     public function className($value)
     {
         return get_class($value);
