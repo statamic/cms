@@ -102,7 +102,7 @@ abstract class EloquentQueryBuilder implements Builder
             return $this->whereNested($column, $boolean);
         }
 
-        if (lower($operator) == 'like') {
+        if (strtolower($operator) == 'like') {
             $this->builder->whereRaw('LOWER('.$this->column($column).') LIKE ?', strtolower($value), $boolean);
 
             return $this;
