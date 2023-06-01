@@ -243,7 +243,10 @@ class UsersController extends CpController
 
         $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
 
-        $fields->validate(['email' => 'required|unique_user_value:{id}'], [], ['id' => $user->id()]);
+        $fields
+            ->validator()
+            ->withReplacements(['id' => $user->id()])
+            ->validate(['email' => 'required|unique_user_value:{id}']);
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
