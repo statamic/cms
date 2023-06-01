@@ -17,6 +17,7 @@ use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Query\StatusQueryBuilder;
+use Statamic\Search\Result;
 use Statamic\Support\Arr;
 
 class Entries extends Relationship
@@ -96,12 +97,14 @@ class Entries extends Relationship
 
     public function getIndexItems($request)
     {
-        $query = $this->getIndexQuery($request);
+        $collections = $this->getConfiguredCollections();
+
+        $query = $this->getIndexQuery($request, collect($collections));
 
         $filters = $request->filters;
 
         if (! isset($filters['collection'])) {
-            $query->whereIn('collection', $this->getConfiguredCollections());
+            $query->whereIn('collection', $collections);
         }
 
         if ($blueprints = $this->config('blueprints')) {
@@ -114,7 +117,13 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+        $entries = $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+
+        if ($entries->getCollection()->first() instanceOf Result) {
+            $entries->setCollection($entries->getCollection()->map->getSearchable());
+        }
+
+        return $entries;
     }
 
     public function getResourceCollection($request, $items)
@@ -167,12 +176,24 @@ class Entries extends Relationship
         return $order;
     }
 
-    protected function getIndexQuery($request)
+    protected function getIndexQuery($request, $collections)
     {
         $query = Entry::query();
 
         if ($search = $request->search) {
-            $query->where('title', 'like', '%'.$search.'%');
+            $usingSearchIndex = false;
+
+            if ($collections->count() == 1) {
+                $collection = Collection::findByHandle($collections->first());
+                if ($collection && $collection->hasSearchIndex()) {
+                    $query = $collection->searchIndex()->ensureExists()->search($search);
+                    $usingSearchIndex = true;
+                }
+            }
+
+            if (! $usingSearchIndex) {
+                $query->where('title', 'like', '%'.$search.'%');
+            }
         }
 
         if ($site = $request->site) {
