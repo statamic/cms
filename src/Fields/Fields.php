@@ -301,9 +301,9 @@ class Fields
         return Validator::make()->fields($this);
     }
 
-    public function validate($extraRules = [], $customMessages = [], $replacements = [])
+    public function validate($extraRules = [], $customMessages = [])
     {
-        return $this->validator()->withRules($extraRules)->withMessages($customMessages)->withReplacements($replacements)->validate();
+        return $this->validator()->withRules($extraRules)->withMessages($customMessages)->validate();
     }
 
     public function toGql()
