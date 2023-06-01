@@ -119,7 +119,7 @@ class Entries extends Relationship
 
         $entries = $request->boolean('paginate', true) ? $query->paginate() : $query->get();
 
-        if ($entries->getCollection()->first() instanceOf Result) {
+        if ($entries->getCollection()->first() instanceof Result) {
             $entries->setCollection($entries->getCollection()->map->getSearchable());
         }
 
