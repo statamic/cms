@@ -47,6 +47,7 @@ use Statamic\Http\Controllers\CP\Fields\MetaController;
 use Statamic\Http\Controllers\CP\Fieldtypes\FilesFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\MarkdownFieldtypeController;
 use Statamic\Http\Controllers\CP\Fieldtypes\RelationshipFieldtypeController;
+use Statamic\Http\Controllers\CP\Forms\ActionController as FormActionController;
 use Statamic\Http\Controllers\CP\Forms\FormBlueprintController;
 use Statamic\Http\Controllers\CP\Forms\FormExportController;
 use Statamic\Http\Controllers\CP\Forms\FormsController;
@@ -250,8 +251,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('addons', [AddonsController::class, 'index'])->name('addons.index');
     Route::post('addons/editions', AddonEditionsController::class);
 
-    Route::post('forms/actions', [ActionController::class, 'run'])->name('forms.actions.run');
-    Route::post('forms/actions/list', [ActionController::class, 'bulkActions'])->name('forms.actions.bulk');
+    Route::post('forms/actions', [FormActionController::class, 'run'])->name('forms.actions.run');
+    Route::post('forms/actions/list', [FormActionController::class, 'bulkActions'])->name('forms.actions.bulk');
     Route::post('forms/{form}/submissions/actions', [SubmissionActionController::class, 'run'])->name('forms.submissions.actions.run');
     Route::post('forms/{form}/submissions/actions/list', [SubmissionActionController::class, 'bulkActions'])->name('forms.submissions.actions.bulk');
     Route::resource('forms', FormsController::class);
