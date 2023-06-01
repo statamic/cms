@@ -104,6 +104,7 @@ abstract class EloquentQueryBuilder implements Builder
 
         if (lower($operator) == 'like') {
             $this->builder->whereRaw('LOWER('.$this->column($column).') LIKE ?', strtolower($value), $boolean);
+
             return $this;
         }
 
