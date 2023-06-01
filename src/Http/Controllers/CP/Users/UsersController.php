@@ -245,8 +245,9 @@ class UsersController extends CpController
 
         $fields
             ->validator()
+            ->withRules(['email' => 'required|unique_user_value:{id}'])
             ->withReplacements(['id' => $user->id()])
-            ->validate(['email' => 'required|unique_user_value:{id}']);
+            ->validate();
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
