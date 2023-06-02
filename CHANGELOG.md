@@ -1,5 +1,27 @@
 # Release Notes
 
+## 4.5.0 (2023-06-02)
+
+### What's new
+- Add a CSS `classes` modifier. [#8237](https://github.com/statamic/cms/issues/8237) by @JohnathonKoster
+- Add Blade support to `user` tags. [#8223](https://github.com/statamic/cms/issues/8223) [#8242](https://github.com/statamic/cms/issues/8242) by @ryanmitchell
+
+### What's improved
+- Add missing validation messages for `starts_with` and `ends_with`. [#8247](https://github.com/statamic/cms/issues/8247) by @ryanmitchell
+- Use real Facade for `Cascade`. [#8198](https://github.com/statamic/cms/issues/8198) by @edalzell
+
+### What's fixed
+- Fix relationship fields not being scoped to selected site in nav item editor. [#8212](https://github.com/statamic/cms/issues/8212) by @duncanmcclean
+- Fix error when searching users with a search index configured. [#8239](https://github.com/statamic/cms/issues/8239) by @ryanmitchell
+- Fix `embed_url` modifier not handling start time on YouTube URLs. [#8250](https://github.com/statamic/cms/issues/8250) by @JohnathonKoster
+- Fix replacements so the `unique_user_value` validation rule works as expected. [#8241](https://github.com/statamic/cms/issues/8241) by @ryanmitchell
+- Fix form actions. [#8240](https://github.com/statamic/cms/issues/8240) by @duncanmcclean
+- Fix asset grid button visibility. [#8232](https://github.com/statamic/cms/issues/8232) by @jasonvarga
+- Fix asset grid folder dropdown. [#8228](https://github.com/statamic/cms/issues/8228) by @jacksleight
+- Fix missing bard settings. [#8231](https://github.com/statamic/cms/issues/8231) by @jasonvarga
+
+
+
 ## 4.4.0 (2023-05-30)
 
 ### What's new
