@@ -145,7 +145,6 @@ class UserController extends Controller
             session()->flash('user.profile.success', __('Update successful.'));
 
             return $this->userProfileSuccess();
-
         } catch (ValidationException $e) {
             return $this->userProfileFailure($e->validator->errors());
         }
