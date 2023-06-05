@@ -110,40 +110,45 @@ class UserController extends Controller
     {
         throw_unless($user = User::current(), new UnauthorizedHttpException(403));
 
-        $blueprint = User::blueprint();
+        try {
+            $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields();
-        $values = $this->valuesWithoutAssetFields($fields, $request);
-        $fields = $fields->addValues($values);
+            $fields = $blueprint->fields();
+            $values = $this->valuesWithoutAssetFields($fields, $request);
+            $fields = $fields->addValues($values);
 
-        $fieldRules = $fields->validator()->withRules([
-            'email' => ['required', 'email', 'unique_user_value:{id}'],
-        ])->withReplacements([
-            'id' => $user->id(),
-        ])->rules();
+            $fieldRules = $fields->validator()->withRules([
+                'email' => ['required', 'email', 'unique_user_value:{id}'],
+            ])->withReplacements([
+                'id' => $user->id(),
+            ])->rules();
 
-        $validator = Validator::make($values, $fieldRules);
+            $validator = Validator::make($values, $fieldRules);
 
-        if ($validator->fails()) {
-            return $this->userProfileFailure($validator->errors());
+            if ($validator->fails()) {
+                return $this->userProfileFailure($validator->errors());
+            }
+
+            $values = $fields->process()->values()
+                ->only(array_keys($values))
+                ->except(['email', 'password', 'groups', 'roles', 'super']);
+
+            if ($request->email) {
+                $user->email($request->email);
+            }
+            foreach ($values as $key => $value) {
+                $user->set($key, $value);
+            }
+
+            $user->save();
+
+            session()->flash('user.profile.success', __('Update successful.'));
+
+            return $this->userProfileSuccess();
+
+        } catch (ValidationException $e) {
+            return $this->userProfileFailure($e->validator->errors());
         }
-
-        $values = $fields->process()->values()
-            ->only(array_keys($values))
-            ->except(['email', 'password', 'groups', 'roles', 'super']);
-
-        if ($request->email) {
-            $user->email($request->email);
-        }
-        foreach ($values as $key => $value) {
-            $user->set($key, $value);
-        }
-
-        $user->save();
-
-        session()->flash('user.profile.success', __('Update successful.'));
-
-        return $this->userProfileSuccess();
     }
 
     public function password(Request $request)
