@@ -58,19 +58,19 @@ jobs:
           echo "Any modified?: ${{ steps.changed-files.outputs.any_modified }}"
 
       - name: Update apt sources
-        if: steps.changed-files.outputs.any_changed == 'true' && matrix.os == 'ubuntu-latest'
+        if: steps.changed-files.outputs.any_modified == 'true' && matrix.os == 'ubuntu-latest'
         run: |
           sudo gem install apt-spy2
           sudo apt-spy2 fix --commit --launchpad --country=US
           sudo apt-get update
 
       - name: Install French Locale
-        if: steps.changed-files.outputs.any_changed == 'true' && matrix.os == 'ubuntu-latest'
+        if: steps.changed-files.outputs.any_modified == 'true' && matrix.os == 'ubuntu-latest'
         run: sudo apt-get install language-pack-fr
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
-        if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed-files.outputs.any_modified == 'true'
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
@@ -78,7 +78,7 @@ jobs:
 
       - name: Install dependencies
         uses: nick-invision/retry@v2
-        if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed-files.outputs.any_modified == 'true'
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -87,11 +87,11 @@ jobs:
             composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: List Installed Dependencies
-        if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed-files.outputs.any_modified == 'true'
         run: composer show -D
 
       - name: Execute tests
-        if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed-files.outputs.any_modified == 'true'
         run: vendor/bin/phpunit
 
   js-tests:
