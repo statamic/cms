@@ -53,7 +53,7 @@ jobs:
 
       - name: List all modified files
         run: |
-          cat .github/outputs/modified_files.txt
+          cat .github/outputs/changed_files.txt && echo '\n' && cat .github/outputs/modified_files.txt
 
       - name: Update apt sources
         if: steps.changed-files.outputs.any_changed == 'true' && matrix.os == 'ubuntu-latest'
