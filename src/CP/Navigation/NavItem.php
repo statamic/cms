@@ -2,6 +2,7 @@
 
 namespace Statamic\CP\Navigation;
 
+use Illuminate\Support\Collection;
 use Statamic\Facades\CP\Nav;
 use Statamic\Statamic;
 use Statamic\Support\Html;
@@ -324,6 +325,16 @@ class NavItem
         $pattern = preg_quote(config('statamic.cp.route'), '#').'/'.$this->active;
 
         return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
+    }
+
+    /**
+     * Get whether the nav item has a currently active child.
+     *
+     * @return bool
+     */
+    public function hasActiveChild()
+    {
+        return $this->children() instanceof Collection && $this->children()->first(fn ($item) => $item->isActive()) !== null;
     }
 
     /**

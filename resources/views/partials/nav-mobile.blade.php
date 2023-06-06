@@ -13,7 +13,7 @@
                             <a href="{{ $item->url() }}">
                                 <i>{!! $item->icon() !!}</i><span>{{ __($item->name()) }}</span>
                             </a>
-                            @if ($item->children() && $item->isActive())
+                            @if ($item->children() && ($item->isActive() || $item->hasActiveChild()))
                                 <ul>
                                     @foreach ($item->children() as $child)
                                         <li class="{{ $child->isActive() ? 'current' : '' }}">
