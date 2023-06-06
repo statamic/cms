@@ -40,7 +40,6 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v36
         with:
-          write_output_files: true
           files: |
             config
             resources/users
@@ -55,6 +54,8 @@ jobs:
         run: |
           echo "List all the files that have changed: ${{ steps.changed-files.outputs.all_changed_files }}"
           echo "List all the files that have been modified: ${{ steps.changed-files.outputs.all_modified_files }}"
+          echo "Any changed?: ${{ steps.changed-files.outputs.any_changed }}"
+          echo "Any modified?: ${{ steps.changed-files.outputs.any_modified }}"
 
       - name: Update apt sources
         if: steps.changed-files.outputs.any_changed == 'true' && matrix.os == 'ubuntu-latest'
