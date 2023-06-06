@@ -53,8 +53,8 @@ jobs:
 
       - name: List all changed files
         run: |
-          echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"
-          echo "List all the files that have been modified: ${{ steps.changed-files-specific.outputs.all_modified_files }}"
+          echo "List all the files that have changed: ${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "List all the files that have been modified: ${{ steps.changed-files.outputs.all_modified_files }}"
 
       - name: Update apt sources
         if: steps.changed-files.outputs.any_changed == 'true' && matrix.os == 'ubuntu-latest'
