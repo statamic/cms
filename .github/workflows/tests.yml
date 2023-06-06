@@ -33,10 +33,6 @@ jobs:
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v36
-
       - name: Update apt sources
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -50,6 +46,10 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v1
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v36
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
