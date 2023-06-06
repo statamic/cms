@@ -50,6 +50,7 @@ jobs:
             tests
             composer.json
             phpunit.xml.dist
+            **.php
 
       - name: List all changed files
         run: |
