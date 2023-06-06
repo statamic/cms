@@ -55,7 +55,7 @@ jobs:
       - name: Determine whether tests should run
         id: should-run-tests
         if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
-        run: echo "::set-output name=result::true"
+        run: echo "result=true" >> $GITHUB_OUTPUT
 
       - name: Update apt sources
         if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
@@ -115,7 +115,7 @@ jobs:
       - name: Determine whether tests should run
         id: should-run-tests
         if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
-        run: echo "::set-output name=result::true"
+        run: echo "result=true" >> $GITHUB_OUTPUT
 
       - name: Install required npm version
         if: steps.should-run-tests.outputs.result == 'true'
