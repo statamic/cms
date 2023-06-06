@@ -33,6 +33,15 @@ jobs:
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v36
+        with:
+          json: 'true'
+
       - name: Update apt sources
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -43,15 +52,6 @@ jobs:
       - name: Install French Locale
         run: sudo apt-get install language-pack-fr
         if: matrix.os == 'ubuntu-latest'
-
-      - name: Checkout code
-        uses: actions/checkout@v1
-
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v36
-        with:
-          json: 'true'
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
