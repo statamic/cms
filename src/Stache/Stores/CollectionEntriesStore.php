@@ -20,7 +20,7 @@ class CollectionEntriesStore extends ChildStore
 {
     protected $collection;
 
-    protected function collection()
+    public function collection()
     {
         return $this->collection ?? Collection::findByHandle($this->childKey);
     }
@@ -157,6 +157,7 @@ class CollectionEntriesStore extends ChildStore
             'site' => Indexes\Site::class,
             'origin' => Indexes\Origin::class,
             'parent' => Indexes\Parents::class,
+            'status' => Indexes\Entries\Status::class,
         ]);
 
         if (! $collection = Collection::findByHandle($this->childKey())) {
