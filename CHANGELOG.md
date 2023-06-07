@@ -1,5 +1,19 @@
 # Release Notes
 
+## 4.6.0 (2023-06-07)
+
+### What's new
+- Added methods to reduce computed value callback calls. [#8248](https://github.com/statamic/cms/issues/8248) by @jacksleight
+- Added custom sort field methods to Collection [#8278](https://github.com/statamic/cms/issues/8278) by @jasonvarga
+
+### What's improved
+- French translations. [#8262](https://github.com/statamic/cms/issues/8262) by @ebeauchamps
+
+### What's fixed
+- Bump vite from 4.2.1 to 4.2.3 [#8268](https://github.com/statamic/cms/issues/8268) by @dependabot
+
+
+
 ## 4.5.0 (2023-06-02)
 
 ### What's new
