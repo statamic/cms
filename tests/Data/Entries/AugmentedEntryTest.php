@@ -195,4 +195,31 @@ class AugmentedEntryTest extends AugmentedTestCase
         $this->assertEveryItemIsInstanceOf(\Statamic\Contracts\Auth\User::class, $authors->get());
         $this->assertEquals(['user-1', 'user-2'], $authors->get()->map->id()->all());
     }
+
+    /** @test */
+    public function it_doesnt_evaluated_computed_callbacks_when_getting_keys()
+    {
+        $computedCallbackCount = 0;
+        Collection::computed('test', 'computed', function () use (&$computedCallbackCount) {
+            $computedCallbackCount++;
+
+            return 'computed value';
+        });
+
+        $entry = EntryFactory::id('entry-id')
+            ->collection('test')
+            ->slug('entry-slug')
+            ->data(['foo' => 'bar'])
+            ->create();
+
+        $augmented = new AugmentedEntry($entry);
+
+        $this->assertEquals(0, $computedCallbackCount);
+        $augmented->keys();
+        $this->assertEquals(0, $computedCallbackCount);
+        $augmented->get('computed');
+        $this->assertEquals(1, $computedCallbackCount);
+        $augmented->get('computed');
+        $this->assertEquals(2, $computedCallbackCount);
+    }
 }

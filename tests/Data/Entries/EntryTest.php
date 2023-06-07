@@ -481,6 +481,25 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_only_evaluates_computed_data_closures_when_getting_values()
+    {
+        $count = 0;
+        Facades\Collection::computed('articles', 'description', function ($entry) use (&$count) {
+            $count++;
+
+            return $entry->get('title').' AND MORE!';
+        });
+
+        $articleEntry = (new Entry)->collection(tap(Collection::make('articles'))->save())->data(['title' => 'Pop Rocks']);
+
+        $this->assertEquals(0, $count);
+        $this->assertEquals(['title', 'description'], $articleEntry->keys()->all());
+
+        $this->assertEquals(['title' => 'Pop Rocks', 'description' => 'Pop Rocks AND MORE!'], $articleEntry->values()->all());
+        $this->assertEquals(1, $count);
+    }
+
+    /** @test */
     public function it_gets_the_url_from_the_collection()
     {
         Facades\Site::setConfig(['default' => 'en', 'sites' => [
