@@ -12,13 +12,13 @@ trait HasOrigin
 
         $originKeys = $this->hasOrigin() ? $this->origin()->keys() : collect();
 
-        $computedFields = method_exists($this, 'computedFields') ? $this->computedFields() : [];
+        $computedKeys = method_exists($this, 'computedKeys') ? $this->computedKeys() : [];
 
         return collect()
             ->merge($originFallbackKeys)
             ->merge($originKeys)
             ->merge($this->data->keys())
-            ->merge($computedFields);
+            ->merge($computedKeys);
     }
 
     public function values()

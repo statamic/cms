@@ -6,7 +6,7 @@ trait ContainsComputedData
 {
     protected $withComputedData = true;
 
-    public function computedFields()
+    public function computedKeys()
     {
         if (! method_exists($this, 'getComputedCallbacks')) {
             return collect();
