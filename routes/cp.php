@@ -52,6 +52,7 @@ use Statamic\Http\Controllers\CP\Forms\FormExportController;
 use Statamic\Http\Controllers\CP\Forms\FormsController;
 use Statamic\Http\Controllers\CP\Forms\FormSubmissionsController;
 use Statamic\Http\Controllers\CP\Forms\SubmissionActionController;
+use Statamic\Http\Controllers\CP\Forms\ActionController as FormActionController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsBlueprintController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsController;
 use Statamic\Http\Controllers\CP\Globals\GlobalVariablesController;
@@ -250,8 +251,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('addons', [AddonsController::class, 'index'])->name('addons.index');
     Route::post('addons/editions', AddonEditionsController::class);
 
-    Route::post('forms/actions', [ActionController::class, 'run'])->name('forms.actions.run');
-    Route::post('forms/actions/list', [ActionController::class, 'bulkActions'])->name('forms.actions.bulk');
+    Route::post('forms/actions', [FormActionController::class, 'run'])->name('forms.actions.run');
+    Route::post('forms/actions/list', [FormActionController::class, 'bulkActions'])->name('forms.actions.bulk');
     Route::post('forms/{form}/submissions/actions', [SubmissionActionController::class, 'run'])->name('forms.submissions.actions.run');
     Route::post('forms/{form}/submissions/actions/list', [SubmissionActionController::class, 'bulkActions'])->name('forms.submissions.actions.bulk');
     Route::resource('forms', FormsController::class);
