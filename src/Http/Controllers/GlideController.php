@@ -85,18 +85,14 @@ class GlideController extends Controller
      * Generate a manipulated image by an asset reference.
      *
      * @param  string  $ref
+     * @param  string  $path 
      * @return mixed
      *
      * @throws \Exception
      */
-    public function generateByAsset($encoded)
+    public function generateByAsset($container, $path)
     {
         $this->validateSignature();
-
-        $decoded = base64_decode($encoded);
-
-        // The string before the first slash is the container
-        [$container, $path] = explode('/', $decoded, 2);
 
         throw_unless($container = AssetContainer::find($container), new NotFoundHttpException);
 
