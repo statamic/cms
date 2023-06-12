@@ -5,12 +5,13 @@ namespace Statamic\Http\Controllers\CP\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Middleware\CP\CanManageBlueprints;
 
 class FieldsController extends CpController
 {
     public function __construct()
     {
-        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
+        $this->middleware(CanManageBlueprints::class);
     }
 
     public function index(Request $request)

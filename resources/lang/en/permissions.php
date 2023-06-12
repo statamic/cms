@@ -64,6 +64,8 @@ return [
     'group_forms' => 'Forms',
     'configure_forms' => 'Configure forms',
     'configure_forms_desc' => 'Grants access to all form related permissions',
+    'configure_form_fields' => 'Configure Form Fields',
+    'configure_form_fields_desc' => 'Ability to edit form blueprints, fieldsets, and their fields.',
     'view_{form}_form_submissions' => 'View :form submissions',
     'delete_{form}_form_submissions' => 'Delete :form submissions',
 
