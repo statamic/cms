@@ -146,6 +146,13 @@ class FieldsController extends CpController
                 'default' => 'visible',
                 'type' => 'select',
             ],
+            'replicator_preview' => [
+                'display' => __('Preview'),
+                'instructions' => __('statamic::messages.fields_replicator_preview_instructions'),
+                'type' => 'toggle',
+                'validate' => 'boolean',
+                'default' => true,
+            ],
             'duplicate' => [
                 'display' => __('Duplicate'),
                 'instructions' => __('statamic::messages.fields_duplicate_instructions'),
