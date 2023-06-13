@@ -158,7 +158,7 @@ class FileCacher extends AbstractCacher
     /**
      * Get the path to the cached file.
      *
-     * @param $url
+     * @param  $url
      * @return string
      */
     public function getFilePath($url, $site = null)
