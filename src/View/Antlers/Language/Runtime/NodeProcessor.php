@@ -1575,6 +1575,7 @@ class NodeProcessor
                         } finally {
                             GlobalRuntimeState::$requiresRuntimeIsolation = $currentIsolationState;
                             GlobalRuntimeState::$evaulatingTagContents = false;
+                            $this->stopMeasuringTag();
                         }
 
                         $afterAssignments = $this->runtimeAssignments;
@@ -1620,6 +1621,8 @@ class NodeProcessor
                             // If the current processor instance is a conditional processor, we
                             // will simply return whether the section has been registered.
                             if ($this->isConditionalProcessor) {
+                                $this->stopMeasuringTag();
+
                                 return LiteralReplacementManager::hasRegisteredSectionName($tagMethod);
                             }
 
