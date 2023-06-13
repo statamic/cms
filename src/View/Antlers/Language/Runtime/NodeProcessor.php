@@ -410,7 +410,7 @@ class NodeProcessor
         }
 
         if ($node->startPosition != null) {
-            $suffix .= ' Line: '. $node->startPosition->line;
+            $suffix .= ' Line: '.$node->startPosition->line;
         }
 
         $suffix = trim($suffix);
