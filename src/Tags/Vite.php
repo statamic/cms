@@ -20,9 +20,15 @@ class Vite extends Tags
         $directory = $this->params->get('directory', 'build');
         $hot = $this->params->get('hot');
 
+        $extraParams = $this->params->filter(function ($value, $key) {
+            return ! in_array($key, ['src', 'directory', 'hot']);
+        })->all();
+
         return app(LaravelVite::class)
             ->withEntryPoints($src)
             ->useBuildDirectory($directory)
+            ->useStyleTagAttributes($extraParams)
+            ->useScriptTagAttributes($extraParams)
             ->useHotFile($hot ? base_path($hot) : null)
             ->toHtml();
     }
