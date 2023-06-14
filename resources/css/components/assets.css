@@ -98,7 +98,7 @@
     .asset-thumb {
         @apply flex justify-center items-center;
         > img, > svg, > .svg-img {
-            @apply max-h-full max-w-full absolute;
+            @apply w-full h-full max-h-full max-w-full;
         }
     }
 
