@@ -2,6 +2,7 @@
 
 namespace Tests\Fakes\Composer\Package;
 
+use Illuminate\Support\Facades\File;
 use Statamic\Facades\Path;
 
 class PackToTheFuture

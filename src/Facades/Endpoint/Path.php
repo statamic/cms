@@ -75,7 +75,7 @@ class Path
      * exist, PHP's realpath() won't work. Flysystem already has
      * a way to do this. Nice one. flysystem++
      *
-     * @param  $path
+     * @param $path
      * @return string
      */
     public function resolve($path)
@@ -137,7 +137,7 @@ class Path
     /**
      * Get the status of a $path.
      *
-     * @param  $path
+     * @param $path
      * @return string
      */
     public function status($path)
