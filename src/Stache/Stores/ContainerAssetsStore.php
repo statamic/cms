@@ -19,7 +19,7 @@ class ContainerAssetsStore extends ChildStore
     public function handleFileChanges()
     {
         // We only want to act on any file changes one time per store.
-        if ($this->fileChangesHandled) {
+        if ($this->fileChangesHandled && ! $this->forceHandleChanges) {
             return;
         }
 

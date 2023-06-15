@@ -27,6 +27,7 @@ abstract class Store
     protected $shouldCacheFileItems = false;
     protected $modified;
     protected $keys;
+    protected $forceHandleChanges = false;
 
     public function directory($directory = null)
     {
@@ -162,7 +163,7 @@ abstract class Store
         $this->modified = collect();
 
         // We only want to act on any file changes one time per store.
-        if ($this->fileChangesHandled) {
+        if ($this->fileChangesHandled && ! $this->forceHandleChanges) {
             return;
         }
 
@@ -171,7 +172,7 @@ abstract class Store
         // This whole process can be disabled to save overhead, at the expense of needing to update
         // the cache manually. If the Control Panel is being used, or the cache is cleared when
         // deployed, for example, this will happen naturally and disabling is a good idea.
-        if (! config('statamic.stache.watcher')) {
+        if (! config('statamic.stache.watcher') && ! $this->forceHandleChanges) {
             return;
         }
 
@@ -263,6 +264,15 @@ abstract class Store
         });
 
         $this->modified = $modified;
+    }
+
+    public function handleFileChangesForcefully()
+    {
+        $this->forceHandleChanges = true;
+
+        $this->handleFileChanges();
+
+        $this->forceHandleChanges = false;
     }
 
     protected function handleModifiedItem($item)
@@ -390,6 +400,8 @@ abstract class Store
     public function warm()
     {
         $this->shouldCacheFileItems = true;
+
+        $this->handleFileChangesForcefully();
 
         $this->resolveIndexes()->each->update();
 
