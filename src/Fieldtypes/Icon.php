@@ -55,12 +55,6 @@ class Icon extends Fieldtype
 
     public function augment($value)
     {
-        // If a directory has not been configured, it's a Statamic Control Panel icon.
-        // We don't want to allow them on the front-end due to licensing restrictions.
-        if (! $this->config('directory')) {
-            return $value;
-        }
-
         [$path] = $this->resolveParts();
 
         return File::get($path.'/'.$value.'.svg');
