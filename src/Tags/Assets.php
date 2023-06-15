@@ -25,8 +25,8 @@ class Assets extends Tags
      *   {{ url }}, etc
      * {{ /asset:[variable] }}
      *
-     * @param $method
-     * @param $arguments
+     * @param  $method
+     * @param  $arguments
      * @return string
      */
     public function __call($method, $arguments)
@@ -126,7 +126,7 @@ class Assets extends Tags
     }
 
     /**
-     * @param $value
+     * @param  $value
      * @return \Illuminate\Support\Collection|mixed|null
      */
     protected function filterByType($value)

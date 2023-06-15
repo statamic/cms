@@ -37,7 +37,7 @@ class UrlBuilder implements UrlBuilderContract
     }
 
     /**
-     * @param $route
+     * @param  $route
      * @return string
      *
      * @throws \Statamic\Exceptions\InvalidEntryTypeException

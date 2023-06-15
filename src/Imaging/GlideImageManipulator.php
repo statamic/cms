@@ -181,7 +181,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param $value
+     * @param  $value
      * @return $this
      */
     public function width($value)
