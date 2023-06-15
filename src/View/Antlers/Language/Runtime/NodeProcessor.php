@@ -2020,7 +2020,7 @@ class NodeProcessor
                                         }
                                     }
 
-                                    if ($val instanceof  Value) {
+                                    if ($val instanceof Value) {
                                         if ($val->shouldParseAntlers()) {
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
                                             GlobalRuntimeState::$isEvaluatingData = true;

@@ -213,6 +213,7 @@ class DocumentParser
                 $this->nodes[] = $escapeNode;
                 $this->currentContent = [];
                 $this->currentIndex += 1;
+
                 continue;
             }
 
@@ -344,6 +345,7 @@ class DocumentParser
             if (Str::startsWith($antlersRegion, '@')) {
                 $lastAntlersOffset = mb_strpos($this->content, $antlersRegion, $lastAntlersOffset) + 2;
                 $lastWasEscaped = true;
+
                 continue;
             }
 
@@ -352,6 +354,7 @@ class DocumentParser
             if ($lastWasEscaped) {
                 if ($lastAntlersOffset == $offset) {
                     $lastAntlersOffset = $offset;
+
                     continue;
                 }
             }
@@ -431,6 +434,7 @@ class DocumentParser
                 if ($this->jumpToIndex != null) {
                     $i = $this->jumpToIndex - 1;
                     $this->jumpToIndex = null;
+
                     continue;
                 }
 
@@ -497,6 +501,7 @@ class DocumentParser
                                 }
 
                                 $i = $skipIndex - 1;
+
                                 continue;
                             }
                         }
@@ -840,6 +845,7 @@ class DocumentParser
             if ($this->cur == self::LeftBrace) {
                 if ($this->prev == self::AtChar) {
                     $subContent[] = $this->cur;
+
                     continue;
                 }
 
@@ -848,6 +854,7 @@ class DocumentParser
             } elseif ($this->cur == self::RightBrace) {
                 if ($this->prev == self::AtChar) {
                     $subContent[] = $this->cur;
+
                     continue;
                 }
 
@@ -971,18 +978,21 @@ class DocumentParser
             if ($this->cur == self::LeftBrace && $this->prev == self::AtChar) {
                 array_pop($this->currentContent);
                 $this->currentContent = array_merge($this->currentContent, $this->getLeftBrace());
+
                 continue;
             }
 
             if ($this->isInterpolatedParser && $this->cur == self::RightBrace && $this->prev == self::AtChar) {
                 array_pop($this->currentContent);
                 $this->currentContent[] = $this->cur;
+
                 continue;
             }
 
             if ($this->cur == self::RightBrace && $this->prev == self::AtChar) {
                 array_pop($this->currentContent);
                 $this->currentContent = array_merge($this->currentContent, $this->getRightBrace());
+
                 continue;
             }
 
@@ -992,6 +1002,7 @@ class DocumentParser
 
                 $this->currentContent = array_merge($this->currentContent, StringUtilities::split($results[2]));
                 $this->interpolationRegions[$results[1]] = $results[3];
+
                 continue;
             }
 
@@ -1168,8 +1179,6 @@ class DocumentParser
     }
 
     /**
-     * @param $offset
-     * @param $index
      * @param  false  $isRelativeOffset
      * @return Position
      */

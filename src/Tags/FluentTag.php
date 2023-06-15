@@ -35,8 +35,6 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
 
     /**
      * Instantiate fluent tag helper.
-     *
-     * @param  Loader  $loader
      */
     public function __construct(Loader $loader)
     {

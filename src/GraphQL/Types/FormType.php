@@ -39,12 +39,12 @@ class FormType extends \Rebing\GraphQL\Support\Type
                 },
             ],
         ])
-        ->map(function (array $arr) {
-            $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
+            ->map(function (array $arr) {
+                $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
 
-            return $arr;
-        })
-        ->all();
+                return $arr;
+            })
+            ->all();
     }
 
     private function resolver()

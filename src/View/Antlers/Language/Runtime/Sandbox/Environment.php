@@ -517,6 +517,7 @@ class Environment
                 }
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof StringConcatenationOperator) {
                 $left = array_pop($stack);
@@ -540,6 +541,7 @@ class Environment
                 }
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof FactorialOperator) {
                 $left = array_pop($stack);
@@ -567,6 +569,7 @@ class Environment
 
                 $stack[] = ($leftValue / $rightValue);
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof ExponentiationOperator) {
                 $left = array_pop($stack);
@@ -580,6 +583,7 @@ class Environment
 
                 $stack[] = pow($leftValue, $rightValue);
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof ModulusOperator) {
                 $left = array_pop($stack);
@@ -594,6 +598,7 @@ class Environment
                 $stack[] = ($leftValue % $rightValue);
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof MultiplicationOperator) {
                 $left = array_pop($stack);
@@ -607,6 +612,7 @@ class Environment
 
                 $stack[] = ($leftValue * $rightValue);
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof SubtractionOperator) {
                 $left = array_pop($stack);
@@ -620,6 +626,7 @@ class Environment
 
                 $stack[] = ($leftValue - $rightValue);
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof EqualCompOperator) {
                 $left = array_pop($stack);
@@ -647,6 +654,7 @@ class Environment
                 $stack[] = $left == $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof GreaterThanCompOperator) {
                 $left = array_pop($stack);
@@ -661,6 +669,7 @@ class Environment
                 $stack[] = $left > $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof GreaterThanEqualCompOperator) {
                 $left = array_pop($stack);
@@ -675,6 +684,7 @@ class Environment
                 $stack[] = $left >= $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LessThanCompOperator) {
                 $left = array_pop($stack);
@@ -689,6 +699,7 @@ class Environment
                 $stack[] = $left < $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LessThanEqualCompOperator) {
                 $left = array_pop($stack);
@@ -703,6 +714,7 @@ class Environment
                 $stack[] = $left <= $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof NotEqualCompOperator) {
                 $left = array_pop($stack);
@@ -717,6 +729,7 @@ class Environment
                 $stack[] = $left != $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof NotStrictEqualCompOperator) {
                 $left = array_pop($stack);
@@ -731,6 +744,7 @@ class Environment
                 $stack[] = $left !== $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof SpaceshipCompOperator) {
                 $left = array_pop($stack);
@@ -745,6 +759,7 @@ class Environment
                 $stack[] = $left <=> $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof StrictEqualCompOperator) {
                 $left = array_pop($stack);
@@ -759,6 +774,7 @@ class Environment
                 $stack[] = $left === $right;
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LogicalOrOperator) {
                 $left = $this->getValue(array_pop($stack));
@@ -778,6 +794,7 @@ class Environment
                 }
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LogicalAndOperator) {
                 $left = $this->getValue(array_pop($stack));
@@ -785,6 +802,7 @@ class Environment
 
                 $stack[] = ($this->getComparisonValue($left) && $this->getComparisonValue($right));
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LogicalXorOperator) {
                 $left = $this->getValue(array_pop($stack));
@@ -793,12 +811,15 @@ class Environment
                 $stack[] = ($this->getComparisonValue($left) xor $this->getComparisonValue($right));
 
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LogicGroup) {
                 $stack[] = $currentNode;
+
                 continue;
             } elseif ($currentNode instanceof NullCoalescenceGroup) {
                 $stack[] = $this->adjustValue($this->evaluateNullCoalescence($currentNode), $currentNode);
+
                 continue;
             } elseif ($currentNode instanceof TernaryCondition) {
                 $stack[] = $this->adjustValue($this->evaluateTernaryGroup($currentNode), $currentNode);
@@ -811,6 +832,7 @@ class Environment
 
                 // Need to skip over the value node.
                 $i += 1;
+
                 continue;
             } elseif ($currentNode instanceof LanguageOperatorConstruct) {
                 if (! array_key_exists($currentNode->content, LanguageOperatorRegistry::$operators)) {
@@ -863,18 +885,21 @@ class Environment
                 }
 
                 $i += 3;
+
                 continue;
             } elseif ($currentNode instanceof MethodInvocationNode) {
                 $leftNode = array_pop($stack);
 
                 if ($leftNode == null) {
                     $stack[] = null;
+
                     continue;
                 }
                 $leftVal = $this->getValue($leftNode);
 
                 if ($leftVal == null) {
                     $stack[] = null;
+
                     continue;
                 }
 
@@ -903,6 +928,7 @@ class Environment
                         $exception->getMessage()
                     );
                 }
+
                 continue;
             }
 
@@ -1118,7 +1144,6 @@ class Environment
     /**
      * Evaluates the provided null coalescence group.
      *
-     * @param  NullCoalescenceGroup  $group  The group.
      * @return mixed|DirectionGroup|ListValueNode|string
      *
      * @throws RuntimeException

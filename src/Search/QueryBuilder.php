@@ -67,8 +67,8 @@ abstract class QueryBuilder extends BaseQueryBuilder
                         ->setScore($raw['search_score'] ?? null);
                 });
         })
-        ->sortByDesc->getScore()
-        ->values();
+            ->sortByDesc->getScore()
+            ->values();
     }
 
     protected function collect($items = [])

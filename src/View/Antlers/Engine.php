@@ -48,9 +48,6 @@ class Engine implements EngineInterface
 
     /**
      * Create a new AntlersEngine instance.
-     *
-     * @param  Filesystem  $filesystem
-     * @param  Parser  $parser
      */
     public function __construct(Filesystem $filesystem, Parser $parser)
     {
@@ -74,7 +71,6 @@ class Engine implements EngineInterface
      * Get the evaluated contents of the view.
      *
      * @param  string  $path
-     * @param  array  $data
      * @return string
      */
     public function get($path, array $data = [])

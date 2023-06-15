@@ -834,7 +834,6 @@ INFO;
      * array or object.
      *
      * @param  string  $key  Dot-notated key to find
-     * @param $context
      * @param  mixed  $default  Default value to use if not found
      * @return mixed
      *
@@ -886,7 +885,6 @@ INFO;
     /**
      * Sets a render callback.
      *
-     * @param $callback
      * @return Parser
      */
     public function callback($callback)

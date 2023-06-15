@@ -54,7 +54,7 @@ class ModifierManager
                 );
             }
 
-            return  false;
+            return false;
         }
 
         return true;

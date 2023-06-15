@@ -21,7 +21,6 @@ abstract class AbstractMetric implements Metric
     /**
      * Create a new Metric.
      *
-     * @param  Form  $form
      * @param  array  $config
      */
     public function __construct(Form $form, $config = [])

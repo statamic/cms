@@ -261,6 +261,7 @@ class Parser implements ParserContract
                 // conflict with local scope variables in the next step.
                 // Also, treat it like a callback if it's a query builder so it can be sent through the query tag.
                 $text = $this->createExtraction('callback_blocks', $match[0][0], $match[0][0], $text);
+
                 continue;
             }
 
@@ -757,7 +758,7 @@ class Parser implements ParserContract
                     // Slide it on back into the template
                     $text = str_replace($match[0], $output, $text);
 
-                // Regular old ternary
+                    // Regular old ternary
                 } else {
                     // Split the tag up
                     $bits = explode('? ', $match[1]);
@@ -1432,10 +1433,6 @@ class Parser implements ParserContract
     /**
      * Manipulate data with the use of Modifiers.
      *
-     * @param $modifier
-     * @param $data
-     * @param $parameters
-     * @param $context
      * @return mixed
      */
     protected function runModifier($modifier, $data, $parameters, $context = [])

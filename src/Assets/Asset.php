@@ -702,7 +702,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     /**
      * Replace an asset and/or its references where necessary.
      *
-     * @param  Asset  $originalAsset
      * @param  bool  $deleteOriginal
      * @return $this
      */
@@ -793,8 +792,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
     /**
      * Get the asset's ratio.
-     *
-     * @return
      */
     public function ratio()
     {
@@ -835,7 +832,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     /**
      * Upload a file.
      *
-     * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
      * @return $this
      */
     public function upload(UploadedFile $file)
