@@ -757,7 +757,7 @@ class Parser implements ParserContract
                     // Slide it on back into the template
                     $text = str_replace($match[0], $output, $text);
 
-                    // Regular old ternary
+                // Regular old ternary
                 } else {
                     // Split the tag up
                     $bits = explode('? ', $match[1]);
@@ -1432,10 +1432,10 @@ class Parser implements ParserContract
     /**
      * Manipulate data with the use of Modifiers.
      *
-     * @param  $modifier
-     * @param  $data
-     * @param  $parameters
-     * @param  $context
+     * @param $modifier
+     * @param $data
+     * @param $parameters
+     * @param $context
      * @return mixed
      */
     protected function runModifier($modifier, $data, $parameters, $context = [])

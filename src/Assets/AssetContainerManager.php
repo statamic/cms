@@ -43,8 +43,8 @@ class AssetContainerManager
      * Since a directory cannot reliably be detected as a URL, a
      * temporary file will be written, and we'll check for that directly.
      *
-     * @param  $url
-     * @param  $path
+     * @param $url
+     * @param $path
      * @return bool
      */
     public function urlExists($url, $path)

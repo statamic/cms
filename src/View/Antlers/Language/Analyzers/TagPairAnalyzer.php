@@ -188,7 +188,7 @@ class TagPairAnalyzer
     /**
      * @param  AbstractNode[]  $nodes
      * @param  AntlersNode  $node
-     * @param  $scanFor
+     * @param $scanFor
      */
     private function findClosingPair($nodes, $node, $scanFor)
     {
@@ -247,8 +247,8 @@ class TagPairAnalyzer
     }
 
     /**
-     * @param  $documentNodes
-     * @param  $document
+     * @param $documentNodes
+     * @param $document
      * @return array
      *
      * @throws SyntaxErrorException

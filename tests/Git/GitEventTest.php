@@ -4,6 +4,7 @@ namespace Tests\Git;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Statamic\Assets\Asset;
