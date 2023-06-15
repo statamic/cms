@@ -1,5 +1,4 @@
 <?php
-
 namespace Statamic\Assets;
 
 use Illuminate\Filesystem\FilesystemManager;
