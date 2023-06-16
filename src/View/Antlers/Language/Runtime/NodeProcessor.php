@@ -211,6 +211,13 @@ class NodeProcessor
 
     private $doStackIntercept = true;
 
+    /**
+     * The current tag name being profiled.
+     *
+     * @var string|null
+     */
+    private $profilingTagName = null;
+
     public function __construct(Loader $loader, EnvironmentDetails $envDetails)
     {
         $this->loader = $loader;
@@ -382,6 +389,50 @@ class NodeProcessor
         $this->doStackIntercept = $doIntercept;
 
         return $this;
+    }
+
+    private function startMeasuringTag($tagName, AntlersNode $node)
+    {
+        $file = '';
+
+        if (count(GlobalRuntimeState::$templateFileStack) > 0) {
+            $file = GlobalRuntimeState::$templateFileStack[count(GlobalRuntimeState::$templateFileStack) - 1][0];
+        }
+
+        $suffix = '';
+
+        if ($file != '') {
+            $suffix = str_replace('//', '/', mb_substr($file, strlen(base_path())));
+
+            if (Str::startsWith($suffix, '/')) {
+                $suffix = mb_substr($suffix, 1);
+            }
+        }
+
+        if ($node->startPosition != null) {
+            $suffix .= ' Line: '.$node->startPosition->line;
+        }
+
+        $suffix = trim($suffix);
+
+        $report = 'Tag: '.$tagName;
+
+        if (mb_strlen($suffix) > 0) {
+            $report .= ' ['.$suffix.']';
+        }
+
+        $this->profilingTagName = 'tag_'.$tagName.microtime();
+        debugbar()->startMeasure($this->profilingTagName, $report);
+    }
+
+    private function stopMeasuringTag()
+    {
+        if ($this->profilingTagName == null) {
+            return;
+        }
+
+        debugbar()->stopMeasure($this->profilingTagName);
+        $this->profilingTagName = null;
     }
 
     /**
@@ -1117,6 +1168,11 @@ class NodeProcessor
             $nodeCount = count($nodes);
 
             for ($i = $startIndex; $i < $nodeCount; $i += 1) {
+                // Stop measuring any active tag at this point.
+                // We will do it here instead of tracking
+                // down every possible exit point below.
+                $this->stopMeasuringTag();
+
                 $node = $nodes[$i];
 
                 $this->activeNode = $node;
@@ -1388,9 +1444,15 @@ class NodeProcessor
                     $shouldProcessAsTag = $this->shouldProcessAsTag($node);
                     $this->data = $lockData;
 
+                    if (! $shouldProcessAsTag) {
+                        $this->profilingTagName = null;
+                    }
+
                     if ($shouldProcessAsTag) {
                         $tagName = $node->name->getCompoundTagName();
                         $tagMethod = $node->name->getMethodName();
+
+                        $this->startMeasuringTag($tagName, $node);
 
                         if (! empty($node->processedInterpolationRegions)) {
                             foreach ($node->processedInterpolationRegions as $region => $regionNodes) {
@@ -1513,6 +1575,7 @@ class NodeProcessor
                         } finally {
                             GlobalRuntimeState::$requiresRuntimeIsolation = $currentIsolationState;
                             GlobalRuntimeState::$evaulatingTagContents = false;
+                            $this->stopMeasuringTag();
                         }
 
                         $afterAssignments = $this->runtimeAssignments;
@@ -1558,6 +1621,8 @@ class NodeProcessor
                             // If the current processor instance is a conditional processor, we
                             // will simply return whether the section has been registered.
                             if ($this->isConditionalProcessor) {
+                                $this->stopMeasuringTag();
+
                                 return LiteralReplacementManager::hasRegisteredSectionName($tagMethod);
                             }
 
@@ -2268,6 +2333,10 @@ class NodeProcessor
                 }
             }
         }
+
+        // If we finished processing the stack, just call this
+        // one last time to make sure we didn't miss anything.
+        $this->stopMeasuringTag();
 
         if ($this->allowPhp) {
             $buffer = $this->evaluatePhp($buffer);
