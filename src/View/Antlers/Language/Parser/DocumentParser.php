@@ -1168,8 +1168,8 @@ class DocumentParser
     }
 
     /**
-     * @param  $offset
-     * @param  $index
+     * @param $offset
+     * @param $index
      * @param  false  $isRelativeOffset
      * @return Position
      */

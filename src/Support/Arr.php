@@ -73,7 +73,7 @@ class Arr
     /**
      * Checks if an array is associative.
      *
-     * @param  $array
+     * @param $array
      * @return bool
      */
     public static function assoc($array)

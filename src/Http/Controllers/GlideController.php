@@ -108,8 +108,8 @@ class GlideController extends Controller
     /**
      * Generate an image.
      *
-     * @param  $type
-     * @param  $item
+     * @param $type
+     * @param $item
      * @return mixed
      */
     private function generateBy($type, $item)

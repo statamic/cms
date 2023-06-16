@@ -66,7 +66,7 @@ class Html
     /**
      * Transform the string to an Html serializable object.
      *
-     * @param  $html
+     * @param $html
      * @return \Illuminate\Support\HtmlString
      */
     protected static function toHtmlString($html)
