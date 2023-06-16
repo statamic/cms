@@ -352,7 +352,7 @@ class UserGroupTest extends TestCase
     {
         $blueprint = Facades\UserGroup::blueprint();
         $contents = $blueprint->contents();
-        $contents['sections']['main']['fields'] = array_merge($contents['sections']['main']['fields'], [
+        $contents['tabs']['main']['sections'][0]['fields'] = array_merge($contents['tabs']['main']['sections'][0]['fields'], [
             ['handle' => 'two', 'field' => ['type' => 'text']],
             ['handle' => 'four', 'field' => ['type' => 'text']],
             ['handle' => 'unused_in_bp', 'field' => ['type' => 'text']],
