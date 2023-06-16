@@ -2,9 +2,9 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
-use Facades\Statamic\View\Cascade;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Cascade;
 use Statamic\Facades\Data;
 
 class Session

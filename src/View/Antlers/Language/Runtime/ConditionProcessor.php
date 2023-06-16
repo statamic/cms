@@ -31,10 +31,20 @@ class ConditionProcessor
 
     public function process(ConditionNode $node, $data)
     {
+        $condValueToRestore = $this->processor->getIsConditionProcessor();
+
         foreach ($node->logicBranches as $branch) {
             if ($branch->head->name->name == 'else') {
+                $this->processor->setIsConditionProcessor($condValueToRestore);
+
                 return $branch;
             } else {
+                // Let the processor know that it is being used
+                // to help process a condition. Some tags are
+                // handled internally by the processor, and
+                // they may want to change their behavior.
+                $this->processor->setIsConditionProcessor(true);
+
                 $parser = new LanguageParser();
                 $environment = new Environment();
                 $environment->setProcessor($this->processor);
@@ -68,10 +78,14 @@ class ConditionProcessor
                 $result = $environment->evaluateBool(self::$branchCache[$branch->head->content]);
 
                 if ($result === true) {
+                    $this->processor->setIsConditionProcessor($condValueToRestore);
+
                     return $branch;
                 }
             }
         }
+
+        $this->processor->setIsConditionProcessor($condValueToRestore);
 
         return null;
     }

@@ -23,7 +23,6 @@ class Fieldtype extends Relationship
                 'display' => __('Placeholder'),
                 'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
                 'type' => 'text',
-                'width' => 50,
             ],
             'max_items' => [
                 'type' => 'integer',
@@ -31,7 +30,6 @@ class Fieldtype extends Relationship
                 'default' => 1,
                 'instructions' => __('statamic::fieldtypes.form.config.max_items'),
                 'min' => 1,
-                'width' => 50,
             ],
         ];
     }

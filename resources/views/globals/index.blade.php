@@ -5,7 +5,7 @@
 
     @unless($globals->isEmpty())
 
-        <div class="flex items-center mb-3">
+        <div class="flex items-center mb-6">
             <h1 class="flex-1">{{ __('Globals') }}</h1>
             @can('create', 'Statamic\Contracts\Globals\GlobalSet')
                 <a href="{{ cp_route('globals.create') }}" class="btn-primary">{{ __('Create Global Set') }}</a>
@@ -19,7 +19,7 @@
         @include('statamic::partials.empty-state', [
             'title' => __('Globals'),
             'description' => __('statamic::messages.global_set_config_intro'),
-            'svg' => 'empty/content',
+            'svg' => 'empty/globals',
             'button_url' => cp_route('globals.create'),
             'button_text' => __('Create Global Set'),
             'can' => $user->can('create', 'Statamic\Contracts\Globals\GlobalSet')

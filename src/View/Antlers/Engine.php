@@ -2,13 +2,13 @@
 
 namespace Statamic\View\Antlers;
 
-use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\View\Engine as EngineInterface;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Exceptions;
+use Statamic\Facades\Cascade;
 use Statamic\Facades\Compare;
 use Statamic\Facades\Parse;
 use Statamic\Fields\Value;

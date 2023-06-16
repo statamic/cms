@@ -14,12 +14,14 @@ use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Terms;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
+use Tests\Fieldtypes\Concerns\TestsQueryableValueWithMaxItems;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TermsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use TestsQueryableValueWithMaxItems;
 
     public function setUp(): void
     {

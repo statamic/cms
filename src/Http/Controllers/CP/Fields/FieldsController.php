@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
+use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
 
 class FieldsController extends CpController
@@ -27,7 +28,9 @@ class FieldsController extends CpController
 
         $fieldtype = FieldtypeRepository::find($request->type);
 
-        $blueprint = $this->blueprint($fieldtype->configBlueprint());
+        $blueprint = $this
+            ->blueprint($fieldtype->configBlueprint())
+            ->ensureField('hide_display', ['type' => 'toggle', 'visibility' => 'hidden']);
 
         $fields = $blueprint
             ->fields()
@@ -83,25 +86,25 @@ class FieldsController extends CpController
             'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
         ];
 
-        $prepends = collect([
+        $fields = collect([
             'display' => [
-                'display' => __('Display'),
+                'display' => __('Display Label'),
                 'instructions' => __('statamic::messages.fields_display_instructions'),
-                'type' => 'text',
-                'width' => 50,
-                'autoselect' => true,
+                'type' => 'field_display',
             ],
             'handle' => [
                 'display' => __('Handle'),
                 'instructions' => __('statamic::messages.fields_handle_instructions'),
-                'type' => 'text',
+                'type' => 'slug',
+                'from' => 'display',
+                'separator' => '_',
                 'validate' => 'required|not_in:'.implode(',', $reserved),
-                'width' => 50,
+                'show_regenerate' => true,
             ],
             'instructions' => [
                 'display' => __('Instructions'),
                 'instructions' => __('statamic::messages.fields_instructions_instructions'),
-                'type' => 'text',
+                'type' => 'textarea',
             ],
             'instructions_position' => [
                 'display' => __('Instructions Position'),
@@ -112,7 +115,9 @@ class FieldsController extends CpController
                     'below' => __('Below'),
                 ],
                 'default' => 'above',
-                'width' => 33,
+                'if' => [
+                    'instructions' => 'not null',
+                ],
             ],
             'listable' => [
                 'display' => __('Listable'),
@@ -125,7 +130,6 @@ class FieldsController extends CpController
                     'false' => __('Not listable'),
                 ],
                 'default' => 'hidden',
-                'width' => 33,
                 'unless' => [
                     'type' => 'section',
                 ],
@@ -141,22 +145,28 @@ class FieldsController extends CpController
                 ],
                 'default' => 'visible',
                 'type' => 'select',
-                'width' => 33,
             ],
             'duplicate' => [
                 'display' => __('Duplicate'),
                 'instructions' => __('statamic::messages.fields_duplicate_instructions'),
                 'type' => 'toggle',
                 'validate' => 'boolean',
-                'width' => 50,
                 'default' => true,
             ],
+        ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
+
+        return Blueprint::make()->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => array_merge(
+                        [[
+                            'fields' => $fields,
+                            'display' => __('Common'),
+                        ]],
+                        $blueprint->contents()['tabs']['main']['sections'],
+                    ),
+                ],
+            ],
         ]);
-
-        foreach ($prepends->reverse() as $handle => $prepend) {
-            $blueprint->ensureFieldPrepended($handle, $prepend);
-        }
-
-        return $blueprint;
     }
 }
