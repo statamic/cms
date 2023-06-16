@@ -14,6 +14,9 @@ use Tests\TestCase;
 
 class GlobalsStoreTest extends TestCase
 {
+    private $tempDir;
+    private $store;
+
     public function setUp(): void
     {
         parent::setUp();

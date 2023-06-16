@@ -19,18 +19,23 @@ class Link extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'collections' => [
-                'display' => __('Collections'),
-                'instructions' => __('statamic::fieldtypes.link.config.collections'),
-                'type' => 'collections',
-                'mode' => 'select',
-            ],
-            'container' => [
-                'display' => __('Container'),
-                'instructions' => __('statamic::fieldtypes.link.config.container'),
-                'type' => 'asset_container',
-                'mode' => 'select',
-                'max_items' => 1,
+            [
+                'display' => __('Behavior'),
+                'fields' => [
+                    'collections' => [
+                        'display' => __('Collections'),
+                        'instructions' => __('statamic::fieldtypes.link.config.collections'),
+                        'type' => 'collections',
+                        'mode' => 'select',
+                    ],
+                    'container' => [
+                        'display' => __('Container'),
+                        'instructions' => __('statamic::fieldtypes.link.config.container'),
+                        'type' => 'asset_container',
+                        'mode' => 'select',
+                        'max_items' => 1,
+                    ],
+                ],
             ],
         ];
     }
@@ -41,7 +46,7 @@ class Link extends Fieldtype
             return null;
         }
 
-        $redirect = ResolveRedirect::resolve($value, $this->field->parent());
+        $redirect = ResolveRedirect::resolve($value, $this->field->parent(), true);
 
         return $redirect === 404 ? null : $redirect;
     }
@@ -52,9 +57,9 @@ class Link extends Fieldtype
 
         $showAssetOption = $this->showAssetOption();
 
-        $selectedEntry = Str::startsWith($value, 'entry::') ? Str::after($value, 'entry::') : null;
+        $selectedEntry = $value && Str::startsWith($value, 'entry::') ? Str::after($value, 'entry::') : null;
 
-        $selectedAsset = Str::startsWith($value, 'asset::') ? Str::after($value, 'asset::') : null;
+        $selectedAsset = $value && Str::startsWith($value, 'asset::') ? Str::after($value, 'asset::') : null;
 
         $url = ($value !== '@child' && ! $selectedEntry && ! $selectedAsset) ? $value : null;
 

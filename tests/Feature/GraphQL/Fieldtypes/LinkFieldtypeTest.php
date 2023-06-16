@@ -32,7 +32,7 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->once()->with('/hardcoded', $entry)->andReturn('/hardcoded');
+        ResolveRedirect::shouldReceive('resolve')->once()->with('/hardcoded', $entry, true)->andReturn('/hardcoded');
 
         $this->assertGqlEntryHas('link', ['link' => '/hardcoded']);
     }
@@ -47,7 +47,7 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->once()->with('entry::123', $entry)->andReturn('/the-entry-url');
+        ResolveRedirect::shouldReceive('resolve')->once()->with('entry::123', $entry, true)->andReturn('/the-entry-url');
 
         $this->assertGqlEntryHas('link', ['link' => '/the-entry-url']);
     }
@@ -62,7 +62,7 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->once()->with('@child', $entry)->andReturn('/the-first-child');
+        ResolveRedirect::shouldReceive('resolve')->once()->with('@child', $entry, true)->andReturn('/the-first-child');
 
         $this->assertGqlEntryHas('link', ['link' => '/the-first-child']);
     }
@@ -77,7 +77,7 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->once()->with('entry::unknown', $entry)->andReturn(404);
+        ResolveRedirect::shouldReceive('resolve')->once()->with('entry::unknown', $entry, true)->andReturn(404);
 
         $this->assertGqlEntryHas('link', ['link' => null]);
     }

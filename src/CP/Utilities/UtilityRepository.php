@@ -2,16 +2,32 @@
 
 namespace Statamic\CP\Utilities;
 
+use Facades\Statamic\CP\Utilities\CoreUtilities;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\User;
 
 class UtilityRepository
 {
     protected $utilities;
+    protected $extensions = [];
 
     public function __construct()
     {
         $this->utilities = collect([]);
+    }
+
+    public function boot()
+    {
+        CoreUtilities::boot();
+
+        foreach ($this->extensions as $callback) {
+            $callback($this);
+        }
+    }
+
+    public function extend($callback)
+    {
+        $this->extensions[] = $callback;
     }
 
     public function make($handle)
@@ -19,11 +35,15 @@ class UtilityRepository
         return (new Utility)->handle($handle);
     }
 
-    public function push(Utility $utility)
+    public function register($utility)
     {
+        if (! $utility instanceof Utility) {
+            $utility = $this->make($utility);
+        }
+
         $this->utilities[$utility->handle()] = $utility;
 
-        return $this;
+        return $utility;
     }
 
     public function all()
@@ -43,18 +63,27 @@ class UtilityRepository
         return $this->utilities->get($handle);
     }
 
+    public function findBySlug($slug)
+    {
+        return $this->utilities->first(fn ($utility) => $utility->slug() === $slug);
+    }
+
     public function routes()
     {
+        $this->boot();
+
         Route::namespace('\\')->prefix('utilities')->name('utilities.')->group(function () {
             $this->all()->each(function ($utility) {
                 if ($utility->action()) {
                     Route::get($utility->slug(), $utility->action())
+                        ->middleware("can:access {$utility->handle()} utility")
                         ->name($utility->slug());
                 }
 
                 if ($routeClosure = $utility->routes()) {
                     Route::name($utility->slug().'.')
                         ->prefix($utility->slug())
+                        ->middleware("can:access {$utility->handle()} utility")
                         ->group(function () use ($routeClosure) {
                             $routeClosure(Route::getFacadeRoot());
                         });

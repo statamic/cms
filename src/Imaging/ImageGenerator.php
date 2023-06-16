@@ -2,8 +2,8 @@
 
 namespace Statamic\Imaging;
 
+use Facades\Statamic\Imaging\ImageValidator;
 use Illuminate\Support\Facades\Storage;
-use League\Flysystem\FileNotFoundException as FlysystemFileNotFoundException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\UnableToReadFile;
 use League\Glide\Filesystem\FileNotFoundException as GlideFileNotFoundException;
@@ -278,20 +278,20 @@ class ImageGenerator
      */
     private function applyDefaultManipulations()
     {
-        $defaults = [];
+        $defaults = Glide::normalizeParameters(
+            Config::get('statamic.assets.image_manipulation.defaults') ?: []
+        );
 
         // Enable automatic cropping
         if (Config::get('statamic.assets.auto_crop') && $this->asset) {
             $defaults['fit'] = 'crop-'.$this->asset->get('focus', '50-50');
         }
 
-        // TODO: Allow user defined defaults and merge them in here.
-
         $this->server->setDefaults($defaults);
     }
 
     /**
-     * Ensure that the image is actually an image.
+     * Ensure that the image is actually an image and is allowed to be manipulated.
      *
      * @throws \Exception
      */
@@ -300,22 +300,19 @@ class ImageGenerator
         if ($this->asset) {
             $path = $this->asset->path();
             $mime = $this->asset->mimeType();
+            $extension = $this->asset->extension();
         } else {
             $path = public_path($this->path);
             if (! File::exists($path)) {
-                throw $this->isUsingFlysystemOne() ? new FlysystemFileNotFoundException($path) : UnableToReadFile::fromLocation($path);
+                throw UnableToReadFile::fromLocation($path);
             }
             $mime = File::mimeType($path);
+            $extension = File::extension($path);
         }
 
-        if ($mime !== null && strncmp($mime, 'image/', 6) !== 0) {
-            throw new \Exception("Image [{$path}] does not actually appear to be an image.");
+        if (! ImageValidator::isValidImage($extension, $mime)) {
+            throw new \Exception("Image [{$path}] does not actually appear to be a valid image.");
         }
-    }
-
-    private function isUsingFlysystemOne()
-    {
-        return class_exists('\League\Flysystem\Util');
     }
 
     private function pathSourceFilesystem()
@@ -327,9 +324,7 @@ class ImageGenerator
     {
         $guzzleClient = app('statamic.imaging.guzzle');
 
-        $adapter = $this->isUsingFlysystemOne()
-            ? new LegacyGuzzleAdapter($base, $guzzleClient)
-            : new GuzzleAdapter($base, $guzzleClient);
+        $adapter = new GuzzleAdapter($base, $guzzleClient);
 
         return new Filesystem($adapter);
     }

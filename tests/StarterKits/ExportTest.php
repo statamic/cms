@@ -13,6 +13,7 @@ class ExportTest extends TestCase
     protected $files;
     protected $configPath;
     protected $exportPath;
+    protected $postInstallHookPath;
 
     public function setUp(): void
     {
@@ -53,7 +54,7 @@ class ExportTest extends TestCase
     /** @test */
     public function it_can_stub_out_a_new_config()
     {
-        $this->assertFileNotExists($this->configPath);
+        $this->assertFileDoesNotExist($this->configPath);
 
         $this->exportCoolRunnings();
 
@@ -69,8 +70,8 @@ class ExportTest extends TestCase
             'resources/views/welcome.blade.php',
         ]);
 
-        $this->assertFileNotExists($filesystemsConfig = $this->exportPath('config/filesystems.php'));
-        $this->assertFileNotExists($composerJson = $this->exportPath('resources/views/welcome.blade.php'));
+        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
+        $this->assertFileDoesNotExist($composerJson = $this->exportPath('resources/views/welcome.blade.php'));
 
         $this->exportCoolRunnings();
 
@@ -89,8 +90,8 @@ class ExportTest extends TestCase
             'resources/views',
         ]);
 
-        $this->assertFileNotExists($this->exportPath('config'));
-        $this->assertFileNotExists($this->exportPath('resources/views'));
+        $this->assertFileDoesNotExist($this->exportPath('config'));
+        $this->assertFileDoesNotExist($this->exportPath('resources/views'));
 
         $this->exportCoolRunnings();
 
@@ -99,7 +100,7 @@ class ExportTest extends TestCase
 
         $this->assertFileExists($this->exportPath('config/app.php'));
         $this->assertFileExists($this->exportPath('resources/views/errors'));
-        $this->assertFileNotExists($this->exportPath('resources/js'));
+        $this->assertFileDoesNotExist($this->exportPath('resources/js'));
     }
 
     /** @test */
@@ -123,10 +124,10 @@ class ExportTest extends TestCase
             'test-folder' => 'test-renamed-folder',
         ]);
 
-        $this->assertFileNotExists($filesystemsConfig = $this->exportPath('config/filesystems.php'));
-        $this->assertFileNotExists($composerJson = $this->exportPath('resources/views/errors'));
-        $this->assertFileNotExists($renamedFile = $this->exportPath('README-new-site.md'));
-        $this->assertFileNotExists($renamedFolder = $this->exportPath('test-renamed-folder'));
+        $this->assertFileDoesNotExist($filesystemsConfig = $this->exportPath('config/filesystems.php'));
+        $this->assertFileDoesNotExist($composerJson = $this->exportPath('resources/views/errors'));
+        $this->assertFileDoesNotExist($renamedFile = $this->exportPath('README-new-site.md'));
+        $this->assertFileDoesNotExist($renamedFolder = $this->exportPath('test-renamed-folder'));
 
         $this->exportCoolRunnings();
 
@@ -135,8 +136,8 @@ class ExportTest extends TestCase
         $this->assertFileExists($renamedFile);
         $this->assertFileExists($renamedFolder);
 
-        $this->assertFileNotExists($this->exportPath('README.md')); // This got renamed above
-        $this->assertFileNotExists($this->exportPath('test-folder')); // This got renamed above
+        $this->assertFileDoesNotExist($this->exportPath('README.md')); // This got renamed above
+        $this->assertFileDoesNotExist($this->exportPath('test-folder')); // This got renamed above
 
         $this->assertFileHasContent('This is readme for the new site!', $renamedFile);
         $this->assertFileHasContent('One.', $renamedFolder.'/one.txt');
@@ -152,7 +153,7 @@ class ExportTest extends TestCase
             'config',
         ]);
 
-        $this->assertFileNotExists($starterKitConfig = $this->exportPath('starter-kit.yaml'));
+        $this->assertFileDoesNotExist($starterKitConfig = $this->exportPath('starter-kit.yaml'));
 
         $this->exportCoolRunnings();
 
@@ -167,7 +168,7 @@ class ExportTest extends TestCase
             'config',
         ]);
 
-        $this->assertFileNotExists($postInstallHook = $this->exportPath('StarterKitPostInstall.php'));
+        $this->assertFileDoesNotExist($postInstallHook = $this->exportPath('StarterKitPostInstall.php'));
 
         $this->files->put(base_path('StarterKitPostInstall.php'), '<?php');
 
@@ -228,7 +229,7 @@ EOT
 }
 
 EOT
-        , $this->files->get($this->exportPath('composer.json')));
+            , $this->files->get($this->exportPath('composer.json')));
     }
 
     /** @test */
@@ -431,7 +432,7 @@ EOT
 
         $this->exportCoolRunnings();
 
-        $this->assertFileNotExists($this->exportPath('composer.json'));
+        $this->assertFileDoesNotExist($this->exportPath('composer.json'));
     }
 
     /** @test */
@@ -447,7 +448,7 @@ EOT
 
         $this->exportCoolRunnings();
 
-        $this->assertFileNotExists($this->exportPath('composer.json'));
+        $this->assertFileDoesNotExist($this->exportPath('composer.json'));
     }
 
     /** @test */
@@ -473,7 +474,7 @@ EOT
 }
 
 EOT
-        , $this->files->get($this->exportPath('composer.json')));
+            , $this->files->get($this->exportPath('composer.json')));
     }
 
     /** @test */
@@ -507,7 +508,7 @@ EOT
 }
 
 EOT
-        , $this->files->get($this->exportPath('composer.json')));
+            , $this->files->get($this->exportPath('composer.json')));
     }
 
     private function exportPath($path = null)

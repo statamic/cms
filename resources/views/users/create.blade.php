@@ -12,6 +12,7 @@
         :can-assign-groups="{{ $str::bool($user->can('assign user groups')) }}"
         :activation-expiry="{{ $expiry }}"
         :separate-name-fields="{{ $str::bool($separateNameFields) }}"
+        :can-send-invitation="{{ $str::bool($canSendInvitation) }}"
     >
     </user-wizard>
 @stop

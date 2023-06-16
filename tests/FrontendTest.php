@@ -9,8 +9,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 
@@ -631,6 +633,8 @@ class FrontendTest extends TestCase
 
         $this->get('unknown')->assertNotFound()->assertSee('Not found 404 en');
 
+        $this->assertEquals(404, Cascade::get('response_code'));
+
         // todo: test cascade vars are in the debugbar
     }
 
@@ -767,6 +771,7 @@ class FrontendTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider redirectProvider
      */
     public function redirect_is_followed($dataValue, $augmentedValue, $expectedStatus, $expectedLocation)
@@ -832,5 +837,20 @@ class FrontendTest extends TestCase
                 null,                  // and not a redirect
             ],
         ];
+    }
+
+    /** @test */
+    public function it_protects_404_pages()
+    {
+        $this->get('/does-not-exist')->assertStatus(404);
+
+        config(['statamic.protect.default' => 'logged_in']);
+
+        $this->get('/does-not-exist')->assertRedirect('/login?redirect=http://localhost/does-not-exist');
+
+        $this
+            ->actingAs(User::make())
+            ->get('/does-not-exist')
+            ->assertStatus(404);
     }
 }

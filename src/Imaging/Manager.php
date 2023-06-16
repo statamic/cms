@@ -3,6 +3,7 @@
 namespace Statamic\Imaging;
 
 use Statamic\Contracts\Imaging\ImageManipulator;
+use Statamic\Facades\Glide;
 use Statamic\Support\Arr;
 
 class Manager
@@ -72,7 +73,7 @@ class Manager
     }
 
     /**
-     * Get the image manipulation presets required by the control panel.
+     * Get the image manipulation presets used by the control panel.
      *
      * @return array
      */
@@ -83,14 +84,6 @@ class Manager
             'cp_thumbnail_small_portrait' => ['h' => '400', 'fit' => 'contain'],
             'cp_thumbnail_small_square' => ['w' => '400', 'h' => '400'],
         ];
-    }
-
-    /**
-     * @deprecated
-     */
-    public function getCpImageManipulationPresets()
-    {
-        return $this->cpManipulationPresets();
     }
 
     /**
@@ -108,6 +101,6 @@ class Manager
             Arr::forget($preset, 'fit');
         }
 
-        return $preset;
+        return Glide::normalizeParameters($preset);
     }
 }

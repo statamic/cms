@@ -1,4 +1,4 @@
-var getSlug = require('speakingurl');
+import getSlug from 'speakingurl';
 
 export default {
     install(Vue, options) {
@@ -13,7 +13,7 @@ export default {
                 separator: glue || '-',
                 lang,
                 custom,
-                symbols: true // Use this in 3.4: Statamic.$config.get('asciiReplaceExtraSymbols')
+                symbols: Statamic.$config.get('asciiReplaceExtraSymbols')
             });
         };
     }

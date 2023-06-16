@@ -10,6 +10,8 @@ class MakeFieldtypeTest extends TestCase
 {
     use Concerns\CleansUpGeneratedPaths;
 
+    private $files;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -27,8 +29,8 @@ class MakeFieldtypeTest extends TestCase
     /** @test */
     public function it_can_generate_a_fieldtype()
     {
-        $this->assertFileNotExists(base_path('app/Fieldtypes/KnightRider.php'));
-        $this->assertFileNotExists(resource_path('js/components/fieldtypes/KnightRider.vue'));
+        $this->assertFileDoesNotExist(base_path('app/Fieldtypes/KnightRider.php'));
+        $this->assertFileDoesNotExist(resource_path('js/components/fieldtypes/KnightRider.vue'));
 
         $this->artisan('statamic:make:fieldtype', ['name' => 'KnightRider']);
 
@@ -45,7 +47,7 @@ class MakeFieldtypeTest extends TestCase
     {
         $path = base_path('app/Fieldtypes/KnightRider.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:fieldtype', ['name' => 'KnightRider']);
         $this->files->put($path, 'overwritten fieldtype');
@@ -81,7 +83,7 @@ class MakeFieldtypeTest extends TestCase
 
         Composer::shouldReceive('installedPath')->andReturn($path);
 
-        $this->assertFileNotExists($fieldtype = "$path/src/Fieldtypes/Yoda.php");
+        $this->assertFileDoesNotExist($fieldtype = "$path/src/Fieldtypes/Yoda.php");
 
         $this->artisan('statamic:make:fieldtype', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 

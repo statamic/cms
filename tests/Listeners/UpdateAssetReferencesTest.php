@@ -14,6 +14,10 @@ class UpdateAssetReferencesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $container;
+    private $assetHoff;
+    private $assetNorris;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -106,9 +110,9 @@ class UpdateAssetReferencesTest extends TestCase
     {
         $entry = $this->createEntryWithHoffHeroImage();
 
-        $this->assertEquals('hoff.jpg', $entry->get('hero'));
+        $this->container->disk()->filesystem()->put($this->assetNorris->path(), '');
 
-        $this->actuallySaveAssetFileAndMetaToDisk($this->assetNorris);
+        $this->assertEquals('hoff.jpg', $entry->get('hero'));
 
         $this->assetHoff->rename('norris', true);
 
@@ -311,6 +315,7 @@ class UpdateAssetReferencesTest extends TestCase
 
     /**
      * @test
+     *
      * @environment-setup disableUpdateReferences
      **/
     public function it_can_be_disabled()
@@ -1434,17 +1439,8 @@ EOT;
             $this->assetHoff->path($assetPath)->save();
         }
 
-        $this->actuallySaveAssetFileAndMetaToDisk($this->assetHoff);
-
         return tap(Facades\Entry::make()->collection($collection)->data([
             'hero' => $this->assetHoff->path(),
         ]))->save();
-    }
-
-    // For Flysystem 1.x
-    protected function actuallySaveAssetFileAndMetaToDisk($asset)
-    {
-        $this->container->disk()->filesystem()->put($asset->path(), '');
-        $this->container->disk()->filesystem()->put($asset->metaPath(), '');
     }
 }

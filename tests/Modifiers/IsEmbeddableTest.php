@@ -19,6 +19,7 @@ class IsEmbeddableTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider embeddables
      */
     public function it_checks_if_an_url_is_embeddable($expected, $input): void

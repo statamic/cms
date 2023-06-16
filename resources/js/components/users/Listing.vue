@@ -1,4 +1,4 @@
-    <template>
+<template>
     <div>
 
         <div v-if="initializing" class="card loading">
@@ -8,19 +8,56 @@
         <data-list
             v-if="!initializing"
             ref="dataList"
-            :columns="columns"
             :rows="items"
+            :columns="columns"
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0 relative">
-                    <div class="data-list-header">
-                        <data-list-search v-model="searchQuery" />
+                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
+
+                        <data-list-filter-presets
+                            v-show="allowFilterPresets"
+                            ref="presets"
+                            :active-preset="activePreset"
+                            :active-preset-payload="activePresetPayload"
+                            :active-filters="activeFilters"
+                            :has-active-filters="hasActiveFilters"
+                            :preferences-prefix="preferencesPrefix"
+                            :search-query="searchQuery"
+                            @selected="selectPreset"
+                            @reset="filtersReset"
+                        />
+
+                        <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+
+                        <div class="flex space-x-2 mt-2">
+                            <button class="btn btn-sm ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
+                            <button class="btn btn-sm ml-2" v-text="__('Save')" v-show="allowFilterPresets && isDirty" @click="$refs.presets.savePreset()" />
+                            <data-list-column-picker :preferences-key="preferencesKey('columns')" />
+                        </div>
                     </div>
 
-                    <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+                    <data-list-filters
+                        ref="filters"
+                        :filters="filters"
+                        :active-preset="activePreset"
+                        :active-preset-payload="activePresetPayload"
+                        :active-filters="activeFilters"
+                        :active-filter-badges="activeFilterBadges"
+                        :active-count="activeFilterCount"
+                        :search-query="searchQuery"
+                        :is-searching="true"
+                        :saves-presets="true"
+                        :preferences-prefix="preferencesPrefix"
+                        @changed="filterChanged"
+                        @saved="$refs.presets.setPreset($event)"
+                        @deleted="$refs.presets.refreshPresets()"
+                    />
+
+                    <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
 
                     <data-list-bulk-actions
                         class="rounded"
@@ -37,20 +74,24 @@
                     >
                         <template slot="cell-email" slot-scope="{ row: user, value }">
                             <a :href="user.edit_url" class="flex items-center">
-                                <avatar :user="user" class="w-8 h-8 rounded-full mr-1" />
+                                <avatar :user="user" class="w-8 h-8 rounded-full mr-2" />
                                 {{ value }}
                             </a>
                         </template>
                         <template slot="cell-roles" slot-scope="{ row: user, value: roles }">
-                            <span v-if="user.super" class="badge-pill-sm mr-sm">{{ __('Super Admin') }}</span>
-                            <span v-if="!roles || roles.length === 0" />
-                            <span v-for="role in (roles || [])" class="badge-pill-sm mr-sm">{{ role.title }}</span>
+                            <div class="role-index-field">
+                                <div v-if="user.super" class="role-index-field-item mr-1 mb-1.5">{{ __('Super Admin') }}</div>
+                                <div v-if="!roles || roles.length === 0" />
+                                <div v-for="(role, i) in (roles || [])" class="role-index-field-item mr-1 mb-1.5">{{ role.title }}</div>
+                            </div>
                         </template>
                         <template slot="cell-groups" slot-scope="{ row: user, value: groups }">
-                            <span v-for="group in (groups || [])" class="badge-pill-sm mr-sm">{{ group.title }}</span>
+                            <div class="groups-index-field">
+                                <div v-for="group in (groups || [])" class="groups-index-field-item mr-1 mb-1.5">{{ group.title }}</div>
+                            </div>
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
-                            <dropdown-list>
+                            <dropdown-list placement="right-start">
                                 <dropdown-item :text="__('Edit')" :redirect="user.edit_url" v-if="user.editable" />
                                 <dropdown-item :text="__('View')" :redirect="user.edit_url" v-else />
                                 <data-list-inline-actions
@@ -66,7 +107,7 @@
                 </div>
 
                 <data-list-pagination
-                    class="mt-3"
+                    class="mt-6"
                     :resource-meta="meta"
                     :per-page="perPage"
                     :show-totals="true"
@@ -89,6 +130,9 @@ export default {
     props: {
         listingKey: String,
         group: String,
+        allowFilterPresets: {
+            default: true,
+        },
     },
 
     data() {

@@ -68,8 +68,7 @@ abstract class AbstractCacher implements Cacher
      */
     public function getDefaultExpiration()
     {
-        return $this->config('expiry')
-            ?? $this->config('default_cache_length'); // deprecated
+        return $this->config('expiry');
     }
 
     /**
@@ -281,14 +280,14 @@ abstract class AbstractCacher implements Cacher
 
     protected function getPathAndDomain($url)
     {
-        if (Str::startsWith($url, '/')) {
+        $parsed = parse_url($url);
+
+        if (! isset($parsed['scheme'])) {
             return [
-                $url,
+                Str::ensureLeft($url, '/'),
                 $this->getBaseUrl(),
             ];
         }
-
-        $parsed = parse_url($url);
 
         $query = isset($parsed['query']) ? '?'.$parsed['query'] : '';
 

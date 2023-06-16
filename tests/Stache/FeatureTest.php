@@ -17,6 +17,8 @@ use Tests\TestCase;
 
 class FeatureTest extends TestCase
 {
+    private $stache;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -66,16 +68,6 @@ class FeatureTest extends TestCase
 
         // ensure it only gets from the entries' store, not anywhere in the stache.
         $this->assertNull(Entry::find('users-john'));
-    }
-
-    /**
-     * @test
-     *
-     * @deprecated
-     **/
-    public function it_gets_entry_by_slug()
-    {
-        $this->assertEquals('Christmas', Entry::findBySlug('christmas', 'blog', 'christmas')->get('title'));
     }
 
     /** @test */

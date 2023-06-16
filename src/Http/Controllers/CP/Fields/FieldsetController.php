@@ -8,6 +8,7 @@ use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class FieldsetController extends CpController
 {
@@ -18,16 +19,21 @@ class FieldsetController extends CpController
 
     public function index(Request $request)
     {
-        $fieldsets = Facades\Fieldset::all()->map(function ($fieldset) {
-            return [
-                'id' => $fieldset->handle(),
-                'handle' => $fieldset->handle(),
-                'title' => $fieldset->title(),
-                'fields' => $fieldset->fields()->all()->count(),
-                'edit_url' => $fieldset->editUrl(),
-                'delete_url' => $fieldset->deleteUrl(),
-            ];
-        })->values();
+        $fieldsets = Facades\Fieldset::all()
+            ->filter(fn ($fieldset) => $request->user()->can('edit', $fieldset))
+            ->mapToGroups(function (Fieldset $fieldset) {
+                return [
+                    $this->groupKey($fieldset) => [
+                        'handle' => $fieldset->handle(),
+                        'id' => $fieldset->handle(),
+                        'delete_url' => $fieldset->deleteUrl(),
+                        'edit_url' => $fieldset->editUrl(),
+                        'fields' => $fieldset->fields()->all()->count(),
+                        'is_deletable' => $fieldset->isDeletable(),
+                        'title' => $fieldset->title(),
+                    ],
+                ];
+            });
 
         if ($request->wantsJson()) {
             return $fieldsets;
@@ -110,5 +116,10 @@ class FieldsetController extends CpController
         $fieldset->delete();
 
         return response('');
+    }
+
+    private function groupKey(Fieldset $fieldset): string
+    {
+        return $fieldset->isNamespaced() ? Str::of($fieldset->namespace())->replace('_', ' ')->title() : __('My Fieldsets');
     }
 }

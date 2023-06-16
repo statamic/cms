@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
@@ -48,6 +47,10 @@ class EntriesController extends CpController
         }
 
         $entries = $query->paginate(request('perPage'));
+
+        if (request('search') && $collection->hasSearchIndex()) {
+            $entries->setCollection($entries->getCollection()->map->getSearchable());
+        }
 
         return (new Entries($entries))
             ->blueprint($collection->entryBlueprint())
@@ -146,6 +149,7 @@ class EntriesController extends CpController
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish', $entry),
             'previewTargets' => $collection->previewTargets()->all(),
+            'autosaveInterval' => $collection->autosaveInterval(),
         ];
 
         if ($request->wantsJson()) {
@@ -198,7 +202,11 @@ class EntriesController extends CpController
             $entry->blueprint($explicitBlueprint);
         }
 
-        $values = $values->except(['slug', 'date', 'published']);
+        $values = $values->except(['slug', 'published']);
+
+        if ($entry->collection()->dated()) {
+            $entry->date($entry->blueprint()->field('date')->fieldtype()->augment($values->pull('date')));
+        }
 
         if ($entry->hasOrigin()) {
             $entry->data($values->only($request->input('_localized')));
@@ -206,19 +214,17 @@ class EntriesController extends CpController
             $entry->merge($values);
         }
 
-        if ($entry->collection()->dated()) {
-            $entry->date($this->toCarbonInstanceForSaving($request->date));
-        }
-
         $entry->slug($this->resolveSlug($request));
 
-        if ($collection->structure() && ! $collection->orderable()) {
+        if ($structure = $collection->structure()) {
             $tree = $entry->structure()->in($entry->locale());
+        }
 
+        if ($structure && ! $collection->orderable()) {
             $this->validateParent($entry, $tree, $parent);
 
             $entry->afterSave(function ($entry) use ($parent, $tree) {
-                if ($parent && optional($tree->page($parent))->isRoot()) {
+                if ($parent && optional($tree->find($parent))->isRoot()) {
                     $parent = null;
                 }
 
@@ -284,10 +290,6 @@ class EntriesController extends CpController
             'published' => $collection->defaultPublishState(),
         ])->merge($fields->values());
 
-        if ($collection->dated()) {
-            $values['date'] = substr(now()->toDateTimeString(), 0, 10);
-        }
-
         $viewData = [
             'title' => $collection->createLabel(),
             'actions' => [
@@ -316,6 +318,7 @@ class EntriesController extends CpController
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
             'previewTargets' => $collection->previewTargets()->all(),
+            'autosaveInterval' => $collection->autosaveInterval(),
         ];
 
         if ($request->wantsJson()) {
@@ -350,25 +353,29 @@ class EntriesController extends CpController
                 'site' => $site->handle(),
             ])->validate();
 
-        $values = $fields->process()->values()->except(['slug', 'date', 'blueprint', 'published']);
+        $values = $fields->process()->values()->except(['slug', 'blueprint', 'published']);
 
         $entry = Entry::make()
             ->collection($collection)
             ->blueprint($request->_blueprint)
             ->locale($site->handle())
             ->published($request->get('published'))
-            ->slug($this->resolveSlug($request))
-            ->data($values);
+            ->slug($this->resolveSlug($request));
 
         if ($collection->dated()) {
-            $entry->date($this->toCarbonInstanceForSaving($request->date));
+            $entry->date($blueprint->field('date')->fieldtype()->augment($values->pull('date')));
         }
 
-        if (($structure = $collection->structure()) && ! $collection->orderable()) {
+        $entry->data($values);
+
+        if ($structure = $collection->structure()) {
             $tree = $structure->in($site->handle());
+        }
+
+        if ($structure && ! $collection->orderable()) {
             $parent = $values['parent'] ?? null;
             $entry->afterSave(function ($entry) use ($parent, $tree) {
-                if ($parent && optional($tree->page($parent))->isRoot()) {
+                if ($parent && optional($tree->find($parent))->isRoot()) {
                     $parent = null;
                 }
 
@@ -398,7 +405,7 @@ class EntriesController extends CpController
             }
 
             if ($entry->blueprint()->hasField('slug')) {
-                return Str::slug($request->title ?? $entry->autoGeneratedTitle());
+                return Str::slug($request->title ?? $entry->autoGeneratedTitle(), '-', $entry->site()->lang());
             }
 
             return null;
@@ -435,7 +442,7 @@ class EntriesController extends CpController
         }
 
         if ($entry->collection()->dated()) {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 19);
             $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
             $values['date'] = $datetime;
         }
@@ -472,12 +479,6 @@ class EntriesController extends CpController
             })
             ->filter()
             ->values();
-    }
-
-    protected function toCarbonInstanceForSaving($date): Carbon
-    {
-        // Since assume `Y-m-d ...` format, we can use `parse` here.
-        return Carbon::parse($date);
     }
 
     private function validateParent($entry, $tree, $parent)
@@ -526,7 +527,7 @@ class EntriesController extends CpController
             return $entry->uri();
         }
 
-        $parent = $parent ? $tree->page($parent) : null;
+        $parent = $parent ? $tree->find($parent) : null;
 
         return app(\Statamic\Contracts\Routing\UrlBuilder::class)
             ->content($entry)

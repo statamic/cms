@@ -1,0 +1,130 @@
+/* ==========================================================================
+   TOGGLE
+   ========================================================================== */
+
+.toggle-fieldtype-wrapper {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    &:focus-within .toggle-container {
+        @apply ring-2;
+    }
+
+    .inline-label {
+        @apply ml-2 font-normal text-gray-700;
+        a {
+            @apply text-gray-800 underline;
+            &:hover {
+                @apply text-blue;
+            }
+        }
+    }
+}
+
+.locale-status-field .toggle-fieldtype-wrapper {
+    height: auto;
+    display: inline-block;
+}
+
+.toggle-container {
+    @apply bg-white cursor-pointer relative border;
+    height: 22px;
+    width: 46px;
+    border-radius: 20px;
+    font-size: 0.1px;
+    margin: 6px 0;
+    transition: background-color 0.2s ease;
+    &:focus { outline: none; }
+}
+
+.toggle-slider {
+    position: absolute;
+    top: -1px;
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+
+    &.disabled {
+        cursor: not-allowed;
+    }
+}
+
+.toggle-knob {
+    position: absolute;
+    top: 1px;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .4);
+    outline: none;
+    transition: box-shadow 0.1s, background-color 0.2s ease-in-out;
+}
+
+.toggle-knob:hover {
+    box-shadow: 0 1px 3px rgba(theme('colors.blue.DEFAULT'), .9);
+}
+
+.toggle-container.on {
+    @apply bg-green-500 border-green-600;
+    .toggle-slider {
+        width: 44px;
+    }
+
+    .toggle-knob:focus {
+        box-shadow: 0 0 10px theme(colors.green.500/70);
+    }
+}
+
+.toggle-container.on.read-only {
+    @apply bg-gray-500 border-gray-600;
+
+    .toggle-knob:focus {
+        box-shadow: 0 0 10px theme(colors.gray.500/70);
+    }
+}
+
+/* Size Variants
+  ========================================================================== */
+.toggle-sm.toggle-fieldtype-wrapper {
+    height: 16px;
+
+    .toggle-container {
+        height: 12px;
+        width: 21px;
+    }
+
+    .toggle-knob {
+        width: 10px;
+        height: 10px;
+    }
+
+    .toggle-slider {
+        box-shadow: inset 0px 1px rgba(0,0,0,.25);
+        height: 12px;
+        width: 10px;
+    }
+
+    .toggle-container.on .toggle-slider {
+        width: 19px;
+    }
+}
+
+/* Inside the Sidebar
+  ========================================================================== */
+.publish-sidebar .toggle-fieldtype {
+    @apply flex items-center justify-between;
+    .field-inner > label { margin: 0; }
+    .toggle-fieldtype-wrapper { margin-left: 8px; }
+    .help-block { margin-top: 4px !important; }
+}
+
+/* Inside a Grid field
+  ========================================================================== */
+
+.grid-table td.toggle-fieldtype {
+    width: 1%;
+    padding-top: 14px;
+}

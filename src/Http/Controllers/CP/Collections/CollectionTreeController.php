@@ -68,7 +68,7 @@ class CollectionTreeController extends CpController
         }
 
         foreach ($tree->diff()->moved() as $id) {
-            $page = $tree->page($id);
+            $page = $tree->find($id);
             $parent = $page->parent();
 
             $siblings = (! $parent || $parent->isRoot())

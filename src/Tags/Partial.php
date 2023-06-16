@@ -15,6 +15,10 @@ class Partial extends Tags
 
     protected function render($partial)
     {
+        if (! $this->shouldRender()) {
+            return;
+        }
+
         $variables = array_merge($this->context->all(), $this->params->all(), [
             '__frontmatter' => $this->params->all(),
             'slot' => $this->isPair ? trim($this->parse()) : null,
@@ -23,6 +27,19 @@ class Partial extends Tags
         return view($this->viewName($partial), $variables)
             ->withoutExtractions()
             ->render();
+    }
+
+    protected function shouldRender(): bool
+    {
+        if ($this->params->has('when')) {
+            return $this->params->bool('when');
+        }
+
+        if ($this->params->has('unless')) {
+            return ! $this->params->bool('unless');
+        }
+
+        return true;
     }
 
     protected function viewName($partial)

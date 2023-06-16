@@ -10,7 +10,7 @@ class Asset extends JsonResource
 {
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->id(),
             'path' => $this->path(),
             'filename' => $this->filename(),
@@ -57,6 +57,8 @@ class Asset extends JsonResource
 
             'blueprint' => $this->blueprint()->toPublishArray(),
         ];
+
+        return ['data' => $data];
     }
 
     protected function previewUrl()

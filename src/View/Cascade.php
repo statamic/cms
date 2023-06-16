@@ -109,7 +109,7 @@ class Cascade
         return $this;
     }
 
-    private function hydrateVariables()
+    protected function hydrateVariables()
     {
         foreach ($this->contextualVariables() as $key => $value) {
             $this->set($key, $value);
@@ -118,7 +118,7 @@ class Cascade
         return $this;
     }
 
-    private function hydrateSegments()
+    protected function hydrateSegments()
     {
         $path = $this->site->relativePath($this->request->url());
 
@@ -135,7 +135,7 @@ class Cascade
         return $this;
     }
 
-    private function hydrateGlobals()
+    protected function hydrateGlobals()
     {
         foreach (GlobalSet::all() as $global) {
             if (! $global->existsIn($this->site->handle())) {
@@ -156,7 +156,7 @@ class Cascade
         return $this;
     }
 
-    private function hydrateContent()
+    protected function hydrateContent()
     {
         if (! $this->content) {
             return $this;

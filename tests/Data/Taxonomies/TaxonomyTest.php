@@ -179,65 +179,74 @@ class TaxonomyTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider additionalPreviewTargetProvider
      */
     public function it_gets_and_sets_preview_targets($throughFacade)
     {
-        $taxonomy = (new Taxonomy)->handle('tags');
+        $taxonomy = (new Taxonomy)->handle('test');
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->previewTargets());
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->basePreviewTargets());
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->additionalPreviewTargets());
 
         $this->assertEquals([
-            ['label' => 'Term', 'format' => '{permalink}'],
+            ['label' => 'Term', 'format' => '{permalink}', 'refresh' => true],
         ], $taxonomy->basePreviewTargets()->all());
 
         $return = $taxonomy->previewTargets([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}'], // no explicit refresh should imply its enabled
         ]);
 
         $this->assertSame($taxonomy, $return);
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
         ], $taxonomy->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
         ], $taxonomy->basePreviewTargets()->all());
 
         $this->assertEquals([], $taxonomy->additionalPreviewTargets()->all());
 
         $extra = [
-            ['label' => 'Baz', 'format' => '{baz}'],
-            ['label' => 'Qux', 'format' => '{qux}'],
+            ['label' => 'Qux', 'format' => '{qux}', 'refresh' => true],
+            ['label' => 'Quux', 'format' => '{quux}', 'refresh' => false],
+            ['label' => 'Flux', 'format' => '{flux}'], // no explicit refresh should imply its enabled
         ];
 
         if ($throughFacade) {
-            \Statamic\Facades\Taxonomy::addPreviewTargets('tags', $extra);
+            \Statamic\Facades\Taxonomy::addPreviewTargets('test', $extra);
         } else {
             $taxonomy->addPreviewTargets($extra);
         }
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
-            ['label' => 'Baz', 'format' => '{baz}'],
-            ['label' => 'Qux', 'format' => '{qux}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
+            ['label' => 'Qux', 'format' => '{qux}', 'refresh' => true],
+            ['label' => 'Quux', 'format' => '{quux}', 'refresh' => false],
+            ['label' => 'Flux', 'format' => '{flux}', 'refresh' => true],
         ], $taxonomy->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
         ], $taxonomy->basePreviewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Baz', 'format' => '{baz}'],
-            ['label' => 'Qux', 'format' => '{qux}'],
+            ['label' => 'Qux', 'format' => '{qux}', 'refresh' => true],
+            ['label' => 'Quux', 'format' => '{quux}', 'refresh' => false],
+            ['label' => 'Flux', 'format' => '{flux}', 'refresh' => true],
         ], $taxonomy->additionalPreviewTargets()->all());
     }
 

@@ -52,7 +52,9 @@ class UserGroupsController extends CpController
 
         return view('statamic::usergroups.show', [
             'group' => $group,
-            'filters' => Scope::filters('usergroup-users'),
+            'filters' => Scope::filters('usergroup-users', [
+                'blueprints' => ['user'],
+            ]),
         ]);
     }
 

@@ -9,7 +9,7 @@ return [
     |
     | Whether the API should be enabled, and through what route. You
     | can enable or disable the whole API, and expose individual
-    | resources per environent, depending on your site needs.
+    | resources per environment, depending on your site needs.
     |
     | https://statamic.dev/content-api#enable-the-api
     |

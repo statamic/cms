@@ -1,56 +1,74 @@
-import { Node } from 'tiptap'
-import Image from './Image.vue';
+import { Node } from '@tiptap/core';
+import { VueNodeViewRenderer } from '@tiptap/vue-2'
+import ImageComponent from './Image.vue';
 
-export default class ImageNode extends Node {
+export const Image = Node.create({
 
-    get name() {
-        return 'image'
-    }
+    name: 'image',
 
-    get view() {
-        return Image;
-    }
+    addNodeView() {
+        return VueNodeViewRenderer(ImageComponent)
+    },
 
-    get schema() {
+    inline: true,
+
+    group: 'inline',
+
+    draggable: true,
+
+    selectable: false,
+
+    addAttributes() {
         return {
-            inline: true,
-            attrs: {
-                src: {},
-                alt: { default: null },
+            src: {
+                default: null,
+                parseHTML: element => element.querySelector('img')?.getAttribute('data-src'),
             },
-            group: 'inline',
-            draggable: true,
-            selectable: false,
-            parseDOM: [
-                {
-                    tag: 'img[src]',
-                    getAttrs: dom => {
-                        return {
-                            src: dom.getAttribute('data-src'),
-                            alt: dom.getAttribute('alt'),
-                        }
-                    },
-                },
-            ],
-            toDOM: node => {
-                return ['img', {
-                    ...node.attrs,
-                    src: '',
-                    'data-src': node.attrs.src,
-                }]
+            alt: {
+                default: null,
+                parseHTML: element => element.querySelector('img')?.getAttribute('alt'),
+            },
+        }
+    },
+
+    parseHTML() {
+        return [
+            {
+                tag: 'img[src]',
+                getAttrs: dom => {
+                    return {
+                        src: dom.getAttribute('data-src'),
+                        alt: dom.getAttribute('alt'),
+                    }
+                }
             }
-        }
-    }
+        ]
+    },
 
-    commands({ type }) {
-        return attrs => (state, dispatch) => {
-            const { selection } = state
-            const position = selection.$cursor ? selection.$cursor.pos : selection.$to.pos
-            const node = type.create(attrs)
-            node.isNew = true;
-            const transaction = state.tr.insert(position, node)
-            dispatch(transaction)
-        }
-    }
+    renderHTML({ HTMLAttributes }) {
+        return [
+            'img',
+            {
+                ...HTMLAttributes,
+                src: '',
+                'data-src': HTMLAttributes.src,
+            }
+        ]
+    },
 
-}
+    addCommands() {
+        return {
+            insertImage: (attrs) => ({ tr, dispatch }) => {
+                const { selection } = tr;
+                const position = selection.$cursor ? selection.$cursor.pos : selection.$to.pos;
+                const node = this.type.create(attrs);
+                node.isNew = true;
+                if (dispatch) {
+                    const transaction = tr.insert(position, node);
+                    dispatch(transaction);
+                }
+            },
+        }
+    },
+
+})

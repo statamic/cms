@@ -5,7 +5,7 @@
         :before-close="shouldClose"
         @closed="close"
     >
-    <div class="h-full overflow-auto p-3 bg-grey-30">
+    <div class="h-full overflow-auto p-6 bg-gray-300">
 
         <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
