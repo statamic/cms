@@ -34,10 +34,13 @@ export default {
             this.setIframeAttributes(iframe);
 
             const container = this.$refs.contents;
+            let iframeUrl = new URL(url);
+            let cleanUrl = iframeUrl.host + iframeUrl.pathname;
 
             // If there's no iframe yet, just append it.
             if (! container.firstChild) {
                 container.appendChild(iframe);
+                this.previousUrl = cleanUrl;
                 return;
             }
 
@@ -52,10 +55,8 @@ export default {
                 return;
             }
 
-            let iframeUrl = new URL(url);
-            let cleanUrl = iframeUrl.host + iframeUrl.pathname;
             let isSameOrigin = url.startsWith('/') || iframeUrl.host === window.location.host;
-            let preserveScroll = isSameOrigin && (cleanUrl === this.previousUrl || this.previousUrl === null);
+            let preserveScroll = isSameOrigin && cleanUrl === this.previousUrl;
 
             let scroll = preserveScroll ? [
                 container.firstChild.contentWindow.scrollX ?? 0,
