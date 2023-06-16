@@ -56,6 +56,10 @@ class LinkMark extends Link
             return '';
         }
 
+        if($item instanceof Entry){
+            return $item->in(Site::current()->handle())?->url() ?? $item->url();
+        }
+
         return $item->url();
     }
 }
