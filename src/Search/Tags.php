@@ -4,6 +4,8 @@ namespace Statamic\Search;
 
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
+use Statamic\Search\PlainResult;
+use Statamic\Search\Result;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
@@ -30,9 +32,7 @@ class Tags extends BaseTags
         $builder = Search::index($this->params->get('index'))
             ->ensureExists()
             ->search($query)
-            ->withData($supplementData)
-            ->limit($this->params->get('limit'))
-            ->offset($this->params->get('offset'));
+            ->withData($supplementData);
 
         $this->querySite($builder);
         $this->queryStatus($builder);
@@ -41,6 +41,11 @@ class Tags extends BaseTags
         $this->queryOrderBys($builder);
 
         $results = $this->getQueryResults($builder);
+
+        // PlainResult inherits from Result, but doesnt provide getSearchable...
+        if ($results->getCollection()->first() instanceof Result && !$results->getCollection()->first() instanceof PlainResult) {
+            $results->setCollection($results->getCollection()->map->getSearchable());
+        }
 
         return $this->output($results);
     }
