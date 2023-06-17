@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
+use Statamic\Entries\Entry;
 use Statamic\Facades\Data;
 use Statamic\Support\Str;
 use Tiptap\Marks\Link;
