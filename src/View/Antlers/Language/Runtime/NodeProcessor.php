@@ -393,36 +393,8 @@ class NodeProcessor
 
     private function startMeasuringTag($tagName, AntlersNode $node)
     {
-        $file = '';
-
-        if (count(GlobalRuntimeState::$templateFileStack) > 0) {
-            $file = GlobalRuntimeState::$templateFileStack[count(GlobalRuntimeState::$templateFileStack) - 1][0];
-        }
-
-        $suffix = '';
-
-        if ($file != '') {
-            $suffix = str_replace('//', '/', mb_substr($file, strlen(base_path())));
-
-            if (Str::startsWith($suffix, '/')) {
-                $suffix = mb_substr($suffix, 1);
-            }
-        }
-
-        if ($node->startPosition != null) {
-            $suffix .= ' Line: '.$node->startPosition->line;
-        }
-
-        $suffix = trim($suffix);
-
-        $report = 'Tag: '.$tagName;
-
-        if (mb_strlen($suffix) > 0) {
-            $report .= ' ['.$suffix.']';
-        }
-
         $this->profilingTagName = 'tag_'.$tagName.microtime();
-        debugbar()->startMeasure($this->profilingTagName, $report);
+        debugbar()->startMeasure($this->profilingTagName, $tagName);
     }
 
     private function stopMeasuringTag()
@@ -440,7 +412,7 @@ class NodeProcessor
      *
      * @return bool
      */
-    private function isTracingEnabled()
+    public function isTracingEnabled()
     {
         if ($this->runtimeConfiguration == null) {
             return false;
@@ -451,6 +423,11 @@ class NodeProcessor
         }
 
         return false;
+    }
+
+    public function getRuntimeConfiguration()
+    {
+        return $this->runtimeConfiguration;
     }
 
     /**
