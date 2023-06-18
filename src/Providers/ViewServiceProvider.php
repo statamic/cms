@@ -18,6 +18,8 @@ use Statamic\View\Antlers\Language\Runtime\Tracing\TraceManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\Parser;
 use Statamic\View\Cascade;
+use Statamic\View\Debugbar\AntlersProfiler\PerformanceCollector;
+use Statamic\View\Debugbar\AntlersProfiler\PerformanceTracer;
 use Statamic\View\Store;
 
 class ViewServiceProvider extends ServiceProvider
@@ -90,6 +92,14 @@ class ViewServiceProvider extends ServiceProvider
             return new ModifierManager();
         });
 
+        $this->app->singleton(PerformanceTracer::class, function () {
+            return new PerformanceTracer();
+        });
+
+        if (debugbar()->isEnabled()) {
+            debugbar()->addCollector(new PerformanceCollector());
+        }
+
         $this->app->bind('antlers.runtime', function ($app) {
             /** @var RuntimeParser $parser */
             $parser = $app->make(RuntimeParser::class)->cascade($app[Cascade::class]);
@@ -144,6 +154,15 @@ class ViewServiceProvider extends ServiceProvider
                 }
 
                 $runtimeConfig->traceManager->registerTracer(GlobalDebugManager::getTimingsTracer());
+            }
+
+            if (debugbar()->isEnabled()) {
+                if (! $isTracingOn) {
+                    $runtimeConfig->traceManager = new TraceManager();
+                    $runtimeConfig->isTracingEnabled = true;
+                }
+
+                $runtimeConfig->traceManager->registerTracer(app(PerformanceTracer::class));
             }
 
             $parser->isolateRuntimes(GlobalRuntimeState::$requiresRuntimeIsolation)
