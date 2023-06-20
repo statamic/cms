@@ -103,7 +103,8 @@ class ConditionProcessor
                     $this->processor->getRuntimeConfiguration()->traceManager->traceOnExit($branch->head, $result);
                 }
 
-                if ($result === true) {
+                if ($result == true) {
+
                     $this->processor->setIsConditionProcessor($condValueToRestore);
 
                     return $branch;
