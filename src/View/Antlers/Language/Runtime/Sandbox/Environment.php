@@ -382,7 +382,8 @@ class Environment
         }
 
         if (is_numeric($result)) {
-            $value = $result >= 1;
+            // Updated to be != 0 to be consistent with PHP behavior.
+            $value = $result != 0;
             $this->unlock();
 
             return $value;
