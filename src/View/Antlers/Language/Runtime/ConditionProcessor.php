@@ -77,7 +77,7 @@ class ConditionProcessor
 
                 $result = $environment->evaluateBool(self::$branchCache[$branch->head->content]);
 
-                if ($result === true) {
+                if ($result == true) {
                     $this->processor->setIsConditionProcessor($condValueToRestore);
 
                     return $branch;
