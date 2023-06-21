@@ -457,7 +457,7 @@
                             }
 
                             if (data.isHot) {
-                                display += `<span title="This code is called a large number of times, or contains code that is executed a large number of times.">${svgs.hotCode}</span>`;
+                                display += `<span title="This code, or code it contains, is executed a large number of times.">${svgs.hotCode}</span>`;
                             }
 
                             display += data.executionCount;
