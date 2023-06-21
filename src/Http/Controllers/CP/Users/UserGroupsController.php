@@ -131,7 +131,27 @@ class UserGroupsController extends CpController
     {
         $this->authorize('edit user groups');
 
-        return view('statamic::usergroups.create');
+        $blueprint = UserGroup::blueprint();
+
+        if (! User::current()->can('edit roles')) {
+            $blueprint->ensureField('roles', ['visibility' => 'read_only']);
+        }
+
+        $fields = $blueprint
+            ->fields()
+            ->preProcess();
+
+        $viewData = [
+            'values' => $fields->values()->all(),
+            'meta' => $fields->meta(),
+            'blueprint' => $blueprint->toPublishArray(),
+            'actions' => [
+                'save' => cp_route('user-groups.store'),
+            ],
+        ];
+
+        return view('statamic::usergroups.create', $viewData);
+
     }
 
     public function store(Request $request)

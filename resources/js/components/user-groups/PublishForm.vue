@@ -63,7 +63,8 @@ export default {
         initialTitle: String,
         actions: Object,
         method: String,
-        canEditBlueprint: Boolean
+        canEditBlueprint: Boolean,
+        isCreating: Boolean,
     },
 
     data() {
@@ -97,8 +98,9 @@ export default {
 
             this.$axios[this.method](this.actions.save, this.visibleValues).then(response => {
                 this.title = response.data.title;
-                if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
+                if (this.isCreating) window.location = response.data.redirect;
+                this.$toast.success(__('Saved'));
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => {
                 if (e.response && e.response.status === 422) {
