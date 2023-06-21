@@ -155,7 +155,7 @@
     </div>
     @endforeach
 
-    <h3 class="little-heading pl-0 mb-2">{{ __('Other') }}</h3>
+    <h3 class="little-heading pl-0 mb-2">{{ __('Users') }}</h3>
     <div class="card p-0 mb-4">
         <table class="data-table">
             <tr>
@@ -169,8 +169,8 @@
             <tr>
                 <td>
                     <div class="flex items-center">
-                        <div class="w-4 h-4 mr-2">@cp_svg('user_groups')</div>
-                        <a href="{{ cp_route('user-groups.blueprint.edit') }}">{{ __('Groups') }}</a>
+                        <div class="w-4 h-4 mr-4">@cp_svg('icons/light/user_groups')</div>
+                        <a href="{{ cp_route('user-groups.blueprint.edit') }}">{{ __('Group') }}</a>
                     </div>
                 </td>
             </tr>
