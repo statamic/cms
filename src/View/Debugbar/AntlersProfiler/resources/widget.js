@@ -400,7 +400,7 @@
                         }
                     },
                     path: {
-                        title: 'File Path',
+                        title: 'View Path',
                         field: 'path',
                         visible: false,
                         formatter: function (cell) {
