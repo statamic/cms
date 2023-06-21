@@ -369,7 +369,7 @@
                         title: '',
                     },
                     sequence: {
-                        title: 'Sequence',
+                        title: 'Timestamp',
                         field: 'sampleTime',
                         formatter: function (cell) {
                             var data = cell.getData();
