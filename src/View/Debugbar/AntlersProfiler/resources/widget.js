@@ -431,7 +431,7 @@
                         }
                     },
                     cumulativeMemoryUsage: {
-                        title: 'Cum. Memory Samples',
+                        title: 'Memory Usage',
                         formatter: function (cell) {
                             var data = cell.getData();
 
