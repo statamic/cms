@@ -119,7 +119,7 @@
     </div>
     <div>
         <button title="Display nested performance data by view file." id="btn-antlers-trace-view-graph" class="antlers-trace-button antlers-trace-button-active">View Graph</button>
-        <button title="Display performance data for each Antlers node." id="btn-antlers-trace-node-graph" class="antlers-trace-button">Node Graph</button>
+        <button title="Display performance data for each Antlers expression." id="btn-antlers-trace-expression-graph" class="antlers-trace-button">Expression Graph</button>
         <button title="View generated source output with performance data." id="btn-antlers-trace-source-graph" class="antlers-trace-button">Source View</button>
     </div>
 </div>
@@ -159,7 +159,7 @@
 
                 var btnCallGraph = document.getElementById('btn-antlers-trace-view-graph'),
                     btnSourceGraph = document.getElementById('btn-antlers-trace-source-graph'),
-                    btnNodeGraph = document.getElementById('btn-antlers-trace-node-graph'),
+                    btnNodeGraph = document.getElementById('btn-antlers-trace-expression-graph'),
                     btnCloseProperties = document.getElementById('btn-antlers-trace-close-properties'),
                     tabCallGraph = document.getElementById('antlers-trace-call-report'),
                     tabSourceGraph = document.getElementById('antlers-trace-source-graph'),
@@ -184,7 +184,7 @@
                     var objProperties = [],
                         properties = '';
                     objProperties.push({
-                        label: 'Node Content',
+                        label: 'Expression Content',
                         value: `<span style="font-family:monospace">${obj.escapedNodeContent}</span>`,
                         help: '',
                     });
@@ -206,36 +206,36 @@
                     objProperties.push({
                         label: 'Self Execution Time',
                         value: obj.clientSelfTimeDisplay,
-                        help: 'The time spent evaluating just this Antlers node.'
+                        help: 'The time spent evaluating this Antlers expression.'
                     });
 
                     objProperties.push({
                         label: 'Total Execution Time',
                         value: obj.clientTotalTimeDisplay,
-                        help: 'The time spent evaluating the Antlers node, and all child nodes.'
+                        help: 'The time spent evaluating the Antlers expression, and all child expressions.'
                     });
 
                     objProperties.push({
                         label: 'Execution Time %',
                         value: obj.percentOfExecutionTime,
-                        help: 'The percent of rendering time attributable to this Antlers node.'
+                        help: 'The percent of rendering time attributable to this Antlers expression.'
                     });
 
                     objProperties.push({
                         label: '# of Executions',
                         value: obj.executionCount,
-                        help: 'The total number of times this Antlers node was evaluated.'
+                        help: 'The total number of times this Antlers expression was evaluated.'
                     });
 
                     objProperties.push({
                         label: 'Cumulative Memory',
                         value: formatBytes(obj.cumulativeMemorySamples),
-                        help: 'The relative amount of memory consumed while this Antlers node was being evaluated.'
+                        help: 'The relative amount of memory consumed while this Antlers expression was being evaluated.'
                     });
 
                     if (obj.escapedSourceContent.trim().length > 0) {
                         objProperties.push({
-                            label: 'Inner Node Content',
+                            label: 'Inner Expression Content',
                             value: `<span style="font-family:monospace">${obj.escapedSourceContent}</span>`,
                             help: ''
                         });
@@ -603,7 +603,7 @@
                 var observerConfig = { attributes: true, attributeFilter: ['style'] };
                 observer.observe(debugBarBody, observerConfig);
 
-                addMetric('Nodes Processed', data.total_antlers_nodes.toLocaleString());
+                addMetric('Expressions Processed', data.total_antlers_nodes.toLocaleString());
             }.bind(this));
         },
 
