@@ -445,7 +445,7 @@
                         hozAlign: 'right',
                     },
                     executionCount: {
-                        title: 'Excution Count',
+                        title: 'Execution Count',
                         field: 'executionCount',
                         hozAlign: 'right',
                         formatter: function (cell) {
