@@ -187,9 +187,6 @@ abstract class UserGroup implements UserGroupContract, Augmentable, ArrayAccess,
     }
 
     /**
-     * Get or set the blueprint.
-     *
-     * @param string|null|bool
      * @return \Statamic\Fields\Blueprint
      */
     public function blueprint()
