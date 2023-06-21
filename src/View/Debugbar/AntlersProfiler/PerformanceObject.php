@@ -46,9 +46,9 @@ class PerformanceObject
     public $cumulativeMemorySamples = 0;
     protected $memorySampleStart = 0;
 
-    public function __construct()
+    public function __construct($baselineTime)
     {
-        $this->sampleTime = microtime(true) * 1000;
+        $this->sampleTime = (microtime(true) * 1000) - $baselineTime;
         $this->initializedMemorySample = memory_get_usage();
     }
 

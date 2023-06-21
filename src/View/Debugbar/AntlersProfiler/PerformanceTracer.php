@@ -57,6 +57,8 @@ class PerformanceTracer implements RuntimeTracerContract
 
     private $memorySampleBaseline = 0;
 
+    private $firstSampleTime = null;
+
     public function __construct()
     {
         $this->memorySampleBaseline = memory_get_usage();
@@ -144,13 +146,17 @@ class PerformanceTracer implements RuntimeTracerContract
             $minDepth = $fileItems->min(fn (PerformanceObject $item) => $item->depth);
 
             $reportItems = $fileItems->where(fn (PerformanceObject $item) => $item->depth == $minDepth)->values()->all();
-            $rootItem = new PerformanceObject();
+            $rootItem = new PerformanceObject($this->firstSampleTime);
             $rootItem->path = $file;
             $rootItem->isNodeObject = false;
             $rootItem->children = $reportItems;
             $rootItem->escapedNodeContent = e($rootItem->nodeContent);
             $rootItem->clientSelfTimeDisplay = $rootItem->getTotalExecutionTimeDisplay();
             $rootItem->clientTotalTimeDisplay = $rootItem->getTotalExecutionTimeDisplay();
+
+            if (count($reportItems) > 0) {
+                $rootItem->sampleTime = $reportItems[0]->sampleTime;
+            }
 
             /** @var PerformanceObject $item */
             foreach ($reportItems as $item) {
@@ -168,7 +174,7 @@ class PerformanceTracer implements RuntimeTracerContract
         $currentMemory = memory_get_usage() - $this->memorySampleBaseline;
 
         $sample = new RuntimeSample();
-        $sample->time = microtime(true) * 1000;
+        $sample->time = (microtime(true) * 1000) - $this->firstSampleTime;
         $sample->memory = $currentMemory;
         $sample->antlersNodesProcessed = $this->antlersNodesObserved;
 
@@ -194,6 +200,10 @@ class PerformanceTracer implements RuntimeTracerContract
             return;
         }
 
+        if ($this->firstSampleTime == null) {
+            $this->firstSampleTime = microtime(true) * 1000;
+        }
+
         $this->sampleEnvironmentData();
 
         if (GlobalRuntimeState::$currentExecutionFile == null) {
@@ -212,7 +222,7 @@ class PerformanceTracer implements RuntimeTracerContract
         $this->antlersNodesObserved += 1;
 
         if ($node->isClosingTag) {
-            $outputClosing = new PerformanceObject();
+            $outputClosing = new PerformanceObject($this->firstSampleTime);
             $outputClosing->nodeRefId = $node->refId;
 
             $outputClosing->bufferOutput = $node->rawStart.$node->content.$node->rawEnd;
@@ -233,7 +243,7 @@ class PerformanceTracer implements RuntimeTracerContract
         $this->uniqueFiles[$file] = 1;
 
         if ($node->isClosedBy != null) {
-            $openNode = new PerformanceObject();
+            $openNode = new PerformanceObject($this->firstSampleTime);
             $openNode->nodeRefId = $node->refId;
             $openNode->bufferOutput = $node->rawStart.$node->content.$node->rawEnd;
             $openNode->escapedBufferOutput = e($openNode->bufferOutput);
@@ -249,7 +259,7 @@ class PerformanceTracer implements RuntimeTracerContract
         }
 
         if (! array_key_exists($node->refId, $this->nodePerformanceItems)) {
-            $performanceItem = new PerformanceObject();
+            $performanceItem = new PerformanceObject($this->firstSampleTime);
             $performanceItem->path = $file;
             $performanceItem->fullPath = $fullPath;
 
@@ -312,7 +322,7 @@ class PerformanceTracer implements RuntimeTracerContract
 
         if ($node instanceof LiteralNode) {
             if (! array_key_exists($node->refId, $this->sourceViewObjects)) {
-                $literalObject = new PerformanceObject();
+                $literalObject = new PerformanceObject($this->firstSampleTime);
                 $literalObject->bufferOutput = $runtimeContent;
                 $literalObject->escapedBufferOutput = e($literalObject->bufferOutput);
                 $literalObject->path = $this->massageFilePath(GlobalRuntimeState::$currentExecutionFile);
@@ -343,7 +353,7 @@ class PerformanceTracer implements RuntimeTracerContract
             }
 
             if (is_bool($runtimeContent) || is_numeric($runtimeContent) || (is_string($runtimeContent)) && ! $node->isTagNode && $node->isClosedBy == null) {
-                $outObject = new PerformanceObject();
+                $outObject = new PerformanceObject($this->firstSampleTime);
                 $outObject->nodeRefId = $node->refId;
 
                 $outContent = $runtimeContent;
