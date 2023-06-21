@@ -520,6 +520,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Get the file download url.
+     * 
+     * @return string
+     */
+    public function downloadUrl()
+    {
+        return cp_route('assets.download', base64_encode($this->id()));
+    }
+
+    /**
      * Get the file extension of the asset.
      *
      * @return string
