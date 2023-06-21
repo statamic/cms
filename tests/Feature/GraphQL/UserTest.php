@@ -43,7 +43,7 @@ class UserTest extends TestCase
     }
 
     /** @test */
-    public function it_queries_an_user_by_id()
+    public function it_queries_a_user_by_id()
     {
         $this->createUsers();
 
@@ -79,7 +79,7 @@ GQL;
     }
 
     /** @test */
-    public function it_queries_an_user_by_email()
+    public function it_queries_a_user_by_email()
     {
         $this->createUsers();
 
