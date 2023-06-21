@@ -480,7 +480,7 @@
                         hozAlign: 'right'
                     },
                     selfExecutionTime: {
-                        title: 'Self Time',
+                        title: 'Tag Time',
                         field: 'clientSelfTime',
                         formatter: function (cell) {
                             var data = cell.getData();
