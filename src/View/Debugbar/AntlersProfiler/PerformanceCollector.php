@@ -87,6 +87,7 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
                 'widget' => 'PhpDebugBar.Widgets.StatamicAntlersWidget',
                 'title' => 'Antlers Profiler',
                 'map' => 'antlers',
+                'icon' => 'code',
                 'default' => '{}',
             ],
         ];
