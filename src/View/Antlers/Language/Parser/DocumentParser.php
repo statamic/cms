@@ -107,6 +107,7 @@ class DocumentParser
     private $interpolatedCollisionCount = [];
     private $threeCharCollisionCount = -1;
     private $threeCharCollisions = [];
+    private $isVirtual = false;
 
     /**
      * A list of node visitors.
@@ -144,6 +145,11 @@ class DocumentParser
         $this->seedStartChar = $startChar;
 
         return $this;
+    }
+
+    public function setIsVirtual($isVirtual)
+    {
+        $this->isVirtual = $isVirtual;
     }
 
     /**
@@ -213,6 +219,7 @@ class DocumentParser
                 $this->nodes[] = $escapeNode;
                 $this->currentContent = [];
                 $this->currentIndex += 1;
+
                 continue;
             }
 
@@ -344,6 +351,7 @@ class DocumentParser
             if (Str::startsWith($antlersRegion, '@')) {
                 $lastAntlersOffset = mb_strpos($this->content, $antlersRegion, $lastAntlersOffset) + 2;
                 $lastWasEscaped = true;
+
                 continue;
             }
 
@@ -352,6 +360,7 @@ class DocumentParser
             if ($lastWasEscaped) {
                 if ($lastAntlersOffset == $offset) {
                     $lastAntlersOffset = $offset;
+
                     continue;
                 }
             }
@@ -431,6 +440,7 @@ class DocumentParser
                 if ($this->jumpToIndex != null) {
                     $i = $this->jumpToIndex - 1;
                     $this->jumpToIndex = null;
+
                     continue;
                 }
 
@@ -497,6 +507,7 @@ class DocumentParser
                                 }
 
                                 $i = $skipIndex - 1;
+
                                 continue;
                             }
                         }
@@ -840,6 +851,7 @@ class DocumentParser
             if ($this->cur == self::LeftBrace) {
                 if ($this->prev == self::AtChar) {
                     $subContent[] = $this->cur;
+
                     continue;
                 }
 
@@ -848,6 +860,7 @@ class DocumentParser
             } elseif ($this->cur == self::RightBrace) {
                 if ($this->prev == self::AtChar) {
                     $subContent[] = $this->cur;
+
                     continue;
                 }
 
@@ -971,18 +984,21 @@ class DocumentParser
             if ($this->cur == self::LeftBrace && $this->prev == self::AtChar) {
                 array_pop($this->currentContent);
                 $this->currentContent = array_merge($this->currentContent, $this->getLeftBrace());
+
                 continue;
             }
 
             if ($this->isInterpolatedParser && $this->cur == self::RightBrace && $this->prev == self::AtChar) {
                 array_pop($this->currentContent);
                 $this->currentContent[] = $this->cur;
+
                 continue;
             }
 
             if ($this->cur == self::RightBrace && $this->prev == self::AtChar) {
                 array_pop($this->currentContent);
                 $this->currentContent = array_merge($this->currentContent, $this->getRightBrace());
+
                 continue;
             }
 
@@ -992,6 +1008,7 @@ class DocumentParser
 
                 $this->currentContent = array_merge($this->currentContent, StringUtilities::split($results[2]));
                 $this->interpolationRegions[$results[1]] = $results[3];
+
                 continue;
             }
 
@@ -1045,6 +1062,7 @@ class DocumentParser
     {
         $node = new PhpExecutionNode();
 
+        $node->isVirtual = $this->isVirtual;
         $node->isEchoNode = $isEcho;
 
         if ($isEcho) {
@@ -1084,6 +1102,8 @@ class DocumentParser
     private function makeAntlersTagNode($index, $isComment)
     {
         $node = new AntlersNode();
+
+        $node->isVirtual = $this->isVirtual;
 
         if ($this->isDoubleBrace) {
             $node->rawStart = '{{';
@@ -1160,6 +1180,7 @@ class DocumentParser
     private function makeLiteralNode($buffer, $startOffset, $currentOffset)
     {
         $node = new LiteralNode();
+        $node->isVirtual = $this->isVirtual;
         $node->content = implode('', $buffer);
         $node->startPosition = $this->positionFromOffset($startOffset, $startOffset);
         $node->endPosition = $this->positionFromOffset($currentOffset, $startOffset);

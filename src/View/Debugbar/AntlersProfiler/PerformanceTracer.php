@@ -2,7 +2,6 @@
 
 namespace Statamic\View\Debugbar\AntlersProfiler;
 
-use Carbon\Carbon;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
@@ -111,7 +110,9 @@ class PerformanceTracer implements RuntimeTracerContract
         foreach ($this->sourceViewObjects as $item) {
             $item->escapedNodeContent = e($item->nodeContent);
 
-            if (! $item->isNodeObject) { continue; }
+            if (! $item->isNodeObject) {
+                continue;
+            }
 
             // Copy details over.
             if (array_key_exists($item->nodeRefId, $this->nodePerformanceItems)) {
@@ -189,6 +190,10 @@ class PerformanceTracer implements RuntimeTracerContract
 
     public function onEnter(AbstractNode $node)
     {
+        if ($node->isVirtual) {
+            return;
+        }
+
         $this->sampleEnvironmentData();
 
         if (GlobalRuntimeState::$currentExecutionFile == null) {
@@ -297,6 +302,10 @@ class PerformanceTracer implements RuntimeTracerContract
 
     public function onExit(AbstractNode $node, $runtimeContent)
     {
+        if ($node->isVirtual) {
+            return;
+        }
+
         if (GlobalRuntimeState::$currentExecutionFile == null) {
             return;
         }
