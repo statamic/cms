@@ -118,7 +118,7 @@
         ${debugWarningLabel}
     </div>
     <div>
-        <button title="Display nested performance data by file." id="btn-antlers-trace-call-graph" class="antlers-trace-button antlers-trace-button-active">Call Graph</button>
+        <button title="Display nested performance data by view file." id="btn-antlers-trace-view-graph" class="antlers-trace-button antlers-trace-button-active">View Graph</button>
         <button title="Display performance data for each Antlers node." id="btn-antlers-trace-node-graph" class="antlers-trace-button">Node Graph</button>
         <button title="View generated source output with performance data." id="btn-antlers-trace-source-graph" class="antlers-trace-button">Source View</button>
     </div>
@@ -157,7 +157,7 @@
 
                 this.$el.empty().append($content);
 
-                var btnCallGraph = document.getElementById('btn-antlers-trace-call-graph'),
+                var btnCallGraph = document.getElementById('btn-antlers-trace-view-graph'),
                     btnSourceGraph = document.getElementById('btn-antlers-trace-source-graph'),
                     btnNodeGraph = document.getElementById('btn-antlers-trace-node-graph'),
                     btnCloseProperties = document.getElementById('btn-antlers-trace-close-properties'),
