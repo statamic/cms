@@ -16,8 +16,9 @@
             sgBad: 'rgb(255 198 192)',
         },
         svgs = {
-            codeBrackets: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="antlers-trace-svg">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+            codeBrackets: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke-width="1.5" class="antlers-trace-svg">
+    <path d="M22.5,21.753a1.5,1.5,0,0,1-1.5,1.5H3a1.5,1.5,0,0,1-1.5-1.5V2.253A1.5,1.5,0,0,1,3,.753H18.045a1.5,1.5,0,0,1,1.048.427l2.955,2.882A1.5,1.5,0,0,1,22.5,5.136Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M14.295 9.003L18.045 12.753 14.295 16.503" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9.795 9.003L6.045 12.753 9.795 16.503" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>
 `,
             hotCode: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="antlers-trace-svg antlers-hot-code">
@@ -36,6 +37,11 @@
 `,
             externalLink: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="antlers-trace-svg antlers-external-link">
   <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+</svg>
+`,
+            variable: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke-width="1.5" class="antlers-trace-svg">
+    <path d="M16.5,3.75H10.8a3.3,3.3,0,0,0-3.3,3.3c0,4.95,9,4.95,9,9.9a3.3,3.3,0,0,1-3.3,3.3H7.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 3.75L12 0.75" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M12 20.25L12 23.25" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
 </svg>
 `,
         };
@@ -377,26 +383,43 @@
                             return getSampleTime(data.sampleTime);
                         }
                     },
-                    item: {
-                        title: 'Item',
-                        maxInitialWidth: 540,
-                        field: 'clientDisplay',
+                    type: {
+                        title: 'Type',
+                        field: 'type',
                         formatter: function (cell) {
                             var data = cell.getData(),
                                 contents = '',
-                                prefix = '';
+                                icon = '';
 
                             if (!data.isNodeObject) {
-                                contents = `${svgs.codeBrackets} ${truncateString(data.path, 100)}`;
+                                contents = "View";
+                                icon = svgs.codeBrackets;
+                            } else if (data.isTag) {
+                                contents = "Tag"
+                                icon = svgs.tag;
                             } else {
-                                if (data.isTag) {
-                                    prefix = svgs.tag;
-                                }
+                                contents = "Variable";
+                                icon = svgs.variable;
+                            }
 
+                            return `<span class="antlers-trace-type-tooltip">${icon}${contents}</span>`;
+                        }
+                    },
+                    item: {
+                        title: 'Item',
+                        maxInitialWidth: 400,
+                        field: 'clientDisplay',
+                        formatter: function (cell) {
+                            var data = cell.getData(),
+                                contents = '';
+
+                            if (!data.isNodeObject) {
+                                contents = truncateString(data.path, 100);
+                            } else {
                                 contents += truncateString(data.nodeContent, 100);
                             }
 
-                            return `<span class="antlers-trace-item-tooltip">${prefix}${contents}</span>`;
+                            return `<span class="antlers-trace-item-tooltip">${contents}</span>`;
                         }
                     },
                     path: {
@@ -445,7 +468,7 @@
                         hozAlign: 'right',
                     },
                     executionCount: {
-                        title: 'Execution Count',
+                        title: 'Execution',
                         field: 'executionCount',
                         hozAlign: 'right',
                         formatter: function (cell) {
@@ -544,6 +567,7 @@
                     columns: [
                         columnConfig.expander,
                         columnConfig.sequence,
+                        columnConfig.type,
                         columnConfig.item,
                         columnConfig.path,
                         columnConfig.lineNumber,
