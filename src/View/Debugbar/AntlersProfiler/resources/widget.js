@@ -549,8 +549,8 @@
                         columnConfig.lineNumber,
                         columnConfig.cumulativeMemoryUsage,
                         columnConfig.executionCount,
-                        columnConfig.totalExecutionTime,
                         columnConfig.selfExecutionTime,
+                        columnConfig.totalExecutionTime,
                         columnConfig.percentOfExecutionTime,
                     ],
                     data: data.data
