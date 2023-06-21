@@ -367,11 +367,9 @@
                 var columnConfig = {
                     expander: {
                         title: '',
-                        maxWidth: 150
                     },
                     sequence: {
                         title: 'Sequence',
-                        maxWidth: 70,
                         field: 'sampleTime',
                         formatter: function (cell) {
                             var data = cell.getData();
@@ -381,6 +379,7 @@
                     },
                     item: {
                         title: 'Item',
+                        maxInitialWidth: 540,
                         field: 'clientDisplay',
                         formatter: function (cell) {
                             var data = cell.getData(),
@@ -419,7 +418,6 @@
                         title: 'Line',
                         formatter: (cell) => cell.getValue(),
                         field: 'line',
-                        maxWidth: 70,
                         hozAlign: 'right',
                         formatter: function (cell) {
                             var data = cell.getData(),
@@ -444,13 +442,11 @@
                             return formatBytes(data.cumulativeMemorySamples);
                         },
                         field: 'cumulativeMemorySamples',
-                        maxWidth: 80,
                         hozAlign: 'right',
                     },
                     executionCount: {
                         title: 'Excution Count',
                         field: 'executionCount',
-                        maxWidth: 100,
                         hozAlign: 'right',
                         formatter: function (cell) {
                             var data = cell.getData(),
@@ -472,7 +468,6 @@
                     totalExecutionTime: {
                         title: 'Total Time',
                         field: 'clientTotalTime',
-                        maxWidth: 100,
                         formatter: function (cell) {
                             var data = cell.getData();
 
@@ -487,7 +482,6 @@
                     selfExecutionTime: {
                         title: 'Self Time',
                         field: 'clientSelfTime',
-                        maxWidth: 100,
                         formatter: function (cell) {
                             var data = cell.getData();
 
@@ -502,7 +496,6 @@
                     percentOfExecutionTime: {
                         title: '%',
                         field: 'percentOfExecutionTime',
-                        maxWidth: 100,
                         hozAlign: 'right',
                         formatter: function (cell) {
                             var data = cell.getData(),
