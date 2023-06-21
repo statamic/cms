@@ -18,13 +18,6 @@ class UserTest extends TestCase
 
     protected $enabledQueries = ['users'];
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        BlueprintRepository::partialMock();
-    }
-
     private function createUsers()
     {
         User::make()->id('1')->email('a@example.com')->set('name', 'Carmen Sandiego')->save();
