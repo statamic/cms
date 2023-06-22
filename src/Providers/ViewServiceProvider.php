@@ -153,7 +153,7 @@ class ViewServiceProvider extends ServiceProvider
                 $runtimeConfig->traceManager->registerTracer(GlobalDebugManager::getTimingsTracer());
             }
 
-            if (debugbar()->isEnabled() && ! \Statamic\Statamic::isCpRoute()) {
+            if ($this->profilerEnabled()) {
                 if (! $isTracingOn) {
                     $runtimeConfig->traceManager = new TraceManager();
                     $runtimeConfig->isTracingEnabled = true;
@@ -187,8 +187,13 @@ class ViewServiceProvider extends ServiceProvider
 
         ini_set('pcre.backtrack_limit', config('statamic.system.pcre_backtrack_limit', -1));
 
-        if (debugbar()->isEnabled() && ! Statamic::isCpRoute()) {
+        if ($this->profilerEnabled()) {
             debugbar()->addCollector(new PerformanceCollector);
         }
+    }
+
+    private function profilerEnabled()
+    {
+        return debugbar()->isEnabled() && ! Statamic::isCpRoute();
     }
 }
