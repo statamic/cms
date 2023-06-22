@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
 use Statamic\Facades\Site;
+use Statamic\Statamic;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Language\Analyzers\NodeTypeAnalyzer;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
@@ -96,10 +97,6 @@ class ViewServiceProvider extends ServiceProvider
             return new PerformanceTracer();
         });
 
-        if (debugbar()->isEnabled() && !\Statamic\Statamic::isCpRoute()) {
-            debugbar()->addCollector(new PerformanceCollector());
-        }
-
         $this->app->bind('antlers.runtime', function ($app) {
             /** @var RuntimeParser $parser */
             $parser = $app->make(RuntimeParser::class)->cascade($app[Cascade::class]);
@@ -156,7 +153,7 @@ class ViewServiceProvider extends ServiceProvider
                 $runtimeConfig->traceManager->registerTracer(GlobalDebugManager::getTimingsTracer());
             }
 
-            if (debugbar()->isEnabled() && !\Statamic\Statamic::isCpRoute()) {
+            if (debugbar()->isEnabled() && ! \Statamic\Statamic::isCpRoute()) {
                 if (! $isTracingOn) {
                     $runtimeConfig->traceManager = new TraceManager();
                     $runtimeConfig->isTracingEnabled = true;
@@ -189,5 +186,9 @@ class ViewServiceProvider extends ServiceProvider
         }
 
         ini_set('pcre.backtrack_limit', config('statamic.system.pcre_backtrack_limit', -1));
+
+        if (debugbar()->isEnabled() && ! Statamic::isCpRoute()) {
+            debugbar()->addCollector(new PerformanceCollector);
+        }
     }
 }
