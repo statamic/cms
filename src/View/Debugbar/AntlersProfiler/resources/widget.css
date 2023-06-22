@@ -40,6 +40,7 @@
     align-items: center !important;
     justify-content: space-between !important;
     gap: 5px !important;
+    color: #2c2828;
 }
 
 .antlers-trace-metric:not(:first-child) {
@@ -148,6 +149,7 @@
     border-bottom: 1px solid #e9e9e9 !important;
     padding-bottom: 5px !important;
     width: 100% !important;
+    color: #2c2828;
 }
 
 .antlers-trace-property-key {
