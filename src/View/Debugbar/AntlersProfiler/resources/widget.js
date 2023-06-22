@@ -120,6 +120,7 @@
 
                 var $content = $(`
 <div id="antlers-trace-toolbar">
+    <h2>Antlers Profiler [Experimental]</h2>
     <div id="antlers-trace-metrics">
         ${debugWarningLabel}
     </div>

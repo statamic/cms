@@ -24,6 +24,7 @@
 #antlers-trace-toolbar {
     display: flex !important;
     justify-content: space-between !important;
+    align-items: center !important;
     gap: 5px !important;
     border-bottom: 1px solid #eaeaea;
     padding: 5px;
@@ -33,6 +34,13 @@
     left: 0 !important;
     right: 0 !important;
     background-color: #ffffff !important;
+}
+
+#antlers-trace-toolbar h2 {
+    margin: 0 !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    color: #2c2828 !important;
 }
 
 #antlers-trace-metrics {

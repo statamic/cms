@@ -16,19 +16,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Debugbar Profiler (Experimental)
-    |--------------------------------------------------------------------------
-    |
-    | Enable the Antlers Profiling tab in the Debugbar. This is a work in
-    | progress tool that's being developed to find performance
-    | bottlenecks in your Antlers templates.
-    |
-    */
-
-    'debugbar' => false,
-
-    /*
-    |--------------------------------------------------------------------------
     | Guarded Variables
     |--------------------------------------------------------------------------
     |
