@@ -375,7 +375,7 @@
                         title: '',
                     },
                     sequence: {
-                        title: 'Timestamp',
+                        title: 'Time',
                         field: 'sampleTime',
                         formatter: function (cell) {
                             var data = cell.getData();
@@ -407,17 +407,13 @@
                     },
                     item: {
                         title: 'Item',
-                        maxInitialWidth: 400,
+                        maxInitialWidth: 640,
                         field: 'clientDisplay',
                         formatter: function (cell) {
-                            var data = cell.getData(),
-                                contents = '';
+                            var data = cell.getData();
+                            var contents = !data.isNodeObject ? data.path : data.nodeContent;
 
-                            if (!data.isNodeObject) {
-                                contents = truncateString(data.path, 100);
-                            } else {
-                                contents += truncateString(data.nodeContent, 100);
-                            }
+                            contents = truncateString(contents, 100);
 
                             return `<span class="antlers-trace-item-tooltip">${contents}</span>`;
                         }
@@ -439,6 +435,7 @@
                     },
                     lineNumber: {
                         title: 'Line',
+                        headerHozAlign: 'right',
                         formatter: (cell) => cell.getValue(),
                         field: 'line',
                         hozAlign: 'right',
@@ -504,6 +501,7 @@
                     },
                     selfExecutionTime: {
                         title: 'Tag Time',
+                        headerHozAlign: 'right',
                         field: 'clientSelfTime',
                         formatter: function (cell) {
                             var data = cell.getData();
@@ -520,6 +518,7 @@
                         title: '%',
                         field: 'percentOfExecutionTime',
                         hozAlign: 'right',
+                        headerHozAlign: 'right',
                         formatter: function (cell) {
                             var data = cell.getData(),
                                 contents = '';
