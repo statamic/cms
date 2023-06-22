@@ -8,12 +8,12 @@
             executionTimeDanger: 5
         },
         colors = {
-            hotCode: 'rgb(227 208 252)',
+            hotCode: '#f6eec7',
             sgFast: '#bbffbb',
             sgGood: '#86f286',
-            sgWarn: 'yellow',
-            sgStrongWarn: 'rgb(252 182 120)',
-            sgBad: 'rgb(255 198 192)',
+            sgWarn: '#f2dea1',
+            sgStrongWarn: '#f8c7b4',
+            sgBad: '#f1a7a7',
         },
         svgs = {
             codeBrackets: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke-width="1.5" class="antlers-trace-svg">
