@@ -89,11 +89,17 @@
 
 .antlers-trace-editor-link {
     margin-left: 3px !important;
+    position: relative;
+    top: -2px;
+}
+
+.antlers-trace-editor-link:hover {
+    color: #FF269E !important;
 }
 
 .antlers-trace-editor-link svg {
-    height: 15px;
-    width: 15px;
+    height: 14px;
+    width: 14px;
 }
 
 #antlers-trace-report-view {
