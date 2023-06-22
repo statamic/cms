@@ -85,14 +85,17 @@ class UrlBuilder implements UrlBuilderContract
     {
         $slashPlaceholder = strtolower(str_random());
         $dotPlaceholder = strtolower(str_random());
+        $hashPlaceholder = strtolower(str_random());
 
         $value = str_replace('/', $slashPlaceholder, $value);
         $value = str_replace('.', $dotPlaceholder, $value);
+        $value = str_replace('#', $hashPlaceholder, $value);
 
         $value = Str::slug($value);
 
         $value = str_replace($slashPlaceholder, '/', $value);
         $value = str_replace($dotPlaceholder, '.', $value);
+        $value = str_replace($hashPlaceholder, '#', $value);
 
         return $value;
     }
