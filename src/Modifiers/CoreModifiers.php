@@ -328,6 +328,11 @@ class CoreModifiers extends Modifier
             ->all();
     }
 
+    public function classes($value)
+    {
+        return Arr::toCssClasses($value);
+    }
+
     public function className($value)
     {
         return get_class($value);
@@ -757,20 +762,6 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Converts a string to a Carbon instance and formats it according to the whim of the Overlord.
-     *
-     * @deprecated formatLocalized is deprecated since Carbon 2.55.0. You may want to use isoFormat instead.
-     *
-     * @param $value
-     * @param $params
-     * @return string
-     */
-    public function formatLocalized($value, $params)
-    {
-        return $this->carbon($value)->formatLocalized(Arr::get($params, 0));
-    }
-
-    /**
      * Format a number with grouped thousands and decimal points.
      *
      * @param $value
@@ -1127,8 +1118,8 @@ class CoreModifiers extends Modifier
     public function isBetween($value, $params, $context)
     {
         return $this->carbon($value)->between(
-                $this->carbon($this->getFromContext($context, $params, 0)),
-                $this->carbon($this->getFromContext($context, $params, 1))
+            $this->carbon($this->getFromContext($context, $params, 0)),
+            $this->carbon($this->getFromContext($context, $params, 1))
         );
     }
 
@@ -3038,6 +3029,10 @@ class CoreModifiers extends Modifier
 
         if (Str::contains($url, 'youtube.com/watch?v=')) {
             $url = str_replace('watch?v=', 'embed/', $url);
+
+            if (Str::contains($url, '&t=')) {
+                $url = str_replace('&t=', '?start=', $url);
+            }
         }
 
         if (Str::contains($url, 'youtube.com')) {

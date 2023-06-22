@@ -4,8 +4,6 @@ namespace Statamic\Console\Commands;
 
 use Archetype\Facades\PHPFile;
 use PhpParser\BuilderFactory;
-use PhpParser\Node\Scalar\MagicConst\Dir;
-use PhpParser\Node\Scalar\String_;
 use Statamic\Console\RunsInPlease;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -120,7 +118,7 @@ class MakeFieldtype extends GeneratorCommand
         }
 
         $files = [
-            'addon/webpack.mix.js.stub' => 'webpack.mix.js',
+            'addon/vite.config.js.stub' => 'vite.config.js',
             'addon/package.json.stub' => 'package.json',
             'addon/addon.js.stub' => 'resources/js/addon.js',
         ];
@@ -134,6 +132,8 @@ class MakeFieldtype extends GeneratorCommand
         foreach ($files as $stub => $file) {
             $this->createFromStub($stub, $addonPath.'/'.$file, $data);
         }
+
+        $this->files->makeDirectory($addonPath.'/resources/dist', 0777, true, true);
     }
 
     /**
@@ -143,16 +143,14 @@ class MakeFieldtype extends GeneratorCommand
     {
         $factory = new BuilderFactory();
 
-        $scriptsValue = $factory->concat(
-            new Dir,
-            new String_('/../dist/js/addon.js')
-        );
-
         $fieldtypeClassValue = $factory->classConstFetch('Fieldtypes\\'.$this->getNameInput(), 'class');
 
         try {
             PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
-                    ->add()->protected()->property('scripts', $scriptsValue)
+                    ->add()->protected()->property('vite', [
+                        'input' => ['resources/js/addon.js'],
+                        'publicDirectory' => 'resources/dist',
+                    ])
                     ->add()->protected()->property('fieldtypes', $fieldtypeClassValue)
                     ->save();
         } catch (\Exception $e) {

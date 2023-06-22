@@ -3,14 +3,14 @@
     <node-view-wrapper>
         <div class="bard-inline-image-container">
             <div v-if="src">
-                <div class="p-1 text-center">
+                <div class="p-2 text-center">
                     <div ref="content" hidden />
                     <img :src="src" class="block mx-auto" data-drag-handle />
                 </div>
 
-                <div class="flex items-center p-1 pt-0 rounded-b" @paste.stop>
-                    <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-1" />
-                    <button class="btn-flat mr-1" @click="openSelector">
+                <div class="flex items-center p-2 border-t rounded-b" @paste.stop>
+                    <text-input name="alt" v-model="alt" :prepend="__('Alt Text')" class="mr-2 flex-1" />
+                    <button class="btn-flat mr-2" @click="openSelector">
                         {{ __('Replace') }}
                     </button>
                     <button class="btn-flat" @click="deleteNode">
@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <div v-else class="text-center p-2">
+            <div v-else class="text-center p-4">
                 <button class="btn-flat" @click="openSelector">
                     {{ __('Choose Image') }}
                 </button>
@@ -139,12 +139,10 @@ export default {
 
         openSelector() {
             this.showingSelector = true;
-            this.$root.hideOverflow = true;
         },
 
         closeSelector() {
             this.showingSelector = false;
-            this.$root.hideOverflow = false;
         },
 
         assetsSelected(selections) {
@@ -164,8 +162,8 @@ export default {
                 // return;
             }
 
-            this.$axios.get(cp_url('assets-fieldtype'), {
-                params: { assets: [id] }
+            this.$axios.post(cp_url('assets-fieldtype'), {
+                assets: [id],
             }).then(response => {
                 this.setAsset(response.data[0]);
             });
@@ -179,7 +177,12 @@ export default {
             this.updateAttributes({ src: this.actualSrc });
         },
 
-    }
+    },
 
+    updated() {
+        // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
+        // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
+        this.$el.setAttribute('draggable', false);
+    }
 }
 </script>

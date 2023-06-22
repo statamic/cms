@@ -197,8 +197,6 @@ class UserTags extends Tags
 
         $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
-        $html = $this->formOpen(route('statamic.profile'), 'POST', $knownParams);
-
         $params = [];
 
         if ($redirect = $this->getRedirectUrl()) {
@@ -208,6 +206,18 @@ class UserTags extends Tags
         if ($errorRedirect = $this->getErrorRedirectUrl()) {
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
+
+        $action = route('statamic.profile');
+        $method = 'POST';
+
+        if (! $this->parser) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
 
         $html .= $this->formMetaFields($params);
 
@@ -237,7 +247,8 @@ class UserTags extends Tags
 
         $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
-        $html = $this->formOpen(route('statamic.password'), 'POST', $knownParams);
+        $action = route('statamic.password');
+        $method = 'POST';
 
         $params = [];
 
@@ -248,6 +259,15 @@ class UserTags extends Tags
         if ($errorRedirect = $this->getErrorRedirectUrl()) {
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
+
+        if (! $this->parser) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams);
 
         $html .= $this->formMetaFields($params);
 
@@ -413,16 +433,18 @@ class UserTags extends Tags
     public function can()
     {
         if (! $user = User::current()) {
-            return;
+            return $this->parser ? null : false;
         }
 
         $permissions = Arr::wrap($this->params->explode(['permission', 'do']));
 
         foreach ($permissions as $permission) {
             if ($user->can($permission)) {
-                return $this->parse();
+                return $this->parser ? $this->parse() : true;
             }
         }
+
+        return $this->parser ? null : false;
     }
 
     /**
@@ -435,7 +457,7 @@ class UserTags extends Tags
     public function cant()
     {
         if (! $user = User::current()) {
-            return $this->parse();
+            return $this->parser ? $this->parse() : true;
         }
 
         $permissions = Arr::wrap($this->params->explode(['permission', 'do']));
@@ -447,6 +469,10 @@ class UserTags extends Tags
                 $can = true;
                 break;
             }
+        }
+
+        if (! $this->parser) {
+            return ! $can;
         }
 
         return $can ? null : $this->parse();
@@ -462,16 +488,18 @@ class UserTags extends Tags
     public function is()
     {
         if (! $user = User::current()) {
-            return;
+            return $this->parser ? null : false;
         }
 
         $roles = Arr::wrap($this->params->explode(['role', 'roles']));
 
         foreach ($roles as $role) {
             if ($user->hasRole($role)) {
-                return $this->parse();
+                return $this->parser ? $this->parse() : true;
             }
         }
+
+        return $this->parser ? null : false;
     }
 
     /**
@@ -484,7 +512,7 @@ class UserTags extends Tags
     public function isnt()
     {
         if (! $user = User::current()) {
-            return $this->parse();
+            return $this->parser ? $this->parse() : true;
         }
 
         $roles = Arr::wrap($this->params->explode(['roles', 'role']));
@@ -496,6 +524,10 @@ class UserTags extends Tags
                 $is = true;
                 break;
             }
+        }
+
+        if (! $this->parser) {
+            return ! $is;
         }
 
         return $is ? null : $this->parse();
@@ -511,16 +543,18 @@ class UserTags extends Tags
     public function in()
     {
         if (! $user = User::current()) {
-            return;
+            return $this->parser ? null : false;
         }
 
         $groups = Arr::wrap($this->params->explode(['group', 'groups']));
 
         foreach ($groups as $group) {
             if ($user->isInGroup($group)) {
-                return $this->parse();
+                return $this->parser ? $this->parse() : true;
             }
         }
+
+        return $this->parser ? null : false;
     }
 
     /**
@@ -533,7 +567,7 @@ class UserTags extends Tags
     public function notIn()
     {
         if (! $user = User::current()) {
-            return $this->parse();
+            return $this->parser ? $this->parse() : true;
         }
 
         $groups = Arr::wrap($this->params->explode(['groups', 'group']));
@@ -545,6 +579,10 @@ class UserTags extends Tags
                 $in = true;
                 break;
             }
+        }
+
+        if (! $this->parser) {
+            return ! $in;
         }
 
         return $in ? null : $this->parse();

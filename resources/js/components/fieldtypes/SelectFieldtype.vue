@@ -3,6 +3,8 @@
         <v-select
             ref="input"
             class="flex-1"
+            append-to-body
+            :calculate-position="positionOptions"
             :name="name"
             :clearable="config.clearable"
             :disabled="config.disabled || isReadOnly || (config.multiple && limitReached)"
@@ -38,35 +40,57 @@
                     <template v-else v-text="label"></template>
                 </template>
                 <template #no-options>
-                    <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                    <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
                 </template>
                 <template #footer="{ deselect }" v-if="config.multiple">
+                    <sortable-list
+                        item-class="sortable-item"
+                        handle-class="sortable-item"
+                        :value="value"
+                        :distance="5"
+                        :mirror="false"
+                        @input="update"
+                    >
                     <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-1">
+                        <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-2 sortable-item">
                             <div v-if="config.label_html" v-html="option.label"></div>
                             <template v-else>{{ option.label }}</template>
                             <button v-if="!readOnly" @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
                                 <span>×</span>
                             </button>
                             <button v-else type="button" class="vs__deselect">
-                                <span class="opacity-50">×</span>
+                                <span class="text-gray-500">×</span>
                             </button>
                         </span>
                     </div>
+                    </sortable-list>
                 </template>
         </v-select>
-        <div class="text-xs ml-1 mt-1.5" :class="limitIndicatorColor" v-if="config.max_items">
+        <div class="text-xs ml-2 mt-3" :class="limitIndicatorColor" v-if="config.max_items">
             <span v-text="currentLength"></span>/<span v-text="config.max_items"></span>
         </div>
     </div>
 </template>
 
+<style scoped>
+    .draggable-source--is-dragging {
+        @apply opacity-75 bg-transparent border-dashed
+    }
+</style>
+
 <script>
 import HasInputOptions from './HasInputOptions.js'
+import { SortableList } from '../sortable/Sortable';
+import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+
 
 export default {
 
-    mixins: [Fieldtype, HasInputOptions],
+    mixins: [Fieldtype, HasInputOptions, PositionsSelectOptions],
+
+    components: {
+        SortableList
+    },
 
     computed: {
         selectedOptions() {
@@ -121,12 +145,12 @@ export default {
 
         limitIndicatorColor() {
             if (this.limitExceeded) {
-                return 'text-red';
+                return 'text-red-500';
             } else if (this.limitReached) {
-                return 'text-green';
+                return 'text-green-600';
             }
 
-            return 'text-grey';
+            return 'text-gray';
         }
     },
 
@@ -145,7 +169,7 @@ export default {
                     this.update(null);
                 }
             }
-        }
+        },
     }
 };
 </script>

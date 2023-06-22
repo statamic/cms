@@ -91,7 +91,6 @@ class Environment
     protected $interpolationKeys = [];
     protected $assignments = [];
     protected $dataManagerInterpolations = [];
-    protected $evaluatedModifiers = false;
 
     /**
      * @var LanguageOperatorManager|null
@@ -311,8 +310,6 @@ class Environment
      */
     public function evaluate($nodes)
     {
-        $this->evaluatedModifiers = false;
-
         if (count($nodes) == 0) {
             return null;
         }
@@ -385,7 +382,8 @@ class Environment
         }
 
         if (is_numeric($result)) {
-            $value = $result >= 1;
+            // Updated to be != 0 to be consistent with PHP behavior.
+            $value = $result != 0;
             $this->unlock();
 
             return $value;
@@ -935,6 +933,12 @@ class Environment
 
                 $this->dataRetriever->setRuntimeValue($varName, $this->data, $right);
                 $lastPath = $this->dataRetriever->lastPath();
+
+                if (count($varName->pathParts) > 1) {
+                    $right = $this->dataRetriever->getData($varName->getRoot(), $this->data);
+                    $lastPath = $varName->pathParts[0]->name;
+                }
+
                 $this->assignments[$lastPath] = $right;
 
                 if (array_key_exists($lastPath, GlobalRuntimeState::$tracedRuntimeAssignments)) {
@@ -972,7 +976,15 @@ class Environment
                     $this->data,
                     $newVal
                 );
-                $this->assignments[$this->dataRetriever->lastPath()] = $newVal;
+
+                $lastPath = $this->dataRetriever->lastPath();
+
+                if (count($varName->pathParts) > 1) {
+                    $newVal = $this->dataRetriever->getData($varName->getRoot(), $this->data);
+                    $lastPath = $varName->pathParts[0]->name;
+                }
+
+                $this->assignments[$lastPath] = $newVal;
 
                 return null;
             } elseif ($operand instanceof DivisionAssignmentOperator) {
@@ -991,7 +1003,15 @@ class Environment
                     $this->data,
                     $assignValue
                 );
-                $this->assignments[$this->dataRetriever->lastPath()] = $assignValue;
+
+                $lastPath = $this->dataRetriever->lastPath();
+
+                if (count($varName->pathParts) > 1) {
+                    $assignValue = $this->dataRetriever->getData($varName->getRoot(), $this->data);
+                    $lastPath = $varName->pathParts[0]->name;
+                }
+
+                $this->assignments[$lastPath] = $assignValue;
 
                 return null;
             } elseif ($operand instanceof ModulusAssignmentOperator) {
@@ -1009,7 +1029,15 @@ class Environment
                     $this->data,
                     $assignValue
                 );
-                $this->assignments[$this->dataRetriever->lastPath()] = $assignValue;
+
+                $lastPath = $this->dataRetriever->lastPath();
+
+                if (count($varName->pathParts) > 1) {
+                    $assignValue = $this->dataRetriever->getData($varName->getRoot(), $this->data);
+                    $lastPath = $varName->pathParts[0]->name;
+                }
+
+                $this->assignments[$lastPath] = $assignValue;
 
                 return null;
             } elseif ($operand instanceof MultiplicationAssignmentOperator) {
@@ -1027,7 +1055,15 @@ class Environment
                     $this->data,
                     $assignValue
                 );
-                $this->assignments[$this->dataRetriever->lastPath()] = $assignValue;
+
+                $lastPath = $this->dataRetriever->lastPath();
+
+                if (count($varName->pathParts) > 1) {
+                    $assignValue = $this->dataRetriever->getData($varName->getRoot(), $this->data);
+                    $lastPath = $varName->pathParts[0]->name;
+                }
+
+                $this->assignments[$lastPath] = $assignValue;
 
                 return null;
             } elseif ($operand instanceof SubtractionAssignmentOperator) {
@@ -1045,7 +1081,15 @@ class Environment
                     $this->data,
                     $assignValue
                 );
-                $this->assignments[$this->dataRetriever->lastPath()] = $assignValue;
+
+                $lastPath = $this->dataRetriever->lastPath();
+
+                if (count($varName->pathParts) > 1) {
+                    $assignValue = $this->dataRetriever->getData($varName->getRoot(), $this->data);
+                    $lastPath = $varName->pathParts[0]->name;
+                }
+
+                $this->assignments[$lastPath] = $assignValue;
 
                 return null;
             } elseif ($operand instanceof ConditionalVariableFallbackOperator) {
@@ -1252,14 +1296,7 @@ class Environment
      */
     private function applyModifiers($value, ModifierChainNode $modifierChain)
     {
-        $this->evaluatedModifiers = true;
-
         return ModifierManager::evaluate($value, $this, $modifierChain, $this->data);
-    }
-
-    public function getDidEvaluateModifiers()
-    {
-        return $this->evaluatedModifiers;
     }
 
     /**

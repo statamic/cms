@@ -4,6 +4,7 @@ namespace Tests\Tags\Concerns;
 
 use Illuminate\Support\Carbon;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Fields\LabeledValue;
 use Statamic\Query\Builder;
 use Statamic\Tags\Collection\Entries;
@@ -323,6 +324,9 @@ class QueriesConditionsTest extends TestCase
     public function it_filters_by_is_after_or_before_date_conditions()
     {
         $this->collection->dated(true)->save();
+        $blueprint = Blueprint::makeFromFields(['date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true]])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/test')->once()->andReturn(collect([$blueprint]));
+
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
 
         $this->makeEntry('a')->date('2019-03-09')->save(); // definitely in past

@@ -104,15 +104,15 @@ class ThumbnailController extends Controller
         Cache::put($this->mutex(), true, now()->addMinutes(5));
 
         try {
-            $preset = $this->getPreset();
+            $preset = $this->size ? $this->getPreset() : null;
 
-            if (! collect(Image::cpManipulationPresets())->has($preset)) {
+            if ($preset && ! collect(Image::cpManipulationPresets())->has($preset)) {
                 throw new \Exception('Invalid preset');
             }
 
             $path = $this->generator->generateByAsset(
                 $this->asset,
-                $this->size ? ['p' => $preset] : []
+                $preset ? ['p' => $preset] : []
             );
         } finally {
             Cache::forget($this->mutex());

@@ -5,7 +5,7 @@
         :full="true"
         @closed="close">
 
-    <div class="asset-editor" :class="isImage ? 'is-image' : 'is-file'">
+    <div class="asset-editor flex flex-col relative bg-gray-100 h-full rounded" :class="isImage ? 'is-image' : 'is-file'">
 
         <div v-if="loading" class="loading">
             <loading-graphic />
@@ -13,43 +13,60 @@
 
         <template v-if="!loading">
 
-            <div class="editor-meta">
-                <div class="asset-editor-meta-items">
-                    <div class="meta-item">
-                        <span class="meta-label">{{ __('Path') }}</span>
-                        <span class="meta-value">{{ asset.path }}</span>
-                    </div>
-                    <div class="meta-item" v-if="isImage">
-                        <span class="meta-label">{{ __('Dimensions') }}</span>
-                        <span class="meta-value">{{ asset.width }} x {{ asset.height }}</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">{{ __('Size') }}</span>
-                        <span class="meta-value">{{ asset.size }}</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">{{ __('Last Modified') }}</span>
-                        <span class="meta-value" :title="asset.lastModified">{{ asset.lastModifiedRelative }}</span>
-                    </div>
-                </div>
-
-                <div class="asset-editor-meta-actions">
-                    <button @click="open" v-tooltip="__('Open in a new window')" :aria-label="__('Open in a new window')">
-                        <svg-icon name="external-link" class="h-6 w-6"/>
-                    </button>
-                    <button @click="download" v-tooltip="__('Download file')" :aria-label="__('Download file')" v-if="asset.allowDownloading">
-                        <svg-icon name="download" class="h-6 w-6"/>
-                    </button>
-                    <button @click="close" v-tooltip="__('Close editor')" :aria-label="__('Close editor')">
-                        <svg-icon name="close" class="h-6 w-6"/>
-                    </button>
-                </div>
+            <!-- Header -->
+            <div id="asset-editor-header" class="flex justify-between w-full px-2 relative">
+                <button class="flex items-center p-4 group" @click="open" v-tooltip.right="__('Open in a new window')" :aria-label="__('Open in a new window')">
+                    <svg-icon name="folder-image" class="text-gray-700 h-5 w-5" />
+                    <span class="ml-2 text-sm text-gray-800 group-hover:text-blue">{{ asset.path }}</span>
+                    <svg-icon name="micro/chevron-right" class="text-gray-700 h-5 w-5 group-hover:text-blue" />
+                </button>
+                <button class="btn-close absolute top-2 right-2.5" @click="close" :aria-label="__('Close Editor')">&times;</button>
             </div>
 
-            <div class="editor-main">
+            <div class="flex flex-1 flex-col md:flex-row md:justify-between grow overflow-scroll">
 
-                <div class="editor-preview">
+                <!-- Visual Area -->
+                <div class="editor-preview bg-gray-800 md:rounded-tr-md flex flex-col justify-between flex-1 min-h-[45vh] md:min-h-auto md:flex-auto md:grow w-full md:w-1/2 lg:w-2/3 shadow-[inset_0px_4px_3px_0px_black]">
 
+                    <!-- Toolbar -->
+                    <div id="asset-editor-toolbar" class="@container/toolbar flex items-center justify-center py-4 px-2 text-2xs text-white text-center space-x-1 sm:space-x-3" v-if="!readOnly">
+                        <button v-if="isImage && isFocalPointEditorEnabled" type="button" class="flex bg-gray-750 hover:bg-gray-900 hover:text-yellow-light rounded items-center justify-center px-3 py-1.5" @click.prevent="openFocalPointEditor">
+                            <svg-icon name="focal-point" class="h-4" />
+                            <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Focal Point') }}</span>
+                        </button>
+
+                        <button v-if="canRunAction('rename_asset')" type="button" class="flex bg-gray-750 hover:bg-gray-900 hover:text-yellow-light rounded items-center px-3 py-1.5" @click.prevent="runAction('rename_asset')">
+                            <svg-icon name="rename-file" class="h-4" />
+                            <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Rename') }}</span>
+                        </button>
+
+                        <button v-if="canRunAction('move_asset')" type="button" class="flex bg-gray-750 hover:bg-gray-900 hover:text-yellow-light rounded items-center px-3 py-1.5" @click.prevent="runAction('move_asset')">
+                            <svg-icon name="move-file" class="h-4" />
+                            <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Move') }}</span>
+                        </button>
+
+                        <button v-if="canRunAction('replace_asset')" type="button" class="flex bg-gray-750 hover:bg-gray-900 hover:text-yellow-light rounded items-center px-3 py-1.5" @click.prevent="runAction('replace_asset')">
+                            <svg-icon name="swap" class="h-4" />
+                            <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Replace') }}</span>
+                        </button>
+
+                        <button v-if="canRunAction('reupload_asset')" type="button" class="flex bg-gray-750 hover:bg-gray-900 hover:text-yellow-light rounded items-center px-3 py-1.5" @click.prevent="runAction('reupload_asset')">
+                            <svg-icon name="upload-cloud" class="h-4" />
+                            <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Reupload') }}</span>
+                        </button>
+
+                        <button v-if="asset.allowDownloading" class="flex bg-gray-750 hover:bg-gray-900 hover:text-yellow-light rounded items-center px-3 py-1.5" @click="download" :aria-label="__('Download file')">
+                            <svg-icon name="download-desktop" class="h-4"/>
+                            <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Download') }}</span>
+                        </button>
+
+                        <button v-if="allowDeleting && canRunAction('delete')" @click="runAction('delete')" class="flex bg-gray-750 hover:bg-gray-900 hover:text-red-400 rounded items-center text-center px-3 py-1.5">
+                            <svg-icon name="trash" class="h-4" />
+                            <span class="ml-2 hidden @3xl/toolbar:inline-block">{{ __('Delete') }}</span>
+                        </button>
+                    </div>
+
+                    <!-- Image Preview -->
                     <div
                         v-if="asset.isImage || asset.isSvg || asset.isAudio || asset.isVideo"
                         class="editor-preview-image"
@@ -60,18 +77,18 @@
 
                             <!-- SVG -->
                             <div v-else-if="asset.isSvg" class="bg-checkerboard h-full w-full flex flex-col">
-                                <div class="flex border-b-2 border-grey-90">
-                                    <div class="flex-1 order-r p-2 border-grey-90 flex items-center justify-center">
+                                <div class="flex border-b-2 border-gray-900">
+                                    <div class="flex-1 order-r p-4 border-gray-900 flex items-center justify-center">
                                         <img :src="asset.url" class="asset-thumb w-4 h-4" />
                                     </div>
-                                    <div class="flex-1 border-l border-r p-2 border-grey-90 flex items-center justify-center">
+                                    <div class="flex-1 border-l border-r p-4 border-gray-900 flex items-center justify-center">
                                         <img :src="asset.url" class="asset-thumb w-12 h-12" />
                                     </div>
-                                    <div class="flex-1 border-l p-2 border-grey-90 flex items-center justify-center">
+                                    <div class="flex-1 border-l p-4 border-gray-900 flex items-center justify-center">
                                         <img :src="asset.url" class="asset-thumb w-24 h-24" />
                                     </div>
                                 </div>
-                                <div class="min-h-0 h-full p-2 flex items-center justify-center">
+                                <div class="min-h-0 h-full p-4 flex items-center justify-center">
                                     <img :src="asset.url" class="asset-thumb w-2/3 max-w-full max-h-full" />
                                 </div>
                             </div>
@@ -91,31 +108,9 @@
                     <div class="h-full" v-else-if="asset.isPreviewable && canUseGoogleDocsViewer">
                         <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
                     </div>
-
-                    <div class="editor-file-actions" v-if="!readOnly">
-                        <button v-if="isImage && isFocalPointEditorEnabled" type="button" class="btn" @click.prevent="openFocalPointEditor">
-                            {{ __('Set Focal Point') }}
-                        </button>
-
-                        <button v-if="canRunAction('rename_asset')" type="button" class="btn" @click.prevent="runAction('rename_asset')">
-                            {{ __('Rename') }}
-                        </button>
-
-                        <button v-if="canRunAction('move_asset')" type="button" class="btn" @click.prevent="runAction('move_asset')">
-                            {{ __('Move') }}
-                        </button>
-
-                        <button v-if="canRunAction('replace_asset')" type="button" class="btn" @click.prevent="runAction('replace_asset')">
-                            {{ __('Replace') }}
-                        </button>
-
-                        <button v-if="canRunAction('reupload_asset')" type="button" class="btn" @click.prevent="runAction('reupload_asset')">
-                            {{ __('Reupload') }}
-                        </button>
-                    </div>
-
                 </div>
 
+                <!-- Fields Area -->
                 <publish-container
                     v-if="fields"
                     :name="publishContainer"
@@ -125,55 +120,66 @@
                     :errors="errors"
                     @updated="values = { ...$event, focus: values.focus }"
                 >
-                    <div class="editor-form" slot-scope="{ setFieldValue, setFieldMeta }">
+                    <div class="w-full sm:p-4 md:pt-px md:w-1/3 md:grow h-1/2 md:h-full overflow-scroll" slot-scope="{ setFieldValue, setFieldMeta }">
 
                         <div v-if="saving" class="loading">
                             <loading-graphic text="Saving" />
                         </div>
 
-                        <div class="editor-form-fields">
-                            <div v-if="error" class="bg-red text-white p-2 shadow mb-2" v-text="error" />
-                            <publish-fields
-                                :fields="fields"
-                                :read-only="readOnly"
-                                @updated="setFieldValue"
-                                @meta-updated="setFieldMeta"
-                            />
-                        </div>
+                        <div v-if="error" class="bg-red-500 text-white p-4 shadow mb-4" v-text="error" />
 
-                        <div class="editor-form-actions text-right" v-if="!readOnly">
-                            <button v-if="allowDeleting && canRunAction('delete')" type="button" class="btn-danger mr-1" @click="runAction('delete')">
-                                {{ __('Delete') }}
-                            </button>
-                            <button type="button" class="btn-primary" @click="save">
-                                {{ __('Save') }}
-                            </button>
-                        </div>
+                        <publish-sections
+                            :sections="fieldset.tabs[0].sections"
+                            :read-only="readOnly"
+                            @updated="setFieldValue"
+                            @meta-updated="setFieldMeta"
+                        />
 
                     </div>
                 </publish-container>
+            </div>
 
-
+            <div class="bg-gray-200 w-full border-t flex items-center justify-end py-3 px-4 rounded-b">
+                <div id="asset-meta-data" class="flex-1 hidden sm:flex space-x-3 py-1 h-full text-xs text-gray-800">
+                    <div class="flex items-center bg-gray-400 rounded py-1 pl-2 pr-3" v-if="isImage">
+                        <svg-icon name="image-picture" class="h-3 mr-2" />
+                        <div class="">{{ asset.width }} x {{ asset.height }}</div>
+                    </div>
+                    <div class="flex items-center bg-gray-400 rounded py-1 pl-2 pr-3">
+                        <svg-icon name="sd-card" class="h-3 mr-2" />
+                        <div class="">{{ asset.size }}</div>
+                    </div>
+                    <div class="flex items-center bg-gray-400 rounded py-1 pl-2 pr-3">
+                        <svg-icon name="thumbprint" class="h-3 mr-2" />
+                        <div class="" :title="asset.lastModified">{{ asset.lastModifiedRelative }}</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button type="button" class="btn" @click="close">
+                        {{ __('Cancel') }}
+                    </button>
+                    <button type="button" class="btn-primary" @click="save" v-if="!readOnly">
+                        {{ __('Save') }}
+                    </button>
+                </div>
             </div>
 
         </template>
 
-        <portal to="outside">
-            <focal-point-editor
-                v-if="showFocalPointEditor && isFocalPointEditorEnabled"
-                :data="values.focus"
-                :image="asset.preview"
-                @selected="selectFocalPoint"
-                @closed="closeFocalPointEditor" />
+        <editor-actions
+            v-if="actions.length"
+            :id="id"
+            :actions="actions"
+            :url="actionUrl"
+            @started="actionStarted"
+            @completed="actionCompleted" />
 
-            <editor-actions
-                v-if="actions.length"
-                :id="id"
-                :actions="actions"
-                :url="actionUrl"
-                @started="actionStarted"
-                @completed="actionCompleted" />
-        </portal>
+        <focal-point-editor
+            v-if="showFocalPointEditor && isFocalPointEditorEnabled"
+            :data="values.focus"
+            :image="asset.preview"
+            @selected="selectFocalPoint"
+            @closed="closeFocalPointEditor" />
 
     </div>
 
@@ -238,18 +244,12 @@ export default {
 
     computed: {
 
-        /**
-         * Whether the asset is an image
-         */
         isImage() {
             if (! this.asset) return false;
 
             return this.asset.isImage;
         },
 
-        /**
-         * Whether there are errors present.
-         */
         hasErrors: function() {
             return this.error || Object.keys(this.errors).length;
         },
@@ -262,9 +262,8 @@ export default {
         isFocalPointEditorEnabled()
         {
             return Statamic.$config.get("focalPointEditorEnabled");
-        }
+        },
     },
-
 
     mounted() {
         this.$modal.show('asset-editor');
@@ -305,7 +304,9 @@ export default {
                 this.actions = data.actions;
 
                 this.fieldset = data.blueprint;
-                this.fields = _.chain(this.fieldset.sections)
+                this.fields = _.chain(this.fieldset.tabs)
+                    .map(tab => tab.sections)
+                    .flatten(true)
                     .map(section => section.fields)
                     .flatten(true)
                     .value();
@@ -314,32 +315,20 @@ export default {
             });
         },
 
-        /**
-         * Open the focal point editor UI
-         */
         openFocalPointEditor() {
             this.showFocalPointEditor = true;
         },
 
-        /**
-         * Close the focal point editor UI
-         */
         closeFocalPointEditor() {
             this.showFocalPointEditor = false;
         },
 
-        /**
-         * When the focal point is selected
-         */
         selectFocalPoint(point) {
             point = (point === '50-50-1') ? null : point;
             this.$set(this.values, 'focus', point);
             this.$dirty.add(this.publishContainer);
         },
 
-        /**
-         * Save the asset
-         */
         save() {
             this.saving = true;
             const url = cp_url(`assets/${utf8btoa(this.id)}`);
@@ -370,9 +359,6 @@ export default {
             this.errors = {};
         },
 
-        /**
-         * Close the editor
-         */
         close() {
             this.$modal.hide('asset-editor');
             this.$emit('closed');

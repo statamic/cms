@@ -2,7 +2,7 @@
 
     <div class="bg-white h-full flex flex-col">
 
-        <div class="bg-grey-20 px-2 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+        <div class="bg-gray-200 px-4 py-2 border-b border-gray-300 text-lg font-medium flex items-center justify-between">
             {{ __('Revision History') }}
             <button
                 type="button"
@@ -17,7 +17,7 @@
                 <loading-graphic />
             </div>
 
-            <div v-if="!loading && revisions.length === 0" class="p-2 text-grey text-sm">
+            <div v-if="!loading && revisions.length === 0" class="p-4 text-gray text-sm">
                 {{ __('No revisions') }}
             </div>
 
@@ -25,7 +25,7 @@
                 v-for="group in revisions"
                 :key="group.day"
             >
-                <h6 class="revision-date" v-text="$moment.unix(group.day).format('LL')" />
+                <h6 class="revision-date" v-text="$moment.unix(group.day).isBefore($moment().startOf('day')) ? $moment.unix(group.day).format('LL') : __('Today')" />
                 <div class="revision-list">
                     <revision
                         v-for="revision in group.revisions"
@@ -76,7 +76,7 @@ export default {
             this.close();
         });
     },
-    
+
     beforeDestroy() {
         this.escBinding.destroy();
     },

@@ -74,7 +74,7 @@ class SiteClear extends Command
             return false;
         }
 
-        return ! $this->confirm('There is no site theme or sample content in v3 - are you sure you want to remove all new site defaults?', false);
+        return ! $this->confirm('Are you sure you want to remove all the site content and resources?', false);
     }
 
     /**

@@ -42,14 +42,14 @@ use Symfony\Component\Mime\MimeTypes;
 class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues, SearchableContract
 {
     use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
-    TracksQueriedRelations,
-    Searchable, ContainsData {
-        set as traitSet;
-        get as traitGet;
-        remove as traitRemove;
-        data as traitData;
-        merge as traitMerge;
-    }
+        TracksQueriedRelations,
+        Searchable, ContainsData {
+            set as traitSet;
+            get as traitGet;
+            remove as traitRemove;
+            data as traitData;
+            merge as traitMerge;
+        }
 
     protected $container;
     protected $path;
@@ -520,6 +520,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Get the file download url.
+     * 
+     * @return string
+     */
+    public function cpDownloadUrl()
+    {
+        return cp_route('assets.download', base64_encode($this->id()));
+    }
+
+    /**
      * Get the file extension of the asset.
      *
      * @return string
@@ -693,12 +703,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $this->disk()->rename($oldPath, $newPath);
         $this->path($newPath);
         $this->save();
-
-        $isFlysystemV1 = method_exists($this->disk()->filesystem()->getDriver(), 'getTimestamp');
-
-        if ($isFlysystemV1) {
-            $this->disk()->delete($this->metaPath());
-        }
 
         $this->disk()->rename($oldMetaPath, $this->metaPath());
 
