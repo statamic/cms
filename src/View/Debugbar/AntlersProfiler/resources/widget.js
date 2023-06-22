@@ -447,6 +447,10 @@
                                 output += makeEditorLink(data);
                             }
 
+                            if (output === 0) {
+                                return "&mdash;";
+                            }
+
                             return output;
                         }
                     },
