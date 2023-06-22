@@ -297,7 +297,7 @@
                 $sourceGraph.empty();
 
                 data.source_samples.forEach((item) => {
-                    var backgroundColor = 'none',
+                    var backgroundColor = 'transparent',
                         color = 'black',
                         title = '',
                         cursorStyle = '';
