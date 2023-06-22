@@ -524,7 +524,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      * 
      * @return string
      */
-    public function downloadUrl()
+    public function cpDownloadUrl()
     {
         return cp_route('assets.download', base64_encode($this->id()));
     }
