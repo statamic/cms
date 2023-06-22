@@ -96,7 +96,7 @@ class ViewServiceProvider extends ServiceProvider
             return new PerformanceTracer();
         });
 
-        if (debugbar()->isEnabled()) {
+        if (debugbar()->isEnabled() && config('statamic.antlers.debugbar', true) && !\Statamic\Statamic::isCpRoute()) {
             debugbar()->addCollector(new PerformanceCollector());
         }
 
@@ -156,7 +156,7 @@ class ViewServiceProvider extends ServiceProvider
                 $runtimeConfig->traceManager->registerTracer(GlobalDebugManager::getTimingsTracer());
             }
 
-            if (debugbar()->isEnabled()) {
+            if (debugbar()->isEnabled() && config('statamic.antlers.debugbar', true) && !\Statamic\Statamic::isCpRoute()) {
                 if (! $isTracingOn) {
                     $runtimeConfig->traceManager = new TraceManager();
                     $runtimeConfig->isTracingEnabled = true;
