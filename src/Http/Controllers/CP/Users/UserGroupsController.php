@@ -114,9 +114,11 @@ class UserGroupsController extends CpController
             $group->set($key, $value);
         }
 
-        $group
-            ->title($request->title)
-            ->handle($request->handle ?: snake_case($request->title));
+        $group->title($request->title);
+
+        if ($request->handle) {
+            $group->handle($request->handle);
+        }
 
         if (User::current()->can('assign roles')) {
             $group->roles($request->roles);
@@ -151,7 +153,6 @@ class UserGroupsController extends CpController
         ];
 
         return view('statamic::usergroups.create', $viewData);
-
     }
 
     public function store(Request $request)
