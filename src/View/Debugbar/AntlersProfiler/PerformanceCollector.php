@@ -2,19 +2,19 @@
 
 namespace Statamic\View\Debugbar\AntlersProfiler;
 
-use InvalidArgumentException;
 use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
+use InvalidArgumentException;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 
 class PerformanceCollector extends DataCollector implements Renderable, AssetProvider
 {
-
     /**
      * A list of known editor strings.
      *
      * Adapted from Barryvdh\Debugbar\DataCollector\ViewCollector
+     *
      * @var string[]
      */
     protected $editors = [
@@ -39,14 +39,13 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
     /**
      * Get the editor href for a given file and line, if available.
      *
-     * @param string $filePath
-     * @param int    $line
+     * @param  string  $filePath
+     * @param  int  $line
      *
      * Adapted from Barryvdh\Debugbar\DataCollector\ViewCollector
+     * @return null|string
      *
      * @throws InvalidArgumentException If editor resolver does not return a string
-     *
-     * @return null|string
      */
     protected function getEditorHref($filePath, $line)
     {
@@ -56,7 +55,7 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
 
         if (empty($this->editors[config('debugbar.editor')])) {
             throw new InvalidArgumentException(
-                'Unknown editor identifier: ' . config('debugbar.editor') . '. Known editors:' .
+                'Unknown editor identifier: '.config('debugbar.editor').'. Known editors:'.
                 implode(', ', array_keys($this->editors))
             );
         }
@@ -71,8 +70,7 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
      *
      * Adapted from Barryvdh\Debugbar\DataCollector\ViewCollector
      *
-     * @param string $filePath
-     *
+     * @param  string  $filePath
      * @return string
      */
     protected function replaceSitesPath($filePath)
