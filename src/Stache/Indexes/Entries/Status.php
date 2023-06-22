@@ -86,4 +86,9 @@ class Status extends Value
             return $entry->status();
         }
     }
+
+    public function items()
+    {
+        return parent::items()->map(fn ($item) => explode('::', $item)[0]);
+    }
 }
