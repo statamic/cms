@@ -68,7 +68,7 @@ class UserGroupsController extends CpController
 
         $blueprint = $group->blueprint();
 
-        if (! User::current()->can('edit roles')) {
+        if (! User::current()->can('assign roles')) {
             $blueprint->ensureField('roles', ['visibility' => 'read_only']);
         }
 
