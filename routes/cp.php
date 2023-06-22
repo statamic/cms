@@ -89,6 +89,7 @@ use Statamic\Http\Controllers\CP\Users\PasswordController;
 use Statamic\Http\Controllers\CP\Users\RolesController;
 use Statamic\Http\Controllers\CP\Users\UserActionController;
 use Statamic\Http\Controllers\CP\Users\UserBlueprintController;
+use Statamic\Http\Controllers\CP\Users\UserGroupBlueprintController;
 use Statamic\Http\Controllers\CP\Users\UserGroupsController;
 use Statamic\Http\Controllers\CP\Users\UsersController;
 use Statamic\Http\Controllers\CP\Users\UserWizardController;
@@ -268,6 +269,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::resource('users', UsersController::class);
     Route::patch('users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
     Route::get('account', AccountController::class)->name('account');
+    Route::get('user-groups/blueprint', [UserGroupBlueprintController::class, 'edit'])->name('user-groups.blueprint.edit');
+    Route::patch('user-groups/blueprint', [UserGroupBlueprintController::class, 'update'])->name('user-groups.blueprint.update');
     Route::resource('user-groups', UserGroupsController::class);
     Route::resource('roles', RolesController::class);
 

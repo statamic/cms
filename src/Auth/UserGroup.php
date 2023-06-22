@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Auth\Role;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\UserGroupDeleted;
 use Statamic\Events\UserGroupSaved;
@@ -20,11 +21,12 @@ abstract class UserGroup implements UserGroupContract, Augmentable, ArrayAccess,
     protected $originalHandle;
     protected $roles;
 
-    use HasAugmentedData;
+    use ContainsData, HasAugmentedData;
 
     public function __construct()
     {
         $this->roles = collect();
+        $this->data = collect();
     }
 
     public function title(string $title = null)
@@ -161,6 +163,11 @@ abstract class UserGroup implements UserGroupContract, Augmentable, ArrayAccess,
         return cp_route('user-groups.edit', $this->handle());
     }
 
+    public function updateUrl()
+    {
+        return cp_route('user-groups.update', $this->handle());
+    }
+
     public function deleteUrl()
     {
         return cp_route('user-groups.destroy', $this->handle());
@@ -173,9 +180,17 @@ abstract class UserGroup implements UserGroupContract, Augmentable, ArrayAccess,
 
     public function augmentedArrayData()
     {
-        return [
+        return $this->data()->merge([
             'title' => $this->title(),
             'handle' => $this->handle(),
-        ];
+        ])->all();
+    }
+
+    /**
+     * @return \Statamic\Fields\Blueprint
+     */
+    public function blueprint()
+    {
+        return Facades\UserGroup::blueprint();
     }
 }
