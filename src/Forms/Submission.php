@@ -177,7 +177,7 @@ class Submission implements SubmissionContract, Augmentable
      */
     public function delete()
     {
-        File::delete($this->getPath());
+        FormSubmission::delete($this);
 
         SubmissionDeleted::dispatch($this);
     }
