@@ -58,19 +58,14 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         return $this->fluentlyGetOrSet('locale')->args(func_get_args());
     }
 
-    private function globalSetHandle()
-    {
-        return $this->set instanceof GlobalSet ? $this->set->handle() : $this->set;
-    }
-
     public function id()
     {
-        return $this->globalSetHandle().($this->locale ? '.'.$this->locale : '');
+        return $this->handle().($this->locale ? '.'.$this->locale : '');
     }
 
     public function handle()
     {
-        return $this->globalSetHandle();
+        return $this->set instanceof GlobalSet ? $this->set->handle() : $this->set;
     }
 
     public function title()
