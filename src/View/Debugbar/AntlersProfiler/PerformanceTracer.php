@@ -220,6 +220,10 @@ class PerformanceTracer implements RuntimeTracerContract
             return;
         }
 
+        if ($node->isComment) {
+            return;
+        }
+
         $file = $this->massageFilePath(GlobalRuntimeState::$currentExecutionFile);
         $fullPath = $this->normalizePath(GlobalRuntimeState::$currentExecutionFile);
         $this->antlersNodesObserved += 1;
@@ -315,6 +319,10 @@ class PerformanceTracer implements RuntimeTracerContract
 
     public function onExit(AbstractNode $node, $runtimeContent)
     {
+        if ($node instanceof AntlersNode && $node->isComment) {
+            return;
+        }
+
         if ($node->isVirtual) {
             return;
         }
