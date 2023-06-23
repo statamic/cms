@@ -1,5 +1,18 @@
 # Release Notes
 
+## 4.8.0 (2023-06-23)
+
+### What's new
+- Antlers performance profiler tab for Debugbar. [#8323](https://github.com/statamic/cms/issues/8323) by @JohnathonKoster
+- User Groups may have a blueprint to allow for custom fields. [#6506](https://github.com/statamic/cms/issues/6506) by @ryanmitchell
+- Arrays can be passed to the `user_groups` tag. [#8336](https://github.com/statamic/cms/issues/8336) by @ryanmitchell
+- Added `cpDownloadUrl` method to the `Asset` class. [#8334](https://github.com/statamic/cms/issues/8334) by @jonassiewertsen
+
+### What's fixed
+- Fix missing GraphQL types for more complex fields (e.g. Grid) in user blueprints. [#8335](https://github.com/statamic/cms/issues/8335) by @jesseleite
+
+
+
 ## 4.7.0 (2023-06-20)
 
 ### What's new
