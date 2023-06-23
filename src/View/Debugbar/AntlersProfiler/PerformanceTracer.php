@@ -100,7 +100,10 @@ class PerformanceTracer implements RuntimeTracerContract
 
             $item->clientTotalTime = $item->getTotalExecutionTime();
             $item->clientSelfTime = $item->getSelfExecutionTime();
-            $item->percentOfExecutionTime = round(($item->totalElapsedTime / $this->totalElapsedTime) * 100, 2);
+
+            if ($this->totalElapsedTime > 0) {
+                $item->percentOfExecutionTime = round(($item->totalElapsedTime / $this->totalElapsedTime) * 100, 2);
+            }
 
             $item->clientSelfTimeDisplay = $item->getSelfExecutionTimeDisplay();
             $item->clientTotalTimeDisplay = $item->getTotalExecutionTimeDisplay();
