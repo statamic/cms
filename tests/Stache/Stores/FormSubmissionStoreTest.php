@@ -40,7 +40,7 @@ class FormSubmissionStoreTest extends TestCase
 
         $this->assertStringEqualsFile($path = $this->directory.'/test_form/'.$submission->id().'.yaml', $submission->fileContents());
         @unlink($path);
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->assertEquals($path, $this->parent->store('test_form')->paths()->get($submission->id()));
     }
