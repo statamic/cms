@@ -19,11 +19,6 @@ class GlobalVariableRepository implements RepositoryContract
         $this->store = $stache->store('global-variables');
     }
 
-    public function make()
-    {
-        return app(Variables::class);
-    }
-
     public function all(): VariableCollection
     {
         $keys = $this->store->paths()->keys();

@@ -2,8 +2,8 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\Contracts\Globals\Variables;
 use Statamic\Facades\File;
-use Statamic\Facades\GlobalSetVariable;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
@@ -49,7 +49,7 @@ class GlobalVariablesStore extends BasicStore
 
     protected function makeVariablesFromFile($handle, $path, $data)
     {
-        $variables = GlobalSetVariable::make()
+        $variables = app(Variables::class)
             ->initialPath($path)
             ->data(Arr::except($data, 'origin'));
 

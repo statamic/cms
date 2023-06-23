@@ -13,4 +13,6 @@ interface GlobalVariableRepository
     public function findBySet($handle): ?VariableCollection;
 
     public function save($variable);
+
+    public function delete($variable);
 }
