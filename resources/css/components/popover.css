@@ -1,0 +1,69 @@
+/* ==========================================================================
+   POPOVERS
+   ========================================================================== */
+
+.popover {
+    pointer-events: none;
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -10px 0;
+    }
+
+    .popover-content {
+        min-width: 180px;
+        transform-origin: 50% 10%;
+        animation-fill-mode: forwards;
+        opacity: 0;
+        transform: scale(.85);
+        transition: all .05s ease-in;
+        will-change: transform, opacity;
+        background-clip: padding-box;
+    }
+}
+
+.popover-container {
+    pointer-events: none;
+}
+
+/*  When open */
+.popover-open {
+    .popover {
+        pointer-events: auto;
+        visibility: visible;
+    }
+
+    .popover-content {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .rotating-dots {
+        transform: rotate(90deg);
+    }
+}
+
+/*  Supporting elements */
+.rotating-dots {
+    @apply relative cursor-pointer;
+    transition: .12s ease-out;
+}
+
+.rotating-dots-button {
+    @apply  text-gray-700 rounded-full flex items-center justify-center;
+    height: 24px;
+    width: 24px;
+
+    &:hover {
+        @apply text-gray-950;
+    }
+
+    &:focus {
+        @apply focus-outline;
+    }
+}

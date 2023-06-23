@@ -47,6 +47,17 @@ class RecursiveNodeManager
         }
     }
 
+    public static function updateNamedDepth(AntlersNode $node, $depth)
+    {
+        $namedDepthMapping = $node->content.'_depth';
+
+        if (! array_key_exists($namedDepthMapping, self::$namedDepthMapping)) {
+            self::$namedDepthMapping[$namedDepthMapping] = 0;
+        }
+
+        self::$namedDepthMapping[$namedDepthMapping] = $depth;
+    }
+
     public static function decrementDepth(AntlersNode $node)
     {
         $namedDepthMapping = $node->content.'_depth';
@@ -54,7 +65,11 @@ class RecursiveNodeManager
         self::$namedDepthMapping[$namedDepthMapping] -= 1;
 
         if (! $node instanceof RecursiveNode || ! $node->isNestedRecursive) {
-            self::$depthMapping[$node->getRootRef()] -= 1;
+            $rootRefId = $node->getRootRef();
+
+            if (array_key_exists($rootRefId, self::$depthMapping)) {
+                self::$depthMapping[$rootRefId] -= 1;
+            }
         }
     }
 

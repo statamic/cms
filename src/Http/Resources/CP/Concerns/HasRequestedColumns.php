@@ -22,9 +22,8 @@ trait HasRequestedColumns
         $columns = $this->columns->keyBy('field')->map->visible(false);
 
         return collect($requested)
-            ->map(function ($field) use ($columns) {
-                return $columns->get($field)->visible(true);
-            })
+            ->filter(fn ($field) => $columns->has($field))
+            ->map(fn ($field) => $columns->get($field)->visible(true))
             ->merge($columns->except($requested))
             ->values();
     }

@@ -2,37 +2,59 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use ProseMirrorToHtml\Nodes\Node;
 use Statamic\Facades\Asset;
 use Statamic\Support\Str;
+use Tiptap\Core\Node;
+use Tiptap\Utils\HTML;
 
 class ImageNode extends Node
 {
-    public function matching()
+    public static $name = 'image';
+
+    public function addOptions()
     {
-        return $this->node->type === 'image';
+        return [
+            'HTMLAttributes' => [],
+        ];
     }
 
-    public function selfClosing()
+    public function parseHTML()
     {
-        return true;
-    }
-
-    public function tag()
-    {
-        $attrs = $this->node->attrs;
-
-        if (Str::startsWith($attrs->src, 'asset::')) {
-            $id = Str::after($attrs->src, 'asset::');
-            $attrs->src = $this->getUrl($id);
-        }
-
         return [
             [
-                'tag' => 'img',
-                'attrs' => (array) $attrs,
+                'tag' => 'img[src]',
             ],
         ];
+    }
+
+    public function addAttributes()
+    {
+        return [
+            'src' => [
+                'renderHTML' => function ($attributes) {
+                    $src = $attributes->src;
+                    if (! isset($src)) {
+                        return null;
+                    }
+
+                    if (Str::startsWith($src, 'asset::')) {
+                        $id = Str::after($src, 'asset::');
+                        $src = $this->getUrl($id);
+                    }
+
+                    return [
+                        'src' => $src,
+                    ];
+                },
+            ],
+            'alt' => [],
+            'title' => [],
+        ];
+    }
+
+    public function renderHTML($node, $HTMLAttributes = [])
+    {
+        return ['img', HTML::mergeAttributes($this->options['HTMLAttributes'], $HTMLAttributes), 0];
     }
 
     protected function getUrl($id)

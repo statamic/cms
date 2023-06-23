@@ -3,40 +3,171 @@
 namespace Statamic\Providers;
 
 use Closure;
+use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Actions\Action;
 use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
+use Statamic\Facades\Fieldset;
+use Statamic\Facades\File;
+use Statamic\Fields\Fieldtype;
+use Statamic\Forms\JsDrivers\JsDriver;
+use Statamic\Modifiers\Modifier;
+use Statamic\Query\Scopes\Scope;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Tags\Tags;
+use Statamic\UpdateScripts\UpdateScript;
+use Statamic\Widgets\Widget;
 
 abstract class AddonServiceProvider extends ServiceProvider
 {
+    /**
+     * Array of event class => Listener class.
+     *
+     * @var array<class-string, class-string[]>
+     */
     protected $listen = [];
+
+    /**
+     * @var list<class-string>
+     */
     protected $subscribe = [];
+
+    /**
+     * @var list<class-string<Tags>>
+     */
     protected $tags = [];
+
+    /**
+     * @var list<class-string<Scope>>
+     */
     protected $scopes = [];
+
+    /**
+     * @var list<class-string<Action>>
+     */
     protected $actions = [];
+
+    /**
+     * @var list<class-string<Fieldtype>>
+     */
     protected $fieldtypes = [];
+
+    /**
+     * @var list<class-string<Modifier>>
+     */
     protected $modifiers = [];
+
+    /**
+     * @var list<class-string<Widget>>
+     */
     protected $widgets = [];
+
+    /**
+     * @var list<class-string<JsDriver>>
+     */
+    protected $formJsDrivers = [];
+
+    /**
+     * @var array<class-string, string>
+     */
     protected $policies = [];
+
+    /**
+     * @var list<class-string<Command>>
+     */
     protected $commands = [];
+
+    /**
+     * @var list<string> - Paths on disk
+     */
     protected $stylesheets = [];
+
+    /**
+     * @var list<string> - URLs of stylesheets
+     */
     protected $externalStylesheets = [];
+
+    /**
+     * @var list<string> - Paths on disk
+     */
     protected $scripts = [];
+
+    /**
+     * @var list<string> - URLs of scripts
+     */
     protected $externalScripts = [];
+
+    /**
+     * @var list<string> - URLs of Vite entry points
+     */
+    protected $vite = null;
+
+    /**
+     * Map of path on disk to name in the public directory. The file will be published
+     * as `vendor/{packageName}/{value}`.
+     *
+     * @var array<string, string>
+     */
     protected $publishables = [];
+
+    /**
+     * Map of type => Path of route PHP file on disk where the key (type) can be one
+     * of `cp`, `web`, `actions`.
+     *
+     * @template TType of 'cp'|'web'|'actions'
+     *
+     * @var array<TType, string>
+     */
     protected $routes = [];
+
+    /**
+     * @var string|null
+     */
+    protected $routeNamespace;
+
+    /**
+     * Map of group name => Middlewares to apply.
+     *
+     * @var array<string, class-string[]>
+     */
     protected $middlewareGroups = [];
+
+    /**
+     * @var list<class-string<UpdateScript>>
+     */
     protected $updateScripts = [];
+
+    /**
+     * @var string
+     */
+    protected $fieldsetNamespace;
+
+    /**
+     * @var string
+     */
     protected $viewNamespace;
+
+    /**
+     * @var bool
+     */
     protected $publishAfterInstall = true;
+
+    /**
+     * @var bool
+     */
     protected $config = true;
+
+    /**
+     * @var bool
+     */
     protected $translations = true;
 
     public function boot()
@@ -54,11 +185,13 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootFieldtypes()
                 ->bootModifiers()
                 ->bootWidgets()
+                ->bootFormJsDrivers()
                 ->bootCommands()
                 ->bootSchedule()
                 ->bootPolicies()
                 ->bootStylesheets()
                 ->bootScripts()
+                ->bootVite()
                 ->bootPublishables()
                 ->bootConfig()
                 ->bootTranslations()
@@ -66,6 +199,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootMiddleware()
                 ->bootUpdateScripts()
                 ->bootViews()
+                ->bootFieldsets()
                 ->bootPublishAfterInstall()
                 ->bootAddon();
         });
@@ -145,6 +279,15 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
+    protected function bootFormJsDrivers()
+    {
+        foreach ($this->formJsDrivers as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
     protected function bootPolicies()
     {
         foreach ($this->policies as $key => $value) {
@@ -193,6 +336,15 @@ abstract class AddonServiceProvider extends ServiceProvider
 
         foreach ($this->externalScripts as $url) {
             $this->registerExternalScript($url);
+        }
+
+        return $this;
+    }
+
+    protected function bootVite()
+    {
+        if ($this->vite) {
+            $this->registerVite($this->vite);
         }
 
         return $this;
@@ -274,6 +426,11 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
+    protected function routeNamespace()
+    {
+        return $this->routeNamespace;
+    }
+
     /**
      * Register routes from the root of the site.
      *
@@ -283,7 +440,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerWebRoutes($routes)
     {
         Statamic::pushWebRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')->group($routes);
+            Route::namespace($this->routeNamespace())->group($routes);
         });
     }
 
@@ -296,7 +453,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerCpRoutes($routes)
     {
         Statamic::pushCpRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')->group($routes);
+            Route::namespace($this->routeNamespace())->group($routes);
         });
     }
 
@@ -309,43 +466,10 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerActionRoutes($routes)
     {
         Statamic::pushActionRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')
+            Route::namespace($this->routeNamespace())
                 ->prefix($this->getAddon()->slug())
                 ->group($routes);
         });
-    }
-
-    /**
-     * Register a route group.
-     *
-     * @param  string|Closure  $routes  Either the path to a routes file, or a closure containing routes.
-     * @param  array  $attributes  Additional attributes to be applied to the route group.
-     * @return void
-     */
-    protected function registerRouteGroup($routes, array $attributes = [])
-    {
-        if (is_string($routes)) {
-            $routes = function () use ($routes) {
-                require $routes;
-            };
-        }
-
-        Statamic::routes(function () use ($attributes, $routes) {
-            Route::group($this->routeGroupAttributes($attributes), $routes);
-        });
-    }
-
-    /**
-     * The attributes to be applied to the route group.
-     *
-     * @param  array  $overrides  Any additional attributes.
-     * @return array
-     */
-    protected function routeGroupAttributes($overrides = [])
-    {
-        return array_merge($overrides, [
-            'namespace' => $this->getAddon()->namespace(),
-        ]);
     }
 
     protected function bootMiddleware()
@@ -390,7 +514,34 @@ abstract class AddonServiceProvider extends ServiceProvider
             $path => public_path("vendor/{$name}/js/{$filename}.js"),
         ], $this->getAddon()->slug());
 
-        Statamic::script($name, "{$filename}.js?v={$version}");
+        Statamic::script($name, "{$filename}.js?v=".md5($version));
+    }
+
+    public function registerVite($config)
+    {
+        $name = $this->getAddon()->packageName();
+        $directory = $this->getAddon()->directory();
+
+        if (is_string($config) || ! Arr::isAssoc($config)) {
+            $config = ['input' => $config];
+        }
+
+        $publicDirectory = $config['publicDirectory'] ?? 'public';
+        $buildDirectory = $config['buildDirectory'] ?? 'build';
+        $hotFile = $config['hotFile'] ?? "{$directory}{$publicDirectory}/hot";
+        $input = $config['input'];
+
+        $publishSource = "{$directory}{$publicDirectory}/{$buildDirectory}/";
+        $publishTarget = public_path("vendor/{$name}/{$buildDirectory}/");
+        $this->publishes([
+            $publishSource => $publishTarget,
+        ], $this->getAddon()->slug());
+
+        Statamic::vite($name, [
+            'hotFile' => $hotFile,
+            'buildDirectory' => "vendor/{$name}/{$buildDirectory}",
+            'input' => $input,
+        ]);
     }
 
     public function registerExternalScript(string $url)
@@ -408,7 +559,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             $path => public_path("vendor/{$name}/css/{$filename}.css"),
         ], $this->getAddon()->slug());
 
-        Statamic::style($name, "{$filename}.css?v={$version}");
+        Statamic::style($name, "{$filename}.css?v=".md5($version));
     }
 
     public function registerExternalStylesheet(string $url)
@@ -416,7 +567,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         Statamic::externalStyle($url);
     }
 
-    protected function schedule($schedule)
+    protected function schedule(Schedule $schedule)
     {
         //
     }
@@ -453,7 +604,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             return $this;
         }
 
-        if (empty($this->scripts) && empty($this->stylesheets)) {
+        if (empty($this->scripts) && empty($this->stylesheets) && empty($this->vite) && empty($this->publishables)) {
             return $this;
         }
 
@@ -463,6 +614,20 @@ abstract class AddonServiceProvider extends ServiceProvider
                 '--force' => true,
             ]);
         });
+
+        return $this;
+    }
+
+    protected function bootFieldsets()
+    {
+        if (! file_exists($path = "{$this->getAddon()->directory()}resources/fieldsets")) {
+            return $this;
+        }
+
+        Fieldset::addNamespace(
+            $this->fieldsetNamespace ?? $this->getAddon()->slug(),
+            $path
+        );
 
         return $this;
     }

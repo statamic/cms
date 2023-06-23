@@ -199,18 +199,20 @@ class LanguageParser
                 $wrapperGroup->nodes[] = $lastNode;
                 $wrapperGroup->nodes[] = $thisNode;
 
+                $doBreak = false;
+
                 if ($i != $lastNodeIndex) {
                     for ($j = $i + 1; $j < $nodeLen; $j++) {
                         if ($nodes[$j] instanceof MethodInvocationNode) {
                             $wrapperGroup->nodes[] = $nodes[$j];
 
                             if ($j == $lastNodeIndex) {
-                                $i += 1; // Force the outer loop to break as well.
+                                $doBreak = true;
                                 break;
                             }
                         } else {
                             if ($j == $lastNodeIndex) {
-                                $i += 1; // Force the outer loop to break as well.
+                                $doBreak = true;
                                 break;
                             }
 
@@ -223,6 +225,10 @@ class LanguageParser
                 $wrapperGroup->endPosition = $wrapperGroup->nodes[count($wrapperGroup->nodes) - 1]->endPosition;
 
                 $newNodes[] = $wrapperGroup;
+
+                if ($doBreak) {
+                    break;
+                }
             } else {
                 $newNodes[] = $thisNode;
             }
@@ -976,11 +982,25 @@ class LanguageParser
                     $wrapperSemanticGroup = $next->scope->nodes[0];
 
                     if (empty($wrapperSemanticGroup->nodes) || $wrapperSemanticGroup->nodes[0] instanceof LogicGroup == false) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_UNEXPECTED_SWITCH_START_VALUE_NO_SEMANTIC_VALUE,
-                            $token,
-                            'Unexpected input while parsing [T_SWITCH_GROUP].'
-                        );
+                        $shouldError = true;
+
+                        if (! empty($wrapperSemanticGroup->nodes)) {
+                            $firstNode = $wrapperSemanticGroup->nodes[0];
+
+                            if ($firstNode instanceof  ArrayNode && $firstNode->hasModifiers()) {
+                                $shouldError = false;
+                            } elseif ($firstNode instanceof VariableNode) {
+                                $shouldError = false;
+                            }
+                        }
+
+                        if ($shouldError) {
+                            throw ErrorFactory::makeSyntaxError(
+                                AntlersErrorCodes::TYPE_UNEXPECTED_SWITCH_START_VALUE_NO_SEMANTIC_VALUE,
+                                $token,
+                                'Unexpected input while parsing [T_SWITCH_GROUP].'
+                            );
+                        }
                     }
 
                     $firstCondition = $wrapperSemanticGroup->nodes;
@@ -1889,7 +1909,7 @@ class LanguageParser
             } elseif ($node instanceof ImplicitArrayEnd && $newNodeCount > 0) {
                 $left = $newNodes[$newNodeCount - 1];
 
-                if ($left instanceof VariableNode && NodeHelpers::distance($left, $node) <= 1) {
+                if ($left instanceof VariableNode && NodeHelpers::distance($left, $node) <= 1 && Str::contains($left->name, '[')) {
                     array_pop($newNodes);
                     NodeHelpers::mergeVarContentLeft($node->content, $node, $left);
                     $newNodes[] = $left;

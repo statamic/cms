@@ -19,6 +19,8 @@ class Date extends FieldtypeFilter
             ],
             'value' => [
                 'type' => 'date',
+                'inline' => true,
+                'full_width' => true,
                 'required' => 'true',
                 'if' => [
                     'operator' => 'not empty',

@@ -1,26 +1,29 @@
 <template>
-
-    <div class="inline-block relative">
-
-        <button
-            class="bard-toolbar-button"
-            :class="{ active }"
-            v-html="button.html"
-            v-tooltip="button.text"
-            :aria-label="button.text"
-            @click="toggleLinkToolbar"
-        />
-
-        <link-toolbar
-            v-if="showingToolbar"
-            :link-attrs="linkAttrs"
-            :config="config"
-            :bard="bard"
-            @updated="setLink"
-            @deselected="showingToolbar = false"
-        />
-    </div>
-
+    <popover ref="popover" placement="bottom-end" @closed="popoverClosed" :clickaway="false">
+        <template #trigger>
+            <button
+                class="bard-toolbar-button"
+                :class="{ active }"
+                v-tooltip="button.text"
+                :aria-label="button.text"
+                @click="toggleLinkToolbar"
+            >
+                <svg-icon :name="button.svg" v-if="button.svg"></svg-icon>
+            </button>
+        </template>
+        <template #default>
+            <link-toolbar
+                class="w-80"
+                ref="toolbar"
+                v-if="showingToolbar"
+                :link-attrs="linkAttrs"
+                :config="config"
+                :bard="bard"
+                @updated="setLink"
+                @canceled="close"
+            />
+        </template>
+    </popover>
 </template>
 
 <script>
@@ -38,27 +41,35 @@ export default {
         return {
             linkAttrs: null,
             showingToolbar: false,
-            getMarkAttrs: this.editor.getMarkAttrs.bind(this.editor),
         }
     },
 
     methods: {
 
-        toggleLinkToolbar() {            
+        toggleLinkToolbar() {
             this.showingToolbar = ! this.showingToolbar;
 
             if (this.showingToolbar) {
-                this.linkAttrs = this.getMarkAttrs('link');
+                this.linkAttrs = this.editor.getAttributes('link');
             } else {
-                this.editor.focus();
+                this.editor.view.dom.focus();
             }
         },
 
-        setLink(attributes) {
-            this.editor.commands.link(attributes);
-            this.linkAttrs = null;
+        close() {
             this.showingToolbar = false;
-            this.editor.focus();
+            this.$refs.popover.close();
+        },
+
+        popoverClosed() {
+            this.showingToolbar = false;
+        },
+
+        setLink(attributes) {
+            this.editor.commands.setLink(attributes);
+            this.linkAttrs = null;
+            this.close();
+            this.editor.view.dom.focus();
         }
 
     }

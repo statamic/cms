@@ -27,7 +27,7 @@ class EntryPreviewController extends PreviewController
             ->data($values);
 
         if ($collection->dated()) {
-            $entry->date($preview['date'] ?? now()->format('Y-m-d-Hi'));
+            $entry->date($preview['date'] ?? now()->format('Y-m-d-His'));
         }
 
         return $this->tokenizeAndReturn($request, $entry);

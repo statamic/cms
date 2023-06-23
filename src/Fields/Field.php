@@ -101,6 +101,11 @@ class Field implements Arrayable
         return $visibility ?? 'visible';
     }
 
+    public function alwaysSave()
+    {
+        return Arr::get($this->config, 'always_save', false);
+    }
+
     public function rules()
     {
         $rules = [$this->handle => $this->addNullableRule(array_merge(
@@ -194,14 +199,6 @@ class Field implements Arrayable
         return ! in_array($this->get('listable'), [false, 'hidden'], true);
     }
 
-    /**
-     * @deprecated  Use isVisibleOnListing() instead.
-     */
-    public function isVisible()
-    {
-        return $this->isVisibleOnListing();
-    }
-
     public function isSortable()
     {
         if (is_null($this->get('sortable'))) {
@@ -220,6 +217,15 @@ class Field implements Arrayable
         return (bool) $this->get('filterable');
     }
 
+    public function shouldBeDuplicated()
+    {
+        if (is_null($this->get('duplicate'))) {
+            return true;
+        }
+
+        return (bool) $this->get('duplicate');
+    }
+
     public function toPublishArray()
     {
         return array_merge($this->preProcessedConfig(), [
@@ -231,21 +237,8 @@ class Field implements Arrayable
             'required' => $this->isRequired(),
             'visibility' => $this->visibility(),
             'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
+            'always_save' => $this->alwaysSave(),
         ]);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function toBlueprintArray()
-    {
-        return [
-            'handle' => $this->handle,
-            'type' => $this->type(),
-            'display' => $this->display(),
-            'instructions' => $this->instructions(),
-            'config' => array_except($this->preProcessedConfig(), 'type'),
-        ];
     }
 
     public function setValue($value)

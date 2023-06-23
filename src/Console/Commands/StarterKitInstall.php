@@ -41,10 +41,6 @@ class StarterKitInstall extends Command
      */
     public function handle()
     {
-        if (version_compare(app()->version(), '7', '<')) {
-            return $this->error('Laravel 7+ is required to install starter kits!');
-        }
-
         if ($this->validationFails($package = $this->getPackage(), new ComposerPackage)) {
             return;
         }
@@ -59,11 +55,12 @@ class StarterKitInstall extends Command
             $this->call('statamic:site:clear', ['--no-interaction' => true]);
         }
 
-        $installer = StarterKitInstaller::package($package, $licenseManager, $this)
+        $installer = StarterKitInstaller::package($package, $this, $licenseManager)
             ->fromLocalRepo($this->option('local'))
             ->withConfig($this->option('with-config'))
             ->withoutDependencies($this->option('without-dependencies'))
-            ->withUser($cleared && $this->input->isInteractive())
+            ->withUser($cleared && $this->input->isInteractive() && ! $this->option('cli-install'))
+            ->usingSubProcess($this->option('cli-install'))
             ->force($this->option('force'));
 
         try {

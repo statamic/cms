@@ -65,6 +65,8 @@ class NavigationController extends CpController
     {
         abort_if(! $nav = Nav::find($nav), 404);
 
+        $this->authorize('view', $nav, __('You are not authorized to view navs.'));
+
         $site = $request->site ?? Site::selected()->handle();
 
         if (! $nav->existsIn($site)) {
@@ -207,7 +209,7 @@ class NavigationController extends CpController
             ];
         }
 
-        return Blueprint::makeFromSections($contents);
+        return Blueprint::makeFromTabs($contents);
     }
 
     public function destroy($nav)

@@ -84,8 +84,8 @@ class UpdateFormTest extends TestCase
                     'subject' => null,
                     'text' => 'emails.contact.text',
                     'html' => 'emails.contact.html',
-                    'markdown' => false,
-                    'attachments' => false,
+                    'markdown' => true,
+                    'attachments' => true,
                 ],
             ]])
             ->assertOk();
@@ -101,6 +101,8 @@ class UpdateFormTest extends TestCase
                 'from' => 'bar@example.com',
                 'text' => 'emails.contact.text',
                 'html' => 'emails.contact.html',
+                'markdown' => true,
+                'attachments' => true,
             ],
         ], $updated->email());
     }

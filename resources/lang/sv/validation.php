@@ -29,6 +29,7 @@ return [
     'between.array' => 'Måste ha mellan :min och :max artiklar.',
     'boolean' => 'Måste vara sant eller falskt.',
     'confirmed' => 'Bekräftelsen stämmer inte.',
+    'current_password' => 'Lösenordet är felaktigt.',
     'date' => 'Inte ett giltigt datum.',
     'date_format' => 'Matchar inte formatet :format .',
     'different' => 'Detta fält och :other måste vara olika.',

@@ -8,6 +8,12 @@ class Version
 {
     public function get()
     {
-        return Composer::installedVersion(Statamic::PACKAGE);
+        $currentVersion = Composer::installedVersion(Statamic::PACKAGE);
+
+        if (! $currentVersion) {
+            throw new \Exception('Statamic version could not be found. The composer.lock file is missing.');
+        }
+
+        return $currentVersion;
     }
 }

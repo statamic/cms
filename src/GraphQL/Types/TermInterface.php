@@ -4,6 +4,7 @@ namespace Statamic\GraphQL\Types;
 
 use Rebing\GraphQL\Support\InterfaceType;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Events\TermBlueprintFound;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Taxonomy;
 
@@ -66,6 +67,7 @@ class TermInterface extends InterfaceType
             ->flatMap(function ($taxonomy) {
                 return $taxonomy
                     ->termBlueprints()
+                    ->each(fn ($blueprint) => TermBlueprintFound::dispatch($blueprint))
                     ->each->addGqlTypes()
                     ->map(function ($blueprint) use ($taxonomy) {
                         return compact('taxonomy', 'blueprint');

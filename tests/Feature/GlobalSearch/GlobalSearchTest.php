@@ -23,16 +23,18 @@ class GlobalSearchTest extends TestCase
         $entry1 = tap(
             Entry::make()
             ->id('1')->locale('en')->slug('test-entry-1')
+            ->set('title', 'Entry 1')
             ->collection(tap(Collection::make('test-collection-1')->title('Test Collection 1'))->save())
         )->save();
 
         $entry2 = tap(
             Entry::make()
             ->id('2')->locale('en')->slug('test-entry-2')
+            ->set('title', 'Entry 2')
             ->collection(tap(Collection::make('test-collection-2')->title('Test Collection 2'))->save())
         )->save();
 
-        $results = collect([$entry1, $entry2]);
+        $results = collect([$entry1, $entry2])->map->toSearchResult();
 
         $builder = $this->mock(QueryBuilder::class);
         $builder->shouldReceive('get')->once()->andReturn($results);
@@ -51,10 +53,7 @@ class GlobalSearchTest extends TestCase
             ->assertJsonCount(1)
             ->assertJsonStructure([
                 [
-                    'title', 'edit_url',
-                    'collection', 'is_entry',
-                    'taxonomy', 'is_term',
-                    'container', 'is_asset',
+                    'title', 'url', 'badge', 'reference',
                 ],
             ]);
     }

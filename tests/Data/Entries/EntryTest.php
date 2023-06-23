@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
+use LogicException;
 use Mockery;
 use ReflectionClass;
 use Statamic\Contracts\Data\Augmentable;
@@ -117,6 +118,30 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function if_the_slug_is_a_function_it_will_only_resolve_it_once()
+    {
+        $count = 0;
+        $slugWithinClosure = 'not yet set';
+        $entry = new Entry;
+        $entry->slug(function ($entry) use (&$count, &$slugWithinClosure) {
+            $count++;
+
+            // Call slug in here again to attempt infinite recursion. This could
+            // happen if something in the closure logic indirectly calls slug again.
+            $slugWithinClosure = $entry->slug();
+
+            return 'the-slug';
+        });
+
+        $this->assertEquals('the-slug', $entry->slug());
+        $this->assertNull($slugWithinClosure);
+        $this->assertEquals(1, $count);
+
+        // Ensure that the temporary null slug is reset back the actual one for subsequent calls.
+        $this->assertEquals('the-slug', $entry->slug());
+    }
+
+    /** @test */
     public function it_sets_gets_and_removes_data_values()
     {
         $collection = tap(Collection::make('test'))->save();
@@ -180,6 +205,7 @@ class EntryTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider queryBuilderProvider
      **/
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)
@@ -343,17 +369,146 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_custom_computed_data()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry) {
+            return $entry->get('title').' AND MORE!';
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+        $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks']);
+
+        $expectedData = [
+            'title' => 'Pop Rocks',
+        ];
+
+        $expectedComputedData = [
+            'description' => 'Pop Rocks AND MORE!',
+        ];
+
+        $expectedValues = array_merge($expectedData, $expectedComputedData);
+
+        $this->assertArraySubset($expectedData, $entry->data()->all());
+        $this->assertEquals($expectedComputedData, $entry->computedData()->all());
+        $this->assertEquals($expectedValues, $entry->values()->all());
+        $this->assertEquals($expectedValues['title'], $entry->value('title'));
+        $this->assertEquals($expectedValues['description'], $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_gets_empty_computed_data_by_default()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks']);
+
+        $this->assertEquals([], $entry->computedData()->all());
+    }
+
+    /** @test */
+    public function it_doesnt_recursively_get_computed_data_when_callback_uses_value_methods()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry) {
+            return $entry->value('title').' '.$entry->values()->get('suffix');
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+        $entry = (new Entry)->collection($collection)->data(['title' => 'Pop Rocks', 'suffix' => 'AND MORE!']);
+
+        $this->assertEquals('Pop Rocks AND MORE!', $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_can_use_actual_data_to_compose_computed_data()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry, $value) {
+            return $value ?? 'N/A';
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+
+        $entry = (new Entry)->collection($collection);
+
+        $this->assertEquals('N/A', $entry->value('description'));
+
+        $entry->data(['description' => 'Raddest article ever!']);
+
+        $this->assertEquals('Raddest article ever!', $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_can_use_origin_data_to_compose_computed_data()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry, $value) {
+            return $entry->value('description') ?? 'N/A';
+        });
+
+        $collection = tap(Collection::make('articles'))->save();
+
+        (new Entry)->collection($collection)->id('origin')->data([
+            'description' => 'Dill Pickles',
+        ])->save();
+
+        $entry = (new Entry)->collection($collection)->origin('origin');
+
+        $this->assertEquals('Dill Pickles', $entry->values()->get('description'));
+        $this->assertEquals('Dill Pickles', $entry->value('description'));
+
+        $entry->data(['description' => 'Raddest article ever!']);
+
+        $this->assertEquals('Raddest article ever!', $entry->values()->get('description'));
+        $this->assertEquals('Raddest article ever!', $entry->value('description'));
+    }
+
+    /** @test */
+    public function it_properly_scopes_custom_computed_data_by_collection_handle()
+    {
+        Facades\Collection::computed('articles', 'description', function ($entry) {
+            return $entry->get('title').' AND MORE!';
+        });
+
+        Facades\Collection::computed('events', 'french_description', function ($entry) {
+            return $entry->get('title').' ET PLUS!';
+        });
+
+        $articleEntry = (new Entry)->collection(tap(Collection::make('articles'))->save())->data(['title' => 'Pop Rocks']);
+        $eventEntry = (new Entry)->collection(tap(Collection::make('events'))->save())->data(['title' => 'Jazz Concert']);
+
+        $this->assertEquals('Pop Rocks AND MORE!', $articleEntry->value('description'));
+
+        $this->assertNull($articleEntry->value('french_description'));
+        $this->assertNull($eventEntry->value('description'));
+        $this->assertEquals('Jazz Concert ET PLUS!', $eventEntry->value('french_description'));
+    }
+
+    /** @test */
+    public function it_only_evaluates_computed_data_closures_when_getting_values()
+    {
+        $count = 0;
+        Facades\Collection::computed('articles', 'description', function ($entry) use (&$count) {
+            $count++;
+
+            return $entry->get('title').' AND MORE!';
+        });
+
+        $articleEntry = (new Entry)->collection(tap(Collection::make('articles'))->save())->data(['title' => 'Pop Rocks']);
+
+        $this->assertEquals(0, $count);
+        $this->assertEquals(['title', 'description'], $articleEntry->keys()->all());
+
+        $this->assertEquals(['title' => 'Pop Rocks', 'description' => 'Pop Rocks AND MORE!'], $articleEntry->values()->all());
+        $this->assertEquals(1, $count);
+    }
+
+    /** @test */
     public function it_gets_the_url_from_the_collection()
     {
-        config(['statamic.amp.enabled' => true]);
-
         Facades\Site::setConfig(['default' => 'en', 'sites' => [
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr_FR'],
             'de' => ['url' => 'http://domain.de/', 'locale' => 'de_DE'],
         ]]);
 
-        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->ampable(true)->routes([
+        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',
@@ -370,7 +525,6 @@ class EntryTest extends TestCase
         $this->assertEquals('/blog/foo', $entryEn->urlWithoutRedirect());
         $this->assertEquals('http://domain.com/blog/foo', $entryEn->absoluteUrl());
         $this->assertEquals('http://domain.com/blog/foo', $entryEn->absoluteUrlWithoutRedirect());
-        $this->assertEquals('http://domain.com/amp/blog/foo', $entryEn->ampUrl());
         $this->assertNull($entryEn->redirectUrl());
 
         $this->assertEquals('/le-blog/le-foo', $entryFr->uri());
@@ -378,7 +532,6 @@ class EntryTest extends TestCase
         $this->assertEquals('/fr/le-blog/le-foo', $entryFr->urlWithoutRedirect());
         $this->assertEquals('http://domain.com/fr/le-blog/le-foo', $entryFr->absoluteUrl());
         $this->assertEquals('http://domain.com/fr/le-blog/le-foo', $entryFr->absoluteUrlWithoutRedirect());
-        $this->assertEquals('http://domain.com/fr/amp/le-blog/le-foo', $entryFr->ampUrl());
         $this->assertNull($entryFr->redirectUrl());
 
         $this->assertEquals('/das-blog/das-foo', $entryDe->uri());
@@ -386,7 +539,6 @@ class EntryTest extends TestCase
         $this->assertEquals('/das-blog/das-foo', $entryDe->urlWithoutRedirect());
         $this->assertEquals('http://domain.de/das-blog/das-foo', $entryDe->absoluteUrl());
         $this->assertEquals('http://domain.de/das-blog/das-foo', $entryDe->absoluteUrlWithoutRedirect());
-        $this->assertEquals('http://domain.de/amp/das-blog/das-foo', $entryDe->ampUrl());
         $this->assertNull($entryDe->redirectUrl());
 
         $this->assertEquals('/blog/redirected', $redirectEntry->uri());
@@ -394,7 +546,6 @@ class EntryTest extends TestCase
         $this->assertEquals('/blog/redirected', $redirectEntry->urlWithoutRedirect());
         $this->assertEquals('http://example.com/page', $redirectEntry->absoluteUrl());
         $this->assertEquals('http://domain.com/blog/redirected', $redirectEntry->absoluteUrlWithoutRedirect());
-        $this->assertNull($redirectEntry->ampUrl());
         $this->assertEquals('http://example.com/page', $redirectEntry->redirectUrl());
 
         $this->assertEquals('/blog/redirect-404', $redirect404Entry->uri());
@@ -402,7 +553,6 @@ class EntryTest extends TestCase
         $this->assertEquals('/blog/redirect-404', $redirect404Entry->urlWithoutRedirect());
         $this->assertEquals('http://domain.com/blog/redirect-404', $redirect404Entry->absoluteUrl());
         $this->assertEquals('http://domain.com/blog/redirect-404', $redirect404Entry->absoluteUrlWithoutRedirect());
-        $this->assertEquals('http://domain.com/amp/blog/redirect-404', $redirect404Entry->ampUrl());
         $this->assertEquals(404, $redirect404Entry->redirectUrl());
     }
 
@@ -468,6 +618,10 @@ class EntryTest extends TestCase
     {
         \Event::fake(); // Don't invalidate static cache etc when saving entries.
 
+        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en_US'],
+        ]]);
+
         $collection = tap((new Collection)->handle('pages')->routes('{parent_uri}/{slug}'))->save();
 
         $parent = tap((new Entry)->id('1')->locale('en')->collection($collection)->slug('parent')->set('redirect', '@child'))->save();
@@ -494,16 +648,22 @@ class EntryTest extends TestCase
         $this->assertEquals('/parent', $parent->uri());
         $this->assertEquals('/parent/child', $parent->url());
         $this->assertEquals('/parent', $parent->urlWithoutRedirect());
+        $this->assertEquals('http://domain.com/parent/child', $parent->absoluteUrl());
+        $this->assertEquals('http://domain.com/parent', $parent->absoluteUrlWithoutRedirect());
         $this->assertEquals('/parent/child', $parent->redirectUrl());
 
         $this->assertEquals('/parent/child', $child->uri());
         $this->assertEquals('/parent/child', $child->url());
         $this->assertEquals('/parent/child', $child->urlWithoutRedirect());
+        $this->assertEquals('http://domain.com/parent/child', $child->absoluteUrl());
+        $this->assertEquals('http://domain.com/parent/child', $child->absoluteUrlWithoutRedirect());
         $this->assertNull($child->redirectUrl());
 
         $this->assertEquals('/nochildren', $noChildren->uri());
         $this->assertEquals('/nochildren', $noChildren->url());
         $this->assertEquals('/nochildren', $noChildren->urlWithoutRedirect());
+        $this->assertEquals('http://domain.com/nochildren', $noChildren->absoluteUrl());
+        $this->assertEquals('http://domain.com/nochildren', $noChildren->absoluteUrlWithoutRedirect());
         $this->assertEquals(404, $noChildren->redirectUrl());
     }
 
@@ -513,11 +673,16 @@ class EntryTest extends TestCase
         $entry = new Entry;
         $this->assertEquals([], $entry->supplements()->all());
 
-        $return = $entry->setSupplement('foo', 'bar');
+        $return = $entry->setSupplement('foo', 'bar')->setSupplement('baz', null);
 
         $this->assertEquals($entry, $return);
         $this->assertEquals('bar', $entry->getSupplement('foo'));
-        $this->assertEquals(['foo' => 'bar'], $entry->supplements()->all());
+        $this->assertNull($entry->getSupplement('bar'));
+        $this->assertNull($entry->getSupplement('baz'));
+        $this->assertTrue($entry->hasSupplement('foo'));
+        $this->assertFalse($entry->hasSupplement('bar'));
+        $this->assertTrue($entry->hasSupplement('baz'));
+        $this->assertEquals(['foo' => 'bar', 'baz' => null], $entry->supplements()->all());
     }
 
     /** @test */
@@ -689,7 +854,7 @@ class EntryTest extends TestCase
             'en' => ['url' => '/', 'locale' => 'en_US'],
         ]]);
 
-        $collection = tap(Facades\Collection::make('blog'))->save();
+        $collection = tap(Facades\Collection::make('blog')->dated(true))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.md', $entry->path());
@@ -704,7 +869,7 @@ class EntryTest extends TestCase
             'fr' => ['url' => '/', 'locale' => 'fr_FR'],
         ]]);
 
-        $collection = tap(Facades\Collection::make('blog'))->save();
+        $collection = tap(Facades\Collection::make('blog')->dated(true))->save();
         $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/post.md', $entry->path());
@@ -729,38 +894,137 @@ class EntryTest extends TestCase
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/123.md', $entry->path());
     }
 
-    /** @test */
-    public function it_gets_and_sets_the_date()
-    {
-        Carbon::setTestNow(Carbon::parse('2015-09-24'));
+    /**
+     * @test
+     *
+     * @dataProvider dateCollectionEntriesProvider
+     */
+    public function it_gets_dates_for_dated_collection_entries(
+        $setDate,
+        $enableTimeInBlueprint,
+        $enableSecondsInBlueprint,
+        $expectedDate,
+        $expectedToHaveTime,
+        $expectedToHaveSeconds,
+        $expectedPath,
+    ) {
+        Carbon::setTestNow(Carbon::parse('2015-09-24 13:45:23'));
 
-        $collection = tap(Facades\Collection::make('blog'))->save();
+        $collection = tap(Facades\Collection::make('test')->dated(true))->save();
+
+        $entry = (new Entry)->collection($collection)->slug('foo');
+
+        if ($setDate) {
+            $entry->date($setDate);
+        }
+
+        $fields = [];
+
+        if ($enableTimeInBlueprint) {
+            $fields['date'] = ['type' => 'date', 'time_enabled' => $enableTimeInBlueprint, 'time_seconds_enabled' => $enableSecondsInBlueprint];
+        }
+
+        $blueprint = Blueprint::makeFromFields($fields);
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'test' => $blueprint->setHandle('test'),
+        ]));
+
+        $this->assertTrue($entry->hasDate());
+        $this->assertEquals($expectedDate, $entry->date()->format('Y-m-d H:i:s'));
+        $this->assertEquals($expectedToHaveTime, $entry->hasTime());
+        $this->assertEquals($expectedToHaveSeconds, $entry->hasSeconds());
+        $this->assertEquals($expectedPath, pathinfo($entry->path(), PATHINFO_FILENAME));
+    }
+
+    public function dateCollectionEntriesProvider()
+    {
+        return [
+            'no date explicitly set, time not explicitly enabled' => [null, null, null, '2015-09-24 00:00:00', false, false, 'foo'], // By default, the date field added to dated collection blueprints does not have time enabled.
+            'no date explicitly set, time enabled, seconds enabled' => [null, true, true, '2015-09-24 13:45:23', true, true, 'foo'],
+            'no date explicitly set, time enabled, seconds disabled' => [null, true, false, '2015-09-24 13:45:00', true, false, 'foo'], // Seconds are disabled, so they should be zeroed out.
+
+            'date set, time not explicitly enabled' => ['2023-04-19', null, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
+            'date set, time enabled, seconds enabled' => ['2023-04-19', true, true, '2023-04-19 00:00:00', true, true, '2023-04-19-000000.foo'],
+            'date set, time enabled, seconds disabled' => ['2023-04-19', true, false, '2023-04-19 00:00:00', true, false, '2023-04-19-0000.foo'],
+
+            'datetime set, time not explicitly enabled' => ['2023-04-19-1425', null, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is not enabled, so it should be zeroed out.
+            'datetime set, time enabled, seconds enabled' => ['2023-04-19-1425', true, true, '2023-04-19 14:25:00', true, true, '2023-04-19-142500.foo'],
+            'datetime set, time enabled, seconds disabled' => ['2023-04-19-1425', true, false, '2023-04-19 14:25:00', true, false, '2023-04-19-1425.foo'],
+
+            'datetime with seconds set, time not explicitly enabled' => ['2023-04-19-142512', null, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is not enabled, so it should be zeroed out.
+            'datetime with seconds set, time enabled, seconds enabled' => ['2023-04-19-142512', true, true, '2023-04-19 14:25:12', true, true, '2023-04-19-142512.foo'],
+            'datetime with seconds set, time enabled, seconds disabled' => ['2023-04-19-142512', true, false, '2023-04-19 14:25:00', true, false, '2023-04-19-1425.foo'], // Seconds are disabled, so they should be zeroed out.
+
+            'date set, time disabled' => ['2023-04-19', false, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
+            'date set, time disabled, seconds enabled' => ['2023-04-19', false, true, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is disabled, so seconds should be disabled too.
+
+            'datetime set, time disabled' => ['2023-04-19-1425', false, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
+            'datetime set, time disabled, seconds enabled' => ['2023-04-19-1425', false, true, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is disabled, so seconds should be disabled too.
+
+            'datetime with seconds set, time disabled' => ['2023-04-19-142512', false, null, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'],
+            'datetime with seconds set, time disabled, seconds enabled' => ['2023-04-19-142512', false, true, '2023-04-19 00:00:00', false, false, '2023-04-19.foo'], // Time is disabled, so seconds should be disabled too.
+        ];
+    }
+
+    /** @test */
+    public function date_is_null_if_a_collection_hasnt_been_set()
+    {
+        $this->assertNull((new Entry)->date());
+    }
+
+    /** @test */
+    public function it_gets_dates_for_non_dated_collection_entries()
+    {
+        Carbon::setTestNow(Carbon::parse('2015-09-24 13:45:23'));
+
+        // Have a "date" field named "date" just to prove it doesn't affect the date() methods.
+        $blueprint = Blueprint::makeFromFields(['date' => ['type' => 'date']]);
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            'test' => $blueprint->setHandle('test'),
+        ]));
+
+        $collection = tap(Facades\Collection::make('test')->dated(false))->save();
+
         $entry = (new Entry)->collection($collection);
 
-        // Without explicitly having the date set, it falls back to the last modified date (which if there's no file, is Carbon::now())
-        $this->assertInstanceOf(Carbon::class, $entry->date());
-        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-09-24 00:00')->eq($entry->date()));
         $this->assertFalse($entry->hasDate());
+        $this->assertFalse($entry->hasTime());
+        $this->assertFalse($entry->hasSeconds());
+        $this->assertNull($entry->date());
+        $this->assertNull($entry->date);
+        $this->assertNull($entry->get('date'));
+        $this->assertNull($entry->value('date'));
 
-        // Date can be provided as string without time
-        $return = $entry->date('2015-03-05');
-        $this->assertEquals($entry, $return);
-        $this->assertInstanceOf(Carbon::class, $entry->date());
-        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-03-05 00:00')->eq($entry->date()));
-        $this->assertTrue($entry->hasDate());
+        $entry->set('date', '2023-04-19');
 
-        // Date can be provided as string with time
-        $entry->date('2015-03-05-1325');
-        $this->assertInstanceOf(Carbon::class, $entry->date());
-        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-03-05 13:25')->eq($entry->date()));
-        $this->assertTrue($entry->hasDate());
+        $this->assertFalse($entry->hasDate());
+        $this->assertFalse($entry->hasTime());
+        $this->assertFalse($entry->hasSeconds());
+        $this->assertNull($entry->date());
+        $this->assertInstanceOf(Carbon::class, $entry->date);
+        $this->assertEquals('2023-04-19 00:00:00', $entry->date->format('Y-m-d H:i:s'));
+        $this->assertEquals('2023-04-19', $entry->get('date'));
+        $this->assertEquals('2023-04-19', $entry->value('date'));
+    }
 
-        // Date can be provided as carbon instance
-        $carbon = Carbon::createFromFormat('Y-m-d H:i', '2018-05-02 17:32');
-        $entry->date($carbon);
-        $this->assertInstanceOf(Carbon::class, $entry->date());
-        $this->assertTrue($carbon->eq($entry->date()));
-        $this->assertTrue($entry->hasDate());
+    /** @test */
+    public function setting_date_on_non_dated_collection_throws_exception()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot set date on non-dated collection entry.');
+
+        $collection = tap(Facades\Collection::make('test')->dated(false))->save();
+
+        (new Entry)->collection($collection)->date('2023-04-19');
+    }
+
+    /** @test */
+    public function setting_date_on_entry_that_doesnt_have_a_collection_set_throws_exception()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot set date on non-dated collection entry.');
+
+        (new Entry)->date('2023-04-19');
     }
 
     /** @test */
@@ -813,38 +1077,6 @@ class EntryTest extends TestCase
         $this->assertEquals('potato', $three->order());
         $this->assertEquals(24, $four->order());
         $this->assertEquals(24, $five->order());
-    }
-
-    /** @test */
-    public function it_gets_and_sets_the_date_for_date_collections()
-    {
-        Carbon::setTestNow(Carbon::parse('2015-09-24'));
-
-        $dateEntry = with('', function () {
-            $collection = tap(Collection::make('dated')->dated(true))->save();
-
-            return (new Entry)->collection($collection);
-        });
-
-        $numberEntry = with('', function () {
-            $collection = tap(Collection::make('ordered')->structureContents(['max_depth' => 1, 'tree' => []]))->save();
-
-            return (new Entry)->collection($collection);
-        });
-
-        $dateEntry->date('2017-01-02');
-
-        $this->assertEquals('2017-01-02 12:00am', $dateEntry->date()->format('Y-m-d h:ia'));
-        $this->assertTrue($dateEntry->hasDate());
-        $this->assertFalse($dateEntry->hasTime());
-
-        $this->assertEquals('2015-09-24 12:00am', $numberEntry->date()->format('Y-m-d h:ia'));
-        $this->assertFalse($numberEntry->hasDate());
-
-        $dateEntry->date('2017-01-02-1523');
-        $this->assertEquals('2017-01-02 03:23pm', $dateEntry->date()->format('Y-m-d h:ia'));
-        $this->assertTrue($dateEntry->hasDate());
-        $this->assertTrue($dateEntry->hasTime());
     }
 
     /** @test */
@@ -903,6 +1135,19 @@ class EntryTest extends TestCase
 
         $this->assertSame($second, $entry->blueprint());
         $this->assertNotSame($first, $second);
+    }
+
+    /** @test */
+    public function it_can_set_a_blueprint_using_an_instance()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'first' => $first = (new Blueprint)->setHandle('first'),
+            'second' => $second = (new Blueprint)->setHandle('second'),
+        ]));
+        Collection::make('blog')->save();
+        $entry = (new Entry)->collection('blog')->blueprint($second);
+
+        $this->assertSame($second, $entry->blueprint());
     }
 
     /** @test */
@@ -1298,13 +1543,13 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_file_contents_for_saving()
     {
-        tap(Collection::make('test'))->save();
+        tap(Collection::make('test')->dated(true))->save();
 
         $entry = (new Entry)
             ->collection('test')
             ->id('123')
             ->slug('test')
-            ->date('2018-01-01')
+            ->date('2018-01-01') // set the date to ensure it doesnt appear in contents
             ->published(false)
             ->data([
                 'title' => 'The title',
@@ -1330,7 +1575,7 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_file_contents_for_saving_a_localized_entry()
     {
-        tap(Collection::make('test'))->save();
+        tap(Collection::make('test')->dated(true))->save();
 
         $originEntry = $this->mock(Entry::class);
         $originEntry->shouldReceive('id')->andReturn('123');
@@ -1714,7 +1959,7 @@ class EntryTest extends TestCase
         $page->shouldReceive('parent')->andReturn($parentPage);
         $tree = $this->partialMock(CollectionTree::class);
         $tree->locale('en');
-        $tree->shouldReceive('page')->with('entry-id')->andReturn($page);
+        $tree->shouldReceive('find')->with('entry-id')->andReturn($page);
         CollectionTreeRepository::shouldReceive('find', 'en')->andReturn($tree);
 
         $structure = new CollectionStructure;
@@ -1738,6 +1983,7 @@ class EntryTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider autoGeneratedTitleProvider
      */
     public function it_gets_the_auto_generated_title($format)
@@ -1785,7 +2031,7 @@ class EntryTest extends TestCase
             'de' => ['url' => 'http://domain.de/', 'locale' => 'de_DE'],
         ]]);
 
-        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->ampable(true)->routes([
+        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',
@@ -1809,8 +2055,8 @@ class EntryTest extends TestCase
         ], $entryDe->previewTargets()->all());
 
         $collection->previewTargets([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'refresh' => true],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'refresh' => true],
         ])->save();
 
         $this->assertEquals([

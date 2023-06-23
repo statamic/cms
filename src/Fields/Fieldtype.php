@@ -174,13 +174,77 @@ abstract class Fieldtype implements Arrayable
     public function configBlueprint(): Blueprint
     {
         return (new Blueprint)->setContents([
-            'fields' => $this->configFields()->items()->all(),
+            'tabs' => [
+                'main' => [
+                    'sections' => $this->configSections(),
+                ],
+            ],
         ]);
+    }
+
+    private function configSections()
+    {
+        $fields = $this->configFieldItems();
+        $extras = $this->extraConfigFieldItems();
+
+        if (empty($fields) && empty($extras)) {
+            return [];
+        }
+
+        $extras = collect($extras)
+            ->map(fn ($field, $handle) => compact('handle', 'field'))
+            ->values()->all();
+
+        if (! $this->configFieldsUseSections()) {
+            return [
+                [
+                    'fields' => collect($fields)
+                        ->map(fn ($field, $handle) => compact('handle', 'field'))
+                        ->merge($extras)
+                        ->values()->all(),
+                ],
+            ];
+        }
+
+        $sections = collect($fields)->map(function ($section) {
+            $section['fields'] = collect($section['fields'])
+                ->map(fn ($field, $handle) => compact('handle', 'field'))
+                ->values()->all();
+
+            return $section;
+        });
+
+        if (! empty($extras)) {
+            if ($sections->containsOneItem()) {
+                $section = $sections[0];
+                $section['fields'] = array_merge($section['fields'], $extras);
+                $sections[0] = $section;
+            } else {
+                $sections[] = ['fields' => $extras];
+            }
+        }
+
+        return $sections->all();
+    }
+
+    private function configFieldsUseSections()
+    {
+        if (empty($fields = $this->configFieldItems())) {
+            return false;
+        }
+
+        return array_keys($fields)[0] === 0;
     }
 
     public function configFields(): Fields
     {
-        $fields = collect($this->configFieldItems())
+        $fields = collect($this->configFieldItems());
+
+        if ($this->configFieldsUseSections()) {
+            $fields = $fields->flatMap(fn ($section) => $section['fields']);
+        }
+
+        $fields = $fields
             ->merge($this->extraConfigFieldItems())
             ->map(function ($field, $handle) {
                 return compact('handle', 'field');

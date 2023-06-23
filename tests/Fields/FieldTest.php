@@ -51,8 +51,7 @@ class FieldTest extends TestCase
     /** @test */
     public function it_gets_the_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype
-        {
+        $fieldtype = new class extends Fieldtype {
         };
 
         FieldtypeRepository::shouldReceive('find')
@@ -326,6 +325,7 @@ class FieldTest extends TestCase
             'validate' => 'required',
             'visibility' => 'visible',
             'read_only' => false, // deprecated
+            'always_save' => false,
             'component' => 'example',
             'a_config_field_with_pre_processing' => 'foo preprocessed',
             'a_config_field_without_pre_processing' => 'foo',
@@ -534,6 +534,7 @@ class FieldTest extends TestCase
 
     /**
      * @test
+     *
      * @group graphql
      **/
     public function it_gets_the_graphql_type()
@@ -561,6 +562,7 @@ class FieldTest extends TestCase
 
     /**
      * @test
+     *
      * @group graphql
      **/
     public function it_makes_the_graphql_type_non_nullable_if_its_required()

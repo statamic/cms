@@ -94,6 +94,7 @@ class RequestCacheTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider bypassCacheProvider
      */
     public function it_bypasses_cache_when_using_a_valid_token($url, $headers)
@@ -120,6 +121,7 @@ class RequestCacheTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider bypassCacheProvider
      */
     public function it_doesnt_bypass_cache_when_using_an_invalid_token($url, $headers)

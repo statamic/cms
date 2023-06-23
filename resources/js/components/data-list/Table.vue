@@ -1,8 +1,8 @@
 <template>
-    <table ref="table" tabindex="0" class="data-table" :class="{ 'opacity-50': loading, 'select-none' : shifting }" @keydown.shift="shiftDown" @keyup="clearShift">
-        <thead v-if="allowBulkActions || allowColumnPicker || visibleColumns.length > 1">
+    <table :data-size="relativeColumnsSize" ref="table" tabindex="0" class="data-table" :class="{ 'select-none' : shifting }" @keydown.shift="shiftDown" @keyup="clearShift">
+        <thead v-if="allowBulkActions || visibleColumns.length > 1">
             <tr>
-                <th class="checkbox-column" v-if="allowBulkActions || reorderable">
+                <th :class="{'checkbox-column': ! reorderable, 'handle-column': reorderable}" v-if="allowBulkActions || reorderable">
                     <data-list-toggle-all ref="toggleAll" v-if="allowBulkActions && !singleSelect" />
                 </th>
                 <th
@@ -12,23 +12,27 @@
                         'current-column': sharedState.sortColumn === column.field,
                         'sortable-column': column.sortable === true,
                         'cursor-not-allowed': !sortable,
-                        'text-right pr-4': column.numeric,
+                        'text-right pr-8': column.numeric,
                     }"
+                    class="group"
                     @click.prevent="changeSortColumn(column.field)"
                 >
                     <span v-text="column.label" />
-                    <svg v-if="sharedState.sortColumn === column.field" :class="sharedState.sortDirection" height="8" width="8" viewBox="0 0 10 6.5">
+                    <svg v-if="column.sortable" :class="[sharedState.sortDirection, {'opacity-100 pointer-events-none': sharedState.sortColumn === column.field}]" height="8" width="8" viewBox="0 0 10 6.5" class="ml-1 opacity-0 group-hover:opacity-100">
                         <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor"/>
                     </svg>
                 </th>
-                <th class="actions-column">
-                    <data-list-column-picker :preferences-key="columnPreferencesKey" v-if="allowColumnPicker" />
+                <th class="type-column" v-if="type">
+                    <template v-if="type === 'entries'">{{ __('Collection') }}</template>
+                    <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
                 </th>
+                <th class="actions-column" />
             </tr>
         </thead>
         <sortable-list
             :value="rows"
             :vertical="true"
+            :mirror="false"
             item-class="sortable-row"
             handle-class="table-drag-handle"
             @input="$emit('reordered', $event)"
@@ -37,7 +41,7 @@
             <slot name="tbody-start" />
             <tr v-for="(row, index) in rows" :key="row.id" class="sortable-row outline-none" :class="{'row-selected': sharedState.selections.includes(row.id)}">
                 <td class="table-drag-handle" v-if="reorderable"></td>
-                <td class="checkbox-column" v-if="allowBulkActions && !reorderable">
+                <th class="checkbox-column" v-if="allowBulkActions && !reorderable">
                     <input
                         v-if="!reorderable"
                         type="checkbox"
@@ -47,8 +51,8 @@
                         :id="`checkbox-${row.id}`"
                         @click="checkboxClicked(row, index, $event)"
                     />
-                </td>
-                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width" :class="{'text-right pr-4': column.numeric}">
+                </th>
+                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row, index, $event)" :width="column.width" :class="{'text-right pr-8': column.numeric}">
                     <slot
                         :name="`cell-${column.field}`"
                         :value="row[column.value || column.field]"
@@ -61,14 +65,20 @@
                         <table-field :handle="column.field" :value="row[column.value || column.field]" :values="row" :fieldtype="column.fieldtype" :key="column.field" />
                     </slot>
                 </td>
-                <td class="actions-column">
+                <td class="type-column" v-if="type">
+                    <span v-if="type === 'entries' || type === 'terms'" class="rounded px-1 py-px text-2xs uppercase bg-gray-200 text-gray">
+                        <template v-if="type === 'entries'">{{ row.collection.title }}</template>
+                        <template v-if="type === 'terms'">{{ row.taxonomy.title }}</template>
+                    </span>
+                </td>
+                <th class="actions-column">
                     <slot
                         name="actions"
                         :row="row"
                         :index="actualIndex(row)"
                         :display-index="index"
                     ></slot>
-                </td>
+                </th>
             </tr>
         </tbody>
         </sortable-list>
@@ -114,12 +124,8 @@ export default {
             type: Boolean,
             default: false
         },
-        allowColumnPicker: {
-            type: Boolean,
-            default: false
-        },
-        columnPreferencesKey: {
-            type: String,
+        type: {
+            type: String
         },
     },
 
@@ -138,6 +144,14 @@ export default {
 
         reachedSelectionLimit() {
             return this.sharedState.selections.length === this.sharedState.maxSelections;
+        },
+
+        relativeColumnsSize() {
+            if (this.visibleColumns.length <= 4) return 'sm';
+            if (this.visibleColumns.length <= 8) return 'md';
+            if (this.visibleColumns.length >= 12) return 'lx';
+
+            return 'xl';
         },
 
         singleSelect() {

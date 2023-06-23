@@ -7,6 +7,7 @@ use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
+use Statamic\Facades\Search;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
@@ -14,6 +15,7 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Search\Result;
 
 class UsersController extends CpController
 {
@@ -44,7 +46,7 @@ class UsersController extends CpController
         $query = User::query();
 
         if ($search = request('search')) {
-            $query->where('email', 'like', '%'.$search.'%')->orWhere('name', 'like', '%'.$search.'%');
+            $query = $this->searchUsers($search, $query);
         }
 
         return $query;
@@ -54,13 +56,23 @@ class UsersController extends CpController
     {
         $query = $request->group
             ? UserGroup::find($request->group)->queryUsers()
-            : $this->indexQuery();
+            : User::query();
 
-        $activeFilterBadges = $this->queryFilters($query, $request->filters);
+        if ($search = request('search')) {
+            $query = $this->searchUsers($search, $query, ! $request->has('group'));
+        }
+
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'blueprints' => ['user'],
+        ]);
 
         $users = $query
             ->orderBy(request('sort', 'email'), request('order', 'asc'))
             ->paginate(request('perPage'));
+
+        if ($users->getCollection()->first() instanceof Result) {
+            $users->setCollection($users->getCollection()->map->getSearchable());
+        }
 
         return (new Users($users))
             ->blueprint(User::blueprint())
@@ -68,6 +80,27 @@ class UsersController extends CpController
             ->additional(['meta' => [
                 'activeFilterBadges' => $activeFilterBadges,
             ]]);
+    }
+
+    protected function searchUsers($search, $query, $useIndex = true)
+    {
+        if ($useIndex && Search::indexes()->has('users')) {
+            return Search::index('users')->ensureExists()->search($search);
+        }
+
+        $query->where(function ($query) use ($search) {
+            $query
+                ->where('email', 'like', '%'.$search.'%')
+                ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
+                    $query
+                        ->orWhere('first_name', 'like', '%'.$search.'%')
+                        ->orWhere('last_name', 'like', '%'.$search.'%');
+                }, function ($query) use ($search) {
+                    $query->orWhere('name', 'like', '%'.$search.'%');
+                });
+        });
+
+        return $query;
     }
 
     /**
@@ -97,6 +130,7 @@ class UsersController extends CpController
             ],
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
+            'canSendInvitation' => config('statamic.users.wizard_invitation'),
         ];
 
         if ($request->wantsJson()) {
@@ -123,15 +157,15 @@ class UsersController extends CpController
             ->email($request->email)
             ->data($values);
 
-        if ($request->roles && User::current()->can('edit roles')) {
+        if ($request->roles && User::current()->can('assign roles')) {
             $user->roles($request->roles);
         }
 
-        if ($request->groups && User::current()->can('edit user groups')) {
+        if ($request->groups && User::current()->can('assign user groups')) {
             $user->groups($request->groups);
         }
 
-        if ($request->super && User::current()->can('edit roles')) {
+        if ($request->super && User::current()->isSuper()) {
             $user->makeSuper();
         }
 
@@ -162,19 +196,27 @@ class UsersController extends CpController
 
         $blueprint = $user->blueprint();
 
-        if (! User::current()->can('edit roles')) {
+        if (! User::current()->can('assign roles')) {
             $blueprint->ensureField('roles', ['visibility' => 'read_only']);
         }
 
-        if (! User::current()->can('edit user groups')) {
+        if (! User::current()->can('assign user groups')) {
             $blueprint->ensureField('groups', ['visibility' => 'read_only']);
         }
+
+        if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
+            $blueprint->ensureField('super', ['type' => 'toggle']);
+        }
+
+        $values = $user->data()
+            ->merge($user->computedData())
+            ->merge(['email' => $user->email()]);
 
         $fields = $blueprint
             ->removeField('password')
             ->removeField('password_confirmation')
             ->fields()
-            ->addValues($user->data()->merge(['email' => $user->email()])->all())
+            ->addValues($values->all())
             ->preProcess();
 
         $viewData = [
@@ -206,20 +248,29 @@ class UsersController extends CpController
 
         $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
 
-        $fields->validate(['email' => 'required|unique_user_value:'.$user->id()]);
+        $fields
+            ->validator()
+            ->withRules(['email' => 'required|unique_user_value:{id}'])
+            ->withReplacements(['id' => $user->id()])
+            ->validate();
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
         foreach ($values as $key => $value) {
             $user->set($key, $value);
         }
+
+        if (User::current()->isSuper() && User::current()->id() !== $user->id()) {
+            $user->super = $request->super;
+        }
+
         $user->email($request->email);
 
-        if (User::current()->can('edit roles')) {
+        if (User::current()->can('assign roles')) {
             $user->roles($request->roles);
         }
 
-        if (User::current()->can('edit user groups')) {
+        if (User::current()->can('assign user groups')) {
             $user->groups($request->groups);
         }
 

@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use Rebing\GraphQL\Support\InterfaceType;
+use Statamic\Events\EntryBlueprintFound;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Fields\DateField;
@@ -89,6 +90,7 @@ class EntryInterface extends InterfaceType
             ->flatMap(function ($collection) {
                 return $collection
                     ->entryBlueprints()
+                    ->each(fn ($blueprint) => EntryBlueprintFound::dispatch($blueprint))
                     ->each->addGqlTypes()
                     ->map(function ($blueprint) use ($collection) {
                         return compact('collection', 'blueprint');

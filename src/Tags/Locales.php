@@ -8,6 +8,7 @@ use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\GetsQuerySelectKeys;
+use Statamic\Taxonomies\LocalizedTerm;
 
 class Locales extends Tags
 {
@@ -159,7 +160,30 @@ class Locales extends Tags
 
         $id = $this->params->get('id', $this->context->value('id'));
 
-        return $this->data = Data::find($id);
+        $data = Data::find($id);
+
+        $data = $this->workaroundForCollectionTaxonomyTerm($id, $data);
+
+        return $this->data = $data;
+    }
+
+    private function workaroundForCollectionTaxonomyTerm($id, $data)
+    {
+        if (! $this->params->bool('collection_term_workaround', true)) {
+            return $data;
+        }
+
+        if (! $data instanceof LocalizedTerm) {
+            return $data;
+        }
+
+        // If the ID is the same as the root "page" item, then we'll just use that
+        // term instead, as it'll have the collection associated with it already.
+        if ($id === ($page = $this->context->get('page'))->id()) {
+            return $page;
+        }
+
+        return $data;
     }
 
     /**

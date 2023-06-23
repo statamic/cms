@@ -49,7 +49,10 @@ export default {
         },
 
         isReadOnly() {
-            return this.readOnly || this.config.visibility === 'read_only' || false;
+            return this.readOnly
+                || this.config.visibility === 'read_only'
+                || this.config.visibility === 'computed'
+                || false;
         },
 
         replicatorPreview() {

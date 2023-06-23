@@ -190,8 +190,8 @@ class LicenseManagerTest extends TestCase
     {
         $outpost = $this->mock(Outpost::class);
 
-        $outpost->shouldReceive('response')->andReturn($response);
         $this->addToAssertionCount(-1); // Dont want to assert this
+        $outpost->shouldReceive('response')->zeroOrMoreTimes()->andReturn($response);
 
         return new LicenseManager($outpost);
     }

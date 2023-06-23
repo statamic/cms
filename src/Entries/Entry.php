@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
+use LogicException;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -14,6 +15,8 @@ use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Contracts\Search\Searchable as SearchableContract;
+use Statamic\Data\ContainsComputedData;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
@@ -36,18 +39,19 @@ use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
+use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, ContainsQueryableValues, Arrayable, ArrayAccess
+class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, ContainsQueryableValues, Arrayable, ArrayAccess, SearchableContract
 {
     use Routable {
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified;
+    use ContainsData, ContainsComputedData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, Searchable;
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
@@ -136,7 +140,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             ->setter(function ($blueprint) use ($key) {
                 Blink::forget($key);
 
-                return $blueprint;
+                return $blueprint instanceof \Statamic\Fields\Blueprint ? $blueprint->handle() : $blueprint;
             })
             ->args(func_get_args());
     }
@@ -357,8 +361,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         $prefix = '';
 
-        if ($this->hasDate()) {
-            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d').'.';
+        if ($this->hasDate() && $this->date) {
+            $format = 'Y-m-d';
+            if ($this->hasTime()) {
+                $format .= '-Hi';
+                if ($this->hasSeconds()) {
+                    $format .= 's';
+                }
+            }
+
+            $prefix = $this->date->format($format).'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
@@ -428,9 +440,27 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('date')
             ->getter(function ($date) {
-                return $date ?? $this->lastModified();
+                if (! $this->collection()?->dated()) {
+                    return null;
+                }
+
+                $date = $date ?? $this->lastModified();
+
+                if (! $this->hasTime()) {
+                    $date->startOfDay();
+                }
+
+                if (! $this->hasSeconds()) {
+                    $date->startOfMinute();
+                }
+
+                return $date;
             })
             ->setter(function ($date) {
+                if (! $this->collection()?->dated()) {
+                    throw new LogicException('Cannot set date on non-dated collection entry.');
+                }
+
                 if ($date === null) {
                     return null;
                 }
@@ -443,19 +473,36 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
                 }
 
-                return Carbon::createFromFormat('Y-m-d-Hi', $date);
+                if (strlen($date) === 15) {
+                    return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
+                }
+
+                return Carbon::createFromFormat('Y-m-d-His', $date);
             })
             ->args(func_get_args());
     }
 
     public function hasDate()
     {
-        return $this->date !== null;
+        return $this->collection()->dated();
     }
 
     public function hasTime()
     {
-        return $this->hasDate() && $this->date()->format('H:i:s') !== '00:00:00';
+        if (! $this->hasDate()) {
+            return false;
+        }
+
+        return $this->blueprint()->field('date')->fieldtype()->timeEnabled();
+    }
+
+    public function hasSeconds()
+    {
+        if (! $this->hasTime()) {
+            return false;
+        }
+
+        return $this->blueprint()->field('date')->fieldtype()->secondsEnabled();
     }
 
     public function sites()
@@ -491,11 +538,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected function shouldRemoveNullsFromFileData()
     {
         return false;
-    }
-
-    public function ampable()
-    {
-        return $this->collection()->ampable();
     }
 
     protected function revisionKey()
@@ -629,13 +671,18 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function makeLocalization($site)
     {
-        return Facades\Entry::make()
+        $localization = Facades\Entry::make()
             ->collection($this->collection)
             ->origin($this)
             ->locale($site)
             ->published($this->published)
-            ->slug($this->slug())
-            ->date($this->date());
+            ->slug($this->slug());
+
+        if ($this->collection()->dated()) {
+            $localization->date($this->date());
+        }
+
+        return $localization;
     }
 
     public function supplementTaxonomies()
@@ -673,7 +720,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             return null;
         }
 
-        return $this->structure()->in($this->locale())->page($id);
+        return $this->structure()->in($this->locale())->find($id);
     }
 
     public function route()
@@ -692,6 +739,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         if ($this->hasDate()) {
             $data = $data->merge([
+                'date' => $this->date(),
                 'year' => $this->date()->format('Y'),
                 'month' => $this->date()->format('m'),
                 'day' => $this->date()->format('d'),
@@ -734,9 +782,14 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return Facades\Entry::find($origin);
     }
 
-    public function values()
+    protected function getOriginFallbackValues()
     {
-        return $this->collection()->cascade()->merge($this->originValues());
+        return $this->collection()->cascade();
+    }
+
+    protected function getOriginFallbackValue($key)
+    {
+        return $this->collection()->cascade()->get($key);
     }
 
     public function defaultAugmentedArrayKeys()
@@ -788,7 +841,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         // Since the slug is generated from the title, we'll avoid augmenting
         // the slug which could result in an infinite loop in some cases.
-        return (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+        $title = (string) Antlers::parse($format, $this->augmented()->except('slug')->all());
+
+        return trim($title);
     }
 
     public function previewTargets()
@@ -836,5 +891,20 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    public function getSearchValue(string $field)
+    {
+        return method_exists($this, $field) ? $this->$field() : $this->value($field);
+    }
+
+    public function getCpSearchResultBadge(): string
+    {
+        return $this->collection()->title();
+    }
+
+    protected function getComputedCallbacks()
+    {
+        return Facades\Collection::getComputedCallbacks($this->collection);
     }
 }

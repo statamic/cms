@@ -19,6 +19,7 @@ class SmartypantsTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider dumbChars
      */
     public function it_translates_plain_ascii_chars_into_smart_punctuation($expected, $input): void

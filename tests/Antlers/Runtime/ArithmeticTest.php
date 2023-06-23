@@ -76,4 +76,13 @@ class ArithmeticTest extends ParserTestCase
         $this->assertSame('Yes', $this->renderString('{{ if 6 % 2 == 0 }}Yes{{ else }}No{{ endif }}'));
         $this->assertSame('No', $this->renderString('{{ if 6 % 2 == 1 }}Yes{{ else }}No{{ endif }}'));
     }
+
+    public function test_subtraction_after_logic_groups()
+    {
+        $data = [
+            'items' => ['a', 'b', 'c'],
+        ];
+
+        $this->assertSame(2, intval($this->renderString('{{ (items|length) - 1 }}', $data, true)));
+    }
 }

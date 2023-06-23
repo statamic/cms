@@ -23,17 +23,21 @@ class BardFieldtypeTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /** @test */
-    public function it_outputs_bard_fields()
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_outputs_bard_fields($isGrouped)
     {
         $article = Blueprint::makeFromFields([
             'things' => [
                 'type' => 'bard',
-                'sets' => [
+                'sets' => $this->groupSets($isGrouped, [
                     'meal' => [
                         'fields' => [
                             ['handle' => 'food', 'field' => ['type' => 'text']],
-                            ['handle' => 'drink', 'field' => ['type' => 'text']],
+                            ['handle' => 'drink', 'field' => ['type' => 'markdown']], // using markdown to show nested fields are resolved using their fieldtype.
                         ],
                     ],
                     'car' => [
@@ -42,7 +46,7 @@ class BardFieldtypeTest extends TestCase
                             ['handle' => 'model', 'field' => ['type' => 'text']],
                         ],
                     ],
-                ],
+                ]),
             ],
         ]);
 
@@ -53,12 +57,12 @@ class BardFieldtypeTest extends TestCase
         EntryFactory::collection('blog')->id('1')->data([
             'title' => 'Main Post',
             'things' => [
-                ['type' => 'text', 'text' => 'first text'],
-                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
-                ['type' => 'text', 'text' => 'second text'],
-                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
-                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
-                ['type' => 'text', 'text' => 'last text'],
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'first text']]],
+                ['type' => 'set', 'attrs' => ['id' => '1', 'values' => ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke _zero_']]],
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'second text']]],
+                ['type' => 'set', 'attrs' => ['id' => '2', 'values' => ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla']]],
+                ['type' => 'set', 'attrs' => ['values' => ['type' => 'meal', 'food' => 'salad', 'drink' => 'water']]], // id intentionally omitted
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'last text']]],
             ],
         ])->create();
 
@@ -73,11 +77,14 @@ class BardFieldtypeTest extends TestCase
                     text
                 }
                 ... on Set_Things_Meal {
+                    id
                     type
                     food
                     drink
+                    drink_md: drink(format: "markdown")
                 }
                 ... on Set_Things_Car {
+                    id
                     type
                     make
                     model
@@ -97,10 +104,10 @@ GQL;
                     'title' => 'Main Post',
                     'things' => [
                         ['type' => 'text', 'text' => '<p>first text</p>'],
-                        ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke'],
+                        ['id' => '1', 'type' => 'meal', 'food' => 'burger', 'drink' => "<p>coke <em>zero</em></p>\n", 'drink_md' => 'coke _zero_'],
                         ['type' => 'text', 'text' => '<p>second text</p>'],
-                        ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
-                        ['type' => 'meal', 'food' => 'salad', 'drink' => 'water'],
+                        ['id' => '2', 'type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
+                        ['id' => null, 'type' => 'meal', 'food' => 'salad', 'drink' => "<p>water</p>\n", 'drink_md' => 'water'],
                         ['type' => 'text', 'text' => '<p>last text</p>'],
                     ],
                 ],
@@ -344,5 +351,24 @@ GQL;
                     ],
                 ],
             ]]);
+    }
+
+    public function groupedSetsProvider()
+    {
+        return [
+            'grouped sets (new)' => [true],
+            'ungrouped sets (old)' => [false],
+        ];
+    }
+
+    private function groupSets($shouldGroup, $sets)
+    {
+        if (! $shouldGroup) {
+            return $sets;
+        }
+
+        return [
+            'group_one' => ['sets' => $sets],
+        ];
     }
 }

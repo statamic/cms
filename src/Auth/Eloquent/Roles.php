@@ -47,6 +47,8 @@ class Roles
      */
     public function sync($roles)
     {
+        $roles = collect($roles);
+
         $dbRoles = collect(
             $this->table()->where('user_id', $this->user->id())->get()
         )->keyBy('role_id');

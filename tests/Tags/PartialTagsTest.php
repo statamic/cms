@@ -103,34 +103,46 @@ class PartialTagsTest extends TestCase
     }
 
     /** @test */
-    public function parameters_can_be_accessed_within_slots()
+    public function it_doesnt_render_partial_if_when_condition_is_false()
     {
-        $this->viewShouldReturnRaw('mypartial', '{{ slot }}');
+        $this->viewShouldReturnRaw('mypartial', "---\nfoo: bar\n---\nthe partial content with {{ foo }}");
 
         $this->assertEquals(
-            'slot start bar slot end',
-            $this->tag('{{ partial:mypartial foo="bar" }}slot start {{ foo }} slot end{{ /partial:mypartial }}')
+            '',
+            $this->partialTag('mypartial', 'foo="baz" when="false"')
         );
     }
 
     /** @test */
-    public function parameters_can_be_accessed_within_named_slots()
+    public function it_renders_partial_if_when_condition_is_true()
     {
-        $this->viewShouldReturnRaw('mypartial', '<slot>{{ slot }}</slot><named:slot>{{ slot:footer | upper }}</named:slot>');
-
-        $template = <<<'EOT'
-{{ partial:mypartial foo="bar" }}
-    {{ slot:footer }}
-        Footer: {{ foo }}
-    {{ /slot:footer }}
-    
-    Slot: {{ foo }}
-{{ /partial:mypartial }}
-EOT;
+        $this->viewShouldReturnRaw('mypartial', "---\nfoo: bar\n---\nthe partial content with {{ foo }}");
 
         $this->assertEquals(
-            '<slot>Slot: bar</slot><named:slot>FOOTER: BAR</named:slot>',
-            $this->tag($template)
+            'the partial content with baz',
+            $this->partialTag('mypartial', 'foo="baz" when="true"')
+        );
+    }
+
+    /** @test */
+    public function it_doesnt_render_partial_if_unless_condition_is_true()
+    {
+        $this->viewShouldReturnRaw('mypartial', "---\nfoo: bar\n---\nthe partial content with {{ foo }}");
+
+        $this->assertEquals(
+            '',
+            $this->partialTag('mypartial', 'foo="baz" unless="true"')
+        );
+    }
+
+    /** @test */
+    public function it_renders_partial_if_unless_condition_is_false()
+    {
+        $this->viewShouldReturnRaw('mypartial', "---\nfoo: bar\n---\nthe partial content with {{ foo }}");
+
+        $this->assertEquals(
+            'the partial content with baz',
+            $this->partialTag('mypartial', 'foo="baz" unless="false"')
         );
     }
 }

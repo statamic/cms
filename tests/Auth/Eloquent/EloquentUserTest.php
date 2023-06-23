@@ -98,7 +98,7 @@ class EloquentUserTest extends TestCase
                 // 'password' => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret
                 'remember_token' => str_random(10),
             ])
-        );
+            );
     }
 
     public function createPermissible()
@@ -119,11 +119,9 @@ class EloquentUserTest extends TestCase
 
     public function additionalDataValues()
     {
-        $lt7 = version_compare(app()->version(), 7, '<');
-
         return [
-            'created_at' => $lt7 ? now()->format('Y-m-d H:i:s') : now()->toISOString(),
-            'updated_at' => $lt7 ? now()->format('Y-m-d H:i:s') : now()->toISOString(),
+            'created_at' => now()->toISOString(),
+            'updated_at' => now()->toISOString(),
             'preferences' => [
                 'locale' => 'en',
             ],

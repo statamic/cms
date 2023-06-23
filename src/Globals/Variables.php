@@ -131,7 +131,7 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
             });
 
         return (new \Statamic\Fields\Blueprint)->setContents([
-            'sections' => [
+            'tabs' => [
                 'main' => [
                     'fields' => array_values($fields->all()),
                 ],

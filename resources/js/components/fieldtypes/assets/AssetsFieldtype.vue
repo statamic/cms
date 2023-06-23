@@ -1,6 +1,5 @@
 <template>
-    <element-container @resized="containerWidth = $event.width">
-    <div :class="{ 'narrow': containerWidth < 500, 'really-narrow': containerWidth < 280 }">
+    <div class="@container">
 
         <uploader
             ref="uploader"
@@ -14,12 +13,12 @@
             <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
 
                 <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
-                    <svg-icon name="upload" class="h-8 w-8 mr-3" />
-                    <span>{{ __('Drop File to Upload') }}</span>
+                    <svg-icon name="upload" class="h-6 @md:h-8 w-6 @md:w-8 mr-2 @md:mr-6" />
+                    <span>{{ __('Drop to Upload') }}</span>
                 </div>
 
                 <div
-                    v-if="!maxFilesReached && !isReadOnly"
+                    v-if="!isReadOnly && showPicker"
                     class="assets-fieldtype-picker"
                     :class="{
                         'is-expanded': expanded,
@@ -28,30 +27,23 @@
                 >
 
                     <button
+                        :class="{'opacity-0': dragging }"
                         type="button"
                         class="btn btn-with-icon"
                         @click="openSelector"
                         @keyup.space.enter="openSelector"
                         tabindex="0">
-                        <svg-icon name="folder-image" class="w-6 h-6 text-grey-80"></svg-icon>
+                        <svg-icon name="folder-image" class="w-4 h-4 text-gray-800"></svg-icon>
                         {{ __('Browse') }}
                     </button>
 
-                    <p class="asset-upload-control text-xs text-grey-60" v-if="config.allow_uploads">
+                    <p class="asset-upload-control" v-if="config.allow_uploads">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
-                        <span class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
+                        <span v-if="soloAsset" class="drag-drop-text" v-text="__('or drag & drop here to replace.')"></span>
+                        <span v-else class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
                     </p>
-
-                    <button
-                        type="button"
-                        class="delete-bard-set btn btn-icon float-right"
-                        v-if="isInBardField"
-                        @click.prevent="$dispatch('asset-field.delete-bard-set')">
-                        <span class="icon icon-trash"></span>
-                    </button>
-
                 </div>
 
                 <uploads
@@ -62,40 +54,43 @@
                 <template v-if="expanded">
 
                     <sortable-list
-                        v-if="displayMode === 'grid' && ! soloAsset"
+                        v-if="displayMode === 'grid'"
                         v-model="assets"
                         item-class="asset-tile"
                         handle-class="asset-thumb-container"
                         @dragstart="$emit('focus')"
                         @dragend="$emit('blur')"
+                        :constrain-dimensions="true"
                         :disabled="isReadOnly"
+                        :distance="5"
+                        :animate="false"
+                        append-to="body"
                     >
-                        <div
-                            class="asset-grid-listing border rounded overflow-hidden"
-                            :class="{ 'rounded-t-none': !maxFilesReached }"
-                            ref="assets"
-                        >
+                        <div class="asset-grid-listing border rounded overflow-hidden rounded-t-none" ref="assets">
                             <asset-tile
                                 v-for="asset in assets"
                                 :key="asset.id"
                                 :asset="asset"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
+                                :show-set-alt="showSetAlt"
                                 @updated="assetUpdated"
-                                @removed="assetRemoved">
+                                @removed="assetRemoved"
+                                @id-changed="idChanged(asset.id, $event)">
                             </asset-tile>
                         </div>
                     </sortable-list>
 
                     <div class="asset-table-listing" v-if="displayMode === 'list'">
-
                         <table class="table-fixed">
                             <sortable-list
                                 v-model="assets"
-                                :vertical="true"
                                 item-class="asset-row"
                                 handle-class="asset-row"
+                                :vertical="true"
                                 :disabled="isReadOnly"
+                                :distance="5"
+                                :mirror="false"
                             >
                                 <tbody ref="assets">
                                     <tr is="assetRow"
@@ -105,37 +100,20 @@
                                         :asset="asset"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
+                                        :show-set-alt="showSetAlt"
                                         @updated="assetUpdated"
-                                        @removed="assetRemoved">
+                                        @removed="assetRemoved"
+                                        @id-changed="idChanged(asset.id, $event)">
                                     </tr>
                                 </tbody>
                             </sortable-list>
                         </table>
-
                     </div>
-
                 </template>
-
-                <div class="asset-solo-container" v-if="expanded && soloAsset && displayMode == 'grid'" ref="assets">
-                    <asset-tile
-                        v-for="asset in assets"
-                        :key="asset.id"
-                        :asset="asset"
-                        :read-only="isReadOnly"
-                        @updated="assetUpdated"
-                        @removed="assetRemoved">
-                    </asset-tile>
-                </div>
-
             </div>
-
         </uploader>
 
-        <stack
-            v-if="showSelector"
-            name="asset-selector"
-            @closed="closeSelector"
-        >
+        <stack v-if="showSelector" name="asset-selector" @closed="closeSelector">
             <selector
                 :container="container"
                 :folder="folder"
@@ -153,7 +131,7 @@
 </template>
 
 
-<style lang="scss">
+<style>
 
     .asset-listing-uploads {
         border: 1px dashed #ccc;
@@ -211,7 +189,6 @@ export default {
             uploads: [],
             innerDragging: false,
             displayMode: 'grid',
-            containerWidth: null,
         };
     },
 
@@ -318,13 +295,61 @@ export default {
             }
         },
 
+        isInGridField() {
+            let vm = this;
+
+            while (true) {
+                let parent = vm.$parent;
+
+                if (! parent) return false;
+
+                if (parent.grid) {
+                    return true;
+                }
+
+                vm = parent;
+            }
+        },
+
+        isInLinkField() {
+            let vm = this;
+
+            while (true) {
+                let parent = vm.$parent;
+
+                if (! parent) return false;
+
+                if (parent.$options.name === 'link-fieldtype') {
+                    return true;
+                }
+
+                vm = parent;
+            }
+        },
+
         replicatorPreview() {
             return _.map(this.assets, (asset) => {
-                return asset.isImage ?
+                return (asset.isImage || asset.isSvg) ?
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
             }).join(', ');
-        }
+        },
+
+        showPicker() {
+            if (this.maxFilesReached && ! this.isFullWidth) return false
+
+            if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false
+
+            return true
+        },
+
+        isFullWidth() {
+            return ! (this.config.width && this.config.width < 100)
+        },
+
+        showSetAlt() {
+            return this.config.show_set_alt && ! this.isReadOnly;
+        },
 
     },
 
@@ -348,6 +373,8 @@ export default {
                 this.initializing = false;
                 this.loading = false;
             });
+
+            this.$emit('replicator-preview-updated', this.replicatorPreview);
         },
 
         /**
@@ -364,8 +391,8 @@ export default {
 
             this.loading = true;
 
-            this.$axios.get(cp_url('assets-fieldtype'), {
-                params: { assets }
+            this.$axios.post(cp_url('assets-fieldtype'), {
+                assets
             }).then(response => {
                 this.assets = response.data;
                 this.loading = false;
@@ -386,7 +413,6 @@ export default {
          */
         openSelector() {
             this.showSelector = true;
-            this.$root.hideOverflow = true;
         },
 
         /**
@@ -394,7 +420,6 @@ export default {
          */
         closeSelector() {
             this.showSelector = false;
-            this.$root.hideOverflow = false;
         },
 
         /**
@@ -448,7 +473,12 @@ export default {
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
             }).join(', ');
-        }
+        },
+
+        idChanged(oldId, newId) {
+            const index = this.value.indexOf(oldId);
+            this.update([...this.value.slice(0, index), newId, ...this.value.slice(index + 1)]);
+        },
 
     },
 

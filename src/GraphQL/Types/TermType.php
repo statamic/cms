@@ -6,7 +6,6 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Blueprint;
-use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
 class TermType extends \Rebing\GraphQL\Support\Type
@@ -51,13 +50,7 @@ class TermType extends \Rebing\GraphQL\Support\Type
     private function resolver()
     {
         return function (Term $term, $args, $context, $info) {
-            $value = $term->augmentedValue($info->fieldName);
-
-            if ($value instanceof Value) {
-                $value = $value->value();
-            }
-
-            return $value;
+            return $term->resolveGqlValue($info->fieldName);
         };
     }
 }

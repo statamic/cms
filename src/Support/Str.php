@@ -2,20 +2,15 @@
 
 namespace Statamic\Support;
 
+use Closure;
+use Illuminate\Support\Str as IlluminateStr;
 use Statamic\Facades\Compare;
 use Stringy\StaticStringy;
 use voku\helper\ASCII;
 
-/**
- * Manipulating strings.
- */
-class Str extends \Illuminate\Support\Str
+/** @mixin \Illuminate\Support\Str */
+class Str
 {
-    public static function __callStatic($method, $parameters)
-    {
-        return call_user_func_array([StaticStringy::class, $method], $parameters);
-    }
-
     public static function ascii($value, $language = 'en')
     {
         return ASCII::to_ascii((string) $value, $language, true, config('statamic.system.ascii_replace_extra_symbols'));
@@ -89,41 +84,44 @@ class Str extends \Illuminate\Support\Str
         return strip_tags($html);
     }
 
-    public static function slug($string, $separator = '-', $language = 'en')
+    public static function slug($string, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
     {
         $string = (string) $string;
+
+        // Ensure we use local `ascii()` helper, since IlluminateStr doesn't have access to ours.
+        $string = $language ? static::ascii($string, $language) : $string;
 
         // Statamic is a-OK with underscores in slugs.
         $string = str_replace('_', $placeholder = strtolower(str_random(16)), $string);
 
-        $slug = parent::slug($string, $separator, $language);
+        $slug = IlluminateStr::slug($string, $separator, $language, $dictionary);
 
         return str_replace($placeholder, '_', $slug);
     }
 
     public static function studlyToSlug($string)
     {
-        return parent::slug(Str::snake($string));
+        return self::modifyMultiple($string, ['snake', 'slugify']);
     }
 
     public static function studlyToTitle($string)
     {
-        return Str::modifyMultiple($string, ['snake', 'slugToTitle']);
+        return self::modifyMultiple($string, ['snake', 'slugToTitle']);
     }
 
     public static function studlyToWords($string)
     {
-        return Str::modifyMultiple($string, ['snake', 'deslugify']);
+        return self::modifyMultiple($string, ['snake', 'deslugify']);
     }
 
     public static function slugToTitle($string)
     {
-        return Str::modifyMultiple($string, ['deslugify', 'title']);
+        return self::modifyMultiple($string, ['deslugify', 'title']);
     }
 
     public static function isUrl($string)
     {
-        return self::startsWith($string, '/') || filter_var($string, FILTER_VALIDATE_URL) !== false;
+        return IlluminateStr::startsWith($string, '/') || filter_var($string, FILTER_VALIDATE_URL) !== false;
     }
 
     public static function deslugify($string)
@@ -217,6 +215,24 @@ class Str extends \Illuminate\Support\Str
     }
 
     /**
+     * Parse each part of a string split with a regex through a callback function.
+     *
+     * @param  string  $value
+     * @param  string  $regex
+     * @param  Closure  $callback
+     * @return string
+     */
+    public static function mapRegex($value, $regex, Closure $callback)
+    {
+        $parts = preg_split($regex, $value, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        foreach ($parts as $i => $part) {
+            $parts[$i] = $callback($part, preg_match($regex, $part));
+        }
+
+        return implode('', $parts);
+    }
+
+    /**
      * Apply multiple string modifications via array.
      *
      * @param  string  $string
@@ -237,17 +253,15 @@ class Str extends \Illuminate\Support\Str
     public static function tailwindWidthClass($width)
     {
         $widths = [
-            25 => '1/4',
-            33 => '1/3',
-            50 => '1/2',
-            66 => '2/3',
-            75 => '3/4',
-            100 => 'full',
+            25 => 'w-full @lg:w-1/4',
+            33 => 'w-full @lg:w-1/3',
+            50 => 'w-full @lg:w-1/2',
+            66 => 'w-full @lg:w-2/3',
+            75 => 'w-full @lg:w-3/4',
+            100 => 'w-full',
         ];
 
-        $class = $widths[$width] ?? 'full';
-
-        return "w-$class";
+        return $widths[$width] ?? 'w-full';
     }
 
     /**
@@ -272,25 +286,37 @@ class Str extends \Illuminate\Support\Str
         return ! in_array(strtolower($value), ['no', 'false', '0', '', '-1']);
     }
 
-    public static function replace($string, $search, $replace)
+    public static function safeTruncateReverse($string, $length, $substring = '')
     {
-        return StaticStringy::replace($string, $search, $replace);
+        return IlluminateStr::reverse(StaticStringy::safeTruncate(IlluminateStr::reverse($string), $length, $substring));
     }
 
-    public static function studly($value)
+    /**
+     * Implicitly defer all other method calls to either \Stringy\StaticStringy or \Illuminate\Support\Str.
+     *
+     * @param  string  $method
+     * @param  array  $args
+     * @return mixed
+     */
+    public static function __callStatic($method, $args)
     {
-        $key = $value;
+        $deferToStringy = [
+            'append', 'at', 'camelize', 'chars', 'collapseWhitespace', 'containsAny', 'count', 'countSubstr',
+            'dasherize', 'delimit', 'endsWithAny', 'ensureLeft', 'ensureRight', 'first', 'getEncoding', 'getIterator',
+            'hasLowerCase', 'hasUpperCase', 'htmlDecode', 'htmlEncode', 'humanize', 'indexOf', 'indexOfLast', 'insert',
+            'isAlpha', 'isAlphanumeric', 'isBase64', 'isBlank', 'isHexadecimal', 'isLowerCase', 'isSerialized',
+            'isUpperCase', 'last', 'lines', 'longestCommonPrefix', 'longestCommonSubstring', 'longestCommonSuffix',
+            'lowerCaseFirst', 'offsetExists', 'offsetGet', 'offsetSet', 'offsetUnset', 'pad', 'prepend', 'regexReplace',
+            'removeLeft', 'removeRight', 'safeTruncate', 'shuffle', 'slice', 'slugify', 'split', 'startsWithAny',
+            'stripWhitespace', 'surround', 'swapCase', 'tidy', 'titleize', 'toAscii', 'toBoolean', 'toLowerCase',
+            'toSpaces', 'toTabs', 'toTitleCase', 'toUpperCase', 'trim', 'trimLeft', 'trimRight', 'truncate',
+            'underscored', 'upperCamelize', 'upperCaseFirst',
+        ];
 
-        if (isset(parent::$studlyCache[$key])) {
-            return parent::$studlyCache[$key];
+        if (in_array($method, $deferToStringy)) {
+            return StaticStringy::$method(...$args);
         }
 
-        $words = explode(' ', str_replace(['-', '_'], ' ', $value));
-
-        $studlyWords = array_map(function ($word) {
-            return parent::ucfirst($word);
-        }, $words);
-
-        return parent::$studlyCache[$key] = implode($studlyWords);
+        return IlluminateStr::$method(...$args);
     }
 }

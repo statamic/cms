@@ -13,6 +13,7 @@ class AddonLicenseTest extends TestCase
     protected function license($response = [])
     {
         Addon::shouldReceive('get')->with('test/addon')
+            ->zeroOrMoreTimes()
             ->andReturn(new FakeAddonLicenseAddon('Test Addon', '1.2.3', 'rad'));
         $this->addToAssertionCount(-1); // dont need to assert this.
 

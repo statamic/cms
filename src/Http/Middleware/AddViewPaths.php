@@ -4,27 +4,70 @@ namespace Statamic\Http\Middleware;
 
 use Closure;
 use Statamic\Facades\Site;
-use Statamic\Statamic;
 
 class AddViewPaths
 {
+    private $paths;
+    private $hints;
+    private $site;
+    private $finder;
+
     public function handle($request, Closure $next)
     {
-        $finder = view()->getFinder();
-        $amp = Statamic::isAmpRequest();
-        $site = Site::current()->handle();
+        $this->update();
 
-        $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site, $amp) {
+        $response = $next($request);
+
+        $this->restore();
+
+        return $response;
+    }
+
+    private function update()
+    {
+        $this->finder = view()->getFinder();
+        $this->site = Site::current()->handle();
+        $this->paths = $this->finder->getPaths();
+        $this->hints = $this->finder->getHints();
+
+        $this->updatePaths();
+        $this->updateHints();
+    }
+
+    private function updatePaths()
+    {
+        $site = $this->site;
+
+        $paths = collect($this->paths)->flatMap(function ($path) use ($site) {
             return [
-                $amp ? $path.'/'.$site.'/amp' : null,
                 $path.'/'.$site,
-                $amp ? $path.'/amp' : null,
                 $path,
             ];
         })->filter()->values()->all();
 
-        $finder->setPaths($paths);
+        $this->finder->setPaths($paths);
+    }
 
-        return $next($request);
+    private function updateHints()
+    {
+        foreach ($this->hints as $namespace => $paths) {
+            $paths = collect($paths)->flatMap(function ($path) {
+                return [
+                    $path.'/'.$this->site,
+                    $path,
+                ];
+            })->values();
+
+            $this->finder->replaceNamespace($namespace, $paths->all());
+        }
+    }
+
+    private function restore()
+    {
+        $this->finder->setPaths($this->paths);
+
+        foreach ($this->hints as $namespace => $paths) {
+            $this->finder->replaceNamespace($namespace, $paths);
+        }
     }
 }

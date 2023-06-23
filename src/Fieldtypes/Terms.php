@@ -57,20 +57,42 @@ class Terms extends Relationship
 
     protected function configFieldItems(): array
     {
-        return array_merge(parent::configFieldItems(), [
-            'create' => [
-                'display' => __('Allow Creating'),
-                'instructions' => __('statamic::fieldtypes.terms.config.create'),
-                'type' => 'toggle',
-                'default' => true,
-                'width' => 50,
+        return [
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
+                    ],
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                        'type' => 'radio',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                    ],
+                    'create' => [
+                        'display' => __('Allow Creating'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.create'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'taxonomies' => [
+                        'display' => __('Taxonomies'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.taxonomies'),
+                        'type' => 'taxonomies',
+                        'mode' => 'select',
+                    ],
+                ],
             ],
-            'taxonomies' => [
-                'display' => __('Taxonomies'),
-                'type' => 'taxonomies',
-                'mode' => 'select',
-            ],
-        ]);
+        ];
     }
 
     public function filter()
@@ -99,6 +121,7 @@ class Terms extends Relationship
             && $parent
             && $parent instanceof Entry
             && $this->field->handle() === $this->taxonomies()[0]
+            && $parent->collection() !== null
             && $parent->collection()->taxonomies()->map->handle()->contains($this->field->handle());
 
         if ($shouldQueryCollection) {
@@ -372,8 +395,16 @@ class Terms extends Relationship
 
     protected function createTermFromString($string, $taxonomy)
     {
+        // The parent is the item this terms fieldtype exists on. Most commonly an
+        // entry, but could also be something else, like another taxonomy term.
+        $parent = $this->field->parent();
+
+        $lang = $parent instanceof Localization
+            ? Site::get($parent->locale())->lang()
+            : Site::default()->lang();
+
         $term = Facades\Term::make()
-            ->slug(Str::slug($string))
+            ->slug(Str::slug($string, '-', $lang))
             ->taxonomy(Facades\Taxonomy::findByHandle($taxonomy))
             ->set('title', $string);
 
