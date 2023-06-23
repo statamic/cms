@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Globals\Variables as Contract;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Data\ContainsData;
@@ -15,6 +16,10 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\GlobalVariablesBlueprintFound;
+use Statamic\Events\GlobalVariableCreated;
+use Statamic\Events\GlobalVariableDeleted;
+use Statamic\Events\GlobalVariableSaved;
+use Statamic\Events\GlobalVariableSaving;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -27,6 +32,8 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
 
     protected $set;
     protected $locale;
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -36,7 +43,14 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
 
     public function globalSet($set = null)
     {
-        return $this->fluentlyGetOrSet('set')->args(func_get_args());
+        return $this->fluentlyGetOrSet('set')
+            ->setter(function ($set) {
+                return $set;
+            })
+            ->getter(function ($set) {
+                return $set instanceof GlobalSet ? $set : Facades\GlobalSet::find($set);
+            })
+            ->args(func_get_args());
     }
 
     public function locale($locale = null)
@@ -44,14 +58,19 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         return $this->fluentlyGetOrSet('locale')->args(func_get_args());
     }
 
+    private function globalSetHandle()
+    {
+        return $this->set instanceof GlobalSet ? $this->set->handle() : $this->set;
+    }
+
     public function id()
     {
-        return $this->globalSet()->id();
+        return $this->globalSetHandle().($this->locale ? '.'.$this->locale : '');
     }
 
     public function handle()
     {
-        return $this->globalSet()->handle();
+        return $this->globalSetHandle();
     }
 
     public function title()
@@ -90,14 +109,60 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         return cp_route($route, $params);
     }
 
-    public function save()
+    public function afterSave($callback)
     {
-        $this
-            ->globalSet()
-            ->addLocalization($this)
-            ->save();
+        $this->afterSaveCallbacks[] = $callback;
 
         return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
+    public function save()
+    {
+        $isNew = is_null(Facades\GlobalSetVariable::find($this->id()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (GlobalVariableSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
+        Facades\GlobalSetVariable::save($this);
+
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                GlobalVariableCreated::dispatch($this);
+            }
+
+            GlobalVariableSaved::dispatch($this);
+        }
+
+        return $this;
+    }
+
+    public function delete()
+    {
+        Facades\GlobalSetVariable::delete($this);
+
+        GlobalVariableDeleted::dispatch($this);
+
+        return true;
     }
 
     public function site()
@@ -177,6 +242,6 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
 
     public function fresh()
     {
-        return Facades\GlobalSet::find($this->id())->in($this->locale);
+        return Facades\GlobalSet::find($this->handle())->in($this->locale);
     }
 }

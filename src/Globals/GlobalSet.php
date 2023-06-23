@@ -3,6 +3,7 @@
 namespace Statamic\Globals;
 
 use Statamic\Contracts\Globals\GlobalSet as Contract;
+use Statamic\Contracts\Globals\Variables;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\GlobalSetDeleted;
@@ -132,7 +133,7 @@ class GlobalSet implements Contract
 
     public function makeLocalization($site)
     {
-        return (new Variables)
+        return app(Variables::class)
             ->globalSet($this)
             ->locale($site);
     }
