@@ -15,10 +15,9 @@ use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\File;
+use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Stache;
-use Statamic\Facades\YAML;
 use Statamic\Forms\Uploaders\AssetsUploader;
-use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Submission implements SubmissionContract, Augmentable
@@ -158,7 +157,7 @@ class Submission implements SubmissionContract, Augmentable
             }
         }
 
-        File::put($this->getPath(), YAML::dump(Arr::removeNullValues($this->data()->all())));
+        FormSubmission::save($this);
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
