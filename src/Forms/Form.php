@@ -17,6 +17,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Facades\Form as FormFacade;
+use Statamic\Facades\FormSubmission;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Statamic;
@@ -282,13 +283,7 @@ class Form implements FormContract, Augmentable, Arrayable
      */
     public function submissions()
     {
-        $path = config('statamic.forms.submissions').'/'.$this->handle();
-
-        return collect(Folder::getFilesByType($path, 'yaml'))->map(function ($file) {
-            return $this->makeSubmission()
-                ->id(pathinfo($file)['filename'])
-                ->data(YAML::parse(File::get($file)));
-        });
+        return FormSubmission::whereForm($this->handle())->get();
     }
 
     /**
@@ -311,7 +306,7 @@ class Form implements FormContract, Augmentable, Arrayable
      */
     public function makeSubmission()
     {
-        $submission = app(Submission::class);
+        $submission = FormSubmission::make();
 
         $submission->form($this);
 
