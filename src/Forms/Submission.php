@@ -236,6 +236,11 @@ class Submission implements SubmissionContract, Augmentable
         return $this->form->blueprint();
     }
 
+    public function fileData()
+    {
+        return $this->data()->all();
+    }
+
     public function __get($key)
     {
         return $this->get($key);

@@ -3,7 +3,6 @@
 namespace Statamic\Data;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
@@ -32,12 +31,7 @@ trait ExistsAsFile
 
     public function fileData()
     {
-        $data = $this->data();
-        if ($data instanceof Collection) {
-            $data = $data->all();
-        }
-
-        return array_merge($data, [
+        return array_merge($this->data(), [
             'id' => $this->id(),
         ]);
     }
