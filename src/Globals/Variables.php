@@ -60,7 +60,7 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
 
     public function id()
     {
-        return $this->handle().($this->locale ? '.'.$this->locale : '');
+        return $this->handle().($this->locale ? '::'.$this->locale : '');
     }
 
     public function handle()

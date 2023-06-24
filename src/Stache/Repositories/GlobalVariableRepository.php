@@ -34,7 +34,7 @@ class GlobalVariableRepository implements RepositoryContract
     public function findBySet($handle): ?VariableCollection
     {
         return $this->all()->filter(function ($variable) use ($handle) {
-            return Str::before($variable->id(), '.') == $handle;
+            return Str::before($variable->id(), '::') == $handle;
         });
     }
 
