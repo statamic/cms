@@ -4,8 +4,8 @@ namespace Statamic\Stache\Repositories;
 
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Contracts\Forms\SubmissionQueryBuilder;
 use Statamic\Contracts\Forms\SubmissionRepository as RepositoryContract;
-use Statamic\Stache\Query\SubmissionQueryBuilder;
 use Statamic\Stache\Stache;
 
 class SubmissionRepository implements RepositoryContract
@@ -57,7 +57,7 @@ class SubmissionRepository implements RepositoryContract
 
     public function query()
     {
-        return new SubmissionQueryBuilder($this->store);
+        return app(SubmissionQueryBuilder::class);
     }
 
     public function make(): Submission
@@ -69,6 +69,7 @@ class SubmissionRepository implements RepositoryContract
     {
         return [
             Submission::class => \Statamic\Forms\Submission::class,
+            SubmissionQueryBuilder::class => \Statamic\Stache\Query\SubmissionQueryBuilder::class,
         ];
     }
 }
