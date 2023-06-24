@@ -294,9 +294,7 @@ class Form implements FormContract, Augmentable, Arrayable
      */
     public function submission($id)
     {
-        return $this->submissions()->filter(function ($submission) use ($id) {
-            return $submission->id() === $id;
-        })->first();
+        return FormSubmission::find($id);
     }
 
     /**
