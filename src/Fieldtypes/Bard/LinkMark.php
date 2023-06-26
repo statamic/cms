@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Statamic\Entries\Entry;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Support\Str;
