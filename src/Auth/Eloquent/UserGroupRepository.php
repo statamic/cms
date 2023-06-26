@@ -44,7 +44,7 @@ class UserGroupRepository extends BaseRepository
     public static function bindings(): array
     {
         return [
-            UserGroupContract::class => UserGroupModel::class,
+            UserGroupContract::class => UserGroup::class,
         ];
     }
 
