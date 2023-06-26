@@ -48,12 +48,14 @@ class CacheTagTest extends TestCase
 
         $this->actingAs(tap(User::make()->id('user1'))->save());
 
+        $original = Event::getFacadeRoot();
         Event::fake();
 
         $this->tag($template);
 
         $this->assertMissed();
 
+        Event::swap($original);
         Event::fake();
 
         $this->tag($template);
@@ -93,12 +95,14 @@ class CacheTagTest extends TestCase
 
         $mock->shouldReceive('getCurrent')->andReturn('/test/url');
 
+        $original = Event::getFacadeRoot();
         Event::fake();
 
         $this->tag($template);
 
         $this->assertMissed();
 
+        Event::swap($original);
         Event::fake();
 
         $this->tag($template);
@@ -146,12 +150,14 @@ class CacheTagTest extends TestCase
 
         Site::setCurrent('default');
 
+        $original = Event::getFacadeRoot();
         Event::fake();
 
         $this->tag($template);
 
         $this->assertMissed();
 
+        Event::swap($original);
         Event::fake();
 
         $this->tag($template);
@@ -196,6 +202,7 @@ class CacheTagTest extends TestCase
 
         $this->mock(Sites::class)->shouldReceive('getCurrent')->andReturn('default');
 
+        $original = Event::getFacadeRoot();
         Event::fake();
 
         $this->tag($template);
@@ -204,6 +211,7 @@ class CacheTagTest extends TestCase
 
         $this->mock(Sites::class)->shouldReceive('getCurrent')->andReturn('other');
 
+        Event::swap($original);
         Event::fake();
 
         $this->tag($template);

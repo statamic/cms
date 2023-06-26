@@ -41,10 +41,6 @@ class StarterKitInstall extends Command
      */
     public function handle()
     {
-        if (version_compare(app()->version(), '7', '<')) {
-            return $this->error('Laravel 7+ is required to install starter kits!');
-        }
-
         if ($this->validationFails($package = $this->getPackage(), new ComposerPackage)) {
             return;
         }

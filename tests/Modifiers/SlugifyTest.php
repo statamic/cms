@@ -16,6 +16,7 @@ class SlugifyTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider wordsDontComeEasyToMe
      */
     public function it_converts_the_string_to_an_url_slug($expected, $input): void

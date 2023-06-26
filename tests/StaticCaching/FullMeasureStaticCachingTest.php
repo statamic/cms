@@ -17,6 +17,8 @@ class FullMeasureStaticCachingTest extends TestCase
     use FakesViews;
     use PreventSavingStacheItemsToDisk;
 
+    private $dir;
+
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);

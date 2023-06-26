@@ -423,8 +423,6 @@ class GitEventTest extends TestCase
 
         $asset = tap($this->makeAsset()->data(['bar' => 'baz']))->saveQuietly();
 
-        $this->actuallySaveAssetFileAndMetaToDisk($asset);
-
         $asset->move('new-location');
     }
 
@@ -434,8 +432,6 @@ class GitEventTest extends TestCase
         Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
 
         $asset = tap($this->makeAsset()->data(['bar' => 'baz']))->saveQuietly();
-
-        $this->actuallySaveAssetFileAndMetaToDisk($asset);
 
         $asset->rename('new-name');
     }
@@ -599,13 +595,6 @@ class GitEventTest extends TestCase
             ->container($container->handle())
             ->path($path)
             ->data(['foo' => 'bar']);
-    }
-
-    // For Flysystem 1.x
-    protected function actuallySaveAssetFileAndMetaToDisk($asset)
-    {
-        $asset->container->disk()->filesystem()->put($asset->path(), '');
-        $asset->container->disk()->filesystem()->put($asset->metaPath(), '');
     }
 }
 

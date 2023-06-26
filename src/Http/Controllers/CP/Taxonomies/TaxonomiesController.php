@@ -245,7 +245,7 @@ class TaxonomiesController extends CpController
                         'type' => 'html',
                         'html' => ''.
                             '<div class="text-xs">'.
-                            '   <span class="mr-2">'.$taxonomy->termBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <span class="mr-4">'.$taxonomy->termBlueprints()->map->title()->join(', ').'</span>'.
                             '   <a href="'.cp_route('taxonomies.blueprints.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
                             '</div>',
                     ],
@@ -284,13 +284,24 @@ class TaxonomiesController extends CpController
                             [
                                 'handle' => 'label',
                                 'field' => [
+                                    'display' => __('Label'),
                                     'type' => 'text',
                                 ],
                             ],
                             [
                                 'handle' => 'format',
                                 'field' => [
+                                    'display' => __('Format'),
                                     'type' => 'text',
+                                ],
+                            ],
+                            [
+                                'handle' => 'refresh',
+                                'field' => [
+                                    'display' => __('Refresh'),
+                                    'type' => 'toggle',
+                                    'instructions' => __('statamic::messages.taxonomies_preview_target_refresh_instructions'),
+                                    'default' => true,
                                 ],
                             ],
                         ],
@@ -299,6 +310,6 @@ class TaxonomiesController extends CpController
             ],
         ]);
 
-        return Blueprint::makeFromSections($fields);
+        return Blueprint::makeFromTabs($fields);
     }
 }

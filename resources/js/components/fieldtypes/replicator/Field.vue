@@ -1,11 +1,11 @@
 <template>
 
-    <div class="p-2 m-0" :class="classes">
+    <div class="p-4 m-0 @container" :class="classes">
 
-        <label class="block">
-            {{ display }}
+        <label class="block" v-if="showLabel">
+            <span v-if="showLabelText">{{ display }}</span>
             <i class="required" v-if="field.required">*</i>
-            <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm" v-text="__('Read Only')" />
+            <span v-if="isReadOnly" class="text-gray-500 font-normal text-2xs mx-1" v-text="__('Read Only')" />
         </label>
 
         <div
@@ -31,12 +31,12 @@
         />
 
         <div
-            class="help-block mt-1"
+            class="help-block mt-2"
             v-if="instructions && field.instructions_position === 'below'"
             v-html="instructions" />
 
         <div v-if="hasError">
-            <small class="help-block text-red mt-1" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block text-red-500 mt-2" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
 
     </div>
@@ -119,11 +119,21 @@ export default {
             return [
                 'form-group publish-field',
                 `${this.field.type}-fieldtype`,
-                `field-${tailwind_width_class(this.field.width)}`,
+                `${tailwind_width_class(this.field.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
                 this.field.classes || '',
                 { 'has-error': this.hasError || this.hasNestedError }
             ];
+        },
+
+        showLabel() {
+            return this.showLabelText // Need to see the label
+                || this.isReadOnly // Need to see the "Read Only" text
+                || this.field.required; // Need to see the asterisk
+        },
+
+        showLabelText() {
+            return !this.field.hide_display;
         }
 
     }

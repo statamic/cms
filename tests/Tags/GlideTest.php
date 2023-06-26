@@ -11,6 +11,7 @@ class GlideTest extends TestCase
 {
     /**
      * @test
+     *
      * @define-env relativeRouteUrl
      */
     public function it_outputs_a_relative_url_by_default_when_the_glide_route_is_relative()
@@ -24,6 +25,7 @@ class GlideTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env absoluteHttpRouteUrl
      */
     public function it_outputs_an_absolute_url_by_default_when_the_glide_route_is_absolute_http()
@@ -37,6 +39,7 @@ class GlideTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env absoluteHttpsRouteUrl
      */
     public function it_outputs_an_absolute_url_by_default_when_the_glide_route_is_absolute_https()

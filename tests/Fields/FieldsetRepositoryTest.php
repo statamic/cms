@@ -12,6 +12,8 @@ use Tests\TestCase;
 
 class FieldsetRepositoryTest extends TestCase
 {
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -182,6 +184,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider saveProvider
      */
     public function it_saves_to_disk($handle, $expectedPath)

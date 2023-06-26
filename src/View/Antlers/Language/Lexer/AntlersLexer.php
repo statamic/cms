@@ -678,8 +678,8 @@ class AntlersLexer
                 // -
                 if ($this->isParsingModifierName == false && $this->cur == DocumentParser::Punctuation_Minus) {
                     if (ctype_digit($this->next) && (
-                            ctype_digit((string) $this->prev) == false &&
-                            $this->prev != DocumentParser::RightParent) && $this->isRightOfInterpolationRegion() == false) {
+                        ctype_digit((string) $this->prev) == false &&
+                        $this->prev != DocumentParser::RightParent) && $this->isRightOfInterpolationRegion() == false) {
                         $this->currentContent[] = $this->cur;
                         continue;
                     }
@@ -1109,6 +1109,17 @@ class AntlersLexer
                             }
                             continue;
                         }
+                    }
+
+                    if ($this->next == DocumentParser::Punctuation_Colon && $this->lastNode instanceof VariableNode) {
+                        $this->lastNode->name .= '::';
+                        if ($this->lastNode->endPosition != null) {
+                            $this->lastNode->endPosition->index += 2;
+                            $this->lastNode->endPosition->offset += 2;
+                            $this->lastNode->endPosition->char += 2;
+                        }
+                        $this->currentIndex += 1;
+                        continue;
                     }
 
                     $branchSeparator = new InlineBranchSeparator();

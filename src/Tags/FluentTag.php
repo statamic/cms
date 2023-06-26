@@ -103,16 +103,25 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
             $method = $originalMethod = 'index';
         }
 
+        $tagName = $name.':'.$originalMethod;
+        $profileTagName = 'tag_'.$tagName.microtime();
+
+        debugbar()->startMeasure($profileTagName, $tagName);
+
         $tag = app(Loader::class)->load($name, [
             'parser'     => null,
             'params'     => $this->params,
             'content'    => '',
             'context'    => $this->context,
-            'tag'        => $name.':'.$originalMethod,
+            'tag'        => $tagName,
             'tag_method' => $originalMethod,
         ]);
 
-        return $this->fetched = $tag->$method();
+        $this->fetched = $tag->$method();
+
+        debugbar()->stopMeasure($profileTagName);
+
+        return $this->fetched;
     }
 
     /**

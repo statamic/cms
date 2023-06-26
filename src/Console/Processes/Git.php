@@ -2,6 +2,8 @@
 
 namespace Statamic\Console\Processes;
 
+use Statamic\Support\Str;
+
 class Git extends Process
 {
     /**
@@ -75,5 +77,20 @@ class Git extends Process
                 return is_null($part);
             })
             ->all();
+    }
+
+    /**
+     * Prepare error (stderr) output.
+     *
+     * @param  string  $type
+     * @param  string  $buffer
+     */
+    protected function prepareErrorOutput($type, $buffer)
+    {
+        if (Str::contains($buffer, 'remote: Resolving deltas')) {
+            return;
+        }
+
+        parent::prepareErrorOutput($type, $buffer);
     }
 }

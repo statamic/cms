@@ -19,13 +19,13 @@ abstract class ActionController extends CpController
 
         $context = $data['context'] ?? [];
 
-        $action = Action::get($request->action)->context($context);
+        $items = $this->getSelectedItems(collect($data['selections']), $context);
+
+        $action = Action::get($request->action)->context($context)->items($items);
 
         $validation = $action->fields()->validator();
 
         $request->replace($request->values)->validate($validation->rules());
-
-        $items = $this->getSelectedItems(collect($data['selections']), $context);
 
         $unauthorized = $items->reject(function ($item) use ($action) {
             return $action->authorize(User::current(), $item);

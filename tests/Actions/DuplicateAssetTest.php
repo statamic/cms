@@ -17,6 +17,8 @@ class DuplicateAssetTest extends TestCase
     use PreventSavingStacheItemsToDisk;
     use FakesRoles;
 
+    private $container;
+
     public function setUp(): void
     {
         parent::setUp();

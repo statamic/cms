@@ -8,6 +8,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Value;
 use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
@@ -87,6 +88,32 @@ class ScopeTest extends TestCase
         ];
 
         $this->assertEquals($expected, $this->modify($arr, 'test'));
+    }
+
+    /** @test */
+    public function it_resolves_values_value_when_adding_scope()
+    {
+        $arr = [
+            new Value(['title' => 'One']),
+            new Value(['title' => 'Two']),
+        ];
+
+        $expected = [
+            [
+                'title' => 'One',
+                'article' => [
+                    'title' => 'One',
+                ],
+            ],
+            [
+                'title' => 'Two',
+                'article' => [
+                    'title' => 'Two',
+                ],
+            ],
+        ];
+
+        $this->assertSame($expected, $this->modify($arr, 'article'));
     }
 
     public function modify($arr, $scope)

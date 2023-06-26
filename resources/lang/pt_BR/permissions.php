@@ -66,7 +66,6 @@ return [
     'edit_roles' => 'Editar funções',
     'group_updates' => 'Atualizações',
     'view_updates' => 'Visualizar atualizações',
-    'perform_updates' => 'Realizar atualizações',
     'group_utilities' => 'Utilidades',
     'access_utility' => ':title',
     'access_utility_desc' => 'Concede acesso ao utilitário :title',

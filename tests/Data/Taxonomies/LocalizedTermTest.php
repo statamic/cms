@@ -22,6 +22,15 @@ class LocalizedTermTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
+    public function it_gets_the_reference()
+    {
+        $term = (new Term)->taxonomy('tags')->slug('foo');
+
+        $this->assertEquals('term::tags::foo::en', (new LocalizedTerm($term, 'en'))->reference());
+        $this->assertEquals('term::tags::foo::fr', (new LocalizedTerm($term, 'fr'))->reference());
+    }
+
+    /** @test */
     public function it_gets_the_entry_count_through_the_repository()
     {
         $term = (new Term)->taxonomy('tags')->slug('foo');
@@ -102,6 +111,7 @@ class LocalizedTermTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider queryBuilderProvider
      **/
     public function it_has_magic_property_and_methods_for_fields_that_augment_to_query_builders($builder)

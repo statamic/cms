@@ -1,0 +1,26 @@
+.item {
+    @apply text-sm outline-none flex rounded border bg-white shadow-sm items-center;
+
+    .item-move {
+        @apply w-4 border-r rounded-l p-2;
+        cursor: grab;
+        background: theme('colors.gray.200') url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
+        background-size: 7px 17px;
+        &:hover { @apply bg-gray-300; }
+    }
+
+    .item-inner {
+        @apply w-full flex items-center p-2;
+    }
+
+    &.invalid {
+        .item-inner {
+            @apply border-red-300 bg-red-100 text-red-500;
+        }
+    }
+
+    /*  Drag interaction */
+    &.draggable-source--is-dragging {
+        opacity: 0.5;
+    }
+}

@@ -1,14 +1,14 @@
 <template>
     <div>
 
-        <div class="mb-1 flex justify-end">
+        <div class="mb-2 flex justify-end">
             <a
-                class="text-2xs text-blue mr-2 underline"
+                class="text-2xs text-blue mr-4 underline"
                 v-text="__('Expand All')"
                 @click="expandAll"
             />
             <a
-                class="text-2xs text-blue mr-1 underline"
+                class="text-2xs text-blue mr-2 underline"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />

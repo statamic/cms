@@ -14,12 +14,14 @@ use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Terms;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
+use Tests\Fieldtypes\Concerns\TestsQueryableValueWithMaxItems;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TermsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use TestsQueryableValueWithMaxItems;
 
     public function setUp(): void
     {
@@ -125,8 +127,7 @@ class TermsTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class
-        {
+        $parent = new class {
             // Class does not implement "Localizable"
         };
 
@@ -143,8 +144,7 @@ class TermsTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class
-        {
+        $parent = new class {
             // Class does not implement "Localizable"
         };
 
@@ -270,8 +270,7 @@ class TermsTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class
-        {
+        $parent = new class {
             // Class does not implement "Localizable"
         };
 
@@ -304,8 +303,7 @@ class TermsTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class
-        {
+        $parent = new class {
             // Class does not implement "Localizable"
         };
 
@@ -336,6 +334,7 @@ class TermsTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider collectionAttachmentProvider
      **/
     public function it_attaches_collection_during_augmentation($expectCollection, $parentIsEntry, $handle, $isRootLevel, $collectionUsesTaxonomy)
@@ -352,8 +351,7 @@ class TermsTest extends TestCase
         if ($parentIsEntry) {
             $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
         } else {
-            $parent = new class
-            {
+            $parent = new class {
                 // Class does not implement "Localizable"
             };
         }

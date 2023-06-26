@@ -10,6 +10,8 @@ class MakeTagTest extends TestCase
 {
     use Concerns\CleansUpGeneratedPaths;
 
+    private $files;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -29,7 +31,7 @@ class MakeTagTest extends TestCase
     {
         $path = base_path('app/Tags/Donkey.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:tag', ['name' => 'Donkey']);
 
@@ -42,7 +44,7 @@ class MakeTagTest extends TestCase
     {
         $path = base_path('app/Tags/Donkey.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:tag', ['name' => 'Donkey']);
         $this->files->put($path, 'overwritten tag');
@@ -78,7 +80,7 @@ class MakeTagTest extends TestCase
 
         Composer::shouldReceive('installedPath')->andReturn($path);
 
-        $this->assertFileNotExists($tag = "$path/src/Tags/Yoda.php");
+        $this->assertFileDoesNotExist($tag = "$path/src/Tags/Yoda.php");
 
         $this->artisan('statamic:make:tag', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 

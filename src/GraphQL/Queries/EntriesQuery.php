@@ -2,9 +2,13 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
+use Statamic\GraphQL\Middleware\AuthorizeFilters;
+use Statamic\GraphQL\Middleware\AuthorizeSubResources;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Queries\Concerns\FiltersQuery;
 use Statamic\GraphQL\Types\EntryInterface;
@@ -13,14 +17,18 @@ use Statamic\Support\Str;
 
 class EntriesQuery extends Query
 {
-    use FiltersQuery;
+    use FiltersQuery {
+        filterQuery as traitFilterQuery;
+    }
 
     protected $attributes = [
         'name' => 'entries',
     ];
 
     protected $middleware = [
+        AuthorizeSubResources::class,
         ResolvePage::class,
+        AuthorizeFilters::class,
     ];
 
     public function type(): Type
@@ -43,15 +51,22 @@ class EntriesQuery extends Query
     {
         $query = Entry::query();
 
-        if ($collection = $args['collection'] ?? null) {
-            $query->whereIn('collection', $collection);
-        }
+        $query->whereIn('collection', $args['collection'] ?? $this->allowedSubResources());
 
         $this->filterQuery($query, $args['filter'] ?? []);
 
         $this->sortQuery($query, $args['sort'] ?? []);
 
         return $query->paginate($args['limit'] ?? 1000);
+    }
+
+    private function filterQuery($query, $filters)
+    {
+        if (! isset($filters['status']) && ! isset($filters['published'])) {
+            $filters['status'] = 'published';
+        }
+
+        $this->traitFilterQuery($query, $filters);
     }
 
     private function sortQuery($query, $sorts)
@@ -69,5 +84,20 @@ class EntriesQuery extends Query
 
             $query->orderBy($sort, $order);
         }
+    }
+
+    public function subResourceArg()
+    {
+        return 'collection';
+    }
+
+    public function allowedSubResources()
+    {
+        return ResourceAuthorizer::allowedSubResources('graphql', 'collections');
+    }
+
+    public function allowedFilters($args)
+    {
+        return FilterAuthorizer::allowedForSubResources('graphql', 'collections', $args['collection'] ?? '*');
     }
 }
