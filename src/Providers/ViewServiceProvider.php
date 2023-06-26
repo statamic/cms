@@ -194,6 +194,6 @@ class ViewServiceProvider extends ServiceProvider
 
     private function profilerEnabled()
     {
-        return debugbar()->isEnabled() && ! Statamic::isCpRoute();
+        return debugbar()->isEnabled() && config('statamic.antlers.debugbar', true) && ! Statamic::isCpRoute();
     }
 }
