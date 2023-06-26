@@ -216,7 +216,7 @@
                                             @dblclick.stop="$emit('edit-asset', asset)"
                                         >
                                             <div class="asset-thumb-container">
-                                                <div class="asset-thumb">
+                                                <div class="asset-thumb" :class="{'bg-checkerboard': asset.can_be_transparent}">
                                                     <img v-if="asset.is_image" :src="asset.thumbnail" loading="lazy" :class="{'p-4 h-full w-full': asset.extension === 'svg'}" />
                                                     <file-icon
                                                         v-else

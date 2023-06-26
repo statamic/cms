@@ -15,14 +15,24 @@ class FolderAsset extends JsonResource
             'basename' => $this->basename(),
             'extension' => $this->extension(),
             'url' => $this->absoluteUrl(),
-
             'size_formatted' => Str::fileSizeForHumans($this->size(), 0),
             'last_modified_relative' => $this->lastModified()->diffForHumans(),
 
-            $this->mergeWhen($this->isImage() || $this->isSvg(), function () {
+            $this->mergeWhen($this->isSvg(), function () {
+                return [
+                    'is_image' => true,
+                    'alt' => $this->alt,
+                    'thumbnail' => $this->thumbnailUrl('small'),
+                    'is_svg' => true,
+                    'can_be_transparent' => true,
+                ];
+            }),
+
+            $this->mergeWhen($this->isImage() && ! $this->isSvg(), function () {
                 return [
                     'is_image' => true,
                     'thumbnail' => $this->thumbnailUrl('small'),
+                    'can_be_transparent' => $this->extension() === 'png',
                     'alt' => $this->alt,
                 ];
             }),
