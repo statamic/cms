@@ -135,11 +135,19 @@ trait QueriesConditions
 
     protected function queryContainsCondition($query, $field, $value)
     {
+        if (is_array($value)) {
+            return $query->whereJsonContains($field, $value);
+        }
+
         return $query->where($field, 'like', "%{$value}%");
     }
 
     protected function queryDoesntContainCondition($query, $field, $value)
     {
+        if (is_array($value)) {
+            return $query->whereJsonDoesntContain($field, $value);
+        }
+
         return $query->where($field, 'not like', "%{$value}%");
     }
 
