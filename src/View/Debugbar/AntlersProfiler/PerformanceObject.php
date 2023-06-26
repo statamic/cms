@@ -21,9 +21,7 @@ class PerformanceObject
     public $children = [];
     public $parent = null;
     public $childMap = [];
-    public $nodeContent = '';
     public $escapedNodeContent = '';
-    public $sourceContent = '';
     public $escapedSourceContent = '';
     public $isNodeObject = false;
     public $executionCount = 0;
@@ -32,7 +30,6 @@ class PerformanceObject
     public $line = 0;
     public $percentOfExecutionTime = 0;
     public $isConditionNode = false;
-    public $bufferOutput = '';
     public $escapedBufferOutput = '';
     public $isCloseOutput = false;
     public $clientTotalTime = 0;
@@ -155,5 +152,39 @@ class PerformanceObject
         }
 
         return $this->getTotalExecutionTime() - $this->getChildExecutionTime();
+    }
+
+    public function toArray($includeChildren = true)
+    {
+        $children = [];
+
+        if ($includeChildren) {
+            foreach ($this->children as $child) {
+                $children[] = $child->toArray();
+            }
+        }
+
+        return [
+            'escapedNodeContent' => $this->escapedNodeContent,
+            'escapedBufferOutput' => $this->escapedBufferOutput,
+            'escapedSourceContent' => $this->escapedSourceContent,
+            'path' => $this->path,
+            'fullPath' => $this->fullPath,
+            'editorLink' => $this->editorLink,
+            'isNodeObject' => $this->isNodeObject,
+            'executionCount' => $this->executionCount,
+            'totalElapsedTime' => $this->totalElapsedTime,
+            'isHot' => $this->isHot,
+            'isTag' => $this->isTag,
+            'isCloseOutput' => $this->isCloseOutput,
+            'cumulativeMemorySamples' => $this->cumulativeMemorySamples,
+            'executionTimeCategory' => $this->executionTimeCategory,
+            'sampleTime' => $this->sampleTime,
+            'children' => $children,
+            'line' => $this->line,
+            'clientSelfTimeDisplay' => $this->clientSelfTimeDisplay,
+            'clientTotalTimeDisplay' => $this->clientTotalTimeDisplay,
+            'percentOfExecutionTime' => $this->percentOfExecutionTime,
+        ];
     }
 }
