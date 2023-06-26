@@ -1282,7 +1282,7 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return bool
      */
-    public function isUrlExternal($value)
+    public function isExternalUrl($value)
     {
         return Str::isUrl($value) && URL::isExternal($value);
     }
