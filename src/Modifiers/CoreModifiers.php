@@ -407,6 +407,10 @@ class CoreModifiers extends Modifier
         $needle = $this->getFromContext($context, $params);
 
         if (is_array($haystack)) {
+            if (is_array($needle)) {
+                return count(array_intersect($haystack, $needle)) > 0;
+            }
+
             if (Arr::isAssoc($haystack)) {
                 return Arr::exists($haystack, $needle);
             }
@@ -1274,17 +1278,6 @@ class CoreModifiers extends Modifier
     public function isUrl($value)
     {
         return Str::isUrl($value);
-    }
-
-    /**
-     * Returns true if the string is an external URL.
-     *
-     * @param $value
-     * @return bool
-     */
-    public function isExternalUrl($value)
-    {
-        return Str::isUrl($value) && URL::isExternal($value);
     }
 
     /**

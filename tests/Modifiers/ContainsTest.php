@@ -73,6 +73,24 @@ class ContainsTest extends TestCase
         $this->assertFalse($modified);
     }
 
+    /** @test */
+    public function it_returns_true_if_needle_array_found_in_array(): void
+    {
+        $haystack = ['bacon', 'bread', 'tomato'];
+
+        $modified = $this->modify($haystack, ['delicious'], ['delicious' => ['bacon', 'bread'], 'gross' => 'broccoli']);
+        $this->assertTrue($modified);
+    }
+
+    /** @test */
+    public function it_returns_false_if_needle_array_not_found_in_array(): void
+    {
+        $haystack = ['bacon', 'bread', 'tomato'];
+
+        $modified = $this->modify($haystack, ['gross'], ['delicious' => 'bacon', 'gross' => ['broccoli']]);
+        $this->assertFalse($modified);
+    }
+
     private function modify($value, array $params, array $context)
     {
         return Modify::value($value)->context($context)->contains($params)->fetch();
