@@ -3,5 +3,5 @@
    ========================================================================== */
 
 .spacer-fieldtype {
-    @apply invisible;
+    @apply hidden @sm:block @sm:invisible;
 }
