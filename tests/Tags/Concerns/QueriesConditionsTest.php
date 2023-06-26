@@ -101,6 +101,28 @@ class QueriesConditionsTest extends TestCase
     }
 
     /** @test */
+    public function it_filters_by_contains_condition_when_needle_and_data_are_arrays()
+    {
+        $this->makeEntry('dog')->set('array_field', ['one', 'two', 'three'])->save();
+        $this->makeEntry('cat')->set('array_field', ['four', 'five', 'six'])->save();
+        $this->makeEntry('tiger')->set('array_field', ['seven', 'eight', 'nine'])->save();
+
+        $this->assertCount(3, $this->getEntries());
+        $this->assertCount(1, $this->getEntries(['array_field:contains' => ['four', 'ten']]));
+    }
+
+    /** @test */
+    public function it_filters_by_doesnt_contain_condition_when_needle_and_data_are_arrays()
+    {
+        $this->makeEntry('dog')->set('array_field', ['one', 'two', 'three'])->save();
+        $this->makeEntry('cat')->set('array_field', ['four', 'five', 'six'])->save();
+        $this->makeEntry('tiger')->set('array_field', ['seven', 'eight', 'nine'])->save();
+
+        $this->assertCount(3, $this->getEntries());
+        $this->assertCount(2, $this->getEntries(['array_field:doesnt_contain' => ['four', 'ten']]));
+    }
+
+    /** @test */
     public function it_filters_by_in_condition()
     {
         $this->makeEntry('dog')->set('type', 'canine')->save();
