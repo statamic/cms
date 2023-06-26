@@ -11,8 +11,8 @@ class ResolveValue
     public function __invoke($item, $name)
     {
         if (Str::startsWith($name, 'data->')) {
-            if ($item = $item->get(str_replace('->', '.', Str::after($name, 'data->')))) {
-                return $item;
+            if ($result = $item->get(str_replace('->', '.', Str::after($name, 'data->')))) {
+                return $result;
             }
         }
 
