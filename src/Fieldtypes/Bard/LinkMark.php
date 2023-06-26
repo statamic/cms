@@ -3,8 +3,8 @@
 namespace Statamic\Fieldtypes\Bard;
 
 use Statamic\Entries\Entry;
-use Statamic\Facades\Site;
 use Statamic\Facades\Data;
+use Statamic\Facades\Site;
 use Statamic\Support\Str;
 use Tiptap\Marks\Link;
 
@@ -58,8 +58,8 @@ class LinkMark extends Link
             return '';
         }
 
-        if($item instanceof Entry){
-            return $item->in(Site::current()->handle())?->url() ?? $item->url();
+        if ($item instanceof Entry) {
+            return ($item->in(Site::current()->handle()) ?? $item)->url();
         }
 
         return $item->url();
