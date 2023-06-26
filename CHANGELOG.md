@@ -1,5 +1,24 @@
 # Release Notes
 
+## 4.9.0 (2023-06-26)
+
+### What's new
+- Add setting to disable Antlers profiler. [#8356](https://github.com/statamic/cms/issues/8356) by @jasonvarga
+- Add Spacer fieldtype. [#8326](https://github.com/statamic/cms/issues/8326) by @aerni
+- Add `is_external_url` modifer. [#8351](https://github.com/statamic/cms/issues/8351) by @martyf
+- Entry data values can be queried directly for efficiency. [#7371](https://github.com/statamic/cms/issues/7371) by @ryanmitchell
+
+### What's improved
+- Use Blink Cache for flattened pages in Collection Structure. [#7476](https://github.com/statamic/cms/issues/7476) by @o1y
+- French translations. [#8348](https://github.com/statamic/cms/issues/8348) by @ebeauchamps
+
+### What's fixed
+- Fix links within Bard fields not being localized. [#8319](https://github.com/statamic/cms/issues/8319) by @modrictin
+- Fix checkboard background on asset tiles. [#8355](https://github.com/statamic/cms/issues/8355) by @jackmcdade
+- Fix relationship fieldtype encoding issue. [#8349](https://github.com/statamic/cms/issues/8349) by @zsoltjanes
+
+
+
 ## 4.8.0 (2023-06-23)
 
 ### What's new
