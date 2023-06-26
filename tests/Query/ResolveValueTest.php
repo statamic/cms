@@ -58,6 +58,9 @@ class ResolveValueTest extends TestCase
             'direct data get' => [$dataItem, 'data->the_foo_field', 'getfoo'],
             'direct data value' => [$valueItem, 'data->the_foo_field', 'getfoo'],
             'direct data method' => [$methodItem, 'data->the_foo_field', 'getfoo'],
+            'direct data nested get' => [$dataItem, 'data->the_nested_field->the_foo_field', 'getfoo'],
+            'direct data nested value' => [$valueItem, 'data->the_nested_field->the_foo_field', 'getfoo'],
+            'direct data nested method' => [$methodItem, 'data->the_nested_field->the_foo_field', 'getfoo'],
         ];
     }
 
