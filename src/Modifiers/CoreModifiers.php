@@ -1277,6 +1277,17 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Returns true if the string is an external URL.
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isExternalUrl($value)
+    {
+        return Str::isUrl($value) && URL::isExternal($value);
+    }
+
+    /**
      * Determines if the date on a weekday.
      *
      * @param $value
