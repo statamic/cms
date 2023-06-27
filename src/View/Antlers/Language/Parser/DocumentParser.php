@@ -107,6 +107,7 @@ class DocumentParser
     private $interpolatedCollisionCount = [];
     private $threeCharCollisionCount = -1;
     private $threeCharCollisions = [];
+    private $isVirtual = false;
 
     /**
      * A list of node visitors.
@@ -144,6 +145,11 @@ class DocumentParser
         $this->seedStartChar = $startChar;
 
         return $this;
+    }
+
+    public function setIsVirtual($isVirtual)
+    {
+        $this->isVirtual = $isVirtual;
     }
 
     /**
@@ -402,6 +408,7 @@ class DocumentParser
 
         if ($indexCount == 0) {
             $fullDocumentLiteral = new LiteralNode();
+            $fullDocumentLiteral->isVirtual = $this->isVirtual;
             $fullDocumentLiteral->content = $this->prepareLiteralContent($this->content);
             $fullDocumentLiteral->startPosition = $this->positionFromOffset(0, 0);
             $fullDocumentLiteral->endPosition = $this->positionFromOffset($this->inputLen - 1, $this->inputLen - 1);
@@ -414,6 +421,7 @@ class DocumentParser
                 if ($i == 0 && $offset > 0) {
                     // Create a literal node representing the start of the document.
                     $node = new LiteralNode();
+                    $node->isVirtual = $this->isVirtual;
                     $node->content = $this->prepareLiteralContent(StringUtilities::substr($this->content, 0, $offset));
 
                     if (! strlen($node->content) == 0) {
@@ -461,6 +469,7 @@ class DocumentParser
 
                                 if (strlen($content) > 0) {
                                     $node = new LiteralNode();
+                                    $node->isVirtual = $this->isVirtual;
                                     $node->content = $content;
 
                                     $literalStartOffset = $this->lastAntlersNode->endPosition->offset + 1;
@@ -490,6 +499,7 @@ class DocumentParser
 
                                     if (strlen($content) > 0) {
                                         $node = new LiteralNode();
+                                        $node->isVirtual = $this->isVirtual;
                                         $node->content = $content;
 
                                         $node->startPosition = $this->positionFromOffset($spanStart, $spanStart);
@@ -525,6 +535,7 @@ class DocumentParser
 
                                     if (! strlen($finalContent) == 0) {
                                         $finalLiteral = new LiteralNode();
+                                        $finalLiteral->isVirtual = $this->isVirtual;
                                         $finalLiteral->content = $finalContent;
                                         $finalLiteral->startPosition = $this->positionFromOffset($literalStart, $literalStart);
                                         $finalLiteral->endPosition = $this->positionFromOffset($this->inputLen - 1, $literalStart);
@@ -566,6 +577,7 @@ class DocumentParser
 
                                 $node = new LiteralNode();
 
+                                $node->isVirtual = $this->isVirtual;
                                 $node->content = $this->prepareLiteralContent($content);
 
                                 if (! strlen($node->content) == 0) {
@@ -587,6 +599,7 @@ class DocumentParser
 
                         $node = new LiteralNode();
 
+                        $node->isVirtual = $this->isVirtual;
                         $node->content = $this->prepareLiteralContent($content);
 
                         if (! strlen($node->content) == 0) {
@@ -614,6 +627,7 @@ class DocumentParser
 
                         $node = new LiteralNode();
 
+                        $node->isVirtual = $this->isVirtual;
                         $node->content = $this->prepareLiteralContent($content);
 
                         if (! strlen($node->content) == 0) {
@@ -632,6 +646,7 @@ class DocumentParser
                     if ($literalStart < $this->inputLen) {
                         $node = new LiteralNode();
 
+                        $node->isVirtual = $this->isVirtual;
                         $node->content = $this->prepareLiteralContent(StringUtilities::substr($this->content, $literalStart));
 
                         if (! strlen($node->content) == 0) {
@@ -1056,6 +1071,7 @@ class DocumentParser
     {
         $node = new PhpExecutionNode();
 
+        $node->isVirtual = $this->isVirtual;
         $node->isEchoNode = $isEcho;
 
         if ($isEcho) {
@@ -1095,6 +1111,8 @@ class DocumentParser
     private function makeAntlersTagNode($index, $isComment)
     {
         $node = new AntlersNode();
+
+        $node->isVirtual = $this->isVirtual;
 
         if ($this->isDoubleBrace) {
             $node->rawStart = '{{';
@@ -1171,6 +1189,7 @@ class DocumentParser
     private function makeLiteralNode($buffer, $startOffset, $currentOffset)
     {
         $node = new LiteralNode();
+        $node->isVirtual = $this->isVirtual;
         $node->content = implode('', $buffer);
         $node->startPosition = $this->positionFromOffset($startOffset, $startOffset);
         $node->endPosition = $this->positionFromOffset($currentOffset, $startOffset);

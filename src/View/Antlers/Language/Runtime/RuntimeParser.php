@@ -351,6 +351,8 @@ class RuntimeParser implements Parser
             $cacheSlug = md5($parseText);
 
             if (! array_key_exists($cacheSlug, self::$standardRenderNodeCache)) {
+                $this->documentParser->setIsVirtual($this->view == '');
+
                 if (strlen($this->view) > 0) {
                     $seedStartLine = $this->getFrontMatterLineOffset($this->view);
                     $this->documentParser->setStartLineSeed($seedStartLine);
