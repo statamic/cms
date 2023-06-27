@@ -9,7 +9,6 @@ use Statamic\Stache\Repositories\GlobalRepository;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\GlobalsStore;
 use Statamic\Stache\Stores\GlobalVariablesStore;
-
 use Tests\TestCase;
 
 class GlobalRepositoryTest extends TestCase
