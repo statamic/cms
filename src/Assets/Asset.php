@@ -521,7 +521,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
     /**
      * Get the file download url.
-     * 
+     *
      * @return string
      */
     public function cpDownloadUrl()
