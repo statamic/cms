@@ -9,7 +9,7 @@
 
        /*  Push toggle off to the right */
        > .publish-fields > .toggle-fieldtype {
-           @apply flex justify-between items-center;
+           @apply flex justify-between items-center flex-wrap;
            .help-block, .help-block p { @apply mb-0; }
            .field-inner { @apply pr-8; }
        }
