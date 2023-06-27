@@ -108,13 +108,10 @@ class PerformanceTracer implements RuntimeTracerContract
             $item->clientSelfTimeDisplay = $item->getSelfExecutionTimeDisplay();
             $item->clientTotalTimeDisplay = $item->getTotalExecutionTimeDisplay();
 
-            $item->escapedNodeContent = e($item->nodeContent);
             $item->executionTimeCategory = PerformanceCategory::getCategory($item->totalElapsedTime);
         }
 
         foreach ($this->sourceViewObjects as $item) {
-            $item->escapedNodeContent = e($item->nodeContent);
-
             if (! $item->isNodeObject) {
                 continue;
             }
@@ -123,7 +120,6 @@ class PerformanceTracer implements RuntimeTracerContract
             if (array_key_exists($item->nodeRefId, $this->nodePerformanceItems)) {
                 $reference = $this->nodePerformanceItems[$item->nodeRefId];
 
-                $item->nodeContent = $reference->nodeContent;
                 $item->escapedNodeContent = $reference->escapedNodeContent;
                 $item->clientSelfTime = $reference->clientSelfTime;
                 $item->clientTotalTime = $reference->clientTotalTime;
@@ -153,7 +149,6 @@ class PerformanceTracer implements RuntimeTracerContract
             $rootItem->path = $file;
             $rootItem->isNodeObject = false;
             $rootItem->children = $reportItems;
-            $rootItem->escapedNodeContent = e($rootItem->nodeContent);
             $rootItem->clientSelfTimeDisplay = $rootItem->getTotalExecutionTimeDisplay();
             $rootItem->clientTotalTimeDisplay = $rootItem->getTotalExecutionTimeDisplay();
 
@@ -166,7 +161,7 @@ class PerformanceTracer implements RuntimeTracerContract
                 $rootItem->totalElapsedTime += $item->getTotalExecutionTime();
             }
 
-            $report[] = $rootItem;
+            $report[] = $rootItem->toArray();
         }
 
         return $report;
@@ -232,14 +227,12 @@ class PerformanceTracer implements RuntimeTracerContract
             $outputClosing = new PerformanceObject($this->firstSampleTime);
             $outputClosing->nodeRefId = $node->refId;
 
-            $outputClosing->bufferOutput = $node->rawStart.$node->content.$node->rawEnd;
-            $outputClosing->escapedBufferOutput = e($outputClosing->bufferOutput);
+            $outputClosing->escapedBufferOutput = e($node->rawStart.$node->content.$node->rawEnd);
             $outputClosing->path = $file;
             $outputClosing->fullPath = $fullPath;
             $outputClosing->isCloseOutput = true;
             $outputClosing->isNodeObject = true;
 
-            $outputClosing->sourceContent = trim($node->runtimeContent);
             $outputClosing->escapedSourceContent = e($node->runtimeContent);
             $this->sourceViewObjects[] = $outputClosing;
             $this->currentDepth -= 1;
@@ -252,13 +245,11 @@ class PerformanceTracer implements RuntimeTracerContract
         if ($node->isClosedBy != null) {
             $openNode = new PerformanceObject($this->firstSampleTime);
             $openNode->nodeRefId = $node->refId;
-            $openNode->bufferOutput = $node->rawStart.$node->content.$node->rawEnd;
-            $openNode->escapedBufferOutput = e($openNode->bufferOutput);
+            $openNode->escapedBufferOutput = e($node->rawStart.$node->content.$node->rawEnd);
             $openNode->isNodeObject = true;
             $openNode->path = $file;
             $openNode->fullPath = $fullPath;
 
-            $openNode->sourceContent = trim($node->runtimeContent);
             $openNode->escapedSourceContent = e($node->runtimeContent);
 
             $this->sourceViewRefIdMapping[$node->refId] = $openNode;
@@ -273,14 +264,19 @@ class PerformanceTracer implements RuntimeTracerContract
             $performanceItem->isTag = $node->isTagNode;
             $performanceItem->isConditionNode = in_array($node->name->name, self::$conditions);
 
-            $content = $node->content;
+            $contentNode = $node;
 
             if ($node->originalNode != null) {
-                $content = $node->originalNode->content;
+                $contentNode = $node->originalNode;
             }
 
-            $performanceItem->nodeContent = $node->rawStart.' '.trim($content).' '.$node->rawEnd;
-            $performanceItem->sourceContent = trim($node->runtimeContent);
+            $content = $contentNode->rawStart.' '.trim($contentNode->content).' '.$contentNode->rawEnd;
+
+            if (count($contentNode->interpolationRegions) > 0) {
+                $content = $contentNode->getNodeDocumentText();
+            }
+
+            $performanceItem->escapedNodeContent = e($content);
             $performanceItem->escapedSourceContent = e($node->runtimeContent);
 
             $performanceItem->isNodeObject = true;
@@ -334,8 +330,7 @@ class PerformanceTracer implements RuntimeTracerContract
         if ($node instanceof LiteralNode) {
             if (! array_key_exists($node->refId, $this->sourceViewObjects)) {
                 $literalObject = new PerformanceObject($this->firstSampleTime);
-                $literalObject->bufferOutput = $runtimeContent;
-                $literalObject->escapedBufferOutput = e($literalObject->bufferOutput);
+                $literalObject->escapedBufferOutput = e($runtimeContent);
                 $literalObject->path = $this->massageFilePath(GlobalRuntimeState::$currentExecutionFile);
                 $literalObject->fullPath = $this->normalizePath(GlobalRuntimeState::$currentExecutionFile);
                 $this->sourceViewObjects[] = $literalObject;
@@ -370,21 +365,18 @@ class PerformanceTracer implements RuntimeTracerContract
                 $outContent = $runtimeContent;
 
                 if (Str::contains($node->content, 'template_content')) {
-                    $outContent = '/*REPLACED_CONTENT*/';
+                    $outContent = '****REPLACED_CONTENT****';
                     $this->triggeredTemplateContent = $this->nodePerformanceItems[$node->refId]->path;
                 }
 
-                $outObject->bufferOutput = $outContent;
-                $outObject->escapedBufferOutput = e($outObject->bufferOutput);
-                $outObject->nodeContent = $this->nodePerformanceItems[$node->refId]->nodeContent;
-                $outObject->escapedNodeContent = e($outObject->nodeContent);
+                $outObject->escapedBufferOutput = e($outContent);
+                $outObject->escapedNodeContent = $this->nodePerformanceItems[$node->refId]->escapedNodeContent;
                 $outObject->isNodeObject = true;
                 $outObject->totalElapsedTime = $elapsed;
                 $outObject->clientTotalTimeDisplay = $outObject->getTotalExecutionTimeDisplay();
                 $outObject->path = $this->nodePerformanceItems[$node->refId]->path;
                 $outObject->fullPath = $this->nodePerformanceItems[$node->refId]->fullPath;
 
-                $outObject->sourceContent = trim($node->runtimeContent);
                 $outObject->escapedSourceContent = e($node->runtimeContent);
 
                 $this->sourceViewObjects[] = $outObject;

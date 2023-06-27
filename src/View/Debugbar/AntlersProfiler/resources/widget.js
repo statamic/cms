@@ -103,12 +103,6 @@
 
         render: function () {
             this.bindAttr('data', function (data) {
-                data.performance_items_array = Object.keys(data.performance_items).map(function (key) {
-                    return data.performance_items[key];
-                }).filter(function (item) {
-                    return item.depth == 0;
-                });
-
                 var debugWarningLabel = '';
 
                 if (data.had_active_debug_sessions) {
@@ -412,7 +406,7 @@
                         field: 'clientDisplay',
                         formatter: function (cell) {
                             var data = cell.getData();
-                            var contents = !data.isNodeObject ? data.path : data.nodeContent;
+                            var contents = !data.isNodeObject ? data.path : data.escapedNodeContent;
 
                             contents = truncateString(contents, 100);
 
@@ -608,7 +602,7 @@
                     btnNodeGraph.classList.add('antlers-trace-button-active');
                     btnSourceGraph.classList.remove('antlers-trace-button-active');
 
-                    callTable.replaceData(data.performance_items_array);
+                    callTable.replaceData(data.performance_items);
                     callTable.showColumn('path');
                 });
 

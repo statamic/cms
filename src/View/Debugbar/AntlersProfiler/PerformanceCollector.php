@@ -111,12 +111,12 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
 
         /** @var PerformanceObject $item */
         foreach ($layout as $item) {
-            if ($item->bufferOutput == '/*REPLACED_CONTENT*/') {
+            if ($item->escapedBufferOutput == '****REPLACED_CONTENT****') {
                 foreach ($everythingElse as $newItem) {
-                    $newItems[] = $newItem;
+                    $newItems[] = $newItem->toArray(false);
                 }
             } else {
-                $newItems[] = $item;
+                $newItems[] = $item->toArray(false);
             }
         }
 
@@ -133,14 +133,48 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
             $item->editorLink = $this->getEditorHref($item->fullPath, $item->line);
         }
 
+        $nodePerformanceItems = [];
+
+        foreach ($tracer->getPerformanceItems() as $item) {
+            if ($item->depth != 0) {
+                continue;
+            }
+
+            $nodePerformanceItems[] = $item->toArray();
+        }
+
+        $testSamples = $tracer->getRuntimeSamples();
+        $samples = [];
+
+        foreach ($testSamples as $sample) {
+            for ($i = 0; $i < 2100; $i++) {
+                $samples[] = $sample;
+            }
+        }
+
         return [
             'data' => $tracer->getPerformanceData(),
-            'system_samples' => $tracer->getRuntimeSamples(),
+            'system_samples' =>$this->filterSamples($samples),
             'source_samples' => $this->makeSourceViewReport($tracer->getOutputObjects(), $tracer->getPathTriggeringOutput()),
             'total_antlers_nodes' => $tracer->getTotalNodeOperations(),
             'had_active_debug_sessions' => GlobalDebugManager::isDebugSessionActive(),
-            'performance_items' => $tracer->getPerformanceItems(),
+            'performance_items' => $nodePerformanceItems,
         ];
+    }
+
+    private function filterSamples($samples)
+    {
+        if (count($samples) <= 1000) {
+            return $samples;
+        }
+
+        $result = [];
+
+        for ($i = 0; $i < count($samples); $i += 5) {
+            $result[] = $samples[$i];
+        }
+
+        return $this->filterSamples($result);
     }
 
     public function getName()
