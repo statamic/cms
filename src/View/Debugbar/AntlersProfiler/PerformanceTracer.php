@@ -59,6 +59,8 @@ class PerformanceTracer implements RuntimeTracerContract
 
     private $firstSampleTime = null;
 
+    protected $foundLayoutTrigger = false;
+
     public function __construct()
     {
         $this->memorySampleBaseline = memory_get_usage();
@@ -89,6 +91,11 @@ class PerformanceTracer implements RuntimeTracerContract
     public function getPathTriggeringOutput()
     {
         return $this->triggeredTemplateContent;
+    }
+
+    public function getDidFindLayoutTrigger()
+    {
+        return $this->foundLayoutTrigger;
     }
 
     public function getPerformanceData()
@@ -365,6 +372,7 @@ class PerformanceTracer implements RuntimeTracerContract
                 $outContent = $runtimeContent;
 
                 if (Str::contains($node->content, 'template_content')) {
+                    $this->foundLayoutTrigger = true;
                     $outContent = '****REPLACED_CONTENT****';
                     $this->triggeredTemplateContent = $this->nodePerformanceItems[$node->refId]->path;
                 }
