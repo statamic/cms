@@ -264,13 +264,19 @@ class PerformanceTracer implements RuntimeTracerContract
             $performanceItem->isTag = $node->isTagNode;
             $performanceItem->isConditionNode = in_array($node->name->name, self::$conditions);
 
-            $content = $node->content;
+            $contentNode = $node;
 
             if ($node->originalNode != null) {
-                $content = $node->originalNode->content;
+                $contentNode = $node->originalNode;
             }
 
-            $performanceItem->escapedNodeContent = e($node->rawStart.' '.trim($content).' '.$node->rawEnd);
+            $content = $contentNode->rawStart.' '.trim($contentNode->content).' '.$contentNode->rawEnd;
+
+            if (count($contentNode->interpolationRegions) > 0) {
+                $content = $contentNode->getNodeDocumentText();
+            }
+
+            $performanceItem->escapedNodeContent = e($content);
             $performanceItem->escapedSourceContent = e($node->runtimeContent);
 
             $performanceItem->isNodeObject = true;
