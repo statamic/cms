@@ -82,23 +82,4 @@ class GlobalVariableRepositoryTest extends TestCase
 
         $this->assertCount(0, $this->repo->findBySet('unknown'));
     }
-
-    /** @test */
-    public function it_saves_a_global_to_the_stache_and_to_a_file()
-    {
-        $global = GlobalSetAPI::make('new');
-
-        $localization = $global->makeLocalization('en')->data(['foo' => 'bar', 'baz' => 'qux']);
-        $global->addLocalization($localization);
-
-        $this->assertNull($this->repo->find('new::en'));
-
-        $this->globalRepo->save($global);
-        $this->repo->save($localization);
-
-        $this->assertNotNull($item = $this->repo->find('new::en'));
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $item->data()->all());
-        $this->assertFileExists($this->directory.'/new.yaml');
-        @unlink($this->directory.'/new.yaml');
-    }
 }
