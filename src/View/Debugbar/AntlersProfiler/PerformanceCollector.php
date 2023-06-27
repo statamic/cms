@@ -136,7 +136,7 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
         $nodePerformanceItems = [];
 
         foreach ($tracer->getPerformanceItems() as $item) {
-            if ($item->depth != 0) {
+            if ($item->parent != null) {
                 continue;
             }
 
