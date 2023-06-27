@@ -1,5 +1,13 @@
 # Release Notes
 
+## 4.9.1 (2023-06-27)
+
+### What's fixed
+- Fix visibility of Cache FileStore path method. [#8365](https://github.com/statamic/cms/issues/8365) by @jasonvarga
+- Adjust how Antlers Profiler handles larger amounts of data to prevent JS errors. [#8358](https://github.com/statamic/cms/issues/8358) by @JohnathonKoster
+
+
+
 ## 4.9.0 (2023-06-26)
 
 ### What's new
