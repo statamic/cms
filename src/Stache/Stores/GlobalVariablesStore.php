@@ -72,7 +72,7 @@ class GlobalVariablesStore extends BasicStore
     public function save($variable)
     {
         if (Site::hasMultiple()) {
-            parent:save($variable);
+            parent::save($variable);
         }
     }
 
