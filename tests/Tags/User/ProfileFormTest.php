@@ -141,7 +141,7 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The email field is required.',
+            'The Email Address field is required.',
         ];
 
         $this->assertEmpty($success[1]);
@@ -240,7 +240,7 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The email field is required.',
+            'The Email Address field is required.',
         ];
 
         $this->assertEmpty($success[1]);
