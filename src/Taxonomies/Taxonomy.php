@@ -41,6 +41,9 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     protected $revisions = false;
     protected $searchIndex;
     protected $previewTargets = [];
+    protected $template;
+    protected $termTemplate;
+    protected $layout;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -344,20 +347,54 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         return $fallback;
     }
 
-    public function template()
+    public function termTemplate($template = null)
     {
-        $template = $this->handle().'.index';
+        return $this
+            ->fluentlyGetOrSet('termTemplate')
+            ->getter(function ($template) {
+                if ($template ?? false) {
+                    return $template;
+                }
 
-        if ($collection = $this->collection()) {
-            $template = $collection->handle().'.'.$template;
-        }
+                $template = $this->handle().'.show';
 
-        return $template;
+                if ($collection = $this->collection()) {
+                    $template = $collection->handle().'.'.$template;
+                }
+
+                return $template;
+            })
+            ->args(func_get_args());
     }
 
-    public function layout()
+    public function template($template = null)
     {
-        return 'layout';
+        return $this
+            ->fluentlyGetOrSet('template')
+            ->getter(function ($template) {
+                if ($template ?? false) {
+                    return $template;
+                }
+
+                $template = $this->handle().'.index';
+
+                if ($collection = $this->collection()) {
+                    $template = $collection->handle().'.'.$template;
+                }
+
+                return $template;
+            })
+            ->args(func_get_args());
+    }
+
+    public function layout($layout = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('layout')
+            ->getter(function ($layout) {
+                return $layout ?? 'layout';
+            })
+            ->args(func_get_args());
     }
 
     public function searchIndex($index = null)

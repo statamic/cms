@@ -341,6 +341,45 @@ class TaxonomyTest extends TestCase
         Event::assertNotDispatched(TaxonomySaved::class);
     }
 
+    /** @test */
+    public function it_gets_and_sets_the_layout()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        // defaults to layout
+        $this->assertEquals('layout', $taxonomy->layout());
+
+        // collection level overrides the default
+        $taxonomy->layout('foo');
+        $this->assertEquals('foo', $taxonomy->layout());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_template()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        // defaults to layout
+        $this->assertEquals('tags.index', $taxonomy->template());
+
+        // collection level overrides the default
+        $taxonomy->template('foo');
+        $this->assertEquals('foo', $taxonomy->template());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_term_template()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        // defaults to layout
+        $this->assertEquals('tags.show', $taxonomy->termTemplate());
+
+        // collection level overrides the default
+        $taxonomy->termTemplate('foo');
+        $this->assertEquals('foo', $taxonomy->termTemplate());
+    }
+
     public function additionalPreviewTargetProvider()
     {
         return [

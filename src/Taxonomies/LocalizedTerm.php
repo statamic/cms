@@ -381,13 +381,7 @@ class LocalizedTerm implements
     public function template($template = null)
     {
         if (func_num_args() === 0) {
-            $defaultTemplate = $this->taxonomyHandle().'.show';
-
-            if ($collection = $this->collection()) {
-                $defaultTemplate = $collection->handle().'.'.$defaultTemplate;
-            }
-
-            return $this->get('template', $defaultTemplate);
+            return $this->get('template', $this->taxonomy()->termTemplate());
         }
 
         return $this->set('template', $template);
@@ -396,7 +390,7 @@ class LocalizedTerm implements
     public function layout($layout = null)
     {
         if (func_num_args() === 0) {
-            return $this->get('layout', 'layout');
+            return $this->get('layout') ?? $this->taxonomy()->layout();
         }
 
         return $this->set('layout', $layout);
