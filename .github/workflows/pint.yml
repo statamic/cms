@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - '**.php'
+  pull_request:
+    paths:
+      - '**.php'
 
 permissions:
   contents: write
