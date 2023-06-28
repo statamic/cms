@@ -36,6 +36,7 @@ class Statamic
 
     public static function version()
     {
+        return '5.0.0';
         return \Facades\Statamic\Version::get();
     }
 
@@ -44,8 +45,7 @@ class Statamic
         return config('statamic.editions.pro');
     }
 
-    public static function enablePro()
-    {
+    public static function enablePro(){
         $path = config_path('statamic/editions.php');
 
         $contents = File::get($path);
