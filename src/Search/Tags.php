@@ -4,8 +4,6 @@ namespace Statamic\Search;
 
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
-use Statamic\Search\PlainResult;
-use Statamic\Search\Result;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
