@@ -5,7 +5,6 @@ on:
     paths:
       - '**.php'
 
-
 permissions:
   contents: write
 
