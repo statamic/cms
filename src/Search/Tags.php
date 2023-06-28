@@ -42,15 +42,6 @@ class Tags extends BaseTags
 
         $results = $this->getQueryResults($builder);
 
-        // PlainResult inherits from Result, but doesnt provide getSearchable...
-        if (method_exists($results, 'getCollection')) {
-            if ($results->getCollection()->first() instanceof Result && !$results->getCollection()->first() instanceof PlainResult) {
-                $results->setCollection($results->getCollection()->map->getSearchable());
-            }
-        } else if ($results->first() instanceof Result && !$results->first() instanceof PlainResult) {
-            $results->transform->getSearchable();
-        }
-
         return $this->output($results);
     }
 
