@@ -38,13 +38,11 @@ class FormType extends \Rebing\GraphQL\Support\Type
                     return $form->blueprint()->fields()->validator()->rules();
                 },
             ],
-        ])
-            ->map(function (array $arr) {
-                $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
+        ])->map(function (array $arr) {
+            $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
 
-                return $arr;
-            })
-            ->all();
+            return $arr;
+        })->all();
     }
 
     private function resolver()

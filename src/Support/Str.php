@@ -195,7 +195,6 @@ class Str
             // step 4, re-replace the code from step 1 with spaces
             return str_replace('%###%##%', ' ', $value);
 
-            // otherwise
         } else {
             return preg_replace_callback("/([^\s]\s)([^\s]*\s?){{$words}}$/im", function ($matches) {
                 return preg_replace("/([\s])/", '&nbsp;', rtrim($matches[0]));

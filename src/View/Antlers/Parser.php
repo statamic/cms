@@ -758,8 +758,9 @@ class Parser implements ParserContract
                     // Slide it on back into the template
                     $text = str_replace($match[0], $output, $text);
 
-                    // Regular old ternary
                 } else {
+                    // Regular old ternary
+
                     // Split the tag up
                     $bits = explode('? ', $match[1]);
 
