@@ -137,6 +137,11 @@ class DateTest extends TestCase
                 ['date' => null, 'time' => null],
                 null,
             ],
+            'object with missing time' => [
+                [],
+                ['date' => null],
+                null,
+            ],
             'date with default format' => [
                 [],
                 ['date' => '2012-08-29', 'time' => null],
@@ -146,6 +151,11 @@ class DateTest extends TestCase
                 ['format' => 'Y--m--d'],
                 ['date' => '2012-08-29', 'time' => null],
                 '2012--08--29',
+            ],
+            'date with missing time' => [
+                [],
+                ['date' => '2012-08-29'],
+                '2012-08-29',
             ],
             'date with time' => [
                 ['time_enabled' => true],
