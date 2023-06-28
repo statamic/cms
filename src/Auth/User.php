@@ -34,17 +34,7 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
-abstract class User implements
-    UserContract,
-    Authenticatable,
-    CanResetPasswordContract,
-    Augmentable,
-    AuthorizableContract,
-    ResolvesValuesContract,
-    HasLocalePreference,
-    ArrayAccess,
-    Arrayable,
-    SearchableContract
+abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, Augmentable, AuthorizableContract, ResolvesValuesContract, HasLocalePreference, ArrayAccess, Arrayable, SearchableContract
 {
     use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues, ContainsComputedData, Searchable;
 

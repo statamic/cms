@@ -1,6 +1,6 @@
 <?php
 
-class Test
+class test
 {
     public function method()
     {

@@ -382,10 +382,6 @@ class AntlersNode extends AbstractNode
     /**
      * Returns the value of a single parameter by name.
      *
-     * @param $parameterName
-     * @param  NodeProcessor  $processor
-     * @param $data
-     * @param $default
      * @return array|mixed|\Statamic\Contracts\Query\Builder|string|string[]|null
      */
     public function getSingleParameterValueByName($parameterName, NodeProcessor $processor, $data, $default = null)

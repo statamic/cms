@@ -154,7 +154,7 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
 
         return [
             'data' => $tracer->getPerformanceData(),
-            'system_samples' =>$this->filterSamples($samples),
+            'system_samples' => $this->filterSamples($samples),
             'source_samples' => $this->makeSourceViewReport($tracer->getOutputObjects(), $tracer->getPathTriggeringOutput()),
             'total_antlers_nodes' => $tracer->getTotalNodeOperations(),
             'had_active_debug_sessions' => GlobalDebugManager::isDebugSessionActive(),

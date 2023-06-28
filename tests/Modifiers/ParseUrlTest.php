@@ -13,13 +13,13 @@ class ParseUrlTest extends TestCase
         $path = 'http://admin:password@example.com:8080/path?query=1#hash';
 
         $this->assertEquals([
-            'scheme'   => 'http',
-            'host'     => 'example.com',
-            'port'     => '8080',
-            'user'     => 'admin',
-            'pass'     => 'password',
-            'path'     => '/path',
-            'query'    => 'query=1',
+            'scheme' => 'http',
+            'host' => 'example.com',
+            'port' => '8080',
+            'user' => 'admin',
+            'pass' => 'password',
+            'path' => '/path',
+            'query' => 'query=1',
             'fragment' => 'hash',
         ], $this->modify($path));
     }
