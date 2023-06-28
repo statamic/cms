@@ -36,7 +36,6 @@ class Statamic
 
     public static function version()
     {
-        return '5.0.0';
         return \Facades\Statamic\Version::get();
     }
 
