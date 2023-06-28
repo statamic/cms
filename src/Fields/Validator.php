@@ -3,7 +3,6 @@
 namespace Statamic\Fields;
 
 use Illuminate\Support\Facades\Validator as LaravelValidator;
-use Illuminate\Validation\ValidationException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -102,17 +101,6 @@ class Validator
             $this->customMessages,
             $this->attributes()
         );
-    }
-
-    public function validateWithBag(string $errorBag)
-    {
-        try {
-            return $this->validate();
-        } catch (ValidationException $e) {
-            $e->errorBag = $errorBag;
-
-            throw $e;
-        }
     }
 
     public function attributes()
