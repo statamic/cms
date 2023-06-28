@@ -697,13 +697,13 @@ GQL;
 GQL;
 
         $this
-                ->withoutExceptionHandling()
-                ->post('/graphql', ['query' => $query])
-                ->assertGqlOk()
-                ->assertExactJson(['data' => ['entry' => [
-                    'id' => '6',
-                    'title' => 'That was so rad!',
-                ]]]);
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => [
+                'id' => '6',
+                'title' => 'That was so rad!',
+            ]]]);
 
         $query = <<<'GQL'
 {

@@ -790,13 +790,13 @@ GQL;
 GQL;
 
         $this
-                ->withoutExceptionHandling()
-                ->post('/graphql', ['query' => $query])
-                ->assertGqlOk()
-                ->assertExactJson(['data' => ['entries' => ['data' => [
-                    ['id' => '2', 'title' => 'Art Directed Blog Post'],
-                    ['id' => '4', 'title' => 'Event Two'],
-                ]]]]);
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '2', 'title' => 'Art Directed Blog Post'],
+                ['id' => '4', 'title' => 'Event Two'],
+            ]]]]);
 
         $query = <<<'GQL'
 {
@@ -810,13 +810,13 @@ GQL;
 GQL;
 
         $this
-                ->withoutExceptionHandling()
-                ->post('/graphql', ['query' => $query])
-                ->assertGqlOk()
-                ->assertExactJson(['data' => ['entries' => ['data' => [
-                    ['id' => '2', 'title' => 'Art Directed Blog Post'],
-                    ['id' => '4', 'title' => 'Event Two'],
-                ]]]]);
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '2', 'title' => 'Art Directed Blog Post'],
+                ['id' => '4', 'title' => 'Event Two'],
+            ]]]]);
 
         $query = <<<'GQL'
 {
@@ -830,11 +830,11 @@ GQL;
 GQL;
 
         $this
-                ->withoutExceptionHandling()
-                ->post('/graphql', ['query' => $query])
-                ->assertGqlOk()
-                ->assertExactJson(['data' => ['entries' => ['data' => [
-                    ['id' => '1', 'title' => 'Standard Blog Post'],
-                ]]]]);
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '1', 'title' => 'Standard Blog Post'],
+            ]]]]);
     }
 }

@@ -35,8 +35,6 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
 
     /**
      * Instantiate fluent tag helper.
-     *
-     * @param  Loader  $loader
      */
     public function __construct(Loader $loader)
     {
@@ -109,11 +107,11 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
         debugbar()->startMeasure($profileTagName, $tagName);
 
         $tag = app(Loader::class)->load($name, [
-            'parser'     => null,
-            'params'     => $this->params,
-            'content'    => '',
-            'context'    => $this->context,
-            'tag'        => $tagName,
+            'parser' => null,
+            'params' => $this->params,
+            'content' => '',
+            'context' => $this->context,
+            'tag' => $tagName,
             'tag_method' => $originalMethod,
         ]);
 

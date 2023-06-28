@@ -28,7 +28,6 @@ trait ResetsPasswords
      *
      * If no token is present, display the link request form.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string|null  $token
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
@@ -42,7 +41,6 @@ trait ResetsPasswords
     /**
      * Reset the given user's password.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function reset(Request $request)
@@ -93,7 +91,6 @@ trait ResetsPasswords
     /**
      * Get the password reset credentials from the request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     protected function credentials(Request $request)
@@ -138,7 +135,6 @@ trait ResetsPasswords
     /**
      * Get the response for a successful password reset.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string  $response
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
@@ -149,13 +145,12 @@ trait ResetsPasswords
         }
 
         return redirect($this->redirectPath())
-                            ->with('status', trans($response));
+            ->with('status', trans($response));
     }
 
     /**
      * Get the response for a failed password reset.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string  $response
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
@@ -168,8 +163,8 @@ trait ResetsPasswords
         }
 
         return redirect()->back()
-                    ->withInput($request->only('email'))
-                    ->withErrors(['email' => trans($response)]);
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => trans($response)]);
     }
 
     /**

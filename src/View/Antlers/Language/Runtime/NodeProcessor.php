@@ -1074,7 +1074,7 @@ class NodeProcessor
             Log::warning('Runtime Access Violation: '.$tagCheck, [
                 'tag' => $tagCheck,
                 'file' => GlobalRuntimeState::$currentExecutionFile,
-                'trace' =>  GlobalRuntimeState::$templateFileStack,
+                'trace' => GlobalRuntimeState::$templateFileStack,
             ]);
 
             if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
@@ -2062,7 +2062,7 @@ class NodeProcessor
                                         }
                                     }
 
-                                    if ($val instanceof  Value) {
+                                    if ($val instanceof Value) {
                                         if ($val->shouldParseAntlers()) {
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
                                             GlobalRuntimeState::$isEvaluatingData = true;
@@ -2444,7 +2444,7 @@ class NodeProcessor
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".
             if (! is_array($value)) {
-                $value = ['value' => $value, 'name'  => $value];
+                $value = ['value' => $value, 'name' => $value];
             }
 
             $value['count'] = $index + 1;

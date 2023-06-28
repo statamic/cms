@@ -34,8 +34,6 @@ class UpdateTermReferences extends Subscriber implements ShouldQueue
 
     /**
      * Handle the term saved event.
-     *
-     * @param  TermSaved  $event
      */
     public function handleSaved(TermSaved $event)
     {
@@ -48,8 +46,6 @@ class UpdateTermReferences extends Subscriber implements ShouldQueue
 
     /**
      * Handle the term deleted event.
-     *
-     * @param  TermDeleted  $event
      */
     public function handleDeleted(TermDeleted $event)
     {

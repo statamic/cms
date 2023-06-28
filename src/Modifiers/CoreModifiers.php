@@ -77,7 +77,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns a string with backslashes added before characters that need to be escaped.
      *
-     * @param $value
      * @return string
      */
     public function addSlashes($value)
@@ -119,7 +118,6 @@ class CoreModifiers extends Modifier
     /**
      * Alias an array variable.
      *
-     * @param $value
      * @param  array  $params
      * @return array|void
      */
@@ -149,8 +147,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns the character at given index $param[0], starting from 0.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function at($value, $params)
@@ -161,7 +157,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns a focal point as a background-position CSS value.
      *
-     * @param $value
      * @return string
      */
     public function backgroundPosition($value)
@@ -192,7 +187,6 @@ class CoreModifiers extends Modifier
     /**
      * Converts a bard value to a flat array of nodes and marks.
      *
-     * @param $value
      * @return array
      */
     public function bardItems($value)
@@ -219,7 +213,6 @@ class CoreModifiers extends Modifier
     /**
      * Converts a bard value to plain text (excluding sets).
      *
-     * @param $value
      * @return string
      */
     public function bardText($value)
@@ -246,7 +239,6 @@ class CoreModifiers extends Modifier
     /**
      * Converts a bard value to HTML (excluding sets).
      *
-     * @param $value
      * @return string
      */
     public function bardHtml($value)
@@ -277,7 +269,6 @@ class CoreModifiers extends Modifier
      * capitalizes letters following digits, spaces, dashes and underscores,
      * and removes spaces, dashes, as well as underscores.
      *
-     * @param $value
      * @return string
      */
     public function camelize($value)
@@ -288,7 +279,6 @@ class CoreModifiers extends Modifier
     /**
      * Wraps a value in CDATA tags for RSS/XML feeds.
      *
-     * @param $value
      * @return string
      */
     public function cdata($value)
@@ -299,7 +289,6 @@ class CoreModifiers extends Modifier
     /**
      * Rounds a number up to the next whole number.
      *
-     * @param $value
      * @return int
      */
     public function ceil($value)
@@ -354,7 +343,6 @@ class CoreModifiers extends Modifier
      * a single space. This includes tabs and newline characters, as well as
      * multibyte whitespace such as the thin space and ideographic space.
      *
-     * @param $value
      * @return string
      */
     public function collapseWhitespace($value)
@@ -366,8 +354,6 @@ class CoreModifiers extends Modifier
      * Converts a comma-separated list of variable names into an array.
      *
      * @param  string  $value
-     * @param $params
-     * @param $context
      * @return array
      */
     public function compact($value, $params, $context)
@@ -438,8 +424,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string contains all needles ($params), false otherwise. Case-insensitive.
      *
-     * @param $value
-     * @param $params
      * @return bool
      */
     public function containsAny($value, $params)
@@ -466,8 +450,6 @@ class CoreModifiers extends Modifier
      * Returns the number of occurrences of $params[0] in the given string. By default,
      * the comparison is case-insensitive, but can be made sensitive by setting $params[1] to true.
      *
-     * @param $value
-     * @param $params
      * @return int
      */
     public function countSubstring($value, $params)
@@ -480,7 +462,6 @@ class CoreModifiers extends Modifier
      * characters (with the exception if the first character of the string), and in
      * place of spaces as well as underscores.
      *
-     * @param $value
      * @return string
      */
     public function dashify($value)
@@ -502,8 +483,6 @@ class CoreModifiers extends Modifier
 
     /**
      * Dump, Die, and Debug using Ignition.
-     *
-     * @param $value
      */
     public function ddd($value)
     {
@@ -512,8 +491,6 @@ class CoreModifiers extends Modifier
 
     /**
      * Dump a var into the Debug bar for data exploration.
-     *
-     * @param $value
      */
     public function debug($value)
     {
@@ -534,7 +511,6 @@ class CoreModifiers extends Modifier
     /**
      * Replaces hyphens and underscores with spaces.
      *
-     * @param $value
      * @return string
      */
     public function deslugify($value)
@@ -545,8 +521,6 @@ class CoreModifiers extends Modifier
     /**
      * Divides values with some science. Context aware.
      *
-     * @param $value
-     * @param $params
      * @return mixed
      */
     public function divide($value, $params, $context)
@@ -557,8 +531,6 @@ class CoreModifiers extends Modifier
     /**
      * Turn an array into an definition list.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function dl($value, $params)
@@ -568,8 +540,6 @@ class CoreModifiers extends Modifier
 
     /**
      * Dump and die the output of a variable.
-     *
-     * @param $value
      */
     public function dd($value)
     {
@@ -578,8 +548,6 @@ class CoreModifiers extends Modifier
 
     /**
      * Dump a variable.
-     *
-     * @param $value
      */
     public function dump($value)
     {
@@ -590,8 +558,6 @@ class CoreModifiers extends Modifier
      * Returns true if the string ends with a given substring, false otherwise.
      * The comparison is case-insensitive.
      *
-     * @param $value
-     * @param $params
      * @return bool
      */
     public function endsWith($value, $params)
@@ -603,8 +569,6 @@ class CoreModifiers extends Modifier
      * Ensures that the string begins with a specified string.
      * If it doesn't, it's prepended.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function ensureLeft($value, $params)
@@ -615,8 +579,6 @@ class CoreModifiers extends Modifier
     /**
      * Ensures that the string ends with a specified string. If it doesn't, it's appended.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function ensureRight($value, $params)
@@ -639,8 +601,6 @@ class CoreModifiers extends Modifier
      * Breaks a string at a given marker.
      * Uses <!--more--> by default.
      *
-     * @param $value
-     * @param $params
      * @return array|false|string
      */
     public function excerpt($value, $params)
@@ -669,7 +629,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns the file extension of a given filename.
      *
-     * @param $value
      * @return string
      */
     public function extension($value)
@@ -680,7 +639,6 @@ class CoreModifiers extends Modifier
     /**
      * Generate a link to a Favicon file.
      *
-     * @param $value
      * @return string
      */
     public function favicon($value)
@@ -691,8 +649,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns the first $params[0] characters of a string, or the first element of an array.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function first($value, $params)
@@ -707,7 +663,6 @@ class CoreModifiers extends Modifier
     /**
      * Flattens a multi-dimensional collection into a single dimension.
      *
-     * @param $value
      * @return array
      */
     public function flatten($value)
@@ -729,7 +684,6 @@ class CoreModifiers extends Modifier
     /**
      * Rounds a number down to the next whole number.
      *
-     * @param $value
      * @return int
      */
     public function floor($value)
@@ -740,8 +694,6 @@ class CoreModifiers extends Modifier
     /**
      * Converts a string to a Carbon instance and formats it according to the whim of the Overlord.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function format($value, $params)
@@ -752,8 +704,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns a converted string in a Carbon translated format.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function formatTranslated($value, $params)
@@ -764,8 +714,6 @@ class CoreModifiers extends Modifier
     /**
      * Format a number with grouped thousands and decimal points.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function formatNumber($value, $params)
@@ -782,7 +730,6 @@ class CoreModifiers extends Modifier
     /**
      * Replace /absolute/urls with http://domain.com/urls.
      *
-     * @param $value
      * @return string
      */
     public function fullUrls($value)
@@ -797,8 +744,6 @@ class CoreModifiers extends Modifier
     /**
      * Get any variable from a relationship.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function get($value, $params)
@@ -840,8 +785,6 @@ class CoreModifiers extends Modifier
     /**
      * Get a Gravatar image URL from an email.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function gravatar($value, $params)
@@ -852,8 +795,6 @@ class CoreModifiers extends Modifier
     /**
      * Groups the collection's items by a given key.
      *
-     * @param $value
-     * @param $params
      * @return Collection
      */
     public function groupBy($value, $params)
@@ -960,7 +901,6 @@ class CoreModifiers extends Modifier
      * Get the date difference in hours.
      *
      * @param  Carbon  $value
-     * @param $params
      * @return int
      */
     public function hoursAgo($value, $params)
@@ -971,8 +911,6 @@ class CoreModifiers extends Modifier
     /**
      * Generate an HTML image element.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function image($value, $params)
@@ -984,8 +922,6 @@ class CoreModifiers extends Modifier
      * Turn an array into a string and glue together with a delimiter.
      * Joinplode because join and implode are existing PHP methods. Obviously.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function joinplode($value, $params)
@@ -1011,7 +947,6 @@ class CoreModifiers extends Modifier
      * Check if an item exists in an array using "dot" notation.
      *
      * @param $value
-     * @param $params
      * @return bool
      */
     public function inArray($haystack, $params, $context)
@@ -1036,8 +971,6 @@ class CoreModifiers extends Modifier
     /**
      * Inserts $substring into the string at the $position provided.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function insert($value, $params)
@@ -1051,9 +984,6 @@ class CoreModifiers extends Modifier
     /**
      * Determines if the date is after another specified date ($params[0]).
      *
-     * @param $value
-     * @param $params
-     * @param $context
      * @return bool
      */
     public function isAfter($value, $params, $context)
@@ -1064,7 +994,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string contains only alphabetic chars, false otherwise.
      *
-     * @param $value
      * @return bool
      */
     public function isAlpha($value)
@@ -1075,7 +1004,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string contains only alphabetic and numeric chars, false otherwise.
      *
-     * @param $value
      * @return bool
      */
     public function isAlphanumeric($value)
@@ -1086,7 +1014,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the value is an array.
      *
-     * @param $value
      * @return bool
      */
     public function isArray($value)
@@ -1097,9 +1024,6 @@ class CoreModifiers extends Modifier
     /**
      * Determines if the date is before another specified date ($params[0]).
      *
-     * @param $value
-     * @param $params
-     * @param $context
      * @return bool
      */
     public function isBefore($value, $params, $context)
@@ -1110,9 +1034,6 @@ class CoreModifiers extends Modifier
     /**
      * Determines if the date is between two other specified dates, $params[0] and $params[1].
      *
-     * @param $value
-     * @param $params
-     * @param $context
      * @return bool
      */
     public function isBetween($value, $params, $context)
@@ -1126,7 +1047,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string contains only whitespace chars, false otherwise.
      *
-     * @param $value
      * @return bool
      */
     public function isBlank($value)
@@ -1137,7 +1057,6 @@ class CoreModifiers extends Modifier
     /**
      * Return true if the string is an email address.
      *
-     * @param $value
      * @return bool
      */
     public function isEmail($value)
@@ -1169,7 +1088,6 @@ class CoreModifiers extends Modifier
     /**
      * Determines if the date is in the future, ie. greater (after) than now.
      *
-     * @param $value
      * @return bool
      */
     public function isFuture($value)
@@ -1180,7 +1098,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the value is iterable.
      *
-     * @param $value
      * @return bool
      */
     public function isIterable($value)
@@ -1191,7 +1108,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string is JSON, false otherwise.
      *
-     * @param $value
      * @return bool
      */
     public function isJson($value)
@@ -1202,7 +1118,6 @@ class CoreModifiers extends Modifier
     /**
      * Determines if the date in a leap year.
      *
-     * @param $value
      * @return bool
      */
     public function isLeapYear($value)
@@ -1213,7 +1128,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string contains only lowercase chars, false otherwise.
      *
-     * @param $value
      * @return bool
      */
     public function isLowercase($value)
@@ -1224,7 +1138,6 @@ class CoreModifiers extends Modifier
     /**
      * Finds whether a value is a number or a numeric string.
      *
-     * @param $value
      * @return bool
      */
     public function isNumeric($value)
@@ -1235,7 +1148,6 @@ class CoreModifiers extends Modifier
     /**
      * Determines if the date is in the past, ie. less (before) than now.
      *
-     * @param $value
      * @return bool
      */
     public function isPast($value)
@@ -1246,7 +1158,6 @@ class CoreModifiers extends Modifier
     /**
      * Determines if the date is today.
      *
-     * @param $value
      * @return bool
      */
     public function isToday($value)
@@ -1257,7 +1168,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string contains only uppercase chars, false otherwise.
      *
-     * @param $value
      * @return bool
      */
     public function isUppercase($value)
@@ -1268,7 +1178,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string is a URL.
      *
-     * @param $value
      * @return bool
      */
     public function isUrl($value)
@@ -1279,7 +1188,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns true if the string is an external URL.
      *
-     * @param $value
      * @return bool
      */
     public function isExternalUrl($value)
@@ -1290,7 +1198,6 @@ class CoreModifiers extends Modifier
     /**
      * Determines if the date on a weekday.
      *
-     * @param $value
      * @return bool
      */
     public function isWeekday($value)
@@ -1301,7 +1208,6 @@ class CoreModifiers extends Modifier
     /**
      * Determines if the date on a weekend.
      *
-     * @param $value
      * @return bool
      */
     public function isWeekend($value)
@@ -1312,7 +1218,6 @@ class CoreModifiers extends Modifier
     /**
      * Determines if the date is yesterday.
      *
-     * @param $value
      * @return bool
      */
     public function isYesterday($value)
@@ -1323,7 +1228,6 @@ class CoreModifiers extends Modifier
     /**
      * Determines if the date is tomorrow.
      *
-     * @param $value
      * @return bool
      */
     public function isTomorrow($value)
@@ -1334,7 +1238,6 @@ class CoreModifiers extends Modifier
     /**
      * Converts a string to kebab-case.
      *
-     * @param $value
      * @return string
      */
     public function kebab($value)
@@ -1345,8 +1248,6 @@ class CoreModifiers extends Modifier
     /**
      * Rekeys an array or collection.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function keyBy($value, $params)
@@ -1359,8 +1260,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns the last $params[0] characters of a string, or the last element of an array.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function last($value, $params)
@@ -1375,7 +1274,6 @@ class CoreModifiers extends Modifier
     /**
      * Converts the first character of the supplied string to lower case.
      *
-     * @param $value
      * @return string
      */
     public function lcfirst($value)
@@ -1386,7 +1284,6 @@ class CoreModifiers extends Modifier
     /**
      * Get the items in an array or characters in a string.
      *
-     * @param $value
      * @return int
      */
     public function length($value)
@@ -1423,8 +1320,6 @@ class CoreModifiers extends Modifier
     /**
      * Generate an HTML link.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function link($value, $params)
@@ -1439,7 +1334,6 @@ class CoreModifiers extends Modifier
      * Converts all characters in the string to lowercase. Multi-byte friendly.
      *
      *
-     * @param $value
      * @return string
      */
     public function lower($value)
@@ -1450,7 +1344,6 @@ class CoreModifiers extends Modifier
     /**
      * Replace a var with a localized string.
      *
-     * @param $value
      * @return string
      */
     public function localize($value)
@@ -1461,7 +1354,6 @@ class CoreModifiers extends Modifier
     /**
      * Rough macro prototype that only uses CoreModifiers.
      *
-     * @param $value
      * @param  array  $params
      * @param  array  $context
      * @return mixed
@@ -1482,7 +1374,6 @@ class CoreModifiers extends Modifier
     /**
      * Wraps matched words with <mark> tags.
      *
-     * @param $value
      * @param  array  $params
      * @return string
      */
@@ -1503,8 +1394,6 @@ class CoreModifiers extends Modifier
     /**
      * Generate a HTML link to an email address.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function mailto($value, $params)
@@ -1515,7 +1404,6 @@ class CoreModifiers extends Modifier
     /**
      * Parse content as Markdown.
      *
-     * @param $value
      * @param  array  $params
      * @return mixed
      */
@@ -1533,9 +1421,6 @@ class CoreModifiers extends Modifier
     /**
      * Merge an array variable with another array variable.
      *
-     * @param $value
-     * @param $params
-     * @param $context
      * @return array
      */
     public function merge($value, $params, $context)
@@ -1548,7 +1433,6 @@ class CoreModifiers extends Modifier
     /**
      * Generate an md5 hash of a value.
      *
-     * @param $value
      * @param $params
      * @return string
      */
@@ -1561,7 +1445,6 @@ class CoreModifiers extends Modifier
      * Get the date difference in minutes.
      *
      * @param  Carbon  $value
-     * @param $params
      * @return int
      */
     public function minutesAgo($value, $params)
@@ -1572,9 +1455,6 @@ class CoreModifiers extends Modifier
     /**
      * Performs modulus division on a value. Context aware.
      *
-     * @param $value
-     * @param $params
-     * @param $context
      * @return int
      */
     public function mod($value, $params, $context)
@@ -1589,8 +1469,6 @@ class CoreModifiers extends Modifier
      *
      * @link http://php.net/manual/en/function.strtotime.php
      *
-     * @param $value
-     * @param $params
      * @return \DateTime
      */
     public function modifyDate($value, $params)
@@ -1602,7 +1480,6 @@ class CoreModifiers extends Modifier
      * Get the date difference in months.
      *
      * @param  Carbon  $value
-     * @param $params
      * @return int
      */
     public function monthsAgo($value, $params)
@@ -1613,9 +1490,6 @@ class CoreModifiers extends Modifier
     /**
      * Multiplies values together with a little help from science. Context aware.
      *
-     * @param $value
-     * @param $params
-     * @param $context
      * @return float|int
      */
     public function multiply($value, $params, $context)
@@ -1626,7 +1500,6 @@ class CoreModifiers extends Modifier
     /**
      * It's kinda neat!
      *
-     * @param $value
      * @return string
      */
     public function neatify($value)
@@ -1637,7 +1510,6 @@ class CoreModifiers extends Modifier
     /**
      * Replaces line breaks with <br> tags.
      *
-     * @param $value
      * @return string
      */
     public function nl2br($value)
@@ -1648,7 +1520,6 @@ class CoreModifiers extends Modifier
     /**
      * Is it or is it not numberwang?
      *
-     * @param $value
      * @return bool
      */
     public function isNumberwang($value)
@@ -1659,7 +1530,6 @@ class CoreModifiers extends Modifier
     /**
      * Obfuscate a string to prevent spam-bots from sniffing it.
      *
-     * @param $value
      * @return string
      */
     public function obfuscate($value)
@@ -1670,7 +1540,6 @@ class CoreModifiers extends Modifier
     /**
      * Obfuscate an e-mail address to prevent spam-bots from sniffing it.
      *
-     * @param $value
      * @return string
      */
     public function obfuscateEmail($value)
@@ -1733,7 +1602,6 @@ class CoreModifiers extends Modifier
     /**
      * Get the output of an Asset, useful for SVGs.
      *
-     * @param $value
      * @return array|mixed|null|void
      */
     public function output($value)
@@ -1752,7 +1620,6 @@ class CoreModifiers extends Modifier
     /**
      * Get a path component.
      *
-     * @param $value
      * @return string
      */
     public function pathinfo($value, $params)
@@ -1760,10 +1627,10 @@ class CoreModifiers extends Modifier
         $key = Arr::get($params, 0);
 
         $component = $key ? [
-            'dirname'   => PATHINFO_DIRNAME,
-            'basename'  => PATHINFO_BASENAME,
+            'dirname' => PATHINFO_DIRNAME,
+            'basename' => PATHINFO_BASENAME,
             'extension' => PATHINFO_EXTENSION,
-            'filename'  => PATHINFO_FILENAME,
+            'filename' => PATHINFO_FILENAME,
         ][$key] : (defined('PATHINFO_ALL') ? PATHINFO_ALL : 15);
 
         return pathinfo($value, $component);
@@ -1838,7 +1705,6 @@ class CoreModifiers extends Modifier
     /**
      * Return a random value from an array.
      *
-     * @param $value
      * @return string
      */
     public function random($value)
@@ -1849,7 +1715,6 @@ class CoreModifiers extends Modifier
     /**
      * URL-encode according to RFC 3986.
      *
-     * @param $value
      * @return string
      */
     public function rawurlencode($value)
@@ -1860,7 +1725,6 @@ class CoreModifiers extends Modifier
     /**
      * Send data to Laravel Ray.
      *
-     * @param $value
      * @return void
      */
     public function ray($value)
@@ -1875,8 +1739,6 @@ class CoreModifiers extends Modifier
     /**
      * Estimate the read time based on a given number of words per minute.
      *
-     * @param $value
-     * @param $params
      * @return int
      */
     public function readTime($value, $params)
@@ -1889,7 +1751,6 @@ class CoreModifiers extends Modifier
     /**
      * Wraps regex matches with <mark> tags.
      *
-     * @param $value
      * @param  array  $params
      * @return string
      */
@@ -1918,8 +1779,6 @@ class CoreModifiers extends Modifier
     /**
      * Replaces all occurrences of pattern $params[0] with the string $params[1].
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function regexReplace($value, $params)
@@ -1930,8 +1789,6 @@ class CoreModifiers extends Modifier
     /**
      * Alias of `diff_for_humans`.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function relative($value, $params)
@@ -1943,8 +1800,6 @@ class CoreModifiers extends Modifier
      * Format date in an easier for humans to read format.
      * Send $params[1] as true to turn off modifiers "ago", "from now", etc.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function diffForHumans($value, $params)
@@ -1958,8 +1813,6 @@ class CoreModifiers extends Modifier
      * Format date in an easier for owls to read format.
      * For whoever gives a hoot.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function diffForOwls($value, $params)
@@ -1970,8 +1823,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns a new string with the prefix $params[0] removed, if present.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function removeLeft($value, $params)
@@ -2014,8 +1865,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns a new string with the suffix $params[0] removed, if present.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function removeRight($value, $params)
@@ -2026,9 +1875,6 @@ class CoreModifiers extends Modifier
     /**
      * Repeats value a given number of times.
      *
-     * @param $value
-     * @param $params
-     * @param $context
      * @return string
      */
     public function repeat($value, $params, $context)
@@ -2046,8 +1892,6 @@ class CoreModifiers extends Modifier
     /**
      * Replaces all occurrences of a search in $params[0] by $params[1].
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function replace($value, $params)
@@ -2081,8 +1925,6 @@ class CoreModifiers extends Modifier
     /**
      * Rounds a number to a specified precision (number of digits after the decimal point).
      *
-     * @param $value
-     * @param $params
      * @return float
      */
     public function round($value, $params)
@@ -2096,8 +1938,6 @@ class CoreModifiers extends Modifier
      * the string is further truncated so that the substring may be
      * appended without exceeding the desired length.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function safeTruncate($value, $params)
@@ -2108,7 +1948,6 @@ class CoreModifiers extends Modifier
     /**
      * Convert special characters to HTML entities with htmlspecialchars.
      *
-     * @param $value
      * @return string
      */
     public function sanitize($value, $params)
@@ -2172,7 +2011,6 @@ class CoreModifiers extends Modifier
      * Get the date difference in seconds.
      *
      * @param  Carbon  $value
-     * @param $params
      * @return int
      */
     public function secondsAgo($value, $params)
@@ -2274,7 +2112,6 @@ class CoreModifiers extends Modifier
     /**
      * Get the singular form of an English word.
      *
-     * @param $value
      * @return string
      */
     public function singular($value)
@@ -2289,7 +2126,6 @@ class CoreModifiers extends Modifier
      * The replacement defaults to a single dash, and the string is also
      * converted to lowercase.
      *
-     * @param $value
      * @return string
      */
     public function slugify($value)
@@ -2300,7 +2136,6 @@ class CoreModifiers extends Modifier
     /**
      * Parse with SmartyPants. Aren't you fancy?
      *
-     * @param $value
      * @return string
      */
     public function smartypants($value)
@@ -2311,7 +2146,6 @@ class CoreModifiers extends Modifier
     /**
      * Converts a string to snake_case.
      *
-     * @param $value
      * @return string
      */
     public function snake($value)
@@ -2357,7 +2191,6 @@ class CoreModifiers extends Modifier
     /**
      * Strip whitespace from HTML.
      *
-     * @param $value
      * @return string
      */
     public function spaceless($value)
@@ -2371,8 +2204,6 @@ class CoreModifiers extends Modifier
     /**
      * Break an array into a given number of groups.
      *
-     * @param $value
-     * @param $params
      * @return array
      */
     public function split($value, $params)
@@ -2392,8 +2223,6 @@ class CoreModifiers extends Modifier
      * Returns true if the string starts with a given substring ($params[0]), false otherwise.
      * The comparison is case-insensitive.
      *
-     * @param $value
-     * @param $params
      * @return bool
      */
     public function startsWith($value, $params)
@@ -2404,9 +2233,6 @@ class CoreModifiers extends Modifier
     /**
      * Strip tags from a string, allowing for an explicit list. Context aware.
      *
-     * @param $value
-     * @param $params
-     * @param $context
      * @return string
      */
     public function stripTags($value, $params, $context)
@@ -2427,7 +2253,6 @@ class CoreModifiers extends Modifier
      *
      * @param  string  $value  The value to be modified.
      * @param  array  $params  Any parameters used in the modifier.
-     * @return string
      */
     public function strPad(string $value, array $params): string
     {
@@ -2445,7 +2270,6 @@ class CoreModifiers extends Modifier
      *
      * @param  string  $value  The value to be modified.
      * @param  array  $params  Any parameters used in the modifier.
-     * @return string
      */
     public function strPadBoth(string $value, array $params): string
     {
@@ -2459,7 +2283,6 @@ class CoreModifiers extends Modifier
      *
      * @param  string  $value  The value to be modified.
      * @param  array  $params  Any parameters used in the modifier.
-     * @return string
      */
     public function strPadLeft(string $value, array $params): string
     {
@@ -2473,7 +2296,6 @@ class CoreModifiers extends Modifier
      *
      * @param  string  $value  The value to be modified.
      * @param  array  $params  Any parameters used in the modifier.
-     * @return string
      */
     public function strPadRight(string $value, array $params): string
     {
@@ -2483,7 +2305,6 @@ class CoreModifiers extends Modifier
     /**
      * Converts a string to StudlyCase.
      *
-     * @param $value
      * @return string
      */
     public function studly($value)
@@ -2494,9 +2315,6 @@ class CoreModifiers extends Modifier
     /**
      * Subtracts values with the help of science. Context aware.
      *
-     * @param $value
-     * @param $params
-     * @param $context
      * @return int|float
      */
     public function subtract($value, $params, $context)
@@ -2509,8 +2327,6 @@ class CoreModifiers extends Modifier
      * It differs from the mb_substr() function in that providing a length of
      * null will return the rest of the string, rather than an empty string.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function substr($value, $params)
@@ -2521,7 +2337,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns the sum of all items in the array, optionally by specific key.
      *
-     * @param $value
      * @param  array  $params
      * @return mixed
      */
@@ -2550,8 +2365,6 @@ class CoreModifiers extends Modifier
     /**
      * Surrounds a string with substring $params[0].
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function surround($value, $params)
@@ -2562,7 +2375,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns a case swapped version of the string.
      *
-     * @param $value
      * @return string
      */
     public function swapCase($value)
@@ -2573,8 +2385,6 @@ class CoreModifiers extends Modifier
     /**
      * Convert an array of data from the Table fieldtype into a basic HTML table.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function table($value, $params)
@@ -2603,7 +2413,6 @@ class CoreModifiers extends Modifier
      * Returns a string with smart quotes, ellipsis characters, and dashes from
      * Windows-1252 (commonly used in Word documents) replaced by their ASCII equivalents.
      *
-     * @param $value
      * @return string
      */
     public function tidy($value)
@@ -2614,7 +2423,6 @@ class CoreModifiers extends Modifier
     /**
      * Converts the first character of each word in the string to uppercase.
      *
-     * @param $value
      * @return string
      */
     public function title($value)
@@ -2629,8 +2437,6 @@ class CoreModifiers extends Modifier
     /**
      * Convert value to a boolean.
      *
-     * @param $params
-     * @param $value
      * @return bool
      */
     public function toBool($value, $params)
@@ -2645,8 +2451,6 @@ class CoreModifiers extends Modifier
     /**
      * Converts the data to json.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function toJson($value, $params)
@@ -2668,8 +2472,6 @@ class CoreModifiers extends Modifier
      * Converts each tab in the string to some number of spaces, as defined by
      * $param[0]. By default, each tab is converted to 4 consecutive spaces.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function toSpaces($value, $params)
@@ -2686,8 +2488,6 @@ class CoreModifiers extends Modifier
      * Converts each occurrence of some consecutive number of spaces, as defined by
      * $param[0], to a tab. By default, each 4 consecutive spaces are converted to a tab.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function toTabs($value, $params)
@@ -2698,7 +2498,6 @@ class CoreModifiers extends Modifier
     /**
      * Translates a string.
      *
-     * @param $value
      * @return string
      */
     public function trans($value)
@@ -2709,9 +2508,6 @@ class CoreModifiers extends Modifier
     /**
      * Translates and pluralizes a string.
      *
-     * @param $value
-     * @param $params
-     * @param $context
      * @return string
      */
     public function transChoice($value, $params, $context)
@@ -2724,7 +2520,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns the trimmed string.
      *
-     * @param $value
      * @return string
      */
     public function trim($value)
@@ -2737,8 +2532,6 @@ class CoreModifiers extends Modifier
      * truncating occurs, the string is further truncated so that the substring
      * may be appended without exceeding the desired length.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function truncate($value, $params)
@@ -2783,7 +2576,6 @@ class CoreModifiers extends Modifier
     /**
      * Converts the first character of the supplied string to upper case.
      *
-     * @param $value
      * @return string
      */
     public function ucfirst($value)
@@ -2806,7 +2598,6 @@ class CoreModifiers extends Modifier
     /**
      * Decodes URL-encoded string.
      *
-     * @param $value
      * @return string
      */
     public function urldecode($value)
@@ -2817,7 +2608,6 @@ class CoreModifiers extends Modifier
     /**
      * URL-encodes string.
      *
-     * @param $value
      * @return string
      */
     public function urlencode($value)
@@ -2830,7 +2620,6 @@ class CoreModifiers extends Modifier
      * Underscores are inserted before uppercase characters (with the exception
      * of the first character of the string), and in place of spaces as well as dashes.
      *
-     * @param $value
      * @return string
      */
     public function underscored($value)
@@ -2841,7 +2630,6 @@ class CoreModifiers extends Modifier
     /**
      * Transform a value into uppercase. Multi-byte friendly.
      *
-     * @param $value
      * @return string
      */
     public function upper($value)
@@ -2852,7 +2640,6 @@ class CoreModifiers extends Modifier
     /**
      * Returns all of the unique-by-key items in the array.
      *
-     * @param $value
      * @param  array  $params
      * @return array
      */
@@ -2864,7 +2651,6 @@ class CoreModifiers extends Modifier
     /**
      * Get the URL from an ID.
      *
-     * @param $value
      * @return string
      */
     public function url($value)
@@ -2881,7 +2667,6 @@ class CoreModifiers extends Modifier
     /**
      * Get a URL component.
      *
-     * @param $value
      * @return string
      */
     public function parse_url($value, $params)
@@ -2889,13 +2674,13 @@ class CoreModifiers extends Modifier
         $key = Arr::get($params, 0);
 
         $component = $key ? [
-            'scheme'   => PHP_URL_SCHEME,
-            'host'     => PHP_URL_HOST,
-            'port'     => PHP_URL_PORT,
-            'user'     => PHP_URL_USER,
-            'pass'     => PHP_URL_PASS,
-            'path'     => PHP_URL_PATH,
-            'query'    => PHP_URL_QUERY,
+            'scheme' => PHP_URL_SCHEME,
+            'host' => PHP_URL_HOST,
+            'port' => PHP_URL_PORT,
+            'user' => PHP_URL_USER,
+            'pass' => PHP_URL_PASS,
+            'path' => PHP_URL_PATH,
+            'query' => PHP_URL_QUERY,
             'fragment' => PHP_URL_FRAGMENT,
         ][$key] : -1;
 
@@ -2906,7 +2691,6 @@ class CoreModifiers extends Modifier
      * Get the date difference in weeks.
      *
      * @param  Carbon  $value
-     * @param $params
      * @return int
      */
     public function weeksAgo($value, $params)
@@ -2953,7 +2737,6 @@ class CoreModifiers extends Modifier
     /**
      * Wraps an HTML tag around the value.
      *
-     * @param $value
      * @return string
      */
     public function wrap($value, $params)
@@ -2978,7 +2761,6 @@ class CoreModifiers extends Modifier
     /**
      * Count the number of words in a string.
      *
-     * @param $value
      * @return mixed
      */
     public function wordCount($value)
@@ -2993,7 +2775,6 @@ class CoreModifiers extends Modifier
      * Get the date difference in years.
      *
      * @param  Carbon  $value
-     * @param $params
      * @return int
      */
     public function yearsAgo($value, $params)
@@ -3096,8 +2877,6 @@ class CoreModifiers extends Modifier
     /**
      * Converts a string to a Carbon instance and formats it with ISO formats.
      *
-     * @param $value
-     * @param $params
      * @return string
      */
     public function isoFormat($value, $params)
@@ -3110,7 +2889,6 @@ class CoreModifiers extends Modifier
     /**
      * Takes a modifier array, split on ":", and formats it for HTML attribute key:value pairs.
      *
-     * @param $params
      * @param  string  $delimiter
      * @return array
      */

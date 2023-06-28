@@ -26,6 +26,10 @@
     .read-only-overlay {
         display: none;
     }
+
+    label:last-child {
+        @apply mb-0 !important; /* Removes spacing under label when there are no instructions to display */
+    }
 }
 
 .bard-fieldtype .section-fieldtype {

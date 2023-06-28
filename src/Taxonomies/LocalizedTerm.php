@@ -33,16 +33,7 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
-class LocalizedTerm implements
-    Term,
-    Responsable,
-    Augmentable,
-    Protectable,
-    ResolvesValuesContract,
-    ArrayAccess,
-    Arrayable,
-    ContainsQueryableValues,
-    SearchableContract
+class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, ResolvesValuesContract, ArrayAccess, Arrayable, ContainsQueryableValues, SearchableContract
 {
     use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, ContainsSupplementalData, ResolvesValues, Searchable;
 

@@ -15,9 +15,6 @@ class GlideUrlBuilder extends ImageUrlBuilder
      */
     protected $options;
 
-    /**
-     * @param  array  $options
-     */
     public function __construct(array $options = [])
     {
         $this->options = $options;
