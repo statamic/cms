@@ -99,12 +99,18 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
      * the layout. We do this by checking for REPLACED_CONTENT
      * which is inserted when we see {{ template_content }}.
      *
-     * @param  PerformanceObject[]  $outputItems
-     * @param  string  $templateContentsPath
      * @return PerformanceObject[]
      */
-    private function makeSourceViewReport($outputItems, $templateContentsPath)
+    private function makeSourceViewReport(PerformanceTracer $tracer)
     {
+        $outputItems = $tracer->getOutputObjects();
+
+        if (! $tracer->getDidFindLayoutTrigger()) {
+            return array_values($outputItems);
+        }
+
+        $templateContentsPath = $tracer->getPathTriggeringOutput();
+
         $newItems = [];
         $layout = collect($outputItems)->where(fn (PerformanceObject $item) => $item->path == $templateContentsPath)->all();
         $everythingElse = collect($outputItems)->where(fn (PerformanceObject $item) => $item->path != $templateContentsPath)->all();
@@ -136,7 +142,7 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
         $nodePerformanceItems = [];
 
         foreach ($tracer->getPerformanceItems() as $item) {
-            if ($item->depth != 0) {
+            if ($item->parent != null) {
                 continue;
             }
 
@@ -155,7 +161,7 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
         return [
             'data' => $tracer->getPerformanceData(),
             'system_samples' => $this->filterSamples($samples),
-            'source_samples' => $this->makeSourceViewReport($tracer->getOutputObjects(), $tracer->getPathTriggeringOutput()),
+            'source_samples' => $this->makeSourceViewReport($tracer),
             'total_antlers_nodes' => $tracer->getTotalNodeOperations(),
             'had_active_debug_sessions' => GlobalDebugManager::isDebugSessionActive(),
             'performance_items' => $nodePerformanceItems,
