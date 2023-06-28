@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  php-code-styling:
+  fix-php-code-styling:
     runs-on: ubuntu-latest
 
     steps:
