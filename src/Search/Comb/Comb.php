@@ -434,7 +434,7 @@ class Comb
                 array_push($output, $record);
             }
 
-        // find categorized data
+            // find categorized data
         } else {
             foreach ($this->haystack as $category => $records) {
                 foreach ($records as $item) {
@@ -493,7 +493,7 @@ class Comb
             // search return that no results were found
             if ($params['required']) {
                 throw new NoResultsFound('No results found.');
-            // otherwise, the haystack is empty and that's an error
+                // otherwise, the haystack is empty and that's an error
             } else {
                 throw new CombException('Empty haystack.');
             }
@@ -667,7 +667,7 @@ class Comb
 
             $output = $categorized_output;
 
-        // or trim outputs to limit if it was set
+            // or trim outputs to limit if it was set
         } elseif ($this->limit) {
             // if we do not want more results than the limit
             if ($this->enable_too_many_results && count($output) > $this->limit) {
@@ -677,7 +677,7 @@ class Comb
             $output = array_slice($output, 0, $this->limit);
             $output_length = count($output);
 
-        // otherwise, the size is the size
+            // otherwise, the size is the size
         } else {
             $output_length = count($output);
         }
@@ -870,7 +870,7 @@ class Comb
                 array_push($parts['chunks'], $query);
             }
 
-        // perform a boolean search -- require words, disallow words
+            // perform a boolean search -- require words, disallow words
         } elseif ($this->query_mode === self::QUERY_BOOLEAN) {
             $words = preg_split("/\s+/i", $query);
 
@@ -903,7 +903,7 @@ class Comb
                 array_push($parts['chunks'], $query);
             }
 
-        // search for the entire query as one thing
+            // search for the entire query as one thing
         } else {
             $parts['chunks'] = [strtolower($query)];
         }
