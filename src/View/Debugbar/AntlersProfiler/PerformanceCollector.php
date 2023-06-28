@@ -99,7 +99,6 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
      * the layout. We do this by checking for REPLACED_CONTENT
      * which is inserted when we see {{ template_content }}.
      *
-     * @param PerformanceTracer  $tracer
      * @return PerformanceObject[]
      */
     private function makeSourceViewReport(PerformanceTracer $tracer)
