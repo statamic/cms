@@ -11,6 +11,7 @@ permissions:
 jobs:
   fix-php-code-styling:
     runs-on: ubuntu-latest
+    if: github.repository_owner == 'statamic'
 
     steps:
       - name: Checkout code
