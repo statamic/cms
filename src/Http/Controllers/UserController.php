@@ -116,17 +116,13 @@ class UserController extends Controller
         $values = $this->valuesWithoutAssetFields($fields, $request);
         $fields = $fields->addValues($values);
 
-        $fieldRules = $fields->validator()->withRules([
-            'email' => ['required', 'email', 'unique_user_value:{id}'],
-        ])->withReplacements([
-            'id' => $user->id(),
-        ])->rules();
-
-        $validator = Validator::make($values, $fieldRules);
-
-        if ($validator->fails()) {
-            return $this->userProfileFailure($validator->errors());
-        }
+        $fields
+            ->validator()
+            ->withRules([
+                'email' => ['required', 'email', 'unique_user_value:{id}'],
+            ])->withReplacements([
+                'id' => $user->id(),
+            ])->validateWithBag('user.profile');
 
         $values = $fields->process()->values()
             ->only(array_keys($values))
