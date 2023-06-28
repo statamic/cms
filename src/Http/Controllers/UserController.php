@@ -125,7 +125,7 @@ class UserController extends Controller
                     'id' => $user->id(),
                 ])->validate();
         } catch (ValidationException $e) {
-            return $this->userProfileFailure($e->errors());
+            return $this->userProfileFailure($e->validator->errors());
         }
 
         $values = $fields->process()->values()
