@@ -1,96 +1,80 @@
 <template>
 
-        <div>
-            <header class="mb-6">
-                <breadcrumb :url="breadcrumbUrl" :title="__('User Groups')" />
-                <div class="flex items-center">
-                    <h1 class="flex-1" v-text="title || __('Create Group')" />
-                    <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
-                </div>
-            </header>
+    <div>
 
-            <div class="card p-0 mb-6 publish-fields @container">
+        <header class="mb-3">
+            <breadcrumb :url="cp_url('user-groups')" :title="__('User Groups')" />
+            <div class="flex items-center">
+                <h1 class="flex-1" v-text="title" />
+                    <dropdown-list class="mr-2" v-if="canEditBlueprint">
+                        <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                    </dropdown-list>
 
-                <form-group
-                    :display="__('Title')"
-                    handle="title"
-                    :errors="errors.title"
-                    :instructions="__('messages.user_groups_title_instructions')"
-                    v-model="title"
-                    :focus="true"
-                />
+                    <button
+                        class="btn-primary"
+                        @click.prevent="save"
+                        v-text="__('Save')" />
 
-                <form-group
-                    fieldtype="slug"
-                    :display="__('Handle')"
-                    handle="handle"
-                    :instructions="__('messages.user_groups_handle_instructions')"
-                    :errors="errors.title"
-                    v-model="handle"
-                />
-
-                <div class="text-xs text-red-500 p-6 pt-0" v-if="initialHandle && handle != initialHandle">
-                    {{ __('messages.role_change_handle_warning') }}
-                </div>
-
-                <div class="form-group publish-field w-full" v-if="$permissions.has('assign roles')">
-                    <div class="field-inner">
-                        <label class="publish-field-label" v-text="__('Roles')" />
-                        <div class="help-block -mt-2">
-                            <p>{{ __('messages.user_groups_role_instructions') }}</p>
-                        </div>
-                    </div>
-                    <publish-field-meta
-                        :config="{ handle: 'roles', type: 'user_roles' }"
-                        :initial-value="roles">
-                        <div slot-scope="{ meta, value, loading }">
-                            <relationship-fieldtype
-                                v-if="!loading"
-                                :config="{ handle: 'roles', type: 'user_roles', mode: 'select' }"
-                                :value="value"
-                                :meta="meta"
-                                handle="roles"
-                                @input="roles = $event" />
-                        </div>
-                    </publish-field-meta>
-                    <small class="help-block text-red-500 mt-2 mb-0" v-if="errors.roles" v-text="errors.roles[0]" />
-                </div>
-
+                <slot name="action-buttons-right" />
             </div>
-        </div>
+        </header>
+
+        <publish-container
+            v-if="fieldset"
+            ref="container"
+            :name="publishContainer"
+            :blueprint="fieldset"
+            :values="values"
+            :reference="initialReference"
+            :meta="meta"
+            :errors="errors"
+            @updated="values = $event"
+        >
+            <div slot-scope="{ container, setFieldValue, setFieldMeta }">
+                <publish-tabs
+                    :enable-sidebar="false"
+                    @updated="setFieldValue"
+                    @meta-updated="setFieldMeta"
+                    @focus="container.$emit('focus', $event)"
+                    @blur="container.$emit('blur', $event)"
+                ></publish-tabs>
+            </div>
+        </publish-container>
+
+    </div>
 </template>
 
 
 <script>
+import HasHiddenFields from '../publish/HasHiddenFields';
+
 export default {
 
+    mixins: [
+        HasHiddenFields,
+    ],
+
     props: {
+        publishContainer: String,
+        initialFieldset: Object,
+        initialValues: Object,
+        initialMeta: Object,
+        initialReference: String,
         initialTitle: String,
-        initialHandle: String,
-        initialRoles: Array,
-        initialUsers: Array,
-        action: String,
+        actions: Object,
         method: String,
-        creating: Boolean,
-        breadcrumbUrl: String,
+        canEditBlueprint: Boolean,
+        isCreating: Boolean,
     },
 
     data() {
         return {
+            fieldset: _.clone(this.initialFieldset),
+            values: _.clone(this.initialValues),
+            meta: _.clone(this.initialMeta),
             error: null,
             errors: {},
             title: this.initialTitle,
-            handle: this.initialHandle,
-            roles: this.initialRoles,
-            users: this.initialUsers,
-        }
-    },
-
-    watch: {
-        'title': function(display) {
-            if (this.creating) {
-                this.handle = this.$slugify(display, '_');
-            }
         }
     },
 
@@ -98,15 +82,6 @@ export default {
 
         hasErrors() {
             return this.error || Object.keys(this.errors).length;
-        },
-
-        payload() {
-            return {
-                title: this.title,
-                handle: this.handle,
-                roles: this.roles,
-                users: this.users,
-            }
         }
 
     },
@@ -121,8 +96,12 @@ export default {
         save() {
             this.clearErrors();
 
-            this.$axios[this.method](this.action, this.payload).then(response => {
-                window.location = response.data.redirect;
+            this.$axios[this.method](this.actions.save, this.visibleValues).then(response => {
+                this.title = response.data.title;
+                this.$refs.container.saved();
+                if (this.isCreating) window.location = response.data.redirect;
+                this.$toast.success(__('Saved'));
+                this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => {
                 if (e.response && e.response.status === 422) {
                     const { message, errors } = e.response.data;
@@ -130,7 +109,7 @@ export default {
                     this.errors = errors;
                     this.$toast.error(message);
                 } else {
-                    this.$toast.error(__('Unable to save user group'));
+                    this.$toast.error(__('Something went wrong'));
                 }
             });
         }

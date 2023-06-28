@@ -9,9 +9,6 @@ class OrderBy
 
     /**
      * Instantiate order by object.
-     *
-     * @param  string  $sort
-     * @param  string  $direction
      */
     public function __construct(string $sort, string $direction)
     {
@@ -28,7 +25,6 @@ class OrderBy
     /**
      * Instantiate order by object.
      *
-     * @param  string  $orderBy
      * @return static
      */
     public static function parse(string $orderBy)

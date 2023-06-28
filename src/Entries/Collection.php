@@ -158,6 +158,11 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function customSortField()
+    {
+        return $this->sortField;
+    }
+
     public function sortDirection($dir = null)
     {
         return $this
@@ -183,6 +188,11 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 return 'asc';
             })
             ->args(func_get_args());
+    }
+
+    public function customSortDirection()
+    {
+        return $this->sortDirection;
     }
 
     public function title($title = null)

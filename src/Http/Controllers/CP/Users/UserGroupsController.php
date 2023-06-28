@@ -58,7 +58,7 @@ class UserGroupsController extends CpController
         ]);
     }
 
-    public function edit($group)
+    public function edit(Request $request, $group)
     {
         $this->authorize('edit user groups');
 
@@ -66,11 +66,34 @@ class UserGroupsController extends CpController
             return $this->pageNotFound();
         }
 
-        return view('statamic::usergroups.edit', [
-            'group' => $group,
-            'roles' => $group->roles()->map->handle()->values()->all(),
-            'filters' => Scope::filters('usergroup-users'),
-        ]);
+        $blueprint = $group->blueprint();
+
+        if (! User::current()->can('assign roles')) {
+            $blueprint->ensureField('roles', ['visibility' => 'read_only']);
+        }
+
+        $fields = $blueprint
+            ->fields()
+            ->addValues($group->data()->merge(['handle' => $group->handle()])->all())
+            ->preProcess();
+
+        $viewData = [
+            'title' => $group->title(),
+            'values' => $fields->values()->all(),
+            'meta' => $fields->meta(),
+            'blueprint' => $group->blueprint()->toPublishArray(),
+            'reference' => $group->handle(),
+            'actions' => [
+                'save' => $group->updateUrl(),
+                'editBlueprint' => cp_route('user-groups.blueprint.edit'),
+            ],
+        ];
+
+        if ($request->wantsJson()) {
+            return $viewData;
+        }
+
+        return view('statamic::usergroups.edit', $viewData);
     }
 
     public function update(Request $request, $group)
@@ -81,15 +104,21 @@ class UserGroupsController extends CpController
             return $this->pageNotFound();
         }
 
-        $request->validate([
-            'title' => 'required',
-            'handle' => 'alpha_dash',
-            'roles' => 'array',
-        ]);
+        $fields = $group->blueprint()->fields()->addValues($request->all());
 
-        $group
-            ->title($request->title)
-            ->handle($request->handle ?: snake_case($request->title));
+        $fields->validate();
+
+        $values = $fields->process()->values()->except(['title', 'handle', 'roles']);
+
+        foreach ($values as $key => $value) {
+            $group->set($key, $value);
+        }
+
+        $group->title($request->title);
+
+        if ($request->handle) {
+            $group->handle($request->handle);
+        }
 
         if (User::current()->can('assign roles')) {
             $group->roles($request->roles);
@@ -97,30 +126,50 @@ class UserGroupsController extends CpController
 
         $group->save();
 
-        session()->flash('success', __('User group updated'));
-
-        return ['redirect' => cp_route('user-groups.show', $group->handle())];
+        return ['title' => $group->title()];
     }
 
     public function create()
     {
         $this->authorize('edit user groups');
 
-        return view('statamic::usergroups.create');
+        $blueprint = UserGroup::blueprint();
+
+        if (! User::current()->can('edit roles')) {
+            $blueprint->ensureField('roles', ['visibility' => 'read_only']);
+        }
+
+        $fields = $blueprint
+            ->fields()
+            ->preProcess();
+
+        $viewData = [
+            'values' => $fields->values()->all(),
+            'meta' => $fields->meta(),
+            'blueprint' => $blueprint->toPublishArray(),
+            'actions' => [
+                'save' => cp_route('user-groups.store'),
+            ],
+        ];
+
+        return view('statamic::usergroups.create', $viewData);
     }
 
     public function store(Request $request)
     {
         $this->authorize('edit user groups');
 
-        $request->validate([
-            'title' => 'required',
-            'handle' => 'alpha_dash',
-            'roles' => 'array',
-        ]);
+        $blueprint = UserGroup::blueprint();
+
+        $fields = $blueprint->fields()->addValues($request->all());
+
+        $fields->validate();
+
+        $values = $fields->process()->values()->except(['title', 'handle', 'roles']);
 
         $group = UserGroup::make()
             ->title($request->title)
+            ->data($values)
             ->handle($request->handle ?: snake_case($request->title));
 
         if (User::current()->can('assign roles')) {
@@ -128,8 +177,6 @@ class UserGroupsController extends CpController
         }
 
         $group->save();
-
-        session()->flash('success', __('User group created'));
 
         return ['redirect' => cp_route('user-groups.show', $group->handle())];
     }
