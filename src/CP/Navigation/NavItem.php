@@ -35,7 +35,7 @@ class NavItem
      * @return mixed
      */
     public function display($display = null)
-        {
+    {
         return $this->fluentlyGetOrSet('display')->value($display);
     }
 
@@ -157,9 +157,9 @@ class NavItem
     {
         return $this
             ->fluentlyGetOrSet('icon')
-                ->getter(function ($value) {
-                    return $value ?? Statamic::svg('entries');
-                })
+            ->getter(function ($value) {
+                return $value ?? Statamic::svg('entries');
+            })
             ->setter(function ($value) {
                 return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
             })
@@ -281,8 +281,8 @@ class NavItem
         }
 
         $this->authorization = (object) [
-            'ability'   => $ability,
-            'arguments'=> $arguments,
+            'ability' => $ability,
+            'arguments' => $arguments,
         ];
 
         return $this;
@@ -323,6 +323,7 @@ class NavItem
         }
 
         $pattern = preg_quote(config('statamic.cp.route'), '#').'/'.$this->active;
+
         return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
     }
 
@@ -428,7 +429,7 @@ class NavItem
     public static function snakeCase($string)
     {
         $string = Str::modifyMultiple($string, ['lower', 'snake']);
-        $string = Str::replace('-', '_', $string)  ;
+        $string = Str::replace('-', '_', $string);
 
         return $string;
     }
