@@ -1,12 +1,9 @@
-name: Fix PHP code style issues
+name: Check PHP code style issues
 
 on:
-  push:
+  pull_request:
     paths:
       - '**.php'
-
-permissions:
-  contents: write
 
 jobs:
   php-code-styling:
@@ -17,12 +14,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref }}
-          token: ${{ secrets.PINT }}
 
-      - name: Fix PHP code style issues
+      - name: Check PHP code style issues
         uses: aglipanci/laravel-pint-action@1.0.0
-
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Fix styling
+          testMode: true
