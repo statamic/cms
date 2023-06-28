@@ -381,7 +381,17 @@ class LocalizedTerm implements
     public function template($template = null)
     {
         if (func_num_args() === 0) {
-            return $this->get('template', $this->taxonomy()->termTemplate());
+            if ($template = $this->get('template')) {
+                return $template;
+            }
+
+            $template = $this->taxonomy()->termTemplate();
+
+            if ($collection = $this->collection()) {
+                $template = $collection->handle().'.'.$template;
+            }
+
+            return $template;
         }
 
         return $this->set('template', $template);

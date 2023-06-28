@@ -347,22 +347,18 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         return $fallback;
     }
 
-    public function termTemplate($template = null)
+    public function termTemplate($termTemplate = null)
     {
         return $this
             ->fluentlyGetOrSet('termTemplate')
-            ->getter(function ($template) {
-                if ($template ?? false) {
-                    return $template;
+            ->getter(function ($termTemplate) {
+                if ($termTemplate ?? false) {
+                    return $termTemplate;
                 }
 
-                $template = $this->handle().'.show';
+                $termTemplate = $this->handle().'.show';
 
-                if ($collection = $this->collection()) {
-                    $template = $collection->handle().'.'.$template;
-                }
-
-                return $template;
+                return $termTemplate;
             })
             ->args(func_get_args());
     }
