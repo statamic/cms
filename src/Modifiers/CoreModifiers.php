@@ -1627,10 +1627,10 @@ class CoreModifiers extends Modifier
         $key = Arr::get($params, 0);
 
         $component = $key ? [
-            'dirname'   => PATHINFO_DIRNAME,
-            'basename'  => PATHINFO_BASENAME,
+            'dirname' => PATHINFO_DIRNAME,
+            'basename' => PATHINFO_BASENAME,
             'extension' => PATHINFO_EXTENSION,
-            'filename'  => PATHINFO_FILENAME,
+            'filename' => PATHINFO_FILENAME,
         ][$key] : (defined('PATHINFO_ALL') ? PATHINFO_ALL : 15);
 
         return pathinfo($value, $component);
@@ -2674,13 +2674,13 @@ class CoreModifiers extends Modifier
         $key = Arr::get($params, 0);
 
         $component = $key ? [
-            'scheme'   => PHP_URL_SCHEME,
-            'host'     => PHP_URL_HOST,
-            'port'     => PHP_URL_PORT,
-            'user'     => PHP_URL_USER,
-            'pass'     => PHP_URL_PASS,
-            'path'     => PHP_URL_PATH,
-            'query'    => PHP_URL_QUERY,
+            'scheme' => PHP_URL_SCHEME,
+            'host' => PHP_URL_HOST,
+            'port' => PHP_URL_PORT,
+            'user' => PHP_URL_USER,
+            'pass' => PHP_URL_PASS,
+            'path' => PHP_URL_PATH,
+            'query' => PHP_URL_QUERY,
             'fragment' => PHP_URL_FRAGMENT,
         ][$key] : -1;
 

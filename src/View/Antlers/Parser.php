@@ -321,15 +321,15 @@ class Parser implements ParserContract
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".
             if (! is_array($value)) {
-                $value = ['value' => $value, 'name'  => $value];
+                $value = ['value' => $value, 'name' => $value];
             }
 
             $value = array_merge($value, [
-                'count'         => $index + 1,
-                'index'         => $index,
+                'count' => $index + 1,
+                'index' => $index,
                 'total_results' => $total,
-                'first'         => ($index === 0),
-                'last'          => ($index === $total - 1),
+                'first' => ($index === 0),
+                'last' => ($index === $total - 1),
             ]);
 
             $index++;

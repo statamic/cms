@@ -107,11 +107,11 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
         debugbar()->startMeasure($profileTagName, $tagName);
 
         $tag = app(Loader::class)->load($name, [
-            'parser'     => null,
-            'params'     => $this->params,
-            'content'    => '',
-            'context'    => $this->context,
-            'tag'        => $tagName,
+            'parser' => null,
+            'params' => $this->params,
+            'content' => '',
+            'context' => $this->context,
+            'tag' => $tagName,
             'tag_method' => $originalMethod,
         ]);
 

@@ -146,11 +146,11 @@ class Engine implements EngineInterface
 
         try {
             $tag = app(TagLoader::class)->load($name, [
-                'parser'     => $parser,
-                'params'     => $parameters,
-                'content'    => $content,
-                'context'    => $context,
-                'tag'        => $name.':'.$original_method,
+                'parser' => $parser,
+                'params' => $parameters,
+                'content' => $content,
+                'context' => $context,
+                'tag' => $name.':'.$original_method,
                 'tag_method' => $original_method,
             ]);
 

@@ -183,7 +183,7 @@ class Assets extends Tags
 
         $this->assets->supplement(function ($asset) {
             return [
-                'width'  => $asset->width(),
+                'width' => $asset->width(),
                 'height' => $asset->height(),
             ];
         });

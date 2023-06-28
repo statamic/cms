@@ -405,7 +405,7 @@ class PathDataManager
             Log::warning('Runtime Access Violation: '.$normalizedReference, [
                 'variable' => $normalizedReference,
                 'file' => GlobalRuntimeState::$currentExecutionFile,
-                'trace' =>  GlobalRuntimeState::$templateFileStack,
+                'trace' => GlobalRuntimeState::$templateFileStack,
             ]);
 
             if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
