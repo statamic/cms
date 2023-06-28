@@ -34,7 +34,7 @@ class Statamic
     protected static $bootedCallbacks = [];
     protected static $afterInstalledCallbacks = [];
 
-    public static function  version()
+    public static function version()
     {
         return \Facades\Statamic\Version::get();
     }
