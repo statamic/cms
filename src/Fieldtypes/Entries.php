@@ -97,14 +97,12 @@ class Entries extends Relationship
 
     public function getIndexItems($request)
     {
-        $collections = $this->getConfiguredCollections();
-
-        $query = $this->getIndexQuery($request, collect($collections));
+        $query = $this->getIndexQuery($request);
 
         $filters = $request->filters;
 
         if (! isset($filters['collection'])) {
-            $query->whereIn('collection', $collections);
+            $query->whereIn('collection', $this->getConfiguredCollections());
         }
 
         if ($blueprints = $this->config('blueprints')) {
@@ -176,9 +174,10 @@ class Entries extends Relationship
         return $order;
     }
 
-    protected function getIndexQuery($request, $collections)
+    protected function getIndexQuery($request)
     {
         $query = Entry::query();
+        $collections = collect($this->getConfiguredCollections());
 
         if ($search = $request->search) {
             $usingSearchIndex = false;
