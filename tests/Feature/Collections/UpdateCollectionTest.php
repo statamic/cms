@@ -37,12 +37,12 @@ class UpdateCollectionTest extends TestCase
 
         $collection = tap(
             Collection::make('test')
-            ->title('Original title')
-            ->dated(false)
-            ->template('original-template')
-            ->layout('original-layout')
-            ->defaultPublishState(true)
-            ->sortDirection('asc')
+                ->title('Original title')
+                ->dated(false)
+                ->template('original-template')
+                ->layout('original-layout')
+                ->defaultPublishState(true)
+                ->sortDirection('asc')
         )->save();
         $this->assertCount(1, Collection::all());
         $this->assertEquals('Original title', $collection->title());

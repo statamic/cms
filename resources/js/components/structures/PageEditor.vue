@@ -28,6 +28,7 @@
                     :meta="meta"
                     :errors="errors"
                     :localized-fields="localizedFields"
+                    :site="site"
                     class="px-2"
                     @updated="values = $event"
                 >

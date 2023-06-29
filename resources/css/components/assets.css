@@ -96,7 +96,7 @@
     @apply bg-white relative min-w-0 flex items-center flex-col justify-between cursor-pointer border rounded;
 
     .asset-thumb {
-        @apply flex justify-center items-center;
+        @apply flex justify-center items-center w-full h-full rounded;
         > img, > svg, > .svg-img {
             @apply max-h-full max-w-full absolute;
         }

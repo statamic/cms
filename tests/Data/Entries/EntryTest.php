@@ -23,7 +23,6 @@ use Statamic\Events\EntryCreated;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
-use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -478,6 +477,25 @@ class EntryTest extends TestCase
         $this->assertNull($articleEntry->value('french_description'));
         $this->assertNull($eventEntry->value('description'));
         $this->assertEquals('Jazz Concert ET PLUS!', $eventEntry->value('french_description'));
+    }
+
+    /** @test */
+    public function it_only_evaluates_computed_data_closures_when_getting_values()
+    {
+        $count = 0;
+        Facades\Collection::computed('articles', 'description', function ($entry) use (&$count) {
+            $count++;
+
+            return $entry->get('title').' AND MORE!';
+        });
+
+        $articleEntry = (new Entry)->collection(tap(Collection::make('articles'))->save())->data(['title' => 'Pop Rocks']);
+
+        $this->assertEquals(0, $count);
+        $this->assertEquals(['title', 'description'], $articleEntry->keys()->all());
+
+        $this->assertEquals(['title' => 'Pop Rocks', 'description' => 'Pop Rocks AND MORE!'], $articleEntry->values()->all());
+        $this->assertEquals(1, $count);
     }
 
     /** @test */

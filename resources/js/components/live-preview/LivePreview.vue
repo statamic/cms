@@ -119,6 +119,7 @@ export default {
             keybinding: null,
             token: null,
             target: 0,
+            previousUrl: null
         }
     },
 

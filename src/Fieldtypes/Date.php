@@ -72,13 +72,13 @@ class Date extends Fieldtype
             [
                 'display' => __('Timepicker'),
                 'fields' => [
-                    'time_enabled'  => [
+                    'time_enabled' => [
                         'display' => __('Time Enabled'),
                         'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
                         'type' => 'toggle',
                         'default' => false,
                     ],
-                    'time_seconds_enabled'  => [
+                    'time_seconds_enabled' => [
                         'display' => __('Show Seconds'),
                         'instructions' => __('statamic::fieldtypes.date.config.time_seconds_enabled'),
                         'type' => 'toggle',
@@ -203,7 +203,7 @@ class Date extends Fieldtype
 
     private function processSingle($data)
     {
-        return $this->processDateTime($data['date'].' '.$data['time']);
+        return $this->processDateTime($data['date'].' '.($data['time'] ?? '00:00'));
     }
 
     private function processRange($data)
