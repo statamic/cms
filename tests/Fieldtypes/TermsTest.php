@@ -127,7 +127,8 @@ class TermsTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -144,7 +145,8 @@ class TermsTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -270,7 +272,8 @@ class TermsTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -303,7 +306,8 @@ class TermsTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -351,7 +355,8 @@ class TermsTest extends TestCase
         if ($parentIsEntry) {
             $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
         } else {
-            $parent = new class {
+            $parent = new class
+            {
                 // Class does not implement "Localizable"
             };
         }

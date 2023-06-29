@@ -294,7 +294,6 @@ class Process
     /**
      * Get cached output.
      *
-     * @param  string  $cacheKey
      * @return array
      */
     public function cachedOutput(string $cacheKey)
@@ -309,7 +308,6 @@ class Process
     /**
      * Get cached output for last completed process.
      *
-     * @param  string  $cacheKey
      * @return array
      */
     public function lastCompletedCachedOutput(string $cacheKey)
@@ -415,7 +413,6 @@ class Process
     /**
      * Throw exception.
      *
-     * @param  string  $output
      *
      * @throws ProcessException
      */

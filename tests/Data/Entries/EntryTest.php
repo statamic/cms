@@ -23,7 +23,6 @@ use Statamic\Events\EntryCreated;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
-use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;

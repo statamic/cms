@@ -58,7 +58,7 @@
     </div>
     </login>
 </div>
-@if (! $oauth)
+@if ($emailLoginEnabled)
     <div class="w-full text-center mt-4">
         <a href="{{ cp_route('password.request') }}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
             {{ __('Forgot password?') }}
