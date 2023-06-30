@@ -10,7 +10,6 @@ use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
-use Statamic\Entries\Entry as StatamicEntry;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionDeleted;
 use Statamic\Events\CollectionSaved;
@@ -24,7 +23,6 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
-use Statamic\Fields\Blueprint as StatamicBlueprint;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
@@ -289,18 +287,18 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         });
     }
 
-    public function entryBlueprint(string $blueprint = null, StatamicEntry $entry = null): ?StatamicBlueprint
+    public function entryBlueprint($blueprint = null, $entry = null)
     {
-        if (! $entryBlueprint = $this->getBaseEntryBlueprint($blueprint)) {
+        if (! $blueprint = $this->getBaseEntryBlueprint($blueprint)) {
             return null;
         }
 
-        $entryBlueprint->setParent($entry ?? $this);
+        $blueprint->setParent($entry ?? $this);
 
-        return $entryBlueprint;
+        return $blueprint;
     }
 
-    private function getBaseEntryBlueprint(string $blueprint = null): ?StatamicBlueprint
+    private function getBaseEntryBlueprint($blueprint)
     {
         $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint;
 
@@ -318,7 +316,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         });
     }
 
-    public function fallbackEntryBlueprint(): StatamicBlueprint
+    public function fallbackEntryBlueprint()
     {
         $blueprint = (clone Blueprint::find('default'))
             ->setHandle(Str::singular($this->handle()))
@@ -331,7 +329,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         return $blueprint;
     }
 
-    public function ensureEntryBlueprintFields(StatamicBlueprint $blueprint): StatamicBlueprint
+    public function ensureEntryBlueprintFields($blueprint)
     {
         $blueprint->ensureFieldPrepended('title', [
             'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
