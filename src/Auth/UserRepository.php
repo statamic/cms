@@ -58,11 +58,10 @@ abstract class UserRepository implements RepositoryContract
 
     public function blueprint()
     {
-        $blink = 'user-blueprint';
-
-        if (Blink::has($blink)) {
+        if (Blink::has($blink = 'user-blueprint')) {
             return Blink::get($blink);
         }
+
         $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
             'name' => ['type' => 'text', 'display' => 'Name', 'listable' => true],
         ])->setHandle('user');
