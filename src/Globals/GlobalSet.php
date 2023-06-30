@@ -9,6 +9,7 @@ use Statamic\Events\GlobalSetDeleted;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalSetSaving;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -47,9 +48,7 @@ class GlobalSet implements Contract
 
     public function blueprint()
     {
-        $blink = 'global-set-blueprint-'.$this->handle();
-
-        return Facades\Blink::once($blink, function () {
+        return Blink::once('global-set-blueprint-'.$this->handle(), function () {
             return Blueprint::find('globals.'.$this->handle());
         });
     }
