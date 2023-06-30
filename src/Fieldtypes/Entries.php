@@ -17,6 +17,7 @@ use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Query\StatusQueryBuilder;
+use Statamic\Search\Result;
 use Statamic\Support\Arr;
 
 class Entries extends Relationship
@@ -114,7 +115,13 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+        $entries = $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+
+        if ($entries->getCollection()->first() instanceof Result) {
+            $entries->setCollection($entries->getCollection()->map->getSearchable());
+        }
+
+        return $entries;
     }
 
     public function getResourceCollection($request, $items)
@@ -172,7 +179,20 @@ class Entries extends Relationship
         $query = Entry::query();
 
         if ($search = $request->search) {
-            $query->where('title', 'like', '%'.$search.'%');
+            $usingSearchIndex = false;
+            $collections = collect($this->getConfiguredCollections());
+
+            if ($collections->count() == 1) {
+                $collection = Collection::findByHandle($collections->first());
+                if ($collection && $collection->hasSearchIndex()) {
+                    $query = $collection->searchIndex()->ensureExists()->search($search);
+                    $usingSearchIndex = true;
+                }
+            }
+
+            if (! $usingSearchIndex) {
+                $query->where('title', 'like', '%'.$search.'%');
+            }
         }
 
         if ($site = $request->site) {
