@@ -16,6 +16,7 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\GlobalVariablesBlueprintFound;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\GraphQL\ResolvesValues;
@@ -116,8 +117,7 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         $handle = $blueprint->handle();
 
         if ($handle) {
-            $blink = 'variables-blueprint-dispatch-'.$blueprint->handle();
-            Facades\Blink::once($blink, function () use ($blueprint) {
+            Blink::once('variables-blueprint-dispatch-'.$blueprint->handle(), function () use ($blueprint) {
                 GlobalVariablesBlueprintFound::dispatch($blueprint, $this);
             });
         } else {
