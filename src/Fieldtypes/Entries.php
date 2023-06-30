@@ -177,10 +177,10 @@ class Entries extends Relationship
     protected function getIndexQuery($request)
     {
         $query = Entry::query();
-        $collections = collect($this->getConfiguredCollections());
 
         if ($search = $request->search) {
             $usingSearchIndex = false;
+            $collections = collect($this->getConfiguredCollections());
 
             if ($collections->count() == 1) {
                 $collection = Collection::findByHandle($collections->first());
