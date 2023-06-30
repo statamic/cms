@@ -9,6 +9,7 @@ use Statamic\Events\NavBlueprintFound;
 use Statamic\Events\NavDeleted;
 use Statamic\Events\NavSaved;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
@@ -109,15 +110,17 @@ class Nav extends Structure implements Contract
 
     public function blueprint()
     {
-        $blink = 'nav-blueprint-'.$this->handle();
+        if (Blink::has($blink = 'nav-blueprint-'.$this->handle())) {
+            return Blink::get($blink);
+        }
 
-        return Facades\Blink::once($blink, function () {
-            $blueprint = Blueprint::find('navigation.'.$this->handle())
-                ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('navigation');
+        $blueprint = Blueprint::find('navigation.'.$this->handle())
+            ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('navigation');
 
-            NavBlueprintFound::dispatch($blueprint, $this);
+        NavBlueprintFound::dispatch($blueprint, $this);
 
-            return $blueprint;
-        });
+        Blink::put($blink, $blueprint);
+
+        return $blueprint;
     }
 }
