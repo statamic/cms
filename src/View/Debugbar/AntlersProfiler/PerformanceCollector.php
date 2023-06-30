@@ -149,14 +149,7 @@ class PerformanceCollector extends DataCollector implements Renderable, AssetPro
             $nodePerformanceItems[] = $item->toArray();
         }
 
-        $testSamples = $tracer->getRuntimeSamples();
-        $samples = [];
-
-        foreach ($testSamples as $sample) {
-            for ($i = 0; $i < 2100; $i++) {
-                $samples[] = $sample;
-            }
-        }
+        $samples = $tracer->getRuntimeSamples();
 
         return [
             'data' => $tracer->getPerformanceData(),
