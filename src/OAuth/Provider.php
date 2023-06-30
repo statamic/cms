@@ -48,7 +48,6 @@ class Provider
      * Create a Statamic user from a Socialite user.
      *
      * @param  SocialiteUser  $socialite
-     * @return StatamicUser
      */
     public function createUser($socialite): StatamicUser
     {

@@ -93,19 +93,6 @@ trait Routable
         return $this->makeAbsolute($this->redirectUrl());
     }
 
-    public function ampUrl()
-    {
-        if ($this->isRedirect()) {
-            return null;
-        }
-
-        return ! $this->ampable() ? null : vsprintf('%s/%s/%s', [
-            rtrim($this->site()->absoluteUrl(), '/'),
-            config('statamic.amp.route'),
-            ltrim($this->uri(), '/'),
-        ]);
-    }
-
     private function makeAbsolute($url)
     {
         if (! $url) {

@@ -2,8 +2,11 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Config;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -27,13 +30,13 @@ class UsersTest extends TestCase
         User::make()->id('7')->email('g@example.com')->set('name', 'Fred')->save();
     }
 
-    /**
-     * @test
-     *
-     * @environment-setup disableQueries
-     **/
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'users')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'users')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{users}'])
@@ -41,7 +44,7 @@ class UsersTest extends TestCase
     }
 
     /** @test */
-    public function it_queries_users()
+    public function it_queries_all_users()
     {
         $this->createUsers();
 
@@ -55,6 +58,10 @@ class UsersTest extends TestCase
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'users')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'users')->never();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()
@@ -146,7 +153,7 @@ GQL;
     }
 
     /** @test */
-    public function it_filters_users()
+    public function it_cannot_filter_users_by_default()
     {
         $this->createUsers();
         User::find('3')->set('bio', 'That was so rad!')->save();
@@ -171,6 +178,61 @@ GQL;
     }
 }
 GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForResource')
+            ->with('graphql', 'users')
+            ->andReturn([])
+            ->once();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'filter' => ['Forbidden: bio'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'users' => null,
+                ],
+            ]);
+    }
+
+    /** @test */
+    public function it_can_filter_users_when_configuration_allows_for_it()
+    {
+        $this->createUsers();
+        User::find('3')->set('bio', 'That was so rad!')->save();
+        User::find('4')->set('bio', 'I wish I was as cool as Daniel Radcliffe!')->save();
+        User::find('5')->set('bio', 'I hate radishes.')->save();
+
+        $blueprint = Blueprint::makeFromFields(['bio' => ['type' => 'text']]);
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $query = <<<'GQL'
+{
+    users(filter: {
+        bio: {
+            contains: "rad",
+            ends_with: "!"
+        }
+    }) {
+        data {
+            id
+            bio
+        }
+    }
+}
+GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForResource')
+            ->with('graphql', 'users')
+            ->andReturn(['bio'])
+            ->once();
 
         $this
             ->withoutExceptionHandling()
@@ -205,6 +267,11 @@ GQL;
     }
 }
 GQL;
+
+        FilterAuthorizer::shouldReceive('allowedForResource')
+            ->with('graphql', 'users')
+            ->andReturn(['email'])
+            ->once();
 
         $this
             ->withoutExceptionHandling()
@@ -246,6 +313,11 @@ GQL;
 }
 GQL;
 
+        FilterAuthorizer::shouldReceive('allowedForResource')
+            ->with('graphql', 'users')
+            ->andReturn(['bio'])
+            ->once();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -263,8 +335,12 @@ GQL;
      *
      * @dataProvider userPasswordFilterProvider
      */
-    public function it_doesnt_allow_filtering_users_by_password($filter)
+    public function it_doesnt_allow_filtering_users_by_password($field, $filter)
     {
+        Config::set('statamic.graphql.resources.users', [
+            'allowed_filters' => ['password', 'password_hash'],
+        ]);
+
         User::make()->id('one')->email('one@domain.com')->passwordHash('abc')->save();
         User::make()->id('two')->email('two@domain.com')->passwordHash('def')->save();
 
@@ -281,22 +357,30 @@ GQL;
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
-            ->assertGqlOk()
-            ->assertExactJson(['data' => ['users' => ['data' => [
-                ['id' => 'one'],
-                ['id' => 'two'], // this one would be filtered out if the password was allowed
-            ]]]]);
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'filter' => ["Forbidden: {$field}"],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'users' => null,
+                ],
+            ]);
     }
 
     public function userPasswordFilterProvider()
     {
         return [
-            'password' => ['{ password: "abc" }'],
-            'password:is' => ['{ password: {is: "abc"} }'],
-            'password:regex' => ['{ password: {regex: "abc"} }'],
-            'password_hash' => ['{ password_hash: "abc" }'],
-            'password_hash:is' => ['{ password_hash: {is: "abc"} }'],
-            'password_hash:regex' => ['{ password_hash: {regex: "abc"} }'],
+            'password' => ['password', '{ password: "abc" }'],
+            'password:is' => ['password', '{ password: {is: "abc"} }'],
+            'password:regex' => ['password', '{ password: {regex: "abc"} }'],
+            'password_hash' => ['password_hash', '{ password_hash: "abc" }'],
+            'password_hash:is' => ['password_hash', '{ password_hash: {is: "abc"} }'],
+            'password_hash:regex' => ['password_hash', '{ password_hash: {regex: "abc"} }'],
         ];
     }
 

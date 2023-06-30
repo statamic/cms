@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
@@ -19,13 +20,13 @@ class NavTest extends TestCase
 
     protected $enabledQueries = ['navs'];
 
-    /**
-     * @test
-     *
-     * @environment-setup disableQueries
-     **/
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'navs')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'navs')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{nav}'])
@@ -51,6 +52,10 @@ class NavTest extends TestCase
 }
 GQL;
 
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'navs')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'navs')->andReturn(Nav::all()->map->handle()->all())->once();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -63,6 +68,42 @@ GQL;
                     'expects_root' => false,
                 ],
             ]]);
+    }
+
+    /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource()
+    {
+        $this->createFooterNav();
+
+        $query = <<<'GQL'
+{
+    nav(handle: "footer") {
+        handle
+        title
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'navs')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'navs')->andReturn([])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'handle' => ['Forbidden: footer'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'nav' => null,
+                ],
+            ]);
     }
 
     /** @test */

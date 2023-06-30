@@ -47,14 +47,14 @@ class RendersFormsTest extends TestCase
     {
         $output = $this->tag
             ->setParameters([
-                'class' => 'mb-1',
+                'class' => 'mb-2',
                 'attr:id' => 'form',
                 'method' => 'this should not render',
                 'action' => 'this should not render',
             ])
             ->formOpen('http://localhost:8000/submit', 'DELETE');
 
-        $this->assertStringStartsWith('<form method="POST" action="http://localhost:8000/submit" class="mb-1" id="form">', $output);
+        $this->assertStringStartsWith('<form method="POST" action="http://localhost:8000/submit" class="mb-2" id="form">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_method" value="DELETE">', $output);
     }

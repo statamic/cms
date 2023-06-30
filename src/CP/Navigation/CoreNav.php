@@ -48,7 +48,7 @@ class CoreNav
         if (count(config('statamic.cp.widgets')) > 0 || config('statamic.cp.start_page') === 'dashboard') {
             Nav::topLevel('Dashboard')
                 ->route('dashboard')
-                ->icon('charts');
+                ->icon('/charts');
         }
 
         return $this;
@@ -63,7 +63,7 @@ class CoreNav
     {
         Nav::content('Collections')
             ->route('collections.index')
-            ->icon('content-writing')
+            ->icon('/content-writing')
             ->can('index', Collection::class)
             ->children(function () {
                 return CollectionAPI::all()->sortBy->title()->map(function ($collection) {
@@ -75,7 +75,7 @@ class CoreNav
 
         Nav::content('Navigation')
             ->route('navigation.index')
-            ->icon('hierarchy-files')
+            ->icon('/hierarchy-files')
             ->can('index', NavContract::class)
             ->children(function () {
                 return NavAPI::all()->sortBy->title()->map(function ($nav) {
@@ -87,7 +87,7 @@ class CoreNav
 
         Nav::content('Taxonomies')
             ->route('taxonomies.index')
-            ->icon('tags')
+            ->icon('/tags')
             ->can('index', Taxonomy::class)
             ->children(function () {
                 return TaxonomyAPI::all()->sortBy->title()->map(function ($taxonomy) {
@@ -99,7 +99,7 @@ class CoreNav
 
         Nav::content('Assets')
             ->route('assets.index')
-            ->icon('assets')
+            ->icon('/assets')
             ->can('index', AssetContainer::class)
             ->children(function () {
                 return AssetContainerAPI::all()->sortBy->title()->map(function ($assetContainer) {
@@ -111,7 +111,7 @@ class CoreNav
 
         Nav::content('Globals')
             ->route('globals.index')
-            ->icon('earth')
+            ->icon('/earth')
             ->can('index', GlobalSet::class)
             ->children(function () {
                 return GlobalSetAPI::all()->sortBy->title()->map(function ($globalSet) {
@@ -139,12 +139,12 @@ class CoreNav
     {
         Nav::fields('Blueprints')
             ->route('blueprints.index')
-            ->icon('blueprint')
+            ->icon('/blueprint')
             ->can('configure fields');
 
         Nav::fields('Fieldsets')
             ->route('fieldsets.index')
-            ->icon('fieldsets')
+            ->icon('/fieldsets')
             ->can('configure fields');
 
         return $this;
@@ -159,7 +159,7 @@ class CoreNav
     {
         Nav::tools('Forms')
             ->route('forms.index')
-            ->icon('drawer-file')
+            ->icon('/drawer-file')
             ->can('index', Form::class)
             ->children(function () {
                 return FormAPI::all()->sortBy->title()->map(function ($form) {
@@ -171,19 +171,19 @@ class CoreNav
 
         Nav::tools('Updates')
             ->route('updater')
-            ->icon('loading-bar')
+            ->icon('/loading-bar')
             ->view('statamic::nav.updates')
             ->can('view updates');
 
         Nav::tools('Addons')
             ->route('addons.index')
-            ->icon('addons')
+            ->icon('/addons')
             ->can('configure addons');
 
         if (Stache::duplicates()->isNotEmpty()) {
             Nav::tools('Duplicate IDs')
                 ->route('duplicates')
-                ->icon('duplicate-ids')
+                ->icon('/duplicate-ids')
                 ->view('statamic::nav.duplicates')
                 ->can('resolve duplicate ids');
         }
@@ -193,7 +193,7 @@ class CoreNav
         if (config('statamic.graphql.enabled') && Statamic::pro()) {
             Nav::tools('GraphQL')
                 ->route('graphql.index')
-                ->icon('array')
+                ->icon('/array')
                 ->attributes(['target' => '_blank'])
                 ->can('view graphql');
         }
@@ -210,7 +210,7 @@ class CoreNav
         if (count($utilities)) {
             Nav::tools('Utilities')
                 ->route('utilities.index')
-                ->icon('settings-slider')
+                ->icon('/settings-slider')
                 ->children($utilities);
         }
 
@@ -230,12 +230,12 @@ class CoreNav
 
         Nav::users('Users')
             ->route('users.index')
-            ->icon('users-box')
+            ->icon('/users-box')
             ->can('index', UserContract::class);
 
         Nav::users('Groups')
             ->route('user-groups.index')
-            ->icon('users-multiple')
+            ->icon('/users-multiple')
             ->can('edit user groups')
             ->children(function () {
                 return UserGroupAPI::all()->sortBy->title()->map(function ($userGroup) {
@@ -246,7 +246,7 @@ class CoreNav
 
         Nav::users('Permissions')
             ->route('roles.index')
-            ->icon('shield-key')
+            ->icon('/shield-key')
             ->can('edit roles')
             ->children(function () {
                 return RoleAPI::all()->sortBy->title()->map(function ($role) {

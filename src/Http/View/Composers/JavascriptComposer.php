@@ -3,6 +3,7 @@
 namespace Statamic\Http\View\Composers;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Preference;
@@ -18,39 +19,55 @@ class JavascriptComposer
 
     public function compose(View $view)
     {
-        $user = User::current();
-        $licenses = app('Statamic\Licensing\LicenseManager');
+        $variables = $this->commonVariables();
 
-        Statamic::provideToScript([
-            'version' => Statamic::version(),
-            'laravelVersion' => app()->version(),
+        if (Gate::allows('access cp')) {
+            $variables = array_merge($variables, $this->protectedVariables());
+        }
+
+        Statamic::provideToScript($variables);
+    }
+
+    private function commonVariables()
+    {
+        return [
             'csrfToken' => csrf_token(),
             'cpUrl' => cp_route('index'),
             'cpRoot' => str_start(config('statamic.cp.route'), '/'),
             'urlPath' => Str::after(request()->getRequestUri(), config('statamic.cp.route').'/'),
             'resourceUrl' => Statamic::cpAssetUrl(),
-            'locales' => config('statamic.system.locales'),
             'flash' => Statamic::flash(),
             'toasts' => Toast::toArray(),
+            'translationLocale' => app('translator')->locale(),
+            'translations' => app('translator')->toJson(),
+            'locale' => config('app.locale'),
+            'asciiReplaceExtraSymbols' => $replaceSymbols = config('statamic.system.ascii_replace_extra_symbols'),
+            'charmap' => ASCII::charsArray($replaceSymbols),
+        ];
+    }
+
+    private function protectedVariables()
+    {
+        $user = User::current();
+        $licenses = app('Statamic\Licensing\LicenseManager');
+
+        return [
+            'version' => Statamic::version(),
+            'laravelVersion' => app()->version(),
+            'locales' => config('statamic.system.locales'),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
             'focalPointEditorEnabled' => config('statamic.assets.focal_point_editor'),
             'user' => $this->user($user),
             'paginationSize' => config('statamic.cp.pagination_size'),
             'paginationSizeOptions' => config('statamic.cp.pagination_size_options'),
-            'translationLocale' => app('translator')->locale(),
-            'translations' => app('translator')->toJson(),
             'sites' => $this->sites(),
             'selectedSite' => Site::selected()->handle(),
-            'ampEnabled' => config('statamic.amp.enabled'),
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
-            'locale' => config('app.locale'),
             'permissions' => $this->permissions($user),
             'hasLicenseBanner' => $licenses->invalid() || $licenses->requestFailed(),
-            'asciiReplaceExtraSymbols' => $replaceSymbols = config('statamic.system.ascii_replace_extra_symbols'),
-            'charmap' => ASCII::charsArray($replaceSymbols),
-        ]);
+        ];
     }
 
     protected function sites()

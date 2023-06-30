@@ -66,7 +66,7 @@ trait FilesystemAdapterTests
     {
         file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
         $this->adapter->delete('filename.txt');
-        $this->assertFileNotExists($this->tempDir.'/filename.txt');
+        $this->assertFileDoesNotExist($this->tempDir.'/filename.txt');
     }
 
     /** @test */
@@ -102,7 +102,7 @@ trait FilesystemAdapterTests
         file_put_contents($this->tempDir.'/src.txt', 'Hello World');
         $this->assertTrue($this->adapter->move('src.txt', 'dest.txt'));
         $this->assertStringEqualsFile($this->tempDir.'/dest.txt', 'Hello World');
-        $this->assertFileNotExists($this->tempDir.'/src.txt');
+        $this->assertFileDoesNotExist($this->tempDir.'/src.txt');
     }
 
     /** @test */
@@ -112,7 +112,7 @@ trait FilesystemAdapterTests
         file_put_contents($this->tempDir.'/dest.txt', 'Existing Content');
         $this->assertTrue($this->adapter->move('src.txt', 'dest.txt', true));
         $this->assertStringEqualsFile($this->tempDir.'/dest.txt', 'Hello World');
-        $this->assertFileNotExists($this->tempDir.'/src.txt');
+        $this->assertFileDoesNotExist($this->tempDir.'/src.txt');
     }
 
     /** @test */
@@ -120,7 +120,7 @@ trait FilesystemAdapterTests
     {
         file_put_contents($this->tempDir.'/src.txt', 'Hello World');
         $this->assertTrue($this->adapter->rename('src.txt', 'dest.txt'));
-        $this->assertFileNotExists($this->tempDir.'/src.txt');
+        $this->assertFileDoesNotExist($this->tempDir.'/src.txt');
         $this->assertStringEqualsFile($this->tempDir.'/dest.txt', 'Hello World');
     }
 
@@ -354,8 +354,8 @@ trait FilesystemAdapterTests
 
         $this->adapter->moveDirectory('src', 'dest');
 
-        $this->assertFileNotExists($this->tempDir.'/src/one.txt');
-        $this->assertFileNotExists($this->tempDir.'/src/two.txt');
+        $this->assertFileDoesNotExist($this->tempDir.'/src/one.txt');
+        $this->assertFileDoesNotExist($this->tempDir.'/src/two.txt');
         $this->assertStringEqualsFile($this->tempDir.'/dest/one.txt', 'One');
         $this->assertStringEqualsFile($this->tempDir.'/dest/two.txt', 'Two');
     }
@@ -374,9 +374,9 @@ trait FilesystemAdapterTests
         $this->assertDirectoryExists($this->tempDir.'/one');
         $this->assertDirectoryExists($this->tempDir.'/one/two');
         $this->assertDirectoryExists($this->tempDir.'/three');
-        $this->assertDirectoryNotExists($this->tempDir.'/three/four');
-        $this->assertDirectoryNotExists($this->tempDir.'/three/five');
-        $this->assertDirectoryNotExists($this->tempDir.'/three/five/six');
+        $this->assertDirectoryDoesNotExist($this->tempDir.'/three/four');
+        $this->assertDirectoryDoesNotExist($this->tempDir.'/three/five');
+        $this->assertDirectoryDoesNotExist($this->tempDir.'/three/five/six');
     }
 
     /** @test */

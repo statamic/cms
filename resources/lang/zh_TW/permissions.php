@@ -76,7 +76,6 @@ return [
 
     'group_updates' => '更新',
     'view_updates' => '檢視更新',
-    'perform_updates' => '執行更新',
 
     'group_utilities' => '公用程式',
     'access_utility' => ':title',

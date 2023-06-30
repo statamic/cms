@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
+use LogicException;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -360,8 +361,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         $prefix = '';
 
-        if ($this->hasDate()) {
-            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d').'.';
+        if ($this->hasDate() && $this->date) {
+            $format = 'Y-m-d';
+            if ($this->hasTime()) {
+                $format .= '-Hi';
+                if ($this->hasSeconds()) {
+                    $format .= 's';
+                }
+            }
+
+            $prefix = $this->date->format($format).'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
@@ -431,9 +440,27 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('date')
             ->getter(function ($date) {
-                return $date ?? $this->lastModified();
+                if (! $this->collection()?->dated()) {
+                    return null;
+                }
+
+                $date = $date ?? $this->lastModified();
+
+                if (! $this->hasTime()) {
+                    $date->startOfDay();
+                }
+
+                if (! $this->hasSeconds()) {
+                    $date->startOfMinute();
+                }
+
+                return $date;
             })
             ->setter(function ($date) {
+                if (! $this->collection()?->dated()) {
+                    throw new LogicException('Cannot set date on non-dated collection entry.');
+                }
+
                 if ($date === null) {
                     return null;
                 }
@@ -446,19 +473,36 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
                 }
 
-                return Carbon::createFromFormat('Y-m-d-Hi', $date);
+                if (strlen($date) === 15) {
+                    return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
+                }
+
+                return Carbon::createFromFormat('Y-m-d-His', $date);
             })
             ->args(func_get_args());
     }
 
     public function hasDate()
     {
-        return $this->date !== null;
+        return $this->collection()->dated();
     }
 
     public function hasTime()
     {
-        return $this->hasDate() && $this->date()->format('H:i:s') !== '00:00:00';
+        if (! $this->hasDate()) {
+            return false;
+        }
+
+        return $this->blueprint()->field('date')->fieldtype()->timeEnabled();
+    }
+
+    public function hasSeconds()
+    {
+        if (! $this->hasTime()) {
+            return false;
+        }
+
+        return $this->blueprint()->field('date')->fieldtype()->secondsEnabled();
     }
 
     public function sites()
@@ -494,11 +538,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected function shouldRemoveNullsFromFileData()
     {
         return false;
-    }
-
-    public function ampable()
-    {
-        return $this->collection()->ampable();
     }
 
     protected function revisionKey()
@@ -681,7 +720,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             return null;
         }
 
-        return $this->structure()->in($this->locale())->page($id);
+        return $this->structure()->in($this->locale())->find($id);
     }
 
     public function route()

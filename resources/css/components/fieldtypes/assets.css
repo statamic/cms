@@ -1,0 +1,74 @@
+/* ==========================================================================
+   ASSETS FIELDTYPE
+   ========================================================================== */
+
+.assets-fieldtype .assets-fieldtype-drag-container {
+    position: relative;
+}
+
+.assets-fieldtype .assets-fieldtype-picker {
+    @apply flex flex-col @sm:flex-row items-start @sm:items-center px-4 py-2 bg-gray-200 border rounded;
+
+    &.is-expanded {
+        @apply border-b-0 rounded-b-none;
+    }
+
+    .asset-upload-control {
+      @apply mt-2 @sm:ml-4 @sm:mt-0 text-xs text-gray-600 leading-tight;
+    }
+
+    .upload-text-button {
+        @apply text-blue underline whitespace-nowrap;
+        &:hover {
+            @apply text-blue-800;
+        }
+    }
+}
+
+.assets-fieldtype .drag-drop-text {
+    @apply ml-1 text-gray-700;
+}
+
+.assets-fieldtype .asset-upload-control {
+    @apply hidden @xs:inline-block;
+}
+
+
+/* Inside a Grid
+  ========================================================================== */
+
+.grid-fieldtype .assets-fieldtype-picker {
+    @apply border-none rounded-none bg-transparent p-0;
+}
+
+
+
+/* In a Grid fieldtype
+  ========================================================================== */
+
+.grid-fieldtype .grid-table .assets-fieldtype {
+    .asset-table-listing tbody tr td {
+        padding: 4px;
+    }
+}
+
+
+
+/* In a Bard fieldtype
+  ========================================================================== */
+
+.bard-set-solo .asset-tile {
+    max-width: none;
+    padding: 0;
+}
+
+.bard-set-solo .assets-fieldtype label {
+    display: none;
+}
+
+/*  Only show the trash button when its a solo field. */
+/*  Probably better as a template condition but difficult at the moment. */
+.assets-fieldtype .delete-bard-set {
+    display: none;
+    .bard-set-solo & { display: block; }
+}

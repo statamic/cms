@@ -20,14 +20,6 @@ class User extends BaseUser
     protected $roles;
     protected $groups;
 
-    /** @deprecated */
-    public static function fromModel(Model $model)
-    {
-        return tap(new static, function ($user) use ($model) {
-            $user->model($model);
-        });
-    }
-
     public function model(Model $model = null)
     {
         if (is_null($model)) {

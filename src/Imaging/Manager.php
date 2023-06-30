@@ -87,14 +87,6 @@ class Manager
     }
 
     /**
-     * @deprecated
-     */
-    public function getCpImageManipulationPresets()
-    {
-        return $this->cpManipulationPresets();
-    }
-
-    /**
      * Normalize preset.
      *
      * @param  array  $preset

@@ -34,9 +34,7 @@ final class Installer
     /**
      * Instantiate starter kit installer.
      *
-     * @param  string  $package
      * @param  mixed  $console
-     * @param  LicenseManager|null  $licenseManager
      */
     public function __construct(string $package, $console = null, LicenseManager $licenseManager = null)
     {
@@ -50,14 +48,12 @@ final class Installer
     /**
      * Instantiate starter kit installer.
      *
-     * @param  string  $package
      * @param  mixed  $console
-     * @param  LicenseManager|null  $licenseManager
      * @return static
      */
     public static function package(string $package, $console = null, LicenseManager $licenseManager = null)
     {
-        return new static($package, $console, $licenseManager);
+        return new self($package, $console, $licenseManager);
     }
 
     /**
@@ -726,7 +722,6 @@ EOT;
      *
      * TODO: Move to trait and reuse in MakeAddon?
      *
-     * @param  string  $output
      * @return string
      */
     private function outputFromSymfonyProcess(string $output)
@@ -872,7 +867,6 @@ EOT;
     /**
      * Normalize packages array to require args, with version handling if `package => version` array structure is passed.
      *
-     * @param  array  $packages
      * @return array
      */
     private function normalizePackagesArrayToRequireArgs(array $packages)

@@ -13,7 +13,7 @@ use Statamic\Fields\BlueprintRepository;
  * @method static void delete(Blueprint $blueprint)
  * @method static \Statamic\Fields\Blueprint make($handle = null)
  * @method static \Statamic\Fields\Blueprint makeFromFields($fields)
- * @method static \Statamic\Fields\Blueprint makeFromSections($sections)
+ * @method static \Statamic\Fields\Blueprint makeFromTabs($tabs)
  *
  * @see \Statamic\Fields\Blueprint
  */

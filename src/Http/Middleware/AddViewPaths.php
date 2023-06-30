@@ -4,13 +4,11 @@ namespace Statamic\Http\Middleware;
 
 use Closure;
 use Statamic\Facades\Site;
-use Statamic\Statamic;
 
 class AddViewPaths
 {
     private $paths;
     private $hints;
-    private $amp;
     private $site;
     private $finder;
 
@@ -28,7 +26,6 @@ class AddViewPaths
     private function update()
     {
         $this->finder = view()->getFinder();
-        $this->amp = Statamic::isAmpRequest();
         $this->site = Site::current()->handle();
         $this->paths = $this->finder->getPaths();
         $this->hints = $this->finder->getHints();
@@ -39,14 +36,11 @@ class AddViewPaths
 
     private function updatePaths()
     {
-        $amp = $this->amp;
         $site = $this->site;
 
-        $paths = collect($this->paths)->flatMap(function ($path) use ($site, $amp) {
+        $paths = collect($this->paths)->flatMap(function ($path) use ($site) {
             return [
-                $amp ? $path.'/'.$site.'/amp' : null,
                 $path.'/'.$site,
-                $amp ? $path.'/amp' : null,
                 $path,
             ];
         })->filter()->values()->all();

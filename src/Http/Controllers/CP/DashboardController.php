@@ -11,7 +11,6 @@ class DashboardController extends CpController
     /**
      * View for the CP dashboard.
      *
-     * @param  Loader  $loader
      * @return mixed
      */
     public function index(Loader $loader)

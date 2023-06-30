@@ -1,5 +1,6 @@
 <script>
-require('dmuploader')
+import { Upload } from 'upload';
+import uniqid from 'uniqid';
 
 export default {
 
@@ -12,6 +13,7 @@ export default {
 
         return h('div', { on: {
             'dragenter': this.dragenter,
+            'dragover': this.dragover,
             'dragleave': this.dragleave,
             'drop': this.drop,
         }}, [
@@ -56,17 +58,12 @@ export default {
 
 
     mounted() {
-        if (this.enabled) {
-            this.bindUploader();
-        }
+        this.$refs.nativeFileField.addEventListener('change', this.addNativeFileFieldSelections);
     },
 
 
-    // Using beforeDestroy instead of destroy, since the destroy hook didn't seem to
-    // get called at all sometimes when using `npm run production`. Works fine when
-    // using `npm run dev`. beforeDestroy works fine in both cases. ¯\_(ツ)_/¯
     beforeDestroy() {
-        $(this.$el).unbind().removeData();
+        this.$refs.nativeFileField.removeEventListener('change', this.addNativeFileFieldSelections);
     },
 
 
@@ -74,80 +71,32 @@ export default {
 
         uploads(uploads) {
             this.$emit('updated', uploads);
-        },
-
-        extraData(data) {
-            $(this.$el).data('dmUploader').settings.extraData = data;
-        },
+        }
 
     },
 
 
     methods: {
 
-        /**
-         * Open the native file browser
-         */
         browse() {
-            $(this.$refs.nativeFileField).click();
+            this.$refs.nativeFileField.click();
         },
 
-        /**
-         * Bind the uploader plugin to the DOM
-         */
-        bindUploader() {
-            $(this.$el).dmUploader({
-                url: this.url,
-
-                extraData: this.extraData,
-
-                onNewFile: (id, file) => {
-                    this.uploads.push({
-                        id: id,
-                        basename: file.name,
-                        extension: file.name.split('.').pop(),
-                        percent: 0,
-                        errorMessage: null
-                    });
-                },
-
-                onUploadProgress: (id, percent) => {
-                    let upload = _(this.uploads).findWhere({ id });
-                    upload.percent = percent;
-                    this.$emit('progress', upload, this.uploads);
-                },
-
-                onUploadSuccess: (id, response) => {
-                    this.$emit('upload-complete', response.data, this.uploads);
-
-                    let index = _(this.uploads).findIndex({ id });
-                    this.uploads.splice(index, 1);
-                },
-
-                onUploadError: (id, errMsg, response) => {
-                    let upload = _(this.uploads).findWhere({ id });
-
-                    if (response.responseJSON) {
-                        errMsg = response.responseJSON.message;
-                    } 
-
-                    if (! errMsg) {
-                        if (response.status === 413) {
-                            errMsg = __('Upload failed. The file is larger than is allowed by your server.');
-                        } else {
-                            errMsg = __('Upload failed. The file might be larger than is allowed by your server.');
-                        }
-                    }
-
-                    upload.errorMessage = errMsg;
-
-                    this.$emit('error', upload, this.uploads);
-                }
-            });
+        addNativeFileFieldSelections(e) {
+            for (let i = 0; i < e.target.files.length; i++) {
+                this.addFile(e.target.files[i]);
+            }
         },
 
         dragenter(e) {
+            e.stopPropagation();
+            e.preventDefault();
             this.dragging = true;
+        },
+
+        dragover(e) {
+            e.stopPropagation();
+            e.preventDefault();
         },
 
         dragleave(e) {
@@ -158,8 +107,91 @@ export default {
         },
 
         drop(e) {
+            e.stopPropagation();
+            e.preventDefault();
             this.dragging = false;
-        }
+
+            for (let i = 0; i < e.dataTransfer.files.length; i++) {
+                this.addFile(e.dataTransfer.files[i]);
+            }
+        },
+
+        addFile(file) {
+            if (! this.enabled) return;
+
+            const id = uniqid();
+            const upload = this.makeUpload(id, file);
+
+            this.uploads.push({
+                id,
+                basename: file.name,
+                extension: file.name.split('.').pop(),
+                percent: 0,
+                errorMessage: null
+            });
+
+            upload.upload().then(response => {
+                const json = JSON.parse(response.data);
+                response.status === 200
+                    ? this.handleUploadSuccess(id, json)
+                    : this.handleUploadError(id, status, json);
+            });
+        },
+
+        findUpload(id) {
+            return this.uploads.find(u => u.id === id);
+        },
+
+        findUploadIndex(id) {
+            return this.uploads.findIndex(u => u.id === id);
+        },
+
+        makeUpload(id, file) {
+            const upload = new Upload({
+                url: this.url,
+                form: this.makeFormData(file),
+                headers: {
+                    Accept: 'application/json'
+                }
+            });
+
+            upload.on('progress', progress => {
+                this.findUpload(id).percent = progress * 100;
+            });
+
+            return upload;
+        },
+
+        makeFormData(file) {
+            const form = new FormData();
+
+            form.append('file', file);
+
+            for (let key in this.extraData) {
+                form.append(key, this.extraData[key]);
+            }
+
+            return form;
+        },
+
+        handleUploadSuccess(id, response) {
+            this.$emit('upload-complete', response.data, this.uploads);
+            this.uploads.splice(this.findUploadIndex(id), 1);
+        },
+
+        handleUploadError(id, status, response) {
+            const upload = this.findUpload(id);
+            let msg = response.message;
+            if (! msg) {
+                if (status === 413) {
+                    msg = __('Upload failed. The file is larger than is allowed by your server.');
+                } else {
+                    msg = __('Upload failed. The file might be larger than is allowed by your server.');
+                }
+            }
+            upload.errorMessage = msg;
+            this.$emit('error', upload, this.uploads);
+        },
     }
 
 }

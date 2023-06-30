@@ -4,40 +4,36 @@ import Statamic from './components/Statamic.js';
 import Alpine from 'alpinejs'
 import * as Globals from './bootstrap/globals'
 import { default as underscore } from 'underscore'
+import Cookies from 'cookies-js';
 
 let global_functions = Object.keys(Globals)
-global_functions.forEach(fnName => { global[fnName] = Globals[fnName] })
-global.Cookies = require('cookies-js');
+global_functions.forEach(fnName => { window[fnName] = Globals[fnName] })
 
 Vue.config.silent = false;
 Vue.config.devtools = true;
 Vue.config.productionTip = false
 
+window.Cookies = Cookies;
 window.Alpine = Alpine
 window.Vue = Vue;
 window.Statamic = Statamic;
 window._ = underscore;
-window.$ = window.jQuery = require('jquery');
-window.rangy = require('rangy');
 
-require('./bootstrap/polyfills');
-require('./bootstrap/underscore-mixins');
-require('./bootstrap/jquery-plugins');
-require('./bootstrap/plugins');
-require('./bootstrap/filters');
-require('./bootstrap/mixins');
-require('./bootstrap/components');
-require('./bootstrap/fieldtypes');
-require('./bootstrap/directives');
+import './bootstrap/polyfills';
+import './bootstrap/underscore-mixins';
+import './bootstrap/plugins';
+import './bootstrap/filters';
+import './bootstrap/mixins';
+import './bootstrap/components';
+import './bootstrap/fieldtypes';
+import './bootstrap/directives';
+import './bootstrap/tooltips';
 
 import axios from 'axios';
 import PortalVue from "portal-vue";
 import VModal from "vue-js-modal";
 import Vuex from 'vuex';
 import StatamicStore from './store';
-import Popover  from 'vue-js-popover'
-import VTooltip from 'v-tooltip'
-import ReactiveProvide from 'vue-reactive-provide';
 import vSelect from 'vue-select'
 import VCalendar from 'v-calendar';
 
@@ -69,14 +65,12 @@ Vue.prototype.$echo = Statamic.$echo;
 Vue.prototype.$bard = Statamic.$bard;
 Vue.prototype.$keys = Statamic.$keys;
 
-window.moment = Vue.moment = Vue.prototype.$moment = require('moment');
+import Moment from 'moment';
+window.moment = Vue.moment = Vue.prototype.$moment = Moment;
 
-Vue.use(Popover, { tooltip: true })
-Vue.use(PortalVue)
-Vue.use(VModal, { componentName: 'vue-modal' })
-Vue.use(VTooltip)
+Vue.use(PortalVue, { portalName: 'v-portal' })
+Vue.use(VModal, { componentName: 'v-modal' })
 Vue.use(Vuex);
-Vue.use(ReactiveProvide);
 Vue.use(VCalendar);
 
 Vue.component(vSelect)
@@ -90,15 +84,62 @@ Statamic.$store = new Vuex.Store({
     }
 });
 
-require('./components/ToastBus');
-require('./components/ModalBus');
-require('./components/stacks/Stacks');
-require('./components/panes/Panes');
-require('./components/ProgressBar');
-require('./components/DirtyState');
-require('./components/Config');
-require('./components/Preference');
-require('./components/Permission');
+import './components/ToastBus';
+import './components/portals/Portals';
+import './components/stacks/Stacks';
+import './components/ProgressBar';
+import './components/DirtyState';
+import './components/Config';
+import './components/Preference';
+import './components/Permission';
+
+
+import GlobalSearch from './components/GlobalSearch.vue';
+import GlobalSiteSelector from './components/GlobalSiteSelector.vue';
+import Login from './components/login/login';
+import LoginModal from './components/login/LoginModal.vue';
+import BaseEntryCreateForm from './components/entries/BaseCreateForm.vue';
+import BaseTermCreateForm from './components/terms/BaseCreateForm.vue';
+import CreateTermButton from './components/terms/CreateTermButton.vue';
+import Importer from './components/importer/importer';
+import FieldsetListing from './components/fieldsets/Listing.vue';
+import FieldsetCreateForm from './components/fieldsets/CreateForm.vue';
+import FieldsetEditForm from './components/fieldsets/EditForm.vue';
+import BlueprintListing from './components/blueprints/Listing.vue';
+import BlueprintBuilder from './components/blueprints/Builder.vue';
+import FormCreateForm from './components/forms/CreateForm.vue';
+import FormListing from './components/forms/Listing.vue';
+import FormSubmissionListing from './components/forms/SubmissionListing.vue';
+import GlobalListing from './components/globals/Listing.vue';
+import GlobalEditForm from './components/globals/EditForm.vue';
+import GlobalPublishForm from './components/globals/PublishForm.vue';
+import GlobalCreateForm from './components/globals/Create.vue';
+import UserListing from './components/users/Listing.vue';
+import UserWizard from './components/users/Wizard.vue';
+import RoleListing from './components/roles/Listing.vue';
+import RolePublishForm from './components/roles/PublishForm.vue';
+import UserGroupListing from './components/user-groups/Listing.vue';
+import UserGroupPublishForm from './components/user-groups/PublishForm.vue';
+import CollectionCreateForm from './components/collections/CreateForm.vue';
+import CollectionScaffolder from './components/collections/Scaffolder.vue';
+import CollectionEditForm from './components/collections/EditForm.vue';
+import CollectionView from './components/collections/View.vue';
+import CollectionBlueprintListing from './components/collections/BlueprintListing.vue';
+import SessionExpiry from './components/SessionExpiry.vue';
+import NavigationListing from './components/navigation/Listing.vue';
+import NavigationCreateForm from './components/navigation/CreateForm.vue';
+import NavigationEditForm from './components/navigation/EditForm.vue';
+import PreferencesEditForm from './components/preferences/EditForm.vue';
+import NavigationView from './components/navigation/View.vue';
+import TaxonomyCreateForm from './components/taxonomies/CreateForm.vue';
+import TaxonomyEditForm from './components/taxonomies/EditForm.vue';
+import TaxonomyBlueprintListing from './components/taxonomies/BlueprintListing.vue';
+import AssetContainerCreateForm from './components/asset-containers/CreateForm.vue';
+import AssetContainerEditForm from './components/asset-containers/EditForm.vue';
+import NavBuilder from './components/nav/Builder.vue';
+import Updater from './components/updater/Updater.vue';
+import PortalTargets from './components/portals/PortalTargets.vue';
+
 
 Statamic.app({
     el: '#statamic',
@@ -108,61 +149,59 @@ Statamic.app({
     store: Statamic.$store,
 
     components: {
-        GlobalSearch: require('./components/GlobalSearch.vue').default,
-        GlobalSiteSelector: require('./components/GlobalSiteSelector.vue').default,
-        Login: require('./components/login/login'),
-        LoginModal: require('./components/login/LoginModal.vue').default,
-        BaseEntryCreateForm: require('./components/entries/BaseCreateForm.vue').default,
-        BaseTermCreateForm: require('./components/terms/BaseCreateForm.vue').default,
-        CreateTermButton: require('./components/terms/CreateTermButton.vue').default,
-        Importer: require('./components/importer/importer'),
-        FieldsetListing: require('./components/fieldsets/Listing.vue').default,
-        FieldsetCreateForm: require('./components/fieldsets/CreateForm.vue').default,
-        FieldsetEditForm: require('./components/fieldsets/EditForm.vue').default,
-        BlueprintListing: require('./components/blueprints/Listing.vue').default,
-        BlueprintBuilder: require('./components/blueprints/Builder.vue').default,
-        FormCreateForm: require('./components/forms/CreateForm.vue').default,
-        FormListing: require('./components/forms/Listing.vue').default,
-        FormSubmissionListing: require('./components/forms/SubmissionListing.vue').default,
-        GlobalListing: require('./components/globals/Listing.vue').default,
-        GlobalEditForm: require('./components/globals/EditForm.vue').default,
-        GlobalPublishForm: require('./components/globals/PublishForm.vue').default,
-        GlobalCreateForm: require('./components/globals/Create.vue').default,
-        UserListing: require('./components/users/Listing.vue').default,
-        UserWizard: require('./components/users/Wizard.vue').default,
-        RoleListing: require('./components/roles/Listing.vue').default,
-        RolePublishForm: require('./components/roles/PublishForm.vue').default,
-        UserGroupListing: require('./components/user-groups/Listing.vue').default,
-        UserGroupPublishForm: require('./components/user-groups/PublishForm.vue').default,
-        CollectionCreateForm: require('./components/collections/CreateForm.vue').default,
-        CollectionScaffolder: require('./components/collections/Scaffolder.vue').default,
-        CollectionEditForm: require('./components/collections/EditForm.vue').default,
-        CollectionView: require('./components/collections/View.vue').default,
-        CollectionBlueprintListing:  require('./components/collections/BlueprintListing.vue').default,
-        SessionExpiry: require('./components/SessionExpiry.vue').default,
-        NavigationListing: require('./components/navigation/Listing.vue').default,
-        NavigationCreateForm: require('./components/navigation/CreateForm.vue').default,
-        NavigationEditForm: require('./components/navigation/EditForm.vue').default,
-        PreferencesEditForm: require('./components/preferences/EditForm.vue').default,
-        NavigationView: require('./components/navigation/View.vue').default,
-        TaxonomyCreateForm: require('./components/taxonomies/CreateForm.vue').default,
-        TaxonomyEditForm: require('./components/taxonomies/EditForm.vue').default,
-        TaxonomyBlueprintListing:  require('./components/taxonomies/BlueprintListing.vue').default,
-        AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue').default,
-        AssetContainerEditForm: require('./components/asset-containers/EditForm.vue').default,
-        NavBuilder: require('./components/nav/Builder.vue').default,
-        Updater: require('./components/updater/Updater.vue').default,
-        PortalTargets: require('./components/PortalTargets.vue').default,
+        GlobalSearch,
+        GlobalSiteSelector,
+        Login,
+        LoginModal,
+        BaseEntryCreateForm,
+        BaseTermCreateForm,
+        CreateTermButton,
+        Importer,
+        FieldsetListing,
+        FieldsetCreateForm,
+        FieldsetEditForm,
+        BlueprintListing,
+        BlueprintBuilder,
+        FormCreateForm,
+        FormListing,
+        FormSubmissionListing,
+        GlobalListing,
+        GlobalEditForm,
+        GlobalPublishForm,
+        GlobalCreateForm,
+        UserListing,
+        UserWizard,
+        RoleListing,
+        RolePublishForm,
+        UserGroupListing,
+        UserGroupPublishForm,
+        CollectionCreateForm,
+        CollectionScaffolder,
+        CollectionEditForm,
+        CollectionView,
+        CollectionBlueprintListing,
+        SessionExpiry,
+        NavigationListing,
+        NavigationCreateForm,
+        NavigationEditForm,
+        PreferencesEditForm,
+        NavigationView,
+        TaxonomyCreateForm,
+        TaxonomyEditForm,
+        TaxonomyBlueprintListing,
+        AssetContainerCreateForm,
+        AssetContainerEditForm,
+        NavBuilder,
+        Updater,
+        PortalTargets,
     },
 
     data: {
-        showLoginModal: false,
         navOpen: true,
         mobileNavOpen: false,
         showBanner: true,
         portals: [],
-        panes: [],
-        appendedComponents: []
+        appendedComponents: [],
     },
 
     computed: {
