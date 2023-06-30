@@ -18,6 +18,7 @@ use Statamic\Events\TaxonomySaving;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Search;
@@ -108,9 +109,9 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function termBlueprint(string $blueprint = null, Term $term = null)
     {
-        $blueprintBlink = 'taxonomy-blueprint-'.($blueprint ?? 'null').'-'.(optional($term)->id() ?? 'null');
+        $blink = 'taxonomy-blueprint-'.($blueprint ?? 'null').'-'.(optional($term)->id() ?? 'null');
 
-        return Facades\Blink::once($blueprintBlink, function () use ($blueprint, $term) {
+        return Blink::once($blink, function () use ($blueprint, $term) {
             $blueprint = $this->getBaseTermBlueprint($blueprint);
 
             if ($blueprint) {
