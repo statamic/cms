@@ -173,9 +173,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function blueprint()
     {
-        $blink = 'asset-container-blueprint-'.$this->handle();
-
-        if (Blink::has($blink)) {
+        if (Blink::has($blink = 'asset-container-blueprint-'.$this->handle())) {
             return Blink::get($blink);
         }
 
