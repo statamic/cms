@@ -175,19 +175,23 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     {
         $blink = 'asset-container-blueprint-'.$this->handle();
 
-        return Blink::once($blink, function () {
-            $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
-                'alt' => [
-                    'type' => 'text',
-                    'display' => __('Alt Text'),
-                    'instructions' => __('Description of the image'),
-                ],
-            ])->setHandle($this->handle())->setNamespace('assets');
+        if (Blink::has($blink)) {
+            return Blink::get($blink);
+        }
 
-            AssetContainerBlueprintFound::dispatch($blueprint, $this);
+        $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
+            'alt' => [
+                'type' => 'text',
+                'display' => __('Alt Text'),
+                'instructions' => __('Description of the image'),
+            ],
+        ])->setHandle($this->handle())->setNamespace('assets');
 
-            return $blueprint;
-        });
+        AssetContainerBlueprintFound::dispatch($blueprint, $this);
+
+        Blink::put($blink, $blueprint);
+
+        return $blueprint;
     }
 
     public function afterSave($callback)
