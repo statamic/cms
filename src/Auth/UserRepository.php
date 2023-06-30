@@ -58,25 +58,30 @@ abstract class UserRepository implements RepositoryContract
 
     public function blueprint()
     {
-        return Blink::once('user-blueprint', function () {
-            $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
-                'name' => ['type' => 'text', 'display' => 'Name', 'listable' => true],
-            ])->setHandle('user');
+        $blink = 'user-blueprint';
 
-            $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address', 'listable' => true]);
+        if (Blink::has($blink)) {
+            return Blink::get($blink);
+        }
+        $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
+            'name' => ['type' => 'text', 'display' => 'Name', 'listable' => true],
+        ])->setHandle('user');
 
-            if (Statamic::pro()) {
-                $blueprint->ensureField('roles', ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true, 'filterable' => false]);
-                $blueprint->ensureField('groups', ['type' => 'user_groups', 'mode' => 'select', 'width' => 50, 'listable' => true, 'filterable' => false]);
-            } else {
-                $blueprint->removeField('roles');
-                $blueprint->removeField('groups');
-            }
+        $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address', 'listable' => true]);
 
-            UserBlueprintFound::dispatch($blueprint);
+        if (Statamic::pro()) {
+            $blueprint->ensureField('roles', ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true, 'filterable' => false]);
+            $blueprint->ensureField('groups', ['type' => 'user_groups', 'mode' => 'select', 'width' => 50, 'listable' => true, 'filterable' => false]);
+        } else {
+            $blueprint->removeField('roles');
+            $blueprint->removeField('groups');
+        }
 
-            return $blueprint;
-        });
+        UserBlueprintFound::dispatch($blueprint);
+
+        Blink::put($blink, $blueprint);
+
+        return $blueprint;
     }
 
     public function findByOAuthId(string $provider, string $id): ?User
