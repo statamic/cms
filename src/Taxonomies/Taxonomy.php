@@ -111,18 +111,21 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     {
         $blink = 'taxonomy-blueprint-'.($blueprint ?? 'null').'-'.(optional($term)->id() ?? 'null');
 
-        return Blink::once($blink, function () use ($blueprint, $term) {
-            $blueprint = $this->getBaseTermBlueprint($blueprint);
+        if (Blink::has($blink)) {
+            return Blink::get($blink);
+        }
 
-            if ($blueprint) {
-                $this->ensureTermBlueprintFields($blueprint);
-                $blueprint->setParent($term ?? $this);
+        $blueprint = $this->getBaseTermBlueprint($blueprint);
 
-                TermBlueprintFound::dispatch($blueprint, $term);
-            }
+        $blueprint ? $this->ensureTermBlueprintFields($blueprint) : null;
 
-            return $blueprint;
-        });
+        if ($blueprint) {
+            TermBlueprintFound::dispatch($blueprint->setParent($term ?? $this), $term);
+        }
+
+        Blink::put($blink, $blueprint);
+
+        return $blueprint;
     }
 
     private function getBaseTermBlueprint($blueprint)
