@@ -51,6 +51,7 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
 use Statamic\View\Cascade;
+use Statamic\View\State\CachesOutput;
 use Throwable;
 
 class NodeProcessor
@@ -1428,6 +1429,7 @@ class NodeProcessor
                     if ($shouldProcessAsTag) {
                         $tagName = $node->name->getCompoundTagName();
                         $tagMethod = $node->name->getMethodName();
+                        $isCacheTag = false;
 
                         $this->startMeasuringTag($tagName, $node);
 
@@ -1528,6 +1530,11 @@ class NodeProcessor
                             'tag_method' => $tagMethod,
                         ]);
 
+                        if (in_array(CachesOutput::class, class_implements($tag))) {
+                            $isCacheTag = true;
+                            GlobalRuntimeState::$isCacheEnabled = true;
+                        }
+
                         $methodToCall = $node->name->getRuntimeMethodName();
 
                         if ($this->encounteredBuilder) {
@@ -1547,6 +1554,10 @@ class NodeProcessor
 
                         try {
                             $output = call_user_func([$tag, $methodToCall], ...$args);
+
+                            if ($isCacheTag) {
+                                GlobalRuntimeState::$isCacheEnabled = false;
+                            }
                         } catch (Exception $e) {
                             throw $e;
                         } finally {
@@ -1650,6 +1661,14 @@ class NodeProcessor
                                 $tagMethod,
                                 $this->cascade->sections()->get($tagMethod)
                             );
+
+                            if (GlobalRuntimeState::$isCacheEnabled) {
+                                LiteralReplacementManager::$cachedSections[] = [
+                                    $sectionName,
+                                    $tagMethod,
+                                    (string) $this->cascade->sections()->get($tagMethod),
+                                ];
+                            }
 
                             if ($this->isTracingEnabled()) {
                                 $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
