@@ -17,7 +17,7 @@ class Markdown extends Fieldtype
     {
         return [
             [
-                'display' => 'Editor',
+                'display' => __('Editor'),
                 'fields' => [
                     'automatic_line_breaks' => [
                         'display' => __('Automatic Line Breaks'),
@@ -56,7 +56,7 @@ class Markdown extends Fieldtype
                 ],
             ],
             [
-                'display' => 'Assets',
+                'display' => __('Assets'),
                 'fields' => [
                     'container' => [
                         'display' => __('Container'),
@@ -85,7 +85,7 @@ class Markdown extends Fieldtype
                 'display' => 'Antlers',
                 'fields' => [
                     'antlers' => [
-                        'display' => 'Allow Antlers',
+                        'display' => __('Allow Antlers'),
                         'instructions' => __('statamic::fieldtypes.any.config.antlers'),
                         'type' => 'toggle',
                     ],
