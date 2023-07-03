@@ -185,9 +185,9 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             ],
         ])->setHandle($this->handle())->setNamespace('assets');
 
-        AssetContainerBlueprintFound::dispatch($blueprint, $this);
-
         Blink::put($blink, $blueprint);
+
+        AssetContainerBlueprintFound::dispatch($blueprint, $this);
 
         return $blueprint;
     }
