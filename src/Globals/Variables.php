@@ -116,13 +116,9 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         $blueprint = $this->globalSet()->blueprint() ?? $this->fallbackBlueprint();
         $handle = $blueprint->handle();
 
-        if ($handle) {
-            Blink::once('variables-blueprint-dispatch-'.$blueprint->handle(), function () use ($blueprint) {
-                GlobalVariablesBlueprintFound::dispatch($blueprint, $this);
-            });
-        } else {
+        Blink::onceIf($handle, 'variables-blueprint-dispatch-'.$blueprint->handle(), function () use ($blueprint) {
             GlobalVariablesBlueprintFound::dispatch($blueprint, $this);
-        }
+        });
 
         return $blueprint;
     }
