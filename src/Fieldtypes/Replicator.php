@@ -206,6 +206,7 @@ class Replicator extends Fieldtype
             $meta = Blink::once($metaHash, function () use ($config, $set) {
                 return (new Fields($config))->addValues($set)->meta();
             });
+
             return [$set['_id'] => $meta->put('_', '_')];
         })->toArray();
 
