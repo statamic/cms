@@ -76,9 +76,9 @@ abstract class UserRepository implements RepositoryContract
             $blueprint->removeField('groups');
         }
 
-        UserBlueprintFound::dispatch($blueprint);
-
         Blink::put($blink, $blueprint);
+
+        UserBlueprintFound::dispatch($blueprint);
 
         return $blueprint;
     }
