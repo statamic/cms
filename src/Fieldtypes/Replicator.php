@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Fieldtypes\RowId;
+use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
@@ -197,10 +198,15 @@ class Replicator extends Fieldtype
 
     public function preload()
     {
-        $existing = collect($this->field->value())->mapWithKeys(function ($set) {
-            $config = Arr::get($this->flattenedSetsConfig(), "{$set['type']}.fields", []);
+        $flattenedConfig = $this->flattenedSetsConfig();
 
-            return [$set['_id'] => (new Fields($config))->addValues($set)->meta()->put('_', '_')];
+        $existing = collect($this->field->value())->mapWithKeys(function ($set) use ($flattenedConfig) {
+            $config = Arr::get($flattenedConfig, "{$set['type']}.fields", []);
+            $metaHash = md5(json_encode($config).json_encode($set));
+            $meta = Blink::once($metaHash, function () use ($config, $set) {
+                return (new Fields($config))->addValues($set)->meta();
+            });
+            return [$set['_id'] => $meta->put('_', '_')];
         })->toArray();
 
         $defaults = collect($this->flattenedSetsConfig())->map(function ($set) {
@@ -209,8 +215,16 @@ class Replicator extends Fieldtype
             })->all();
         })->all();
 
-        $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
-            return (new Fields($set['fields']))->addValues($defaults[$handle])->meta()->put('_', '_');
+        $new = collect($flattenedConfig)->map(function ($set, $handle) use ($defaults) {
+            $fields = $set['fields'];
+            $handle = $defaults[$handle];
+            $metaHash = md5(json_encode($fields).json_encode($handle));
+
+            $meta = Blink::once($metaHash, function () use ($fields, $handle) {
+                return (new Fields($fields))->addValues($handle)->meta();
+            });
+
+            return $meta->put('_', '_');
         })->toArray();
 
         $previews = collect($existing)->map(function ($fields) {
