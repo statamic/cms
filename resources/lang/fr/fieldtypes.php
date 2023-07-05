@@ -85,6 +85,7 @@ return [
     'html.title' => 'HTML',
     'icon.config.directory' => 'Le chemin d’accès au répertoire contenant les icônes.',
     'icon.config.folder' => 'Un sous-dossier contenant un jeu d’icônes spécifique.',
+    'icon.title' => 'Icon',
     'integer.title' => 'Integer',
     'link.config.collections' => 'Les entrées de ces collections seront disponibles. Si vous laissez cette zone à blanc, les entrées des collections routables seront disponibles.',
     'link.config.container' => 'Choisissez quel conteneur de ressources à utiliser pour ce champ.',
