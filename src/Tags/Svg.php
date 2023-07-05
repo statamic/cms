@@ -2,6 +2,9 @@
 
 namespace Statamic\Tags;
 
+use enshrined\svgSanitize\data\AllowedAttributes;
+use enshrined\svgSanitize\data\AllowedTags;
+use enshrined\svgSanitize\Sanitizer;
 use Statamic\Facades\File;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
@@ -47,11 +50,13 @@ class Svg extends Tags
             $svg = $this->setTitleAndDesc($svg);
         }
 
-        return str_replace(
+        $svg = str_replace(
             '<svg',
             collect(['<svg', $attributes])->filter()->implode(' '),
             $svg
         );
+
+        return $this->sanitize($svg);
     }
 
     private function setTitleAndDesc($svg)
@@ -78,5 +83,59 @@ class Svg extends Tags
         }
 
         return $doc->saveHTML();
+    }
+
+    private function sanitize($svg)
+    {
+        if ($this->params->bool('sanitize') === false) {
+            return $svg;
+        }
+
+        $sanitizer = new Sanitizer;
+        $sanitizer->removeXMLTag(! Str::startsWith($svg, '<?xml'));
+        $sanitizer->setAllowedAttrs($this->getAllowedAttrs());
+        $sanitizer->setAllowedTags($this->getAllowedTags());
+
+        return $sanitizer->sanitize($svg);
+    }
+
+    private function getAllowedAttrs()
+    {
+        $attrs = $this->params->explode('allow_attrs', []);
+
+        return new class($attrs) extends AllowedAttributes
+        {
+            private static $attrs = [];
+
+            public function __construct($attrs)
+            {
+                self::$attrs = $attrs;
+            }
+
+            public static function getAttributes()
+            {
+                return array_merge(parent::getAttributes(), self::$attrs);
+            }
+        };
+    }
+
+    private function getAllowedTags()
+    {
+        $tags = $this->params->explode('allow_tags', []);
+
+        return new class($tags) extends AllowedTags
+        {
+            private static $tags = [];
+
+            public function __construct($tags)
+            {
+                self::$tags = $tags;
+            }
+
+            public static function getTags()
+            {
+                return array_merge(parent::getTags(), self::$tags);
+            }
+        };
     }
 }
