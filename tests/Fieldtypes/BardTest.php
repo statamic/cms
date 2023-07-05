@@ -145,7 +145,7 @@ class BardTest extends TestCase
                 'attrs' => [
                     'id' => 'set-id', // Set id. Auto generated
                     'values' => [
-                        'id'    => 'value-id', // Value id. User Input.
+                        'id' => 'value-id', // Value id. User Input.
                         'type' => 'image',
                         'image' => 'test.jpg',
                     ],

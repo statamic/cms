@@ -160,7 +160,7 @@ return [
     | Allowing Id's inside sets (bard and replicator) might have frontend
     | breaking changes, why this setting needs to be opt in.
     |
-    | Automatically defined set ids will normally be availabe with the id 
+    | Automatically defined set ids will normally be availabe with the id
     | handle. As soon as this setting is turned on, the set-id handle
     | will be prefixed wiht a underscore, like `_id`.
     |

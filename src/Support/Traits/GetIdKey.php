@@ -2,12 +2,10 @@
 
 namespace Statamic\Support\Traits;
 
-use Statamic\Support\FluentGetterSetter;
-
 trait GetIdKey
 {
     /**
-     * 
+     * Depending on the config, set id's will be augmented via `id` or `_id`.
      */
     protected function getIdKey(): string
     {
