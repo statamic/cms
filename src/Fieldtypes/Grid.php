@@ -11,9 +11,12 @@ use Statamic\GraphQL\Types\GridItemType;
 use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\GetIdKey;
 
 class Grid extends Fieldtype
 {
+    use GetIdKey;
+
     protected $categories = ['structured'];
     protected $defaultable = false;
     protected $defaultValue = [];
@@ -93,7 +96,7 @@ class Grid extends Fieldtype
     {
         $fields = $this->fields()->addValues($row)->process()->values()->all();
 
-        $row = array_merge(['id' => Arr::pull($row, '_id')], $row, $fields);
+        $row = array_merge([$this->getIdKey() => Arr::pull($row, '_id')], $row, $fields);
 
         return Arr::removeNullValues($row);
     }
@@ -115,7 +118,7 @@ class Grid extends Fieldtype
     {
         $fields = $this->fields()->addValues($row)->preProcess()->values()->all();
 
-        $id = Arr::pull($row, 'id') ?? RowId::generate();
+        $id = Arr::pull($row, $this->getIdKey()) ?? RowId::generate();
 
         return array_merge($row, $fields, [
             '_id' => $id,
