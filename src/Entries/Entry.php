@@ -25,6 +25,7 @@ use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
@@ -127,15 +128,23 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) use ($key) {
-                return Blink::once($key, function () use ($blueprint) {
-                    if (! $blueprint) {
-                        $blueprint = $this->hasOrigin()
-                            ? $this->origin()->blueprint()->handle()
-                            : $this->get('blueprint');
-                    }
+                if (Blink::has($key)) {
+                    return Blink::get($key);
+                }
 
-                    return $this->collection()->entryBlueprint($blueprint, $this);
-                });
+                if (! $blueprint) {
+                    $blueprint = $this->hasOrigin()
+                        ? $this->origin()->blueprint()->handle()
+                        : $this->get('blueprint');
+                }
+
+                $blueprint = $this->collection()->entryBlueprint($blueprint, $this);
+
+                Blink::put($key, $blueprint);
+
+                EntryBlueprintFound::dispatch($blueprint, $this);
+
+                return $blueprint;
             })
             ->setter(function ($blueprint) use ($key) {
                 Blink::forget($key);
