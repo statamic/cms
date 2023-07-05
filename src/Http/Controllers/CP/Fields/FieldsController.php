@@ -86,6 +86,11 @@ class FieldsController extends CpController
             'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
         ];
 
+        // TODO: Should be added as default value in next major release.
+        if (! config('statamic.system.allow_ids_in_sets')) {
+            array_push($reserved, 'id');
+        }
+
         $fields = collect([
             'display' => [
                 'display' => __('Display Label'),

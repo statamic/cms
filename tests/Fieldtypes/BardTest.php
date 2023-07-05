@@ -125,6 +125,59 @@ class BardTest extends TestCase
     }
 
     /** @test */
+    public function it_augments_ids_and_sets_id_correctly()
+    {
+        config()->set('statamic.system.allow_ids_in_sets', true);
+
+        (new class extends Fieldtype
+        {
+            public static $handle = 'test';
+
+            public function augment($value)
+            {
+                return $value.' (augmented)';
+            }
+        })::register();
+
+        $data = [
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'set-id', // Set id. Auto generated
+                    'values' => [
+                        'id'    => 'value-id', // Value id. User Input.
+                        'type' => 'image',
+                        'image' => 'test.jpg',
+                    ],
+                ],
+            ],
+        ];
+
+        $expected = [
+            [
+                '_id' => 'set-id',
+                'id' => 'value-id',
+                'type' => 'image',
+                'image' => 'test.jpg (augmented)',
+            ],
+        ];
+
+        $augmented = $this->bard([
+            'sets' => [
+                'image' => [
+                    'fields' => [
+                        ['handle' => 'id', 'field' => ['type' => 'text']],
+                        ['handle' => 'image', 'field' => ['type' => 'test']],
+                    ],
+                ],
+            ],
+        ])->augment($data);
+
+        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
+        $this->assertEquals($expected, collect($augmented)->toArray());
+    }
+
+    /** @test */
     public function it_doesnt_augment_when_saved_as_html()
     {
         $this->assertEquals('<p>Paragraph</p>', $this->bard()->augment('<p>Paragraph</p>'));

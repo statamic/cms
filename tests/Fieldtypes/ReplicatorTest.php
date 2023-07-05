@@ -310,6 +310,81 @@ class ReplicatorTest extends TestCase
         ], $field->process()->value());
     }
 
+    /** @test */
+    public function it_processes_the_values_recursively_with_underscore_ids_as_well()
+    {
+        config()->set('statamic.system.allow_ids_in_sets', true);
+
+        FieldRepository::shouldReceive('find')
+            ->with('testfieldset.numbers')
+            ->andReturnUsing(function () {
+                return new Field('numbers', ['type' => 'integer']);
+            });
+
+        $field = (new Field('test', [
+            'type' => 'replicator',
+            'sets' => [
+                'one' => [
+                    'fields' => [
+                        ['handle' => 'numbers', 'field' => 'testfieldset.numbers'],
+                        ['handle' => 'words', 'field' => ['type' => 'text']],
+                        ['handle' => 'nested_replicator', 'field' => [
+                            'type' => 'replicator',
+                            'sets' => [
+                                'two' => [
+                                    'fields' => [
+                                        ['handle' => 'nested_age', 'field' => 'testfieldset.numbers'],
+                                        ['handle' => 'nested_food', 'field' => ['type' => 'text']],
+                                    ],
+                                ],
+                            ],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->setValue([
+            [
+                '_id' => 'set-id-1',
+                'id' => 'user-input-id-1',
+                'type' => 'one',
+                'numbers' => '2', // corresponding fieldtype has preprocessing
+                'words' => 'test', // corresponding fieldtype has no preprocessing
+                'foo' => 'bar', // no corresponding fieldtype, so theres no preprocessing
+                'nested_replicator' => [
+                    [
+                        '_id' => 'set-id-2',
+                        'id' => 'user-input-id-2',
+                        'type' => 'two',
+                        'nested_age' => '13', // corresponding fieldtype has preprocessing
+                        'nested_food' => 'pizza', // corresponding fieldtype has no preprocessing
+                        'nested_foo' => 'more bar', // no corresponding fieldtype, so theres no preprocessing
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertSame([
+            [
+                '_id' => 'set-id-1',
+                'id' => 'user-input-id-1',
+                'type' => 'one',
+                'numbers' => 2,
+                'words' => 'test',
+                'foo' => 'bar',
+                'nested_replicator' => [
+                    [
+                        '_id' => 'set-id-2',
+                        'id' => 'user-input-id-2',
+                        'type' => 'two',
+                        'nested_age' => 13,
+                        'nested_food' => 'pizza',
+                        'nested_foo' => 'more bar',
+                    ],
+                ],
+            ],
+        ], $field->process()->value());
+    }
+
     /**
      * @test
      *
