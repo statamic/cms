@@ -1,5 +1,19 @@
 # Release Notes
 
+## 4.10.0 (2023-07-05)
+
+### What's new
+- Added `sanitize` param to the `svg` tag. [#8408](https://github.com/statamic/cms/issues/8408) by @jasonvarga
+
+### What's improved
+- French translations. [#8388](https://github.com/statamic/cms/issues/8388) by @ebeauchamps
+
+### What's fixed
+- Bring back the password reset link for non-OAuth sites. [#8396](https://github.com/statamic/cms/issues/8396) by @jackmcdade
+- Add some missing translation calls. [#8387](https://github.com/statamic/cms/issues/8387) by @ebeauchamps
+
+
+
 ## 4.9.2 (2023-06-30)
 
 ### What's fixed
