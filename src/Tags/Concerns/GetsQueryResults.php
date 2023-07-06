@@ -10,15 +10,15 @@ trait GetsQueryResults
     {
         $this->setPaginationParameterPrecedence();
 
-        if ($paginate = $this->params->get('paginate')) {
+        if ($paginate = $this->params->int('paginate')) {
             return $this->paginatedResults($query, $paginate);
         }
 
-        if ($limit = $this->params->get('limit')) {
+        if ($limit = $this->params->int('limit')) {
             $query->limit($limit);
         }
 
-        if ($offset = $this->params->get('offset')) {
+        if ($offset = $this->params->int('offset')) {
             $query->offset($offset);
         }
 
@@ -38,7 +38,8 @@ trait GetsQueryResults
             $this->queryPaginationFriendlyOffset($query, $offset);
         }
 
-        $paginator = $query->paginate($perPage);
+        $pageName = $this->params->get('page_name', 'page');
+        $paginator = $query->paginate($perPage, ['*'], $pageName);
 
         Blink::put('tag-paginator', $paginator);
 

@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\Form;
 use Statamic\Facades\GraphQL;
@@ -20,6 +21,8 @@ class FormsQuery extends Query
 
     public function resolve($root, $args)
     {
-        return Form::all();
+        $allowed = ResourceAuthorizer::allowedSubResources('graphql', 'forms');
+
+        return Form::all()->filter(fn ($form) => in_array($form->handle(), $allowed));
     }
 }

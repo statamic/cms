@@ -18,6 +18,7 @@ class NodeTypeAnalyzer
             if ($node instanceof AntlersNode) {
                 if ($node->pathReference != null && $node->pathReference->isStrictVariableReference) {
                     $node->isTagNode = false;
+
                     continue;
                 }
 

@@ -7,6 +7,8 @@ use Statamic\Query\Scopes\Filter;
 
 class UserRole extends Filter
 {
+    protected $pinned = true;
+
     public static function title()
     {
         return __('Role');
@@ -25,7 +27,11 @@ class UserRole extends Filter
 
     public function apply($query, $values)
     {
-        $query->whereRole($values['role']);
+        if ($values['role'] === 'super') {
+            $query->where('super', true);
+        } else {
+            $query->whereRole($values['role']);
+        }
     }
 
     public function badge($values)

@@ -14,6 +14,9 @@ use Tests\TestCase;
 
 class CollectionRepositoryTest extends TestCase
 {
+    private $directory;
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();

@@ -46,6 +46,31 @@ EOT;
         $this->assertSame('sendForm()', $param2->value);
     }
 
+    public function test_tag_parameters_can_start_with_numbers()
+    {
+        $template = <<<'EOT'
+{{ tag lg:ratio="2" 2xl:ratio="7" }}
+EOT;
+
+        $nodes = $this->parseNodes($template);
+        $this->assertCount(1, $nodes);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[0]);
+
+        /** @var AntlersNode $node */
+        $node = $nodes[0];
+
+        $this->assertCount(2, $node->parameters);
+
+        $param1 = $node->parameters[0];
+        $param2 = $node->parameters[1];
+
+        $this->assertSame('lg:ratio', $param1->name);
+        $this->assertSame('2', $param1->value);
+
+        $this->assertSame('2xl:ratio', $param2->name);
+        $this->assertSame('7', $param2->value);
+    }
+
     public function test_node_parameter_escape_consistent_behavior()
     {
         // Ensure that the escape sequence behavior
@@ -170,8 +195,8 @@ EOT;
             animation="/visuals/pattern-0{{ count }}.json"
         }}
 
-    <div class="md:absolute md:z-10 p-6 md:p-8 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
-        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-4" }}
+    <div class="md:absolute md:z-10 p-16 md:p-30 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
+        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-8" }}
     </div>
 </figure>
 EOT;
@@ -184,7 +209,7 @@ EOT;
         $this->assertInstanceOf(AntlersNode::class, $nodes[3]);
         $this->assertInstanceOf(LiteralNode::class, $nodes[4]);
 
-        $checkString = '<div class="md:absolute md:z-10 p-6 md:p-8 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">';
+        $checkString = '<div class="md:absolute md:z-10 p-16 md:p-30 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">';
         $this->assertStringContainsString($checkString, $nodes[2]->content);
 
         $template = <<<'EOT'
@@ -193,8 +218,8 @@ EOT;
             animation="/visuals/pattern-0{{ count }}- {{two}} {{three}four}.json"
         }}
 
-    <div class="md:absolute md:z-10 p-6 md:p-8 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
-        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-4" }}
+    <div class="md:absolute md:z-10 p-16 md:p-30 md:bottom-0 md:right-0 w-full md:w-4/5 bg-white/90 md:translate-y-1/3 backdrop-blur-xl backdrop-saturate-150 firefox:bg-white">
+        {{ partial:typography/paragraph as="span" :content="title" class="block !mb-8" }}
     </div>
 </figure>
 EOT;

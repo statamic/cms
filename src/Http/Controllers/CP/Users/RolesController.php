@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\CP\Column;
 use Statamic\Facades\Permission;
 use Statamic\Facades\Role;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\RequireStatamicPro;
 
@@ -67,13 +68,19 @@ class RolesController extends CpController
 
         $role = Role::make()
             ->title($request->title)
-            ->handle($request->handle ?: snake_case($request->title))
-            ->permissions($request->super ? ['super'] : $request->permissions)
-            ->save();
+            ->handle($request->handle ?: snake_case($request->title));
+
+        if ($request->super && User::current()->isSuper()) {
+            $role->permissions(['super']);
+        } elseif (! in_array('super', $request->permissions ?? [])) {
+            $role->permissions($request->permissions);
+        }
+
+        $role->save();
 
         session()->flash('success', __('Role created'));
 
-        return ['redirect' => cp_route('roles.index', $role->handle())];
+        return ['redirect' => cp_route('roles.index')];
     }
 
     public function edit($role)
@@ -108,13 +115,19 @@ class RolesController extends CpController
 
         $role
             ->title($request->title)
-            ->handle($request->handle ?: snake_case($request->title))
-            ->permissions($request->super ? ['super'] : $request->permissions)
-            ->save();
+            ->handle($request->handle ?: snake_case($request->title));
+
+        if ($request->super && User::current()->isSuper()) {
+            $role->permissions(['super']);
+        } elseif (! in_array('super', $request->permissions ?? [])) {
+            $role->permissions($request->permissions);
+        }
+
+        $role->save();
 
         session()->flash('success', __('Role updated'));
 
-        return ['redirect' => cp_route('roles.index', $role->handle())];
+        return ['redirect' => cp_route('roles.index')];
     }
 
     public function destroy($role)

@@ -51,4 +51,9 @@ class UserType extends \Rebing\GraphQL\Support\Type
             return $user->resolveGqlValue($info->fieldName);
         };
     }
+
+    public static function addTypes()
+    {
+        User::blueprint()->addGqlTypes();
+    }
 }

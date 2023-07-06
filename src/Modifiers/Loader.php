@@ -3,6 +3,7 @@
 namespace Statamic\Modifiers;
 
 use Statamic\Support\Str;
+use Statamic\View\State\StateManager;
 
 class Loader
 {
@@ -22,6 +23,8 @@ class Loader
         if (Str::contains($class = $modifiers->get($key), 'CoreModifiers@')) {
             [$class, $method] = explode('@', $class);
         }
+
+        StateManager::track($class);
 
         return [app($class), $method ?? 'index'];
     }

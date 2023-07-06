@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Blueprint;
+use Statamic\Tags\Tags;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -127,5 +128,43 @@ EOT;
 
         $this->assertStringContainsString('<Home Page>', $content);
         $this->assertStringContainsString('<p>I am some text<a href="/about">I am the link</a></p>', $content);
+    }
+
+    public function test_condition_augmentation_doesnt_reset_up_the_scope()
+    {
+        $this->createData();
+        $this->withFakeViews();
+
+        (new class extends Tags
+        {
+            public static $handle = 'just_a_tag';
+
+            public function index()
+            {
+                return [];
+            }
+        })::register();
+        $template = <<<'EOT'
+
+{{ just_a_tag }}
+    {{ replicator_field }}
+        {{ partial:inner }}
+    {{ /replicator_field }}
+{{ /just_a_tag }}
+EOT;
+        $partial = <<<'PARTIAL'
+{{ stuff }}
+
+{{ if bard_field }} {{ bard_field }} {{ /if }}
+PARTIAL;
+
+        $this->viewShouldReturnRaw('inner', $partial);
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('default', $template);
+
+        $responseOne = $this->get('/home')->assertOk();
+        $content = trim($responseOne->content());
+
+        $this->assertSame('<p>I am some text<a href="/about">I am the link</a></p>', $content);
     }
 }

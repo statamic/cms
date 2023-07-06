@@ -75,7 +75,6 @@ return [
 
     'group_updates' => 'Aktualizacje',
     'view_updates' => 'Wyświetlanie aktualizacji',
-    'perform_updates' => 'Przeprowadzanie aktualizacji',
 
     'group_utilities' => 'Narzędzia',
     'access_utility' => ':title',

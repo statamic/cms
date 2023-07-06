@@ -18,6 +18,7 @@ class CsvExporter extends AbstractExporter
     public function __construct()
     {
         $this->writer = Writer::createFromFileObject(new SplTempFileObject);
+        $this->writer->setDelimiter(config('statamic.forms.csv_delimiter', ','));
     }
 
     /**
@@ -59,7 +60,7 @@ class CsvExporter extends AbstractExporter
             unset($submission['id']);
 
             return collect($submission)->map(function ($value) {
-                return (is_array($value)) ? join(', ', $value) : $value;
+                return (is_array($value)) ? implode(', ', $value) : $value;
             })->all();
         })->all();
 

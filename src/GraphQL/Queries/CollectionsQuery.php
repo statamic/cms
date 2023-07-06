@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
@@ -20,6 +21,8 @@ class CollectionsQuery extends Query
 
     public function resolve($root, $args)
     {
-        return Collection::all();
+        $allowed = ResourceAuthorizer::allowedSubResources('graphql', 'collections');
+
+        return Collection::all()->filter(fn ($collection) => in_array($collection->handle(), $allowed));
     }
 }

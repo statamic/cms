@@ -13,7 +13,13 @@
     <link rel="shortcut icon" type="image/x-icon" href="{{ Statamic::cpAssetUrl('img/favicon.ico') }}" sizes="16x16 32x32"/>
 @endif
 
-<link href="{{ Statamic::cpAssetUrl('css/cp.css') }}?v={{ Statamic::version() }}" rel="stylesheet" />
+{{ \Illuminate\Support\Facades\Vite::getFacadeRoot()
+    ->useHotFile('vendor/statamic/cp/hot')
+    ->useBuildDirectory('vendor/statamic/cp/build')
+    ->withEntryPoints([
+        'resources/js/app.js',
+        'resources/css/tailwind.css'
+    ]) }}
 
 @if (Statamic::pro() && config('statamic.cp.custom_css_url'))
 <link href="{{ config('statamic.cp.custom_css_url') }}?v={{ Statamic::version() }}" rel="stylesheet" />
@@ -25,7 +31,7 @@
 
 @foreach (Statamic::availableStyles(request()) as $package => $paths)
     @foreach ($paths as $path)
-        <link href="{{ Statamic::vendorAssetUrl("$package/css/$path") }}" rel="stylesheet" />
+        <link href="{{ Statamic::vendorPackageAssetUrl($package, $path, 'css') }}" rel="stylesheet" />
     @endforeach
 @endforeach
 

@@ -2427,6 +2427,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider objectInConditionProvider
      */
     public function it_uses_entries_as_conditions($object)
@@ -2475,6 +2476,8 @@ EOT;
 
 class NonArrayableObject
 {
+    protected $data;
+
     public function __construct($data)
     {
         $this->data = $data;

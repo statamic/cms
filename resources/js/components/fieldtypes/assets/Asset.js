@@ -1,4 +1,3 @@
-import Luminous from 'luminous-lightbox';
 import AssetEditor from '../../assets/Editor/Editor.vue';
 
 export default {
@@ -11,6 +10,10 @@ export default {
         asset: Object,
         readOnly: Boolean,
         showFilename: {
+            type: Boolean,
+            default: true
+        },
+        showSetAlt: {
             type: Boolean,
             default: true
         }
@@ -33,8 +36,16 @@ export default {
             return this.asset.extension === 'svg';
         },
 
+        container() {
+            return this.asset.id.substr(0, this.asset.id.indexOf('::'))
+        },
+
         canBeTransparent() {
             return ['png', 'svg'].includes(this.asset.extension)
+        },
+
+        canDownload() {
+            return Statamic.$permissions.has(`view ${this.container} assets`);
         },
 
         thumbnail() {
@@ -43,6 +54,10 @@ export default {
 
         label() {
             return this.asset.basename;
+        },
+
+        needsAlt() {
+            return (this.asset.isImage || this.asset.isSvg) && !this.asset.values.alt;
         }
     },
 
@@ -61,15 +76,12 @@ export default {
             this.$emit('removed', this.asset);
         },
 
-        makeZoomable() {
-            const el = $(this.$el).find('a.zoom')[0];
+        open() {
+            window.open(this.asset.url, '_blank');
+        },
 
-            if (! el || ! this.isImage) return;
-
-            new Luminous(el, {
-                closeOnScroll: true,
-                captionAttribute: 'title'
-            });
+        download() {
+            window.open(this.asset.downloadUrl);
         },
 
         closeEditor() {
@@ -79,13 +91,17 @@ export default {
         assetSaved(asset) {
             this.$emit('updated', asset);
             this.closeEditor();
-        }
+        },
 
-    },
+        actionCompleted(successful, response) {
+            if (successful === false) return;
+            const id = response.ids[0] || null;
+            if (id && id !== this.asset.id) {
+                this.$emit('id-changed', id);
+            }
+            this.closeEditor();
+        },
 
-
-    mounted() {
-        this.makeZoomable();
     }
 
 }

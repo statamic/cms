@@ -48,6 +48,8 @@ abstract class AbstractNode
      */
     public $originalAbstractNode = null;
 
+    public $isVirtual = false;
+
     public function __construct()
     {
         $this->refId = StringUtilities::uuidv4();
@@ -80,5 +82,14 @@ abstract class AbstractNode
     public function rawContent()
     {
         return $this->content;
+    }
+
+    public function getRootRef()
+    {
+        if ($this->parent != null) {
+            return $this->parent->getRootRef();
+        }
+
+        return $this->refId;
     }
 }

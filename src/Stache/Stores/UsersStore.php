@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\Facades\Role as RoleFacade;
+use Statamic\Facades\Role as UserRole;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Facades\YAML;
@@ -13,14 +13,19 @@ class UsersStore extends BasicStore
 {
     protected function storeIndexes()
     {
-        return UserGroup::all()->mapWithKeys(function ($group) {
+        $groups = UserGroup::all()->mapWithKeys(function ($group) {
             return ['groups/'.$group->handle() => Group::class];
-        })
-        ->merge(RoleFacade::all()->mapWithKeys(function ($role) {
+        });
+
+        $roles = UserRole::all()->mapWithKeys(function ($role) {
             return ['roles/'.$role->handle() => Role::class];
-        }))
-        ->push('email')
-        ->all();
+        });
+
+        return collect()
+            ->merge($groups)
+            ->merge($roles)
+            ->push('email')
+            ->all();
     }
 
     protected $groups = [];
@@ -47,7 +52,7 @@ class UsersStore extends BasicStore
             ->data($data);
 
         if (array_get($data, 'password') || isset($idGenerated)) {
-            $user->save();
+            $user->writeFile();
         }
 
         // $this->queueGroups($user);

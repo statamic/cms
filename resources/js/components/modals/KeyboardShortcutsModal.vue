@@ -1,9 +1,9 @@
 <template>
-    <modal v-if="open" name="keyboard-shortcuts" width="380" height="auto" :adaptive="true" :pivotY=".1" @closed="open = false" v-on-clickaway="close">
-        <h1 class="p-2 bg-grey-20 border-b text-center">
+    <modal v-if="open" name="keyboard-shortcuts" width="380" height="auto" :adaptive="true" @closed="open = false" click-to-close>
+        <h1 class="p-4 bg-gray-200 border-b text-center">
             {{ __('Keyboard Shortcuts') }}
         </h1>
-        <div class="p-3 relative">
+        <div class="p-6 relative">
             <div class="shortcut-pair">
                 <span class="shortcut-combo">
                     <span class="shortcut">shift</span><span class="shortcut-joiner">+</span><span class="shortcut">?</span>

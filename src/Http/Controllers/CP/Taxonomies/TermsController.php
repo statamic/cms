@@ -26,6 +26,7 @@ class TermsController extends CpController
         $query = $this->indexQuery($taxonomy);
 
         $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'taxonomy' => $taxonomy->handle(),
             'blueprints' => $taxonomy->termBlueprints()->map->handle(),
         ]);
 
@@ -41,13 +42,19 @@ class TermsController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $terms = $query->paginate(request('perPage'));
+        $paginator = $query->paginate(request('perPage'));
 
-        $terms->setCollection(
-            $terms->getCollection()->map->in(Site::selected()->handle())
-        );
+        $terms = $paginator->getCollection();
 
-        return (new Terms($terms))
+        if (request('search') && $taxonomy->hasSearchIndex()) {
+            $terms = $terms->map->getSearchable();
+        }
+
+        $terms = $terms->map->in(Site::selected()->handle());
+
+        $paginator->setCollection($terms);
+
+        return (new Terms($paginator))
             ->blueprint($taxonomy->termBlueprint())
             ->columnPreferenceKey("taxonomies.{$taxonomy->handle()}.columns")
             ->additional(['meta' => [
@@ -97,6 +104,7 @@ class TermsController extends CpController
                 'revisions' => $term->revisionsUrl(),
                 'restore' => $term->restoreRevisionUrl(),
                 'createRevision' => $term->createRevisionUrl(),
+                'editBlueprint' => cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $term->id()]),
             'meta' => $meta,

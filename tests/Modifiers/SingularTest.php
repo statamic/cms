@@ -18,6 +18,7 @@ class SingularTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider pluralWords
      */
     public function it_returns_the_singular_word_of_an_english_word($expected, $input): void

@@ -10,6 +10,8 @@ class MakeModifierTest extends TestCase
 {
     use Concerns\CleansUpGeneratedPaths;
 
+    private $files;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -29,7 +31,7 @@ class MakeModifierTest extends TestCase
     {
         $path = base_path('app/Modifiers/Giraffe.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:modifier', ['name' => 'Giraffe']);
 
@@ -42,7 +44,7 @@ class MakeModifierTest extends TestCase
     {
         $path = base_path('app/Modifiers/Giraffe.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:modifier', ['name' => 'Giraffe']);
         $this->files->put($path, 'overwritten modifier');
@@ -78,7 +80,7 @@ class MakeModifierTest extends TestCase
 
         Composer::shouldReceive('installedPath')->andReturn($path);
 
-        $this->assertFileNotExists($modifier = "$path/src/Modifiers/Yoda.php");
+        $this->assertFileDoesNotExist($modifier = "$path/src/Modifiers/Yoda.php");
 
         $this->artisan('statamic:make:modifier', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 

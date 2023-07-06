@@ -2,13 +2,13 @@
 
 namespace Tests\Imaging;
 
+use Facades\Statamic\Imaging\ImageValidator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
-use League\Flysystem\Adapter\Local;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Glide\Manipulators\Watermark;
 use League\Glide\Server;
@@ -18,7 +18,6 @@ use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Imaging\GuzzleAdapter;
 use Statamic\Imaging\ImageGenerator;
-use Statamic\Imaging\LegacyGuzzleAdapter;
 use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -39,8 +38,10 @@ class ImageGeneratorTest extends TestCase
     {
         Event::fake();
 
-        $cacheKey = 'asset::test_container::foo/hoff.jpg::4dbc41d8e3ba1ccd302641e509b48768';
-        $this->assertNull(Glide::cacheStore()->get($cacheKey));
+        $manifestCacheKey = 'asset::test_container::foo/hoff.jpg';
+        $manipulationCacheKey = 'asset::test_container::foo/hoff.jpg::4dbc41d8e3ba1ccd302641e509b48768';
+        $this->assertNull(Glide::cacheStore()->get($manifestCacheKey));
+        $this->assertNull(Glide::cacheStore()->get($manipulationCacheKey));
 
         Storage::fake('test');
         $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
@@ -49,6 +50,10 @@ class ImageGeneratorTest extends TestCase
         $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
 
         $this->assertCount(0, $this->generatedImagePaths());
+
+        ImageValidator::shouldReceive('isValidImage')
+            ->andReturnTrue()
+            ->once(); // Only one manipulation should happen because of cache.
 
         // Generate the image twice to make sure it's cached.
         foreach (range(1, 2) as $i) {
@@ -64,13 +69,54 @@ class ImageGeneratorTest extends TestCase
         $actualParams = array_merge($userParams, ['fit' => 'crop-50-50']);
         $md5 = $this->getGlideMd5($asset->basename(), $actualParams);
 
-        $expectedPath = "containers/test_container/foo/hoff.jpg/{$md5}.jpg";
+        $expectedCacheManifest = [$manipulationCacheKey];
+        $expectedPathPrefix = 'containers/test_container';
+        $expectedPath = "{$expectedPathPrefix}/foo/hoff.jpg/{$md5}.jpg";
 
+        $this->assertEquals($manifestCacheKey, ImageGenerator::assetCacheManifestKey($asset));
+        $this->assertEquals($expectedPathPrefix, ImageGenerator::assetCachePathPrefix($asset));
         $this->assertEquals($expectedPath, $path);
         $this->assertCount(1, $paths = $this->generatedImagePaths());
         $this->assertContains($expectedPath, $paths);
-        $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
+        $this->assertEquals($expectedCacheManifest, Glide::cacheStore()->get($manifestCacheKey));
+        $this->assertEquals($expectedPath, Glide::cacheStore()->get($manipulationCacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
+    }
+
+    /** @test */
+    public function it_generates_cache_manifest_for_multiple_asset_manipulations()
+    {
+        Event::fake();
+
+        $manifestCacheKey = 'asset::test_container::foo/hoff.jpg';
+        $this->assertNull(Glide::cacheStore()->get($manifestCacheKey));
+
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        ImageValidator::shouldReceive('isValidImage')
+            ->andReturnTrue()
+            ->times(2); // Two manipulations should get cached.
+
+        // Generate the image twice to make sure it's cached.
+        foreach (range(1, 2) as $i) {
+            $this->makeGenerator()->generateByAsset(
+                $asset,
+                ['w' => 100, 'h' => $i] // Ensure unique params so that two manipulations get cached.
+            );
+        }
+
+        Event::assertDispatchedTimes(GlideImageGenerated::class, 2);
+
+        $this->assertCount(2, $manifest = Glide::cacheStore()->get($manifestCacheKey));
+        $this->assertCount(2, $this->generatedImagePaths());
+
+        foreach ($manifest as $cacheKey) {
+            $this->assertTrue(Str::startsWith($cacheKey, 'asset::test_container::foo/hoff.jpg::'));
+        }
     }
 
     /** @test */
@@ -89,6 +135,10 @@ class ImageGeneratorTest extends TestCase
         $image = UploadedFile::fake()->image('', 30, 60);
         $contents = file_get_contents($image->getPathname());
         File::put(public_path($imagePath), $contents);
+
+        ImageValidator::shouldReceive('isValidImage')
+            ->andReturnTrue()
+            ->once(); // Only one manipulation should happen because of cache.
 
         // Generate the image twice to make sure it's cached.
         foreach (range(1, 2) as $i) {
@@ -226,6 +276,7 @@ class ImageGeneratorTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider guzzleWatermarkProvider
      */
     public function the_watermark_disk_is_a_guzzle_adapter_when_a_url_is_provided($protocol)
@@ -252,18 +303,6 @@ class ImageGeneratorTest extends TestCase
         $watermark = collect($manipulators)->first(fn ($m) => $m instanceof Watermark);
 
         return $watermark->getWatermarks();
-    }
-
-    /** @test */
-    public function it_validates_an_asset()
-    {
-        $this->markTestIncomplete();
-    }
-
-    /** @test */
-    public function it_validates_an_image()
-    {
-        $this->markTestIncomplete();
     }
 
     private function makeGenerator()
@@ -298,33 +337,16 @@ class ImageGeneratorTest extends TestCase
 
     private function assertLocalAdapter($adapter)
     {
-        if ($this->isUsingFlysystemV1()) {
-            return $this->assertInstanceOf(Local::class, $adapter);
-        }
-
         $this->assertInstanceOf(LocalFilesystemAdapter::class, $adapter);
     }
 
     private function assertGuzzleAdapter($adapter)
     {
-        if ($this->isUsingFlysystemV1()) {
-            return $this->assertInstanceOf(LegacyGuzzleAdapter::class, $adapter);
-        }
-
         $this->assertInstanceOf(GuzzleAdapter::class, $adapter);
-    }
-
-    private function isUsingFlysystemV1()
-    {
-        return class_exists('\League\Flysystem\Util');
     }
 
     private function getRootFromLocalAdapter($adapter)
     {
-        if ($this->isUsingFlysystemV1()) {
-            return $adapter->getPathPrefix();
-        }
-
         $reflection = new \ReflectionClass($adapter);
         $property = $reflection->getProperty('prefixer');
         $property->setAccessible(true);

@@ -1,0 +1,117 @@
+/* ==========================================================================
+   PUBLISH COMPONENT
+   ========================================================================== */
+
+.publishing .page-wrapper {
+    padding: 0;
+
+    .publish-errors {
+        margin: 0 24px 24px;
+        padding: 16px 0;
+    }
+}
+
+.publish-tab-outer {
+    @apply flex justify-between;
+}
+
+.publish-form {
+    position: relative;
+
+    .loading-blocker {
+        padding-top: 50px;
+        border-radius: 3px;
+    }
+}
+
+.head .status {
+    display: inline-block;
+    label {
+        margin: 0 6px 0 0;
+        position: relative;
+        top: 3px;
+    }
+    > div {
+        display: inline-block;
+        position: relative;
+        top: 8px;
+    }
+
+}
+
+code.parent-url {
+    @apply block text-3xs bg-none text-gray-700;
+    padding: 0 0 3px 0;
+}
+
+.publish-fields {
+    @apply flex flex-wrap;
+
+    .form-group {
+        > label,
+        .field-inner > label {
+            @apply font-medium mb-2;
+        }
+    }
+
+    > .form-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .has-error > .field-inner > label {
+        @apply text-red-500;
+    }
+
+    .field-inner {
+        position: relative;
+    }
+
+    .read-only-overlay {
+        @apply absolute inset-0 cursor-not-allowed bg-white/25;
+        z-index: 100;
+    }
+}
+
+.publish-field {
+    @apply relative;
+}
+
+.publish-field-label {
+    @apply flex items-center;
+}
+
+.publish-sections-section {
+    @apply mb-8;
+}
+
+.publish-section-header {
+    @apply border-b border-gray-400 bg-gray-100 rounded-t-lg;
+}
+
+.publish-section-header-inner {
+    @apply px-3 @sm:px-4 @lg:px-6 pt-4 pb-3;
+}
+
+.publish-sidebar {
+    @apply shrink-0;
+    margin-left: 20px;
+    width: 300px;
+
+    .publish-tab-actions {
+        @apply border-b;
+    }
+
+    .publish-fields .form-group {
+        @apply p-4;
+    }
+}
+
+.publish-tab-actions-footer {
+    @apply mt-6;
+}
+
+.sneak-peek-editing .publish-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}

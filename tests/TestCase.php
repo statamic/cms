@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use Illuminate\Testing\Assert as IlluminateAssert;
+use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
@@ -13,9 +15,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function setUp(): void
     {
-        require_once __DIR__.'/ConsoleKernel.php';
-
         parent::setUp();
+
+        $this->withoutVite();
 
         $uses = array_flip(class_uses_recursive(static::class));
 
@@ -24,12 +26,12 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         if ($this->shouldFakeVersion) {
-            \Facades\Statamic\Version::shouldReceive('get')->andReturn('3.0.0-testing');
+            \Facades\Statamic\Version::shouldReceive('get')->zeroOrMoreTimes()->andReturn('3.0.0-testing');
             $this->addToAssertionCount(-1); // Dont want to assert this
         }
 
         if ($this->shouldPreventNavBeingBuilt) {
-            \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn([]);
+            \Statamic\Facades\CP\Nav::shouldReceive('build')->zeroOrMoreTimes()->andReturn(collect());
             $this->addToAssertionCount(-1); // Dont want to assert this
         }
 
@@ -74,8 +76,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         foreach ($configs as $config) {
             $app['config']->set("statamic.$config", require(__DIR__."/../config/{$config}.php"));
         }
-
-        $app['config']->set('statamic.antlers.version', 'runtime');
     }
 
     protected function getEnvironmentSetUp($app)
@@ -113,6 +113,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'driver' => 'file',
             'path' => storage_path('framework/cache/outpost-data'),
         ]);
+
+        $app['config']->set('statamic.search.indexes.default.driver', 'null');
 
         $viewPaths = $app['config']->get('view.paths');
         $viewPaths[] = __DIR__.'/__fixtures__/views/';
@@ -170,8 +172,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     public static function assertArraySubset($subset, $array, bool $checkForObjectIdentity = false, string $message = ''): void
     {
-        $class = version_compare(app()->version(), 7, '>=') ? \Illuminate\Testing\Assert::class : \Illuminate\Foundation\Testing\Assert::class;
-        $class::assertArraySubset($subset, $array, $checkForObjectIdentity, $message);
+        IlluminateAssert::assertArraySubset($subset, $array, $checkForObjectIdentity, $message);
     }
 
     // This method is unavailable on earlier versions of Laravel.
@@ -183,40 +184,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         return $mock;
     }
 
-    /**
-     * @deprecated
-     */
-    public static function assertFileNotExists(string $filename, string $message = ''): void
-    {
-        method_exists(static::class, 'assertFileDoesNotExist')
-            ? static::assertFileDoesNotExist($filename, $message)
-            : parent::assertFileNotExists($filename, $message);
-    }
-
-    /**
-     * @deprecated
-     */
-    public static function assertDirectoryNotExists(string $filename, string $message = ''): void
-    {
-        method_exists(static::class, 'assertDirectoryDoesNotExist')
-            ? static::assertDirectoryDoesNotExist($filename, $message)
-            : parent::assertDirectoryNotExists($filename, $message);
-    }
-
-    public static function assertMatchesRegularExpression(string $pattern, string $string, string $message = ''): void
-    {
-        method_exists(\PHPUnit\Framework\Assert::class, 'assertMatchesRegularExpression')
-            ? parent::assertMatchesRegularExpression($pattern, $string, $message)
-            : parent::assertRegExp($pattern, $string, $message);
-    }
-
     private function addGqlMacros()
     {
-        $testResponseClass = version_compare($this->app->version(), 7, '<')
-            ? \Illuminate\Foundation\Testing\TestResponse::class
-            : \Illuminate\Testing\TestResponse::class;
-
-        $testResponseClass::macro('assertGqlOk', function () {
+        TestResponse::macro('assertGqlOk', function () {
             $this->assertOk();
 
             $json = $this->json();
@@ -231,7 +201,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             return $this;
         });
 
-        $testResponseClass::macro('assertGqlUnauthorized', function () {
+        TestResponse::macro('assertGqlUnauthorized', function () {
             $this->assertOk();
 
             $json = $this->json();

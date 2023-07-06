@@ -8,6 +8,7 @@ use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\UserType;
 use Statamic\Query\OrderedQueryBuilder;
+use Statamic\Query\Scopes\Filters\Fields\User as UserFilter;
 use Statamic\Support\Arr;
 
 class Users extends Relationship
@@ -29,22 +30,32 @@ class Users extends Relationship
     protected function configFieldItems(): array
     {
         return [
-            'max_items' => [
-                'display' => __('Max Items'),
-                'instructions' => __('statamic::messages.max_items_instructions'),
-                'type' => 'integer',
-                'min' => 1,
-            ],
-            'mode' => [
-                'display' => __('Mode'),
-                'type' => 'radio',
-                'options' => [
-                    'default' => __('Stack Selector'),
-                    'select' => __('Select Dropdown'),
-                    'typeahead' => __('Typeahead Field'),
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'type' => 'integer',
+                        'min' => 1,
+                    ],
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.any.config.mode'),
+                        'type' => 'radio',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                        'default' => 'select',
+                    ],
+                    'default' => [
+                        'display' => __('Default'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'users',
+                    ],
                 ],
-                'default' => 'select',
-                'width' => 50,
             ],
         ];
     }
@@ -82,6 +93,8 @@ class Users extends Relationship
         if ($request->exclusions) {
             $query->whereNotIn('id', $request->exclusions);
         }
+
+        $query->orderBy('name');
 
         $userFields = function ($user) {
             return [
@@ -171,5 +184,10 @@ class Users extends Relationship
         }
 
         return $type;
+    }
+
+    public function filter()
+    {
+        return new UserFilter($this);
     }
 }

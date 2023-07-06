@@ -3,8 +3,17 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
+use Statamic\Facades\File;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\NullCacher;
+use Statamic\StaticCaching\NoCache\Session;
+use Statamic\StaticCaching\Replacer;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\NoLock;
+use Symfony\Component\Lock\Store\FlockStore;
 
 class Cache
 {
@@ -13,31 +22,75 @@ class Cache
      */
     private $cacher;
 
-    public function __construct(Cacher $cacher)
+    /**
+     * @var Session
+     */
+    protected $nocache;
+
+    public function __construct(Cacher $cacher, Session $nocache)
     {
         $this->cacher = $cacher;
+        $this->nocache = $nocache;
     }
 
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
+        $lock = $this->createLock($request);
+
+        while (! $lock->acquire()) {
+            sleep(1);
+        }
+
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            return response($this->cacher->getCachedPage($request));
+            $response = response($this->cacher->getCachedPage($request));
+
+            $this->makeReplacements($response);
+
+            return $response;
         }
 
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
-            $this->cacher->cachePage($request, $response);
+            $lock->acquire(true);
+
+            $this->makeReplacementsAndCacheResponse($request, $response);
+
+            $this->nocache->write();
+        } elseif (! $response->isRedirect()) {
+            $this->makeReplacements($response);
         }
 
         return $response;
+    }
+
+    private function makeReplacementsAndCacheResponse($request, $response)
+    {
+        $cachedResponse = clone $response;
+
+        if ($response instanceof Response) {
+            $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse, $response));
+        }
+
+        $this->cacher->cachePage($request, $cachedResponse);
+    }
+
+    private function makeReplacements($response)
+    {
+        if ($response instanceof Response) {
+            $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->replaceInCachedResponse($response));
+        }
+    }
+
+    private function getReplacers(): Collection
+    {
+        return collect(config('statamic.static_caching.replacers'))->map(fn ($class) => app($class));
     }
 
     private function canBeCached($request)
@@ -72,5 +125,20 @@ class Cache
         }
 
         return true;
+    }
+
+    private function createLock($request)
+    {
+        if ($this->cacher instanceof NullCacher) {
+            return new NoLock;
+        }
+
+        File::makeDirectory($dir = storage_path('statamic/static-caching-locks'));
+
+        $locks = new LockFactory(new FlockStore($dir));
+
+        $key = $this->cacher->getUrl($request);
+
+        return $locks->createLock($key, 30);
     }
 }

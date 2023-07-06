@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use Statamic\Facades;
 use Statamic\Statamic;
@@ -46,7 +47,7 @@ class Outpost
         try {
             return $this->performAndCacheRequest();
         } catch (ConnectException $e) {
-            return $this->cacheAndReturnErrorResponse();
+            return $this->cacheAndReturnErrorResponse($e);
         } catch (RequestException $e) {
             return $this->handleRequestException($e);
         }
@@ -139,7 +140,7 @@ class Outpost
         } elseif ($code == 429) {
             return $this->cacheAndReturnRateLimitResponse($e);
         } elseif ($code >= 500 && $code < 600) {
-            return $this->cacheAndReturnErrorResponse();
+            return $this->cacheAndReturnErrorResponse($e);
         }
 
         throw $e;
@@ -162,8 +163,10 @@ class Outpost
         return $this->cacheResponse(now()->addSeconds($seconds), ['error' => 429]);
     }
 
-    private function cacheAndReturnErrorResponse()
+    private function cacheAndReturnErrorResponse($e)
     {
+        Log::debug('Error contacting Outpost: '.$e->getMessage());
+
         return $this->cacheResponse(now()->addMinutes(5), ['error' => 500]);
     }
 

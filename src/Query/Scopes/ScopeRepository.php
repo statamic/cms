@@ -6,9 +6,10 @@ class ScopeRepository
 {
     public function all()
     {
-        return app('statamic.scopes')->map(function ($class) {
-            return app($class);
-        })->values();
+        return app('statamic.scopes')
+            ->map(fn ($class) => app($class))
+            ->filter()
+            ->values();
     }
 
     public function find($key, $context = [])
@@ -21,9 +22,7 @@ class ScopeRepository
     public function filters($key, $context = [])
     {
         return $this->all()
-            ->filter(function ($filter) {
-                return $filter instanceof Filter;
-            })
+            ->filter(fn ($filter) => $filter instanceof Filter)
             ->each->context($context)
             ->filter->visibleTo($key)
             ->values();

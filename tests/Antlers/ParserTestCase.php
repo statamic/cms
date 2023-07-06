@@ -85,7 +85,7 @@ class ParserTestCase extends TestCase
     {
         if (self::$testBlueprint == null) {
             $blueprintContents = YAML::parse(file_get_contents(__DIR__.'/../__fixtures__/blueprints/article.yaml'));
-            $blueprintFields = collect($blueprintContents['sections']['main']['fields'])->keyBy(function ($item) {
+            $blueprintFields = collect($blueprintContents['tabs']['main']['fields'])->keyBy(function ($item) {
                 return $item['handle'];
             })->map(function ($item) {
                 return $item['field'];
@@ -229,6 +229,7 @@ class ParserTestCase extends TestCase
         $processor->setData($data);
 
         $runtimeParser = new RuntimeParser($documentParser, $processor, new AntlersLexer(), new LanguageParser());
+        $processor->setAntlersParserInstance($runtimeParser);
 
         if ($withCoreTagsAndModifiers) {
             $runtimeParser->cascade(app(Cascade::class));
