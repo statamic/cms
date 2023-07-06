@@ -24,10 +24,7 @@ trait OutputsItems
         $extra = [];
 
         $extra['total_results'] = $items->count();
-
-        if ($items->isEmpty()) {
-            $extra['no_results'] = true;
-        }
+        $extra['no_results'] = $items->isEmpty();
 
         return $extra;
     }
@@ -57,14 +54,14 @@ trait OutputsItems
     protected function getPaginationData($paginator)
     {
         return [
-            'total_items'    => $paginator->total(),
+            'total_items' => $paginator->total(),
             'items_per_page' => $paginator->perPage(),
-            'total_pages'    => $paginator->lastPage(),
-            'current_page'   => $paginator->currentPage(),
-            'prev_page'      => $paginator->previousPageUrl(),
-            'next_page'      => $paginator->nextPageUrl(),
-            'auto_links'     => $paginator->render('pagination::default'),
-            'links'          => $paginator->renderArray(),
+            'total_pages' => $paginator->lastPage(),
+            'current_page' => $paginator->currentPage(),
+            'prev_page' => $paginator->previousPageUrl(),
+            'next_page' => $paginator->nextPageUrl(),
+            'auto_links' => $paginator->render('pagination::default'),
+            'links' => $paginator->renderArray(),
         ];
     }
 }

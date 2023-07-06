@@ -33,7 +33,7 @@ class Exporter
         $this->exportPath = $absolutePath;
 
         if (! $this->files->exists($this->exportPath)) {
-            throw new StarterKitException("Path [$exportPath] does not exist.");
+            throw new StarterKitException("Path [$this->exportPath] does not exist.");
         }
 
         if (! $this->files->exists(base_path('starter-kit.yaml'))) {
@@ -43,6 +43,7 @@ class Exporter
         $this
             ->exportFiles()
             ->exportConfig()
+            ->exportHooks()
             ->exportComposerJson();
     }
 
@@ -186,6 +187,22 @@ class Exporter
         $config = $this->exportDependenciesFromComposerJson($config);
 
         $this->files->put("{$this->exportPath}/starter-kit.yaml", YAML::dump($config->all()));
+
+        return $this;
+    }
+
+    /**
+     * Export starter kit hooks.
+     *
+     * @return $this
+     */
+    protected function exportHooks()
+    {
+        $hooks = ['StarterKitPostInstall.php'];
+
+        collect($hooks)
+            ->filter(fn ($hook) => $this->files->exists(base_path($hook)))
+            ->each(fn ($hook) => $this->copyPath($hook));
 
         return $this;
     }

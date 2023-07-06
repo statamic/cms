@@ -39,7 +39,7 @@ class UserRoles extends Relationship
 
     public function getIndexItems($request)
     {
-        return Role::all()->map(function ($role) {
+        return Role::all()->sortBy('title')->map(function ($role) {
             return [
                 'id' => $role->handle(),
                 'title' => $role->title(),

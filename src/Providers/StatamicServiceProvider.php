@@ -14,10 +14,10 @@ class StatamicServiceProvider extends AggregateServiceProvider
     protected $providers = [
         IgnitionServiceProvider::class,
         ViewServiceProvider::class,
+        CacheServiceProvider::class,
         AppServiceProvider::class,
         ConsoleServiceProvider::class,
         CollectionsServiceProvider::class,
-        CacheServiceProvider::class,
         FilesystemServiceProvider::class,
         ExtensionServiceProvider::class,
         EventServiceProvider::class,
@@ -36,5 +36,6 @@ class StatamicServiceProvider extends AggregateServiceProvider
         \Statamic\Git\ServiceProvider::class,
         \Statamic\GraphQL\ServiceProvider::class,
         BardServiceProvider::class,
+        \Statamic\Preferences\ServiceProvider::class,
     ];
 }

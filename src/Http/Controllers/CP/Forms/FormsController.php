@@ -190,7 +190,7 @@ class FormsController extends CpController
 
     protected function editFormBlueprint($form)
     {
-        return Blueprint::makeFromSections([
+        return Blueprint::makeFromTabs([
             'name' => [
                 'display' => __('Name'),
                 'fields' => [
@@ -278,6 +278,7 @@ class FormsController extends CpController
                                     'type' => 'template',
                                     'display' => __('HTML view'),
                                     'instructions' => __('statamic::messages.form_configure_email_html_instructions'),
+                                    'folder' => config('statamic.forms.email_view_folder'),
                                 ],
                             ],
                             [
@@ -286,6 +287,7 @@ class FormsController extends CpController
                                     'type' => 'template',
                                     'display' => __('Text view'),
                                     'instructions' => __('statamic::messages.form_configure_email_text_instructions'),
+                                    'folder' => config('statamic.forms.email_view_folder'),
                                 ],
                             ],
                             [

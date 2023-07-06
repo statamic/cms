@@ -3,11 +3,17 @@
 namespace Statamic\Tags;
 
 use Statamic\Support\Arr;
+use Statamic\View\State\ResetsState;
 
-class Rotate extends Tags
+class Rotate extends Tags implements ResetsState
 {
     protected static $aliases = ['switch'];
     protected static $counts = [];
+
+    public static function resetStaticState()
+    {
+        self::$counts = [];
+    }
 
     /**
      * The {{ rotate }} tag.

@@ -96,6 +96,7 @@ class LanguageParser
     protected $tokens = [];
 
     private $isRoot = true;
+    private $createdMethods = false;
 
     public function __construct()
     {
@@ -117,6 +118,7 @@ class LanguageParser
         $this->tokens = $this->createTupleLists($this->tokens);
 
         $this->tokens = $this->createOperatorInvocations($this->tokens);
+        $this->tokens = $this->createLogicGroupsAroundMethodCalls($this->tokens);
         $this->tokens = $this->associateModifiers($this->tokens);
         $this->tokens = $this->createNullCoalescenceGroups($this->tokens);
 
@@ -166,10 +168,12 @@ class LanguageParser
                 $logicGroupBegin = new LogicGroupBegin();
                 $newNodes[] = $arrConstruct;
                 $newNodes[] = $logicGroupBegin;
+
                 continue;
             } elseif ($thisNode instanceof ImplicitArrayEnd) {
                 $logicGroupEnd = new LogicGroupEnd();
                 $newNodes[] = $logicGroupEnd;
+
                 continue;
             } else {
                 $newNodes[] = $thisNode;
@@ -197,18 +201,20 @@ class LanguageParser
                 $wrapperGroup->nodes[] = $lastNode;
                 $wrapperGroup->nodes[] = $thisNode;
 
+                $doBreak = false;
+
                 if ($i != $lastNodeIndex) {
                     for ($j = $i + 1; $j < $nodeLen; $j++) {
                         if ($nodes[$j] instanceof MethodInvocationNode) {
                             $wrapperGroup->nodes[] = $nodes[$j];
 
                             if ($j == $lastNodeIndex) {
-                                $i += 1; // Force the outer loop to break as well.
+                                $doBreak = true;
                                 break;
                             }
                         } else {
                             if ($j == $lastNodeIndex) {
-                                $i += 1; // Force the outer loop to break as well.
+                                $doBreak = true;
                                 break;
                             }
 
@@ -221,6 +227,10 @@ class LanguageParser
                 $wrapperGroup->endPosition = $wrapperGroup->nodes[count($wrapperGroup->nodes) - 1]->endPosition;
 
                 $newNodes[] = $wrapperGroup;
+
+                if ($doBreak) {
+                    break;
+                }
             } else {
                 $newNodes[] = $thisNode;
             }
@@ -327,8 +337,10 @@ class LanguageParser
                 $methodInvocation->method = $thisNode;
 
                 $newTokens[] = $methodInvocation;
+                $this->createdMethods = true;
 
                 $i += 1;
+
                 continue;
             } elseif ($thisNode instanceof LogicGroup && $prevNode instanceof VariableNode && $prevNode->variableReference != null &&
                 count($prevNode->variableReference->pathParts) >= 2) {
@@ -364,6 +376,7 @@ class LanguageParser
                 }
 
                 $newTokens[] = $methodInvocation;
+                $this->createdMethods = true;
 
                 continue;
             } elseif ($thisNode instanceof VariableNode && $prevNode instanceof MethodInvocationNode) {
@@ -404,8 +417,10 @@ class LanguageParser
                 $methodInvocation->method = $thisNode;
 
                 $newTokens[] = $methodInvocation;
+                $this->createdMethods = true;
 
                 $i += 1;
+
                 continue;
             } elseif ($thisNode instanceof InlineBranchSeparator && $prevNode instanceof MethodInvocationNode) {
                 if ($i + 1 > $nodeCount) {
@@ -454,8 +469,10 @@ class LanguageParser
                 $methodInvocation->method = $next;
 
                 $newTokens[] = $methodInvocation;
+                $this->createdMethods = true;
 
                 $i += 2;
+
                 continue;
             } elseif ($thisNode instanceof MethodInvocationNode) {
                 if ($i + 1 > $nodeCount) {
@@ -531,12 +548,14 @@ class LanguageParser
 
                     if (array_key_exists($checkParts[0], LanguageOperatorRegistry::$operators)) {
                         $tokens[$i] = $this->convertVarNodeToOperator($thisNode);
+
                         continue;
                     }
                 }
 
                 if (array_key_exists($thisNode->name, LanguageOperatorRegistry::$operators)) {
                     $tokens[$i] = $this->convertVarNodeToOperator($thisNode);
+
                     continue;
                 }
             }
@@ -545,6 +564,7 @@ class LanguageParser
                 if ($i + 1 >= $nodeCount) {
                     // Convert it into a variable type node.
                     $tokens[$i] = $this->convertOperatorToVarNode($thisNode);
+
                     continue;
                 }
 
@@ -553,6 +573,7 @@ class LanguageParser
                 if ($next instanceof StatementSeparatorNode) {
                     // Convert it into a variable type node.
                     $tokens[$i] = $this->convertOperatorToVarNode($thisNode);
+
                     continue;
                 }
             }
@@ -728,6 +749,7 @@ class LanguageParser
 
                 $newTokens[] = $arrayNode;
                 $i += 1;
+
                 continue;
             } else {
                 $newTokens[] = $thisToken;
@@ -863,6 +885,7 @@ class LanguageParser
                     $newTokens[] = $token;
                     $newTokens[] = $orderGroup;
                     $i += 1;
+
                     continue;
                 } elseif ($token->content == LanguageOperatorRegistry::ARR_GROUPBY) {
                     if ($i + 1 >= $tokenCount) {
@@ -912,6 +935,7 @@ class LanguageParser
                                 $groupFields->parsedName = $peekTwo;
 
                                 $i += 3;
+
                                 continue;
                             } else {
                                 throw ErrorFactory::makeSyntaxError(
@@ -924,6 +948,7 @@ class LanguageParser
                     }
 
                     $i += 1;
+
                     continue;
                 } elseif ($token->content == LanguageOperatorRegistry::STRUCT_SWITCH) {
                     if ($i + 1 >= $tokenCount) {
@@ -936,6 +961,7 @@ class LanguageParser
                         }
 
                         $newTokens[] = $token->originalAbstractNode;
+
                         continue;
                     }
 
@@ -970,11 +996,25 @@ class LanguageParser
                     $wrapperSemanticGroup = $next->scope->nodes[0];
 
                     if (empty($wrapperSemanticGroup->nodes) || $wrapperSemanticGroup->nodes[0] instanceof LogicGroup == false) {
-                        throw ErrorFactory::makeSyntaxError(
-                            AntlersErrorCodes::TYPE_UNEXPECTED_SWITCH_START_VALUE_NO_SEMANTIC_VALUE,
-                            $token,
-                            'Unexpected input while parsing [T_SWITCH_GROUP].'
-                        );
+                        $shouldError = true;
+
+                        if (! empty($wrapperSemanticGroup->nodes)) {
+                            $firstNode = $wrapperSemanticGroup->nodes[0];
+
+                            if ($firstNode instanceof ArrayNode && $firstNode->hasModifiers()) {
+                                $shouldError = false;
+                            } elseif ($firstNode instanceof VariableNode) {
+                                $shouldError = false;
+                            }
+                        }
+
+                        if ($shouldError) {
+                            throw ErrorFactory::makeSyntaxError(
+                                AntlersErrorCodes::TYPE_UNEXPECTED_SWITCH_START_VALUE_NO_SEMANTIC_VALUE,
+                                $token,
+                                'Unexpected input while parsing [T_SWITCH_GROUP].'
+                            );
+                        }
                     }
 
                     $firstCondition = $wrapperSemanticGroup->nodes;
@@ -1072,6 +1112,7 @@ class LanguageParser
                                 }
 
                                 $c += 2;
+
                                 continue;
                             }
                         }
@@ -1082,6 +1123,7 @@ class LanguageParser
                     $newTokens[] = $switchGroup;
 
                     $i += 1;
+
                     continue;
                 } elseif ($token->content == LanguageOperatorRegistry::ARR_MAKE) {
                     if ($i + 1 >= $tokenCount) {
@@ -1104,11 +1146,11 @@ class LanguageParser
 
                     $subNodes = $nextToken->nodes;
 
-                    if ($subNodes[0] instanceof SemanticGroup) {
+                    if (count($subNodes) > 0 && $subNodes[0] instanceof SemanticGroup) {
                         $subNodes = $subNodes[0]->nodes;
                     }
 
-                    if ($nextToken instanceof  ScopedLogicGroup) {
+                    if ($nextToken instanceof ScopedLogicGroup) {
                         array_unshift($subNodes, new ScopeAssignmentOperator());
                         array_unshift($subNodes, $nextToken->scope);
                     }
@@ -1215,6 +1257,7 @@ class LanguageParser
                 $values[] = $namedValueNode;
 
                 $i += 3;
+
                 continue;
             }
 
@@ -1227,6 +1270,7 @@ class LanguageParser
                 $values[] = $namedValueNode;
 
                 $i += 1;
+
                 continue;
             }
         }
@@ -1270,6 +1314,7 @@ class LanguageParser
             if ($next == null || $next instanceof ArgSeparator) {
                 $values[] = $thisNode;
                 $i += 1;
+
                 continue;
             }
         }
@@ -1345,6 +1390,7 @@ class LanguageParser
 
                     $fields[] = $fieldNode;
                     $i += 1;
+
                     continue;
                 }
             }
@@ -1406,6 +1452,7 @@ class LanguageParser
 
                     $orders[] = $orderNode;
                     $i += 1;
+
                     continue;
                 }
             }
@@ -1445,6 +1492,7 @@ class LanguageParser
             if ($next == null || $next instanceof ArgSeparator) {
                 $argGroup->args[] = $nodes[$i];
                 $i += 1;
+
                 continue;
             } elseif ($next instanceof InlineBranchSeparator) {
                 if ($i + 2 >= $nodeCount) {
@@ -1538,6 +1586,7 @@ class LanguageParser
         $nodes = $this->groupNodesByType($nodes, DivisionOperator::class);
         $nodes = $this->groupNodesByType($nodes, AdditionOperator::class);
         $nodes = $this->groupNodesByType($nodes, SubtractionOperator::class);
+        $nodes = $this->groupNodesByType($nodes, ModulusOperator::class);
 
         return $nodes;
     }
@@ -1599,6 +1648,7 @@ class LanguageParser
 
                 $i += 1;
                 $newNodes[] = $logicGroup;
+
                 continue;
             } else {
                 $newNodes[] = $node;
@@ -1694,6 +1744,7 @@ class LanguageParser
                     $lastNegation = $curNode;
                     $negationCount += 1;
                     $index += 1;
+
                     continue;
                 } elseif ($this->isOperand($curNode)) {
                     $value = $curNode;
@@ -1724,6 +1775,7 @@ class LanguageParser
                 $branchSeparator->startPosition = $node->startPosition;
                 $branchSeparator->endPosition = $node->endPosition;
                 $newNodes[] = $branchSeparator;
+
                 continue;
             } elseif ($node instanceof ModifierValueNode) {
                 $varNode = new VariableNode();
@@ -1732,6 +1784,7 @@ class LanguageParser
                 $varNode->endPosition = $node->endPosition;
                 $varNode->modifierChain = $node->modifierChain;
                 $newNodes[] = $varNode;
+
                 continue;
             }
 
@@ -1821,14 +1874,17 @@ class LanguageParser
 
                     // Skip over the adjusted right.
                     $i += 1;
+
                     continue;
                 } else {
                     $newNodes[] = $node;
+
                     continue;
                 }
             } elseif ($node instanceof StringValueNode && $newNodeCount > 0) {
                 if (($i + 1) >= $tokenCount) {
                     $newNodes[] = $node;
+
                     continue;
                 }
 
@@ -1844,6 +1900,7 @@ class LanguageParser
                     $newNodes[] = $left;
 
                     $i += 1;
+
                     continue;
                 } else {
                     $newNodes[] = $node;
@@ -1862,6 +1919,7 @@ class LanguageParser
                     $newNodes[] = $left;
 
                     $i += 1;
+
                     continue;
                 } elseif ($this->canMergeIntoVariablePath($right) && $left instanceof VariableNode) {
                     array_pop($newNodes);
@@ -1874,15 +1932,17 @@ class LanguageParser
 
                     $newNodes[] = $left;
                     $i += 1;
+
                     continue;
                 } else {
                     $newNodes[] = $node;
+
                     continue;
                 }
             } elseif ($node instanceof ImplicitArrayEnd && $newNodeCount > 0) {
                 $left = $newNodes[$newNodeCount - 1];
 
-                if ($left instanceof VariableNode && NodeHelpers::distance($left, $node) <= 1) {
+                if ($left instanceof VariableNode && NodeHelpers::distance($left, $node) <= 1 && Str::contains($left->name, '[')) {
                     array_pop($newNodes);
                     NodeHelpers::mergeVarContentLeft($node->content, $node, $left);
                     $newNodes[] = $left;
@@ -1901,6 +1961,7 @@ class LanguageParser
                 } else {
                     $newNodes[] = $node;
                 }
+
                 continue;
             } elseif ($node instanceof SubtractionOperator && $newNodeCount > 0) {
                 $left = $newNodes[$newNodeCount - 1];
@@ -1935,6 +1996,87 @@ class LanguageParser
 
                     throw $antlersException;
                 }
+            }
+        }
+
+        return $newNodes;
+    }
+
+    private function createLogicGroupsAroundMethodCalls($nodes)
+    {
+        // Bail early if we have not created any method calls anyway :)
+        if (! $this->createdMethods) {
+            return $nodes;
+        }
+
+        $newNodes = [];
+        $nodeLen = count($nodes);
+
+        for ($i = 0; $i < $nodeLen; $i++) {
+            $thisNode = $nodes[$i];
+
+            if ($thisNode instanceof MethodInvocationNode) {
+                // Check to see if we should continue.
+                $doContinue = false;
+                if ($i + 1 < $nodeLen) {
+                    for ($j = $i + 1; $j < $nodeLen; $j++) {
+                        $checkNode = $nodes[$j];
+
+                        if ($checkNode instanceof ModifierSeparator) {
+                            $doContinue = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (! $doContinue) {
+                    $newNodes[] = $thisNode;
+
+                    continue;
+                }
+
+                $targetNodes = [];
+                $lastNode = array_pop($newNodes);
+                $targetNodes[] = $lastNode;
+
+                // Scan backwards to find the variable this references.
+                while ($lastNode instanceof VariableNode == false) {
+                    $lastNode = array_pop($newNodes);
+                    $targetNodes[] = $lastNode;
+                }
+
+                // Add the current invocation.
+                $targetNodes[] = $thisNode;
+
+                // Scan forwards to collect all chained calls.
+                if ($i + 1 < $nodeLen && $nodes[$i + 1] instanceof MethodInvocationNode) {
+                    $skipTo = $i;
+
+                    for ($j = $i + 1; $j < $nodeLen; $j++) {
+                        $chainedNode = $nodes[$j];
+
+                        if ($chainedNode instanceof MethodInvocationNode) {
+                            $targetNodes[] = $chainedNode;
+                        } else {
+                            $skipTo = $j;
+                            break;
+                        }
+                    }
+
+                    $i = $skipTo;
+                }
+
+                $wrapper = new LogicGroup();
+                $wrapper->startPosition = $targetNodes[0]->startPosition;
+                $wrapper->endPosition = $targetNodes[count($targetNodes) - 1]->endPosition;
+                $wrapper->nodes = $targetNodes;
+
+                $semanticWrapper = new SemanticGroup();
+                $semanticWrapper->nodes[] = $wrapper;
+
+                $newNodes[] = $semanticWrapper;
+            } else {
+                $newNodes[] = $thisNode;
             }
         }
 
@@ -2034,6 +2176,7 @@ class LanguageParser
                 $i += $resultCount;
 
                 $applyModifiersToNode->modifierChain->modifierChain[] = $modifier;
+
                 continue;
             } else {
                 $newNodes[] = $node;
@@ -2222,6 +2365,7 @@ class LanguageParser
                     }
 
                     $i += 1;
+
                     continue;
                 } else {
                     throw ErrorFactory::makeSyntaxError(
@@ -2323,12 +2467,14 @@ class LanguageParser
                         $adjustedTokens[] = $tokens[$i + 1];
                         $adjustedTokens[] = new StatementSeparatorNode();
                         $i += 1;
+
                         continue;
                     } else {
                         $adjustedTokens[] = $thisToken;
                         $adjustedTokens[] = $tokens[$i + 1];
                         $adjustedTokens[] = $tokens[$i + 2];
                         $i += 2;
+
                         continue;
                     }
                 } else {
@@ -2402,6 +2548,7 @@ class LanguageParser
                 $newTokens[] = $nullCoalescenceGroup;
 
                 $i += 1;
+
                 continue;
             } else {
                 $newTokens[] = $node;
@@ -2525,6 +2672,7 @@ class LanguageParser
                 }*/
 
                 $i = $targetJumpIndex;
+
                 continue;
             } else {
                 $newTokens[] = $node;
@@ -2600,6 +2748,7 @@ class LanguageParser
                 // An even number of negation operators are the same has having no negation operators.
                 if ($negationCount % 2 == 0) {
                     $i += $negationCount - 1;
+
                     continue;
                 }
 
@@ -2739,6 +2888,7 @@ class LanguageParser
                 $subNodes[] = $subGroup[0];
                 $skipCount += $subGroup[1];
                 $i += $subGroup[1];
+
                 continue;
             } else {
                 $subNodes[] = $node;

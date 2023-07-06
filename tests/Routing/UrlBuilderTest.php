@@ -64,6 +64,8 @@ class UrlBuilderTest extends TestCase
     public function it_builds_a_date_url()
     {
         $this->assertEquals('/blog/2015/01/02/post', $this->builder->build('/blog/{{ year }}/{{ month }}/{{ day }}/{{ slug }}'));
+        $this->assertEquals('/blog/1420156800/post', $this->builder->build('/blog/{{ date format="U" }}/{{ slug }}'));
+        $this->assertEquals('/blog/2-jan-15/post', $this->builder->build('/blog/{{ date format="j-M-y" }}/{{ slug }}'));
     }
 
     /** @test */
@@ -127,5 +129,13 @@ class UrlBuilderTest extends TestCase
             '/test/foo/baz',
             $this->builder->merge(['foo' => 'foo', 'baz' => 'baz'])->build('/test/{{ foo }}/{{ bar }}/{{ baz }}')
         );
+    }
+
+    /** @test */
+    public function it_preserves_dots_in_url()
+    {
+        $this->assertEquals('/blog/post.html', $this->builder->build('/blog/{{ slug }}.html'));
+        $this->assertEquals('/blog/post.aspx', $this->builder->build('/blog/{{ slug }}.aspx'));
+        $this->assertEquals('/blog/post.foo.bar', $this->builder->build('/blog/{{ slug }}.foo.bar'));
     }
 }

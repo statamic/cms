@@ -11,6 +11,9 @@ use Tests\TestCase;
 
 class CollectionTreeRepositoryTest extends TestCase
 {
+    private $store;
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();

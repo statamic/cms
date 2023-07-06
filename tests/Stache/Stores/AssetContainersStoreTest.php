@@ -15,6 +15,9 @@ use Tests\TestCase;
 
 class AssetContainersStoreTest extends TestCase
 {
+    private $tempDir;
+    private $store;
+
     public function setUp(): void
     {
         parent::setUp();

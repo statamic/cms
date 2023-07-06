@@ -3,10 +3,16 @@
 namespace Tests\Data\Taxonomies;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Support\Facades\Event;
 use Mockery;
+use Statamic\Events\TermBlueprintFound;
+use Statamic\Events\TermCreated;
+use Statamic\Events\TermSaved;
+use Statamic\Events\TermSaving;
 use Statamic\Facades;
 use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
+use Statamic\Taxonomies\Taxonomy as TaxonomiesTaxonomy;
 use Statamic\Taxonomies\Term;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -76,6 +82,28 @@ class TermTest extends TestCase
     }
 
     /** @test */
+    public function it_dispatches_an_event_when_getting_blueprint()
+    {
+        Event::fake();
+
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect([
+            'blueprint' => $blueprint = (new Blueprint)->setHandle('blueprint'),
+        ]));
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy($taxonomy);
+
+        // Do it twice so we can check the event is only dispatched once.
+        $term->blueprint();
+        $term->blueprint();
+
+        Event::assertDispatchedTimes(TermBlueprintFound::class, 1);
+        Event::assertDispatched(TermBlueprintFound::class, function ($event) use ($blueprint, $term) {
+            return $event->blueprint === $blueprint
+                && $event->term === $term;
+        });
+    }
+
+    /** @test */
     public function it_gets_the_entry_count_through_the_repository()
     {
         $term = (new Term)->taxonomy('tags')->slug('foo');
@@ -89,6 +117,85 @@ class TermTest extends TestCase
     }
 
     /** @test */
+    public function it_saves_through_the_api()
+    {
+        Event::fake();
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        $return = $term->save();
+
+        $this->assertTrue($return);
+
+        Event::assertDispatched(TermSaving::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+
+        Event::assertDispatched(TermCreated::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+
+        Event::assertDispatched(TermSaved::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_term_created_only_once()
+    {
+        Event::fake();
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        Facades\Term::shouldReceive('save')->with($term);
+        Facades\Term::shouldReceive('find')->with($term->id())->times(3)->andReturn(null, $term, $term);
+
+        $term->save();
+        $term->save();
+        $term->save();
+
+        Event::assertDispatched(TermSaved::class, 3);
+        Event::assertDispatched(TermCreated::class, 1);
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        $return = $term->saveQuietly();
+
+        $this->assertTrue($return);
+
+        Event::assertNotDispatched(TermSaving::class);
+        Event::assertNotDispatched(TermSaved::class);
+        Event::assertNotDispatched(TermCreated::class);
+    }
+
+    /** @test */
+    public function if_saving_event_returns_false_the_term_doesnt_save()
+    {
+        Event::fake([TermSaved::class]);
+
+        Event::listen(TermSaving::class, function () {
+            return false;
+        });
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        $return = $term->save();
+
+        $this->assertFalse($return);
+
+        Event::assertNotDispatched(TermSaved::class);
+    }
+
     public function it_gets_file_contents_for_saving()
     {
         tap(Taxonomy::make('tags')->sites(['en', 'fr']))->save();
@@ -162,8 +269,8 @@ class TermTest extends TestCase
         ], $termDe->previewTargets()->all());
 
         $taxonomy->previewTargets([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true', 'refresh' => true],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'refresh' => true],
         ])->save();
 
         $this->assertEquals([

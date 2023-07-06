@@ -64,7 +64,34 @@ class UpdateFormTest extends TestCase
         $form = tap(Form::make('test'))->save();
         $this->assertNull($form->email());
 
-        $emailConfig = [
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, ['email' => [
+                [
+                    'to' => 'john@example.com',
+                    'from' => 'jane@example.com',
+                    'reply_to' => null,
+                    'subject' => null,
+                    'text' => null,
+                    'html' => null,
+                    'markdown' => false,
+                    'attachments' => false,
+                ],
+                [
+                    'to' => 'foo@example.com',
+                    'from' => 'bar@example.com',
+                    'reply_to' => null,
+                    'subject' => null,
+                    'text' => 'emails.contact.text',
+                    'html' => 'emails.contact.html',
+                    'markdown' => true,
+                    'attachments' => true,
+                ],
+            ]])
+            ->assertOk();
+
+        $updated = Form::all()->first();
+        $this->assertEquals([
             [
                 'to' => 'john@example.com',
                 'from' => 'jane@example.com',
@@ -74,16 +101,10 @@ class UpdateFormTest extends TestCase
                 'from' => 'bar@example.com',
                 'text' => 'emails.contact.text',
                 'html' => 'emails.contact.html',
+                'markdown' => true,
+                'attachments' => true,
             ],
-        ];
-
-        $this
-            ->actingAs($this->userWithPermission())
-            ->update($form, ['email' => $emailConfig])
-            ->assertOk();
-
-        $updated = Form::all()->first();
-        $this->assertEquals($emailConfig, $updated->email());
+        ], $updated->email());
     }
 
     private function userWithoutPermission()

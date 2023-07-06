@@ -1,25 +1,25 @@
 import Vue from 'vue'
+import uniqid from 'uniqid'
 
 class Stacks {
     constructor(instance) {
-        this.stacks = instance.$root.stacks;
+        this.portals = instance.$root.portals;
     }
 
     count() {
-        return this.stacks.length;
+        return this.stacks().length;
     }
 
     add(vm) {
-        this.stacks.push(vm);
-    }
-
-    remove(vm) {
-        const i = _.indexOf(this.stacks, vm);
-        this.stacks.splice(i, 1);
+        return vm.$portals.create('stack', {
+            type: 'stack',
+            depth: this.count() + 1,
+            vm
+        });
     }
 
     stacks() {
-        return this.stacks;
+        return this.portals.filter(portal => portal.data?.type === 'stack');
     }
 }
 

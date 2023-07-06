@@ -2,6 +2,7 @@
 
 namespace Statamic\Exceptions;
 
+use Statamic\Facades\Cascade;
 use Statamic\Statamic;
 use Statamic\View\View;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as SymfonyException;
@@ -21,10 +22,13 @@ class NotFoundHttpException extends SymfonyException
 
     protected function contents()
     {
-        return (new View)
+        Cascade::hydrated(function ($cascade) {
+            $cascade->set('response_code', 404);
+        });
+
+        return app(View::class)
             ->template('errors.404')
             ->layout($this->layout())
-            ->with(['response_code' => 404])
             ->render();
     }
 

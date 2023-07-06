@@ -1,0 +1,15 @@
+/* ==========================================================================
+   MODALS
+   ========================================================================== */
+
+.vm--modal {
+    @apply rounded-lg !important;
+}
+
+.vm--overlay {
+    background: hsla(210, 20%, 10%, .15) !important;
+}
+
+.confirmation-modal .publish-fields .form-group {
+    @apply p-0 mb-6;
+}

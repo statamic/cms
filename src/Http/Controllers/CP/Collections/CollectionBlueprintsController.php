@@ -49,7 +49,7 @@ class CollectionBlueprintsController extends CpController
     {
         $request->validate([
             'title' => 'required',
-            'sections' => 'array',
+            'tabs' => 'array',
         ]);
 
         $this->updateBlueprint($request, $collection->entryBlueprint($blueprint));

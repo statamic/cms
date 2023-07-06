@@ -2,6 +2,7 @@
 
 namespace Statamic\Support;
 
+use Closure;
 use Illuminate\Support\HtmlString;
 use Michelf\SmartyPants;
 use Statamic\Facades\Config;
@@ -65,7 +66,6 @@ class Html
     /**
      * Transform the string to an Html serializable object.
      *
-     * @param $html
      * @return \Illuminate\Support\HtmlString
      */
     protected static function toHtmlString($html)
@@ -122,8 +122,6 @@ class Html
     /**
      * Generate a description list of items.
      *
-     * @param  array  $list
-     * @param  array  $attributes
      * @return \Illuminate\Support\HtmlString
      */
     public static function dl(array $list, array $attributes = [])
@@ -259,6 +257,19 @@ class Html
         $title = static::entities($title);
 
         return static::toHtmlString('<a href="'.static::entities($url).'"'.static::attributes($attributes).'>'.$title.'</a>');
+    }
+
+    /**
+     * Parse each text part of an HTML string (no tags) through a callback function.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function mapText($value, Closure $callback)
+    {
+        return Str::mapRegex($value, '/(<[^>]+>)/', function ($part, $match) use ($callback) {
+            return ! $match ? $callback($part) : $part;
+        });
     }
 
     /**

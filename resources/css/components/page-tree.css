@@ -1,0 +1,46 @@
+.page-tree {
+
+    .tree-node-inner {
+        @apply relative text-xs bg-white shadow rounded;
+
+        &:hover {
+            @apply bg-gray-100;
+        }
+    }
+
+    .draggable-placeholder-inner {
+        border: 1px dashed #0088F8;
+        background: rgba(0, 136, 249, 0.09);
+
+        * { display: none; }
+    }
+
+.page-move {
+        @apply w-6 border-r rounded-l;
+        cursor: grab;
+        background-color: hsla(210, 30%, 95%, .5);
+        background-image: url('../../svg/icons/light/drag-dots.svg');
+        background-size: 7px 17px;
+        background-position: center center;
+        background-repeat: no-repeat;
+        &:hover { @apply bg-gray-300; }
+    }
+
+    .page-root {
+        background-color: hsla(210, 30%, 95%, .5);
+        @apply flex w-6 rounded-l items-center border-r;
+    }
+}
+
+.page-tree-with-sections {
+    > .tree-node > .tree-node-children > .tree-node {
+        @apply mb-8;
+    }
+
+    .section-placeholder-inner {
+        @apply rounded;
+        border: 1px dashed #0088F8;
+        background: rgba(0, 136, 249, 0.09);
+        min-height: 42px;
+    }
+}

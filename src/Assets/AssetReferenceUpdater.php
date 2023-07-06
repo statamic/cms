@@ -16,7 +16,6 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Filter by container.
      *
-     * @param  string  $container
      * @return $this
      */
     public function filterByContainer(string $container)
@@ -167,9 +166,11 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             return;
         }
 
-        $value = preg_replace_callback('/([("]statamic:\/\/[^()"]*::)([^)"]*)([)"])/im', function ($matches) {
-            return $matches[2] === $this->originalValue
-                ? $matches[1].$this->newValue.$matches[3]
+        $value = preg_replace_callback('/([("])(statamic:\/\/[^()"]*::)([^)"]*)([)"])/im', function ($matches) {
+            $newValue = $this->isRemovingValue() ? '' : $matches[2].$this->newValue;
+
+            return $matches[3] === $this->originalValue
+                ? $matches[1].$newValue.$matches[4]
                 : $matches[0];
         }, $value);
 
@@ -206,13 +207,19 @@ class AssetReferenceUpdater extends DataReferenceUpdater
             return;
         }
 
-        $value = "asset::{$this->container}::{$this->newValue}";
+        $newValue = $this->isRemovingValue()
+            ? null
+            : "asset::{$this->container}::{$this->newValue}";
 
-        if ($originalValue === $value) {
+        if ($originalValue === $newValue) {
             return;
         }
 
-        Arr::set($data, $dottedKey, $value);
+        if ($this->isRemovingValue()) {
+            Arr::forget($data, $dottedKey);
+        } else {
+            Arr::set($data, $dottedKey, $newValue);
+        }
 
         $this->item->data($data);
 
@@ -245,6 +252,10 @@ class AssetReferenceUpdater extends DataReferenceUpdater
 
         $bardPayload = Arr::get($data, $dottedKey, []);
 
+        if (! $bardPayload) {
+            return;
+        }
+
         $changed = collect(Arr::dot($bardPayload))
             ->filter(function ($value, $key) {
                 return preg_match('/(.*)\.(type)/', $key) && $value === 'image';
@@ -261,7 +272,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 return "asset::{$this->container}::{$this->newValue}";
             })
             ->each(function ($value, $key) use (&$bardPayload) {
-                Arr::set($bardPayload, $key, $value);
+                Arr::set($bardPayload, $key, $this->isRemovingValue() ? '' : $value);
             });
 
         if ($changed->isEmpty()) {
@@ -289,6 +300,10 @@ class AssetReferenceUpdater extends DataReferenceUpdater
 
         $bardPayload = Arr::get($data, $dottedKey, []);
 
+        if (! $bardPayload) {
+            return;
+        }
+
         $changed = collect(Arr::dot($bardPayload))
             ->filter(function ($value, $key) {
                 return preg_match('/(.*)\.(type)/', $key) && $value === 'link';
@@ -305,7 +320,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
                 return "statamic://asset::{$this->container}::{$this->newValue}";
             })
             ->each(function ($value, $key) use (&$bardPayload) {
-                Arr::set($bardPayload, $key, $value);
+                Arr::set($bardPayload, $key, $this->isRemovingValue() ? '' : $value);
             });
 
         if ($changed->isEmpty()) {

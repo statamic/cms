@@ -61,6 +61,9 @@ class AssetContainersController extends CpController
             'allow_renaming' => $container->allowRenaming(),
             'allow_moving' => $container->allowMoving(),
             'create_folders' => $container->createFolders(),
+            'source_preset' => $container->sourcePreset(),
+            'warm_intelligent' => $intelligent = $container->warmsPresetsIntelligently(),
+            'warm_presets' => $intelligent ? [] : $container->warmPresets(),
         ];
 
         $fields = ($blueprint = $this->formBlueprint($container))
@@ -93,7 +96,9 @@ class AssetContainersController extends CpController
             ->allowRenaming($values['allow_renaming'])
             ->allowMoving($values['allow_moving'])
             ->allowUploads($values['allow_uploads'])
-            ->createFolders($values['create_folders']);
+            ->createFolders($values['create_folders'])
+            ->sourcePreset($values['source_preset'])
+            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
 
         $container->save();
 
@@ -139,7 +144,9 @@ class AssetContainersController extends CpController
             ->title($values['title'])
             ->disk($values['disk'])
             ->allowUploads($values['allow_uploads'])
-            ->createFolders($values['create_folders']);
+            ->createFolders($values['create_folders'])
+            ->sourcePreset($values['source_preset'])
+            ->warmPresets($values['warm_intelligent'] ? null : $values['warm_presets']);
 
         $container->save();
 
@@ -217,7 +224,7 @@ class AssetContainersController extends CpController
                         'html' => $container ? ''.
                             '<div class="text-xs">'.
                             '   <a href="'.cp_route('asset-containers.blueprint.edit', $container->handle()).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>' : '<div class="text-xs text-grey">'.__('Editable once created').'</div>',
+                            '</div>' : '<div class="text-xs text-gray">'.__('Editable once created').'</div>',
                     ],
                 ],
             ];
@@ -261,6 +268,60 @@ class AssetContainersController extends CpController
             ],
         ]);
 
-        return Blueprint::makeFromSections($fields);
+        $fields = array_merge($fields, [
+            'image_manipulation' => [
+                'display' => __('Image Manipulation'),
+                'fields' => [
+                    'source_preset' => [
+                        'type' => 'select',
+                        'display' => __('Process Source Images'),
+                        'instructions' => __('statamic::messages.asset_container_source_preset_instructions'),
+                        'label_html' => true,
+                        'options' => $this->expandedGlidePresetOptions(),
+                        'clearable' => true,
+                    ],
+                    'warm_intelligent' => [
+                        'type' => 'toggle',
+                        'display' => __('Intelligently Warm Presets'),
+                        'instructions' => __('statamic::messages.asset_container_warm_intelligent_instructions'),
+                        'default' => true,
+                    ],
+                    'warm_presets' => [
+                        'type' => 'select',
+                        'display' => __('Warm Specific Presets'),
+                        'instructions' => __('statamic::messages.asset_container_warm_presets_instructions'),
+                        'multiple' => true,
+                        'label_html' => true,
+                        'options' => $this->expandedGlidePresetOptions(),
+                        'if' => [
+                            'warm_intelligent' => false,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        return Blueprint::makeFromTabs($fields);
+    }
+
+    private function expandedGlidePresetOptions()
+    {
+        return collect(config('statamic.assets.image_manipulation.presets'))
+            ->mapWithKeys(function ($params, $handle) {
+                return [$handle => $this->expandedGlidePresetLabel($handle, $params)];
+            });
+    }
+
+    private function expandedGlidePresetLabel($handle, $params)
+    {
+        $separator = '<span class="hidden-outside text-gray-500">-</span>';
+
+        $params = collect($params)
+            ->map(function ($value, $param) {
+                return sprintf('<code class="hidden-outside">%s: %s</code>', $param, $value);
+            })
+            ->implode(' ');
+
+        return "{$handle} {$separator} {$params}";
     }
 }

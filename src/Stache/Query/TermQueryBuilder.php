@@ -28,11 +28,6 @@ class TermQueryBuilder extends Builder
         return parent::where($column, $operator, $value, $boolean);
     }
 
-    public function orWhere($column, $operator = null, $value = null)
-    {
-        return $this->where($column, $operator, $value, 'or');
-    }
-
     public function whereIn($column, $values, $boolean = 'and')
     {
         if (in_array($column, ['taxonomy', 'taxonomies'])) {
@@ -48,11 +43,6 @@ class TermQueryBuilder extends Builder
         }
 
         return parent::whereIn($column, $values, $boolean);
-    }
-
-    public function orWhereIn($column, $values)
-    {
-        return $this->whereIn($column, $values, 'or');
     }
 
     protected function collect($items = [])
@@ -75,13 +65,9 @@ class TermQueryBuilder extends Builder
             $this->filterUsagesWithinCollections($taxonomies);
         }
 
-        $keys = empty($this->wheres)
+        return empty($this->wheres)
             ? $this->getKeysFromTaxonomies($taxonomies)
             : $this->getKeysFromTaxonomiesWithWheres($taxonomies, $this->wheres);
-
-        return $keys->unique(function ($key) {
-            return collect(explode('::', $key))->forget(1)->join('::');
-        });
     }
 
     protected function getKeysFromTaxonomies($taxonomies)

@@ -31,6 +31,7 @@ class GlideImageManipulatorTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider paramProvider
      */
     public function adds_standard_api_params($param)
@@ -41,6 +42,7 @@ class GlideImageManipulatorTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider paramProvider
      */
     public function adds_standard_api_params_using_magic_method($param)
@@ -100,6 +102,7 @@ class GlideImageManipulatorTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider aliasProvider
      */
     public function testAddsParamsUsingAliases($alias, $value, $expected)

@@ -16,6 +16,7 @@ class EntitiesTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider entityDataProvider
      */
     public function it_encodes_html_entities($expected, $input): void

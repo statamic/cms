@@ -126,4 +126,30 @@ return [
         'pretty_print_variables' => true,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | ASCII
+    |--------------------------------------------------------------------------
+    |
+    | During various string manipulations (e.g. slugification), Statamic will
+    | need to make ASCII character conversions. Here you may define whether
+    | or not extra characters get converted. e.g. "%" becomes "percent".
+    |
+    */
+
+    'ascii_replace_extra_symbols' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Update References on Change
+    |--------------------------------------------------------------------------
+    |
+    | With this enabled, Statamic will attempt to update references to assets
+    | and terms when moving, renaming, replacing, deleting, etc. This will
+    | be queued, but it can disabled as needed for performance reasons.
+    |
+    */
+
+    'update_references' => true,
+
 ];

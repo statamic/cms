@@ -18,8 +18,8 @@ class ParentTags extends Tags
      *
      * Gets a specified field value from the parent.
      *
-     * @param  $method
-     * @param  $args
+     * @param  string  $method
+     * @param  array  $args
      * @return mixed
      */
     public function __call($method, $args)
@@ -76,7 +76,7 @@ class ParentTags extends Tags
         // Create crumbs from segments
         $segment_urls = [];
         for ($i = 1; $i <= $segment_count; $i++) {
-            $segment_urls[] = URL::tidy(join('/', $segments));
+            $segment_urls[] = URL::tidy(implode('/', $segments));
             array_pop($segments);
         }
 

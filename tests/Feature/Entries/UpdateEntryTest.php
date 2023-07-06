@@ -2,11 +2,14 @@
 
 namespace Tests\Feature\Entries;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\EntrySaving;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -31,9 +34,8 @@ class UpdateEntryTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->from('/original')
             ->update($entry)
-            ->assertRedirect('/original');
+            ->assertForbidden();
 
         $this->assertCount(1, Entry::all());
         $this->assertEquals('Existing Entry', $entry->fresh()->value('title'));
@@ -87,6 +89,47 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals('Foo Bar Baz', $entry->value('title'));
         $this->assertEquals('foo-bar-baz', $entry->slug());
         $this->assertEquals('foo-bar-baz.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider multipleSlugLangsProvider
+     */
+    public function slug_is_not_required_and_will_get_created_from_the_submitted_title_and_correct_language_if_slug_is_in_the_blueprint_and_the_submitted_slug_was_empty($lang, $expectedSlug)
+    {
+        Site::setConfig(['sites' => [
+            'en' => array_merge(config('statamic.sites.sites.en'), ['lang' => $lang]),
+        ]]);
+
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry'])
+            ->create();
+
+        $this->assertTrue($entry->blueprint()->hasField('slug'));
+        $this->assertCount(1, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Foo Bar Baz æøå', 'slug' => ''])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = $entry->fresh();
+        $this->assertEquals('Foo Bar Baz æøå', $entry->value('title'));
+        $this->assertEquals($expectedSlug, $entry->slug());
+        $this->assertEquals($expectedSlug.'.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    public function multipleSlugLangsProvider()
+    {
+        return [
+            'English' => ['en', 'foo-bar-baz-aeoa'],
+            'Danish' => ['da', 'foo-bar-baz-aeoeaa'], // danish replaces æøå with aeoeaa
+        ];
     }
 
     /** @test */
@@ -200,6 +243,26 @@ class UpdateEntryTest extends TestCase
     }
 
     /** @test */
+    public function it_can_validate_against_published_value()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $this->seedBlueprintFields($collection, [
+            'test_field' => ['validate' => 'required_if:published,true'],
+        ]);
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'foo' => 'bar'])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Test', 'slug' => 'manually-entered-slug', 'published' => true])
+            ->assertStatus(422);
+    }
+
+    /** @test */
     public function published_entry_gets_saved_to_working_copy()
     {
         $this->markTestIncomplete();
@@ -232,6 +295,16 @@ class UpdateEntryTest extends TestCase
         return [$user, $collection];
     }
 
+    private function seedBlueprintFields($collection, $fields)
+    {
+        $blueprint = Blueprint::makeFromFields($fields);
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('in')
+            ->with('collections/'.$collection->handle())
+            ->andReturn(collect([$blueprint]));
+    }
+
     private function update($entry, $attrs = [])
     {
         $payload = array_merge([
@@ -239,6 +312,6 @@ class UpdateEntryTest extends TestCase
             'slug' => 'updated-entry',
         ], $attrs);
 
-        return $this->patch($entry->updateUrl(), $payload);
+        return $this->patchJson($entry->updateUrl(), $payload);
     }
 }

@@ -61,7 +61,8 @@ class StringUtilities
             if (ctype_punct($char) && $char != DocumentParser::LeftBracket &&
                 $char != DocumentParser::RightBracket &&
                 $char != DocumentParser::Punctuation_Colon &&
-                $char != DocumentParser::Punctuation_Underscore) {
+                $char != DocumentParser::Punctuation_Underscore &&
+                $char != DocumentParser::Punctuation_FullStop) {
                 return true;
             }
         }

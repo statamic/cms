@@ -3,6 +3,7 @@
 namespace Tests\Tags\Form;
 
 use Statamic\Facades\Form;
+use Statamic\Statamic;
 
 class FormCreateTest extends FormTestCase
 {
@@ -47,7 +48,7 @@ class FormCreateTest extends FormTestCase
     }
 
     /** @test */
-    public function it_renders_form_dynamically_with_fields_array()
+    public function it_dynamically_renders_fields_array()
     {
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact }}
@@ -56,7 +57,7 @@ class FormCreateTest extends FormTestCase
     {{ /fields }}
 {{ /form:contact }}
 EOT
-));
+        ));
 
         $this->assertStringContainsString('<label>Full Name</label><input type="text" name="name" value="">', $output);
         $this->assertStringContainsString('<label>Email Address</label><input type="email" name="email" value="" required>', $output);
@@ -447,6 +448,61 @@ EOT
     }
 
     /** @test */
+    public function it_dynamically_renders_sections_array()
+    {
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'One',
+                            'instructions' => 'One Instructions',
+                            'fields' => [
+                                ['handle' => 'alpha', 'field' => ['type' => 'text']],
+                                ['handle' => 'bravo', 'field' => ['type' => 'text']],
+                            ],
+                        ],
+                        [
+                            'display' => 'Two',
+                            'instructions' => 'Two Instructions',
+                            'fields' => [
+                                ['handle' => 'charlie', 'field' => ['type' => 'text']],
+                                ['handle' => 'delta', 'field' => ['type' => 'text']],
+                            ],
+                        ],
+                        [
+                            'display' => null,
+                            'instructions' => null,
+                            'fields' => [
+                                ['handle' => 'echo', 'field' => ['type' => 'text']],
+                                ['handle' => 'fox', 'field' => ['type' => 'text']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ sections }}
+        <div class="section">{{ if display}}{{ display }} - {{ /if }}{{ if instructions }}{{ instructions }} - {{ /if }}{{ fields | pluck('handle') | join(',') }}</div>
+    {{ /sections }}
+    <div class="fields">{{ fields | pluck('handle') | join(',') }}</div>
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="section">One - One Instructions - alpha,bravo</div>', $output);
+        $this->assertStringContainsString('<div class="section">Two - Two Instructions - charlie,delta</div>', $output);
+        $this->assertStringContainsString('<div class="section">echo,fox</div>', $output);
+
+        // Even though the fields are all nested within sections,
+        // we should still be able to get them via `{{ fields }}` array at top level...
+        $this->assertStringContainsString('<div class="fields">alpha,bravo,charlie,delta,echo,fox</div>', $output);
+    }
+
+    /** @test */
     public function it_wont_submit_form_and_renders_errors()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
@@ -689,10 +745,35 @@ EOT
         ];
 
         $expectedInline = [
-            'The Full Name must be at least 3 characters.',
+            trans('validation.min.string', ['attribute' => 'Full Name', 'min' => 3]), // 'The Full Name must be at least 3 characters.',
         ];
 
         $this->assertEquals($expected, $errors[1]);
         $this->assertEquals($expectedInline, $inlineErrors[1]);
+    }
+
+    /** @test */
+    public function it_fetches_form_data()
+    {
+        $form = Statamic::tag('form:contact')->params([
+            'js' => 'alpine',
+            'files' => true,
+            'redirect' => 'http://localhost/',
+            'id' => 'my-form',
+        ])->fetch();
+
+        $this->assertEquals($form['attrs']['action'], 'http://localhost/!/forms/contact');
+        $this->assertEquals($form['attrs']['method'], 'POST');
+        $this->assertEquals($form['attrs']['enctype'], 'multipart/form-data');
+        $this->assertEquals($form['attrs']['id'], 'my-form');
+
+        $this->assertEquals($form['params']['_redirect'], 'http://localhost/');
+        $this->assertArrayHasKey('_token', $form['params']);
+
+        $this->assertIsArray($form['errors']);
+        $this->assertIsArray($form['fields']);
+
+        $this->assertEquals($form['honeypot'], 'winnie');
+        $this->assertEquals($form['js_driver'], 'alpine');
     }
 }

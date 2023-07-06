@@ -1,4 +1,4 @@
-var getSlug = require('speakingurl');
+import getSlug from 'speakingurl';
 
 export default {
     install(Vue, options) {
@@ -9,7 +9,12 @@ export default {
             lang = lang ?? site?.lang ?? Statamic.$config.get('lang');
             const custom = Statamic.$config.get(`charmap.${lang}`) ?? undefined;
 
-            return getSlug(text, { separator: glue || '-', lang, custom });
+            return getSlug(text, {
+                separator: glue || '-',
+                lang,
+                custom,
+                symbols: Statamic.$config.get('asciiReplaceExtraSymbols')
+            });
         };
     }
 };

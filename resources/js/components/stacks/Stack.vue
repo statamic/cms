@@ -1,9 +1,9 @@
 <template>
 
-    <portal :to="portal" :order="depth">
+    <v-portal :to="portal" :order="depth" target-class="stack">
         <div class="stack-container"
-            :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering, 'p-1 shadow-lg': full }"
-            :style="{ zIndex: (depth + 1) * 1000, left: `${leftOffset}px` }"
+            :class="{ 'stack-is-current': isTopStack, 'hovering': isHovering, 'p-2 shadow-lg': full }"
+            :style="{ left: `${leftOffset}px` }"
         >
             <transition name="stack-overlay-fade">
                 <div class="stack-overlay" v-if="visible" :style="{ left: `-${leftOffset}px` }" />
@@ -17,7 +17,7 @@
                 </div>
             </transition>
         </div>
-    </portal>
+    </v-portal>
 
 </template>
 
@@ -46,8 +46,7 @@ export default {
 
     data() {
         return {
-            depth: null,
-            portal: null,
+            stack: null,
             visible: false,
             isHovering: false,
             escBinding: null,
@@ -55,6 +54,14 @@ export default {
     },
 
     computed: {
+
+        portal() {
+            return this.stack ? this.stack.id : null;
+        },
+
+        depth() {
+            return this.stack.data.depth;
+        },
 
         id() {
             return `${this.name}-${this._uid}`;
@@ -94,9 +101,7 @@ export default {
     },
 
     created() {
-        this.depth = this.$stacks.count() + 1;
-        this.portal = `stack-${this.depth-1}`;
-        this.$stacks.add(this);
+        this.stack = this.$stacks.add(this);
 
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => this.isHovering = true);
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => this.isHovering = false);
@@ -104,7 +109,7 @@ export default {
     },
 
     destroyed() {
-        this.$stacks.remove(this);
+        this.stack.destroy();
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseenter`);
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseout`);
         this.escBinding.destroy();

@@ -34,6 +34,18 @@ export function data_get(obj, path, fallback=null) {
     return value !== undefined ? value : fallback;
 };
 
+export function data_set(obj, path, value) {
+    // Source: https://stackoverflow.com/a/20240290
+    var parts = path.split('.');
+    while (parts.length - 1) {
+        var key = parts.shift();
+        var shouldBeArray = parts.length ? new RegExp('^[0-9]+$').test(parts[0]) : false;
+        if (! (key in obj)) obj[key] = shouldBeArray ? [] : {};
+        obj = obj[key];
+    }
+    obj[parts[0]] = value;
+};
+
 export function clone(value) {
     if (value === undefined) return undefined;
 
@@ -42,15 +54,15 @@ export function clone(value) {
 
 export function tailwind_width_class(width) {
     const widths = {
-        25: '1/4',
-        33: '1/3',
-        50: '1/2',
-        66: '2/3',
-        75: '3/4',
-        100: 'full'
+        25: 'w-full @lg:w-1/4',
+        33: 'w-full @lg:w-1/3',
+        50: 'w-full @lg:w-1/2',
+        66: 'w-full @lg:w-2/3',
+        75: 'w-full @lg:w-3/4',
+        100: 'w-full'
     };
 
-    return `w-${widths[width] || 'full'}`;
+    return `${widths[width] || 'w-full'}`;
 }
 
 export function markdown(value) {

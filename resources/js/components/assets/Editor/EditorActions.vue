@@ -7,6 +7,7 @@
             :key="action.handle"
             :action="action"
             :selections="1"
+            :errors="errors"
             @selected="run" />
     </div>
 

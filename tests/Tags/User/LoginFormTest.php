@@ -4,6 +4,7 @@ namespace Tests\Tags\User;
 
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
+use Statamic\Statamic;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -211,5 +212,16 @@ EOT
 
         $this->assertStringContainsString($expectedRedirect, $output);
         $this->assertStringContainsString($expectedErrorRedirect, $output);
+    }
+
+    /** @test */
+    public function it_fetches_form_data()
+    {
+        $form = Statamic::tag('user:login_form')->fetch();
+
+        $this->assertEquals($form['attrs']['action'], 'http://localhost/!/auth/login');
+        $this->assertEquals($form['attrs']['method'], 'POST');
+
+        $this->assertArrayHasKey('_token', $form['params']);
     }
 }

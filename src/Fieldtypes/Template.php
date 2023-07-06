@@ -12,12 +12,28 @@ class Template extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'hide_partials' => [
-                'display' => __('Hide Partials'),
-                'instructions' => __('statamic::fieldtypes.template.config.hide_partials'),
-                'type' => 'toggle',
-                'default' => true,
-                'width' => 50,
+            [
+                'display' => __('Behavior'),
+                'fields' => [
+                    'hide_partials' => [
+                        'display' => __('Hide Partials'),
+                        'instructions' => __('statamic::fieldtypes.template.config.hide_partials'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'blueprint' => [
+                        'display' => __('Blueprint'),
+                        'instructions' => __('statamic::fieldtypes.template.config.blueprint'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'folder' => [
+                        'display' => __('Restrict to Folder'),
+                        'instructions' => __('statamic::fieldtypes.template.config.folder'),
+                        'type' => 'template_folder',
+                        'max_items' => 1,
+                    ],
+                ],
             ],
         ];
     }
