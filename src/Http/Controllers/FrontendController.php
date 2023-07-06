@@ -7,9 +7,9 @@ use Statamic\Auth\Protect\Protection;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Data;
 use Statamic\Http\Responses\DataResponse;
+use Statamic\Licensing\Outpost;
 use Statamic\Support\Arr;
 use Statamic\View\View;
-use Statamic\Licensing\Outpost;
 
 /**
  * The front-end controller.
@@ -78,7 +78,7 @@ class FrontendController extends Controller
     /**
      * Ping the site and have it phone home.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return string
      */
     public function elliot($token)
