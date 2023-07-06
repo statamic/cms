@@ -1,5 +1,17 @@
 # Release Notes
 
+## 4.10.1 (2023-07-06)
+
+### What's improved
+- French translations. [#8409](https://github.com/statamic/cms/issues/8409) by @ebeauchamps
+
+### What's fixed
+- Fix blueprint events being dispatched repeatedly, especially when using Laravel Telescope. [#8048](https://github.com/statamic/cms/issues/8048) by @morhi
+- Fix mapping of search results in entries fieldtype. [#8414](https://github.com/statamic/cms/issues/8414) by @jasonvarga
+- Fix Live Preview viewport not being reset when switching back to "Responsive". [#8402](https://github.com/statamic/cms/issues/8402) by @wiebkevogel
+
+
+
 ## 4.10.0 (2023-07-05)
 
 ### What's new
