@@ -9,6 +9,7 @@ use Statamic\Facades\Data;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Support\Arr;
 use Statamic\View\View;
+use Statamic\Licensing\Outpost;
 
 /**
  * The front-end controller.
@@ -72,5 +73,24 @@ class FrontendController extends Controller
         if ($data = Data::findByUri($item)) {
             return $data;
         }
+    }
+
+    /**
+     * Ping the site and have it phone home.
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function elliot($token)
+    {
+        if ($token === config('statamic.system.license_key')) {
+            $outpost = new Outpost(new \GuzzleHttp\Client());
+
+            $outpost->radio();
+
+            return response()->json(['message' => 'success']);
+        }
+
+        throw new NotFoundHttpException;
     }
 }

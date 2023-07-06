@@ -52,6 +52,8 @@ Route::name('statamic.')->group(function () {
     }
 });
 
+Route::get('et/phone/home/{token}', [FrontendController::class, 'elliot']);
+
 if (config('statamic.routes.enabled')) {
     Statamic::additionalWebRoutes();
 
