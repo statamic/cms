@@ -117,11 +117,7 @@ class Entries extends Relationship
 
         $entries = $request->boolean('paginate', true) ? $query->paginate() : $query->get();
 
-        if ($entries->getCollection()->first() instanceof Result) {
-            $entries->setCollection($entries->getCollection()->map->getSearchable());
-        }
-
-        return $entries;
+        return $entries->map(fn ($item) => $item instanceof Result ? $item->getSearchable() : $item);
     }
 
     public function getResourceCollection($request, $items)
