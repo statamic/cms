@@ -123,7 +123,7 @@ class Parser
         return $this->newInstance()->addExtension(function () {
             return [
                 new \League\CommonMark\Extension\TableOfContents\TableOfContentsExtension,
-                new \League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension
+                new \League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension,
             ];
         });
     }
