@@ -81,7 +81,7 @@ class FrontendController extends Controller
      */
     public function elliot(Outpost $outpost, $token)
     {
-        if ($token !== Config::getLicenseKey()) {
+        if (! password_verify(Config::getLicenseKey(), $token)) {
             throw new NotFoundHttpException;
         }
 
