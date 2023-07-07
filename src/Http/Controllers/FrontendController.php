@@ -77,20 +77,15 @@ class FrontendController extends Controller
 
     /**
      * Ping the site and have it phone home.
-     *
-     * @param  Request  $request
-     * @return string
      */
-    public function elliot($token)
+    public function elliot(Outpost $outpost, $token)
     {
-        if ($token === config('statamic.system.license_key')) {
-            $outpost = new Outpost(new \GuzzleHttp\Client());
-
-            $outpost->radio();
-
-            return response()->json(['message' => 'success']);
+        if ($token !== config('statamic.system.license_key')) {
+            throw new NotFoundHttpException;
         }
 
-        throw new NotFoundHttpException;
+        $outpost->radio();
+
+        return response()->json(['message' => 'success']);
     }
 }
