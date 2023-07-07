@@ -87,6 +87,6 @@ class FrontendController extends Controller
 
         $outpost->radio();
 
-        return response()->json(['message' => 'success']);
+        return response()->json(['success' => true]);
     }
 }
