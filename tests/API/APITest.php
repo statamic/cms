@@ -196,30 +196,45 @@ class APITest extends TestCase
     public function it_filters_by_taxonomy_terms()
     {
         Facades\Config::set('statamic.api.resources.collections.test', [
-            'allowed_filters' => ['taxonomy:tags'],
+            'allowed_filters' => ['taxonomy:tags', 'taxonomy:categories'],
         ]);
 
         $this->makeTaxonomy('tags')->save();
-        $this->makeTerm('tags', 'rad')->save();
-        $this->makeTerm('tags', 'meh')->save();
-        $this->makeTerm('tags', 'wow')->save();
+        $this->makeTaxonomy('categories')->save();
+        $this->makeCollection('test')->taxonomies(['tags', 'categories'])->save();
 
-        $this->makeCollection('test')->taxonomies(['tags'])->save();
+        $this->makeEntry('test', '1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
+        $this->makeEntry('test', '2')->data(['tags' => ['awesome'], 'categories' => ['events']])->save();
+        $this->makeEntry('test', '3')->data(['tags' => ['rad', 'awesome']])->save();
+        $this->makeEntry('test', '4')->data(['tags' => ['meh']])->save();
+        $this->makeEntry('test', '5')->data(['tags' => []])->save();
 
-        $this->makeEntry('test', '1')->data(['tags' => ['rad', 'wow']])->save();
-        $this->makeEntry('test', '2')->data(['tags' => ['rad']])->save();
-        $this->makeEntry('test', '3')->data(['tags' => ['meh']])->save();
+        // Where term in
+        $this->assertEquals([1, 3], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:in]=rad'));
+        $this->assertEquals([1, 3], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:any]=rad'));
+        $this->assertEquals([1, 3], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags]=rad')); // shorthand
 
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags]=rad', 2);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags]=boring', 0);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:in]=boring', 0);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:in]=boring,rad', 2);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:in]=wow,rad', 2);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:in]=rad,meh', 3);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:not_in]=boring', 3);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:not_in]=rad', 1);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:not_in]=boring,rad', 1);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:not_in]=rad,meh,wow', 0);
+        // Where any of these terms in
+        $this->assertEquals([1, 3, 4], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:in]=rad,meh'));
+        $this->assertEquals([1, 3, 4], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:any]=rad,meh'));
+        $this->assertEquals([1, 3, 4], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags]=rad,meh')); // shorthand
+
+        // Where term not in
+        $this->assertEquals([2, 4, 5], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:not_in]=rad'));
+        $this->assertEquals([2, 4, 5], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:not]=rad'));
+
+        // Where terms not in
+        $this->assertEquals([4, 5], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:not_in]=rad,awesome'));
+        $this->assertEquals([4, 5], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:not]=rad,awesome'));
+
+        // Where all of these terms in
+        $this->assertEquals([3], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:all]=rad,awesome'));
+
+        // Ensure in and not logic intersect properly
+        $this->assertEquals([1, 3], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:in]=rad,meh&filter[taxonomy:tags:not]=meh'));
+
+        // Ensure in logic intersects properly across multiple taxonomies
+        $this->assertEquals([1], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:in]=rad,meh&filter[taxonomy:categories:in]=news'));
     }
 
     /** @test */
@@ -461,6 +476,16 @@ class APITest extends TestCase
     private function makeTerm($taxonomy, $slug, $data = [])
     {
         return Facades\Term::make()->taxonomy($taxonomy)->inDefaultLocale()->slug($slug)->data($data);
+    }
+
+    private function getDataIds($endpoint)
+    {
+        $response = $this
+            ->get($endpoint)
+            ->assertSuccessful()
+            ->assertJson(['data' => []]);
+
+        return collect($response->getData()->data)->pluck('id')->all();
     }
 
     private function assertEndpointDataCount($endpoint, $count)
