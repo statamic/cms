@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers;
 use Illuminate\Http\Request;
 use Statamic\Auth\Protect\Protection;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Config;
 use Statamic\Facades\Data;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Licensing\Outpost;
@@ -80,7 +81,7 @@ class FrontendController extends Controller
      */
     public function elliot(Outpost $outpost, $token)
     {
-        if ($token !== config('statamic.system.license_key')) {
+        if ($token !== Config::getLicenseKey()) {
             throw new NotFoundHttpException;
         }
 
