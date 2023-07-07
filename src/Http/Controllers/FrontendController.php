@@ -79,9 +79,9 @@ class FrontendController extends Controller
     /**
      * Ping the site and have it phone home.
      */
-    public function elliot(Outpost $outpost, $token)
+    public function elliot(Outpost $outpost, $hash)
     {
-        if (! password_verify(Config::getLicenseKey(), $token)) {
+        if (! password_verify(Config::getLicenseKey(), $hash)) {
             throw new NotFoundHttpException;
         }
 
