@@ -1362,6 +1362,12 @@ class NodeProcessor
                             $recursiveParent->activeDepth += 1;
 
                             $rootData = RecursiveNodeManager::getRecursiveRootData($node);
+
+                            // Prevent an infinite loop with arbitrary data.
+                            if (array_key_exists($node->content, $rootData)) {
+                                unset($rootData[$node->content]);
+                            }
+
                             $parentParameterValues = array_values($recursiveParent->getParameterValues($this));
                             // Substitute the current node with the original parent.
                             foreach ($children as $childData) {
@@ -1374,7 +1380,7 @@ class NodeProcessor
                                 // Keep the manager in sync.
                                 RecursiveNodeManager::updateNamedDepth($node, $recursiveParent->activeDepth);
 
-                                $childDataToUse = $depths + $childData;
+                                $childDataToUse = $childData;
 
                                 if (! empty($recursiveParent->parameters)) {
                                     $lockData = $this->data;
@@ -1387,6 +1393,14 @@ class NodeProcessor
                                     $childDataToUse = $childDataToUse + $rootData;
                                 } else {
                                     $childDataToUse = $childDataToUse + $rootData;
+                                }
+
+                                // Apply depths after merging root data to prevent overwriting.
+                                $childDataToUse = array_merge($childDataToUse, $depths);
+
+                                // Add an empty array for consistency.
+                                if (! array_key_exists($node->content, $childDataToUse)) {
+                                    $childDataToUse[$node->content] = [];
                                 }
 
                                 $result = $this->cloneProcessor()
