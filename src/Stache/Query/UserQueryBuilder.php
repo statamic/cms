@@ -9,11 +9,15 @@ class UserQueryBuilder extends Builder
     public function whereGroup($value, $operator = '=', $boolean = 'and')
     {
         $this->where('groups/'.$value, $operator, true, $boolean);
+
+        return $this;
     }
 
     public function orWhereGroup($value, $operator = '=')
     {
         $this->whereGroup($value, $operator, 'or');
+
+        return $this;
     }
 
     public function whereGroupIn($groups, $boolean = 'and')
@@ -24,21 +28,29 @@ class UserQueryBuilder extends Builder
                 $query->orWhere('groups/'.$group, true);
             }
         });
+
+        return $this;
     }
 
     public function orWhereGroupIn($groups)
     {
         $this->whereGroupIn($groups, 'or');
+
+        return $this;
     }
 
     public function whereRole($value, $operator = '=', $boolean = 'and')
     {
         $this->where('roles/'.$value, $operator, true, $boolean);
+
+        return $this;
     }
 
     public function orWhereRole($value, $operator = '=')
     {
         $this->whereRole($value, $operator, 'or');
+
+        return $this;
     }
 
     public function whereRoleIn($roles, $boolean = 'and')
@@ -49,11 +61,15 @@ class UserQueryBuilder extends Builder
                 $query->orWhere('roles/'.$role, true);
             }
         });
+
+        return $this;
     }
 
     public function orWhereRoleIn($roles)
     {
         $this->whereRoleIn($roles, 'or');
+
+        return $this;
     }
 
     protected function getFilteredKeys()
