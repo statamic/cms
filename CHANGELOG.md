@@ -1,5 +1,16 @@
 # Release Notes
 
+## 4.10.2 (2023-07-10)
+
+### What's improved
+- Chinese translations. [#8418](https://github.com/statamic/cms/issues/8418) by @xuchunyang
+
+### What's fixed
+- Fix pagination in entries stack selector. [#8426](https://github.com/statamic/cms/issues/8426) by @jasonvarga
+- Bump tough-cookie from 4.1.2 to 4.1.3 [#8423](https://github.com/statamic/cms/issues/8423) by @dependabot
+
+
+
 ## 4.10.1 (2023-07-06)
 
 ### What's improved
