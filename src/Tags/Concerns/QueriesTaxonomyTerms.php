@@ -20,7 +20,7 @@ trait QueriesTaxonomyTerms
             $values->each(fn ($value) => $query->whereTaxonomy($value));
         } else {
             throw new InvalidArgumentException(
-                'Unknown taxonomy query modifier ['.$modifier.']. Valid values are "in", "any", "not_in", "not", and "all".'
+                'Unknown taxonomy query modifier ['.$modifier.']. Valid values are "any", "not", and "all".'
             );
         }
     }

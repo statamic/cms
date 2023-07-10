@@ -503,7 +503,7 @@ class EntriesTest extends TestCase
     public function it_throws_an_exception_when_using_an_unknown_taxonomy_query_modifier()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown taxonomy query modifier [xyz]. Valid values are "in", "any", "not_in", "not", and "all".');
+        $this->expectExceptionMessage('Unknown taxonomy query modifier [xyz]. Valid values are "any", "not", and "all".');
 
         $this->getEntries(['taxonomy:tags:xyz' => 'test']);
     }
