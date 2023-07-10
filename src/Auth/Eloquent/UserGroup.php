@@ -14,7 +14,7 @@ class UserGroup extends FileUserGroup
         return (new static)
             ->title($model->title)
             ->handle($model->handle)
-            ->roles($model->roles)
+            ->roles($model->roles ?? [])
             ->model($model);
     }
 
