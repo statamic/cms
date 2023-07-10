@@ -64,16 +64,16 @@ class UserGroupRepository extends BaseRepository
         });
     }
 
-    public function find($id): ?UserGroupContract
+    public function find($handle): ?UserGroupContract
     {
         if (! $this->isEloquentEnabled()) {
-            return parent::find($id);
+            return parent::find($handle);
         }
 
-        return Blink::once("eloquent-groups-{$id}", function () use ($id) {
+        return Blink::once("eloquent-groups-{$handle}", function () use ($handle) {
             $model = UserGroupModel::where(is_integer($handle) ? 'id' : 'handle', $handle)->first();
 
-            return $model ? (new UserGroup)->fromModel($id) : null;
+            return $model ? (new UserGroup)->fromModel($model) : null;
         });
     }
 
