@@ -4,7 +4,6 @@ namespace Tests\Tags;
 
 use Illuminate\Support\Facades\File;
 use Statamic\Facades\Parse;
-use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\TestCase;
 
 class SvgTagTest extends TestCase
@@ -18,10 +17,7 @@ class SvgTagTest extends TestCase
 
     private function tag($tag)
     {
-        $output = Parse::template($tag, []);
-
-        // Normalize whitespace and line breaks for testing ease.
-        return trim(StringUtilities::normalizeLineEndings($output));
+        return Parse::template($tag, []);
     }
 
     /** @test */
