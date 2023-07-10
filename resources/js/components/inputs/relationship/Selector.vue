@@ -49,9 +49,12 @@
                             >
                                 <template slot="cell-title" slot-scope="{ row: entry }">
                                     <div class="flex items-center">
-                                        <div v-if="entry.published !== undefined" class="little-dot mr-2" :class="getStatusClass(entry)" />
+                                        <div class="little-dot mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
                                         {{ entry.title }}
                                     </div>
+                                </template>
+                                <template slot="cell-status" slot-scope="{ row: entry }">
+                                    <div class="status-index-field select-none" v-tooltip="getStatusTooltip(entry)" :class="`status-${entry.status}`" v-text="getStatusLabel(entry)" />
                                 </template>
                                 <template slot="cell-url" slot-scope="{ row: entry }">
                                     <span class="text-2xs">{{ entry.url }}</span>
@@ -276,7 +279,37 @@ export default {
             } else {
                 return 'bg-gray-400';
             }
-        }
+        },
+
+        getStatusLabel(entry) {
+            if (entry.status === 'published') {
+                return __('Published');
+            } else if (entry.status === 'scheduled') {
+                return __('Scheduled');
+            } else if (entry.status === 'expired') {
+                return __('Expired');
+            } else if (entry.status === 'draft') {
+                return __('Draft');
+            }
+        },
+
+        getStatusTooltip(entry) {
+            if (entry.status === 'published') {
+                return entry.collection.dated
+                    ? __('messages.status_published_with_date', {date: entry.date})
+                    : null; // The label is sufficient.
+            } else if (entry.status === 'scheduled') {
+                return __('messages.status_scheduled_with_date', {date: entry.date})
+            } else if (entry.status === 'expired') {
+                return __('messages.status_expired_with_date', {date: entry.date})
+            } else if (entry.status === 'draft') {
+                return null; // The label is sufficient.
+            }
+        },
+
+        columnShowing(column) {
+            return this.visibleColumns.find(c => c.field === column);
+        },
 
     }
 

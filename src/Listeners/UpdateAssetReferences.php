@@ -36,8 +36,6 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
 
     /**
      * Handle the asset saved event.
-     *
-     * @param  AssetSaved  $event
      */
     public function handleSaved(AssetSaved $event)
     {
@@ -50,8 +48,6 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
 
     /**
      * Handle the asset replaced event.
-     *
-     * @param  AssetReplaced  $event
      */
     public function handleReplaced(AssetReplaced $event)
     {
@@ -64,8 +60,6 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
 
     /**
      * Handle the asset deleted event.
-     *
-     * @param  AssetDeleted  $event
      */
     public function handleDeleted(AssetDeleted $event)
     {

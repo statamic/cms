@@ -33,22 +33,44 @@ jobs:
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v36
+        with:
+          files: |
+            config
+            resources/lang
+            resources/users
+            resources/views
+            routes
+            src
+            tests
+            composer.json
+            phpunit.xml.dist
+            **.php
+
+      - name: Determine whether tests should run
+        id: should-run-tests
+        if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
+        run: echo "result=true" >> $GITHUB_OUTPUT
+
       - name: Update apt sources
-        if: matrix.os == 'ubuntu-latest'
+        if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
         run: |
           sudo gem install apt-spy2
           sudo apt-spy2 fix --commit --launchpad --country=US
           sudo apt-get update
 
       - name: Install French Locale
+        if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
         run: sudo apt-get install language-pack-fr
-        if: matrix.os == 'ubuntu-latest'
-
-      - name: Checkout code
-        uses: actions/checkout@v1
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
+        if: steps.should-run-tests.outputs.result == 'true'
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
@@ -56,6 +78,7 @@ jobs:
 
       - name: Install dependencies
         uses: nick-invision/retry@v2
+        if: steps.should-run-tests.outputs.result == 'true'
         with:
           timeout_minutes: 5
           max_attempts: 5
@@ -64,9 +87,11 @@ jobs:
             composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: List Installed Dependencies
+        if: steps.should-run-tests.outputs.result == 'true'
         run: composer show -D
 
       - name: Execute tests
+        if: steps.should-run-tests.outputs.result == 'true'
         run: vendor/bin/phpunit
 
   js-tests:
@@ -79,13 +104,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v1
 
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v36
+        with:
+          files: |
+            **.{js,vue,ts}
+            package.json
+
+      - name: Determine whether tests should run
+        id: should-run-tests
+        if: steps.changed-files.outputs.any_modified == 'true' || github.event_name == 'schedule'
+        run: echo "result=true" >> $GITHUB_OUTPUT
+
       - name: Install required npm version
+        if: steps.should-run-tests.outputs.result == 'true'
         run: npm -g install npm@8.5.5
 
       - name: Install dependencies
+        if: steps.should-run-tests.outputs.result == 'true'
         run: npm ci
 
       - name: Execute tests
+        if: steps.should-run-tests.outputs.result == 'true'
         run: npm run test
 
   slack:

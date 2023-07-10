@@ -5,7 +5,7 @@
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-4 py-2 pl-2">
-                    <svg-icon class="text-gray-800 mr-2 h-4 w-4 flex-none" :name="`light/${field.icon}`" v-tooltip="tooltipText" default="light/generic-field" />
+                    <svg-icon class="text-gray-800 mr-2 h-4 w-4 flex-none" :name="field.icon.startsWith('<svg') ? field.icon : `light/${field.icon}`" v-tooltip="tooltipText" default="light/generic-field" />
                     <a class="break-all" v-text="labelText" @click="$emit('edit')" />
                     <svg-icon name="light/hyperlink" v-if="isReferenceField" class="text-gray-600 text-3xs ml-2 h-4 w-4" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>

@@ -61,6 +61,10 @@
     transform: translateX(-4px);
 }
 
+.replicator-set-picker.between .replicator-set-picker-button-wrapper {
+    @apply h-5;
+}
+
 .replicator-set.has-error > .replicator-set-header label {
     @apply text-red-500;
 }

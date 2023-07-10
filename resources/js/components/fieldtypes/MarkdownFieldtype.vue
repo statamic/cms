@@ -476,7 +476,7 @@ export default {
             // We don't want to maintain the asset selections
             this.selectedAssets = [];
 
-            this.$axios.get(cp_url('assets-fieldtype'), { params: { assets } }).then(response => {
+            this.$axios.post(cp_url('assets-fieldtype'), { assets }).then(response => {
                 _(response.data).each((asset) => {
                     var alt = asset.values.alt || '';
                     var url = encodeURI('statamic://'+asset.reference);

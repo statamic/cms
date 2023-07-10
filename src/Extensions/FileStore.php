@@ -8,7 +8,7 @@ use Statamic\Support\Str;
 
 class FileStore extends LaravelFileStore implements Store
 {
-    protected function path($key)
+    public function path($key)
     {
         if (! Str::startsWith($key, 'stache::')) {
             return parent::path($key);

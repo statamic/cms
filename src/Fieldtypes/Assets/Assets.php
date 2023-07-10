@@ -206,6 +206,10 @@ class Assets extends Fieldtype
             $rules[] = 'max:'.$max;
         }
 
+        if ($min = $this->config('min_files')) {
+            $rules[] = 'min:'.$min;
+        }
+
         return $rules;
     }
 
