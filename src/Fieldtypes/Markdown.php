@@ -45,6 +45,21 @@ class Markdown extends Fieldtype
             [
                 'display' => __('Editor'),
                 'fields' => [
+                    'buttons' => [
+                        'display' => __('Buttons'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.buttons'),
+                        'type' => 'markdown_buttons_setting',
+                        'default' => [
+                            'bold',
+                            'italic',
+                            'unorderedlist',
+                            'orderedlist',
+                            'quote',
+                            'link',
+                            'image',
+                            'table',
+                        ],
+                    ],
                     'automatic_line_breaks' => [
                         'display' => __('Automatic Line Breaks'),
                         'instructions' => __('statamic::fieldtypes.markdown.config.automatic_line_breaks'),

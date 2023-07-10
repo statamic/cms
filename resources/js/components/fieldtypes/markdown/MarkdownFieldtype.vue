@@ -17,43 +17,14 @@
                         <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'" />
                         <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'" />
                     </div>
-
                     <div class="markdown-buttons" v-if="! isReadOnly">
-                        <button @click="toggleInline('bold')" v-tooltip="__('Bold')" :aria-label="__('Bold')">
-                            <svg-icon name="text-bold" class="w-4 h-4" />
-                        </button>
-                        <button @click="toggleInline('italic')" v-tooltip="__('Italic')" :aria-label="__('Italic')">
-                            <svg-icon name="text-italic" class="w-4 h-4" />
-                        </button>
-                        <button @click="toggleInline('strikethrough')" v-tooltip="__('Strike Though')" :aria-label="__('Strike Though')">
-                            <svg-icon name="text-strike-through" class="w-4 h-4" />
-                        </button>
-                        <button @click="toggleLine('unordered-list')" v-tooltip="__('List')" :aria-label="__('List')">
-                            <svg-icon name="list-ul" class="w-4 h-4" />
-                        </button>
-                        <button @click="toggleLine('ordered-list')" v-tooltip="__('Ordered List')" :aria-label="__('Ordered List')">
-                            <svg-icon name="list-ol" class="w-4 h-4" />
-                        </button>
-                        <button @click="addAsset" v-if="assetsEnabled" v-tooltip="__('Insert Asset')" :aria-label="__('Insert Asset')">
-                            <svg-icon name="insert-image" class="w-4 h-4" />
-                        </button>
-                        <button @click="insertImage('')" v-else v-tooltip="__('Insert Image')" :aria-label="__('Insert Image')">
-                            <svg-icon name="insert-image" class="w-4 h-4" />
-                        </button>
-                        <button @click="toggleLine('quote')" v-tooltip="__('Blockquote')" :aria-label="__('Blockquote')">
-                            <svg-icon name="quote" class="w-4 h-4" />
-                        </button>
-                        <button @click="insertTable" v-tooltip="__('Insert Table')" :aria-label="__('Insert Table')">
-                            <svg-icon name="add-table" class="w-4 h-4" />
-                        </button>
-                        <button @click="toggleInline('code')" v-tooltip="__('Inline Code')" :aria-label="__('Inline Code')">
-                            <svg-icon name="code-inline" class="w-4 h-4" />
-                        </button>
-                        <button @click="toggleBlock('code')" v-tooltip="__('Code Block')" :aria-label="__('Code Block')">
-                            <svg-icon name="code-block" class="w-4 h-4" />
-                        </button>
-                        <button @click="insertLink('')" v-tooltip="__('Insert Link')" :aria-label="__('Insert Link')">
-                            <svg-icon name="insert-link" class="w-4 h-4" />
+                        <button
+                            v-for="button in buttons"
+                            v-tooltip="button.text"
+                            :aria-label="button.text"
+                            @click="button.command(editor)"
+                        >
+                            <svg-icon :name="button.svg" class="w-4 h-4" />
                         </button>
                         <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
                             <svg-icon name="dark-mode" class="w-4 h-4" />
@@ -161,9 +132,10 @@ import 'codemirror/mode/php/php';
 import 'codemirror/mode/yaml/yaml';
 import 'codemirror/addon/edit/continuelist';
 
-import Selector from '../assets/Selector.vue';
-import Uploader from '../assets/Uploader.vue';
-import Uploads from '../assets/Uploads.vue';
+import { availableButtons, addButtonHtml } from './buttons';
+import Selector from '../../assets/Selector.vue';
+import Uploader from '../../assets/Uploader.vue';
+import Uploads from '../../assets/Uploads.vue';
 import VueCountable from 'vue-countable'
 
 // Keymaps
@@ -183,6 +155,7 @@ export default {
     data: function() {
         return {
             data: this.value || '',
+            buttons: [],
             mode: 'write',
             selections: null,
             showAssetSelector: false,
@@ -219,6 +192,12 @@ export default {
             if (mode === 'preview') this.updateMarkdownPreview();
         }
 
+    },
+
+    mounted() {
+        this.buttons = this.config.buttons.map(button => {
+            return _.findWhere(availableButtons(), { name: button.toLowerCase() }) || button;
+        });
     },
 
     methods: {
@@ -668,7 +647,28 @@ export default {
             this.$nextTick(function() {
                 this.codemirror.refresh();
             })
-        }
+        },
+
+        buttonIsActive(button) {
+            if (button.hasOwnProperty('active')) {
+                return button.active(this.editor, button.args);
+            }
+            const nameProperty = button.hasOwnProperty('activeName') ? 'activeName' : 'name';
+            const name = button[nameProperty];
+            return this.editor.isActive(name, button.args);
+        },
+
+        buttonIsVisible(button) {
+            if (button.hasOwnProperty('visible')) {
+                return button.visible(this.editor, button.args);
+            }
+            if (! button.hasOwnProperty('visibleWhenActive')) return true;
+            return this.editor.isActive(button.visibleWhenActive, button.args);
+        },
+
+        visibleButtons(buttons) {
+            return buttons.filter(button => this.buttonIsVisible(button));
+        },
 
     },
 
@@ -679,6 +679,10 @@ export default {
 
         container: function() {
             return this.config.container;
+        },
+
+        editor() {
+            return this;
         },
 
         folder: function() {
