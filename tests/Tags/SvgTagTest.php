@@ -42,28 +42,20 @@ class SvgTagTest extends TestCase
     {
         File::put(resource_path('xss.svg'), <<<'SVG'
 <svg>
-    <path onload="loadxss" onclick="clickxss"></path>
+    <path onload="loadxss" onclick="clickxss" />
     <script>alert("xss")</script>
-    <foreignObject></foreignObject>
-    <mesh></mesh>
+    <foreignObject/>
+    <mesh/>
 </svg>
 SVG);
 
-        $this->assertEquals(<<<'SVG'
-<svg>
-  <path></path>
-</svg>
-SVG,
+        $this->assertEquals(
+            '<svg><path/></svg>',
             $this->tag('{{ svg src="xss" sanitize="true" }}')
         );
 
-        $this->assertEquals(<<<'SVG'
-<svg>
-  <path onclick="clickxss"></path>
-  <foreignObject></foreignObject>
-  <mesh></mesh>
-</svg>
-SVG,
+        $this->assertEquals(
+            '<svg><path onclick="clickxss"/><foreignObject/><mesh/></svg>',
             $this->tag('{{ svg src="xss" sanitize="true" allow_tags="mesh|foreignObject" allow_attrs="onclick" }}')
         );
     }
@@ -71,14 +63,9 @@ SVG,
     /** @test */
     public function sanitizing_doesnt_add_xml_tag()
     {
-        // Thes sanitizer package adds an xml tag by default.
         // We want to make sure if there wasn't one to begin with, it doesn't add one.
 
-        $svg = <<<'SVG'
-<svg>
-  <path></path>
-</svg>
-SVG;
+        $svg = '<svg><path/></svg>';
 
         File::put(resource_path('xmltag.svg'), $svg);
 
@@ -88,15 +75,9 @@ SVG;
     /** @test */
     public function sanitizing_doesnt_remove_an_xml_tag()
     {
-        // Thes sanitizer package adds an xml tag by default.
         // We want to make sure that we haven't configured it to remove it if we wanted it there to begin with.
 
-        $svg = <<<'SVG'
-<?xml version="1.0" encoding="UTF-8"?>
-<svg>
-  <path></path>
-</svg>
-SVG;
+        $svg = '<?xml version="1.0" encoding="UTF-8"?><svg><path/></svg>';
 
         File::put(resource_path('xmltag.svg'), $svg);
 

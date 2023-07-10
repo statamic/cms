@@ -2,9 +2,7 @@
 
 namespace Statamic\Tags;
 
-use enshrined\svgSanitize\data\AllowedAttributes;
-use enshrined\svgSanitize\data\AllowedTags;
-use enshrined\svgSanitize\Sanitizer;
+use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Facades\File;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
@@ -91,51 +89,31 @@ class Svg extends Tags
             return $svg;
         }
 
-        $sanitizer = new Sanitizer;
-        $sanitizer->removeXMLTag(! Str::startsWith($svg, '<?xml'));
-        $sanitizer->setAllowedAttrs($this->getAllowedAttrs());
-        $sanitizer->setAllowedTags($this->getAllowedTags());
+        $sanitizer = new DOMSanitizer(DOMSanitizer::SVG);
+        $this->setAllowedAttrs($sanitizer);
+        $this->setAllowedTags($sanitizer);
 
-        return $sanitizer->sanitize($svg);
+        return $sanitizer->sanitize($svg, [
+            'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
+        ]);
     }
 
-    private function getAllowedAttrs()
+    private function setAllowedAttrs(DOMSanitizer $sanitizer)
     {
         $attrs = $this->params->explode('allow_attrs', []);
-
-        return new class($attrs) extends AllowedAttributes
-        {
-            private static $attrs = [];
-
-            public function __construct($attrs)
-            {
-                self::$attrs = $attrs;
-            }
-
-            public static function getAttributes()
-            {
-                return array_merge(parent::getAttributes(), self::$attrs);
-            }
-        };
+        $allowed = array_merge($sanitizer->getAllowedAttributes(), $attrs);
+        $sanitizer->setAllowedAttributes($allowed);
     }
 
-    private function getAllowedTags()
+    private function setAllowedTags(DOMSanitizer $sanitizer)
     {
-        $tags = $this->params->explode('allow_tags', []);
-
-        return new class($tags) extends AllowedTags
-        {
-            private static $tags = [];
-
-            public function __construct($tags)
-            {
-                self::$tags = $tags;
-            }
-
-            public static function getTags()
-            {
-                return array_merge(parent::getTags(), self::$tags);
-            }
-        };
+        // The sanitizer package has certain svg tags explicitly disallowed.
+        // If we allow them, we need to remove them from the disallowed list.
+        // They are defined in lowercase, so we'll lowercase our tags too.
+        $tags = collect($this->params->explode('allow_tags', []))->map(fn ($tag) => strtolower($tag))->all();
+        $allowed = array_merge($sanitizer->getAllowedTags(), $tags);
+        $disallowed = array_diff($sanitizer->getDisallowedTags(), $tags);
+        $sanitizer->setAllowedTags($allowed);
+        $sanitizer->setDisallowedTags($disallowed);
     }
 }
