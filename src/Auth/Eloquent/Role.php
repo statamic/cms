@@ -13,8 +13,8 @@ class Role extends FileRole
         return (new static)
             ->title($model->title)
             ->handle($model->handle)
-            ->permissions($model->permissions)
-            ->preferences($model->preferences)
+            ->permissions($model->permissions ?? [])
+            ->preferences($model->preferences ?? [])
             ->model($model);
     }
 
