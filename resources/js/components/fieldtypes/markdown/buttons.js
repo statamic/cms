@@ -8,7 +8,7 @@ const availableButtons = () => [
     { name: 'link', text: __('Insert Link'), command: (editor) => editor.insertLink(''), svg: 'insert-link' },
     { name: 'table', text: __('Table'), command: (editor) => editor.insertTable(), svg: 'add-table' },
     { name: 'image', text: __('Insert Image'), command: (editor) => editor.insertImage(), svg: 'insert-image'},
-    { name: 'asset', text: __('Insert Asset'), command: (editor) => editor.insertAsset(), svg: 'asset-folder'},
+    { name: 'asset', text: __('Insert Asset'), command: (editor) => editor.addAsset(), svg: 'asset-folder'},
     { name: 'code', text: __('Inline Code'), command: (editor) => editor.toggleInline('code'), svg: 'code-inline' },
     { name: 'codeblock', text: __('Code Block'), command: (editor) => editor.toggleBlock('code'), svg: 'code-block' },
 ];
