@@ -85,7 +85,7 @@ class Alpine extends AbstractJsDriver
     protected function getAlpineXDataKey($fieldHandle, $alpineScope)
     {
         return is_string($alpineScope)
-            ? "{$alpineScope}.{$fieldHandle}"
+            ? "{$alpineScope}['{$fieldHandle}']"
             : $fieldHandle;
     }
 
