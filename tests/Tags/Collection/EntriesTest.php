@@ -497,6 +497,13 @@ class EntriesTest extends TestCase
 
         // Ensure in logic intersects properly across multiple taxonomies
         $this->assertEquals([1], $this->getEntryIds(['taxonomy:tags:in' => 'rad|meh', 'taxonomy:categories:in' => 'news']));
+
+        // Passing IDs into generic taxonomy param
+        $this->assertEquals([1, 3], $this->getEntryIds(['taxonomy' => 'tags::rad']));
+        $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy' => 'tags::rad|tags::meh']));
+        $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy' => 'tags::rad|tags::meh|categories::news']));
+        $this->assertEquals([1], $this->getEntryIds(['taxonomy::all' => 'tags::rad|categories::news'])); // modifier still expected to be 3rd segment
+        $this->assertEquals([1], $this->getEntryIds(['taxonomy' => 'tags::rad|tags::meh', 'taxonomy:categories' => 'news'])); // mix and match
     }
 
     /** @test */
