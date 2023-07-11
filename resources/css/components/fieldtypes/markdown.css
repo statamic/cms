@@ -199,6 +199,12 @@
     ul {
         @apply list-disc;
     }
+
+    pre {
+        @apply rounded p-2;
+        color: #c7254e;
+        background-color: #f9f2f4;
+    }
 }
 
 .markdown-fieldtype-wrapper.markdown-fullscreen {
