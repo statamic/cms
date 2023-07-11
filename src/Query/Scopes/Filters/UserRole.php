@@ -30,7 +30,19 @@ class UserRole extends Filter
         if ($values['role'] === 'super') {
             $query->where('super', true);
         } else {
-            $query->where('roles/'.$values['role'], true);
+            if(config('statamic.users.repository') == 'eloquent') {
+                $tableName = config('statamic.users.tables.role_user', 'role_user');
+                $userIds = DB::connection(config('statamic.users.database'))
+                    ->table($tableName)
+                    ->where('role_id', $values['role'])
+                    ->distinct('user_id')
+                    ->pluck('user_id')
+                    ->toArray();
+                    
+                $query->whereIn('id', $userIds);
+            } else {
+                $query->where('roles/'.$values['role'], true);
+            }
         }
     }
 
