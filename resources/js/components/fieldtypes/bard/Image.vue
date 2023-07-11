@@ -106,7 +106,7 @@ export default {
             showingSelector: false,
             loading: false,
             alt: this.node.attrs.alt,
-            showingAltEdit: this.node.attrs.alt || false,
+            showingAltEdit: !!this.node.attrs.alt,
         }
     },
 
