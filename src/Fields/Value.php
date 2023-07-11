@@ -52,7 +52,7 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function __toString()
     {
-        return (string) $this->value();
+        return $this->antlersValue(app(Parser::class));
     }
 
     #[\ReturnTypeWillChange]
@@ -78,7 +78,7 @@ class Value implements IteratorAggregate, JsonSerializable
         return $this->fieldtype && $this->fieldtype->config('antlers');
     }
 
-    public function antlersValue(Parser $parser, $variables)
+    public function antlersValue(Parser $parser, $variables = [])
     {
         $value = $this->value();
         $shouldParseAntlers = $this->shouldParseAntlers();
