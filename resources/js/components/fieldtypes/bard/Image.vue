@@ -19,7 +19,11 @@
                 </button>
                 <button v-if="src" @click="edit" type="button" class="flex btn btn-sm px-3 py-1.5">
                     <svg-icon name="pencil" class="h-4" />
-                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Set Alt') }}</span>
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Edit Asset') }}</span>
+                </button>
+                <button v-if="src" @click="showingAltEdit = !showingAltEdit" type="button" class="flex btn btn-sm px-3 py-1.5" :class="{ active: showingAltEdit }">
+                    <svg-icon name="rename-file" class="h-4" />
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Override Alt') }}</span>
                 </button>
                 <button v-if="src" @click="openSelector" type="button" class="flex btn btn-sm px-3 py-1.5">
                     <svg-icon name="swap" class="h-4" />
@@ -29,6 +33,10 @@
                     <svg-icon name="trash" class="h-4" />
                     <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Delete') }}</span>
                 </button>
+            </div>
+
+            <div v-if="showingAltEdit" class="flex items-center p-2 border-t rounded-b" @paste.stop>
+                <text-input name="alt" :focus="showingAltEdit" v-model="alt" :placeholder="assetAlt" :prepend="__('Alt Text')" class="flex-1" />
             </div>
 
             <stack
@@ -93,10 +101,12 @@ export default {
     data() {
         return {
             assetId: null,
+            assetAlt: null,
             editorAsset: null,
             showingSelector: false,
             loading: false,
             alt: this.node.attrs.alt,
+            showingAltEdit: this.node.attrs.alt || false,
         }
     },
 
@@ -188,13 +198,12 @@ export default {
         setAsset(asset) {
             this.editorAsset = asset;
             this.assetId = asset.id;
-            this.alt = this.alt || asset.values.alt;
+            this.assetAlt = asset.values.alt;
             this.loading = false;
             this.updateAttributes({ src: this.actualSrc });
         },
 
         editorAssetSaved(asset) {
-            this.alt = null
             this.setAsset(asset);
             this.closeEditor();
         },
