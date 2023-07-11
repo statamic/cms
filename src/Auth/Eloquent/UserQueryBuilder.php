@@ -24,7 +24,7 @@ class UserQueryBuilder extends EloquentQueryBuilder
         $this->$method(function ($query) use ($operator, $value) {
             $query->select(DB::raw(1))
                 ->from($this->groupsTable())
-                ->where('groups_id', $operator, $value)
+                ->where('group_id', $operator, $value)
                 ->whereColumn($this->groupsTable().'.user_id', 'users.id');
         });
 
@@ -53,7 +53,7 @@ class UserQueryBuilder extends EloquentQueryBuilder
         $this->$method(function ($query) use ($groups) {
             $query->select(DB::raw(1))
                 ->from($this->groupsTable())
-                ->whereIn('groups_id', $groups)
+                ->whereIn('group_id', $groups)
                 ->whereColumn($this->groupsTable().'.user_id', 'users.id');
         });
 
