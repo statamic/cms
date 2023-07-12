@@ -201,9 +201,11 @@
     }
 
     pre {
-        @apply rounded p-2;
+        @apply rounded px-4 py-2;
         color: #c7254e;
         background-color: #f9f2f4;
+
+        code { @apply p-0 }
     }
 }
 
