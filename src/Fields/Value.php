@@ -52,9 +52,7 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function __toString()
     {
-        $value = $this->antlersValue(app(Parser::class));
-
-        return is_null($value) ? '' : $value;
+        return $this->antlersValue(app(Parser::class));
     }
 
     #[\ReturnTypeWillChange]

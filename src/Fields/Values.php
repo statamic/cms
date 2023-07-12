@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use IteratorAggregate;
 use JsonSerializable;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesGqlValues;
+use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Facades\Compare;
 use Traversable;
 
@@ -52,7 +53,7 @@ class Values implements ArrayAccess, Arrayable, IteratorAggregate, JsonSerializa
     {
         $value = $this->getProxiedInstance()->get($key);
 
-        return $value instanceof Value ? $value->value() : $value;
+        return $value instanceof Value ? $value->antlersValue(app(Parser::class)) : $value;
     }
 
     #[\ReturnTypeWillChange]
