@@ -14,13 +14,13 @@ return [
     */
 
     'footnotes' => [
-        'backref_class'      => 'footnote-backref',
-        'backref_symbol'     => '↩',
-        'container_add_hr'   => true,
-        'container_class'    => 'footnotes',
-        'ref_class'          => 'footnote-ref',
-        'ref_id_prefix'      => 'fnref:',
-        'footnote_class'     => 'footnote',
+        'backref_class' => 'footnote-backref',
+        'backref_symbol' => '↩',
+        'container_add_hr' => true,
+        'container_class' => 'footnotes',
+        'ref_class' => 'footnote-ref',
+        'ref_id_prefix' => 'fnref:',
+        'footnote_class' => 'footnote',
         'footnote_id_prefix' => 'fn:',
     ],
 
@@ -75,8 +75,5 @@ return [
             'placeholder' => null,
         ],
     ],
-
-
-
 
 ];
