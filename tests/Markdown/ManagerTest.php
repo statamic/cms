@@ -90,11 +90,17 @@ class ManagerTest extends TestCase
             return $parserB = $parser;
         });
 
+        $parserC = null;
+        $manager->extend('c', ['max_nesting_level' => 5], function ($parser) use (&$parserC) {
+            return $parserC = $parser;
+        });
+
         $this->assertSame($parserA, $manager->parser('a'));
         $this->assertNotSame($parserB, $manager->parser('a'));
 
         $this->assertEquals(PHP_INT_MAX, $parserA->config('max_nesting_level')); // The default is used because it wasn't customized in the config.
         $this->assertEquals(3, $parserB->config('max_nesting_level')); // Gets the customized value from the config.
+        $this->assertEquals(5, $parserC->config('max_nesting_level')); // Gets the customized value from the config in the second argument.
     }
 
     /** @test */
