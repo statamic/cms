@@ -4,76 +4,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Footnotes
+    | Markdown Parser Configurations
     |--------------------------------------------------------------------------
     |
-    | Words
+    | Here you may define the configuration arrays for each markdown parser.
+    | You may use the base CommonMark options as well as any extension's
+    | options here. The available options are in the CommonMark docs.
     |
-    | https://commonmark.thephpleague.com/2.4/extensions/footnotes/#configuration
+    | https://statamic.dev/extending/markdown#configuration
     |
     */
 
-    'footnotes' => [
-        'backref_class' => 'footnote-backref',
-        'backref_symbol' => '↩',
-        'container_add_hr' => true,
-        'container_class' => 'footnotes',
-        'ref_class' => 'footnote-ref',
-        'ref_id_prefix' => 'fnref:',
-        'footnote_class' => 'footnote',
-        'footnote_id_prefix' => 'fn:',
-    ],
+    'configs' => [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Heading Permalinks
-    |--------------------------------------------------------------------------
-    |
-    | Words
-    |
-    | https://commonmark.thephpleague.com/2.4/extensions/footnotes/#configuration
-    |
-    */
-
-    'heading_permalinks' => [
-        'enable' => false,
-        'config' => [
-            'html_class' => 'heading-permalink',
-            'id_prefix' => 'content',
-            'apply_id_to_heading' => false,
-            'heading_class' => '',
-            'fragment_prefix' => 'content',
-            'insert' => 'before',
-            'min_heading_level' => 1,
-            'max_heading_level' => 3,
-            'title' => 'Permalink',
-            'symbol' => '#',
-            'aria_hidden' => true,
+        'default' => [
+            // 'heading_permalink' => [
+            //     'symbol' => '#',
+            // ],
         ],
-    ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Table of Contents
-    |--------------------------------------------------------------------------
-    |
-    | Words
-    |
-    | https://commonmark.thephpleague.com/2.4/extensions/table-of-contents/#configuration
-    |
-    */
-
-    'table_of_contents' => [
-        'enable' => false,
-        'config' => [
-            'html_class' => 'table-of-contents',
-            'position' => 'top',
-            'style' => 'bullet',
-            'min_heading_level' => 1,
-            'max_heading_level' => 3,
-            'normalize' => 'relative',
-            'placeholder' => null,
-        ],
     ],
 
 ];

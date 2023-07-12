@@ -23,7 +23,9 @@ class Manager
     public function parser(string $name)
     {
         if ($name === 'default' && ! $this->hasParser('default')) {
-            return $this->parsers['default'] = $this->makeParser();
+            return $this->parsers['default'] = $this
+                ->makeParser($this->config($name))
+                ->withStatamicDefaults();
         }
 
         if (! $this->hasParser($name)) {
@@ -40,12 +42,17 @@ class Manager
 
     public function extend(string $name, Closure $closure)
     {
-        $parser = $closure($this->makeParser());
+        $parser = $closure($this->makeParser($this->config($name)));
 
         if (! $parser instanceof Parser) {
             throw new UnexpectedValueException('A ['.Parser::class.'] instance is expected.');
         }
 
         $this->parsers[$name] = $parser;
+    }
+
+    private function config(string $name)
+    {
+        return config('statamic.markdown.configs.'.$name, []);
     }
 }
