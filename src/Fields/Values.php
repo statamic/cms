@@ -52,7 +52,7 @@ class Values implements ArrayAccess, Arrayable, IteratorAggregate, JsonSerializa
     {
         $value = $this->getProxiedInstance()->get($key);
 
-        return $value;
+        return $value instanceof Value ? $value->value() : $value;
     }
 
     #[\ReturnTypeWillChange]
