@@ -89,7 +89,7 @@
         </div>
         <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.word_count || config.character_limit)">
             <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
-            <div v-if="config.word_count">{{ wordCount }}</div>
+            <div v-if="config.word_count">{{ __('Word Count') }} {{ editor.storage.characterCount.words() }}</div>
             <div v-if="config.character_limit">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
         </div>
     </div>
@@ -213,12 +213,6 @@ export default {
 
                 return moment.utc(duration.asMilliseconds()).format("mm:ss");
             }
-        },
-
-        wordCount() {
-            var count = this.editor.storage.characterCount.words();
-            var units = ( count == 1 ) ? __('Word') : __('Words');
-            return count + " " + units;
         },
 
         isFirstCreation() {
