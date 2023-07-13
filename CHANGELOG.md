@@ -1,5 +1,18 @@
 # Release Notes
 
+## 4.11.0 (2023-07-13)
+
+### What's new
+- Markdown upgrades. [#8417](https://github.com/statamic/cms/issues/8417) by @jackmcdade
+
+### What's fixed
+- Swap SVG sanitizer packages for one with an appropriate license. [#8428](https://github.com/statamic/cms/issues/8428) by @jasonvarga
+- Fix taxonomy term filtering inconsistencies between Tag and API. [#8389](https://github.com/statamic/cms/issues/8389) by @jesseleite
+- Bump `semver` from 5.7.1 to 5.7.2 [#8434](https://github.com/statamic/cms/issues/8434) by @dependabot
+- Pint formatting [#8444](https://github.com/statamic/cms/issues/8444) by @jasonvarga
+
+
+
 ## 4.10.2 (2023-07-10)
 
 ### What's improved
