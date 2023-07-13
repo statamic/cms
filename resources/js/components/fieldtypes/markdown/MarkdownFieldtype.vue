@@ -195,9 +195,7 @@ export default {
     },
 
     mounted() {
-        this.buttons = this.config.buttons.map(button => {
-            return _.findWhere(availableButtons(), { name: button.toLowerCase() }) || button;
-        });
+        this.initToolbarButtons();
     },
 
     methods: {
@@ -647,6 +645,20 @@ export default {
             this.$nextTick(function() {
                 this.codemirror.refresh();
             })
+        },
+
+        initToolbarButtons() {
+            let buttons = this.config.buttons.map(button => {
+                return _.findWhere(availableButtons(), { name: button.toLowerCase() }) || button;
+            });
+
+            // Remove buttons that don't pass conditions.
+            // eg. only the insert asset button can be shown if a container has been set.
+            buttons = buttons.filter(button => {
+                return (button.condition) ? button.condition.call(null, this.config) : true;
+            });
+
+            this.buttons = buttons;
         },
 
         buttonIsActive(button) {
