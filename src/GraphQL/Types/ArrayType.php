@@ -21,7 +21,7 @@ class ArrayType extends ScalarType implements TypeConvertible
         return $value;
     }
 
-    public function parseLiteral(Node $valueNode, ?array $variables = null)
+    public function parseLiteral(Node $valueNode, array $variables = null)
     {
         return $valueNode->value;
     }
@@ -30,5 +30,4 @@ class ArrayType extends ScalarType implements TypeConvertible
     {
         return new static();
     }
-
 }
