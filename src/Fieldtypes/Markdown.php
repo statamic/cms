@@ -157,7 +157,7 @@ class Markdown extends Fieldtype
         }
 
         if ($this->config('heading_anchors') && ! $this->config('table_of_contents')) {
-            $markdown = $markdown->withHeadingAnchors();
+            $markdown = $markdown->withHeadingPermalinks();
         }
 
         $value = $this->resolveStatamicUrls($value);

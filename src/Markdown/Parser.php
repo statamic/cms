@@ -128,7 +128,7 @@ class Parser
         });
     }
 
-    public function withHeadingAnchors(): self
+    public function withHeadingPermalinks(): self
     {
         return $this->newInstance()->addExtension(function () {
             return new \League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension;
