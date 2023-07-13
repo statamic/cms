@@ -18,7 +18,7 @@
 
 <script>
 import {Sortable, Plugins} from '@shopify/draggable';
-import { availableButtons, addButtonHtml } from './buttons';
+import { availableButtons } from './buttons';
 
 export default {
 
@@ -62,7 +62,6 @@ export default {
         initButtons() {
             // Get all default buttons first
             let available = availableButtons();
-            available = addButtonHtml(available);
 
             let buttons = available.map(button => {
                 button.enabled = this.data.includes(button.name);

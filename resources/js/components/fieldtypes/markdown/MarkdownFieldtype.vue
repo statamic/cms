@@ -132,7 +132,7 @@ import 'codemirror/mode/php/php';
 import 'codemirror/mode/yaml/yaml';
 import 'codemirror/addon/edit/continuelist';
 
-import { availableButtons, addButtonHtml } from './buttons';
+import { availableButtons } from './buttons';
 import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';

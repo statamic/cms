@@ -13,10 +13,4 @@ const availableButtons = () => [
     { name: 'codeblock', text: __('Code Block'), command: (editor) => editor.toggleBlock('code'), svg: 'code-block' },
 ];
 
-const addButtonHtml = (buttons) => {
-    return buttons.map(button => {
-        return button;
-    });
-}
-
-export { availableButtons, addButtonHtml };
+export { availableButtons };
