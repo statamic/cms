@@ -8,7 +8,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may define the configuration arrays for each markdown parser.
-    | You may use the base CommonMark options as well as any extension's
+    | You may use the base CommonMark options as well as any extensions'
     | options here. The available options are in the CommonMark docs.
     |
     | https://statamic.dev/extending/markdown#configuration
