@@ -115,9 +115,11 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        $entries = $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+        $results = ($paginate = $request->boolean('paginate', true)) ? $query->paginate() : $query->get();
 
-        return $entries->map(fn ($item) => $item instanceof Result ? $item->getSearchable() : $item);
+        $items = $results->map(fn ($item) => $item instanceof Result ? $item->getSearchable() : $item);
+
+        return $paginate ? $results->setCollection($items) : $items;
     }
 
     public function getResourceCollection($request, $items)
