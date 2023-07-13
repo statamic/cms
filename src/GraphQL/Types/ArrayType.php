@@ -30,4 +30,5 @@ class ArrayType extends ScalarType implements TypeConvertible
     {
         return new static();
     }
+
 }
