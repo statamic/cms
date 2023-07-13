@@ -234,4 +234,60 @@ EOT;
             rtrim(Markdown::withSmartPunctuation()->parse('"Foo" -- Bar...'))
         );
     }
+
+    /** @test */
+    public function it_uses_heading_permalinks_on_demand()
+    {
+        $markdown = <<<'EOT'
+## Alfa Bravo
+## Charlie Delta
+EOT;
+
+        $this->assertParses(<<<'EOT'
+<h2>Alfa Bravo</h2>
+<h2>Charlie Delta</h2>
+EOT, $markdown);
+
+        $this->assertEquals(<<<'EOT'
+<h2><a id="content-alfa-bravo" href="#content-alfa-bravo" class="heading-permalink" aria-hidden="true" title="Permalink">¶</a>Alfa Bravo</h2>
+<h2><a id="content-charlie-delta" href="#content-charlie-delta" class="heading-permalink" aria-hidden="true" title="Permalink">¶</a>Charlie Delta</h2>
+EOT,
+            rtrim(Markdown::withHeadingPermalinks()->parse($markdown))
+        );
+    }
+
+    /** @test */
+    public function it_uses_table_of_contents_on_demand()
+    {
+        $markdown = <<<'EOT'
+## Alfa Bravo
+Foo bar.
+## Charlie Delta
+Baz qux.
+EOT;
+
+        $this->assertParses(<<<'EOT'
+<h2>Alfa Bravo</h2>
+<p>Foo bar.</p>
+<h2>Charlie Delta</h2>
+<p>Baz qux.</p>
+EOT, $markdown);
+
+        $this->assertEquals(<<<'EOT'
+<ul class="table-of-contents">
+<li>
+<a href="#content-alfa-bravo">Alfa Bravo</a>
+</li>
+<li>
+<a href="#content-charlie-delta">Charlie Delta</a>
+</li>
+</ul>
+<h2><a id="content-alfa-bravo" href="#content-alfa-bravo" class="heading-permalink" aria-hidden="true" title="Permalink">¶</a>Alfa Bravo</h2>
+<p>Foo bar.</p>
+<h2><a id="content-charlie-delta" href="#content-charlie-delta" class="heading-permalink" aria-hidden="true" title="Permalink">¶</a>Charlie Delta</h2>
+<p>Baz qux.</p>
+EOT,
+            rtrim(Markdown::withTableOfContents()->parse($markdown))
+        );
+    }
 }
