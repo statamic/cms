@@ -119,6 +119,79 @@ EOT;
     }
 
     /** @test */
+    public function it_parses_description_lists()
+    {
+        $markdown = <<<'EOT'
+# Heading
+
+Apple
+:   Pomaceous fruit of plants of the genus Malus in
+    the family Rosaceae.
+:   An American computer company.
+
+Orange
+:   The fruit of an evergreen tree of the genus Citrus.
+
+Paragraph
+EOT;
+
+        $html = <<<'EOT'
+<h1>Heading</h1>
+<dl>
+<dt>Apple</dt>
+<dd>Pomaceous fruit of plants of the genus Malus in
+the family Rosaceae.</dd>
+<dd>An American computer company.</dd>
+<dt>Orange</dt>
+<dd>The fruit of an evergreen tree of the genus Citrus.</dd>
+</dl>
+<p>Paragraph</p>
+EOT;
+        $this->assertParses($html, $markdown);
+    }
+
+    /** @test */
+    public function it_parses_footnotes()
+    {
+        $markdown = <<<'EOT'
+This is a true fact[^note1]. Seriously.
+
+[^note1]: Someone said this, probably.
+EOT;
+
+        $html = <<<'EOT'
+<p>This is a true fact<sup id="fnref:note1"><a class="footnote-ref" href="#fn:note1" role="doc-noteref">1</a></sup>. Seriously.</p>
+<div class="footnotes" role="doc-endnotes"><hr /><ol><li class="footnote" id="fn:note1" role="doc-endnote"><p>Someone said this, probably.&nbsp;<a class="footnote-backref" rev="footnote" href="#fnref:note1" role="doc-backlink">↩</a></p></li></ol></div>
+EOT;
+        $this->assertParses($html, $markdown);
+    }
+
+    /** @test */
+    public function it_parses_tasklists()
+    {
+        $markdown = <<<'EOT'
+# Heading
+
+- [x] One
+- [ ] Two
+- [ ] Three
+
+Paragraph
+EOT;
+
+        $html = <<<'EOT'
+<h1>Heading</h1>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> One</li>
+<li><input disabled="" type="checkbox"> Two</li>
+<li><input disabled="" type="checkbox"> Three</li>
+</ul>
+<p>Paragraph</p>
+EOT;
+        $this->assertParses($html, $markdown);
+    }
+
+    /** @test */
     public function it_does_not_automatically_convert_urls_to_links()
     {
         $this->assertParses('<p>https://example.com</p>', 'https://example.com');
