@@ -120,11 +120,8 @@ class Parser
 
     public function withTableOfContents(): self
     {
-        return $this->newInstance()->addExtension(function () {
-            return [
-                new \League\CommonMark\Extension\TableOfContents\TableOfContentsExtension,
-                new \League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension,
-            ];
+        return $this->newInstance()->withHeadingPermalinks()->addExtension(function () {
+            return new \League\CommonMark\Extension\TableOfContents\TableOfContentsExtension;
         });
     }
 
