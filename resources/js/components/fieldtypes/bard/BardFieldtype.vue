@@ -87,7 +87,7 @@
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
-        <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.word_count || config.character_limit)">
+        <div class="bard-footer-toolbar" v-if="editor && numFooterToolbarStats">
             <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
             <div v-if="numFooterToolbarStats == 2 && config.reading_time" />
             <div v-if="config.word_count">{{ __('Word Count') }} {{ editor.storage.characterCount.words() }}</div>
