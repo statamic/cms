@@ -46,7 +46,11 @@ class Session
 
     public function region(string $key): Region
     {
-        return $this->regions[$key];
+        if ($region = $this->regions[$key] ?? null) {
+            return $region;
+        }
+
+        throw new RegionNotFound($key);
     }
 
     public function pushRegion($contents, $context, $extension): StringRegion
