@@ -369,7 +369,7 @@ class Date extends Fieldtype
             return $this->preProcessSingleValidatable($value);
         }
 
-        if (isset($value['start'])) {
+        if (! $value || isset($value['start'])) {
             // It was already processed.
             return $value;
         }
