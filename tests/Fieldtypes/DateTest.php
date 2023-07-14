@@ -543,6 +543,11 @@ class DateTest extends TestCase
                 ['date' => null],
                 null,
             ],
+            'hidden date in range mode' => [
+                ['mode' => 'range'],
+                null,
+                null,
+            ],
             'both dates null' => [
                 ['mode' => 'range'],
                 ['date' => ['start' => null, 'end' => null]],
