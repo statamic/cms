@@ -89,7 +89,9 @@
         </div>
         <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.word_count || config.character_limit)">
             <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
+            <div v-if="numFooterToolbarStats == 2 && config.reading_time" />
             <div v-if="config.word_count">{{ __('Word Count') }} {{ editor.storage.characterCount.words() }}</div>
+            <div v-if="numFooterToolbarStats == 2 && !config.reading_time" />
             <div v-if="config.character_limit">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
         </div>
     </div>
@@ -213,6 +215,10 @@ export default {
 
                 return moment.utc(duration.asMilliseconds()).format("mm:ss");
             }
+        },
+
+        numFooterToolbarStats() {
+            return (this.config.reading_time ? 1 : 0) + (this.config.word_count ? 1 : 0) + (this.config.character_limit ? 1 : 0);
         },
 
         isFirstCreation() {
