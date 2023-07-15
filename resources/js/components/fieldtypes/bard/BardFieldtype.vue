@@ -87,12 +87,10 @@
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
-        <div class="bard-footer-toolbar" v-if="editor && numFooterToolbarStats">
-            <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
-            <div v-if="numFooterToolbarStats == 2 && config.reading_time" />
-            <div v-if="config.word_count">{{ __('Word Count') }} {{ editor.storage.characterCount.words() }}</div>
-            <div v-if="numFooterToolbarStats == 2 && !config.reading_time" />
-            <div v-if="config.character_limit">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
+        <div v-if="editor && numBardFooterToolbarStats" :class="bardFooterToolbarClasses" >
+            <div v-if="config.reading_time" class="text-left">{{ readingTime }} {{ __('Reading Time') }}</div>
+            <div v-if="config.word_count" :class="wordCountClasses">{{ __('Word Count') }} {{ editor.storage.characterCount.words() }}</div>
+            <div v-if="config.character_limit" :class="characterCountClasses">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
         </div>
     </div>
 </div>
@@ -217,8 +215,28 @@ export default {
             }
         },
 
-        numFooterToolbarStats() {
+        numBardFooterToolbarStats() {
             return (this.config.reading_time ? 1 : 0) + (this.config.word_count ? 1 : 0) + (this.config.character_limit ? 1 : 0);
+        },
+
+        bardFooterToolbarClasses() {
+            return "bard-footer-toolbar grid-cols-" + this.numBardFooterToolbarStats;
+        },
+
+        wordCountClasses() {
+            if (this.numBardFooterToolbarStats == 3) {
+                return "text-center";
+            }
+
+            if (this.numBardFooterToolbarStats && this.config.reading_time) {
+                return "text-right";
+            } else {
+                return "text-left";
+            }
+        },
+
+        characterCountClasses() {
+            return this.numBardFooterToolbarStats == 1 ? "text-left" : "text-right";
         },
 
         isFirstCreation() {
