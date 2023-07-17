@@ -2,20 +2,23 @@
 
 namespace Tests\Fieldtypes;
 
-use Facades\Statamic\Fields\FieldRepository;
-use Facades\Statamic\Fieldtypes\RowId;
+use Tests\TestCase;
+use Mockery\MockInterface;
 use Statamic\Fields\Field;
-use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Grid;
-use Tests\TestCase;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\RowId;
+use Facades\Statamic\Fields\FieldRepository;
 
 class GridTest extends TestCase
 {
     /** @test */
     public function it_preprocesses_the_values()
     {
-        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+        });
 
         FieldRepository::shouldReceive('find')
             ->with('testfieldset.numbers')
@@ -61,14 +64,16 @@ class GridTest extends TestCase
     /** @test */
     public function it_preprocesses_the_values_recursively()
     {
-        RowId::shouldReceive('generate')->times(6)->andReturn(
-            'random-string-1',
-            'random-string-2',
-            'random-string-3',
-            'random-string-4',
-            'random-string-5',
-            'random-string-6',
-        );
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->times(6)->andReturn(
+                'random-string-1',
+                'random-string-2',
+                'random-string-3',
+                'random-string-4',
+                'random-string-5',
+                'random-string-6',
+            );
+        });
 
         FieldRepository::shouldReceive('find')
             ->with('testfieldset.numbers')
@@ -218,7 +223,7 @@ class GridTest extends TestCase
     /** @test */
     public function it_processes_the_values_recursively_if_ids_inside_sets_are_allowed()
     {
-        config()->set('statamic.system.allow_ids_in_sets', true);
+        config()->set('statamic.system.row_id_handle', '_id');
 
         FieldRepository::shouldReceive('find')
             ->with('testfieldset.numbers')

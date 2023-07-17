@@ -2,10 +2,11 @@
 
 namespace Tests\Fieldtypes;
 
-use Facades\Statamic\Fieldtypes\RowId;
+use Statamic\Fieldtypes\RowId;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Mockery\MockInterface;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -125,9 +126,9 @@ class BardTest extends TestCase
     }
 
     /** @test */
-    public function it_augments_ids_and_sets_id_correctly()
+    public function it_augments_ids_and_sets_id_correctly_with_a_custom_id_handle()
     {
-        config()->set('statamic.system.allow_ids_in_sets', true);
+        config()->set('statamic.system.row_id_handle', '_id');
 
         (new class extends Fieldtype
         {
@@ -480,7 +481,9 @@ class BardTest extends TestCase
     /** @test */
     public function it_transforms_v2_formatted_content_into_prosemirror_structure()
     {
-        RowId::shouldReceive('generate')->andReturn('random-string-1');
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1');
+        });
 
         $data = [
             ['type' => 'text', 'text' => '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>'],
@@ -538,7 +541,9 @@ class BardTest extends TestCase
     /** @test */
     public function it_transforms_v2_formatted_content_with_only_sets_into_prosemirror_structure()
     {
-        RowId::shouldReceive('generate')->andReturn('random-string-1');
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1');
+        });
 
         $data = [
             ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux'],
@@ -631,14 +636,16 @@ class BardTest extends TestCase
      */
     public function it_preloads($areSetsGrouped)
     {
-        RowId::shouldReceive('generate')->andReturn(
-            'random-string-1',
-            'random-string-2',
-            'random-string-3',
-            'random-string-4',
-            'random-string-5',
-            'random-string-6',
-        );
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn(
+                'random-string-1',
+                'random-string-2',
+                'random-string-3',
+                'random-string-4',
+                'random-string-5',
+                'random-string-6',
+            );
+        });
 
         // For this test, use a grid field with min_rows.
         // It doesn't have to be, but it's a fieldtype that would

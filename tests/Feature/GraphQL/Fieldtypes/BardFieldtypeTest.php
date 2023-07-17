@@ -121,7 +121,7 @@ GQL;
      */
     public function it_outputs_bard_fields_with_set_and_manual_id($isGrouped)
     {
-        config()->set('statamic.system.allow_ids_in_sets', true);
+        config()->set('statamic.system.row_id_handle', '_id');
 
         $article = Blueprint::makeFromFields([
             'things' => [

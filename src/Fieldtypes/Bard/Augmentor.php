@@ -3,18 +3,16 @@
 namespace Statamic\Fieldtypes\Bard;
 
 use Closure;
+use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
-use Statamic\Support\Traits\GetIdKey;
 use Tiptap\Editor;
 
 class Augmentor
 {
-    use GetIdKey;
-
     protected $fieldtype;
     protected $sets = [];
     protected $includeDisabledSets = false;
@@ -94,7 +92,7 @@ class Augmentor
             if ($value['type'] == 'set') {
                 $this->sets[$index] = array_merge(
                     $value['attrs']['values'],
-                    [$this->getIdKey() => $value['attrs']['id'] ?? null]
+                    [RowId::handle() => $value['attrs']['id'] ?? null]
                 );
                 $value['index'] = 'index-'.$index;
             }
@@ -158,7 +156,7 @@ class Augmentor
 
             $values = $this->fieldtype->fields($set['type'])->addValues($set)->{$augmentMethod}()->values()->all();
 
-            return array_merge($values, [$this->getIdKey() => $set[$this->getIdKey()] ?? null, 'type' => $set['type']]);
+            return array_merge($values, [RowId::handle() => $set[RowId::handle()] ?? null, 'type' => $set['type']]);
         })->all();
     }
 

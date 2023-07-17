@@ -154,25 +154,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Allow Id's inside sets
+    | Row id handle
     |--------------------------------------------------------------------------
     |
-    | Allowing Id's inside sets (bard and replicator) might have frontend
-    | breaking changes, why this setting needs to be opt in.
-    |
-    | Automatically defined set ids will normally be availabe with the id
-    | handle. As soon as this setting is turned on, the set-id handle
-    | will be prefixed wiht a underscore, like `_id`.
-    |
-    | If ids are not allowed in sets, the data structure looks like this:
-    | - id: set-id
-    |
-    | If ids are allowed:
-    | - _id: set-id
-    | - id: some-id-value
+    | Set id's will be saved and available via the id key. In special cases,
+    | if for example having legacy data already using the id keyword, you
+    | can avoid conflicts by changing the row id handle used by Statamic.
     |
     */
 
-    'allow_ids_in_sets' => false,
+    'row_id_handle' => 'id',
 
 ];

@@ -2,13 +2,14 @@
 
 namespace Tests\Fieldtypes;
 
-use Facades\Statamic\Fields\FieldRepository;
-use Facades\Statamic\Fieldtypes\RowId;
-use Statamic\Fields\Field;
-use Statamic\Fields\Fieldtype;
-use Statamic\Fields\Values;
-use Statamic\Fieldtypes\Replicator;
 use Tests\TestCase;
+use Mockery\MockInterface;
+use Statamic\Fields\Field;
+use Statamic\Fields\Values;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\RowId;
+use Statamic\Fieldtypes\Replicator;
+use Facades\Statamic\Fields\FieldRepository;
 
 class ReplicatorTest extends TestCase
 {
@@ -47,7 +48,9 @@ class ReplicatorTest extends TestCase
      */
     public function it_preprocesses_the_values($areSetsGrouped)
     {
-        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+        });
 
         FieldRepository::shouldReceive('find')
             ->with('testfieldset.numbers')
@@ -113,7 +116,9 @@ class ReplicatorTest extends TestCase
      */
     public function it_preprocesses_the_values_recursively($areSetsGrouped)
     {
-        RowId::shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+        });
 
         FieldRepository::shouldReceive('find')
             ->with('testfieldset.numbers')
@@ -311,9 +316,9 @@ class ReplicatorTest extends TestCase
     }
 
     /** @test */
-    public function it_processes_the_values_recursively_with_underscore_ids_as_well()
+    public function it_processes_the_values_recursively_with_a_custom_id()
     {
-        config()->set('statamic.system.allow_ids_in_sets', true);
+        config()->set('statamic.system.row_id_handle', '_id');
 
         FieldRepository::shouldReceive('find')
             ->with('testfieldset.numbers')
@@ -392,14 +397,16 @@ class ReplicatorTest extends TestCase
      */
     public function it_preloads($areSetsGrouped)
     {
-        RowId::shouldReceive('generate')->andReturn(
-            'random-string-1',
-            'random-string-2',
-            'random-string-3',
-            'random-string-4',
-            'random-string-5',
-            'random-string-6',
-        );
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn(
+                'random-string-1',
+                'random-string-2',
+                'random-string-3',
+                'random-string-4',
+                'random-string-5',
+                'random-string-6',
+            );
+        });
 
         // For this test, use a grid field with min_rows.
         // It doesn't have to be, but it's a fieldtype that would

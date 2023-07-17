@@ -12,12 +12,9 @@ use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Support\Traits\GetIdKey;
 
 class Replicator extends Fieldtype
 {
-    use GetIdKey;
-
     protected $categories = ['structured'];
     protected $defaultValue = [];
     protected $rules = ['array'];
@@ -90,7 +87,7 @@ class Replicator extends Fieldtype
     {
         $fields = $this->fields($row['type'])->addValues($row)->process()->values()->all();
 
-        $row = array_merge([$this->getIdKey() => Arr::pull($row, '_id')], $row, $fields);
+        $row = array_merge([RowId::handle() => Arr::pull($row, '_id')], $row, $fields);
 
         return Arr::removeNullValues($row);
     }
@@ -106,7 +103,7 @@ class Replicator extends Fieldtype
     {
         $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values()->all();
 
-        $id = Arr::pull($row, $this->getIdKey()) ?? RowId::generate();
+        $id = Arr::pull($row, RowId::handle()) ?? RowId::generate();
 
         return array_merge($row, $fields, [
             '_id' => $id,
