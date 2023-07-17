@@ -23,7 +23,9 @@ class Bard extends Replicator
     use Concerns\ResolvesStatamicUrls;
 
     protected $categories = ['text', 'structured'];
+
     protected $defaultValue = '[]';
+
     protected $rules = [];
 
     protected function configFieldItems(): array
@@ -227,6 +229,19 @@ class Bard extends Replicator
         return new BardFilter($this);
     }
 
+    public function callExtensions($value, $method)
+    {
+        $extensions = collect((new Augmentor($this))->extensions())
+            ->filter(fn ($extension) => method_exists($extension, $method))
+            ->all();
+
+        foreach ($extensions as $extension) {
+            $value = $extension->{$method}($value);
+        }
+
+        return $value;
+    }
+
     protected function performAugmentation($value, $shallow)
     {
         if ($this->shouldSaveHtml()) {
@@ -259,6 +274,8 @@ class Bard extends Replicator
 
             return $this->processRow($row);
         })->all();
+
+        $structure = $this->callExtensions($structure, 'process');
 
         if ($this->shouldSaveHtml()) {
             return (new Augmentor($this))->withStatamicImageUrls()->convertToHtml($structure);
@@ -365,13 +382,17 @@ class Bard extends Replicator
             }
         }
 
-        return collect($value)->map(function ($row, $i) {
+        $value = collect($value)->map(function ($row, $i) {
             if ($row['type'] !== 'set') {
                 return $row;
             }
 
             return $this->preProcessRow($row, $i);
-        })->toJson();
+        })->all();
+
+        $value = $this->callExtensions($value, 'preProcess');
+
+        return json_encode($value);
     }
 
     protected function preProcessRow($row, $index)
@@ -402,7 +423,9 @@ class Bard extends Replicator
 
         $data = collect($value)->reject(function ($value) {
             return $value['type'] === 'set';
-        })->values();
+        })->values()->all();
+
+        $data = $this->callExtensions($data, 'preProcessIndex');
 
         return (new Augmentor($this))->renderProsemirrorToHtml([
             'type' => 'doc',
@@ -554,7 +577,7 @@ class Bard extends Replicator
             });
         }
 
-        return [
+        $data = [
             'existing' => $existing,
             'new' => $new,
             'defaults' => $defaults,
@@ -564,6 +587,10 @@ class Bard extends Replicator
             'linkCollections' => $linkCollections,
             'linkData' => (object) $this->getLinkData($value),
         ];
+
+        $data = $this->callExtensions($data, 'preload');
+
+        return $data;
     }
 
     public function preProcessValidatable($value)
