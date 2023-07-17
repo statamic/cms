@@ -90,6 +90,11 @@ class Entries extends Relationship
                         'type' => 'collections',
                         'mode' => 'select',
                     ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
                 ],
             ],
         ];

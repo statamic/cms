@@ -90,6 +90,11 @@ class Terms extends Relationship
                         'type' => 'taxonomies',
                         'mode' => 'select',
                     ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
                 ],
             ],
         ];
