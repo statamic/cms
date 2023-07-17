@@ -2,14 +2,14 @@
 
 namespace Tests\Fieldtypes;
 
-use Tests\TestCase;
+use Facades\Statamic\Fields\FieldRepository;
 use Mockery\MockInterface;
 use Statamic\Fields\Field;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Replicator;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\RowId;
-use Statamic\Fieldtypes\Replicator;
-use Facades\Statamic\Fields\FieldRepository;
+use Tests\TestCase;
 
 class ReplicatorTest extends TestCase
 {

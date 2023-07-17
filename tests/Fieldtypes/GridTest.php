@@ -2,14 +2,14 @@
 
 namespace Tests\Fieldtypes;
 
-use Tests\TestCase;
 use Mockery\MockInterface;
+use Facades\Statamic\Fields\FieldRepository;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Grid;
-use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\RowId;
-use Facades\Statamic\Fields\FieldRepository;
+use Tests\TestCase;
 
 class GridTest extends TestCase
 {
