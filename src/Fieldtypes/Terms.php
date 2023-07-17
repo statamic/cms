@@ -369,6 +369,8 @@ class Terms extends Relationship
             $query->whereNotIn('id', $request->exclusions);
         }
 
+        $this->applyIndexQueryScopes($query, $request->all());
+
         return $query;
     }
 

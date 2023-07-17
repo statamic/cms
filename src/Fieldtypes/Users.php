@@ -94,6 +94,8 @@ class Users extends Relationship
             $query->whereNotIn('id', $request->exclusions);
         }
 
+        $this->applyIndexQueryScopes($query, $request->all());
+
         $query->orderBy('name');
 
         $userFields = function ($user) {
