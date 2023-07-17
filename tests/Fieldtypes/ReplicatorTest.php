@@ -5,9 +5,9 @@ namespace Tests\Fieldtypes;
 use Facades\Statamic\Fields\FieldRepository;
 use Mockery\MockInterface;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Replicator;
-use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\RowId;
 use Tests\TestCase;
 

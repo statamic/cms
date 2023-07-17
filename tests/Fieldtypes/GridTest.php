@@ -2,8 +2,8 @@
 
 namespace Tests\Fieldtypes;
 
-use Mockery\MockInterface;
 use Facades\Statamic\Fields\FieldRepository;
+use Mockery\MockInterface;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
