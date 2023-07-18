@@ -171,6 +171,7 @@ return [
     'user_groups.title' => 'User Groups',
     'user_roles.title' => 'User Roles',
     'users.title' => 'Users',
+    'users.config.query_scopes' => 'Choose which query scopes should be applied when retrieving selectable users.',
     'width.config.options' => 'Set the available width options.',
     'video.title' => 'Video',
     'yaml.title' => 'YAML',
