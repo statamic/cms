@@ -90,6 +90,11 @@ class Entries extends Relationship
                         'type' => 'collections',
                         'mode' => 'select',
                     ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
                 ],
             ],
         ];
@@ -200,6 +205,8 @@ class Entries extends Relationship
         if ($request->exclusions) {
             $query->whereNotIn('id', $request->exclusions);
         }
+
+        $this->applyIndexQueryScopes($query, $request->all());
 
         return $query;
     }
