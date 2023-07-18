@@ -43,6 +43,7 @@ class Entries extends FieldtypeFilter
     {
         if ($values['field'] == 'id') {
             $query->where($handle, $values['operator'], $values['value']);
+
             return;
         }
 
@@ -57,6 +58,7 @@ class Entries extends FieldtypeFilter
 
         if (($config['max_items'] ?? 0) == 1) {
             $query->whereIn($handle, $ids);
+
             return;
         }
 
