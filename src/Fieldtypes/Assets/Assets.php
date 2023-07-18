@@ -91,6 +91,11 @@ class Assets extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
                 ],
             ],
         ];
