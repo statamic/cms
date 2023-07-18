@@ -281,7 +281,7 @@ export default {
         },
 
         /**
-         * The query scopes to use to limit the options.
+         * The scopes to use to filter the queries.
          */
         queryScopes() {
             return this.config.query_scopes || [];
