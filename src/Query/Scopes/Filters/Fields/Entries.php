@@ -64,6 +64,8 @@ class Entries extends FieldtypeFilter
 
         if (empty($ids)) {
             $query->where($handle, -1);
+
+            return;
         }
 
         $query->where(function ($subquery) use ($handle, $ids) {
