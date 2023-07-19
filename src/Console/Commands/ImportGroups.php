@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Facade;
 use Statamic\Auth\Eloquent\UserGroup as EloquentGroup;
 use Statamic\Auth\Eloquent\UserGroupRepository as EloquentRepository;
 use Statamic\Auth\File\UserGroup as FileGroup;
@@ -53,16 +54,23 @@ class ImportGroups extends Command
         app()->bind(GroupContract::class, FileGroup::class);
         app()->bind(GroupRepositoryContract::class, FileRepository::class);
 
+        Facade::clearResolvedInstance(GroupContract::class);
+        Facade::clearResolvedInstance(GroupRepositoryContract::class);
+
         $groups = UserGroup::path(config('statamic.users.paths.groups', resource_path('users/groups.yaml')))->all();
 
         app()->bind(GroupContract::class, EloquentGroup::class);
         app()->bind(GroupRepositoryContract::class, EloquentRepository::class);
 
+        Facade::clearResolvedInstance(GroupContract::class);
+        Facade::clearResolvedInstance(GroupRepositoryContract::class);
+
         $this->withProgressBar($groups, function ($group) {
             $eloquentGroup = UserGroup::make($group->handle())
                 ->title($group->title())
                 ->permissions($group->permissions())
-                ->roles($groups->roles());
+                ->roles($group->roles())
+                ->data($group->data());
 
             $eloquentGroup->save();
         });

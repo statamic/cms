@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Facade;
 use Statamic\Auth\Eloquent\Role as EloquentRole;
 use Statamic\Auth\Eloquent\RoleRepository as EloquentRepository;
 use Statamic\Auth\File\Role as FileRole;
@@ -53,10 +54,16 @@ class ImportRoles extends Command
         app()->bind(RoleContract::class, FileRole::class);
         app()->bind(RoleRepositoryContract::class, FileRepository::class);
 
+        Facade::clearResolvedInstance(GroupContract::class);
+        Facade::clearResolvedInstance(GroupRepositoryContract::class);
+
         $roles = Role::path(config('statamic.users.paths.roles', resource_path('users/roles.yaml')))->all();
 
         app()->bind(RoleContract::class, EloquentRole::class);
         app()->bind(RoleRepositoryContract::class, EloquentRepository::class);
+
+        Facade::clearResolvedInstance(GroupContract::class);
+        Facade::clearResolvedInstance(GroupRepositoryContract::class);
 
         $this->withProgressBar($roles, function ($role) {
             $eloquentRole = Role::make($role->handle())
