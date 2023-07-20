@@ -4,8 +4,6 @@ namespace Statamic\Query\Traits;
 
 use Closure;
 use InvalidArgumentException;
-use Statamic\Facades;
-use Statamic\Fieldtypes;
 
 trait QueriesRelationships
 {
