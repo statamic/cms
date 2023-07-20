@@ -185,7 +185,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Get the blueprints avaialble to this query builder
+     * Get the blueprints available to this query builder
      *
      * @return \Illuminate\Support\Collection
      */
@@ -195,7 +195,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Get the "has relation" base query instance.
+     * Get the query builder and field for the relation we are querying (if they exist)
      *
      * @param  string  $relation
      * @return \Statamic\Query\Builder
