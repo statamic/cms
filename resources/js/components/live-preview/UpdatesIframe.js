@@ -34,7 +34,7 @@ export default {
             this.setIframeAttributes(iframe);
 
             const container = this.$refs.contents;
-            let iframeUrl = new URL(url);
+            let iframeUrl = new URL(url, window.origin);
             let cleanUrl = iframeUrl.host + iframeUrl.pathname;
 
             // If there's no iframe yet, just append it.
