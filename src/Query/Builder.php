@@ -13,6 +13,8 @@ use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 abstract class Builder implements Contract
 {
+    use Traits\QueriesRelationships;
+
     protected $columns;
     protected $limit;
     protected $offset = 0;

@@ -352,4 +352,12 @@ class Entries extends Relationship
             ? collect([$augmented])
             : $augmented->whereAnyStatus()->get();
     }
+
+    public function relationshipQueryBuilder()
+    {
+        $collections = $this->config('collections');
+
+        return Entry::query()
+                ->when($collections, fn ($query) => $query->whereIn('collection', $collections));
+    }
 }
