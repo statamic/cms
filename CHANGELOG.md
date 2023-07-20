@@ -1,5 +1,20 @@
 # Release Notes
 
+## 4.12.0 (2023-07-20)
+
+### What's new
+- Add `query_scopes` option to the relationship fieldtypes. [#8456](http://github.com/statamic/cms/pull/8456) by @jacksleight
+
+### What's improved
+- French translations. [#8451](http://github.com/statamic/cms/pull/8451) by @ebeauchamps
+
+### What's fixed
+- Fix error handling for recent curl bug. [#8475](http://github.com/statamic/cms/pull/8475) by @jesseleite
+- Bump word-wrap from 1.2.3 to 1.2.4. [#8466](http://github.com/statamic/cms/pull/8466) by @dependabot
+- Only show code block copy button on https. [#8457](http://github.com/statamic/cms/pull/8457) by @jasonvarga
+
+
+
 ## 4.11.0 (2023-07-13)
 
 ### What's new
