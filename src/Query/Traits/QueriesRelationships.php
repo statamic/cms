@@ -19,7 +19,7 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return \Statamic\Query\Builder|static
      *
-     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
     public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
     {
