@@ -38,15 +38,15 @@ trait QueriesRelationships
             return $this->{$boolean == 'and' ? 'whereJsonLength' : 'orWhereJsonLength'}($relation, $operator, $count, $boolean);
         }
 
+        if ($count != 1) {
+            throw new InvalidArgumentException('Counting with subqueries in has clauses is not supported');
+        }
+
         $ids = $relationQueryBuilder
             ->where($callback)
             ->get(['id'])
             ->map(fn ($item) => $item->id())
             ->all();
-
-        if ($count != 1) {
-            throw new InvalidArgumentException('Counting with callbacks in has clauses is not supported');
-        }
 
         if ($maxItems == 1) {
             $method = $boolean == 'and' ? 'whereIn' : 'orWhereIn';
