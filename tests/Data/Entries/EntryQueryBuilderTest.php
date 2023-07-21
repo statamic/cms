@@ -685,6 +685,11 @@ class EntryQueryBuilderTest extends TestCase
             ])
             ->save();
 
+        $entries = Entry::query()->whereHas('entries_field')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
         $entries = Entry::query()->whereHas('entries_field', function ($subquery) {
             $subquery->where('title', 'Post 2');
         })
@@ -721,6 +726,11 @@ class EntryQueryBuilderTest extends TestCase
                 'entries_field' => [1, 2]
             ])
             ->save();
+
+        $entries = Entry::query()->whereHas('entries_field')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
 
         $entries = Entry::query()->whereHas('entries_field', function ($subquery) {
             $subquery->where('title', 'Post 2');

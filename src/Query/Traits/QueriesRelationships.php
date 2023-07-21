@@ -23,7 +23,19 @@ trait QueriesRelationships
     {
         [$relationQueryBuilder, $relationField] = $this->getRelationQueryBuilderAndField($relation);
 
+        $maxItems = $relationField->config()['max_items'] ?? 0;
+        $negate = in_array($operator, ['!=', '<']);
+
         if (! $callback) {
+            if ($maxItems == 1) {
+                $method = $boolean == 'and' ? 'whereNull' : 'orWhereNull';
+                if (! $negate) {
+                    $method = str_replace('Null', 'NotNull', $method);
+                }
+
+                return $this->$method($relation);
+            }
+
             return $this->{$boolean == 'and' ? 'whereJsonLength' : 'orWhereJsonLength'}($relation, $operator, $count, $boolean);
         }
 
@@ -32,10 +44,6 @@ trait QueriesRelationships
             ->get(['id'])
             ->map(fn ($item) => $item->id())
             ->all();
-
-        $maxItems = $relationField->config()['max_items'] ?? 0;
-
-        $negate = in_array($operator, ['!=', '<']);
 
         if ($count != 1) {
             throw new InvalidArgumentException("Counting with callbacks in has clauses is not supported");
