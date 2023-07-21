@@ -675,13 +675,13 @@ class EntryQueryBuilderTest extends TestCase
 
         Entry::find(1)
             ->merge([
-                'entries_field' => 2
+                'entries_field' => 2,
             ])
             ->save();
 
         Entry::find(3)
             ->merge([
-                'entries_field' => 1
+                'entries_field' => 1,
             ])
             ->save();
 
@@ -717,13 +717,13 @@ class EntryQueryBuilderTest extends TestCase
 
         Entry::find(1)
             ->merge([
-                'entries_field' => [2, 1]
+                'entries_field' => [2, 1],
             ])
             ->save();
 
         Entry::find(3)
             ->merge([
-                'entries_field' => [1, 2]
+                'entries_field' => [1, 2],
             ])
             ->save();
 
@@ -759,13 +759,13 @@ class EntryQueryBuilderTest extends TestCase
 
         Entry::find(1)
             ->merge([
-                'entries_field' => [2, 1]
+                'entries_field' => [2, 1],
             ])
             ->save();
 
         Entry::find(3)
             ->merge([
-                'entries_field' => [1, 2]
+                'entries_field' => [1, 2],
             ])
             ->save();
 

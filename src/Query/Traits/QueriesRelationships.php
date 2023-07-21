@@ -14,7 +14,6 @@ trait QueriesRelationships
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean
-     * @param  \Closure|null  $callback
      * @return \Statamic\Query\Builder|static
      *
      * @throws \InvalidArgumentException
@@ -46,7 +45,7 @@ trait QueriesRelationships
             ->all();
 
         if ($count != 1) {
-            throw new InvalidArgumentException("Counting with callbacks in has clauses is not supported");
+            throw new InvalidArgumentException('Counting with callbacks in has clauses is not supported');
         }
 
         if ($maxItems == 1) {
@@ -92,7 +91,6 @@ trait QueriesRelationships
      *
      * @param  string  $relation
      * @param  string  $boolean
-     * @param  \Closure|null  $callback
      * @return \Statamic\Query\Builder|static
      */
     public function doesntHave($relation, $boolean = 'and', Closure $callback = null)
@@ -115,7 +113,6 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses.
      *
      * @param  string  $relation
-     * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return \Statamic\Query\Builder|static
@@ -129,7 +126,6 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
      * @param  string  $relation
-     * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int  $count
      * @return \Statamic\Query\Builder|static
@@ -143,7 +139,6 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses.
      *
      * @param  string  $relation
-     * @param  \Closure|null  $callback
      * @return \Statamic\Query\Builder|static
      */
     public function whereDoesntHave($relation, Closure $callback = null)
@@ -155,7 +150,6 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
      * @param  string  $relation
-     * @param  \Closure|null  $callback
      * @return \Statamic\Query\Builder|static
      */
     public function orWhereDoesntHave($relation, Closure $callback = null)

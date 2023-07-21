@@ -5,7 +5,6 @@ namespace Tests\Data\Users;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;

@@ -358,6 +358,6 @@ class Entries extends Relationship
         $collections = $this->config('collections');
 
         return Entry::query()
-                ->when($collections, fn ($query) => $query->whereIn('collection', $collections));
+            ->when($collections, fn ($query) => $query->whereIn('collection', $collections));
     }
 }
