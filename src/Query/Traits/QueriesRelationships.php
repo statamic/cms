@@ -24,7 +24,7 @@ trait QueriesRelationships
         [$relationQueryBuilder, $relationField] = $this->getRelationQueryBuilderAndField($relation);
 
         if (! $callback) {
-            return $this->whereJsonLength($relation, $operator, $count, $boolean);
+            return $this->{$boolean == 'and' ? 'whereJsonLength' : 'orWhereJsonLength'}($relation, $operator, $count, $boolean);
         }
 
         $ids = $relationQueryBuilder
@@ -35,17 +35,33 @@ trait QueriesRelationships
 
         $maxItems = $relationField->config()['max_items'] ?? 0;
 
+        $negate = in_array($operator, ['!=', '<']);
+
+        if ($count != 1) {
+            throw new InvalidArgumentException("Counting with callbacks in has clauses is not supported");
+        }
+
         if ($maxItems == 1) {
-            return $this->whereIn($relation, $ids);
+            $method = $boolean == 'and' ? 'whereIn' : 'orWhereIn';
+            if ($negate) {
+                $method = str_replace('here', 'hereNot', $method);
+            }
+
+            return $this->$method($relation, $ids);
         }
 
         if (empty($ids)) {
-            return $this->whereJsonContains($relation, ['']);
+            return $this->{$boolean == 'and' ? 'whereJsonContains' : 'orWhereJsonContains'}($relation, ['']);
         }
 
-        return $this->where(function ($subquery) use ($relation, $ids) {
+        return $this->{$boolean == 'and' ? 'where' : 'orWhere'}(function ($subquery) use ($ids, $negate, $relation) {
             foreach ($ids as $count => $id) {
-                $subquery->{$count == 0 ? 'whereJsonContains' : 'orWhereJsonContains'}($relation, [$id]);
+                $method = $count == 0 ? 'whereJsonContains' : 'orWhereJsonContains';
+                if ($negate) {
+                    $method = str_replace('Contains', 'DoesntContain', $method);
+                }
+
+                $subquery->$method($relation, [$id]);
             }
         });
     }
@@ -73,10 +89,7 @@ trait QueriesRelationships
      */
     public function doesntHave($relation, $boolean = 'and', Closure $callback = null)
     {
-        return $this->{$boolean == 'and' ? 'where' : 'orwhere'}(function ($subquery) use ($relation, $callback) {
-            return $subquery->whereNull($relation)
-                ->orHas($relation, '<', 1, 'and', $callback);
-        });
+        return $this->has($relation, '<', 1, $boolean, $callback);
     }
 
     /**

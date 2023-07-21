@@ -146,10 +146,12 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             $collections = Facades\Collection::all();
         }
 
-        return $collections->flatMap(function ($collectionHandle) {
-            if ($collection = Facades\Collection::find($collectionHandle)) {
-                return $collection->entryBlueprints();
+        return $collections->flatMap(function ($collection) {
+            if (is_string($collection)) {
+                $collection = Facades\Collection::find($collection);
             }
+
+            return $collection ? $collection->entryBlueprints() : false;
         })
             ->filter()
             ->unique();
