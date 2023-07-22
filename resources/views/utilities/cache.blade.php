@@ -39,7 +39,9 @@
             </div>
             <div class="text-sm text-gray flex">
                 <div class="mr-4 badge-pill-sm"><span class="text-gray-800 font-medium">{{ __('Records') }}:</span> {{ $stache['records'] }}</div>
-                <div class="mr-4 badge-pill-sm"><span class="text-gray-800 font-medium">{{ __('Size') }}:</span> {{ $stache['size'] }}</div>
+                @if($stache['size'])
+                    <div class="mr-4 badge-pill-sm"><span class="text-gray-800 font-medium">{{ __('Size') }}:</span> {{ $stache['size'] }}</div>
+                @endif
                 @if ($stache['time'])
                     <div class="mr-4 badge-pill-sm"><span class="text-gray-800 font-medium">{{ __('Build time') }}:</span> {{ $stache['time'] }}</div>
                 @endif
