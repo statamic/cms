@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
+use GuzzleHttp\Client;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
@@ -9,11 +10,14 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class DefaultInvalidator implements Invalidator
 {
     protected $cacher;
+
     protected $rules;
 
     public function __construct(Cacher $cacher, $rules = [])
@@ -48,15 +52,19 @@ class DefaultInvalidator implements Invalidator
     protected function invalidateFormUrls($form)
     {
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "forms.{$form->handle()}.urls")
+            $rules = Arr::get($this->rules, "forms.{$form->handle()}.urls")
         );
+
+        $this->warmUrls($rules);
     }
 
     protected function invalidateAssetUrls($asset)
     {
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls")
+            $rules = Arr::get($this->rules, "assets.{$asset->container()->handle()}.urls")
         );
+
+        $this->warmUrls($rules);
     }
 
     protected function invalidateEntryUrls($entry)
@@ -64,54 +72,68 @@ class DefaultInvalidator implements Invalidator
         $entry->descendants()->push($entry)->each(function ($entry) {
             if (! $entry->isRedirect() && $url = $entry->absoluteUrl()) {
                 $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
+                $this->warmUrl($url);
             }
         });
 
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls")
+            $rules = Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls")
         );
+
+        $this->warmUrls($rules);
     }
 
     protected function invalidateTermUrls($term)
     {
         if ($url = $term->absoluteUrl()) {
             $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
+            $this->warmUrl($term->absoluteUrl());
 
             $term->taxonomy()->collections()->each(function ($collection) use ($term) {
                 if ($url = $term->collection($collection)->absoluteUrl()) {
                     $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
+                    $this->warmUrl($url);
                 }
             });
         }
 
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls")
+            $rules = Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls")
         );
+
+        $this->warmUrls($rules);
     }
 
     protected function invalidateNavUrls($nav)
     {
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "navigation.{$nav->handle()}.urls")
+            $rules = Arr::get($this->rules, "navigation.{$nav->handle()}.urls")
         );
+
+        $this->warmUrls($rules);
     }
 
     protected function invalidateGlobalUrls($set)
     {
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "globals.{$set->handle()}.urls")
+            $rules = Arr::get($this->rules, "globals.{$set->handle()}.urls")
         );
+
+        $this->warmUrls($rules);
     }
 
     protected function invalidateCollectionUrls($collection)
     {
         if ($url = $collection->absoluteUrl()) {
             $this->cacher->invalidateUrl(...$this->splitUrlAndDomain($url));
+            $this->warmUrl($url);
         }
 
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "collections.{$collection->handle()}.urls")
+            $rules = Arr::get($this->rules, "collections.{$collection->handle()}.urls")
         );
+
+        $this->warmUrls($rules);
     }
 
     private function splitUrlAndDomain(string $url)
@@ -122,5 +144,20 @@ class DefaultInvalidator implements Invalidator
             Arr::get($parsed, 'path', '/'),
             $parsed['scheme'].'://'.$parsed['host'],
         ];
+    }
+
+    private function warmUrl(string $url): void
+    {
+        // TODO: use same parameters as the StaticWarm command?
+        $client = new Client();
+
+        $client->get(URL::tidy(Str::start($url, config('app.url').'/')));
+    }
+
+    private function warmUrls(array $urls): void
+    {
+        collect($urls)
+            ->filter(fn ($url) => Str::contains($url, '*'))
+            ->each(fn ($url) => $this->warmUrl($url));
     }
 }
