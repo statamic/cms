@@ -38,6 +38,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrls')->once()->with(['/page/one', '/page/two']);
+            $cacher->shouldReceive('warmUrls')->once()->with(['/page/one', '/page/two']);
         });
 
         $container = tap(Mockery::mock(AssetContainer::class), function ($m) {
@@ -68,6 +69,8 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/collection', 'http://test.com')->once();
             $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+            $cacher->shouldReceive('warmUrl')->with('http://test.com/my/test/collection')->once();
+            $cacher->shouldReceive('warmUrls')->once()->with(['/blog/one', '/blog/two']);
         });
 
         $collection = tap(Mockery::mock(Collection::class), function ($m) {
@@ -95,6 +98,8 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/entry', 'http://test.com')->once();
             $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+            $cacher->shouldReceive('warmUrl')->with('http://test.com/my/test/entry')->once();
+            $cacher->shouldReceive('warmUrls')->once()->with(['/blog/one', '/blog/two']);
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -124,6 +129,8 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrl')->never();
             $cacher->shouldReceive('invalidateUrls')->once()->with(['/blog/one', '/blog/two']);
+            $cacher->shouldReceive('warmUrl')->never();
+            $cacher->shouldReceive('warmUrls')->once()->with(['/blog/one', '/blog/two']);
         });
 
         $entry = tap(Mockery::mock(Entry::class), function ($m) {
@@ -154,6 +161,8 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
             $cacher->shouldReceive('invalidateUrl')->with('/my/test/term', 'http://test.com')->once();
             $cacher->shouldReceive('invalidateUrl')->with('/my/collection/tags/term', 'http://test.com')->once();
             $cacher->shouldReceive('invalidateUrls')->once()->with(['/tags/one', '/tags/two']);
+            $cacher->shouldReceive('warmUrl')->with('http://test.com/my/collection/tags/term')->twice();
+            $cacher->shouldReceive('warmUrls')->once()->with(['/tags/one', '/tags/two']);
         });
 
         $collection = Mockery::mock(Collection::class);
@@ -188,6 +197,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two']);
+            $cacher->shouldReceive('warmUrls')->once()->with(['/one', '/two']);
         });
 
         $nav = tap(Mockery::mock(Nav::class), function ($m) {
@@ -213,6 +223,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two']);
+            $cacher->shouldReceive('warmUrls')->once()->with(['/one', '/two']);
         });
 
         $set = tap(Mockery::mock(GlobalSet::class), function ($m) {
@@ -238,6 +249,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     {
         $cacher = tap(Mockery::mock(Cacher::class), function ($cacher) {
             $cacher->shouldReceive('invalidateUrls')->once()->with(['/one', '/two']);
+            $cacher->shouldReceive('warmUrls')->once()->with(['/one', '/two']);
         });
 
         $form = tap(Mockery::mock(Form::class), function ($m) {
