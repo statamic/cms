@@ -2,10 +2,12 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
+use GuzzleHttp\Client;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
@@ -293,5 +295,20 @@ abstract class AbstractCacher implements Cacher
             $path.$query,
             $parsed['scheme'].'://'.$parsed['host'],
         ];
+    }
+
+    public function warmUrl(string $url): void
+    {
+        // TODO: use same parameters as the StaticWarm command?
+        $client = new Client();
+
+        $client->get(URL::tidy(Str::start($url, config('app.url').'/')));
+    }
+
+    public function warmUrls(array $urls): void
+    {
+        collect($urls)
+            ->filter(fn ($url) => Str::contains($url, '*'))
+            ->each(fn ($url) => $this->warmUrl($url));
     }
 }
