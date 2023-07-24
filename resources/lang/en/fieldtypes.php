@@ -38,6 +38,7 @@ return [
     'bard.config.section.editor.instructions' => 'Configure the editor\'s appearance and general behavior.',
     'bard.config.section.links.instructions' => 'Configure how links are handled in this instance of Bard.',
     'bard.config.section.sets.instructions' => 'Configure blocks of fields that can be inserted anywhere in your Bard content.',
+    'bard.config.word_count' => 'Show the word count at the bottom of the field.',
     'bard.title' => 'Bard',
     'button_group.title' => 'Button Group',
     'checkboxes.config.inline' => 'Show the checkboxes in a row.',

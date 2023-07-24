@@ -84,6 +84,12 @@ class Bard extends Replicator
                         'type' => 'toggle',
                         'default' => false,
                     ],
+                    'word_count' => [
+                        'display' => __('Show Word Count'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.word_count'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
                     'fullscreen' => [
                         'display' => __('Allow Fullscreen Mode'),
                         'instructions' => __('statamic::fieldtypes.bard.config.fullscreen'),

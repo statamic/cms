@@ -87,11 +87,10 @@
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
-        <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.character_limit)">
+        <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.character_limit || config.word_count)">
             <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
             <div v-else />
-
-            <div v-if="config.character_limit">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
+            <div v-if="config.character_limit || config.word_count" v-text="characterAndWordCountText" />
         </div>
     </div>
 </div>
@@ -214,6 +213,24 @@ export default {
 
                 return moment.utc(duration.asMilliseconds()).format("mm:ss");
             }
+        },
+
+        characterAndWordCountText() {
+            const showWordCount = this.config.word_count;
+            const wordCount = this.editor.storage.characterCount.words();
+            const wordCountText = `${__n(':count word|:count words', wordCount)}`;
+            const charLimit = this.config.character_limit;
+            const showCharLimit = charLimit > 0;
+            const charCount = this.editor.storage.characterCount.characters();
+
+            // If both are enabled, show a more verbose combined string.
+            if (showCharLimit && showWordCount) {
+                return `${wordCountText}, ${__(':count/:total characters', { count: charCount, total: charLimit })}`;
+            }
+
+            // Otherwise show one or the other.
+            if (showCharLimit) return `${charCount}/${charLimit}`;
+            if (showWordCount) return wordCountText;
         },
 
         isFirstCreation() {
