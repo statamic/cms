@@ -163,7 +163,7 @@
 }
 
 .bard-footer-toolbar {
-    @apply bg-white shadow-none text-gray-700 rounded-b border-t text-xs p-2 grid grid-flow-col;
+    @apply bg-white shadow-none text-gray-700 rounded-b border-t text-xs p-2 flex items-center justify-between;
     padding: 8px 12px;
 
     .bard-fullscreen & {

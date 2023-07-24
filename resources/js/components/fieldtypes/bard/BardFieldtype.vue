@@ -87,10 +87,10 @@
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
-        <div v-if="editor && numBardFooterToolbarStats" :class="bardFooterToolbarClasses" >
-            <div v-if="config.reading_time" class="text-left">{{ readingTime }} {{ __('Reading Time') }}</div>
-            <div v-if="config.word_count" :class="wordCountClasses">{{ __('Word Count') }} {{ editor.storage.characterCount.words() }}</div>
-            <div v-if="config.character_limit" :class="characterCountClasses">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
+        <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.character_limit || config.word_count)">
+            <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
+            <div v-else />
+            <div v-if="config.character_limit || config.word_count" v-text="characterAndWordCountText" />
         </div>
     </div>
 </div>
@@ -215,28 +215,22 @@ export default {
             }
         },
 
-        numBardFooterToolbarStats() {
-            return (this.config.reading_time ? 1 : 0) + (this.config.word_count ? 1 : 0) + (this.config.character_limit ? 1 : 0);
-        },
+        characterAndWordCountText() {
+            const showWordCount = this.config.word_count;
+            const wordCount = this.editor.storage.characterCount.words();
+            const wordCountText = `${__n(':count word|:count words', wordCount)}`;
+            const charLimit = this.config.character_limit;
+            const showCharLimit = charLimit > 0;
+            const charCount = this.editor.storage.characterCount.characters();
 
-        bardFooterToolbarClasses() {
-            return "bard-footer-toolbar grid-cols-" + this.numBardFooterToolbarStats;
-        },
-
-        wordCountClasses() {
-            if (this.numBardFooterToolbarStats == 3) {
-                return "text-center";
+            // If both are enabled, show a more verbose combined string.
+            if (showCharLimit && showWordCount) {
+                return `${wordCountText}, ${__(':count/:total characters', { count: charCount, total: charLimit })}`;
             }
 
-            if (this.numBardFooterToolbarStats && this.config.reading_time) {
-                return "text-right";
-            } else {
-                return "text-left";
-            }
-        },
-
-        characterCountClasses() {
-            return this.numBardFooterToolbarStats == 1 ? "text-left" : "text-right";
+            // Otherwise show one or the other.
+            if (showCharLimit) return `${charCount}/${charLimit}`;
+            if (showWordCount) return wordCountText;
         },
 
         isFirstCreation() {
