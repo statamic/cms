@@ -1,5 +1,13 @@
 # Release Notes
 
+## 4.13.1 (2023-07-25)
+
+### What's fixed
+- Fix ranged date validation. [#8447](https://github.com/statamic/cms/issues/8447) by @AndreasSchantl
+- Use site in create entry button on collection tree view. [#8487](https://github.com/statamic/cms/issues/8487) by @jasonvarga
+
+
+
 ## 4.13.0 (2023-07-24)
 
 ### What's new
