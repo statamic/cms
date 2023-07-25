@@ -468,6 +468,11 @@ class DateTest extends TestCase
         // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
 
         return [
+            'null' => [
+                [],
+                null,
+                null,
+            ],
             'null date when not required' => [
                 [],
                 ['date' => null, 'time' => null],
@@ -530,6 +535,11 @@ class DateTest extends TestCase
         // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
 
         return [
+            'null' => [
+                ['mode' => 'range'],
+                null,
+                null,
+            ],
             'valid date range' => [
                 ['mode' => 'range'],
                 ['date' => ['start' => '2012-01-29', 'end' => '2012-01-30']],
