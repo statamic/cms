@@ -182,7 +182,7 @@ export default {
         title: { type: String, required: true },
         handle: { type: String, required: true },
         canCreate: { type: Boolean, required: true },
-        createUrl: { type: String, required: true },
+        createUrls: { type: Object, required: true },
         createLabel: { type: String, required: true },
         blueprints: { type: Array, required: true },
         breadcrumbUrl: { type: String, required: true },
@@ -243,6 +243,10 @@ export default {
             }
             countChildren(this.entryBeingDeleted);
             return children;
+        },
+
+        createUrl() {
+            return this.createUrls[this.site];
         }
 
     },
