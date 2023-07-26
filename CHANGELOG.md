@@ -1,5 +1,12 @@
 # Release Notes
 
+## 4.13.2 (2023-07-26)
+
+### What's fixed
+- Fix create entry button. [#8493](https://github.com/statamic/cms/issues/8493) by @jasonvarga
+
+
+
 ## 4.13.1 (2023-07-25)
 
 ### What's fixed
