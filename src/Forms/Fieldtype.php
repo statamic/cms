@@ -31,6 +31,11 @@ class Fieldtype extends Relationship
                 'instructions' => __('statamic::fieldtypes.form.config.max_items'),
                 'min' => 1,
             ],
+            'query_scopes' => [
+                'display' => __('Query Scopes'),
+                'instructions' => __('statamic::fieldtypes.form.config.query_scopes'),
+                'type' => 'taggable',
+            ],
         ];
     }
 
@@ -61,13 +66,19 @@ class Fieldtype extends Relationship
 
     public function getIndexItems($request)
     {
-        return Facades\Form::all()->map(function ($form) {
-            return [
-                'id' => $form->handle(),
-                'title' => $form->title(),
-                'submissions' => $form->submissions()->count(),
-            ];
-        })->values();
+        $query = Facades\Form::query();
+
+        $this->applyIndexQueryScopes($query, $request->all());
+
+        return $query->get()
+            ->map(function ($form) {
+                return [
+                    'id' => $form->handle(),
+                    'title' => $form->title(),
+                    'submissions' => $form->submissions()->count(),
+                ];
+            })
+            ->values();
     }
 
     public function augmentValue($value)
