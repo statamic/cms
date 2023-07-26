@@ -7,9 +7,12 @@ use Statamic\Contracts\Forms\FormRepository as Contract;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
+use Statamic\Support\Arr;
 
 class FormRepository implements Contract
 {
+    private $configs = [];
+
     /**
      * Find a form.
      *
@@ -64,6 +67,25 @@ class FormRepository implements Contract
         }
 
         return $form;
+    }
+
+    public function addConfig($handles, array $fields)
+    {
+        $this->configs[] = [
+            'handles' => Arr::wrap($handles),
+            'fields' => $fields,
+        ];
+    }
+
+    public function getConfigFor($handle)
+    {
+        return collect($this->configs)
+            ->filter(function ($config) use ($handle) {
+                return in_array('*', $config['handles']) || in_array($handle, $config['handles']);
+            })
+            ->flatMap(fn ($config) => $config['fields'])
+            ->except(['name', 'fields', 'submission', 'email']) // cant use reserved words
+            ->all();
     }
 
     public static function bindings(): array
