@@ -64,6 +64,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Warm after Invalidation
+    |--------------------------------------------------------------------------
+    |
+    | When configured, Statamic will automatically warm the static cache after
+    | invalidating content. It'll use your invalidation rules to determine
+    | which pages should be warmed.
+    |
+    */
+
+    'warm_after_invalidation' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Invalidation Rules
     |--------------------------------------------------------------------------
     |
