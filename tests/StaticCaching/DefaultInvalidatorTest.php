@@ -14,8 +14,9 @@ use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
+use Tests\TestCase;
 
-class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
+class DefaultInvalidatorTest extends TestCase
 {
     public function tearDown(): void
     {
