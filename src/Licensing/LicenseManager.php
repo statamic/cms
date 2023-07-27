@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\MessageBag;
 use Statamic\Support\Arr;
 
-class LicenseManager
+final class LicenseManager
 {
     protected $outpost;
     protected $addons;
