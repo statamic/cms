@@ -66,7 +66,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $blueprint;
     protected $date;
     protected $locale;
-    protected $localizations;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
     protected $template;
@@ -199,8 +198,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $entry->deleteDescendants();
             $entry->delete();
         });
-
-        $this->localizations = null;
 
         return true;
     }
@@ -648,14 +645,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function descendants()
     {
-        if (! $this->localizations) {
-            $this->localizations = Facades\Entry::query()
-                ->where('collection', $this->collectionHandle())
-                ->where('origin', $this->id())->get()
-                ->keyBy->locale();
-        }
-
-        $localizations = collect($this->localizations);
+        $localizations = Facades\Entry::query()
+            ->where('collection', $this->collectionHandle())
+            ->where('origin', $this->id())->get()
+            ->keyBy->locale();
 
         foreach ($localizations as $loc) {
             $localizations = $localizations->merge($loc->descendants());
