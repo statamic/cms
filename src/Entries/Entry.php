@@ -669,15 +669,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->in($locale) !== null;
     }
 
-    public function addLocalization($entry)
-    {
-        $entry->origin($this);
-
-        $this->localizations[$entry->locale()] = $entry;
-
-        return $this;
-    }
-
     public function makeLocalization($site)
     {
         $localization = Facades\Entry::make()
