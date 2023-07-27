@@ -2,12 +2,14 @@
 
 namespace Statamic\Testing\Extend;
 
-use Facades\Statamic\Licensing\LicenseManager;
 use Foo\Bar\TestAddonServiceProvider;
+use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
 use Statamic\Extend\Addon;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Licensing\LicenseManager;
+use Statamic\Licensing\Outpost;
 use Tests\TestCase;
 
 class AddonTest extends TestCase
@@ -234,11 +236,26 @@ class AddonTest extends TestCase
     /** @test */
     public function it_gets_the_license()
     {
-        LicenseManager::shouldReceive('addons')->once()->andReturn(collect([
+        $addon = Addon::make('foo/bar');
+
+        $this->assertNull($addon->license());
+
+        $licenseManager = new LicenseManager(new Outpost(new Client));
+        $licenseManager = \Mockery::mock($licenseManager);
+        $licenseManager->shouldReceive('addons')->once()->andReturn(collect([
             'foo/bar' => 'the license',
         ]));
 
-        $this->assertEquals('the license', Addon::make('foo/bar')->license());
+        $addon->licenseManager($licenseManager);
+
+        $this->assertEquals('the license', $addon->license());
+
+        $licenseManager->shouldReceive('isOnPublicDomain')->andReturn(true);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot set custom license manager on public domain!');
+
+        $addon->licenseManager($licenseManager);
     }
 
     /**

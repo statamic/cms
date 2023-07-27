@@ -3,10 +3,10 @@
 namespace Statamic\Extend;
 
 use Composer\Package\Version\VersionParser;
-use Facades\Statamic\Licensing\LicenseManager;
 use ReflectionClass;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Licensing\LicenseManager;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Updater\AddonChangelog;
@@ -148,11 +148,33 @@ final class Addon
     protected $editions = [];
 
     /**
+     * License manager instance.
+     *
+     * @var LicenseManager
+     */
+    protected $licenseManager;
+
+    /**
      * @param  string  $id
      */
     public function __construct($id)
     {
         $this->id = $id;
+        $this->licenseManager = LicenseManager::instance();
+    }
+
+    /**
+     * Set license manager instance, adding extra check instead of deferring to __call()'s setter.
+     *
+     * @param  LicenseManager  $licenseManager
+     */
+    public function licenseManager($licenseManager)
+    {
+        if ($this->licenseManager->isOnPublicDomain()) {
+            throw new \Exception('Cannot set custom license manager on public domain!');
+        }
+
+        $this->licenseManager = $licenseManager;
     }
 
     /**
@@ -385,7 +407,7 @@ final class Addon
 
     public function license()
     {
-        return LicenseManager::addons()->get($this->package());
+        return $this->licenseManager->addons()->get($this->package());
     }
 
     /**
