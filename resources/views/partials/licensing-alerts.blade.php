@@ -1,4 +1,6 @@
-@inject('licenses', 'Statamic\Licensing\LicenseManager')
+@php
+    $licenses = \Statamic\Licensing\LicenseManager::instance();
+@endphp
 
 @if ($licenses->requestFailed())
     <div class="p-2 w-full fixed bottom-0 z-20">

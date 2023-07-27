@@ -2,6 +2,7 @@
 
 namespace Statamic\Licensing;
 
+use GuzzleHttp\Client;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\MessageBag;
 use Statamic\Support\Arr;
@@ -14,6 +15,11 @@ class LicenseManager
     public function __construct(Outpost $outpost)
     {
         $this->outpost = $outpost;
+    }
+
+    public static function instance()
+    {
+        return new self(new Outpost(new Client));
     }
 
     public function requestFailed()

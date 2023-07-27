@@ -49,7 +49,7 @@ class JavascriptComposer
     private function protectedVariables()
     {
         $user = User::current();
-        $licenses = app('Statamic\Licensing\LicenseManager');
+        $licenses = \Statamic\Licensing\LicenseManager::instance();
 
         return [
             'version' => Statamic::version(),
