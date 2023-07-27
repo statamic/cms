@@ -2097,5 +2097,47 @@ class EntryTest extends TestCase
         ], $entryDe->previewTargets()->all());
     }
 
-    // todo: add tests for localization things. in(), descendants(), addLocalization(), etc
+    /** @test */
+    public function it_gets_descendants()
+    {
+        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+            'fr_CA' => ['locale' => 'fr_CA', 'url' => '/fr-ca/'],
+            'de' => ['locale' => 'de_DE', 'url' => '/de/'],
+        ]]);
+
+        $one = EntryFactory::collection('test')->id('1')->locale('en')->create();
+        $two = EntryFactory::collection('test')->id('2')->origin('1')->locale('fr')->create();
+        $three = EntryFactory::collection('test')->id('3')->origin('2')->locale('fr_CA')->create();
+        $four = EntryFactory::collection('test')->id('4')->origin('2')->locale('de')->create();
+
+        $this->assertEquals(['fr' => $two, 'fr_CA' => $three, 'de' => $four], $one->descendants()->all());
+        $this->assertEquals(['fr_CA' => $three, 'de' => $four], $two->descendants()->all());
+        $this->assertEquals([], $three->descendants()->all());
+        $this->assertEquals([], $four->descendants()->all());
+    }
+
+    /** @test */
+    public function it_gets_ancestors()
+    {
+        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+            'fr_CA' => ['locale' => 'fr_CA', 'url' => '/fr-ca/'],
+            'de' => ['locale' => 'de_DE', 'url' => '/de/'],
+        ]]);
+
+        $one = EntryFactory::collection('test')->id('1')->locale('en')->create();
+        $two = EntryFactory::collection('test')->id('2')->origin('1')->locale('fr')->create();
+        $three = EntryFactory::collection('test')->id('3')->origin('2')->locale('fr_CA')->create();
+        $four = EntryFactory::collection('test')->id('4')->origin('2')->locale('de')->create();
+
+        $this->assertEquals([], $one->ancestors()->all());
+        $this->assertEquals([$one], $two->ancestors()->all());
+        $this->assertEquals([$two, $one], $three->ancestors()->all());
+        $this->assertEquals([$two, $one], $four->ancestors()->all());
+    }
+
+    // todo: add tests for localization things. in(), addLocalization(), etc
 }

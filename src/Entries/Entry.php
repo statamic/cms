@@ -199,6 +199,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $entry->delete();
         });
 
+        Blink::forget('entry-descendants-'.$this->id());
+
         return true;
     }
 
@@ -325,6 +327,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
         }
+
+        $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
 
         $this->taxonomize();
 
@@ -643,12 +647,28 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->descendants()->get($locale);
     }
 
+    public function ancestors()
+    {
+        $ancestors = collect();
+
+        $origin = $this->origin();
+
+        while ($origin) {
+            $ancestors->push($origin);
+            $origin = $origin->origin();
+        }
+
+        return $ancestors;
+    }
+
     public function descendants()
     {
-        $localizations = Facades\Entry::query()
-            ->where('collection', $this->collectionHandle())
-            ->where('origin', $this->id())->get()
-            ->keyBy->locale();
+        $localizations = Blink::once('entry-descendants-'.$this->id(), function () {
+            return Facades\Entry::query()
+                ->where('collection', $this->collectionHandle())
+                ->where('origin', $this->id())->get()
+                ->keyBy->locale();
+        });
 
         foreach ($localizations as $loc) {
             $localizations = $localizations->merge($loc->descendants());
