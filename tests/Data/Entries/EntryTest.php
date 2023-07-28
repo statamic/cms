@@ -2144,4 +2144,42 @@ class EntryTest extends TestCase
     }
 
     // todo: add tests for localization things. in(), addLocalization(), etc
+
+    /** @test */
+    public function it_updates_the_origin_of_descendants_when_saving_an_entry_with_localizations()
+    {
+        // The issue this test is covering doesn't happen when using the
+        // array cache driver, since the objects are stored in memory.
+        config(['cache.default' => 'file']);
+        Cache::clear();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
+            ],
+        ]);
+
+        $one = EntryFactory::collection('test')->id('1')->locale('en')->data(['foo' => 'root'])->create();
+        $two = EntryFactory::collection('test')->id('2')->origin('1')->locale('fr')->create();
+        $three = EntryFactory::collection('test')->id('3')->origin('2')->locale('de')->create();
+
+        $this->assertEquals('root', $one->foo);
+        $this->assertEquals('root', $two->foo);
+        $this->assertEquals('root', $three->foo);
+
+        $one->data(['foo' => 'root updated'])->save();
+
+        $this->assertEquals('root updated', $one->foo);
+        $this->assertEquals('root updated', $two->foo);
+        $this->assertEquals('root updated', $three->foo);
+
+        $two->data(['foo' => 'two updated'])->save();
+
+        $this->assertEquals('root updated', $one->foo);
+        $this->assertEquals('two updated', $two->foo);
+        $this->assertEquals('two updated', $three->foo);
+    }
 }
