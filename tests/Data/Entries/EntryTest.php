@@ -24,6 +24,7 @@ use Statamic\Events\EntryCreated;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -293,8 +294,8 @@ class EntryTest extends TestCase
     public function values_fall_back_to_the_origin_then_the_collection()
     {
         $collection = tap(Collection::make('test'))->save();
-        $origin = (new Entry)->collection('test');
-        $entry = (new Entry)->origin($origin)->collection('test');
+        $origin = EntryFactory::collection('test')->create();
+        $entry = EntryFactory::origin($origin)->collection('test')->create();
 
         $this->assertNull($entry->value('test'));
 
@@ -314,14 +315,14 @@ class EntryTest extends TestCase
             'three' => 'three in collection',
         ]))->save();
 
-        $origin = (new Entry)->collection('test')->data([
+        $origin = EntryFactory::collection('test')->data([
             'two' => 'two in origin',
             'three' => 'three in origin',
-        ]);
+        ])->create();
 
-        $entry = (new Entry)->origin($origin)->collection('test')->data([
+        $entry = EntryFactory::origin($origin)->collection('test')->data([
             'three' => 'three in entry',
-        ]);
+        ])->create();
 
         $this->assertEquals([
             'one' => 'one in collection',
@@ -344,16 +345,16 @@ class EntryTest extends TestCase
             'four' => 'four in collection',
         ]))->save();
 
-        $origin = (new Entry)->collection('test')->data([
+        $origin = EntryFactory::collection('test')->data([
             'two' => null,
             'three' => 'three in origin',
             'four' => 'four in origin',
-        ]);
+        ])->create();
 
-        $entry = (new Entry)->origin($origin)->collection('test')->data([
+        $entry = EntryFactory::origin($origin)->collection('test')->data([
             'three' => null,
             'four' => 'four in entry',
-        ]);
+        ])->create();
 
         $this->assertEquals([
             'one' => 'one in collection', // falls all the way back
@@ -1172,8 +1173,8 @@ class EntryTest extends TestCase
             'second' => $second = (new Blueprint)->setHandle('second'),
         ]));
         Collection::make('blog')->save();
-        $origin = (new Entry)->collection('blog')->set('blueprint', 'second');
-        $entry = (new Entry)->collection('blog')->origin($origin);
+        $origin = EntryFactory::collection('blog')->data(['blueprint' => 'second'])->create();
+        $entry = EntryFactory::collection('blog')->origin($origin)->create();
 
         $this->assertSame($second, $entry->blueprint());
         $this->assertNotSame($first, $second);
@@ -1187,8 +1188,8 @@ class EntryTest extends TestCase
             'second' => $second = (new Blueprint)->setHandle('second'),
         ]));
         Collection::make('blog')->save();
-        $origin = (new Entry)->collection('blog')->blueprint('second');
-        $entry = (new Entry)->collection('blog')->origin($origin);
+        $origin = EntryFactory::collection('blog')->blueprint('second')->create();
+        $entry = EntryFactory::collection('blog')->origin($origin)->create();
 
         $this->assertSame($second, $entry->blueprint());
         $this->assertNotSame($first, $second);
@@ -1258,6 +1259,7 @@ class EntryTest extends TestCase
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('a')->once()->andReturnNull();
+        Blink::put('entry-descendants-a', collect()); // Prevents the query needing to be mocked.
 
         $return = $entry->save();
 
@@ -1283,6 +1285,7 @@ class EntryTest extends TestCase
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('1')->times(3)->andReturn(null, $entry, $entry);
+        Blink::put('entry-descendants-1', collect()); // Prevents the query needing to be mocked.
 
         $entry->save();
         $entry->save();
@@ -1302,6 +1305,7 @@ class EntryTest extends TestCase
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('a')->once()->andReturnNull();
+        Blink::put('entry-descendants-a', collect()); // Prevents the query needing to be mocked.
 
         $return = $entry->saveQuietly();
 
@@ -1352,7 +1356,7 @@ class EntryTest extends TestCase
         Event::fake();
 
         $collection = (new Collection)->handle('pages')->save();
-        $entry = (new Entry)->id('a')->collection($collection);
+        $entry = EntryFactory::id('a')->collection($collection)->create();
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
         Facades\Entry::shouldReceive('find')->with('a')->times(2)->andReturn(null, $entry);
@@ -1725,8 +1729,8 @@ class EntryTest extends TestCase
     public function it_gets_and_sets_the_template()
     {
         $collection = tap(Collection::make('test'))->save();
-        $origin = (new Entry)->collection($collection);
-        $entry = (new Entry)->collection($collection)->origin($origin);
+        $origin = EntryFactory::collection($collection)->create();
+        $entry = EntryFactory::collection($collection)->origin($origin)->create();
 
         // defaults to default
         $this->assertEquals('default', $entry->template());
@@ -1769,8 +1773,8 @@ class EntryTest extends TestCase
     public function it_gets_and_sets_the_layout()
     {
         $collection = tap(Collection::make('test'))->save();
-        $origin = (new Entry)->collection($collection);
-        $entry = (new Entry)->collection($collection)->origin($origin);
+        $origin = EntryFactory::collection($collection)->create();
+        $entry = EntryFactory::collection($collection)->origin($origin)->create();
 
         // defaults to layout
         $this->assertEquals('layout', $entry->layout());
