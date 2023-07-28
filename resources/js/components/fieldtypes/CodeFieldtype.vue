@@ -1,12 +1,12 @@
 <template>
 
-<element-container @resized="refresh">
-    <div class="code-fieldtype-container" :class="themeClass">
-        <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" class="code-mode-picker" />
-        <div v-else v-text="modeLabel" class="code-mode"></div>
-        <div ref="codemirror"></div>
-    </div>
-</element-container>
+    <element-container @resized="refresh">
+        <div class="code-fieldtype-container" :class="themeClass">
+            <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" class="code-mode-picker" />
+            <div v-else v-text="modeLabel" class="code-mode"></div>
+            <div ref="codemirror"></div>
+        </div>
+    </element-container>
 
 </template>
 
@@ -15,6 +15,7 @@ import CodeMirror from 'codemirror'
 
 // Addons
 import 'codemirror/addon/edit/matchbrackets'
+import 'codemirror/addon/display/fullscreen'
 
 // Keymaps
 import 'codemirror/keymap/sublime'
@@ -115,6 +116,23 @@ export default {
             readOnly: this.readOnlyOption,
             theme: this.exactTheme,
             inputStyle: 'contenteditable',
+            extraKeys: {
+                'F11': function(cm) {
+                    document.body.classList.toggle(
+                        'CodeMirror-fullscreen-container'
+                    );
+                    cm.setOption('fullScreen', !cm.getOption('fullScreen'));
+                },
+                'Esc': function(cm) {
+                    document.body.classList.toggle(
+                        'CodeMirror-fullscreen-container',
+                        false
+                    );
+                    if (cm.getOption('fullScreen')) {
+                        cm.setOption('fullScreen', false);
+                    }
+                }
+            }
         });
 
         this.codemirror.on('change', (cm) => {

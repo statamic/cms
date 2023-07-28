@@ -24,3 +24,22 @@
         }
     }
 }
+
+.CodeMirror-fullscreen {
+    @apply fixed inset-0 h-auto z-10 rounded-none;
+}
+
+.CodeMirror-fullscreen-container {
+    .global-header {
+        display: none;
+    }
+
+    #MainTabPanel .publish-fields.\@container {
+        @apply fixed inset-0 z-20;
+        container-type: initial;
+
+        .code-mode-picker {
+            @apply fixed top-0 z-20;
+        }
+    }
+}
