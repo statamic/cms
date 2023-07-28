@@ -14,7 +14,9 @@ use Statamic\Support\Arr;
 class Users extends Relationship
 {
     protected $statusIcons = false;
+
     protected $formComponent = 'user-publish-form';
+
     protected $canEdit = true;
 
     protected $formComponentProps = [
@@ -55,11 +57,6 @@ class Users extends Relationship
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'users',
                     ],
-                    'query_scopes' => [
-                        'display' => __('Query Scopes'),
-                        'instructions' => __('statamic::fieldtypes.users.config.query_scopes'),
-                        'type' => 'taggable',
-                    ],
                 ],
             ],
         ];
@@ -99,9 +96,14 @@ class Users extends Relationship
             $query->whereNotIn('id', $request->exclusions);
         }
 
-        $this->applyIndexQueryScopes($query, $request->all());
-
-        $query->orderBy('name');
+        $query
+            ->when(User::blueprint()->hasField('first_name'), function ($query) {
+                $query
+                    ->selectRaw('CONCAT(first_name, " ", last_name) as name')
+                    ->orderBy('name');
+            }, function ($query) {
+                $query->orderBy('name');
+            });
 
         $userFields = function ($user) {
             return [
