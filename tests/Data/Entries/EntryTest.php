@@ -33,6 +33,7 @@ use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -2191,6 +2192,29 @@ class EntryTest extends TestCase
         $two = EntryFactory::collection('test')->id('2')->origin('1')->locale('fr')->create();
         $three = EntryFactory::collection('test')->id('3')->origin('2')->locale('de')->create();
 
+        // We want to check that the origin blink key was explicitly cleared,
+        // so we'll keep track of it happening from within the Entry@save method.
+        // It would also get cleared coincidentally within the Stache.
+        Blink::swap($fakeBlink = new class extends \Statamic\Support\Blink
+        {
+            public $calls = [];
+
+            public function __call($method, $args)
+            {
+                // Ugly. Sorry. ¯\_(ツ)_/¯
+                $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+                if (
+                    'Statamic\Entries\Entry@save' === $trace[2]['class'].'@'.$trace[2]['function']
+                    && $method === 'forget'
+                    && Str::startsWith($args[0], 'origin-Entry-')
+                ) {
+                    $this->calls[$args[0]][] = true;
+                }
+
+                return parent::__call($method, $args);
+            }
+        });
+
         $this->assertEquals('root', $one->foo);
         $this->assertEquals('root', $two->foo);
         $this->assertEquals('root', $three->foo);
@@ -2200,15 +2224,17 @@ class EntryTest extends TestCase
         $this->assertEquals('root updated', $one->foo);
         $this->assertEquals('root updated', $two->foo);
         $this->assertEquals('root updated', $three->foo);
+        $this->assertCount(1, $fakeBlink->calls['origin-Entry-1']);
+        $this->assertCount(1, $fakeBlink->calls['origin-Entry-2']);
+        $this->assertCount(1, $fakeBlink->calls['origin-Entry-3']);
 
         $two->data(['foo' => 'two updated'])->save();
 
         $this->assertEquals('root updated', $one->foo);
         $this->assertEquals('two updated', $two->foo);
         $this->assertEquals('two updated', $three->foo);
-
-        // Todo: explicitly test that the origin blink key is forgotten for all descendants
-        // At the moment it coincidentally when the Stache CollectionEntriesStore re-makes
-        // the file and calls ->origin($origin).
+        $this->assertCount(1, $fakeBlink->calls['origin-Entry-1']);
+        $this->assertCount(2, $fakeBlink->calls['origin-Entry-2']);
+        $this->assertCount(2, $fakeBlink->calls['origin-Entry-3']);
     }
 }

@@ -331,7 +331,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
 
-        $this->descendants()->each->save();
+        $this->directDescendants()->each->save();
 
         $this->taxonomize();
 
