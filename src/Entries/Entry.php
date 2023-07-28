@@ -664,14 +664,19 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $ancestors;
     }
 
-    public function descendants()
+    public function directDescendants()
     {
-        $localizations = Blink::once('entry-descendants-'.$this->id(), function () {
+        return Blink::once('entry-descendants-'.$this->id(), function () {
             return Facades\Entry::query()
                 ->where('collection', $this->collectionHandle())
                 ->where('origin', $this->id())->get()
                 ->keyBy->locale();
         });
+    }
+
+    public function descendants()
+    {
+        $localizations = $this->directDescendants();
 
         foreach ($localizations as $loc) {
             $localizations = $localizations->merge($loc->descendants());
