@@ -34,9 +34,8 @@
         display: none;
     }
 
-    #MainTabPanel .publish-fields.\@container {
-        @apply fixed inset-0 z-20;
-        container-type: initial;
+    .publish-fields.\@container {
+        container-type: initial !important;
 
         .code-mode-picker {
             @apply fixed top-0 z-20;
@@ -53,3 +52,4 @@
 .CodeMirror-ruler {
     @apply top-0 bottom-0;
 }
+
