@@ -43,3 +43,13 @@
         }
     }
 }
+
+.CodeMirror-rulers {
+    @apply absolute left-0 right-0 overflow-hidden;
+    top: -50px;
+    bottom: -20px;
+}
+
+.CodeMirror-ruler {
+    @apply top-0 bottom-0;
+}

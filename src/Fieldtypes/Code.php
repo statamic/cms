@@ -103,6 +103,12 @@ class Code extends Fieldtype
                         'type' => 'toggle',
                         'default' => true,
                     ],
+                    'rulers' => [
+                        'display' => __('Display Rulers'),
+                        'instructions' => __('statamic::fieldtypes.code.config.rulers'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
                 ],
             ],
             [

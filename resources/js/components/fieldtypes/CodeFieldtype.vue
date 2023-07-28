@@ -16,6 +16,7 @@ import CodeMirror from 'codemirror'
 // Addons
 import 'codemirror/addon/edit/matchbrackets'
 import 'codemirror/addon/display/fullscreen'
+import 'codemirror/addon/display/rulers'
 
 // Keymaps
 import 'codemirror/keymap/sublime'
@@ -98,7 +99,24 @@ export default {
         },
         readOnlyOption() {
             return this.isReadOnly ? 'nocursor' : false;
-        }
+        },
+        rulers() {
+            let rulerColor = (this.config.theme === 'light')
+                ? '#d1d5db'
+                : '#546e7a';
+
+            return [
+                {
+                    color: rulerColor,
+                    column: 80,
+                    lineStyle: 'dashed'
+                },
+                {
+                    color: rulerColor,
+                    column: 120,
+                }
+            ];
+        },
     },
 
     mounted() {
@@ -116,6 +134,7 @@ export default {
             readOnly: this.readOnlyOption,
             theme: this.exactTheme,
             inputStyle: 'contenteditable',
+            rulers: this.rulers,
             extraKeys: {
                 'F11': function(cm) {
                     document.body.classList.toggle(
