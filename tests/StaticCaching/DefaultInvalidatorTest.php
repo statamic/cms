@@ -2,6 +2,7 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Support\Facades\Config;
 use Mockery;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
@@ -18,8 +19,17 @@ use Tests\TestCase;
 
 class DefaultInvalidatorTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Config::set('statamic.static_caching.warm_after_invalidation', true);
+    }
+
     public function tearDown(): void
     {
+        parent::tearDown();
+
         Mockery::close();
     }
 
