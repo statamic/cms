@@ -2181,5 +2181,9 @@ class EntryTest extends TestCase
         $this->assertEquals('root updated', $one->foo);
         $this->assertEquals('two updated', $two->foo);
         $this->assertEquals('two updated', $three->foo);
+
+        // Todo: explicitly test that the origin blink key is forgotten for all descendants
+        // At the moment it coincidentally when the Stache CollectionEntriesStore re-makes
+        // the file and calls ->origin($origin).
     }
 }
