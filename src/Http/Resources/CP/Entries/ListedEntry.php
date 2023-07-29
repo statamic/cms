@@ -9,6 +9,7 @@ use Statamic\Facades\User;
 class ListedEntry extends JsonResource
 {
     protected $blueprint;
+
     protected $columns;
 
     public function blueprint($blueprint)
@@ -43,10 +44,14 @@ class ListedEntry extends JsonResource
 
             'permalink' => $entry->absoluteUrl(),
             'edit_url' => $entry->editUrl(),
-            'collection' => array_merge($entry->collection()->toArray(), ['dated' => $entry->collection()->dated()]),
+            'collection' => array_merge($entry->collection()->toArray(), [
+                'dated' => $entry->collection()->dated(),
+                'hasStructure' => $entry->collection()->hasStructure(),
+            ]),
             'viewable' => User::current()->can('view', $entry),
             'editable' => User::current()->can('edit', $entry),
             'actions' => Action::for($entry, ['collection' => $collection->handle()]),
+            'parent' => $entry->parent()?->toShallowAugmentedCollection(),
         ];
     }
 
