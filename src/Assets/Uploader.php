@@ -21,6 +21,10 @@ abstract class Uploader
 
     private function processSourceFile(UploadedFile $file): string
     {
+        if (in_array($file->getExtension(), ['gif', 'svg'])) {
+            return $file->getRealPath();
+        }
+
         if (! $preset = $this->preset()) {
             return $file->getRealPath();
         }
