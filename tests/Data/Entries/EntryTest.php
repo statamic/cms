@@ -2136,11 +2136,11 @@ class EntryTest extends TestCase
             'it' => ['local' => 'it_IT', 'url' => '/it/'],
         ]]);
 
-        $one = EntryFactory::collection('test')->id('1')->locale('en')->create();
-        $two = EntryFactory::collection('test')->id('2')->origin('1')->locale('fr')->create();
-        $three = EntryFactory::collection('test')->id('3')->origin('2')->locale('fr_CA')->create();
-        $four = EntryFactory::collection('test')->id('4')->origin('2')->locale('de')->create();
-        $five = EntryFactory::collection('test')->id('5')->origin('3')->locale('it')->create();
+        $one = EntryFactory::collection('test')->id(1)->locale('en')->create();
+        $two = EntryFactory::collection('test')->id(2)->origin(1)->locale('fr')->create();
+        $three = EntryFactory::collection('test')->id(3)->origin(2)->locale('fr_CA')->create();
+        $four = EntryFactory::collection('test')->id(4)->origin(2)->locale('de')->create();
+        $five = EntryFactory::collection('test')->id(5)->origin(3)->locale('it')->create();
 
         $this->assertEquals(['fr' => $two], $one->directDescendants()->all());
         $this->assertEquals(['fr_CA' => $three, 'de' => $four], $two->directDescendants()->all());

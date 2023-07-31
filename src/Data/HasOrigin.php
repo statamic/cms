@@ -67,7 +67,7 @@ trait HasOrigin
             ->setter(function ($origin) {
                 Blink::forget($this->getOriginBlinkKey());
 
-                return is_string($origin) || is_null($origin) ? $origin : $this->getOriginIdFromObject($origin);
+                return is_object($origin) ? $this->getOriginIdFromObject($origin) : $origin;
             })
             ->args(func_get_args());
     }
