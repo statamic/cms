@@ -400,7 +400,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
 
     public function isNamespaced(): bool
     {
-        return Facades\Blueprint::getAdditionalNamespacePath($this->namespace) !== null;
+        return Facades\Blueprint::getAdditionalNamespaces()->has($this->namespace);
     }
 
     public function isDeletable()

@@ -187,7 +187,7 @@ class BlueprintRepository
             ->keyBy->handle();
     }
 
-    public function addAdditionalNamespace(string $namespace, string $directory): void
+    public function addNamespace(string $namespace, string $directory): void
     {
         $this->additionalNamespaces[$namespace] = $directory;
     }
@@ -195,11 +195,6 @@ class BlueprintRepository
     public function getAdditionalNamespaces()
     {
         return collect($this->additionalNamespaces);
-    }
-
-    public function getAdditionalNamespacePath(string $namespace)
-    {
-        return $this->additionalNamespaces[$namespace] ?? '';
     }
 
     protected function filesIn($namespace)
