@@ -79,7 +79,7 @@ trait HasOrigin
         return 'origin-'.class_basename($this).'-'.$this->id();
     }
 
-    public function getOriginIdFromObject($origin)
+    protected function getOriginIdFromObject($origin)
     {
         return $origin->id();
     }
