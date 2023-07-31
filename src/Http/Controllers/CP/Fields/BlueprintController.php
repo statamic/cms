@@ -25,7 +25,7 @@ class BlueprintController extends CpController
                 return [
                     'title' => Str::humanize($key),
                     'blueprints' => Blueprint::in($key)
-                        ->map(function ($blueprint) use ($key) {
+                        ->map(function ($blueprint) {
                             return [
                                 'handle' => $blueprint->handle(),
                                 'namespace' => $blueprint->namespace(),
