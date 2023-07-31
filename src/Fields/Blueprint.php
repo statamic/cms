@@ -105,14 +105,24 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
 
     public function initialPath()
     {
+        if ($this->isNamespaced()) {
+            return $this->path();
+        }
+
         return $this->initialPath;
     }
 
     public function path()
     {
+        $namespace = str_replace('.', '/', (string) $this->namespace());
+
+        if ($this->isNamespaced()) {
+            $namespace = 'vendor/'.$namespace;
+        }
+
         return Path::tidy(vsprintf('%s/%s/%s.yaml', [
             Facades\Blueprint::directory(),
-            str_replace('.', '/', (string) $this->namespace()),
+            $namespace,
             $this->handle(),
         ]));
     }
@@ -385,7 +395,17 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
 
     public function title()
     {
-        return array_get($this->contents, 'title', Str::humanize($this->handle));
+        return array_get($this->contents, 'title', Str::humanize(Str::of($this->handle)->after('::')->afterLast('.')));
+    }
+
+    public function isNamespaced(): bool
+    {
+        return Facades\Blueprint::getAdditionalNamespacePath($this->namespace) !== null;
+    }
+
+    public function isDeletable()
+    {
+        return ! $this->isNamespaced();
     }
 
     public function toPublishArray()
