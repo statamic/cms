@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Http\Controllers\CP\Fields\ManagesBlueprints;
 use Statamic\Support\Str;
 
 class BlueprintController extends CpController

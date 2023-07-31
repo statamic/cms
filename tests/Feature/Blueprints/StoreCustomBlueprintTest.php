@@ -2,9 +2,8 @@
 
 namespace Tests\Feature\Blueprints;
 
-use Facades\Statamic\Fields\BlueprintRepository;
+use Statamic\Facades;
 use Statamic\Fields\Blueprint;
-use Tests\Fakes\FakeBlueprintRepository;use Statamic\Facades;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
