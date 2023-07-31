@@ -97,6 +97,7 @@ class TaxonomyTest extends TestCase
                 ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
+        BlueprintRepository::shouldReceive('getAdditionalNamespaces')->andReturn(collect());
 
         $blueprint = $taxonomy->termBlueprint();
         $this->assertNotEquals($default, $blueprint);

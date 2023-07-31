@@ -359,6 +359,7 @@ class CollectionTest extends TestCase
                 ->setNamespace('this.will.change')
                 ->setContents(['title' => 'This will change'])
         );
+        BlueprintRepository::shouldReceive('getAdditionalNamespaces')->andReturn(collect());
 
         $blueprint = $collection->entryBlueprint();
         $this->assertNotEquals($default, $blueprint);
