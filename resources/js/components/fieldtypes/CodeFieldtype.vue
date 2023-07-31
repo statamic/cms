@@ -101,6 +101,8 @@ export default {
             return this.isReadOnly ? 'nocursor' : false;
         },
         rulers() {
+            if (!this.config.rulers) return [];
+
             let rulerColor = (this.config.theme === 'light')
                 ? '#d1d5db'
                 : '#546e7a';
