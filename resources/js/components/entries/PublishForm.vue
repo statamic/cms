@@ -156,7 +156,7 @@
                                             class="flex items-center justify-center mt-4 btn-flat px-2 w-full"
                                             v-if="!isCreating && revisionsEnabled"
                                             @click="showRevisionHistory = true">
-                                            <svg-icon name="history" class="h-4 w-4 mr-2" />
+                                            <svg-icon name="light/history" class="h-4 w-4 mr-2" />
                                             <span>{{ __('View History') }}</span>
                                         </button>
                                 </div>
