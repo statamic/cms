@@ -58,23 +58,31 @@ trait HasOrigin
 
     public function origin($origin = null)
     {
-        $key = 'origin-'.class_basename($this).'-'.$this->id();
-
         return $this->fluentlyGetOrSet('origin')
-            ->getter(function ($origin) use ($key) {
+            ->getter(function ($origin) {
                 return $origin
-                    ? Blink::once($key, fn () => $this->getOriginByString($origin))
+                    ? Blink::once($this->getOriginBlinkKey(), fn () => $this->getOriginByString($origin))
                     : null;
             })
-            ->setter(function ($origin) use ($key) {
-                Blink::forget($key);
+            ->setter(function ($origin) {
+                Blink::forget($this->getOriginBlinkKey());
 
-                return is_string($origin) || is_null($origin) ? $origin : $origin->id();
+                return is_string($origin) || is_null($origin) ? $origin : $this->getOriginIdFromObject($origin);
             })
             ->args(func_get_args());
     }
 
     abstract public function getOriginByString($origin);
+
+    protected function getOriginBlinkKey()
+    {
+        return 'origin-'.class_basename($this).'-'.$this->id();
+    }
+
+    public function getOriginIdFromObject($origin)
+    {
+        return $origin->id();
+    }
 
     public function hasOrigin()
     {

@@ -9,6 +9,7 @@ use Statamic\Events\GlobalSetDeleted;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalSetSaving;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -21,7 +22,6 @@ class GlobalSet implements Contract
 
     protected $title;
     protected $handle;
-    protected $localizations;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -141,21 +141,21 @@ class GlobalSet implements Contract
     {
         $localization->globalSet($this);
 
-        $this->localizations[$localization->locale()] = $localization;
+        $this->localizations()[$localization->locale()] = $localization;
 
         return $this;
     }
 
     public function removeLocalization($localization)
     {
-        unset($this->localizations[$localization->locale()]);
+        unset($this->localizations()[$localization->locale()]);
 
         return $this;
     }
 
     public function in($locale)
     {
-        return $this->localizations[$locale] ?? null;
+        return $this->localizations()[$locale] ?? null;
     }
 
     public function inSelectedSite()
@@ -180,7 +180,7 @@ class GlobalSet implements Contract
 
     public function localizations()
     {
-        return collect($this->localizations);
+        return Blink::once('global-set-localizations-'.$this->id(), fn () => collect());
     }
 
     public function editUrl()
