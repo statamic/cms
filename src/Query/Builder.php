@@ -156,7 +156,7 @@ abstract class Builder implements Contract
             throw new InvalidArgumentException('Illegal operator and value combination.');
         }
 
-        return [$value, $operator];
+        return [$value, strtolower($operator)];
     }
 
     protected function invalidOperatorAndValue($operator, $value)
