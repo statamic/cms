@@ -8,14 +8,11 @@
             <div ref="content" hidden />
             <div class="replicator-set-header" :class="{'collapsed': collapsed, 'invalid': isInvalid }">
                 <div class="item-move sortable-handle" data-drag-handle />
-                <div class="flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
+                <div class="flex items-center flex-1 p-2 replicator-set-header-inner cursor-pointer" :class="{'flex items-center': collapsed}" @click="toggleCollapsedState">
                     <label v-text="display || config.handle" class="text-xs whitespace-nowrap mr-2"/>
-                    <div
-                        v-if="config.instructions"
-                        v-show="!collapsed"
-                        v-html="instructions"
-                        class="help-block mt-2 -mb-2" />
-
+                    <div class="flex items-center" v-if="config.instructions && !collapsed">
+                        <svg-icon name="micro/circle-help" class="text-gray-700 hover:text-gray-800 h-3 w-3 text-xs" v-tooltip="{ content: $options.filters.markdown(config.instructions), html:true }" />
+                    </div>
                     <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-8">
                         <div
                             v-html="previewText"
