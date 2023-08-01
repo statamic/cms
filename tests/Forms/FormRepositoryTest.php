@@ -2,13 +2,7 @@
 
 namespace Tests\Forms;
 
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Facades\Event;
-use Statamic\Events\FormCreated;
-use Statamic\Events\FormSaved;
-use Statamic\Events\FormSaving;
 use Statamic\Facades\Form;
-use Statamic\Fields\Blueprint;
 use Tests\TestCase;
 
 class FormRepositoryTest extends TestCase
