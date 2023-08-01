@@ -113,22 +113,17 @@ class UpdateFormTest extends TestCase
         $form = tap(Form::make('test'))->save();
         $this->assertNull($form->email());
 
-        Form::addConfig('*', [
-            'config' => [
-                'display' => __('config'),
-                'fields' => [
-                    'another_config' => [
-                        'handle' => 'another_config',
-                        'field' => [
-                            'type' => 'text',
-                        ],
-                    ],
-                    'some_config' => [
-                        'handle' => 'some_config',
-                        'field' => [
-                            'type' => 'text',
-                        ],
-                    ],
+        Form::addConfig('*', 'Test Config', [
+            'another_config' => [
+                'handle' => 'another_config',
+                'field' => [
+                    'type' => 'text',
+                ],
+            ],
+            'some_config' => [
+                'handle' => 'some_config',
+                'field' => [
+                    'type' => 'text',
                 ],
             ],
         ]);
