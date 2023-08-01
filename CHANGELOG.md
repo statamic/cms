@@ -1,5 +1,29 @@
 # Release Notes
 
+## 4.14.0 (2023-08-01)
+
+### What's improved
+- Improved the Bard Inline Image Extension. [#8131](https://github.com/statamic/cms/issues/8131) by @o1y
+- French translations. [#8496](https://github.com/statamic/cms/issues/8496) by @ebeauchamps
+
+### What's fixed
+- Apostrophes no longer get slugified in JS. [#8524](https://github.com/statamic/cms/issues/8524) by @jackmcdade
+- Allow relative URLs as preview targets. [#8490](https://github.com/statamic/cms/issues/8490) by @helloiamlukas
+- Lower the Trial Banner Z-Index. [#8530](https://github.com/statamic/cms/issues/8530) by @jackmcdade
+- Handle separate first & last name fields in User fieldtype. [#8507](https://github.com/statamic/cms/issues/8507) by @duncanmcclean
+- Fix Relationship Index Field Item height. [#8529](https://github.com/statamic/cms/issues/8529) by @jackmcdade
+- Conform Bard Set Headers to match Replicator. [#8528](https://github.com/statamic/cms/issues/8528) by @jackmcdade
+- Fix form listing table corner clip. [#8527](https://github.com/statamic/cms/issues/8527) by @jackmcdade
+- Fix Relationship Item long titles. [#8526](https://github.com/statamic/cms/issues/8526) by @jackmcdade
+- Implement `ContainsQueryableValues` on users. [#8455](https://github.com/statamic/cms/issues/8455) by @ryanmitchell
+- Ignore processing GIFs on file upload. [#8512](https://github.com/statamic/cms/issues/8512) by @duncanmcclean
+- Fix link insert cancel in Markdown field. [#8525](https://github.com/statamic/cms/issues/8525) by @jackmcdade
+- Fix the History Icon path. [#8517](https://github.com/statamic/cms/issues/8517) by @jackmcdade
+- Reset page in asset browser when searching. [#8506](https://github.com/statamic/cms/issues/8506) by @duncanmcclean
+- Fix incorrect doctype in `Submission` contract. [#8504](https://github.com/statamic/cms/issues/8504) by @duncanmcclean
+
+
+
 ## 4.13.2 (2023-07-26)
 
 ### What's fixed
