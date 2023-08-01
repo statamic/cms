@@ -150,13 +150,15 @@ abstract class Builder implements Contract
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
-        if ($useDefault) {
+        $operator = strtolower($operator);
+
+        if ($useDefault || ! isset($this->operators[$operator])) {
             return [$operator, '='];
         } elseif ($this->invalidOperatorAndValue($operator, $value)) {
             throw new InvalidArgumentException('Illegal operator and value combination.');
         }
 
-        return [$value, strtolower($operator)];
+        return [$value, $operator];
     }
 
     protected function invalidOperatorAndValue($operator, $value)
