@@ -2,26 +2,26 @@
 
     <node-view-wrapper>
         <div
-            class="bard-inline-image-container"
+            class="bard-inline-image-container shadow-sm"
             :class="{
                 'border-blue-400' : selected,
             }"
         >
-            <div v-if="src" class="p-2 pb-0 text-center" draggable="true" data-drag-handle>
+            <div v-if="src" class="p-2 text-center" draggable="true" data-drag-handle>
                 <div ref="content" hidden />
-                <img :src="src" class="block mx-auto" />
+                <img :src="src" class="block mx-auto rounded-sm" />
             </div>
 
-            <div class="@container/toolbar flex items-center justify-center py-2 px-2 text-2xs text-white text-center space-x-1 sm:space-x-3">
+            <div class="@container/toolbar flex items-center border-t justify-center py-2 px-2 text-2xs text-white text-center space-x-1 sm:space-x-3">
                 <button v-if="!src" @click="openSelector" type="button" class="flex btn btn-sm px-3 py-1.5">
                     <svg-icon name="folder-image" class="h-4" />
                     <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Chose Image') }}</span>
                 </button>
                 <button v-if="src" @click="edit" type="button" class="flex btn btn-sm px-3 py-1.5">
                     <svg-icon name="pencil" class="h-4" />
-                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Edit Asset') }}</span>
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Edit Image') }}</span>
                 </button>
-                <button v-if="src" @click="showingAltEdit = !showingAltEdit" type="button" class="flex btn btn-sm px-3 py-1.5" :class="{ active: showingAltEdit }">
+                <button v-if="src" @click="toggleAltEditor" type="button" class="flex btn btn-sm px-3 py-1.5" :class="{ active: showingAltEdit }">
                     <svg-icon name="rename-file" class="h-4" />
                     <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Override Alt') }}</span>
                 </button>
@@ -201,6 +201,13 @@ export default {
             this.assetAlt = asset.values.alt;
             this.loading = false;
             this.updateAttributes({ src: this.actualSrc });
+        },
+
+        toggleAltEditor() {
+            this.showingAltEdit = !this.showingAltEdit;
+            if (!this.showingAltEdit) {
+                this.alt = null;
+            }
         },
 
         editorAssetSaved(asset) {
