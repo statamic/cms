@@ -42,14 +42,6 @@ class Entries extends FieldtypeFilter
 
     public function apply($query, $handle, $values)
     {
-        if ($values['field'] == 'id') {
-            $query->where($handle, $values['operator'], $values['value']);
-
-            return;
-        }
-
-        $config = $this->fieldtype->field()->config();
-
         $operator = $values['operator'];
         $value = $values['value'];
 
@@ -57,6 +49,14 @@ class Entries extends FieldtypeFilter
             $value = Str::ensureLeft($value, '%');
             $value = Str::ensureRight($value, '%');
         }
+
+        if ($values['field'] == 'id') {
+            $query->where($handle, $operator, $value);
+
+            return;
+        }
+
+        $config = $this->fieldtype->field()->config();
 
         $ids = Facades\Entry::query()
             ->when($config['collections'], fn ($query) => $query->whereIn('collection', $config['collections']))
