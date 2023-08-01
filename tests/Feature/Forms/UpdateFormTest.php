@@ -121,13 +121,13 @@ class UpdateFormTest extends TestCase
                         'handle' => 'another_config',
                         'field' => [
                             'type' => 'text',
-                        ]
+                        ],
                     ],
                     'some_config' => [
                         'handle' => 'some_config',
                         'field' => [
                             'type' => 'text',
-                        ]
+                        ],
                     ],
                 ],
             ],
