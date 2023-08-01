@@ -4,6 +4,7 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 
 use Statamic\Facades;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Entries extends FieldtypeFilter
 {
@@ -49,9 +50,17 @@ class Entries extends FieldtypeFilter
 
         $config = $this->fieldtype->field()->config();
 
+        $operator = $values['operator'];
+        $value = $values['value'];
+
+        if ($operator === 'like') {
+            $value = Str::ensureLeft($value, '%');
+            $value = Str::ensureRight($value, '%');
+        }
+
         $ids = Facades\Entry::query()
             ->when($config['collections'], fn ($query) => $query->whereIn('collection', $config['collections']))
-            ->where($values['field'], $values['operator'], $values['value'])
+            ->where($values['field'], $operator, $value)
             ->get(['id'])
             ->map(fn ($entry) => $entry->id())
             ->all();
