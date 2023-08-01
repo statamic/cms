@@ -60,7 +60,9 @@ export default {
         },
 
         fieldId() {
-            return 'field_'+this.config.handle;
+            let prefix = this.fieldPathPrefix ? this.fieldPathPrefix+'_' : '';
+
+            return prefix+'field_'+this.config.handle;
         }
     },
 

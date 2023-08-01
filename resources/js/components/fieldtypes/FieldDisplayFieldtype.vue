@@ -4,8 +4,9 @@
     <div class="flex items-center">
         <div class="input-group">
             <input
-                ref="input"
-                class="input-text"
+            ref="input"
+            class="input-text"
+                :id="fieldId"
                 :name="name"
                 :value="value"
                 type="text"

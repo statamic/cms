@@ -19,6 +19,7 @@
             :value="selectedOptions"
             :create-option="(value) => ({ value, label: value })"
             @input="vueSelectUpdated"
+            @focus="$emit('focus')"
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')">
                 <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>

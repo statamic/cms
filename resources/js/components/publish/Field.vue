@@ -162,6 +162,7 @@ export default {
         },
 
         fieldId() {
+            console.log(this.fieldPathPrefix)
             return 'field_'+this.config.handle;
         },
 
