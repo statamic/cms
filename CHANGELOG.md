@@ -1,5 +1,50 @@
 # Release Notes
 
+## 4.13.2 (2023-07-26)
+
+### What's fixed
+- Fix create entry button. [#8493](https://github.com/statamic/cms/issues/8493) by @jasonvarga
+
+
+
+## 4.13.1 (2023-07-25)
+
+### What's fixed
+- Fix ranged date validation. [#8447](https://github.com/statamic/cms/issues/8447) by @AndreasSchantl
+- Use site in create entry button on collection tree view. [#8487](https://github.com/statamic/cms/issues/8487) by @jasonvarga
+
+
+
+## 4.13.0 (2023-07-24)
+
+### What's new
+- Add word count option to Bard. [#8445](https://github.com/statamic/cms/issues/8445) by @markguleno
+- Support querying entries in a specific site in GraphQL. [#8446](https://github.com/statamic/cms/issues/8446) by @fabiangigler
+- Support for using recursion on arbitrary array data in Antlers. [#8421](https://github.com/statamic/cms/issues/8421) by @JohnathonKoster
+
+### What's fixed
+- Fix a hardcoded live preview URL when editing taxonomy terms. [#8461](https://github.com/statamic/cms/issues/8461) by @ryanmitchell
+- Hide heading when there are no unlisted addons. [#8479](https://github.com/statamic/cms/issues/8479) by @duncanmcclean
+- Handle `nocache` tag error. [#8449](https://github.com/statamic/cms/issues/8449) by @jasonvarga
+- Avoid showing Stache size label in the Cache utility when there is no size. [#8480](https://github.com/statamic/cms/issues/8480) by @duncanmcclean
+
+
+
+## 4.12.0 (2023-07-20)
+
+### What's new
+- Add `query_scopes` option to the relationship fieldtypes. [#8456](http://github.com/statamic/cms/pull/8456) by @jacksleight
+
+### What's improved
+- French translations. [#8451](http://github.com/statamic/cms/pull/8451) by @ebeauchamps
+
+### What's fixed
+- Fix error handling for recent curl bug. [#8475](http://github.com/statamic/cms/pull/8475) by @jesseleite
+- Bump word-wrap from 1.2.3 to 1.2.4. [#8466](http://github.com/statamic/cms/pull/8466) by @dependabot
+- Only show code block copy button on https. [#8457](http://github.com/statamic/cms/pull/8457) by @jasonvarga
+
+
+
 ## 4.11.0 (2023-07-13)
 
 ### What's new

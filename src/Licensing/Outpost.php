@@ -139,11 +139,9 @@ class Outpost
             return $this->cacheAndReturnValidationResponse($e);
         } elseif ($code == 429) {
             return $this->cacheAndReturnRateLimitResponse($e);
-        } elseif ($code >= 500 && $code < 600) {
-            return $this->cacheAndReturnErrorResponse($e);
         }
 
-        throw $e;
+        return $this->cacheAndReturnErrorResponse($e);
     }
 
     private function cacheAndReturnValidationResponse($e)
@@ -167,7 +165,7 @@ class Outpost
     {
         Log::debug('Error contacting Outpost: '.$e->getMessage());
 
-        return $this->cacheResponse(now()->addMinutes(5), ['error' => 500]);
+        return $this->cacheResponse(now()->addMinutes(5), ['error' => $e->getCode()]);
     }
 
     private function cache()
