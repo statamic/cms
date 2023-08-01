@@ -101,7 +101,11 @@ class Users extends Relationship
 
         $this->applyIndexQueryScopes($query, $request->all());
 
-        $query->orderBy('name');
+        $query->when(
+            User::blueprint()->hasField('first_name'),
+            fn ($query) => $query->orderBy('first_name')->orderBy('last_name'),
+            fn ($query) => $query->orderBy('name')
+        );
 
         $userFields = function ($user) {
             return [
