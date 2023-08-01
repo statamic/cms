@@ -45,7 +45,7 @@ class ImageNode extends Node
 
                     return [
                         'src' => $src,
-                        'alt' => $alt
+                        'alt' => $alt,
                     ];
                 },
             ],
