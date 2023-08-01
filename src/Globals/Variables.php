@@ -16,10 +16,10 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\GlobalVariablesBlueprintFound;
-use Statamic\Events\GlobalVariableCreated;
-use Statamic\Events\GlobalVariableDeleted;
-use Statamic\Events\GlobalVariableSaved;
-use Statamic\Events\GlobalVariableSaving;
+use Statamic\Events\GlobalVariablesCreated;
+use Statamic\Events\GlobalVariablesDeleted;
+use Statamic\Events\GlobalVariablesSaved;
+use Statamic\Events\GlobalVariablesSaving;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -120,7 +120,7 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
 
     public function save()
     {
-        $isNew = is_null(Facades\GlobalSetVariable::find($this->id()));
+        $isNew = is_null(Facades\GlobalSetVariables::find($this->id()));
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
@@ -129,12 +129,12 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
-            if (GlobalVariableSaving::dispatch($this) === false) {
+            if (GlobalVariablesSaving::dispatch($this) === false) {
                 return false;
             }
         }
 
-        Facades\GlobalSetVariable::save($this);
+        Facades\GlobalSetVariables::save($this);
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -142,10 +142,10 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
 
         if ($withEvents) {
             if ($isNew) {
-                GlobalVariableCreated::dispatch($this);
+                GlobalVariablesCreated::dispatch($this);
             }
 
-            GlobalVariableSaved::dispatch($this);
+            GlobalVariablesSaved::dispatch($this);
         }
 
         return $this;
@@ -153,9 +153,9 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
 
     public function delete()
     {
-        Facades\GlobalSetVariable::delete($this);
+        Facades\GlobalSetVariables::delete($this);
 
-        GlobalVariableDeleted::dispatch($this);
+        GlobalVariablesDeleted::dispatch($this);
 
         return true;
     }

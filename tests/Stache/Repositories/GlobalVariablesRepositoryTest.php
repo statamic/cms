@@ -4,15 +4,15 @@ namespace Tests\Stache\Repositories;
 
 use Statamic\Contracts\Globals\Variables;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
-use Statamic\Globals\VariableCollection;
+use Statamic\Globals\VariablesCollection;
 use Statamic\Stache\Repositories\GlobalRepository;
-use Statamic\Stache\Repositories\GlobalVariableRepository;
+use Statamic\Stache\Repositories\GlobalVariablesRepository;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\GlobalsStore;
 use Statamic\Stache\Stores\GlobalVariablesStore;
 use Tests\TestCase;
 
-class GlobalVariableRepositoryTest extends TestCase
+class GlobalVariablesRepositoryTest extends TestCase
 {
     private $directory;
     private $repo;
@@ -27,7 +27,7 @@ class GlobalVariableRepositoryTest extends TestCase
         $stache->registerStore((new GlobalsStore($stache, app('files')))->directory($this->directory));
         $stache->registerStore((new GlobalVariablesStore($stache, app('files')))->directory($this->directory));
 
-        $this->repo = new GlobalVariableRepository($stache);
+        $this->repo = new GlobalVariablesRepository($stache);
         $this->globalRepo = new GlobalRepository($stache);
     }
 
@@ -36,7 +36,7 @@ class GlobalVariableRepositoryTest extends TestCase
     {
         $sets = $this->repo->all();
 
-        $this->assertInstanceOf(VariableCollection::class, $sets);
+        $this->assertInstanceOf(VariablesCollection::class, $sets);
         $this->assertCount(2, $sets);
         $this->assertEveryItemIsInstanceOf(Variables::class, $sets);
 
@@ -67,14 +67,14 @@ class GlobalVariableRepositoryTest extends TestCase
     public function it_gets_global_variables_by_set_handle()
     {
         tap($this->repo->findBySet('global'), function ($variables) {
-            $this->assertInstanceOf(VariableCollection::class, $variables);
+            $this->assertInstanceOf(VariablesCollection::class, $variables);
             $first = $variables->first();
             $this->assertEquals('global::en', $first->id());
             $this->assertEquals('global', $first->handle());
         });
 
         tap($this->repo->findBySet('contact'), function ($variables) {
-            $this->assertInstanceOf(VariableCollection::class, $variables);
+            $this->assertInstanceOf(VariablesCollection::class, $variables);
             $first = $variables->first();
             $this->assertEquals('contact::en', $first->id());
             $this->assertEquals('contact', $first->handle());

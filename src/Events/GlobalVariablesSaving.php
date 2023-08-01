@@ -2,7 +2,7 @@
 
 namespace Statamic\Events;
 
-class GlobalVariableDeleted extends Event
+class GlobalVariablesSaving extends Event
 {
     public $variable;
 

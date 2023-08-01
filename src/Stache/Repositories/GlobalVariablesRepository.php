@@ -2,13 +2,13 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Contracts\Globals\GlobalVariableRepository as RepositoryContract;
+use Statamic\Contracts\Globals\GlobalVariablesRepository as RepositoryContract;
 use Statamic\Contracts\Globals\Variables;
-use Statamic\Globals\VariableCollection;
+use Statamic\Globals\VariablesCollection;
 use Statamic\Support\Str;
 use Statamic\Stache\Stache;
 
-class GlobalVariableRepository implements RepositoryContract
+class GlobalVariablesRepository implements RepositoryContract
 {
     protected $stache;
     protected $store;
@@ -19,11 +19,11 @@ class GlobalVariableRepository implements RepositoryContract
         $this->store = $stache->store('global-variables');
     }
 
-    public function all(): VariableCollection
+    public function all(): VariablesCollection
     {
         $keys = $this->store->paths()->keys();
 
-        return VariableCollection::make($this->store->getItems($keys));
+        return VariablesCollection::make($this->store->getItems($keys));
     }
 
     public function find($id): ?Variables
@@ -31,7 +31,7 @@ class GlobalVariableRepository implements RepositoryContract
         return $this->store->getItem($id);
     }
 
-    public function findBySet($handle): ?VariableCollection
+    public function findBySet($handle): ?VariablesCollection
     {
         return $this->all()->filter(function ($variable) use ($handle) {
             return Str::before($variable->id(), '::') == $handle;

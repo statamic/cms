@@ -3,20 +3,20 @@
 namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Statamic\Contracts\Globals\GlobalVariableRepository;
+use Statamic\Contracts\Globals\GlobalVariablesRepository;
 
 /**
- * @method static \Statamic\Globals\VariableCollection all()
+ * @method static \Statamic\Globals\VariablesCollection all()
  * @method static null|\Statamic\Globals\Variables find($id)
  * @method static null|\Statamic\Globals\Variables findBySet($set)
  * @method static void save($variable);
  *
- * @see \Statamic\Globals\VariableCollection
+ * @see \Statamic\Globals\VariablesCollection
  */
-class GlobalSetVariable extends Facade
+class GlobalSetVariables extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return GlobalVariableRepository::class;
+        return GlobalVariablesRepository::class;
     }
 }
