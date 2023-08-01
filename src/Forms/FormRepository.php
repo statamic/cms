@@ -81,7 +81,7 @@ class FormRepository implements Contract
 
     public function getConfigFor($handle)
     {
-        $reserved = ['name', 'fields', 'submission', 'email'];
+        $reserved = ['title', 'honeypot', 'store', 'email'];
 
         return collect($this->configs)
             ->filter(function ($config) use ($handle) {
