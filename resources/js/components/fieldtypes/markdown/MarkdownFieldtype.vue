@@ -440,7 +440,7 @@ export default {
             if (! url) {
                 url = prompt(__('Enter URL'), 'https://');
                 if (! url) {
-                    url = '';
+                    return;
                 }
             }
 
