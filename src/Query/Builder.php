@@ -152,7 +152,7 @@ abstract class Builder implements Contract
     {
         $loweredOperator = strtolower($operator);
 
-        if ($useDefault || ! isset($this->operators[$loweredOperator])) {
+        if ($useDefault) {
             return [$operator, '='];
         } elseif ($this->invalidOperatorAndValue($operator, $value)) {
             throw new InvalidArgumentException('Illegal operator and value combination.');
