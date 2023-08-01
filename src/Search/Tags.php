@@ -30,9 +30,7 @@ class Tags extends BaseTags
         $builder = Search::index($this->params->get('index'))
             ->ensureExists()
             ->search($query)
-            ->withData($supplementData)
-            ->limit($this->params->get('limit'))
-            ->offset($this->params->get('offset'));
+            ->withData($supplementData);
 
         $this->querySite($builder);
         $this->queryStatus($builder);

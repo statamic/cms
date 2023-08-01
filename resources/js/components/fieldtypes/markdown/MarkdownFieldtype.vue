@@ -17,22 +17,14 @@
                         <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'" />
                         <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'" />
                     </div>
-
                     <div class="markdown-buttons" v-if="! isReadOnly">
-                        <button @click="bold" v-tooltip="__('Bold')" :aria-label="__('Bold')">
-                            <svg-icon name="text-bold" class="w-4 h-4" />
-                        </button>
-                        <button @click="italic" v-tooltip="__('Italic')" :aria-label="__('Italic')">
-                            <svg-icon name="text-italic" class="w-4 h-4" />
-                        </button>
-                        <button @click="insertLink('')" v-tooltip="__('Insert Link')" :aria-label="__('Insert Link')">
-                            <svg-icon name="insert-link" class="w-4 h-4" />
-                        </button>
-                        <button @click="addAsset" v-if="assetsEnabled" v-tooltip="__('Insert Asset')" :aria-label="__('Insert Asset')">
-                            <svg-icon name="insert-image" class="w-4 h-4" />
-                        </button>
-                        <button @click="insertImage('')" v-else v-tooltip="__('Insert Image')" :aria-label="__('Insert Image')">
-                            <svg-icon name="insert-image" class="w-4 h-4" />
+                        <button
+                            v-for="button in buttons"
+                            v-tooltip="button.text"
+                            :aria-label="button.text"
+                            @click="button.command(editor)"
+                        >
+                            <svg-icon :name="button.svg" class="w-4 h-4" />
                         </button>
                         <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
                             <svg-icon name="dark-mode" class="w-4 h-4" />
@@ -140,9 +132,10 @@ import 'codemirror/mode/php/php';
 import 'codemirror/mode/yaml/yaml';
 import 'codemirror/addon/edit/continuelist';
 
-import Selector from '../assets/Selector.vue';
-import Uploader from '../assets/Uploader.vue';
-import Uploads from '../assets/Uploads.vue';
+import { availableButtons } from './buttons';
+import Selector from '../../assets/Selector.vue';
+import Uploader from '../../assets/Uploader.vue';
+import Uploads from '../../assets/Uploads.vue';
 import VueCountable from 'vue-countable'
 
 // Keymaps
@@ -162,16 +155,17 @@ export default {
     data: function() {
         return {
             data: this.value || '',
+            buttons: [],
             mode: 'write',
-            selections: null,      // CodeMirror text selections
-            showAssetSelector: false,  // Is the asset selector opened?
-            selectedAssets: [],    // Assets selected in the selector
+            selections: null,
+            showAssetSelector: false,
+            selectedAssets: [],
             selectorViewMode: null,
             draggingFile: false,
             showCheatsheet: false,
             fullScreenMode: false,
             darkMode: false,
-            codemirror: null,       // The CodeMirror instance
+            codemirror: null,
             uploads: [],
             count: {},
             escBinding: null,
@@ -200,6 +194,10 @@ export default {
 
     },
 
+    mounted() {
+        this.initToolbarButtons();
+    },
+
     methods: {
 
         closeFullScreen() {
@@ -226,24 +224,173 @@ export default {
             this.darkMode = ! this.darkMode;
         },
 
-        /**
-         * Get the text for a selection
-         *
-         * @param  Range selection  A CodeMirror Range
-         * @return string
-         */
         getText: function(selection) {
             var i = _.indexOf(this.selections, selection);
 
             return this.codemirror.getSelections()[i];
         },
 
-        /**
-         * Inserts an image at the selection
-         *
-         * @param  String url  URL of the image
-         * @param  String alt  Alt text
-         */
+        toggleInline(type) {
+            var self = this;
+            var replacements = [];
+            let elements = {
+                "bold": {
+                    "pattern": /^\*{2}(.*)\*{2}$/,
+                    "delimiter": "**"
+                },
+                "code": {
+                    "pattern": /^\`(.*)\`$/,
+                    "delimiter": "`"
+                },
+                "italic": {
+                    "pattern": /^\_(.*)\_$/,
+                    "delimiter": "_"
+                },
+                "strikethrough": {
+                    "pattern": /^\~\~(.*)\~\~$/,
+                    "delimiter": "~~"
+                }
+            };
+
+            _.each(self.selections, function (selection) {
+                let delimiter = elements[type]['delimiter'];
+                let replacement = (self.getText(selection).match(elements[type]['pattern']))
+                    ? self.removeInline(selection, elements[type]['delimiter'])
+                    : delimiter + self.getText(selection) + delimiter;
+
+                replacements.push(replacement);
+            });
+
+            this.codemirror.replaceSelections(replacements, 'around');
+
+            this.codemirror.focus();
+        },
+
+        toggleBlock(type) {
+            var self = this;
+            var replacements = [];
+            let elements = {
+                "code": {
+                    "pattern": /^\`\`\`(.*)\n(.*)\n\`\`\`$/,
+                    "delimiter": "\`\`\`"
+                },
+            };
+
+            _.each(self.selections, function (selection) {
+                let text = self.getText(selection);
+                let delimiter = elements[type]['delimiter'];
+                let replacement = (text.match(elements[type]['pattern']))
+                    ? self.removeInline(selection, delimiter)
+                    : delimiter + "\n" + text + "\n" + delimiter;
+
+                replacements.push(replacement);
+            });
+
+            this.codemirror.replaceSelections(replacements, 'around');
+
+            this.codemirror.focus();
+        },
+
+        removeInline: function (selection, delimiter) {
+            var text = this.getText(selection);
+            var blockLength = delimiter.length;
+
+            return text.substring(blockLength, text.length-blockLength);
+        },
+
+        toggleLine(type) {
+            let startPoint = this.codemirror.getCursor("start");
+            let endPoint = this.codemirror.getCursor("end");
+            let patterns = {
+                "quote": /^(\s*)\>\s+/,
+                "unordered-list": /^(\s*)(\*|\-|\+)\s+/,
+                "ordered-list": /^(\s*)\d+\.\s+/
+            };
+            let map = {
+                "quote": "> ",
+                "unordered-list": "- ",
+                "ordered-list": "1. "
+            };
+
+            for (let i = startPoint.line; i <= endPoint.line; i++) {
+                let text = this.codemirror.getLine(i);
+                text = this.isInside(type) ? text.replace(patterns[type], "$1") : map[type] + text;
+
+                this.codemirror.replaceRange(text, { line: i, ch: 0 }, { line: i, ch: Infinity });
+            }
+
+            this.codemirror.focus();
+        },
+
+        // Get the state of the current position to see what elements it may be inside
+        getState(position) {
+            position = position || this.codemirror.getCursor("start");
+            let state = this.codemirror.getTokenAt(position);
+
+            if(!state.type) return {};
+
+            let types = state.type.split(" ");
+
+            let ret = {},
+                data, text;
+
+            for (var i = 0; i < types.length; i++) {
+                data = types[i];
+
+                if (data === "strong") {
+                    ret.bold = true;
+                } else if(data === "variable-2") {
+                    text = this.codemirror.getLine(position.line);
+                    if (/^\s*\d+\.\s/.test(text)) {
+                        ret["ordered-list"] = true;
+                    } else {
+                        ret["unordered-list"] = true;
+                    }
+                } else if (data === "atom") {
+                    ret.quote = true;
+                } else if (data === "em") {
+                    ret.italic = true;
+                } else if (data === "quote") {
+                    ret.quote = true;
+                } else if (data === "strikethrough") {
+                    ret.strikethrough = true;
+                } else if (data === "comment") {
+                    ret.code = true;
+                } else if (data === "link") {
+                    ret.link = true;
+                } else if (data === "tag") {
+                    ret.image = true;
+                } else if (data.match(/^header(\-[1-6])?$/)) {
+                    ret[data.replace("header", "heading")] = true;
+                }
+            }
+
+            return ret;
+        },
+
+        // Check if position is inside a specific element
+        isInside(type) {
+            return this.getState()[type] ?? false;
+        },
+
+        insertTable() {
+            let doc = this.codemirror.getDoc();
+            let cursor = doc.getCursor();
+            let line = doc.getLine(cursor.line);
+            let pos = { line: cursor.line };
+            let table = "|     |     |\n| --- | --- |\n|     |     |";
+
+            if (line.length === 0) {
+                doc.replaceRange(table, pos);
+                this.codemirror.focus();
+                this.codemirror.setCursor(cursor.line, 2);
+            } else {
+                doc.replaceRange("\n\n" + table, pos);
+                this.codemirror.focus();
+                this.codemirror.setCursor(cursor.line + 2, 2);
+            }
+        },
+
         insertImage: function(url, alt) {
             var cm = this.codemirror.doc
 
@@ -280,12 +427,6 @@ export default {
             this.data += '\n\n!['+alt+']('+url+')';
         },
 
-        /**
-         * Inserts a link at the selection
-         *
-         * @param  String url   URL of the link
-         * @param  String text  Link text
-         */
         insertLink: function(url, text) {
             var cm = this.codemirror.doc
 
@@ -316,119 +457,9 @@ export default {
             this.codemirror.focus();
         },
 
-        /**
-         * Inserts a link at the end of the data
-         *
-         * @param  String url   URL of the link
-         * @param  String text  Link text
-         */
         appendLink: function(url, text) {
             text = text || '';
             this.data += '\n\n['+text+']('+url+')';
-        },
-
-        /**
-         * Toggle the boldness on the current selection(s)
-         */
-        bold: function() {
-            var self = this;
-            var replacements = [];
-
-            _.each(self.selections, function (selection, i) {
-                var replacement = (self.isBold(selection))
-                    ? self.removeBold(selection)
-                    : self.makeBold(selection);
-
-                replacements.push(replacement);
-            });
-
-            this.codemirror.replaceSelections(replacements, 'around');
-
-            this.codemirror.focus();
-        },
-
-        /**
-         * Check if a string is bold
-         *
-         * @param  Range  selection  CodeMirror selection
-         * @return Boolean
-         */
-        isBold: function (selection) {
-            return this.getText(selection).match(/^\*{2}(.*)\*{2}$/);
-        },
-
-        /**
-         * Make a string bold
-         *
-         * @param  Range  selection  CodeMirror selection
-         * @return String
-         */
-        makeBold: function (selection) {
-            return '**' + this.getText(selection) + '**';
-        },
-
-        /**
-         * Remove the boldness from a string
-         *
-         * @param  Range  selection  CodeMirror selection
-         * @return String
-         */
-        removeBold: function (selection) {
-            var text = this.getText(selection);
-
-            return text.substring(2, text.length-2);
-        },
-
-        /**
-         * Toggle the italics on the current selection(s)
-         */
-        italic: function() {
-            var self = this;
-            var replacements = [];
-
-            _.each(self.selections, function (selection, i) {
-                var replacement = (self.isItalic(selection))
-                    ? self.removeItalic(selection)
-                    : self.makeItalic(selection);
-
-                replacements.push(replacement);
-            });
-
-            this.codemirror.replaceSelections(replacements, 'around');
-
-            this.codemirror.focus();
-        },
-
-        /**
-         * Check if a string is italic
-         *
-         * @param  Range  selection  CodeMirror selection
-         * @return Boolean
-         */
-        isItalic: function (selection) {
-            return this.getText(selection).match(/^\_(.*)\_$/);
-        },
-
-        /**
-         * Make a string italic
-         *
-         * @param  Range  selection  CodeMirror selection
-         * @return String
-         */
-        makeItalic: function (selection) {
-            return '_' + this.getText(selection) + '_';
-        },
-
-        /**
-         * Remove the italics from a string
-         *
-         * @param  Range  selection  CodeMirror selection
-         * @return String
-         */
-        removeItalic: function (selection) {
-            var text = this.getText(selection);
-
-            return text.substring(1, text.length-1);
         },
 
         /**
@@ -446,12 +477,37 @@ export default {
             var mod = e.metaKey === true || e.ctrlKey === true;
 
             if (mod && key === 66) { // cmd+b
-                this.bold();
+                this.toggleInline('bold');
                 e.preventDefault();
             }
 
             if (mod && key === 73) { // cmd+i
-                this.italic();
+                this.toggleInline('italic');
+                e.preventDefault();
+            }
+
+            if (mod && key === 190) { // cmd+.
+                this.toggleLine('quote');
+                e.preventDefault();
+            }
+
+            if (mod && key === 192) { // ctrl+` (tick)
+                this.toggleInline('code');
+                e.preventDefault();
+            }
+
+            if (mod && key === 76) { // cmd+l
+                this.toggleLine('unordered-list');
+                e.preventDefault();
+            }
+
+            if (mod && key === 79) { // cmd+o
+                this.toggleLine('ordered-list');
+                e.preventDefault();
+            }
+
+            if (mod && key === 220) { // cmd+\
+                this.toggleBlock('code');
                 e.preventDefault();
             }
 
@@ -589,6 +645,20 @@ export default {
             this.$nextTick(function() {
                 this.codemirror.refresh();
             })
+        },
+
+        initToolbarButtons() {
+            let buttons = this.config.buttons.map(button => {
+                return _.findWhere(availableButtons(), { name: button.toLowerCase() }) || button;
+            });
+
+            // Remove buttons that don't pass conditions.
+            // eg. only the insert asset button can be shown if a container has been set.
+            buttons = buttons.filter(button => {
+                return (button.condition) ? button.condition.call(null, this.config) : true;
+            });
+
+            this.buttons = buttons;
         }
 
     },
@@ -600,6 +670,10 @@ export default {
 
         container: function() {
             return this.config.container;
+        },
+
+        editor() {
+            return this;
         },
 
         folder: function() {

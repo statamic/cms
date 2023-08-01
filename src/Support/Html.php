@@ -66,7 +66,6 @@ class Html
     /**
      * Transform the string to an Html serializable object.
      *
-     * @param $html
      * @return \Illuminate\Support\HtmlString
      */
     protected static function toHtmlString($html)
@@ -123,8 +122,6 @@ class Html
     /**
      * Generate a description list of items.
      *
-     * @param  array  $list
-     * @param  array  $attributes
      * @return \Illuminate\Support\HtmlString
      */
     public static function dl(array $list, array $attributes = [])
@@ -266,7 +263,6 @@ class Html
      * Parse each text part of an HTML string (no tags) through a callback function.
      *
      * @param  string  $value
-     * @param  Closure  $callback
      * @return string
      */
     public static function mapText($value, Closure $callback)

@@ -393,36 +393,8 @@ class NodeProcessor
 
     private function startMeasuringTag($tagName, AntlersNode $node)
     {
-        $file = '';
-
-        if (count(GlobalRuntimeState::$templateFileStack) > 0) {
-            $file = GlobalRuntimeState::$templateFileStack[count(GlobalRuntimeState::$templateFileStack) - 1][0];
-        }
-
-        $suffix = '';
-
-        if ($file != '') {
-            $suffix = str_replace('//', '/', mb_substr($file, strlen(base_path())));
-
-            if (Str::startsWith($suffix, '/')) {
-                $suffix = mb_substr($suffix, 1);
-            }
-        }
-
-        if ($node->startPosition != null) {
-            $suffix .= ' Line: '.$node->startPosition->line;
-        }
-
-        $suffix = trim($suffix);
-
-        $report = 'Tag: '.$tagName;
-
-        if (mb_strlen($suffix) > 0) {
-            $report .= ' ['.$suffix.']';
-        }
-
         $this->profilingTagName = 'tag_'.$tagName.microtime();
-        debugbar()->startMeasure($this->profilingTagName, $report);
+        debugbar()->startMeasure($this->profilingTagName, $tagName);
     }
 
     private function stopMeasuringTag()
@@ -440,7 +412,7 @@ class NodeProcessor
      *
      * @return bool
      */
-    private function isTracingEnabled()
+    public function isTracingEnabled()
     {
         if ($this->runtimeConfiguration == null) {
             return false;
@@ -451,6 +423,11 @@ class NodeProcessor
         }
 
         return false;
+    }
+
+    public function getRuntimeConfiguration()
+    {
+        return $this->runtimeConfiguration;
     }
 
     /**
@@ -1097,7 +1074,7 @@ class NodeProcessor
             Log::warning('Runtime Access Violation: '.$tagCheck, [
                 'tag' => $tagCheck,
                 'file' => GlobalRuntimeState::$currentExecutionFile,
-                'trace' =>  GlobalRuntimeState::$templateFileStack,
+                'trace' => GlobalRuntimeState::$templateFileStack,
             ]);
 
             if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
@@ -1385,6 +1362,12 @@ class NodeProcessor
                             $recursiveParent->activeDepth += 1;
 
                             $rootData = RecursiveNodeManager::getRecursiveRootData($node);
+
+                            // Prevent an infinite loop with arbitrary data.
+                            if (array_key_exists($node->content, $rootData)) {
+                                unset($rootData[$node->content]);
+                            }
+
                             $parentParameterValues = array_values($recursiveParent->getParameterValues($this));
                             // Substitute the current node with the original parent.
                             foreach ($children as $childData) {
@@ -1397,7 +1380,7 @@ class NodeProcessor
                                 // Keep the manager in sync.
                                 RecursiveNodeManager::updateNamedDepth($node, $recursiveParent->activeDepth);
 
-                                $childDataToUse = $depths + $childData;
+                                $childDataToUse = $childData;
 
                                 if (! empty($recursiveParent->parameters)) {
                                     $lockData = $this->data;
@@ -1410,6 +1393,14 @@ class NodeProcessor
                                     $childDataToUse = $childDataToUse + $rootData;
                                 } else {
                                     $childDataToUse = $childDataToUse + $rootData;
+                                }
+
+                                // Apply depths after merging root data to prevent overwriting.
+                                $childDataToUse = array_merge($childDataToUse, $depths);
+
+                                // Add an empty array for consistency.
+                                if (! array_key_exists($node->content, $childDataToUse)) {
+                                    $childDataToUse[$node->content] = [];
                                 }
 
                                 $result = $this->cloneProcessor()
@@ -2085,7 +2076,7 @@ class NodeProcessor
                                         }
                                     }
 
-                                    if ($val instanceof  Value) {
+                                    if ($val instanceof Value) {
                                         if ($val->shouldParseAntlers()) {
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
                                             GlobalRuntimeState::$isEvaluatingData = true;
@@ -2467,7 +2458,7 @@ class NodeProcessor
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".
             if (! is_array($value)) {
-                $value = ['value' => $value, 'name'  => $value];
+                $value = ['value' => $value, 'name' => $value];
             }
 
             $value['count'] = $index + 1;

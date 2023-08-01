@@ -251,7 +251,11 @@ export default {
         setIframeAttributes(iframe) {
             iframe.setAttribute('frameborder', '0');
             iframe.setAttribute('class', this.previewDevice ? 'device' : 'responsive');
-            if (this.previewDevice) iframe.setAttribute('style', `width: ${this.previewDeviceWidth}; height: ${this.previewDeviceHeight}`);
+            if (this.previewDevice) {
+                iframe.setAttribute('style', `width: ${this.previewDeviceWidth}; height: ${this.previewDeviceHeight}`);
+            } else {
+                iframe.removeAttribute('style');
+            }
         },
 
         close() {

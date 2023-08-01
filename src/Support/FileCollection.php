@@ -198,21 +198,21 @@ class FileCollection extends Collection
             $gb = number_format($size / 1073741824, 2);
 
             $data[] = [
-                'file'           => URL::format($path), // Todo: This will only work when using the local file adapter
-                'filename'       => $pathinfo['filename'],
-                'extension'      => array_get($pathinfo, 'extension'),
-                'basename'       => array_get($pathinfo, 'basename'),
-                'size'           => File::sizeHuman($path),
-                'size_bytes'     => $size,
+                'file' => URL::format($path), // Todo: This will only work when using the local file adapter
+                'filename' => $pathinfo['filename'],
+                'extension' => array_get($pathinfo, 'extension'),
+                'basename' => array_get($pathinfo, 'basename'),
+                'size' => File::sizeHuman($path),
+                'size_bytes' => $size,
                 'size_kilobytes' => $kb,
                 'size_megabytes' => $mb,
                 'size_gigabytes' => $gb,
-                'size_b'         => $size,
-                'size_kb'        => $kb,
-                'size_mb'        => $kb,
-                'size_gb'        => $kb,
-                'is_file'        => File::isImage($path),
-                'last_modified'  => Carbon::createFromTimestamp(File::lastModified($path)),
+                'size_b' => $size,
+                'size_kb' => $kb,
+                'size_mb' => $kb,
+                'size_gb' => $kb,
+                'is_file' => File::isImage($path),
+                'last_modified' => Carbon::createFromTimestamp(File::lastModified($path)),
             ];
         }
 

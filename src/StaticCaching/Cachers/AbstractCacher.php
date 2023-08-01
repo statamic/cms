@@ -22,9 +22,6 @@ abstract class AbstractCacher implements Cacher
      */
     private $config;
 
-    /**
-     * @param  Repository  $cache
-     */
     public function __construct(Repository $cache, $config)
     {
         $this->cache = $cache;
@@ -135,7 +132,6 @@ abstract class AbstractCacher implements Cacher
     /**
      * Get the URL from a request.
      *
-     * @param  Request  $request
      * @return string
      */
     public function getUrl(Request $request)

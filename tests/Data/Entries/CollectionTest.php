@@ -10,6 +10,7 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\Collection;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionSaved;
+use Statamic\Events\EntryBlueprintFound;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
@@ -373,6 +374,28 @@ class CollectionTest extends TestCase
 
         $this->assertEquals($blueprint, $collection->entryBlueprint('article'));
         $this->assertNull($collection->entryBlueprint('two'));
+    }
+
+    /** @test */
+    public function it_dispatches_an_event_when_getting_entry_blueprint()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'blueprint' => $blueprint = (new Blueprint)->setHandle('blueprint'),
+        ]));
+
+        // Do it twice so we can check the event is only dispatched once.
+        $collection->entryBlueprint();
+        $collection->entryBlueprint();
+
+        Event::assertDispatchedTimes(EntryBlueprintFound::class, 1);
+        Event::assertDispatched(EntryBlueprintFound::class, function ($event) use ($blueprint) {
+            return $event->blueprint === $blueprint
+                && $event->entry === null;
+        });
     }
 
     /** @test */
