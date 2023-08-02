@@ -2,8 +2,8 @@
 
 namespace Statamic\Forms;
 
-use Statamic\Data\DataCollection;
 use Statamic\CP\Column;
+use Statamic\Data\DataCollection;
 use Statamic\Facades;
 use Statamic\Facades\GraphQL;
 use Statamic\Fieldtypes\Relationship;
