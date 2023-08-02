@@ -15,6 +15,7 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Search\Result;
 
 class UsersController extends CpController
 {
@@ -68,6 +69,10 @@ class UsersController extends CpController
         $users = $query
             ->orderBy(request('sort', 'email'), request('order', 'asc'))
             ->paginate(request('perPage'));
+
+        if ($users->getCollection()->first() instanceof Result) {
+            $users->setCollection($users->getCollection()->map->getSearchable());
+        }
 
         return (new Users($users))
             ->blueprint(User::blueprint())
@@ -243,7 +248,11 @@ class UsersController extends CpController
 
         $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
 
-        $fields->validate(['email' => 'required|unique_user_value:'.$user->id()]);
+        $fields
+            ->validator()
+            ->withRules(['email' => 'required|unique_user_value:{id}'])
+            ->withReplacements(['id' => $user->id()])
+            ->validate();
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 

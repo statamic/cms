@@ -40,15 +40,15 @@ class ImageNode extends Node
                     if (Str::startsWith($src, 'asset::')) {
                         $id = Str::after($src, 'asset::');
                         $src = $this->getUrl($id);
+                        $alt = $attributes->alt ? $attributes->alt : $this->getAlt($id);
                     }
 
                     return [
                         'src' => $src,
+                        'alt' => $alt,
                     ];
                 },
             ],
-            'alt' => [],
-            'title' => [],
         ];
     }
 
@@ -60,5 +60,10 @@ class ImageNode extends Node
     protected function getUrl($id)
     {
         return optional(Asset::find($id))->url();
+    }
+
+    protected function getAlt($id)
+    {
+        return optional(Asset::find($id))->data()->get('alt');
     }
 }

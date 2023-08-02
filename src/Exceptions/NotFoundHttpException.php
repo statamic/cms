@@ -2,7 +2,7 @@
 
 namespace Statamic\Exceptions;
 
-use Facades\Statamic\View\Cascade;
+use Statamic\Facades\Cascade;
 use Statamic\Statamic;
 use Statamic\View\View;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as SymfonyException;

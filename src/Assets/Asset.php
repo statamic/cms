@@ -520,6 +520,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Get the file download url.
+     *
+     * @return string
+     */
+    public function cpDownloadUrl()
+    {
+        return cp_route('assets.download', base64_encode($this->id()));
+    }
+
+    /**
      * Get the file extension of the asset.
      *
      * @return string
@@ -702,7 +712,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     /**
      * Replace an asset and/or its references where necessary.
      *
-     * @param  Asset  $originalAsset
      * @param  bool  $deleteOriginal
      * @return $this
      */
@@ -793,8 +802,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
     /**
      * Get the asset's ratio.
-     *
-     * @return
      */
     public function ratio()
     {
@@ -835,7 +842,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     /**
      * Upload a file.
      *
-     * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
      * @return $this
      */
     public function upload(UploadedFile $file)

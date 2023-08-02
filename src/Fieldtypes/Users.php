@@ -55,6 +55,11 @@ class Users extends Relationship
                         'instructions' => __('statamic::messages.fields_default_instructions'),
                         'type' => 'users',
                     ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.users.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
                 ],
             ],
         ];
@@ -94,7 +99,13 @@ class Users extends Relationship
             $query->whereNotIn('id', $request->exclusions);
         }
 
-        $query->orderBy('name');
+        $this->applyIndexQueryScopes($query, $request->all());
+
+        $query->when(
+            User::blueprint()->hasField('first_name'),
+            fn ($query) => $query->orderBy('first_name')->orderBy('last_name'),
+            fn ($query) => $query->orderBy('name')
+        );
 
         $userFields = function ($user) {
             return [

@@ -14,7 +14,7 @@ class Text extends Fieldtype
     {
         return [
             [
-                'display' => 'Input Behavior',
+                'display' => __('Input Behavior'),
                 'fields' => [
                     'input_type' => [
                         'display' => __('Input Type'),
@@ -54,7 +54,7 @@ class Text extends Fieldtype
                 ],
             ],
             [
-                'display' => 'Appearance',
+                'display' => __('Appearance'),
                 'fields' => [
                     'prepend' => [
                         'display' => __('Prepend'),
@@ -72,7 +72,7 @@ class Text extends Fieldtype
                 'display' => 'Antlers',
                 'fields' => [
                     'antlers' => [
-                        'display' => 'Allow Antlers',
+                        'display' => __('Allow Antlers'),
                         'instructions' => __('statamic::fieldtypes.any.config.antlers'),
                         'type' => 'toggle',
                     ],

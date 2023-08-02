@@ -161,7 +161,8 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -180,7 +181,8 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -300,7 +302,8 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 
@@ -334,7 +337,8 @@ class EntriesTest extends TestCase
     {
         Site::setCurrent('fr');
 
-        $parent = new class {
+        $parent = new class
+        {
             // Class does not implement "Localizable"
         };
 

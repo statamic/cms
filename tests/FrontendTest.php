@@ -3,13 +3,13 @@
 namespace Tests;
 
 use Facades\Statamic\CP\LivePreview;
-use Facades\Statamic\View\Cascade;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;

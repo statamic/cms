@@ -72,7 +72,7 @@ class AssetsMetaTest extends TestCase
         Storage::disk('test')->assertMissing('foo/.meta/bar.txt.yaml');
 
         $this->artisan('statamic:assets:meta test_container')
-             ->expectsOutput('Asset metadata generated');
+            ->expectsOutput('Asset metadata generated');
 
         Storage::disk('test')->assertExists('foo/bar.txt');
         Storage::disk('test')->assertExists('foo/.meta/bar.txt.yaml');

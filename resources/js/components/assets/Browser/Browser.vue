@@ -188,7 +188,12 @@
                                         <div class="asset-meta flex items-center">
                                             <div class="asset-filename text-center w-full px-2 py-1" v-text="folder.basename" :title="folder.basename" />
                                         </div>
-                                        <dropdown-list autoclose v-if="folderActions(folder).length" class="absolute top-1 right-2 opacity-0 group-hover:opacity-100">
+                                        <dropdown-list v-if="folderActions(folder).length"
+                                            class="absolute top-1 right-2 opacity-0 group-hover:opacity-100"
+                                            :class="{ 'opacity-100': actionOpened === folder.path }"
+                                            @opened="actionOpened = folder.path"
+                                            @closed="actionOpened = null"
+                                        >
                                              <data-list-inline-actions
                                                  :item="folder.path"
                                                  :url="folderActionUrl"
@@ -211,7 +216,7 @@
                                             @dblclick.stop="$emit('edit-asset', asset)"
                                         >
                                             <div class="asset-thumb-container">
-                                                <div class="asset-thumb">
+                                                <div class="asset-thumb" :class="{'bg-checkerboard': asset.can_be_transparent}">
                                                     <img v-if="asset.is_image" :src="asset.thumbnail" loading="lazy" :class="{'p-4 h-full w-full': asset.extension === 'svg'}" />
                                                     <file-icon
                                                         v-else
@@ -226,6 +231,9 @@
                                         </div>
                                         <dropdown-list
                                             class="absolute top-1 right-2 opacity-0 group-hover:opacity-100"
+                                            :class="{ 'opacity-100': actionOpened === asset.id }"
+                                            @opened="actionOpened = asset.id"
+                                            @closed="actionOpened = null"
                                         >
                                              <dropdown-item :text="__(canEdit ? 'Edit' : 'View')" @click="edit(asset.id)" />
                                              <div class="divider" v-if="asset.actions.length" />
@@ -350,7 +358,8 @@ export default {
             actionUrl: null,
             folderActionUrl: null,
             shifting: false,
-            lastItemClicked: null
+            lastItemClicked: null,
+            actionOpened: null,
         }
     },
 
@@ -473,7 +482,11 @@ export default {
                 : this.path;
 
             this.$emit('navigated', this.container, path);
-        }
+        },
+
+        searchQuery() {
+            this.page = 1;
+        },
 
     },
 
