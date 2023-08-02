@@ -18,7 +18,7 @@ class Entries extends FieldtypeFilter
                     'title' => __('Title'),
                 ],
                 'placeholder' => __('Field'),
-                'default' => 'id',
+                'default' => 'title',
             ],
             'operator' => [
                 'type' => 'select',
