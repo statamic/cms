@@ -59,7 +59,7 @@ class Entries extends FieldtypeFilter
         }
 
         $ids = Facades\Entry::query()
-            ->when($config['collections'], fn ($query) => $query->whereIn('collection', $config['collections']))
+            ->when($config['collections'] ?? null, fn ($query) => $query->whereIn('collection', $config['collections']))
             ->where($values['field'], $operator, $value)
             ->get(['id'])
             ->map(fn ($entry) => $entry->id())
