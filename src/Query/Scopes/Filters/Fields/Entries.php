@@ -72,7 +72,7 @@ class Entries extends FieldtypeFilter
         }
 
         if (empty($ids)) {
-            $query->where($handle, -1);
+            $query->whereJsonContains($handle, [-1]);
 
             return;
         }
