@@ -17,12 +17,10 @@ class Entries extends FieldtypeFilter
                     'id' => __('ID'),
                     'title' => __('Title'),
                 ],
-                'placeholder' => __('Field'),
                 'default' => 'title',
             ],
             'operator' => [
                 'type' => 'select',
-                'placeholder' => __('Select Operator'),
                 'options' => [
                     'like' => __('Contains'),
                     '=' => __('Is'),
