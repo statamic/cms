@@ -1709,6 +1709,14 @@ class CoreModifiers extends Modifier
      */
     public function random($value)
     {
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
         return array_random($value);
     }
 
