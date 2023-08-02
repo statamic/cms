@@ -3,7 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
-use Statamic\Auth\Passwords\PasswordDefaults;
+use Illuminate\Validation\Rules\Password;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Facades\User;
@@ -197,7 +197,7 @@ class MakeUser extends Command
     {
         return $this->validationFails(
             $this->data['password'],
-            ['required', PasswordDefaults::rules()]
+            ['required', Password::default()]
         );
     }
 

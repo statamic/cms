@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Facades\Statamic\API\FilterAuthorizer;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Term;
 use Statamic\Http\Resources\API\TermResource;
@@ -10,10 +11,13 @@ class TaxonomyTermsController extends ApiController
 {
     protected $resourceConfigKey = 'taxonomies';
     protected $routeResourceKey = 'taxonomy';
+    protected $taxonomyHandle;
 
     public function index($taxonomy)
     {
         $this->abortIfDisabled();
+
+        $this->taxonomyHandle = $taxonomy->handle();
 
         $with = $taxonomy->termBlueprints()
             ->flatMap(fn ($blueprint) => $blueprint->fields()->all())
@@ -33,5 +37,10 @@ class TaxonomyTermsController extends ApiController
         throw_unless($term, new NotFoundHttpException);
 
         return app(TermResource::class)::make($term);
+    }
+
+    protected function allowedFilters()
+    {
+        return FilterAuthorizer::allowedForSubResources('api', 'taxonomies', $this->taxonomyHandle);
     }
 }

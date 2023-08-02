@@ -30,22 +30,37 @@ class Users extends Relationship
     protected function configFieldItems(): array
     {
         return [
-            'max_items' => [
-                'display' => __('Max Items'),
-                'instructions' => __('statamic::messages.max_items_instructions'),
-                'type' => 'integer',
-                'min' => 1,
-            ],
-            'mode' => [
-                'display' => __('Mode'),
-                'type' => 'radio',
-                'options' => [
-                    'default' => __('Stack Selector'),
-                    'select' => __('Select Dropdown'),
-                    'typeahead' => __('Typeahead Field'),
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'type' => 'integer',
+                        'min' => 1,
+                    ],
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.any.config.mode'),
+                        'type' => 'radio',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                        'default' => 'select',
+                    ],
+                    'default' => [
+                        'display' => __('Default'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'users',
+                    ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.users.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
                 ],
-                'default' => 'select',
-                'width' => 50,
             ],
         ];
     }
@@ -84,7 +99,13 @@ class Users extends Relationship
             $query->whereNotIn('id', $request->exclusions);
         }
 
-        $query->orderBy('name');
+        $this->applyIndexQueryScopes($query, $request->all());
+
+        $query->when(
+            User::blueprint()->hasField('first_name'),
+            fn ($query) => $query->orderBy('first_name')->orderBy('last_name'),
+            fn ($query) => $query->orderBy('name')
+        );
 
         $userFields = function ($user) {
             return [

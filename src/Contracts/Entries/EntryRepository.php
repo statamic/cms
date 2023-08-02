@@ -14,9 +14,6 @@ interface EntryRepository
 
     public function findByUri(string $uri);
 
-    /** @deprecated */
-    public function findBySlug(string $slug, string $collection);
-
     public function make();
 
     public function query();

@@ -10,6 +10,8 @@ class MakeScopeTest extends TestCase
 {
     use Concerns\CleansUpGeneratedPaths;
 
+    private $files;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -29,7 +31,7 @@ class MakeScopeTest extends TestCase
     {
         $path = base_path('app/Scopes/Dog.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:scope', ['name' => 'Dog']);
 
@@ -42,7 +44,7 @@ class MakeScopeTest extends TestCase
     {
         $path = base_path('app/Scopes/Dog.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:scope', ['name' => 'Dog']);
         $this->files->put($path, 'overwritten scope');
@@ -78,7 +80,7 @@ class MakeScopeTest extends TestCase
 
         Composer::shouldReceive('installedPath')->andReturn($path);
 
-        $this->assertFileNotExists($scope = "$path/src/Scopes/Yoda.php");
+        $this->assertFileDoesNotExist($scope = "$path/src/Scopes/Yoda.php");
 
         $this->artisan('statamic:make:scope', ['name' => 'Yoda', 'addon' => 'yoda/bag-odah']);
 

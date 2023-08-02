@@ -2,8 +2,8 @@
 
 namespace Statamic\View;
 
-use Facades\Statamic\View\Cascade;
 use InvalidArgumentException;
+use Statamic\Facades\Cascade;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Engine;
@@ -57,6 +57,7 @@ class View
     {
         return array_merge($this->cascade(), $this->data, [
             'current_template' => $this->template(),
+            'current_layout' => $this->layout(),
         ]);
     }
 

@@ -9,15 +9,14 @@ use Statamic\Console\Composer\Lock;
  */
 class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
 {
+    protected $lockPath = './composer.lock';
+    protected $customLockPath = './custom/composer.lock';
+    protected $backupLockPath = './storage/statamic/updater/composer.lock.bak';
+    protected $customBackupLockPath = './custom/storage/statamic/updater/composer.lock.bak';
+
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->lockPath = './composer.lock';
-        $this->customLockPath = './custom/composer.lock';
-
-        $this->backupLockPath = './storage/statamic/updater/composer.lock.bak';
-        $this->customBackupLockPath = './custom/storage/statamic/updater/composer.lock.bak';
 
         $this->removeLockFiles();
     }
@@ -35,7 +34,7 @@ class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
         file_put_contents($this->lockPath, $content = 'test lock file content');
 
         $this->assertFileExists($this->lockPath);
-        $this->assertFileNotExists($this->backupLockPath);
+        $this->assertFileDoesNotExist($this->backupLockPath);
 
         Lock::backup();
 
@@ -48,7 +47,7 @@ class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
     {
         Lock::backup('non-existent-file.lock');
 
-        $this->assertFileNotExists($this->backupLockPath);
+        $this->assertFileDoesNotExist($this->backupLockPath);
     }
 
     /** @test */
@@ -61,7 +60,7 @@ class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
         file_put_contents($this->customLockPath, $content = 'custom lock file content');
 
         $this->assertFileExists($this->customLockPath);
-        $this->assertFileNotExists($this->customBackupLockPath);
+        $this->assertFileDoesNotExist($this->customBackupLockPath);
 
         Lock::backup($this->customLockPath);
 
@@ -83,15 +82,5 @@ class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
                 unlink($lockFile);
             }
         }
-    }
-
-    /**
-     * @deprecated
-     */
-    public static function assertFileNotExists(string $filename, string $message = ''): void
-    {
-        method_exists(static::class, 'assertFileDoesNotExist')
-            ? static::assertFileDoesNotExist($filename, $message)
-            : parent::assertFileNotExists($filename, $message);
     }
 }

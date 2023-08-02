@@ -11,25 +11,15 @@ class Stacks {
     }
 
     add(vm) {
-        const portal = {
+        return vm.$portals.create('stack', {
             type: 'stack',
-            key: uniqid(),
             depth: this.count() + 1,
             vm
-        };
-
-        this.portals.push(portal);
-
-        return portal;
-    }
-
-    remove(vm) {
-        const i = _.findIndex(this.portals, (item) => item.vm === vm);
-        this.portals.splice(i, 1);
+        });
     }
 
     stacks() {
-        return this.portals.filter(portal => portal.type === 'stack');
+        return this.portals.filter(portal => portal.data?.type === 'stack');
     }
 }
 

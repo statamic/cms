@@ -230,4 +230,26 @@ EOT;
 
         $this->assertSame('Count: 3', $this->renderString($template, ['counter' => $counter]));
     }
+
+    public function test_dangling_chained_method_calls()
+    {
+        $template = <<<'ANTLERS'
+{{
+    datetime:parse("October 12, 2001"):
+            addDays(10):
+            toAtomString()
+}}
+ANTLERS;
+        $result = $this->renderString($template, ['datetime' => new TestDateTime]);
+
+        $this->assertSame('2001-10-22T00:00:00+00:00', $result);
+    }
+}
+
+class TestDateTime
+{
+    public function parse($string)
+    {
+        return Carbon::parse($string);
+    }
 }

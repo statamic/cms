@@ -1,0 +1,98 @@
+/* ==========================================================================
+   GLOBAL CONTROL PANEL LAYOUT ELEMENTS
+   ========================================================================== */
+
+body {
+    @apply w-full bg-gray-300 relative;
+}
+
+#statamic {
+    min-height: 100vh;
+}
+
+
+#main {
+    @apply flex;
+    padding-bottom: 72px;
+    position: relative;
+    z-index: 1;
+}
+
+#main .workspace {
+    transition: padding .3s;
+    @apply w-full;
+}
+
+a {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+@screen md {
+
+    #main {
+        padding-top: 52px;
+    }
+
+    #main .workspace {
+        padding-left: 14rem;
+    }
+
+    #main.nav-closed {
+        .nav-main {
+            left: -14rem;
+        }
+
+        .workspace {
+            padding-left: 0;
+        }
+    }
+}
+
+
+/* Page Wrapper
+  ========================================================================== */
+.page-wrapper {
+    @apply p-3 pt-6;
+}
+
+@screen md {
+    .page-wrapper {
+        @apply px-8 max-w-xl mx-auto;
+    }
+}
+
+.fieldtype-hidden {
+    display: none;
+}
+
+/* Draggable Mirrors
+  ========================================================================== */
+
+/* Mirrors that have been appended to the body should appear on top of everything. (Portals are 4) */
+body > .draggable-mirror {
+    z-index: 5;
+}
+
+/* Outside the Control Panel
+  ========================================================================== */
+.outside {
+    @apply bg-gray-300 px-2 min-h-screen;
+
+    label {
+        color: #596498;
+    }
+
+    .logo svg {
+        @apply h-6 block mx-auto mb-20 mb-8 w-auto;
+        path {
+            fill: rgba(0,0,0,.25);
+        }
+    }
+}
+
+ /*  Alternate rad mode for a more playful vibe */
+.outside.rad-theme {
+    background: #12c2e9;
+    background: linear-gradient(45deg, #f64f59, #c471ed, #12c2e9);
+}

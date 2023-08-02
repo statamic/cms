@@ -68,13 +68,13 @@ class ProfileFormTest extends TestCase
     {{ /fields }}
 {{ /user:profile_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Email Address</label><input type="email" name="email" value="test@example.com">',
             '<label>Name</label><input type="text" name="name" value="Test User">',
+            '<label>Email Address</label><input type="email" name="email" value="test@example.com">',
         ];
 
         $this->assertEquals($expected, $actual[0]);
@@ -83,11 +83,12 @@ EOT
     /** @test */
     public function it_renders_form_with_fields_array_and_custom_blueprint()
     {
+        $this->useCustomBlueprint();
+
         $this->actingAs(User::make()
             ->email('test@example.com')
             ->data(['name' => 'Test User', 'phone' => '12345'])
             ->save());
-        $this->useCustomBlueprint();
 
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ user:profile_form }}
@@ -96,12 +97,13 @@ EOT
     {{ /fields }}
 {{ /user:profile_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
             '<label>Full Name</label><input type="text" name="name" value="Test User">',
+            '<label>Email Address</label><input type="email" name="email" value="test@example.com">',
             '<label>Phone Number</label><input type="text" name="phone" value="12345">',
             '<label>Over 18 years of age?</label><input type="text" name="age" value="" required>',
         ];
@@ -140,7 +142,7 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The email field is required.',
+            'The Email Address field is required.',
         ];
 
         $this->assertEmpty($success[1]);
@@ -239,7 +241,7 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The email field is required.',
+            'The Email Address field is required.',
         ];
 
         $this->assertEmpty($success[1]);
@@ -276,6 +278,10 @@ EOT
                         'type' => 'text',
                         'display' => 'Full Name',
                     ],
+                ],
+                [
+                    'handle' => 'email', // Field is included by default, but we're just implying field order here.
+                    'field' => [],
                 ],
                 [
                     'handle' => 'password', // Field already exists, but we're defining custom validation rules.

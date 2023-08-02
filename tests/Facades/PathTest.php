@@ -15,6 +15,7 @@ class PathTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider extensionProvider
      */
     public function it_gets_the_extension($path, $extension)

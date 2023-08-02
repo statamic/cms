@@ -11,6 +11,9 @@ use Tests\TestCase;
 
 class BasicStoreTest extends TestCase
 {
+    private $tempDir;
+    private $store;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -87,6 +90,9 @@ class TestBasicStore extends BasicStore
 
 class TestBasicStoreItem
 {
+    private $id;
+    private $data;
+
     public function __construct($id, $data)
     {
         $this->id = $id;

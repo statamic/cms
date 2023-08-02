@@ -8,7 +8,6 @@ use Statamic\Auth\Protect\Protection;
 use Statamic\Events\ResponseCreated;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
-use Statamic\Statamic;
 use Statamic\Tokens\Handlers\LivePreview;
 use Statamic\View\View;
 
@@ -37,8 +36,7 @@ class DataResponse implements Responsable
             ->handleDraft()
             ->handlePrivateEntries()
             ->adjustResponseType()
-            ->addContentHeaders()
-            ->handleAmp();
+            ->addContentHeaders();
 
         $response = response()
             ->make($this->contents())
@@ -52,31 +50,19 @@ class DataResponse implements Responsable
     protected function addViewPaths()
     {
         $finder = view()->getFinder();
-        $amp = Statamic::isAmpRequest();
 
         $site = method_exists($this->data, 'site')
             ? $this->data->site()->handle()
             : Site::current()->handle();
 
-        $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site, $amp) {
+        $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site) {
             return [
-                $amp ? $path.'/'.$site.'/amp' : null,
                 $path.'/'.$site,
-                $amp ? $path.'/amp' : null,
                 $path,
             ];
         })->filter()->values()->all();
 
         $finder->setPaths($paths);
-
-        return $this;
-    }
-
-    protected function handleAmp()
-    {
-        if (Statamic::isAmpRequest() && ! $this->data->ampable()) {
-            abort(404);
-        }
 
         return $this;
     }

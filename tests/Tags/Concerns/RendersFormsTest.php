@@ -13,6 +13,8 @@ class RendersFormsTest extends TestCase
 {
     const MISSING = 'field is missing from request';
 
+    private $tag;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -45,14 +47,14 @@ class RendersFormsTest extends TestCase
     {
         $output = $this->tag
             ->setParameters([
-                'class' => 'mb-1',
+                'class' => 'mb-2',
                 'attr:id' => 'form',
                 'method' => 'this should not render',
                 'action' => 'this should not render',
             ])
             ->formOpen('http://localhost:8000/submit', 'DELETE');
 
-        $this->assertStringStartsWith('<form method="POST" action="http://localhost:8000/submit" class="mb-1" id="form">', $output);
+        $this->assertStringStartsWith('<form method="POST" action="http://localhost:8000/submit" class="mb-2" id="form">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_method" value="DELETE">', $output);
     }
@@ -115,6 +117,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderTextProvider
      */
     public function renders_text_fields($value, $default, $old, $expected)
@@ -132,6 +135,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderTextProvider
      */
     public function renders_fallback_fields_as_text_fields($value, $default, $old, $expected)
@@ -146,6 +150,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderTextProvider
      */
     public function renders_textarea_fields($value, $default, $old, $expected)
@@ -179,6 +184,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderToggleProvider
      */
     public function renders_toggles($value, $default, $old, $expected)
@@ -234,6 +240,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderSingleSelectProvider
      */
     public function renders_single_select_fields($value, $default, $old, $expected)
@@ -262,6 +269,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderSingleSelectProvider
      */
     public function renders_radio_fields($value, $default, $old, $expected)
@@ -310,6 +318,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderMultipleSelectProvider
      */
     public function renders_multiple_select_fields($value, $default, $old, $expected)
@@ -342,6 +351,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderMultipleSelectProvider
      */
     public function renders_checkboxes_fields($value, $default, $old, $expected)

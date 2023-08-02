@@ -19,6 +19,7 @@ class ExtensionTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider filenames
      */
     public function it_returns_the_extension_of_filename($expected, $input): void

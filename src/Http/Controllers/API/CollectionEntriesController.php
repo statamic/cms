@@ -2,20 +2,27 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Facades\Statamic\API\FilterAuthorizer;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Entry;
 use Statamic\Http\Resources\API\EntryResource;
 use Statamic\Support\Str;
+use Statamic\Tags\Concerns\QueriesTaxonomyTerms;
 
 class CollectionEntriesController extends ApiController
 {
+    use QueriesTaxonomyTerms;
+
     protected $resourceConfigKey = 'collections';
     protected $routeResourceKey = 'collection';
     protected $filterPublished = true;
+    protected $collectionHandle;
 
     public function index($collection)
     {
         $this->abortIfDisabled();
+
+        $this->collectionHandle = $collection->handle();
 
         $with = $collection->entryBlueprints()
             ->flatMap(fn ($blueprint) => $blueprint->fields()->all())
@@ -56,17 +63,11 @@ class CollectionEntriesController extends ApiController
 
     protected function applyTaxonomyFilter($query, $filter, $terms)
     {
-        [$_, $taxonomy, $condition] = array_pad(explode(':', $filter), 3, null);
+        [$_, $taxonomy, $modifier] = array_pad(explode(':', $filter), 3, null);
 
-        $terms = collect(explode(',', $terms))->map(fn ($term) => "$taxonomy::$term");
+        $values = collect(explode(',', $terms))->map(fn ($term) => "$taxonomy::$term");
 
-        if ($condition === 'in') {
-            $query->whereTaxonomyIn($terms->all());
-        } elseif ($condition === 'not_in') {
-            $query->whereTaxonomyNotIn($terms->all());
-        } else {
-            $terms->each(fn ($term) => $query->whereTaxonomy($term));
-        }
+        $this->queryTaxonomyTerms($query, $modifier, $values);
     }
 
     private function abortIfInvalid($entry, $collection)
@@ -74,5 +75,10 @@ class CollectionEntriesController extends ApiController
         if (! $entry || $entry->collection()->id() !== $collection->id()) {
             throw new NotFoundHttpException;
         }
+    }
+
+    protected function allowedFilters()
+    {
+        return FilterAuthorizer::allowedForSubResources('api', 'collections', $this->collectionHandle);
     }
 }

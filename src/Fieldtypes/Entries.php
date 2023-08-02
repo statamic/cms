@@ -16,6 +16,8 @@ use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Query\StatusQueryBuilder;
+use Statamic\Search\Result;
 use Statamic\Support\Arr;
 
 class Entries extends Relationship
@@ -55,20 +57,47 @@ class Entries extends Relationship
 
     protected function configFieldItems(): array
     {
-        return array_merge(parent::configFieldItems(), [
-            'create' => [
-                'display' => __('Allow Creating'),
-                'instructions' => __('statamic::fieldtypes.entries.config.create'),
-                'type' => 'toggle',
-                'default' => true,
-                'width' => 50,
+        return [
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
+                    ],
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                        'type' => 'radio',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                    ],
+                    'create' => [
+                        'display' => __('Allow Creating'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.create'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'collections' => [
+                        'display' => __('Collections'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.collections'),
+                        'type' => 'collections',
+                        'mode' => 'select',
+                    ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
+                ],
             ],
-            'collections' => [
-                'display' => __('Collections'),
-                'type' => 'collections',
-                'mode' => 'select',
-            ],
-        ]);
+        ];
     }
 
     public function getIndexItems($request)
@@ -91,7 +120,11 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+        $results = ($paginate = $request->boolean('paginate', true)) ? $query->paginate() : $query->get();
+
+        $items = $results->map(fn ($item) => $item instanceof Result ? $item->getSearchable() : $item);
+
+        return $paginate ? $results->setCollection($items) : $items;
     }
 
     public function getResourceCollection($request, $items)
@@ -149,7 +182,20 @@ class Entries extends Relationship
         $query = Entry::query();
 
         if ($search = $request->search) {
-            $query->where('title', 'like', '%'.$search.'%');
+            $usingSearchIndex = false;
+            $collections = collect($this->getConfiguredCollections());
+
+            if ($collections->count() == 1) {
+                $collection = Collection::findByHandle($collections->first());
+                if ($collection && $collection->hasSearchIndex()) {
+                    $query = $collection->searchIndex()->ensureExists()->search($search);
+                    $usingSearchIndex = true;
+                }
+            }
+
+            if (! $usingSearchIndex) {
+                $query->where('title', 'like', '%'.$search.'%');
+            }
         }
 
         if ($site = $request->site) {
@@ -159,6 +205,8 @@ class Entries extends Relationship
         if ($request->exclusions) {
             $query->whereNotIn('id', $request->exclusions);
         }
+
+        $this->applyIndexQueryScopes($query, $request->all());
 
         return $query;
     }
@@ -238,9 +286,8 @@ class Entries extends Relationship
             ->filter()
             ->all();
 
-        $query = (new OrderedQueryBuilder(Entry::query(), $ids))
-            ->whereIn('id', $ids)
-            ->where('status', 'published');
+        $query = (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
+            ->whereIn('id', $ids);
 
         return $this->config('max_items') === 1 ? $query->first() : $query;
     }
@@ -301,6 +348,8 @@ class Entries extends Relationship
             return collect();
         }
 
-        return $this->config('max_items') === 1 ? collect([$augmented]) : $augmented->get();
+        return $this->config('max_items') === 1
+            ? collect([$augmented])
+            : $augmented->whereAnyStatus()->get();
     }
 }

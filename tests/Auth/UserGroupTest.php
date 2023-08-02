@@ -5,10 +5,10 @@ namespace Tests\Auth;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Auth\File\Role;
-use Statamic\Auth\File\UserGroup;
 use Statamic\Facades;
 use Statamic\Facades\Role as RoleAPI;
 use Statamic\Facades\User as UserAPI;
+use Statamic\Facades\UserGroup;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -19,7 +19,7 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_gets_and_sets_the_title()
     {
-        $group = new UserGroup;
+        $group = UserGroup::make();
         $this->assertNull($group->title());
 
         $return = $group->title('Test');
@@ -31,7 +31,7 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_gets_and_sets_the_handle()
     {
-        $group = new UserGroup;
+        $group = UserGroup::make();
         $this->assertNull($group->handle());
         $this->assertNull($group->originalHandle());
 
@@ -53,7 +53,7 @@ class UserGroupTest extends TestCase
 
         $userA = tap(UserAPI::make())->save();
         $userB = tap(UserAPI::make())->save();
-        $group = tap((new UserGroup)->handle('test'))->save();
+        $group = tap(UserGroup::make()->handle('test'))->save();
 
         $this->assertInstanceOf(Collection::class, $group->users());
         $this->assertCount(0, $group->users());
@@ -76,7 +76,7 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_gets_and_sets_roles()
     {
-        $group = new UserGroup;
+        $group = UserGroup::make();
         $this->assertInstanceOf(Collection::class, $group->roles());
 
         $role = new class extends Role
@@ -103,7 +103,7 @@ class UserGroupTest extends TestCase
                 return 'test';
             }
         };
-        $group = new UserGroup;
+        $group = UserGroup::make();
 
         $return = $group->assignRole($role);
 
@@ -122,7 +122,7 @@ class UserGroupTest extends TestCase
         };
         RoleAPI::shouldReceive('find')->with('test')->andReturn($role);
 
-        $group = new UserGroup;
+        $group = UserGroup::make();
 
         $return = $group->assignRole($role);
 
@@ -155,7 +155,7 @@ class UserGroupTest extends TestCase
             }
         });
 
-        $group = new UserGroup;
+        $group = UserGroup::make();
         $group->assignRole('one');
 
         $return = $group->roles(['two', 'three']);
@@ -176,7 +176,7 @@ class UserGroupTest extends TestCase
             }
         };
 
-        $group = (new UserGroup)->assignRole($role);
+        $group = UserGroup::make()->assignRole($role);
         $this->assertCount(1, $group->roles());
 
         $return = $group->removeRole($role);
@@ -196,7 +196,7 @@ class UserGroupTest extends TestCase
         };
         RoleAPI::shouldReceive('find')->with('test')->andReturn($role);
 
-        $group = (new UserGroup)->assignRole($role);
+        $group = UserGroup::make()->assignRole($role);
         $this->assertCount(1, $group->roles());
 
         $return = $group->removeRole('test');
@@ -222,7 +222,7 @@ class UserGroupTest extends TestCase
             }
         };
 
-        $group = (new UserGroup)->assignRole($roleA);
+        $group = UserGroup::make()->assignRole($roleA);
 
         $this->assertTrue($group->hasRole($roleA));
         $this->assertFalse($group->hasRole($roleB));
@@ -246,7 +246,7 @@ class UserGroupTest extends TestCase
             }
         };
 
-        $group = (new UserGroup)->assignRole($roleA);
+        $group = UserGroup::make()->assignRole($roleA);
 
         $this->assertTrue($group->hasRole('a'));
         $this->assertFalse($group->hasRole('b'));
@@ -263,7 +263,7 @@ class UserGroupTest extends TestCase
             }
         };
 
-        $group = (new UserGroup)->assignRole($role);
+        $group = UserGroup::make()->assignRole($role);
 
         $this->assertTrue($group->hasPermission('one'));
         $this->assertFalse($group->hasPermission('two'));
@@ -287,8 +287,8 @@ class UserGroupTest extends TestCase
             }
         };
 
-        $superGroup = (new UserGroup)->assignRole($superRole);
-        $nonSuperGroup = (new UserGroup)->assignRole($nonSuperRole);
+        $superGroup = UserGroup::make()->assignRole($superRole);
+        $nonSuperGroup = UserGroup::make()->assignRole($nonSuperRole);
 
         $this->assertTrue($superGroup->isSuper());
         $this->assertFalse($nonSuperGroup->isSuper());
@@ -297,7 +297,7 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_can_be_saved()
     {
-        $group = (new UserGroup);
+        $group = UserGroup::make();
         Facades\UserGroup::shouldReceive('save')->with($group)->once()->andReturnTrue();
         $this->assertTrue($group->save());
     }
@@ -305,7 +305,7 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_can_be_deleted()
     {
-        $group = (new UserGroup);
+        $group = UserGroup::make();
         Facades\UserGroup::shouldReceive('delete')->with($group)->once()->andReturnTrue();
         $this->assertTrue($group->delete());
     }
@@ -313,7 +313,7 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_gets_evaluated_augmented_value_using_magic_property()
     {
-        $group = (new UserGroup)->handle('test')->title('Test');
+        $group = UserGroup::make()->handle('test')->title('Test');
 
         $group
             ->toAugmentedCollection()
@@ -324,12 +324,52 @@ class UserGroupTest extends TestCase
     /** @test */
     public function it_is_arrayable()
     {
-        $group = (new UserGroup)->handle('test')->title('Test');
+        $group = UserGroup::make()->handle('test')->title('Test');
 
         $this->assertInstanceOf(Arrayable::class, $group);
 
         collect($group->toArray())
             ->each(fn ($value, $key) => $this->assertEquals($value, $group->{$key}))
             ->each(fn ($value, $key) => $this->assertEquals($value, $group[$key]));
+    }
+
+    /** @test */
+    public function it_gets_data()
+    {
+        $group = UserGroup::make()->handle('test')->data([
+            'foo' => 'bar',
+            'content' => 'Lorem Ipsum',
+        ]);
+
+        $this->assertEquals([
+            'foo' => 'bar',
+            'content' => 'Lorem Ipsum',
+        ], $group->data()->all());
+    }
+
+    /** @test */
+    public function it_gets_blueprint_values()
+    {
+        $blueprint = Facades\UserGroup::blueprint();
+        $contents = $blueprint->contents();
+        $contents['tabs']['main']['sections'][0]['fields'] = array_merge($contents['tabs']['main']['sections'][0]['fields'], [
+            ['handle' => 'two', 'field' => ['type' => 'text']],
+            ['handle' => 'four', 'field' => ['type' => 'text']],
+            ['handle' => 'unused_in_bp', 'field' => ['type' => 'text']],
+        ]);
+        $blueprint->setContents($contents);
+        Facades\Blueprint::shouldReceive('find')->with('user_group')->andReturn($blueprint);
+
+        $data = [
+            'one' => 'the "one" value on the group',
+            'two' => 'the "two" value on the group and in the blueprint',
+        ];
+
+        $group = UserGroup::make()
+            ->handle('group_1')
+            ->data($data);
+
+        $this->assertEquals($group->get('one'), $data['one']);
+        $this->assertEquals($group->get('two'), $data['two']);
     }
 }

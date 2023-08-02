@@ -66,7 +66,6 @@ return [
     'edit_roles' => 'Rolleri düzenle',
     'group_updates' => 'Güncellemeler',
     'view_updates' => 'Güncellemeleri görüntüle',
-    'perform_updates' => 'Güncellemeleri gerçekleştir',
     'group_utilities' => 'Araçlar',
     'access_utility' => ':title',
     'access_utility_desc' => ':title aracına erişim izni verir',
