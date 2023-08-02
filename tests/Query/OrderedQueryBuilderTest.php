@@ -63,7 +63,7 @@ class OrderedQueryBuilderTest extends TestCase
     public function it_wont_order_the_items_after_getting_them_if_the_builder_is_manually_ordered()
     {
         $builder = $this->mock(Builder::class);
-        $builder->shouldReceive('orderBy')->with('title')->andReturnSelf();
+        $builder->shouldReceive('orderBy')->with('title')->once()->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn(collect([
             ['id' => '3'],
             ['id' => '1'],
