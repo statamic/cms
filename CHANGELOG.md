@@ -1,5 +1,21 @@
 # Release Notes
 
+## 4.15.0 (2023-08-02)
+
+### What's new
+- Allow entries fieldtypes to be filtered by `title`. [#8464](https://github.com/statamic/cms/issues/8464) by @ryanmitchell
+- Add hooks for Globals Publish Form. [#7618](https://github.com/statamic/cms/issues/7618) by @duncanmcclean
+- Add `query_scopes` and searching to the form fieldtype. [#8533](https://github.com/statamic/cms/issues/8533) by @ryanmitchell
+
+### What's fixed
+- Fix variable name collisions when using the `as` tag param. [#8386](https://github.com/statamic/cms/issues/8386) by @JohnathonKoster
+- Fix missing support for Collections and QueryBuilders in the `random` modifier. [#8398](https://github.com/statamic/cms/issues/8398) by @edalzell
+- Fix entry listing hit target. [#8538](https://github.com/statamic/cms/issues/8538) by @jackmcdade
+- Fix Bard image alt logic. [#8537](https://github.com/statamic/cms/issues/8537) by @jackmcdade
+- Fix case sensitivity of operators in the query builder. [#8522](https://github.com/statamic/cms/issues/8522) by @ryanmitchell
+
+
+
 ## 4.14.0 (2023-08-01)
 
 ### What's improved
