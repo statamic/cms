@@ -42,6 +42,8 @@ class Entries extends FieldtypeFilter
 
     public function apply($query, $handle, $values)
     {
+        $config = $this->fieldtype->field()->config();
+        $maxItems = $config['max_items'] ?? 0;
         $operator = $values['operator'];
         $value = $values['value'];
 
@@ -51,12 +53,12 @@ class Entries extends FieldtypeFilter
         }
 
         if ($values['field'] == 'id') {
-            $query->where($handle, $operator, $value);
+            $maxItems === 1
+                ? $query->where($handle, $operator, $value)
+                : $query->whereJsonContains($handle, $value);
 
             return;
         }
-
-        $config = $this->fieldtype->field()->config();
 
         $ids = Facades\Entry::query()
             ->when($config['collections'], fn ($query) => $query->whereIn('collection', $config['collections']))
@@ -65,7 +67,7 @@ class Entries extends FieldtypeFilter
             ->map(fn ($entry) => $entry->id())
             ->all();
 
-        if (($config['max_items'] ?? 0) == 1) {
+        if ($maxItems == 1) {
             $query->whereIn($handle, $ids);
 
             return;
