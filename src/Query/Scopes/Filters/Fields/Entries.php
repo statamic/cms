@@ -67,14 +67,16 @@ class Entries extends FieldtypeFilter
             ->map(fn ($entry) => $entry->id())
             ->all();
 
-        if ($maxItems == 1) {
-            $query->whereIn($handle, $ids);
+        if (empty($ids)) {
+            $maxItems === 1
+                ? $query->where($handle, -1)
+                : $query->whereJsonContains($handle, [-1]);
 
             return;
         }
 
-        if (empty($ids)) {
-            $query->whereJsonContains($handle, [-1]);
+        if ($maxItems === 1) {
+            $query->whereIn($handle, $ids);
 
             return;
         }
