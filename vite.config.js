@@ -3,8 +3,6 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue2';
 import inject from '@rollup/plugin-inject';
 import svgLoader from './vite-svg-loader';
-import path from 'path'
-import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
@@ -28,14 +26,6 @@ export default defineConfig(({ mode }) => {
                 Vue: 'vue',
                 _: 'underscore',
                 include: 'resources/js/**'
-            }),
-            viteStaticCopy({
-                targets: [
-                    {
-                        src: 'resources/img/*',
-                        dest: path.resolve(__dirname, 'resources/dist/img')
-                    }
-                ]
             })
         ],
         resolve: {
