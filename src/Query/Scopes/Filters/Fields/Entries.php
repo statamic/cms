@@ -74,7 +74,7 @@ class Entries extends FieldtypeFilter
         }
 
         if ($maxItems === 1) {
-            $query->where($handle, $ids[0]);
+            $query->whereIn($handle, $ids);
 
             return;
         }
