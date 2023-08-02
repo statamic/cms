@@ -19,11 +19,11 @@ use Statamic\Data\AugmentedCollection;
 use Statamic\Entries\AugmentedEntry;
 use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
+use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
-use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -1224,6 +1224,28 @@ class EntryTest extends TestCase
 
         $this->assertEquals('the new blueprint', $entry->blueprint());
         $this->assertEquals('the new blueprint', $entry->blueprint());
+    }
+
+    /** @test */
+    public function it_dispatches_an_event_when_getting_blueprint()
+    {
+        Event::fake();
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'blueprint' => $blueprint = (new Blueprint)->setHandle('blueprint'),
+        ]));
+        $collection = tap(Collection::make('blog'))->save();
+        $entry = (new Entry)->collection($collection);
+
+        // Do it twice so we can check the event is only dispatched once.
+        $entry->blueprint();
+        $entry->blueprint();
+
+        Event::assertDispatchedTimes(EntryBlueprintFound::class, 1);
+        Event::assertDispatched(EntryBlueprintFound::class, function ($event) use ($blueprint, $entry) {
+            return $event->blueprint === $blueprint
+                && $event->entry === $entry;
+        });
     }
 
     /** @test */

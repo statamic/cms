@@ -36,12 +36,12 @@ class Install extends Command
     public function handle()
     {
         $this->addons()
-             ->createFiles()
-             ->publish()
-             ->runCallbacks()
-             ->clearViews()
-             ->clearCache()
-             ->runUpdateScripts();
+            ->createFiles()
+            ->publish()
+            ->runCallbacks()
+            ->clearViews()
+            ->clearCache()
+            ->runUpdateScripts();
     }
 
     protected function addons()

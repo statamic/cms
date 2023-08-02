@@ -77,10 +77,10 @@
                             @reordered="reordered"
                         >
                             <template slot="cell-title" slot-scope="{ row: entry }">
-                                <div class="title-index-field">
-                                    <div class="little-dot mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
-                                    <a :href="entry.edit_url" @click.stop>{{ entry.title }}</a>
-                                </div>
+                                <a class="title-index-field inline-flex items-center" :href="entry.edit_url" @click.stop>
+                                    <span class="little-dot mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
+                                    <span v-text="entry.title" />
+                                </a>
                             </template>
                             <template slot="cell-status" slot-scope="{ row: entry }">
                                 <div class="status-index-field select-none" v-tooltip="getStatusTooltip(entry)" :class="`status-${entry.status}`" v-text="getStatusLabel(entry)" />

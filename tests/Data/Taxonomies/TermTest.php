@@ -5,6 +5,7 @@ namespace Tests\Data\Taxonomies;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Event;
 use Mockery;
+use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
@@ -78,6 +79,28 @@ class TermTest extends TestCase
 
         $this->assertEquals('the new blueprint', $term->blueprint());
         $this->assertEquals('the new blueprint', $term->blueprint());
+    }
+
+    /** @test */
+    public function it_dispatches_an_event_when_getting_blueprint()
+    {
+        Event::fake();
+
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect([
+            'blueprint' => $blueprint = (new Blueprint)->setHandle('blueprint'),
+        ]));
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = (new Term)->taxonomy($taxonomy);
+
+        // Do it twice so we can check the event is only dispatched once.
+        $term->blueprint();
+        $term->blueprint();
+
+        Event::assertDispatchedTimes(TermBlueprintFound::class, 1);
+        Event::assertDispatched(TermBlueprintFound::class, function ($event) use ($blueprint, $term) {
+            return $event->blueprint === $blueprint
+                && $event->term === $term;
+        });
     }
 
     /** @test */

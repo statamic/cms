@@ -43,7 +43,8 @@ class AugmentedTest extends TestCase
     /** @test */
     public function it_gets_a_single_value_by_key()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing {
+        $augmented = new class($this->thing) extends BaseAugmentedThing
+        {
             //
         };
 
@@ -54,7 +55,8 @@ class AugmentedTest extends TestCase
     /** @test */
     public function it_can_use_null_as_a_supplement_value()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing {
+        $augmented = new class($this->thing) extends BaseAugmentedThing
+        {
             //
         };
 
@@ -76,7 +78,8 @@ class AugmentedTest extends TestCase
             }
         };
 
-        $augmented = new class($thingWithValueMethod) extends BaseAugmentedThing {
+        $augmented = new class($thingWithValueMethod) extends BaseAugmentedThing
+        {
             //
         };
 

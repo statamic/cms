@@ -80,7 +80,8 @@ PARTIAL;
                 'line' => 1, 'file' => '',
             ]);
 
-        $object = new class {
+        $object = new class
+        {
         };
 
         $this->assertEquals('', $this->renderString('{{ object }}', compact('object')));

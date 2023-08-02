@@ -137,6 +137,11 @@ class DateTest extends TestCase
                 ['date' => null, 'time' => null],
                 null,
             ],
+            'object with missing time' => [
+                [],
+                ['date' => null],
+                null,
+            ],
             'date with default format' => [
                 [],
                 ['date' => '2012-08-29', 'time' => null],
@@ -146,6 +151,11 @@ class DateTest extends TestCase
                 ['format' => 'Y--m--d'],
                 ['date' => '2012-08-29', 'time' => null],
                 '2012--08--29',
+            ],
+            'date with missing time' => [
+                [],
+                ['date' => '2012-08-29'],
+                '2012-08-29',
             ],
             'date with time' => [
                 ['time_enabled' => true],
@@ -458,6 +468,11 @@ class DateTest extends TestCase
         // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
 
         return [
+            'null' => [
+                [],
+                null,
+                null,
+            ],
             'null date when not required' => [
                 [],
                 ['date' => null, 'time' => null],
@@ -520,6 +535,11 @@ class DateTest extends TestCase
         // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
 
         return [
+            'null' => [
+                ['mode' => 'range'],
+                null,
+                null,
+            ],
             'valid date range' => [
                 ['mode' => 'range'],
                 ['date' => ['start' => '2012-01-29', 'end' => '2012-01-30']],

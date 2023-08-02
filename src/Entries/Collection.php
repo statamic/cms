@@ -295,7 +295,14 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
         $blueprint->setParent($entry ?? $this);
 
-        $this->dispatchEntryBlueprintFoundEvent($blueprint, $entry);
+        // Only dispatch the event when there's no entry.
+        // When there is an entry, the event is dispatched from the entry.
+        if (! $entry) {
+            Blink::once(
+                'collection-entryblueprintfound-'.$this->handle().'-'.$blueprint->handle(),
+                fn () => EntryBlueprintFound::dispatch($blueprint)
+            );
+        }
 
         return $blueprint;
     }
@@ -311,17 +318,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
             return $this->entryBlueprints()->keyBy->handle()->get($blueprint)
                 ?? $this->entryBlueprints()->keyBy->handle()->get(Str::singular($blueprint));
-        });
-    }
-
-    private function dispatchEntryBlueprintFoundEvent($blueprint, $entry)
-    {
-        $id = optional($entry)->id() ?? 'null';
-
-        $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint->handle().'-'.$id;
-
-        Blink::once($blink, function () use ($blueprint, $entry) {
-            EntryBlueprintFound::dispatch($blueprint, $entry);
         });
     }
 

@@ -4,12 +4,14 @@
 @section('content')
 
     <user-group-publish-form
-        action="{{ cp_route('user-groups.store') }}"
-        breadcrumb-url="{{ cp_route('user-groups.index') }}"
+        :actions="{{ json_encode($actions) }}"
         method="post"
-        :creating="true"
-        v-cloak
-
+        publish-container="base"
+        :initial-title="__('Create Group')"
+        :initial-fieldset="{{ json_encode($blueprint) }}"
+        :initial-values="{{ json_encode($values) }}"
+        :initial-meta="{{ json_encode($meta) }}"
+        :is-creating="true"
     ></user-group-publish-form>
 
 @endsection
