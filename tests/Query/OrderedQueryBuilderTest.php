@@ -80,6 +80,26 @@ class OrderedQueryBuilderTest extends TestCase
     }
 
     /** @test */
+    public function it_wont_order_the_items_after_getting_them_if_the_builder_is_manually_randomly_ordered()
+    {
+        $builder = $this->mock(Builder::class);
+        $builder->shouldReceive('inRandomOrder')->once()->andReturnSelf();
+        $builder->shouldReceive('get')->once()->andReturn(collect([
+            ['id' => '3'],
+            ['id' => '1'],
+            ['id' => '2'],
+        ]));
+
+        $results = (new OrderedQueryBuilder($builder, [2, 3, 1]))->inRandomOrder()->get();
+
+        $this->assertEquals([
+            ['id' => '3'],
+            ['id' => '1'],
+            ['id' => '2'],
+        ], $results->all());
+    }
+
+    /** @test */
     public function it_wont_order_the_items_when_using_pagination()
     {
         // This will just be a known limitation.
