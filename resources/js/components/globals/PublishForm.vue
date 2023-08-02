@@ -224,7 +224,7 @@ export default {
                 this.saving = false;
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
-                this.runAfterSaveHook();
+                this.runAfterSaveHook(response);
             }).catch(e => this.handleAxiosError(e));
         },
 
