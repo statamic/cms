@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Vite;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
 use Statamic\Facades\Preference;
@@ -267,6 +268,26 @@ class Statamic
     public static function cpAssetUrl($url = '/')
     {
         return static::vendorPackageAssetUrl('statamic/cp', $url);
+    }
+
+    public static function cpViteAsset($asset)
+    {
+        return static::cpVite()->asset('resources/'.$asset);
+    }
+
+    public static function cpViteScripts()
+    {
+        return static::cpVite()->withEntryPoints([
+            'resources/js/app.js',
+            'resources/css/tailwind.css',
+        ]);
+    }
+
+    private static function cpVite()
+    {
+        return Vite::getFacadeRoot()
+            ->useHotFile('vendor/statamic/cp/hot')
+            ->useBuildDirectory('vendor/statamic/cp/build');
     }
 
     public static function cpDateFormat()
