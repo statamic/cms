@@ -461,7 +461,7 @@ class Bard extends Replicator
             return false;
         }
 
-        if (! $setConfig = $this->config('sets')) {
+        if (! $setConfig = $this->flattenedSetsConfig()->all()) {
             return false;
         }
 
