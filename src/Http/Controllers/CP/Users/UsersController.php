@@ -92,7 +92,7 @@ class UsersController extends CpController
             $query
                 ->where('email', 'like', '%'.$search.'%')
                 ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
-                    foreach (explode(' ', $query) as $word) {
+                    foreach (explode(' ', $search) as $word) {
                         $query
                             ->orWhere('first_name', 'like', '%'.$word.'%')
                             ->orWhere('last_name', 'like', '%'.$word.'%');
