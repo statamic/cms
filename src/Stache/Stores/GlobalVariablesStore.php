@@ -3,12 +3,10 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Contracts\Globals\Variables;
-use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class GlobalVariablesStore extends BasicStore

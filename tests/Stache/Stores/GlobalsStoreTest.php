@@ -11,7 +11,6 @@ use Statamic\Facades\Path;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\GlobalsStore;
 use Statamic\Stache\Stores\GlobalVariablesStore;
-
 use Tests\TestCase;
 
 class GlobalsStoreTest extends TestCase

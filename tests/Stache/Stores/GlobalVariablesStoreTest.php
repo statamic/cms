@@ -6,12 +6,10 @@ use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
 use Mockery;
 use Statamic\Contracts\Globals\Variables;
-use Statamic\Facades\GlobalSet as GlobalsAPI;
 use Statamic\Facades\Path;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\GlobalsStore;
 use Statamic\Stache\Stores\GlobalVariablesStore;
-
 use Tests\TestCase;
 
 class GlobalVariablesStoreTest extends TestCase

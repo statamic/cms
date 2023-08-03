@@ -2,13 +2,10 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\Facades\File;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Path;
-use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class GlobalsStore extends BasicStore

@@ -5,8 +5,8 @@ namespace Statamic\Stache\Repositories;
 use Statamic\Contracts\Globals\GlobalVariablesRepository as RepositoryContract;
 use Statamic\Contracts\Globals\Variables;
 use Statamic\Globals\VariablesCollection;
-use Statamic\Support\Str;
 use Statamic\Stache\Stache;
+use Statamic\Support\Str;
 
 class GlobalVariablesRepository implements RepositoryContract
 {

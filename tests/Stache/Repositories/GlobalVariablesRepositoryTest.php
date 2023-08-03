@@ -3,7 +3,6 @@
 namespace Tests\Stache\Repositories;
 
 use Statamic\Contracts\Globals\Variables;
-use Statamic\Facades\GlobalSet as GlobalSetAPI;
 use Statamic\Globals\VariablesCollection;
 use Statamic\Stache\Repositories\GlobalRepository;
 use Statamic\Stache\Repositories\GlobalVariablesRepository;
