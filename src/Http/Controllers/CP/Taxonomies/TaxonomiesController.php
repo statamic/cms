@@ -133,6 +133,9 @@ class TaxonomiesController extends CpController
             'collections' => $taxonomy->collections()->map->handle()->all(),
             'sites' => $taxonomy->sites()->all(),
             'preview_targets' => $taxonomy->basePreviewTargets(),
+            'term_template' => $taxonomy->termTemplate(),
+            'template' => $taxonomy->template(),
+            'layout' => $taxonomy->layout(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($taxonomy))
@@ -167,6 +170,10 @@ class TaxonomiesController extends CpController
         if ($sites = array_get($values, 'sites')) {
             $taxonomy->sites($sites);
         }
+
+        $taxonomy->termTemplate($values['term_template'] ?? null);
+        $taxonomy->template($values['template'] ?? null);
+        $taxonomy->layout($values['layout'] ?? null);
 
         $taxonomy->save();
 
@@ -305,6 +312,28 @@ class TaxonomiesController extends CpController
                                 ],
                             ],
                         ],
+                    ],
+                ],
+            ],
+            'templates' => [
+                'display' => __('Templates'),
+                'fields' => [
+                    'template' => [
+                        'display' => __('Template'),
+                        'instructions' => __('statamic::messages.taxonomy_configure_template_instructions'),
+                        'type' => 'template',
+                        'placeholder' => __('System default'),
+                    ],
+                    'term_template' => [
+                        'display' => __('Term Template'),
+                        'instructions' => __('statamic::messages.taxonomy_configure_term_template_instructions'),
+                        'type' => 'template',
+                        'placeholder' => __('System default'),
+                    ],
+                    'layout' => [
+                        'display' => __('Layout'),
+                        'instructions' => __('statamic::messages.taxonomy_configure_layout_instructions'),
+                        'type' => 'template',
                     ],
                 ],
             ],

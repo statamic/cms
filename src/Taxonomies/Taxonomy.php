@@ -242,6 +242,9 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             'title' => $this->title,
             'blueprints' => $this->blueprints,
             'preview_targets' => $this->previewTargetsForFile(),
+            'template' => $this->template,
+            'term_template' => $this->termTemplate,
+            'layout' => $this->layout,
         ];
 
         if (Site::hasMultiple()) {
