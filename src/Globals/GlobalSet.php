@@ -112,7 +112,7 @@ class GlobalSet implements Contract
 
     public function delete()
     {
-        $this->localizations()->delete();
+        $this->localizations()->each->delete();
 
         Facades\GlobalSet::delete($this);
 
