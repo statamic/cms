@@ -10,7 +10,9 @@ use Statamic\Events\GlobalSetDeleted;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalSetSaving;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\GlobalSetVariables;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
@@ -22,7 +24,6 @@ class GlobalSet implements Contract
 
     protected $title;
     protected $handle;
-    protected $localizations;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -92,6 +93,8 @@ class GlobalSet implements Contract
 
         Facades\GlobalSet::save($this);
 
+        $this->localizations()->each->save();
+
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
         }
@@ -109,6 +112,8 @@ class GlobalSet implements Contract
 
     public function delete()
     {
+        $this->localizations()->delete();
+
         Facades\GlobalSet::delete($this);
 
         GlobalSetDeleted::dispatch($this);
@@ -142,21 +147,21 @@ class GlobalSet implements Contract
     {
         $localization->globalSet($this);
 
-        $this->localizations[$localization->locale()] = $localization;
+        $this->localizations()[$localization->locale()] = $localization;
 
         return $this;
     }
 
     public function removeLocalization($localization)
     {
-        unset($this->localizations[$localization->locale()]);
+        $this->localizations()->forget($localization->locale());
 
         return $this;
     }
 
     public function in($locale)
     {
-        return $this->localizations[$locale] ?? null;
+        return $this->localizations()->get($locale);
     }
 
     public function inSelectedSite()
@@ -181,7 +186,9 @@ class GlobalSet implements Contract
 
     public function localizations()
     {
-        return collect($this->localizations);
+        return Blink::once('global-set-localizations-'.$this->id(), function () {
+            return GlobalSetVariables::findBySet($this->handle())->keyBy->locale();
+        });
     }
 
     public function editUrl()

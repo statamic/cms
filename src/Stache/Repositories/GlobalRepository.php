@@ -28,14 +28,12 @@ class GlobalRepository implements RepositoryContract
     {
         $keys = $this->store->paths()->keys();
 
-        return GlobalCollection::make($this->store->getItems($keys)->map(function ($set) {
-            return $this->addLocalizations($set);
-        }));
+        return GlobalCollection::make($this->store->getItems($keys));
     }
 
     public function find($id): ?GlobalSet
     {
-        return $this->addLocalizations($this->store->getItem($id));
+        return $this->store->getItem($id);
     }
 
     public function findByHandle($handle): ?GlobalSet
@@ -48,15 +46,11 @@ class GlobalRepository implements RepositoryContract
     public function save($global)
     {
         $this->store->save($global);
-
-        $global->localizations()->each->save();
     }
 
     public function delete($global)
     {
         $this->store->delete($global);
-
-        $global->localizations()->each->delete();
     }
 
     public static function bindings(): array
