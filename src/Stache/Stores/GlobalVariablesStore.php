@@ -67,17 +67,12 @@ class GlobalVariablesStore extends BasicStore
         return $variables;
     }
 
-    public function save($variable)
+    protected function writeItemToDisk($item)
     {
         if (Site::hasMultiple()) {
-            parent::save($variable);
-        }
-    }
-
-    public function delete($variable)
-    {
-        if (Site::hasMultiple()) {
-            parent::delete($variable);
+            $item->writeFile();
+        } else {
+            $item->globalSet()->writeFile();
         }
     }
 }
