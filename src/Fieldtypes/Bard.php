@@ -227,19 +227,6 @@ class Bard extends Replicator
         return new BardFilter($this);
     }
 
-    public function callExtensions($value, $method)
-    {
-        $extensions = collect((new Augmentor($this))->extensions())
-            ->filter(fn ($extension) => method_exists($extension, $method))
-            ->all();
-
-        foreach ($extensions as $extension) {
-            $value = $extension->{$method}($value);
-        }
-
-        return $value;
-    }
-
     protected function performAugmentation($value, $shallow)
     {
         if ($this->shouldSaveHtml()) {
@@ -433,19 +420,23 @@ class Bard extends Replicator
 
     public function extraRules(): array
     {
-        if (! $this->config('sets')) {
-            return [];
+        $rules = [];
+
+        if ($this->config('sets')) {
+            $rules = collect($this->field->value())->filter(function ($set) {
+                return $set['type'] === 'set';
+            })->map(function ($set, $index) {
+                $set = $set['attrs']['values'];
+
+                return $this->setRules($set['type'], $set, $index);
+            })->reduce(function ($carry, $rules) {
+                return $carry->merge($rules);
+            }, collect())->all();
         }
 
-        return collect($this->field->value())->filter(function ($set) {
-            return $set['type'] === 'set';
-        })->map(function ($set, $index) {
-            $set = $set['attrs']['values'];
+        $rules = $this->callExtensions($rules, 'extraRules');
 
-            return $this->setRules($set['type'], $set, $index);
-        })->reduce(function ($carry, $rules) {
-            return $carry->merge($rules);
-        }, collect())->all();
+        return $rules;
     }
 
     protected function setRuleFieldPrefix($index)
@@ -455,19 +446,23 @@ class Bard extends Replicator
 
     public function extraValidationAttributes(): array
     {
-        if (! $this->config('sets')) {
-            return [];
+        $attributes = [];
+
+        if ($this->config('sets')) {
+            $attributes = collect($this->field->value())->filter(function ($set) {
+                return $set['type'] === 'set';
+            })->map(function ($set, $index) {
+                $set = $set['attrs']['values'];
+
+                return $this->setValidationAttributes($set['type'], $set, $index);
+            })->reduce(function ($carry, $rules) {
+                return $carry->merge($rules);
+            }, collect())->all();
         }
 
-        return collect($this->field->value())->filter(function ($set) {
-            return $set['type'] === 'set';
-        })->map(function ($set, $index) {
-            $set = $set['attrs']['values'];
+        $attributes = $this->callExtensions($attributes, 'extraValidationAttributes');
 
-            return $this->setValidationAttributes($set['type'], $set, $index);
-        })->reduce(function ($carry, $rules) {
-            return $carry->merge($rules);
-        }, collect())->all();
+        return $attributes;
     }
 
     public function isLegacyData($value)
@@ -599,7 +594,7 @@ class Bard extends Replicator
 
         $value = json_decode($value ?? '[]', true);
 
-        return collect($value)->map(function ($item) {
+        $value = collect($value)->map(function ($item) {
             if ($item['type'] !== 'set') {
                 return $item;
             }
@@ -616,6 +611,21 @@ class Bard extends Replicator
 
             return $item;
         })->all();
+
+        $value = $this->callExtensions($value, 'preProcessValidatable');
+
+        return $value;
+    }
+
+    public function callExtensions($value, $method)
+    {
+        collect((new Augmentor($this))->extensions())
+            ->filter(fn ($extension) => method_exists($extension, $method))
+            ->each(function ($extension) use (&$value, $method) {
+                $value = $extension->{$method}($value);
+            });
+
+        return $value;
     }
 
     public function toGqlType()
