@@ -13,17 +13,11 @@ use Tiptap\Editor;
 class Augmentor
 {
     protected $fieldtype;
-
     protected $sets = [];
-
     protected $includeDisabledSets = false;
-
     protected $augmentSets = true;
-
     protected $withStatamicImageUrls = false;
-
     protected static $extensions = [];
-
     protected static $extensionReplacements = [];
 
     public function __construct($fieldtype)

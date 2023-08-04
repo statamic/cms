@@ -60,8 +60,6 @@ import ResourceDeleter from '../components/ResourceDeleter.vue';
 import Stack from '../components/stacks/Stack.vue';
 import StackTest from '../components/stacks/StackTest.vue';
 import CodeBlock from '../components/CodeBlock.vue';
-import SetField from '../components/fieldtypes/replicator/Field.vue';
-import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
 
 // Third Party
 Vue.component('v-select', vSelect)
@@ -144,7 +142,3 @@ Vue.component('resource-deleter', ResourceDeleter);
 
 Vue.component('stack', Stack);
 Vue.component('stack-test', StackTest);
-
-// Sets
-Vue.component('set-field', SetField);
-Vue.component('set-picker', SetPicker);

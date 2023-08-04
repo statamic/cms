@@ -23,9 +23,7 @@ class Bard extends Replicator
     use Concerns\ResolvesStatamicUrls;
 
     protected $categories = ['text', 'structured'];
-
     protected $defaultValue = '[]';
-
     protected $rules = [];
 
     protected function configFieldItems(): array
