@@ -139,21 +139,21 @@ class GlobalVariablesRepositoryTest extends TestCase
     {
         $this->setUpSingleSite();
 
-        tap($this->repo->findBySet('global'), function ($variables) {
+        tap($this->repo->whereSet('global'), function ($variables) {
             $this->assertInstanceOf(VariablesCollection::class, $variables);
             $first = $variables->first();
             $this->assertEquals('global::en', $first->id());
             $this->assertEquals('global', $first->handle());
         });
 
-        tap($this->repo->findBySet('contact'), function ($variables) {
+        tap($this->repo->whereSet('contact'), function ($variables) {
             $this->assertInstanceOf(VariablesCollection::class, $variables);
             $first = $variables->first();
             $this->assertEquals('contact::en', $first->id());
             $this->assertEquals('contact', $first->handle());
         });
 
-        $this->assertCount(0, $this->repo->findBySet('unknown'));
+        $this->assertCount(0, $this->repo->whereSet('unknown'));
     }
 
     /** @test */
@@ -161,19 +161,19 @@ class GlobalVariablesRepositoryTest extends TestCase
     {
         $this->setUpMultiSite();
 
-        tap($this->repo->findBySet('global'), function ($variables) {
+        tap($this->repo->whereSet('global'), function ($variables) {
             $this->assertInstanceOf(VariablesCollection::class, $variables);
             $ordered = $variables->sortBy->path()->values();
             $this->assertEquals(['global::en',  'global::fr'], $ordered->map->id()->all());
         });
 
-        tap($this->repo->findBySet('contact'), function ($variables) {
+        tap($this->repo->whereSet('contact'), function ($variables) {
             $this->assertInstanceOf(VariablesCollection::class, $variables);
             $ordered = $variables->sortBy->path()->values();
             $this->assertEquals(['contact::en', 'contact::fr'], $ordered->map->id()->all());
         });
 
-        $this->assertCount(0, $this->repo->findBySet('unknown'));
+        $this->assertCount(0, $this->repo->whereSet('unknown'));
     }
 
     /** @test */

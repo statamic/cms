@@ -187,7 +187,7 @@ class GlobalSet implements Contract
     public function localizations()
     {
         return Blink::once('global-set-localizations-'.$this->id(), function () {
-            return GlobalVariables::findBySet($this->handle())->keyBy->locale();
+            return GlobalVariables::whereSet($this->handle())->keyBy->locale();
         });
     }
 

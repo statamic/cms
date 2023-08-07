@@ -66,7 +66,7 @@ class GlobalRepository implements RepositoryContract
             return $set;
         }
 
-        GlobalVariables::findBySet($set->handle())
+        GlobalVariables::whereSet($set->handle())
             ->each(function ($variable) use ($set) {
                 $set->addLocalization($variable);
             });
