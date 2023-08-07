@@ -2,6 +2,7 @@
     <div class="flex">
         <v-select
             ref="input"
+            :input-id="fieldId"
             class="flex-1"
             append-to-body
             :calculate-position="positionOptions"
