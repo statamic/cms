@@ -4,7 +4,7 @@ namespace Statamic\Stache\Repositories;
 
 use Statamic\Contracts\Globals\GlobalRepository as RepositoryContract;
 use Statamic\Contracts\Globals\GlobalSet;
-use Statamic\Facades\GlobalSetVariables;
+use Statamic\Facades\GlobalVariables;
 use Statamic\Globals\GlobalCollection;
 use Statamic\Stache\Stache;
 
@@ -66,7 +66,7 @@ class GlobalRepository implements RepositoryContract
             return $set;
         }
 
-        GlobalSetVariables::findBySet($set->handle())
+        GlobalVariables::findBySet($set->handle())
             ->each(function ($variable) use ($set) {
                 $set->addLocalization($variable);
             });

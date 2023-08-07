@@ -121,7 +121,7 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
 
     public function save()
     {
-        $isNew = is_null(Facades\GlobalSetVariables::find($this->id()));
+        $isNew = is_null(Facades\GlobalVariables::find($this->id()));
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
@@ -135,7 +135,7 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
             }
         }
 
-        Facades\GlobalSetVariables::save($this);
+        Facades\GlobalVariables::save($this);
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -154,7 +154,7 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
 
     public function delete()
     {
-        Facades\GlobalSetVariables::delete($this);
+        Facades\GlobalVariables::delete($this);
 
         GlobalVariablesDeleted::dispatch($this);
 

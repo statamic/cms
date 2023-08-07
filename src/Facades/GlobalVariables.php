@@ -13,7 +13,7 @@ use Statamic\Contracts\Globals\GlobalVariablesRepository;
  *
  * @see \Statamic\Globals\VariablesCollection
  */
-class GlobalSetVariables extends Facade
+class GlobalVariables extends Facade
 {
     protected static function getFacadeAccessor()
     {

@@ -12,7 +12,7 @@ use Statamic\Events\GlobalSetSaving;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\GlobalSetVariables;
+use Statamic\Facades\GlobalVariables;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
@@ -187,7 +187,7 @@ class GlobalSet implements Contract
     public function localizations()
     {
         return Blink::once('global-set-localizations-'.$this->id(), function () {
-            return GlobalSetVariables::findBySet($this->handle())->keyBy->locale();
+            return GlobalVariables::findBySet($this->handle())->keyBy->locale();
         });
     }
 
