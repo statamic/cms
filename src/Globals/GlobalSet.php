@@ -93,7 +93,7 @@ class GlobalSet implements Contract
 
         Facades\GlobalSet::save($this);
 
-        $this->localizations()->each->save();
+        $this->saveOrDeleteLocalizations();
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
@@ -108,6 +108,17 @@ class GlobalSet implements Contract
         }
 
         return $this;
+    }
+
+    protected function saveOrDeleteLocalizations()
+    {
+        $localizations = $this->localizations();
+
+        $localizations->each->save();
+
+        $this->freshLocalizations()
+            ->diffKeys($localizations)
+            ->each->delete();
     }
 
     public function delete()
@@ -127,9 +138,9 @@ class GlobalSet implements Contract
             'title' => $this->title(),
         ];
 
-        if (! Site::hasMultiple()) {
+        if (! Site::hasMultiple() && ($variables = $this->in(Site::default()->handle()))) {
             $data['data'] = Arr::removeNullValues(
-                $this->in(Site::default()->handle())->data()->all()
+                $variables->data()->all()
             );
         }
 
@@ -187,8 +198,13 @@ class GlobalSet implements Contract
     public function localizations()
     {
         return Blink::once('global-set-localizations-'.$this->id(), function () {
-            return GlobalVariables::whereSet($this->handle())->keyBy->locale();
+            return $this->freshLocalizations();
         });
+    }
+
+    private function freshLocalizations()
+    {
+        return GlobalVariables::whereSet($this->handle())->keyBy->locale();
     }
 
     public function editUrl()

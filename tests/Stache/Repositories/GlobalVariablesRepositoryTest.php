@@ -243,4 +243,70 @@ YAML;
         $this->assertFileExists($this->directory.'/en/new.yaml');
         @unlink($this->directory.'/en/new.yaml');
     }
+
+    /** @test */
+    public function it_deletes_a_global_from_the_stache_and_file_with_single_site()
+    {
+        // In single site, the actual global set holds the data.
+        // The file should remain, but the data should get emptied out.
+        // There would have been no dedicated global variables file.
+        // The Variables object should also be removed from the store.
+        // (Realistically, you wouldn't ever delete variables without also deleting the set.)
+        $this->setUpSingleSite();
+
+        $global = GlobalSet::make('new')->title('Test Global Test');
+        $localization = $global->makeLocalization('en')->data(['foo' => 'bar', 'baz' => 'qux']);
+        $global->addLocalization($localization);
+        $this->globalRepo->save($global);
+        $this->repo->save($localization);
+
+        $this->assertNotNull($item = $this->repo->find('new::en'));
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $item->data()->all());
+        $this->assertFileExists($this->directory.'/new.yaml');
+        $yaml = <<<'YAML'
+title: 'Test Global Test'
+data:
+  foo: bar
+  baz: qux
+
+YAML;
+        $this->assertEquals($yaml, file_get_contents($this->directory.'/new.yaml'));
+
+        $this->repo->delete($item);
+
+        $this->assertNull($this->repo->find('new::en'));
+        $this->assertNotNull($this->globalRepo->find('new'));
+        $this->assertFileExists($this->directory.'/new.yaml');
+        $yaml = <<<'YAML'
+title: 'Test Global Test'
+
+YAML;
+        $this->assertEquals($yaml, file_get_contents($this->directory.'/new.yaml'));
+        @unlink($this->directory.'/new.yaml');
+    }
+
+    /** @test */
+    public function it_deletes_a_global_from_the_stache_and_file_with_multi_site()
+    {
+        // In multi-site, the global set file should not be touched.
+        // There should be a dedicated global variables file, which should be deleted.
+
+        $this->setUpMultiSite();
+
+        $global = GlobalSet::make('new');
+        $localization = $global->makeLocalization('en')->data(['foo' => 'bar', 'baz' => 'qux']);
+        $global->addLocalization($localization);
+        $this->globalRepo->save($global);
+        $this->repo->save($localization);
+
+        $this->assertNotNull($item = $this->repo->find('new::en'));
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $item->data()->all());
+
+        $this->repo->delete($item);
+
+        $this->assertNull($this->repo->find('new::en'));
+        $this->assertNotNull($this->globalRepo->find('new'));
+        $this->assertFileDoesNotExist($this->directory.'/en/new.yaml');
+        @unlink($this->directory.'/new.yaml');
+    }
 }

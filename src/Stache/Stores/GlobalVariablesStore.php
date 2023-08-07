@@ -75,4 +75,13 @@ class GlobalVariablesStore extends BasicStore
             $item->globalSet()->writeFile();
         }
     }
+
+    protected function deleteItemFromDisk($item)
+    {
+        if (Site::hasMultiple()) {
+            $item->deleteFile();
+        } else {
+            $item->globalSet()->removeLocalization($item)->writeFile();
+        }
+    }
 }
