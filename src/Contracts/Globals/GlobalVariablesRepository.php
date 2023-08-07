@@ -10,7 +10,7 @@ interface GlobalVariablesRepository
 
     public function find($id): ?Variables;
 
-    public function whereSet($handle): ?VariablesCollection;
+    public function whereSet($handle): VariablesCollection;
 
     public function save($variable);
 
