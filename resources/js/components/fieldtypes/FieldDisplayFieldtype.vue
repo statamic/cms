@@ -6,6 +6,7 @@
             <input
                 ref="input"
                 class="input-text"
+                :id="fieldId"
                 :name="name"
                 :value="value"
                 type="text"
