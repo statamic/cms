@@ -5,15 +5,14 @@ namespace Tests\Stache\Stores;
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
 use Mockery;
-use Statamic\Contracts\Globals\GlobalSet;
-use Statamic\Facades\GlobalSet as GlobalsAPI;
+use Statamic\Contracts\Globals\Variables;
 use Statamic\Facades\Path;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\GlobalsStore;
 use Statamic\Stache\Stores\GlobalVariablesStore;
 use Tests\TestCase;
 
-class GlobalsStoreTest extends TestCase
+class GlobalVariablesStoreTest extends TestCase
 {
     private $tempDir;
     private $store;
@@ -26,8 +25,8 @@ class GlobalsStoreTest extends TestCase
 
         $stache = (new Stache)->sites(['en']);
         $this->app->instance(Stache::class, $stache);
-        $stache->registerStore($this->store = (new GlobalsStore($stache, app('files')))->directory($this->tempDir));
-        $stache->registerStore((new GlobalVariablesStore($stache, app('files')))->directory($this->tempDir));
+        $stache->registerStore((new GlobalsStore($stache, app('files')))->directory($this->tempDir));
+        $stache->registerStore($this->store = (new GlobalVariablesStore($stache, app('files')))->directory($this->tempDir));
     }
 
     public function tearDown(): void
@@ -61,14 +60,13 @@ class GlobalsStoreTest extends TestCase
     }
 
     /** @test */
-    public function it_makes_global_set_instances_from_files()
+    public function it_makes_global_variable_instances_from_files()
     {
         $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/example.yaml'), "title: Example\ndata:\n  foo: bar");
 
-        $this->assertInstanceOf(GlobalSet::class, $item);
-        $this->assertEquals('example', $item->id());
+        $this->assertInstanceOf(Variables::class, $item);
+        $this->assertEquals('example::en', $item->id());
         $this->assertEquals('example', $item->handle());
-        $this->assertEquals('Example', $item->title());
     }
 
     /** @test */
@@ -81,22 +79,5 @@ class GlobalsStoreTest extends TestCase
             '123',
             $this->store->getItemKey($set)
         );
-    }
-
-    /** @test */
-    public function it_saves_to_disk()
-    {
-        $set = GlobalsAPI::make('test');
-        $set->addLocalization($set->makeLocalization('en'));
-
-        $this->store->save($set);
-
-        $this->assertStringEqualsFile($this->tempDir.'/test.yaml', $set->fileContents());
-    }
-
-    /** @test */
-    public function it_saves_to_disk_with_multiple_sites()
-    {
-        $this->markTestIncomplete();
     }
 }
