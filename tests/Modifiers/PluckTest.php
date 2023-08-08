@@ -188,12 +188,18 @@ class ItemWithOrigin
     public function __construct($data, $origin = null)
     {
         $this->data($data);
-        $this->origin($origin);
+        $this->origin = $origin;
+    }
+
+    public function origin($origin = null)
+    {
+        // Bypass the logic to load the origin. Just use what was passed in.
+        return $this->origin;
     }
 
     public function getOriginByString($origin)
     {
-        //
+        // Required by trait
     }
 }
 

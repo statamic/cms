@@ -229,6 +229,16 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
         return $this->globalSet()->in($origin);
     }
 
+    protected function getOriginIdFromObject($origin)
+    {
+        return $origin->locale();
+    }
+
+    protected function getOriginBlinkKey()
+    {
+        return 'origin-globals-'.$this->id().'-'.$this->locale();
+    }
+
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedVariables($this);

@@ -66,7 +66,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $blueprint;
     protected $date;
     protected $locale;
-    protected $localizations;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
     protected $template;
@@ -200,7 +199,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $entry->delete();
         });
 
-        $this->localizations = null;
+        Blink::forget('entry-descendants-'.$this->id());
 
         return true;
     }
@@ -327,7 +326,12 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         if ($this->id()) {
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
+            Blink::forget($this->getOriginBlinkKey());
         }
+
+        $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
+
+        $this->directDescendants()->each->save();
 
         $this->taxonomize();
 
@@ -646,16 +650,33 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->descendants()->get($locale);
     }
 
-    public function descendants()
+    public function ancestors()
     {
-        if (! $this->localizations) {
-            $this->localizations = Facades\Entry::query()
+        $ancestors = collect();
+
+        $origin = $this->origin();
+
+        while ($origin) {
+            $ancestors->push($origin);
+            $origin = $origin->origin();
+        }
+
+        return $ancestors;
+    }
+
+    public function directDescendants()
+    {
+        return Blink::once('entry-descendants-'.$this->id(), function () {
+            return Facades\Entry::query()
                 ->where('collection', $this->collectionHandle())
                 ->where('origin', $this->id())->get()
                 ->keyBy->locale();
-        }
+        });
+    }
 
-        $localizations = collect($this->localizations);
+    public function descendants()
+    {
+        $localizations = $this->directDescendants();
 
         foreach ($localizations as $loc) {
             $localizations = $localizations->merge($loc->descendants());
@@ -669,11 +690,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->in($locale) !== null;
     }
 
+    /** @deprecated */
     public function addLocalization($entry)
     {
         $entry->origin($this);
-
-        $this->localizations[$entry->locale()] = $entry;
 
         return $this;
     }
