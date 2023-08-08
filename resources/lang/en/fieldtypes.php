@@ -73,6 +73,7 @@ return [
     'entries.title' => 'Entries',
     'float.title' => 'Float',
     'form.config.max_items' => 'Set a maximum number of selectable forms.',
+    'form.config.query_scopes' => 'Choose which query scopes should be applied when retrieving selectable forms.',
     'form.title' => 'Form',
     'grid.config.add_row' => 'Customize the label of the "Add Row" button.',
     'grid.config.fields' => 'Each field becomes a column in the grid table.',

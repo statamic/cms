@@ -344,6 +344,10 @@ export default {
         this.pageHeader = document.querySelector('.global-header');
 
         this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
+
+        document.querySelector(`label[for="${this.fieldId}"]`).addEventListener('click', () => {
+            this.editor.commands.focus();
+        });
     },
 
     beforeDestroy() {
@@ -488,8 +492,8 @@ export default {
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
             const isEmptyTextBlock = $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
-
-            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock;
+            const isAroundInlineImage = state.selection.$to.nodeBefore?.type.name === 'image' || state.selection.$to.nodeAfter?.type.name === 'image'
+            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
             return this.setConfigs.length && (this.config.always_show_set_button || isActive);
         },
 

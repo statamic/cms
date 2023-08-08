@@ -16,6 +16,7 @@ use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
@@ -351,5 +352,10 @@ class Entries extends Relationship
         return $this->config('max_items') === 1
             ? collect([$augmented])
             : $augmented->whereAnyStatus()->get();
+    }
+
+    public function filter()
+    {
+        return new EntriesFilter($this);
     }
 }

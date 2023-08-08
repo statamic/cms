@@ -9,6 +9,9 @@ export default {
             lang = lang ?? site?.lang ?? Statamic.$config.get('lang');
             const custom = Statamic.$config.get(`charmap.${lang}`) ?? undefined;
 
+            // Remove apostrophes in all languages
+            custom["'"] = "";
+
             return getSlug(text, {
                 separator: glue || '-',
                 lang,

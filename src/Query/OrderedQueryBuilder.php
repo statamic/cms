@@ -28,6 +28,13 @@ class OrderedQueryBuilder implements Builder
         return $this->forwardCallTo($this->builder, 'orderBy', func_get_args());
     }
 
+    public function inRandomOrder()
+    {
+        $this->ordered = true;
+
+        return $this->forwardCallTo($this->builder, 'inRandomOrder', func_get_args());
+    }
+
     public function get($columns = ['*'])
     {
         $results = $this->builder->get($columns);
