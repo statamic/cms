@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class GlobalVariablesSaving extends Event
 {
-    public $variable;
+    public $variables;
 
-    public function __construct($variable)
+    public function __construct($variables)
     {
-        $this->variable = $variable;
+        $this->variables = $variables;
     }
 
     /**
