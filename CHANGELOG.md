@@ -1,5 +1,21 @@
 # Release Notes
 
+## 4.16.0 (2023-08-08)
+
+### What's new
+- Split global set variables into its own repository and Stache store. [#8343](https://github.com/statamic/cms/issues/8343) by @ryanmitchell
+- Add `is_svg` to augmented assets. [#8549](https://github.com/statamic/cms/issues/8549) by @ryanmitchell
+
+### What's fixed
+- Fix a number of multisite issues regarding data fallbacks, search, queries, and more. [#8505](https://github.com/statamic/cms/issues/8505) by @jasonvarga
+- Fix nested field ids and focus behavior of some fieldtypes. [#8531](https://github.com/statamic/cms/issues/8531) by @jackmcdade
+- Fix Bard legacy content handling. [#8544](https://github.com/statamic/cms/issues/8544) by @jasonvarga
+- Consolidate behavior of searching in users listing and users field type. [#8543](https://github.com/statamic/cms/issues/8543) by @ryanmitchell
+- Make UpdatesBadge component only update the count when the response is a number. [#8540](https://github.com/statamic/cms/issues/8540) by @martyf
+- Fix missing Control Panel favicons. [#8532](https://github.com/statamic/cms/issues/8532) by @martyf
+
+
+
 ## 4.15.0 (2023-08-02)
 
 ### What's new
