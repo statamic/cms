@@ -1,5 +1,90 @@
 # Release Notes
 
+## 4.15.0 (2023-08-02)
+
+### What's new
+- Allow entries fieldtypes to be filtered by `title`. [#8464](https://github.com/statamic/cms/issues/8464) by @ryanmitchell
+- Add hooks for Globals Publish Form. [#7618](https://github.com/statamic/cms/issues/7618) by @duncanmcclean
+- Add `query_scopes` and searching to the form fieldtype. [#8533](https://github.com/statamic/cms/issues/8533) by @ryanmitchell
+
+### What's fixed
+- Fix variable name collisions when using the `as` tag param. [#8386](https://github.com/statamic/cms/issues/8386) by @JohnathonKoster
+- Fix missing support for Collections and QueryBuilders in the `random` modifier. [#8398](https://github.com/statamic/cms/issues/8398) by @edalzell
+- Fix entry listing hit target. [#8538](https://github.com/statamic/cms/issues/8538) by @jackmcdade
+- Fix Bard image alt logic. [#8537](https://github.com/statamic/cms/issues/8537) by @jackmcdade
+- Fix case sensitivity of operators in the query builder. [#8522](https://github.com/statamic/cms/issues/8522) by @ryanmitchell
+
+
+
+## 4.14.0 (2023-08-01)
+
+### What's improved
+- Improved the Bard Inline Image Extension. [#8131](https://github.com/statamic/cms/issues/8131) by @o1y
+- French translations. [#8496](https://github.com/statamic/cms/issues/8496) by @ebeauchamps
+
+### What's fixed
+- Apostrophes no longer get slugified in JS. [#8524](https://github.com/statamic/cms/issues/8524) by @jackmcdade
+- Allow relative URLs as preview targets. [#8490](https://github.com/statamic/cms/issues/8490) by @helloiamlukas
+- Lower the Trial Banner Z-Index. [#8530](https://github.com/statamic/cms/issues/8530) by @jackmcdade
+- Handle separate first & last name fields in User fieldtype. [#8507](https://github.com/statamic/cms/issues/8507) by @duncanmcclean
+- Fix Relationship Index Field Item height. [#8529](https://github.com/statamic/cms/issues/8529) by @jackmcdade
+- Conform Bard Set Headers to match Replicator. [#8528](https://github.com/statamic/cms/issues/8528) by @jackmcdade
+- Fix form listing table corner clip. [#8527](https://github.com/statamic/cms/issues/8527) by @jackmcdade
+- Fix Relationship Item long titles. [#8526](https://github.com/statamic/cms/issues/8526) by @jackmcdade
+- Implement `ContainsQueryableValues` on users. [#8455](https://github.com/statamic/cms/issues/8455) by @ryanmitchell
+- Ignore processing GIFs on file upload. [#8512](https://github.com/statamic/cms/issues/8512) by @duncanmcclean
+- Fix link insert cancel in Markdown field. [#8525](https://github.com/statamic/cms/issues/8525) by @jackmcdade
+- Fix the History Icon path. [#8517](https://github.com/statamic/cms/issues/8517) by @jackmcdade
+- Reset page in asset browser when searching. [#8506](https://github.com/statamic/cms/issues/8506) by @duncanmcclean
+- Fix incorrect doctype in `Submission` contract. [#8504](https://github.com/statamic/cms/issues/8504) by @duncanmcclean
+
+
+
+## 4.13.2 (2023-07-26)
+
+### What's fixed
+- Fix create entry button. [#8493](https://github.com/statamic/cms/issues/8493) by @jasonvarga
+
+
+
+## 4.13.1 (2023-07-25)
+
+### What's fixed
+- Fix ranged date validation. [#8447](https://github.com/statamic/cms/issues/8447) by @AndreasSchantl
+- Use site in create entry button on collection tree view. [#8487](https://github.com/statamic/cms/issues/8487) by @jasonvarga
+
+
+
+## 4.13.0 (2023-07-24)
+
+### What's new
+- Add word count option to Bard. [#8445](https://github.com/statamic/cms/issues/8445) by @markguleno
+- Support querying entries in a specific site in GraphQL. [#8446](https://github.com/statamic/cms/issues/8446) by @fabiangigler
+- Support for using recursion on arbitrary array data in Antlers. [#8421](https://github.com/statamic/cms/issues/8421) by @JohnathonKoster
+
+### What's fixed
+- Fix a hardcoded live preview URL when editing taxonomy terms. [#8461](https://github.com/statamic/cms/issues/8461) by @ryanmitchell
+- Hide heading when there are no unlisted addons. [#8479](https://github.com/statamic/cms/issues/8479) by @duncanmcclean
+- Handle `nocache` tag error. [#8449](https://github.com/statamic/cms/issues/8449) by @jasonvarga
+- Avoid showing Stache size label in the Cache utility when there is no size. [#8480](https://github.com/statamic/cms/issues/8480) by @duncanmcclean
+
+
+
+## 4.12.0 (2023-07-20)
+
+### What's new
+- Add `query_scopes` option to the relationship fieldtypes. [#8456](http://github.com/statamic/cms/pull/8456) by @jacksleight
+
+### What's improved
+- French translations. [#8451](http://github.com/statamic/cms/pull/8451) by @ebeauchamps
+
+### What's fixed
+- Fix error handling for recent curl bug. [#8475](http://github.com/statamic/cms/pull/8475) by @jesseleite
+- Bump word-wrap from 1.2.3 to 1.2.4. [#8466](http://github.com/statamic/cms/pull/8466) by @dependabot
+- Only show code block copy button on https. [#8457](http://github.com/statamic/cms/pull/8457) by @jasonvarga
+
+
+
 ## 4.11.0 (2023-07-13)
 
 ### What's new
