@@ -45,9 +45,6 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
     public function globalSet($set = null)
     {
         return $this->fluentlyGetOrSet('set')
-            ->setter(function ($set) {
-                return $set;
-            })
             ->getter(function ($set) {
                 return $set instanceof GlobalSet ? $set : Facades\GlobalSet::find($set);
             })
