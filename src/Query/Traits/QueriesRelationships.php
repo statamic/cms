@@ -35,7 +35,7 @@ trait QueriesRelationships
                 return $this->$method($relation);
             }
 
-            return $this->{$boolean == 'and' ? 'whereJsonLength' : 'orWhereJsonLength'}($relation, $operator, $count, $boolean);
+            return $this->{$boolean == 'and' ? 'whereJsonLength' : 'orWhereJsonLength'}($relation, $operator, $count);
         }
 
         if ($count != 1) {
