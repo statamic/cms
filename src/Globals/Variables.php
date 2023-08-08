@@ -74,7 +74,7 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
     public function path()
     {
         return vsprintf('%s/%s%s.%s', [
-            rtrim(Stache::store('globals')->directory(), '/'),
+            rtrim(Stache::store('global-variables')->directory(), '/'),
             Site::hasMultiple() ? $this->locale().'/' : '',
             $this->handle(),
             'yaml',
