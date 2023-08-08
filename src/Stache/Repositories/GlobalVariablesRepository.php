@@ -33,9 +33,10 @@ class GlobalVariablesRepository implements RepositoryContract
 
     public function whereSet($handle): VariablesCollection
     {
-        return $this->all()->filter(function ($variable) use ($handle) {
-            return Str::before($variable->id(), '::') == $handle;
-        })->values();
+        return $this
+            ->all()
+            ->filter(fn ($variable) => Str::before($variable->id(), '::') == $handle)
+            ->values();
     }
 
     public function save($variable)
