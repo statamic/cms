@@ -8,6 +8,12 @@ use Tests\TestCase;
 
 class ViteTest extends TestCase
 {
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+        $app['config']->set('app.asset_url', 'http://localhost');
+    }
+
     private function tag($tag, $data = [])
     {
         $this->withFakeVite();
