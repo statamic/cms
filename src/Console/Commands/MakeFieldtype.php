@@ -147,12 +147,12 @@ class MakeFieldtype extends GeneratorCommand
 
         try {
             PHPFile::load("addons/{$this->package}/src/ServiceProvider.php")
-                    ->add()->protected()->property('vite', [
-                        'input' => ['resources/js/addon.js'],
-                        'publicDirectory' => 'resources/dist',
-                    ])
-                    ->add()->protected()->property('fieldtypes', $fieldtypeClassValue)
-                    ->save();
+                ->add()->protected()->property('vite', [
+                    'input' => ['resources/js/addon.js'],
+                    'publicDirectory' => 'resources/dist',
+                ])
+                ->add()->protected()->property('fieldtypes', $fieldtypeClassValue)
+                ->save();
         } catch (\Exception $e) {
             $this->comment("Don't forget to register the Fieldtype class and scripts in your addon's service provider.");
         }

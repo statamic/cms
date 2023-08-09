@@ -42,7 +42,7 @@
                 <span>{{ __('Maximum items selected:')}}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
-            <div v-if="canSelectOrCreate" class="relationship-input-buttons relative" :class="{ 'mt-4': items.length > 0 }" >
+            <div v-if="canSelectOrCreate" class="relationship-input-buttons relative @container" :class="{ 'mt-4': items.length > 0 }" >
                 <div class="flex flex-wrap items-center text-sm -mb-2">
                     <div class="relative mb-2">
                         <create-button
@@ -56,7 +56,8 @@
                     </div>
                     <button ref="existing" class="text-blue hover:text-gray-800 flex items-center mb-2 outline-none" @click.prevent="isSelecting = true">
                         <svg-icon name="light/hyperlink" class="mr-1 h-4 w-4 flex items-center"></svg-icon>
-                        {{ __('Link Existing Item') }}
+                        <span class="hidden @sm:block" v-text="__('Link Existing Item')" />
+                        <span class="@sm:hidden" v-text="__('Link')" />
                     </button>
                 </div>
             </div>

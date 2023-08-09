@@ -115,7 +115,7 @@
 /* Inside the Sidebar
   ========================================================================== */
 .publish-sidebar .toggle-fieldtype {
-    @apply flex items-center justify-between;
+    @apply flex items-center justify-between flex-wrap;
     .field-inner > label { margin: 0; }
     .toggle-fieldtype-wrapper { margin-left: 8px; }
     .help-block { margin-top: 4px !important; }
@@ -125,6 +125,5 @@
   ========================================================================== */
 
 .grid-table td.toggle-fieldtype {
-    width: 1%;
     padding-top: 14px;
 }

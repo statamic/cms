@@ -46,6 +46,7 @@ return [
     'ipv4' => 'Doit être une adresse IPv4 valide.',
     'ipv6' => 'Doit être une adresse IPv6 valide.',
     'json' => 'Doit être une chaîne JSON valide.',
+    'lowercase' => 'Doit être en minuscules.',
     'lt.numeric' => 'Doit être strictement inférieur à :value.',
     'lt.file' => 'Doit être strictement inférieur à :value kilo-octets.',
     'lt.string' => 'Doit être strictement inférieur à :value caractères.',

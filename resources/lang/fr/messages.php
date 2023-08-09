@@ -206,7 +206,6 @@ return [
     'try_again_in_seconds' => '{0,1} Réessayez maintenant. | Réessayez dans :count secondes.',
     'updater_require_version_command' => 'Pour exiger une version spécifique, exécutez la commande suivante',
     'updater_update_to_latest_command' => 'Pour mettre à jour vers la dernière version, exécutez la commande suivante',
-    'user_groups_handle_instructions' => 'Comment vous allez faire référence à ce groupe d’utilisateurs sur le frontal. Ne peut pas être facilement changé.',
     'user_groups_intro' => 'Les groupes d’utilisateurs vous permettent d’organiser les utilisateurs et d’appliquer des rôles basés sur des autorisations dans leur ensemble.',
     'user_groups_role_instructions' => 'Affectez des rôles afin de donner aux utilisateurs de ce groupe toutes les autorisations correspondantes.',
     'user_groups_title_instructions' => 'Habituellement un nom au pluriel, comme "Editeurs" ou "Photographes".',

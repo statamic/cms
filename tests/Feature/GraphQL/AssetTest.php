@@ -138,10 +138,10 @@ GQL;
         Storage::disk('test')->putFileAs('sub', $file, 'image.jpg');
         $realFilePath = Storage::disk('test')->path('sub/image.jpg');
         touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
-        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
-        $container->makeAsset('sub/image.jpg')->data(['potato' => 'baked'])->save();
         $blueprint = Blueprint::makeFromFields(['potato' => ['type' => 'text']]);
         BlueprintRepository::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
+        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
+        $container->makeAsset('sub/image.jpg')->data(['potato' => 'baked'])->save();
 
         $query = <<<'GQL'
 {

@@ -2,6 +2,7 @@
     <div class="flex">
         <v-select
             ref="input"
+            :input-id="fieldId"
             class="flex-1"
             append-to-body
             :calculate-position="positionOptions"
@@ -19,6 +20,7 @@
             :value="selectedOptions"
             :create-option="(value) => ({ value, label: value })"
             @input="vueSelectUpdated"
+            @focus="$emit('focus')"
             @search:focus="$emit('focus')"
             @search:blur="$emit('blur')">
                 <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>

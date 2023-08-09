@@ -43,7 +43,7 @@ class ModifierManager
             Log::warning('Runtime Access Violation: '.$modifierName, [
                 'modifier' => $modifierName,
                 'file' => GlobalRuntimeState::$currentExecutionFile,
-                'trace' =>  GlobalRuntimeState::$templateFileStack,
+                'trace' => GlobalRuntimeState::$templateFileStack,
             ]);
 
             if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
@@ -54,7 +54,7 @@ class ModifierManager
                 );
             }
 
-            return  false;
+            return false;
         }
 
         return true;

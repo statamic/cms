@@ -8,18 +8,12 @@
 @if (Statamic::pro() && config('statamic.cp.custom_favicon_url'))
     @include('statamic::partials.favicon', ['favicon_url' => config('statamic.cp.custom_favicon_url')])
 @else
-    <link rel="icon" type="image/png" href="{{ Statamic::cpAssetUrl('img/favicon-32x32.png') }}" sizes="32x32" />
-    <link rel="icon" type="image/png" href="{{ Statamic::cpAssetUrl('img/favicon-16x16.png') }}" sizes="16x16" />
-    <link rel="shortcut icon" type="image/x-icon" href="{{ Statamic::cpAssetUrl('img/favicon.ico') }}" sizes="16x16 32x32"/>
+    <link rel="icon" type="image/png" href="{{ Statamic::cpViteAsset('img/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" type="image/png" href="{{ Statamic::cpViteAsset('img/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="shortcut icon" type="image/x-icon" href="{{ Statamic::cpViteAsset('img/favicon.ico') }}" sizes="16x16 32x32"/>
 @endif
 
-{{ \Illuminate\Support\Facades\Vite::getFacadeRoot()
-    ->useHotFile('vendor/statamic/cp/hot')
-    ->useBuildDirectory('vendor/statamic/cp/build')
-    ->withEntryPoints([
-        'resources/js/app.js',
-        'resources/css/tailwind.css'
-    ]) }}
+{{ Statamic::cpViteScripts() }}
 
 @if (Statamic::pro() && config('statamic.cp.custom_css_url'))
 <link href="{{ config('statamic.cp.custom_css_url') }}?v={{ Statamic::version() }}" rel="stylesheet" />

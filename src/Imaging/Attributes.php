@@ -2,22 +2,29 @@
 
 namespace Statamic\Imaging;
 
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
-use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\MountManager;
 use Statamic\Support\Str;
 
 class Attributes
 {
-    public function from(Filesystem $source, string $path)
+    private $cacheDisk;
+
+    public function from(FilesystemAdapter $source, string $path)
     {
-        $manager = $this->mountManager($source, $this->cacheDisk()->getDriver());
+        if ($source->getAdapter() instanceof LocalFilesystemAdapter) {
+            $this->cacheDisk = $source;
+        } else {
+            $manager = $this->mountManager($source->getDriver(), $this->cacheDisk()->getDriver());
 
-        if ($manager->has($destination = "cache://{$path}")) {
-            $manager->delete($destination);
+            if ($manager->has($destination = "cache://{$path}")) {
+                $manager->delete($destination);
+            }
+
+            $manager->copy("source://{$path}", $destination);
         }
-
-        $manager->copy("source://{$path}", $destination);
 
         $svg = Str::endsWith($path, '.svg');
 
@@ -26,7 +33,7 @@ class Attributes
         } catch (\Exception $e) {
             $attributes = $svg ? $this->defaultSvgAttributes() : [];
         } finally {
-            $manager->delete($destination);
+            isset($manager) && $manager->delete($destination);
         }
 
         return $attributes;
@@ -71,7 +78,7 @@ class Attributes
 
     private function cacheDisk()
     {
-        return Storage::build([
+        return $this->cacheDisk ?: $this->cacheDisk = Storage::build([
             'driver' => 'local',
             'root' => storage_path('statamic/attributes-cache'),
         ]);

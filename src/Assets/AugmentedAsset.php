@@ -23,6 +23,7 @@ class AugmentedAsset extends AbstractAugmented
                 'is_audio',
                 'is_previewable',
                 'is_image',
+                'is_svg',
                 'is_video',
                 'blueprint',
                 'edit_url',

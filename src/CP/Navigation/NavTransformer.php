@@ -16,8 +16,6 @@ class NavTransformer
 
     /**
      * Instantiate nav transformer.
-     *
-     * @param  array  $submitted
      */
     public function __construct(array $submitted)
     {
@@ -29,7 +27,6 @@ class NavTransformer
     /**
      * Transform and minify from payload submitted by `components/nav/Builder.vue`.
      *
-     * @param  array  $submitted
      * @return array
      */
     public static function fromVue(array $submitted)
