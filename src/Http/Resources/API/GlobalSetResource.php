@@ -7,6 +7,7 @@ use Statamic\Statamic;
 
 class GlobalSetResource extends JsonResource
 {
+    /** @deprecated */
     private static $relations = false;
 
     /**
@@ -37,6 +38,7 @@ class GlobalSetResource extends JsonResource
             ->toArray();
     }
 
+    /** @deprecated */
     public static function withRelations()
     {
         static::$relations = true;
