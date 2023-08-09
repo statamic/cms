@@ -26,7 +26,7 @@ class Vite extends Tags
             ->keyBy(fn ($_, $key) => Str::after($key, 'attr:'))
             ->all();
 
-        return app(LaravelVite::class)
+        return $this->vite()
             ->withEntryPoints($src)
             ->useBuildDirectory($directory)
             ->useStyleTagAttributes($attrs)
@@ -49,9 +49,14 @@ class Vite extends Tags
         $directory = $this->params->get('directory', 'build');
         $hot = $this->params->get('hot');
 
-        return app(LaravelVite::class)
+        return $this->vite()
             ->useBuildDirectory($directory)
             ->useHotFile($hot ? base_path($hot) : null)
             ->asset($src);
+    }
+
+    private function vite()
+    {
+        return clone app(LaravelVite::class);
     }
 }
