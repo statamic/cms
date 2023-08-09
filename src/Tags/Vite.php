@@ -3,6 +3,7 @@
 namespace Statamic\Tags;
 
 use Illuminate\Foundation\Vite as LaravelVite;
+use Statamic\Support\Str;
 
 class Vite extends Tags
 {
@@ -20,15 +21,16 @@ class Vite extends Tags
         $directory = $this->params->get('directory', 'build');
         $hot = $this->params->get('hot');
 
-        $extraParams = $this->params->filter(function ($value, $key) {
-            return ! in_array($key, ['src', 'directory', 'hot']);
-        })->all();
+        $attrs = $this->params
+            ->filter(fn ($_, $key) => Str::startsWith($key, 'attr:'))
+            ->keyBy(fn ($_, $key) => Str::after($key, 'attr:'))
+            ->all();
 
         return app(LaravelVite::class)
             ->withEntryPoints($src)
             ->useBuildDirectory($directory)
-            ->useStyleTagAttributes($extraParams)
-            ->useScriptTagAttributes($extraParams)
+            ->useStyleTagAttributes($attrs)
+            ->useScriptTagAttributes($attrs)
             ->useHotFile($hot ? base_path($hot) : null)
             ->toHtml();
     }
