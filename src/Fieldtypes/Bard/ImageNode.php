@@ -33,22 +33,25 @@ class ImageNode extends Node
             'src' => [
                 'renderHTML' => function ($attributes) {
                     $src = $attributes->src;
+
                     if (! isset($src)) {
                         return null;
                     }
 
+                    $alt = $attributes->alt ?? null;
+
                     if (Str::startsWith($src, 'asset::')) {
                         $id = Str::after($src, 'asset::');
                         $src = $this->getUrl($id);
+                        $alt = $alt ?? $this->getAlt($id);
                     }
 
                     return [
                         'src' => $src,
+                        'alt' => $alt,
                     ];
                 },
             ],
-            'alt' => [],
-            'title' => [],
         ];
     }
 
@@ -60,5 +63,10 @@ class ImageNode extends Node
     protected function getUrl($id)
     {
         return optional(Asset::find($id))->url();
+    }
+
+    protected function getAlt($id)
+    {
+        return optional(Asset::find($id))->data()->get('alt');
     }
 }

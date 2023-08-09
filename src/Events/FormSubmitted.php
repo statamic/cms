@@ -8,13 +8,9 @@ class FormSubmitted extends Event
 {
     public $submission;
 
-    /** @deprecated */
-    public $form;
-
     public function __construct(Submission $submission)
     {
         $this->submission = $submission;
-        $this->form = $submission; // deprecated
     }
 
     /**

@@ -66,7 +66,6 @@ return [
     'edit_roles' => 'Úprava rolí',
     'group_updates' => 'Aktualizace skupiny',
     'view_updates' => 'Zobrazení aktualizací',
-    'perform_updates' => 'Provádění aktualizací',
     'group_utilities' => 'Pomůcky skupiny',
     'access_utility' => ':title',
     'access_utility_desc' => 'Umožňuje přístup ke zdroji «:title»',

@@ -133,14 +133,14 @@ class Email extends Mailable
         $augmented = $this->submission->toAugmentedArray();
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
-            'config'     => config()->all(),
-            'fields'     => $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form'])),
-            'site_url'   => Config::getSiteUrl(),
-            'date'       => now(),
-            'now'        => now(),
-            'today'      => now(),
-            'site'       => $this->site->handle(),
-            'locale'     => $this->site->handle(),
+            'config' => config()->all(),
+            'fields' => $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form'])),
+            'site_url' => Config::getSiteUrl(),
+            'date' => now(),
+            'now' => now(),
+            'today' => now(),
+            'site' => $this->site->handle(),
+            'locale' => $this->site->handle(),
         ]);
 
         return $this->with($data);

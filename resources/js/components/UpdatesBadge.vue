@@ -1,5 +1,5 @@
 <template>
-    <span v-if="count" class="badge-sm bg-red">
+    <span v-if="count" class="badge-sm bg-red-500">
         {{ count }}
     </span>
 </template>
@@ -25,7 +25,7 @@
                 let params = clearCache ? {'clearCache': clearCache} : {};
 
                 this.$axios.get(cp_url('updater/count'), params).then(response => {
-                    this.count = response.data;
+                    this.count = !isNaN(response.data) ? response.data : 0;
                 });
             }
         }

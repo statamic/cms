@@ -25,7 +25,7 @@ export default {
         this.channel.onmessage = e => {
             switch (e.data.event) {
                 case 'updated':
-                    this.updateIframeContents(e.data.url);
+                    this.updateIframeContents(e.data.url, e.data.target, e.data.payload);
                     break;
                 case 'ping':
                     this.channel.postMessage({ event: 'popout.pong' });

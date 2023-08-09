@@ -12,12 +12,12 @@
         @updated="values = $event"
     >
         <div slot-scope="{ setFieldValue, setFieldMeta }">
-            <configure-sections
+            <configure-tabs
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
                 :enable-sidebar="false"/>
 
-            <div class="py-2 border-t flex justify-between">
+            <div class="py-4 border-t flex justify-between">
                 <a :href="url" class="btn" v-text="__('Cancel') "/>
                 <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>

@@ -12,8 +12,6 @@ class Nav
 
     /**
      * Register a nav extension closure.
-     *
-     * @param  Closure  $callback
      */
     public function extend(Closure $callback)
     {

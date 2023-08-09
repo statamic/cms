@@ -10,15 +10,15 @@ trait GetsQueryResults
     {
         $this->setPaginationParameterPrecedence();
 
-        if ($paginate = $this->params->get('paginate')) {
+        if ($paginate = $this->params->int('paginate')) {
             return $this->paginatedResults($query, $paginate);
         }
 
-        if ($limit = $this->params->get('limit')) {
+        if ($limit = $this->params->int('limit')) {
             $query->limit($limit);
         }
 
-        if ($offset = $this->params->get('offset')) {
+        if ($offset = $this->params->int('offset')) {
             $query->offset($offset);
         }
 

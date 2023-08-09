@@ -1,0 +1,178 @@
+#antlers-trace-call-table .tabulator-row.tabulator-row-even {
+    background-color: #efefef;
+}
+
+.antlers-trace-svg {
+    display: inline-block;
+    width: 17px;
+    height: 17px;
+}
+
+.antlers-hot-code {
+    stroke: red;
+}
+
+.phpdebugbar-widgets-antlers {
+    background: #fff;
+    overflow: hidden !important;
+}
+
+#antlers-trace-report-view {
+    margin-top: 20px !important;
+}
+
+#antlers-trace-toolbar {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 5px !important;
+    border-bottom: 1px solid #eaeaea;
+    padding: 5px;
+    z-index: 7000000 !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background-color: #ffffff !important;
+}
+
+#antlers-trace-toolbar h2 {
+    margin: 0 !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    color: #2c2828 !important;
+}
+
+#antlers-trace-metrics {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 5px !important;
+    color: #2c2828;
+}
+
+.antlers-trace-metric:not(:first-child) {
+    border-left: 1px solid #d5d5d5 !important;
+    padding-left: 5px !important;
+}
+
+.antlers-trace-button {
+    border: 1px solid pink !important;
+    padding: 5px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    color: #2c2828 !important;
+    transition: background-color 0.3s ease;
+}
+
+#antlers-trace-debugger-warning {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    background: #ffe4e4 !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}
+
+#antlers-trace-debugger-symbol {
+    display: inline-block !important;
+    width: 15px !important;
+    height: 15px !important;
+    background: red !important;
+    border-radius: 50% !important;
+    margin-right: 5px !important;
+}
+
+.antlers-trace-button:hover {
+    background-color: #fcd5ff !important;
+}
+
+.antlers-trace-button-active {
+    color: #391d3d !important;
+    font-weight: bold !important;
+    background: #f9adff !important;
+}
+
+.antlers-trace-metric-name {
+    font-weight: bold !important;
+}
+
+.antlers-trace-editor-link {
+    margin-left: 3px !important;
+    position: relative;
+    top: -2px;
+}
+
+.antlers-trace-editor-link:hover {
+    color: #FF269E !important;
+}
+
+.antlers-trace-editor-link svg {
+    height: 14px;
+    width: 14px;
+}
+
+#antlers-trace-report-view {
+    display: flex;
+}
+
+#antlers-trace-reports {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: auto !important;
+}
+
+#antlers-trace-properties {
+    min-width: 250px;
+    padding: 10px;
+    overflow: auto !important;
+    border-left: 1px solid #e8e8e8 !important;
+    word-wrap: break-word !important;
+}
+
+#antlers-trace-properties-toolbar {
+    display: flex !important;
+    justify-content: space-between !important;
+    border-bottom: 1px solid #efefef !important;
+    padding-bottom: 5px !important;
+    align-items: center !important;
+}
+
+#antlers-trace-properties-content {
+    max-width: 250px !important;
+    width: 250px !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+    width: 250px !important;
+}
+
+.antlers-trace-properties-window {
+    width: 250px !important;
+    padding: 5px !important;
+}
+
+.antlers-trace-property {
+    margin-bottom: 5px !important;
+    border-bottom: 1px solid #e9e9e9 !important;
+    padding-bottom: 5px !important;
+    width: 100% !important;
+    color: #2c2828;
+}
+
+.antlers-trace-property-key {
+    font-weight: bold !important;
+    display:inline-block;
+}
+
+.antlers-trace-property-value {
+    display:block !important;
+    margin-top:5px !important;
+}
+
+.antlers-trace-property-desc {
+    color: #818181 !important;
+    font-size: 10px !important;
+    margin-top: 5px !important;
+    display: block !important;
+}

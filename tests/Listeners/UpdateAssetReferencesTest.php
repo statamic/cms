@@ -110,9 +110,9 @@ class UpdateAssetReferencesTest extends TestCase
     {
         $entry = $this->createEntryWithHoffHeroImage();
 
-        $this->assertEquals('hoff.jpg', $entry->get('hero'));
+        $this->container->disk()->filesystem()->put($this->assetNorris->path(), '');
 
-        $this->actuallySaveAssetFileAndMetaToDisk($this->assetNorris);
+        $this->assertEquals('hoff.jpg', $entry->get('hero'));
 
         $this->assetHoff->rename('norris', true);
 
@@ -1439,17 +1439,8 @@ EOT;
             $this->assetHoff->path($assetPath)->save();
         }
 
-        $this->actuallySaveAssetFileAndMetaToDisk($this->assetHoff);
-
         return tap(Facades\Entry::make()->collection($collection)->data([
             'hero' => $this->assetHoff->path(),
         ]))->save();
-    }
-
-    // For Flysystem 1.x
-    protected function actuallySaveAssetFileAndMetaToDisk($asset)
-    {
-        $this->container->disk()->filesystem()->put($asset->path(), '');
-        $this->container->disk()->filesystem()->put($asset->metaPath(), '');
     }
 }

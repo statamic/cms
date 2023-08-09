@@ -49,7 +49,7 @@ EOT;
         – Powered by <a href="https://statamic.com?ref=cool-writings" class="hover:text-teal">Statamic</a></div>
     <div class="flex items-center">
         {{ settings:social }}
-            <a href="{{ url }}" class="ml-4" aria-label="{{ name }}" rel="noopener">
+            <a href="{{ url }}" class="ml-8" aria-label="{{ name }}" rel="noopener">
                 {{ svg :src="icon" class="h-6 w-6 hover:text-teal" }}
             </a>
         {{ /settings:social }}
