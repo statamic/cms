@@ -54,6 +54,10 @@ export default {
 
         label() {
             return this.asset.basename;
+        },
+
+        needsAlt() {
+            return (this.asset.isImage || this.asset.isSvg) && !this.asset.values.alt;
         }
     },
 

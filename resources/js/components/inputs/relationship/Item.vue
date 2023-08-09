@@ -6,14 +6,15 @@
     >
         <div class="item-move" v-if="sortable">&nbsp;</div>
         <div class="item-inner">
-            <div v-if="statusIcon" class="little-dot mr-2" :class="item.status" />
+            <div v-if="statusIcon" class="little-dot mr-2 hidden@sm:block" :class="item.status" />
 
             <div
                 v-if="item.invalid"
                 v-tooltip.top="__('An item with this ID could not be found')"
                 v-text="item.title" />
 
-            <a v-if="!item.invalid && editable" @click="edit" v-text="item.title" />
+
+            <a v-if="!item.invalid && editable" @click="edit" v-text="item.title" class="truncate" v-tooltip="item.title" />
 
             <div v-if="!item.invalid && !editable" v-text="item.title" />
 
@@ -26,16 +27,19 @@
                 @closed="isEditing = false"
             />
 
+            <div class="flex items-center flex-1 justify-end">
+                <div v-if="item.collection" v-text="item.collection.title" class="text-4xs text-gray-600 uppercase whitespace-nowrap mr-2 hidden @sm:block" />
+
+                <div class="flex items-center" v-if="!readOnly">
+                    <dropdown-list>
+                        <dropdown-item :text="__('Edit')" @click="edit" v-if="editable" />
+                        <dropdown-item :text="__('Unlink')" class="warning" @click="$emit('removed')" />
+                    </dropdown-list>
+                </div>
+            </div>
+
         </div>
 
-        <div v-if="item.collection" v-text="item.collection.title" class="text-4xs text-gray-600 uppercase whitespace-nowrap mr-2" />
-
-        <div class="pr-2 flex items-center" v-if="!readOnly">
-            <dropdown-list>
-                <dropdown-item :text="__('Edit')" @click="edit" v-if="editable" />
-                <dropdown-item :text="__('Unlink')" class="warning" @click="$emit('removed')" />
-            </dropdown-list>
-        </div>
     </div>
 
 </template>

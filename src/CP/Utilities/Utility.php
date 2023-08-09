@@ -40,7 +40,7 @@ class Utility
 
     public function slug()
     {
-        return Str::slug($this->handle);
+        return Str::slug(Str::replace('_', '-', $this->handle));
     }
 
     public function action($action = null)

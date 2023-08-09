@@ -33,7 +33,7 @@
                 <button @click="collapseAll" class="btn btn-icon flex items-center" v-tooltip="__('Collapse Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
                     <svg-icon name="arrows-horizontal-collapse" class="h-3.5 px-0.5 text-gray-750" />
                 </button>
-                <button @click="fullScreenMode = !fullScreenMode" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
+                <button v-if="config.fullscreen" @click="fullScreenMode = !fullScreenMode" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
                     <svg-icon name="expand-bold" class="h-3.5 px-0.5 text-gray-750" v-show="! fullScreenMode" />
                     <svg-icon name="shrink-all" class="h-3.5 px-0.5 text-gray-750" v-show="fullScreenMode" />
                 </button>
@@ -79,12 +79,13 @@
                     @blur="blurred"
                     @previews-updated="updateSetPreviews(set._id, $event)"
                 >
-                    <template v-slot:picker v-if="canAddSet">
+                    <template v-slot:picker>
                         <add-set-button
                             class="between"
                             :groups="groupConfigs"
                             :sets="setConfigs"
                             :index="index"
+                            :enabled="canAddSet"
                             @added="addSet" />
                     </template>
                 </replicator-set>

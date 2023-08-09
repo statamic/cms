@@ -21,10 +21,10 @@ class GlideManager
     public function server(array $config = [])
     {
         return ServerFactory::create(array_merge([
-            'source'   => base_path(), // this gets overridden on the fly by the image generator
-            'cache'    => $this->cacheDisk()->getDriver(),
+            'source' => base_path(), // this gets overridden on the fly by the image generator
+            'cache' => $this->cacheDisk()->getDriver(),
             'response' => new LaravelResponseFactory(app('request')),
-            'driver'   => Config::get('statamic.assets.image_manipulation.driver'),
+            'driver' => Config::get('statamic.assets.image_manipulation.driver'),
             'cache_with_file_extensions' => true,
             'presets' => Image::manipulationPresets(),
             'watermarks' => public_path(),

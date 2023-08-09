@@ -90,6 +90,11 @@ class Terms extends Relationship
                         'type' => 'taxonomies',
                         'mode' => 'select',
                     ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
                 ],
             ],
         ];
@@ -368,6 +373,8 @@ class Terms extends Relationship
         if ($request->exclusions) {
             $query->whereNotIn('id', $request->exclusions);
         }
+
+        $this->applyIndexQueryScopes($query, $request->all());
 
         return $query;
     }
