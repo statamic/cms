@@ -605,14 +605,6 @@ class ReplicatorTest extends TestCase
         ], collect($augmented)->toArray());
     }
 
-    public function augmentProvider()
-    {
-        return [
-            'default row id' => ['id'],
-            'customized row id' => ['_id'],
-        ];
-    }
-
     /** @test */
     public function it_converts_a_queryable_value()
     {
