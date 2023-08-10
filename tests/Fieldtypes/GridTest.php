@@ -484,6 +484,43 @@ class GridTest extends TestCase
     }
 
     /** @test */
+    public function it_augments_with_custom_row_id_handle()
+    {
+        config(['statamic.system.row_id_handle' => '_id']);
+
+        (new class extends Fieldtype
+        {
+            public static $handle = 'test';
+
+            public function augment($value)
+            {
+                return $value.' (augmented)';
+            }
+        })::register();
+
+        $field = new Field('test', [
+            'type' => 'grid',
+            'fields' => [
+                ['handle' => 'words', 'field' => ['type' => 'test']],
+                ['handle' => 'id', 'field' => ['type' => 'test']],
+            ],
+        ]);
+
+        $augmented = $field->fieldtype()->augment([
+            ['_id' => '1', 'id' => '7', 'words' => 'one'],
+            ['id' => '8', 'words' => 'two'], // row id intentionally omitted
+            ['_id' => '3', 'words' => 'three'], // id field intentionally omitted
+        ]);
+
+        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
+        $this->assertEquals([
+            ['_id' => '1', 'id' => '7 (augmented)', 'words' => 'one (augmented)'],
+            ['_id' => null, 'id' => '8 (augmented)', 'words' => 'two (augmented)'],
+            ['_id' => '3', 'id' => ' (augmented)', 'words' => 'three (augmented)'],
+        ], collect($augmented)->toArray());
+    }
+
+    /** @test */
     public function it_converts_a_queryable_value()
     {
         $this->assertNull((new Grid)->toQueryableValue(null));
