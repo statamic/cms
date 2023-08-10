@@ -1,5 +1,16 @@
 # Release Notes
 
+## 4.17.0 (2023-08-10)
+
+### What's improved
+- Improve performance of getting asset metadata when using the local filesystem. [#7887](https://github.com/statamic/cms/issues/7887) by @FrittenKeeZ
+
+### What's fixed
+- Fix globals save event. [#8564](https://github.com/statamic/cms/issues/8564) by @jasonvarga
+- REST API Globals return resolved relations via opt-in method. [#8555](https://github.com/statamic/cms/issues/8555) by @martink635
+
+
+
 ## 4.16.0 (2023-08-08)
 
 ### What's new
