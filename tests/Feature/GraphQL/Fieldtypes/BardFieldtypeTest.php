@@ -114,6 +114,101 @@ GQL;
             ]]);
     }
 
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_outputs_bard_fields_with_set_and_manual_id($isGrouped)
+    {
+        config()->set('statamic.system.row_id_handle', '_id');
+
+        $article = Blueprint::makeFromFields([
+            'things' => [
+                'type' => 'bard',
+                'sets' => $this->groupSets($isGrouped, [
+                    'meal' => [
+                        'fields' => [
+                            ['handle' => 'id', 'field' => ['type' => 'text']],
+                            ['handle' => 'food', 'field' => ['type' => 'text']],
+                            ['handle' => 'drink', 'field' => ['type' => 'markdown']], // using markdown to show nested fields are resolved using their fieldtype.
+                        ],
+                    ],
+                    'car' => [
+                        'fields' => [
+                            ['handle' => 'make', 'field' => ['type' => 'text']],
+                            ['handle' => 'model', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                ]),
+            ],
+        ]);
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'article' => $article->setHandle('article'),
+        ]));
+
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'things' => [
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'first text']]],
+                ['type' => 'set', 'attrs' => ['id' => 'set-id-1', 'values' => ['id' => 'id-value-1', 'type' => 'meal', 'food' => 'burger', 'drink' => 'coke _zero_']]],
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'second text']]],
+                ['type' => 'set', 'attrs' => ['id' => 'set-id-2', 'values' => ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla']]],
+                ['type' => 'set', 'attrs' => ['values' => ['type' => 'meal', 'food' => 'salad', 'drink' => 'water']]], // id intentionally omitted
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'last text']]],
+            ],
+        ])->create();
+
+        // TODO: Make _id as a field work.
+
+        $query = <<<'GQL'
+{
+    entry(id: "1") {
+        title
+        ... on Entry_Blog_Article {
+            things {
+                ... on BardText {
+                    type
+                    text
+                }
+                ... on Set_Things_Meal {
+                    id
+                    type
+                    food
+                    drink
+                    drink_md: drink(format: "markdown")
+                }
+                ... on Set_Things_Car {
+                    type
+                    make
+                    model
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'title' => 'Main Post',
+                    'things' => [
+                        ['type' => 'text', 'text' => '<p>first text</p>'],
+                        ['id' => 'id-value-1', 'type' => 'meal', 'food' => 'burger', 'drink' => "<p>coke <em>zero</em></p>\n", 'drink_md' => 'coke _zero_'],
+                        ['type' => 'text', 'text' => '<p>second text</p>'],
+                        ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
+                        ['id' => null, 'type' => 'meal', 'food' => 'salad', 'drink' => "<p>water</p>\n", 'drink_md' => 'water'],
+                        ['type' => 'text', 'text' => '<p>last text</p>'],
+                    ],
+                ],
+            ]]);
+    }
+
     /** @test */
     public function it_outputs_a_string_for_bard_fields_with_no_sets()
     {
