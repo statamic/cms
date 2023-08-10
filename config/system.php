@@ -154,12 +154,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Row id handle
+    | Row ID handle
     |--------------------------------------------------------------------------
     |
-    | Set id's will be saved and available via the id key. In special cases,
-    | if for example having legacy data already using the id keyword, you
-    | can avoid conflicts by changing the row id handle used by Statamic.
+    | Rows in Grid, Replicator, and Bard fields will be given a unique ID using
+    | the "id" field. You may need your own field named "id", in which case
+    | you may customize the handle of the field that Statamic will use.
     |
     */
 
