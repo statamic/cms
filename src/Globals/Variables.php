@@ -15,6 +15,8 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\GlobalSetSaved;
+use Statamic\Events\GlobalSetSaving;
 use Statamic\Events\GlobalVariablesBlueprintFound;
 use Statamic\Events\GlobalVariablesCreated;
 use Statamic\Events\GlobalVariablesDeleted;
@@ -130,6 +132,11 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
             if (GlobalVariablesSaving::dispatch($this) === false) {
                 return false;
             }
+
+            // @deprecated
+            if (GlobalSetSaving::dispatch($this->globalSet()) === false) {
+                return false;
+            }
         }
 
         Facades\GlobalVariables::save($this);
@@ -144,6 +151,9 @@ class Variables implements Contract, Localization, Augmentable, ResolvesValuesCo
             }
 
             GlobalVariablesSaved::dispatch($this);
+
+            // @deprecated
+            GlobalSetSaved::dispatch($this->globalSet());
         }
 
         return $this;
