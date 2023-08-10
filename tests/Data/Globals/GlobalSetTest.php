@@ -2,13 +2,16 @@
 
 namespace Tests\Data\Globals;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalSetSaving;
 use Statamic\Facades\GlobalSet as GlobalSetFacade;
+use Statamic\Facades\GlobalVariables;
 use Statamic\Facades\Site;
 use Statamic\Globals\GlobalSet;
+use Statamic\Globals\VariablesCollection;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -121,6 +124,80 @@ EOT;
     }
 
     /** @test */
+    public function saving_a_new_global_set_will_create_its_localizations()
+    {
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        // when it queries for fresh localizations
+        GlobalVariables::shouldReceive('whereSet')->with('test')->andReturn(VariablesCollection::make());
+        // when it checks if it's new
+        GlobalVariables::shouldReceive('find')->with('test::en');
+        GlobalVariables::shouldReceive('find')->with('test::fr');
+        // when it saves
+        GlobalVariables::shouldReceive('save')
+            ->withArgs(fn ($arg) => $arg->locale() === 'en')
+            ->once();
+        GlobalVariables::shouldReceive('save')
+            ->withArgs(fn ($arg) => $arg->locale() === 'fr')
+            ->once();
+
+        $set = GlobalSet::make('test');
+        $set->addLocalization($en = $set->makeLocalization('en')->data(['foo' => 'bar']));
+        $set->addLocalization($fr = $set->makeLocalization('fr')->data(['foo' => 'le bar']));
+        $set->save();
+    }
+
+    /** @test */
+    public function saving_an_existing_global_set_will_save_or_delete_its_localizations()
+    {
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $set = GlobalSet::make('test');
+        $set->addLocalization($en = $set->makeLocalization('en')->data(['foo' => 'bar']));
+        $set->addLocalization($fr = $set->makeLocalization('fr')->data(['foo' => 'le bar']));
+        $set->addLocalization($de = $set->makeLocalization('de')->data(['foo' => 'der bar']));
+        $set->save();
+
+        // when it queries for fresh localizations
+        GlobalVariables::shouldReceive('whereSet')->with('test')->andReturn(VariablesCollection::make([
+            'en' => $en,
+            'fr' => $fr,
+            'de' => $de,
+        ]));
+        // when it checks if it's new
+        GlobalVariables::shouldReceive('find')->with('test::en');
+        GlobalVariables::shouldReceive('find')->with('test::de');
+        // when it saves
+        GlobalVariables::shouldReceive('save')
+            ->withArgs(fn ($arg) => $arg->locale() === 'en')
+            ->once();
+        GlobalVariables::shouldReceive('save')
+            ->withArgs(fn ($arg) => $arg->locale() === 'de')
+            ->once();
+        // when it deletes
+        GlobalVariables::shouldReceive('delete')
+            ->withArgs(fn ($arg) => $arg->locale() === 'fr')
+            ->once();
+
+        $set->removeLocalization($fr);
+        $set->save();
+    }
+
+    /** @test */
     public function it_dispatches_global_set_created_only_once()
     {
         Event::fake();
@@ -214,5 +291,47 @@ EOT;
         $set->save();
 
         Event::assertNotDispatched(GlobalSetSaved::class);
+    }
+
+    /** @test */
+    public function it_updates_the_origin_of_descendants_when_saving_an_entry_with_localizations()
+    {
+        // The issue this test is covering doesn't happen when using the
+        // array cache driver, since the objects are stored in memory.
+        config(['cache.default' => 'file']);
+        Cache::clear();
+
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
+            ],
+        ]);
+
+        $global = tap(GlobalSet::make('test'), function ($global) {
+            $global->addLocalization($global->makeLocalization('en')->data(['foo' => 'root']));
+            $global->addLocalization($global->makeLocalization('fr')->origin('en'));
+            $global->addLocalization($global->makeLocalization('de')->origin('fr'));
+        })->save();
+
+        $this->assertEquals('root', $global->in('en')->foo);
+        $this->assertEquals('root', $global->in('fr')->foo);
+        $this->assertEquals('root', $global->in('de')->foo);
+
+        $global = GlobalSet::find('test');
+        $global->in('en')->data(['foo' => 'root updated'])->save();
+
+        $this->assertEquals('root updated', $global->in('en')->foo);
+        $this->assertEquals('root updated', $global->in('fr')->foo);
+        $this->assertEquals('root updated', $global->in('de')->foo);
+
+        $global = GlobalSet::find('test');
+        $global->in('fr')->data(['foo' => 'fr updated'])->save();
+
+        $this->assertEquals('root updated', $global->in('en')->foo);
+        $this->assertEquals('fr updated', $global->in('fr')->foo);
+        $this->assertEquals('fr updated', $global->in('de')->foo);
     }
 }

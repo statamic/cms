@@ -75,6 +75,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Link::class,
         Fieldtypes\Lists::class,
         Fieldtypes\Markdown::class,
+        Fieldtypes\Markdown\Buttons::class,
         Fieldtypes\NestedFields::class,
         Fieldtypes\Radio::class,
         Fieldtypes\Range::class,

@@ -1,31 +1,42 @@
 <template>
 
     <node-view-wrapper>
-        <div class="bard-inline-image-container">
-            <div v-if="src">
-                <div class="p-2 text-center">
-                    <div ref="content" hidden />
-                    <img :src="src" class="block mx-auto" data-drag-handle />
-                </div>
-
-                <div class="flex items-center p-2 border-t rounded-b" @paste.stop>
-                    <text-input name="alt" v-model="alt" :prepend="__('Alt Text')" class="mr-2 flex-1" />
-                    <button class="btn-flat mr-2" @click="openSelector">
-                        {{ __('Replace') }}
-                    </button>
-                    <button class="btn-flat" @click="deleteNode">
-                        {{ __('Remove') }}
-                    </button>
-                </div>
+        <div
+            class="bard-inline-image-container shadow-sm"
+            :class="{
+                'border-blue-400' : selected,
+            }"
+        >
+            <div v-if="src" class="p-2 text-center" draggable="true" data-drag-handle>
+                <div ref="content" hidden />
+                <img :src="src" class="block mx-auto rounded-sm" />
             </div>
 
-            <div v-else class="text-center p-4">
-                <button class="btn-flat" @click="openSelector">
-                    {{ __('Choose Image') }}
+            <div class="@container/toolbar flex items-center border-t justify-center py-2 px-2 text-2xs text-white text-center space-x-1 sm:space-x-3">
+                <button v-if="!src" @click="openSelector" type="button" class="flex btn btn-sm px-3 py-1.5">
+                    <svg-icon name="folder-image" class="h-4" />
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Chose Image') }}</span>
                 </button>
-                <button class="btn-flat" @click="deleteNode">
-                    {{ __('Remove') }}
+                <button v-if="src" @click="edit" type="button" class="flex btn btn-sm px-3 py-1.5">
+                    <svg-icon name="pencil" class="h-4" />
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Edit Image') }}</span>
                 </button>
+                <button v-if="src" @click="toggleAltEditor" type="button" class="flex btn btn-sm px-3 py-1.5" :class="{ active: showingAltEdit }">
+                    <svg-icon name="rename-file" class="h-4" />
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Override Alt') }}</span>
+                </button>
+                <button v-if="src" @click="openSelector" type="button" class="flex btn btn-sm px-3 py-1.5">
+                    <svg-icon name="swap" class="h-4" />
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Replace') }}</span>
+                </button>
+                <button @click="deleteNode" class="flex btn btn-sm text-red-500 px-3 py-1.5">
+                    <svg-icon name="trash" class="h-4" />
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Delete') }}</span>
+                </button>
+            </div>
+
+            <div v-if="showingAltEdit" class="flex items-center p-2 border-t rounded-b" @paste.stop>
+                <text-input name="alt" :focus="showingAltEdit" v-model="alt" :placeholder="assetAlt" :prepend="__('Alt Text')" class="flex-1" />
             </div>
 
             <stack
@@ -45,16 +56,29 @@
                     @closed="closeSelector">
                 </selector>
             </stack>
+
+            <asset-editor
+                v-if="editing"
+                :id="assetId"
+                :showToolbar="false"
+                :allow-deleting="false"
+                @closed="closeEditor"
+                @saved="editorAssetSaved"
+                @actionCompleted="actionCompleted"
+            >
+            </asset-editor>
         </div>
     </node-view-wrapper>
 
 </template>
 
 <script>
+import Asset from '../assets/Asset';
 import { NodeViewWrapper } from '@tiptap/vue-2';
 import Selector from '../../assets/Selector.vue';
 
 export default {
+    mixins: [Asset],
 
     components: {
         NodeViewWrapper,
@@ -77,23 +101,25 @@ export default {
     data() {
         return {
             assetId: null,
-            asset: null,
+            assetAlt: null,
+            editorAsset: null,
             showingSelector: false,
             loading: false,
             alt: this.node.attrs.alt,
+            showingAltEdit: !!this.node.attrs.alt,
         }
     },
 
     computed: {
 
         src() {
-            if (this.asset) {
-                return this.asset.url;
+            if (this.editorAsset) {
+                return this.editorAsset.url;
             }
         },
 
         actualSrc() {
-            if (this.asset) {
+            if (this.editorAsset) {
                 return `asset::${this.assetId}`;
             }
 
@@ -170,13 +196,24 @@ export default {
         },
 
         setAsset(asset) {
-            this.asset = asset;
+            this.editorAsset = asset;
             this.assetId = asset.id;
-            this.alt = asset.alt || this.alt;
+            this.assetAlt = asset.values.alt;
             this.loading = false;
             this.updateAttributes({ src: this.actualSrc });
         },
 
+        toggleAltEditor() {
+            this.showingAltEdit = !this.showingAltEdit;
+            if (!this.showingAltEdit) {
+                this.alt = null;
+            }
+        },
+
+        editorAssetSaved(asset) {
+            this.setAsset(asset);
+            this.closeEditor();
+        },
     },
 
     updated() {

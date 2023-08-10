@@ -1130,4 +1130,53 @@ EOT;
 
         $this->assertSame('The value: Two.', trim($this->renderString($template, ['data' => ['foo' => 'bar']])));
     }
+
+    public function test_variable_assignment_and_tag_aliasing()
+    {
+        EntryFactory::collection('blog')->id('1')->data(['title' => '1-One'])->create();
+        EntryFactory::collection('blog')->id('2')->data(['title' => '2-Two'])->create();
+        EntryFactory::collection('blog')->id('3')->data(['title' => '3-Three'])->create();
+
+        $template = <<<'EOT'
+{{ entries = {collection:blog limit="1"} }}
+A: {{ entries }}{{ title }}{{ /entries }}
+{{ collection:blog as="entries" }}
+B: {{ entries }}{{ title }}{{ /entries }}
+{{ /collection:blog }}
+C: {{ entries }}{{ title }}{{ /entries }}
+EOT;
+
+        $expected = <<<'EOT'
+A: 1-One
+
+B: 1-One2-Two3-Three
+
+C: 1-One
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
+{{ entries = {collection:blog limit="1"} }}
+A: {{ entries }}{{ title }}{{ /entries }}
+{{ collection:blog as="entries" }}
+B: {{ entries }}{{ title }}{{ /entries }}
+
+{{ entries = [['title' => 'Five'], ['title' => 'Six']] /}}
+{{ /collection:blog }}
+C: {{ entries }}{{ title }}{{ /entries }}
+EOT;
+
+        $expected = <<<'EOT'
+A: 1-One
+
+B: 1-One2-Two3-Three
+
+
+
+C: FiveSix
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
 }

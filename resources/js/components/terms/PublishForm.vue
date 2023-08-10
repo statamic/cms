@@ -104,7 +104,7 @@
                                     <div class="p-4 flex items-center -mx-2" v-if="showLivePreviewButton || showVisitUrlButton">
                                         <button
                                             class="flex items-center justify-center btn-flat w-full mx-2 px-2"
-                                            v-if="isBase"
+                                            v-if="showLivePreviewButton"
                                             @click="openLivePreview">
                                             <svg-icon name="light/synchronize" class="h-4 w-4 mr-2" />
                                             <span>{{ __('Live Preview') }}</span>
@@ -343,7 +343,7 @@ export default {
         },
 
         livePreviewUrl() {
-            return _.findWhere(this.localizations, { active: true }).url + '/preview';
+            return _.findWhere(this.localizations, { active: true }).livePreviewUrl;
         },
 
         showLivePreviewButton() {

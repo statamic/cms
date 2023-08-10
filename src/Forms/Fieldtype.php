@@ -3,10 +3,12 @@
 namespace Statamic\Forms;
 
 use Statamic\CP\Column;
+use Statamic\Data\DataCollection;
 use Statamic\Facades;
 use Statamic\Facades\GraphQL;
 use Statamic\Fieldtypes\Relationship;
 use Statamic\GraphQL\Types\FormType;
+use Statamic\Query\ItemQueryBuilder;
 
 class Fieldtype extends Relationship
 {
@@ -30,6 +32,11 @@ class Fieldtype extends Relationship
                 'default' => 1,
                 'instructions' => __('statamic::fieldtypes.form.config.max_items'),
                 'min' => 1,
+            ],
+            'query_scopes' => [
+                'display' => __('Query Scopes'),
+                'instructions' => __('statamic::fieldtypes.form.config.query_scopes'),
+                'type' => 'taggable',
             ],
         ];
     }
@@ -61,13 +68,38 @@ class Fieldtype extends Relationship
 
     public function getIndexItems($request)
     {
-        return Facades\Form::all()->map(function ($form) {
+        $query = (new ItemQueryBuilder())
+            ->withItems(new DataCollection(Facades\Form::all()));
+
+        if ($search = $request->search) {
+            $query->where('title', 'like', '%'.$search.'%');
+        }
+
+        if ($request->exclusions) {
+            $query->whereNotIn('id', $request->exclusions);
+        }
+
+        $this->applyIndexQueryScopes($query, $request->all());
+
+        $query->orderBy('title');
+
+        $formFields = function ($form) {
             return [
                 'id' => $form->handle(),
                 'title' => $form->title(),
                 'submissions' => $form->submissions()->count(),
             ];
-        })->values();
+        };
+
+        if ($request->boolean('paginate', true)) {
+            $forms = $query->paginate();
+
+            $forms->getCollection()->transform($formFields);
+
+            return $forms;
+        }
+
+        return $query->get()->map($formFields);
     }
 
     public function augmentValue($value)
