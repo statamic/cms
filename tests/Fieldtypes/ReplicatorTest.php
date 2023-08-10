@@ -565,6 +565,55 @@ class ReplicatorTest extends TestCase
     }
 
     /** @test */
+    public function it_augments_with_custom_row_id_handle()
+    {
+        config(['statamic.system.row_id_handle' => '_id']);
+
+        (new class extends Fieldtype
+        {
+            public static $handle = 'test';
+
+            public function augment($value)
+            {
+                return $value.' (augmented)';
+            }
+        })::register();
+
+        $field = new Field('test', [
+            'type' => 'replicator',
+            'sets' => [
+                'a' => [
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'test']],
+                        ['handle' => 'id', 'field' => ['type' => 'test']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $augmented = $field->fieldtype()->augment([
+            ['_id' => '1', 'id' => '7', 'type' => 'a', 'words' => 'one'],
+            ['type' => 'a', 'id' => '8', 'words' => 'two'], // row id intentionally omitted
+            ['_id' => '3', 'type' => 'a', 'words' => 'three'], // id field intentionally omitted
+        ]);
+
+        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
+        $this->assertEquals([
+            ['_id' => '1', 'id' => '7 (augmented)', 'type' => 'a', 'words' => 'one (augmented)'],
+            ['_id' => null, 'id' => '8 (augmented)', 'type' => 'a', 'words' => 'two (augmented)'],
+            ['_id' => '3', 'id' => ' (augmented)', 'type' => 'a', 'words' => 'three (augmented)'],
+        ], collect($augmented)->toArray());
+    }
+
+    public function augmentProvider()
+    {
+        return [
+            'default row id' => ['id'],
+            'customized row id' => ['_id'],
+        ];
+    }
+
+    /** @test */
     public function it_converts_a_queryable_value()
     {
         $this->assertNull((new Replicator)->toQueryableValue(null));
