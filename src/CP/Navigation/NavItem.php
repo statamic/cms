@@ -427,8 +427,8 @@ class NavItem
      */
     public static function snakeCase($string)
     {
-        // Create placeholder to preserve `::` segments for child items.
-        $string = Str::replace('::', '___nest___', $string);
+        // Preserve colons `:` segments for child items and cloned ids.
+        $string = Str::replace(':', '___colon___', $string);
 
         // Convert to lowercase and slug, removing all special characters.
         $string = Str::modifyMultiple($string, ['lower', 'slug']);
@@ -436,8 +436,8 @@ class NavItem
         // Convert to snake case.
         $string = Str::replace('-', '_', $string);
 
-        // Put `::` segments back for child items.
-        $string = Str::replace('___nest___', '::', $string);
+        // Put colons `:` back for child items and cloned ids.
+        $string = Str::replace('___colon___', ':', $string);
 
         return $string;
     }
