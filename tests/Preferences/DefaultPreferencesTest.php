@@ -29,7 +29,7 @@ class DefaultPreferencesTest extends TestCase
     /** @test */
     public function it_gets_empty_array_by_default()
     {
-        $this->assertFileNotExists(resource_path('preferences.yaml'));
+        $this->assertFileDoesNotExist(resource_path('preferences.yaml'));
         $this->assertEquals([], Preference::default()->all());
     }
 
@@ -62,9 +62,33 @@ EOT
     }
 
     /** @test */
+    public function it_gets_a_preference_by_key()
+    {
+        Preference::default()->set([
+            'foo' => 'bar',
+            'bar' => 'baz',
+        ])->save();
+
+        $this->assertEquals('bar', Preference::default()->get('foo'));
+    }
+
+    /** @test */
+    public function it_removes_a_preference_by_key()
+    {
+        Preference::default()->set([
+            'foo' => 'bar',
+            'bar' => 'baz',
+        ])->save();
+
+        Preference::default()->remove('foo')->save();
+
+        $this->assertEquals(['bar' => 'baz'], Preference::default()->all());
+    }
+
+    /** @test */
     public function it_saves_preferences_to_file()
     {
-        $this->assertFileNotExists(resource_path('preferences.yaml'));
+        $this->assertFileDoesNotExist(resource_path('preferences.yaml'));
 
         Preference::default()->set($preferences = [
             'collections' => [
@@ -86,7 +110,7 @@ EOT
     /** @test */
     public function it_merges_preferences_to_file()
     {
-        $this->assertFileNotExists(resource_path('preferences.yaml'));
+        $this->assertFileDoesNotExist(resource_path('preferences.yaml'));
 
         Preference::default()->set($preferences = [
             'foo' => 'bar',

@@ -1,94 +1,125 @@
 <template>
 
-    <div class="bard-inline-image-container">
-        <div v-if="src">
-            <div class="p-1 text-center">
-                <div ref="content" hidden />
-                <img :src="src" class="block mx-auto" data-drag-handle />
-            </div>
-
-            <div class="flex items-center p-1 pt-0 rounded-b" @paste.stop>
-                <text-input name="alt" v-model="alt" prepend="Alt Text" class="mr-1" />
-                <button class="btn-flat mr-1" @click="openSelector">
-                    {{ __('Replace') }}
-                </button>
-                <button class="btn-flat" @click="remove">
-                    {{ __('Remove') }}
-                </button>
-            </div>
-        </div>
-
-        <div v-else class="text-center p-2">
-            <button class="btn-flat" @click="openSelector">
-                {{ __('Choose Image') }}
-            </button>
-            <button class="btn-flat" @click="remove">
-                {{ __('Remove') }}
-            </button>
-        </div>
-
-        <stack
-            v-if="showingSelector"
-            name="asset-selector"
-            @closed="closeSelector"
+    <node-view-wrapper>
+        <div
+            class="bard-inline-image-container shadow-sm"
+            :class="{
+                'border-blue-400' : selected,
+            }"
         >
-            <selector
-                :container="options.bard.config.container"
-                :folder="options.bard.config.folder || '/'"
-                :restrict-container-navigation="true"
-                :restrict-folder-navigation="options.bard.config.restrict_assets"
-                :selected="selections"
-                :view-mode="'grid'"
-                :max-files="1"
-                @selected="assetsSelected"
-                @closed="closeSelector">
-            </selector>
-        </stack>
-    </div>
+            <div v-if="src" class="p-2 text-center" draggable="true" data-drag-handle>
+                <div ref="content" hidden />
+                <img :src="src" class="block mx-auto rounded-sm" />
+            </div>
+
+            <div class="@container/toolbar flex items-center border-t justify-center py-2 px-2 text-2xs text-white text-center space-x-1 sm:space-x-3">
+                <button v-if="!src" @click="openSelector" type="button" class="flex btn btn-sm px-3 py-1.5">
+                    <svg-icon name="folder-image" class="h-4" />
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Chose Image') }}</span>
+                </button>
+                <button v-if="src" @click="edit" type="button" class="flex btn btn-sm px-3 py-1.5">
+                    <svg-icon name="pencil" class="h-4" />
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Edit Image') }}</span>
+                </button>
+                <button v-if="src" @click="toggleAltEditor" type="button" class="flex btn btn-sm px-3 py-1.5" :class="{ active: showingAltEdit }">
+                    <svg-icon name="rename-file" class="h-4" />
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Override Alt') }}</span>
+                </button>
+                <button v-if="src" @click="openSelector" type="button" class="flex btn btn-sm px-3 py-1.5">
+                    <svg-icon name="swap" class="h-4" />
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Replace') }}</span>
+                </button>
+                <button @click="deleteNode" class="flex btn btn-sm text-red-500 px-3 py-1.5">
+                    <svg-icon name="trash" class="h-4" />
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Delete') }}</span>
+                </button>
+            </div>
+
+            <div v-if="showingAltEdit" class="flex items-center p-2 border-t rounded-b" @paste.stop>
+                <text-input name="alt" :focus="showingAltEdit" v-model="alt" :placeholder="assetAlt" :prepend="__('Alt Text')" class="flex-1" />
+            </div>
+
+            <stack
+                v-if="showingSelector"
+                name="asset-selector"
+                @closed="closeSelector"
+            >
+                <selector
+                    :container="extension.options.bard.config.container"
+                    :folder="extension.options.bard.config.folder || '/'"
+                    :restrict-container-navigation="true"
+                    :restrict-folder-navigation="extension.options.bard.config.restrict_assets"
+                    :selected="selections"
+                    :view-mode="'grid'"
+                    :max-files="1"
+                    @selected="assetsSelected"
+                    @closed="closeSelector">
+                </selector>
+            </stack>
+
+            <asset-editor
+                v-if="editing"
+                :id="assetId"
+                :showToolbar="false"
+                :allow-deleting="false"
+                @closed="closeEditor"
+                @saved="editorAssetSaved"
+                @actionCompleted="actionCompleted"
+            >
+            </asset-editor>
+        </div>
+    </node-view-wrapper>
 
 </template>
 
 <script>
+import Asset from '../assets/Asset';
+import { NodeViewWrapper } from '@tiptap/vue-2';
 import Selector from '../../assets/Selector.vue';
 
 export default {
+    mixins: [Asset],
 
     components: {
+        NodeViewWrapper,
         Selector,
     },
 
     inject: ['storeName'],
 
     props: [
-        'node', // Prosemirror Node Object
-        'view', // Prosemirror EditorView Object
-        'getPos', // function allowing the view to find its position
-        'updateAttrs', // function to update attributes defined in `schema`
-        'editable', // global editor prop whether the content can be edited
-        'options', // array of extension options
-        `selected`, // whether its selected
+        'editor', // the editor instance
+        'node', // access the current node
+        'decorations', // an array of decorations
+        'selected', // true when there is a NodeSelection at the current node view
+        'extension', // access to the node extension, for example to get options
+        'getPos', // get the document position of the current node
+        'updateAttributes', // update attributes of the current node.
+        'deleteNode', // delete the current node
     ],
 
     data() {
         return {
             assetId: null,
-            asset: null,
+            assetAlt: null,
+            editorAsset: null,
             showingSelector: false,
             loading: false,
             alt: this.node.attrs.alt,
+            showingAltEdit: !!this.node.attrs.alt,
         }
     },
 
     computed: {
 
         src() {
-            if (this.asset) {
-                return this.asset.url;
+            if (this.editorAsset) {
+                return this.editorAsset.url;
             }
         },
 
         actualSrc() {
-            if (this.asset) {
+            if (this.editorAsset) {
                 return `asset::${this.assetId}`;
             }
 
@@ -108,7 +139,7 @@ export default {
             this.openSelector();
         }
 
-        if (src.startsWith('asset:')) {
+        if (src && src.startsWith('asset:')) {
             this.assetId = src.substr(7);
         }
 
@@ -120,12 +151,12 @@ export default {
 
         actualSrc(src) {
             if ( !this.node.attrs.src) {
-                this.updateAttrs({ src, asset: !!this.assetId });
+                this.updateAttributes({ src, asset: !!this.assetId });
             }
         },
 
         alt(alt) {
-            this.updateAttrs({ alt });
+            this.updateAttributes({ alt });
         }
 
     },
@@ -134,19 +165,10 @@ export default {
 
         openSelector() {
             this.showingSelector = true;
-            this.$root.hideOverflow = true;
-        },
-
-        remove() {
-            let tr = this.view.state.tr;
-            let pos = this.getPos();
-            tr.delete(pos, pos + this.node.nodeSize);
-            this.view.dispatch(tr);
         },
 
         closeSelector() {
             this.showingSelector = false;
-            this.$root.hideOverflow = false;
         },
 
         assetsSelected(selections) {
@@ -166,22 +188,38 @@ export default {
                 // return;
             }
 
-            this.$axios.get(cp_url('assets-fieldtype'), {
-                params: { assets: [id] }
+            this.$axios.post(cp_url('assets-fieldtype'), {
+                assets: [id],
             }).then(response => {
                 this.setAsset(response.data[0]);
             });
         },
 
         setAsset(asset) {
-            this.asset = asset;
+            this.editorAsset = asset;
             this.assetId = asset.id;
-            this.alt = asset.alt || this.alt;
+            this.assetAlt = asset.values.alt;
             this.loading = false;
-            this.updateAttrs({ src: this.actualSrc });
+            this.updateAttributes({ src: this.actualSrc });
         },
 
-    }
+        toggleAltEditor() {
+            this.showingAltEdit = !this.showingAltEdit;
+            if (!this.showingAltEdit) {
+                this.alt = null;
+            }
+        },
 
+        editorAssetSaved(asset) {
+            this.setAsset(asset);
+            this.closeEditor();
+        },
+    },
+
+    updated() {
+        // This is a workaround to avoid Firefox's inability to select inputs/textareas when the
+        // parent element is set to draggable: https://bugzilla.mozilla.org/show_bug.cgi?id=739071
+        this.$el.setAttribute('draggable', false);
+    }
 }
 </script>

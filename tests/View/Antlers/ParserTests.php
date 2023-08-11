@@ -1144,7 +1144,7 @@ EOT;
                 return 'augmented '.$value;
             }
 
-            public function config(?string $key = null, $fallback = null)
+            public function config(string $key = null, $fallback = null)
             {
                 return true;
             }
@@ -1158,7 +1158,7 @@ EOT;
                 return 'augmented '.$value;
             }
 
-            public function config(?string $key = null, $fallback = null)
+            public function config(string $key = null, $fallback = null)
             {
                 return false;
             }
@@ -2427,6 +2427,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider objectInConditionProvider
      */
     public function it_uses_entries_as_conditions($object)

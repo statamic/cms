@@ -25,16 +25,13 @@ class CollectionType extends \Rebing\GraphQL\Support\Type
             'structure' => [
                 'type' => GraphQL::type(CollectionStructureType::NAME),
             ],
-        ])
-        ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(function ($closure) {
+        ])->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(function ($closure) {
             return $closure();
-        }))
-        ->map(function (array $arr) {
+        }))->map(function (array $arr) {
             $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
 
             return $arr;
-        })
-        ->all();
+        })->all();
     }
 
     private function resolver()

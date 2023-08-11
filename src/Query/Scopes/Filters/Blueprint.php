@@ -9,6 +9,8 @@ use Statamic\Support\Arr;
 
 class Blueprint extends Filter
 {
+    protected $pinned = true;
+
     public static function title()
     {
         return __('Blueprint');

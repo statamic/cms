@@ -13,7 +13,7 @@
     >
         <div slot-scope="{ setFieldValue }">
 
-            <div class="flex items-center mb-3">
+            <div class="flex items-center mb-6">
                 <h1 class="flex-1">
                     <small class="subhead block">
                         <a :href="listingUrl" v-text="__('Assets')" />
@@ -23,7 +23,7 @@
                 <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
-            <configure-sections @updated="setFieldValue" :enable-sidebar="false"/>
+            <configure-tabs @updated="setFieldValue" :enable-sidebar="false"/>
         </div>
     </publish-container>
 

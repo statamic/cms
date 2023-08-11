@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
+use LogicException;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -14,6 +15,7 @@ use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Contracts\Entries\EntryRepository;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsComputedData;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
@@ -23,6 +25,7 @@ use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
 use Statamic\Events\EntryCreating;
 use Statamic\Events\EntryDeleted;
@@ -38,18 +41,19 @@ use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
+use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, ContainsQueryableValues, Arrayable, ArrayAccess
+class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, ContainsQueryableValues, Arrayable, ArrayAccess, SearchableContract
 {
     use Routable {
         uri as routableUri;
     }
 
-    use ContainsData, ContainsComputedData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified;
+    use ContainsData, ContainsComputedData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, Searchable;
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
@@ -63,7 +67,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $blueprint;
     protected $date;
     protected $locale;
-    protected $localizations;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
     protected $template;
@@ -125,15 +128,23 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) use ($key) {
-                return Blink::once($key, function () use ($blueprint) {
-                    if (! $blueprint) {
-                        $blueprint = $this->hasOrigin()
-                            ? $this->origin()->blueprint()->handle()
-                            : $this->get('blueprint');
-                    }
+                if (Blink::has($key)) {
+                    return Blink::get($key);
+                }
 
-                    return $this->collection()->entryBlueprint($blueprint, $this);
-                });
+                if (! $blueprint) {
+                    $blueprint = $this->hasOrigin()
+                        ? $this->origin()->blueprint()->handle()
+                        : $this->get('blueprint');
+                }
+
+                $blueprint = $this->collection()->entryBlueprint($blueprint, $this);
+
+                Blink::put($key, $blueprint);
+
+                EntryBlueprintFound::dispatch($blueprint, $this);
+
+                return $blueprint;
             })
             ->setter(function ($blueprint) use ($key) {
                 Blink::forget($key);
@@ -189,7 +200,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $entry->delete();
         });
 
-        $this->localizations = null;
+        Blink::forget('entry-descendants-'.$this->id());
 
         return true;
     }
@@ -320,7 +331,12 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         if ($this->id()) {
             Blink::store('structure-uris')->forget($this->id());
             Blink::store('structure-entries')->forget($this->id());
+            Blink::forget($this->getOriginBlinkKey());
         }
+
+        $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
+
+        $this->directDescendants()->each->save();
 
         $this->taxonomize();
 
@@ -363,8 +379,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         $prefix = '';
 
-        if ($this->hasDate()) {
-            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d').'.';
+        if ($this->hasDate() && $this->date) {
+            $format = 'Y-m-d';
+            if ($this->hasTime()) {
+                $format .= '-Hi';
+                if ($this->hasSeconds()) {
+                    $format .= 's';
+                }
+            }
+
+            $prefix = $this->date->format($format).'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
@@ -434,9 +458,27 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this
             ->fluentlyGetOrSet('date')
             ->getter(function ($date) {
-                return $date ?? $this->lastModified();
+                if (! $this->collection()?->dated()) {
+                    return null;
+                }
+
+                $date = $date ?? $this->lastModified();
+
+                if (! $this->hasTime()) {
+                    $date->startOfDay();
+                }
+
+                if (! $this->hasSeconds()) {
+                    $date->startOfMinute();
+                }
+
+                return $date;
             })
             ->setter(function ($date) {
+                if (! $this->collection()?->dated()) {
+                    throw new LogicException('Cannot set date on non-dated collection entry.');
+                }
+
                 if ($date === null) {
                     return null;
                 }
@@ -449,19 +491,36 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     return Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
                 }
 
-                return Carbon::createFromFormat('Y-m-d-Hi', $date);
+                if (strlen($date) === 15) {
+                    return Carbon::createFromFormat('Y-m-d-Hi', $date)->startOfMinute();
+                }
+
+                return Carbon::createFromFormat('Y-m-d-His', $date);
             })
             ->args(func_get_args());
     }
 
     public function hasDate()
     {
-        return $this->date !== null;
+        return $this->collection()->dated();
     }
 
     public function hasTime()
     {
-        return $this->hasDate() && $this->date()->format('H:i:s') !== '00:00:00';
+        if (! $this->hasDate()) {
+            return false;
+        }
+
+        return $this->blueprint()->field('date')->fieldtype()->timeEnabled();
+    }
+
+    public function hasSeconds()
+    {
+        if (! $this->hasTime()) {
+            return false;
+        }
+
+        return $this->blueprint()->field('date')->fieldtype()->secondsEnabled();
     }
 
     public function sites()
@@ -497,11 +556,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected function shouldRemoveNullsFromFileData()
     {
         return false;
-    }
-
-    public function ampable()
-    {
-        return $this->collection()->ampable();
     }
 
     protected function revisionKey()
@@ -601,16 +655,33 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->descendants()->get($locale);
     }
 
-    public function descendants()
+    public function ancestors()
     {
-        if (! $this->localizations) {
-            $this->localizations = Facades\Entry::query()
+        $ancestors = collect();
+
+        $origin = $this->origin();
+
+        while ($origin) {
+            $ancestors->push($origin);
+            $origin = $origin->origin();
+        }
+
+        return $ancestors;
+    }
+
+    public function directDescendants()
+    {
+        return Blink::once('entry-descendants-'.$this->id(), function () {
+            return Facades\Entry::query()
                 ->where('collection', $this->collectionHandle())
                 ->where('origin', $this->id())->get()
                 ->keyBy->locale();
-        }
+        });
+    }
 
-        $localizations = collect($this->localizations);
+    public function descendants()
+    {
+        $localizations = $this->directDescendants();
 
         foreach ($localizations as $loc) {
             $localizations = $localizations->merge($loc->descendants());
@@ -624,11 +695,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->in($locale) !== null;
     }
 
+    /** @deprecated */
     public function addLocalization($entry)
     {
         $entry->origin($this);
-
-        $this->localizations[$entry->locale()] = $entry;
 
         return $this;
     }
@@ -684,7 +754,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             return null;
         }
 
-        return $this->structure()->in($this->locale())->page($id);
+        return $this->structure()->in($this->locale())->find($id);
     }
 
     public function route()
@@ -855,6 +925,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    public function getSearchValue(string $field)
+    {
+        return method_exists($this, $field) ? $this->$field() : $this->value($field);
+    }
+
+    public function getCpSearchResultBadge(): string
+    {
+        return $this->collection()->title();
     }
 
     protected function getComputedCallbacks()

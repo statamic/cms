@@ -26,7 +26,7 @@ class ReuploadAsset extends Action
 
     public function authorize($user, $asset)
     {
-        return $user->can('store', $asset->container());
+        return $user->can('reupload', $asset);
     }
 
     public function buttonText()
@@ -77,6 +77,7 @@ class ReuploadAsset extends Action
                 'type' => 'files',
                 'max_files' => 1,
                 'validate' => ['required'],
+                'container' => $this->items->first()->container()->handle(),
             ],
         ];
     }

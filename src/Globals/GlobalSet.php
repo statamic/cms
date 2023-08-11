@@ -3,6 +3,7 @@
 namespace Statamic\Globals;
 
 use Statamic\Contracts\Globals\GlobalSet as Contract;
+use Statamic\Contracts\Globals\Variables;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\GlobalSetCreating;
@@ -10,7 +11,9 @@ use Statamic\Events\GlobalSetDeleted;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalSetSaving;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\GlobalVariables;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
@@ -22,7 +25,6 @@ class GlobalSet implements Contract
 
     protected $title;
     protected $handle;
-    protected $localizations;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -96,6 +98,8 @@ class GlobalSet implements Contract
 
         Facades\GlobalSet::save($this);
 
+        $this->saveOrDeleteLocalizations();
+
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
         }
@@ -111,8 +115,21 @@ class GlobalSet implements Contract
         return $this;
     }
 
+    protected function saveOrDeleteLocalizations()
+    {
+        $localizations = $this->localizations();
+
+        $localizations->each->save();
+
+        $this->freshLocalizations()
+            ->diffKeys($localizations)
+            ->each->delete();
+    }
+
     public function delete()
     {
+        $this->localizations()->each->delete();
+
         Facades\GlobalSet::delete($this);
 
         GlobalSetDeleted::dispatch($this);
@@ -126,9 +143,9 @@ class GlobalSet implements Contract
             'title' => $this->title(),
         ];
 
-        if (! Site::hasMultiple()) {
+        if (! Site::hasMultiple() && ($variables = $this->in(Site::default()->handle()))) {
             $data['data'] = Arr::removeNullValues(
-                $this->in(Site::default()->handle())->data()->all()
+                $variables->data()->all()
             );
         }
 
@@ -137,7 +154,7 @@ class GlobalSet implements Contract
 
     public function makeLocalization($site)
     {
-        return (new Variables)
+        return app(Variables::class)
             ->globalSet($this)
             ->locale($site);
     }
@@ -146,21 +163,21 @@ class GlobalSet implements Contract
     {
         $localization->globalSet($this);
 
-        $this->localizations[$localization->locale()] = $localization;
+        $this->localizations()[$localization->locale()] = $localization;
 
         return $this;
     }
 
     public function removeLocalization($localization)
     {
-        unset($this->localizations[$localization->locale()]);
+        $this->localizations()->forget($localization->locale());
 
         return $this;
     }
 
     public function in($locale)
     {
-        return $this->localizations[$locale] ?? null;
+        return $this->localizations()->get($locale);
     }
 
     public function inSelectedSite()
@@ -185,7 +202,14 @@ class GlobalSet implements Contract
 
     public function localizations()
     {
-        return collect($this->localizations);
+        return Blink::once('global-set-localizations-'.$this->id(), function () {
+            return $this->freshLocalizations();
+        });
+    }
+
+    private function freshLocalizations()
+    {
+        return GlobalVariables::whereSet($this->handle())->keyBy->locale();
     }
 
     public function editUrl()

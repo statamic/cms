@@ -16,7 +16,7 @@ use Statamic\Sites\Site;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Structures\Page;
 use Statamic\Taxonomies\Taxonomy;
-use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValueCache;
+use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
 
 class ScopeDumper
 {
@@ -49,11 +49,13 @@ class ScopeDumper
         foreach ($data as $k => $v) {
             if (array_key_exists($k, self::$contextualKeys)) {
                 $contextual[$k] = $v;
+
                 continue;
             }
 
             if (is_string($v) || is_numeric($v) || is_bool($v) || is_null($v)) {
                 $root[$k] = $v;
+
                 continue;
             }
 
@@ -68,6 +70,7 @@ class ScopeDumper
             // Move dates to root.
             if ($v instanceof Carbon) {
                 $root[$k] = $this->dumpCarbon($v);
+
                 continue;
             }
 
@@ -135,6 +138,7 @@ class ScopeDumper
             if (is_string($v)) {
                 $variable->value = $v;
                 $vars[] = $variable;
+
                 continue;
             } elseif (is_bool($v)) {
                 if ($v) {
@@ -144,18 +148,22 @@ class ScopeDumper
                 }
 
                 $vars[] = $variable;
+
                 continue;
             } elseif (is_null($v)) {
                 $variable->value = 'null';
                 $vars[] = $variable;
+
                 continue;
             } elseif (is_numeric($v)) {
                 $variable->value = strval($v);
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof HtmlString) {
                 $variable->value = $v->toHtml();
                 $vars[] = $variable;
+
                 continue;
             } elseif (is_array($v)) {
                 self::$varIndexCount += 1;
@@ -165,19 +173,22 @@ class ScopeDumper
                 $variable->value = '{array['.count($v).']}';
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof Carbon) {
                 $variable->value = $this->dumpCarbon($v);
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof Site) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $this->additionalVars[$thisVar] = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $this->additionalVars[$thisVar] = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
 
                 $variable->value = '{site}';
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof \Illuminate\Support\Collection) {
                 self::$varIndexCount += 1;
@@ -187,6 +198,7 @@ class ScopeDumper
                 $variable->value = '{Collection['.$v->count().']}';
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof ViewErrorBag) {
                 self::$varIndexCount += 1;
@@ -196,12 +208,13 @@ class ScopeDumper
                 $variable->value = '{ViewErrorBag['.$v->count().']}';
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof Value) {
                 $resolvedValue = null;
 
                 if ($v instanceof Augmentable) {
-                    $resolvedValue = RuntimeValueCache::resolveWithRuntimeIsolation($v);
+                    $resolvedValue = RuntimeValues::resolveWithRuntimeIsolation($v);
                 } else {
                     $resolvedValue = $v->value();
                 }
@@ -210,6 +223,7 @@ class ScopeDumper
                     if ($resolvedValue instanceof Carbon) {
                         $variable->value = $this->dumpCarbon($resolvedValue);
                         $vars[] = $variable;
+
                         continue;
                     }
 
@@ -220,6 +234,7 @@ class ScopeDumper
 
                         $variable->value = '{array['.count($resolvedValue).']}';
                         $variable->variablesReference = $thisVar;
+
                         continue;
                     } else {
                         $resolvedValue = $v->value();
@@ -237,26 +252,29 @@ class ScopeDumper
                 }
 
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof Collection) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{Entries\Collection['.count($subVar).']}';
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof Page) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{Page['.count($subVar).']}';
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof EntryQueryBuilder) {
                 $subVar = $v->get()->all();
@@ -269,56 +287,62 @@ class ScopeDumper
                 $variable->value = '{EntryQuery['.count($subVar).']}';
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof Entry) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{Entry['.count($subVar).']}';
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof Blueprint) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{Blueprint['.count($subVar).']}';
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof User) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{User['.count($subVar).']}';
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof \Statamic\Auth\Eloquent\User) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{EloquentUser['.count($subVar).']}';
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
+
                 continue;
             } elseif ($v instanceof Taxonomy) {
                 self::$varIndexCount += 1;
                 $thisVar = self::$varIndexCount;
-                $subVar = $this->createVariables(RuntimeValueCache::resolveWithRuntimeIsolation($v));
+                $subVar = $this->createVariables(RuntimeValues::resolveWithRuntimeIsolation($v));
                 $this->additionalVars[$thisVar] = $subVar;
 
                 $variable->value = '{Taxonomy['.count($subVar).']}';
                 $variable->variablesReference = $thisVar;
                 $vars[] = $variable;
+
                 continue;
             }
         }

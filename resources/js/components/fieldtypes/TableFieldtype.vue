@@ -1,75 +1,87 @@
 <template>
+    <portal name="table-fullscreen" :disabled="!fullScreenMode" target-class="table-fieldtype">
+        <div class="table-fieldtype-container" :class="{'table-fullscreen bg-white': fullScreenMode }">
+            <header class="bg-gray-200 border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
+                <h2 v-text="config.display" />
+                <button class="btn-close absolute top-2 right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
+            </header>
+            <section :class="{'p-4': fullScreenMode}">
+                <table class="table-fieldtype-table" v-if="rowCount">
+                    <thead>
+                        <tr>
+                            <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
+                            <th v-for="(column, index) in columnCount" :key="index">
+                                <div class="flex items-center justify-between h-6">
+                                    <span class="column-count">{{ index + 1 }}</span>
+                                    <a v-show="canDeleteColumns" class="opacity-25 text-lg antialiased hover:opacity-75" @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')">
+                                        &times;
+                                    </a>
+                                </div>
+                            </th>
+                            <th class="row-controls pr-0">
+                                <button @click="fullScreenMode = !fullScreenMode" class="flex items-center w-full h-full justify-center text-gray-600 hover:text-gray-800">
+                                    <svg-icon name="expand-bold" class="h-3.5 w-3.5" v-show="! fullScreenMode" />
+                                    <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="fullScreenMode" />
+                                </button>
+                            </th>
+                        </tr>
+                    </thead>
 
-    <div class="table-fieldtype-container">
-        <table class="table-fieldtype-table" v-if="rowCount">
-            <thead>
-                <tr>
-                    <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
-                    <th v-for="(column, index) in columnCount" :key="index">
-                        <div class="flex items-center justify-between h-6">
-                            <span class="column-count">{{ index + 1 }}</span>
-                            <a v-show="canDeleteColumns" class="opacity-25 text-lg antialiased hover:opacity-75" @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')">
-                                &times;
-                            </a>
-                        </div>
-                    </th>
-                    <th class="row-controls" v-if="canDeleteRows"></th>
-                </tr>
-            </thead>
+                    <sortable-list
+                        v-model="data"
+                        :vertical="true"
+                        item-class="sortable-row"
+                        handle-class="table-drag-handle"
+                        :mirror="false"
+                        @dragstart="$emit('focus')"
+                        @dragend="$emit('blur')"
+                    >
+                        <tbody>
+                            <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
+                                <td class="table-drag-handle" v-if="!isReadOnly"></td>
+                                <td v-for="(cell, cellIndex) in row.value.cells">
+                                    <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" :readonly="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
+                                </td>
+                                <td class="row-controls" v-if="canDeleteRows">
+                                    <button @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75" :aria-label="__('Delete Row')">&times;</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </sortable-list>
+                </table>
 
-            <sortable-list
-                v-model="data"
-                :vertical="true"
-                item-class="sortable-row"
-                handle-class="table-drag-handle"
-                @dragstart="$emit('focus')"
-                @dragend="$emit('blur')"
+                <button class="btn" @click="addRow" :disabled="atRowMax" v-if="canAddRows">
+                    {{ __('Add Row') }}
+                </button>
+
+                <button class="btn ml-2" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
+                    {{ __('Add Column') }}
+                </button>
+            </section>
+
+            <confirmation-modal
+                v-if="deletingRow !== false"
+                :title="__('Delete Row')"
+                :bodyText="__('Are you sure you want to delete this row?')"
+                :buttonText="__('Delete')"
+                :danger="true"
+                @confirm="deleteRow(deletingRow)"
+                @cancel="deleteCancelled"
             >
-                <tbody>
-                    <tr class="sortable-row" v-for="(row, rowIndex) in data" :key="row._id">
-                        <td class="table-drag-handle" v-if="!isReadOnly"></td>
-                        <td v-for="(cell, cellIndex) in row.value.cells">
-                            <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" :readonly="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
-                        </td>
-                        <td class="row-controls" v-if="canDeleteRows">
-                            <button @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75" :aria-label="__('Delete Row')">&times;</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </sortable-list>
-        </table>
+            </confirmation-modal>
 
-        <button class="btn" @click="addRow" :disabled="atRowMax" v-if="canAddRows">
-            {{ __('Add Row') }}
-        </button>
-
-        <button class="btn ml-1" @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns">
-            {{ __('Add Column') }}
-        </button>
-
-        <confirmation-modal
-            v-if="deletingRow !== false"
-            :title="__('Delete Row')"
-            :bodyText="__('Are you sure you want to delete this row?')"
-            :buttonText="__('Delete')"
-            :danger="true"
-            @confirm="deleteRow(deletingRow)"
-            @cancel="deleteCancelled"
-        >
-        </confirmation-modal>
-
-        <confirmation-modal
-            v-if="deletingColumn !== false"
-            :title="__('Delete Column')"
-            :bodyText="__('Are you sure you want to delete this column?')"
-            :buttonText="__('Delete')"
-            :danger="true"
-            @confirm="deleteColumn(deletingColumn)"
-            @cancel="deleteCancelled"
-        >
-        </confirmation-modal>
-    </div>
-
+            <confirmation-modal
+                v-if="deletingColumn !== false"
+                :title="__('Delete Column')"
+                :bodyText="__('Are you sure you want to delete this column?')"
+                :buttonText="__('Delete')"
+                :danger="true"
+                @confirm="deleteColumn(deletingColumn)"
+                @cancel="deleteCancelled"
+            >
+            </confirmation-modal>
+        </div>
+    </portal>
 </template>
 
 <script>
@@ -90,6 +102,7 @@ export default {
             data: this.arrayToSortable(this.value || []),
             deletingRow: false,
             deletingColumn: false,
+            fullScreenMode: false
         }
     },
 

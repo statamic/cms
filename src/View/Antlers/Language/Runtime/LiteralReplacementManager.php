@@ -9,6 +9,7 @@ class LiteralReplacementManager
     protected static $regions = [];
     protected static $replacements = [];
     protected static $globalReplacement = [];
+    protected static $registeredSections = [];
     protected static $retargeted = [];
 
     public static function resetLiteralState()
@@ -17,6 +18,7 @@ class LiteralReplacementManager
         self::$replacements = [];
         self::$globalReplacement = [];
         self::$retargeted = [];
+        self::$registeredSections = [];
     }
 
     public static function registerRegion($name, $section, $default)
@@ -42,8 +44,24 @@ class LiteralReplacementManager
         return $name;
     }
 
+    /**
+     * Tests if a section name bas been registered with the manager.
+     *
+     * @param  string  $name  The section name.
+     * @return bool
+     */
+    public static function hasRegisteredSectionName($name)
+    {
+        return in_array($name, self::$registeredSections);
+    }
+
     public static function registerRegionReplacement($name, $tagMethod, $string)
     {
+        // Keep a record of all the section names we've registered.
+        if (! in_array($tagMethod, self::$registeredSections)) {
+            self::$registeredSections[] = $tagMethod;
+        }
+
         $name = '__literalReplacement::_'.md5($name);
 
         $string = (string) $string;

@@ -14,12 +14,12 @@ use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Fieldset;
-use Statamic\Facades\File;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Tags;
 use Statamic\UpdateScripts\UpdateScript;
@@ -105,6 +105,11 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $externalScripts = [];
 
     /**
+     * @var list<string> - URLs of Vite entry points
+     */
+    protected $vite = null;
+
+    /**
      * Map of path on disk to name in the public directory. The file will be published
      * as `vendor/{packageName}/{value}`.
      *
@@ -121,6 +126,11 @@ abstract class AddonServiceProvider extends ServiceProvider
      * @var array<TType, string>
      */
     protected $routes = [];
+
+    /**
+     * @var string|null
+     */
+    protected $routeNamespace;
 
     /**
      * Map of group name => Middlewares to apply.
@@ -180,6 +190,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootPolicies()
                 ->bootStylesheets()
                 ->bootScripts()
+                ->bootVite()
                 ->bootPublishables()
                 ->bootConfig()
                 ->bootTranslations()
@@ -329,6 +340,15 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
+    protected function bootVite()
+    {
+        if ($this->vite) {
+            $this->registerVite($this->vite);
+        }
+
+        return $this;
+    }
+
     protected function bootConfig()
     {
         $filename = $this->getAddon()->slug();
@@ -405,6 +425,11 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
+    protected function routeNamespace()
+    {
+        return $this->routeNamespace;
+    }
+
     /**
      * Register routes from the root of the site.
      *
@@ -414,7 +439,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerWebRoutes($routes)
     {
         Statamic::pushWebRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')->group($routes);
+            Route::namespace($this->routeNamespace())->group($routes);
         });
     }
 
@@ -427,7 +452,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerCpRoutes($routes)
     {
         Statamic::pushCpRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')->group($routes);
+            Route::namespace($this->routeNamespace())->group($routes);
         });
     }
 
@@ -440,43 +465,10 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerActionRoutes($routes)
     {
         Statamic::pushActionRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')
+            Route::namespace($this->routeNamespace())
                 ->prefix($this->getAddon()->slug())
                 ->group($routes);
         });
-    }
-
-    /**
-     * Register a route group.
-     *
-     * @param  string|Closure  $routes  Either the path to a routes file, or a closure containing routes.
-     * @param  array  $attributes  Additional attributes to be applied to the route group.
-     * @return void
-     */
-    protected function registerRouteGroup($routes, array $attributes = [])
-    {
-        if (is_string($routes)) {
-            $routes = function () use ($routes) {
-                require $routes;
-            };
-        }
-
-        Statamic::routes(function () use ($attributes, $routes) {
-            Route::group($this->routeGroupAttributes($attributes), $routes);
-        });
-    }
-
-    /**
-     * The attributes to be applied to the route group.
-     *
-     * @param  array  $overrides  Any additional attributes.
-     * @return array
-     */
-    protected function routeGroupAttributes($overrides = [])
-    {
-        return array_merge($overrides, [
-            'namespace' => $this->getAddon()->namespace(),
-        ]);
     }
 
     protected function bootMiddleware()
@@ -521,7 +513,34 @@ abstract class AddonServiceProvider extends ServiceProvider
             $path => public_path("vendor/{$name}/js/{$filename}.js"),
         ], $this->getAddon()->slug());
 
-        Statamic::script($name, "{$filename}.js?v={$version}");
+        Statamic::script($name, "{$filename}.js?v=".md5($version));
+    }
+
+    public function registerVite($config)
+    {
+        $name = $this->getAddon()->packageName();
+        $directory = $this->getAddon()->directory();
+
+        if (is_string($config) || ! Arr::isAssoc($config)) {
+            $config = ['input' => $config];
+        }
+
+        $publicDirectory = $config['publicDirectory'] ?? 'public';
+        $buildDirectory = $config['buildDirectory'] ?? 'build';
+        $hotFile = $config['hotFile'] ?? "{$directory}{$publicDirectory}/hot";
+        $input = $config['input'];
+
+        $publishSource = "{$directory}{$publicDirectory}/{$buildDirectory}/";
+        $publishTarget = public_path("vendor/{$name}/{$buildDirectory}/");
+        $this->publishes([
+            $publishSource => $publishTarget,
+        ], $this->getAddon()->slug());
+
+        Statamic::vite($name, [
+            'hotFile' => $hotFile,
+            'buildDirectory' => "vendor/{$name}/{$buildDirectory}",
+            'input' => $input,
+        ]);
     }
 
     public function registerExternalScript(string $url)
@@ -539,7 +558,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             $path => public_path("vendor/{$name}/css/{$filename}.css"),
         ], $this->getAddon()->slug());
 
-        Statamic::style($name, "{$filename}.css?v={$version}");
+        Statamic::style($name, "{$filename}.css?v=".md5($version));
     }
 
     public function registerExternalStylesheet(string $url)
@@ -584,7 +603,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             return $this;
         }
 
-        if (empty($this->scripts) && empty($this->stylesheets)) {
+        if (empty($this->scripts) && empty($this->stylesheets) && empty($this->vite) && empty($this->publishables)) {
             return $this;
         }
 

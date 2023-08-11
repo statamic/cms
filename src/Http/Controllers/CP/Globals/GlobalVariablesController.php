@@ -104,7 +104,7 @@ class GlobalVariablesController extends CpController
 
         $set->data($values);
 
-        $set->save();
+        $set->globalSet()->addLocalization($set)->save();
 
         return response('', 204);
     }

@@ -43,7 +43,6 @@ class CollectionsStore extends BasicStore
             ->titleFormats(array_get($data, 'title_format'))
             ->mount(array_get($data, 'mount'))
             ->dated(array_get($data, 'date', false))
-            ->ampable(array_get($data, 'amp', false))
             ->sites($sites)
             ->template(array_get($data, 'template'))
             ->layout(array_get($data, 'layout'))
@@ -57,7 +56,8 @@ class CollectionsStore extends BasicStore
             ->sortDirection(array_get($data, 'sort_dir'))
             ->taxonomies(array_get($data, 'taxonomies'))
             ->propagate(array_get($data, 'propagate'))
-            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])));
+            ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])))
+            ->autosaveInterval(array_get($data, 'autosave'));
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
             $collection
@@ -118,6 +118,7 @@ class CollectionsStore extends BasicStore
             return [
                 'format' => $target['url'],
                 'label' => $target['label'],
+                'refresh' => $target['refresh'] ?? true,
             ];
         })->all();
     }
