@@ -919,6 +919,32 @@ class NavTransformerTest extends TestCase
     }
 
     /** @test */
+    public function it_can_create_a_new_section_with_special_characters_in_display()
+    {
+        $transformed = $this->transform([
+            [
+                'display_original' => 'Foo & Bar Section (One + Two)',
+                'items' => [
+                    [
+                        'id' => 'content::collections::pages',
+                        'manipulations' => [
+                            'action' => '@alias',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $expected = [
+            'foo_bar_section_one_two' => [
+                'content::collections::pages' => '@alias',
+            ],
+        ];
+
+        $this->assertEquals($expected, $transformed);
+    }
+
+    /** @test */
     public function it_ignores_new_section_which_contain_no_manipulations()
     {
         $transformed = $this->transform([
