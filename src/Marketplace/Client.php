@@ -57,8 +57,8 @@ class Client
                 'query' => $params,
                 'proxy' => [
                     'http' => env('APP_HTTP_PROXY', null),
-                    'https' => env('APP_HTTPS_PROXY', null),
-                ]
+                    'https' => env('APP_HTTPS_PROXY', null)
+                ],
             ]);
 
             $json = json_decode($response->getBody(), true);
