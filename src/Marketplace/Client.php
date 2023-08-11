@@ -55,6 +55,10 @@ class Client
             $response = Guzzle::request('GET', $endpoint, [
                 'verify' => $this->verifySsl,
                 'query' => $params,
+                'proxy' => [
+                    'http' => env('APP_HTTP_PROXY', null),
+                    'https' => env('APP_HTTPS_PROXY', null)
+                ]
             ]);
 
             $json = json_decode($response->getBody(), true);
