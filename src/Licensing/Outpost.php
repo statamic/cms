@@ -65,8 +65,8 @@ class Outpost
             'json' => $this->payload(),
             'timeout' => self::REQUEST_TIMEOUT,
             'proxy' => [
-                    'http' => env('APP_HTTP_PROXY', null),
-                    'https' => env('APP_HTTPS_PROXY', null),
+                'http' => env('APP_HTTP_PROXY', null),
+                'https' => env('APP_HTTPS_PROXY', null),
             ],
         ]);
 
