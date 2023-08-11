@@ -54,7 +54,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    public function is_can_create_a_nav_item()
+    public function it_can_create_a_nav_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
