@@ -64,6 +64,10 @@ class Outpost
             'headers' => ['accept' => 'application/json'],
             'json' => $this->payload(),
             'timeout' => self::REQUEST_TIMEOUT,
+            'proxy' => [
+                    'http' => env('APP_HTTP_PROXY', null),
+                    'https' => env('APP_HTTPS_PROXY', null)
+            ]
         ]);
 
         return json_decode($response->getBody()->getContents(), true);
