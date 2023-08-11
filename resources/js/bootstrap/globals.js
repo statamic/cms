@@ -1,6 +1,6 @@
 import { marked } from 'marked';
 import { translate, translateChoice } from '../translations/translator';
-import uniqid from 'uniqid';
+import uid from 'uniqid';
 
 export function cp_url(url) {
     url = Statamic.$config.get('cpUrl') + '/' + url;
@@ -86,6 +86,6 @@ export function utf8btoa(stringToEncode) {
     return btoa(utf8String);
 }
 
-export function row_id() {
-    return uniqid();
+export function uniqid() {
+    return uid();
 }
