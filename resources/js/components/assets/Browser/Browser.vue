@@ -482,7 +482,11 @@ export default {
                 : this.path;
 
             this.$emit('navigated', this.container, path);
-        }
+        },
+
+        searchQuery() {
+            this.page = 1;
+        },
 
     },
 

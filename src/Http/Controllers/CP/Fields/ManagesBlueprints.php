@@ -60,11 +60,24 @@ trait ManagesBlueprints
         }
     }
 
+    private function validateReservedFieldHandles($blueprint)
+    {
+        $handles = $blueprint->fields()->all()->keys();
+
+        if ($handles->contains('id')) {
+            throw ValidationException::withMessages([
+                'tabs' => __('statamic::validation.reserved_field_handle', ['handle' => 'id']),
+            ]);
+        }
+    }
+
     private function updateBlueprint($request, $blueprint)
     {
         $this->setBlueprintContents($request, $blueprint);
 
         $this->validateUniqueHandles($blueprint);
+
+        $this->validateReservedFieldHandles($blueprint);
 
         $blueprint->save();
     }

@@ -365,6 +365,10 @@ class Date extends Fieldtype
             ]);
         }
 
+        if ($value === null) {
+            return null;
+        }
+
         if ($this->config('mode', 'single') === 'single') {
             return $this->preProcessSingleValidatable($value);
         }
@@ -383,7 +387,7 @@ class Date extends Fieldtype
             return $value;
         }
 
-        if (! $value || ! $value['date']) {
+        if (! $value['date']) {
             return null;
         }
 

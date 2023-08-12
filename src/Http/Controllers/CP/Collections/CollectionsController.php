@@ -105,6 +105,9 @@ class CollectionsController extends CpController
                     'name' => $site->name(),
                 ];
             })->values()->all(),
+            'createUrls' => $collection->sites()
+                ->mapWithKeys(fn ($site) => [$site => cp_route('collections.entries.create', [$collection->handle(), $site])])
+                ->all(),
         ];
 
         if ($collection->queryEntries()->count() === 0) {

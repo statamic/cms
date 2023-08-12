@@ -16,6 +16,7 @@ use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
@@ -89,6 +90,11 @@ class Entries extends Relationship
                         'instructions' => __('statamic::fieldtypes.entries.config.collections'),
                         'type' => 'collections',
                         'mode' => 'select',
+                    ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
+                        'type' => 'taggable',
                     ],
                 ],
             ],
@@ -200,6 +206,8 @@ class Entries extends Relationship
         if ($request->exclusions) {
             $query->whereNotIn('id', $request->exclusions);
         }
+
+        $this->applyIndexQueryScopes($query, $request->all());
 
         return $query;
     }
@@ -344,5 +352,10 @@ class Entries extends Relationship
         return $this->config('max_items') === 1
             ? collect([$augmented])
             : $augmented->whereAnyStatus()->get();
+    }
+
+    public function filter()
+    {
+        return new EntriesFilter($this);
     }
 }

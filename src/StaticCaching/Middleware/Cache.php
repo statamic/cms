@@ -5,10 +5,12 @@ namespace Statamic\StaticCaching\Middleware;
 use Closure;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
+use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\Lock\LockFactory;
@@ -47,12 +49,12 @@ class Cache
             sleep(1);
         }
 
-        if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            $response = response($this->cacher->getCachedPage($request));
-
-            $this->makeReplacements($response);
-
-            return $response;
+        try {
+            if ($response = $this->attemptToGetCachedResponse($request)) {
+                return $response;
+            }
+        } catch (RegionNotFound $e) {
+            Log::debug("Static cache region [{$e->getRegion()}] not found on [{$request->fullUrl()}]. Serving uncached response.");
         }
 
         $response = $next($request);
@@ -68,6 +70,17 @@ class Cache
         }
 
         return $response;
+    }
+
+    private function attemptToGetCachedResponse($request)
+    {
+        if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
+            $response = response($this->cacher->getCachedPage($request));
+
+            $this->makeReplacements($response);
+
+            return $response;
+        }
     }
 
     private function makeReplacementsAndCacheResponse($request, $response)

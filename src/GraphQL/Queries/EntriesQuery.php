@@ -44,6 +44,7 @@ class EntriesQuery extends Query
             'page' => GraphQL::int(),
             'filter' => GraphQL::type(JsonArgument::NAME),
             'sort' => GraphQL::listOf(GraphQL::string()),
+            'site' => GraphQL::string(),
         ];
     }
 
@@ -52,6 +53,10 @@ class EntriesQuery extends Query
         $query = Entry::query();
 
         $query->whereIn('collection', $args['collection'] ?? $this->allowedSubResources());
+
+        if ($site = $args['site'] ?? null) {
+            $query->where('site', $site);
+        }
 
         $this->filterQuery($query, $args['filter'] ?? []);
 
