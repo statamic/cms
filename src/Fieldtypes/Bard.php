@@ -266,7 +266,7 @@ class Bard extends Replicator
             return $this->processRow($row);
         })->all();
 
-        $structure = $this->callExtensions($structure, 'process');
+        $structure = $this->callExtensions('process', $structure);
 
         if ($this->shouldSaveHtml()) {
             return (new Augmentor($this))->withStatamicImageUrls()->convertToHtml($structure);
@@ -381,7 +381,7 @@ class Bard extends Replicator
             return $this->preProcessRow($row, $i);
         })->all();
 
-        $value = $this->callExtensions($value, 'preProcess');
+        $value = $this->callExtensions('preProcess', $value);
 
         return json_encode($value);
     }
@@ -416,7 +416,7 @@ class Bard extends Replicator
             return $value['type'] === 'set';
         })->values()->all();
 
-        $data = $this->callExtensions($data, 'preProcessIndex');
+        $data = $this->callExtensions('preProcessIndex', $data);
 
         return (new Augmentor($this))->renderProsemirrorToHtml([
             'type' => 'doc',
@@ -440,7 +440,7 @@ class Bard extends Replicator
             }, collect())->all();
         }
 
-        $rules = $this->callExtensions($rules, 'extraRules');
+        $rules = $this->callExtensions('extraRules', $rules);
 
         return $rules;
     }
@@ -466,7 +466,7 @@ class Bard extends Replicator
             }, collect())->all();
         }
 
-        $attributes = $this->callExtensions($attributes, 'extraValidationAttributes');
+        $attributes = $this->callExtensions('extraValidationAttributes', $attributes);
 
         return $attributes;
     }
@@ -587,7 +587,7 @@ class Bard extends Replicator
             'linkData' => (object) $this->getLinkData($value),
         ];
 
-        $data = $this->callExtensions($data, 'preload');
+        $data = $this->callExtensions('preload', $data);
 
         return $data;
     }
@@ -618,17 +618,17 @@ class Bard extends Replicator
             return $item;
         })->all();
 
-        $value = $this->callExtensions($value, 'preProcessValidatable');
+        $value = $this->callExtensions('preProcessValidatable', $value);
 
         return $value;
     }
 
-    public function callExtensions($value, $method)
+    public function callExtensions($method, $value, ...$extras)
     {
         collect((new Augmentor($this))->extensions())
             ->filter(fn ($extension) => method_exists($extension, $method))
-            ->each(function ($extension) use (&$value, $method) {
-                $value = $extension->{$method}($value);
+            ->each(function ($extension) use ($method, &$value, $extras) {
+                $value = $extension->{$method}($value, ...$extras);
             });
 
         return $value;
