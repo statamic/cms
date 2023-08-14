@@ -533,6 +533,7 @@ class TreeTest extends TestCase
 
     /**
      * @test
+     *
      * @group tree-caching
      */
     public function it_caches_validated_structures()
@@ -549,6 +550,7 @@ class TreeTest extends TestCase
 
     /**
      * @test
+     *
      * @group tree-caching
      */
     public function cached_tree_is_the_new_tree()
