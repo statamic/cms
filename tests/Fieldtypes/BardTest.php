@@ -1159,6 +1159,8 @@ EOT;
         $this->assertArrayHasKey('customData', $bard->preload(json_encode($data)));
         $this->assertArrayHasKey('custom_field', $bard->extraRules(json_encode($data)));
         $this->assertArrayHasKey('custom_field', $bard->extraValidationAttributes(json_encode($data)));
+
+        Augmentor::removeExtension('customExtension');
     }
 
     private function bard($config = [])

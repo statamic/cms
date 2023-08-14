@@ -120,6 +120,11 @@ class Augmentor
         static::$extensions[$name] = $extension;
     }
 
+    public static function removeExtension($name)
+    {
+        unset(static::$extensions[$name]);
+    }
+
     public static function replaceExtension($name, $extension)
     {
         static::$extensionReplacements[$name] = $extension;
