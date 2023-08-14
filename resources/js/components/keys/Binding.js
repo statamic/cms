@@ -1,4 +1,4 @@
-const mousetrap = require('mousetrap');
+import mousetrap from 'mousetrap';
 
 export default class Binding {
 

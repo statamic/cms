@@ -3,14 +3,6 @@
 
 @section('content')
 
-    <header class="mb-3">
-        @include('statamic::partials.breadcrumb', [
-            'url' => cp_route('forms.show', $form->handle()),
-            'title' => $form->title()
-        ])
-        <h1>@yield('title')</h1>
-    </header>
-
     <collection-edit-form
         initial-title="{{ $form->title() }}"
         :blueprint="{{ json_encode($blueprint) }}"

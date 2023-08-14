@@ -2,13 +2,13 @@
 
 namespace Statamic\View\Antlers;
 
-use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\View\Engine as EngineInterface;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Exceptions;
+use Statamic\Facades\Cascade;
 use Statamic\Facades\Compare;
 use Statamic\Facades\Parse;
 use Statamic\Fields\Value;
@@ -48,9 +48,6 @@ class Engine implements EngineInterface
 
     /**
      * Create a new AntlersEngine instance.
-     *
-     * @param  Filesystem  $filesystem
-     * @param  Parser  $parser
      */
     public function __construct(Filesystem $filesystem, Parser $parser)
     {
@@ -74,7 +71,6 @@ class Engine implements EngineInterface
      * Get the evaluated contents of the view.
      *
      * @param  string  $path
-     * @param  array  $data
      * @return string
      */
     public function get($path, array $data = [])
@@ -150,11 +146,11 @@ class Engine implements EngineInterface
 
         try {
             $tag = app(TagLoader::class)->load($name, [
-                'parser'     => $parser,
-                'params'     => $parameters,
-                'content'    => $content,
-                'context'    => $context,
-                'tag'        => $name.':'.$original_method,
+                'parser' => $parser,
+                'params' => $parameters,
+                'content' => $content,
+                'context' => $context,
+                'tag' => $name.':'.$original_method,
                 'tag_method' => $original_method,
             ]);
 

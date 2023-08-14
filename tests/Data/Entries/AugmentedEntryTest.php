@@ -37,6 +37,7 @@ class AugmentedEntryTest extends AugmentedTestCase
         config(['statamic.amp.enabled' => true]);
 
         $blueprint = Blueprint::makeFromFields([
+            'date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true],
             'two' => ['type' => 'text'],
             'four' => ['type' => 'text'],
             'six' => ['type' => 'text'],
@@ -45,8 +46,8 @@ class AugmentedEntryTest extends AugmentedTestCase
         Blueprint::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
 
         $collection = tap(Collection::make('test')
+            ->dated(true)
             ->routes('/test/{slug}')
-            ->ampable(true)
             ->cascade(['seven' => 'the "seven" value from the collection']))
             ->save();
 
@@ -74,7 +75,7 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $entry
             ->origin('origin-id')
-            ->date('2018-01-03-1705')
+            ->date('2018-01-03-170512')
             ->blueprint('test')
             ->setSupplement('three', 'the "three" value supplemented on the entry')
             ->setSupplement('four', 'the "four" value supplemented on the entry and in the blueprint')
@@ -85,38 +86,37 @@ class AugmentedEntryTest extends AugmentedTestCase
         $augmented = new AugmentedEntry($entry);
 
         $expectations = [
-            'id'            => ['type' => 'string', 'value' => 'entry-id'],
-            'origin_id'     => ['type' => 'string', 'value' => 'origin-id'],
-            'slug'          => ['type' => 'string', 'value' => 'entry-slug'],
-            'uri'           => ['type' => 'string', 'value' => '/test/entry-slug'],
-            'url'           => ['type' => 'string', 'value' => '/test/entry-slug'],
-            'edit_url'      => ['type' => 'string', 'value' => 'http://localhost/cp/collections/test/entries/entry-id'],
-            'permalink'     => ['type' => 'string', 'value' => 'http://localhost/test/entry-slug'],
-            'amp_url'       => ['type' => 'string', 'value' => 'http://localhost/amp/test/entry-slug'],
-            'api_url'       => ['type' => 'string', 'value' => 'http://localhost/api/collections/test/entries/entry-id'],
-            'status'        => ['type' => 'string', 'value' => 'published'],
-            'published'     => ['type' => 'bool', 'value' => true],
-            'private'       => ['type' => 'bool', 'value' => false],
-            'date'          => ['type' => Carbon::class, 'value' => '2018-01-03 17:05'],
-            'order'         => ['type' => 'null', 'value' => null], // todo: test for when this is an int
-            'is_entry'      => ['type' => 'bool', 'value' => true],
-            'collection'    => ['type' => CollectionContract::class, 'value' => $collection],
-            'blueprint'     => ['type' => FieldsBlueprint::class, 'value' => $blueprint],
-            'mount'         => ['type' => CollectionContract::class, 'value' => $mount],
-            'locale'        => ['type' => 'string', 'value' => 'en'],
+            'id' => ['type' => 'string', 'value' => 'entry-id'],
+            'origin_id' => ['type' => 'string', 'value' => 'origin-id'],
+            'slug' => ['type' => 'string', 'value' => 'entry-slug'],
+            'uri' => ['type' => 'string', 'value' => '/test/entry-slug'],
+            'url' => ['type' => 'string', 'value' => '/test/entry-slug'],
+            'edit_url' => ['type' => 'string', 'value' => 'http://localhost/cp/collections/test/entries/entry-id'],
+            'permalink' => ['type' => 'string', 'value' => 'http://localhost/test/entry-slug'],
+            'api_url' => ['type' => 'string', 'value' => 'http://localhost/api/collections/test/entries/entry-id'],
+            'status' => ['type' => 'string', 'value' => 'published'],
+            'published' => ['type' => 'bool', 'value' => true],
+            'private' => ['type' => 'bool', 'value' => false],
+            'date' => ['type' => Carbon::class, 'value' => '2018-01-03 17:05:12'],
+            'order' => ['type' => 'null', 'value' => null], // todo: test for when this is an int
+            'is_entry' => ['type' => 'bool', 'value' => true],
+            'collection' => ['type' => CollectionContract::class, 'value' => $collection],
+            'blueprint' => ['type' => FieldsBlueprint::class, 'value' => $blueprint],
+            'mount' => ['type' => CollectionContract::class, 'value' => $mount],
+            'locale' => ['type' => 'string', 'value' => 'en'],
             'last_modified' => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
-            'updated_at'    => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
-            'updated_by'    => ['type' => UserContract::class, 'value' => 'test-user'],
-            'one'           => ['type' => 'string', 'value' => 'the "one" value on the entry'],
-            'two'           => ['type' => 'string', 'value' => 'the "two" value on the entry and in the blueprint'],
-            'three'         => ['type' => 'string', 'value' => 'the "three" value supplemented on the entry'],
-            'four'          => ['type' => 'string', 'value' => 'the "four" value supplemented on the entry and in the blueprint'],
-            'five'          => ['type' => 'string', 'value' => 'the "five" value from the origin'],
-            'six'           => ['type' => 'string', 'value' => 'the "six" value from the origin and in the blueprint'],
-            'seven'         => ['type' => 'string', 'value' => 'the "seven" value from the collection'],
-            'eight'         => ['type' => 'null', 'value' => null], // explicitly supplemented null
-            'title'         => ['type' => 'string', 'value' => null],
-            'unused_in_bp'  => ['type' => 'string', 'value' => null],
+            'updated_at' => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
+            'updated_by' => ['type' => UserContract::class, 'value' => 'test-user'],
+            'one' => ['type' => 'string', 'value' => 'the "one" value on the entry'],
+            'two' => ['type' => 'string', 'value' => 'the "two" value on the entry and in the blueprint'],
+            'three' => ['type' => 'string', 'value' => 'the "three" value supplemented on the entry'],
+            'four' => ['type' => 'string', 'value' => 'the "four" value supplemented on the entry and in the blueprint'],
+            'five' => ['type' => 'string', 'value' => 'the "five" value from the origin'],
+            'six' => ['type' => 'string', 'value' => 'the "six" value from the origin and in the blueprint'],
+            'seven' => ['type' => 'string', 'value' => 'the "seven" value from the collection'],
+            'eight' => ['type' => 'null', 'value' => null], // explicitly supplemented null
+            'title' => ['type' => 'string', 'value' => null],
+            'unused_in_bp' => ['type' => 'string', 'value' => null],
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
@@ -194,5 +194,32 @@ class AugmentedEntryTest extends AugmentedTestCase
         $this->assertInstanceOf(Builder::class, $authors);
         $this->assertEveryItemIsInstanceOf(\Statamic\Contracts\Auth\User::class, $authors->get());
         $this->assertEquals(['user-1', 'user-2'], $authors->get()->map->id()->all());
+    }
+
+    /** @test */
+    public function it_doesnt_evaluated_computed_callbacks_when_getting_keys()
+    {
+        $computedCallbackCount = 0;
+        Collection::computed('test', 'computed', function () use (&$computedCallbackCount) {
+            $computedCallbackCount++;
+
+            return 'computed value';
+        });
+
+        $entry = EntryFactory::id('entry-id')
+            ->collection('test')
+            ->slug('entry-slug')
+            ->data(['foo' => 'bar'])
+            ->create();
+
+        $augmented = new AugmentedEntry($entry);
+
+        $this->assertEquals(0, $computedCallbackCount);
+        $augmented->keys();
+        $this->assertEquals(0, $computedCallbackCount);
+        $augmented->get('computed');
+        $this->assertEquals(1, $computedCallbackCount);
+        $augmented->get('computed');
+        $this->assertEquals(2, $computedCallbackCount);
     }
 }

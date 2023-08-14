@@ -33,14 +33,14 @@ class Utility
         return $this
             ->fluentlyGetOrSet('icon')
             ->setter(function ($value) {
-                return Str::startsWith($value, '<svg') ? $value : Statamic::svg($value);
+                return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
             })
             ->value($icon);
     }
 
     public function slug()
     {
-        return Str::slug($this->handle);
+        return Str::slug(Str::replace('_', '-', $this->handle));
     }
 
     public function action($action = null)
@@ -102,10 +102,5 @@ class Utility
     public function routes(Closure $routes = null)
     {
         return $this->fluentlyGetOrSet('routes')->args(func_get_args());
-    }
-
-    public function register()
-    {
-        \Statamic\Facades\Utility::push($this);
     }
 }

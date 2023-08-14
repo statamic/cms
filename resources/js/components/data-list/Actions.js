@@ -44,34 +44,33 @@ export default {
             };
 
             this.$axios.post(this.url, payload, { responseType: 'blob' }).then(response => {
-                if (response.headers['content-disposition']) {
-                    this.downloadFile(response);
-                    this.$emit('completed', true);
-                }
+                response.headers['content-disposition']
+                    ? this.handleFileDownload(response) // Pass blob response for downloads
+                    : this.handleActionSuccess(response); // Otherwise handle as normal, converting from JSON
+            }).catch(error => this.handleActionError(error.response));
+        },
 
-                // We need a blob for file downloads, but we need to convert it back to JSON to handle a redirect
-                else {
-                    response.data.text().then(data => {
-                        data = JSON.parse(data);
-                        if (data.redirect) window.location = data.redirect;
-                        this.$emit('completed', true, data);
-                    });
-                }
-            }).catch(error => {
-                error.response.data.text().then(data => {
-                    data = JSON.parse(data);
-                    this.$toast.error(data.message);
-                    if (error.response.status == 422) this.errors = data.errors;
-                    this.$emit('completed', false, data)
-                });
+        handleActionSuccess(response) {
+            response.data.text().then(data => {
+                data = JSON.parse(data);
+                if (data.redirect) window.location = data.redirect;
+                if (data.callback) Statamic.$callbacks.call(data.callback[0], ...data.callback.slice(1));
+                this.$emit('completed', true, data);
             });
         },
 
-        downloadFile(response) {
+        handleActionError(response) {
+            response.data.text().then(data => {
+                data = JSON.parse(data);
+                if (response.status == 422) this.errors = data.errors;
+                this.$toast.error(data.message);
+                this.$emit('completed', false, data);
+            });
+        },
+
+        handleFileDownload(response) {
             const attachmentMatch = response.headers['content-disposition'].match(/^attachment.+filename\*?=(?:UTF-8'')?"?([^"]+)"?/i) || [];
-
             if (! attachmentMatch.length) return;
-
             const filename = attachmentMatch.length >= 2 ? attachmentMatch[1] : 'file.txt';
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -79,6 +78,7 @@ export default {
             link.setAttribute('download', filename);
             document.body.appendChild(link);
             link.click();
+            this.$emit('completed', true);
         },
 
     }

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Statamic\Assets\AssetReferenceUpdater;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReferencesUpdated;
+use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\Subscriber;
 
@@ -15,6 +16,7 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
 
     protected $listeners = [
         AssetSaved::class => 'handleSaved',
+        AssetReplaced::class => 'handleReplaced',
         AssetDeleted::class => 'handleDeleted',
     ];
 
@@ -34,8 +36,6 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
 
     /**
      * Handle the asset saved event.
-     *
-     * @param  AssetSaved  $event
      */
     public function handleSaved(AssetSaved $event)
     {
@@ -47,9 +47,19 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
     }
 
     /**
+     * Handle the asset replaced event.
+     */
+    public function handleReplaced(AssetReplaced $event)
+    {
+        $asset = $event->newAsset;
+        $originalPath = $event->originalAsset->path();
+        $newPath = $event->newAsset->path();
+
+        $this->replaceReferences($asset, $originalPath, $newPath);
+    }
+
+    /**
      * Handle the asset deleted event.
-     *
-     * @param  AssetDeleted  $event
      */
     public function handleDeleted(AssetDeleted $event)
     {

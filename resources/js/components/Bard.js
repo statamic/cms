@@ -1,11 +1,8 @@
-import * as core from 'tiptap';
-import * as commands from 'tiptap-commands';
-import * as utils from 'tiptap-utils';
-import * as extensions from 'tiptap-extensions';
-import Link from './fieldtypes/bard/Link';
-import Image from './fieldtypes/bard/Image';
-import Subscript from './fieldtypes/bard/Subscript';
-import Superscript from './fieldtypes/bard/Superscript';
+import * as core from '@tiptap/core';
+import * as vue2 from '@tiptap/vue-2';
+import * as state from '@tiptap/pm/state';
+import * as model from '@tiptap/pm/model';
+import * as view from '@tiptap/pm/view';
 
 class Bard {
     constructor(instance) {
@@ -13,11 +10,6 @@ class Bard {
         this.extensionCallbacks = [];
         this.extensionReplacementCallbacks = [];
         this.buttonCallbacks = [];
-    }
-
-    /** @deprecated */
-    extend(callback) {
-        this.addExtension(callback);
     }
 
     addExtension(callback) {
@@ -35,16 +27,13 @@ class Bard {
     get tiptap() {
         return {
             core,
-            commands,
-            utils,
-            extensions: {
-                ...extensions,
-                Link,
-                Image,
-                Subscript,
-                Superscript,
-            },
-         };
+            vue2,
+            pm: {
+                state,
+                model,
+                view
+            }
+        };
     }
 }
 

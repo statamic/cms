@@ -34,8 +34,6 @@ class FileCacher extends AbstractCacher
     private $nocachePlaceholder;
 
     /**
-     * @param  Writer  $writer
-     * @param  Repository  $cache
      * @param  array  $config
      */
     public function __construct(Writer $writer, Repository $cache, $config)
@@ -71,7 +69,6 @@ class FileCacher extends AbstractCacher
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
      * @return string
      */
     public function getCachedPage(Request $request)
@@ -116,16 +113,15 @@ class FileCacher extends AbstractCacher
      */
     public function invalidateUrl($url, $domain = null)
     {
-        if (! $key = $this->getUrls($domain)->flip()->get($url)) {
-            // URL doesn't exist, nothing to invalidate.
-            return;
-        }
-
         $site = optional(Site::findByUrl($domain.$url))->handle();
 
-        $this->writer->delete($this->getFilePath($url, $site));
-
-        $this->forgetUrl($key, $domain);
+        $this
+            ->getUrls($domain)
+            ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
+            ->each(function ($value, $key) use ($site, $domain) {
+                $this->writer->delete($this->getFilePath($value, $site));
+                $this->forgetUrl($key, $domain);
+            });
     }
 
     public function getCachePaths()
@@ -133,7 +129,7 @@ class FileCacher extends AbstractCacher
         $paths = $this->config('path');
 
         if (! is_array($paths)) {
-            $paths = [$this->config('locale') => $paths];
+            $paths = Site::all()->mapWithKeys(fn ($site) => [$site->handle() => $paths])->all();
         }
 
         return $paths;
@@ -159,7 +155,6 @@ class FileCacher extends AbstractCacher
     /**
      * Get the path to the cached file.
      *
-     * @param $url
      * @return string
      */
     public function getFilePath($url, $site = null)
@@ -196,36 +191,44 @@ class FileCacher extends AbstractCacher
         $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
 
         $default = <<<EOT
-var els = document.getElementsByClassName('nocache');
-var map = {};
-for (var i = 0; i < els.length; i++) {
-    var section = els[i].getAttribute('data-nocache');
-    map[section] = els[i];
-}
+(function() {
+    var els = document.getElementsByClassName('nocache');
+    var map = {};
+    for (var i = 0; i < els.length; i++) {
+        var section = els[i].getAttribute('data-nocache');
+        map[section] = els[i];
+    }
 
-fetch('/!/nocache', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        url: window.location.href,
-        sections: Object.keys(map)
+    fetch('/!/nocache', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            url: window.location.href,
+            sections: Object.keys(map)
+        })
     })
-})
-.then((response) => response.json())
-.then((data) => {
-    const regions = data.regions;
-    for (var key in regions) {
-        if (map[key]) map[key].outerHTML = regions[key];
-    }
+    .then((response) => response.json())
+    .then((data) => {
+        const regions = data.regions;
+        for (var key in regions) {
+            if (map[key]) map[key].outerHTML = regions[key];
+        }
 
-    for (const input of document.querySelectorAll('input[value=$csrfPlaceholder]')) {
-        input.value = data.csrf;
-    }
+        for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
+            input.value = data.csrf;
+        }
 
-    for (const meta of document.querySelectorAll('meta[content=$csrfPlaceholder]')) {
-        meta.content = data.csrf;
-    }
-});
+        for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
+            meta.content = data.csrf;
+        }
+        
+        if (window.hasOwnProperty('livewire_token')) {
+            window.livewire_token = data.csrf
+        }
+
+        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));
+    });
+})();
 EOT;
 
         return $this->nocacheJs ?? $default;

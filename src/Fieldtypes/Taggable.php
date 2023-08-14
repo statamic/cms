@@ -19,7 +19,6 @@ class Taggable extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.select.config.placeholder'),
                 'type' => 'text',
                 'default' => '',
-                'width' => 50,
             ],
         ];
     }

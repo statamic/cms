@@ -1,5 +1,5 @@
 <template>
-    <div><component :is="component" :handle="handle" :value="value" :values="values" /></div>
+    <div><component :class="cssClass" :is="component" :handle="handle" :value="value" :values="values" /></div>
 </template>
 
 <script>
@@ -25,6 +25,10 @@ export default {
             if (!this.fieldtype) return fallback;
 
             return Vue.options.components[custom] ? custom : fallback;
+        },
+
+        cssClass() {
+            return this.fieldtype ? `${this.fieldtype}-index-field` : '';
         }
 
     }

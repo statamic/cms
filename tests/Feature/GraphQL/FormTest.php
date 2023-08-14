@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
@@ -25,12 +26,13 @@ class FormTest extends TestCase
         Form::all()->each->delete();
     }
 
-    /**
-     * @test
-     * @environment-setup disableQueries
-     **/
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'forms')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'forms')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{form}'])
@@ -53,6 +55,10 @@ class FormTest extends TestCase
 }
 GQL;
 
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'forms')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'forms')->andReturn(Form::all()->map->handle()->all())->once();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
@@ -67,6 +73,39 @@ GQL;
     }
 
     /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource()
+    {
+        $query = <<<'GQL'
+{
+    form(handle: "support") {
+        handle
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'forms')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'forms')->andReturn([])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'handle' => ['Forbidden: support'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'form' => null,
+                ],
+            ]);
+    }
+
+    /** @test */
     public function it_queries_the_fields()
     {
         Form::make('contact')->title('Contact Us')->save();
@@ -78,9 +117,10 @@ GQL;
                 'instructions' => 'Enter your name',
                 'placeholder' => 'Type here...',
                 'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
+                'width' => 50,
             ],
             'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
-            'message' => ['type' => 'textarea'],
+            'message' => ['type' => 'textarea', 'width' => 33],
         ]);
 
         BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
@@ -93,6 +133,7 @@ GQL;
             type
             display
             instructions
+            width
             config
         }
     }
@@ -111,6 +152,7 @@ GQL;
                             'type' => 'text',
                             'display' => 'Your Name',
                             'instructions' => 'Enter your name',
+                            'width' => 50,
                             'config' => [
                                 'placeholder' => 'Type here...',
                             ],
@@ -120,6 +162,7 @@ GQL;
                             'type' => 'select',
                             'display' => 'Subject',
                             'instructions' => null,
+                            'width' => 100,
                             'config' => [
                                 'options' => ['disco' => 'Disco', 'house' => 'House'],
                             ],
@@ -129,6 +172,7 @@ GQL;
                             'type' => 'textarea',
                             'display' => 'Message',
                             'instructions' => null,
+                            'width' => 33,
                             'config' => [],
                         ],
                     ],

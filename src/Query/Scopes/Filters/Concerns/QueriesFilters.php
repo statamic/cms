@@ -29,6 +29,7 @@ trait QueriesFilters
             ->mapWithKeys(function ($filter, $handle) use (&$values, &$badges) {
                 return [$handle => $filter->filterInstance->badge($filter->values)];
             })
+            ->reject(fn ($badges) => empty($badges))
             ->all();
     }
 }

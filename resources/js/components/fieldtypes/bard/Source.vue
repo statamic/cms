@@ -4,7 +4,7 @@
         <div
             v-for="(block, i) in blocks"
             :key="i"
-            class="p-2"
+            class="p-4"
         >
             <pre
                 class="whitespace-pre-wrap leading-normal text-xs font-mono"
@@ -12,7 +12,7 @@
                 v-text="block.text" />
 
             <div
-                class="border border-dashed p-1 rounded text-xs"
+                class="border border-dashed p-2 rounded text-xs"
                 v-if="block.type === 'set'"
                 v-text="setDisplay(block.set)" />
         </div>
@@ -21,13 +21,13 @@
 </template>
 
 <script>
-const pretty = require('pretty');
+import pretty from 'pretty';
 
 export default {
 
     props: ['html'],
 
-    inject: ['setConfigs'],
+    inject: ['bard'],
 
     computed: {
 
@@ -48,7 +48,7 @@ export default {
     methods: {
 
         setDisplay(handle) {
-            const set = _.findWhere(this.setConfigs, { handle });
+            const set = _.findWhere(this.bard.setConfigs, { handle });
             return set.display || handle;
         }
 

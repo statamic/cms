@@ -76,6 +76,10 @@ class LanguageOperatorManager
         $value = null;
 
         if ($operator == LanguageOperatorRegistry::ARR_PLUCK) {
+            if ($a === null) {
+                return [];
+            }
+
             $tmpValue = Arr::pluck($a, $b);
             $value = [];
 

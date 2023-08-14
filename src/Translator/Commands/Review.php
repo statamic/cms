@@ -15,6 +15,8 @@ class Review extends Command
 {
     protected $files;
     protected $englishTranslations = [];
+    protected $input;
+    protected $output;
 
     public function __construct(Filesystem $files)
     {

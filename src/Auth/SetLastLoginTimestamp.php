@@ -3,15 +3,17 @@
 namespace Statamic\Auth;
 
 use Illuminate\Auth\Events\Login;
-use Statamic\Contracts\Auth\User as StatamicUser;
 use Statamic\Facades\User;
 
 class SetLastLoginTimestamp
 {
     public function handle(Login $event)
     {
-        if ($event->user instanceof StatamicUser) {
-            User::fromUser($event->user)->setLastLogin(now());
+        $guards = collect(config('statamic.users.guards'))->values()->unique()->all();
+        if (in_array($event->guard, $guards)) {
+            if ($user = User::fromUser($event->user)) {
+                $user->setLastLogin(now());
+            }
         }
     }
 }

@@ -45,13 +45,16 @@ class Submissions extends ResourceCollection
     {
         $this->setColumns();
 
-        return [
-            'data' => $this->collection->each(function ($collection) {
-                $collection
-                    ->blueprint($this->blueprint)
-                    ->columns($this->requestedColumns());
-            }),
+        return $this->collection->each(function ($collection) {
+            $collection
+                ->blueprint($this->blueprint)
+                ->columns($this->requestedColumns());
+        });
+    }
 
+    public function with($request)
+    {
+        return [
             'meta' => [
                 'columns' => $this->visibleColumns(),
             ],

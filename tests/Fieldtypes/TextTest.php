@@ -10,6 +10,7 @@ class TextTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider processValues
      **/
     public function it_processes_values($mode, $values)

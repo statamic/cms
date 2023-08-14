@@ -61,6 +61,12 @@ class EmbedUrlTest extends TestCase
             $this->embed('https://youtu.be/s72r_wu_NVY?t=559'),
             'It transforms the start time parameter of shortened sharing links'
         );
+
+        $this->assertEquals(
+            'https://www.youtube-nocookie.com/embed/hyJ7CBs_2RQ?start=2',
+            $this->embed('https://www.youtube.com/watch?v=hyJ7CBs_2RQ&t=2'),
+            'It transforms the start time parameter of full youtube links'
+        );
     }
 
     public function embed($url)

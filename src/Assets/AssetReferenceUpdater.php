@@ -16,7 +16,6 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Filter by container.
      *
-     * @param  string  $container
      * @return $this
      */
     public function filterByContainer(string $container)
@@ -253,6 +252,10 @@ class AssetReferenceUpdater extends DataReferenceUpdater
 
         $bardPayload = Arr::get($data, $dottedKey, []);
 
+        if (! $bardPayload) {
+            return;
+        }
+
         $changed = collect(Arr::dot($bardPayload))
             ->filter(function ($value, $key) {
                 return preg_match('/(.*)\.(type)/', $key) && $value === 'image';
@@ -296,6 +299,10 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $dottedKey = $dottedPrefix.$field->handle();
 
         $bardPayload = Arr::get($data, $dottedKey, []);
+
+        if (! $bardPayload) {
+            return;
+        }
 
         $changed = collect(Arr::dot($bardPayload))
             ->filter(function ($value, $key) {

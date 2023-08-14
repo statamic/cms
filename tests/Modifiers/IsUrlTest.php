@@ -21,6 +21,7 @@ class IsUrlTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider urls()
      */
     public function it_returns_true_if_value_is_valid_url($expected, $input): void

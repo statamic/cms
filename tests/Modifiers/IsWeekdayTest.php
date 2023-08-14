@@ -21,6 +21,7 @@ class IsWeekdayTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider dates
      */
     public function it_returns_true_if_date_is_weekday($expected, $input): void

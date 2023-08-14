@@ -50,7 +50,6 @@ class ApplicationCacher extends AbstractCacher
     /**
      * Check if a page has been cached.
      *
-     * @param  Request  $request
      * @return bool
      */
     public function hasCachedPage(Request $request)
@@ -61,7 +60,6 @@ class ApplicationCacher extends AbstractCacher
     /**
      * Get a cached page.
      *
-     * @param  Request  $request
      * @return string
      */
     public function getCachedPage(Request $request)
@@ -103,13 +101,12 @@ class ApplicationCacher extends AbstractCacher
      */
     public function invalidateUrl($url, $domain = null)
     {
-        if (! $key = $this->getUrls($domain)->flip()->get($url)) {
-            // URL doesn't exist, nothing to invalidate.
-            return;
-        }
-
-        $this->cache->forget($this->normalizeKey('responses:'.$key));
-
-        $this->forgetUrl($key);
+        $this
+            ->getUrls($domain)
+            ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
+            ->each(function ($value, $key) {
+                $this->cache->forget($this->normalizeKey('responses:'.$key));
+                $this->forgetUrl($key);
+            });
     }
 }

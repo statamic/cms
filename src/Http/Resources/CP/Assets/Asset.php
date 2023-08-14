@@ -10,7 +10,7 @@ class Asset extends JsonResource
 {
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->id(),
             'path' => $this->path(),
             'filename' => $this->filename(),
@@ -19,7 +19,7 @@ class Asset extends JsonResource
             'reference' => $this->reference(),
             'permalink' => $this->absoluteUrl(),
             'extension' => $this->extension(),
-            'downloadUrl' => cp_route('assets.download', base64_encode($this->id())),
+            'downloadUrl' => $this->cpDownloadUrl(),
             'size' => Str::fileSizeForHumans($this->size()),
             'lastModified' => $this->lastModified()->inPreferredFormat(),
             'lastModifiedRelative' => $this->lastModified()->diffForHumans(),
@@ -50,10 +50,15 @@ class Asset extends JsonResource
 
             'allowDownloading' => $this->container()->allowDownloading(),
             'actionUrl' => cp_route('assets.actions.run'),
-            'actions' => Action::for($this->resource, ['container' => $this->container()->handle()]),
+            'actions' => Action::for($this->resource, [
+                'container' => $this->container()->handle(),
+                'folder' => $this->folder(),
+            ]),
 
             'blueprint' => $this->blueprint()->toPublishArray(),
         ];
+
+        return ['data' => $data];
     }
 
     protected function previewUrl()

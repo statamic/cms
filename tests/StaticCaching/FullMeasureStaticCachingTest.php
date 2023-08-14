@@ -5,7 +5,6 @@ namespace Tests\StaticCaching;
 use Statamic\Facades\File;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\NoCache\Session;
-use Symfony\Component\HttpFoundation\Response;
 use Tests\FakesContent;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -16,6 +15,8 @@ class FullMeasureStaticCachingTest extends TestCase
     use FakesContent;
     use FakesViews;
     use PreventSavingStacheItemsToDisk;
+
+    private $dir;
 
     protected function getEnvironmentSetUp($app)
     {

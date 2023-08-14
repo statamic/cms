@@ -3,13 +3,17 @@
 namespace Tests\StarterKits;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Facades\Statamic\Console\Processes\TtyDetector;
+use Facades\Statamic\StarterKits\Hook;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Http;
+use Mockery;
+use Statamic\Console\Commands\StarterKitInstall as InstallCommand;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Config;
 use Statamic\Facades\YAML;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Tests\Fakes\Composer\FakeComposer;
 use Tests\TestCase;
 
 class InstallTest extends TestCase
@@ -21,10 +25,6 @@ class InstallTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        if (version_compare(app()->version(), '7', '<')) {
-            $this->markTestSkipped();
-        }
 
         $this->files = app(Filesystem::class);
 
@@ -45,15 +45,15 @@ class InstallTest extends TestCase
     /** @test */
     public function it_installs_starter_kit()
     {
-        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('copied.md'));
 
         $this->installCoolRunnings();
 
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
-        $this->assertFileNotExists($this->kitVendorPath());
-        $this->assertFileNotExists(base_path('composer.json.bak'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));
     }
@@ -72,24 +72,24 @@ class InstallTest extends TestCase
             ],
         ]);
 
-        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('copied.md'));
-        $this->assertFileNotExists($renamedFile = base_path('README.md'));
-        $this->assertFileNotExists($renamedFolder = base_path('original-dir'));
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist($renamedFile = base_path('README.md'));
+        $this->assertFileDoesNotExist($renamedFolder = base_path('original-dir'));
 
         $this->installCoolRunnings();
 
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
-        $this->assertFileNotExists($this->kitVendorPath());
-        $this->assertFileNotExists(base_path('composer.json.bak'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));
         $this->assertFileExists($renamedFile);
         $this->assertFileExists($renamedFolder);
 
-        $this->assertFileNotExists(base_path('README-for-new-site.md')); // This was renamed back to original path on install
-        $this->assertFileNotExists(base_path('renamed-dir')); // This was renamed back to original path on install
+        $this->assertFileDoesNotExist(base_path('README-for-new-site.md')); // This was renamed back to original path on install
+        $this->assertFileDoesNotExist(base_path('renamed-dir')); // This was renamed back to original path on install
 
         $this->assertFileHasContent('This readme should get installed to README.md.', $renamedFile);
         $this->assertFileHasContent('One.', $renamedFolder.'/one.txt');
@@ -99,9 +99,9 @@ class InstallTest extends TestCase
     /** @test */
     public function it_installs_from_github()
     {
-        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('copied.md'));
 
         $this->installCoolRunnings([], [
             'outpost.*' => Http::response(['data' => ['price' => null]], 200),
@@ -110,7 +110,7 @@ class InstallTest extends TestCase
         ]);
 
         $this->assertEquals('https://github.com/statamic/cool-runnings', Blink::get('starter-kit-repository-added'));
-        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));
     }
@@ -118,9 +118,9 @@ class InstallTest extends TestCase
     /** @test */
     public function it_installs_from_bitbucket()
     {
-        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('copied.md'));
 
         $this->installCoolRunnings([], [
             'outpost.*' => Http::response(['data' => ['price' => null]], 200),
@@ -129,7 +129,7 @@ class InstallTest extends TestCase
         ]);
 
         $this->assertEquals('https://bitbucket.org/statamic/cool-runnings.git', Blink::get('starter-kit-repository-added'));
-        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));
     }
@@ -137,9 +137,9 @@ class InstallTest extends TestCase
     /** @test */
     public function it_installs_from_gitlab()
     {
-        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('copied.md'));
 
         $this->installCoolRunnings([], [
             'outpost.*' => Http::response(['data' => ['price' => null]], 200),
@@ -148,7 +148,7 @@ class InstallTest extends TestCase
         ]);
 
         $this->assertEquals('https://gitlab.com/statamic/cool-runnings', Blink::get('starter-kit-repository-added'));
-        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));
     }
@@ -170,8 +170,8 @@ class InstallTest extends TestCase
     /** @test */
     public function it_restores_existing_repositories_after_successful_install()
     {
-        $this->assertFileNotExists($this->kitVendorPath());
-        $this->assertFileNotExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('copied.md'));
 
         $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
 
@@ -198,7 +198,7 @@ class InstallTest extends TestCase
         ]);
 
         $this->assertEquals('https://github.com/statamic/cool-runnings', Blink::get('starter-kit-repository-added'));
-        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertFileExists(base_path('copied.md'));
 
         $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
@@ -214,7 +214,7 @@ class InstallTest extends TestCase
 
         $this->installCoolRunnings();
 
-        $this->assertFileNotExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('copied.md'));
     }
 
     /** @test */
@@ -229,7 +229,7 @@ class InstallTest extends TestCase
 
         $this->installCoolRunnings();
 
-        $this->assertFileNotExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('copied.md'));
     }
 
     /** @test */
@@ -238,7 +238,7 @@ class InstallTest extends TestCase
         $this->files->put($this->preparePath(base_path('content/collections/pages/contact.md')), 'Contact');
 
         $this->assertFileExists(base_path('content/collections/pages/contact.md'));
-        $this->assertFileNotExists(base_path('content/collections/pages/home.md'));
+        $this->assertFileDoesNotExist(base_path('content/collections/pages/home.md'));
 
         $this->installCoolRunnings();
 
@@ -249,13 +249,13 @@ class InstallTest extends TestCase
     /** @test */
     public function it_doesnt_copy_files_not_defined_as_export_paths()
     {
-        $this->assertFileNotExists(base_path('copied.md'));
-        $this->assertFileNotExists(base_path('not-copied.md'));
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('not-copied.md'));
 
         $this->installCoolRunnings();
 
         $this->assertFileExists(base_path('copied.md'));
-        $this->assertFileNotExists(base_path('not-copied.md'));
+        $this->assertFileDoesNotExist(base_path('not-copied.md'));
     }
 
     /** @test */
@@ -274,7 +274,7 @@ class InstallTest extends TestCase
     {
         $this->installCoolRunnings();
 
-        $this->assertFileNotExists(base_path('starter-kit.yaml'));
+        $this->assertFileDoesNotExist(base_path('starter-kit.yaml'));
     }
 
     /** @test */
@@ -293,6 +293,37 @@ export_paths:
 EOT;
 
         $this->assertEquals($expected, $this->files->get($configPath));
+    }
+
+    /** @test */
+    public function it_copies_starter_kit_post_install_script_hook_when_with_config_option_is_passed()
+    {
+        $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), '<?php');
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn(null);
+
+        $this->installCoolRunnings(['--with-config' => true]);
+
+        $this->assertFileExists($hookPath = base_path('StarterKitPostInstall.php'));
+        $this->assertFileHasContent('<?php', $hookPath);
+    }
+
+    /** @test */
+    public function it_doesnt_copy_starter_kit_post_install_script_hook_when_with_config_option_is_not_passed()
+    {
+        $this->files->put($this->kitRepoPath('StarterKitPostInstall.php'), '<?php');
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn(null);
+
+        $this->installCoolRunnings();
+
+        $this->assertFileDoesNotExist(base_path('StarterKitPostInstall.php'));
     }
 
     /** @test */
@@ -335,8 +366,8 @@ EOT;
         $this->installCoolRunnings(['--clear-site' => true]);
 
         $this->assertFileExists(base_path('content/collections/pages/home.md'));
-        $this->assertFileNotExists(base_path('content/collections/pages/contact.md'));
-        $this->assertFileNotExists(base_path('content/collections/blog'));
+        $this->assertFileDoesNotExist(base_path('content/collections/pages/contact.md'));
+        $this->assertFileDoesNotExist(base_path('content/collections/blog'));
     }
 
     /** @test */
@@ -352,16 +383,16 @@ EOT;
             ],
         ]);
 
-        $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
-        $this->assertFileNotExists(base_path('vendor/statamic/seo-pro'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/seo-pro'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
-        $this->assertFileNotExists(base_path('vendor/bobsled/speed-calculator'));
+        $this->assertFileDoesNotExist(base_path('vendor/bobsled/speed-calculator'));
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
 
         $this->installCoolRunnings();
 
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
         $this->assertFileExists(base_path('vendor/statamic/seo-pro'));
         $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
         $this->assertFileExists(base_path('vendor/bobsled/speed-calculator'));
@@ -380,14 +411,14 @@ EOT;
             ],
         ]);
 
-        $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
-        $this->assertFileNotExists(base_path('vendor/statamic/ssg'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/ssg'));
         $this->assertComposerJsonDoesntHave('statamic/ssg');
 
         $this->installCoolRunnings();
 
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
         $this->assertFileExists(base_path('vendor/statamic/ssg'));
         $this->assertComposerJsonHasPackageVersion('require-dev', 'statamic/ssg', '*');
     }
@@ -408,18 +439,18 @@ EOT;
             ],
         ]);
 
-        $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
-        $this->assertFileNotExists(base_path('vendor/statamic/seo-pro'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/seo-pro'));
         $this->assertComposerJsonDoesntHave('statamic/seo-pro');
-        $this->assertFileNotExists(base_path('vendor/bobsled/speed-calculator'));
+        $this->assertFileDoesNotExist(base_path('vendor/bobsled/speed-calculator'));
         $this->assertComposerJsonDoesntHave('bobsled/speed-calculator');
-        $this->assertFileNotExists(base_path('vendor/statamic/ssg'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/ssg'));
         $this->assertComposerJsonDoesntHave('statamic/ssg');
 
         $this->installCoolRunnings();
 
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('vendor/statamic/cool-runnings'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
         $this->assertFileExists(base_path('vendor/statamic/seo-pro'));
         $this->assertComposerJsonHasPackageVersion('require', 'statamic/seo-pro', '^0.2.0');
         $this->assertFileExists(base_path('vendor/bobsled/speed-calculator'));
@@ -502,9 +533,9 @@ EOT;
     {
         Config::set('statamic.system.license_key', 'site-key');
 
-        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('copied.md'));
 
         $this->installCoolRunnings([], [
             'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
@@ -519,8 +550,8 @@ EOT;
         ]);
 
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
-        $this->assertFileNotExists($this->kitVendorPath());
-        $this->assertFileNotExists(base_path('composer.json.bak'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));
     }
@@ -530,9 +561,9 @@ EOT;
     {
         Config::set('statamic.system.license_key', 'site-key');
 
-        $this->assertFileNotExists($this->kitVendorPath());
+        $this->assertFileDoesNotExist($this->kitVendorPath());
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('copied.md'));
 
         $this->installCoolRunnings([], [
             'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
@@ -547,10 +578,85 @@ EOT;
         ]);
 
         $this->assertFalse(Blink::has('starter-kit-repository-added'));
-        $this->assertFileNotExists($this->kitVendorPath());
-        $this->assertFileNotExists(base_path('composer.json.bak'));
+        $this->assertFileDoesNotExist($this->kitVendorPath());
+        $this->assertFileDoesNotExist(base_path('composer.json.bak'));
         $this->assertComposerJsonDoesntHave('repositories');
-        $this->assertFileNotExists(base_path('copied.md'));
+        $this->assertFileDoesNotExist(base_path('copied.md'));
+    }
+
+    /** @test */
+    public function it_runs_post_install_script_hook_when_available()
+    {
+        $mock = Mockery::mock();
+        $mock->shouldReceive('handle')
+            ->withArgs(fn ($arg) => $arg instanceof InstallCommand)
+            ->once();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn($mock);
+
+        $this->installCoolRunnings();
+    }
+
+    /** @test */
+    public function it_can_register_and_run_newly_installed_command_in_post_install_hook()
+    {
+        Hook::shouldReceive('find')->andReturn(new StarterKitPostInstall);
+
+        $this->assertFalse(Blink::has('starter-kit-command-run'));
+
+        $this->installCoolRunnings();
+
+        $this->assertTrue(Blink::has('starter-kit-command-run'));
+    }
+
+    /** @test */
+    public function it_caches_post_install_hook_instructions_when_tty_is_not_available_during_a_cli_install()
+    {
+        $mock = Mockery::mock();
+        $mock->shouldReceive('handle')->never();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn($mock);
+
+        TtyDetector::shouldReceive('isTtySupported')->andReturn(false);
+
+        $this->installCoolRunnings(['--cli-install' => true]);
+
+        $cachedInstructionsPath = storage_path('statamic/tmp/cli/post-install-instructions.txt');
+
+        $this->assertFileExists($cachedInstructionsPath);
+        $this->assertFileHasContent('Warning', $cachedInstructionsPath);
+        $this->assertFileHasContent('php please starter-kit:run-post-install statamic/cool-runnings', $cachedInstructionsPath);
+
+        // Ensure the starter kit repo is not cleaned up so that `starter-kit:run-post-install` can be run by the
+        // user afterwards. It will be cleaned up after the post-install hook is successfully run instead.
+        $this->assertFileExists(base_path('vendor/statamic/cool-runnings'));
+    }
+
+    /** @test */
+    public function it_doesnt_caches_post_install_hook_instructions_when_not_being_run_as_a_cli_install()
+    {
+        $mock = Mockery::mock();
+        $mock->shouldReceive('handle')
+            ->withArgs(fn ($arg) => $arg instanceof InstallCommand)
+            ->once();
+
+        Hook::shouldReceive('find')
+            ->with($this->kitVendorPath('StarterKitPostInstall.php'))
+            ->once()
+            ->andReturn($mock);
+
+        TtyDetector::shouldReceive('isTtySupported')->andReturn(false);
+
+        $this->installCoolRunnings(['--cli-install' => false]);
+
+        $this->assertFileDoesNotExist(storage_path('statamic/tmp/cli/post-install-instructions.txt'));
+        $this->assertFileDoesNotExist(base_path('vendor/statamic/cool-runnings'));
     }
 
     private function kitRepoPath($path = null)
@@ -625,131 +731,24 @@ EOT;
     }
 }
 
-class FakeComposer
+class StarterKitPostInstall
 {
-    public function __construct()
+    public $registerCommands = [
+        StarterKitTestCommand::class,
+    ];
+
+    public function handle($console)
     {
-        $this->files = app(Filesystem::class);
+        $console->call('statamic:test:starter-kit-command');
     }
+}
 
-    public function require($package, $version = null, ...$extraParams)
+class StarterKitTestCommand extends \Illuminate\Console\Command
+{
+    protected $name = 'statamic:test:starter-kit-command';
+
+    public function handle()
     {
-        if (collect($extraParams)->contains('--dry-run')) {
-            return;
-        }
-
-        $this->fakeInstallComposerJson('require', $package, $version);
-        $this->fakeInstallVendorFiles($package);
-    }
-
-    public function requireDev($package, $version = null, ...$extraParams)
-    {
-        if (collect($extraParams)->contains('--dry-run')) {
-            return;
-        }
-
-        $this->fakeInstallComposerJson('require-dev', $package, $version);
-        $this->fakeInstallVendorFiles($package);
-    }
-
-    public function requireMultiple($packages, ...$extraParams)
-    {
-        foreach ($packages as $package => $version) {
-            $this->require($package, $version, ...$extraParams);
-        }
-    }
-
-    public function requireMultipleDev($packages, ...$extraParams)
-    {
-        foreach ($packages as $package => $version) {
-            $this->requireDev($package, $version, ...$extraParams);
-        }
-    }
-
-    public function remove($package)
-    {
-        $this->removeFromComposerJson($package);
-        $this->removeFromVendorFiles($package);
-    }
-
-    public function removeDev($package)
-    {
-        $this->remove($package);
-    }
-
-    public function runAndOperateOnOutput($args, $callback)
-    {
-        $args = collect($args);
-
-        if (! $args->contains('require')) {
-            return;
-        }
-
-        $requireMethod = $args->contains('--dev')
-            ? 'requireMultipleDev'
-            : 'requireMultiple';
-
-        $packages = $args
-            ->filter(function ($arg) {
-                return Str::contains($arg, '/');
-            })
-            ->mapWithKeys(function ($arg) {
-                $parts = explode(':', $arg);
-
-                return [$parts[0] => $parts[1]];
-            })
-            ->all();
-
-        $this->{$requireMethod}($packages);
-    }
-
-    private function fakeInstallComposerJson($requireKey, $package, $version)
-    {
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
-
-        $composerJson[$requireKey][$package] = $version ?? '*';
-
-        $this->files->put(
-            base_path('composer.json'),
-            json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
-        );
-    }
-
-    private function removeFromComposerJson($package)
-    {
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
-
-        Arr::forget($composerJson, "require.{$package}");
-        Arr::forget($composerJson, "require-dev.{$package}");
-
-        $this->files->put(
-            base_path('composer.json'),
-            json_encode($composerJson, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
-        );
-    }
-
-    private function fakeInstallVendorFiles($package)
-    {
-        if ($this->files->exists($path = base_path("vendor/{$package}"))) {
-            $this->files->deleteDirectory($path);
-        }
-
-        if ($package === 'statamic/cool-runnings') {
-            $this->files->copyDirectory(base_path('repo/cool-runnings'), $path);
-        } else {
-            $this->files->makeDirectory($path, 0755, true);
-        }
-    }
-
-    private function removeFromVendorFiles($package)
-    {
-        if ($this->files->exists($path = base_path("vendor/{$package}"))) {
-            $this->files->deleteDirectory($path);
-        }
-    }
-
-    public function __call($method, $args)
-    {
-        return $this;
+        Blink::put('starter-kit-command-run', true);
     }
 }

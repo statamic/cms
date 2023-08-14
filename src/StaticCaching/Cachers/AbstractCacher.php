@@ -22,9 +22,6 @@ abstract class AbstractCacher implements Cacher
      */
     private $config;
 
-    /**
-     * @param  Repository  $cache
-     */
     public function __construct(Repository $cache, $config)
     {
         $this->cache = $cache;
@@ -51,16 +48,16 @@ abstract class AbstractCacher implements Cacher
     public function getBaseUrl()
     {
         // Check 'base_url' for backward compatibility.
-        if ($url = $this->config('base_url')) {
-            return $url;
+        if (! $baseUrl = $this->config('base_url')) {
+            // This could potentially just be Site::current()->absoluteUrl() but at the
+            // moment that method gets the URL based on the request. For now, we will
+            // manually get it from the config, as to not break any existing sites.
+            $baseUrl = Str::startsWith($url = Site::current()->url(), '/')
+                ? Str::removeRight(config('app.url'), '/').$url
+                : $url;
         }
 
-        // This could potentially just be Site::current()->absoluteUrl() but at the
-        // moment that method gets the URL based on the request. For now, we will
-        // manually get it from the config, as to not break any existing sites.
-        return Str::startsWith($url = Site::current()->url(), '/')
-            ? Str::removeRight(config('app.url'), '/').$url
-            : $url;
+        return rtrim($baseUrl, '/');
     }
 
     /**
@@ -68,8 +65,7 @@ abstract class AbstractCacher implements Cacher
      */
     public function getDefaultExpiration()
     {
-        return $this->config('expiry')
-            ?? $this->config('default_cache_length'); // deprecated
+        return $this->config('expiry');
     }
 
     /**
@@ -136,7 +132,6 @@ abstract class AbstractCacher implements Cacher
     /**
      * Get the URL from a request.
      *
-     * @param  Request  $request
      * @return string
      */
     public function getUrl(Request $request)
@@ -281,17 +276,21 @@ abstract class AbstractCacher implements Cacher
 
     protected function getPathAndDomain($url)
     {
-        if (Str::startsWith($url, '/')) {
+        $parsed = parse_url($url);
+
+        if (! isset($parsed['scheme'])) {
             return [
-                $url,
+                Str::ensureLeft($url, '/'),
                 $this->getBaseUrl(),
             ];
         }
 
-        $parsed = parse_url($url);
+        $query = isset($parsed['query']) ? '?'.$parsed['query'] : '';
+
+        $path = $parsed['path'] ?? '/';
 
         return [
-            $parsed['path'] ?? '/',
+            $path.$query,
             $parsed['scheme'].'://'.$parsed['host'],
         ];
     }
