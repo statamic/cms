@@ -83,7 +83,7 @@
                 </set-picker>
             </floating-menu>
 
-            <div class="bard-invalid" v-if="invalid" v-html="__('Invalid content')"></div>
+            <div class="bard-invalid" v-if="invalid" v-html="invalid"></div>
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
@@ -627,11 +627,30 @@ export default {
                         try {
                             state.schema.nodeFromJSON(content);
                         } catch (error) {
-                            this.invalid = true;
+                            const invalid = this.invalidMessage(error);
+                            if (invalid) {
+                                this.invalid = invalid;
+                            } else {
+                                this.invalid = __('Something went wrong');
+                                console.error(error);
+                            }
                         }
                     }
                 }
             });
+        },
+
+        invalidMessage(error) {
+            let match;
+            if (match = error.message.match(/^There is no mark type ([\w]+) in this schema$/)) {
+                return __('Invalid content, check :type button/extension is enabled', { type: match[1] });
+            } else if (match = error.message.match(/^Unknown node type: ([\w]+)$/)) {
+                return __('Invalid content, check :type button/extension is enabled', { type: match[1] });
+            } else if (match = error.message.match(/^Invalid text node in JSON$/)) {
+                return __('Invalid content, text values must be strings');
+            } else if (match = error.message.match(/^Empty text nodes are not allowed$/)) {
+                return __('Invalid content, text values cannot be empty');
+            }
         },
 
         valueToContent(value) {
