@@ -428,8 +428,10 @@ class Bard extends Replicator
     {
         $rules = [];
 
+        $value = $this->field->value();
+
         if ($this->config('sets')) {
-            $rules = collect($this->field->value())->filter(function ($set) {
+            $rules = collect($value)->filter(function ($set) {
                 return $set['type'] === 'set';
             })->map(function ($set, $index) {
                 $set = $set['attrs']['values'];
@@ -440,7 +442,7 @@ class Bard extends Replicator
             }, collect())->all();
         }
 
-        $rules = $this->callExtensions('extraRules', $rules);
+        $rules = $this->callExtensions('extraRules', $rules, $value);
 
         return $rules;
     }
@@ -454,8 +456,10 @@ class Bard extends Replicator
     {
         $attributes = [];
 
+        $value = $this->field->value();
+
         if ($this->config('sets')) {
-            $attributes = collect($this->field->value())->filter(function ($set) {
+            $attributes = collect($value)->filter(function ($set) {
                 return $set['type'] === 'set';
             })->map(function ($set, $index) {
                 $set = $set['attrs']['values'];
@@ -466,7 +470,7 @@ class Bard extends Replicator
             }, collect())->all();
         }
 
-        $attributes = $this->callExtensions('extraValidationAttributes', $attributes);
+        $attributes = $this->callExtensions('extraValidationAttributes', $attributes, $value);
 
         return $attributes;
     }
@@ -587,7 +591,7 @@ class Bard extends Replicator
             'linkData' => (object) $this->getLinkData($value),
         ];
 
-        $data = $this->callExtensions('preload', $data);
+        $data = $this->callExtensions('preload', $data, $value);
 
         return $data;
     }
