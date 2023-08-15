@@ -1,16 +1,14 @@
+<template>
+    <component v-if="icon" :is="icon" />
+</template>
+
 <script>
-import Vue from "vue";
+import { defineAsyncComponent } from 'vue';
 
 export default {
 
     props: {
         extension: String,
-    },
-
-    render(createElement) {
-        const compiledTemplate = Vue.compile(this.getIcon());
-
-        return compiledTemplate.render.call(this, createElement);
     },
 
     computed: {
@@ -96,14 +94,11 @@ export default {
                 default:
                     return 'generic';
             }
-        }
-    },
-
-    methods: {
-
-        getIcon() {
-            return require(`!!html-loader!./../../svg/filetypes/${this.name}.svg`);
         },
+
+        icon() {
+            return defineAsyncComponent(() => import(`./../../svg/filetypes/${this.name}.svg`));
+        }
     }
 }
 </script>

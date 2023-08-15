@@ -1,0 +1,90 @@
+/* ==========================================================================
+   THE MAIN NAV
+   ========================================================================== */
+
+.nav-main {
+    @apply hidden select-none bg-white shadow h-screen absolute left-0 overflow-scroll w-56;
+    transition: all .3s;
+
+    h6 { @apply mt-6; }
+
+    ul {
+        @apply list-none p-0 mt-0;
+    }
+
+    li {
+        @apply p-0 text-sm;
+        margin-top: 6px;
+    }
+
+    li a {
+        @apply p-0 flex items-center text-gray-800;
+        transition: all .08s ease-in-out;
+
+        &:hover {
+            @apply text-blue;
+        }
+
+        i {
+            @apply block h-7 p-1 w-7 mr-2 rounded-full;
+        }
+    }
+
+    li.current > a {
+        @apply text-gray-900 font-medium;
+
+        i {
+            @apply bg-white;
+        }
+    }
+
+    li ul {
+        @apply mb-2;
+        margin-left: 1.5rem;
+
+        li {
+            @apply text-xs;
+            margin-left: 12px;
+        }
+
+        li a {
+            @apply text-gray;
+        }
+    }
+
+    .nav-closed & {
+        left: -110%;
+    }
+
+    .nav-section-top-level {
+        @apply mt-4;
+    }
+}
+
+@screen md {
+    .nav-main {
+        @apply fixed flex bg-transparent shadow-none overflow-auto border-r;
+        height: calc(100% - 52px);
+        .showing-license-banner & {
+            height: calc(100% - 120px);
+        }
+    }
+}
+
+.nav-main-inner {
+    @apply pl-6 pr-4 pt-2;
+}
+
+.nav-toggle {
+    @apply block h-6 p-1 w-6 mr-3 rounded;
+    outline: none !important;
+
+    &:hover {
+        @apply bg-gray-200;
+    }
+}
+
+
+
+/* Responsive Wangjangling
+  ========================================================================== */

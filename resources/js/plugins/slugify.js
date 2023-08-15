@@ -1,4 +1,4 @@
-var getSlug = require('speakingurl');
+import getSlug from 'speakingurl';
 
 export default {
     install(Vue, options) {
@@ -8,6 +8,9 @@ export default {
             const site = sites.find(site => site.handle === selectedSite);
             lang = lang ?? site?.lang ?? Statamic.$config.get('lang');
             const custom = Statamic.$config.get(`charmap.${lang}`) ?? undefined;
+
+            // Remove apostrophes in all languages
+            custom["'"] = "";
 
             return getSlug(text, {
                 separator: glue || '-',

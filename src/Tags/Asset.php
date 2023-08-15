@@ -19,8 +19,6 @@ class Asset extends Assets
      * If the variable contains an array of IDs, we'll use only the first.
      * To iterate over multiple assets, use {{ assets:[variable }} instead.
      *
-     * @param $method
-     * @param $arguments
      * @return string
      */
     public function __call($method, $arguments)

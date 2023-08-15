@@ -2,10 +2,10 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Facades\Statamic\API\FilterAuthorizer;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\API\UserResource;
-use Statamic\Support\Str;
 
 class UsersController extends ApiController
 {
@@ -36,9 +36,10 @@ class UsersController extends ApiController
         return $user;
     }
 
-    protected function getFilters()
+    protected function allowedFilters()
     {
-        return parent::getFilters()
-            ->reject(fn ($_, $filter) => Str::startsWith($filter, 'password'));
+        return collect(FilterAuthorizer::allowedForResource('api', 'users'))
+            ->reject(fn ($field) => in_array($field, ['password', 'password_hash']))
+            ->all();
     }
 }

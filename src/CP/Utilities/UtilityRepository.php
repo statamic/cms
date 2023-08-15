@@ -46,14 +46,6 @@ class UtilityRepository
         return $utility;
     }
 
-    /** @deprecated */
-    public function push(Utility $utility)
-    {
-        $this->register($utility);
-
-        return $this;
-    }
-
     public function all()
     {
         return $this->utilities;
@@ -69,6 +61,11 @@ class UtilityRepository
     public function find($handle)
     {
         return $this->utilities->get($handle);
+    }
+
+    public function findBySlug($slug)
+    {
+        return $this->utilities->first(fn ($utility) => $utility->slug() === $slug);
     }
 
     public function routes()

@@ -2,9 +2,9 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
-use Facades\Statamic\View\Cascade;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Cascade;
 use Statamic\Facades\Data;
 
 class Session
@@ -46,7 +46,11 @@ class Session
 
     public function region(string $key): Region
     {
-        return $this->regions[$key];
+        if ($region = $this->regions[$key] ?? null) {
+            return $region;
+        }
+
+        throw new RegionNotFound($key);
     }
 
     public function pushRegion($contents, $context, $extension): StringRegion

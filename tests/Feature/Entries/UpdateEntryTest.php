@@ -9,6 +9,7 @@ use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -88,6 +89,47 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals('Foo Bar Baz', $entry->value('title'));
         $this->assertEquals('foo-bar-baz', $entry->slug());
         $this->assertEquals('foo-bar-baz.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider multipleSlugLangsProvider
+     */
+    public function slug_is_not_required_and_will_get_created_from_the_submitted_title_and_correct_language_if_slug_is_in_the_blueprint_and_the_submitted_slug_was_empty($lang, $expectedSlug)
+    {
+        Site::setConfig(['sites' => [
+            'en' => array_merge(config('statamic.sites.sites.en'), ['lang' => $lang]),
+        ]]);
+
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry'])
+            ->create();
+
+        $this->assertTrue($entry->blueprint()->hasField('slug'));
+        $this->assertCount(1, Entry::all());
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Foo Bar Baz æøå', 'slug' => ''])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = $entry->fresh();
+        $this->assertEquals('Foo Bar Baz æøå', $entry->value('title'));
+        $this->assertEquals($expectedSlug, $entry->slug());
+        $this->assertEquals($expectedSlug.'.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    public function multipleSlugLangsProvider()
+    {
+        return [
+            'English' => ['en', 'foo-bar-baz-aeoa'],
+            'Danish' => ['da', 'foo-bar-baz-aeoeaa'], // danish replaces æøå with aeoeaa
+        ];
     }
 
     /** @test */
@@ -198,6 +240,60 @@ class UpdateEntryTest extends TestCase
         $this->assertEquals('Auto Avada Kedavra', $entry->value('title'));
         $this->assertEquals('auto-avada-kedavra', $entry->slug());
         $this->assertEquals('auto-avada-kedavra.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /** @test */
+    public function auto_title_only_gets_saved_on_localization_when_different_from_origin()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]]);
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->sites(['en', 'fr']);
+        $collection->titleFormats('Auto {foo}')->save();
+
+        $this->seedBlueprintFields($collection, [
+            'foo' => ['type' => 'text'],
+        ]);
+
+        $origin = EntryFactory::collection($collection)
+            ->locale('en')
+            ->slug('origin')
+            ->data(['foo' => 'bar'])
+            ->create();
+
+        $localization = EntryFactory::collection($collection)
+            ->locale('fr')
+            ->origin($origin)
+            ->slug('localization')
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($localization, [
+                'foo' => 'le bar',
+                '_localized' => ['foo'],
+            ])
+            ->assertOk();
+
+        $localization = $localization->fresh();
+        $this->assertEquals('le bar', $localization->foo);
+        $this->assertEquals('Auto le bar', $localization->title);
+        $this->assertEquals('Auto le bar', $localization->get('title'));
+
+        $this
+            ->actingAs($user)
+            ->update($localization, [
+                '_localized' => [], // foo is intentionally missing
+            ])
+            ->assertOk();
+
+        $localization = $localization->fresh();
+        $this->assertEquals('bar', $localization->foo);
+        $this->assertEquals('Auto bar', $localization->title);
+        $this->assertNull($localization->get('title'));
     }
 
     /** @test */

@@ -5,10 +5,12 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Search;
 use Statamic\Facades\User;
 use Statamic\GraphQL\Types\UserType;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Fields\User as UserFilter;
+use Statamic\Search\Result;
 use Statamic\Support\Arr;
 
 class Users extends Relationship
@@ -30,22 +32,37 @@ class Users extends Relationship
     protected function configFieldItems(): array
     {
         return [
-            'max_items' => [
-                'display' => __('Max Items'),
-                'instructions' => __('statamic::messages.max_items_instructions'),
-                'type' => 'integer',
-                'min' => 1,
-            ],
-            'mode' => [
-                'display' => __('Mode'),
-                'type' => 'radio',
-                'options' => [
-                    'default' => __('Stack Selector'),
-                    'select' => __('Select Dropdown'),
-                    'typeahead' => __('Typeahead Field'),
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'type' => 'integer',
+                        'min' => 1,
+                    ],
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.any.config.mode'),
+                        'type' => 'radio',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                        'default' => 'select',
+                    ],
+                    'default' => [
+                        'display' => __('Default'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'users',
+                    ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.users.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
                 ],
-                'default' => 'select',
-                'width' => 50,
             ],
         ];
     }
@@ -77,16 +94,36 @@ class Users extends Relationship
         $query = User::query();
 
         if ($search = $request->search) {
-            $query->where('name', 'like', '%'.$search.'%');
+            if (Search::indexes()->has('users')) {
+                $query = Search::index('users')->ensureExists()->search($search);
+            } else {
+                $query->where(function ($query) use ($search) {
+                    $query
+                        ->where('email', 'like', '%'.$search.'%')
+                        ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
+                            foreach (explode(' ', $search) as $word) {
+                                $query
+                                    ->orWhere('first_name', 'like', '%'.$word.'%')
+                                    ->orWhere('last_name', 'like', '%'.$word.'%');
+                            }
+                        }, function ($query) use ($search) {
+                            $query->orWhere('name', 'like', '%'.$search.'%');
+                        });
+                });
+            }
         }
 
         if ($request->exclusions) {
             $query->whereNotIn('id', $request->exclusions);
         }
 
-        $query->orderBy('name');
+        $this->applyIndexQueryScopes($query, $request->all());
 
         $userFields = function ($user) {
+            if ($user instanceof Result) {
+                $user = $user->getSearchable();
+            }
+
             return [
                 'id' => $user->id(),
                 'title' => $user->name(),

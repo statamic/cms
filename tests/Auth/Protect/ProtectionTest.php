@@ -53,7 +53,8 @@ class ProtectionTest extends TestCase
     {
         $this->assertNull($this->protection->scheme());
 
-        $this->protection->setData(new class {
+        $this->protection->setData(new class
+        {
             //
         });
 

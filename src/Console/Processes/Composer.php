@@ -43,7 +43,6 @@ class Composer extends Process
     /**
      * Check if specific package is installed.
      *
-     * @param  string  $package
      * @return bool
      */
     public function isInstalled(string $package)
@@ -77,7 +76,6 @@ class Composer extends Process
     /**
      * Get installed version of a specific package.
      *
-     * @param  string  $package
      * @return string
      */
     public function installedVersion(string $package)
@@ -96,7 +94,6 @@ class Composer extends Process
     /**
      * Get installed path of a specific package.
      *
-     * @param  string  $package
      * @return string
      */
     public function installedPath(string $package)
@@ -110,8 +107,6 @@ class Composer extends Process
     /**
      * Require a package.
      *
-     * @param  string  $package
-     * @param  string|null  $version
      * @param  mixed  $extraParams
      */
     public function require(string $package, string $version = null, ...$extraParams)
@@ -129,9 +124,6 @@ class Composer extends Process
 
     /**
      * Require a dev package.
-     *
-     * @param  string  $package
-     * @param  string|null  $version
      */
     public function requireDev(string $package, string $version = null, ...$extraParams)
     {
@@ -141,7 +133,6 @@ class Composer extends Process
     /**
      * Require multiple packages at once.
      *
-     * @param  array  $packages
      * @param  mixed  $extraParams
      */
     public function requireMultiple(array $packages, ...$extraParams)
@@ -156,7 +147,6 @@ class Composer extends Process
     /**
      * Require multiple dev packages at once.
      *
-     * @param  array  $packages
      * @param  mixed  $extraParams
      */
     public function requireMultipleDev(array $packages, ...$extraParams)
@@ -167,7 +157,6 @@ class Composer extends Process
     /**
      * Remove a package.
      *
-     * @param  string  $package
      * @param  mixed  $extraParams
      */
     public function remove(string $package, ...$extraParams)
@@ -178,7 +167,6 @@ class Composer extends Process
     /**
      * Remove a dev package.
      *
-     * @param  string  $package
      * @param  mixed  $extraParams
      */
     public function removeDev(string $package, ...$extraParams)
@@ -189,7 +177,6 @@ class Composer extends Process
     /**
      * Remove multiple packages at once.
      *
-     * @param  array  $packages
      * @param  mixed  $extraParams
      */
     public function removeMultiple(array $packages, ...$extraParams)
@@ -202,7 +189,6 @@ class Composer extends Process
     /**
      * Remove multiple dev packages at once.
      *
-     * @param  array  $packages
      * @param  mixed  $extraParams
      */
     public function removeMultipleDev(array $packages, ...$extraParams)
@@ -212,8 +198,6 @@ class Composer extends Process
 
     /**
      * Update a package.
-     *
-     * @param  string  $package
      */
     public function update(string $package)
     {
@@ -223,7 +207,6 @@ class Composer extends Process
     /**
      * Get cached output for package process.
      *
-     * @param  string  $package
      * @return mixed
      */
     public function cachedOutput(string $package)
@@ -234,7 +217,6 @@ class Composer extends Process
     /**
      * Get cached output for last completed package process.
      *
-     * @param  string  $package
      * @return mixed
      */
     public function lastCompletedCachedOutput(string $package)
@@ -328,7 +310,6 @@ class Composer extends Process
     /**
      * Sometimes composer returns versions with a 'v', sometimes it doesn't.
      *
-     * @param  string  $version
      * @return string
      */
     private function normalizeVersion(string $version)
@@ -350,7 +331,6 @@ class Composer extends Process
     /**
      * Normalize packages array to require args, with version handling if `package => version` array structure is passed.
      *
-     * @param  array  $packages
      * @return array
      */
     private function normalizePackagesArrayToRequireArgs(array $packages)

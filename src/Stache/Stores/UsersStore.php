@@ -2,20 +2,30 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\Facades\Role as UserRole;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes\Users\Group;
+use Statamic\Stache\Indexes\Users\Role;
 
 class UsersStore extends BasicStore
 {
     protected function storeIndexes()
     {
-        return UserGroup::all()->mapWithKeys(function ($group) {
+        $groups = UserGroup::all()->mapWithKeys(function ($group) {
             return ['groups/'.$group->handle() => Group::class];
-        })
-        ->push('email')
-        ->all();
+        });
+
+        $roles = UserRole::all()->mapWithKeys(function ($role) {
+            return ['roles/'.$role->handle() => Role::class];
+        });
+
+        return collect()
+            ->merge($groups)
+            ->merge($roles)
+            ->push('email')
+            ->all();
     }
 
     protected $groups = [];

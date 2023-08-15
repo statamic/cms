@@ -253,6 +253,7 @@ class AntlersLexer
                     $this->currentContent = [];
                     $this->runtimeNodes[] = $stringConcat;
                     $this->currentIndex += 1;
+
                     continue;
                 }
 
@@ -268,6 +269,7 @@ class AntlersLexer
                     $terminator = $this->cur;
                     $this->isParsingString = true;
                     $stringStartedOn = $this->currentIndex;
+
                     continue;
                 }
             }
@@ -302,6 +304,7 @@ class AntlersLexer
                             if ($nextNonWhitespace === DocumentParser::String_Terminator_SingleQuote ||
                                 $nextNonWhitespace === DocumentParser::String_Terminator_DoubleQuote) {
                                 $this->currentContent = [];
+
                                 continue;
                             }
                         }
@@ -324,6 +327,7 @@ class AntlersLexer
 
                     $this->currentContent = [];
                     $this->isInModifierParameterValue = false;
+
                     continue;
                 }
 
@@ -371,6 +375,7 @@ class AntlersLexer
                 } else {
                     $this->currentContent[] = $this->cur;
                 }
+
                 continue;
             }
 
@@ -396,6 +401,7 @@ class AntlersLexer
                         $this->currentContent = [];
                         $this->isParsingString = false;
                         $this->isInModifierParameterValue = false;
+
                         continue;
                     }
 
@@ -414,6 +420,7 @@ class AntlersLexer
                     $this->runtimeNodes[] = $stringNode;
                     $this->lastNode = $stringNode;
                 }
+
                 continue;
             }
 
@@ -422,26 +429,32 @@ class AntlersLexer
                     $this->currentContent[] = DocumentParser::String_EscapeCharacter;
                     $this->ignorePrevious = true;
                     $this->currentIndex += 1;
+
                     continue;
                 } elseif ($this->next == DocumentParser::String_Terminator_SingleQuote) {
                     $this->currentContent[] = DocumentParser::String_Terminator_SingleQuote;
                     $this->currentIndex += 1;
+
                     continue;
                 } elseif ($this->next == DocumentParser::String_Terminator_DoubleQuote) {
                     $this->currentContent[] = DocumentParser::String_Terminator_DoubleQuote;
                     $this->currentIndex += 1;
+
                     continue;
                 } elseif ($this->next == 'n') {
                     $this->currentContent[] = "\n";
                     $this->currentIndex += 1;
+
                     continue;
                 } elseif ($this->next == 't') {
                     $this->currentContent[] = "\t";
                     $this->currentIndex += 1;
+
                     continue;
                 } elseif ($this->next == 'r') {
                     $this->currentContent[] = "\r";
                     $this->currentIndex += 1;
+
                     continue;
                 }
             }
@@ -476,6 +489,7 @@ class AntlersLexer
 
                         $this->runtimeNodes[] = $logicalAnd;
                         $this->lastNode = $logicalAnd;
+
                         continue;
                     } elseif ($lowerParsedValue == LanguageKeywords::LogicalOr) {
                         $logicalOr = new LogicalOrOperator();
@@ -485,6 +499,7 @@ class AntlersLexer
 
                         $this->runtimeNodes[] = $logicalOr;
                         $this->lastNode = $logicalOr;
+
                         continue;
                     } elseif ($lowerParsedValue == LanguageKeywords::LogicalXor) {
                         $logicalXor = new LogicalXorOperator();
@@ -494,6 +509,7 @@ class AntlersLexer
 
                         $this->runtimeNodes[] = $logicalXor;
                         $this->lastNode = $logicalXor;
+
                         continue;
                     } elseif ($lowerParsedValue == LanguageKeywords::ConstNull) {
                         $constNull = new NullConstant();
@@ -503,6 +519,7 @@ class AntlersLexer
 
                         $this->runtimeNodes[] = $constNull;
                         $this->lastNode = $constNull;
+
                         continue;
                     } elseif ($lowerParsedValue == LanguageKeywords::ConstTrue) {
                         $constTrue = new TrueConstant();
@@ -512,6 +529,7 @@ class AntlersLexer
 
                         $this->runtimeNodes[] = $constTrue;
                         $this->lastNode = $constTrue;
+
                         continue;
                     } elseif ($lowerParsedValue == LanguageKeywords::ConstFalse) {
                         $constFalse = new FalseConstant();
@@ -521,6 +539,7 @@ class AntlersLexer
 
                         $this->runtimeNodes[] = $constFalse;
                         $this->lastNode = $constFalse;
+
                         continue;
                     } elseif ($lowerParsedValue == LanguageKeywords::LogicalNot) {
                         $logicNegation = new LogicalNegationOperator();
@@ -530,6 +549,7 @@ class AntlersLexer
 
                         $this->runtimeNodes[] = $logicNegation;
                         $this->lastNode = $logicNegation;
+
                         continue;
                     } elseif ($parsedValue == LanguageKeywords::ArrList && $this->next == DocumentParser::LeftParen) {
                         $tupleListStart = new TupleListStart();
@@ -539,6 +559,7 @@ class AntlersLexer
 
                         $this->runtimeNodes[] = $tupleListStart;
                         $this->lastNode = $tupleListStart;
+
                         continue;
                     }
 
@@ -556,6 +577,7 @@ class AntlersLexer
 
                         $this->runtimeNodes[] = $numberNode;
                         $this->lastNode = $numberNode;
+
                         continue;
                     }
 
@@ -569,6 +591,7 @@ class AntlersLexer
                             $modifierNameNode->endPosition = $endPosition;
                             $this->runtimeNodes[] = $modifierNameNode;
                             $this->lastNode = $modifierNameNode;
+
                             continue;
                         } elseif ($lastValue instanceof ModifierValueSeparator) {
                             $modifierValueNode = new ModifierValueNode();
@@ -580,6 +603,7 @@ class AntlersLexer
                             $this->lastNode = $modifierValueNode;
 
                             $this->isParsingModifierName = false;
+
                             continue;
                         }
                     }
@@ -605,6 +629,7 @@ class AntlersLexer
                 }
             } else {
                 $this->currentContent[] = $this->cur;
+
                 continue;
             }
 
@@ -636,6 +661,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $argSeparator;
                     $this->lastNode = $argSeparator;
+
                     continue;
                 }
 
@@ -648,6 +674,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $statementSeparator;
                     $this->lastNode = $statementSeparator;
+
                     continue;
                 }
 
@@ -662,6 +689,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $additionAssignment;
                         $this->lastNode = $additionAssignment;
                         $this->currentIndex += 1;
+
                         continue;
                     }
 
@@ -672,6 +700,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $additionOperator;
                     $this->lastNode = $additionOperator;
+
                     continue;
                 }
 
@@ -681,6 +710,7 @@ class AntlersLexer
                         ctype_digit((string) $this->prev) == false &&
                         $this->prev != DocumentParser::RightParent) && $this->isRightOfInterpolationRegion() == false) {
                         $this->currentContent[] = $this->cur;
+
                         continue;
                     }
 
@@ -693,6 +723,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $subtractionAssignment;
                         $this->lastNode = $subtractionAssignment;
                         $this->currentIndex += 1;
+
                         continue;
                     } elseif ($this->next == DocumentParser::Punctuation_GreaterThan) {
                         $methodInvocation = new MethodInvocationNode();
@@ -703,6 +734,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $methodInvocation;
                         $this->lastNode = $methodInvocation;
                         $this->currentIndex += 1;
+
                         continue;
                     }
 
@@ -713,6 +745,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $subtractionOperator;
                     $this->lastNode = $subtractionOperator;
+
                     continue;
                 }
 
@@ -727,6 +760,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $exponentiationOperator;
                         $this->lastNode = $exponentiationOperator;
                         $this->currentIndex += 1;
+
                         continue;
                     } elseif ($this->next == DocumentParser::Punctuation_Equals) {
                         $multiplicationAssignment = new MultiplicationAssignmentOperator();
@@ -737,6 +771,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $multiplicationAssignment;
                         $this->lastNode = $multiplicationAssignment;
                         $this->currentIndex += 1;
+
                         continue;
                     }
 
@@ -748,6 +783,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $multiplicationOperator;
                     $this->lastNode = $multiplicationOperator;
+
                     continue;
                 }
 
@@ -762,6 +798,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $divisionAssignment;
                         $this->lastNode = $divisionAssignment;
                         $this->currentIndex += 1;
+
                         continue;
                     }
 
@@ -772,6 +809,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $divisionOperator;
                     $this->lastNode = $divisionOperator;
+
                     continue;
                 }
 
@@ -786,6 +824,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $modulusAssignment;
                         $this->lastNode = $modulusAssignment;
                         $this->currentIndex += 1;
+
                         continue;
                     }
 
@@ -796,6 +835,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $modulusOperator;
                     $this->lastNode = $modulusOperator;
+
                     continue;
                 }
 
@@ -817,6 +857,7 @@ class AntlersLexer
                             $this->runtimeNodes[] = $spaceshipOperator;
                             $this->lastNode = $spaceshipOperator;
                             $this->currentIndex += 2;
+
                             continue;
                         }
 
@@ -829,6 +870,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $lessThanEqual;
                         $this->lastNode = $lessThanEqual;
                         $this->currentIndex += 1;
+
                         continue;
                     }
 
@@ -840,6 +882,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $lessThan;
                     $this->lastNode = $lessThan;
+
                     continue;
                 }
 
@@ -854,6 +897,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $greaterThanEqual;
                         $this->lastNode = $greaterThanEqual;
                         $this->currentIndex += 1;
+
                         continue;
                     }
 
@@ -864,6 +908,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $greaterThan;
                     $this->lastNode = $greaterThan;
+
                     continue;
                 }
 
@@ -875,6 +920,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $leftAssignment;
                     $this->lastNode = $leftAssignment;
+
                     continue;
                 }
 
@@ -906,6 +952,7 @@ class AntlersLexer
                         $this->lastNode = $equalOperator;
                         $this->currentIndex += 1;
                     }
+
                     continue;
                 }
 
@@ -920,6 +967,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $logicalAnd;
                         $this->lastNode = $logicalAnd;
                         $this->currentIndex += 1;
+
                         continue;
                     }
 
@@ -932,6 +980,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $concatOperator;
                         $this->lastNode = $concatOperator;
                         $this->currentIndex += 1;
+
                         continue;
                     }
 
@@ -942,6 +991,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $logicalAnd;
                     $this->lastNode = $logicalAnd;
+
                     continue;
                 }
 
@@ -955,6 +1005,7 @@ class AntlersLexer
                     $this->lastNode = $modifierSeparator;
 
                     $this->isParsingModifierName = true;
+
                     continue;
                 }
 
@@ -968,6 +1019,7 @@ class AntlersLexer
                     $this->runtimeNodes[] = $logicalOr;
                     $this->lastNode = $logicalOr;
                     $this->currentIndex += 1;
+
                     continue;
                 }
 
@@ -989,6 +1041,7 @@ class AntlersLexer
                             $this->runtimeNodes[] = $strictNotEqual;
                             $this->lastNode = $strictNotEqual;
                             $this->currentIndex += 2;
+
                             continue;
                         }
 
@@ -1001,6 +1054,7 @@ class AntlersLexer
                         $this->runtimeNodes[] = $notEqual;
                         $this->lastNode = $notEqual;
                         $this->currentIndex += 1;
+
                         continue;
                     }
 
@@ -1012,6 +1066,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $logicalNot;
                     $this->lastNode = $logicalNot;
+
                     continue;
                 }
 
@@ -1025,6 +1080,7 @@ class AntlersLexer
                     $this->runtimeNodes[] = $conditionalFallback;
                     $this->lastNode = $conditionalFallback;
                     $this->currentIndex += 1;
+
                     continue;
                 }
 
@@ -1038,6 +1094,7 @@ class AntlersLexer
                     $this->runtimeNodes[] = $nullCoalesceOperator;
                     $this->lastNode = $nullCoalesceOperator;
                     $this->currentIndex += 1;
+
                     continue;
                 }
 
@@ -1051,6 +1108,7 @@ class AntlersLexer
                     $this->runtimeNodes[] = $nullCoalesceOperator;
                     $this->lastNode = $nullCoalesceOperator;
                     $this->currentIndex += 1;
+
                     continue;
                 }
 
@@ -1063,6 +1121,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $ternarySeparator;
                     $this->lastNode = $ternarySeparator;
+
                     continue;
                 }
 
@@ -1074,6 +1133,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $logicalGroupBegin;
                     $this->lastNode = $logicalGroupBegin;
+
                     continue;
                 }
 
@@ -1085,6 +1145,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $logicalGroupEnd;
                     $this->lastNode = $logicalGroupEnd;
+
                     continue;
                 }
 
@@ -1107,6 +1168,7 @@ class AntlersLexer
                             } else {
                                 $this->isInModifierParameterValue = false;
                             }
+
                             continue;
                         }
                     }
@@ -1119,6 +1181,7 @@ class AntlersLexer
                             $this->lastNode->endPosition->char += 2;
                         }
                         $this->currentIndex += 1;
+
                         continue;
                     }
 
@@ -1130,6 +1193,7 @@ class AntlersLexer
                     $this->runtimeNodes[] = $branchSeparator;
                     $this->lastNode = $branchSeparator;
                     $this->isParsingModifierName = false;
+
                     continue;
                 }
 
@@ -1141,6 +1205,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $implicitArrayBegin;
                     $this->lastNode = $implicitArrayBegin;
+
                     continue;
                 }
 
@@ -1152,6 +1217,7 @@ class AntlersLexer
 
                     $this->runtimeNodes[] = $implicitArrayEnd;
                     $this->lastNode = $implicitArrayEnd;
+
                     continue;
                 }
             }

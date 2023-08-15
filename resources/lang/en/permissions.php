@@ -82,7 +82,6 @@ return [
 
     'group_updates' => 'Updates',
     'view_updates' => 'View updates',
-    'perform_updates' => 'Perform updates',
 
     'group_utilities' => 'Utilities',
     'access_utility' => ':title',

@@ -18,6 +18,7 @@ use Statamic\Events\TaxonomySaving;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Search;
@@ -108,12 +109,21 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function termBlueprint($blueprint = null, $term = null)
     {
-        $blueprint = $this->getBaseTermBlueprint($blueprint);
+        if (! $blueprint = $this->getBaseTermBlueprint($blueprint)) {
+            return null;
+        }
 
-        $blueprint ? $this->ensureTermBlueprintFields($blueprint) : null;
+        $this->ensureTermBlueprintFields($blueprint);
 
-        if ($blueprint) {
-            TermBlueprintFound::dispatch($blueprint->setParent($term ?? $this), $term);
+        $blueprint->setParent($term ?? $this);
+
+        // Only dispatch the event when there's no term.
+        // When there is a term, the event is dispatched from the term.
+        if (! $term) {
+            Blink::once(
+                'collection-termblueprintfound-'.$this->handle().'-'.$blueprint->handle(),
+                fn () => TermBlueprintFound::dispatch($blueprint)
+            );
         }
 
         return $blueprint;
@@ -412,7 +422,9 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             ? $this->defaultPreviewTargets()
             : $this->previewTargets;
 
-        return collect($targets);
+        return collect($targets)->map(function ($target) {
+            return $target + ['refresh' => $target['refresh'] ?? true];
+        });
     }
 
     public function addPreviewTargets($targets)
@@ -424,12 +436,20 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function additionalPreviewTargets()
     {
-        return Facades\Taxonomy::additionalPreviewTargets($this->handle);
+        return Facades\Taxonomy::additionalPreviewTargets($this->handle)->map(function ($target) {
+            return $target + ['refresh' => $target['refresh'] ?? true];
+        });
     }
 
     private function defaultPreviewTargets()
     {
-        return [['label' => 'Term', 'format' => '{permalink}']];
+        return [
+            [
+                'label' => 'Term',
+                'format' => '{permalink}',
+                'refresh' => true,
+            ],
+        ];
     }
 
     private function previewTargetsForFile()
@@ -448,6 +468,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             return [
                 'label' => $target['label'],
                 'url' => $target['format'],
+                'refresh' => $target['refresh'],
             ];
         })->filter()->values()->all();
     }
