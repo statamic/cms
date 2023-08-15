@@ -54,8 +54,8 @@ trait ResetsPasswords
                 : back();
 
             return $redirect
-                        ->withInput($request->only('email'))
-                        ->withErrors($validator->errors());
+                ->withInput($request->only('email'))
+                ->withErrors($validator->errors());
         }
 
         // Here we will attempt to reset the user's password. If it is successful we
@@ -178,8 +178,8 @@ trait ResetsPasswords
             : back();
 
         return $redirect
-                    ->withInput($request->only('email'))
-                    ->withErrors(['email' => trans($response)]);
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => trans($response)]);
     }
 
     /**
