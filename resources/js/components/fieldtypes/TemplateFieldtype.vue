@@ -4,6 +4,8 @@
             ref="input"
             :name="name"
             @input="update"
+            append-to-body
+            :calculate-position="positionOptions"
             :clearable="config.clearable"
             :placeholder="config.placeholder"
             :disabled="isReadOnly"
@@ -12,14 +14,21 @@
             :searchable="true"
             :push-tags="false"
             :multiple="false"
-            :value="value" />
+            :value="value">
+            <template #no-options>
+                <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No templates to choose from.')" />
+            </template>
+        </v-select>
     </div>
 </template>
 
 <script>
+import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+
+
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, PositionsSelectOptions],
 
     data: function() {
         return {
@@ -54,6 +63,11 @@ export default {
 
             // Set default
             var options = [];
+
+            // Prepend @blueprint as an option
+            if (this.config.blueprint) {
+                options.push({ label: __('Map to Blueprint'), value: '@blueprint' });
+            }
 
             _.each(templates, (template) => {
                 options.push({

@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use ProseMirrorToHtml\Renderer;
+use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -29,137 +29,201 @@ class Bard extends Replicator
     protected function configFieldItems(): array
     {
         return [
-            'always_show_set_button' => [
-                'display' => __('Always Show Set Button'),
-                'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
+            [
+                'display' => __('Editor'),
+                'instructions' => __('statamic::fieldtypes.bard.config.section.editor.instructions'),
+                'fields' => [
+                    'buttons' => [
+                        'display' => __('Buttons'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.buttons'),
+                        'type' => 'bard_buttons_setting',
+                        'full_width_setting' => true,
+                        'default' => [
+                            'h2',
+                            'h3',
+                            'bold',
+                            'italic',
+                            'unorderedlist',
+                            'orderedlist',
+                            'removeformat',
+                            'quote',
+                            'anchor',
+                            'image',
+                            'table',
+                        ],
+                    ],
+                    'smart_typography' => [
+                        'display' => __('Smart Typography'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.smart_typography'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'save_html' => [
+                        'display' => __('Save as HTML'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.save_html'),
+                        'type' => 'toggle',
+                    ],
+                    'inline' => [
+                        'display' => __('Inline'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.inline'),
+                        'type' => 'toggle',
+                    ],
+                    'toolbar_mode' => [
+                        'display' => __('Toolbar Mode'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.toolbar_mode'),
+                        'type' => 'select',
+                        'default' => 'fixed',
+                        'options' => [
+                            'fixed' => __('Fixed'),
+                            'floating' => __('Floating'),
+                        ],
+                    ],
+                    'reading_time' => [
+                        'display' => __('Show Reading Time'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.reading_time'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'word_count' => [
+                        'display' => __('Show Word Count'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.word_count'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'allow_source' => [
+                        'display' => __('Allow Source Mode'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.allow_source'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'enable_input_rules' => [
+                        'display' => __('Enable Input Rules'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.enable_input_rules'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'enable_paste_rules' => [
+                        'display' => __('Enable Paste Rules'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.enable_paste_rules'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'remove_empty_nodes' => [
+                        'display' => __('Remove Empty Nodes'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.remove_empty_nodes'),
+                        'type' => 'select',
+                        'cast_booleans' => true,
+                        'options' => [
+                            'false' => __("Don't remove empty nodes"),
+                            'true' => __('Remove all empty nodes'),
+                            'trim' => __('Remove empty nodes at the start and end'),
+                        ],
+                        'default' => 'false',
+                    ],
+                    'placeholder' => [
+                        'display' => __('Placeholder'),
+                        'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                        'type' => 'text',
+                    ],
+                    'character_limit' => [
+                        'display' => __('Character Limit'),
+                        'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
+                        'type' => 'integer',
+                    ],
+                    'antlers' => [
+                        'display' => 'Antlers',
+                        'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                        'type' => 'toggle',
+                    ],
+                ],
             ],
-            'previews' => [
-                'display' => __('Field Previews'),
-                'instructions' => __('statamic::fieldtypes.bard.config.previews'),
-                'type' => 'toggle',
-                'default' => true,
-                'width' => 50,
+            [
+                'display' => __('Links'),
+                'instructions' => __('statamic::fieldtypes.bard.config.section.links.instructions'),
+                'fields' => [
+                    'link_noopener' => [
+                        'display' => __('Link Noopener'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.link_noopener'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'link_noreferrer' => [
+                        'display' => __('Link Noreferrer'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.link_noreferrer'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'target_blank' => [
+                        'display' => __('Target Blank'),
+                        'type' => 'toggle',
+                        'default' => false,
+                        'instructions' => __('statamic::fieldtypes.bard.config.target_blank'),
+                    ],
+                    'link_collections' => [
+                        'display' => __('Link Collections'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.link_collections'),
+                        'type' => 'collections',
+                        'mode' => 'select',
+                    ],
+                    'container' => [
+                        'display' => __('Container'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.container'),
+                        'type' => 'asset_container',
+                        'mode' => 'select',
+                        'max_items' => 1,
+                        'if' => [
+                            'buttons' => 'contains_any anchor, image',
+                        ],
+                    ],
+                ],
             ],
-            'sets' => [
+            [
                 'display' => __('Sets'),
-                'instructions' => __('statamic::fieldtypes.bard.config.sets'),
-                'type' => 'sets',
-                'require_section' => false,
-            ],
-            'buttons' => [
-                'display' => __('Buttons'),
-                'instructions' => __('statamic::fieldtypes.bard.config.buttons'),
-                'type' => 'bard_buttons_setting',
-                'default' => [
-                    'h2',
-                    'h3',
-                    'bold',
-                    'italic',
-                    'unorderedlist',
-                    'orderedlist',
-                    'removeformat',
-                    'quote',
-                    'anchor',
-                    'image',
-                    'table',
+                'instructions' => __('statamic::fieldtypes.bard.config.section.sets.instructions'),
+                'fields' => [
+                    'sets' => [
+                        'display' => __('Sets'),
+                        'hide_display' => true,
+                        'type' => 'sets',
+                        'full_width_setting' => true,
+                        'require_set' => false,
+                    ],
                 ],
             ],
-            'container' => [
-                'display' => __('Container'),
-                'instructions' => __('statamic::fieldtypes.bard.config.container'),
-                'type' => 'asset_container',
-                'mode' => 'select',
-                'max_items' => 1,
-                'if' => [
-                    'buttons' => 'contains_any anchor, image',
+            [
+                'display' => __('Set Behavior'),
+                'fields' => [
+                    'always_show_set_button' => [
+                        'display' => __('Always Show Set Button'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'collapse' => [
+                        'display' => __('Collapse'),
+                        'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
+                        'type' => 'select',
+                        'cast_booleans' => true,
+                        'options' => [
+                            'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
+                            'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
+                            'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+                        ],
+                        'default' => false,
+                    ],
+                    'previews' => [
+                        'display' => __('Field Previews'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.previews'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
                 ],
-            ],
-            'save_html' => [
-                'display' => __('Display HTML'),
-                'instructions' => __('statamic::fieldtypes.bard.config.save_html'),
-                'type' => 'toggle',
-            ],
-            'toolbar_mode' => [
-                'display' => __('Toolbar Mode'),
-                'instructions' => __('statamic::fieldtypes.bard.config.toolbar_mode'),
-                'type' => 'select',
-                'default' => 'fixed',
-                'options' => [
-                    'fixed' => __('Fixed'),
-                    'floating' => __('Floating'),
-                ],
-                'width' => 50,
-            ],
-            'link_noopener' => [
-                'display' => __('Link Noopener'),
-                'instructions' => __('statamic::fieldtypes.bard.config.link_noopener'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'link_noreferrer' => [
-                'display' => __('Link Noreferrer'),
-                'instructions' => __('statamic::fieldtypes.bard.config.link_noreferrer'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'target_blank' => [
-                'display' => __('Target Blank'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-                'instructions' => __('statamic::fieldtypes.bard.config.target_blank'),
-            ],
-            'link_collections' => [
-                'display' => __('Link Collections'),
-                'instructions' => __('statamic::fieldtypes.bard.config.link_collections'),
-                'type' => 'collections',
-                'mode' => 'select',
-            ],
-            'reading_time' => [
-                'display' => __('Show Reading Time'),
-                'instructions' => __('statamic::fieldtypes.bard.config.reading_time'),
-                'type' => 'toggle',
-                'default' => false,
-                'width' => 50,
-            ],
-            'fullscreen' => [
-                'display' => __('Allow Fullscreen Mode'),
-                'instructions' => __('statamic::fieldtypes.bard.config.fullscreen'),
-                'type' => 'toggle',
-                'default' => true,
-                'width' => 50,
-            ],
-            'allow_source' => [
-                'display' => __('Allow Source Mode'),
-                'instructions' => __('statamic::fieldtypes.bard.config.allow_source'),
-                'type' => 'toggle',
-                'default' => true,
-                'width' => 50,
-            ],
-            'enable_input_rules' => [
-                'display' => __('Enable Input Rules'),
-                'instructions' => __('statamic::fieldtypes.bard.config.enable_input_rules'),
-                'type' => 'toggle',
-                'default' => true,
-                'width' => 50,
-            ],
-            'enable_paste_rules' => [
-                'display' => __('Enable Paste Rules'),
-                'instructions' => __('statamic::fieldtypes.bard.config.enable_paste_rules'),
-                'type' => 'toggle',
-                'default' => true,
-                'width' => 50,
-            ],
-            'antlers' => [
-                'display' => 'Antlers',
-                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
-                'type' => 'toggle',
-                'width' => 50,
             ],
         ];
     }
@@ -179,12 +243,20 @@ class Bard extends Replicator
             $value = $this->convertLegacyData($value);
         }
 
+        $value = $this->convertLegacyTiptap($value);
+
         return (new Augmentor($this))->augment($value, $shallow);
     }
 
     public function process($value)
     {
         $value = json_decode($value, true);
+
+        $value = $this->removeEmptyNodes($value);
+
+        if ($this->config('inline')) {
+            $value = $this->unwrapInlineValue($value);
+        }
 
         $structure = collect($value)->map(function ($row) {
             if ($row['type'] !== 'set') {
@@ -209,6 +281,43 @@ class Bard extends Replicator
         return $structure;
     }
 
+    protected function removeEmptyNodes($value)
+    {
+        $value = collect($value);
+
+        if ($this->config('remove_empty_nodes') === true) {
+            $empty = $value->filter(function ($value) {
+                return $this->shouldRemoveNode($value);
+            });
+
+            return $value->diffKeys($empty)->values();
+        }
+
+        if ($this->config('remove_empty_nodes') === 'trim') {
+            if ($this->shouldRemoveNode($value->first())) {
+                $value->shift();
+
+                return $this->removeEmptyNodes($value);
+            }
+
+            if ($this->shouldRemoveNode($value->last())) {
+                $value->pop();
+
+                return $this->removeEmptyNodes($value);
+            }
+        }
+
+        return $value;
+    }
+
+    protected function shouldRemoveNode($value)
+    {
+        $type = Arr::get($value, 'type');
+
+        return in_array($type, ['heading', 'paragraph'])
+            && ! Arr::has($value, 'content');
+    }
+
     protected function shouldSaveHtml()
     {
         if ($this->config('sets')) {
@@ -221,8 +330,6 @@ class Bard extends Replicator
     protected function processRow($row)
     {
         $row['attrs']['values'] = parent::processRow($row['attrs']['values']);
-
-        unset($row['attrs']['id']);
 
         if (array_get($row, 'attrs.enabled', true) === true) {
             unset($row['attrs']['enabled']);
@@ -241,10 +348,27 @@ class Bard extends Replicator
 
         if (is_string($value)) {
             $value = str_replace('statamic://', '', $value);
-            $doc = (new \HtmlToProseMirror\Renderer)->render($value);
+            $doc = (new Augmentor($this))->renderHtmlToProsemirror($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
+        }
+
+        $value = $this->convertLegacyTiptap($value);
+
+        if ($this->config('inline')) {
+            // Root should be text, if it's not this must be a block field converted
+            // to inline. In that instance unwrap the content of the first node.
+            if ($value[0]['type'] !== 'text') {
+                $value = $this->unwrapInlineValue($value);
+            }
+            $value = $this->wrapInlineValue($value);
+        } else {
+            // Root should not be text, if it is this must be an inline field converted
+            // to block. In that instance wrap the content in a paragraph node.
+            if ($value[0]['type'] === 'text') {
+                $value = $this->wrapInlineValue($value);
+            }
         }
 
         return collect($value)->map(function ($row, $i) {
@@ -260,12 +384,12 @@ class Bard extends Replicator
     {
         $values = parent::preProcessRow($row['attrs']['values'], $index);
 
-        unset($values['_id']);
+        $generatedId = Arr::pull($values, '_id');
 
         return [
             'type' => 'set',
             'attrs' => [
-                'id' => "set-$index",
+                'id' => $row['attrs']['id'] ?? $generatedId,
                 'enabled' => $row['attrs']['enabled'] ?? true,
                 'values' => Arr::except($values, 'enabled'),
             ],
@@ -286,9 +410,7 @@ class Bard extends Replicator
             return $value['type'] === 'set';
         })->values();
 
-        $renderer = new Renderer;
-
-        return $renderer->render([
+        return (new Augmentor($this))->renderProsemirrorToHtml([
             'type' => 'doc',
             'content' => $data,
         ]);
@@ -339,7 +461,7 @@ class Bard extends Replicator
             return false;
         }
 
-        if (! $setConfig = $this->config('sets')) {
+        if (! $setConfig = $this->flattenedSetsConfig()->all()) {
             return false;
         }
 
@@ -357,7 +479,7 @@ class Bard extends Replicator
                 if (empty($set['text'])) {
                     return;
                 }
-                $doc = (new \HtmlToProseMirror\Renderer)->render($set['text']);
+                $doc = (new Augmentor($this))->renderHtmlToProsemirror($set['text']);
 
                 return $doc['content'];
             }
@@ -366,11 +488,34 @@ class Bard extends Replicator
                 [
                     'type' => 'set',
                     'attrs' => [
-                        'id' => "set-$i",
+                        'id' => RowId::generate(),
                         'values' => $set,
                     ],
                 ],
             ];
+        })->all();
+    }
+
+    protected function convertLegacyTiptap($value)
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        return collect($value)->map(function ($item, $key) {
+            if (is_array($item) && $key === 'attrs') {
+                return $item;
+            }
+
+            if (is_array($item)) {
+                return $this->convertLegacyTiptap($item);
+            }
+
+            if ($key === 'type') {
+                return Str::camel($item);
+            }
+
+            return $item;
         })->all();
     }
 
@@ -382,18 +527,18 @@ class Bard extends Replicator
             return $item['type'] === 'set';
         })->mapWithKeys(function ($set) {
             $values = $set['attrs']['values'];
-            $config = $this->config("sets.{$values['type']}.fields", []);
+            $config = Arr::get($this->flattenedSetsConfig(), "{$values['type']}.fields", []);
 
             return [$set['attrs']['id'] => (new Fields($config))->addValues($values)->meta()->put('_', '_')];
         })->toArray();
 
-        $defaults = collect($this->config('sets'))->map(function ($set) {
+        $defaults = collect($this->flattenedSetsConfig())->map(function ($set) {
             return (new Fields($set['fields']))->all()->map(function ($field) {
                 return $field->fieldtype()->preProcess($field->defaultValue());
             })->all();
         })->all();
 
-        $new = collect($this->config('sets'))->map(function ($set, $handle) use ($defaults) {
+        $new = collect($this->flattenedSetsConfig())->map(function ($set, $handle) use ($defaults) {
             return (new Fields($set['fields']))->addValues($defaults[$handle])->meta()->put('_', '_');
         })->toArray();
 
@@ -461,7 +606,7 @@ class Bard extends Replicator
 
     public function addGqlTypes()
     {
-        $types = collect($this->config('sets'))
+        $types = collect($this->flattenedSetsConfig())
             ->each(function ($set, $handle) {
                 $this->fields($handle)->all()->each(function ($field) {
                     $field->fieldtype()->addGqlTypes();
@@ -548,5 +693,18 @@ class Bard extends Replicator
         }
 
         return [$ref => $data];
+    }
+
+    private function wrapInlineValue($value)
+    {
+        return [[
+            'type' => 'paragraph',
+            'content' => $value,
+        ]];
+    }
+
+    private function unwrapInlineValue($value)
+    {
+        return $value[0]['content'] ?? [];
     }
 }

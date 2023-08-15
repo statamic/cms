@@ -29,7 +29,6 @@ class RunComposer implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param  string  $cacheKey
      * @param  string|array  $params
      * @return void
      */

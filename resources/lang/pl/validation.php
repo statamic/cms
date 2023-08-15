@@ -17,6 +17,7 @@ return [
     'between.array' => 'Musi mieć pomiędzy :min a :max elementów.',
     'boolean' => 'Musi mieć wartość logiczną prawda albo fałsz.',
     'confirmed' => 'Potwierdzenie pola nie zgadza się.',
+    'current_password' => 'Hasło jest nieprawidłowe.',
     'date' => 'Nieprawidłowa data.',
     'date_format' => 'Nie jest w formacie :format .',
     'different' => 'To pole oraz :other muszą się różnić.',

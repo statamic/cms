@@ -4,12 +4,13 @@ namespace Statamic\Entries;
 
 use Statamic\Data\AbstractAugmented;
 use Statamic\Facades\Collection;
+use Statamic\Statamic;
 
 class AugmentedEntry extends AbstractAugmented
 {
     public function keys()
     {
-        return $this->data->values()->keys()
+        return $this->data->keys()
             ->merge($this->data->supplements()->keys())
             ->merge($this->commonKeys())
             ->merge($this->blueprintFields()->keys())
@@ -26,7 +27,6 @@ class AugmentedEntry extends AbstractAugmented
             'url',
             'edit_url',
             'permalink',
-            'amp_url',
             'api_url',
             'status',
             'published',
@@ -35,6 +35,7 @@ class AugmentedEntry extends AbstractAugmented
             'order',
             'is_entry',
             'collection',
+            'blueprint',
             'mount',
             'locale',
             'last_modified',
@@ -45,7 +46,11 @@ class AugmentedEntry extends AbstractAugmented
 
     protected function updatedBy()
     {
-        return $this->data->lastModifiedBy();
+        $user = $this->data->lastModifiedBy();
+
+        return Statamic::isApiRoute()
+            ? optional($user)->toShallowAugmentedCollection()
+            : $user;
     }
 
     protected function updatedAt()
@@ -65,7 +70,11 @@ class AugmentedEntry extends AbstractAugmented
 
     protected function parent()
     {
-        return $this->data->parent();
+        $parent = $this->data->parent();
+
+        return Statamic::isApiRoute()
+            ? optional($parent)->toShallowAugmentedCollection()
+            : $parent;
     }
 
     protected function mount()
@@ -81,5 +90,12 @@ class AugmentedEntry extends AbstractAugmented
     public function originId()
     {
         return optional($this->data->origin())->id();
+    }
+
+    public function date()
+    {
+        return $this->data->collection()->dated()
+            ? $this->data->date()
+            : $this->wrapValue($this->getFromData('date'), 'date');
     }
 }

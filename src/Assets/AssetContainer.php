@@ -10,13 +10,16 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\AssetContainerBlueprintFound;
+use Statamic\Events\AssetContainerCreated;
 use Statamic\Events\AssetContainerDeleted;
 use Statamic\Events\AssetContainerSaved;
+use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
+use Statamic\Facades\Image;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
@@ -36,7 +39,11 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     protected $allowMoving;
     protected $allowRenaming;
     protected $createFolders;
+    protected $sourcePreset;
+    protected $warmPresets;
     protected $searchIndex;
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
     protected $sortField;
     protected $sortDirection;
 
@@ -166,17 +173,37 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function blueprint()
     {
+        if (Blink::has($blink = 'asset-container-blueprint-'.$this->handle())) {
+            return Blink::get($blink);
+        }
+
         $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
             'alt' => [
                 'type' => 'text',
-                'display' => 'Alt Text',
-                'instructions' => 'Description of the image',
+                'display' => __('Alt Text'),
+                'instructions' => __('Description of the image'),
             ],
         ])->setHandle($this->handle())->setNamespace('assets');
+
+        Blink::put($blink, $blueprint);
 
         AssetContainerBlueprintFound::dispatch($blueprint, $this);
 
         return $blueprint;
+    }
+
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
     }
 
     /**
@@ -186,9 +213,33 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function save()
     {
+        $isNew = is_null(Facades\AssetContainer::find($this->id()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (AssetContainerSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         Facades\AssetContainer::save($this);
 
-        AssetContainerSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($withEvents) {
+            if ($isNew) {
+                AssetContainerCreated::dispatch($this);
+            }
+
+            AssetContainerSaved::dispatch($this);
+        }
 
         return $this;
     }
@@ -249,6 +300,16 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
         }
 
         return $this->contents()->filteredFilesIn($folder, $recursive)->keys();
+    }
+
+    public function metaFiles($folder = '/', $recursive = false)
+    {
+        // When requesting files() as-is, we want all of them.
+        if (func_num_args() === 0) {
+            $recursive = true;
+        }
+
+        return $this->contents()->metaFilesIn($folder, $recursive)->keys();
     }
 
     public function foldersCacheKey($folder = '/', $recursive = false)
@@ -374,15 +435,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function accessible()
     {
-        $config = $this->disk()->filesystem()->getConfig();
-
-        // If Flysystem 1.x, it will be an array, so wrap it with `collect()` so it can `get()` values;
-        // Otherwise it will already be a `ReadOnlyConfiguration` object with a `get()` method.
-        if (is_array($config)) {
-            $config = collect($config);
-        }
-
-        return $config->get('url') !== null;
+        return Arr::get($this->disk()->filesystem()->getConfig(), 'url') !== null;
     }
 
     /**
@@ -475,6 +528,55 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             ->args(func_get_args());
     }
 
+    /**
+     * The glide source preset to be permanently applied to source image on upload.
+     *
+     * @param  string|null  $preset
+     * @return string|null|$this
+     */
+    public function sourcePreset($preset = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('sourcePreset')
+            ->args(func_get_args());
+    }
+
+    /**
+     * The specific glide presets to be used when warming glide image cache on upload.
+     *
+     * @param  array|null  $presets
+     * @return array|null|$this
+     */
+    public function warmPresets($preset = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('warmPresets')
+            ->getter(function ($presets) {
+                if ($presets === false) {
+                    return [];
+                }
+
+                if ($presets !== null) {
+                    return $presets;
+                }
+
+                $presets = Image::userManipulationPresets();
+
+                $presets = Arr::except($presets, $this->sourcePreset);
+
+                return array_keys($presets);
+            })
+            ->setter(function ($presets) {
+                return $presets === [] ? false : $presets;
+            })
+            ->args(func_get_args());
+    }
+
+    public function warmsPresetsIntelligently()
+    {
+        return $this->warmPresets === null;
+    }
+
     public function fileData()
     {
         $array = [
@@ -486,6 +588,8 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             'allow_renaming' => $this->allowRenaming,
             'allow_moving' => $this->allowMoving,
             'create_folders' => $this->createFolders,
+            'source_preset' => $this->sourcePreset,
+            'warm_presets' => $this->warmPresets,
         ];
 
         $array = Arr::removeNullValues(array_merge($array, [
@@ -519,5 +623,10 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     public static function __callStatic($method, $parameters)
     {
         return Facades\AssetContainer::{$method}(...$parameters);
+    }
+
+    public function __toString()
+    {
+        return $this->handle();
     }
 }

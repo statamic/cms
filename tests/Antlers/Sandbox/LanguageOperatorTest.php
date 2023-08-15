@@ -61,4 +61,9 @@ EOT;
 
         $this->assertSame('123345', $this->renderString('{{ merged = a merge b }}{{ value }}{{ /merged }}', ['a' => $a, 'b' => $b]));
     }
+
+    public function test_pluck_on_variable_that_doesnt_exist()
+    {
+        $this->assertSame('', $this->renderString('{{ doesnt_exist pluck("title") }}'));
+    }
 }

@@ -11,6 +11,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository;
 use Statamic\Data\ContainsSupplementalData;
@@ -28,20 +29,13 @@ use Statamic\GraphQL\ResolvesValues;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
+use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
-class LocalizedTerm implements
-    Term,
-    Responsable,
-    Augmentable,
-    Protectable,
-    ResolvesValuesContract,
-    ArrayAccess,
-    Arrayable,
-    ContainsQueryableValues
+class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, ResolvesValuesContract, ArrayAccess, Arrayable, ContainsQueryableValues, SearchableContract
 {
-    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, ContainsSupplementalData, ResolvesValues;
+    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, ContainsSupplementalData, ResolvesValues, Searchable;
 
     protected $locale;
     protected $term;
@@ -199,7 +193,7 @@ class LocalizedTerm implements
 
     public function reference()
     {
-        return $this->term->reference();
+        return $this->term->reference().'::'.$this->locale();
     }
 
     public function in($site)
@@ -346,7 +340,7 @@ class LocalizedTerm implements
         $route = '/'.str_replace('_', '-', $this->taxonomyHandle()).'/{slug}';
 
         if ($this->collection()) {
-            $collectionUrl = $this->collection()->url() ?? $this->collection()->handle();
+            $collectionUrl = $this->collection()->uri($this->locale()) ?? $this->collection()->handle();
             $route = $collectionUrl.$route;
         }
 
@@ -515,5 +509,10 @@ class LocalizedTerm implements
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    public function getCpSearchResultBadge()
+    {
+        return $this->taxonomy()->title();
     }
 }

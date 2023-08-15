@@ -37,7 +37,11 @@ class MoveAsset extends Action
 
     public function run($assets, $values)
     {
-        $assets->each->move($values['folder']);
+        $ids = $assets->each->move($values['folder'])->map->id()->all();
+
+        return [
+            'ids' => $ids,
+        ];
     }
 
     protected function fieldItems()

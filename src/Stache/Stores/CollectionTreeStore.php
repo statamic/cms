@@ -5,7 +5,6 @@ namespace Statamic\Stache\Stores;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Path;
 use Statamic\Structures\CollectionTree;
-use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionTreeStore extends NavTreeStore
@@ -38,16 +37,5 @@ class CollectionTreeStore extends NavTreeStore
             ->initialPath($path)
             ->locale($site)
             ->handle($handle);
-    }
-
-    public function getItemKey($item)
-    {
-        $key = parent::getItemKey($item);
-
-        if (Str::startsWith($key, 'collection::')) {
-            $key = Str::after($key, 'collection::');
-        }
-
-        return $key;
     }
 }

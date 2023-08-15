@@ -49,7 +49,10 @@ export default {
         },
 
         isReadOnly() {
-            return this.readOnly || this.config.visibility === 'read_only' || false;
+            return this.readOnly
+                || this.config.visibility === 'read_only'
+                || this.config.visibility === 'computed'
+                || false;
         },
 
         replicatorPreview() {
@@ -57,7 +60,9 @@ export default {
         },
 
         fieldId() {
-            return 'field_'+this.config.handle;
+            let prefix = this.fieldPathPrefix ? this.fieldPathPrefix+'.' : '';
+
+            return prefix+'field_'+this.config.handle;
         }
     },
 

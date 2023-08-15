@@ -2,11 +2,13 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Facades;
+use Statamic\Facades\Addon;
 use Statamic\Facades\Preference;
 use Statamic\Facades\Token;
 use Statamic\Sites\Sites;
@@ -17,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
     protected $root = __DIR__.'/../..';
 
     protected $configFiles = [
-        'amp', 'antlers', 'api', 'assets', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'oauth', 'protect', 'revisions',
+        'antlers', 'api', 'assets', 'autosave', 'cp', 'editions', 'forms', 'git', 'graphql', 'live_preview', 'markdown', 'oauth', 'protect', 'revisions',
         'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'users',
     ];
 
@@ -82,6 +84,8 @@ class AppServiceProvider extends ServiceProvider
                 return Token::find($token);
             }
         });
+
+        $this->addAboutCommandInfo();
     }
 
     public function register()
@@ -100,6 +104,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Taxonomies\TaxonomyRepository::class => \Statamic\Stache\Repositories\TaxonomyRepository::class,
             \Statamic\Contracts\Entries\CollectionRepository::class => \Statamic\Stache\Repositories\CollectionRepository::class,
             \Statamic\Contracts\Globals\GlobalRepository::class => \Statamic\Stache\Repositories\GlobalRepository::class,
+            \Statamic\Contracts\Globals\GlobalVariablesRepository::class => \Statamic\Stache\Repositories\GlobalVariablesRepository::class,
             \Statamic\Contracts\Assets\AssetContainerRepository::class => \Statamic\Stache\Repositories\AssetContainerRepository::class,
             \Statamic\Contracts\Structures\StructureRepository::class => \Statamic\Structures\StructureRepository::class,
             \Statamic\Contracts\Structures\CollectionTreeRepository::class => \Statamic\Stache\Repositories\CollectionTreeRepository::class,
@@ -134,7 +139,7 @@ class AppServiceProvider extends ServiceProvider
                 });
         });
 
-        $this->app->bind(\Statamic\Fields\FieldsetRepository::class, function () {
+        $this->app->singleton(\Statamic\Fields\FieldsetRepository::class, function () {
             return (new \Statamic\Fields\FieldsetRepository)
                 ->setDirectory(resource_path('fieldsets'));
         });
@@ -163,5 +168,26 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\AuthGuard::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ]);
+    }
+
+    protected function addAboutCommandInfo()
+    {
+        if (! class_exists(AboutCommand::class)) {
+            return;
+        }
+
+        $addons = Addon::all();
+
+        AboutCommand::add('Statamic', [
+            'Version' => fn () => Statamic::version().' '.(Statamic::pro() ? '<fg=yellow;options=bold>PRO</>' : 'Solo'),
+            'Antlers' => config('statamic.antlers.version'),
+            'Addons' => $addons->count(),
+            'Stache Watcher' => config('statamic.stache.watcher') ? 'Enabled' : 'Disabled',
+            'Static Caching' => config('statamic.static_caching.strategy') ?: 'Disabled',
+        ]);
+
+        foreach ($addons as $addon) {
+            AboutCommand::add('Statamic Addons', $addon->package(), $addon->version());
+        }
     }
 }

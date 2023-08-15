@@ -8,6 +8,8 @@
         :is-read-only="isReadOnly"
         :id="fieldId"
         :min="config.min"
+        :prepend="config.prepend"
+        :append="config.append"
         @input="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
@@ -19,6 +21,9 @@
 export default {
 
     mixins: [Fieldtype],
-
+    props: {
+        prepend: { default: null },
+        append: { default: null },
+    }
 };
 </script>

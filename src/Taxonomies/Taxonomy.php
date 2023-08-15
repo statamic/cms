@@ -11,11 +11,14 @@ use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\TaxonomyCreated;
 use Statamic\Events\TaxonomyDeleted;
 use Statamic\Events\TaxonomySaved;
+use Statamic\Events\TaxonomySaving;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Search;
@@ -23,6 +26,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAccess, Arrayable
@@ -38,6 +42,8 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     protected $revisions = false;
     protected $searchIndex;
     protected $previewTargets = [];
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -103,17 +109,34 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function termBlueprint($blueprint = null, $term = null)
     {
-        $blueprint = is_null($blueprint)
-            ? $this->termBlueprints()->first()
-            : $this->termBlueprints()->keyBy->handle()->get($blueprint);
+        if (! $blueprint = $this->getBaseTermBlueprint($blueprint)) {
+            return null;
+        }
 
-        $blueprint ? $this->ensureTermBlueprintFields($blueprint) : null;
+        $this->ensureTermBlueprintFields($blueprint);
 
-        if ($blueprint) {
-            TermBlueprintFound::dispatch($blueprint->setParent($term ?? $this), $term);
+        $blueprint->setParent($term ?? $this);
+
+        // Only dispatch the event when there's no term.
+        // When there is a term, the event is dispatched from the term.
+        if (! $term) {
+            Blink::once(
+                'collection-termblueprintfound-'.$this->handle().'-'.$blueprint->handle(),
+                fn () => TermBlueprintFound::dispatch($blueprint)
+            );
         }
 
         return $blueprint;
+    }
+
+    private function getBaseTermBlueprint($blueprint)
+    {
+        if (is_null($blueprint)) {
+            return $this->termBlueprints()->first();
+        }
+
+        return $this->termBlueprints()->keyBy->handle()->get($blueprint)
+            ?? $this->termBlueprints()->keyBy->handle()->get(Str::singular($blueprint));
     }
 
     public function ensureTermBlueprintFields($blueprint)
@@ -127,12 +150,12 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function fallbackTermBlueprint()
     {
-        $blueprint = Blueprint::find('default')
-            ->setHandle($this->handle())
+        $blueprint = (clone Blueprint::find('default'))
+            ->setHandle(Str::singular($this->handle()))
             ->setNamespace('taxonomies.'.$this->handle());
 
         $contents = $blueprint->contents();
-        $contents['title'] = $this->title();
+        $contents['title'] = Str::singular($this->title());
         $blueprint->setContents($contents);
 
         return $blueprint;
@@ -159,11 +182,45 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         return $query;
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->save();
+    }
+
     public function save()
     {
+        $isNew = is_null(Facades\Taxonomy::find($this->id()));
+
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($withEvents) {
+            if (TaxonomySaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         Facades\Taxonomy::save($this);
 
-        TaxonomySaved::dispatch($this);
+        if ($withEvents) {
+            if ($isNew) {
+                TaxonomyCreated::dispatch($this);
+            }
+
+            TaxonomySaved::dispatch($this);
+        }
 
         return true;
     }
@@ -365,7 +422,9 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             ? $this->defaultPreviewTargets()
             : $this->previewTargets;
 
-        return collect($targets);
+        return collect($targets)->map(function ($target) {
+            return $target + ['refresh' => $target['refresh'] ?? true];
+        });
     }
 
     public function addPreviewTargets($targets)
@@ -377,12 +436,20 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function additionalPreviewTargets()
     {
-        return Facades\Taxonomy::additionalPreviewTargets($this->handle);
+        return Facades\Taxonomy::additionalPreviewTargets($this->handle)->map(function ($target) {
+            return $target + ['refresh' => $target['refresh'] ?? true];
+        });
     }
 
     private function defaultPreviewTargets()
     {
-        return [['label' => 'Term', 'format' => '{permalink}']];
+        return [
+            [
+                'label' => 'Term',
+                'format' => '{permalink}',
+                'refresh' => true,
+            ],
+        ];
     }
 
     private function previewTargetsForFile()
@@ -401,6 +468,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             return [
                 'label' => $target['label'],
                 'url' => $target['format'],
+                'refresh' => $target['refresh'],
             ];
         })->filter()->values()->all();
     }

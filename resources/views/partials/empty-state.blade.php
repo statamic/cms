@@ -1,10 +1,13 @@
-<div class="no-results md:pt-8 max-w-2xl mx-auto">
-    <div class="flex flex-wrap">
-        <div class="w-full md:w-1/2">
-            <h1 class="mb-4">{{ $title }}</h1>
+<div class="no-results md:mt-4 max-w-md mx-auto">
+    <div class="card rounded-xl text-center p-6 lg:py-10">
+            <h1 class="mb-8">{{ $title }}</h1>
+
+            <div class="hidden md:block">
+                @cp_svg($svg ?? 'empty/content')
+            </div>
 
             @if ($description ?? false)
-            <p class="text-grey-70 leading-normal mb-4 text-lg antialiased">
+            <p class="text-gray-700 leading-normal my-8 text-lg antialiased">
                 {{ $description }}
             </p>
             @endif
@@ -18,8 +21,4 @@
                 <a href="{{ $button_url }}" class="btn-primary btn-lg">{{ $button_text }}</a>
             @endunless
         </div>
-        <div class="hidden md:block w-1/2 pl-6">
-            @cp_svg($svg ?? 'empty/content')
-        </div>
-    </div>
 </div>

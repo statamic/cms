@@ -5,7 +5,6 @@ namespace Statamic\Tags\Collection;
 use Closure;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as IlluminateCollection;
-use InvalidArgumentException;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
@@ -21,7 +20,8 @@ class Entries
     use Concerns\QueriesScopes,
         Concerns\QueriesOrderBys,
         Concerns\GetsQueryResults,
-        Concerns\GetsQuerySelectKeys;
+        Concerns\GetsQuerySelectKeys,
+        Concerns\QueriesTaxonomyTerms;
     use Concerns\QueriesConditions {
         queryableConditionParams as traitQueryableConditionParams;
     }
@@ -305,7 +305,7 @@ class Entries
             return $key === 'taxonomy' || Str::startsWith($key, 'taxonomy:');
         })->each(function ($values, $param) use ($query) {
             $taxonomy = substr($param, 9);
-            [$taxonomy, $modifier] = array_pad(explode(':', $taxonomy), 2, 'any');
+            [$taxonomy, $modifier] = array_pad(explode(':', $taxonomy), 2, null);
 
             if (Compare::isQueryBuilder($values)) {
                 $values = $values->get();
@@ -327,19 +327,7 @@ class Entries
                 return Str::contains($term, '::') ? $term : $taxonomy.'::'.$term;
             });
 
-            if ($modifier === 'all') {
-                $values->each(function ($value) use ($query) {
-                    $query->whereTaxonomy($value);
-                });
-            } elseif ($modifier === 'not') {
-                $query->whereTaxonomyNotIn($values->all());
-            } elseif ($modifier === 'any') {
-                $query->whereTaxonomyIn($values->all());
-            } else {
-                throw new InvalidArgumentException(
-                    'Unknown taxonomy query modifier ['.$modifier.']. Valid values are "any", "not", and "all".'
-                );
-            }
+            $this->queryTaxonomyTerms($query, $modifier, $values);
         });
     }
 

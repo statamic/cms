@@ -150,6 +150,7 @@ class PathParser
             if ($this->isParsingString && $this->cur == DocumentParser::String_EscapeCharacter && $this->next == $terminator) {
                 $currentChars[] = $terminator;
                 $this->currentIndex += 1;
+
                 continue;
             }
 
@@ -166,6 +167,7 @@ class PathParser
                         }
                     } else {
                         $currentChars[] = $this->cur;
+
                         continue;
                     }
                 } else {
@@ -181,24 +183,29 @@ class PathParser
             if ($this->isParsingString) {
                 if (ctype_space($this->cur)) {
                     $currentChars[] = $this->cur;
+
                     continue;
                 } elseif ($this->cur == DocumentParser::String_EscapeCharacter) {
                     if ($this->next == DocumentParser::String_EscapeCharacter) {
                         $currentChars[] = DocumentParser::String_EscapeCharacter;
                         $this->currentIndex += 1;
                         $ignorePrevious = true;
+
                         continue;
                     } elseif ($this->next == 'n') {
                         $currentChars[] = "\n";
                         $this->currentIndex += 1;
+
                         continue;
                     } elseif ($this->next == 't') {
                         $currentChars[] = "\t";
                         $this->currentIndex += 1;
+
                         continue;
                     } elseif ($this->next == 'r') {
                         $currentChars[] = "\r";
                         $this->currentIndex += 1;
+
                         continue;
                     }
                 }
@@ -247,6 +254,7 @@ class PathParser
                 $activeDelimiter = self::ColonSeparator;
                 $this->currentIndex += 1;
                 $isParsingAccessor = false;
+
                 continue;
             }
 
@@ -254,6 +262,16 @@ class PathParser
                 $this->cur == self::DotPathSeparator || $this->currentIndex == $this->lastIndex)) {
                 if ($this->next == null || ctype_space($this->next)) {
                     if ($this->cur == self::ColonSeparator) {
+                        if (count($parts) > 0 && $parts[count($parts) - 1] instanceof PathNode) {
+                            $lastPart = $parts[count($parts) - 1];
+
+                            if ($lastPart->delimiter == self::ColonSeparator) {
+                                $lastPart->delimiter .= $this->cur;
+
+                                continue;
+                            }
+                        }
+
                         if (count($currentChars) == 0) {
                             throw ErrorFactory::makeSyntaxError(
                                 AntlersErrorCodes::TYPE_UNEXPECTED_BRANCH_SEPARATOR,
@@ -299,9 +317,11 @@ class PathParser
 
                 $parts[] = $pathNode;
                 $currentChars = [];
+
                 continue;
             } else {
                 $currentChars[] = $this->cur;
+
                 continue;
             }
         }
@@ -354,12 +374,13 @@ class PathParser
             }
 
             if ($isParsingString == false && (
-                    $cur == DocumentParser::String_Terminator_SingleQuote ||
-                    $cur == DocumentParser::String_Terminator_DoubleQuote
-                )) {
+                $cur == DocumentParser::String_Terminator_SingleQuote ||
+                $cur == DocumentParser::String_Terminator_DoubleQuote
+            )) {
                 $isParsingString = true;
                 $terminator = $cur;
                 $nestedChars[] = $cur;
+
                 continue;
             }
 
@@ -374,6 +395,7 @@ class PathParser
                 $nestedChars[] = $cur;
                 $isParsingString = false;
                 $terminator = null;
+
                 continue;
             }
 
@@ -386,6 +408,7 @@ class PathParser
                     break;
                 } else {
                     $nestedChars[] = $cur;
+
                     continue;
                 }
             } else {

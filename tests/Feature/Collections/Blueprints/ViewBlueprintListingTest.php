@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Collections\Blueprints;
 
-use Statamic\Auth\User;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Blueprint;
@@ -39,7 +38,7 @@ class ViewBlueprintListingTest extends TestCase
                     'id' => 'foo',
                     'handle' => 'foo',
                     'title' => 'Foo',
-                    'sections' => 2,
+                    'tabs' => 2,
                     'fields' => 2,
                     'hidden' => false,
                     'edit_url' => 'http://localhost/cp/collections/test/blueprints/foo/edit',
@@ -49,7 +48,7 @@ class ViewBlueprintListingTest extends TestCase
                     'id' => 'bar',
                     'handle' => 'bar',
                     'title' => 'Bar',
-                    'sections' => 2,
+                    'tabs' => 2,
                     'fields' => 2,
                     'hidden' => false,
                     'edit_url' => 'http://localhost/cp/collections/test/blueprints/bar/edit',

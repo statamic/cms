@@ -11,6 +11,7 @@ class ResolveValueTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider resolvesValueProvider
      **/
     public function it_resolves_values($item, $field, $expected)
@@ -52,11 +53,20 @@ class ResolveValueTest extends TestCase
             'scalar nested get' => [$dataItem, 'the_foo_field->test', null],
             'scalar nested value' => [$valueItem, 'the_foo_field->test', null],
             'scalar nested method' => [$methodItem, 'the_foo_field->test', null],
+
+            // Prefixing with data-> will force it to read from the data array.
+            'direct data get' => [$dataItem, 'data->the_foo_field', 'getfoo'],
+            'direct data value' => [$valueItem, 'data->the_foo_field', 'getfoo'],
+            'direct data method' => [$methodItem, 'data->the_foo_field', 'getfoo'],
+            'direct data nested get' => [$dataItem, 'data->the_nested_field->the_foo_field', 'getfoo'],
+            'direct data nested value' => [$valueItem, 'data->the_nested_field->the_foo_field', 'getfoo'],
+            'direct data nested method' => [$methodItem, 'data->the_nested_field->the_foo_field', 'getfoo'],
         ];
     }
 
     /**
      * @test
+     *
      * @dataProvider delegatesToClassProvider
      **/
     public function it_delegates_resolving_to_the_queryable_class($field, $expected)

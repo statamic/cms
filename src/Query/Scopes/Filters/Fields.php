@@ -2,13 +2,17 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\User;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Arr;
 
 class Fields extends Filter
 {
+    protected $pinned = true;
+
     public static function title()
     {
         return __('Field');
@@ -35,7 +39,9 @@ class Fields extends Filter
                 return isset($values[$handle]);
             })
             ->each(function ($field, $handle) use ($query, $values) {
-                $field->fieldtype()->filter()->apply($query, $handle, $values[$handle]);
+                $filter = $field->fieldtype()->filter();
+                $values = $filter->fields()->addValues($values[$handle])->process()->values();
+                $filter->apply($query, $handle, $values);
             });
     }
 
@@ -46,14 +52,18 @@ class Fields extends Filter
                 return isset($values[$handle]);
             })
             ->map(function ($field, $handle) use ($values) {
-                return $field->fieldtype()->filter()->badge($values[$handle]);
+                $filter = $field->fieldtype()->filter();
+                $values = $filter->fields()->addValues($values[$handle])->process()->values();
+
+                return $filter->badge($values);
             })
+            ->filter()
             ->all();
     }
 
     public function visibleTo($key)
     {
-        return in_array($key, ['entries', 'entries-fieldtype', 'terms']);
+        return in_array($key, ['entries', 'entries-fieldtype', 'terms', 'users', 'usergroup-users']);
     }
 
     protected function getFields()
@@ -78,6 +88,14 @@ class Fields extends Filter
         if ($taxonomies = Arr::getFirst($this->context, ['taxonomy', 'taxonomies'])) {
             return collect(Arr::wrap($taxonomies))->flatMap(function ($taxonomy) {
                 return Taxonomy::findByHandle($taxonomy)->termBlueprints();
+            });
+        }
+
+        if (isset($this->context['blueprints'])) {
+            return collect($this->context['blueprints'])->map(function ($handle) {
+                return $handle === 'user'
+                    ? User::blueprint()
+                    : Blueprint::find($handle);
             });
         }
 

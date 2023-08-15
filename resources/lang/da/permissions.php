@@ -63,7 +63,6 @@ return [
     'edit_roles' => 'Rediger roller',
     'group_updates' => 'Opdateringer',
     'view_updates' => 'Se opdateringer',
-    'perform_updates' => 'Udfør opdateringer',
     'group_utilities' => 'Hjælpeprogrammer',
     'access_utility' => ':title',
     'access_utility_desc' => 'Giver adgang til :title titelværktøjet',

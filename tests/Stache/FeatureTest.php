@@ -2,14 +2,13 @@
 
 namespace Tests\Stache;
 
-use Mockery;
-use Statamic\Contracts\Structures\StructureRepository;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Data;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Nav as NavRepository;
 use Statamic\Facades\Structure;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
@@ -18,6 +17,8 @@ use Tests\TestCase;
 
 class FeatureTest extends TestCase
 {
+    private $stache;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -33,6 +34,7 @@ class FeatureTest extends TestCase
             $stache->store('entries')->directory($dir.'/content/collections');
             $stache->store('navigation')->directory($dir.'/content/navigation');
             $stache->store('globals')->directory($dir.'/content/globals');
+            $stache->store('global-variables')->directory($dir.'/content/globals');
             $stache->store('asset-containers')->directory($dir.'/content/assets');
             $stache->store('collection-trees')->directory($dir.'/content/structures/collections');
             $stache->store('nav-trees')->directory($dir.'/content/structures/navigation');
@@ -67,16 +69,6 @@ class FeatureTest extends TestCase
 
         // ensure it only gets from the entries' store, not anywhere in the stache.
         $this->assertNull(Entry::find('users-john'));
-    }
-
-    /**
-     * @test
-     *
-     * @deprecated
-     **/
-    public function it_gets_entry_by_slug()
-    {
-        $this->assertEquals('Christmas', Entry::findBySlug('christmas', 'blog', 'christmas')->get('title'));
     }
 
     /** @test */
@@ -211,9 +203,7 @@ class FeatureTest extends TestCase
     {
         $structure = Structure::find('footer');
 
-        $repo = Mockery::mock(StructureRepository::class);
-        $repo->shouldReceive('save')->with($structure);
-        $this->app->instance(StructureRepository::class, $repo);
+        NavRepository::shouldReceive('save')->with($structure)->once();
 
         $structure->save();
     }

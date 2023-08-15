@@ -47,7 +47,7 @@ class CopyPasswordResetLink extends Action
 
         $passwordResetLink = $user->password()
             ? PasswordReset::url($user->generatePasswordResetToken(), PasswordReset::BROKER_RESETS)
-            : PasswordReset::url($user->generatePasswordResetToken(), PasswordReset::BROKER_ACTIVATIONS);
+            : PasswordReset::url($user->generateActivateAccountToken(), PasswordReset::BROKER_ACTIVATIONS);
 
         return [
             'message' => false,

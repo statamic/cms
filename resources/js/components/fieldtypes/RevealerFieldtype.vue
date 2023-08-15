@@ -4,7 +4,7 @@
         <template v-if="isToggleMode">
             <div class="toggle-fieldtype-wrapper">
                 <toggle-input :value="isRevealed" @input="update" :read-only="isReadOnly" />
-                <label v-if="config.input_label" class="ml-1 font-normal">{{ config.input_label }}</label>
+                <label v-if="config.input_label" class="ml-2 font-normal">{{ config.input_label }}</label>
             </div>
         </template>
 
@@ -47,8 +47,13 @@ export default {
         this.$store.commit(`publish/${this.storeName}/setRevealerField`, this.fieldPath);
     },
 
+    beforeDestroy() {
+        this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, this.fieldPath);
+    },
+
     watch: {
-        fieldPath(fieldPath) {
+        fieldPath(fieldPath, oldFieldPath) {
+            this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, oldFieldPath);
             this.$store.commit(`publish/${this.storeName}/setRevealerField`, fieldPath);
         }
     },

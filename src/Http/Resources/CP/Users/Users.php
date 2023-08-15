@@ -55,7 +55,6 @@ class Users extends ResourceCollection
         $columns->put('last_login',
             Column::make('last_login')
                 ->label(__('Last Login'))
-                ->sortable(false)
                 ->defaultOrder($columns->max('defaultOrder') + 1)
         );
 
@@ -99,13 +98,16 @@ class Users extends ResourceCollection
     {
         $this->setColumns();
 
-        return [
-            'data' => $this->collection->each(function ($user) {
-                $user
-                    ->blueprint($this->blueprint)
-                    ->columns($this->requestedColumns());
-            }),
+        return $this->collection->each(function ($user) {
+            $user
+                ->blueprint($this->blueprint)
+                ->columns($this->requestedColumns());
+        });
+    }
 
+    public function with($request)
+    {
+        return [
             'meta' => [
                 'columns' => $this->visibleColumns(),
             ],

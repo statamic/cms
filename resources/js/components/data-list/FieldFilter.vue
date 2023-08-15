@@ -1,11 +1,11 @@
 <template>
     <div>
         <div v-if="hasAvailableFieldFilters">
-            <div class="flex flex-col p-2">
+            <div class="flex flex-col p-3">
 
                 <v-select
                     ref="fieldSelect"
-                    :placeholder="__('Select field')"
+                    :placeholder="__('Field')"
                     :options="fieldOptions"
                     :reduce="option => option.value"
                     :value="field"
@@ -18,29 +18,30 @@
                     :meta="{}"
                     :values="containerValues"
                     :track-dirty-state="false"
-                    class="filter-fields mt-1"
+                    class="filter-fields mt-2"
                     @updated="updateValues"
                 >
                     <!-- TODO: handle showing/hiding of labels more elegantly -->
                     <publish-fields
-                        slot-scope="{ setFieldValue }"
+                        slot-scope="{ setFieldValue, setFieldMeta }"
                         :fields="filter.fields"
                         name-prefix="filter-field"
                         class="w-full no-label"
                         @updated="setFieldValue"
+                        @meta-updated="setFieldMeta"
                     />
                 </publish-container>
 
             </div>
 
-            <div class="flex border-t text-grey-80">
+            <div class="flex border-t text-gray-800">
                 <button
-                    class="p-1 hover:bg-grey-10 rounded-bl text-xs flex-1"
+                    class="p-2 hover:bg-gray-100 rounded-bl text-xs flex-1"
                     v-text="__('Clear')"
                     @click="resetAll"
                 />
                 <button
-                    class="p-1 hover:bg-grey-10 flex-1 rounded-br border-l text-xs"
+                    class="p-2 hover:bg-gray-100 flex-1 rounded-br border-l text-xs"
                     v-text="__('Close')"
                     @click="$emit('closed')"
                 />
@@ -61,6 +62,7 @@ export default {
     props: {
         config: Object,
         values: Object,
+        badges: Object,
     },
 
     data() {
@@ -142,6 +144,12 @@ export default {
     },
 
     methods: {
+
+        popoverClosed() {
+            if (! this.badges[this.field]) {
+                this.resetAll();
+            }
+        },
 
         reset() {
             if (this.field) this.$emit('changed', this.initialValues);

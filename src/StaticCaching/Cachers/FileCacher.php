@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
+use Statamic\Facades\Site;
 use Statamic\StaticCaching\Replacers\CsrfTokenReplacer;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -33,8 +34,6 @@ class FileCacher extends AbstractCacher
     private $nocachePlaceholder;
 
     /**
-     * @param  Writer  $writer
-     * @param  Repository  $cache
      * @param  array  $config
      */
     public function __construct(Writer $writer, Repository $cache, $config)
@@ -66,11 +65,10 @@ class FileCacher extends AbstractCacher
             return;
         }
 
-        $this->cacheUrl($this->makeHash($url), $url);
+        $this->cacheUrl($this->makeHash($url), ...$this->getPathAndDomain($url));
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
      * @return string
      */
     public function getCachedPage(Request $request)
@@ -113,16 +111,17 @@ class FileCacher extends AbstractCacher
      * @param  string  $url
      * @return void
      */
-    public function invalidateUrl($url)
+    public function invalidateUrl($url, $domain = null)
     {
-        if (! $key = $this->getUrls()->flip()->get($url)) {
-            // URL doesn't exist, nothing to invalidate.
-            return;
-        }
+        $site = optional(Site::findByUrl($domain.$url))->handle();
 
-        $this->writer->delete($this->getFilePath($url));
-
-        $this->forgetUrl($key);
+        $this
+            ->getUrls($domain)
+            ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
+            ->each(function ($value, $key) use ($site, $domain) {
+                $this->writer->delete($this->getFilePath($value, $site));
+                $this->forgetUrl($key, $domain);
+            });
     }
 
     public function getCachePaths()
@@ -130,7 +129,7 @@ class FileCacher extends AbstractCacher
         $paths = $this->config('path');
 
         if (! is_array($paths)) {
-            $paths = [$this->config('locale') => $paths];
+            $paths = Site::all()->mapWithKeys(fn ($site) => [$site->handle() => $paths])->all();
         }
 
         return $paths;
@@ -139,27 +138,26 @@ class FileCacher extends AbstractCacher
     /**
      * Get the path where static files are stored.
      *
-     * @param  string|null  $locale  A specific locale's path.
+     * @param  string|null  $site  A specific site's path.
      * @return string
      */
-    public function getCachePath($locale = null)
+    public function getCachePath($site = null)
     {
         $paths = $this->getCachePaths();
 
-        if (! $locale) {
-            $locale = $this->config('locale');
+        if (! $site) {
+            $site = $this->config('locale');
         }
 
-        return $paths[$locale];
+        return $paths[$site];
     }
 
     /**
      * Get the path to the cached file.
      *
-     * @param $url
      * @return string
      */
-    public function getFilePath($url)
+    public function getFilePath($url, $site = null)
     {
         $urlParts = parse_url($url);
         $pathParts = pathinfo($urlParts['path']);
@@ -170,7 +168,7 @@ class FileCacher extends AbstractCacher
             $basename = $slug.'_lqs_'.md5($query).'.html';
         }
 
-        return $this->getCachePath().$pathParts['dirname'].'/'.$basename;
+        return $this->getCachePath($site).$pathParts['dirname'].'/'.$basename;
     }
 
     private function isBasenameTooLong($basename)
@@ -193,36 +191,44 @@ class FileCacher extends AbstractCacher
         $csrfPlaceholder = CsrfTokenReplacer::REPLACEMENT;
 
         $default = <<<EOT
-var els = document.getElementsByClassName('nocache');
-var map = {};
-for (var i = 0; i < els.length; i++) {
-    var section = els[i].getAttribute('data-nocache');
-    map[section] = els[i];
-}
+(function() {
+    var els = document.getElementsByClassName('nocache');
+    var map = {};
+    for (var i = 0; i < els.length; i++) {
+        var section = els[i].getAttribute('data-nocache');
+        map[section] = els[i];
+    }
 
-fetch('/!/nocache', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        url: window.location.href,
-        sections: Object.keys(map)
+    fetch('/!/nocache', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            url: window.location.href,
+            sections: Object.keys(map)
+        })
     })
-})
-.then((response) => response.json())
-.then((data) => {
-    const regions = data.regions;
-    for (var key in regions) {
-        if (map[key]) map[key].outerHTML = regions[key];
-    }
+    .then((response) => response.json())
+    .then((data) => {
+        const regions = data.regions;
+        for (var key in regions) {
+            if (map[key]) map[key].outerHTML = regions[key];
+        }
 
-    for (const input of document.querySelectorAll('input[value=$csrfPlaceholder]')) {
-        input.value = data.csrf;
-    }
+        for (const input of document.querySelectorAll('input[value="$csrfPlaceholder"]')) {
+            input.value = data.csrf;
+        }
 
-    for (const meta of document.querySelectorAll('meta[content=$csrfPlaceholder]')) {
-        meta.content = data.csrf;
-    }
-});
+        for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
+            meta.content = data.csrf;
+        }
+        
+        if (window.hasOwnProperty('livewire_token')) {
+            window.livewire_token = data.csrf
+        }
+
+        document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));
+    });
+})();
 EOT;
 
         return $this->nocacheJs ?? $default;

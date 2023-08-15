@@ -16,9 +16,4 @@ trait EnablesQueries
             }
         }
     }
-
-    public function disableQueries()
-    {
-        $this->enabledQueries = [];
-    }
 }

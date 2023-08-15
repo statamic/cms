@@ -5,6 +5,7 @@ namespace Tests\Tags\User;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
+use Statamic\Statamic;
 use Tests\NormalizesHtml;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -61,7 +62,7 @@ class RegisterFormTest extends TestCase
     {{ /fields }}
 {{ /user:register_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
@@ -87,7 +88,7 @@ EOT
     {{ /fields }}
 {{ /user:register_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
@@ -189,10 +190,9 @@ EOT
         preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
-        // TODO: It seems
         $expected = [
-            'The password must be at least 8 characters.',
-            'The age field is required.',
+            trans('validation.min.string', ['attribute' => 'password', 'min' => 8]), // 'The password must be at least 8 characters.',
+            trans('validation.required', ['attribute' => 'age']), // 'The age field is required.',
         ];
 
         $this->assertEmpty($success[1]);
@@ -380,5 +380,16 @@ EOT
         Blueprint::shouldReceive('find')
             ->with('user')
             ->andReturn($blueprint);
+    }
+
+    /** @test */
+    public function it_fetches_form_data()
+    {
+        $form = Statamic::tag('user:register_form')->fetch();
+
+        $this->assertEquals($form['attrs']['action'], 'http://localhost/!/auth/register');
+        $this->assertEquals($form['attrs']['method'], 'POST');
+
+        $this->assertArrayHasKey('_token', $form['params']);
     }
 }

@@ -3,6 +3,7 @@
 namespace Statamic\Tags;
 
 use Facades\Statamic\Imaging\Attributes;
+use Facades\Statamic\Imaging\ImageValidator;
 use League\Glide\Server;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
@@ -88,6 +89,32 @@ class Glide extends Tags
     }
 
     /**
+     * Maps to {{ glide:data_url }}.
+     *
+     * Converts a Glide image to a data URL.
+     *
+     * @return string
+     */
+    public function dataUrl()
+    {
+        $item = $this->params->get(['src', 'id', 'path']);
+
+        return $this->output($this->generateGlideDataUrl($item));
+    }
+
+    /**
+     * Maps to {{ glide:data_uri }}.
+     *
+     * Alias of data_url
+     *
+     * @return string
+     */
+    public function dataUri()
+    {
+        return $this->dataUrl();
+    }
+
+    /**
      * Maps to {{ glide:generate }} ... {{ /glide:generate }}.
      *
      * Generates the image and makes variables available within the pair.
@@ -107,9 +134,9 @@ class Glide extends Tags
         return $items->map(function ($item) {
             $data = ['url' => $this->generateGlideUrl($item)];
 
-            if ($this->isResizable($item)) {
+            if ($this->isValidExtension($item)) {
                 $path = $this->generateImage($item);
-                $attrs = Attributes::from(GlideManager::cacheDisk()->getDriver(), $path);
+                $attrs = Attributes::from(GlideManager::cacheDisk(), $path);
                 $data = array_merge($data, $attrs);
             }
 
@@ -165,7 +192,7 @@ class Glide extends Tags
     private function generateGlideUrl($item)
     {
         try {
-            $url = $this->isResizable($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
+            $url = $this->isValidExtension($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
 
@@ -173,6 +200,29 @@ class Glide extends Tags
         }
 
         $url = ($this->params->bool('absolute', $this->useAbsoluteUrls())) ? URL::makeAbsolute($url) : URL::makeRelative($url);
+
+        return $url;
+    }
+
+    /**
+     * The data URL generation.
+     *
+     * @param  string  $item  Either the ID or path of the image.
+     * @return string
+     */
+    private function generateGlideDataUrl($item)
+    {
+        $cache = GlideManager::cacheDisk();
+
+        try {
+            $path = $this->generateImage($item);
+            $source = $cache->read($path);
+            $url = 'data:'.$cache->mimeType($path).';base64,'.base64_encode($source);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+
+            return;
+        }
 
         return $url;
     }
@@ -280,36 +330,14 @@ class Glide extends Tags
     }
 
     /**
-     * Checks if a file at a given path is resizable.
+     * Checks if a file at a given path has valid extension for glide manipulation.
      *
      * @param  string  $item
      * @return bool
      */
-    private function isResizable($item)
+    private function isValidExtension($item)
     {
-        return in_array(strtolower(Path::extension($item)), $this->allowedFileFormats());
-    }
-
-    /**
-     * The list of allowed file formats based on the configured driver.
-     *
-     * @see http://image.intervention.io/getting_started/formats
-     *
-     * @return array
-     *
-     * @throws \Exception
-     */
-    private function allowedFileFormats()
-    {
-        $driver = config('statamic.assets.image_manipulation.driver');
-
-        if ($driver == 'gd') {
-            return ['jpeg', 'jpg', 'png', 'gif', 'webp'];
-        } elseif ($driver == 'imagick') {
-            return ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
-        }
-
-        throw new \Exception("Unsupported image manipulation driver [$driver]");
+        return ImageValidator::isValidExtension(Path::extension($item));
     }
 
     private function useAbsoluteUrls()

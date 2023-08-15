@@ -15,6 +15,8 @@ class StoreAssetTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
+    private $container;
+
     public function setUp(): void
     {
         parent::setUp();

@@ -4,6 +4,7 @@ namespace Statamic\Forms;
 
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
+use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
@@ -62,6 +63,7 @@ class Tags extends BaseTags
 
         $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
 
+        $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
         $data['fields'] = $this->getFields($this->sessionHandle(), $jsDriver);
         $data['honeypot'] = $form->honeypot();
 
@@ -90,8 +92,6 @@ class Tags extends BaseTags
             $attrs = array_merge($attrs, $jsDriver->addToFormAttributes($form));
         }
 
-        $html = $this->formOpen($action, $method, $knownParams, $attrs);
-
         $params = [];
 
         if ($redirect = $this->getRedirectUrl()) {
@@ -101,6 +101,15 @@ class Tags extends BaseTags
         if ($errorRedirect = $this->getErrorRedirectUrl()) {
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
+
+        if (! $this->parser) {
+            return array_merge([
+                'attrs' => $this->formAttrs($action, $method, $knownParams, $attrs),
+                'params' => $this->formMetaPrefix($this->formParams($method, $params)),
+            ], $data);
+        }
+
+        $html = $this->formOpen($action, $method, $knownParams, $attrs);
 
         $html .= $this->formMetaFields($params);
 
@@ -202,15 +211,36 @@ class Tags extends BaseTags
     }
 
     /**
-     * Get fields with extra data for looping over and rendering.
+     * Get sections of fields, using sections defined in blueprint.
      *
      * @param  string  $sessionHandle
      * @param  JsDriver  $jsDriver
      * @return array
      */
-    protected function getFields($sessionHandle, $jsDriver)
+    protected function getSections($sessionHandle, $jsDriver)
     {
-        return $this->form()->fields()
+        return $this->form()->blueprint()->tabs()->first()->sections()
+            ->map(function ($section) use ($sessionHandle, $jsDriver) {
+                return [
+                    'display' => $section->display(),
+                    'instructions' => $section->instructions(),
+                    'fields' => $this->getFields($sessionHandle, $jsDriver, $section->fields()->all()),
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * Get fields with extra data for looping over and rendering.
+     *
+     * @param  string  $sessionHandle
+     * @param  JsDriver  $jsDriver
+     * @param  array|null  $fields
+     * @return array
+     */
+    protected function getFields($sessionHandle, $jsDriver, $fields = null)
+    {
+        return collect($fields ?? $this->form()->fields())
             ->map(function ($field) use ($sessionHandle, $jsDriver) {
                 return $this->getRenderableField($field, $sessionHandle, function ($data, $field) use ($jsDriver) {
                     return $jsDriver
@@ -319,7 +349,15 @@ class Tags extends BaseTags
 
     protected function formHandle()
     {
-        return $this->params->get(static::HANDLE_PARAM, Arr::get($this->context, 'form'));
+        $form = $this->params->get(static::HANDLE_PARAM, Arr::get($this->context, 'form'));
+
+        if ($form instanceof FormContract) {
+            $handle = $form->handle();
+            Blink::put("form-$handle", $form);
+            $form = $handle;
+        }
+
+        return $form;
     }
 
     public function eventUrl($url, $relative = true)

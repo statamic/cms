@@ -8,13 +8,6 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class UpdateSearchController extends CpController
 {
-    public function index()
-    {
-        return view('statamic::utilities.search', [
-            'indexes' => Search::indexes(),
-        ]);
-    }
-
     public function update(Request $request)
     {
         $indexes = collect($request->validate([

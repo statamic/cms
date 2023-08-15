@@ -20,7 +20,6 @@ class TermReferenceUpdater extends DataReferenceUpdater
     /**
      * Filter by taxonomy.
      *
-     * @param  string  $taxonomy
      * @return $this
      */
     public function filterByTaxonomy(string $taxonomy)
@@ -99,7 +98,7 @@ class TermReferenceUpdater extends DataReferenceUpdater
      *
      * @return mixed
      */
-    public function originalValue()
+    protected function originalValue()
     {
         return $this->scope.$this->originalValue;
     }
@@ -109,7 +108,7 @@ class TermReferenceUpdater extends DataReferenceUpdater
      *
      * @return mixed
      */
-    public function newValue()
+    protected function newValue()
     {
         return $this->scope.$this->newValue;
     }

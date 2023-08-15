@@ -70,4 +70,19 @@ class ArithmeticTest extends ParserTestCase
         // Note: This is not the same as "double factorial". This syntax is just iterative:
         $this->assertSame(720, intval($this->renderString('{{ 3!! }}')));
     }
+
+    public function test_modulus_operator()
+    {
+        $this->assertSame('Yes', $this->renderString('{{ if 6 % 2 == 0 }}Yes{{ else }}No{{ endif }}'));
+        $this->assertSame('No', $this->renderString('{{ if 6 % 2 == 1 }}Yes{{ else }}No{{ endif }}'));
+    }
+
+    public function test_subtraction_after_logic_groups()
+    {
+        $data = [
+            'items' => ['a', 'b', 'c'],
+        ];
+
+        $this->assertSame(2, intval($this->renderString('{{ (items|length) - 1 }}', $data, true)));
+    }
 }

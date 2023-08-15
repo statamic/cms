@@ -20,6 +20,10 @@ class EntryRepositoryTest extends TestCase
 {
     use UnlinksPaths;
 
+    private $stache;
+    private $directory;
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -135,29 +139,27 @@ class EntryRepositoryTest extends TestCase
     /**
      * @test
      *
-     * @deprecated
-     **/
-    public function it_gets_entry_by_slug()
+     * @dataProvider entryByUriProvider
+     */
+    public function it_gets_entry_by_uri($uri, $expectedTitle)
     {
-        $entry = $this->repo->findBySlug('bravo', 'alphabetical');
+        $entry = $this->repo->findByUri($uri);
 
-        $this->assertInstanceOf(Entry::class, $entry);
-        $this->assertEquals('Bravo', $entry->get('title'));
-
-        $this->assertNull($this->repo->findBySlug('unknown-slug', 'alphabetical'));
-        $this->assertNull($this->repo->findBySlug('bravo', 'unknown-collection'));
-        $this->assertNull($this->repo->findBySlug('unknown-slug', 'unknown-collection'));
+        if ($expectedTitle) {
+            $this->assertInstanceOf(Entry::class, $entry);
+            $this->assertEquals($expectedTitle, $entry->get('title'));
+        } else {
+            $this->assertNull($entry);
+        }
     }
 
-    /** @test */
-    public function it_gets_entry_by_uri()
+    public function entryByUriProvider()
     {
-        $entry = $this->repo->findByUri('/alphabetical/bravo');
-
-        $this->assertInstanceOf(Entry::class, $entry);
-        $this->assertEquals('Bravo', $entry->get('title'));
-
-        $this->assertNull($this->repo->findByUri('/unknown'));
+        return [
+            'case sensitive' => ['/alphabetical/bravo', 'Bravo'],
+            'case insensitive' => ['/alphabetical/BrAvO', null],
+            'missing' => ['/unknown', null],
+        ];
     }
 
     /** @test */
@@ -223,6 +225,6 @@ class EntryRepositoryTest extends TestCase
 
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($item = $this->repo->find('test-blog-entry'));
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
     }
 }

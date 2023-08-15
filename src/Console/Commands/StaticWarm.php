@@ -28,7 +28,12 @@ class StaticWarm extends Command
     use RunsInPlease;
     use EnhancesCommands;
 
-    protected $signature = 'statamic:static:warm {--queue : Queue the requests}';
+    protected $signature = 'statamic:static:warm
+        {--queue : Queue the requests}
+        {--u|user= : HTTP authentication user}
+        {--p|password= : HTTP authentication password}
+        {--insecure : Skip SSL verification}
+    ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
 
@@ -66,7 +71,12 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        $client = new Client(['verify' => ! $this->laravel->isLocal()]);
+        $client = new Client([
+            'verify' => $this->shouldVerifySsl(),
+            'auth' => $this->option('user') && $this->option('password')
+                ? [$this->option('user'), $this->option('password')]
+                : null,
+        ]);
 
         $this->output->newLine();
         $this->line('Compiling URLs...');
@@ -76,10 +86,11 @@ class StaticWarm extends Command
         $this->output->newLine();
 
         if ($this->shouldQueue) {
-            $this->line('Queueing '.count($requests).' requests...');
+            $queue = config('statamic.static_caching.warm_queue');
+            $this->line(sprintf('Adding %s requests onto %squeue...', count($requests), $queue ? $queue.' ' : ''));
 
             foreach ($requests as $request) {
-                StaticWarmJob::dispatch($request);
+                StaticWarmJob::dispatch($request)->onQueue($queue);
             }
         } else {
             $this->line('Visiting '.count($requests).' URLs...');
@@ -158,6 +169,15 @@ class StaticWarm extends Command
             })
             ->sort()
             ->values();
+    }
+
+    private function shouldVerifySsl(): bool
+    {
+        if ($this->option('insecure')) {
+            return false;
+        }
+
+        return ! $this->laravel->isLocal();
     }
 
     protected function entryUris(): Collection

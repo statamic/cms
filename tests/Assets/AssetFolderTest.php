@@ -433,6 +433,281 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
+    public function it_can_be_moved_to_another_folder_with_a_new_folder_name()
+    {
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
+
+        $paths = collect([
+            'move/one.txt',
+            'move/two.txt',
+            'move/sub/three.txt',
+            'move/sub/subsub/four.txt',
+            'destination/folder/five.txt',
+        ]);
+
+        $paths->each(function ($path) use ($disk, $container) {
+            $disk->put($path, '');
+            $container->makeAsset($path)->save();
+        });
+
+        $paths->each(function ($path) use ($disk) {
+            $metaPath = Str::beforeLast($path, '/').'/.meta/'.Str::afterLast($path, '/').'.yaml';
+            $disk->assertExists($path);
+            $disk->assertExists($metaPath);
+        });
+
+        $this->assertCount(10, $disk->allFiles());
+
+        $this->assertEquals([
+            'move',
+            'move/sub',
+            'move/sub/subsub',
+            'destination',
+            'destination/folder',
+        ], $container->folders()->all());
+
+        $folder = (new Folder)
+            ->container($container)
+            ->path('move');
+
+        Event::fake();
+
+        $folder->move('destination/folder', 'newmove');
+
+        $disk->assertMissing('move');
+        $disk->assertMissing('move/sub');
+        $disk->assertMissing('move/sub/subsub');
+
+        $disk->assertExists('destination/folder/newmove');
+        $disk->assertExists('destination/folder/newmove/sub');
+        $disk->assertExists('destination/folder/newmove/sub/subsub');
+
+        $this->assertEquals([
+            'destination',
+            'destination/folder',
+            'destination/folder/newmove',
+            'destination/folder/newmove/sub',
+            'destination/folder/newmove/sub/subsub',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'destination',
+            'destination/folder',
+            'destination/folder/five.txt',
+            'destination/folder/newmove',
+            'destination/folder/newmove/sub',
+            'destination/folder/newmove/sub/subsub',
+            'destination/folder/newmove/sub/subsub/four.txt',
+            'destination/folder/newmove/sub/three.txt',
+            'destination/folder/newmove/one.txt',
+            'destination/folder/newmove/two.txt',
+        ], $container->contents()->cached()->keys()->all());
+
+        // Assert asset folder events.
+        $paths = ['move', 'move/sub', 'move/sub/subsub'];
+        Event::assertDispatchedTimes(AssetFolderDeleted::class, count($paths));
+        Event::assertDispatchedTimes(AssetFolderSaved::class, count($paths));
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) use ($path) {
+                return $event->folder->path() === $path;
+            });
+        }
+        $paths = ['newmove', 'newmove/sub', 'newmove/sub/subsub'];
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) use ($path) {
+                return $event->folder->path() === 'destination/folder/'.$path;
+            });
+        }
+
+        // Assert asset events.
+        $paths = [
+            'destination/folder/newmove/one.txt',
+            'destination/folder/newmove/two.txt',
+            'destination/folder/newmove/sub/three.txt',
+            'destination/folder/newmove/sub/subsub/four.txt',
+        ];
+        Event::assertDispatchedTimes(AssetSaved::class, count($paths));
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) use ($path) {
+                return $event->asset->path() === $path;
+            });
+        }
+    }
+
+    /** @test */
+    public function it_lowercases_when_moving_to_another_foldre_with_a_new_folder_name()
+    {
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
+
+        $paths = collect([
+            'move/one.txt',
+            'move/two.txt',
+            'move/sub/three.txt',
+            'move/sub/subsub/four.txt',
+            'destination/folder/five.txt',
+        ]);
+
+        $paths->each(function ($path) use ($disk, $container) {
+            $disk->put($path, '');
+            $container->makeAsset($path)->save();
+        });
+
+        $folder = (new Folder)->container($container)->path('move');
+
+        Event::fake();
+
+        $folder->move('destination/folder', 'NEWMOVE');
+
+        $disk->assertMissing('move');
+        $disk->assertMissing('move/sub');
+        $disk->assertMissing('move/sub/subsub');
+
+        $disk->assertExists('destination/folder/newmove');
+        $disk->assertExists('destination/folder/newmove/sub');
+        $disk->assertExists('destination/folder/newmove/sub/subsub');
+
+        $this->assertEquals([
+            'destination',
+            'destination/folder',
+            'destination/folder/newmove',
+            'destination/folder/newmove/sub',
+            'destination/folder/newmove/sub/subsub',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'destination',
+            'destination/folder',
+            'destination/folder/five.txt',
+            'destination/folder/newmove',
+            'destination/folder/newmove/sub',
+            'destination/folder/newmove/sub/subsub',
+            'destination/folder/newmove/sub/subsub/four.txt',
+            'destination/folder/newmove/sub/three.txt',
+            'destination/folder/newmove/one.txt',
+            'destination/folder/newmove/two.txt',
+        ], $container->contents()->cached()->keys()->all());
+
+        // Assert asset folder events.
+        $paths = ['move', 'move/sub', 'move/sub/subsub'];
+        Event::assertDispatchedTimes(AssetFolderDeleted::class, count($paths));
+        Event::assertDispatchedTimes(AssetFolderSaved::class, count($paths));
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) use ($path) {
+                return $event->folder->path() === $path;
+            });
+        }
+        $paths = ['newmove', 'newmove/sub', 'newmove/sub/subsub'];
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) use ($path) {
+                return $event->folder->path() === 'destination/folder/'.$path;
+            });
+        }
+
+        // Assert asset events.
+        $paths = [
+            'destination/folder/newmove/one.txt',
+            'destination/folder/newmove/two.txt',
+            'destination/folder/newmove/sub/three.txt',
+            'destination/folder/newmove/sub/subsub/four.txt',
+        ];
+        Event::assertDispatchedTimes(AssetSaved::class, count($paths));
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) use ($path) {
+                return $event->asset->path() === $path;
+            });
+        }
+    }
+
+    /** @test */
+    public function it_doesnt_lowercase_moved_folders_when_configured()
+    {
+        config(['statamic.assets.lowercase' => false]);
+
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
+
+        $paths = collect([
+            'move/one.txt',
+            'move/two.txt',
+            'move/sub/three.txt',
+            'move/sub/subsub/four.txt',
+            'destination/folder/five.txt',
+        ]);
+
+        $paths->each(function ($path) use ($disk, $container) {
+            $disk->put($path, '');
+            $container->makeAsset($path)->save();
+        });
+
+        $folder = (new Folder)->container($container)->path('move');
+
+        Event::fake();
+
+        $folder->move('destination/folder', 'NEWMOVE');
+
+        $disk->assertMissing('move');
+        $disk->assertMissing('move/sub');
+        $disk->assertMissing('move/sub/subsub');
+
+        $disk->assertExists('destination/folder/NEWMOVE');
+        $disk->assertExists('destination/folder/NEWMOVE/sub');
+        $disk->assertExists('destination/folder/NEWMOVE/sub/subsub');
+
+        $this->assertEquals([
+            'destination',
+            'destination/folder',
+            'destination/folder/NEWMOVE',
+            'destination/folder/NEWMOVE/sub',
+            'destination/folder/NEWMOVE/sub/subsub',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'destination',
+            'destination/folder',
+            'destination/folder/five.txt',
+            'destination/folder/NEWMOVE',
+            'destination/folder/NEWMOVE/sub',
+            'destination/folder/NEWMOVE/sub/subsub',
+            'destination/folder/NEWMOVE/sub/subsub/four.txt',
+            'destination/folder/NEWMOVE/sub/three.txt',
+            'destination/folder/NEWMOVE/one.txt',
+            'destination/folder/NEWMOVE/two.txt',
+        ], $container->contents()->cached()->keys()->all());
+
+        // Assert asset folder events.
+        $paths = ['move', 'move/sub', 'move/sub/subsub'];
+        Event::assertDispatchedTimes(AssetFolderDeleted::class, count($paths));
+        Event::assertDispatchedTimes(AssetFolderSaved::class, count($paths));
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) use ($path) {
+                return $event->folder->path() === $path;
+            });
+        }
+        $paths = ['NEWMOVE', 'NEWMOVE/sub', 'NEWMOVE/sub/subsub'];
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) use ($path) {
+                return $event->folder->path() === 'destination/folder/'.$path;
+            });
+        }
+
+        // Assert asset events.
+        $paths = [
+            'destination/folder/NEWMOVE/one.txt',
+            'destination/folder/NEWMOVE/two.txt',
+            'destination/folder/NEWMOVE/sub/three.txt',
+            'destination/folder/NEWMOVE/sub/subsub/four.txt',
+        ];
+        Event::assertDispatchedTimes(AssetSaved::class, count($paths));
+        foreach ($paths as $path) {
+            Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) use ($path) {
+                return $event->asset->path() === $path;
+            });
+        }
+    }
+
+    /** @test */
     public function it_cannot_be_moved_to_its_own_subfolder()
     {
         $container = $this->containerWithDisk();
@@ -621,6 +896,100 @@ class AssetFolderTest extends TestCase
             'bravo',
             'bravo/two.txt',
         ], $container->contents()->cached()->keys()->all());
+    }
+
+    /** @test */
+    public function it_lowercases_when_renaming_by_default()
+    {
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
+        $path = 'before/sub/foo.txt';
+        $disk->put($path, '');
+        $container->makeAsset($path)->save();
+        $folder = (new Folder)->container($container)->path('before');
+        Event::fake();
+
+        $folder->rename('AFTER');
+
+        $disk->assertMissing('before');
+        $disk->assertMissing('before/sub');
+        $disk->assertMissing('before/sub/foo.txt');
+
+        $disk->assertExists('after');
+        $disk->assertExists('after/sub');
+        $disk->assertExists('after/sub/foo.txt');
+
+        $this->assertEquals([
+            'after',
+            'after/sub',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'after',
+            'after/sub',
+            'after/sub/foo.txt',
+        ], $container->contents()->cached()->keys()->all());
+
+        // Assert asset folder events.
+        Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) {
+            return $event->folder->path() === 'after';
+        });
+        Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) {
+            return $event->folder->path() === 'after/sub';
+        });
+
+        // Assert asset event.
+        Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) {
+            return $event->asset->path() === 'after/sub/foo.txt';
+        });
+    }
+
+    /** @test */
+    public function it_doesnt_lowercase_renamed_folder_when_configured()
+    {
+        config(['statamic.assets.lowercase' => false]);
+
+        $container = $this->containerWithDisk();
+        $disk = $container->disk()->filesystem();
+        $path = 'before/sub/foo.txt';
+        $disk->put($path, '');
+        $container->makeAsset($path)->save();
+        $folder = (new Folder)->container($container)->path('before');
+        Event::fake();
+
+        $folder->rename('AFTER');
+
+        $disk->assertMissing('before');
+        $disk->assertMissing('before/sub');
+        $disk->assertMissing('before/sub/foo.txt');
+
+        $disk->assertExists('AFTER');
+        $disk->assertExists('AFTER/sub');
+        $disk->assertExists('AFTER/sub/foo.txt');
+
+        $this->assertEquals([
+            'AFTER',
+            'AFTER/sub',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'AFTER',
+            'AFTER/sub',
+            'AFTER/sub/foo.txt',
+        ], $container->contents()->cached()->keys()->all());
+
+        // Assert asset folder events.
+        Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) {
+            return $event->folder->path() === 'AFTER';
+        });
+        Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) {
+            return $event->folder->path() === 'AFTER/sub';
+        });
+
+        // Assert asset event.
+        Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) {
+            return $event->asset->path() === 'AFTER/sub/foo.txt';
+        });
     }
 
     /** @test */
