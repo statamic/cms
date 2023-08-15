@@ -70,7 +70,7 @@ class RoleRepository extends BaseRepository
         }
 
         return Blink::once("eloquent-roles-{$handle}", function () use ($handle) {
-            $model = RoleModel::where(is_integer($handle) ? 'id' : 'handle', $handle)->first();
+            $model = RoleModel::where(is_int($handle) ? 'id' : 'handle', $handle)->first();
 
             return $model ? (new Role)->fromModel($model) : null;
         });

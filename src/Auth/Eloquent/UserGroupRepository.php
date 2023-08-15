@@ -71,7 +71,7 @@ class UserGroupRepository extends BaseRepository
         }
 
         return Blink::once("eloquent-groups-{$handle}", function () use ($handle) {
-            $model = UserGroupModel::where(is_integer($handle) ? 'id' : 'handle', $handle)->first();
+            $model = UserGroupModel::where(is_int($handle) ? 'id' : 'handle', $handle)->first();
 
             return $model ? (new UserGroup)->fromModel($model) : null;
         });
