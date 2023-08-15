@@ -107,6 +107,7 @@ trait PermissibleContractTests
             }
         };
 
+        RoleAPI::shouldReceive('find')->with('a')->andReturn($roleA);
         RoleAPI::shouldReceive('find')->with('b')->andReturn($roleB);
         RoleAPI::shouldReceive('find')->with('c')->andReturn($roleC);
         RoleAPI::shouldReceive('all')->andReturn(collect([$roleA, $roleB, $roleC, $roleD])); // the stache calls this when getting a user. unrelated to test.
@@ -187,7 +188,8 @@ trait PermissibleContractTests
         $this->assertFalse($user->hasRole('b'));
 
         $groupA = (new UserGroup)->handle('some_group')->assignRole($roleA);
-        $groupA->save();
+        UserGroupAPI::shouldReceive('find')->with('some_group')->andReturn($groupA);
+        UserGroupAPI::shouldReceive('all')->andReturn(collect([$groupA])); // the stache calls this when getting a user. unrelated to test.
 
         $user->addToGroup($groupA);
         $user->save();
