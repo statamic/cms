@@ -649,11 +649,12 @@ export default {
                 return __(messages[error.message]);
             }
             let match;
-            if (match = error.message.match(/^Unknown (?:node|mark) type: $/)) {
-                return __('Invalid content, nodes and marks must have a type');
-            }
-            if (match = error.message.match(/^(?:There is no|Unknown) (?:node|mark) type:? (\w+)/)) {
-                return __('Invalid content, :type button/extension is not enabled', { type: match[1] });
+            if (match = error.message.match(/^(?:There is no|Unknown) (?:node|mark) type:? (\w*)(?: in this schema)?$/)) {
+                if (match[1]) {
+                    return __('Invalid content, :type button/extension is not enabled', { type: match[1] });
+                } else {
+                    return __('Invalid content, nodes and marks must have a type');
+                }
             }
         },
 
