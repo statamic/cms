@@ -145,9 +145,9 @@ class User extends BaseUser
 
     public function hasRole($role)
     {
-        return $this->roles()->has(
-            is_string($role) ? $role : $role->handle()
-        );
+        $role = is_string($role) ? $role : $role->handle();
+
+        return $this->roles()->has($role) || $this->groups()->flatMap(fn ($group) => $group->roles())->has($role);
     }
 
     public function groups($groups = null)

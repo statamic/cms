@@ -196,7 +196,7 @@ class User extends BaseUser
     {
         $role = $role instanceof RoleContract ? $role->handle() : $role;
 
-        return $this->roles()->has($role);
+        return $this->roles()->has($role) || $this->groups()->flatMap(fn ($group) => $group->roles())->has($role);
     }
 
     public function addToGroup($group)

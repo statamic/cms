@@ -159,6 +159,46 @@ trait PermissibleContractTests
     }
 
     /** @test */
+    public function it_checks_if_it_has_a_role_through_a_group()
+    {
+        $roleA = new class extends Role
+        {
+            public function handle(string $handle = null)
+            {
+                return 'a';
+            }
+        };
+        $roleB = new class extends Role
+        {
+            public function handle(string $handle = null)
+            {
+                return 'b';
+            }
+        };
+
+        RoleAPI::shouldReceive('find')->with('a')->andReturn($roleA);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$roleA])); // the stache calls this when getting a user. unrelated to test.
+
+        $user = $this->createPermissible();
+
+        $this->assertFalse($user->hasRole($roleA));
+        $this->assertFalse($user->hasRole('a'));
+        $this->assertFalse($user->hasRole($roleB));
+        $this->assertFalse($user->hasRole('b'));
+
+        $groupA = (new UserGroup)->handle('some_group')->assignRole($roleA);
+        $groupA->save();
+
+        $user->addToGroup($groupA);
+        $user->save();
+
+        $this->assertTrue($user->hasRole($roleA));
+        $this->assertTrue($user->hasRole('a'));
+        $this->assertFalse($user->hasRole($roleB));
+        $this->assertFalse($user->hasRole('b'));
+    }
+
+    /** @test */
     public function it_gets_and_checks_permissions()
     {
         $directRole = RoleAPI::make('direct')->addPermission([
