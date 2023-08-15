@@ -405,7 +405,7 @@ class PathDataManager
             Log::warning('Runtime Access Violation: '.$normalizedReference, [
                 'variable' => $normalizedReference,
                 'file' => GlobalRuntimeState::$currentExecutionFile,
-                'trace' =>  GlobalRuntimeState::$templateFileStack,
+                'trace' => GlobalRuntimeState::$templateFileStack,
             ]);
 
             if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
@@ -541,6 +541,7 @@ class PathDataManager
             if ($pathItem instanceof PathNode) {
                 if ($pathItem->isStringVar) {
                     $this->reducedVar = $pathItem->name;
+
                     continue;
                 }
 
@@ -564,6 +565,7 @@ class PathDataManager
                         }
 
                         $this->compact($pathItem->isFinal);
+
                         continue;
                     }
                 }
@@ -640,6 +642,7 @@ class PathDataManager
                                 }
 
                                 $this->didFind = true;
+
                                 continue;
                             }
                         }
@@ -695,6 +698,7 @@ class PathDataManager
                     }
 
                     $this->doBreak = false;
+
                     continue;
                 } else {
                     $referencePath = null;
@@ -925,21 +929,25 @@ class PathDataManager
                 }
 
                 $reductionStack[] = $augmented;
+
                 continue;
             } elseif ($reductionValue instanceof Values) {
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = $reductionValue->toArray();
                 GlobalRuntimeState::$isEvaluatingData = false;
+
                 continue;
             } elseif ($reductionValue instanceof \Statamic\Entries\Collection) {
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = RuntimeValues::resolveWithRuntimeIsolation($reductionValue);
                 GlobalRuntimeState::$isEvaluatingData = false;
+
                 continue;
             } elseif ($reductionValue instanceof ArrayableString) {
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = $reductionValue->toArray();
                 GlobalRuntimeState::$isEvaluatingData = false;
+
                 continue;
             } elseif ($reductionValue instanceof Augmentable) {
                 // Avoids resolving augmented data "too early".
@@ -960,16 +968,19 @@ class PathDataManager
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = $reductionValue->all();
                 GlobalRuntimeState::$isEvaluatingData = false;
+
                 continue;
             } elseif ($reductionValue instanceof Arrayable) {
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = $reductionValue->toArray();
                 GlobalRuntimeState::$isEvaluatingData = false;
+
                 continue;
             } elseif ($reductionValue instanceof Builder && $reduceBuildersAndAugmentables) {
                 GlobalRuntimeState::$isEvaluatingData = true;
                 $reductionStack[] = $reductionValue->get();
                 GlobalRuntimeState::$isEvaluatingData = false;
+
                 continue;
             }
 

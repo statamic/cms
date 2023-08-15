@@ -5,7 +5,7 @@
             :src="asset.thumbnail"
             class="asset-thumbnail max-h-8 max-w-full mx-auto rounded"
             loading="lazy"
-            :class="{'w-8 h-8 fit-cover': square}"
+            :class="{'w-8 h-8 object-cover': square}"
             />
         <img v-else-if="asset.is_svg"
             :src="asset.url"

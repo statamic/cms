@@ -5,10 +5,17 @@ namespace Statamic\StaticCaching\Middleware;
 use Closure;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use Statamic\Facades\File;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\NullCacher;
+use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\NoLock;
+use Symfony\Component\Lock\Store\FlockStore;
 
 class Cache
 {
@@ -32,22 +39,29 @@ class Cache
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            $response = response($this->cacher->getCachedPage($request));
+        $lock = $this->createLock($request);
 
-            $this->makeReplacements($response);
+        while (! $lock->acquire()) {
+            sleep(1);
+        }
 
-            return $response;
+        try {
+            if ($response = $this->attemptToGetCachedResponse($request)) {
+                return $response;
+            }
+        } catch (RegionNotFound $e) {
+            Log::debug("Static cache region [{$e->getRegion()}] not found on [{$request->fullUrl()}]. Serving uncached response.");
         }
 
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
+            $lock->acquire(true);
+
             $this->makeReplacementsAndCacheResponse($request, $response);
 
             $this->nocache->write();
@@ -56,6 +70,17 @@ class Cache
         }
 
         return $response;
+    }
+
+    private function attemptToGetCachedResponse($request)
+    {
+        if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
+            $response = response($this->cacher->getCachedPage($request));
+
+            $this->makeReplacements($response);
+
+            return $response;
+        }
     }
 
     private function makeReplacementsAndCacheResponse($request, $response)
@@ -113,5 +138,20 @@ class Cache
         }
 
         return true;
+    }
+
+    private function createLock($request)
+    {
+        if ($this->cacher instanceof NullCacher) {
+            return new NoLock;
+        }
+
+        File::makeDirectory($dir = storage_path('statamic/static-caching-locks'));
+
+        $locks = new LockFactory(new FlockStore($dir));
+
+        $key = $this->cacher->getUrl($request);
+
+        return $locks->createLock($key, 30);
     }
 }

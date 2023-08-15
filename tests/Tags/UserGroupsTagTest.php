@@ -49,12 +49,14 @@ class UserGroupsTagTest extends TestCase
         UserGroup::make()->handle('test3')->title('Test 3')->save();
 
         $this->assertEquals('test2|test3|', $this->tag('{{ user_groups handle="test2|test3" }}{{ handle }}|{{ /user_groups }}'));
+        $this->assertEquals('test2|test3|', $this->tag('{{ user_groups :handle="groups" }}{{ handle }}|{{ /user_groups }}', ['groups' => ['test2', 'test3']]));
     }
 
     /** @test */
     public function it_outputs_no_results_when_finding_multiple_groups()
     {
         $this->assertEquals('nothing', $this->tag('{{ user_groups handle="test2|test3" }}{{ if no_results }}nothing{{ else }}something{{ /if }}{{ /user_groups }}'));
+        $this->assertEquals('nothing', $this->tag('{{ user_groups :handle="groups" }}{{ if no_results }}nothing{{ else }}something{{ /if }}{{ /user_groups }}', ['groups' => ['test2', 'test3']]));
     }
 
     private function tag($tag, $data = [])

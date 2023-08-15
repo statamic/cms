@@ -26,7 +26,7 @@ class ReuploadAsset extends Action
 
     public function authorize($user, $asset)
     {
-        return $user->can('store', $asset->container());
+        return $user->can('reupload', $asset);
     }
 
     public function buttonText()

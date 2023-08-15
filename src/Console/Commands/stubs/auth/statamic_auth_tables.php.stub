@@ -26,7 +26,7 @@ class StatamicAuthTables extends Migration
             $table->string('group_id');
         });
 
-        Schema::create('password_activations', function (Blueprint $table) {
+        Schema::create('password_activation_tokens', function (Blueprint $table) {
             $table->string('email')->index();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
@@ -49,6 +49,6 @@ class StatamicAuthTables extends Migration
          Schema::dropIfExists('ROLE_USER_TABLE');
          Schema::dropIfExists('GROUP_USER_TABLE');
 
-         Schema::dropIfExists('password_activations');
+         Schema::dropIfExists('password_activation_tokens');
      }
 }

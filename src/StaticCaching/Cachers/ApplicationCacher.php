@@ -50,7 +50,6 @@ class ApplicationCacher extends AbstractCacher
     /**
      * Check if a page has been cached.
      *
-     * @param  Request  $request
      * @return bool
      */
     public function hasCachedPage(Request $request)
@@ -61,7 +60,6 @@ class ApplicationCacher extends AbstractCacher
     /**
      * Get a cached page.
      *
-     * @param  Request  $request
      * @return string
      */
     public function getCachedPage(Request $request)

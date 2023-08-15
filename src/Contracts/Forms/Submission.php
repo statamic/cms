@@ -47,7 +47,7 @@ interface Submission extends Arrayable
      * Get or set the data.
      *
      * @param  array|null  $data
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function data($data = null);
 

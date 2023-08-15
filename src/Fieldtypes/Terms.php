@@ -57,20 +57,47 @@ class Terms extends Relationship
 
     protected function configFieldItems(): array
     {
-        return array_merge(parent::configFieldItems(), [
-            'create' => [
-                'display' => __('Allow Creating'),
-                'instructions' => __('statamic::fieldtypes.terms.config.create'),
-                'type' => 'toggle',
-                'default' => true,
-                'width' => 50,
+        return [
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'min' => 1,
+                        'type' => 'integer',
+                    ],
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                        'type' => 'radio',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                    ],
+                    'create' => [
+                        'display' => __('Allow Creating'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.create'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'taxonomies' => [
+                        'display' => __('Taxonomies'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.taxonomies'),
+                        'type' => 'taxonomies',
+                        'mode' => 'select',
+                    ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.terms.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
+                ],
             ],
-            'taxonomies' => [
-                'display' => __('Taxonomies'),
-                'type' => 'taxonomies',
-                'mode' => 'select',
-            ],
-        ]);
+        ];
     }
 
     public function filter()
@@ -346,6 +373,8 @@ class Terms extends Relationship
         if ($request->exclusions) {
             $query->whereNotIn('id', $request->exclusions);
         }
+
+        $this->applyIndexQueryScopes($query, $request->all());
 
         return $query;
     }

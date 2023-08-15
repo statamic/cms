@@ -6,6 +6,7 @@ use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Auth\UserRepository as RepositoryContract;
 use Statamic\Data\StoresComputedFieldCallbacks;
 use Statamic\Events\UserBlueprintFound;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\OAuth\Provider;
 use Statamic\Statamic;
@@ -57,6 +58,10 @@ abstract class UserRepository implements RepositoryContract
 
     public function blueprint()
     {
+        if (Blink::has($blink = 'user-blueprint')) {
+            return Blink::get($blink);
+        }
+
         $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
             'name' => ['type' => 'text', 'display' => 'Name', 'listable' => true],
         ])->setHandle('user');
@@ -64,12 +69,14 @@ abstract class UserRepository implements RepositoryContract
         $blueprint->ensureField('email', ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address', 'listable' => true]);
 
         if (Statamic::pro()) {
-            $blueprint->ensureField('roles', ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true]);
-            $blueprint->ensureField('groups', ['type' => 'user_groups', 'mode' => 'select', 'width' => 50, 'listable' => true]);
+            $blueprint->ensureField('roles', ['type' => 'user_roles', 'mode' => 'select', 'width' => 50, 'listable' => true, 'filterable' => false]);
+            $blueprint->ensureField('groups', ['type' => 'user_groups', 'mode' => 'select', 'width' => 50, 'listable' => true, 'filterable' => false]);
         } else {
             $blueprint->removeField('roles');
             $blueprint->removeField('groups');
         }
+
+        Blink::put($blink, $blueprint);
 
         UserBlueprintFound::dispatch($blueprint);
 

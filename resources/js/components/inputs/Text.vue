@@ -1,7 +1,11 @@
 <template>
     <div class="flex items-center">
         <div class="input-group">
-            <div class="input-group-prepend" v-if="prepend" v-text="prepend" />
+            <slot name="prepend" v-if="prepend">
+                <div class="input-group-prepend">
+                    {{ prepend }}
+                </div>
+            </slot>
             <input
                 ref="input"
                 class="input-text"
@@ -21,9 +25,13 @@
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             >
-            <div class="input-group-append" v-if="append" v-text="append" />
+            <slot name="append" v-if="append">
+                <div class="input-group-append">
+                    {{ append }}
+                </div>
+            </slot>
         </div>
-        <div class="text-xs ml-1" :class="limitIndicatorColor" v-if="limit">
+        <div class="text-xs ml-2" :class="limitIndicatorColor" v-if="limit">
             <span v-text="currentLength"></span>/<span v-text="limit"></span>
         </div>
     </div>

@@ -161,7 +161,7 @@ class NavItem
                 return $value ?? Statamic::svg('entries');
             })
             ->setter(function ($value) {
-                return Str::startsWith($value, '<svg') ? $value : Statamic::svg($value);
+                return Str::startsWith($value, '<svg') ? $value : Statamic::svg('icons/light/'.$value);
             })
             ->args(func_get_args());
     }
@@ -427,8 +427,17 @@ class NavItem
      */
     public static function snakeCase($string)
     {
-        $string = Str::modifyMultiple($string, ['lower', 'snake']);
-        $string = Str::replace($string, '-', '_');
+        // Preserve colons `:` segments for child items and cloned ids.
+        $string = Str::replace(':', '___colon___', $string);
+
+        // Convert to lowercase and slug, removing all special characters.
+        $string = Str::modifyMultiple($string, ['lower', 'slug']);
+
+        // Convert to snake case.
+        $string = Str::replace('-', '_', $string);
+
+        // Put colons `:` back for child items and cloned ids.
+        $string = Str::replace('___colon___', ':', $string);
 
         return $string;
     }
