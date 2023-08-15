@@ -86,7 +86,7 @@ class EndpointsTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->post(cp_route('preferences.destroy', 'food'))
+            ->delete(cp_route('preferences.destroy', 'food'))
             ->assertExactJson($expected);
 
         $this->assertEquals($expected, Preference::all());
@@ -119,7 +119,7 @@ class EndpointsTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->post(cp_route('preferences.destroy', 'favorites.foods'), ['value' => 'lasagna'])
+            ->delete(cp_route('preferences.destroy', 'favorites.foods'), ['value' => 'lasagna'])
             ->assertExactJson($expected);
 
         $this->assertEquals($expected, Preference::all());

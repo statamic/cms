@@ -5,9 +5,10 @@ namespace Statamic\Support;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr as IlluminateArr;
-use Statamic\Fields\Values;
+use Statamic\Fields\Value;
 
-class Arr extends IlluminateArr
+/** @mixin \Illuminate\Support\Arr */
+class Arr
 {
     /**
      * Get an item from an array using "dot" or "colon" notation.
@@ -23,7 +24,7 @@ class Arr extends IlluminateArr
             $key = str_replace(':', '.', $key);
         }
 
-        return parent::get($array, $key, $default);
+        return IlluminateArr::get($array, $key, $default);
     }
 
     /**
@@ -39,7 +40,7 @@ class Arr extends IlluminateArr
             $key = str_replace(':', '.', $key);
         }
 
-        return parent::has($array, $key);
+        return IlluminateArr::has($array, $key);
     }
 
     public static function addScope($array, $scope)
@@ -51,6 +52,10 @@ class Arr extends IlluminateArr
         }
 
         return collect($array)->map(function ($value) use ($scope) {
+            if ($value instanceof Value) {
+                $value = $value->value();
+            }
+
             if ($value instanceof Arrayable) {
                 $value = $value->toArray();
             }
@@ -68,7 +73,6 @@ class Arr extends IlluminateArr
     /**
      * Checks if an array is associative.
      *
-     * @param $array
      * @return bool
      */
     public static function assoc($array)
@@ -79,7 +83,6 @@ class Arr extends IlluminateArr
     /**
      * Deep merges arrays better than array_merge_recursive().
      *
-     * @param  array  $array1
      * @param  array  $array2
      * @return array
      */
@@ -260,5 +263,63 @@ class Arr extends IlluminateArr
         }
 
         return $array;
+    }
+
+    /**
+     * Set an array item to a given value using "dot" notation.
+     *
+     * If no key is given to the method, the entire array will be replaced.
+     *
+     * Note: This wrapper method is necessary, because `__callStatic()` cannot pass `$array` by reference.
+     *
+     * @param  array  $array
+     * @param  string|int|null  $key
+     * @param  mixed  $value
+     * @return array
+     */
+    public static function set(&$array, $key, $value)
+    {
+        return IlluminateArr::set($array, $key, $value);
+    }
+
+    /**
+     * Get a value from the array, and remove it.
+     *
+     * Note: This wrapper method is necessary, because `__callStatic()` cannot pass `$array` by reference.
+     *
+     * @param  array  $array
+     * @param  string|int  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function pull(&$array, $key, $default = null)
+    {
+        return IlluminateArr::pull($array, $key, $default);
+    }
+
+    /**
+     * Remove one or many array items from a given array using "dot" notation.
+     *
+     * Note: This wrapper method is necessary, because `__callStatic()` cannot pass `$array` by reference.
+     *
+     * @param  array  $array
+     * @param  array|string|int|float  $keys
+     * @return void
+     */
+    public static function forget(&$array, $keys)
+    {
+        return IlluminateArr::forget($array, $keys);
+    }
+
+    /**
+     * Implicitly defer all other method calls to \Illuminate\Support\Arr.
+     *
+     * @param  string  $method
+     * @param  array  $args
+     * @return mixed
+     */
+    public static function __callStatic($method, $args)
+    {
+        return IlluminateArr::$method(...$args);
     }
 }

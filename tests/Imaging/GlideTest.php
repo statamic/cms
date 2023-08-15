@@ -7,7 +7,6 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
-use League\Flysystem\Adapter\Local;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Glide\Server;
 use Statamic\Contracts\Imaging\UrlBuilder;
@@ -156,7 +155,7 @@ class GlideTest extends TestCase
 
         Glide::clearAsset(Asset::find('test_container::foo/hoff.jpg'));
 
-        $this->assertFileNotExists($glidePath);
+        $this->assertFileDoesNotExist($glidePath);
 
         $cacheKeys->each(function ($cacheKey) {
             $this->assertFalse(Glide::cacheStore()->has($cacheKey));
@@ -165,24 +164,11 @@ class GlideTest extends TestCase
 
     private function assertLocalAdapter($adapter)
     {
-        if ($this->isUsingFlysystemV1()) {
-            return $this->assertInstanceOf(Local::class, $adapter);
-        }
-
         $this->assertInstanceOf(LocalFilesystemAdapter::class, $adapter);
-    }
-
-    private function isUsingFlysystemV1()
-    {
-        return class_exists('\League\Flysystem\Util');
     }
 
     private function defaultFolderVisibility($filesystem)
     {
-        if ($this->isUsingFlysystemV1()) {
-            return 'public'; // irrelevant in v1
-        }
-
         $adapter = $this->getAdapterFromFilesystem($filesystem);
 
         $reflection = new \ReflectionClass($adapter);
@@ -208,10 +194,6 @@ class GlideTest extends TestCase
 
     private function getRootFromLocalAdapter($adapter)
     {
-        if ($this->isUsingFlysystemV1()) {
-            return $adapter->getPathPrefix();
-        }
-
         $reflection = new \ReflectionClass($adapter);
         $property = $reflection->getProperty('prefixer');
         $property->setAccessible(true);

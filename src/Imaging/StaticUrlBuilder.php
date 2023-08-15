@@ -33,10 +33,6 @@ class StaticUrlBuilder extends ImageUrlBuilder
      */
     protected $options;
 
-    /**
-     * @param  ImageGenerator  $generator
-     * @param  array  $options
-     */
     public function __construct(ImageGenerator $generator, array $options = [])
     {
         $this->generator = $generator;

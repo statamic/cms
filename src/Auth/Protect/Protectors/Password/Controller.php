@@ -8,6 +8,7 @@ use Statamic\View\View;
 class Controller extends BaseController
 {
     protected $tokenData;
+    protected $password;
 
     public function show()
     {

@@ -35,7 +35,7 @@ class LoginController extends CpController
         $data = [
             'title' => __('Log in'),
             'oauth' => $enabled = OAuth::enabled(),
-            'emailLoginEnabled' => $enabled ? config('statamic.oauth.email_login_enabled') : false,
+            'emailLoginEnabled' => $enabled ? config('statamic.oauth.email_login_enabled') : true,
             'providers' => $enabled ? OAuth::providers() : [],
             'referer' => $this->getReferrer($request),
             'hasError' => $this->hasError(),

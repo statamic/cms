@@ -13,6 +13,8 @@ use Tests\TestCase;
 
 class AttributesTest extends TestCase
 {
+    private $attributes;
+
     public function setUp(): void
     {
         parent::setUp();

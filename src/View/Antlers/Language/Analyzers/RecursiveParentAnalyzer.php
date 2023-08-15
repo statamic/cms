@@ -53,6 +53,16 @@ class RecursiveParentAnalyzer
                         } else {
                             if (Str::contains($subNode->runtimeContent, $recursiveContent) && mb_substr_count($subNode->runtimeContent, '*recursive') == 1 && $node->getRootRef() == $subNode->getRootRef()) {
                                 $lastNode = $subNode;
+
+                                if (! ConditionPairAnalyzer::isConditionalStructure($subNode) && $subNode->isClosedBy != null && $subNode->name->name == $node->name->name) {
+                                    break;
+                                }
+
+                                // Ensure we stop searching once we reach the closest nav parent.
+                                if ($subNode->name->name == 'nav') {
+                                    break;
+                                }
+
                                 continue;
                             } else {
                                 if ($lastNode != null) {

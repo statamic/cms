@@ -4,6 +4,7 @@ namespace Statamic\Entries;
 
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
+use InvalidArgumentException;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
@@ -45,10 +46,10 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $dated = false;
     protected $sortField;
     protected $sortDirection;
-    protected $ampable = false;
     protected $revisions = false;
     protected $positions;
     protected $defaultPublishState = true;
+    protected $originBehavior = 'select';
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
     protected $structure;
@@ -57,6 +58,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
     protected $requiresSlugs = true;
     protected $titleFormats = [];
     protected $previewTargets = [];
+    protected $autosave;
 
     public function __construct()
     {
@@ -156,6 +158,11 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function customSortField()
+    {
+        return $this->sortField;
+    }
+
     public function sortDirection($dir = null)
     {
         return $this
@@ -183,22 +190,17 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function customSortDirection()
+    {
+        return $this->sortDirection;
+    }
+
     public function title($title = null)
     {
         return $this
             ->fluentlyGetOrSet('title')
             ->getter(function ($title) {
                 return $title ?? ucfirst($this->handle);
-            })
-            ->args(func_get_args());
-    }
-
-    public function ampable($ampable = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('ampable')
-            ->getter(function ($ampable) {
-                return config('statamic.amp.enabled') && $ampable;
             })
             ->args(func_get_args());
     }
@@ -293,7 +295,14 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
         $blueprint->setParent($entry ?? $this);
 
-        $this->dispatchEntryBlueprintFoundEvent($blueprint, $entry);
+        // Only dispatch the event when there's no entry.
+        // When there is an entry, the event is dispatched from the entry.
+        if (! $entry) {
+            Blink::once(
+                'collection-entryblueprintfound-'.$this->handle().'-'.$blueprint->handle(),
+                fn () => EntryBlueprintFound::dispatch($blueprint)
+            );
+        }
 
         return $blueprint;
     }
@@ -309,17 +318,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
             return $this->entryBlueprints()->keyBy->handle()->get($blueprint)
                 ?? $this->entryBlueprints()->keyBy->handle()->get(Str::singular($blueprint));
-        });
-    }
-
-    private function dispatchEntryBlueprintFoundEvent($blueprint, $entry)
-    {
-        $id = optional($entry)->id() ?? 'null';
-
-        $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint->handle().'-'.$id;
-
-        Blink::once($blink, function () use ($blueprint, $entry) {
-            EntryBlueprintFound::dispatch($blueprint, $entry);
         });
     }
 
@@ -348,7 +346,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         }
 
         if ($this->dated()) {
-            $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
+            $blueprint->ensureField('date', ['type' => 'date', 'required' => true, 'default' => 'now'], 'sidebar');
         }
 
         if ($this->hasStructure() && ! $this->orderable()) {
@@ -495,7 +493,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             'past_date_behavior' => $this->pastDateBehavior(),
             'future_date_behavior' => $this->futureDateBehavior(),
             'default_publish_state' => $this->defaultPublishState,
-            'amp' => $this->ampable,
             'sites' => $this->sites,
             'propagate' => $this->propagate(),
             'template' => $this->template,
@@ -509,6 +506,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             'taxonomies' => $this->taxonomies,
             'revisions' => $this->revisions,
             'title_format' => $this->titleFormats,
+            'autosave' => $this->autosave,
         ];
 
         $array = Arr::except($formerlyToArray, [
@@ -527,7 +525,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         $array = Arr::removeNullValues(array_merge($array, [
             'route' => $route,
             'slugs' => $this->requiresSlugs() === true ? null : false,
-            'amp' => $array['amp'] ?: null,
             'date' => $this->dated ?: null,
             'sort_by' => $this->sortField,
             'sort_dir' => $this->sortDirection,
@@ -537,6 +534,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 'future' => $this->futureDateBehavior,
             ],
             'preview_targets' => $this->previewTargetsForFile(),
+            'origin_behavior' => ($ob = $this->originBehavior()) === 'select' ? null : $ob,
         ]));
 
         if (! Site::hasMultiple()) {
@@ -576,6 +574,22 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function originBehavior($origin = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('originBehavior')
+            ->setter(function ($origin) {
+                $origin = $origin ?? 'select';
+
+                if (! in_array($origin, ['select', 'root', 'active'])) {
+                    throw new InvalidArgumentException("Invalid origin behavior [$origin]. Must be \"select\", \"root\", or \"active\".");
+                }
+
+                return $origin;
+            })
+            ->args(func_get_args());
+    }
+
     public function pastDateBehavior($behavior = null)
     {
         return $this
@@ -606,6 +620,20 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 }
 
                 return $enabled;
+            })
+            ->args(func_get_args());
+    }
+
+    public function autosaveInterval($interval = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('autosave')
+            ->getter(function ($interval) {
+                if (! config('statamic.autosave.enabled') || ! Statamic::pro() || ! $interval) {
+                    return null;
+                }
+
+                return is_bool($interval) ? config('statamic.autosave.interval') : $interval;
             })
             ->args(func_get_args());
     }
@@ -749,7 +777,9 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ? $this->defaultPreviewTargets()
             : $this->previewTargets;
 
-        return collect($targets);
+        return collect($targets)->map(function ($target) {
+            return $target + ['refresh' => $target['refresh'] ?? true];
+        });
     }
 
     public function addPreviewTargets($targets)
@@ -761,12 +791,20 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function additionalPreviewTargets()
     {
-        return Facades\Collection::additionalPreviewTargets($this->handle);
+        return Facades\Collection::additionalPreviewTargets($this->handle)->map(function ($target) {
+            return $target + ['refresh' => $target['refresh'] ?? true];
+        });
     }
 
     private function defaultPreviewTargets()
     {
-        return [['label' => 'Entry', 'format' => '{permalink}']];
+        return [
+            [
+                'label' => 'Entry',
+                'format' => '{permalink}',
+                'refresh' => true,
+            ],
+        ];
     }
 
     private function previewTargetsForFile()
@@ -785,6 +823,7 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             return [
                 'label' => $target['label'],
                 'url' => $target['format'],
+                'refresh' => $target['refresh'],
             ];
         })->filter()->values()->all();
     }

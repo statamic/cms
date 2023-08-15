@@ -4,6 +4,7 @@ namespace Tests\Tags\Concerns;
 
 use Illuminate\Support\Carbon;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Fields\LabeledValue;
 use Statamic\Query\Builder;
 use Statamic\Tags\Collection\Entries;
@@ -16,6 +17,8 @@ use Tests\TestCase;
 class QueriesConditionsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    private $collection;
 
     public function setUp(): void
     {
@@ -321,6 +324,9 @@ class QueriesConditionsTest extends TestCase
     public function it_filters_by_is_after_or_before_date_conditions()
     {
         $this->collection->dated(true)->save();
+        $blueprint = Blueprint::makeFromFields(['date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true]])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/test')->once()->andReturn(collect([$blueprint]));
+
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
 
         $this->makeEntry('a')->date('2019-03-09')->save(); // definitely in past
@@ -345,6 +351,10 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(4, $this->getEntries(['show_future' => true, 'date:is_future' => 'today']));
         $this->assertCount(3, $this->getEntries(['show_future' => true, 'date:is_after' => false]));
         $this->assertCount(3, $this->getEntries(['show_future' => true, 'date:is_future' => false]));
+
+        $time = Carbon::parse('2019-03-10 13:02');
+        $this->assertCount(5, $this->getEntries(['show_future' => true, 'date:is_before' => $time]));
+        $this->assertCount(1, $this->getEntries(['show_future' => true, 'date:is_after' => $time]));
     }
 
     /** @test */
@@ -513,7 +523,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($value)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($value)
             {
@@ -546,7 +556,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($values)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($values)
             {
@@ -579,7 +589,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($values)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($values)
             {
@@ -606,7 +616,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($value)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($value)
             {
@@ -635,7 +645,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($value)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($value)
             {

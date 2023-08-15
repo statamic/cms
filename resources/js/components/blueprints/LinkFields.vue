@@ -3,14 +3,14 @@
     <div>
 
         <button class="btn flex w-full justify-center items-center" @click="open = true">
-            <svg-icon name="hyperlink" class="mr-1 w-4 h-4" />
+            <svg-icon name="light/hyperlink" class="mr-2 w-4 h-4" />
             <span>{{ __('Link Existing') }}</span>
         </button>
 
         <stack narrow v-if="open" @closed="open = false" name="field-linker">
             <div slot-scope="{ close }" class="bg-white h-full flex flex-col">
 
-                <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
+                <div class="bg-gray-200 px-6 py-2 border-b border-gray-300 text-lg font-medium flex items-center justify-between">
                     {{ __('Link Fields') }}
                     <button
                         type="button"
@@ -19,11 +19,11 @@
                         v-html="'&times'" />
                 </div>
 
-                <div class="flex-1 overflow-auto p-3">
+                <div class="flex-1 overflow-auto p-6">
 
                     <div>
-                        <p class="text-sm font-medium mb-1" v-text="__('Link a single field')" />
-                        <p class="text-2xs text-grey mb-1" v-text="__('Changes to this field will stay in sync.')" />
+                        <p class="text-sm font-medium mb-2" v-text="__('Link a single field')" />
+                        <p class="text-2xs text-gray mb-2" v-text="__('Changes to this field will stay in sync.')" />
                         <v-select
                             name="field"
                             :placeholder="__('Fields')"
@@ -34,29 +34,29 @@
                             v-model="reference">
                             <template slot="option" slot-scope="option">
                                 <div class="flex items-center">
-                                    <span v-text="option.fieldset" class="text-2xs text-grey-50 mr-1" />
+                                    <span v-text="option.fieldset" class="text-2xs text-gray-500 mr-2" />
                                     <span v-text="option.label" />
                                 </div>
                             </template>
                             <template v-slot:no-options>
-                               <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                               <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
                            </template>
                         </v-select>
                         <button
-                            class="btn-primary w-full mt-3"
+                            class="btn-primary w-full mt-6"
                             :class="{ 'opacity-50': !reference }"
                             :disabled="!reference"
                             @click="linkField"
                             v-text="__('Link')" />
                     </div>
-                    <div class="my-2 flex items-center">
-                        <div class="border-b border-grey-30 flex-1" />
-                        <div class="text-2xs text-grey-60 mx-2" v-text="__('or')"></div>
-                        <div class="border-b border-grey-30 flex-1" />
+                    <div class="my-4 flex items-center">
+                        <div class="border-b border-gray-300 flex-1" />
+                        <div class="text-2xs text-gray-600 mx-4" v-text="__('or')"></div>
+                        <div class="border-b border-gray-300 flex-1" />
                     </div>
                     <div>
-                        <p class="text-sm font-medium mb-1" v-text="__('Link a fieldset')" />
-                        <p class="text-2xs text-grey mb-1" v-text="__('Changes to this fieldset will stay in sync.')" />
+                        <p class="text-sm font-medium mb-2" v-text="__('Link a fieldset')" />
+                        <p class="text-2xs text-gray mb-2" v-text="__('Changes to this fieldset will stay in sync.')" />
                         <v-select
                             name="field"
                             :placeholder="__('Fieldsets')"
@@ -67,14 +67,14 @@
                             v-model="fieldset"
                         >
                             <template v-slot:no-options>
-                                <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                                <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
                             </template>
                         </v-select>
-                        <p class="text-sm font-medium mt-3 mb-1" v-text="__('Prefix')" />
-                        <p class="text-2xs text-grey mb-1" v-text="__('messages.fieldset_link_fields_prefix_instructions')" />
+                        <p class="text-sm font-medium mt-6 mb-2" v-text="__('Prefix')" />
+                        <p class="text-2xs text-gray mb-2" v-text="__('messages.fieldset_link_fields_prefix_instructions')" />
                         <text-input v-model="importPrefix" :placeholder="__('e.g. hero_')" />
                         <button
-                            class="btn-primary w-full mt-3"
+                            class="btn-primary w-full mt-6"
                             :class="{ 'opacity-50': !fieldset }"
                             :disabled="!fieldset"
                             @click="linkFieldset"
@@ -101,7 +101,7 @@ export default {
 
     data() {
         const fieldsets = JSON.parse(JSON.stringify(
-            Object.values(this.$config.get('fieldsets')).filter(fieldset => 
+            Object.values(this.$config.get('fieldsets')).filter(fieldset =>
                 fieldset.handle != this.excludeFieldset
             )
         ));

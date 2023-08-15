@@ -130,9 +130,9 @@ class CollectionEntriesStore extends ChildStore
     {
         [$collection, $site] = $this->extractAttributesFromPath($path);
 
-        $collection = Collection::findByHandle($collection);
-
-        $this->removeEntryFromStructure($collection, $id);
+        if ($collection = Collection::findByHandle($collection)) {
+            $this->removeEntryFromStructure($collection, $id);
+        }
     }
 
     protected function removeEntryFromStructure($collection, $id)
@@ -199,7 +199,7 @@ class CollectionEntriesStore extends ChildStore
 
         while (true) {
             $ext = '.'.$item->fileExtension();
-            $filename = Str::before($basePath, $ext);
+            $filename = Str::beforeLast($basePath, $ext);
             $suffix = $num ? ".$num" : '';
             $path = "{$filename}{$suffix}{$ext}";
 

@@ -12,7 +12,7 @@
                             :value="element.key"
                             :selected="element.key === selectedKey" />
                     </select>
-                    <svg-icon name="chevron-down-xs" class="w-2 ml-1" />
+                    <svg-icon name="micro/chevron-down-xs" class="w-2 ml-2" />
                 </div>
                     <input
                         type="text"
@@ -25,16 +25,18 @@
             </div>
         </div>
 
-        <table v-else-if="isKeyed" class="array-table">
-            <tbody>
-                <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
-                    <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ config.keys[element.key] || element.key }}</label></th>
-                    <td>
-                        <input type="text" class="input-text-minimal" :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly" />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div v-else-if="isKeyed" class="array-table-wrapper">
+            <table class="array-table">
+                <tbody>
+                    <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
+                        <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ config.keys[element.key] || element.key }}</label></th>
+                        <td>
+                            <input type="text" class="input-text-minimal" :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <template v-else-if="isDynamic">
             <div class="table-field">
@@ -44,7 +46,7 @@
                             <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
                             <th class="w-1/4">{{ keyHeader }}</th>
                             <th class="">{{ valueHeader }}</th>
-                            <th class="row-controls"></th>
+                            <th class="row-controls" v-if="!isReadOnly"></th>
                         </tr>
                     </thead>
 
@@ -53,6 +55,7 @@
                         :vertical="true"
                         item-class="sortable-row"
                         handle-class="sortable-handle"
+                        :mirror="false"
                     >
                         <tbody>
                             <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
@@ -63,7 +66,7 @@
                                 <td>
                                     <input type="text" class="input-text" v-model="element.value" :readonly="isReadOnly" />
                                 </td>
-                                <td class="row-controls">
+                                <td class="row-controls" v-if="!isReadOnly">
                                     <a @click="deleteOrConfirm(index)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
                                 </td>
                             </tr>
@@ -71,7 +74,7 @@
                     </sortable-list>
                 </table>
 
-                <button class="btn" @click="addValue" :disabled="atMax">
+                <button class="btn" @click="addValue" :disabled="atMax" v-if="!isReadOnly">
                     {{ addButton }}
                 </button>
 

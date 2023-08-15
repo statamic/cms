@@ -43,11 +43,13 @@ abstract class FormTestCase extends TestCase
         ],
     ];
 
+    private $customFieldBlueprintHandle;
+
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->createContactForm();
+        $this->createForm();
         $this->clearSubmissions();
     }
 
@@ -70,13 +72,15 @@ abstract class FormTestCase extends TestCase
         return Parse::template($tag, []);
     }
 
-    protected function createContactForm($fields = null)
+    protected function createForm($blueprintContents = null, $handle = null)
     {
-        $blueprint = Blueprint::make()->setContents([
-            'fields' => $fields ?? $this->defaultFields,
-        ]);
+        $defaultBlueprintContents = [
+            'fields' => $this->defaultFields,
+        ];
 
-        $handle = $fields ? $this->customFieldBlueprintHandle : 'contact';
+        $blueprint = Blueprint::make()->setContents($blueprintContents ?? $defaultBlueprintContents);
+
+        $handle = $handle ?? 'contact';
 
         Blueprint::shouldReceive('find')->with("forms.{$handle}")->andReturn($blueprint);
         Blueprint::makePartial();
@@ -91,13 +95,13 @@ abstract class FormTestCase extends TestCase
     {
         $randomString = str_shuffle('nobodymesseswiththehoff');
 
-        $this->customFieldBlueprintHandle = $handle = $fieldConfig['handle'].'_'.$randomString;
+        $handle = $fieldConfig['handle'].'_'.$randomString;
 
         $fields = $oldData
             ? array_merge([['handle' => 'failing_field', 'field' => ['type' => 'text', 'validate' => 'required']]], [$fieldConfig])
             : [$fieldConfig];
 
-        $this->createContactForm($fields);
+        $this->createForm(['fields' => $fields], $handle);
 
         if ($oldData) {
             $this->post('/!/forms/'.$handle, $oldData)

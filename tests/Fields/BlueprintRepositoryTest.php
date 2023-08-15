@@ -12,6 +12,8 @@ use Tests\TestCase;
 
 class BlueprintRepositoryTest extends TestCase
 {
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -27,7 +29,7 @@ class BlueprintRepositoryTest extends TestCase
     {
         $contents = <<<'EOT'
 title: Test
-sections:
+tabs:
   main:
     fields:
       - one
@@ -43,7 +45,7 @@ EOT;
         $this->assertNull($blueprint->namespace());
         $this->assertEquals([
             'title' => 'Test',
-            'sections' => [
+            'tabs' => [
                 'main' => [
                     'fields' => ['one', 'two'],
                 ],
@@ -56,7 +58,7 @@ EOT;
     {
         $contents = <<<'EOT'
 title: Test
-sections:
+tabs:
   main:
     fields:
       - one
@@ -72,7 +74,7 @@ EOT;
         $this->assertEquals('foo.bar', $blueprint->namespace());
         $this->assertEquals([
             'title' => 'Test',
-            'sections' => [
+            'tabs' => [
                 'main' => [
                     'fields' => ['one', 'two'],
                 ],
@@ -144,7 +146,7 @@ EOT;
     {
         $expectedYaml = <<<'EOT'
 title: 'Test Blueprint'
-sections:
+tabs:
   one:
     display: One
     fields:
@@ -167,7 +169,7 @@ EOT;
 
         $blueprint = (new Blueprint)->setHandle('the_test_blueprint')->setContents([
             'title' => 'Test Blueprint',
-            'sections' => [
+            'tabs' => [
                 'one' => [
                     'display' => 'One',
                     'fields' => [

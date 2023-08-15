@@ -25,6 +25,7 @@ class APITest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider entryNotFoundProvider
      */
     public function it_handles_not_found_entries($url, $requestShouldSucceed)
@@ -52,6 +53,35 @@ class APITest extends TestCase
         ];
     }
 
+    public function exampleFilters()
+    {
+        return [['status:is'], ['published:is'], ['title:is']];
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider exampleFilters
+     */
+    public function it_cannot_filter_entries_by_default($filter)
+    {
+        Facades\Config::set('statamic.api.resources.collections', true);
+
+        Facades\Collection::make('pages')->save();
+
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('dance')->slug('dance')->published(false)->save();
+        Facades\Entry::make()->collection('pages')->id('nectar')->slug('nectar')->published(false)->save();
+
+        $field = explode(':', $filter)[0];
+
+        $this
+            ->get("/api/collections/pages/entries?filter[{$filter}]=published")
+            ->assertJson([
+                'message' => "Forbidden filter: {$field}",
+            ]);
+    }
+
     /** @test */
     public function it_filters_published_entries_by_default()
     {
@@ -64,20 +94,36 @@ class APITest extends TestCase
         Facades\Entry::make()->collection('pages')->id('nectar')->slug('nectar')->published(false)->save();
 
         $this->assertEndpointDataCount('/api/collections/pages/entries', 1);
-        $this->assertEndpointDataCount('/api/collections/pages/entries?filter[status:is]=published', 1);
-        $this->assertEndpointDataCount('/api/collections/pages/entries?filter[status:is]=draft', 2);
-        $this->assertEndpointDataCount('/api/collections/pages/entries?filter[published:is]=true', 1);
-        $this->assertEndpointDataCount('/api/collections/pages/entries?filter[published:is]=false', 2);
-
         $this->assertEndpointSuccessful('/api/collections/pages/entries/about');
         $this->assertEndpointNotFound('/api/collections/pages/entries/dance');
         $this->assertEndpointNotFound('/api/collections/pages/entries/nectar');
     }
 
     /** @test */
+    public function it_can_filter_collection_entries_when_configuration_allows_for_it()
+    {
+        Facades\Config::set('statamic.api.resources.collections.pages', [
+            'allowed_filters' => ['status', 'published'],
+        ]);
+
+        Facades\Collection::make('pages')->save();
+
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('dance')->slug('dance')->published(false)->save();
+        Facades\Entry::make()->collection('pages')->id('nectar')->slug('nectar')->published(false)->save();
+
+        $this->assertEndpointDataCount('/api/collections/pages/entries?filter[status:is]=published', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/entries?filter[status:is]=draft', 2);
+        $this->assertEndpointDataCount('/api/collections/pages/entries?filter[published:is]=true', 1);
+        $this->assertEndpointDataCount('/api/collections/pages/entries?filter[published:is]=false', 2);
+    }
+
+    /** @test */
     public function it_filters_published_entries_in_collection_tree_route_by_default()
     {
-        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Config::set('statamic.api.resources.collections.pages', [
+            'allowed_filters' => ['status', 'published'],
+        ]);
 
         Facades\Collection::make('pages')->structureContents(['root' => true])->save();
 
@@ -101,8 +147,10 @@ class APITest extends TestCase
     /** @test */
     public function it_filters_published_entries_on_term_entries_route_by_default()
     {
-        Facades\Config::set('statamic.api.resources.collections', true);
         Facades\Config::set('statamic.api.resources.taxonomies', true);
+        Facades\Config::set('statamic.api.resources.collections.pages', [
+            'allowed_filters' => ['status', 'published'],
+        ]);
 
         Facades\Taxonomy::make('topics')->save();
 
@@ -147,29 +195,46 @@ class APITest extends TestCase
     /** @test */
     public function it_filters_by_taxonomy_terms()
     {
-        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Config::set('statamic.api.resources.collections.test', [
+            'allowed_filters' => ['taxonomy:tags', 'taxonomy:categories'],
+        ]);
 
         $this->makeTaxonomy('tags')->save();
-        $this->makeTerm('tags', 'rad')->save();
-        $this->makeTerm('tags', 'meh')->save();
-        $this->makeTerm('tags', 'wow')->save();
+        $this->makeTaxonomy('categories')->save();
+        $this->makeCollection('test')->taxonomies(['tags', 'categories'])->save();
 
-        $this->makeCollection('test')->taxonomies(['tags'])->save();
+        $this->makeEntry('test', '1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
+        $this->makeEntry('test', '2')->data(['tags' => ['awesome'], 'categories' => ['events']])->save();
+        $this->makeEntry('test', '3')->data(['tags' => ['rad', 'awesome']])->save();
+        $this->makeEntry('test', '4')->data(['tags' => ['meh']])->save();
+        $this->makeEntry('test', '5')->data(['tags' => []])->save();
 
-        $this->makeEntry('test', '1')->data(['tags' => ['rad', 'wow']])->save();
-        $this->makeEntry('test', '2')->data(['tags' => ['rad']])->save();
-        $this->makeEntry('test', '3')->data(['tags' => ['meh']])->save();
+        // Where term in
+        $this->assertEquals([1, 3], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:in]=rad'));
+        $this->assertEquals([1, 3], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:any]=rad'));
+        $this->assertEquals([1, 3], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags]=rad')); // shorthand
 
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags]=rad', 2);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags]=boring', 0);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:in]=boring', 0);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:in]=boring,rad', 2);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:in]=wow,rad', 2);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:in]=rad,meh', 3);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:not_in]=boring', 3);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:not_in]=rad', 1);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:not_in]=boring,rad', 1);
-        $this->assertEndpointDataCount('/api/collections/test/entries?filter[taxonomy:tags:not_in]=rad,meh,wow', 0);
+        // Where any of these terms in
+        $this->assertEquals([1, 3, 4], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:in]=rad,meh'));
+        $this->assertEquals([1, 3, 4], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:any]=rad,meh'));
+        $this->assertEquals([1, 3, 4], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags]=rad,meh')); // shorthand
+
+        // Where term not in
+        $this->assertEquals([2, 4, 5], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:not_in]=rad'));
+        $this->assertEquals([2, 4, 5], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:not]=rad'));
+
+        // Where terms not in
+        $this->assertEquals([4, 5], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:not_in]=rad,awesome'));
+        $this->assertEquals([4, 5], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:not]=rad,awesome'));
+
+        // Where all of these terms in
+        $this->assertEquals([3], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:all]=rad,awesome'));
+
+        // Ensure in and not logic intersect properly
+        $this->assertEquals([1, 3], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:in]=rad,meh&filter[taxonomy:tags:not]=meh'));
+
+        // Ensure in logic intersects properly across multiple taxonomies
+        $this->assertEquals([1], $this->getDataIds('/api/collections/test/entries?filter[taxonomy:tags:in]=rad,meh&filter[taxonomy:categories:in]=news'));
     }
 
     /** @test */
@@ -206,6 +271,26 @@ class APITest extends TestCase
             ->get('/api/collections/pages/entries/dance')
             ->assertJsonPath('data.api_url', null)
             ->assertJsonPath('data.edit_url', null);
+    }
+
+    /** @test */
+    public function next_prev_link_include_original_query_params()
+    {
+        Facades\Config::set('statamic.api.cache', false);
+        Facades\Config::set('statamic.api.resources.collections.pages', [
+            'allowed_filters' => ['published'],
+        ]);
+
+        Facades\Collection::make('pages')->save();
+
+        Facades\Entry::make()->collection('pages')->id('dance')->slug('dance')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('swing')->slug('swing')->published(true)->save();
+        Facades\Entry::make()->collection('pages')->id('jazz')->slug('jazz')->published(true)->save();
+
+        $this
+            ->get('/api/collections/pages/entries?limit=2&sort=-date&filter[published]=true&unknown=param')
+            ->assertJsonPath('links.first', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&page=1')
+            ->assertJsonPath('links.next', 'http://localhost/api/collections/pages/entries?filter%5Bpublished%5D=true&limit=2&sort=-date&page=2');
     }
 
     /** @test */
@@ -262,22 +347,24 @@ class APITest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider userPasswordFilterProvider
      */
-    public function it_doesnt_allow_filtering_users_by_password($filter)
+    public function it_never_allows_filtering_users_by_password($filter)
     {
-        Facades\Config::set('statamic.api.resources.users', true);
+        Facades\Config::set('statamic.api.resources.users', [
+            'allowed_filters' => ['password', 'password_hash'],
+        ]);
 
         User::make()->id('one')->email('one@domain.com')->passwordHash('abc')->save();
         User::make()->id('two')->email('two@domain.com')->passwordHash('def')->save();
 
+        $field = explode(':', $filter)[0];
+
         $this
             ->get("/api/users?filter[{$filter}]=abc")
             ->assertJson([
-                'data' => [
-                    ['id' => 'one'],
-                    ['id' => 'two'], // this one would be filtered out if the password was allowed
-                ],
+                'message' => "Forbidden filter: {$field}",
             ]);
     }
 
@@ -343,6 +430,7 @@ class APITest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider termNotFoundProvider
      */
     public function it_handles_not_found_terms($url, $requestShouldSucceed)
@@ -388,6 +476,16 @@ class APITest extends TestCase
     private function makeTerm($taxonomy, $slug, $data = [])
     {
         return Facades\Term::make()->taxonomy($taxonomy)->inDefaultLocale()->slug($slug)->data($data);
+    }
+
+    private function getDataIds($endpoint)
+    {
+        $response = $this
+            ->get($endpoint)
+            ->assertSuccessful()
+            ->assertJson(['data' => []]);
+
+        return collect($response->getData()->data)->pluck('id')->all();
     }
 
     private function assertEndpointDataCount($endpoint, $count)

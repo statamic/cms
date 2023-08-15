@@ -20,14 +20,6 @@ class User extends BaseUser
     protected $roles;
     protected $groups;
 
-    /** @deprecated */
-    public static function fromModel(Model $model)
-    {
-        return tap(new static, function ($user) use ($model) {
-            $user->model($model);
-        });
-    }
-
     public function model(Model $model = null)
     {
         if (is_null($model)) {
@@ -323,7 +315,7 @@ class User extends BaseUser
             return null;
         }
 
-        return Carbon::createFromFormat($this->model()->getDateFormat(), $date);
+        return $date instanceof Carbon ? $date : Carbon::createFromFormat($this->model()->getDateFormat(), $date);
     }
 
     public function setLastLogin($time)
