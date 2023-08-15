@@ -83,7 +83,7 @@
                 </set-picker>
             </floating-menu>
 
-            <div class="bard-invalid" v-if="invalid" v-html="invalid"></div>
+            <div class="bard-error" v-if="initError" v-html="initError"></div>
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
@@ -173,7 +173,7 @@ export default {
             collapsed: this.meta.collapsed,
             previews: this.meta.previews,
             mounted: false,
-            invalid: false,
+            initError: null,
             pageHeader: null,
             escBinding: null,
             showAddSetButton: false,
@@ -627,11 +627,11 @@ export default {
                         try {
                             state.schema.nodeFromJSON(content);
                         } catch (error) {
-                            const invalid = this.invalidMessage(error);
-                            if (invalid) {
-                                this.invalid = invalid;
+                            const invalidError = this.invalidError(error);
+                            if (invalidError) {
+                                this.initError = invalidError;
                             } else {
-                                this.invalid = __('Something went wrong');
+                                this.initError = __('Something went wrong');
                                 console.error(error);
                             }
                         }
@@ -640,16 +640,20 @@ export default {
             });
         },
 
-        invalidMessage(error) {
+        invalidError(error) {
+            const messages = {
+                'Invalid text node in JSON': 'Invalid content, text values must be strings',
+                'Empty text nodes are not allowed': 'Invalid content, text values cannot be empty',
+            };
+            if (messages[error.message]) {
+                return __(messages[error.message]);
+            }
             let match;
-            if (match = error.message.match(/^There is no mark type ([\w]+) in this schema$/)) {
-                return __('Invalid content, check :type button/extension is enabled', { type: match[1] });
-            } else if (match = error.message.match(/^Unknown node type: ([\w]+)$/)) {
-                return __('Invalid content, check :type button/extension is enabled', { type: match[1] });
-            } else if (match = error.message.match(/^Invalid text node in JSON$/)) {
-                return __('Invalid content, text values must be strings');
-            } else if (match = error.message.match(/^Empty text nodes are not allowed$/)) {
-                return __('Invalid content, text values cannot be empty');
+            if (match = error.message.match(/^Unknown (?:node|mark) type: $/)) {
+                return __('Invalid content, nodes and marks must have a type');
+            }
+            if (match = error.message.match(/^(?:There is no|Unknown) (?:node|mark) type:? (\w+)/)) {
+                return __('Invalid content, :type button/extension is not enabled', { type: match[1] });
             }
         },
 
