@@ -1,24 +1,24 @@
 <template>
 
     <div>
-        <header class="mb-3">
+        <header class="mb-6">
             <breadcrumb :url="globalsUrl" :title="__('Globals')" />
 
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
 
-                <div class="pt-px text-2xs text-grey-60 ml-2 flex" v-if="! canEdit">
-                    <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
+                <div class="pt-px text-2xs text-gray-600 ml-4 flex" v-if="! canEdit">
+                    <svg-icon name="lock" class="w-4 mr-1 -mt-1" /> {{ __('Read Only') }}
                 </div>
 
-                <dropdown-list v-if="canConfigure || canEditBlueprint" class="mr-1">
+                <dropdown-list v-if="canConfigure || canEditBlueprint" class="mr-2">
                     <dropdown-item v-if="canConfigure" v-text="__('Configure')" :redirect="configureUrl" />
                     <dropdown-item v-if="canEditBlueprint" :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
                 </dropdown-list>
 
                 <site-selector
                     v-if="localizations.length > 1"
-                    class="mr-2"
+                    class="mr-4"
                     :sites="localizations"
                     :value="site"
                     @input="localizationSelected"
@@ -36,9 +36,9 @@
             </div>
         </header>
 
-        <div v-if="fieldset.empty" class="text-center mt-5 border-2 border-dashed rounded-lg px-4 py-8">
+        <div v-if="fieldset.empty" class="text-center mt-10 border-2 border-dashed rounded-lg px-8 py-32">
             <div class="max-w-md mx-auto opacity-50">
-                <h1 class="my-3" v-text="__('This Global Set has no fields.')" />
+                <h1 class="my-6" v-text="__('This Global Set has no fields.')" />
                 <p v-text="__('messages.global_set_no_fields_description')" />
             </div>
         </div>
@@ -65,10 +65,9 @@
                     :container="container"
                     v-bind="component.props"
                 />
-                <publish-sections
+                <publish-tabs
                     :read-only="! canEdit"
                     :syncable="hasOrigin"
-                    :can-toggle-labels="true"
                     :enable-sidebar="false"
                     @updated="setFieldValue"
                     @meta-updated="setFieldMeta"
@@ -85,7 +84,7 @@
 
 <script>
 import SiteSelector from '../SiteSelector.vue';
-import HasHiddenFields from '../data-list/HasHiddenFields';
+import HasHiddenFields from '../publish/HasHiddenFields';
 
 export default {
 
@@ -198,6 +197,24 @@ export default {
             this.saving = true;
             this.clearErrors();
 
+            this.runBeforeSaveHook();
+        },
+
+        runBeforeSaveHook() {
+            Statamic.$hooks.run('global-set.saving', {
+                globalSet: this.initialHandle,
+                values: this.values,
+                container: this.$refs.container,
+                storeName: this.publishContainer,
+            })
+            .then(this.performSaveRequest)
+            .catch(error => {
+                this.saving = false
+                this.$toast.error(error || 'Something went wrong');
+            })
+        },
+
+        performSaveRequest() {
             const payload = { ...this.visibleValues, ...{
                 blueprint: this.fieldset.handle,
                 _localized: this.localizedFields,
@@ -207,8 +224,20 @@ export default {
                 this.saving = false;
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
-                this.$nextTick(() => this.$emit('saved', response));
+                this.runAfterSaveHook(response);
             }).catch(e => this.handleAxiosError(e));
+        },
+
+        runAfterSaveHook(response) {
+            Statamic.$hooks
+                .run('global-set.saved', {
+                    globalSet: this.initialHandle,
+                    reference: this.initialReference,
+                    response,
+                })
+                .then(() => {
+                    this.$nextTick(() => this.$emit('saved', response));
+                }).catch(e => {})
         },
 
         handleAxiosError(e) {

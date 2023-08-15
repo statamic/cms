@@ -14,9 +14,6 @@ class GeneratePresetImageManipulations implements ShouldQueue
      */
     private $generator;
 
-    /**
-     * @param  PresetGenerator  $generator
-     */
     public function __construct(PresetGenerator $generator)
     {
         $this->generator = $generator;
@@ -29,6 +26,10 @@ class GeneratePresetImageManipulations implements ShouldQueue
      */
     public function subscribe($events)
     {
+        if (! config('statamic.assets.image_manipulation.generate_presets_on_upload', true)) {
+            return;
+        }
+
         $events->listen(AssetReuploaded::class, self::class.'@handle');
         $events->listen(AssetUploaded::class, self::class.'@handle');
     }

@@ -3,6 +3,8 @@
 namespace Statamic\Taxonomies;
 
 use Statamic\Data\AbstractAugmented;
+use Statamic\Query\StatusQueryBuilder;
+use Statamic\Statamic;
 
 class AugmentedTerm extends AbstractAugmented
 {
@@ -38,7 +40,11 @@ class AugmentedTerm extends AbstractAugmented
 
     protected function updatedBy()
     {
-        return $this->data->lastModifiedBy();
+        $user = $this->data->lastModifiedBy();
+
+        return Statamic::isApiRoute()
+            ? optional($user)->toShallowAugmentedCollection()
+            : $user;
     }
 
     protected function updatedAt()
@@ -48,7 +54,7 @@ class AugmentedTerm extends AbstractAugmented
 
     protected function entries()
     {
-        return $this->data->queryEntries()->where('site', $this->data->locale());
+        return (new StatusQueryBuilder($this->data->queryEntries()))->where('site', $this->data->locale());
     }
 
     protected function isTerm()

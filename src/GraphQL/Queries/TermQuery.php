@@ -2,7 +2,9 @@
 
 namespace Statamic\GraphQL\Queries;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Validation\ValidationException;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Term;
 use Statamic\GraphQL\Types\TermInterface;
@@ -33,6 +35,21 @@ class TermQuery extends Query
             $query->where('id', $id);
         }
 
-        return $query->limit(1)->get()->first();
+        $term = $query->limit(1)->get()->first();
+
+        // Since the term `id` contains the taxonomy, we don't need `AuthorizesSubResources`
+        // middleware, but should still validate whether or not the taxonomy is allowed.
+        if ($term && ! in_array($taxonomy = $term->taxonomy()->handle(), $this->allowedSubResources())) {
+            throw ValidationException::withMessages([
+                'id' => 'Forbidden: '.$taxonomy,
+            ]);
+        }
+
+        return $term;
+    }
+
+    public function allowedSubResources()
+    {
+        return ResourceAuthorizer::allowedSubResources('graphql', 'taxonomies');
     }
 }

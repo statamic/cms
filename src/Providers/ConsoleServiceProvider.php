@@ -15,6 +15,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\AssetsMeta::class,
         Commands\GlideClear::class,
         Commands\Install::class,
+        Commands\FlatCamp::class,
         Commands\LicenseSet::class,
         Commands\MakeAction::class,
         Commands\MakeAddon::class,
@@ -32,6 +33,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\StacheDoctor::class,
         Commands\StarterKitExport::class,
         Commands\StarterKitInstall::class,
+        Commands\StarterKitRunPostInstall::class,
         Commands\StaticClear::class,
         Commands\StaticWarm::class,
         // Commands\MakeUserMigration::class,
@@ -43,6 +45,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\UpdatesRun::class,
         Commands\ImportGroups::class,
         Commands\ImportRoles::class,
+        Commands\ImportUsers::class,
     ];
 
     public function boot()

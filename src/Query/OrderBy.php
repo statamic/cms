@@ -9,12 +9,15 @@ class OrderBy
 
     /**
      * Instantiate order by object.
-     *
-     * @param  string  $sort
-     * @param  string  $direction
      */
     public function __construct(string $sort, string $direction)
     {
+        $direction = strtolower($direction);
+
+        if (! in_array($direction, ['asc', 'desc'], true)) {
+            throw new \InvalidArgumentException('Order direction must be "asc" or "desc".');
+        }
+
         $this->sort = $sort;
         $this->direction = $direction;
     }
@@ -22,7 +25,6 @@ class OrderBy
     /**
      * Instantiate order by object.
      *
-     * @param  string  $orderBy
      * @return static
      */
     public static function parse(string $orderBy)

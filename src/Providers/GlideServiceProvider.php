@@ -8,7 +8,6 @@ use Statamic\Contracts\Imaging\ImageManipulator;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Facades\Config;
 use Statamic\Facades\Glide;
-use Statamic\Facades\Image;
 use Statamic\Imaging\GlideImageManipulator;
 use Statamic\Imaging\GlideUrlBuilder;
 use Statamic\Imaging\ImageGenerator;
@@ -37,8 +36,7 @@ class GlideServiceProvider extends ServiceProvider
 
         $this->app->bind(PresetGenerator::class, function ($app) {
             return new PresetGenerator(
-                $app->make(ImageGenerator::class),
-                Image::manipulationPresets()
+                $app->make(ImageGenerator::class)
             );
         });
     }

@@ -16,6 +16,8 @@ class CollectionTreeTest extends TestCase
     use PreventSavingStacheItemsToDisk;
     use UnlinksPaths;
 
+    private $directory;
+
     public function setUp(): void
     {
         parent::setUp();

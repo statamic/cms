@@ -34,27 +34,6 @@ class CacherTest extends TestCase
     }
 
     /** @test */
-    public function gets_default_expiration_using_deprecated_key()
-    {
-        $cacher = $this->cacher([
-            'default_cache_length' => 10,
-        ]);
-
-        $this->assertEquals(10, $cacher->getDefaultExpiration());
-    }
-
-    /** @test */
-    public function gets_default_expiration_where_new_key_takes_precedence_over_deprecated_key()
-    {
-        $cacher = $this->cacher([
-            'expiry' => 2,
-            'default_cache_length' => 10,
-        ]);
-
-        $this->assertEquals(2, $cacher->getDefaultExpiration());
-    }
-
-    /** @test */
     public function gets_a_url()
     {
         $cacher = $this->cacher();
@@ -306,18 +285,20 @@ class CacherTest extends TestCase
         $cacher = $this->cacher();
 
         $cacher->shouldReceive('invalidateUrl')->once()->with('/', 'http://example.com');
-        $cacher->shouldReceive('invalidateUrl')->once()->with('/one', 'http://example.com');
+        $cacher->shouldReceive('invalidateUrl')->twice()->with('/one', 'http://example.com');
         $cacher->shouldReceive('invalidateUrl')->once()->with('/two', 'http://example.com');
         $cacher->shouldReceive('invalidateUrl')->once()->with('/three', 'http://example.co.uk');
-        $cacher->shouldReceive('invalidateUrl')->times(2)->with('/blog/post', 'http://example.com');
+        $cacher->shouldReceive('invalidateUrl')->times(3)->with('/blog/post', 'http://example.com');
         $cacher->shouldReceive('invalidateUrl')->once()->with('/blog/post', 'http://example.co.uk');
 
         $cacher->invalidateUrls([
             '/',
             '/one',
+            'one',
             'http://example.com/two',
             'http://example.co.uk/three',
             '/blog/*',
+            'blog/*',
             'http://example.com/blog/*',
             'http://example.co.uk/blog/*',
         ]);

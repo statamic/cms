@@ -1,4 +1,4 @@
-module.exports = function (arr, sortKey, reverse) {
+export default function (arr, sortKey, reverse) {
   if (!sortKey) {
     return arr
   }

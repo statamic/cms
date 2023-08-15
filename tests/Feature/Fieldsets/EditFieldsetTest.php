@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Fieldsets;
 
-use Facades\Statamic\Fields\FieldsetRepository;
 use Statamic\Facades;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Fieldset;
 use Tests\Fakes\FakeFieldsetRepository;
 use Tests\FakesRoles;

@@ -9,6 +9,8 @@ use Statamic\Support\Arr;
 
 class ArrTest extends TestCase
 {
+    use Concerns\TestsIlluminateArr;
+
     /** @test */
     public function it_adds_scope_to_associative_array()
     {
@@ -31,6 +33,7 @@ class ArrTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider multiDimensionalArrayScopeProvider
      */
     public function it_adds_scope_to_multidimensional_array($mapInto)

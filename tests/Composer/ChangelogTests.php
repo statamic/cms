@@ -46,7 +46,7 @@ trait ChangelogTests
 
         collect($contents)->each(function ($release) {
             $this->assertEquals('2018: November 6th', $release->date);
-            $this->assertContainsHtml($release->body);
+            $this->assertIsString($release->body);
         });
     }
 

@@ -2,12 +2,12 @@
 
 namespace Statamic\Fields;
 
-use Facades\Statamic\Fields\FieldsetRepository;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetDeleted;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
 use Statamic\Facades;
+use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Facades\Path;
 use Statamic\Support\Str;
 
@@ -17,6 +17,7 @@ class Fieldset
     protected $contents = [];
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    protected $initialPath;
 
     public function setHandle(string $handle)
     {
@@ -36,6 +37,17 @@ class Fieldset
             Facades\Fieldset::directory(),
             str_replace('.', '/', $this->handle()),
         ]));
+    }
+
+    public function initialPath($path = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->initialPath;
+        }
+
+        $this->initialPath = $path;
+
+        return $this;
     }
 
     public function setContents(array $contents)
@@ -63,7 +75,7 @@ class Fieldset
 
     public function title()
     {
-        return array_get($this->contents, 'title', Str::humanize($this->handle));
+        return $this->contents['title'] ?? Str::humanize(Str::of($this->handle)->after('::')->afterLast('.'));
     }
 
     public function fields(): Fields
@@ -78,6 +90,16 @@ class Fieldset
         return $this->fields()->get($handle);
     }
 
+    public function isNamespaced(): bool
+    {
+        return Str::contains($this->handle(), '::');
+    }
+
+    public function namespace()
+    {
+        return $this->isNamespaced() ? Str::before($this->handle, '::') : null;
+    }
+
     public function editUrl()
     {
         return cp_route('fieldsets.edit', $this->handle());
@@ -86,6 +108,11 @@ class Fieldset
     public function deleteUrl()
     {
         return cp_route('fieldsets.destroy', $this->handle());
+    }
+
+    public function isDeletable()
+    {
+        return ! $this->isNamespaced();
     }
 
     public function afterSave($callback)

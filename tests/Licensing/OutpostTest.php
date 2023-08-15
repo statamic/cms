@@ -118,14 +118,14 @@ class OutpostTest extends TestCase
     }
 
     /** @test */
-    public function it_caches_a_timed_out_request_for_5_minutes_and_treats_it_like_a_500_error()
+    public function it_caches_a_timed_out_request_for_5_minutes()
     {
         $outpost = $this->outpostWithResponse(
-            new ConnectException('', new Request('POST', '/v3/query'))
+            $e = new ConnectException('', new Request('POST', '/v3/query'))
         );
 
         $expectedResponse = [
-            'error' => 500,
+            'error' => $e->getCode(),
             'expiry' => now()->addMinutes(5)->timestamp,
             'payload' => $outpost->payload(),
         ];

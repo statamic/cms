@@ -150,13 +150,15 @@ abstract class Builder implements Contract
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
+        $loweredOperator = strtolower($operator);
+
         if ($useDefault) {
             return [$operator, '='];
-        } elseif ($this->invalidOperatorAndValue($operator, $value)) {
+        } elseif ($this->invalidOperatorAndValue($loweredOperator, $value)) {
             throw new InvalidArgumentException('Illegal operator and value combination.');
         }
 
-        return [$value, $operator];
+        return [$value, $loweredOperator];
     }
 
     protected function invalidOperatorAndValue($operator, $value)
@@ -271,9 +273,9 @@ abstract class Builder implements Contract
         return $this;
     }
 
-    public function orWhereJsonLength($column, $operator, $value)
+    public function orWhereJsonLength($column, $operator, $value = null)
     {
-        return $this->whereJsonLength($column, $operator, $value = null, 'or');
+        return $this->whereJsonLength($column, $operator, $value, 'or');
     }
 
     public function whereNull($column, $boolean = 'and', $not = false)

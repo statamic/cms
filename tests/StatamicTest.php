@@ -3,11 +3,13 @@
 namespace Tests;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\User;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use Tests\Fakes\FakeArtisanRequest;
 
 class StatamicTest extends TestCase
 {
@@ -84,6 +86,7 @@ class StatamicTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider formatsWithTime
      **/
     public function it_doesnt_append_time_if_system_date_format_already_has_time_in_it($format)
@@ -103,6 +106,7 @@ class StatamicTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider formatsWithTime
      **/
     public function it_doesnt_append_time_if_cp_date_format_already_has_time_in_it($format)
@@ -256,6 +260,9 @@ class StatamicTest extends TestCase
 
     /**
      * @test
+     *
+     * @define-env customAssetUrl
+     *
      * @dataProvider cpAssetUrlProvider
      */
     public function it_gets_a_cp_asset_url($url, $expected)
@@ -266,13 +273,16 @@ class StatamicTest extends TestCase
     public function cpAssetUrlProvider()
     {
         return [
-            'slash' => ['/foo/bar.jpg', 'http://localhost/vendor/statamic/cp/foo/bar.jpg'],
-            'no slash' => ['foo/bar.jpg', 'http://localhost/vendor/statamic/cp/foo/bar.jpg'],
+            'slash' => ['/foo/bar.jpg', 'http://test-asset-url.com/vendor/statamic/cp/foo/bar.jpg'],
+            'no slash' => ['foo/bar.jpg', 'http://test-asset-url.com/vendor/statamic/cp/foo/bar.jpg'],
         ];
     }
 
     /**
      * @test
+     *
+     * @define-env customAssetUrl
+     *
      * @dataProvider vendorPackageAssetUrlProvider
      */
     public function it_gets_the_vendor_package_asset_url($arguments, $expected)
@@ -283,16 +293,17 @@ class StatamicTest extends TestCase
     public function vendorPackageAssetUrlProvider()
     {
         return [
-            'package' => [['package', 'cp.js'], 'http://localhost/vendor/package/cp.js'],
-            'package with type' => [['package', 'test.jpg', 'images'], 'http://localhost/vendor/package/images/test.jpg'],
-            'statamic cp' => [['statamic/cp', 'cp.js'], 'http://localhost/vendor/statamic/cp/cp.js'],
-            'vendor url no slash' => [['irrelevant', 'vendor/foo/bar.js'], 'http://localhost/vendor/foo/bar.js'],
-            'vendor url with slash' => [['irrelevant', '/vendor/foo/bar.js'], 'http://localhost/vendor/foo/bar.js'],
+            'package' => [['package', 'cp.js'], 'http://test-asset-url.com/vendor/package/cp.js'],
+            'package with type' => [['package', 'test.jpg', 'images'], 'http://test-asset-url.com/vendor/package/images/test.jpg'],
+            'statamic cp' => [['statamic/cp', 'cp.js'], 'http://test-asset-url.com/vendor/statamic/cp/cp.js'],
+            'vendor url no slash' => [['irrelevant', 'vendor/foo/bar.js'], 'http://test-asset-url.com/vendor/foo/bar.js'],
+            'vendor url with slash' => [['irrelevant', '/vendor/foo/bar.js'], 'http://test-asset-url.com/vendor/foo/bar.js'],
         ];
     }
 
     /**
      * @test
+     *
      * @define-env useFixtureTranslations
      **/
     public function it_makes_breadcrumbs()
@@ -306,5 +317,35 @@ class StatamicTest extends TestCase
     public function useFixtureTranslations($app)
     {
         $app->useLangPath(__DIR__.'/__fixtures__/lang');
+    }
+
+    /** @test */
+    public function it_can_detect_if_running_in_a_queue_worker()
+    {
+        // It should return false by default
+        $this->assertFalse(Statamic::isWorker());
+
+        // It should return false when being called from a custom command
+        Request::swap(new FakeArtisanRequest('stache:clear'));
+        $this->assertFalse(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('statamic:install'));
+        $this->assertFalse(Statamic::isWorker());
+
+        // It should return true when being called from any command beginning with `queue:`
+        Request::swap(new FakeArtisanRequest('queue:listen'));
+        $this->assertTrue(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('queue:work'));
+        $this->assertTrue(Statamic::isWorker());
+        Request::swap(new FakeArtisanRequest('horizon:work'));
+        $this->assertTrue(Statamic::isWorker());
+
+        // It should always return false when not running in console
+        App::shouldReceive('runningInConsole')->andReturn(false);
+        $this->assertFalse(Statamic::isWorker());
+    }
+
+    public function customAssetUrl($app)
+    {
+        $app['config']->set('app.asset_url', 'http://test-asset-url.com');
     }
 }

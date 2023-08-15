@@ -16,6 +16,7 @@ class GetErrorsTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider organizedProvider
      */
     public function it_gets_errors_organized_into_fields($params, $bag, $errors, $expected)
@@ -89,6 +90,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider allProvider
      */
     public function it_gets_errors_for_all_fields_together($params, $bag, $errors, $expected)
@@ -153,6 +155,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider fieldProvider
      */
     public function it_gets_errors_for_a_single_field($params, $bag, $errors, $expected)

@@ -13,6 +13,9 @@ class TermsStoreTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $parent;
+    private $directory;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -36,7 +39,7 @@ class TermsStoreTest extends TestCase
 
         $this->assertStringEqualsFile($path = $this->directory.'/tags/test.yaml', $term->fileContents());
         @unlink($path);
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->assertEquals($path, $this->parent->store('tags')->paths()->get('en::test'));
     }

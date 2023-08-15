@@ -19,6 +19,7 @@ class CorePermissions
             $this->register('access cp');
             $this->register('configure fields');
             $this->register('configure addons');
+            $this->register('manage preferences');
         });
 
         $this->group('collections', function () {
@@ -153,11 +154,7 @@ class CorePermissions
 
     protected function registerUpdates()
     {
-        $this->register('view updates', function ($permission) {
-            $this->permission($permission)->children([
-                $this->permission('perform updates'),
-            ]);
-        });
+        $this->register('view updates');
     }
 
     protected function registerUsers()
@@ -168,11 +165,14 @@ class CorePermissions
                     $this->permission('create users'),
                     $this->permission('delete users'),
                     $this->permission('change passwords'),
-                    $this->permission('edit user groups'),
-                    $this->permission('edit roles'),
+                    $this->permission('assign user groups'),
+                    $this->permission('assign roles'),
                 ]),
             ]);
         });
+
+        $this->register('edit user groups');
+        $this->register('edit roles');
     }
 
     protected function registerForms()

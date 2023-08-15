@@ -3,14 +3,14 @@
         <div class="breadcrumb flex" v-if="showingAddon">
             <button
                 @click="showingAddon = false"
-                class="flex-initial flex p-1 -m-1 items-center text-xs text-grey-70 hover:text-grey-90"
+                class="flex-initial flex p-2 -m-2 items-center text-xs text-gray-700 hover:text-gray-900"
             >
-                <svg-icon name="chevron-right" class="h-6 w-4 rotate-180" />
+                <svg-icon name="micro/chevron-right" class="h-6 w-4 rotate-180" />
                 <span v-text="__('Addons')" />
             </button>
         </div>
 
-        <div class="flex mb-3" v-if="!showingAddon">
+        <div class="flex mb-6" v-if="!showingAddon">
             <h1 class="flex-1" v-text="__('Addons')" />
         </div>
 
@@ -18,7 +18,7 @@
             {{ __('messages.addon_list_loading_error') }}
         </div>
 
-        <div v-if="initializing" class="card p-3 text-center">
+        <div v-if="initializing" class="card p-6 text-center">
             <loading-graphic  />
         </div>
 
@@ -26,7 +26,7 @@
             <div class="" slot-scope="{ rows: addons }">
 
                 <div class="card p-0">
-                    <div class="border-b px-2 text-sm">
+                    <div class="border-b px-4 text-sm">
                         <button
                             class="data-list-filter-link"
                             :class="{ active: filter === 'all' }"
@@ -42,23 +42,23 @@
                         </button>
                     </div>
 
-                    <div class="p-1">
+                    <div class="p-2">
                         <data-list-search
                             ref="search"
                             v-model="searchQuery" />
                     </div>
                 </div>
 
-                <div class="addon-grid my-4" :class="{ 'opacity-50': loading }">
-                    <div class="addon-card bg-white text-grey-80 h-full shadow rounded cursor-pointer relative" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
-                        <span class="badge absolute top-0 left-0 mt-1 ml-1" v-if="addon.installed">Installed</span>
-                        <div class="h-64 rounded-t bg-cover bg-center" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
-                        <div class="px-3 mb-2 relative text-center">
+                <div class="addon-grid my-8" :class="{ 'opacity-50': loading }">
+                    <div class="addon-card bg-white text-gray-800 h-full shadow rounded cursor-pointer relative" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
+                        <span class="badge absolute top-0 left-0 mt-2 ml-2" v-if="addon.installed">Installed</span>
+                        <div class="h-48 rounded-t bg-cover bg-center" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
+                        <div class="px-6 mb-4 relative text-center">
                             <a :href="addon.seller.website" class="relative">
-                                <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 bg-white relative -mt-4 border-2 border-white inline">
+                                <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 bg-white relative -mt-8 border-2 border-white inline">
                             </a>
-                            <div class="addon-card-title mb-1 text-lg font-bold text-center">{{ addon.name }}</div>
-                            <p class="text-grey mb-2" v-text="getPriceRange(addon)" />
+                            <div class="addon-card-title mb-2 text-lg font-bold text-center">{{ addon.name }}</div>
+                            <p class="text-gray mb-4" v-text="getPriceRange(addon)" />
                             <p v-text="addon.summary" class="text-sm"></p>
                         </div>
                     </div>
@@ -70,8 +70,8 @@
         </data-list>
 
         <template v-if="unlisted.length && !showingAddon">
-            <h6 class="mt-4">{{ __('Unlisted Addons') }}</h6>
-            <div class="card p-0 mt-1">
+            <h6 class="mt-8">{{ __('Unlisted Addons') }}</h6>
+            <div class="card p-0 mt-2">
                 <table class="data-table">
                     <tbody>
                         <tr v-for="addon in unlisted" :key="addon.package">

@@ -22,6 +22,7 @@ class AssetsMeta extends Command
         $bar = $this->output->createProgressBar($assets->count());
 
         $assets->each(function ($asset) use ($bar) {
+            $asset->hydrate();
             $asset->save();
             $bar->advance();
         });
@@ -32,6 +33,9 @@ class AssetsMeta extends Command
         $this->info('Asset metadata generated');
     }
 
+    /**
+     * @return \Statamic\Assets\AssetCollection
+     */
     protected function getAssets()
     {
         if (! $container = $this->argument('container')) {

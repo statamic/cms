@@ -1,51 +1,27 @@
 <template>
     <div class="time-fieldtype-container">
-        <div class="input-group">
-            <div class="input-group-prepend flex items-center">
-                <svg-icon name="time" class="w-4 h-4" />
-            </div>
-            <div
-                class="input-text flex items-center px-sm w-auto"
-                :class="{ 'read-only': isReadOnly }"
-            >
-                <template v-for="(part, index) in parts">
-                    <span
-                        v-if="index > 0"
-                        class="colon"
-                        :key="`${part}-colon`"
-                    >:</span>
-                    <input
-                        type="text"
-                        min="00"
-                        placeholder="00"
-                        tabindex="0"
-                        ref="inputs"
-                        :key="`${part}-input`"
-                        :value="inputValue(index)"
-                        :class="`input-time input-${part}`"
-                        :max="maxes[index]"
-                        :readonly="isReadOnly"
-                        @input="updatePart(index, $event.target.value)"
-                        @keydown.up.prevent="incrementPart(index, 1)"
-                        @keydown.down.prevent="incrementPart(index, -1)"
-                        @keydown.esc="clear"
-                        @keydown.186.prevent="focusNextPart(index) /* colon */"
-                        @keydown.190.prevent="focusNextPart(index) /* dot */"
-                        @focus="$emit('focus')"
-                        @blur="$emit('blur')"
-                    />
-                </template>
-            </div>
+        <div class="input-group" :class="{'w-[120px]': useSeconds, 'w-[96px]': ! useSeconds}">
+            <button class="input-group-prepend flex items-center" v-tooltip="__('Set to now')" @click="setToNow">
+                <svg-icon name="light/time" class="w-4 h-4" />
+            </button>
+            <input
+                type="text"
+                ref="time"
+                class="input-text"
+                :readonly="isReadOnly"
+                @keydown.esc="clear"
+                @keydown.up.prevent="incrementPart"
+                @keydown.down.prevent="decrementPart"
+                @focus="focused"
+                @blur="$emit('blur')"
+                @change="updateActualValue"
+            />
         </div>
-        <button class="text-xl text-grey-60 hover:text-grey-80 h-4 w-4 p-1 flex items-center outline-none" tabindex="0"
-              v-if="! required && ! isReadOnly"
-              @click="clear" @keyup.enter.space="clear">
-              &times;
-        </button>
     </div>
 </template>
 
 <script>
+import IMask from 'imask';
 
 export default {
 
@@ -62,91 +38,146 @@ export default {
         },
     },
 
+    inject: ['storeName'],
+
     data() {
         return {
-            maxes: [23, 59, 59],
+            inputValue: this.value,
+            mask: null,
         };
     },
 
+    watch: {
+        // We use this instead of v-model or :value because the mask library wants to be in control of the value.
+        inputValue(value) {
+            this.mask.value = value;
+        },
+        // When the value is changed via the prop (e.g. through collaboration or other JS manually
+        // setting the value) we'll want to make sure it's reflected correctly here.
+        value(value) {
+            this.inputValue = value;
+            this.updateActualValue();
+        },
+    },
+
     computed: {
+        useSeconds() {
+            return this.showSeconds || this.config.seconds_enabled;
+        }
+    },
 
-        partCount() {
-            return this.showSeconds || this.config.seconds_enabled ? 3 : 2;
-        },
+    created() {
+        this.$events.$on(`container.${this.storeName}.saving`, this.updateActualValue);
+    },
 
-        parts() {
-            return ['hour', 'minute', 'second'].slice(0, this.partCount);
-        },
+    mounted() {
+        // The mask will replace the need for binding the value to the input.
+        this.mask = IMask(this.$refs.time, {
+            mask: this.useSeconds ? '0[0]:`0[0]:`00' : '0[0]:`00'
+        });
 
-        time() {
-            const time = Array(this.partCount).fill(0);
+        // Bind initial value to mask.
+        this.mask.value = new String(this.inputValue);
 
-            if (this.value) {
-                this.value.split(':').forEach((e, i) => { time[i] = parseInt(e); });
-            }
+        // We use this instead of v-model or @input because input would be early and give us the raw value.
+        // In this event listener, we get masked value (with colons/guides). // e.g. 032 vs. 03:2
+        this.mask.on('accept', e => this.inputValue = this.mask.value);
+    },
 
-            return time;
-        },
-
+    destroyed() {
+        this.$events.$off(`container.${this.storeName}.saving`, this.updateActualValue);
+        this.mask.destroy();
     },
 
     methods: {
-
-        inputValue(index) {
-            if (this.value) {
-                return this.pad(this.time[index]);
-            }
-
-            return '';
-        },
-
-        updatePart(index, value) {
-            const time = [...this.time];
-            time[index] = Math.max(0, Math.min(this.maxes[index], value));
-            this.updateWithTime(time);
-        },
-
-        incrementPart(index, delta) {
-            let value = this.time[index] + delta;
-
-            const wrap = this.maxes[index] + 1
-            while (value < 0) value += wrap
-            while (value >= wrap) value -= wrap
-
-            this.updatePart(index, value);
-        },
-
-        clear() {
-            this.update(null);
-        },
-
-        updateWithTime(time) {
-            this.update(this.timeToString(time));
-            this.$forceUpdate();
-        },
-
-        timeToString(time) {
-            return time.map(e => this.pad(e)).join(':');
-        },
-
-        pad(value) {
-            return ('00' + value).slice(-2);
-        },
-
-        focusNextPart(index) {
-            this.focusPart(index + 1 === this.partCount ? 0 : index + 1);
-        },
-
-        focusPart(index) {
-            const input = this.$refs.inputs[index];
-            input.focus();
-            input.select();
+        focused() {
+            this.$refs.time.select();
+            this.$emit('focus');
         },
 
         focus() {
-             this.$refs.inputs[0].focus();
+             this.$refs.time.focus();
         },
 
+        // This will take the value of the input, add appropriate padding, and update the actual fieldtype value.
+        // e.g. 03:2    -> 03:02:00
+        //      03:20   -> 03:20:00
+        //      03:20:4 -> 03:20:04
+        //      3:2:4   -> 03:02:04
+        updateActualValue() {
+            if (! this.inputValue) {
+                this.update(null);
+                return;
+            }
+
+            let parts = this.inputValue.split(':');
+            if (parts.length === 1) parts.push('00');
+            if (parts.length === 2 && this.useSeconds) parts.push('00');
+            parts = parts.map(part => part.padStart(2, '0'));
+
+            let newValue = parts.join(':');
+            this.update(newValue);
+            this.inputValue = newValue;
+        },
+
+        setToNow() {
+            const date = new Date();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+
+            this.update(this.useSeconds
+                ? `${hours}:${minutes}:${seconds}`
+                : `${hours}:${minutes}`);
+        },
+
+        adjustPart(e, direction, callback) {
+            const caretPosition = e.target.selectionStart;
+            const time = this.inputValue.split(':');
+
+            let part = 0;
+            if (caretPosition > 5) {
+                part = 2;
+            } else if (caretPosition > 2) {
+                part = 1;
+            }
+
+            const current = parseInt(time[part]);
+            const newValue = current + (direction === 'increment' ? 1 : -1);
+
+            const returned = callback(part, newValue);
+            if (returned) {
+                time[part] = returned;
+            } else {
+                time[part] = String(newValue).padStart(2, '0');
+            }
+
+            this.update(time.join(':'));
+
+            // Set the caret position back to where it was
+            this.$nextTick(() => {
+                e.target.selectionStart = caretPosition;
+                e.target.selectionEnd = caretPosition;
+            });
+        },
+
+        incrementPart(e) {
+            this.adjustPart(e, 'increment', (part, value) => {
+                if ((part === 0 && value > 23) || (part !== 0 && value > 59)) {
+                    return '00';
+                }
+            });
+        },
+
+        decrementPart(e) {
+            this.adjustPart(e, 'decrement', (part, value) => {
+                if (part === 0 && value == -1) {
+                    return '23';
+                } else if (part !== 0 && value == -1) {
+                    return '59';
+                }
+            });
+        },
     }
 
 };

@@ -1,0 +1,125 @@
+.live-preview {
+    @apply inset-0;
+}
+
+.live-preview-header {
+    @apply relative pr-4 pl-6 py-2 h-13 shadow-md flex items-center justify-between;
+    background: linear-gradient(180deg, #fff, #f9fafb);
+    border-bottom: 1px solid #c4cdd6;
+    z-index: 2;
+}
+
+
+.live-preview-main {
+    @apply flex flex-1 overflow-scroll;
+    z-index: 1;
+}
+
+.live-preview-editor {
+    @apply flex relative bg-gray-200 h-full;
+    z-index: 3;
+}
+
+.live-preview-fields {
+    @apply relative;
+    z-index: 2;
+}
+
+.live-preview .publish-tab-outer {
+    @apply @4xl/live-preview:px-6;
+}
+
+.live-preview-contents {
+    @apply relative bg-gray-500 flex-1 flex flex-col;
+    z-index: 1;
+}
+
+.live-preview .tabs-container {
+    @apply bg-gray-300 mb-0;
+    @apply @4xl/live-preview:mb-6;
+}
+
+.live-preview .publish-tabs {
+    @apply pl-4 @4xl/live-preview:pl-6;
+}
+
+.live-preview .publish-sections-section {
+    @apply mb-0 @4xl/live-preview:mb-8;
+}
+
+.live-preview .publish-section-header {
+    @apply rounded-none @4xl/live-preview:rounded-t-md;
+}
+
+.live-preview .card {
+    @apply rounded-none @4xl/live-preview:rounded-md;
+}
+
+.live-preview .publish-tab-actions-footer {
+    display: none;
+}
+
+.live-preview-contents iframe {
+    @apply bg-white;
+    &.responsive { @apply h-full w-full; }
+    &.device { @apply mt-4 shadow-lg rounded; }
+}
+
+.live-preview-resizer {
+    @apply w-4 border-l border-r border-gray-400 shadow-sm;
+    z-index: 1;
+    cursor: ew-resize;
+    background: theme('colors.gray.100') url('../../svg/icons/light/drag-dots.svg') center center no-repeat;
+    background-size: 7px 17px;
+}
+
+
+.live-preview-header-slide-enter-active,
+.live-preview-header-slide-leave-active {
+    transition: all 0.3s ease;
+}
+.live-preview-header-slide-enter,
+.live-preview-header-slide-leave-to {
+    transform: translateY(-100px);
+}
+
+.live-preview-editor-slide-enter-active,
+.live-preview-editor-slide-leave-active {
+    transition: all 0.3s ease;
+}
+.live-preview-editor-slide-enter,
+.live-preview-editor-slide-leave-to {
+    transform: translateX(-50px);
+    opacity: 0;
+}
+
+.live-preview-contents-slide-enter-active,
+.live-preview-contents-slide-leave-active {
+    transition: all 0.3s ease;
+}
+.live-preview-contents-slide-enter,
+.live-preview-contents-slide-leave-to {
+    transform: translateX(50px);
+    opacity: 0;
+}
+
+
+/*  We only want the animation to happen when its on the regular publish page. */
+/*  When portal-ed into live preview, it won't be inside .workspace */
+.workspace {
+    .live-preview-tabs-drop-enter-active,
+    .live-preview-tabs-drop-leave-active {
+        transition: all 0.2s;
+    }
+    .live-preview-tabs-drop-enter-active {
+        transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275)
+    }
+    .live-preview-tabs-drop-leave-active {
+        transition-timing-function: cubic-bezier(0.6, -0.28, 0.735, 0.045);
+    }
+    .live-preview-tabs-drop-enter,
+    .live-preview-tabs-drop-leave-to {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+}

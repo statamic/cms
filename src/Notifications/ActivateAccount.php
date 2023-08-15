@@ -8,6 +8,7 @@ use Statamic\Auth\Passwords\PasswordReset as PasswordResetManager;
 class ActivateAccount extends PasswordReset
 {
     public static $subject;
+    public static $greeting;
     public static $body;
 
     public static function subject($subject = null)
@@ -17,6 +18,15 @@ class ActivateAccount extends PasswordReset
         }
 
         static::$subject = $subject;
+    }
+
+    public static function greeting($greeting = null)
+    {
+        if (is_null($greeting)) {
+            return static::$greeting;
+        }
+
+        static::$greeting = $greeting;
     }
 
     public static function body($body = null)
@@ -38,6 +48,7 @@ class ActivateAccount extends PasswordReset
     {
         return (new MailMessage)
             ->subject(static::$subject ?? __('statamic::messages.activate_account_notification_subject'))
+            ->greeting(static::$greeting)
             ->line(static::$body ?? __('statamic::messages.activate_account_notification_body'))
             ->action(__('Activate Account'), PasswordResetManager::url($this->token, PasswordResetManager::BROKER_ACTIVATIONS));
     }

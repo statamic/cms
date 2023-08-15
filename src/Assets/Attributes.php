@@ -3,7 +3,6 @@
 namespace Statamic\Assets;
 
 use Facades\Statamic\Assets\ExtractInfo;
-use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Arr;
 
 class Attributes
@@ -12,14 +11,6 @@ class Attributes
      * @var Asset
      */
     private $asset;
-
-    /**
-     * @param $generator ImageGenerator
-     */
-    public function __construct(ImageGenerator $generator)
-    {
-        $this->generator = $generator;
-    }
 
     public function asset(Asset $asset)
     {
@@ -75,7 +66,7 @@ class Attributes
      */
     private function getImageAttributes()
     {
-        return \Facades\Statamic\Imaging\Attributes::from($this->asset->disk()->filesystem()->getDriver(), $this->asset->path());
+        return \Facades\Statamic\Imaging\Attributes::from($this->asset->disk()->filesystem(), $this->asset->path());
     }
 
     /**
@@ -85,7 +76,7 @@ class Attributes
      */
     private function getSvgAttributes()
     {
-        return \Facades\Statamic\Imaging\Attributes::from($this->asset->disk()->filesystem()->getDriver(), $this->asset->path());
+        return \Facades\Statamic\Imaging\Attributes::from($this->asset->disk()->filesystem(), $this->asset->path());
     }
 
     /**

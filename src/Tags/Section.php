@@ -2,7 +2,7 @@
 
 namespace Statamic\Tags;
 
-use Facades\Statamic\View\Cascade;
+use Statamic\Facades\Cascade;
 
 class Section extends Tags
 {
