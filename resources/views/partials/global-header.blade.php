@@ -1,6 +1,6 @@
 <div class="global-header">
     <div class="lg:min-w-xl pl-2 md:pl-6 h-full flex items-center">
-        <button class="nav-toggle hidden md:block ml-1 shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@cp_svg('icons/light/burger')</button>
+        <button class="nav-toggle hidden md:flex ml-1 shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@cp_svg('icons/light/burger')</button>
         <button class="nav-toggle md:hidden ml-1 shrink-0" @click="toggleMobileNav" v-if="! mobileNavOpen" aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('icons/light/burger')</button>
         <button class="nav-toggle md:hidden ml-1 shrink-0" @click="toggleMobileNav" v-else v-cloak aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('icons/light/close')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
