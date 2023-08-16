@@ -168,6 +168,7 @@ class FieldtypeTest extends TestCase
         $fieldtype = new class($fields) extends Fieldtype
         {
             protected $mock;
+
             protected static $handle = 'test';
 
             public function __construct($mock)
@@ -340,7 +341,9 @@ class FieldtypeTest extends TestCase
         ]);
 
         $fields = (new TestAppendConfigFields())->configFields();
+        $sections = (new TestAppendConfigFields())->configBlueprint()->tabs()['main']->sections();
 
+        $this->assertCount(2, $sections->all());
         $this->assertCount(6, $fields->all());
         $this->assertEquals('text', $fields->get('extra')->type());
     }
@@ -368,7 +371,9 @@ class FieldtypeTest extends TestCase
         ]);
 
         $fields = (new TestAppendConfigFields())->configFields();
+        $sections = (new TestAppendConfigFields())->configBlueprint()->tabs()['main']->sections();
 
+        $this->assertCount(4, $sections->all());
         $this->assertCount(8, $fields->all());
         $this->assertEquals('text', $fields->get('extra1')->type());
         $this->assertEquals('text', $fields->get('extra2')->type());
