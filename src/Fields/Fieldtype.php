@@ -33,6 +33,7 @@ abstract class Fieldtype implements Arrayable
     protected $defaultValue;
     protected $configFields = [];
     protected static $extraConfigFields = [];
+    protected static $extraConfigSections = [];
     protected $icon;
 
     public static function title()
@@ -186,12 +187,27 @@ abstract class Fieldtype implements Arrayable
     {
         $fields = $this->configFieldItems();
         $extras = $this->extraConfigFieldItems();
+        $extraSections = $this->extraConfigSectionItems();
 
-        if (empty($fields) && empty($extras)) {
+        if (empty($fields) && empty($extras) && empty($extraSections)) {
             return [];
         }
 
+        $fieldMap = collect($fields)
+            ->flatMap(function ($section, $index) {
+                return collect($section['fields'] ?? [])->map(fn () => $index)->all();
+            })
+            ->all();
+        $fieldHandles = array_keys($fieldMap);
+
+        $overrides = collect($extras)
+            ->only($fieldHandles)
+            ->each(function ($field, $handle) use (&$fields, $fieldMap) {
+                $fields[$fieldMap[$handle]]['fields'][$handle] = $field;
+            });
+
         $extras = collect($extras)
+            ->except($fieldHandles)
             ->map(fn ($field, $handle) => compact('handle', 'field'))
             ->values()->all();
 
@@ -224,6 +240,16 @@ abstract class Fieldtype implements Arrayable
             }
         }
 
+        if (! empty($extraSections)) {
+            $sections = $sections->merge(collect($extraSections)->map(function ($section) {
+                $section['fields'] = collect($section['fields'])
+                    ->map(fn ($field, $handle) => compact('handle', 'field'))
+                    ->values()->all();
+
+                return $section;
+            }));
+        }
+
         return $sections->all();
     }
 
@@ -246,6 +272,8 @@ abstract class Fieldtype implements Arrayable
 
         $fields = $fields
             ->merge($this->extraConfigFieldItems())
+            ->merge(collect($this->extraConfigSectionItems())
+                ->flatMap(fn ($section) => $section['fields'] ?? [])->all())
             ->map(function ($field, $handle) {
                 return compact('handle', 'field');
             });
@@ -263,6 +291,11 @@ abstract class Fieldtype implements Arrayable
         return self::$extraConfigFields[static::class] ?? [];
     }
 
+    protected function extraConfigSectionItems(): array
+    {
+        return self::$extraConfigSections[static::class] ?? [];
+    }
+
     public static function appendConfigFields(array $config): void
     {
         $existingConfig = self::$extraConfigFields[static::class] ?? [];
@@ -273,6 +306,18 @@ abstract class Fieldtype implements Arrayable
     public static function appendConfigField(string $field, array $config): void
     {
         self::appendConfigFields([$field => $config]);
+    }
+
+    public static function appendConfigSections(array $config): void
+    {
+        $existingConfig = self::$extraConfigSections[static::class] ?? [];
+
+        self::$extraConfigSections[static::class] = array_merge($existingConfig, $config);
+    }
+
+    public static function appendConfigSection(array $config): void
+    {
+        self::appendConfigSections([$config]);
     }
 
     public function icon()

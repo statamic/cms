@@ -328,6 +328,64 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
+    public function it_can_append_a_single_config_section()
+    {
+        TestAppendConfigFields::appendConfigSection([
+            'display' => 'Extra Section',
+            'fields' => [
+                'extra' => [
+                    'type' => 'text',
+                ],
+            ],
+        ]);
+
+        $fields = (new TestAppendConfigFields())->configFields();
+
+        $this->assertCount(6, $fields->all());
+        $this->assertEquals('text', $fields->get('extra')->type());
+    }
+
+    /** @test */
+    public function it_can_append_multiple_config_sections()
+    {
+        TestAppendConfigFields::appendConfigSections([
+            [
+                'display' => 'Extra Section 1',
+                'fields' => [
+                    'extra1' => [
+                        'type' => 'text',
+                    ],
+                ],
+            ],
+            [
+                'display' => 'Extra Section 2',
+                'fields' => [
+                    'extra2' => [
+                        'type' => 'text',
+                    ],
+                ],
+            ],
+        ]);
+
+        $fields = (new TestAppendConfigFields())->configFields();
+
+        $this->assertCount(8, $fields->all());
+        $this->assertEquals('text', $fields->get('extra1')->type());
+        $this->assertEquals('text', $fields->get('extra2')->type());
+    }
+
+    /** @test */
+    public function it_will_override_default_config_fields()
+    {
+        TestAppendConfigFields::appendConfigField('foo', ['type' => 'text']);
+
+        $fields = (new TestAppendConfigFields())->configFields();
+
+        $this->assertCount(8, $fields->all());
+        $this->assertEquals('text', $fields->get('foo')->type());
+    }
+
+    /** @test */
     public function it_will_only_append_config_fields_to_the_intended_fieldtype()
     {
         $fieldtype = new class extends Fieldtype
