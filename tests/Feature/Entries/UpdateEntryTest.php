@@ -243,6 +243,60 @@ class UpdateEntryTest extends TestCase
     }
 
     /** @test */
+    public function auto_title_only_gets_saved_on_localization_when_different_from_origin()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]]);
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->sites(['en', 'fr']);
+        $collection->titleFormats('Auto {foo}')->save();
+
+        $this->seedBlueprintFields($collection, [
+            'foo' => ['type' => 'text'],
+        ]);
+
+        $origin = EntryFactory::collection($collection)
+            ->locale('en')
+            ->slug('origin')
+            ->data(['foo' => 'bar'])
+            ->create();
+
+        $localization = EntryFactory::collection($collection)
+            ->locale('fr')
+            ->origin($origin)
+            ->slug('localization')
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($localization, [
+                'foo' => 'le bar',
+                '_localized' => ['foo'],
+            ])
+            ->assertOk();
+
+        $localization = $localization->fresh();
+        $this->assertEquals('le bar', $localization->foo);
+        $this->assertEquals('Auto le bar', $localization->title);
+        $this->assertEquals('Auto le bar', $localization->get('title'));
+
+        $this
+            ->actingAs($user)
+            ->update($localization, [
+                '_localized' => [], // foo is intentionally missing
+            ])
+            ->assertOk();
+
+        $localization = $localization->fresh();
+        $this->assertEquals('bar', $localization->foo);
+        $this->assertEquals('Auto bar', $localization->title);
+        $this->assertNull($localization->get('title'));
+    }
+
+    /** @test */
     public function it_can_validate_against_published_value()
     {
         [$user, $collection] = $this->seedUserAndCollection();
