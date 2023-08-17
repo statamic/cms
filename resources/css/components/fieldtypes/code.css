@@ -3,7 +3,7 @@
 }
 
 .code-fieldtype-toolbar {
-    @apply flex justify-end gap-2 border border-gray-500 py-2 px-2 rounded-tl-md rounded-tr-md border-b-0;
+    @apply flex justify-end gap-2 border border-gray-500 py-2 px-2 rounded-tl-md rounded-tr-md bg-white border-b-0;
 
     select {
         @apply h-8 text-sm leading-none;
@@ -20,6 +20,6 @@
     }
 
     .code-fieldtype-toolbar {
-        @apply fixed top-0 left-0 right-0 z-20;
+        @apply fixed top-0 left-0 right-0 z-20 rounded-none border-white;
     }
 }
