@@ -129,7 +129,7 @@ export default {
                 extension: file.name.split('.').pop(),
                 percent: 0,
                 errorMessage: null,
-                upload
+                instance: upload
             });
         },
 
@@ -175,7 +175,7 @@ export default {
             const upload = this.uploads[0];
             const id = upload.id;
 
-            upload.upload.upload().then(response => {
+            upload.instance.upload().then(response => {
                 const json = JSON.parse(response.data);
                 response.status === 200
                     ? this.handleUploadSuccess(id, json)
