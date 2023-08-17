@@ -3,7 +3,6 @@
 namespace Statamic\Taxonomies;
 
 use ArrayAccess;
-use Stringable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
@@ -33,6 +32,7 @@ use Statamic\Routing\Routable;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use Stringable;
 
 class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, ResolvesValuesContract, ArrayAccess, Arrayable, ContainsQueryableValues, SearchableContract, Stringable
 {
