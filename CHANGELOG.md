@@ -1,5 +1,23 @@
 # Release Notes
 
+## 4.18.0 (2023-08-17)
+
+### What's new
+- Expose `uniqid` JS function for generating unique IDs. [#8571](https://github.com/statamic/cms/issues/8571) by @jacksleight
+- Allow renaming of row id handle in Grid, Bard, and Replicator. [#8407](https://github.com/statamic/cms/issues/8407) by @jonassiewertsen
+- Support arbitrary attributes on the vite tag. [#8305](https://github.com/statamic/cms/issues/8305) by @jackmcdade
+
+### What's fixed
+- Make uploader synchronous. [#8592](https://github.com/statamic/cms/issues/8592) by @jasonvarga
+- Fix alignment of menu icon. [#8589](https://github.com/statamic/cms/issues/8589) by @caseydwyer
+- Pint updates. [#8586](https://github.com/statamic/cms/issues/8586) by @jasonvarga
+- Fix slugify error. [#8583](https://github.com/statamic/cms/issues/8583) by @jasonvarga
+- Only save generated title if it's different. [#8101](https://github.com/statamic/cms/issues/8101) by @aerni
+- Make the views field handle reserved. [#8576](https://github.com/statamic/cms/issues/8576) by @jasonvarga
+- Fix special character handling in created CP nav sections. [#8568](https://github.com/statamic/cms/issues/8568) by @jesseleite
+
+
+
 ## 4.17.0 (2023-08-10)
 
 ### What's improved
