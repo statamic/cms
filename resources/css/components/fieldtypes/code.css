@@ -1,55 +1,25 @@
 .code-fieldtype-container {
     @apply relative;
+}
 
-    .code-mode-picker {
-        @apply z-10 right-0 uppercase absolute outline-none shadow-none;
-        right: 0;
+.code-fieldtype-toolbar {
+    @apply flex justify-end gap-2 border border-gray-500 py-2 px-2 rounded-tl-md rounded-tr-md border-b-0;
 
-        select {
-            @apply text-white w-auto text-2xs p-2 text-right;
-            opacity: .5;
-            background: none;
-            border: none;
-            &:focus {
-                @apply outline-none shadow-none text-blue-300;
-            }
-        }
-        select:hover:not(:disabled) {
-            @apply text-white opacity-100;
-            background: none;
-            border: none;
-        }
-        .select-input-toggle {
-            display: none;
-        }
+    select {
+        @apply h-8 text-sm leading-none;
     }
 }
 
-.CodeMirror-fullscreen {
-    @apply fixed inset-0 h-auto z-10 rounded-none;
-}
-
-.CodeMirror-fullscreen-container {
+.code-fieldtype-fullscreen {
     .global-header {
         display: none;
     }
 
     .publish-fields.\@container {
         container-type: initial !important;
+    }
 
-        .code-mode-picker {
-            @apply fixed top-0 z-20;
-        }
+    .code-fieldtype-toolbar {
+        @apply fixed top-0 left-0 right-0 z-20;
     }
 }
-
-.CodeMirror-rulers {
-    @apply absolute left-0 right-0 overflow-hidden;
-    top: -50px;
-    bottom: -20px;
-}
-
-.CodeMirror-ruler {
-    @apply top-0 bottom-0;
-}
-

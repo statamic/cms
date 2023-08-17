@@ -49,7 +49,7 @@ return [
     'code.config.indent_type' => 'Set your preferred type of indentation.',
     'code.config.key_map' => 'Choose preferred set of keyboard shortcuts.',
     'code.config.mode' => 'Choose language for syntax highlighting.',
-    'code.config.rulers' => 'Display rulers at 80 columns and 120 columns.',
+    'code.config.rulers' => 'Configure vertical rulers to help with indentation.',
     'code.config.theme' => 'Choose your preferred theme.',
     'code.title' => 'Code',
     'collections.title' => 'Collections',

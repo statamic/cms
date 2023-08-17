@@ -2,8 +2,17 @@
 
 <element-container @resized="refresh">
     <div class="code-fieldtype-container" :class="themeClass">
-        <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" class="code-mode-picker" />
-        <div v-else v-text="modeLabel" class="code-mode"></div>
+        <nav id="code-fieldtype-toolbar" class="code-fieldtype-toolbar">
+            <div>
+                <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" class="code-mode-picker" v-tooltip="__('Select Color Mode')" />
+                <div v-else v-text="modeLabel" class="code-mode"></div>
+            </div>
+
+            <button @click="fullScreenMode = !fullScreenMode" class="btn-icon h-8 leading-none flex items-center justify-center text-gray-800" v-tooltip="__('Toggle Fullscreen Mode')">
+                <svg-icon name="expand-bold" class="h-3.5 w-3.5" v-show="!fullScreenMode" />
+                <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="fullScreenMode" />
+            </button>
+        </nav>
         <div ref="codemirror"></div>
     </div>
 </element-container>
@@ -109,17 +118,15 @@ export default {
                 ? '#d1d5db'
                 : '#546e7a';
 
-            return [
-                {
+            return Object.entries(this.config.rulers).map(([column, style]) => {
+                let lineStyle = style === 'dashed' ? 'dashed' : 'solid';
+
+                return {
+                    column: parseInt(column),
+                    lineStyle: lineStyle,
                     color: rulerColor,
-                    column: 80,
-                    lineStyle: 'dashed'
-                },
-                {
-                    color: rulerColor,
-                    column: 120,
-                }
-            ];
+                };
+            });
         },
     },
 
@@ -139,23 +146,6 @@ export default {
             theme: this.exactTheme,
             inputStyle: 'contenteditable',
             rulers: this.rulers,
-            extraKeys: {
-                'F11': function(cm) {
-                    document.body.classList.toggle(
-                        'CodeMirror-fullscreen-container'
-                    );
-                    cm.setOption('fullScreen', !cm.getOption('fullScreen'));
-                },
-                'Esc': function(cm) {
-                    document.body.classList.toggle(
-                        'CodeMirror-fullscreen-container',
-                        false
-                    );
-                    if (cm.getOption('fullScreen')) {
-                        cm.setOption('fullScreen', false);
-                    }
-                }
-            }
         });
 
         this.codemirror.on('change', (cm) => {
@@ -185,6 +175,14 @@ export default {
         mode(mode) {
             this.codemirror.setOption('mode', mode);
             this.updateDebounced({code: this.value.code, mode: this.mode});
+        },
+        fullScreenMode(fullScreenMode) {
+            document.body.classList.toggle(
+                'code-fieldtype-fullscreen',
+                fullScreenMode
+            );
+
+            this.codemirror.setOption('fullScreen', fullScreenMode);
         },
     },
 

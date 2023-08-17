@@ -21,7 +21,7 @@
     padding: 0 16px; /* Horizontal padding of content */
   }
   .CodeMirror-wrap {
-    @apply py-2 rounded;
+    @apply rounded-bl rounded-br;
   }
 
   .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
@@ -159,6 +159,7 @@
   }
 
   .CodeMirror-scroll {
+    @apply pt-2;
     overflow: scroll !important; /* Things will break if this is overridden */
     /* 50px is the magic margin used to hide the element's real scrollbars */
     /* See overflow: hidden in .CodeMirror */
@@ -343,6 +344,21 @@
 
   /* Help users use markselection to safely style text background */
   span.CodeMirror-selectedtext { background: none; }
+
+  .CodeMirror-fullscreen {
+        @apply fixed h-auto z-10 rounded-none;
+        inset: 3rem 0 0 0;
+  }
+
+  .CodeMirror-rulers {
+      @apply absolute left-0 right-0 overflow-hidden;
+      top: -50px;
+      bottom: -20px;
+  }
+
+  .CodeMirror-ruler {
+      @apply top-0 bottom-0;
+  }
 
 
   /* Light Theme
