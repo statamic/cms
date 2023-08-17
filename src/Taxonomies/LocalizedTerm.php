@@ -3,6 +3,7 @@
 namespace Statamic\Taxonomies;
 
 use ArrayAccess;
+use Stringable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
@@ -33,7 +34,7 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
-class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, ResolvesValuesContract, ArrayAccess, Arrayable, ContainsQueryableValues, SearchableContract
+class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, ResolvesValuesContract, ArrayAccess, Arrayable, ContainsQueryableValues, SearchableContract, Stringable
 {
     use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, ContainsSupplementalData, ResolvesValues, Searchable;
 
@@ -514,5 +515,9 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable, Reso
     public function getCpSearchResultBadge()
     {
         return $this->taxonomy()->title();
+    }
+
+    public function __toString(): string {
+        return $this->title();
     }
 }
