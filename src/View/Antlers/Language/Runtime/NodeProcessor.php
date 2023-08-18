@@ -218,6 +218,8 @@ class NodeProcessor
      */
     private $profilingTagName = null;
 
+    private $scopeAdjustingParams = ['as'];
+
     public function __construct(Loader $loader, EnvironmentDetails $envDetails)
     {
         $this->loader = $loader;
@@ -514,7 +516,7 @@ class NodeProcessor
 
         if (GlobalRuntimeState::$traceTagAssignments) {
             if (! empty(GlobalRuntimeState::$tracedRuntimeAssignments)) {
-                $data = GlobalRuntimeState::$tracedRuntimeAssignments + $data;
+                $data = array_merge(GlobalRuntimeState::$tracedRuntimeAssignments, $data);
             }
         }
 
@@ -1708,9 +1710,35 @@ class NodeProcessor
                                 GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
 
                                 if ($node->hasModifierParameters()) {
+                                    $tagAssocOutput = $output;
                                     $output = Arr::assoc($output) ? (string) $tag->parse($output) : (string) $tag->parseLoop($this->addLoopIterationVariables($output));
                                     $tagCallbackResult = null;
                                     $currentProcessorCanHandleTagValue = false;
+
+                                    $adjustedScope = false;
+
+                                    // It is possible that the tag has injected a variable
+                                    // that was already in the scope. If this is the case,
+                                    // let's check if the final value is the same as the
+                                    // value returned from the tag. If so, we will not
+                                    // push this new value back up the stack as no
+                                    // explicit re-assignment has occurred.
+                                    foreach ($this->scopeAdjustingParams as $paramName) {
+                                        if (array_key_exists($paramName, $tagParameters)) {
+                                            $potentialVariableCollisionName = $tagParameters[$paramName];
+
+                                            if (array_key_exists($potentialVariableCollisionName, $beforeAssignments) && array_key_exists($potentialVariableCollisionName, $tagAssocOutput)) {
+                                                if ($this->data[count($this->data) - 1][$potentialVariableCollisionName] == $tagAssocOutput[$potentialVariableCollisionName]) {
+                                                    unset($this->runtimeAssignments[$potentialVariableCollisionName]);
+                                                    $adjustedScope = true;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if ($adjustedScope) {
+                                        GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
+                                    }
                                 } else {
                                     $tagCallbackResult = $output;
                                     $currentProcessorCanHandleTagValue = true;

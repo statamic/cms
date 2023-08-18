@@ -136,6 +136,7 @@ return [
     'unique_uri' => 'This URI has already been taken.',
     'duplicate_uri' => 'Duplicate URI :value',
     'reserved' => 'This is a reserved word.',
+    'reserved_field_handle' => 'Field with a handle of :handle is a reserved word.',
     'parent_causes_root_children' => 'This would cause the root page to have children.',
     'parent_cannot_be_itself' => 'Cannot be its own parent.',
     'time' => 'Not a valid time.',

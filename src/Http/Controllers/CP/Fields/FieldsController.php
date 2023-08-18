@@ -76,7 +76,6 @@ class FieldsController extends CpController
             'elseif',
             'endif',
             'endunless',
-            'id',
             'if',
             'length',
             'reference',
@@ -84,6 +83,7 @@ class FieldsController extends CpController
             'status',
             'unless',
             'value', // todo: can be removed when https://github.com/statamic/cms/issues/2495 is resolved
+            'views',
         ];
 
         $fields = collect([

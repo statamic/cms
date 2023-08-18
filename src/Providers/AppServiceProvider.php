@@ -104,6 +104,7 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Taxonomies\TaxonomyRepository::class => \Statamic\Stache\Repositories\TaxonomyRepository::class,
             \Statamic\Contracts\Entries\CollectionRepository::class => \Statamic\Stache\Repositories\CollectionRepository::class,
             \Statamic\Contracts\Globals\GlobalRepository::class => \Statamic\Stache\Repositories\GlobalRepository::class,
+            \Statamic\Contracts\Globals\GlobalVariablesRepository::class => \Statamic\Stache\Repositories\GlobalVariablesRepository::class,
             \Statamic\Contracts\Assets\AssetContainerRepository::class => \Statamic\Stache\Repositories\AssetContainerRepository::class,
             \Statamic\Contracts\Structures\StructureRepository::class => \Statamic\Structures\StructureRepository::class,
             \Statamic\Contracts\Structures\CollectionTreeRepository::class => \Statamic\Stache\Repositories\CollectionTreeRepository::class,
