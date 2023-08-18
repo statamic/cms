@@ -8,16 +8,12 @@ class AssetPolicy
 {
     public function view($user, $asset)
     {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission("view {$asset->containerHandle()} assets");
+        return User::fromUser($user)->hasPermission("view {$asset->containerHandle()} assets");
     }
 
     public function edit($user, $asset)
     {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission("edit {$asset->containerHandle()} assets");
+        return User::fromUser($user)->hasPermission("edit {$asset->containerHandle()} assets");
     }
 
     public function store($user, $assetContainer)

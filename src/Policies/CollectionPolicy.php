@@ -71,7 +71,6 @@ class CollectionPolicy
     {
         $user = User::fromUser($user);
 
-        return $collection->hasStructure()
-            && $user->hasPermission("reorder {$collection->handle()} entries");
+        return $collection->hasStructure() && $user->hasPermission("reorder {$collection->handle()} entries");
     }
 }
