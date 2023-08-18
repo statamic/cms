@@ -24,9 +24,9 @@ class FormPolicy
             return true;
         }
 
-        return ! Form::all()->filter(function ($form) use ($user) {
-            return $this->view($user, $form);
-        })->isEmpty();
+        return Form::all()
+            ->filter(fn ($form) => $this->view($user, $form))
+            ->isNotEmpty();
     }
 
     public function create($user)

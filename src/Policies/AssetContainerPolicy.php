@@ -20,9 +20,9 @@ class AssetContainerPolicy
     {
         $user = User::fromUser($user);
 
-        return AssetContainer::all()->filter(function ($container) use ($user) {
-            return $this->view($user, $container);
-        })->isNotEmpty();
+        return AssetContainer::all()
+            ->filter(fn ($container) => $this->view($user, $container))
+            ->isNotEmpty();
     }
 
     public function create($user)

@@ -30,9 +30,9 @@ class TaxonomyPolicy
             return true;
         }
 
-        return ! Taxonomy::all()->filter(function ($taxonomy) use ($user) {
-            return $this->view($user, $taxonomy);
-        })->isEmpty();
+        return Taxonomy::all()
+            ->filter(fn ($taxonomy) => $this->view($user, $taxonomy))
+            ->isNotEmpty();
     }
 
     public function create($user)

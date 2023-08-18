@@ -30,9 +30,9 @@ class GlobalSetPolicy
             return true;
         }
 
-        return GlobalSet::all()->filter(function ($set) use ($user) {
-            return $this->view($user, $set);
-        })->isNotEmpty();
+        return GlobalSet::all()
+            ->filter(fn ($set) => $this->view($user, $set))
+            ->isNotEmpty();
     }
 
     public function create($user)
