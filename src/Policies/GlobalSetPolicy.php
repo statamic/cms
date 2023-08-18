@@ -7,9 +7,9 @@ use Statamic\Facades\User;
 
 class GlobalSetPolicy
 {
-    use HasMultisitePolicy;
+    use Concerns\HasMultisitePolicy;
 
-    public function before($user, $ability, ...$arguments)
+    public function before($user, $ability, $set)
     {
         $user = User::fromUser($user);
 
@@ -17,7 +17,7 @@ class GlobalSetPolicy
             return true;
         }
 
-        if (! $this->accessInSelectedSite($user, $arguments)) {
+        if ($this->siteIsForbidden($user, $set)) {
             return false;
         }
     }

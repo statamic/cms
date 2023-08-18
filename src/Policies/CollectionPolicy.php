@@ -7,9 +7,9 @@ use Statamic\Facades\User;
 
 class CollectionPolicy
 {
-    use HasMultisitePolicy;
+    use Concerns\HasMultisitePolicy;
 
-    public function before($user, $ability, ...$arguments)
+    public function before($user, $ability, $collection)
     {
         $user = User::fromUser($user);
 
@@ -17,7 +17,7 @@ class CollectionPolicy
             return true;
         }
 
-        if (! $this->accessInSelectedSite($user, $arguments)) {
+        if ($this->siteIsForbidden($user, $collection)) {
             return false;
         }
     }

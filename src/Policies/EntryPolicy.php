@@ -6,9 +6,9 @@ use Statamic\Facades\User;
 
 class EntryPolicy
 {
-    use HasMultisitePolicy;
+    use Concerns\HasMultisitePolicy;
 
-    public function before($user, $ability, ...$arguments)
+    public function before($user, $ability, $entry)
     {
         $user = User::fromUser($user);
 
@@ -16,7 +16,7 @@ class EntryPolicy
             return true;
         }
 
-        if (! $this->accessInSelectedSite($user, $arguments)) {
+        if ($this->siteIsForbidden($user, $entry)) {
             return false;
         }
     }

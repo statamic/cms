@@ -7,9 +7,9 @@ use Statamic\Facades\User;
 
 class TaxonomyPolicy
 {
-    use HasMultisitePolicy;
+    use Concerns\HasMultisitePolicy;
 
-    public function before($user, $ability, ...$arguments)
+    public function before($user, $ability, $taxonomy)
     {
         $user = User::fromUser($user);
 
@@ -17,7 +17,7 @@ class TaxonomyPolicy
             return true;
         }
 
-        if (! $this->accessInSelectedSite($user, $arguments)) {
+        if ($this->siteIsForbidden($user, $taxonomy)) {
             return false;
         }
     }
