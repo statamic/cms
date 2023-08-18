@@ -76,9 +76,7 @@ class JavascriptComposer
         $sites = SiteFacade::all();
 
         if (SiteFacade::hasMultiple()) {
-            $user = User::current();
-
-            $sites = $sites->filter(fn (Site $site) => $user->can("access {$site->handle()} site"));
+            $sites = $sites->filter(fn (Site $site) => User::current()->can("access {$site->handle()} site"));
         }
 
         return $sites->map(function ($site) {
