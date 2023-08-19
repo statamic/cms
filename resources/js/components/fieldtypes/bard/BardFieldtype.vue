@@ -644,9 +644,20 @@ export default {
         },
 
         getExtensions() {
+            let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
+            if (this.config.inline === 'break') {
+                modeExts.push(HardBreak.extend({
+                    addKeyboardShortcuts() {
+                        return {
+                            ...this.parent?.(),
+                            'Enter': () => this.editor.commands.setHardBreak(),
+                        }
+                    },
+                }));
+            }
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
-                ...(this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak]),
+                ...modeExts,
                 Dropcursor,
                 Gapcursor,
                 History,
