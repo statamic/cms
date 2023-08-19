@@ -13,10 +13,9 @@ class SitePolicy
             return null;
         }
 
-        $user = User::fromUser($user);
         $site = Site::selected();
 
-        if (! $user->hasPermission("access {$site->handle()} site")) {
+        if (! User::fromUser($user)->hasPermission("access {$site->handle()} site")) {
             return false;
         }
     }
@@ -28,8 +27,10 @@ class SitePolicy
 
     public function view($user, $site)
     {
-        $user = User::fromUser($user);
+        if (! Site::hasMultiple()) {
+            return null;
+        }
 
-        return ! Site::hasMultiple() || $user->hasPermission("access {$site->handle()} site");
+        return User::fromUser($user)->hasPermission("access {$site->handle()} site");
     }
 }
