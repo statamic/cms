@@ -21,6 +21,11 @@ class Sites
         return $this->sites;
     }
 
+    public function allAccessible()
+    {
+        return $this->sites->filter(fn ($site) => User::current()->can("access {$site->handle()} site"));
+    }
+
     public function default()
     {
         if ($this->hasMultiple() && $user = User::current()) {
