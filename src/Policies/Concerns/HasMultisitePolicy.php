@@ -8,19 +8,25 @@ trait HasMultisitePolicy
 {
     protected function siteIsForbidden($user, ...$arguments)
     {
-        return $this->selectedSiteIsForbidden($user)
-            || $this->dataHasNoAccessibleSite($user, $arguments);
-    }
-
-    protected function selectedSiteIsForbidden($user)
-    {
         if (! Site::hasMultiple()) {
             return false;
         }
 
-        $site = Site::selected();
+        return $this->dataIsInForbiddenSite($user, $arguments)
+            || $this->dataHasNoAccessibleSite($user, $arguments);
+    }
 
-        return $user->cant("access {$site->handle()} site");
+    protected function dataIsInForbiddenSite($user, $arguments)
+    {
+        if (! $data = $this->getDataFromArguments($arguments)) {
+            return false;
+        }
+
+        if (! method_exists($data, 'locale')) {
+            return false;
+        }
+
+        return $user->cant("access {$data->locale()} site");
     }
 
     protected function dataHasNoAccessibleSite($user, $arguments)
@@ -37,21 +43,6 @@ trait HasMultisitePolicy
             ->filter(fn ($site) => $user->can("access {$site} site"))
             ->isEmpty();
     }
-
-    // TODO... Do we actually want this?
-    //
-    // protected function dataDoesNotExistInSelectedSite($data, $arguments)
-    // {
-    //     if (! $data = $this->getDataFromArguments($arguments)) {
-    //         return false;
-    //     }
-    //
-    //     if (! method_exists($data, 'existsIn')) {
-    //         return false;
-    //     }
-    //
-    //     return ! $data->existsIn(Site::selected()->handle());
-    // }
 
     private function getDataFromArguments($arguments)
     {
