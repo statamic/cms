@@ -251,6 +251,10 @@ class UpdateEntryTest extends TestCase
         ]]);
 
         [$user, $collection] = $this->seedUserAndCollection();
+        $this->setTestRoles(['test' => $user->permissions()->merge([
+            'access en site',
+            'access fr site',
+        ])->all()]);
         $collection->sites(['en', 'fr']);
         $collection->titleFormats('Auto {foo}')->save();
 
