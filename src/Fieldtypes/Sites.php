@@ -3,7 +3,6 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\Site;
-use Statamic\Facades\User;
 
 class Sites extends Relationship
 {
@@ -24,7 +23,6 @@ class Sites extends Relationship
     public function getIndexItems($request)
     {
         return Site::all()
-            ->filter(fn ($site) => User::current()->can('view', $site))
             ->sortBy('name')->map(function ($site) {
                 return [
                     'id' => $site->handle(),
