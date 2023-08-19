@@ -896,6 +896,20 @@ EOT;
     }
 
     /** @test */
+    public function it_augments_inline_break_value()
+    {
+        $data = [
+            ['type' => 'text', 'text' => 'This is inline text with'],
+            ['type' => 'hardBreak'],
+            ['type' => 'text', 'text' => 'line breaks.'],
+        ];
+
+        $expected = 'This is inline text with<br>line breaks.';
+
+        $this->assertEquals($expected, $this->bard(['inline' => 'break', 'sets' => null])->augment($data));
+    }
+
+    /** @test */
     public function it_processes_inline_value()
     {
         $data = '[{"type":"paragraph","content":[{"type":"text","text":"This is inline text."}]}]';
