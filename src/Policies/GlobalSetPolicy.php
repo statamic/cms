@@ -42,14 +42,14 @@ class GlobalSetPolicy
 
     public function view($user, $set)
     {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission("edit {$set->handle()} globals");
+        return $this->edit($user, $set);
     }
 
     public function edit($user, $set)
     {
-        // handled by before()
+        $user = User::fromUser($user);
+
+        return $user->hasPermission("edit {$set->handle()} globals");
     }
 
     public function configure($user, $set)
