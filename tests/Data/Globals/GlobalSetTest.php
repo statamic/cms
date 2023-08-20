@@ -334,4 +334,25 @@ EOT;
         $this->assertEquals('fr updated', $global->in('fr')->foo);
         $this->assertEquals('fr updated', $global->in('de')->foo);
     }
+
+    /** @test */
+    public function it_gets_available_sites_from_saved_localizations()
+    {
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $set = GlobalSet::make('test');
+        $set->addLocalization($en = $set->makeLocalization('en')->data(['foo' => 'bar']));
+        $set->addLocalization($fr = $set->makeLocalization('fr')->data(['foo' => 'le bar']));
+        $set->save();
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $set->sites());
+        $this->assertEquals(['en', 'fr'], $set->sites()->all());
+    }
 }
