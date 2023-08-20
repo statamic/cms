@@ -336,7 +336,7 @@ EOT;
     }
 
     /** @test */
-    public function it_gets_available_sites_from_saved_localizations()
+    public function it_gets_available_sites_from_localizations()
     {
         Site::setConfig([
             'default' => 'en',

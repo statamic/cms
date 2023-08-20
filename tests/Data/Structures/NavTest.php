@@ -148,4 +148,24 @@ class NavTest extends StructureTestCase
     {
         $this->assertNull($this->structure('test')->route('en'));
     }
+
+    /** @test */
+    public function it_gets_available_sites_from_trees()
+    {
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $nav = tap(Facades\Nav::make()->handle('test'))->save();
+        $nav->makeTree('en')->save();
+        $nav->makeTree('fr')->save();
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $nav->sites());
+        $this->assertEquals(['en', 'fr'], $nav->sites()->all());
+    }
 }
