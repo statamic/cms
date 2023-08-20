@@ -348,8 +348,8 @@ EOT;
         ]);
 
         $set = GlobalSet::make('test');
-        $set->addLocalization($en = $set->makeLocalization('en')->data(['foo' => 'bar']));
-        $set->addLocalization($fr = $set->makeLocalization('fr')->data(['foo' => 'le bar']));
+        $set->addLocalization($set->makeLocalization('en'));
+        $set->addLocalization($set->makeLocalization('fr'));
         $set->save();
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $set->sites());
