@@ -72,6 +72,10 @@ class EntriesController extends CpController
             $query->where('title', 'like', '%'.$search.'%');
         }
 
+        if (Site::hasMultiple()) {
+            $query->whereIn('site', Site::allAccessible()->map->handle()->all());
+        }
+
         return $query;
     }
 

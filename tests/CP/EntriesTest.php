@@ -42,4 +42,52 @@ class EntriesTest extends TestCase
 
         $this->assertEquals(['one', 'two', 'three'], $entries->pluck('slug')->all());
     }
+
+    /** @test */
+    public function it_shows_only_entries_in_index_for_sites_user_can_access()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
+            'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
+            'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
+        ]]);
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'view test entries',
+            'access en site',
+            'access de site',
+        ]]);
+
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = tap(Collection::make('test'))->save();
+
+        foreach (['en', 'fr', 'de'] as $locale) {
+            foreach (['one', 'two', 'three'] as $handle) {
+                EntryFactory::collection($collection)
+                    ->slug("{$locale}-{$handle}")
+                    ->locale($locale)
+                    ->create();
+            }
+        }
+
+        $response = $this
+            ->actingAs($user)
+            ->get(cp_route('collections.entries.index', ['collection' => 'test']))
+            ->assertOk();
+
+        $entries = collect($response->getData()->data);
+
+        $expected = [
+            'en-one',
+            'en-two',
+            'en-three',
+            'de-one',
+            'de-two',
+            'de-three',
+        ];
+
+        $this->assertEquals($expected, $entries->pluck('slug')->all());
+    }
 }
