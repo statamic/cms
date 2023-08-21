@@ -79,13 +79,15 @@ class JavascriptComposer
             $sites = $sites->filter(fn (Site $site) => User::current()->can("access {$site->handle()} site"));
         }
 
-        return $sites->map(function ($site) {
-            return [
-                'name' => $site->name(),
-                'handle' => $site->handle(),
-                'lang' => $site->lang(),
-            ];
-        })->values();
+        return $sites
+            ->map(function ($site) {
+                return [
+                    'name' => $site->name(),
+                    'handle' => $site->handle(),
+                    'lang' => $site->lang(),
+                ];
+            })
+            ->values();
     }
 
     protected function permissions($user)
