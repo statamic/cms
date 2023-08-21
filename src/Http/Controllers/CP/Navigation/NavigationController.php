@@ -78,13 +78,17 @@ class NavigationController extends CpController
             'nav' => $nav,
             'expectsRoot' => $nav->expectsRoot(),
             'collections' => $nav->collections()->map->handle()->all(),
-            'sites' => $nav->trees()->map(function ($tree) {
-                return [
-                    'handle' => $tree->locale(),
-                    'name' => $tree->site()->name(),
-                    'url' => $tree->showUrl(),
-                ];
-            })->values()->all(),
+            'sites' => $nav->trees()
+                ->filter(fn ($tree) => User::current()->can('view', Site::get($tree->locale())))
+                ->map(function ($tree) {
+                    return [
+                        'handle' => $tree->locale(),
+                        'name' => $tree->site()->name(),
+                        'url' => $tree->showUrl(),
+                    ];
+                })
+                ->values()
+                ->all(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
         ]);
     }
