@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use ArrayAccess;
+use Facades\Statamic\Entries\InitiatorStack;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
@@ -336,17 +337,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
 
-        $stack = Blink::get('entry-event-initiator-'.$this->root()->id()) ?? collect();
-
-        $initiator = $stack->first() ?? $this;
-
-        $initiatorIsAncestor = $this->ancestors()->contains(function ($entry) use ($initiator) {
-            return $entry->id() === $initiator->id();
-        });
-
-        if ($stack->isEmpty() || $initiatorIsAncestor) {
-            $stack->push($this);
-        }
+        $stack = InitiatorStack::entry($this)->push();
 
         $this->directDescendants()->each->save();
 
@@ -375,7 +366,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         }
 
         $stack->pop();
-        Blink::put('entry-event-initiator-'.$this->root()->id(), $stack);
 
         return true;
     }

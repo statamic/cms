@@ -2,8 +2,8 @@
 
 namespace Statamic\Events;
 
+use Facades\Statamic\Entries\InitiatorStack;
 use Statamic\Contracts\Git\ProvidesCommitMessage;
-use Statamic\Facades\Blink;
 
 class EntrySaved extends Event implements ProvidesCommitMessage
 {
@@ -13,7 +13,7 @@ class EntrySaved extends Event implements ProvidesCommitMessage
     public function __construct($entry)
     {
         $this->entry = $entry;
-        $this->initiator = (Blink::get('entry-event-initiator-'.$entry->root()->id()) ?? collect())->first();
+        $this->initiator = InitiatorStack::entry($entry)->initiator();
     }
 
     public function commitMessage()
