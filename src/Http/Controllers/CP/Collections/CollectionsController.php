@@ -63,7 +63,8 @@ class CollectionsController extends CpController
                     'handle' => $blueprint->handle(),
                     'title' => $blueprint->title(),
                 ];
-            })->values();
+            })
+            ->values();
 
         $site = $request->site ? Site::get($request->site) : Site::selected();
 
@@ -93,18 +94,7 @@ class CollectionsController extends CpController
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'sites' => $collection->sites()->map(function ($site_handle) {
-                $site = Site::get($site_handle);
-
-                if (! $site) {
-                    throw new SiteNotFoundException($site_handle);
-                }
-
-                return [
-                    'handle' => $site->handle(),
-                    'name' => $site->name(),
-                ];
-            })->values()->all(),
+            'sites' => $this->getAccessibleSitesForCollection($collection),
             'createUrls' => $collection->sites()
                 ->mapWithKeys(fn ($site) => [$site => cp_route('collections.entries.create', [$collection->handle(), $site])])
                 ->all(),
@@ -559,5 +549,22 @@ class CollectionsController extends CpController
         ]);
 
         return Blueprint::makeFromTabs($fields);
+    }
+
+    protected function getAccessibleSitesForCollection($collection)
+    {
+        return $collection
+            ->sites()
+            ->mapWithKeys(fn ($handle) => [$handle => Site::get($handle)])
+            ->each(fn ($site, $handle) => throw_unless($site, new SiteNotFoundException($handle)))
+            ->filter(fn ($site) => User::current()->can('view', $site))
+            ->map(function ($site) {
+                return [
+                    'handle' => $site->handle(),
+                    'name' => $site->name(),
+                ];
+            })
+            ->values()
+            ->all();
     }
 }
