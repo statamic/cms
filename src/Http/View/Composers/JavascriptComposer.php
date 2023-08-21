@@ -7,9 +7,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\Preference;
-use Statamic\Facades\Site as SiteFacade;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Sites\Site;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use voku\helper\ASCII;
@@ -63,7 +62,7 @@ class JavascriptComposer
             'paginationSize' => config('statamic.cp.pagination_size'),
             'paginationSizeOptions' => config('statamic.cp.pagination_size_options'),
             'sites' => $this->sites(),
-            'selectedSite' => SiteFacade::selected()->handle(),
+            'selectedSite' => Site::selected()->handle(),
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
             'permissions' => $this->permissions($user),
@@ -73,10 +72,10 @@ class JavascriptComposer
 
     protected function sites()
     {
-        $sites = SiteFacade::all();
+        $sites = Site::all();
 
-        if (SiteFacade::hasMultiple()) {
-            $sites = $sites->filter(fn (Site $site) => User::current()->can("access {$site->handle()} site"));
+        if (Site::hasMultiple()) {
+            $sites = $sites->filter(fn ($site) => User::current()->can('view', $site));
         }
 
         return $sites
