@@ -130,23 +130,26 @@ class EntriesController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'permalink' => $entry->absoluteUrl(),
-            'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
-                $localized = $entry->in($handle);
-                $exists = $localized !== null;
+            'localizations' => $this->getAccessibleSitesForCollection($collection)
+                ->map(function ($handle) use ($entry) {
+                    $localized = $entry->in($handle);
+                    $exists = $localized !== null;
 
-                return [
-                    'handle' => $handle,
-                    'name' => Site::get($handle)->name(),
-                    'active' => $handle === $entry->locale(),
-                    'exists' => $exists,
-                    'root' => $exists ? $localized->isRoot() : false,
-                    'origin' => $exists ? $localized->id() === optional($entry->origin())->id() : null,
-                    'published' => $exists ? $localized->published() : false,
-                    'status' => $exists ? $localized->status() : null,
-                    'url' => $exists ? $localized->editUrl() : null,
-                    'livePreviewUrl' => $exists ? $localized->livePreviewUrl() : null,
-                ];
-            })->all(),
+                    return [
+                        'handle' => $handle,
+                        'name' => Site::get($handle)->name(),
+                        'active' => $handle === $entry->locale(),
+                        'exists' => $exists,
+                        'root' => $exists ? $localized->isRoot() : false,
+                        'origin' => $exists ? $localized->id() === optional($entry->origin())->id() : null,
+                        'published' => $exists ? $localized->published() : false,
+                        'status' => $exists ? $localized->status() : null,
+                        'url' => $exists ? $localized->editUrl() : null,
+                        'livePreviewUrl' => $exists ? $localized->livePreviewUrl() : null,
+                    ];
+                })
+                ->values()
+                ->all(),
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
@@ -307,17 +310,20 @@ class EntriesController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
-            'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site, $blueprint) {
-                return [
-                    'handle' => $handle,
-                    'name' => Site::get($handle)->name(),
-                    'active' => $handle === $site->handle(),
-                    'exists' => false,
-                    'published' => false,
-                    'url' => cp_route('collections.entries.create', [$collection->handle(), $handle, 'blueprint' => $blueprint->handle()]),
-                    'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
-                ];
-            })->all(),
+            'localizations' => $this->getAccessibleSitesForCollection($collection)
+                ->map(function ($handle) use ($collection, $site, $blueprint) {
+                    return [
+                        'handle' => $handle,
+                        'name' => Site::get($handle)->name(),
+                        'active' => $handle === $site->handle(),
+                        'exists' => false,
+                        'published' => false,
+                        'url' => cp_route('collections.entries.create', [$collection->handle(), $handle, 'blueprint' => $blueprint->handle()]),
+                        'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
+                    ];
+                })
+                ->values()
+                ->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
@@ -556,5 +562,12 @@ class EntriesController extends CpController
                 'url' => $collection->showUrl(),
             ],
         ]);
+    }
+
+    protected function getAccessibleSitesForCollection($collection)
+    {
+        return $collection
+            ->sites()
+            ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
     }
 }
