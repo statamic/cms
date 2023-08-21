@@ -27,10 +27,6 @@ class SitePolicy
 
     public function view($user, $site)
     {
-        if (! Site::hasMultiple()) {
-            return null;
-        }
-
         return User::fromUser($user)->hasPermission("access {$site->handle()} site");
     }
 }
