@@ -107,7 +107,7 @@
             <div class="divider"></div>
 
             <dropdown-item :text="__('Profile')" redirect="{{ route('statamic.cp.account') }}"></dropdown-item>
-            <dropdown-item :text="__('Log out')" redirect="{{ route('statamic.cp.logout') }}"></dropdown-item>
+            <dropdown-item :text="__('Log out')" redirect="{{ route('statamic.cp.logout', ['redirect' => cp_route('index')]) }}"></dropdown-item>
         </dropdown-list>
     </div>
 </div>
