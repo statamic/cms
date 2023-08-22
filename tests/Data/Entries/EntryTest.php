@@ -2237,4 +2237,54 @@ class EntryTest extends TestCase
         $this->assertCount(2, $fakeBlink->calls['origin-Entry-2']);
         $this->assertCount(2, $fakeBlink->calls['origin-Entry-3']);
     }
+
+    /** @test */
+    public function initially_saved_entry_gets_put_into_events()
+    {
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
+                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => '/es/'],
+            ],
+        ]);
+
+        // Bunch of localizations of the same entry.
+        $one = EntryFactory::collection('test')->id('1')->locale('en')->data(['foo' => 'root'])->create();
+        $two = EntryFactory::collection('test')->id('2')->origin('1')->locale('fr')->create();
+        $three = EntryFactory::collection('test')->id('3')->origin('2')->locale('de')->create();
+        $four = EntryFactory::collection('test')->id('4')->origin('3')->locale('es')->create();
+
+        // Separate entry with localization.
+        $five = EntryFactory::collection('test')->id('5')->locale('en')->create();
+        $six = EntryFactory::collection('test')->id('6')->origin('5')->locale('fr')->create();
+
+        // Yet another separate entry.
+        $seven = EntryFactory::collection('test')->id('7')->create();
+
+        // Avoid using a fake so we can use a real listener.
+        $events = collect();
+        Event::listen(function (EntrySaved $event) use ($five, &$events) {
+            $events[] = $event;
+
+            // Save unrelated entry during the localization recursion.
+            if ($event->entry->id() === '3') {
+                $five->save();
+            }
+        });
+
+        $two->save();
+        $seven->save();
+
+        $this->assertEquals([
+            ['4', '2'],
+            ['3', '2'],
+            ['6', '5'],
+            ['5', '5'],
+            ['2', '2'],
+            ['7', '7'],
+        ], $events->map(fn ($event) => [$event->entry->id(), $event->initiator->id()])->all());
+    }
 }

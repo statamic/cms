@@ -58,7 +58,7 @@
                 :should-show="shouldShowSetButton"
                 :is-showing="showAddSetButton"
                 v-if="editor"
-                v-slot="{ x, y }"
+                v-slot="{ y }"
                 @shown="showAddSetButton = true"
                 @hidden="showAddSetButton = false"
             >
@@ -72,7 +72,7 @@
                         <button
                             type="button"
                             class="btn-round group bard-add-set-button"
-                            :style="{ transform: `translate(${x}px, ${y}px)` }"
+                            :style="{ transform: `translateY(${y}px)` }"
                             :aria-label="__('Add Set')"
                             v-tooltip="__('Add Set')"
                             @click="addSetButtonClicked"
