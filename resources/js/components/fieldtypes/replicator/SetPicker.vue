@@ -24,7 +24,8 @@
                     <span>{{ selectedGroupDisplayText }}</span>
                 </div>
             </div>
-            <div class="p-1 max-h-80 overflow-auto">
+            <div class="p-1 max-h-80 overflow-auto" ref="scrollContainer" @scroll="handleScroll">
+                <div v-if="isOverflowing" class="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-gray-500 to-transparent"></div>
                 <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200': selectionIndex === i }" @mouseover="selectionIndex = i">
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
                         <div class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2">
@@ -68,6 +69,7 @@ export default {
             search: null,
             selectionIndex: 0,
             keybindings: [],
+            isOverflowing: false,
         }
     },
 
@@ -178,6 +180,10 @@ export default {
             }
 
             this.bindKeys();
+
+            setTimeout(() => {
+                this.checkOverflow();
+            }, 1);
         },
 
         closed() {
@@ -221,7 +227,22 @@ export default {
             if (! this.hasMultipleSets) {
                 this.addSet(this.sets[0].sets[0].handle);
             }
-        }
+        },
+
+        handleScroll() {
+            const container = this.$refs.scrollContainer;
+            if (container) {
+                const isAtBottom = container.scrollTop + container.clientHeight >= container.scrollHeight;
+                this.isOverflowing = !isAtBottom && container.scrollHeight > container.clientHeight;
+            }
+        },
+
+        checkOverflow() {
+            const container = this.$refs.scrollContainer;
+            if (container) {
+                this.isOverflowing = container.scrollHeight > container.clientHeight;
+            }
+        },
 
     }
 
