@@ -73,6 +73,7 @@ return [
     'entries.title' => 'Entries',
     'float.title' => 'Float',
     'form.config.max_items' => 'Le nombre maximal de formulaires sélectionnables.',
+    'form.config.query_scopes' => 'Choisissez les étendues de requête à appliquer lors de la récupération des formulaires sélectionnables.',
     'form.title' => 'Form',
     'grid.config.add_row' => 'Définissez le libellé du bouton "Ajouter une rangée".',
     'grid.config.fields' => 'Chaque champ devient une colonne dans la table de grille.',
