@@ -159,7 +159,7 @@
 }
 
 .bard-add-set-button {
-    @apply flex items-center justify-center absolute -left-6 top-[-6px] @xl/bard:-left-8 z-1;
+    @apply flex items-center justify-center absolute -left-4 top-[-6px] z-1;
 }
 
 .bard-footer-toolbar {
