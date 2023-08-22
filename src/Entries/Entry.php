@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use ArrayAccess;
+use Facades\Statamic\Entries\InitiatorStack;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
@@ -336,6 +337,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
 
+        $stack = InitiatorStack::entry($this)->push();
+
         $this->directDescendants()->each->save();
 
         $this->taxonomize();
@@ -361,6 +364,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     $this->makeLocalization($siteHandle)->save();
                 });
         }
+
+        $stack->pop();
 
         return true;
     }
