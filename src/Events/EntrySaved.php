@@ -21,7 +21,7 @@ class EntrySaved extends Event implements ProvidesCommitMessage
         return __('Entry saved', [], config('statamic.git.locale'));
     }
 
-    public function isInitiator()
+    public function isInitial()
     {
         return $this->entry->id() === $this->initiator->id();
     }
