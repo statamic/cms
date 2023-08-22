@@ -885,28 +885,15 @@ EOT;
         $data = [
             ['type' => 'text', 'text' => 'This is inline text with '],
             ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
-            ['type' => 'text', 'text' => ' and '],
+            ['type' => 'text', 'text' => ' and'],
+            ['type' => 'hardBreak'],
             ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
             ['type' => 'text', 'text' => ' text.'],
         ];
 
-        $expected = 'This is inline text with <strong>bold</strong> and <em>italic</em> text.';
+        $expected = 'This is inline text with <strong>bold</strong> and<br><em>italic</em> text.';
 
         $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->augment($data));
-    }
-
-    /** @test */
-    public function it_augments_inline_break_value()
-    {
-        $data = [
-            ['type' => 'text', 'text' => 'This is inline text with'],
-            ['type' => 'hardBreak'],
-            ['type' => 'text', 'text' => 'line breaks.'],
-        ];
-
-        $expected = 'This is inline text with<br>line breaks.';
-
-        $this->assertEquals($expected, $this->bard(['inline' => 'break', 'sets' => null])->augment($data));
     }
 
     /** @test */
