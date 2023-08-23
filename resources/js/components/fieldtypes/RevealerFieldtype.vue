@@ -54,7 +54,9 @@ export default {
     watch: {
         fieldPath(fieldPath, oldFieldPath) {
             this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, oldFieldPath);
-            this.$store.commit(`publish/${this.storeName}/setRevealerField`, fieldPath);
+            this.$nextTick(() => {
+                this.$store.commit(`publish/${this.storeName}/setRevealerField`, fieldPath);
+            });
         }
     },
 
