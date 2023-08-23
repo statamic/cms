@@ -142,6 +142,7 @@ return [
     'terms.config.create' => 'Het aanmaken van nieuwe termen toestaan.',
     'terms.title' => 'Taxonomy Terms',
     'text.config.append' => 'Voeg tekst toe aan het einde (rechterkant) van de tekstinput.',
+    'text.config.autocomplete_purpose' => 'Stel het autocomplete attribuut van het input veld in.',
     'text.config.character_limit' => 'Stel het maximaal aantal karakters in dat ingevoerd kan worden.',
     'text.config.input_type' => 'Stel de HTML5 input type in.',
     'text.config.placeholder' => 'Stel de standaard placeholdertekst in.',
