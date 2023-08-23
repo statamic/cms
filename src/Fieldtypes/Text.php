@@ -51,12 +51,10 @@ class Text extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
                         'type' => 'integer',
                     ],
-                    'input_type' => [
+                    'autocomplete_purpose' => [
                         'display' => __('Autocomplete purpose'),
                         'instructions' => __('statamic::fieldtypes.text.config.autocomplete_purpose'),
                         'type' => 'select',
-                        'default' => '',
-                        'options' => [
                         'default' => '',
                         'options' => [
                             '' => __('None'),
@@ -111,8 +109,7 @@ class Text extends Fieldtype
                             'transaction-amount',
                             'transaction-currency',
                             'url',
-                            'username',
-                        ],
+                            'username'
                         ],
                     ],
                 ],
