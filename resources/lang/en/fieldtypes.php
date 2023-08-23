@@ -163,6 +163,7 @@ return [
     'terms.config.query_scopes' => 'Choose which query scopes should be applied when retrieving selectable terms.',
     'terms.title' => 'Taxonomy Terms',
     'text.config.append' => 'Add text after (to the right of) the input.',
+    'text.config.autocomplete_purpose' => 'Set autocomplete attribute.',
     'text.config.character_limit' => 'Set the maximum number of enterable characters.',
     'text.config.input_type' => 'Set the HTML5 input type.',
     'text.config.placeholder' => 'Set placeholder text.',
