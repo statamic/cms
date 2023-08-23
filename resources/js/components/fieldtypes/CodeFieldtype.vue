@@ -88,7 +88,8 @@ export default {
                 { value: 'xml', label: 'XML' },
                 { value: 'yaml-frontmatter', label: 'YAML' },
             ],
-            mode: this.value.mode || this.config.mode
+            mode: this.value.mode || this.config.mode,
+            fullScreenMode: false,
         }
     },
 
