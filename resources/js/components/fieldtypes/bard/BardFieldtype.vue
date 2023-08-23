@@ -407,7 +407,9 @@ export default {
 
         fieldPathPrefix(fieldPathPrefix, oldFieldPathPrefix) {
             this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, oldFieldPathPrefix);
-            this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+            this.$nextTick(() => {
+                this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+            });
         },
 
         fullScreenMode() {
