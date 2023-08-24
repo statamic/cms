@@ -44,7 +44,7 @@ class StopImpersonating
         $content = $response->content();
 
         $link = view('statamic::impersonator.terminate', [
-            'url' => route('statamic.cp.impersonation.stop')
+            'url' => route('statamic.cp.impersonation.stop'),
         ])->render();
 
         return $response->setContent(str_replace('</body>', $link.'</body>', $content));
