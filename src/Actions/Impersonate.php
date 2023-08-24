@@ -17,6 +17,10 @@ class Impersonate extends Action
 
     public function visibleTo($item)
     {
+        if (session()->get('statamic_impersonated_by')) {
+            return false;
+        }
+
         return $item instanceof UserContract && $item != User::current();
     }
 
