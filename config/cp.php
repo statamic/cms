@@ -126,4 +126,6 @@ return [
 
     'custom_css_url' => env('STATAMIC_CUSTOM_CSS_URL', null),
 
+    'impersonate_redirect' => env('STATAMIC_IMPERSONATE_REDIRECT', null),
+
 ];
