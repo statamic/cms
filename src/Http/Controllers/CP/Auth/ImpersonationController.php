@@ -22,7 +22,6 @@ class ImpersonationController
             $originalUser = User::find($originalUserId);
 
             if ($originalUser) {
-                $guard->logout();
                 $guard->login($originalUser);
             }
 
