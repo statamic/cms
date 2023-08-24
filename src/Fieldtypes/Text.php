@@ -109,7 +109,7 @@ class Text extends Fieldtype
                             'transaction-amount',
                             'transaction-currency',
                             'url',
-                            'username'
+                            'username',
                         ],
                     ],
                 ],
