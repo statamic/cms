@@ -17,7 +17,7 @@ class Impersonate extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof UserContract;// && $item != User::current();
+        return $item instanceof UserContract && $item != User::current();
     }
 
     public function visibleToBulk($items)
