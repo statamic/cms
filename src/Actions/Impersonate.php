@@ -27,7 +27,7 @@ class Impersonate extends Action
 
     public function authorize($authed, $user)
     {
-        return $authed->can('impersonate', $user);
+        return $authed->can('impersonate users');
     }
 
     public function run($users, $values)
