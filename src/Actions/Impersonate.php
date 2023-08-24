@@ -2,6 +2,7 @@
 
 namespace Statamic\Actions;
 
+use Illuminate\Events\NullDispatcher;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\User;
@@ -38,8 +39,20 @@ class Impersonate extends Action
     {
         $guard = Auth::guard();
 
-        session()->put('statamic_impersonated_by', $guard->user()->getKey());
-        $guard->login($users->first());
+        $dispatcher = $guard->getDispatcher();
+
+        if ($dispatcher) {
+            $guard->setDispatcher(new NullDispatcher($dispatcher));
+        }
+
+        try {
+            $guard->login($users->first());
+            session()->put('statamic_impersonated_by', $guard->user()->getKey());
+        } finally {
+            if ($dispatcher) {
+                $guard->setDispatcher($dispatcher);
+            }
+        }
     }
 
     public function redirect($users, $values)
