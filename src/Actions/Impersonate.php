@@ -18,7 +18,7 @@ class Impersonate extends Action
 
     public function visibleTo($item)
     {
-        if (session()->get('statamic_impersonated_by')) {
+        if (! config('statamic.users.impersonate.enabled', true) || session()->get('statamic_impersonated_by')) {
             return false;
         }
 
@@ -46,8 +46,10 @@ class Impersonate extends Action
         }
 
         try {
+            $currentUser = $guard->user();
+
             $guard->login($users->first());
-            session()->put('statamic_impersonated_by', $guard->user()->getKey());
+            session()->put('statamic_impersonated_by', $currentUser->getKey());
         } finally {
             if ($dispatcher) {
                 $guard->setDispatcher($dispatcher);
@@ -57,7 +59,7 @@ class Impersonate extends Action
 
     public function redirect($users, $values)
     {
-        if ($url = config('statamic.users.impersonate_redirect')) {
+        if ($url = config('statamic.users.impersonate.redirect')) {
             return $url;
         }
 
