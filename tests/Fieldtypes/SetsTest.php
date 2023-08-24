@@ -315,6 +315,7 @@ class SetsTest extends TestCase
                                 'visibility' => 'visible',
                                 'read_only' => false,
                                 'always_save' => false,
+                                'autocomplete_purpose' => null,
                             ],
                         ],
                     ],
