@@ -312,9 +312,9 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         return URL::tidy(Site::current()->absoluteUrl().$this->uri());
     }
 
-    public function uri($site = null)
+    public function uri()
     {
-        $site = $site ?? Site::current();
+        $site = Site::current();
 
         $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
 
