@@ -36,6 +36,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
     protected $handle;
     protected $title;
     protected $blueprints = [];
+    protected $routes = [];
     protected $sites = [];
     protected $collection;
     protected $defaultPublishState = true;
@@ -249,6 +250,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
             'title' => $this->title,
             'blueprints' => $this->blueprints,
             'preview_targets' => $this->previewTargetsForFile(),
+            'route' => $this->routes,
         ];
 
         if (Site::hasMultiple()) {
@@ -310,13 +312,13 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
         return URL::tidy(Site::current()->absoluteUrl().$this->uri());
     }
 
-    public function uri()
+    public function uri($site = null)
     {
-        $site = Site::current();
+        $site = $site ?? Site::current();
 
         $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : '/';
 
-        return URL::tidy($prefix.str_replace('_', '-', '/'.$this->handle));
+        return URL::tidy($prefix.$this->routes()->get($site->handle()));
     }
 
     public function collection($collection = null)
@@ -332,6 +334,25 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
                 ->keyBy->handle()
                 ->has($this->handle);
         })->values();
+    }
+
+    public function routes($routes = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('routes')
+            ->getter(function ($routes) {
+                return $this->sites()->mapWithKeys(function ($site) use ($routes) {
+                    $siteRoute = is_string($routes) ? $routes : ($routes[$site] ?? str_replace('_', '-', '/'.$this->handle));
+
+                    return [$site => $siteRoute];
+                });
+            })
+            ->args(func_get_args());
+    }
+
+    public function route($site)
+    {
+        return $this->routes()->get($site);
     }
 
     public function toResponse($request)

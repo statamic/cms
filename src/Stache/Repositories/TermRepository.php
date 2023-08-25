@@ -74,7 +74,7 @@ class TermRepository implements RepositoryContract
             return null;
         }
 
-        if (! $taxonomy = $this->findTaxonomyHandleByUri($taxonomy)) {
+        if (! $taxonomy = $this->findTaxonomyHandleByUri($taxonomy, $site)) {
             return null;
         }
 
@@ -149,9 +149,15 @@ class TermRepository implements RepositoryContract
         ];
     }
 
-    private function findTaxonomyHandleByUri($uri)
+    private function findTaxonomyHandleByUri($uri, $site)
     {
-        return $this->stache->store('taxonomies')->index('uri')->items()->flip()->get(Str::ensureLeft($uri, '/'));
+        $routes = $this->stache->store('taxonomies')->index('routes')->items()->map(fn($item) => $item->get($site))->flip();
+
+        if ($handle = $routes->get($uri)) {
+            return $handle;
+        }
+
+        return $routes->get(Str::removeLeft($uri, '/'));
     }
 
     public function substitute($item)

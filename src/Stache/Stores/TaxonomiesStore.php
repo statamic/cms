@@ -43,6 +43,7 @@ class TaxonomiesStore extends BasicStore
             ->cascade(array_get($data, 'inject', []))
             ->revisionsEnabled(array_get($data, 'revisions', false))
             ->searchIndex(array_get($data, 'search_index'))
+            ->routes(array_get($data, 'route'))
             ->defaultPublishState($this->getDefaultPublishState($data))
             ->sites($sites)
             ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])));

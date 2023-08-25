@@ -78,7 +78,7 @@ class TaxonomyRepository implements RepositoryContract
         // the slash trimmed off at this point. We'll make sure it's there.
         $uri = Str::ensureLeft($uri, '/');
 
-        if (! $key = $this->findTaxonomyHandleByUri($uri)) {
+        if (! $key = $this->findTaxonomyHandleByUri($uri, $site)) {
             return null;
         }
 
@@ -92,9 +92,15 @@ class TaxonomyRepository implements RepositoryContract
         ];
     }
 
-    private function findTaxonomyHandleByUri($uri)
+    private function findTaxonomyHandleByUri($uri, $site)
     {
-        return $this->store->index('uri')->items()->flip()->get($uri);
+        $routes = $this->store->index('routes')->items()->map(fn($item) => $item->get($site))->flip();
+
+        if ($handle = $routes->get($uri)) {
+            return $handle;
+        }
+
+        return $routes->get(Str::removeLeft($uri, '/'));
     }
 
     public function addPreviewTargets($handle, $targets)
