@@ -1,5 +1,25 @@
 # Release Notes
 
+## 4.19.0 (2023-08-23)
+
+### What's new
+- Navs fieldtype. [#8619](https://github.com/statamic/cms/issues/8619) by @jasonvarga
+- Support line breaks in Bard inline mode. [#8598](https://github.com/statamic/cms/issues/8598) by @jacksleight
+- Add a way to determine which entry saved event was the initiator. [#8605](https://github.com/statamic/cms/issues/8605) by @jasonvarga
+
+### What's improved
+- You now redirect to the CP login screen when logging out. [#8602](https://github.com/statamic/cms/issues/8602) by @jasonvarga
+- French translations. [#8612](https://github.com/statamic/cms/issues/8612) by @ebeauchamps
+- Swedish translations. [#8600](https://github.com/statamic/cms/issues/8600) by @andreasbohman
+
+### What's fixed
+- Fix v4 addons not appearing in listing. [#8611](https://github.com/statamic/cms/issues/8611) by @jasonvarga
+- Fix Bard set picker positioning. [#8574](https://github.com/statamic/cms/issues/8574) by @o1y
+- Fix dropdowns list positioning. [#8607](https://github.com/statamic/cms/issues/8607) by @flolanger
+- Fix a hardcoded string. [#8601](https://github.com/statamic/cms/issues/8601) by @andreasbohman
+
+
+
 ## 4.18.0 (2023-08-17)
 
 ### What's new
