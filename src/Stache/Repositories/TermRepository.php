@@ -157,7 +157,7 @@ class TermRepository implements RepositoryContract
             return $handle;
         }
 
-        return $routes->get(Str::removeLeft($uri, '/'));
+        return $routes->get(Str::ensureLeft($uri, '/'));
     }
 
     public function substitute($item)
