@@ -656,6 +656,102 @@ class UpdateAssetReferencesTest extends TestCase
                     'field' => [
                         'type' => 'bard',
                         'sets' => [
+                            'group_one' => [
+                                'sets' => [
+                                    'set_one' => [
+                                        'fields' => [
+                                            [
+                                                'handle' => 'product',
+                                                'field' => [
+                                                    'type' => 'assets',
+                                                    'container' => 'test_container',
+                                                    'max_files' => 1,
+                                                ],
+                                            ],
+                                            [
+                                                'handle' => 'pics',
+                                                'field' => [
+                                                    'type' => 'assets',
+                                                    'container' => 'test_container',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                    'set_two' => [
+                                        'fields' => [
+                                            [
+                                                'handle' => 'not_asset',
+                                                'field' => [
+                                                    'type' => 'text',
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'bardo' => [
+                [
+                    'type' => 'set',
+                    'attrs' => [
+                        'values' => [
+                            'type' => 'set_one',
+                            'product' => 'norris.jpg',
+                            'pics' => ['hoff.jpg', 'norris.jpg'],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'paragraph',
+                    'not_asset' => 'not an asset',
+                ],
+                [
+                    'type' => 'set',
+                    'attrs' => [
+                        'values' => [
+                            'type' => 'set_one',
+                            'product' => 'hoff.jpg',
+                            'pics' => ['hoff.jpg', 'norris.jpg', 'lee.jpg'],
+                        ],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $this->assertEquals('norris.jpg', Arr::get($entry->data(), 'bardo.0.attrs.values.product'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg'], Arr::get($entry->data(), 'bardo.0.attrs.values.pics'));
+        $this->assertEquals('not an asset', Arr::get($entry->data(), 'bardo.1.not_asset'));
+        $this->assertEquals('hoff.jpg', Arr::get($entry->data(), 'bardo.2.attrs.values.product'));
+        $this->assertEquals(['hoff.jpg', 'norris.jpg', 'lee.jpg'], Arr::get($entry->data(), 'bardo.2.attrs.values.pics'));
+
+        $this->assetNorris->path('content/norris.jpg')->save();
+        $this->assetHoff->delete();
+
+        $this->assertEquals('content/norris.jpg', Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.product'));
+        $this->assertEquals(['content/norris.jpg'], Arr::get($entry->fresh()->data(), 'bardo.0.attrs.values.pics'));
+        $this->assertEquals('not an asset', Arr::get($entry->fresh()->data(), 'bardo.1.not_asset'));
+        $this->assertFalse(Arr::has($entry->fresh()->data(), 'bardo.2.attrs.values.product'));
+        $this->assertEquals(['content/norris.jpg', 'lee.jpg'], Arr::get($entry->fresh()->data(), 'bardo.2.attrs.values.pics'));
+    }
+
+    /** @test */
+    public function it_updates_nested_asset_fields_within_legacy_bard_config()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                [
+                    'handle' => 'bardo',
+                    'field' => [
+                        'type' => 'bard',
+                        'sets' => [
                             'set_one' => [
                                 'fields' => [
                                     [
