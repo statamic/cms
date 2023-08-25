@@ -151,7 +151,7 @@ class TermRepository implements RepositoryContract
 
     private function findTaxonomyHandleByUri($uri, $site)
     {
-        $routes = $this->stache->store('taxonomies')->index('routes')->items()->map(fn($item) => $item->get($site))->flip();
+        $routes = $this->stache->store('taxonomies')->index('routes')->items()->map(fn ($item) => $item->get($site))->flip();
 
         if ($handle = $routes->get($uri)) {
             return $handle;

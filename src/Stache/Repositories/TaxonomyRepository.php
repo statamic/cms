@@ -94,7 +94,7 @@ class TaxonomyRepository implements RepositoryContract
 
     private function findTaxonomyHandleByUri($uri, $site)
     {
-        $routes = $this->store->index('routes')->items()->map(fn($item) => $item->get($site))->flip();
+        $routes = $this->store->index('routes')->items()->map(fn ($item) => $item->get($site))->flip();
 
         if ($handle = $routes->get($uri)) {
             return $handle;
