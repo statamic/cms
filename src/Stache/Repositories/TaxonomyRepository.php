@@ -11,11 +11,13 @@ use Statamic\Support\Str;
 
 class TaxonomyRepository implements RepositoryContract
 {
+    protected $stache;
     protected $store;
     protected $additionalPreviewTargets = [];
 
     public function __construct(Stache $stache)
     {
+        $this->stache = $stache;
         $this->store = $stache->store('taxonomies');
     }
 
@@ -94,6 +96,8 @@ class TaxonomyRepository implements RepositoryContract
 
     private function findTaxonomyHandleByUri($uri, $site)
     {
+        $site = $site ?? $this->stache->sites()->first();
+
         $routes = $this->store->index('routes')->items()->map(fn ($item) => $item->get($site))->flip();
 
         if ($handle = $routes->get($uri)) {
