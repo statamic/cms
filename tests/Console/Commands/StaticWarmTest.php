@@ -54,6 +54,25 @@ class StaticWarmTest extends TestCase
     }
 
     /** @test */
+    public function it_queues_the_requests_with_connection()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'queue.default' => 'sync',
+        ]);
+
+        Queue::fake();
+
+        $this->artisan('statamic:static:warm', ['--queue' => 'redis'])
+            ->expectsOutputToContain('Adding 2 requests')
+            ->assertExitCode(0);
+
+        Queue::assertPushed(StaticWarmJob::class, function ($job) {
+            return $job->connection === 'redis';
+        });
+    }
+
+    /** @test */
     public function it_queues_the_requests()
     {
         config([
@@ -64,7 +83,7 @@ class StaticWarmTest extends TestCase
         Queue::fake();
 
         $this->artisan('statamic:static:warm', ['--queue' => true])
-            ->expectsOutput('Queueing 2 requests...')
+            ->expectsOutputToContain('Adding 2 requests')
             ->assertExitCode(0);
 
         Queue::assertPushed(StaticWarmJob::class, function ($job) {

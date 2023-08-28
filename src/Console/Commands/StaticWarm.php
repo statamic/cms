@@ -29,7 +29,7 @@ class StaticWarm extends Command
     use EnhancesCommands;
 
     protected $signature = 'statamic:static:warm
-        {--queue : Queue the requests}
+        {--queue= : Queue the requests}
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
         {--insecure : Skip SSL verification}
@@ -38,6 +38,7 @@ class StaticWarm extends Command
     protected $description = 'Warms the static cache by visiting all URLs';
 
     protected $shouldQueue = false;
+    protected $queueConnection;
 
     private $uris;
 
@@ -49,9 +50,12 @@ class StaticWarm extends Command
             return 1;
         }
 
-        $this->shouldQueue = $this->option('queue');
+        $this->shouldQueue = !!$this->option('queue');
+        $this->queueConnection = is_bool($this->option('queue'))
+            ? config('queue.default')
+            : $this->option('queue');
 
-        if ($this->shouldQueue && config('queue.default') === 'sync') {
+        if ($this->shouldQueue && $this->queueConnection === 'sync') {
             $this->error('The queue connection is set to "sync". Queueing will be disabled.');
             $this->shouldQueue = false;
         }
@@ -90,7 +94,9 @@ class StaticWarm extends Command
             $this->line(sprintf('Adding %s requests onto %squeue...', count($requests), $queue ? $queue.' ' : ''));
 
             foreach ($requests as $request) {
-                StaticWarmJob::dispatch($request)->onQueue($queue);
+                StaticWarmJob::dispatch($request)
+                    ->onConnection($this->queueConnection)
+                    ->onQueue($queue);
             }
         } else {
             $this->line('Visiting '.count($requests).' URLs...');
