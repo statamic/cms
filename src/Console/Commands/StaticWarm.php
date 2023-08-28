@@ -50,7 +50,7 @@ class StaticWarm extends Command
             return 1;
         }
 
-        $this->shouldQueue = !!$this->option('queue');
+        $this->shouldQueue = (bool) $this->option('queue');
         $this->queueConnection = is_bool($this->option('queue'))
             ? config('queue.default')
             : $this->option('queue');
