@@ -82,21 +82,20 @@ class DateTest extends TestCase
         $value = $this->fieldtype(['format' => 'U', 'time_enabled' => true])->preProcess($timestamp);
         $this->assertEquals("05:20", $value['time']);
 
-
         config()->set('app.timezone', 'Europe/Berlin');
 
         // As Europe/Berlin is +2, 07:20:00 should be returned insted of 05:20
         $value = $this->fieldtype(['format' => 'U', 'time_enabled' => true])->preProcess($timestamp);
-        $this->assertEquals("07:20", $value['time']);
+        $this->assertEquals('07:20', $value['time']);
 
         // Test the date to make sure nothing fancy is going on.
-        $this->assertEquals("2023-08-28", $value['date']);
+        $this->assertEquals('2023-08-28', $value['date']);
 
         // If the value can't be parsed, it will use `parse` instead of `createFromFormat`. Let's test that this works as well.
         // createFromFormat will fail if we parse a carbon object, but `parse` can work with it:
         $timestamp = Carbon::createFromTimestamp('1693200000');
         $value = $this->fieldtype(['format' => 'U', 'time_enabled' => true])->preProcess($timestamp);
-        $this->assertEquals("07:20", $value['time']);
+        $this->assertEquals('07:20', $value['time']);
     }
 
     /** @test */
