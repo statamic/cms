@@ -343,7 +343,7 @@ class Date extends Fieldtype
         try {
             return Carbon::createFromFormat($this->saveFormat(), $value)->tz($this->timezone());
         } catch (InvalidFormatException|InvalidArgumentException $e) {
-            return Carbon::parse($value);
+            return Carbon::parse($value)->tz($this->timezone());
         }
     }
 
