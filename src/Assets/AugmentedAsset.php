@@ -150,7 +150,9 @@ class AugmentedAsset extends AbstractAugmented
 
     protected function duration()
     {
-        return round($this->data->duration() ?? 0);
+        return ($duration = $this->data->duration())
+            ? round($duration)
+            : null;
     }
 
     protected function durationSeconds()
