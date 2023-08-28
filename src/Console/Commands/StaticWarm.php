@@ -29,7 +29,7 @@ class StaticWarm extends Command
     use EnhancesCommands;
 
     protected $signature = 'statamic:static:warm
-        {--queue= : Queue the requests}
+        {--queue= : Queue the requests, optionally providing the connection name}
         {--u|user= : HTTP authentication user}
         {--p|password= : HTTP authentication password}
         {--insecure : Skip SSL verification}
