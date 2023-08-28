@@ -2,8 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
-use DateTimeZone;
 use Carbon\Exceptions\InvalidFormatException;
+use DateTimeZone;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Exceptions\ValidationException;

@@ -2,7 +2,6 @@
 
 namespace Tests\Fieldtypes;
 
-use DateTimeZone;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Preference;
@@ -80,7 +79,7 @@ class DateTest extends TestCase
 
         // No Timezone. Stays the same
         $value = $this->fieldtype(['format' => 'U', 'time_enabled' => true])->preProcess($timestamp);
-        $this->assertEquals("05:20", $value['time']);
+        $this->assertEquals('05:20', $value['time']);
 
         config()->set('app.timezone', 'Europe/Berlin');
 
