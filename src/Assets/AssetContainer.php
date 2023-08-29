@@ -171,7 +171,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      *
      * @return \Statamic\Fields\Blueprint
      */
-    public function blueprint()
+    public function blueprint($asset = null)
     {
         if (Blink::has($blink = 'asset-container-blueprint-'.$this->handle())) {
             return Blink::get($blink);
@@ -185,9 +185,11 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
             ],
         ])->setHandle($this->handle())->setNamespace('assets');
 
+        $blueprint->setParent($asset ?? $this);
+
         Blink::put($blink, $blueprint);
 
-        AssetContainerBlueprintFound::dispatch($blueprint, $this);
+        AssetContainerBlueprintFound::dispatch($blueprint, $this, $asset);
 
         return $blueprint;
     }

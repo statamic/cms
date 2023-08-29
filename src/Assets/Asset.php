@@ -912,7 +912,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function blueprint()
     {
-        return $this->container()->blueprint();
+        return $this->container()->blueprint($this);
     }
 
     /**
