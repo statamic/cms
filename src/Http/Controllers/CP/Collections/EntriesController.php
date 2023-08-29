@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
+use Statamic\Events\EntryBlueprintFound;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
@@ -273,7 +274,14 @@ class EntriesController extends CpController
             $blueprint->ensureFieldHasConfig('author', ['visibility' => 'read_only']);
         }
 
-        $values = Entry::make()->collection($collection)->values()->all();
+        $entry = Entry::make()
+            ->collection($collection);
+
+        EntryBlueprintFound::dispatch($blueprint, $entry);
+
+        $values = $entry
+            ->values()
+            ->all();
 
         if ($collection->hasStructure() && $request->parent) {
             $values['parent'] = $request->parent;
