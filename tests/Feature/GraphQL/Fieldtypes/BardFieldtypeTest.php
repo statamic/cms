@@ -12,8 +12,8 @@ use Tests\TestCase;
 /** @group graphql */
 class BardFieldtypeTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['collections'];
 

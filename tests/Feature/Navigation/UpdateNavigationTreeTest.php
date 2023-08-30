@@ -16,8 +16,8 @@ use Tests\TestCase;
 
 class UpdateNavigationTreeTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     private function mockTextFieldtype()
     {

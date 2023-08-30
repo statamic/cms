@@ -6,7 +6,7 @@ use ArrayIterator;
 use Statamic\Support\Str;
 use Traversable;
 
-class FluentTag implements \IteratorAggregate, \ArrayAccess
+class FluentTag implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * @var mixed
