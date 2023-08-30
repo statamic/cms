@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class SelectTest extends TestCase
 {
-    use LabeledValueTests, MultipleLabeledValueTests, CastsBooleansTests, CastsMultipleBooleansTests;
+    use CastsBooleansTests, CastsMultipleBooleansTests, LabeledValueTests, MultipleLabeledValueTests;
 
     private function field($config)
     {

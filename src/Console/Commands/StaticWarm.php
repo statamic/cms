@@ -25,8 +25,8 @@ use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
 {
-    use RunsInPlease;
     use EnhancesCommands;
+    use RunsInPlease;
 
     protected $signature = 'statamic:static:warm
         {--queue : Queue the requests}

@@ -13,8 +13,8 @@ use Tests\FakesViews;
 
 class LoopTest extends ParserTestCase
 {
-    use FakesViews,
-        FakesContent;
+    use FakesContent,
+        FakesViews;
 
     public function test_non_sequential_numeric_keys_are_not_treated_as_associative_arrays()
     {

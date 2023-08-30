@@ -29,9 +29,9 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayable
+class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contract
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
+    use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
 
     protected $handle;
     protected $routes = [];
