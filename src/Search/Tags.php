@@ -9,13 +9,13 @@ use Statamic\Tags\Tags as BaseTags;
 
 class Tags extends BaseTags
 {
-    use Concerns\OutputsItems,
-        Concerns\QueriesConditions,
-        Concerns\QueriesScopes,
-        Concerns\QueriesOrderBys;
     use Concerns\GetsQueryResults {
         results as getQueryResults;
     }
+    use Concerns\OutputsItems,
+        Concerns\QueriesConditions,
+        Concerns\QueriesOrderBys,
+        Concerns\QueriesScopes;
 
     protected static $handle = 'search';
 
