@@ -10,7 +10,7 @@ use Statamic\Facades;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-abstract class Structure implements StructureContract, Augmentable
+abstract class Structure implements Augmentable, StructureContract
 {
     use FluentlyGetsAndSets, Tappable;
 
