@@ -133,6 +133,11 @@ class Cache
             return false;
         }
 
+        // Entries with `static_caching: false` should not be cached.
+        if ($response->headers->has('X-Statamic-No-Cache')) {
+            return false;
+        }
+
         if ($response->getStatusCode() !== 200 || $response->getContent() == '') {
             return false;
         }

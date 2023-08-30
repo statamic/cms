@@ -33,6 +33,7 @@ class DataResponse implements Responsable
 
         $this
             ->protect()
+            ->handleStaticCaching()
             ->handleDraft()
             ->handlePrivateEntries()
             ->adjustResponseType()
@@ -85,6 +86,15 @@ class DataResponse implements Responsable
         app(Protection::class)
             ->setData($this->data)
             ->protect();
+
+        return $this;
+    }
+
+    protected function handleStaticCaching()
+    {
+        if ($this->data->static_caching == false) {
+            $this->headers['X-Statamic-No-Cache'] = true;
+        }
 
         return $this;
     }
