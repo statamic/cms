@@ -26,7 +26,7 @@ use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess, Arrayable
+class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
