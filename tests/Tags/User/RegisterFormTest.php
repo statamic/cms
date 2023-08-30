@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class RegisterFormTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk, NormalizesHtml;
+    use NormalizesHtml, PreventSavingStacheItemsToDisk;
 
     private function tag($tag)
     {

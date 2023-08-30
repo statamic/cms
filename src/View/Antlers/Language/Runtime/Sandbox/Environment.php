@@ -277,7 +277,6 @@ class Environment
 
     /**
      * @param  SemanticGroup[]  $statements
-     * @return null
      *
      * @throws RuntimeException
      * @throws SyntaxErrorException

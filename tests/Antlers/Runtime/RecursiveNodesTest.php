@@ -12,8 +12,8 @@ use Tests\PreventSavingStacheItemsToDisk;
 
 class RecursiveNodesTest extends ParserTestCase
 {
-    use PreventSavingStacheItemsToDisk,
-        FakesViews;
+    use FakesViews,
+        PreventSavingStacheItemsToDisk;
 
     private function makeNavTree()
     {

@@ -17,10 +17,10 @@ use Statamic\Tags\Concerns;
 
 class Entries
 {
-    use Concerns\QueriesScopes,
-        Concerns\QueriesOrderBys,
-        Concerns\GetsQueryResults,
+    use Concerns\GetsQueryResults,
         Concerns\GetsQuerySelectKeys,
+        Concerns\QueriesOrderBys,
+        Concerns\QueriesScopes,
         Concerns\QueriesTaxonomyTerms;
     use Concerns\QueriesConditions {
         queryableConditionParams as traitQueryableConditionParams;
