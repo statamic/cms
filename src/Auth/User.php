@@ -35,9 +35,9 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
-abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, Augmentable, AuthorizableContract, ResolvesValuesContract, HasLocalePreference, ArrayAccess, Arrayable, SearchableContract, ContainsQueryableValues
+abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticatable, AuthorizableContract, CanResetPasswordContract, ContainsQueryableValues, HasLocalePreference, ResolvesValuesContract, SearchableContract, UserContract
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues, ContainsComputedData, Searchable;
+    use Authorizable, CanResetPassword, ContainsComputedData, HasAugmentedInstance, HasAvatar, Notifiable, ResolvesValues, Searchable, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;

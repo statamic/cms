@@ -66,7 +66,14 @@ class Bard extends Replicator
                     'inline' => [
                         'display' => __('Inline'),
                         'instructions' => __('statamic::fieldtypes.bard.config.inline'),
-                        'type' => 'toggle',
+                        'type' => 'select',
+                        'cast_booleans' => true,
+                        'options' => [
+                            'false' => __('statamic::fieldtypes.bard.config.inline.disabled'),
+                            'true' => __('statamic::fieldtypes.bard.config.inline.enabled'),
+                            'break' => __('statamic::fieldtypes.bard.config.inline.break'),
+                        ],
+                        'default' => false,
                     ],
                     'toolbar_mode' => [
                         'display' => __('Toolbar Mode'),

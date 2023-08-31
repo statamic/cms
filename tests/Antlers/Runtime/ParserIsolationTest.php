@@ -13,8 +13,8 @@ use Tests\PreventSavingStacheItemsToDisk;
 
 class ParserIsolationTest extends ParserTestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesViews;
+    use PreventSavingStacheItemsToDisk;
 
     private function createBlueprintsAndData()
     {

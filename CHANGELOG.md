@@ -1,5 +1,61 @@
 # Release Notes
 
+## 4.20.0 (2023-08-30)
+
+### What's new
+- Add duration field to GraphQL AssetInterface. [#8638](https://github.com/statamic/cms/issues/8638) by @notnek
+
+### What's improved
+- German translations. [#8649](https://github.com/statamic/cms/issues/8649) by @helloDanuk
+- Dutch translations. [#8629](https://github.com/statamic/cms/issues/8629) by @jeroenpeters1986
+- Navs fieltype icon. [#8621](https://github.com/statamic/cms/issues/8621) by @jackmcdade
+
+### What's fixed
+- Fix changing image format on upload when using source preset. [#8645](https://github.com/statamic/cms/issues/8645) by @jesseleite
+- Fix asset & term reference updaters when using new set groups blueprint config. [#8630](https://github.com/statamic/cms/issues/8630) by @jesseleite
+- Fix data loss when reordering sets with revealer fields. [#8620](https://github.com/statamic/cms/issues/8620) by @jacksleight
+- Pint updates. [#8650](https://github.com/statamic/cms/issues/8650) by @jasonvarga
+
+
+
+## 4.19.0 (2023-08-23)
+
+### What's new
+- Navs fieldtype. [#8619](https://github.com/statamic/cms/issues/8619) by @jasonvarga
+- Support line breaks in Bard inline mode. [#8598](https://github.com/statamic/cms/issues/8598) by @jacksleight
+- Add a way to determine which entry saved event was the initiator. [#8605](https://github.com/statamic/cms/issues/8605) by @jasonvarga
+
+### What's improved
+- You now redirect to the CP login screen when logging out. [#8602](https://github.com/statamic/cms/issues/8602) by @jasonvarga
+- French translations. [#8612](https://github.com/statamic/cms/issues/8612) by @ebeauchamps
+- Swedish translations. [#8600](https://github.com/statamic/cms/issues/8600) by @andreasbohman
+
+### What's fixed
+- Fix v4 addons not appearing in listing. [#8611](https://github.com/statamic/cms/issues/8611) by @jasonvarga
+- Fix Bard set picker positioning. [#8574](https://github.com/statamic/cms/issues/8574) by @o1y
+- Fix dropdowns list positioning. [#8607](https://github.com/statamic/cms/issues/8607) by @flolanger
+- Fix a hardcoded string. [#8601](https://github.com/statamic/cms/issues/8601) by @andreasbohman
+
+
+
+## 4.18.0 (2023-08-17)
+
+### What's new
+- Expose `uniqid` JS function for generating unique IDs. [#8571](https://github.com/statamic/cms/issues/8571) by @jacksleight
+- Allow renaming of row id handle in Grid, Bard, and Replicator. [#8407](https://github.com/statamic/cms/issues/8407) by @jonassiewertsen
+- Support arbitrary attributes on the vite tag. [#8305](https://github.com/statamic/cms/issues/8305) by @jackmcdade
+
+### What's fixed
+- Make uploader synchronous. [#8592](https://github.com/statamic/cms/issues/8592) by @jasonvarga
+- Fix alignment of menu icon. [#8589](https://github.com/statamic/cms/issues/8589) by @caseydwyer
+- Pint updates. [#8586](https://github.com/statamic/cms/issues/8586) by @jasonvarga
+- Fix slugify error. [#8583](https://github.com/statamic/cms/issues/8583) by @jasonvarga
+- Only save generated title if it's different. [#8101](https://github.com/statamic/cms/issues/8101) by @aerni
+- Make the views field handle reserved. [#8576](https://github.com/statamic/cms/issues/8576) by @jasonvarga
+- Fix special character handling in created CP nav sections. [#8568](https://github.com/statamic/cms/issues/8568) by @jesseleite
+
+
+
 ## 4.17.0 (2023-08-10)
 
 ### What's improved

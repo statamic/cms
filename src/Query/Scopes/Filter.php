@@ -8,7 +8,7 @@ use Statamic\Extend\HasTitle;
 
 abstract class Filter extends Scope implements Arrayable
 {
-    use HasTitle, HasFields;
+    use HasFields, HasTitle;
 
     protected $context = [];
     protected $pinned = false;
