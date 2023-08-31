@@ -55,6 +55,7 @@ class Text extends Fieldtype
                         'display' => __('Autocomplete'),
                         'instructions' => __('statamic::fieldtypes.text.config.autocomplete'),
                         'type' => 'select',
+                        'clearable' => true,
                         'options' => [
                             'additional-name',
                             'address-level1',
