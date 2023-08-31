@@ -1,5 +1,23 @@
 # Release Notes
 
+## 4.20.0 (2023-08-30)
+
+### What's new
+- Add duration field to GraphQL AssetInterface. [#8638](https://github.com/statamic/cms/issues/8638) by @notnek
+
+### What's improved
+- German translations. [#8649](https://github.com/statamic/cms/issues/8649) by @helloDanuk
+- Dutch translations. [#8629](https://github.com/statamic/cms/issues/8629) by @jeroenpeters1986
+- Navs fieltype icon. [#8621](https://github.com/statamic/cms/issues/8621) by @jackmcdade
+
+### What's fixed
+- Fix changing image format on upload when using source preset. [#8645](https://github.com/statamic/cms/issues/8645) by @jesseleite
+- Fix asset & term reference updaters when using new set groups blueprint config. [#8630](https://github.com/statamic/cms/issues/8630) by @jesseleite
+- Fix data loss when reordering sets with revealer fields. [#8620](https://github.com/statamic/cms/issues/8620) by @jacksleight
+- Pint updates. [#8650](https://github.com/statamic/cms/issues/8650) by @jasonvarga
+
+
+
 ## 4.19.0 (2023-08-23)
 
 ### What's new

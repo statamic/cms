@@ -16,8 +16,8 @@ use Tests\TestCase;
 /** @group graphql */
 class AssetTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['assets'];
 
@@ -175,6 +175,7 @@ GQL;
         width
         orientation
         ratio
+        duration
         ... on Asset_Test {
             potato
         }
@@ -219,6 +220,7 @@ GQL;
                     'orientation' => 'portrait',
                     'ratio' => 0.5,
                     'potato' => 'baked',
+                    'duration' => null,
                 ],
             ]]);
     }

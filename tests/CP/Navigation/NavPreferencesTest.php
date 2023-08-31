@@ -8,8 +8,8 @@ use Tests\TestCase;
 
 class NavPreferencesTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk,
-        Concerns\HashedIdAssertions;
+    use Concerns\HashedIdAssertions;
+    use PreventSavingStacheItemsToDisk;
 
     protected $shouldPreventNavBeingBuilt = false;
 

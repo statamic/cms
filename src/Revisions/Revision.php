@@ -12,9 +12,9 @@ use Statamic\Facades;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Revision implements Contract, Arrayable
+class Revision implements Arrayable, Contract
 {
-    use FluentlyGetsAndSets, ExistsAsFile;
+    use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $id;
     protected $key;
