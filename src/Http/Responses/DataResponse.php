@@ -92,7 +92,9 @@ class DataResponse implements Responsable
 
     protected function handleStaticCaching()
     {
-        if ($this->data->static_caching == false) {
+        $ignoreStaticCaching = preg_match_all('/"static_caching":(false|"false")/', $this->data->values()->toJson());
+
+        if ($ignoreStaticCaching) {
             $this->headers['X-Statamic-No-Cache'] = true;
         }
 
