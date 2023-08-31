@@ -57,4 +57,16 @@ return [
 
     'csv_delimiter' => ',',
 
+    /*
+    |--------------------------------------------------------------------------
+    | CSV Export Headings
+    |--------------------------------------------------------------------------
+    |
+    | If true Statamic will use the field handles for headings
+    | if false Statamic will use the field display for headings
+    |
+    */
+
+    'csv_use_handles_for_headings' => true,
+
 ];
