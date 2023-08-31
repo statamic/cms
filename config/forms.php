@@ -62,11 +62,13 @@ return [
     | CSV Export Headings
     |--------------------------------------------------------------------------
     |
-    | If true Statamic will use the field handles for headings
-    | if false Statamic will use the field display for headings
+    | The values to be used in the csv export header rows.
+    | Can be the field handle or the field display text.
+    |
+    | Supported values: "handle", "display"
     |
     */
 
-    'csv_use_handles_for_headings' => true,
+    'csv_headers' => 'handle',
 
 ];
