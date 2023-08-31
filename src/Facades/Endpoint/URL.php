@@ -238,10 +238,6 @@ class URL
      */
     public function getSiteUrl()
     {
-        if (app()->runningInConsole()) {
-            return config('app.url');
-        }
-
         $rootUrl = url()->to('/');
 
         return Str::ensureRight($rootUrl, '/');
