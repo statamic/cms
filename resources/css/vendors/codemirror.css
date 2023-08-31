@@ -340,6 +340,11 @@
   /* Help users use markselection to safely style text background */
   span.CodeMirror-selectedtext { background: none; }
 
+
+  .CodeMirror-fullscreen {
+      @apply fixed h-auto inset-0 top-12 rounded-none;
+  }
+
   .CodeMirror-rulers {
       @apply absolute left-0 right-0 overflow-hidden;
       top: -50px;

@@ -14,8 +14,4 @@
     .code-fieldtype-toolbar {
         @apply fixed z-2 top-0 w-full px-6 py-2 h-12 shadow text-base rounded-none bg-gradient-to-b from-white to-gray-100;
     }
-
-    .CodeMirror {
-        @apply z-1;
-    }
 }

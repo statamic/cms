@@ -192,6 +192,8 @@ export default {
             // Most applicable when loaded by another field like Bard
             this.refresh();
 
+            this.codemirror.setOption('fullScreen', this.fullScreenMode);
+
             // CodeMirror also needs to be manually refreshed when made visible in the DOM
             this.$events.$on('tab-switched', this.refresh);
         }
