@@ -242,7 +242,7 @@ class URL
             return config('app.url');
         }
 
-        $rootUrl = app('request')->root();
+        $rootUrl = url()->to('/');
 
         return Str::ensureRight($rootUrl, '/');
     }
