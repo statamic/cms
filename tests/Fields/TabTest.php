@@ -157,7 +157,7 @@ class TabTest extends TestCase
                             'visibility' => 'visible',
                             'read_only' => false, // deprecated
                             'always_save' => false,
-                            'autocomplete_purpose' => null,
+                            'autocomplete' => null,
                         ],
                         [
                             'handle' => 'two',

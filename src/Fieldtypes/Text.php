@@ -51,9 +51,9 @@ class Text extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
                         'type' => 'integer',
                     ],
-                    'autocomplete_purpose' => [
-                        'display' => __('Autocomplete purpose'),
-                        'instructions' => __('statamic::fieldtypes.text.config.autocomplete_purpose'),
+                    'autocomplete' => [
+                        'display' => __('Autocomplete'),
+                        'instructions' => __('statamic::fieldtypes.text.config.autocomplete'),
                         'type' => 'select',
                         'options' => [
                             'additional-name',
