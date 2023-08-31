@@ -1,21 +1,22 @@
 <template>
 
+<portal name="code-fullscreen" :disabled="!fullScreenMode" target-class="code-fieldtype">
 <element-container @resized="refresh">
-    <div class="code-fieldtype-container" :class="themeClass">
-        <nav id="code-fieldtype-toolbar" class="code-fieldtype-toolbar">
+    <div class="code-fieldtype-container" :class="[themeClass, {'code-fullscreen': fullScreenMode }]">
+        <div class="code-fieldtype-toolbar">
             <div>
-                <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" class="code-mode-picker" v-tooltip="__('Select Color Mode')" />
-                <div v-else v-text="modeLabel" class="code-mode"></div>
+                <select-input v-if="config.mode_selectable" :options="modes" v-model="mode" class="text-xs leading-none" />
+                <div v-else v-text="modeLabel" class="text-xs font-mono text-gray-700"></div>
             </div>
-
             <button @click="fullScreenMode = !fullScreenMode" class="btn-icon h-8 leading-none flex items-center justify-center text-gray-800" v-tooltip="__('Toggle Fullscreen Mode')">
                 <svg-icon name="expand-bold" class="h-3.5 w-3.5" v-show="!fullScreenMode" />
-                <svg-icon name="shrink-all" class="h-3.5 w-3.5" v-show="fullScreenMode" />
+                <svg-icon name="arrows-shrink" class="h-3.5 w-3.5" v-show="fullScreenMode" />
             </button>
-        </nav>
+        </div>
         <div ref="codemirror"></div>
     </div>
 </element-container>
+</portal>
 
 </template>
 
@@ -95,8 +96,7 @@ export default {
 
     computed: {
         modeLabel() {
-            var label = this.config.mode.replace('text/x-', '')
-            return label.replace('htmlmixed', 'html');
+            return _.findWhere(this.modes, { value: this.mode }).label || this.mode;
         },
         exactTheme() {
             return (this.config.theme === 'light') ? 'default' : 'material'
@@ -131,40 +131,6 @@ export default {
         },
     },
 
-    mounted() {
-        this.codemirror = CodeMirror(this.$refs.codemirror, {
-            value: this.value.code || '',
-            mode: this.mode,
-            direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
-            addModeClass: true,
-            keyMap: this.config.key_map,
-            tabSize: this.config.indent_size,
-            indentWithTabs: this.config.indent_type !== 'spaces',
-            lineNumbers: this.config.line_numbers,
-            lineWrapping: this.config.line_wrapping,
-            matchBrackets: true,
-            readOnly: this.readOnlyOption,
-            theme: this.exactTheme,
-            inputStyle: 'contenteditable',
-            rulers: this.rulers,
-        });
-
-        this.codemirror.on('change', (cm) => {
-            this.updateDebounced({code: cm.doc.getValue(), mode: this.mode});
-        });
-
-        this.codemirror.on('focus', () => this.$emit('focus'));
-        this.codemirror.on('blur', () => this.$emit('blur'));
-
-
-        // Refresh to ensure CodeMirror visible and the proper size
-        // Most applicable when loaded by another field like Bard
-        this.refresh();
-
-        // CodeMirror also needs to be manually refreshed when made visible in the DOM
-        this.$events.$on('tab-switched', this.refresh);
-    },
-
     watch: {
         value(value, oldValue) {
             if (value.code == this.codemirror.doc.getValue()) return;
@@ -177,13 +143,13 @@ export default {
             this.codemirror.setOption('mode', mode);
             this.updateDebounced({code: this.value.code, mode: this.mode});
         },
-        fullScreenMode(fullScreenMode) {
-            document.body.classList.toggle(
-                'code-fieldtype-fullscreen',
-                fullScreenMode
-            );
-
-            this.codemirror.setOption('fullScreen', fullScreenMode);
+        fullScreenMode: {
+            immediate: true,
+            handler: function (fullscreen) {
+                this.$nextTick(() => {
+                    this.$nextTick(() => this.initCodeMirror());
+                });
+            }
         },
     },
 
@@ -195,6 +161,39 @@ export default {
             this.$nextTick(function() {
                 this.codemirror.refresh();
             })
+        },
+        initCodeMirror() {
+            this.codemirror = CodeMirror(this.$refs.codemirror, {
+                value: this.value.code || '',
+                mode: this.mode,
+                direction: document.querySelector('html').getAttribute('dir') ?? 'ltr',
+                addModeClass: true,
+                keyMap: this.config.key_map,
+                tabSize: this.config.indent_size,
+                indentWithTabs: this.config.indent_type !== 'spaces',
+                lineNumbers: this.config.line_numbers,
+                lineWrapping: this.config.line_wrapping,
+                matchBrackets: true,
+                readOnly: this.readOnlyOption,
+                theme: this.exactTheme,
+                inputStyle: 'contenteditable',
+                rulers: this.rulers,
+            });
+
+            this.codemirror.on('change', (cm) => {
+                this.updateDebounced({code: cm.doc.getValue(), mode: this.mode});
+            });
+
+            this.codemirror.on('focus', () => this.$emit('focus'));
+            this.codemirror.on('blur', () => this.$emit('blur'));
+
+
+            // Refresh to ensure CodeMirror visible and the proper size
+            // Most applicable when loaded by another field like Bard
+            this.refresh();
+
+            // CodeMirror also needs to be manually refreshed when made visible in the DOM
+            this.$events.$on('tab-switched', this.refresh);
         }
     }
 };

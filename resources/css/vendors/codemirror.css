@@ -8,10 +8,6 @@
     min-height: 80px;
   }
 
-  .code-mode {
-      @apply select-none z-10 opacity-25 absolute right-0 p-2 text-white text-2xs uppercase;
-  }
-
   /* PADDING */
 
   .CodeMirror-lines {
@@ -21,7 +17,7 @@
     padding: 0 16px; /* Horizontal padding of content */
   }
   .CodeMirror-wrap {
-    @apply rounded-bl rounded-br;
+    @apply rounded-b;
   }
 
   .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
@@ -345,11 +341,6 @@
   /* Help users use markselection to safely style text background */
   span.CodeMirror-selectedtext { background: none; }
 
-  .CodeMirror-fullscreen {
-        @apply fixed h-auto z-10 rounded-none;
-        inset: 3rem 0 0 0;
-  }
-
   .CodeMirror-rulers {
       @apply absolute left-0 right-0 overflow-hidden;
       top: -50px;
@@ -364,10 +355,6 @@
   /* Light Theme
   ========================================================================== */
   .code-fieldtype .theme-light {
-
-    .code-mode {
-        @apply text-gray-900;
-    }
 
     .CodeMirror {
         @apply border p-0
