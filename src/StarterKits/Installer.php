@@ -572,7 +572,7 @@ EOT;
         $this->console->info('Reticulating splines...');
 
         if (config('app.env') !== 'testing') {
-            usleep(100000)
+            usleep(500000)
         }
 
         return $this;
