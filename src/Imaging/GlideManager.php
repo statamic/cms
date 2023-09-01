@@ -42,10 +42,10 @@ class GlideManager
                     $this->setCachePathCallable($customCallable);
 
                     // then we append our original filename to the end
-                    $extension = Str::afterLast($cachePath, '.');
-                    $cachePath = Str::beforeLast($cachePath, '.');
+                    $filename = Str::afterLast($cachePath, '/');
+                    $cachePath = Str::beforeLast($cachePath, '/');
 
-                    $cachePath .= '-'.Str::of($path)->before('.')->after('/').'.'.$extension;
+                    $cachePath .= '/'.Str::of($path)->before('.')->after('/').'-'.$filename;
 
                     return $cachePath;
                 });
