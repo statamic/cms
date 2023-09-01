@@ -9,7 +9,7 @@
                     :class="{ 'bg-white': !isReadOnly }"
                     :id="fieldId"
                     :readonly="isReadOnly"
-                    :placeholder="config.placeholder || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
+                    :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
                     @focus="$emit('focus')"
                     @blur="$emit('blur')" />
             </div>

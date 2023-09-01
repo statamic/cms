@@ -9,7 +9,7 @@
 <div class="replicator-fieldtype-container" :class="{'replicator-fullscreen bg-gray-200': fullScreenMode }">
 
     <header class="bg-white fixed top-0 inset-x-0 border-b p-3 pl-4 flex items-center justify-between shadow z-max" v-if="fullScreenMode">
-        <h2 v-text="config.display" class="flex-1" />
+        <h2 v-text="__(config.display)" class="flex-1" />
             <div class="flex items-center">
                 <div class="btn-group">
                     <button @click="expandAll" class="btn btn-icon flex items-center" v-tooltip="__('Expand Sets')" v-if="config.collapse !== 'accordion' && value.length > 0">
@@ -175,7 +175,7 @@ export default {
         },
 
         replicatorPreview() {
-            return `${this.config.display}: ${__n(':count set|:count sets', this.value.length)}`;
+            return `${__(this.config.display)}: ${__n(':count set|:count sets', this.value.length)}`;
         }
     },
 
