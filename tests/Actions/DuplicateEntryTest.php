@@ -26,9 +26,9 @@ class DuplicateEntryTest extends TestCase
         EntryFactory::id('charlie-id')->collection('test')->slug('charlie')->data(['title' => 'Charlie'])->create();
 
         $this->assertEquals([
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa']],
-            ['slug' => 'bravo', 'published' => true, 'data' => ['title' => 'Bravo']],
-            ['slug' => 'charlie', 'published' => true, 'data' => ['title' => 'Charlie']],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en'],
+            ['slug' => 'bravo', 'published' => true, 'data' => ['title' => 'Bravo'], 'locale' => 'en'],
+            ['slug' => 'charlie', 'published' => true, 'data' => ['title' => 'Charlie'], 'locale' => 'en'],
         ], $this->entryData());
 
         (new DuplicateEntry)->run(collect([
@@ -37,11 +37,11 @@ class DuplicateEntryTest extends TestCase
         ]), collect());
 
         $this->assertEquals([
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa']],
-            ['slug' => 'bravo', 'published' => true, 'data' => ['title' => 'Bravo']],
-            ['slug' => 'charlie', 'published' => true, 'data' => ['title' => 'Charlie']],
-            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id']],
-            ['slug' => 'charlie-1', 'published' => false, 'data' => ['title' => 'Charlie (Duplicated)', 'duplicated_from' => 'charlie-id']],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en'],
+            ['slug' => 'bravo', 'published' => true, 'data' => ['title' => 'Bravo'], 'locale' => 'en'],
+            ['slug' => 'charlie', 'published' => true, 'data' => ['title' => 'Charlie'], 'locale' => 'en'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en'],
+            ['slug' => 'charlie-1', 'published' => false, 'data' => ['title' => 'Charlie (Duplicated)', 'duplicated_from' => 'charlie-id'], 'locale' => 'en'],
         ], $this->entryData());
     }
 
@@ -57,9 +57,9 @@ class DuplicateEntryTest extends TestCase
         ]), collect());
 
         $this->assertEquals([
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa']],
-            ['slug' => 'alfa-1', 'published' => true, 'data' => ['title' => 'Alfa (Duplicated)']],
-            ['slug' => 'alfa-2', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated) (2)', 'duplicated_from' => 'alfa-id']],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en'],
+            ['slug' => 'alfa-1', 'published' => true, 'data' => ['title' => 'Alfa (Duplicated)'], 'locale' => 'en'],
+            ['slug' => 'alfa-2', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated) (2)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en'],
         ], $this->entryData());
     }
 
@@ -94,9 +94,9 @@ class DuplicateEntryTest extends TestCase
         EntryFactory::id('charlie-id')->collection('test')->data(['title' => 'Charlie'])->create();
 
         $this->assertEquals([
-            ['slug' => null, 'published' => true, 'data' => ['title' => 'Alfa']],
-            ['slug' => null, 'published' => true, 'data' => ['title' => 'Bravo']],
-            ['slug' => null, 'published' => true, 'data' => ['title' => 'Charlie']],
+            ['slug' => null, 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en'],
+            ['slug' => null, 'published' => true, 'data' => ['title' => 'Bravo'], 'locale' => 'en'],
+            ['slug' => null, 'published' => true, 'data' => ['title' => 'Charlie'], 'locale' => 'en'],
         ], $this->entryData());
 
         (new DuplicateEntry)->run(collect([
