@@ -24,12 +24,12 @@ class DuplicateEntry extends Action
         if (Site::hasMultiple()) {
             return [
                 'mode' => [
-                    'display' => __('Mode'),
+                    'display' => __('Duplication Mode'),
                     'type' => 'button_group',
-                    'instructions' => __('Should this entry be duplicated to just the current site or to all sites?'),
+                    'instructions' => __('How should this entry be duplicated? If you choose "All Localizations", all localizations will be duplicated. If you choose "Current Localization", only the current localization will be duplicated.'),
                     'options' => [
-                        'all' => __('All Sites'),
-                        'current' => __('Current Site'),
+                        'all' => __('All Localizations'),
+                        'current' => __('Current Localization'),
                     ],
                     'default' => 'all',
                     'validate' => 'required',
