@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Actions\DuplicateEntry;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -116,12 +117,80 @@ class DuplicateEntryTest extends TestCase
         $this->assertEquals($id.'.md', basename($charlieDuplicate->path()));
     }
 
+    /** @test */
+    public function it_duplicates_an_entry_into_the_current_site()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
+        ]]);
+
+        Collection::make('test')->sites(['en', 'fr'])->save();
+
+        $entry = EntryFactory::id('alfa-id')->locale('en')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
+        $entry->makeLocalization('fr')->id('alfa-id-fr')->data(['title' => 'Alfa (French)'])->save();
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr'],
+        ], $this->entryData());
+
+        Site::setCurrent('en');
+
+        (new DuplicateEntry)->run(collect([
+            Entry::find('alfa-id'),
+        ]), collect([
+            'mode' => 'current',
+        ]));
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en'],
+        ], $this->entryData());
+    }
+
+    /** @test */
+    public function it_duplicates_an_entry_with_all_its_localizations()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
+        ]]);
+
+        Collection::make('test')->sites(['en', 'fr'])->save();
+
+        $entry = EntryFactory::id('alfa-id')->locale('en')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
+        $entry->makeLocalization('fr')->id('alfa-id-fr')->data(['title' => 'Alfa (French)'])->save();
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr'],
+        ], $this->entryData());
+
+        Site::setCurrent('en');
+
+        (new DuplicateEntry)->run(collect([
+            Entry::find('alfa-id'),
+        ]), collect([
+            'mode' => 'all',
+        ]));
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (French) (Duplicated)', 'duplicated_from' => 'alfa-id-fr'], 'locale' => 'fr'],
+        ], $this->entryData());
+    }
+
     private function entryData()
     {
         return Entry::all()->map(fn ($entry) => [
             'slug' => $entry->slug(),
             'published' => $entry->published(),
             'data' => $entry->data()->all(),
+            'locale' => $entry->locale(),
         ])->all();
     }
 }

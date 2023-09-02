@@ -16,12 +16,33 @@ class DuplicateEntry extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof Entry && ! Site::hasMultiple();
+        return $item instanceof Entry;
+    }
+
+    protected function fieldItems()
+    {
+        if (Site::hasMultiple()) {
+            return [
+                'mode' => [
+                    'display' => __('Mode'),
+                    'type' => 'button_group',
+                    'instructions' => __('Should this entry be duplicated to just the current site or to all sites?'),
+                    'options' => [
+                        'all' => __('All Sites'),
+                        'current' => __('Current Site'),
+                    ],
+                    'default' => 'all',
+                    'validate' => 'required',
+                ],
+            ];
+        }
+
+        return [];
     }
 
     public function run($items, $values)
     {
-        $items->each(function (Entry $original) {
+        $items->each(function (Entry $original) use ($values) {
             $originalParent = $this->getEntryParentFromStructure($original);
             [$title, $slug] = $this->generateTitleAndSlug($original);
 
@@ -33,10 +54,15 @@ class DuplicateEntry extends Action
                 ])->all();
 
             $entry = Entries::make()
+                ->locale($values['site'] ?? Site::current()->handle())
                 ->collection($original->collection())
                 ->blueprint($original->blueprint()->handle())
                 ->published(false)
                 ->data($data);
+
+            if (isset($values['origin'])) {
+                $entry->origin($values['origin']);
+            }
 
             if ($original->collection()->requiresSlugs()) {
                 $entry->slug($slug);
@@ -47,6 +73,15 @@ class DuplicateEntry extends Action
             }
 
             $entry->save();
+
+            if (isset($values['mode']) && $values['mode'] === 'all') {
+                $original->descendants()->each(function ($descendant) use ($entry) {
+                    $this->run(collect([$descendant]), collect([
+                        'site' => $descendant->locale(),
+                        'origin' => $entry,
+                    ]));
+                });
+            }
 
             if ($originalParent && $originalParent !== $original->id()) {
                 $entry->structure()
@@ -101,7 +136,7 @@ class DuplicateEntry extends Action
         $slug .= '-'.$attempt;
 
         // If the slug we've just built already exists, we'll try again, recursively.
-        if ($entry->collection()->queryEntries()->where('slug', $slug)->count()) {
+        if ($entry->collection()->queryEntries()->where('locale', $entry->locale())->where('slug', $slug)->count()) {
             [$title, $slug] = $this->generateTitleAndSlug($entry, $attempt + 1);
         }
 
