@@ -12,8 +12,8 @@ use Tests\PreventSavingStacheItemsToDisk;
 
 class AugmentedAssignmentTest extends ParserTestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesViews;
+    use PreventSavingStacheItemsToDisk;
 
     public function test_tag_results_containing_augmentable_items_are_augmented()
     {

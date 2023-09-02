@@ -29,9 +29,9 @@ use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAccess, Arrayable
+class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract, Responsable
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData, ContainsSupplementalData;
+    use ContainsCascadingData, ContainsSupplementalData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
 
     protected $handle;
     protected $title;
