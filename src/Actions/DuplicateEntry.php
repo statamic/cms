@@ -117,7 +117,7 @@ class DuplicateEntry extends Action
 
     protected function generateTitleAndSlug(Entry $entry, $attempt = 1)
     {
-        $title = $entry->get('title');
+        $title = $entry->value('title');
         $slug = $entry->slug();
         $suffix = ' ('.__('Duplicated').')';
 
