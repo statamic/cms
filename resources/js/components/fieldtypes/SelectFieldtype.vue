@@ -35,11 +35,11 @@
                 </template>
                 <template #option="{ label }">
                     <div v-if="config.label_html" v-html="label"></div>
-                    <template v-else v-text="__(label)"></template>
+                    <template v-else v-text="label"></template>
                 </template>
                 <template #selected-option="{ label }">
                     <div v-if="config.label_html" v-html="label"></div>
-                    <template v-else v-text="__(label)"></template>
+                    <template v-else v-text="label"></template>
                 </template>
                 <template #no-options>
                     <div class="text-sm text-gray-700 text-left py-2 px-4" v-text="__('No options to choose from.')" />
