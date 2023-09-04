@@ -40,7 +40,7 @@
             <button
                 class="btn"
                 v-if="canAddRows"
-                v-text="addRowButtonLabel"
+                v-text="__(addRowButtonLabel)"
                 @click.prevent="addRow" />
 
         </section>
