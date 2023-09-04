@@ -78,9 +78,7 @@ class GlideUrlBuilder extends ImageUrlBuilder
     /**
      * Should the filename be set based on the config setting
      *
-     * @param  string  $filename
      * @return bool|string
-     *
      */
     private function optionallySetFilename(string $filename)
     {
