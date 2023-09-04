@@ -75,7 +75,14 @@ class GlideUrlBuilder extends ImageUrlBuilder
         return URL::prependSiteRoot($builder->getUrl($path, $params));
     }
 
-    private function optionallySetFilename($filename)
+    /**
+     * Should the filename be set based on the config setting
+     *
+     * @param  string  $filename
+     * @return bool|string
+     *
+     */
+    private function optionallySetFilename(string $filename)
     {
         if (! config('statamic.assets.image_manipulation.append_original_filename', false)) {
             return false;
