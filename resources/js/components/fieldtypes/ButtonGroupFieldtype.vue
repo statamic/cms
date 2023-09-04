@@ -10,7 +10,7 @@
                 :value="option.value"
                 :disabled="isReadOnly"
                 :class="{'active': value === option.value}"
-                v-text="__(option.label || option.value)"
+                v-text="option.label || option.value"
             />
         </div>
     </div>
@@ -29,7 +29,7 @@ export default {
 
         replicatorPreview() {
             var option = _.findWhere(this.config.options, {value: this.value});
-            return __((option) ? option.label : this.value);
+            return (option) ? option.label : this.value;
         },
     },
 

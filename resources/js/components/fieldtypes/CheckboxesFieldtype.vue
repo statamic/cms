@@ -9,7 +9,7 @@
                        :disabled="isReadOnly"
                        v-model="values"
                 />
-                {{ __(option.label || option.value) }}
+                {{ option.label || option.value }}
             </label>
         </div>
     </div>
@@ -36,7 +36,7 @@ export default {
         replicatorPreview() {
             return this.values.map(value => {
                 const option = _.findWhere(this.options, { value });
-                return __(option ? option.label : value);
+                return option ? option.label : value;
             }).join(', ');
         },
     },

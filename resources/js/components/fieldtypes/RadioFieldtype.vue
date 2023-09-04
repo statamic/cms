@@ -14,7 +14,7 @@
                     :disabled="isReadOnly"
                     :checked="value === option.value"
                 />
-                {{ __(option.label || option.value) }}
+                {{ option.label || option.value }}
             </label>
         </div>
     </div>
@@ -33,7 +33,7 @@ export default {
 
         replicatorPreview() {
             var option = _.findWhere(this.config.options, {value: this.value});
-            return __((option) ? option.label : this.value);
+            return (option) ? option.label : this.value;
         },
     },
 
