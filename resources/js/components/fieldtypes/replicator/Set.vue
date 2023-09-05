@@ -134,7 +134,7 @@ export default {
         },
 
         display() {
-            return this.config.display || this.values.type;
+            return __(this.config.display) || this.values.type;
         },
 
         instructions() {
