@@ -66,7 +66,14 @@ class Bard extends Replicator
                     'inline' => [
                         'display' => __('Inline'),
                         'instructions' => __('statamic::fieldtypes.bard.config.inline'),
-                        'type' => 'toggle',
+                        'type' => 'select',
+                        'cast_booleans' => true,
+                        'options' => [
+                            'false' => __('statamic::fieldtypes.bard.config.inline.disabled'),
+                            'true' => __('statamic::fieldtypes.bard.config.inline.enabled'),
+                            'break' => __('statamic::fieldtypes.bard.config.inline.break'),
+                        ],
+                        'default' => false,
                     ],
                     'toolbar_mode' => [
                         'display' => __('Toolbar Mode'),
@@ -81,6 +88,12 @@ class Bard extends Replicator
                     'reading_time' => [
                         'display' => __('Show Reading Time'),
                         'instructions' => __('statamic::fieldtypes.bard.config.reading_time'),
+                        'type' => 'toggle',
+                        'default' => false,
+                    ],
+                    'word_count' => [
+                        'display' => __('Show Word Count'),
+                        'instructions' => __('statamic::fieldtypes.bard.config.word_count'),
                         'type' => 'toggle',
                         'default' => false,
                     ],
@@ -455,7 +468,7 @@ class Bard extends Replicator
             return false;
         }
 
-        if (! $setConfig = $this->config('sets')) {
+        if (! $setConfig = $this->flattenedSetsConfig()->all()) {
             return false;
         }
 

@@ -55,9 +55,9 @@ class AugmentedPageTest extends AugmentedTestCase
         ])->setNamespace('navs')->setHandle('pages');
 
         $entry = Mockery::mock(Entry::class);
-        $entry->shouldReceive('values')->andReturn(collect([
-            'one' => 'two',
-            'three' => 'four',
+        $entry->shouldReceive('keys')->andReturn(collect([
+            'one',
+            'three',
         ]));
         $entry->shouldReceive('supplements')->andReturn(collect([
             'alfa' => 'bravo',
@@ -169,11 +169,11 @@ class AugmentedPageTest extends AugmentedTestCase
         ])->setNamespace('navs')->setHandle('pages');
 
         $entry = Mockery::mock(Entry::class);
-        $entry->shouldReceive('values')->andReturn(collect([
-            'title' => 'The Entry Title',
-            'one' => 'two',
-            'three' => 'four',
-            'five' => 'six',
+        $entry->shouldReceive('keys')->andReturn(collect([
+            'title',
+            'one',
+            'three',
+            'five',
         ]));
         $entry->shouldReceive('supplements')->andReturn(collect());
         $entry->shouldReceive('value')->with('title')->andReturn('The Entry Title');

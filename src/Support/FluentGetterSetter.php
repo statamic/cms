@@ -29,7 +29,6 @@ class FluentGetterSetter
     /**
      * Define custom getter logic.
      *
-     * @param  Closure  $callback
      * @return $this
      */
     public function getter(Closure $callback)

@@ -16,8 +16,8 @@ use Tests\TestCase;
 /** @group graphql */
 class AssetTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['assets'];
 
@@ -138,10 +138,10 @@ GQL;
         Storage::disk('test')->putFileAs('sub', $file, 'image.jpg');
         $realFilePath = Storage::disk('test')->path('sub/image.jpg');
         touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
-        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
-        $container->makeAsset('sub/image.jpg')->data(['potato' => 'baked'])->save();
         $blueprint = Blueprint::makeFromFields(['potato' => ['type' => 'text']]);
         BlueprintRepository::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
+        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
+        $container->makeAsset('sub/image.jpg')->data(['potato' => 'baked'])->save();
 
         $query = <<<'GQL'
 {
@@ -175,6 +175,7 @@ GQL;
         width
         orientation
         ratio
+        duration
         ... on Asset_Test {
             potato
         }
@@ -219,6 +220,7 @@ GQL;
                     'orientation' => 'portrait',
                     'ratio' => 0.5,
                     'potato' => 'baked',
+                    'duration' => null,
                 ],
             ]]);
     }

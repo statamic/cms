@@ -67,7 +67,6 @@ interface Asset
     /**
      * Upload a file.
      *
-     * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
      * @return mixed
      */
     public function upload(UploadedFile $file);

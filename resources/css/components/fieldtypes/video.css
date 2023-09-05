@@ -5,13 +5,17 @@
 .video-fieldtype .video-preview-wrapper {
     @apply mt-4;
 }
-.video-fieldtype .video-preview {
-    position: relative;
-    padding: 25px 0 56.25%;
-    height: 0;
+.video-fieldtype .native-video {
+    @apply relative;
 }
 
-.video-fieldtype .video-preview iframe {
+.video-fieldtype .embed-video {
+    @apply w-full h-0 relative;
+    padding-bottom: 56.25%;
+}
+
+.video-fieldtype .embed-video iframe {
+    @apply rounded;
     position: absolute;
     top: 0;
     left: 0;
@@ -19,7 +23,8 @@
     height: 100%;
 }
 
-.video-fieldtype .video-preview video {
+.video-fieldtype .native-video video {
+    @apply rounded;
     width: 100% !important;
     height: auto !important;
 }

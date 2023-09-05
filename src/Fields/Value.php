@@ -83,7 +83,7 @@ class Value implements IteratorAggregate, JsonSerializable
         $value = $this->value();
         $shouldParseAntlers = $this->shouldParseAntlers();
 
-        if ($value instanceof  ArrayableString && $shouldParseAntlers) {
+        if ($value instanceof ArrayableString && $shouldParseAntlers) {
             $value = (string) $value;
         }
 

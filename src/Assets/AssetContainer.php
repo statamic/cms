@@ -26,7 +26,7 @@ use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess, Arrayable
+class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -173,6 +173,10 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function blueprint()
     {
+        if (Blink::has($blink = 'asset-container-blueprint-'.$this->handle())) {
+            return Blink::get($blink);
+        }
+
         $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
             'alt' => [
                 'type' => 'text',
@@ -180,6 +184,8 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
                 'instructions' => __('Description of the image'),
             ],
         ])->setHandle($this->handle())->setNamespace('assets');
+
+        Blink::put($blink, $blueprint);
 
         AssetContainerBlueprintFound::dispatch($blueprint, $this);
 
