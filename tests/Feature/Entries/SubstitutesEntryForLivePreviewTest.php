@@ -72,7 +72,7 @@ EOT;
     /** @test */
     public function it_doesnt_substitute()
     {
-        Token::shouldReceive('find')->with('invalid-token')->andReturnNull()->times(3);
+        Token::shouldReceive('find')->with('invalid-token')->andReturnNull();
 
         $this->get('/test?token=invalid-token')->assertSeeInOrder([
             'Alfa',
