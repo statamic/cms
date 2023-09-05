@@ -12,8 +12,6 @@ class Nav
 
     /**
      * Register a nav extension closure.
-     *
-     * @param  Closure  $callback
      */
     public function extend(Closure $callback)
     {
@@ -55,8 +53,8 @@ class Nav
     public function findOrCreate($section, $name)
     {
         $item = collect($this->items)->first(function ($item) use ($section, $name) {
-            return $item->section() === $section
-                && $item->display() === $name
+            return $section === $item->section()
+                && $name === $item->display()
                 && ! $item->isChild();
         });
 
@@ -75,8 +73,8 @@ class Nav
         $this->items = collect($this->items)
             ->reject(function ($item) use ($section, $name) {
                 return $name
-                    ? $item->section() === $section && $item->display() === $name
-                    : $item->section() === $section;
+                    ? $section === $item->section() && $name === $item->display()
+                    : $section === $item->section();
             })
             ->all();
 

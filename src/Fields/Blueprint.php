@@ -24,9 +24,9 @@ use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
+class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 {
-    use HasAugmentedData, ExistsAsFile;
+    use ExistsAsFile, HasAugmentedData;
 
     protected $handle;
     protected $namespace;

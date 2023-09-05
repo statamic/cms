@@ -41,6 +41,7 @@
                     handle-class="sortable-item"
                     :value="items"
                     :distance="5"
+                    :mirror="false"
                     @input="input"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
@@ -62,19 +63,18 @@
 </template>
 
 <style scoped>
-    .draggable-mirror {
-        display: none !important;
-    }
     .draggable-source--is-dragging {
         @apply opacity-75 bg-transparent border-dashed
     }
 </style>
 
 <script>
+import PositionsSelectOptions from '../../../mixins/PositionsSelectOptions';
 import { SortableList, SortableItem } from '../../sortable/Sortable';
-import { computePosition, offset, flip } from '@floating-ui/dom';
 
 export default {
+
+    mixins: [PositionsSelectOptions],
 
     components: {
         SortableList,
@@ -151,24 +151,6 @@ export default {
             }
 
             this.$emit('input', items);
-        },
-
-        positionOptions(dropdownList, component, { width }) {
-            dropdownList.style.width = width
-
-            computePosition(component.$refs.toggle, dropdownList, {
-                placement: 'bottom',
-                middleware: [
-                    offset({ mainAxis: 0, crossAxis: -1 }),
-                    flip(),
-                ]
-            }).then(({ x, y }) => {
-                Object.assign(dropdownList.style, {
-                    // Round to avoid blurry text
-                    left: `${Math.round(x)}px`,
-                    top: `${Math.round(y)}px`,
-                });
-            });
         },
 
     }

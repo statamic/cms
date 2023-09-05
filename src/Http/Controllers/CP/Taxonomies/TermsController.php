@@ -280,7 +280,7 @@ class TermsController extends CpController
 
         // If the term is *not* being created in the default site, we'll copy all the
         // appropriate values into the default localization since it needs to exist.
-        if ($site->handle() !== $defaultSite) {
+        if ($defaultSite !== $site->handle()) {
             $term
                 ->in($defaultSite)
                 ->published($published)

@@ -33,18 +33,9 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
-class LocalizedTerm implements
-    Term,
-    Responsable,
-    Augmentable,
-    Protectable,
-    ResolvesValuesContract,
-    ArrayAccess,
-    Arrayable,
-    ContainsQueryableValues,
-    SearchableContract
+class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Protectable, ResolvesValuesContract, Responsable, SearchableContract, Term
 {
-    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, ContainsSupplementalData, ResolvesValues, Searchable;
+    use ContainsSupplementalData, HasAugmentedInstance, Publishable, ResolvesValues, Revisable, Routable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $locale;
     protected $term;
@@ -149,7 +140,7 @@ class LocalizedTerm implements
 
     protected function isDefaultLocale()
     {
-        return $this->defaultLocale() === $this->locale;
+        return $this->locale === $this->defaultLocale();
     }
 
     public function hasOrigin()

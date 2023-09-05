@@ -16,9 +16,11 @@
         </div>
 
         <div class="video-preview-wrapper" v-if="isEmbeddable || isVideo">
-            <div class="video-preview">
-                <iframe v-if="isEmbeddable && canShowIframe" width="560" height="315" :src="embed" frameborder="0" allow="fullscreen"></iframe>
-                <video controls v-if="isVideo" :src="embed" width="560" height="315"></video>
+            <div class="embed-video" v-if="isEmbeddable && canShowIframe">
+                <iframe :src="embedUrl" frameborder="0" allow="fullscreen"></iframe>
+            </div>
+            <div class="native-video" v-else-if="isVideo">
+                <video controls :src="embedUrl"></video>
             </div>
         </div>
     </div>
@@ -54,7 +56,7 @@ export default {
     },
 
     computed: {
-        embed() {
+        embedUrl() {
             let embed_url = this.data;
 
             if (embed_url.includes('youtube')) {

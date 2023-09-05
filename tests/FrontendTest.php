@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\ResponseCreated;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Cascade;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -631,6 +632,8 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRaw('errors.404', 'Not found {{ response_code }} {{ site:handle }}');
 
         $this->get('unknown')->assertNotFound()->assertSee('Not found 404 en');
+
+        $this->assertEquals(404, Cascade::get('response_code'));
 
         // todo: test cascade vars are in the debugbar
     }

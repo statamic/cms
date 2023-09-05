@@ -37,11 +37,11 @@
 </template>
 
 <script>
-import { computePosition, offset } from '@floating-ui/dom';
+import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
 
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, PositionsSelectOptions],
 
     computed: {
         options() {
@@ -72,23 +72,6 @@ export default {
             } else {
                 this.update(null);
             }
-        },
-
-        positionOptions(dropdownList, component, { width }) {
-            dropdownList.style.width = width
-
-            computePosition(component.$refs.toggle, dropdownList, {
-                placement: 'bottom',
-                middleware: [
-                    offset({ mainAxis: 0, crossAxis: -1 }),
-                ]
-            }).then(({ x, y }) => {
-                Object.assign(dropdownList.style, {
-                    // Round to avoid blurry text
-                    left: `${Math.round(x)}px`,
-                    top: `${Math.round(y)}px`,
-                });
-            });
         },
     }
 };

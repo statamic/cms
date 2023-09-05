@@ -37,7 +37,7 @@
                             <sortable-list
                                 v-model="selectedColumns"
                                 :vertical="true"
-                                :distance="10"
+                                :distance="5"
                                 item-class="item"
                                 handle-class="item"
                                 append-to=".modal-body"

@@ -167,11 +167,13 @@ class AntlersNodeParser
                     $terminator = $this->cur;
                     $isParsingString = true;
                     $nameContent[] = $this->cur;
+
                     continue;
                 }
 
                 if ($isParsingString && ctype_space($this->cur)) {
                     $nameContent[] = $this->cur;
+
                     continue;
                 }
 
@@ -179,6 +181,7 @@ class AntlersNodeParser
                     $terminator = null;
                     $isParsingString = false;
                     $nameContent[] = $this->cur;
+
                     continue;
                 }
 
@@ -434,6 +437,7 @@ class AntlersNodeParser
             if ($hasFoundName == false && ctype_space($current)) {
                 // Flush the buffer.
                 $currentChars = [];
+
                 continue;
             }
 
@@ -441,11 +445,12 @@ class AntlersNodeParser
                 if (! empty($currentChars)) {
                     if ((ctype_alpha($currentChars[0]) || ctype_digit($currentChars[0]) || $currentChars[0] == DocumentParser::Punctuation_Colon || $currentChars[0] == DocumentParser::AtChar) == false) {
                         $currentChars = [];
+
                         continue;
                     }
                 }
 
-                if ($i + 1 >= $charCount) {
+                if ($charCount <= $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_END_OF_INPUT,
                         $node,
@@ -455,17 +460,19 @@ class AntlersNodeParser
 
                 $peek = null;
 
-                if ($i + 1 < $charCount) {
+                if ($charCount > $i + 1) {
                     $peek = $chars[$i + 1];
                 }
 
                 if ($prev == DocumentParser::Punctuation_Equals) {
                     $currentChars = [];
+
                     continue;
                 }
 
                 if (ctype_space($peek) || $peek == DocumentParser::Punctuation_Equals) {
                     $currentChars = [];
+
                     continue;
                 }
 
@@ -492,13 +499,14 @@ class AntlersNodeParser
             if ($hasFoundName && $current == DocumentParser::String_EscapeCharacter) {
                 $peek = null;
 
-                if ($i + 1 < $charCount) {
+                if ($charCount > $i + 1) {
                     $peek = $chars[$i + 1];
                 }
 
                 if ($peek == DocumentParser::Punctuation_Pipe) {
                     $currentChars = array_merge($currentChars, DocumentParser::getPipeEscapeArray());
                     $i += 1;
+
                     continue;
                 }
 
@@ -506,30 +514,35 @@ class AntlersNodeParser
                     $currentChars[] = DocumentParser::String_EscapeCharacter;
                     $i += 1;
                     $ignorePrevious = true;
+
                     continue;
                 }
 
                 if ($peek == DocumentParser::String_Terminator_DoubleQuote) {
                     $currentChars[] = DocumentParser::String_Terminator_DoubleQuote;
                     $i += 1;
+
                     continue;
                 }
 
                 if ($peek == DocumentParser::String_Terminator_SingleQuote) {
                     $currentChars[] = DocumentParser::String_Terminator_SingleQuote;
                     $i += 1;
+
                     continue;
                 }
 
                 if ($peek == 'n') {
                     $currentChars[] = "\n";
                     $i += 1;
+
                     continue;
                 }
 
                 if ($peek == 'r') {
                     $currentChars[] = "\r";
                     $i += 1;
+
                     continue;
                 }
             }
@@ -554,7 +567,7 @@ class AntlersNodeParser
                 $parameterNode->value = $content;
                 $parameterNode->startPosition = $node->relativePositionFromOffset($startAt, $nameStart);
 
-                if ($i + 1 > $charCount) {
+                if ($charCount < $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_NODE_PARAMETER,
                         $node,
@@ -568,6 +581,7 @@ class AntlersNodeParser
                 $parameters[] = $parameterNode;
 
                 $name = '';
+
                 continue;
             }
 

@@ -12,8 +12,8 @@ use Tests\PreventSavingStacheItemsToDisk;
 
 class RecursiveNodesTest extends ParserTestCase
 {
-    use PreventSavingStacheItemsToDisk,
-        FakesViews;
+    use FakesViews,
+        PreventSavingStacheItemsToDisk;
 
     private function makeNavTree()
     {
@@ -1435,5 +1435,106 @@ EOT;
         $this->assertStringContainsString('<li><a class="" href="leadership">Second: Leadership</a></li>', $result);
         $this->assertStringContainsString('<a href="projects">Second: Projects</a>', $result);
         $this->assertStringContainsString('<a href="contact">Second: Contact</a>', $result);
+    }
+
+    public function test_arbitrary_arrays_can_be_used_in_recursion()
+    {
+        $data = [
+            'parent_data' => [
+                'records' => [
+                    [
+                        'title' => 'One',
+                        'records' => [
+                            [
+                                'title' => 'Two',
+                                'records' => [
+                                    [
+                                        'title' => 'Three',
+                                        'records' => [
+                                            [
+                                                'title' => 'Four',
+                                                'records' => [
+                                                    [
+                                                        'title' => 'Five',
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $template = <<<'EOT'
+{{ parent_data }}
+    <ul class="parent">
+    {{ records }}
+        <li>
+            <span>{{ title }} -- {{ depth }}</span>
+            {{ if records }}
+                <ul class="depth-{{ depth }}">
+                    {{*recursive records*}}
+                </ul>
+            {{ /if }}
+        </li>
+    {{ /records }}
+    </ul>
+{{ /parent_data }}
+EOT;
+
+        $expected = <<<'EXP'
+<ul class="parent">
+    
+        <li>
+            <span>One -- 1</span>
+            
+                <ul class="depth-1">
+                    
+        <li>
+            <span>Two -- 2</span>
+            
+                <ul class="depth-2">
+                    
+        <li>
+            <span>Three -- 3</span>
+            
+                <ul class="depth-3">
+                    
+        <li>
+            <span>Four -- 4</span>
+            
+                <ul class="depth-4">
+                    
+        <li>
+            <span>Five -- 5</span>
+            
+        </li>
+    
+                </ul>
+            
+        </li>
+    
+                </ul>
+            
+        </li>
+    
+                </ul>
+            
+        </li>
+    
+                </ul>
+            
+        </li>
+    
+    </ul>
+EXP;
+
+        $result = trim($this->renderString($template, $data));
+
+        $this->assertSame($expected, $result);
     }
 }

@@ -6,6 +6,7 @@ use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Auth\UserRepository as RepositoryContract;
 use Statamic\Data\StoresComputedFieldCallbacks;
 use Statamic\Events\UserBlueprintFound;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\OAuth\Provider;
 use Statamic\Statamic;
@@ -57,6 +58,10 @@ abstract class UserRepository implements RepositoryContract
 
     public function blueprint()
     {
+        if (Blink::has($blink = 'user-blueprint')) {
+            return Blink::get($blink);
+        }
+
         $blueprint = Blueprint::find('user') ?? Blueprint::makeFromFields([
             'name' => ['type' => 'text', 'display' => 'Name', 'listable' => true],
         ])->setHandle('user');
@@ -70,6 +75,8 @@ abstract class UserRepository implements RepositoryContract
             $blueprint->removeField('roles');
             $blueprint->removeField('groups');
         }
+
+        Blink::put($blink, $blueprint);
 
         UserBlueprintFound::dispatch($blueprint);
 

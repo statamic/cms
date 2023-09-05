@@ -12,7 +12,7 @@ trait GetsQuerySelectKeys
             return null;
         }
 
-        if (false !== ($shallow = array_search('@shallow', $selected))) {
+        if (($shallow = array_search('@shallow', $selected)) !== false) {
             unset($selected[$shallow]);
             $selected = array_merge($selected, $item->shallowAugmentedArrayKeys());
         }

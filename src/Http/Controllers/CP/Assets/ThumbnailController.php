@@ -43,10 +43,6 @@ class ThumbnailController extends Controller
      */
     protected $mutex;
 
-    /**
-     * @param  Server  $server
-     * @param  ImageGenerator  $generator
-     */
     public function __construct(Server $server, ImageGenerator $generator)
     {
         $this->server = $server;
@@ -181,7 +177,7 @@ class ThumbnailController extends Controller
         $maxWidth = Config::get('statamic.assets.thumbnails.max_width');
         $maxHeight = Config::get('statamic.assets.thumbnails.max_height');
 
-        if ($this->asset->width() < $maxWidth && $this->asset->height() < $maxHeight) {
+        if ($maxWidth > $this->asset->width() && $maxHeight > $this->asset->height()) {
             return;
         }
 

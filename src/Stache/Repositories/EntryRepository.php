@@ -52,15 +52,15 @@ class EntryRepository implements RepositoryContract
         }
 
         $entry = $this->query()
-                ->where('uri', $uri)
-                ->where('site', $site)
-                ->first();
+            ->where('uri', $uri)
+            ->where('site', $site)
+            ->first();
 
         if (! $entry) {
             return null;
         }
 
-        if ($entry->uri() !== $uri) {
+        if ($uri !== $entry->uri()) {
             return null;
         }
 

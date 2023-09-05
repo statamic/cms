@@ -305,7 +305,7 @@ class GlobalDebugManager
         $path = Str::finish($path, '/');
 
         if ($handle = opendir($path)) {
-            while (false !== ($entry = readdir($handle))) {
+            while (($entry = readdir($handle)) !== false) {
                 if ($entry != '.' && $entry != '..') {
                     $paths[] = $path.$entry;
                 }

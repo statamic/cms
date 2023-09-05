@@ -16,7 +16,6 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Filter by container.
      *
-     * @param  string  $container
      * @return $this
      */
     public function filterByContainer(string $container)
@@ -54,7 +53,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $fields
             ->filter(function ($field) {
                 return $field->type() === 'assets'
-                    && $this->getConfiguredAssetsFieldContainer($field) === $this->container;
+                    && $this->container === $this->getConfiguredAssetsFieldContainer($field);
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $field->get('max_files') === 1
@@ -77,7 +76,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $fields
             ->filter(function ($field) {
                 return $field->type() === 'link'
-                    && $field->get('container') === $this->container;
+                    && $this->container === $field->get('container');
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $this->updateStatamicUrlsInLinkValue($field, $dottedPrefix);
@@ -98,7 +97,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $fields
             ->filter(function ($field) {
                 return $field->type() === 'bard'
-                    && $field->get('container') === $this->container;
+                    && $this->container === $field->get('container');
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $field->get('save_html') === true
@@ -121,7 +120,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $fields
             ->filter(function ($field) {
                 return $field->type() === 'markdown'
-                    && $field->get('container') === $this->container;
+                    && $this->container === $field->get('container');
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $this->updateStatamicUrlsInStringValue($field, $dottedPrefix);

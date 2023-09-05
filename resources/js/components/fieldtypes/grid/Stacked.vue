@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="flex justify-end absolute top-3 right-3 @md:right-6" v-if="! grid.fullScreenMode">
-        <button @click="grid.toggleFullScreen" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
+        <button v-if="allowFullscreen" @click="grid.toggleFullScreen" class="btn btn-icon flex items-center" v-tooltip="__('Toggle Fullscreen Mode')">
             <svg-icon name="expand-bold" class="h-3.5 px-0.5 text-gray-750" v-show="! grid.fullScreenMode" />
             <svg-icon name="shrink-all" class="h-3.5 px-0.5 text-gray-750" v-show="grid.fullScreenMode" />
         </button>

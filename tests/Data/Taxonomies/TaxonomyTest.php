@@ -9,6 +9,7 @@ use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Events\TaxonomyCreated;
 use Statamic\Events\TaxonomySaved;
 use Statamic\Events\TaxonomySaving;
+use Statamic\Events\TermBlueprintFound;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -111,6 +112,28 @@ class TaxonomyTest extends TestCase
 
         $this->assertEquals($blueprint, $taxonomy->termBlueprint('tag'));
         $this->assertNull($taxonomy->termBlueprint('two'));
+    }
+
+    /** @test */
+    public function it_dispatches_an_event_when_getting_entry_blueprint()
+    {
+        Event::fake();
+
+        $taxonomy = (new Taxonomy)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/blog')->andReturn(collect([
+            'blueprint' => $blueprint = (new Blueprint)->setHandle('blueprint'),
+        ]));
+
+        // Do it twice so we can check the event is only dispatched once.
+        $taxonomy->termBlueprint();
+        $taxonomy->termBlueprint();
+
+        Event::assertDispatchedTimes(TermBlueprintFound::class, 1);
+        Event::assertDispatched(TermBlueprintFound::class, function ($event) use ($blueprint) {
+            return $event->blueprint === $blueprint
+                && $event->term === null;
+        });
     }
 
     /** @test */

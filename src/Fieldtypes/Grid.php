@@ -93,7 +93,7 @@ class Grid extends Fieldtype
     {
         $fields = $this->fields()->addValues($row)->process()->values()->all();
 
-        $row = array_merge(['id' => Arr::pull($row, '_id')], $row, $fields);
+        $row = array_merge([RowId::handle() => Arr::pull($row, '_id')], $row, $fields);
 
         return Arr::removeNullValues($row);
     }
@@ -115,7 +115,7 @@ class Grid extends Fieldtype
     {
         $fields = $this->fields()->addValues($row)->preProcess()->values()->all();
 
-        $id = Arr::pull($row, 'id') ?? RowId::generate();
+        $id = Arr::pull($row, RowId::handle()) ?? RowId::generate();
 
         return array_merge($row, $fields, [
             '_id' => $id,
@@ -220,7 +220,7 @@ class Grid extends Fieldtype
         return collect($value)->map(function ($row) use ($method) {
             $values = $this->fields()->addValues($row)->{$method}()->values();
 
-            return new Values($values->merge(['id' => $row['id'] ?? null])->all());
+            return new Values($values->merge([RowId::handle() => $row[RowId::handle()] ?? null])->all());
         })->all();
     }
 

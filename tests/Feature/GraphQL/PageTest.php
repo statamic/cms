@@ -13,8 +13,8 @@ use Tests\TestCase;
 /** @group graphql */
 class PageTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['navs'];
 

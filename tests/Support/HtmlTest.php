@@ -10,7 +10,7 @@ class HtmlTest extends TestCase
     public function testDl()
     {
         $list = [
-            'foo'  => 'bar',
+            'foo' => 'bar',
             'bing' => 'baz',
         ];
 

@@ -37,6 +37,7 @@
                 :fields="fieldset.fields"
                 :editing-field="editingField"
                 :exclude-fieldset="fieldset.handle"
+                :suggestable-condition-fields="suggestableConditionFields"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-linked="fieldLinked"
@@ -53,8 +54,11 @@
 <script>
 import Fields from '../blueprints/Fields.vue';
 import {Sortable, Plugins} from '@shopify/draggable';
+import SuggestsConditionalFields from '../blueprints/SuggestsConditionalFields';
 
 export default {
+
+    mixins: [SuggestsConditionalFields],
 
     components: {
         Fields
@@ -81,6 +85,10 @@ export default {
             set(fields) {
                 this.fieldset.fields = fields;
             }
+        },
+
+        fieldsForConditionSuggestions() {
+            return this.fields;
         }
 
     },

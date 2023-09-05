@@ -23,7 +23,7 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Form implements FormContract, Augmentable, Arrayable
+class Form implements Arrayable, Augmentable, FormContract
 {
     use FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -300,7 +300,7 @@ class Form implements FormContract, Augmentable, Arrayable
     public function submission($id)
     {
         return $this->submissions()->filter(function ($submission) use ($id) {
-            return $submission->id() === $id;
+            return $id === $submission->id();
         })->first();
     }
 
