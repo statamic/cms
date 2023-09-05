@@ -11,7 +11,8 @@
                 </div>
             </h1>
 
-            <dropdown-list class="mr-4" v-if="canEditBlueprint">
+            <dropdown-list class="mr-4">
+                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" v-if="canEditBlueprint" />
                 <data-list-inline-actions
                     :item="values.id"
                     :url="listActionUrl"
@@ -19,7 +20,6 @@
                     @started="actionStarted"
                     @completed="actionCompleted"
                 />
-                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
             </dropdown-list>
 
             <div class="pt-px text-2xs text-gray-600 flex mr-4" v-if="readOnly">
