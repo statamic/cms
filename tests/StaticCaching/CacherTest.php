@@ -34,27 +34,6 @@ class CacherTest extends TestCase
     }
 
     /** @test */
-    public function gets_default_expiration_using_deprecated_key()
-    {
-        $cacher = $this->cacher([
-            'default_cache_length' => 10,
-        ]);
-
-        $this->assertEquals(10, $cacher->getDefaultExpiration());
-    }
-
-    /** @test */
-    public function gets_default_expiration_where_new_key_takes_precedence_over_deprecated_key()
-    {
-        $cacher = $this->cacher([
-            'expiry' => 2,
-            'default_cache_length' => 10,
-        ]);
-
-        $this->assertEquals(2, $cacher->getDefaultExpiration());
-    }
-
-    /** @test */
     public function gets_a_url()
     {
         $cacher = $this->cacher();

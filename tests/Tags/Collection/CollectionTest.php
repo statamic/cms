@@ -12,14 +12,18 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Tags\Collection\Collection;
-use Statamic\Tags\Collection\Entries;
-use Statamic\Tags\Context;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CollectionTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    private $music;
+    private $art;
+    private $books;
+    private $foods;
+    private $collectionTag;
 
     public function setUp(): void
     {
@@ -570,7 +574,7 @@ class CollectionTest extends TestCase
     public function findEntryByTitle($title)
     {
         return Facades\Entry::all()->first(function ($entry) use ($title) {
-            return $entry->get('title') === $title;
+            return $title === $entry->get('title');
         });
     }
 

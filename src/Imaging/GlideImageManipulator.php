@@ -81,9 +81,6 @@ class GlideImageManipulator implements ImageManipulator
      */
     protected $params = [];
 
-    /**
-     * @param  UrlBuilder  $builder
-     */
     public function __construct(UrlBuilder $builder)
     {
         $this->builder = $builder;
@@ -181,7 +178,6 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * @param $value
      * @return $this
      */
     public function width($value)

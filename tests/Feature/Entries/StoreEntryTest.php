@@ -8,6 +8,7 @@ use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -70,6 +71,43 @@ class StoreEntryTest extends TestCase
         $this->assertEquals('Test Entry', $entry->value('title'));
         $this->assertEquals('test-entry', $entry->slug());
         $this->assertEquals('test-entry.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider multipleSlugLangsProvider
+     */
+    public function slug_is_not_required_and_will_get_created_from_the_submitted_title_if_slug_is_in_blueprint_and_use_entry_language($lang, $expectedSlug)
+    {
+        Site::setConfig(['sites' => [
+            'en' => array_merge(config('statamic.sites.sites.en'), ['lang' => $lang]),
+        ]]);
+
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $this->assertTrue($collection->entryBlueprint()->hasField('slug'));
+        $this->assertCount(0, Entry::all());
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'Test Entry æøå', 'slug' => ''])
+            ->assertOk();
+
+        $this->assertCount(1, Entry::all());
+        $entry = Entry::all()->first();
+        $this->assertEquals('Test Entry æøå', $entry->value('title'));
+        $this->assertEquals($expectedSlug, $entry->slug());
+        $this->assertEquals($expectedSlug.'.md', pathinfo($entry->path(), PATHINFO_BASENAME));
+    }
+
+    public function multipleSlugLangsProvider()
+    {
+        return [
+            'English' => ['en', 'test-entry-aeoa'],
+            'Danish' => ['da', 'test-entry-aeoeaa'], // danish replaces æøå with aeoeaa
+        ];
     }
 
     /** @test */

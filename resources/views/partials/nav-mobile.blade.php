@@ -2,12 +2,12 @@
 
 <nav class="nav-main nav-mobile" v-cloak>
     <div class="nav-main-inner">
-        @foreach ($nav as $section => $items)
-            @if ($section !== 'Top Level')
-                <h6>{{ __($section) }}</h6>
+        @foreach ($nav as $section)
+            @if ($section['display'] !== 'Top Level')
+                <h6>{{ __($section['display']) }}</h6>
             @endif
             <ul>
-                @foreach ($items as $item)
+                @foreach ($section['items'] as $item)
                     @unless ($item->view())
                         <li class="{{ $item->isActive() ? 'current' : '' }}">
                             <a href="{{ $item->url() }}">

@@ -2,11 +2,33 @@
 
 namespace Statamic\Auth;
 
+use Facades\Statamic\Auth\CorePermissions;
+
 class Permissions
 {
+    protected $extensions = [];
     protected $permissions = [];
     protected $groups = [];
     protected $pendingGroup = null;
+
+    public function boot()
+    {
+        $early = $this->permissions;
+        $this->permissions = [];
+
+        CorePermissions::boot();
+
+        foreach ($this->extensions as $callback) {
+            $callback($this);
+        }
+
+        $this->permissions = array_merge($this->permissions, $early);
+    }
+
+    public function extend($callback)
+    {
+        $this->extensions[] = $callback;
+    }
 
     public function make(string $value)
     {

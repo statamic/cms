@@ -13,6 +13,8 @@ use Tests\TestCase;
 
 class StoreTest extends TestCase
 {
+    private $store;
+
     public function setUp(): void
     {
         parent::setUp();

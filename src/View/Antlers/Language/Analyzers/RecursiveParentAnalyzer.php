@@ -46,13 +46,17 @@ class RecursiveParentAnalyzer
 
                     if ($subNode instanceof AntlersNode && $subNode->isClosedBy != null) {
                         if ($node->isNestedRecursive) {
-                            if (trim($subNode->content) == $node->name->name) {
+                            if ($node->name->name == trim($subNode->content)) {
                                 $lastNode = $subNode;
                                 break;
                             }
                         } else {
                             if (Str::contains($subNode->runtimeContent, $recursiveContent) && mb_substr_count($subNode->runtimeContent, '*recursive') == 1 && $node->getRootRef() == $subNode->getRootRef()) {
                                 $lastNode = $subNode;
+
+                                if (! ConditionPairAnalyzer::isConditionalStructure($subNode) && $subNode->isClosedBy != null && $subNode->name->name == $node->name->name) {
+                                    break;
+                                }
 
                                 // Ensure we stop searching once we reach the closest nav parent.
                                 if ($subNode->name->name == 'nav') {

@@ -2,6 +2,7 @@
 
 namespace Statamic\Structures;
 
+use Statamic\Contracts\Structures\CollectionTree;
 use Statamic\Contracts\Structures\CollectionTreeRepository;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -26,14 +27,20 @@ class CollectionStructure extends Structure
         });
     }
 
+    private function flattenedPages($entry)
+    {
+        return Blink::once('collection-structure-flattened-pages-collection'.$this->handle().'-'.$entry->locale(), function () use ($entry) {
+            return $this->in($entry->locale())->flattenedPages();
+        });
+    }
+
     public function entryUri($entry)
     {
         if (! $this->route($entry->locale())) {
             return null;
         }
 
-        $page = $this->in($entry->locale())
-            ->flattenedPages()
+        $page = $this->flattenedPages($entry)
             ->keyBy->reference()
             ->get($entry->id());
 
@@ -52,7 +59,7 @@ class CollectionStructure extends Structure
 
     public function newTreeInstance()
     {
-        return new CollectionTree;
+        return app(CollectionTree::class);
     }
 
     public function validateTree(array $tree, string $locale): array

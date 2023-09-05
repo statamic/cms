@@ -17,6 +17,8 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsComputedData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
@@ -29,21 +31,13 @@ use Statamic\Facades;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
+use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
-abstract class User implements
-    UserContract,
-    Authenticatable,
-    CanResetPasswordContract,
-    Augmentable,
-    AuthorizableContract,
-    ResolvesValuesContract,
-    HasLocalePreference,
-    ArrayAccess,
-    Arrayable
+abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticatable, AuthorizableContract, CanResetPasswordContract, ContainsQueryableValues, HasLocalePreference, ResolvesValuesContract, SearchableContract, UserContract
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues, ContainsComputedData;
+    use Authorizable, CanResetPassword, ContainsComputedData, HasAugmentedInstance, HasAvatar, Notifiable, ResolvesValues, Searchable, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
@@ -296,8 +290,28 @@ abstract class User implements
         return $this->setPreference('locale', $locale);
     }
 
+    public function getCpSearchResultBadge(): string
+    {
+        return __('User');
+    }
+
     protected function getComputedCallbacks()
     {
         return Facades\User::getComputedCallbacks();
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (method_exists($this, $method = Str::camel($field))) {
+            return $this->{$method}();
+        }
+
+        $value = $this->get($field);
+
+        if (! $field = $this->blueprint()->field($field)) {
+            return $value;
+        }
+
+        return $field->fieldtype()->toQueryableValue($value);
     }
 }

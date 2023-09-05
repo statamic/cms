@@ -11,13 +11,12 @@ class FlysystemAdapterTest extends TestCase
 {
     use FilesystemAdapterTests;
 
+    private $tempDir;
+    private $filesystem;
+
     public function setUp(): void
     {
         parent::setUp();
-
-        if (version_compare(app()->version(), '8.48.0', '<')) {
-            $this->markTestSkipped();
-        }
 
         mkdir($this->tempDir = __DIR__.'/tmp');
 

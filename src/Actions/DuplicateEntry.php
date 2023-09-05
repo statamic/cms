@@ -36,8 +36,11 @@ class DuplicateEntry extends Action
                 ->collection($original->collection())
                 ->blueprint($original->blueprint()->handle())
                 ->published(false)
-                ->slug($slug)
                 ->data($data);
+
+            if ($original->collection()->requiresSlugs()) {
+                $entry->slug($slug);
+            }
 
             if ($original->hasDate()) {
                 $entry->date($original->date());
@@ -63,7 +66,7 @@ class DuplicateEntry extends Action
         $parentEntry = $entry
             ->structure()
             ->in($entry->locale())
-            ->page($entry->id())
+            ->find($entry->id())
             ->parent();
 
         if (! $parentEntry) {

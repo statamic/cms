@@ -425,6 +425,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'autocomplete' => null,
             ],
             [
                 'handle' => 'two',
@@ -500,6 +501,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'autocomplete' => null,
             ],
             [
                 'handle' => 'nested_deeper_two',
@@ -519,6 +521,7 @@ class FieldsTest extends TestCase
                 'visibility' => 'visible',
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'autocomplete' => null,
             ],
         ], $fields->toPublishArray());
     }
@@ -921,6 +924,7 @@ class FieldsTest extends TestCase
 
     /**
      * @test
+     *
      * @group graphql
      **/
     public function it_gets_the_fields_as_graphql_types()

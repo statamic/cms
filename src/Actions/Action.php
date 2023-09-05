@@ -10,14 +10,27 @@ use Statamic\Extend\RegistersItself;
 
 abstract class Action implements Arrayable
 {
-    use HasHandle, HasTitle, HasFields, RegistersItself;
+    use HasFields, HasHandle, HasTitle, RegistersItself;
 
     protected static $binding = 'actions';
 
+    protected $items;
     protected $confirm = true;
     protected $dangerous = false;
     protected $fields = [];
     protected $context = [];
+
+    public function __construct()
+    {
+        $this->items = collect();
+    }
+
+    public function items($items)
+    {
+        $this->items = collect($items);
+
+        return $this;
+    }
 
     public function visibleTo($item)
     {

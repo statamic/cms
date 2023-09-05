@@ -80,6 +80,7 @@ class UrlTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider ancestorProvider
      **/
     public function it_checks_whether_a_url_is_an_ancestor_of_another($child, $parent, $isAncestor)
@@ -117,8 +118,58 @@ class UrlTest extends TestCase
         ];
     }
 
+    /** @test */
+    public function gets_site_url()
+    {
+        $this->assertEquals('http://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
+
+        \Illuminate\Support\Facades\URL::forceScheme('https');
+        $this->assertEquals('https://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
+
+        \Illuminate\Support\Facades\URL::forceScheme('http');
+        $this->assertEquals('http://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
+    }
+
     /**
      * @test
+     *
+     * @dataProvider absoluteProvider
+     **/
+    public function it_makes_urls_absolute($url, $expected, $forceScheme = false)
+    {
+        if ($forceScheme) {
+            \Illuminate\Support\Facades\URL::forceScheme($forceScheme);
+        }
+
+        $this->assertSame($expected, URL::makeAbsolute($url));
+    }
+
+    public function absoluteProvider()
+    {
+        return [
+            ['http://example.com', 'http://example.com'],
+            ['http://example.com/', 'http://example.com/'],
+            ['/', 'http://absolute-url-resolved-from-request.com/'],
+            ['/foo', 'http://absolute-url-resolved-from-request.com/foo'],
+            ['/foo/', 'http://absolute-url-resolved-from-request.com/foo/'],
+
+            ['http://example.com', 'http://example.com', 'https'], // absolute url provided, so scheme is left alone.
+            ['http://example.com/', 'http://example.com/', 'https'], // absolute url provided, so scheme is left alone.
+            ['/', 'https://absolute-url-resolved-from-request.com/', 'https'],
+            ['/foo', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
+            ['/foo/', 'https://absolute-url-resolved-from-request.com/foo/', 'https'],
+
+            ['https://example.com', 'https://example.com', 'http'], // absolute url provided, so scheme is left alone.
+            ['https://example.com/', 'https://example.com/', 'http'], // absolute url provided, so scheme is left alone.
+            ['/', 'http://absolute-url-resolved-from-request.com/', 'http'],
+            ['/foo', 'http://absolute-url-resolved-from-request.com/foo', 'http'],
+            ['/foo/', 'http://absolute-url-resolved-from-request.com/foo/', 'http'],
+        ];
+    }
+
+    /**
+     * @test
+     *
      * @dataProvider relativeProvider
      **/
     public function makes_urls_relative($url, $expected)

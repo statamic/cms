@@ -1,14 +1,14 @@
 <template>
     <div>
 
-        <div class="mb-1 flex justify-end">
+        <div class="mb-2 flex justify-end">
             <a
-                class="text-2xs text-blue mr-2 underline"
+                class="text-2xs text-blue mr-4 underline"
                 v-text="__('Expand All')"
                 @click="expandAll"
             />
             <a
-                class="text-2xs text-blue mr-1 underline"
+                class="text-2xs text-blue mr-2 underline"
                 v-text="__('Collapse All')"
                 @click="collapseAll"
             />
@@ -60,10 +60,6 @@
 
         </div>
 
-        <audio ref="soundDrop">
-            <source :src="soundDropUrl" type="audio/mp3">
-        </audio>
-
     </div>
 </template>
 
@@ -100,7 +96,6 @@ export default {
             saving: false,
             pages: [],
             treeData: [],
-            soundDropUrl: this.$config.get('resourceUrl') + '/audio/click.mp3',
         }
     },
 
@@ -161,7 +156,6 @@ export default {
             tree = tree || this.$refs.tree;
 
             this.pages = tree.getPureData();
-            this.$refs.soundDrop.play();
             this.$emit('changed');
         },
 

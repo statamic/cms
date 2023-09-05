@@ -1,7 +1,7 @@
 <template>
 
     <td class="grid-cell" :class="classes" :width="width">
-        <div v-show="showInner">
+        <div v-show="showInner" class="@container">
             <component
                 :is="fieldtypeComponent"
                 :config="field"
@@ -19,7 +19,7 @@
         </div>
 
         <div v-if="hasError">
-            <small class="help-block text-red mt-1 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
+            <small class="help-block text-red-500 mt-2 mb-0" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
     </td>
 

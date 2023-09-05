@@ -12,6 +12,9 @@ use Tests\TestCase;
 
 class AssetContainerRepositoryTest extends TestCase
 {
+    private $directory;
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();

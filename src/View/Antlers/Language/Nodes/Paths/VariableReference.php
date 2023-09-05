@@ -44,6 +44,11 @@ class VariableReference
     public $isFinal = false;
 
     /**
+     * @var VariableReference|null
+     */
+    private $cachedRoot = null;
+
+    /**
      * Determines if the provided path is a complex variable path or not.
      *
      * @return bool
@@ -57,7 +62,7 @@ class VariableReference
         foreach ($this->pathParts as $part) {
             if ($part instanceof PathNode) {
                 // Handle the case of variable.5
-                if (intval($part->name) == $part->name) {
+                if ($part->name == intval($part->name)) {
                     return true;
                 }
             } elseif ($part instanceof VariableReference) {
@@ -66,6 +71,21 @@ class VariableReference
         }
 
         return false;
+    }
+
+    public function getRoot(): VariableReference
+    {
+        if ($this->cachedRoot == null) {
+            $this->cachedRoot = new VariableReference();
+
+            if (count($this->pathParts) == 0) {
+                return $this->cachedRoot;
+            }
+
+            $this->cachedRoot->pathParts[] = $this->pathParts[0];
+        }
+
+        return $this->cachedRoot;
     }
 
     /**

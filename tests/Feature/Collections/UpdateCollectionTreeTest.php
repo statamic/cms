@@ -12,11 +12,12 @@ use Tests\TestCase;
 
 class UpdateCollectionTreeTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     /**
      * @test
+     *
      * @dataProvider collectionTreeDataProvider
      */
     public function it_updates_the_tree($collectionHandle)

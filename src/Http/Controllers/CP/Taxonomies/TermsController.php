@@ -42,13 +42,19 @@ class TermsController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $terms = $query->paginate(request('perPage'));
+        $paginator = $query->paginate(request('perPage'));
 
-        $terms->setCollection(
-            $terms->getCollection()->map->in(Site::selected()->handle())
-        );
+        $terms = $paginator->getCollection();
 
-        return (new Terms($terms))
+        if (request('search') && $taxonomy->hasSearchIndex()) {
+            $terms = $terms->map->getSearchable();
+        }
+
+        $terms = $terms->map->in(Site::selected()->handle());
+
+        $paginator->setCollection($terms);
+
+        return (new Terms($paginator))
             ->blueprint($taxonomy->termBlueprint())
             ->columnPreferenceKey("taxonomies.{$taxonomy->handle()}.columns")
             ->additional(['meta' => [
@@ -274,7 +280,7 @@ class TermsController extends CpController
 
         // If the term is *not* being created in the default site, we'll copy all the
         // appropriate values into the default localization since it needs to exist.
-        if ($site->handle() !== $defaultSite) {
+        if ($defaultSite !== $site->handle()) {
             $term
                 ->in($defaultSite)
                 ->published($published)

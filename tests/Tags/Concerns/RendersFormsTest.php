@@ -13,6 +13,8 @@ class RendersFormsTest extends TestCase
 {
     const MISSING = 'field is missing from request';
 
+    private $tag;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -45,14 +47,14 @@ class RendersFormsTest extends TestCase
     {
         $output = $this->tag
             ->setParameters([
-                'class' => 'mb-1',
+                'class' => 'mb-2',
                 'attr:id' => 'form',
                 'method' => 'this should not render',
                 'action' => 'this should not render',
             ])
             ->formOpen('http://localhost:8000/submit', 'DELETE');
 
-        $this->assertStringStartsWith('<form method="POST" action="http://localhost:8000/submit" class="mb-1" id="form">', $output);
+        $this->assertStringStartsWith('<form method="POST" action="http://localhost:8000/submit" class="mb-2" id="form">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_method" value="DELETE">', $output);
     }
@@ -115,6 +117,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderTextProvider
      */
     public function renders_text_fields($value, $default, $old, $expected)
@@ -132,6 +135,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderTextProvider
      */
     public function renders_fallback_fields_as_text_fields($value, $default, $old, $expected)
@@ -146,6 +150,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderTextProvider
      */
     public function renders_textarea_fields($value, $default, $old, $expected)
@@ -179,6 +184,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderToggleProvider
      */
     public function renders_toggles($value, $default, $old, $expected)
@@ -186,6 +192,7 @@ EOT;
         $rendered = $this->createField('toggle', $value, $default, $old);
 
         $this->assertSame($expected, (bool) $rendered['value']);
+        $this->assertStringContainsString('<input type="hidden" name="test" value="0">', $rendered['field']);
 
         if ($expected) {
             $this->assertStringContainsString('checked', $rendered['field']);
@@ -233,6 +240,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderSingleSelectProvider
      */
     public function renders_single_select_fields($value, $default, $old, $expected)
@@ -261,6 +269,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderSingleSelectProvider
      */
     public function renders_radio_fields($value, $default, $old, $expected)
@@ -309,6 +318,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderMultipleSelectProvider
      */
     public function renders_multiple_select_fields($value, $default, $old, $expected)
@@ -341,6 +351,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderMultipleSelectProvider
      */
     public function renders_checkboxes_fields($value, $default, $old, $expected)
@@ -353,6 +364,8 @@ EOT;
                 'delta' => 'Delta',
             ],
         ]);
+
+        $this->assertStringContainsString('<input type="hidden" name="test[]">', $rendered['field']);
 
         if ($expected) {
             $unexpected = array_diff(array_keys($options), $expected);
@@ -379,18 +392,22 @@ EOT;
             'no value, no default, missing' => ['value' => null, 'default' => null, 'old' => self::MISSING, 'expectedValue' => null],
             'no value, no default, selected' => ['value' => null, 'default' => null, 'old' => ['alfa'], 'expectedValue' => ['alfa']],
             'no value, no default, selected multiple' => ['value' => null, 'default' => null, 'old' => ['alfa', 'bravo'], 'expectedValue' => ['alfa', 'bravo']],
+            'no value, no default, selected none' => ['value' => null, 'default' => null, 'old' => [], 'expectedValue' => []],
 
             'value, no default, missing' => ['value' => ['alfa'], 'default' => null, 'old' => self::MISSING, 'expectedValue' => ['alfa']],
             'value, no default, selected' => ['value' => ['alfa'], 'default' => null, 'old' => ['bravo'], 'expectedValue' => ['bravo']],
             'value, no default, selected multiple' => ['value' => ['alfa'], 'default' => null, 'old' => ['bravo', 'charlie'], 'expectedValue' => ['bravo', 'charlie']],
+            'value, no default, selected none' => ['value' => ['alfa'], 'default' => null, 'old' => [], 'expectedValue' => []],
 
             'no value, default, missing' => ['value' => null, 'default' => ['alfa'], 'old' => self::MISSING, 'expectedValue' => ['alfa']],
             'no value, default, selected' => ['value' => null, 'default' => ['alfa'], 'old' => ['bravo'], 'expectedValue' => ['bravo']],
             'no value, default, selected multiple' => ['value' => null, 'default' => ['alfa'], 'old' => ['bravo', 'charlie'], 'expectedValue' => ['bravo', 'charlie']],
+            'no value, default, selected none' => ['value' => null, 'default' => ['alfa'], 'old' => [], 'expectedValue' => []],
 
             'value, default, missing' => ['value' => ['alfa'], 'default' => ['bravo'], 'old' => self::MISSING, 'expectedValue' => ['alfa']],
             'value, default, selected' => ['value' => ['alfa'], 'default' => ['bravo'], 'old' => ['charlie'], 'expectedValue' => ['charlie']],
             'value, default, selected multiple' => ['value' => ['alfa'], 'default' => ['bravo'], 'old' => ['charlie', 'delta'], 'expectedValue' => ['charlie', 'delta']],
+            'value, default, selected none' => ['value' => ['alfa'], 'default' => ['bravo'], 'old' => [], 'expectedValue' => []],
         ];
     }
 }

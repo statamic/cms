@@ -16,35 +16,48 @@
             @visible-columns-updated="visibleColumns = $event"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0 relative">
-                    <data-list-filter-presets
-                        ref="presets"
-                        :active-preset="activePreset"
-                        :preferences-prefix="preferencesPrefix"
-                        @selected="selectPreset"
-                        @reset="filtersReset"
-                    />
-                    <div class="data-list-header">
-                        <data-list-filters
-                            :filters="filters"
+                <div class="card overflow-hidden p-0 relative">
+                    <div class="flex flex-wrap items-center justify-between px-2 pb-2 text-sm border-b">
+
+                        <data-list-filter-presets
+                            ref="presets"
                             :active-preset="activePreset"
                             :active-preset-payload="activePresetPayload"
                             :active-filters="activeFilters"
-                            :active-filter-badges="activeFilterBadges"
-                            :active-count="activeFilterCount"
-                            :search-query="searchQuery"
-                            :saves-presets="true"
+                            :has-active-filters="hasActiveFilters"
                             :preferences-prefix="preferencesPrefix"
-                            @filter-changed="filterChanged"
-                            @search-changed="searchChanged"
-                            @saved="$refs.presets.setPreset($event)"
-                            @deleted="$refs.presets.refreshPresets()"
-                            @restore-preset="$refs.presets.viewPreset($event)"
+                            :search-query="searchQuery"
+                            @selected="selectPreset"
                             @reset="filtersReset"
                         />
+
+                        <data-list-search class="h-8 mt-2 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+
+                        <div class="flex space-x-2 mt-2">
+                            <button class="btn btn-sm ml-2" v-text="__('Reset')" v-show="isDirty" @click="$refs.presets.refreshPreset()" />
+                            <button class="btn btn-sm ml-2" v-text="__('Save')" v-show="isDirty" @click="$refs.presets.savePreset()" />
+                            <data-list-column-picker :preferences-key="preferencesKey('columns')" />
+                        </div>
                     </div>
 
-                    <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+                    <data-list-filters
+                        ref="filters"
+                        :filters="filters"
+                        :active-preset="activePreset"
+                        :active-preset-payload="activePresetPayload"
+                        :active-filters="activeFilters"
+                        :active-filter-badges="activeFilterBadges"
+                        :active-count="activeFilterCount"
+                        :search-query="searchQuery"
+                        :is-searching="true"
+                        :saves-presets="true"
+                        :preferences-prefix="preferencesPrefix"
+                        @changed="filterChanged"
+                        @saved="$refs.presets.setPreset($event)"
+                        @deleted="$refs.presets.refreshPresets()"
+                    />
+
+                    <div v-show="items.length === 0" class="p-6 text-center text-gray-500" v-text="__('No results')" />
 
                     <data-list-bulk-actions
                         :url="actionUrl"
@@ -70,7 +83,7 @@
                             <span class="font-mono text-2xs">{{ term.slug }}</span>
                         </template>
                         <template slot="actions" slot-scope="{ row: term, index }">
-                            <dropdown-list>
+                            <dropdown-list placement="left-start">
                                 <dropdown-item :text="__('View')" :redirect="term.permalink" />
                                 <dropdown-item :text="__('Edit')" :redirect="term.edit_url" />
                                 <div class="divider" />
@@ -86,7 +99,7 @@
                     </data-list-table>
                 </div>
                 <data-list-pagination
-                    class="mt-3"
+                    class="mt-6"
                     :resource-meta="meta"
                     :show-totals="true"
                     @page-selected="selectPage"

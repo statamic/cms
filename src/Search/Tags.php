@@ -9,13 +9,13 @@ use Statamic\Tags\Tags as BaseTags;
 
 class Tags extends BaseTags
 {
-    use Concerns\OutputsItems,
-        Concerns\QueriesConditions,
-        Concerns\QueriesScopes,
-        Concerns\QueriesOrderBys;
     use Concerns\GetsQueryResults {
         results as getQueryResults;
     }
+    use Concerns\OutputsItems,
+        Concerns\QueriesConditions,
+        Concerns\QueriesOrderBys,
+        Concerns\QueriesScopes;
 
     protected static $handle = 'search';
 
@@ -30,9 +30,7 @@ class Tags extends BaseTags
         $builder = Search::index($this->params->get('index'))
             ->ensureExists()
             ->search($query)
-            ->withData($supplementData)
-            ->limit($this->params->get('limit'))
-            ->offset($this->params->get('offset'));
+            ->withData($supplementData);
 
         $this->querySite($builder);
         $this->queryStatus($builder);
@@ -42,44 +40,7 @@ class Tags extends BaseTags
 
         $results = $this->getQueryResults($builder);
 
-        // Backwards compatibility. This can be removed in 3.2.
-        if (! $this->params->get('as')) {
-            return $this->output($this->addResultTypes($results));
-        }
-
-        $results = $this->output($results);
-
-        return $this->addResultTypesToOutput($results);
-    }
-
-    protected function addResultTypesToOutput($output)
-    {
-        if (! $this->params->get('paginate') && ! $this->params->get('as')) {
-            return $this->addResultTypes($output);
-        }
-
-        $as = $this->getPaginationResultsKey();
-
-        $output[$as] = $this->addResultTypes($output[$as]);
-
-        return $output;
-    }
-
-    protected function addResultTypes($results)
-    {
-        return $results->map(function ($result) {
-            $reference = is_array($result) ? $result['reference'] : $result->reference();
-
-            [$type, $id] = explode('::', $reference, 2);
-
-            if (is_array($result)) {
-                $result['result_type'] = $type;
-            } else {
-                $result->setSupplement('result_type', $type);
-            }
-
-            return $result;
-        });
+        return $this->output($results);
     }
 
     protected function queryStatus($query)

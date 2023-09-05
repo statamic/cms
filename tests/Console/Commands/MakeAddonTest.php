@@ -10,6 +10,8 @@ class MakeAddonTest extends TestCase
 {
     use Concerns\CleansUpGeneratedPaths;
 
+    private $files;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -29,7 +31,7 @@ class MakeAddonTest extends TestCase
     /** @test */
     public function it_can_generate_an_addon()
     {
-        $this->assertFileNotExists(base_path('addons/hasselhoff/knight-rider'));
+        $this->assertFileDoesNotExist(base_path('addons/hasselhoff/knight-rider'));
 
         $this->makeAddon('hasselhoff/knight-rider');
 
@@ -52,7 +54,7 @@ class MakeAddonTest extends TestCase
         $this->artisan('statamic:make:addon', ['addon' => 'some/path/deaths-tar-vulnerability'])
             ->expectsOutput('Please enter a valid composer package name (eg. hasselhoff/kung-fury).');
 
-        $this->assertFileNotExists(base_path('addons/erso/deaths-tar-vulnerability'));
+        $this->assertFileDoesNotExist(base_path('addons/erso/deaths-tar-vulnerability'));
     }
 
     /** @test */
@@ -91,7 +93,7 @@ class MakeAddonTest extends TestCase
     {
         $this->fakeSuccessfulComposerInstall();
 
-        $this->assertFileNotExists(base_path('addons/hasselhoff/knight-rider'));
+        $this->assertFileDoesNotExist(base_path('addons/hasselhoff/knight-rider'));
 
         $this->makeAddon('hasselhoff/knight-rider', ['--fieldtype' => true]);
 
@@ -103,10 +105,11 @@ class MakeAddonTest extends TestCase
 
         // Fieldtype stuff
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/package.json'));
-        $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/webpack.mix.js'));
+        $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/vite.config.js'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/src/Fieldtypes/KnightRider.php'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/resources/js/addon.js'));
         $this->assertFileExists(base_path('addons/hasselhoff/knight-rider/resources/js/components/fieldtypes/KnightRider.vue'));
+        $this->assertDirectoryExists(base_path('addons/hasselhoff/knight-rider/resources/dist'));
     }
 
     /** @test */
@@ -116,7 +119,7 @@ class MakeAddonTest extends TestCase
 
         $path = base_path('addons/ford/san-holo');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:addon', ['addon' => 'ford/san-holo', '--all' => true]);
 
