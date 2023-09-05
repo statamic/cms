@@ -265,7 +265,7 @@ class StaticWarm extends Command
 
         $routes = collect(app('router')->getRoutes()->getRoutes())
             ->filter(function (Route $route) use ($action) {
-                return $route->getActionName() === $action && ! Str::contains($route->uri(), '{');
+                return $action === $route->getActionName() && ! Str::contains($route->uri(), '{');
             })
             ->map(function (Route $route) {
                 return URL::tidy(Str::start($route->uri(), config('app.url').'/'));

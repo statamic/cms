@@ -660,7 +660,7 @@ class Comb
                     $output_length++;
                 }
 
-                if (is_null($this->limit) || ($this->limit && count($categorized_output[$item['category']]) < $this->limit)) {
+                if (is_null($this->limit) || ($this->limit && $this->limit > count($categorized_output[$item['category']]))) {
                     array_push($categorized_output[$item['category']], $item);
                 }
             }
@@ -671,7 +671,7 @@ class Comb
             // or trim outputs to limit if it was set
 
             // if we do not want more results than the limit
-            if ($this->enable_too_many_results && count($output) > $this->limit) {
+            if ($this->enable_too_many_results && $this->limit < count($output)) {
                 throw new TooManyResults('Too many results found.');
             }
 
@@ -885,7 +885,7 @@ class Comb
                     array_push($parts['disallowed'], substr($word, 1));
                 } elseif (strpos($word, '+') === 0 && strlen($word) >= $this->min_word_characters + 1) {
                     array_push($parts['required'], substr($word, 1));
-                } elseif (strlen($word) >= $this->min_word_characters) {
+                } elseif ($this->min_word_characters <= strlen($word)) {
                     array_push($parts['chunks'], $word);
                 }
             }
@@ -1063,7 +1063,7 @@ class Comb
             $before = $surplus.$before;
             $surplus = '';
             $half = floor(($length - Str::length($chunk)) / 2);
-            if (Str::length($after) < $half) {
+            if ($half > Str::length($after)) {
                 $snippet = $chunk.$after;
                 $snippet = Str::safeTruncateReverse($before, $length - Str::length($snippet)).$snippet;
             } else {

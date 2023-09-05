@@ -450,7 +450,7 @@ class AntlersNodeParser
                     }
                 }
 
-                if ($i + 1 >= $charCount) {
+                if ($charCount <= $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_END_OF_INPUT,
                         $node,
@@ -460,7 +460,7 @@ class AntlersNodeParser
 
                 $peek = null;
 
-                if ($i + 1 < $charCount) {
+                if ($charCount > $i + 1) {
                     $peek = $chars[$i + 1];
                 }
 
@@ -499,7 +499,7 @@ class AntlersNodeParser
             if ($hasFoundName && $current == DocumentParser::String_EscapeCharacter) {
                 $peek = null;
 
-                if ($i + 1 < $charCount) {
+                if ($charCount > $i + 1) {
                     $peek = $chars[$i + 1];
                 }
 
@@ -567,7 +567,7 @@ class AntlersNodeParser
                 $parameterNode->value = $content;
                 $parameterNode->startPosition = $node->relativePositionFromOffset($startAt, $nameStart);
 
-                if ($i + 1 > $charCount) {
+                if ($charCount < $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_NODE_PARAMETER,
                         $node,

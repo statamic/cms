@@ -218,7 +218,7 @@ class TagPairAnalyzer
                             // Here we will check some details on the candidate node to
                             // determine what the "priority" of this node is.
                             if ($refOpen != $refClose) {
-                                if (count($candidateNode->runtimeNodes) >= $refRuntimeNodeCount) {
+                                if ($refRuntimeNodeCount <= count($candidateNode->runtimeNodes)) {
                                     continue;
                                 }
                             }

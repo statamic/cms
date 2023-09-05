@@ -60,7 +60,7 @@ class EntryRepository implements RepositoryContract
             return null;
         }
 
-        if ($entry->uri() !== $uri) {
+        if ($uri !== $entry->uri()) {
             return null;
         }
 

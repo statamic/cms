@@ -35,7 +35,7 @@ class GlobalVariablesRepository implements RepositoryContract
     {
         return $this
             ->all()
-            ->filter(fn ($variable) => Str::before($variable->id(), '::') == $handle)
+            ->filter(fn ($variable) => $handle == Str::before($variable->id(), '::'))
             ->values();
     }
 

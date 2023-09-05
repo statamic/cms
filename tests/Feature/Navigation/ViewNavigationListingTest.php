@@ -26,7 +26,7 @@ class ViewNavigationListingTest extends TestCase
             ->visitIndex()
             ->assertSuccessful()
             ->assertViewHas('navs', function ($navs) {
-                return $navs->map->id->all() === ['foo', 'bar'];
+                return ['foo', 'bar'] === $navs->map->id->all();
             })
             ->assertDontSee('no-results');
     }
@@ -59,7 +59,7 @@ class ViewNavigationListingTest extends TestCase
             ->visitIndex()
             ->assertSuccessful()
             ->assertViewHas('navs', function ($navs) {
-                return $navs->map->id->all() === ['bar'];
+                return ['bar'] === $navs->map->id->all();
             })
             ->assertDontSee('no-results');
     }
@@ -79,7 +79,7 @@ class ViewNavigationListingTest extends TestCase
             ->visitIndex()
             ->assertSuccessful()
             ->assertViewHas('navs', function ($navs) {
-                return $navs->map->id->all() === ['foo', 'bar'];
+                return ['foo', 'bar'] === $navs->map->id->all();
             })
             ->assertDontSee('no-results');
     }

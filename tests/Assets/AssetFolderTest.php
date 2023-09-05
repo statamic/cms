@@ -409,7 +409,7 @@ class AssetFolderTest extends TestCase
         Event::assertDispatchedTimes(AssetFolderSaved::class, count($paths));
         foreach ($paths as $path) {
             Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) use ($path) {
-                return $event->folder->path() === $path;
+                return $path === $event->folder->path();
             });
 
             Event::assertDispatched(AssetFolderSaved::class, function (AssetFolderSaved $event) use ($path) {
@@ -427,7 +427,7 @@ class AssetFolderTest extends TestCase
         Event::assertDispatchedTimes(AssetSaved::class, count($paths));
         foreach ($paths as $path) {
             Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) use ($path) {
-                return $event->asset->path() === $path;
+                return $path === $event->asset->path();
             });
         }
     }
@@ -510,7 +510,7 @@ class AssetFolderTest extends TestCase
         Event::assertDispatchedTimes(AssetFolderSaved::class, count($paths));
         foreach ($paths as $path) {
             Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) use ($path) {
-                return $event->folder->path() === $path;
+                return $path === $event->folder->path();
             });
         }
         $paths = ['newmove', 'newmove/sub', 'newmove/sub/subsub'];
@@ -530,7 +530,7 @@ class AssetFolderTest extends TestCase
         Event::assertDispatchedTimes(AssetSaved::class, count($paths));
         foreach ($paths as $path) {
             Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) use ($path) {
-                return $event->asset->path() === $path;
+                return $path === $event->asset->path();
             });
         }
     }
@@ -595,7 +595,7 @@ class AssetFolderTest extends TestCase
         Event::assertDispatchedTimes(AssetFolderSaved::class, count($paths));
         foreach ($paths as $path) {
             Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) use ($path) {
-                return $event->folder->path() === $path;
+                return $path === $event->folder->path();
             });
         }
         $paths = ['newmove', 'newmove/sub', 'newmove/sub/subsub'];
@@ -615,7 +615,7 @@ class AssetFolderTest extends TestCase
         Event::assertDispatchedTimes(AssetSaved::class, count($paths));
         foreach ($paths as $path) {
             Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) use ($path) {
-                return $event->asset->path() === $path;
+                return $path === $event->asset->path();
             });
         }
     }
@@ -682,7 +682,7 @@ class AssetFolderTest extends TestCase
         Event::assertDispatchedTimes(AssetFolderSaved::class, count($paths));
         foreach ($paths as $path) {
             Event::assertDispatched(AssetFolderDeleted::class, function (AssetFolderDeleted $event) use ($path) {
-                return $event->folder->path() === $path;
+                return $path === $event->folder->path();
             });
         }
         $paths = ['NEWMOVE', 'NEWMOVE/sub', 'NEWMOVE/sub/subsub'];
@@ -702,7 +702,7 @@ class AssetFolderTest extends TestCase
         Event::assertDispatchedTimes(AssetSaved::class, count($paths));
         foreach ($paths as $path) {
             Event::assertDispatched(AssetSaved::class, function (AssetSaved $event) use ($path) {
-                return $event->asset->path() === $path;
+                return $path === $event->asset->path();
             });
         }
     }

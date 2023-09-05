@@ -302,7 +302,7 @@ class LanguageParser
                 $prevNode = $newTokens[count($newTokens) - 1];
             }
 
-            if ($i + 1 < $nodeCount) {
+            if ($nodeCount > $i + 1) {
                 $next = $tokens[$i + 1];
             }
 
@@ -382,7 +382,7 @@ class LanguageParser
             } elseif ($thisNode instanceof VariableNode && $prevNode instanceof MethodInvocationNode) {
                 $this->cleanVariableForMethodInvocation($thisNode);
 
-                if ($i + 1 > $nodeCount) {
+                if ($nodeCount < $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_METHOD_CALL_MISSING_ARG_GROUP,
                         $thisNode,
@@ -423,7 +423,7 @@ class LanguageParser
 
                 continue;
             } elseif ($thisNode instanceof InlineBranchSeparator && $prevNode instanceof MethodInvocationNode) {
-                if ($i + 1 > $nodeCount) {
+                if ($nodeCount < $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_METHOD_CALL_MISSING_METHOD,
                         $thisNode,
@@ -433,7 +433,7 @@ class LanguageParser
 
                 $next = $tokens[$i + 1];
 
-                if ($i + 2 > $nodeCount) {
+                if ($nodeCount < $i + 2) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_METHOD_CALL_MISSING_ARG_GROUP,
                         $thisNode,
@@ -475,7 +475,7 @@ class LanguageParser
 
                 continue;
             } elseif ($thisNode instanceof MethodInvocationNode) {
-                if ($i + 1 > $nodeCount) {
+                if ($nodeCount < $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_METHOD_CALL_MISSING_METHOD,
                         $thisNode,
@@ -486,7 +486,7 @@ class LanguageParser
                 /** @var VariableNode $methodNode */
                 $methodNode = $tokens[$i + 1];
 
-                if ($i + 2 > $nodeCount) {
+                if ($nodeCount < $i + 2) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_INVALID_METHOD_CALL_ARG_GROUP,
                         $thisNode,
@@ -561,7 +561,7 @@ class LanguageParser
             }
 
             if ($thisNode instanceof LanguageOperatorConstruct) {
-                if ($i + 1 >= $nodeCount) {
+                if ($nodeCount <= $i + 1) {
                     // Convert it into a variable type node.
                     $tokens[$i] = $this->convertOperatorToVarNode($thisNode);
 
@@ -614,7 +614,7 @@ class LanguageParser
             $thisToken = $tokens[$i];
 
             if ($thisToken instanceof TupleListStart) {
-                if ($i + 1 >= $tokenCount) {
+                if ($tokenCount <= $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_EOI_PARSING_TUPLE_LIST,
                         $thisToken,
@@ -701,7 +701,7 @@ class LanguageParser
                         );
                     }
 
-                    if (count($valueNodeCandidate->nodes) != $targetGroupLength) {
+                    if ($targetGroupLength != count($valueNodeCandidate->nodes)) {
                         throw ErrorFactory::makeSyntaxError(
                             AntlersErrorCodes::TYPE_VALUE_NAME_LENGTH_MISMATCH_TUPLE_LIST,
                             $peek,
@@ -780,7 +780,7 @@ class LanguageParser
             $thisToken = $tokens[$i];
 
             if ($this->isOperatorType($thisToken)) {
-                if ($i + 1 >= $tokenCount) {
+                if ($tokenCount <= $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_OPERATOR,
                         $thisToken,
@@ -835,7 +835,7 @@ class LanguageParser
 
             if ($token instanceof LanguageOperatorConstruct) {
                 if ($token->content == LanguageOperatorRegistry::ARR_ORDERBY) {
-                    if ($i + 1 >= $tokenCount) {
+                    if ($tokenCount <= $i + 1) {
                         throw ErrorFactory::makeSyntaxError(
                             AntlersErrorCodes::TYPE_UNEXPECTED_EOI_PARSING_ORDER_GROUP,
                             $token,
@@ -888,7 +888,7 @@ class LanguageParser
 
                     continue;
                 } elseif ($token->content == LanguageOperatorRegistry::ARR_GROUPBY) {
-                    if ($i + 1 >= $tokenCount) {
+                    if ($tokenCount <= $i + 1) {
                         throw ErrorFactory::makeSyntaxError(
                             AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_GROUP_BY,
                             $token,
@@ -925,7 +925,7 @@ class LanguageParser
                     $newTokens[] = $token;
                     $newTokens[] = $groupFields;
 
-                    if ($i + 2 < $tokenCount && $i + 3 < $tokenCount) {
+                    if ($tokenCount > $i + 2 && $tokenCount > $i + 3) {
                         $peekOne = $tokens[$i + 2];
                         $peekTwo = $tokens[$i + 3];
 
@@ -951,7 +951,7 @@ class LanguageParser
 
                     continue;
                 } elseif ($token->content == LanguageOperatorRegistry::STRUCT_SWITCH) {
-                    if ($i + 1 >= $tokenCount) {
+                    if ($tokenCount <= $i + 1) {
                         if ($token->originalAbstractNode instanceof VariableNode == false) {
                             throw ErrorFactory::makeSyntaxError(
                                 AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_SWITCH_GROUP,
@@ -1081,7 +1081,7 @@ class LanguageParser
                                 continue;
                             }
 
-                            if ($c + 1 < $subTokenCount) {
+                            if ($subTokenCount > $c + 1) {
                                 $next = $subTokens[$c + 1];
                             }
 
@@ -1101,7 +1101,7 @@ class LanguageParser
 
                                 $switchGroup->cases[] = $newCase;
 
-                                if ($c + 3 < $subTokenCount) {
+                                if ($subTokenCount > $c + 3) {
                                     if ($subTokens[$c + 3] instanceof ArgSeparator == false) {
                                         throw ErrorFactory::makeSyntaxError(
                                             AntlersErrorCodes::TYPE_PARSER_INVALID_SWITCH_TOKEN,
@@ -1126,7 +1126,7 @@ class LanguageParser
 
                     continue;
                 } elseif ($token->content == LanguageOperatorRegistry::ARR_MAKE) {
-                    if ($i + 1 >= $tokenCount) {
+                    if ($tokenCount <= $i + 1) {
                         throw ErrorFactory::makeSyntaxError(
                             AntlersErrorCodes::TYPE_ARR_MAKE_MISSING_TARGET,
                             $token,
@@ -1223,12 +1223,12 @@ class LanguageParser
 
             $next = null;
 
-            if ($i + 1 < $nodeCount) {
+            if ($nodeCount > $i + 1) {
                 $next = $nodes[$i + 1];
             }
 
             if ($next instanceof ScopeAssignmentOperator) {
-                if ($i + 2 >= $nodeCount) {
+                if ($nodeCount <= $i + 2) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_ARR_MAKE_MISSING_ARR_KEY_PAIR_VALUE,
                         $next,
@@ -1307,7 +1307,7 @@ class LanguageParser
 
             $next = null;
 
-            if ($i + 1 < $nodeCount) {
+            if ($nodeCount > $i + 1) {
                 $next = $nodes[$i + 1];
             }
 
@@ -1346,7 +1346,7 @@ class LanguageParser
 
                 $next = null;
 
-                if ($i + 1 < $nodeCount) {
+                if ($nodeCount > $i + 1) {
                     $next = $nodes[$i + 1];
                 }
 
@@ -1419,7 +1419,7 @@ class LanguageParser
 
             $next = null;
 
-            if ($i + 1 < $nodeCount) {
+            if ($nodeCount > $i + 1) {
                 $next = $nodes[$i + 1];
             }
 
@@ -1485,7 +1485,7 @@ class LanguageParser
 
             $next = null;
 
-            if ($i + 1 < $nodeCount) {
+            if ($nodeCount > $i + 1) {
                 $next = $nodes[$i + 1];
             }
 
@@ -1495,7 +1495,7 @@ class LanguageParser
 
                 continue;
             } elseif ($next instanceof InlineBranchSeparator) {
-                if ($i + 2 >= $nodeCount) {
+                if ($nodeCount <= $i + 2) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_ARG_UNEXPECTED_NAMED_ARGUMENT,
                         $thisNode,
@@ -1524,7 +1524,7 @@ class LanguageParser
 
                 $argGroup->args[] = $namedArgument;
 
-                if ($i + 3 < $nodeCount && $nodes[$i + 3] instanceof ArgSeparator) {
+                if ($nodeCount > $i + 3 && $nodes[$i + 3] instanceof ArgSeparator) {
                     $i += 3;
                 } else {
                     $i += 2;
@@ -1631,7 +1631,7 @@ class LanguageParser
 
                 $this->assertOperandRight($nodes, $i);
 
-                if ($i + 1 >= $nodeCount) {
+                if ($nodeCount <= $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_REDUCING_NEGATION_OPERATORS,
                         $node,
@@ -1714,7 +1714,7 @@ class LanguageParser
      */
     private function assertOperandRight($tokens, $i)
     {
-        if ($i + 1 > (count($tokens) - 1)) {
+        if ((count($tokens) - 1) < $i + 1) {
             throw ErrorFactory::makeSyntaxError(
                 AntlersErrorCodes::TYPE_UNEXPECTED_END_OF_INPUT,
                 $tokens[$i], 'Unexpected end of input; expecting operand for operator '.TypeLabeler::getPrettyTypeName($tokens[$i]).' near "'.LineRetriever::getNearText($tokens[$i]).'".');
@@ -1825,7 +1825,7 @@ class LanguageParser
                     );
                 }
 
-                if ($i + 1 >= $tokenCount) {
+                if ($tokenCount <= $i + 1) {
                     $lastNodeText = '';
 
                     if ($i > 0) {
@@ -2018,7 +2018,7 @@ class LanguageParser
             if ($thisNode instanceof MethodInvocationNode) {
                 // Check to see if we should continue.
                 $doContinue = false;
-                if ($i + 1 < $nodeLen) {
+                if ($nodeLen > $i + 1) {
                     for ($j = $i + 1; $j < $nodeLen; $j++) {
                         $checkNode = $nodes[$j];
 
@@ -2049,7 +2049,7 @@ class LanguageParser
                 $targetNodes[] = $thisNode;
 
                 // Scan forwards to collect all chained calls.
-                if ($i + 1 < $nodeLen && $nodes[$i + 1] instanceof MethodInvocationNode) {
+                if ($nodeLen > $i + 1 && $nodes[$i + 1] instanceof MethodInvocationNode) {
                     $skipTo = $i;
 
                     for ($j = $i + 1; $j < $nodeLen; $j++) {
@@ -2112,7 +2112,7 @@ class LanguageParser
                     $applyModifiersToNode->modifierChain = new ModifierChainNode();
                 }
 
-                if ($i + 1 >= $tokenCount) {
+                if ($tokenCount <= $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_MODIFIER_DETAILS,
                         $node,
@@ -2326,7 +2326,7 @@ class LanguageParser
 
         for ($i = 0; $i < $tokenCount; $i++) {
             if ($tokens[$i] instanceof ModifierValueSeparator || $tokens[$i] instanceof InlineBranchSeparator) {
-                if ($i + 1 >= $tokenCount) {
+                if ($tokenCount <= $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_MODIFIER_UNEXPECTED_END_OF_VALUE_LIST,
                         null,
@@ -2459,7 +2459,7 @@ class LanguageParser
             $thisToken = $tokens[$i];
 
             if ($thisToken instanceof AssignmentOperatorNodeContract) {
-                if ($i + 2 < $tokenCount) {
+                if ($tokenCount > $i + 2) {
                     $peek = $tokens[$i + 2];
 
                     if ($peek instanceof StatementSeparatorNode == false) {
@@ -2509,7 +2509,7 @@ class LanguageParser
             } else {
                 $groupNodes[] = $tokens[$i];
 
-                if ($i + 1 >= $tokenCount) {
+                if ($tokenCount <= $i + 1) {
                     $semanticGroup = new SemanticGroup();
                     $semanticGroup->nodes = $groupNodes;
                     $groups[] = $semanticGroup;
@@ -2532,7 +2532,7 @@ class LanguageParser
             if ($node instanceof NullCoalesceOperator) {
                 $left = array_pop($newTokens);
 
-                if ($i + 1 >= $tokenCount) {
+                if ($tokenCount <= $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_NULL_COALESCENCE_GROUP,
                         $node,
@@ -2705,7 +2705,7 @@ class LanguageParser
             if ($token instanceof LogicalNegationOperator) {
                 $negationCount = $this->countTypeRight($tokens, $i, LogicalNegationOperator::class);
 
-                if (count($negatedGroupedTokens) == 0 && count($tokens) == $negationCount) {
+                if (count($negatedGroupedTokens) == 0 && $negationCount == count($tokens)) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_LOGIC_NEGATION_OPERATOR,
                         $token,
@@ -2803,7 +2803,7 @@ class LanguageParser
             $token = $negatedGroupedTokens[$i];
 
             if ($token instanceof LogicGroupBegin) {
-                if ($i + 1 >= $negatedTokenCount) {
+                if ($negatedTokenCount <= $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_LOGIC_GROUP_END_DUE_TO_NEGATION,
                         $token,
@@ -2876,7 +2876,7 @@ class LanguageParser
                 $end = $node;
                 break;
             } elseif ($node instanceof LogicGroupBegin) {
-                if ($i + 1 >= $nodeCount) {
+                if ($nodeCount <= $i + 1) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_LOGIC_GROUP_END,
                         $node,
@@ -2911,7 +2911,7 @@ class LanguageParser
         if (count($subNodes) >= 2 && $subNodes[1] instanceof ScopeAssignmentOperator) {
             $logicalGroup = new ScopedLogicGroup();
 
-            if ($i + 2 < $nodeCount && $nodes[$i + 1] instanceof VariableNode && $nodes[$i + 2] instanceof StringValueNode) {
+            if ($nodeCount > $i + 2 && $nodes[$i + 1] instanceof VariableNode && $nodes[$i + 2] instanceof StringValueNode) {
                 /** @var VariableNode $candidateVarNode */
                 $candidateVarNode = $nodes[$i + 1];
 

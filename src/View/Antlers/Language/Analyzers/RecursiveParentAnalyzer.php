@@ -46,7 +46,7 @@ class RecursiveParentAnalyzer
 
                     if ($subNode instanceof AntlersNode && $subNode->isClosedBy != null) {
                         if ($node->isNestedRecursive) {
-                            if (trim($subNode->content) == $node->name->name) {
+                            if ($node->name->name == trim($subNode->content)) {
                                 $lastNode = $subNode;
                                 break;
                             }

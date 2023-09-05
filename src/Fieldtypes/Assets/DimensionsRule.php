@@ -121,6 +121,6 @@ class DimensionsRule implements Rule
 
         $precision = 1 / (max($width, $height) + 1);
 
-        return abs($numerator / $denominator - $width / $height) > $precision;
+        return $precision < abs($numerator / $denominator - $width / $height);
     }
 }

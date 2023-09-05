@@ -79,7 +79,7 @@ class Pattern
      */
     public function startsWith($haystack, $needle)
     {
-        return substr($haystack, 0, strlen($needle)) === $needle;
+        return $needle === substr($haystack, 0, strlen($needle));
     }
 
     /**

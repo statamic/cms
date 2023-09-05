@@ -300,7 +300,7 @@ class Form implements Arrayable, Augmentable, FormContract
     public function submission($id)
     {
         return $this->submissions()->filter(function ($submission) use ($id) {
-            return $submission->id() === $id;
+            return $id === $submission->id();
         })->first();
     }
 

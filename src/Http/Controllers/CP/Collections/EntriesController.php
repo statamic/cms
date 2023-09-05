@@ -483,7 +483,7 @@ class EntriesController extends CpController
 
     private function validateParent($entry, $tree, $parent)
     {
-        if ($entry->id() == $parent) {
+        if ($parent == $entry->id()) {
             throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_cannot_be_itself')]);
         }
 
@@ -497,7 +497,7 @@ class EntriesController extends CpController
         // There will always be a next page since we couldn't have got this far with a single page.
         $nextTopLevelPage = $tree->pages()->all()->skip(1)->first();
 
-        if ($nextTopLevelPage->id() === $parent || $nextTopLevelPage->pages()->all()->count() > 0) {
+        if ($parent === $nextTopLevelPage->id() || $nextTopLevelPage->pages()->all()->count() > 0) {
             throw ValidationException::withMessages(['parent' => __('statamic::validation.parent_causes_root_children')]);
         }
     }

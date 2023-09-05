@@ -574,7 +574,7 @@ class CollectionTest extends TestCase
     public function findEntryByTitle($title)
     {
         return Facades\Entry::all()->first(function ($entry) use ($title) {
-            return $entry->get('title') === $title;
+            return $title === $entry->get('title');
         });
     }
 
