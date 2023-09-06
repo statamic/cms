@@ -78,7 +78,7 @@ class FormController extends Controller
         return $this->formSuccess($params, $submission);
     }
 
-    private function validateContentType($request, $form)
+    protected function validateContentType($request, $form)
     {
         $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
 
@@ -97,7 +97,7 @@ class FormController extends Controller
      * @param  bool  $silentFailure
      * @return Response
      */
-    private function formSuccess($params, $submission, $silentFailure = false)
+    protected function formSuccess($params, $submission, $silentFailure = false)
     {
         if (request()->ajax() || request()->wantsJson()) {
             return response([
@@ -126,7 +126,7 @@ class FormController extends Controller
      * @param  string  $form
      * @return Response|RedirectResponse
      */
-    private function formFailure($params, $errors, $form)
+    protected function formFailure($params, $errors, $form)
     {
         if (request()->ajax()) {
             return response([
