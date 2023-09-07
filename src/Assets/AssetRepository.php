@@ -95,7 +95,7 @@ class AssetRepository implements Contract
     public function findByPath(string $path)
     {
         return $this->all()->filter(function ($asset) use ($path) {
-            return $path === $asset->resolvedPath();
+            return $asset->resolvedPath() === $path;
         })->first();
     }
 
@@ -122,7 +122,7 @@ class AssetRepository implements Contract
 
         $cache->add($asset->path());
 
-        if (($originalPath = $asset->getOriginal('path')) !== $asset->path()) {
+        if ($asset->path() !== ($originalPath = $asset->getOriginal('path'))) {
             $originalId = $asset->container()->handle().'::'.$originalPath;
             $store->delete($store->getItem($originalId));
             $cache->forget($originalPath);

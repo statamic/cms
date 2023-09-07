@@ -135,7 +135,7 @@ class PathParser
                 $this->prev = '';
             }
 
-            if ($this->inputLength > $this->currentIndex + 1) {
+            if ($this->currentIndex + 1 < $this->inputLength) {
                 $this->next = $this->chars[$this->currentIndex + 1];
             }
 
@@ -369,7 +369,7 @@ class PathParser
                 $prev = $this->chars[$i - 1];
             }
 
-            if ($this->inputLength > $i + 1) {
+            if ($i + 1 < $this->inputLength) {
                 $next = $this->chars[$i + 1];
             }
 

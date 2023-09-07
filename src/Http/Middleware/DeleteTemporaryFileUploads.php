@@ -11,7 +11,7 @@ class DeleteTemporaryFileUploads
     {
         $lottery = [2, 100];
 
-        if ($lottery[0] >= random_int(1, $lottery[1])) {
+        if (random_int(1, $lottery[1]) <= $lottery[0]) {
             $this->deleteFilesOverAnHourOld();
         }
 

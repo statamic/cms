@@ -31,6 +31,6 @@ class TimeFieldtype implements InvokableRule
 
         $date = DateTime::createFromFormat('!'.$format, $value);
 
-        return $date && $value == $date->format($format);
+        return $date && $date->format($format) == $value;
     }
 }

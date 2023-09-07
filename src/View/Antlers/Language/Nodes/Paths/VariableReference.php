@@ -62,7 +62,7 @@ class VariableReference
         foreach ($this->pathParts as $part) {
             if ($part instanceof PathNode) {
                 // Handle the case of variable.5
-                if ($part->name == intval($part->name)) {
+                if (intval($part->name) == $part->name) {
                     return true;
                 }
             } elseif ($part instanceof VariableReference) {

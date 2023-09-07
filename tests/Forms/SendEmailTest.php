@@ -36,8 +36,8 @@ class SendEmailTest extends TestCase
         Mail::assertSent(Email::class, 1);
 
         Mail::assertSent(function (Email $mail) use ($submission, $site) {
-            return $submission === $mail->getSubmission()
-                && $site === $mail->getSite()
+            return $mail->getSubmission() === $submission
+                && $mail->getSite() === $site
                 && $mail->getConfig() === [
                     'from' => 'first@sender.com',
                     'to' => 'first@recipient.com',
