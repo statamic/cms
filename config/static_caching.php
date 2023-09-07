@@ -125,4 +125,16 @@ return [
 
     'warm_queue' => null,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Queue Connection
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define the queue connection name that
+    | will be used when warming the static cache.
+    |
+    */
+
+    'queue_connection' => env('STATAMIC_STATIC_WARM_QUEUE_CONNECTION'),
+
 ];
