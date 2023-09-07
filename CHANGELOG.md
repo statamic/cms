@@ -1,5 +1,29 @@
 # Release Notes
 
+## 4.21.0 (2023-09-07)
+
+### What's new
+- Add fullscreen and rulers to the code fieldtype. [#8509](https://github.com/statamic/cms/issues/8509) by @petemolinero
+- Add CollectionTree and NavTree contracts and bindings. [#8658](https://github.com/statamic/cms/issues/8658) by @ryanmitchell
+- Add config setting so CSV submission export headers can use field `display` instead of `handle`. [#8660](https://github.com/statamic/cms/issues/8660) by @ryanmitchell
+- Register/export set and field related components. [#8577](https://github.com/statamic/cms/issues/8577) by @jacksleight
+- Add autocomplete attribute to text fieldtype. [#8623](https://github.com/statamic/cms/issues/8623) by @jeroenimpres
+- Add error redirect on user password reset form. [#7935](https://github.com/statamic/cms/issues/7935) by @ryanmitchell
+
+### What's improved
+- French translations. [#8653](https://github.com/statamic/cms/issues/8653) by @ebeauchamps
+
+### What's fixed
+- Fix list fieldtype focus infinite loop. [#8674](https://github.com/statamic/cms/issues/8674) by @ryanmitchell
+- Fix nested Bard addEventListener error. [#8676](https://github.com/statamic/cms/issues/8676) by @jacksleight
+- Set end range date to end of day in the date fieldtype. [#8648](https://github.com/statamic/cms/issues/8648) by @jonassiewertsen
+- Ensure Live Preview is always excluded from static caching. [#7183](https://github.com/statamic/cms/issues/7183) by @FrittenKeeZ
+- Use Laravel url helper instead to get the site url. [#8659](https://github.com/statamic/cms/issues/8659) by @jonassiewertsen
+- Prevent form section instructions cascading into field instructions. [#8651](https://github.com/statamic/cms/issues/8651) by @jesseleite
+- Reticulate fewer splines. [#8655](https://github.com/statamic/cms/issues/8655) by @robdekort
+
+
+
 ## 4.20.0 (2023-08-30)
 
 ### What's new
