@@ -33,7 +33,7 @@ class UserProvider implements UserProviderContract
             return null;
         }
 
-        return ($token === $user->getRememberToken()) ? $user : null;
+        return ($user->getRememberToken() === $token) ? $user : null;
     }
 
     /**

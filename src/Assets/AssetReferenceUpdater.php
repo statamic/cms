@@ -53,7 +53,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $fields
             ->filter(function ($field) {
                 return $field->type() === 'assets'
-                    && $this->container === $this->getConfiguredAssetsFieldContainer($field);
+                    && $this->getConfiguredAssetsFieldContainer($field) === $this->container;
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $field->get('max_files') === 1
@@ -76,7 +76,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $fields
             ->filter(function ($field) {
                 return $field->type() === 'link'
-                    && $this->container === $field->get('container');
+                    && $field->get('container') === $this->container;
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $this->updateStatamicUrlsInLinkValue($field, $dottedPrefix);
@@ -97,7 +97,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $fields
             ->filter(function ($field) {
                 return $field->type() === 'bard'
-                    && $this->container === $field->get('container');
+                    && $field->get('container') === $this->container;
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $field->get('save_html') === true
@@ -120,7 +120,7 @@ class AssetReferenceUpdater extends DataReferenceUpdater
         $fields
             ->filter(function ($field) {
                 return $field->type() === 'markdown'
-                    && $this->container === $field->get('container');
+                    && $field->get('container') === $this->container;
             })
             ->each(function ($field) use ($dottedPrefix) {
                 $this->updateStatamicUrlsInStringValue($field, $dottedPrefix);

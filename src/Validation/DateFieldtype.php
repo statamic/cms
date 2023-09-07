@@ -124,7 +124,7 @@ class DateFieldtype
 
         $date = DateTime::createFromFormat('!'.$format, $value);
 
-        return $date && $value == $date->format($format);
+        return $date && $date->format($format) == $value;
     }
 
     private function timeEnabled()

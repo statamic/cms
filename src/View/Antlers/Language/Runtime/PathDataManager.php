@@ -683,7 +683,7 @@ class PathDataManager
                 }
 
                 if (count($pathItem->pathParts) == 1 && is_numeric($pathItem->originalContent) &&
-                    $pathItem->originalContent == intval($pathItem->originalContent)) {
+                    intval($pathItem->originalContent) == $pathItem->originalContent) {
                     $numericIndex = intval($pathItem->originalContent);
 
                     if (array_key_exists($numericIndex, $this->reducedVar)) {

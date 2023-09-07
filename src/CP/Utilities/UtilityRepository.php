@@ -65,7 +65,7 @@ class UtilityRepository
 
     public function findBySlug($slug)
     {
-        return $this->utilities->first(fn ($utility) => $slug === $utility->slug());
+        return $this->utilities->first(fn ($utility) => $utility->slug() === $slug);
     }
 
     public function routes()

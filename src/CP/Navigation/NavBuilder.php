@@ -407,7 +407,7 @@ class NavBuilder
         $displayNew = $this->sectionsManipulations[$sectionKey]['display'];
 
         collect($this->items)
-            ->filter(fn ($item) => $displayOriginal === $item->section())
+            ->filter(fn ($item) => $item->section() === $displayOriginal)
             ->each(fn ($item) => $item->preserveCurrentId()->section($displayNew));
 
         $this->sections[$sectionKey] = $displayNew;
@@ -457,7 +457,7 @@ class NavBuilder
 
         // Get unconfigured item IDs...
         $unconfiguredItemIds = collect($this->items)
-            ->filter(fn ($item) => $section === $item->section())
+            ->filter(fn ($item) => $item->section() === $section)
             ->map
             ->id();
 

@@ -873,7 +873,7 @@ class NodeProcessor
             $thisNode = $nodes[$i];
 
             if ($thisNode instanceof StatementSeparatorNode) {
-                if ($nodeCount <= $i + 1) {
+                if ($i + 1 >= $nodeCount) {
                     return true;
                 }
 
@@ -1728,7 +1728,7 @@ class NodeProcessor
                                             $potentialVariableCollisionName = $tagParameters[$paramName];
 
                                             if (array_key_exists($potentialVariableCollisionName, $beforeAssignments) && array_key_exists($potentialVariableCollisionName, $tagAssocOutput)) {
-                                                if ($tagAssocOutput[$potentialVariableCollisionName] == $this->data[count($this->data) - 1][$potentialVariableCollisionName]) {
+                                                if ($this->data[count($this->data) - 1][$potentialVariableCollisionName] == $tagAssocOutput[$potentialVariableCollisionName]) {
                                                     unset($this->runtimeAssignments[$potentialVariableCollisionName]);
                                                     $adjustedScope = true;
                                                 }
@@ -2302,7 +2302,7 @@ class NodeProcessor
 
                                         $processor->setRuntimeAssignments($runtimeAssignments);
 
-                                        if ($dataCount < count($this->data)) {
+                                        if (count($this->data) > $dataCount) {
                                             $this->popLoopScope();
                                         }
                                     }

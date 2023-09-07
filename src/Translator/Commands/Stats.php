@@ -81,7 +81,7 @@ class Stats extends Command
 
         if ($minWords = $input->getOption('min-words')) {
             $rows = $rows->filter(function ($item) use ($minWords) {
-                return ($minWords - 1) <= substr_count($item['string'], ' ');
+                return substr_count($item['string'], ' ') >= ($minWords - 1);
             });
         }
 

@@ -31,7 +31,7 @@ class TaxonomyTermsStore extends ChildStore
         $dir = str_finish($this->directory(), '/');
         $relative = $file->getPathname();
 
-        if ($dir == substr($relative, 0, strlen($dir))) {
+        if (substr($relative, 0, strlen($dir)) == $dir) {
             $relative = substr($relative, strlen($dir));
         }
 

@@ -76,7 +76,7 @@ class CollectionTreeController extends CpController
                 : $page->parent()->pages()->all();
 
             $siblings = $siblings->reject(function ($sibling) use ($id) {
-                return $id === $sibling->reference();
+                return $sibling->reference() === $id;
             });
 
             $uris = $siblings->map->uri();

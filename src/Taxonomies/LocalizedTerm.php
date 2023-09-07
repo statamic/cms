@@ -140,7 +140,7 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
 
     protected function isDefaultLocale()
     {
-        return $this->locale === $this->defaultLocale();
+        return $this->defaultLocale() === $this->locale;
     }
 
     public function hasOrigin()

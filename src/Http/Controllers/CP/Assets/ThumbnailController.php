@@ -177,7 +177,7 @@ class ThumbnailController extends Controller
         $maxWidth = Config::get('statamic.assets.thumbnails.max_width');
         $maxHeight = Config::get('statamic.assets.thumbnails.max_height');
 
-        if ($maxWidth > $this->asset->width() && $maxHeight > $this->asset->height()) {
+        if ($this->asset->width() < $maxWidth && $this->asset->height() < $maxHeight) {
             return;
         }
 
