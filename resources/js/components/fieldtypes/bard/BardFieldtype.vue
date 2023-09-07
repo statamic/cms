@@ -345,11 +345,11 @@ export default {
 
         this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
 
-        // this.$nextTick(() => {
+        this.$nextTick(() => {
             document.querySelector(`label[for="${this.fieldId}"]`).addEventListener('click', () => {
                 this.editor.commands.focus();
             });
-        // });
+        });
     },
 
     beforeDestroy() {
