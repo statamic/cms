@@ -2204,7 +2204,7 @@ class EntryTest extends TestCase
                 // Ugly. Sorry. ¯\_(ツ)_/¯
                 $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
                 if (
-                    'Statamic\Entries\Entry@save' === $trace[2]['class'].'@'.$trace[2]['function']
+                    $trace[2]['class'].'@'.$trace[2]['function'] === 'Statamic\Entries\Entry@save'
                     && $method === 'forget'
                     && Str::startsWith($args[0], 'origin-Entry-')
                 ) {
