@@ -22,7 +22,14 @@ export default {
                 .keys()
                 .value();
 
-            return new Values(this.values, this.jsonSubmittingFields).except(omittableFields);
+            // Prosemirror's JSON will include spaces between tags.
+            // For example (this is not the actual json)...
+            // "<p>One <b>two</b> three</p>" becomes ['OneSPACE', '<b>two</b>', 'SPACEthree']
+            // But, Laravel's TrimStrings middleware would remove them.
+            // Those spaces need to be there, otherwise it would be rendered as <p>One<b>two</b>three</p>
+            // To combat this, we submit the JSON string instead of an object.
+
+            return new Values(this.values, this.jsonSubmittingFields).jsonEncode().except(omittableFields);
         },
 
     },

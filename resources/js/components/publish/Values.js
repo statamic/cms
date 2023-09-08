@@ -25,24 +25,19 @@ export default class Values {
 
     get(dottedKey) {
         let decodedValues = new this.constructor(clone(this.values), this.jsonFields)
-            .jsonDecode()
             .values;
 
         return data_get(decodedValues, dottedKey);
     }
 
     set(dottedKey, value)  {
-        this.jsonDecode()
-            .setValue(dottedKey, value)
-            .jsonEncode();
+        this.setValue(dottedKey, value);
 
         return this;
     }
 
     except(dottedKeys) {
-        return this.jsonDecode()
-            .rejectValuesByKey(dottedKeys)
-            .jsonEncode()
+        return this.rejectValuesByKey(dottedKeys)
             .all();
     }
 

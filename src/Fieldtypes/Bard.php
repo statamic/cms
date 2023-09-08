@@ -23,7 +23,9 @@ class Bard extends Replicator
     use Concerns\ResolvesStatamicUrls;
 
     protected $categories = ['text', 'structured'];
-    protected $defaultValue = '[]';
+
+    protected $defaultValue = [];
+
     protected $rules = [];
 
     protected function configFieldItems(): array
@@ -349,8 +351,8 @@ class Bard extends Replicator
 
     public function preProcess($value)
     {
-        if (empty($value) || $value === '[]') {
-            return '[]';
+        if (empty($value)) {
+            return [];
         }
 
         if (is_string($value)) {
@@ -384,7 +386,7 @@ class Bard extends Replicator
             }
 
             return $this->preProcessRow($row, $i);
-        })->toJson();
+        })->all();
     }
 
     protected function preProcessRow($row, $index)
@@ -528,7 +530,7 @@ class Bard extends Replicator
 
     public function preload()
     {
-        $value = json_decode($this->field->value(), true);
+        $value = $this->field->value();
 
         $existing = collect($value)->filter(function ($item) {
             return $item['type'] === 'set';
