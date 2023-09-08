@@ -2,8 +2,8 @@
 
 <portal name="bard-fullscreen" :disabled="!fullScreenMode" :provide="provide">
 <!-- These wrappers allow any css that expected the field to
-        be within the context of a publish form to continue working
-        once it has been portaled out. -->
+     be within the context of a publish form to continue working
+     once it has been portaled out. -->
 <div :class="{ 'publish-fields': fullScreenMode }">
 <div :class="fullScreenMode && wrapperClasses">
 
