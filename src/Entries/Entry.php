@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use ArrayAccess;
+use Facades\Statamic\Entries\InitiatorStack;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
@@ -46,19 +47,19 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, ContainsQueryableValues, Arrayable, ArrayAccess, SearchableContract
+class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
-    use Routable {
-        uri as routableUri;
-    }
+    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
-    use ContainsData, ContainsComputedData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, Searchable;
-    use ResolvesValues {
-        resolveGqlValue as traitResolveGqlValue;
-    }
     use HasOrigin {
         value as originValue;
         values as originValues;
+    }
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
+    use Routable {
+        uri as routableUri;
     }
 
     protected $id;
@@ -336,6 +337,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
 
+        $stack = InitiatorStack::entry($this)->push();
+
         $this->directDescendants()->each->save();
 
         $this->taxonomize();
@@ -361,6 +364,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     $this->makeLocalization($siteHandle)->save();
                 });
         }
+
+        $stack->pop();
 
         return true;
     }

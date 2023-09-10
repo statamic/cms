@@ -16,7 +16,7 @@ use Tests\TestCase;
 
 class EloquentUserTest extends TestCase
 {
-    use UserContractTests, PermissibleContractTests, HasPreferencesTests, WithFaker;
+    use HasPreferencesTests, PermissibleContractTests, UserContractTests, WithFaker;
 
     public function setUp(): void
     {

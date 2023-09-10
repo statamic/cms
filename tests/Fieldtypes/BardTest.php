@@ -879,20 +879,33 @@ EOT;
         $this->assertEquals([['foo' => 'bar']], (new Bard)->toQueryableValue([['foo' => 'bar']]));
     }
 
-    /** @test */
-    public function it_augments_inline_value()
+    /**
+     * @test
+     *
+     * @dataProvider inlineProvider
+     */
+    public function it_augments_inline_value($config)
     {
         $data = [
             ['type' => 'text', 'text' => 'This is inline text with '],
             ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
-            ['type' => 'text', 'text' => ' and '],
+            ['type' => 'text', 'text' => ' and'],
+            ['type' => 'hardBreak'],
             ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
             ['type' => 'text', 'text' => ' text.'],
         ];
 
-        $expected = 'This is inline text with <strong>bold</strong> and <em>italic</em> text.';
+        $expected = 'This is inline text with <strong>bold</strong> and<br><em>italic</em> text.';
 
-        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->augment($data));
+        $this->assertEquals($expected, $this->bard(['inline' => $config, 'sets' => null])->augment($data));
+    }
+
+    public function inlineProvider()
+    {
+        return [
+            'true' => [true],
+            'break' => ['break'],
+        ];
     }
 
     /** @test */

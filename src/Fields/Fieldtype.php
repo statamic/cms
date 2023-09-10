@@ -13,7 +13,7 @@ use Statamic\Support\Str;
 
 abstract class Fieldtype implements Arrayable
 {
-    use RegistersItself, HasHandle {
+    use HasHandle, RegistersItself {
         handle as protected traitHandle;
     }
 

@@ -27,9 +27,9 @@ use Statamic\Facades\Stache;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Variables implements Contract, Localization, Augmentable, ResolvesValuesContract, ArrayAccess, Arrayable
+class Variables implements Arrayable, ArrayAccess, Augmentable, Contract, Localization, ResolvesValuesContract
 {
-    use ExistsAsFile, ContainsData, HasAugmentedInstance, HasOrigin, FluentlyGetsAndSets, ResolvesValues, TracksQueriedRelations;
+    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, HasOrigin, ResolvesValues, TracksQueriedRelations;
 
     protected $set;
     protected $locale;
