@@ -503,6 +503,29 @@ class NavTest extends TestCase
         $this->assertTrue($articles->isActive());
     }
 
+    /**
+     * @deprecated
+     *
+     * @test
+     */
+    public function it_can_get_has_active_children_status_with_deprecated_active_pattern()
+    {
+        $collections = Nav::content('Custom Collections Url')
+            ->url('http://localhost/cp/custom/url')
+            ->active('collections*')
+            ->children(function () use (&$pages, &$articles) {
+                return [
+                    $pages = Nav::item('Pages')->url('/cp/collections/pages'),
+                    $articles = Nav::item('Articles')->url('/cp/collections/articles'),
+                ];
+            });
+
+        Request::swap(Request::create('http://localhost/cp/collections/articles'));
+        $this->assertTrue($collections->isActive());
+        $this->assertFalse($pages->isActive());
+        $this->assertTrue($articles->isActive());
+    }
+
     /** @test */
     public function it_sets_the_url()
     {

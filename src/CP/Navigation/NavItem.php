@@ -497,8 +497,8 @@ class NavItem
      *
      * @deprecated
      */
-    // public function active($pattern = null)
-    // {
-    //     return $this->fluentlyGetOrSet('resolveChildrenPattern')->value($pattern);
-    // }
+    public function active($pattern = null)
+    {
+        return $this->fluentlyGetOrSet('resolveChildrenPattern')->value($pattern);
+    }
 }
