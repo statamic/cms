@@ -52,15 +52,6 @@ class EntriesTest extends TestCase
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
         ]]);
 
-        $this->setTestRoles(['test' => [
-            'access cp',
-            'view test entries',
-            'access en site',
-            'access de site',
-        ]]);
-
-        $user = tap(User::make()->assignRole('test'))->save();
-
         $collection = tap(Collection::make('test'))->save();
 
         foreach (['en', 'fr', 'de'] as $locale) {
@@ -71,6 +62,15 @@ class EntriesTest extends TestCase
                     ->create();
             }
         }
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'view test entries',
+            'access en site',
+            'access de site',
+        ]]);
+
+        $user = tap(User::make()->assignRole('test'))->save();
 
         $response = $this
             ->actingAs($user)
