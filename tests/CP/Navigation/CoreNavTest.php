@@ -47,6 +47,10 @@ class CoreNavTest extends TestCase
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
         ]]);
 
+        Facades\Collection::make('has_some_french')->sites(['en', 'fr', 'de'])->save();
+        Facades\Collection::make('has_no_french')->sites(['en', 'de'])->save();
+        Facades\Collection::make('has_only_french')->sites(['fr'])->save();
+
         $this->setTestRoles(['test' => [
             'access cp',
             'view has_some_french entries',
@@ -56,10 +60,6 @@ class CoreNavTest extends TestCase
             // 'access fr site', // Give them access to all data, but not all sites
             'access de site',
         ]]);
-
-        Facades\Collection::make('has_some_french')->sites(['en', 'fr', 'de'])->save();
-        Facades\Collection::make('has_no_french')->sites(['en', 'de'])->save();
-        Facades\Collection::make('has_only_french')->sites(['fr'])->save();
 
         $this
             ->actingAs(tap(User::make()->assignRole('test'))->save())
@@ -85,16 +85,6 @@ class CoreNavTest extends TestCase
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
         ]]);
 
-        $this->setTestRoles(['test' => [
-            'access cp',
-            'view has_some_french nav',
-            'view has_no_french nav',
-            'view has_only_french nav',
-            'access en site',
-            // 'access fr site', // Give them access to all data, but not all sites
-            'access de site',
-        ]]);
-
         $nav1 = tap(Facades\Nav::make()->handle('has_some_french'))->save();
         $nav1->makeTree('en')->save();
         $nav1->makeTree('fr')->save();
@@ -106,6 +96,16 @@ class CoreNavTest extends TestCase
 
         $nav3 = tap(Facades\Nav::make()->handle('has_only_french'))->save();
         $nav3->makeTree('fr')->save();
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'view has_some_french nav',
+            'view has_no_french nav',
+            'view has_only_french nav',
+            'access en site',
+            // 'access fr site', // Give them access to all data, but not all sites
+            'access de site',
+        ]]);
 
         $this
             ->actingAs(tap(User::make()->assignRole('test'))->save())
@@ -131,6 +131,10 @@ class CoreNavTest extends TestCase
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
         ]]);
 
+        Facades\Taxonomy::make('has_some_french')->sites(['en', 'fr', 'de'])->save();
+        Facades\Taxonomy::make('has_no_french')->sites(['en', 'de'])->save();
+        Facades\Taxonomy::make('has_only_french')->sites(['fr'])->save();
+
         $this->setTestRoles(['test' => [
             'access cp',
             'view has_some_french terms',
@@ -140,10 +144,6 @@ class CoreNavTest extends TestCase
             // 'access fr site', // Give them access to all data, but not all sites
             'access de site',
         ]]);
-
-        Facades\Taxonomy::make('has_some_french')->sites(['en', 'fr', 'de'])->save();
-        Facades\Taxonomy::make('has_no_french')->sites(['en', 'de'])->save();
-        Facades\Taxonomy::make('has_only_french')->sites(['fr'])->save();
 
         $this
             ->actingAs(tap(User::make()->assignRole('test'))->save())
@@ -169,16 +169,6 @@ class CoreNavTest extends TestCase
             'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
         ]]);
 
-        $this->setTestRoles(['test' => [
-            'access cp',
-            'edit has_some_french globals',
-            'edit has_no_french globals',
-            'edit has_only_french globals',
-            'access en site',
-            // 'access fr site', // Give them access to all data, but not all sites
-            'access de site',
-        ]]);
-
         $set1 = Facades\GlobalSet::make('has_some_french');
         $set1->addLocalization($set1->makeLocalization('en'));
         $set1->addLocalization($set1->makeLocalization('fr'));
@@ -193,6 +183,16 @@ class CoreNavTest extends TestCase
         $set3 = Facades\GlobalSet::make('has_only_french');
         $set3->addLocalization($set3->makeLocalization('fr'));
         $set3->save();
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'edit has_some_french globals',
+            'edit has_no_french globals',
+            'edit has_only_french globals',
+            'access en site',
+            // 'access fr site', // Give them access to all data, but not all sites
+            'access de site',
+        ]]);
 
         $this
             ->actingAs(tap(User::make()->assignRole('test'))->save())
