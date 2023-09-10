@@ -4,6 +4,7 @@ namespace Statamic\CP\Navigation;
 
 use Illuminate\Support\Collection;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -20,8 +21,8 @@ class NavItem
     protected $icon;
     protected $children;
     protected $isChild;
+    protected $resolveChildrenPattern;
     protected $authorization;
-    protected $active;
     protected $view;
     protected $order;
     protected $hidden;
@@ -125,11 +126,26 @@ class NavItem
             ->afterSetter(function ($url) {
                 $cpUrl = url(config('statamic.cp.route')).'/';
 
-                if (! $this->active && Str::startsWith($url, $cpUrl)) {
-                    $this->active = $this->generateActivePatternForCpUrl($url);
+                if (! $this->resolveChildrenPattern && Str::startsWith($url, $cpUrl)) {
+                    $this->resolveChildrenPattern = $this->generateResolveChildrenPatternForCpUrl($url);
                 }
             })
             ->value($url);
+    }
+
+    /**
+     * Generate resolve children pattern for CP url.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function generateResolveChildrenPatternForCpUrl($url)
+    {
+        $cpUrl = url(config('statamic.cp.route')).'/';
+
+        $relativeUrl = str_replace($cpUrl, '', URL::removeQueryAndFragment($url));
+
+        return $relativeUrl.'(/(.*)?|$)';
     }
 
     /**
@@ -241,6 +257,28 @@ class NavItem
     }
 
     /**
+     * Pattern to determine when to resolve children for `hasActiveChild()` checks.
+     *
+     * @return $this
+     */
+    public function resolveChildrenPattern($pattern = null)
+    {
+        return $this->fluentlyGetOrSet('resolveChildrenPattern')->value($pattern);
+    }
+
+    /**
+     * Determine when to resolve children for `hasActiveChild()` checks.
+     *
+     * @return bool
+     */
+    protected function shouldResolveChildren()
+    {
+        $pattern = preg_quote(config('statamic.cp.route'), '#').'/'.$this->resolveChildrenPattern;
+
+        return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
+    }
+
+    /**
      * Resolve children closure.
      *
      * @return $this
@@ -301,30 +339,17 @@ class NavItem
     }
 
     /**
-     * Get or set pattern for active state styling.
-     *
-     * @param  string|null  $pattern
-     * @return mixed
-     */
-    public function active($pattern = null)
-    {
-        return $this->fluentlyGetOrSet('active')->value($pattern);
-    }
-
-    /**
      * Get whether the nav item is currently active.
      *
      * @return bool
      */
     public function isActive()
     {
-        if (! $this->active) {
-            return false;
+        if ($this->hasActiveChild()) {
+            return true;
         }
 
-        $pattern = preg_quote(config('statamic.cp.route'), '#').'/'.$this->active;
-
-        return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
+        return request()->url() === URL::removeQueryAndFragment($this->url);
     }
 
     /**
@@ -332,9 +357,20 @@ class NavItem
      *
      * @return bool
      */
-    public function hasActiveChild()
+    protected function hasActiveChild()
     {
-        return $this->children() instanceof Collection && $this->children()->first(fn ($item) => $item->isActive()) !== null;
+        if ($this->shouldResolveChildren()) {
+            $this->resolveChildren();
+        }
+
+        if (! $this->children() instanceof Collection) {
+            return false;
+        }
+
+        return $this
+            ->children()
+            ->filter(fn ($item) => $item->isActive())
+            ->isNotEmpty();
     }
 
     /**
@@ -454,20 +490,15 @@ class NavItem
     }
 
     /**
-     * Generate active pattern for CP url.
+     * This has been renamed to `resolveChildrenPattern()` because we no longer use this pattern
+     * to determine whether an item is active, but rather when to resolve an items children.
+     * Deprecating it in case addons are setting `active()` patterns on their nav items.
+     * Addons should now start using `resolveChildrenPattern()` from now on instead.
      *
-     * @param  string  $url
-     * @return string
+     * @deprecated
      */
-    protected function generateActivePatternForCpUrl($url)
-    {
-        $cpUrl = url(config('statamic.cp.route')).'/';
-
-        $url = Str::before($url, '?'); // Remove query params
-        $url = Str::before($url, '#'); // Remove anchors
-
-        $relativeUrl = str_replace($cpUrl, '', $url);
-
-        return $relativeUrl.'(/(.*)?|$)';
-    }
+    // public function active($pattern = null)
+    // {
+    //     return $this->fluentlyGetOrSet('resolveChildrenPattern')->value($pattern);
+    // }
 }

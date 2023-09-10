@@ -97,7 +97,7 @@ class NavTest extends TestCase
 
         Nav::droids('C-3PO')
             ->id('some::custom::id')
-            ->active('threepio*')
+            ->resolveChildrenPattern('threepio*')
             ->url('/human-cyborg-relations')
             ->view('cp.nav.importer')
             ->can('index', 'DroidsClass')
@@ -110,7 +110,7 @@ class NavTest extends TestCase
         $this->assertEquals('C-3PO', $item->display());
         $this->assertEquals('http://localhost/human-cyborg-relations', $item->url());
         $this->assertEquals('cp.nav.importer', $item->view());
-        $this->assertEquals('threepio*', $item->active());
+        $this->assertEquals('threepio*', $item->resolveChildrenPattern());
         $this->assertEquals('index', $item->authorization()->ability);
         $this->assertEquals('DroidsClass', $item->authorization()->arguments);
         $this->assertEquals(' target="_blank" class="red"', $item->attributes());
@@ -433,15 +433,15 @@ class NavTest extends TestCase
         $this->assertFalse($hello->isActive());
         $this->assertFalse($helloWithQueryParams->isActive());
         $this->assertFalse($helloWithAnchor->isActive());
-        $this->assertTrue($hell->isActive());
+        $this->assertFalse($hell->isActive());
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
         $this->assertFalse($externalSecure->isActive());
 
         Request::swap(Request::create('http://localhost/cp/hello/test'));
-        $this->assertTrue($hello->isActive());
-        $this->assertTrue($helloWithQueryParams->isActive());
-        $this->assertTrue($helloWithAnchor->isActive());
+        $this->assertFalse($hello->isActive());
+        $this->assertFalse($helloWithQueryParams->isActive());
+        $this->assertFalse($helloWithAnchor->isActive());
         $this->assertFalse($hell->isActive());
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
@@ -471,17 +471,17 @@ class NavTest extends TestCase
     {
         tap(Nav::create('external-absolute')->url('http://domain.com'), function ($nav) {
             $this->assertEquals('http://domain.com', $nav->url());
-            $this->assertNull($nav->active());
+            $this->assertNull($nav->resolveChildrenPattern());
         });
 
         tap(Nav::create('site-relative')->url('/foo/bar'), function ($nav) {
             $this->assertEquals('http://localhost/foo/bar', $nav->url());
-            $this->assertNull($nav->active());
+            $this->assertNull($nav->resolveChildrenPattern());
         });
 
         tap(Nav::create('cp-relative')->url('foo/bar'), function ($nav) {
             $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
-            $this->assertEquals('foo/bar(/(.*)?|$)', $nav->active());
+            $this->assertEquals('foo/bar(/(.*)?|$)', $nav->resolveChildrenPattern());
         });
     }
 
@@ -502,11 +502,11 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_automatically_add_an_active_pattern_when_setting_url_if_one_is_already_defined()
+    public function it_does_not_automatically_add_a_resolve_children_pattern_when_setting_url_if_one_is_already_defined()
     {
-        $nav = Nav::create('cp-relative')->active('foo.*')->url('foo/bar');
+        $nav = Nav::create('cp-relative')->resolveChildrenPattern('foo.*')->url('foo/bar');
         $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
-        $this->assertEquals('foo.*', $nav->active());
+        $this->assertEquals('foo.*', $nav->resolveChildrenPattern());
     }
 
     /** @test */
