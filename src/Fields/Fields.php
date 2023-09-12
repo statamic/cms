@@ -288,10 +288,11 @@ class Fields
             }
 
             if ($conditions = $this->conditions($config)) {
-                $fields = $fields->mapWithKeys(function ($field) use ($config, $conditions) {
+                $fields = $fields->mapWithKeys(function ($field) use ($conditions) {
                     $field = clone $field;
                     $handle = $field->handle();
                     $fieldConfig = array_merge($field->config(), $conditions);
+
                     return [$handle => $field->setHandle($handle)->setConfig($fieldConfig)];
                 });
             }
