@@ -287,6 +287,15 @@ class Fields
                 });
             }
 
+            if ($conditions = $this->conditions($config)) {
+                $fields = $fields->mapWithKeys(function ($field) use ($config, $conditions) {
+                    $field = clone $field;
+                    $handle = $field->handle();
+                    $fieldConfig = array_merge($field->config(), $conditions);
+                    return [$handle => $field->setHandle($handle)->setConfig($fieldConfig)];
+                });
+            }
+
             return $fields;
         })->each->setParent($this->parent)->all();
     }
@@ -309,5 +318,19 @@ class Fields
     public function toGql()
     {
         return $this->fields->map->toGql();
+    }
+
+    public function conditions($config): array
+    {
+        return collect($config)->only([
+            'if',
+            'if_any',
+            'show_when',
+            'show_when_any',
+            'unless',
+            'unless_any',
+            'hide_when',
+            'hide_when_any',
+        ])->all();
     }
 }

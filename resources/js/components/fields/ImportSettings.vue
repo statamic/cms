@@ -41,7 +41,16 @@
                     :value="config.prefix"
                     @input="updateField('prefix', $event)"
                 />
+            </div>
+        </div>
 
+        <div class="card p-0 mt-8">
+            <div class="publish-fields @container">
+                <field-conditions-builder
+                    :config="config"
+                    :suggestable-fields="suggestableConditionFields"
+                    @updated="updateFieldConditions"
+                    @updated-always-save="updateAlwaysSave" />
             </div>
         </div>
     </div>
@@ -49,9 +58,15 @@
 </template>
 
 <script>
-export default {
+    import {FIELD_CONDITIONS_KEYS, FieldConditionsBuilder} from "../field-conditions/FieldConditions";
 
-    props: ['config'],
+export default {
+    components: {FieldConditionsBuilder},
+
+    props: {
+        config: Object,
+        suggestableConditionFields: Array,
+    },
 
     model: {
         prop: 'config',
@@ -81,8 +96,23 @@ export default {
 
         close() {
             this.$emit('closed');
-        }
+        },
 
+        updateFieldConditions(conditions) {
+            let values = {};
+
+            _.each(this.values, (value, key) => {
+                if (! FIELD_CONDITIONS_KEYS.includes(key)) {
+                    values[key] = value;
+                }
+            });
+
+            this.values = {...values, ...conditions};
+        },
+
+        updateAlwaysSave(alwaysSave) {
+            this.values.always_save = alwaysSave;
+        },
     }
 
 };

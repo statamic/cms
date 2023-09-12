@@ -18,6 +18,7 @@
                             ref="settings"
                             :root="isRoot"
                             :config="fieldConfig"
+                            :suggestable-condition-fields="suggestableConditionFields"
                             @committed="settingsUpdated"
                             @closed="editorClosed"
                         />
@@ -39,18 +40,21 @@ export default {
 
     components: { FieldSettings },
 
+    props: [
+        'suggestableConditionFields'
+    ],
+
     computed: {
-
         fieldConfig() {
-            return _.omit(this.field, ['_id', 'type']);
+            return this.field.config;
         }
-
     },
 
     methods: {
 
-        settingsUpdated(settings) {
-            const field = Object.assign({}, this.field, settings);
+        settingsUpdated(settings, editedFields) {
+            let field = this.field;
+            field.config = settings;
             this.$emit('updated', field);
         },
 

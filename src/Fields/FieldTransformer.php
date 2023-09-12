@@ -18,10 +18,16 @@ class FieldTransformer
 
     private static function importTabField(array $submitted)
     {
-        return array_filter([
+        $submittedValues = array_filter([
             'import' => $submitted['fieldset'],
             'prefix' => $submitted['prefix'] ?? null,
         ]);
+
+        if (array_key_exists('config', $submitted) && $conditions = static::conditions($submitted['config'])) {
+            $submittedValues = array_merge($submittedValues, $conditions);
+        }
+
+        return $submittedValues;
     }
 
     private static function inlineTabField(array $submitted)
@@ -110,11 +116,18 @@ class FieldTransformer
 
     private static function importFieldToVue($field): array
     {
-        return [
+        $config = [
             'type' => 'import',
             'fieldset' => $field['import'],
             'prefix' => $field['prefix'] ?? null,
+            'config' => $field['config'] ?? [],
         ];
+
+        if ($conditions = static::conditions($field)) {
+            $config['config'] = array_merge($config['config'], $conditions);
+        }
+
+        return $config;
     }
 
     public static function fieldsetFields()
@@ -176,5 +189,19 @@ class FieldTransformer
         }
 
         return $config;
+    }
+
+    private static function conditions($config): array
+    {
+        return collect($config)->only([
+            'if',
+            'if_any',
+            'show_when',
+            'show_when_any',
+            'unless',
+            'unless_any',
+            'hide_when',
+            'hide_when_any',
+        ])->all();
     }
 }
