@@ -155,12 +155,14 @@ class NestedFieldsTest extends TestCase
                 'type' => 'import',
                 'fieldset' => 'test',
                 'prefix' => 'foo',
+                'config' => [],
                 '_id' => 2,
             ],
             [
                 'type' => 'import',
                 'fieldset' => 'test',
                 'prefix' => null,
+                'config' => [],
                 '_id' => 3,
             ],
         ], $actual);
