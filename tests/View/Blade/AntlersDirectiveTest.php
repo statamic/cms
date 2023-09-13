@@ -10,6 +10,7 @@ class AntlersDirectiveTest extends TestCase
     public function test_blade_antlers_directive_is_compiled()
     {
         $template = <<<'EOT'
+
 <?php $myCustomVariable = ['foo' => 'bar']; ?>
 @php($data = range(1, 10))
 
