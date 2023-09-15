@@ -90,6 +90,10 @@ class UserController extends Controller
         }
 
         try {
+            if ($honeypot = config('statamic.users.registration_form_honeypot_field')) {
+                throw_if(Arr::get($values, $honeypot), new SilentFormFailureException);
+            }
+
             throw_if(UserRegistering::dispatch($user) === false, new SilentFormFailureException);
         } catch (ValidationException $e) {
             return $this->userRegistrationFailure($e->errors());

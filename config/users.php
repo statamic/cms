@@ -77,6 +77,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Registration form honeypot field
+    |--------------------------------------------------------------------------
+    |
+    | When registering new users through the user:register_form tag,
+    | specify the field to act as a honeypot for bots
+    |
+    */
+
+    'registration_form_honeypot_field' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | User Wizard Invitation Email
     |--------------------------------------------------------------------------
     |
