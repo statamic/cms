@@ -1,5 +1,5 @@
 <template>
-    <div class="array-fieldtype-container" ref="arr">
+    <div class="array-fieldtype-container">
 
         <div v-if="isSingle" class="flex items-center">
             <div class="input-group">
