@@ -1,5 +1,5 @@
 <template>
-    <div class="array-fieldtype-container">
+    <div class="array-fieldtype-container" ref="arr">
 
         <div v-if="isSingle" class="flex items-center">
             <div class="input-group">
@@ -181,6 +181,9 @@ export default {
     methods: {
         addValue() {
             this.data.push(this.newSortableValue());
+            this.$nextTick(() => {
+                this.$el.querySelector('tr:last-child input').focus();
+            });
         },
 
         confirmDeleteValue(index) {
