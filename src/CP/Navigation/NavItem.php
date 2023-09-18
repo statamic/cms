@@ -134,6 +134,21 @@ class NavItem
     }
 
     /**
+     * Generate active URL pattern to determine when to resolve children for `hasActiveChild()` checks.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function generateActivePatternForCpUrl($url)
+    {
+        $cpUrl = url(config('statamic.cp.route')).'/';
+
+        $relativeUrl = str_replace($cpUrl, '', URL::removeQueryAndFragment($url));
+
+        return $relativeUrl.'(/(.*)?|$)';
+    }
+
+    /**
      * Get editable url for nav builder UI.
      */
     public function editableUrl()
@@ -476,20 +491,5 @@ class NavItem
         $string = Str::replace('___colon___', ':', $string);
 
         return $string;
-    }
-
-    /**
-     * Generate active URL pattern to determine when to resolve children for `hasActiveChild()` checks.
-     *
-     * @param  string  $url
-     * @return string
-     */
-    protected function generateActivePatternForCpUrl($url)
-    {
-        $cpUrl = url(config('statamic.cp.route')).'/';
-
-        $relativeUrl = str_replace($cpUrl, '', URL::removeQueryAndFragment($url));
-
-        return $relativeUrl.'(/(.*)?|$)';
     }
 }
