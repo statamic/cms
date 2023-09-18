@@ -1,16 +1,16 @@
 <template>
 
-    <div class="h-full overflow-auto p-4 bg-grey-30 h-full">
+    <div class="h-full overflow-auto p-8 bg-gray-300 h-full">
 
-        <div class="flex items-center mb-3 -mt-1">
+        <div class="flex items-center mb-6 -mt-2">
             <h1 class="flex-1">
-                <small class="block text-xs text-grey-70 font-medium leading-none mt-1 flex items-center">
-                    <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-70" name="paperclip"/>{{ __('Linked fieldset') }}
+                <small class="block text-xs text-gray-700 font-medium leading-none mt-2 flex items-center">
+                    <svg-icon class="h-4 w-4 mr-2 inline-block text-gray-700" name="paperclip"/>{{ __('Linked fieldset') }}
                 </small>
                 {{ __('Fieldset') }}
             </h1>
             <button
-                class="text-grey-70 hover:text-grey-80 mr-3 text-sm"
+                class="text-gray-700 hover:text-gray-800 mr-6 text-sm"
                 @click.prevent="close"
                 v-text="__('Cancel')"
             ></button>
@@ -23,7 +23,7 @@
 
         <div class="card">
 
-            <publish-fields-container>
+            <div class="publish-fields @container">
 
                 <form-group
                     handle="fieldset"
@@ -42,7 +42,7 @@
                     @input="updateField('prefix', $event)"
                 />
 
-            </publish-fields-container>
+            </div>
         </div>
     </div>
 

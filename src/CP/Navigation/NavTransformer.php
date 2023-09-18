@@ -16,8 +16,6 @@ class NavTransformer
 
     /**
      * Instantiate nav transformer.
-     *
-     * @param  array  $submitted
      */
     public function __construct(array $submitted)
     {
@@ -29,7 +27,6 @@ class NavTransformer
     /**
      * Transform and minify from payload submitted by `components/nav/Builder.vue`.
      *
-     * @param  array  $submitted
      * @return array
      */
     public static function fromVue(array $submitted)
@@ -107,7 +104,7 @@ class NavTransformer
         $display = Arr::get($section, 'display');
         $displayOriginal = Arr::get($section, 'display_original', $display);
 
-        if ($display !== $displayOriginal) {
+        if ($display !== $displayOriginal || $transformed['action'] === '@create') {
             $transformed['display'] = $display;
         }
 

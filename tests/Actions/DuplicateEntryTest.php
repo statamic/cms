@@ -13,8 +13,8 @@ use Tests\TestCase;
 
 class DuplicateEntryTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     /** @test */
     public function it_duplicates_an_entry()

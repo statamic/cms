@@ -22,16 +22,16 @@ class GlobalSearchTest extends TestCase
     {
         $entry1 = tap(
             Entry::make()
-            ->id('1')->locale('en')->slug('test-entry-1')
-            ->set('title', 'Entry 1')
-            ->collection(tap(Collection::make('test-collection-1')->title('Test Collection 1'))->save())
+                ->id('1')->locale('en')->slug('test-entry-1')
+                ->set('title', 'Entry 1')
+                ->collection(tap(Collection::make('test-collection-1')->title('Test Collection 1'))->save())
         )->save();
 
         $entry2 = tap(
             Entry::make()
-            ->id('2')->locale('en')->slug('test-entry-2')
-            ->set('title', 'Entry 2')
-            ->collection(tap(Collection::make('test-collection-2')->title('Test Collection 2'))->save())
+                ->id('2')->locale('en')->slug('test-entry-2')
+                ->set('title', 'Entry 2')
+                ->collection(tap(Collection::make('test-collection-2')->title('Test Collection 2'))->save())
         )->save();
 
         $results = collect([$entry1, $entry2])->map->toSearchResult();

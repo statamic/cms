@@ -61,7 +61,7 @@ class StoreBlueprintTest extends TestCase
         $this->assertEquals('my_test_blueprint', $blueprint->handle());
         $this->assertEquals([
             'title' => 'My Test Blueprint',
-            'sections' => [
+            'tabs' => [
                 'main' => [
                     'display' => 'Main',
                     'fields' => [],

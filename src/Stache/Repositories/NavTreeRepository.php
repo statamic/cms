@@ -2,9 +2,11 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Statamic\Contracts\Structures\NavTree as TreeContract;
 use Statamic\Contracts\Structures\NavTreeRepository as Contract;
 use Statamic\Contracts\Structures\Tree;
 use Statamic\Stache\Stache;
+use Statamic\Structures\NavTree;
 
 class NavTreeRepository implements Contract
 {
@@ -38,6 +40,8 @@ class NavTreeRepository implements Contract
 
     public static function bindings()
     {
-        return [];
+        return [
+            TreeContract::class => NavTree::class,
+        ];
     }
 }

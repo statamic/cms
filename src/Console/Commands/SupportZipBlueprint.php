@@ -36,7 +36,7 @@ class SupportZipBlueprint extends Command
 
         $zip = new ZipArchive();
 
-        if (true !== $zip->open($filename, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+        if ($zip->open($filename, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             $this->error("Unable to create zip file \"$filename\"");
 
             return false;
@@ -75,7 +75,7 @@ class SupportZipBlueprint extends Command
 
     protected function getFieldsetHandles($blueprint)
     {
-        return $blueprint->sections()->map->fields()->flatMap->items()->map(function ($field) {
+        return $blueprint->tabs()->map->fields()->flatMap->items()->map(function ($field) {
             if (isset($field['import'])) {
                 return $field['import'];
             } elseif (is_string($field['field'])) {

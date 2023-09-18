@@ -4,7 +4,6 @@ namespace Statamic\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
-use Statamic\Events\Subscriber;
 use Statamic\Support\Arr;
 
 class EventServiceProvider extends ServiceProvider
@@ -44,7 +43,7 @@ class EventServiceProvider extends ServiceProvider
     {
         Event::macro('forgetListener', function ($event, $handler) {
             $this->listeners[$event] = Arr::where($this->listeners[$event], function ($eventHandler) use ($handler) {
-                return Subscriber::normalizeRegisteredListener($eventHandler) != $handler;
+                return $eventHandler != $handler;
             });
         });
     }

@@ -12,8 +12,8 @@
                     <svg-icon v-if="buttonIcon" :name="buttonIcon.name" :class="buttonIcon.class" />
                 </button>
             </template>
-            <h6 v-text="__('After Saving')" class="p-1" />
-            <div class="publish-fields px-1">
+            <h6 v-text="__('After Saving')" class="p-2" />
+            <div class="publish-fields px-2">
                 <div class="publish-field save-and-continue-options">
                     <radio-fieldtype
                         handle="save_and_continue_options"
@@ -65,11 +65,11 @@ export default {
         buttonIcon() {
             switch(true) {
                 case this.currentOption === 'listing':
-                    return {name: 'micro-arrow-go-back', class: 'w-3'};
+                    return {name: 'micro/arrow-go-back', class: 'w-3'};
                 case this.currentOption === 'continue_editing':
-                    return {name: 'chevron-down-xs', class: 'w-2'};
+                    return {name: 'micro/chevron-down-xs', class: 'w-2'};
                 case this.currentOption === 'create_another':
-                    return {name: 'micro-add-circle', class: 'w-3'};
+                    return {name: 'micro/add-circle', class: 'w-3'};
             }
         },
 

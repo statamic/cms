@@ -36,8 +36,7 @@ abstract class StructureType extends \Rebing\GraphQL\Support\Type
             $arr['resolve'] = $this->resolver();
 
             return $arr;
-        })
-        ->all();
+        })->all();
     }
 
     private function resolver()

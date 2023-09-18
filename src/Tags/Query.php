@@ -4,11 +4,11 @@ namespace Statamic\Tags;
 
 class Query extends Tags
 {
-    use Concerns\QueriesConditions,
-        Concerns\QueriesScopes,
+    use Concerns\GetsQueryResults,
+        Concerns\OutputsItems,
+        Concerns\QueriesConditions,
         Concerns\QueriesOrderBys,
-        Concerns\GetsQueryResults,
-        Concerns\OutputsItems;
+        Concerns\QueriesScopes;
 
     /**
      * {{ query builder="" }} ... {{ /query }}.

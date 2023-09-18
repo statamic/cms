@@ -6,7 +6,7 @@
                     <a :href="taxonomy.terms_url">{{ taxonomy.title }}</a>
                 </template>
                 <template slot="actions" slot-scope="{ row: taxonomy, index }">
-                    <dropdown-list>
+                    <dropdown-list placement="left-start">
                         <dropdown-item :text="__('Edit')" :redirect="taxonomy.edit_url" />
                         <dropdown-item :text="__('Edit Blueprints')" :redirect="taxonomy.blueprints_url" />
                         <dropdown-item

@@ -23,7 +23,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
  */
 class User extends BaseUser
 {
-    use ExistsAsFile, FluentlyGetsAndSets, HasPreferencesInProperty, ContainsData {
+    use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasPreferencesInProperty {
         data as traitData;
     }
 

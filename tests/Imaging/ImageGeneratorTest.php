@@ -9,7 +9,6 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
-use League\Flysystem\Adapter\Local;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Glide\Manipulators\Watermark;
 use League\Glide\Server;
@@ -19,7 +18,6 @@ use Statamic\Facades\File;
 use Statamic\Facades\Glide;
 use Statamic\Imaging\GuzzleAdapter;
 use Statamic\Imaging\ImageGenerator;
-use Statamic\Imaging\LegacyGuzzleAdapter;
 use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -339,33 +337,16 @@ class ImageGeneratorTest extends TestCase
 
     private function assertLocalAdapter($adapter)
     {
-        if ($this->isUsingFlysystemV1()) {
-            return $this->assertInstanceOf(Local::class, $adapter);
-        }
-
         $this->assertInstanceOf(LocalFilesystemAdapter::class, $adapter);
     }
 
     private function assertGuzzleAdapter($adapter)
     {
-        if ($this->isUsingFlysystemV1()) {
-            return $this->assertInstanceOf(LegacyGuzzleAdapter::class, $adapter);
-        }
-
         $this->assertInstanceOf(GuzzleAdapter::class, $adapter);
-    }
-
-    private function isUsingFlysystemV1()
-    {
-        return class_exists('\League\Flysystem\Util');
     }
 
     private function getRootFromLocalAdapter($adapter)
     {
-        if ($this->isUsingFlysystemV1()) {
-            return $adapter->getPathPrefix();
-        }
-
         $reflection = new \ReflectionClass($adapter);
         $property = $reflection->getProperty('prefixer');
         $property->setAccessible(true);

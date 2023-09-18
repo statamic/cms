@@ -12,15 +12,17 @@
         @updated="values = $event"
     >
         <div slot-scope="{ setFieldValue, setFieldMeta }">
-            <configure-sections
+            <header class="mb-6">
+                <breadcrumb :url="url" :title="values.title" />
+                <div class="flex items-center">
+                    <h1 class="flex-1" v-text="__('Configure Collection')" />
+                    <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
+                </div>
+            </header>
+            <configure-tabs
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
                 :enable-sidebar="false"/>
-
-            <div class="py-2 border-t flex justify-between">
-                <a :href="url" class="btn" v-text="__('Cancel') "/>
-                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-            </div>
         </div>
     </publish-container>
 

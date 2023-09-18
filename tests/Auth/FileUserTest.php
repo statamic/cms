@@ -15,7 +15,7 @@ use Tests\TestCase;
 /** @group user */
 class FileUserTest extends TestCase
 {
-    use UserContractTests, PermissibleContractTests, PreventSavingStacheItemsToDisk;
+    use PermissibleContractTests, PreventSavingStacheItemsToDisk, UserContractTests;
 
     public function makeUser()
     {
@@ -101,6 +101,7 @@ class FileUserTest extends TestCase
 
         Role::shouldReceive('find')->with('direct')->andReturn($directRole);
         UserGroup::shouldReceive('find')->with('usergroup')->andReturn($userGroup);
+        Role::shouldReceive('all')->andReturn(collect([$directRole]));     // the stache calls this when getting a user. unrelated to test.
         UserGroup::shouldReceive('all')->andReturn(collect([$userGroup])); // the stache calls this when getting a user. unrelated to test.
 
         $user = $this->createPermissible()

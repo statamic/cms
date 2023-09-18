@@ -2,16 +2,17 @@
 
 namespace Tests\Fieldtypes;
 
-use Facades\Statamic\Fieldtypes\RowId;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Mockery\MockInterface;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\Fieldtypes\RowId;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Tiptap\Core\Node;
@@ -115,6 +116,59 @@ class BardTest extends TestCase
                     'fields' => [
                         ['handle' => 'image', 'field' => ['type' => 'test']],
                         ['handle' => 'caption', 'field' => ['type' => 'test']],
+                    ],
+                ],
+            ],
+        ])->augment($data);
+
+        $this->assertEveryItemIsInstanceOf(Values::class, $augmented);
+        $this->assertEquals($expected, collect($augmented)->toArray());
+    }
+
+    /** @test */
+    public function it_augments_ids_and_sets_id_correctly_with_a_custom_id_handle()
+    {
+        config()->set('statamic.system.row_id_handle', '_id');
+
+        (new class extends Fieldtype
+        {
+            public static $handle = 'test';
+
+            public function augment($value)
+            {
+                return $value.' (augmented)';
+            }
+        })::register();
+
+        $data = [
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'id' => 'set-id', // Set id. Auto generated
+                    'values' => [
+                        'id' => 'value-id', // Value id. User Input.
+                        'type' => 'image',
+                        'image' => 'test.jpg',
+                    ],
+                ],
+            ],
+        ];
+
+        $expected = [
+            [
+                '_id' => 'set-id',
+                'id' => 'value-id',
+                'type' => 'image',
+                'image' => 'test.jpg (augmented)',
+            ],
+        ];
+
+        $augmented = $this->bard([
+            'sets' => [
+                'image' => [
+                    'fields' => [
+                        ['handle' => 'id', 'field' => ['type' => 'text']],
+                        ['handle' => 'image', 'field' => ['type' => 'test']],
                     ],
                 ],
             ],
@@ -427,7 +481,9 @@ class BardTest extends TestCase
     /** @test */
     public function it_transforms_v2_formatted_content_into_prosemirror_structure()
     {
-        RowId::shouldReceive('generate')->andReturn('random-string-1');
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1');
+        });
 
         $data = [
             ['type' => 'text', 'text' => '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>'],
@@ -485,7 +541,9 @@ class BardTest extends TestCase
     /** @test */
     public function it_transforms_v2_formatted_content_with_only_sets_into_prosemirror_structure()
     {
-        RowId::shouldReceive('generate')->andReturn('random-string-1');
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn('random-string-1');
+        });
 
         $data = [
             ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux'],
@@ -571,31 +629,23 @@ class BardTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_preloads_preprocessed_default_values()
+    /**
+     * @test
+     *
+     * @dataProvider groupedSetsProvider
+     */
+    public function it_preloads($areSetsGrouped)
     {
-        $field = (new Field('test', [
-            'type' => 'bard',
-            'sets' => [
-                'main' => [
-                    'fields' => [
-                        ['handle' => 'things', 'field' => ['type' => 'array']],
-                    ],
-                ],
-            ],
-        ]))->setValue('[]'); // what an empty value would get preprocessed into.
-
-        $expected = [
-            'things' => [],
-        ];
-
-        $this->assertEquals($expected, $field->fieldtype()->preload()['defaults']['main']);
-    }
-
-    /** @test */
-    public function it_preloads_new_meta_with_preprocessed_values()
-    {
-        RowId::shouldReceive('generate')->andReturn('random1', 'random2');
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->andReturn(
+                'random-string-1',
+                'random-string-2',
+                'random-string-3',
+                'random-string-4',
+                'random-string-5',
+                'random-string-6',
+            );
+        });
 
         // For this test, use a grid field with min_rows.
         // It doesn't have to be, but it's a fieldtype that would
@@ -604,41 +654,133 @@ class BardTest extends TestCase
 
         $field = (new Field('test', [
             'type' => 'bard',
-            'sets' => [
+            'sets' => $this->groupSets($areSetsGrouped, [
                 'main' => [
                     'fields' => [
                         [
-                            'handle' => 'things',
+                            'handle' => 'a_text_field',
+                            'field' => [
+                                'type' => 'text',
+                                'default' => 'the default',
+                            ],
+                        ],
+                        [
+                            'handle' => 'a_grid_field',
                             'field' => [
                                 'type' => 'grid',
                                 'min_rows' => 2,
                                 'fields' => [
-                                    ['handle' => 'one', 'field' => ['type' => 'text']],
+                                    ['handle' => 'one', 'field' => ['type' => 'text', 'default' => 'default in nested']],
                                 ],
                             ],
                         ],
                     ],
                 ],
+            ]),
+        ]))->setValue([
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'This is text.'],
+                ],
             ],
-        ]))->setValue('[]'); // what an empty value would get preprocessed into.
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'values' => [
+                        'type' => 'main',
+                        'a_text_field' => 'hello',
+                        'a_grid_field' => [
+                            ['one' => 'foo'],
+                            ['one' => 'bar'],
+                        ],
+                    ],
+                ],
+            ],
+            // Ensure that if there's a set that isn't configured, it gets left as-is and doesn't
+            // throw any errors. For example, if a set is removed from the config.
+            [
+                'type' => 'set',
+                'attrs' => [
+                    'values' => [
+                        'type' => 'nope',
+                        'foo' => 'bar',
+                    ],
+                ],
+            ],
+        ]);
 
-        $expected = [
-            '_' => '_',
-            'things' => [ // this array is the preloaded meta for the grid field
+        // The preload method expects the field to already be preprocessed.
+        // This will add stuff like set/row IDs to *existing* values, but not
+        // to any "new" or "default" values. That'll be handled by the fieldtype.
+        // During this preprocess step, the 2 nested grid rows, and the 1 replicator
+        // set will be assigned the first 3 random-string-n IDs.
+        $field = $field->preProcess();
+
+        $meta = $field->fieldtype()->preload();
+
+        // Assert about the "existing" sub-array.
+        // This is meta data for subfields of existing sets.
+        $this->assertCount(2, $meta['existing']);
+
+        // The set ID assigned during preprocess.
+        $this->assertArrayHasKey('random-string-3', $meta['existing']);
+        $this->assertArrayHasKey('random-string-4', $meta['existing']);
+
+        $this->assertEquals([
+            '_' => '_', // An empty key to enforce an object in JavaScript.
+            'a_text_field' => null, // the text field doesn't have meta data.
+            'a_grid_field' => [ // this array is the preloaded meta for the grid field
                 'defaults' => [
-                    'one' => null, // default value for the text field
+                    'one' => 'default in nested', // default value for the text field
                 ],
                 'new' => [
                     'one' => null, // meta for the text field
                 ],
                 'existing' => [
-                    'random1' => ['one' => null],
-                    'random2' => ['one' => null],
+                    'random-string-1' => ['one' => null],
+                    'random-string-2' => ['one' => null],
                 ],
             ],
-        ];
+        ], $meta['existing']['random-string-3']);
 
-        $this->assertEquals($expected, $field->fieldtype()->preload()['new']['main']);
+        $this->assertEquals([
+            '_' => '_', // An empty key to enforce an object in JavaScript.
+            // The "foo" key doesn't appear here since there's no corresponding "nope" set config.
+        ], $meta['existing']['random-string-4']);
+
+        // Assert about the "defaults" sub-array.
+        // These are the initial values used for subfields when a new set is added.
+        $this->assertCount(1, $meta['defaults']);
+        $this->assertArrayHasKey('main', $meta['defaults']);
+        $this->assertEquals([
+            'a_text_field' => 'the default',
+            'a_grid_field' => [
+                ['_id' => 'random-string-5', 'one' => 'default in nested'],
+                ['_id' => 'random-string-6', 'one' => 'default in nested'],
+            ],
+        ], $meta['defaults']['main']);
+
+        // Assert about the "new" sub-array.
+        // This is meta data for subfields when a new set is added.
+        $this->assertCount(1, $meta['new']);
+        $this->assertArrayHasKey('main', $meta['new']);
+        $this->assertEquals([
+            '_' => '_', // An empty key to enforce an object in JavaScript.
+            'a_text_field' => null, // the text field doesn't have meta data.
+            'a_grid_field' => [ // this array is the preloaded meta for the grid field
+                'defaults' => [
+                    'one' => 'default in nested', // default value for the text field
+                ],
+                'new' => [
+                    'one' => null, // meta for the text field
+                ],
+                'existing' => [
+                    'random-string-5' => ['one' => null],
+                    'random-string-6' => ['one' => null],
+                ],
+            ],
+        ], $meta['new']['main']);
     }
 
     /** @test */
@@ -737,20 +879,33 @@ EOT;
         $this->assertEquals([['foo' => 'bar']], (new Bard)->toQueryableValue([['foo' => 'bar']]));
     }
 
-    /** @test */
-    public function it_augments_inline_value()
+    /**
+     * @test
+     *
+     * @dataProvider inlineProvider
+     */
+    public function it_augments_inline_value($config)
     {
         $data = [
             ['type' => 'text', 'text' => 'This is inline text with '],
             ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
-            ['type' => 'text', 'text' => ' and '],
+            ['type' => 'text', 'text' => ' and'],
+            ['type' => 'hardBreak'],
             ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
             ['type' => 'text', 'text' => ' text.'],
         ];
 
-        $expected = 'This is inline text with <strong>bold</strong> and <em>italic</em> text.';
+        $expected = 'This is inline text with <strong>bold</strong> and<br><em>italic</em> text.';
 
-        $this->assertEquals($expected, $this->bard(['inline' => true, 'sets' => null])->augment($data));
+        $this->assertEquals($expected, $this->bard(['inline' => $config, 'sets' => null])->augment($data));
+    }
+
+    public function inlineProvider()
+    {
+        return [
+            'true' => [true],
+            'break' => ['break'],
+        ];
     }
 
     /** @test */
@@ -939,5 +1094,24 @@ EOT;
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
+    }
+
+    public function groupedSetsProvider()
+    {
+        return [
+            'grouped sets (new)' => [true],
+            'ungrouped sets (old)' => [false],
+        ];
+    }
+
+    private function groupSets($shouldGroup, $sets)
+    {
+        if (! $shouldGroup) {
+            return $sets;
+        }
+
+        return [
+            'group_one' => ['sets' => $sets],
+        ];
     }
 }

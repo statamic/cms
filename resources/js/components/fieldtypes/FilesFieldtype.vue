@@ -13,12 +13,12 @@
             <div slot-scope="{ dragging }" class="assets-fieldtype-drag-container">
 
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-8 w-8 mr-3" />
+                    <svg-icon name="upload" class="h-8 w-8 mr-6" />
                     <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
-                <div class="assets-fieldtype-picker py-2" :class="{ 'is-expanded': value.length }">
-                    <p class="asset-upload-control text-xs text-grey-60 ml-0">
+                <div class="assets-fieldtype-picker py-4" :class="{ 'is-expanded': value.length }">
+                    <p class="asset-upload-control text-xs text-gray-600 ml-0">
                         <button type="button" class="upload-text-button" @click.prevent="uploadFile">
                             {{ __('Upload file') }}
                         </button>
@@ -37,25 +37,25 @@
                             <tr
                                 v-for="(file, i) in value"
                                 :key="file"
-                                class="asset-row bg-white hover:bg-grey-10"
+                                class="asset-row bg-white hover:bg-gray-100"
                             >
                                 <td class="flex items-center">
                                     <div
-                                        class="w-7 h-7 cursor-pointer whitespace-no-wrap flex items-center justify-center"
+                                        class="w-7 h-7 cursor-pointer whitespace-nowrap flex items-center justify-center"
                                     >
                                         <file-icon :extension="getExtension(file)" />
                                     </div>
                                     <div
-                                        class="flex items-center flex-1 ml-1 text-xs text-left truncate"
+                                        class="flex items-center flex-1 ml-2 text-xs text-left truncate"
                                         v-text="file.slice(11)"
                                     />
                                 </td>
                                 <td class="p-0 w-8 text-right align-middle">
                                     <button
                                         @click="remove(i)"
-                                        class="flex items-center p-1 w-full h-full text-grey-60 hover:text-grey-90"
+                                        class="flex items-center p-2 w-full h-full text-gray-600 hover:text-gray-900"
                                     >
-                                        <svg-icon name="trash" class="w-6 h-6" />
+                                        <svg-icon name="micro/trash" class="w-6 h-6" />
                                     </button>
                                 </td>
                             </tr>
