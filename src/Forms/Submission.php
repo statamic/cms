@@ -34,6 +34,8 @@ class Submission implements SubmissionContract, Augmentable
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
+    protected null|string $redirect = null;
+
     public function __construct()
     {
         $this->data = collect();
@@ -227,5 +229,31 @@ class Submission implements SubmissionContract, Augmentable
     public function __get($key)
     {
         return $this->get($key);
+    }
+
+    /**
+     * Does your form need to create a redirect URL after it has been saved, you can
+     * create your own binding of the Submission class where you can include some funky
+     * redirect logic - for example, creating a URL to post to a third party like Stripe.
+     *
+     * @return void
+     */
+    public function buildRedirectUrl():void
+    {
+        $this->redirect = null;
+    }
+
+    /**
+     * Returns the redirect URL for this Submission
+     *
+     * @return string|null
+     */
+    public function getRedirectUrl(): null|string
+    {
+        if (!$this->redirect) {
+            $this->buildRedirectUrl();
+        }
+
+        return $this->redirect;
     }
 }

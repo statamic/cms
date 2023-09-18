@@ -99,15 +99,23 @@ class FormController extends Controller
      */
     protected function formSuccess($params, $submission, $silentFailure = false)
     {
+        // get the redirect (or null)
+        $redirect = $submission->getRedirectUrl();
+
+        if (!$redirect) {
+            // if no redirect configured at the submission level
+            // look to see if there is a _redirect param
+            $redirect = Arr::get($params, '_redirect');
+        }
+
         if (request()->ajax() || request()->wantsJson()) {
             return response([
                 'success' => true,
                 'submission_created' => ! $silentFailure,
                 'submission' => $submission->data(),
+                'redirect' => $redirect
             ]);
         }
-
-        $redirect = Arr::get($params, '_redirect');
 
         $response = $redirect ? redirect($redirect) : back();
 
