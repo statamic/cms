@@ -8,7 +8,7 @@ class AddConfigureFormFieldsPermission extends UpdateScript
 {
     public function shouldUpdate($newVersion, $oldVersion)
     {
-        return $this->isUpdatingTo('3.4.8');
+        return $this->isUpdatingTo('4.22.0');
     }
 
     public function update()
