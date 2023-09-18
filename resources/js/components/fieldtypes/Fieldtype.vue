@@ -71,6 +71,9 @@ export default {
         replicatorPreview: {
             immediate: true,
             handler(text) {
+                if (!this.config.replicator_preview) {
+                    return;
+                }
                 this.$emit('replicator-preview-updated', text);
             }
         }
