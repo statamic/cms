@@ -229,4 +229,23 @@ class UrlTest extends TestCase
             ['/foo/bar/?bar=baz#fragment', '/foo/bar/?bar=baz#fragment'],
         ];
     }
+
+    /** @test */
+    public function it_can_remove_query_and_fragment()
+    {
+        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?query'));
+        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com#anchor'));
+        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?foo=bar&baz=qux'));
+        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?foo=bar&baz=qux#anchor'));
+
+        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/?query'));
+        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/#anchor'));
+        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/?foo=bar&baz=qux'));
+        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/?foo=bar&baz=qux#anchor'));
+
+        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?query'));
+        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about#anchor'));
+        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?foo=bar&baz=qux'));
+        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?foo=bar&baz=qux#anchor'));
+    }
 }
