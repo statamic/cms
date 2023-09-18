@@ -105,7 +105,7 @@ export default {
             return 'theme-' + this.config.theme;
         },
         replicatorPreview() {
-            return this.value.code ? this.value.code.replace('<', '&lt;') : '';
+            return this.value.code ? truncate(escapeHtml(this.value.code), 60) : '';
         },
         readOnlyOption() {
             return this.isReadOnly ? 'nocursor' : false;
