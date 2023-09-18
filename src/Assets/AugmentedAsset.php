@@ -65,6 +65,8 @@ class AugmentedAsset extends AbstractAugmented
             ]);
         }
 
+        $keys->merge($this->blueprintFields()->keys());
+
         return $keys->all();
     }
 
