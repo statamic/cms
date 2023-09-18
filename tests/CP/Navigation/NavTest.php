@@ -97,7 +97,7 @@ class NavTest extends TestCase
 
         Nav::droids('C-3PO')
             ->id('some::custom::id')
-            ->resolveChildrenPattern('threepio*')
+            ->active('threepio*')
             ->url('/human-cyborg-relations')
             ->view('cp.nav.importer')
             ->can('index', 'DroidsClass')
@@ -110,7 +110,7 @@ class NavTest extends TestCase
         $this->assertEquals('C-3PO', $item->display());
         $this->assertEquals('http://localhost/human-cyborg-relations', $item->url());
         $this->assertEquals('cp.nav.importer', $item->view());
-        $this->assertEquals('threepio*', $item->resolveChildrenPattern());
+        $this->assertEquals('threepio*', $item->active());
         $this->assertEquals('index', $item->authorization()->ability);
         $this->assertEquals('DroidsClass', $item->authorization()->arguments);
         $this->assertEquals(' target="_blank" class="red"', $item->attributes());
@@ -489,7 +489,7 @@ class NavTest extends TestCase
     {
         $collections = Nav::content('Custom Collections Url')
             ->url('http://localhost/cp/custom/url')
-            ->resolveChildrenPattern('collections*')
+            ->active('collections*')
             ->children(function () use (&$pages, &$articles) {
                 return [
                     $pages = Nav::item('Pages')->url('/cp/collections/pages'),
@@ -531,17 +531,17 @@ class NavTest extends TestCase
     {
         tap(Nav::create('external-absolute')->url('http://domain.com'), function ($nav) {
             $this->assertEquals('http://domain.com', $nav->url());
-            $this->assertNull($nav->resolveChildrenPattern());
+            $this->assertNull($nav->active());
         });
 
         tap(Nav::create('site-relative')->url('/foo/bar'), function ($nav) {
             $this->assertEquals('http://localhost/foo/bar', $nav->url());
-            $this->assertNull($nav->resolveChildrenPattern());
+            $this->assertNull($nav->active());
         });
 
         tap(Nav::create('cp-relative')->url('foo/bar'), function ($nav) {
             $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
-            $this->assertEquals('foo/bar(/(.*)?|$)', $nav->resolveChildrenPattern());
+            $this->assertEquals('foo/bar(/(.*)?|$)', $nav->active());
         });
     }
 
@@ -564,9 +564,9 @@ class NavTest extends TestCase
     /** @test */
     public function it_does_not_automatically_add_a_resolve_children_pattern_when_setting_url_if_one_is_already_defined()
     {
-        $nav = Nav::create('cp-relative')->resolveChildrenPattern('foo.*')->url('foo/bar');
+        $nav = Nav::create('cp-relative')->active('foo.*')->url('foo/bar');
         $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
-        $this->assertEquals('foo.*', $nav->resolveChildrenPattern());
+        $this->assertEquals('foo.*', $nav->active());
     }
 
     /** @test */
