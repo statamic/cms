@@ -21,8 +21,8 @@ class NavItem
     protected $icon;
     protected $children;
     protected $isChild;
-    protected $active;
     protected $authorization;
+    protected $active;
     protected $view;
     protected $order;
     protected $hidden;
