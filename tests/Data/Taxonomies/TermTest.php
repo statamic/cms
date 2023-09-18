@@ -246,8 +246,8 @@ class TermTest extends TestCase
         ], $termDe->previewTargets()->all());
 
         $taxonomy->previewTargets([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/tags?preview=true', 'refresh' => true],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'refresh' => true],
         ])->save();
 
         $this->assertEquals([

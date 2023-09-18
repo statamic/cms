@@ -713,6 +713,7 @@ class CollectionTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider additionalPreviewTargetProvider
      */
     public function it_gets_and_sets_preview_targets($throughFacade)
@@ -724,31 +725,35 @@ class CollectionTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->additionalPreviewTargets());
 
         $this->assertEquals([
-            ['label' => 'Entry', 'format' => '{permalink}'],
+            ['label' => 'Entry', 'format' => '{permalink}', 'refresh' => true],
         ], $collection->basePreviewTargets()->all());
 
         $return = $collection->previewTargets([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}'], // no explicit refresh should imply its enabled
         ]);
 
         $this->assertSame($collection, $return);
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
         ], $collection->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
         ], $collection->basePreviewTargets()->all());
 
         $this->assertEquals([], $collection->additionalPreviewTargets()->all());
 
         $extra = [
-            ['label' => 'Baz', 'format' => '{baz}'],
-            ['label' => 'Qux', 'format' => '{qux}'],
+            ['label' => 'Qux', 'format' => '{qux}', 'refresh' => true],
+            ['label' => 'Quux', 'format' => '{quux}', 'refresh' => false],
+            ['label' => 'Flux', 'format' => '{flux}'], // no explicit refresh should imply its enabled
         ];
 
         if ($throughFacade) {
@@ -758,20 +763,24 @@ class CollectionTest extends TestCase
         }
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
-            ['label' => 'Baz', 'format' => '{baz}'],
-            ['label' => 'Qux', 'format' => '{qux}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
+            ['label' => 'Qux', 'format' => '{qux}', 'refresh' => true],
+            ['label' => 'Quux', 'format' => '{quux}', 'refresh' => false],
+            ['label' => 'Flux', 'format' => '{flux}', 'refresh' => true],
         ], $collection->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
         ], $collection->basePreviewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Baz', 'format' => '{baz}'],
-            ['label' => 'Qux', 'format' => '{qux}'],
+            ['label' => 'Qux', 'format' => '{qux}', 'refresh' => true],
+            ['label' => 'Quux', 'format' => '{quux}', 'refresh' => false],
+            ['label' => 'Flux', 'format' => '{flux}', 'refresh' => true],
         ], $collection->additionalPreviewTargets()->all());
     }
 

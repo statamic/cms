@@ -33,6 +33,7 @@ class FilesTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider uploadProvider
      */
     public function it_uploads_a_file($container, $isImage, $expectedPath, $expectedWidth, $expectedHeight)

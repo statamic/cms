@@ -135,7 +135,7 @@ class Process
             $this->output .= $operateOnOutput($buffer);
         }, $this->env);
 
-        $this->logErrorOutput();
+        $this->logErrorOutput($process);
 
         if ($this->throwOnFailure && $process->getExitCode() > 0) {
             $this->throwException($this->output);
@@ -186,7 +186,7 @@ class Process
             $this->output .= $buffer;
         }, $this->env);
 
-        $this->logErrorOutput();
+        $this->logErrorOutput($process);
 
         return $this->normalizeOutput($this->output);
     }
@@ -210,7 +210,7 @@ class Process
             $this->appendOutputToCache($cacheKey, $buffer);
         }, $this->env);
 
-        $this->logErrorOutput();
+        $this->logErrorOutput($process);
 
         $this->setCompletedOnCache($cacheKey);
     }
@@ -236,8 +236,10 @@ class Process
 
     /**
      * Log error output.
+     *
+     * @param  SymfonyProcess  $process
      */
-    private function logErrorOutput()
+    private function logErrorOutput($process)
     {
         if (! $this->logErrorOutput) {
             return;
@@ -247,11 +249,19 @@ class Process
             return;
         }
 
-        $process = (new \ReflectionClass($this))->getShortName();
+        $processClass = (new \ReflectionClass($this))->getShortName();
+
+        $command = $process->getCommandLine();
 
         $error = collect($this->errorOutput)->implode("\n");
 
-        Log::error("{$process} Process: {$error}");
+        $output = collect([
+            "Process Class: {$processClass}",
+            "Command: {$command}",
+            "Error: {$error}",
+        ])->implode("\n");
+
+        Log::error($output);
     }
 
     /**

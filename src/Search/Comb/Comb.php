@@ -434,7 +434,7 @@ class Comb
                 array_push($output, $record);
             }
 
-            // find categorized data
+        // find categorized data
         } else {
             foreach ($this->haystack as $category => $records) {
                 foreach ($records as $item) {
@@ -528,7 +528,7 @@ class Comb
 
             // loop over each query chunk
             foreach ($params['chunks'] as $j => $chunk) {
-                $escaped_chunk = str_replace('#', '\#', $chunk);
+                $escaped_chunk = preg_quote($chunk, '#');
                 $regex = [
                     'whole' => '#^'.$escaped_chunk.'$#i',
                     'partial' => '#'.$escaped_chunk.'#i',
@@ -870,7 +870,7 @@ class Comb
                 array_push($parts['chunks'], $query);
             }
 
-            // perform a boolean search -- require words, disallow words
+        // perform a boolean search -- require words, disallow words
         } elseif ($this->query_mode === self::QUERY_BOOLEAN) {
             $words = preg_split("/\s+/i", $query);
 
@@ -903,7 +903,7 @@ class Comb
                 array_push($parts['chunks'], $query);
             }
 
-            // search for the entire query as one thing
+        // search for the entire query as one thing
         } else {
             $parts['chunks'] = [strtolower($query)];
         }
@@ -1043,7 +1043,7 @@ class Comb
         $length = $this->snippet_length;
 
         $escaped_chunks = collect($chunks)
-            ->map(fn ($chunk) => str_replace('#', '\#', $chunk))
+            ->map(fn ($chunk) => preg_quote($chunk, '#'))
             ->join('|');
         $regex = '#(.*?)('.$escaped_chunks.')(.{0,'.$length.'}(?:\s|$))#i';
         if (! preg_match_all($regex, $value, $matches, PREG_SET_ORDER)) {

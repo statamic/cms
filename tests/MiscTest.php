@@ -15,6 +15,7 @@ class MiscTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider localesTagTestProvider
      *
      * @see https://github.com/statamic/cms/issues/4839

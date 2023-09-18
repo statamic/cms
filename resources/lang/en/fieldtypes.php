@@ -10,6 +10,7 @@ return [
     'assets.config.container' => 'Choose which asset container to use for this field.',
     'assets.config.folder' => 'The folder to begin browsing in.',
     'assets.config.max_files' => 'The maximum number of selectable assets.',
+    'assets.config.min_files' => 'The minimum number of selectable assets.',
     'assets.config.mode' => 'Choose your preferred layout style.',
     'assets.config.restrict' => 'Prevent users from navigating to other folders.',
     'assets.config.show_filename' => 'Show the filename next to the preview image.',

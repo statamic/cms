@@ -1299,4 +1299,19 @@ EXP;
 
         $this->assertSame($expected, trim($this->renderString($template, [], true)));
     }
+
+    public function test_assignments_are_processed_after_associative_arrays()
+    {
+        $template = <<<'EOT'
+{{ _value = 'One'; }}
+
+{{ data }}
+    {{ _value = 'Two'; }}
+{{ /data }}
+
+The value: {{ _value }}.
+EOT;
+
+        $this->assertSame('The value: Two.', trim($this->renderString($template, ['data' => ['foo' => 'bar']])));
+    }
 }

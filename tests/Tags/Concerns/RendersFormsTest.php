@@ -117,6 +117,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderTextProvider
      */
     public function renders_text_fields($value, $default, $old, $expected)
@@ -134,6 +135,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderTextProvider
      */
     public function renders_fallback_fields_as_text_fields($value, $default, $old, $expected)
@@ -148,6 +150,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderTextProvider
      */
     public function renders_textarea_fields($value, $default, $old, $expected)
@@ -181,6 +184,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderToggleProvider
      */
     public function renders_toggles($value, $default, $old, $expected)
@@ -236,6 +240,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderSingleSelectProvider
      */
     public function renders_single_select_fields($value, $default, $old, $expected)
@@ -264,6 +269,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderSingleSelectProvider
      */
     public function renders_radio_fields($value, $default, $old, $expected)
@@ -312,6 +318,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderMultipleSelectProvider
      */
     public function renders_multiple_select_fields($value, $default, $old, $expected)
@@ -344,6 +351,7 @@ EOT;
 
     /**
      * @test
+     *
      * @dataProvider renderMultipleSelectProvider
      */
     public function renders_checkboxes_fields($value, $default, $old, $expected)

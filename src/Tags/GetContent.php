@@ -18,7 +18,7 @@ class GetContent extends Tags
     public function wildcard($tag)
     {
         return $this->entries(
-           $this->context->value($tag)
+            $this->context->value($tag)
         );
     }
 
