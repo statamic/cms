@@ -1365,6 +1365,7 @@ class NodeProcessor
                             $recursiveParent->activeDepth += 1;
 
                             $rootData = RecursiveNodeManager::getRecursiveRootData($node);
+                            $rootData = array_merge($rootData, $this->getRuntimeAssignments());
 
                             // Prevent an infinite loop with arbitrary data.
                             if (array_key_exists($node->content, $rootData)) {
@@ -1372,6 +1373,16 @@ class NodeProcessor
                             }
 
                             $parentParameterValues = array_values($recursiveParent->getParameterValues($this));
+
+                            GlobalRuntimeState::$traceTagAssignments = true;
+                            GlobalRuntimeState::$activeTracerCount += 1;
+                            GlobalRuntimeState::$tracedRuntimeAssignments = $this->runtimeAssignments;
+
+                            $currentAssignments = $this->getRuntimeAssignments();
+
+                            $recursiveProcessor = $this->cloneProcessor();
+                            $recursiveProcessor->setRuntimeAssignments($this->runtimeAssignments);
+
                             // Substitute the current node with the original parent.
                             foreach ($children as $childData) {
                                 $namedDepthMapping = $node->content.'_depth';
@@ -1406,8 +1417,17 @@ class NodeProcessor
                                     $childDataToUse[$node->content] = [];
                                 }
 
-                                $result = $this->cloneProcessor()
-                                    ->setData($childDataToUse)->reduce($recursiveParent->children);
+                                $result = $recursiveProcessor->replaceData($childDataToUse)->reduce($recursiveParent->children);
+
+                                $recursiveAssignmentValues = $recursiveProcessor->getRuntimeAssignments();
+
+                                if (! empty($recursiveAssignmentValues)) {
+                                    foreach ($recursiveAssignmentValues as $assignVar => $assignVal) {
+                                        if (array_key_exists($assignVar, $currentAssignments)) {
+                                            GlobalRuntimeState::$tracedRuntimeAssignments[$assignVar] = $assignVal;
+                                        }
+                                    }
+                                }
 
                                 $buffer .= $this->measureBufferAppend($node, $result);
 
@@ -1418,6 +1438,11 @@ class NodeProcessor
 
                             $recursiveParent->activeDepth -= 1;
                             RecursiveNodeManager::releaseRecursiveNode($node);
+
+                            if (GlobalRuntimeState::$activeTracerCount == 0) {
+                                GlobalRuntimeState::$traceTagAssignments = false;
+                                GlobalRuntimeState::$tracedRuntimeAssignments = [];
+                            }
                         }
 
                         continue;
