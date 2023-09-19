@@ -17,7 +17,7 @@ use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Submission implements SubmissionContract, Augmentable
+class Submission implements Augmentable, SubmissionContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedData;
 
@@ -34,7 +34,7 @@ class Submission implements SubmissionContract, Augmentable
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
-    protected null|string $redirect = null;
+    protected ?string $redirect = null;
 
     public function __construct()
     {
@@ -235,22 +235,18 @@ class Submission implements SubmissionContract, Augmentable
      * Does your form need to create a redirect URL after it has been saved, you can
      * create your own binding of the Submission class where you can include some funky
      * redirect logic - for example, creating a URL to post to a third party like Stripe.
-     *
-     * @return void
      */
-    public function buildRedirectUrl():void
+    public function buildRedirectUrl(): void
     {
         $this->redirect = null;
     }
 
     /**
      * Returns the redirect URL for this Submission
-     *
-     * @return string|null
      */
-    public function getRedirectUrl(): null|string
+    public function getRedirectUrl(): ?string
     {
-        if (!$this->redirect) {
+        if (! $this->redirect) {
             $this->buildRedirectUrl();
         }
 
