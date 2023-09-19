@@ -902,9 +902,8 @@ class CoreModifiers extends Modifier
         $style = Arr::get($params, 0, 'ap');
 
         switch ($style) {
-            case 'chicago':
             case 'mla':
-                return $this->renderChicagoOrMLAStyleHeadline($value);
+                return $this->renderMLAStyleHeadline($value);
             default:
                 return $this->renderAPStyleHeadline($value);
         }
@@ -938,7 +937,7 @@ class CoreModifiers extends Modifier
         return $headline;
     }
 
-    private function renderChicagoOrMLAStyleHeadline($value)
+    private function renderMLAStyleHeadline($value)
     {
         $exceptions = [
             'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'if', 'in', 'is', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'with',
