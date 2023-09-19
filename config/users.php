@@ -150,4 +150,17 @@ return [
         'web' => 'web',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Impersonation
+    |--------------------------------------------------------------------------
+    |
+    | Here you can configure if impersonation is available, and what URL to
+    | redirect to after impersonation begins
+    |
+    */
+    'impersonate' => [
+        'enabled' => env('STATAMIC_IMPERSONATE_ENABLED', true),
+        'redirect' => env('STATAMIC_IMPERSONATE_REDIRECT', null),
+    ],
 ];

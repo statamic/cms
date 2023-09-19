@@ -89,11 +89,11 @@
         </a>
         <dropdown-list v-cloak>
             <template v-slot:trigger>
-                <a class="dropdown-toggle items-center ml-4 h-full hide flex">
+                <a class="dropdown-toggle items-center ml-4 h-full hide flex relative group">
                     @if ($user->avatar())
-                        <div class="icon-header-avatar"><img src="{{ $user->avatar() }}" /></div>
+                        <div class="icon-header-avatar {{ session()->get('statamic_impersonated_by') ? 'animate-radar' : '' }}"><img src="{{ $user->avatar() }}" /></div>
                     @else
-                        <div class="icon-header-avatar icon-user-initials">{{ $user->initials() }}</div>
+                        <div class="icon-header-avatar {{ session()->get('statamic_impersonated_by') ? 'animate-radar' : '' }} icon-user-initials">{{ $user->initials() }}</div>
                     @endif
                 </a>
             </template>
@@ -101,12 +101,17 @@
             <div class="px-2">
                 <div class="text-base mb-px">{{ $user->email() }}</div>
                 @if ($user->isSuper())
-                    <div class="text-2xs mt-px text-gray-600">{{ __('Super Admin') }}</div>
+                    <div class="text-2xs mt-px text-gray-600">{{ __('Super Admin') }} @if (session()->get('statamic_impersonated_by'))(Impersonating)@endif</div>
+                @elseif (session()->get('statamic_impersonated_by'))
+                    <div class="text-2xs mt-px text-gray-600">{{ __('Impersonating') }}</div>
                 @endif
             </div>
             <div class="divider"></div>
 
             <dropdown-item :text="__('Profile')" redirect="{{ route('statamic.cp.account') }}"></dropdown-item>
+            @if (session()->get('statamic_impersonated_by'))
+                <dropdown-item :text="__('Stop Impersonating')" redirect="{{ cp_route('impersonation.stop') }}"></dropdown-item>
+            @endif
             <dropdown-item :text="__('Log out')" redirect="{{ route('statamic.cp.logout', ['redirect' => cp_route('index')]) }}"></dropdown-item>
         </dropdown-list>
     </div>

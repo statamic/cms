@@ -45,6 +45,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\ReuploadAsset::class,
         Actions\MoveAssetFolder::class,
         Actions\RenameAssetFolder::class,
+        Actions\Impersonate::class,
     ];
 
     protected $fieldtypes = [

@@ -79,6 +79,7 @@ return [
     'edit_roles' => 'Edit roles',
     'assign_user_groups' => 'Assign groups to users',
     'assign_roles' => 'Assign roles to users',
+    'impersonate_users' => 'Impersonate users',
 
     'group_updates' => 'Updates',
     'view_updates' => 'View updates',
