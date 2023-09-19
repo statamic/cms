@@ -27,11 +27,6 @@ class Site extends Filter
 
     public function autoApply()
     {
-        if (Facades\Site::selected() === null) {
-            $site = session('statamic.cp.selected-site');
-            throw new \Exception("Site handle [{$site}] does not exist in your sites.php config.");
-        }
-
         return [
             'site' => Facades\Site::selected()->handle(),
         ];
