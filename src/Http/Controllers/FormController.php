@@ -78,7 +78,7 @@ class FormController extends Controller
         return $this->formSuccess($params, $submission);
     }
 
-    protected function validateContentType($request, $form)
+    private function validateContentType($request, $form)
     {
         $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
 
@@ -97,7 +97,7 @@ class FormController extends Controller
      * @param  bool  $silentFailure
      * @return Response
      */
-    protected function formSuccess($params, $submission, $silentFailure = false)
+    private function formSuccess($params, $submission, $silentFailure = false)
     {
         // get the redirect (or null)
         $redirect = $submission->getRedirectUrl();
@@ -140,7 +140,7 @@ class FormController extends Controller
      * @param  string  $form
      * @return Response|RedirectResponse
      */
-    protected function formFailure($params, $errors, $form)
+    private function formFailure($params, $errors, $form)
     {
         if (request()->ajax()) {
             return response([
