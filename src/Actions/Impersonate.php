@@ -5,8 +5,8 @@ namespace Statamic\Actions;
 use Illuminate\Events\NullDispatcher;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Contracts\Auth\User as UserContract;
-use Statamic\Facades\User;
 use Statamic\Facades\CP\Toast;
+use Statamic\Facades\User;
 
 class Impersonate extends Action
 {
