@@ -902,10 +902,7 @@ class CoreModifiers extends Modifier
         $style = Arr::get($params, 0, 'ap');
 
         switch ($style) {
-            case 'ap':
-                return $this->renderAPStyleHeadline($value);
             case 'chicago':
-                return $this->renderChicagoOrMLAStyleHeadline($value);
             case 'mla':
                 return $this->renderChicagoOrMLAStyleHeadline($value);
             default:
