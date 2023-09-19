@@ -904,7 +904,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             }, $format);
         }
 
-        return (string) Antlers::parse($format, $this->augmented()->all());
+        return (string) Antlers::parse($format, [
+            ...$this->routeData(),
+            'permalink' => $this->absoluteUrl(),
+            'locale' => $this->locale(),
+        ]);
     }
 
     public function repository()
