@@ -6,6 +6,7 @@ use Illuminate\Events\NullDispatcher;
 use Illuminate\Support\Facades\Auth;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\User;
+use Statamic\Facades\CP\Toast;
 
 class Impersonate extends Action
 {
@@ -50,6 +51,7 @@ class Impersonate extends Action
 
             $guard->login($users->first());
             session()->put('statamic_impersonated_by', $currentUser->getKey());
+            Toast::success(__('You are now impersonating'). ' '.$users->first()->name());
         } finally {
             if ($dispatcher) {
                 $guard->setDispatcher($dispatcher);
