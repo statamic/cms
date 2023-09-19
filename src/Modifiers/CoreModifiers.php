@@ -897,6 +897,68 @@ class CoreModifiers extends Modifier
         return Stringy::hasUpperCase($value);
     }
 
+    public function headline($value, $params)
+    {
+        $style = Arr::get($params, 0, 'ap');
+
+        switch ($style) {
+            case 'ap':
+                return $this->renderAPStyleHeadline($value);
+            case 'chicago':
+                return $this->renderChicagoOrMLAStyleHeadline($value);
+            case 'mla':
+                return $this->renderChicagoOrMLAStyleHeadline($value);
+            default:
+                return $this->renderAPStyleHeadline($value);
+        }
+    }
+
+    private function renderAPStyleHeadline($value)
+    {
+        $exceptions = [
+            'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'if', 'in', 'is', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'with'
+        ];
+
+        $words = explode(' ', $value);
+        $wordCount = count($words);
+
+        $headline = collect($words)->map(function ($word, $index) use ($exceptions, $wordCount) {
+            $word = strtolower($word);
+            $isFirstOrLast = ($index === 0 || $index === $wordCount - 1);
+
+            // Handle hyphenated words
+            if (strpos($word, '-') !== false) {
+                $subWords = explode('-', $word);
+                return collect($subWords)->map(function ($subWord) use ($isFirstOrLast, $exceptions) {
+                    return ($isFirstOrLast || !in_array($subWord, $exceptions)) ? Str::ucfirst($subWord) : $subWord;
+                })->implode('-');
+            }
+
+            return ($isFirstOrLast || !in_array($word, $exceptions)) ? Str::ucfirst($word) : $word;
+        })->implode(' ');
+
+        return $headline;
+    }
+
+    private function renderChicagoOrMLAStyleHeadline($value)
+    {
+        $exceptions = [
+            'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'if', 'in', 'is', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'with'
+        ];
+
+        $words = explode(' ', $value);
+        $wordCount = count($words);
+
+        $headline = collect($words)->map(function ($word, $index) use ($exceptions, $wordCount) {
+            $word = strtolower($word);
+            $isFirstOrLast = ($index === 0 || $index === $wordCount - 1);
+
+            return ($isFirstOrLast || !in_array($word, $exceptions)) ? Str::ucfirst($word) : $word;
+        })->implode(' ');
+
+        return $headline;
+    }
+
     /**
      * Get the date difference in hours.
      *
