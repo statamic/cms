@@ -204,17 +204,6 @@ class TermQueryBuilderTest extends TestCase
 
         $terms = Term::query()->orderBy('test')->get();
         $this->assertEquals(['c', 'b', 'e', 'a', 'd'], $terms->map->slug()->all());
-    }
-
-    /** @test */
-    public function it_sorts_in_descending_order()
-    {
-        Taxonomy::make('tags')->save();
-        Term::make('a')->taxonomy('tags')->data(['test' => 4])->save();
-        Term::make('b')->taxonomy('tags')->data(['test' => 2])->save();
-        Term::make('c')->taxonomy('tags')->data(['test' => 1])->save();
-        Term::make('d')->taxonomy('tags')->data(['test' => 5])->save();
-        Term::make('e')->taxonomy('tags')->data(['test' => 3])->save();
 
         $terms = Term::query()->orderByDesc('test')->get();
         $this->assertEquals(['d', 'a', 'e', 'b', 'c'], $terms->map->slug()->all());
