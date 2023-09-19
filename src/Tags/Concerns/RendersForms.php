@@ -137,6 +137,7 @@ trait RendersForms
             'default' => $field->value() ?? $field->defaultValue(),
             'old' => old($field->handle()),
             'value' => $value,
+            'data' => $field->fieldtype()->getRenderableFieldtypeData(),
         ]);
 
         if ($manipulateDataCallback instanceof Closure) {
