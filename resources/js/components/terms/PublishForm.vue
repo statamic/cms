@@ -98,6 +98,7 @@
                             @blur="container.$emit('blur', $event)"
                         >
                             <template #actions="{ shouldShowSidebar }">
+                            <div class="card p-0" :class="{ 'mb-5': showLivePreviewButton || showVisitUrlButton || localizations.length > 1 }">
 
                                 <div :class="{ 'hi': !shouldShowSidebar }">
 
@@ -183,6 +184,7 @@
                                     </div>
                                 </div>
 
+                            </div>
                             </template>
                         </publish-tabs>
                     </transition>
