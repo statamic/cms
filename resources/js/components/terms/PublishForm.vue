@@ -98,7 +98,7 @@
                             @blur="container.$emit('blur', $event)"
                         >
                             <template #actions="{ shouldShowSidebar }">
-                            <div class="card p-0 mb-5">
+                            <div class="card p-0" :class="{ 'mb-5': showLivePreviewButton || showVisitUrlButton || localizations.length > 1 }">
 
                                 <div :class="{ 'hi': !shouldShowSidebar }">
 
