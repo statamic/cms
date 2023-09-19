@@ -916,7 +916,7 @@ class CoreModifiers extends Modifier
     private function renderAPStyleHeadline($value)
     {
         $exceptions = [
-            'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'if', 'in', 'is', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'with'
+            'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'if', 'in', 'is', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'with',
         ];
 
         $words = explode(' ', $value);
@@ -929,12 +929,13 @@ class CoreModifiers extends Modifier
             // Handle hyphenated words
             if (strpos($word, '-') !== false) {
                 $subWords = explode('-', $word);
+
                 return collect($subWords)->map(function ($subWord) use ($isFirstOrLast, $exceptions) {
-                    return ($isFirstOrLast || !in_array($subWord, $exceptions)) ? Str::ucfirst($subWord) : $subWord;
+                    return ($isFirstOrLast || ! in_array($subWord, $exceptions)) ? Str::ucfirst($subWord) : $subWord;
                 })->implode('-');
             }
 
-            return ($isFirstOrLast || !in_array($word, $exceptions)) ? Str::ucfirst($word) : $word;
+            return ($isFirstOrLast || ! in_array($word, $exceptions)) ? Str::ucfirst($word) : $word;
         })->implode(' ');
 
         return $headline;
@@ -943,7 +944,7 @@ class CoreModifiers extends Modifier
     private function renderChicagoOrMLAStyleHeadline($value)
     {
         $exceptions = [
-            'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'if', 'in', 'is', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'with'
+            'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'if', 'in', 'is', 'nor', 'of', 'on', 'or', 'per', 'the', 'to', 'vs', 'with',
         ];
 
         $words = explode(' ', $value);
@@ -953,7 +954,7 @@ class CoreModifiers extends Modifier
             $word = strtolower($word);
             $isFirstOrLast = ($index === 0 || $index === $wordCount - 1);
 
-            return ($isFirstOrLast || !in_array($word, $exceptions)) ? Str::ucfirst($word) : $word;
+            return ($isFirstOrLast || ! in_array($word, $exceptions)) ? Str::ucfirst($word) : $word;
         })->implode(' ');
 
         return $headline;
