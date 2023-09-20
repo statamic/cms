@@ -1,5 +1,56 @@
 # Release Notes
 
+## 4.23.0 (2023-09-20)
+
+### What's new
+- Add ability to impersonate a user. [#8622](https://github.com/statamic/cms/issues/8622) by @ryanmitchell
+- New modifier for AP and MLA style headlines. [#8731](https://github.com/statamic/cms/issues/8731) by @jackmcdade
+- Add `orderByDesc` method to the query builder. [#8735](https://github.com/statamic/cms/issues/8735) by @duncanmcclean
+- Add replicator_preview toggle to Blueprint editor. [#8297](https://github.com/statamic/cms/issues/8297) by @jacksleight
+
+### What's fixed
+- Fix incorrect entries_count in multisite when using localized term slugs. [#8743](https://github.com/statamic/cms/issues/8743) by @ryanmitchell
+- Fix CSRF field related test failures. [#8746](https://github.com/statamic/cms/issues/8746) by @jasonvarga
+- Make title in revision preview computed. [#8745](https://github.com/statamic/cms/issues/8745) by @jonassiewertsen
+- Adjust data passed to live preview targets. [#8742](https://github.com/statamic/cms/issues/8742) by @jasonvarga
+- Fix sidebar missing background on term publish form. [#8741](https://github.com/statamic/cms/issues/8741) by @jasonvarga
+- Apply overflow styling to user listing. [#8739](https://github.com/statamic/cms/issues/8739) by @jasonvarga
+- Empty form widget styling is now consistent with other widgets. [#8736](https://github.com/statamic/cms/issues/8736) by @jackmcdade
+- Fall back to default site when selected one is invalid. [#8721](https://github.com/statamic/cms/issues/8721) by @jackmcdade
+- Fix single digit month not working on whereMonth. [#8697](https://github.com/statamic/cms/issues/8697) by @arifhp86
+- Make eloquent 'like' queries case insensitive. [#8243](https://github.com/statamic/cms/issues/8243) by @ryanmitchell
+- Fix custom Antlers variables not being updated within recursive loops. [#8725](https://github.com/statamic/cms/issues/8725) by @JohnathonKoster
+- Fix Antlers view variable leak. [#8728](https://github.com/statamic/cms/issues/8728) by @JohnathonKoster
+
+
+
+## 4.22.0 (2023-09-18)
+
+### What's new
+- Ability to give access to only form blueprints and not all blueprints. [#7923](https://github.com/statamic/cms/issues/7923) by @ryanmitchell
+- Add an `@antlers` Blade directive pair. [#8692](https://github.com/statamic/cms/issues/8692) by @JohnathonKoster
+- Allow for a honeypot field on `user:register` tag. [#8704](https://github.com/statamic/cms/issues/8704) by @ryanmitchell
+- Add 'on' and 'off' autocomplete values to text field. [#8679](https://github.com/statamic/cms/issues/8679) by @stoffelio
+
+### What's improved
+- Autofocus on new array field row's first input. [#8710](https://github.com/statamic/cms/issues/8710) by @jackmcdade
+- Add placeholder text to make Taggable usage more clear. [#8703](https://github.com/statamic/cms/issues/8703) by @jackmcdade
+- Improve visibility of overflowing set picker items. [#8701](https://github.com/statamic/cms/issues/8701) by @jackmcdade
+
+### What's fixed
+- Fix nav item active status on user modified navs. [#8685](https://github.com/statamic/cms/issues/8685) by @jesseleite
+- Make condition operators translatable. [#8724](https://github.com/statamic/cms/issues/8724) by @jackmcdade
+- Fix cache tag sometimes outputting placeholder Antlers strings. [#8401](https://github.com/statamic/cms/issues/8401) by @JohnathonKoster
+- Fix search snippets for bard/replicator content. [#7545](https://github.com/statamic/cms/issues/7545) by @stephensamra
+- Fix sidebar's empty card when no actions are present. [#8720](https://github.com/statamic/cms/issues/8720) by @jackmcdade
+- Fix fluent tag camelCase params. [#8715](https://github.com/statamic/cms/issues/8715) by @jackmcdade
+- Prevent deletion of selection when filtering in stack selector. [#8693](https://github.com/statamic/cms/issues/8693) by @wiebkevogel
+- More thoroughly escape and truncate Code replicator previews. [#8718](https://github.com/statamic/cms/issues/8718) by @jackmcdade
+- Stop forcing max_items: 1 on form fields. [#8713](https://github.com/statamic/cms/issues/8713) by @jackmcdade
+- Fix hamburger icon wompyness. [#8700](https://github.com/statamic/cms/issues/8700) by @jackmcdade
+
+
+
 ## 4.21.0 (2023-09-07)
 
 ### What's new

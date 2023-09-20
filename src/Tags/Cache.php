@@ -5,8 +5,11 @@ namespace Statamic\Tags;
 use Illuminate\Support\Facades\Cache as LaraCache;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\View\Antlers\Language\Runtime\LiteralReplacementManager;
+use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
+use Statamic\View\State\CachesOutput;
 
-class Cache extends Tags
+class Cache extends Tags implements CachesOutput
 {
     public function index()
     {
@@ -20,11 +23,37 @@ class Cache extends Tags
             $store = $store->tags($tags);
         }
 
-        if ($cached = $store->get($key = $this->getCacheKey())) {
+        $key = $this->getCacheKey();
+        $nestedCallsKey = $key.'_sections_stacks';
+
+        if ($cached = $store->get($key)) {
+            $nestedResults = $store->get($nestedCallsKey);
+
+            if ($nestedResults != null) {
+                StackReplacementManager::restoreCachedStacks($nestedResults['stacks']);
+                LiteralReplacementManager::restoreCachedSections($nestedResults['sections']);
+            }
+
             return $cached;
         }
 
         $store->put($key, $html = (string) $this->parse([]), $this->getCacheLength());
+
+        $cachedSections = LiteralReplacementManager::getCachedSections();
+        $cachedStacks = StackReplacementManager::getCachedStacks();
+
+        if (! empty($cachedSections) || ! empty($cachedStacks)) {
+            $nestedCalls = [
+                'sections' => LiteralReplacementManager::getCachedSections(),
+                'stacks' => StackReplacementManager::getCachedStacks(),
+            ];
+
+            $store->put($nestedCallsKey, $nestedCalls, $this->getCacheLength());
+        }
+
+        // Do some cleanup so things don't leak elsewhere.
+        StackReplacementManager::clearCachedStacks();
+        LiteralReplacementManager::clearCachedSections();
 
         return $html;
     }

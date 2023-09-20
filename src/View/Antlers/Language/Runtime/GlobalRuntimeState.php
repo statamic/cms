@@ -209,6 +209,8 @@ class GlobalRuntimeState
      */
     public static $peekCallbacks = [];
 
+    public static $isCacheEnabled = false;
+
     public static function resetGlobalState()
     {
         self::$containsLayout = false;
