@@ -78,17 +78,22 @@ class NavigationController extends CpController
             'nav' => $nav,
             'expectsRoot' => $nav->expectsRoot(),
             'collections' => $nav->collections()->map->handle()->all(),
-            'sites' => $nav->trees()
-                ->filter(fn ($tree) => User::current()->can('view', Site::get($tree->locale())))
-                ->map(function ($tree) {
-                    return [
-                        'handle' => $tree->locale(),
-                        'name' => $tree->site()->name(),
-                        'url' => $tree->showUrl(),
-                    ];
-                })->values()->all(),
+            'sites' => $this->getAuthorizedTreesForNav($nav)->map(function ($tree) {
+                return [
+                    'handle' => $tree->locale(),
+                    'name' => $tree->site()->name(),
+                    'url' => $tree->showUrl(),
+                ];
+            })->values()->all(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
         ]);
+    }
+
+    private function getAuthorizedTreesForNav($nav)
+    {
+        return $nav
+            ->trees()
+            ->filter(fn ($tree) => User::current()->can('view', Site::get($tree->locale())));
     }
 
     public function update(Request $request, $nav)
