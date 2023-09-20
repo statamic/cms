@@ -22,15 +22,12 @@ class Sites extends Relationship
 
     public function getIndexItems($request)
     {
-        return Site::all()
-            ->sortBy('name')
-            ->map(function ($site) {
-                return [
-                    'id' => $site->handle(),
-                    'title' => $site->name(),
-                ];
-            })
-            ->values();
+        return Site::all()->sortBy('name')->map(function ($site) {
+            return [
+                'id' => $site->handle(),
+                'title' => $site->name(),
+            ];
+        })->values();
     }
 
     public function augmentValue($value)

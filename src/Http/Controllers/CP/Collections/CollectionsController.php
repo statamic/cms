@@ -63,8 +63,7 @@ class CollectionsController extends CpController
                     'handle' => $blueprint->handle(),
                     'title' => $blueprint->title(),
                 ];
-            })
-            ->values();
+            })->values();
 
         $site = $request->site ? Site::get($request->site) : Site::selected();
 

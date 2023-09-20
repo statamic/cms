@@ -50,7 +50,15 @@ class GlobalVariablesController extends CpController
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
-            'localizations' => $this->getAuthorizedLocalizationsForVariables($variables),
+            'localizations' => $this->getAuthorizedLocalizationsForVariables($variables)->map(function ($localized) use ($variables) {
+                return [
+                    'handle' => $localized->locale(),
+                    'name' => $localized->site()->name(),
+                    'active' => $localized->locale() === $variables->locale(),
+                    'origin' => ! $localized->hasOrigin(),
+                    'url' => $localized->editUrl(),
+                ];
+            })->values()->all(),
             'canEdit' => $user->can('edit', $variables),
             'canConfigure' => $user->can('configure', $variables),
             'canDelete' => $user->can('delete', $variables),
@@ -116,17 +124,6 @@ class GlobalVariablesController extends CpController
         return $variables
             ->globalSet()
             ->localizations()
-            ->filter(fn ($set) => User::current()->can('edit', $set))
-            ->map(function ($localized) use ($variables) {
-                return [
-                    'handle' => $localized->locale(),
-                    'name' => $localized->site()->name(),
-                    'active' => $localized->locale() === $variables->locale(),
-                    'origin' => ! $localized->hasOrigin(),
-                    'url' => $localized->editUrl(),
-                ];
-            })
-            ->values()
-            ->all();
+            ->filter(fn ($set) => User::current()->can('edit', $set));
     }
 }

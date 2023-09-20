@@ -86,9 +86,7 @@ class NavigationController extends CpController
                         'name' => $tree->site()->name(),
                         'url' => $tree->showUrl(),
                     ];
-                })
-                ->values()
-                ->all(),
+                })->values()->all(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
         ]);
     }
