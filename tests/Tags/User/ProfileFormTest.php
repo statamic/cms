@@ -26,7 +26,7 @@ class ProfileFormTest extends TestCase
         $output = $this->tag('{{ user:profile_form }}{{ /user:profile_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/profile">', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
+        $this->assertStringContainsString(csrf_field(), $output);
         $this->assertStringEndsWith('</form>', $output);
     }
 
