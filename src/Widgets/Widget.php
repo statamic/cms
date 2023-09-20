@@ -10,7 +10,7 @@ use Statamic\Support\Str;
 
 abstract class Widget
 {
-    use RegistersItself, HasTitle, HasHandle, HasAliases {
+    use HasAliases, HasHandle, HasTitle, RegistersItself {
         handle as protected traitHandle;
     }
 

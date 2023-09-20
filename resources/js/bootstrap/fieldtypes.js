@@ -57,6 +57,8 @@ import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.
 import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
 import YamlFieldtype from '../components/fieldtypes/YamlFieldtype.vue';
+import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
+import SetField from '../components/fieldtypes/replicator/Field.vue';
 
 Vue.component('select-input', Select);
 Vue.component('text-input', Text);
@@ -113,6 +115,8 @@ Vue.component('toggle-fieldtype-index', ToggleIndexFieldtype);
 Vue.component('width-fieldtype', WidthFieldtype);
 Vue.component('video-fieldtype', VideoFieldtype);
 Vue.component('yaml-fieldtype', YamlFieldtype);
+Vue.component('set-picker', SetPicker);
+Vue.component('set-field', SetField);
 
 
 Vue.component('revealer-fieldtype', RevealerFieldtype);

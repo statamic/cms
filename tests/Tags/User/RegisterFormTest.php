@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class RegisterFormTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk, NormalizesHtml;
+    use NormalizesHtml, PreventSavingStacheItemsToDisk;
 
     private function tag($tag)
     {
@@ -391,5 +391,74 @@ EOT
         $this->assertEquals($form['attrs']['method'], 'POST');
 
         $this->assertArrayHasKey('_token', $form['params']);
+    }
+
+    /** @test */
+    public function it_wont_register_user_when_honeypot_is_present()
+    {
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
+
+        config()->set('statamic.users.registration_form_honeypot_field', 'honeypot');
+
+        $response = $this
+            ->post('/!/auth/register', [
+                'email' => 'san@holo.com',
+                'password' => 'chewbacca',
+                'password_confirmation' => 'chewbacca',
+                'honeypot' => 'falcon',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
+
+        $output = $this->tag(<<<'EOT'
+{{ user:register_form }}
+    <p class="success">{{ success }}</p>
+{{ /user:register_form }}
+EOT
+        );
+
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+
+        $this->assertEquals(['Registration successful.'], $success[1]);
+
+        config()->set('statamic.users.registration_form_honeypot_field', null);
+    }
+
+    /** @test */
+    public function it_will_register_user_when_honeypot_is_not_present()
+    {
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
+
+        config()->set('statamic.users.registration_form_honeypot_field', 'honeypot');
+
+        $response = $this
+            ->post('/!/auth/register', [
+                'email' => 'san@holo.com',
+                'password' => 'chewbacca',
+                'password_confirmation' => 'chewbacca',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $this->assertNotNull(User::findByEmail('san@holo.com'));
+        $this->assertTrue(auth()->check());
+
+        $output = $this->tag(<<<'EOT'
+{{ user:register_form }}
+    <p class="success">{{ success }}</p>
+{{ /user:register_form }}
+EOT
+        );
+
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+
+        $this->assertEquals(['Registration successful.'], $success[1]);
+
+        config()->set('statamic.users.registration_form_honeypot_field', null);
     }
 }

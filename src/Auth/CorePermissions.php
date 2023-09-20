@@ -18,6 +18,7 @@ class CorePermissions
         $this->group('cp', function () {
             $this->register('access cp');
             $this->register('configure fields');
+            $this->register('configure form fields');
             $this->register('configure addons');
             $this->register('manage preferences');
         });
@@ -173,6 +174,7 @@ class CorePermissions
 
         $this->register('edit user groups');
         $this->register('edit roles');
+        $this->register('impersonate users');
     }
 
     protected function registerForms()

@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 abstract class FormTestCase extends TestCase
 {
-    use PreventSavingStacheItemsToDisk, NormalizesHtml;
+    use NormalizesHtml, PreventSavingStacheItemsToDisk;
 
     protected $defaultFields = [
         [

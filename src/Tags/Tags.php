@@ -10,7 +10,7 @@ use Statamic\Support\Arr;
 
 abstract class Tags
 {
-    use HasHandle, HasAliases, RegistersItself;
+    use HasAliases, HasHandle, RegistersItself;
 
     protected static $binding = 'tags';
 

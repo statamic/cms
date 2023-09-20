@@ -89,3 +89,17 @@ export function utf8btoa(stringToEncode) {
 export function uniqid() {
     return uid();
 }
+
+export function truncate(string, length, ending='...') {
+    if (string.length <= length) return string;
+
+    return string.substring(0, length - ending.length) + ending;
+}
+
+export function escapeHtml(string) {
+     return string.replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
