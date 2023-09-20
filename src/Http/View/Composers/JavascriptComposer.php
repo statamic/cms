@@ -72,21 +72,13 @@ class JavascriptComposer
 
     protected function sites()
     {
-        $sites = Site::all();
-
-        if (Site::hasMultiple()) {
-            $sites = $sites->filter(fn ($site) => User::current()->can('view', $site));
-        }
-
-        return $sites
-            ->map(function ($site) {
-                return [
-                    'name' => $site->name(),
-                    'handle' => $site->handle(),
-                    'lang' => $site->lang(),
-                ];
-            })
-            ->values();
+        return Site::authorized()->map(function ($site) {
+            return [
+                'name' => $site->name(),
+                'handle' => $site->handle(),
+                'lang' => $site->lang(),
+            ];
+        })->values();
     }
 
     protected function permissions($user)
