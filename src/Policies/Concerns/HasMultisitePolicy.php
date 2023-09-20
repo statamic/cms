@@ -13,7 +13,7 @@ trait HasMultisitePolicy
         }
 
         return $this->dataIsInForbiddenSite($user, $arguments)
-            || $this->dataHasNoAccessibleSite($user, $arguments);
+            || $this->dataHasNoAuthorizedSite($user, $arguments);
     }
 
     protected function dataIsInForbiddenSite($user, $arguments)
@@ -29,7 +29,7 @@ trait HasMultisitePolicy
         return $user->cant("access {$data->locale()} site");
     }
 
-    protected function dataHasNoAccessibleSite($user, $arguments)
+    protected function dataHasNoAuthorizedSite($user, $arguments)
     {
         if (! $data = $this->getDataFromArguments($arguments)) {
             return false;

@@ -130,7 +130,7 @@ class EntriesController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'permalink' => $entry->absoluteUrl(),
-            'localizations' => $this->getAccessibleSitesForCollection($collection)
+            'localizations' => $this->getAuthorizedSitesForCollection($collection)
                 ->map(function ($handle) use ($entry) {
                     $localized = $entry->in($handle);
                     $exists = $localized !== null;
@@ -310,7 +310,7 @@ class EntriesController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
-            'localizations' => $this->getAccessibleSitesForCollection($collection)
+            'localizations' => $this->getAuthorizedSitesForCollection($collection)
                 ->map(function ($handle) use ($collection, $site, $blueprint) {
                     return [
                         'handle' => $handle,
@@ -564,7 +564,7 @@ class EntriesController extends CpController
         ]);
     }
 
-    protected function getAccessibleSitesForCollection($collection)
+    protected function getAuthorizedSitesForCollection($collection)
     {
         return $collection
             ->sites()

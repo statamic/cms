@@ -94,7 +94,7 @@ class CollectionsController extends CpController
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'sites' => $this->getAccessibleSitesForCollection($collection),
+            'sites' => $this->getAuthorizedSitesForCollection($collection),
             'createUrls' => $collection->sites()
                 ->mapWithKeys(fn ($site) => [$site => cp_route('collections.entries.create', [$collection->handle(), $site])])
                 ->all(),
@@ -551,7 +551,7 @@ class CollectionsController extends CpController
         return Blueprint::makeFromTabs($fields);
     }
 
-    protected function getAccessibleSitesForCollection($collection)
+    protected function getAuthorizedSitesForCollection($collection)
     {
         return $collection
             ->sites()

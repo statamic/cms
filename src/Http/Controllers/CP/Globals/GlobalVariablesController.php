@@ -50,7 +50,7 @@ class GlobalVariablesController extends CpController
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
-            'localizations' => $this->getAccessibleLocalizationsForVariables($variables),
+            'localizations' => $this->getAuthorizedLocalizationsForVariables($variables),
             'canEdit' => $user->can('edit', $variables),
             'canConfigure' => $user->can('configure', $variables),
             'canDelete' => $user->can('delete', $variables),
@@ -111,7 +111,7 @@ class GlobalVariablesController extends CpController
         return [$fields->values()->all(), $fields->meta()->all()];
     }
 
-    protected function getAccessibleLocalizationsForVariables($variables)
+    protected function getAuthorizedLocalizationsForVariables($variables)
     {
         return $variables
             ->globalSet()
