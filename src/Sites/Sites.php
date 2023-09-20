@@ -21,7 +21,7 @@ class Sites
         return $this->sites;
     }
 
-    public function allAccessible()
+    public function authorized()
     {
         return $this->sites->filter(fn ($site) => User::current()->can("access {$site->handle()} site"));
     }

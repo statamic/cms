@@ -51,7 +51,7 @@ class SitesTest extends TestCase
     }
 
     /** @test */
-    public function gets_all_accessible_sites()
+    public function gets_authorized_sites()
     {
         Role::make('test')
             ->permissions([
@@ -62,7 +62,7 @@ class SitesTest extends TestCase
 
         $this->actingAs(tap(User::make()->assignRole('test'))->save());
 
-        tap($this->sites->allAccessible(), function ($sites) {
+        tap($this->sites->authorized(), function ($sites) {
             $this->assertInstanceOf(Collection::class, $sites);
             $this->assertEquals(2, $sites->count());
             $this->assertInstanceOf(Site::class, $sites->first());

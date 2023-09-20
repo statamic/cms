@@ -73,7 +73,7 @@ class EntriesController extends CpController
         }
 
         if (Site::hasMultiple()) {
-            $query->whereIn('site', Site::allAccessible()->map->handle()->all());
+            $query->whereIn('site', Site::authorized()->map->handle()->all());
         }
 
         return $query;
