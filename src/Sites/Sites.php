@@ -28,11 +28,6 @@ class Sites
 
     public function default()
     {
-        if ($this->hasMultiple() && $user = User::current()) {
-            return $this->sites->first(fn (Site $site) => $user->can("access {$site->handle()} site"))
-                ?? $this->sites->first();
-        }
-
         return $this->sites->first();
     }
 
