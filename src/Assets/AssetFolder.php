@@ -11,7 +11,7 @@ use Statamic\Facades\Path;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetFolder implements Contract, Arrayable
+class AssetFolder implements Arrayable, Contract
 {
     use FluentlyGetsAndSets;
 

@@ -136,7 +136,7 @@ class Glide extends Tags
 
             if ($this->isValidExtension($item)) {
                 $path = $this->generateImage($item);
-                $attrs = Attributes::from(GlideManager::cacheDisk()->getDriver(), $path);
+                $attrs = Attributes::from(GlideManager::cacheDisk(), $path);
                 $data = array_merge($data, $attrs);
             }
 

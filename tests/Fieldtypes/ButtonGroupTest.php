@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class ButtonGroupTest extends TestCase
 {
-    use LabeledValueTests, CastsBooleansTests;
+    use CastsBooleansTests, LabeledValueTests;
 
     private function field($config)
     {

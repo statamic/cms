@@ -18,7 +18,7 @@ use Symfony\Component\VarExporter\VarExporter;
 
 class Multisite extends Command
 {
-    use RunsInPlease, EnhancesCommands;
+    use EnhancesCommands, RunsInPlease;
 
     protected $name = 'statamic:multisite';
     protected $description = 'Converts from a single to multisite installation';

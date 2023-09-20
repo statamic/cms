@@ -39,11 +39,11 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues, SearchableContract
+class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, SearchableContract
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
-        TracksQueriedRelations,
-        Searchable, ContainsData {
+    use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance,
+        Searchable,
+        TracksQueriedColumns, TracksQueriedRelations {
             set as traitSet;
             get as traitGet;
             remove as traitRemove;
