@@ -27,8 +27,8 @@ class RegisterFormTest extends TestCase
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/register">', $output);
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/register">', $aliased);
-        $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $aliased);
+        $this->assertStringContainsString(csrf_field(), $output);
+        $this->assertStringContainsString(csrf_field(), $aliased);
         $this->assertStringEndsWith('</form>', $output);
         $this->assertStringEndsWith('</form>', $aliased);
     }
