@@ -70,7 +70,7 @@ class FormRepository implements Contract
         return $form;
     }
 
-    public function addConfig($handles, string $display, array $fields)
+    public function appendConfigFields($handles, string $display, array $fields)
     {
         $this->configs[] = [
             'display' => $display,
