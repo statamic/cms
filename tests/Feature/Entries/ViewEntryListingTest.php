@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\CP;
+namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Entries\Collection;
@@ -10,7 +10,7 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class EntriesTest extends TestCase
+class ViewEntryListingTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
