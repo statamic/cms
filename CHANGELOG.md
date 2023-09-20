@@ -1,5 +1,29 @@
 # Release Notes
 
+## 4.23.0 (2023-09-20)
+
+### What's new
+- Add ability to impersonate a user. [#8622](https://github.com/statamic/cms/issues/8622) by @ryanmitchell
+- New modifier for AP and MLA style headlines. [#8731](https://github.com/statamic/cms/issues/8731) by @jackmcdade
+- Add `orderByDesc` method to the query builder. [#8735](https://github.com/statamic/cms/issues/8735) by @duncanmcclean
+- Add replicator_preview toggle to Blueprint editor. [#8297](https://github.com/statamic/cms/issues/8297) by @jacksleight
+
+### What's fixed
+- Fix incorrect entries_count in multisite when using localized term slugs. [#8743](https://github.com/statamic/cms/issues/8743) by @ryanmitchell
+- Fix CSRF field related test failures. [#8746](https://github.com/statamic/cms/issues/8746) by @jasonvarga
+- Make title in revision preview computed. [#8745](https://github.com/statamic/cms/issues/8745) by @jonassiewertsen
+- Adjust data passed to live preview targets. [#8742](https://github.com/statamic/cms/issues/8742) by @jasonvarga
+- Fix sidebar missing background on term publish form. [#8741](https://github.com/statamic/cms/issues/8741) by @jasonvarga
+- Apply overflow styling to user listing. [#8739](https://github.com/statamic/cms/issues/8739) by @jasonvarga
+- Empty form widget styling is now consistent with other widgets. [#8736](https://github.com/statamic/cms/issues/8736) by @jackmcdade
+- Fall back to default site when selected one is invalid. [#8721](https://github.com/statamic/cms/issues/8721) by @jackmcdade
+- Fix single digit month not working on whereMonth. [#8697](https://github.com/statamic/cms/issues/8697) by @arifhp86
+- Make eloquent 'like' queries case insensitive. [#8243](https://github.com/statamic/cms/issues/8243) by @ryanmitchell
+- Fix custom Antlers variables not being updated within recursive loops. [#8725](https://github.com/statamic/cms/issues/8725) by @JohnathonKoster
+- Fix Antlers view variable leak. [#8728](https://github.com/statamic/cms/issues/8728) by @JohnathonKoster
+
+
+
 ## 4.22.0 (2023-09-18)
 
 ### What's new
