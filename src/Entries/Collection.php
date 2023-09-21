@@ -385,11 +385,6 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             ->args(func_get_args());
     }
 
-    public function existsIn(string $locale): bool
-    {
-        return $this->sites()->contains($locale);
-    }
-
     public function propagate($propagate = null)
     {
         return $this
