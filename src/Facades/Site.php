@@ -7,6 +7,7 @@ use Statamic\Sites\Sites;
 
 /**
  * @method static mixed all()
+ * @method static mixed authorized()
  * @method static mixed default()
  * @method static bool hasMultiple()
  * @method static mixed get($handle)
