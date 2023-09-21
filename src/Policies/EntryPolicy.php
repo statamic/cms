@@ -30,11 +30,8 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
-        if ($this->edit($user, $entry)) {
-            return true;
-        }
-
-        return $user->hasPermission("view {$entry->collectionHandle()} entries");
+        return $this->edit($user, $entry)
+            || $user->hasPermission("view {$entry->collectionHandle()} entries");
     }
 
     public function edit($user, $entry)
@@ -61,6 +58,8 @@ class EntryPolicy
 
     public function update($user, $entry)
     {
+        $user = User::fromUser($user);
+
         return $this->edit($user, $entry);
     }
 

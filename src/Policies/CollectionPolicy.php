@@ -30,9 +30,9 @@ class CollectionPolicy
             return true;
         }
 
-        return Collection::all()
-            ->filter(fn ($collection) => $this->view($user, $collection))
-            ->isNotEmpty();
+        return ! Collection::all()->filter(function ($collection) use ($user) {
+            return $this->view($user, $collection);
+        })->isEmpty();
     }
 
     public function create($user)

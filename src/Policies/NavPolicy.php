@@ -30,9 +30,9 @@ class NavPolicy
             return true;
         }
 
-        return Nav::all()
-            ->filter(fn ($nav) => $this->view($user, $nav))
-            ->isNotEmpty();
+        return ! Nav::all()->filter(function ($nav) use ($user) {
+            return $this->view($user, $nav);
+        })->isEmpty();
     }
 
     public function create($user)
@@ -61,6 +61,8 @@ class NavPolicy
 
     public function update($user, $nav)
     {
+        $user = User::fromUser($user);
+
         return $this->edit($user, $nav);
     }
 
