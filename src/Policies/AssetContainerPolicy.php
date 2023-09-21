@@ -30,7 +30,7 @@ class AssetContainerPolicy
 
     public function view($user, $container)
     {
-        return User::fromUser($user)->hasPermission("view {$container->handle()} assets");
+        return User::fromUser($user)->can("view {$container->handle()} assets");
     }
 
     public function edit($user, $container)
