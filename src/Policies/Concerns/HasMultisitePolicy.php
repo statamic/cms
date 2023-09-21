@@ -6,7 +6,7 @@ use Statamic\Facades\Site;
 
 trait HasMultisitePolicy
 {
-    protected function siteIsForbidden($user, ...$arguments)
+    private function siteIsForbidden($user, ...$arguments)
     {
         if (! Site::hasMultiple()) {
             return false;
@@ -16,7 +16,7 @@ trait HasMultisitePolicy
             || $this->dataHasNoAuthorizedSite($user, $arguments);
     }
 
-    protected function dataIsInForbiddenSite($user, $arguments)
+    private function dataIsInForbiddenSite($user, $arguments)
     {
         if (! $data = $this->getDataFromArguments($arguments)) {
             return false;
@@ -29,7 +29,7 @@ trait HasMultisitePolicy
         return $user->cant("access {$data->locale()} site");
     }
 
-    protected function dataHasNoAuthorizedSite($user, $arguments)
+    private function dataHasNoAuthorizedSite($user, $arguments)
     {
         if (! $data = $this->getDataFromArguments($arguments)) {
             return false;
