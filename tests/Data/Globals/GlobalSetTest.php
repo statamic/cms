@@ -355,7 +355,7 @@ EOT;
         $set->addLocalization($set->makeLocalization('fr'));
         $set->save();
 
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $set->sites());
+        $this->assertEquals(\Illuminate\Support\Collection::class, get_class($set->sites()));
         $this->assertEquals(['en', 'fr'], $set->sites()->all());
     }
 
