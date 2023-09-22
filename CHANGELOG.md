@@ -1,5 +1,17 @@
 # Release Notes
 
+## 4.23.1 (2023-09-22)
+
+### What's improved
+- German translations. [#8757](https://github.com/statamic/cms/issues/8757) by @helloDanuk
+- French translations. [#8754](https://github.com/statamic/cms/issues/8754) [#8750](https://github.com/statamic/cms/issues/8750) by @ebeauchamps
+- Dutch translations. [#8747](https://github.com/statamic/cms/issues/8747) by @robdekort
+
+### What's fixed
+- Fix eloquent like query error. [#8753](https://github.com/statamic/cms/issues/8753) by @ryanmitchell
+
+
+
 ## 4.23.0 (2023-09-20)
 
 ### What's new
