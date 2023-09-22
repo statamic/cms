@@ -108,6 +108,7 @@ return [
     'date_fieldtype_start_date_invalid' => 'Dit is geen geldige startdatum.',
     'date_fieldtype_end_date_required' => 'Einddatum is verplicht.',
     'date_fieldtype_end_date_invalid' => 'Dit is geen geldige einddatum.',
+    'code_fieldtype_rulers' => 'Dit is ongeldig.',
     'custom.attribute-name.rule-name' => 'aangepast-bericht',
     'attributes' => [],
 ];

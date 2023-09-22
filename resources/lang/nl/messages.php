@@ -89,6 +89,7 @@ return [
     'fields_instructions_instructions' => 'Wordt getoond onder het velds weergavelabel, net zoals deze tekst. Markdown is toegestaan.',
     'fields_instructions_position_instructions' => 'Waar de instructie gepositioneerd moet worden ten opzichte van het veld.',
     'fields_listable_instructions' => 'Bepaal of dit veld getoond moet worden als kolom in overzichtstabellen.',
+    'fields_replicator_preview_instructions' => 'Bepaal preview zichtbaarheid in Replicator/Bard sets.',
     'fields_visibility_instructions' => 'Stel de zichtbaarheid van velden in op publiceerformulieren.',
     'fieldset_import_fieldset_instructions' => 'De fieldset die geïmporteerd moet worden.',
     'fieldset_import_prefix_instructions' => 'Het voorvoegsel dat op ieder veld toegepast moet worden als ze worden geïmporteerd. Bijv: hero_',
