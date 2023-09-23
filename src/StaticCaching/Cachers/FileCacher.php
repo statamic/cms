@@ -226,6 +226,12 @@ class FileCacher extends AbstractCacher
             window.livewire_token = data.csrf
         }
 
+        document.querySelector('script[data-csrf="STATAMIC_CSRF_TOKEN"]')?.setAttribute('data-csrf', data.csrf);
+
+        if (window.hasOwnProperty('livewireScriptConfig')) {
+            window.livewireScriptConfig.csrf = data.csrf
+        }
+
         document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));
     });
 })();
