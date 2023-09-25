@@ -221,12 +221,14 @@ class FileCacher extends AbstractCacher
         for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
             meta.content = data.csrf;
         }
-        
+
+        for (const input of document.querySelectorAll('script[data-csrf="$csrfPlaceholder"]')) {
+            input.setAttribute('data-csrf', data.csrf);
+        }
+
         if (window.hasOwnProperty('livewire_token')) {
             window.livewire_token = data.csrf
         }
-
-        document.querySelector('script[data-csrf="STATAMIC_CSRF_TOKEN"]')?.setAttribute('data-csrf', data.csrf);
 
         if (window.hasOwnProperty('livewireScriptConfig')) {
             window.livewireScriptConfig.csrf = data.csrf
