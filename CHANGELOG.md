@@ -1,5 +1,13 @@
 # Release Notes
 
+## 4.23.2 (2023-09-25)
+
+### What's fixed
+- Fix impersonation of own account when using Eloquent users. [#8763](https://github.com/statamic/cms/issues/8763) by @ryanmitchell
+- Fix static caching with Livewire 3. [#8762](https://github.com/statamic/cms/issues/8762) by @aerni
+
+
+
 ## 4.23.1 (2023-09-22)
 
 ### What's improved
