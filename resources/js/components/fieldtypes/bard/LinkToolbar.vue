@@ -32,6 +32,28 @@
                         @keydown.enter.prevent="commit"
                     />
 
+                    <!-- Email input -->
+                    <input
+                        v-else-if="linkType === 'email'"
+                        v-model="urlData.email"
+                        type="text"
+                        ref="emailInput"
+                        class="input h-auto text-sm"
+                        placeholder="Email Address"
+                        @keydown.enter.prevent="commit"
+                    />
+
+                    <!-- Phone input -->
+                    <input
+                        v-else-if="linkType === 'phone'"
+                        v-model="urlData.phone"
+                        type="text"
+                        ref="phoneInput"
+                        class="input h-auto text-sm"
+                        placeholder="Phone Number"
+                        @keydown.enter.prevent="commit"
+                    />
+
                     <!-- Data input -->
                     <div
                         v-else
@@ -65,7 +87,7 @@
                 </div>
 
                 <!-- Title attribute -->
-                <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
+                <div class="h-8 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
                     <input
                         type="text"
                         ref="input"
@@ -75,7 +97,7 @@
                     />
                 </div>
 
-                <label for="target-blank" class="flex items-center font-normal cursor-pointer text-gray-800 hover:text-black">
+                <label for="target-blank" class="mt-4 flex items-center font-normal cursor-pointer text-gray-800 hover:text-black" v-if="canHaveTarget">
                     <input class="checkbox mr-2" type="checkbox" v-model="targetBlank" id="target-blank">
                     {{ __('Open in new window') }}
                 </label>
@@ -170,8 +192,11 @@ export default {
                 { type: 'url', title: __('URL') },
                 { type: 'entry', title: __('Entry') },
                 { type: 'asset', title: __('Asset') },
+                { type: 'email', title: __('Email') },
+                { type: 'phone', title: __('Phone') },
             ],
             url: {},
+            urlData: {},
             itemData: {},
             title: null,
             targetBlank: null,
@@ -199,6 +224,10 @@ export default {
                     return this.itemData.entry ? this.itemData.entry.title : null;
                 case 'asset':
                     return this.itemData.asset ? this.itemData.asset.basename : null;
+                case 'email':
+                    return this.urlData.email ? this.urlData.email : null;
+                case 'phone':
+                    return this.urlData.phone ? this.urlData.phone : null;
             }
         },
 
@@ -251,7 +280,11 @@ export default {
 
         collections() {
             return this.bard.meta.linkCollections;
-        }
+        },
+
+        canHaveTarget() {
+            return ['url', 'entry', 'asset'].includes(this.linkType);
+        },
 
     },
 
@@ -259,7 +292,19 @@ export default {
 
         linkType() {
             this.autofocus();
-        }
+        },
+
+        urlData: {
+            deep: true,
+            handler() {
+                if (this.linkType === 'email') {
+                    this.setUrl('email', `mailto:${this.urlData.email}`);
+                }
+                if (this.linkType === 'phone') {
+                    this.setUrl('phone', `tel:${this.urlData.phone}`);
+                }
+            },
+        },
 
     },
 
@@ -285,6 +330,7 @@ export default {
             this.linkType = this.getLinkTypeForUrl(attrs.href);
 
             this.url = { [this.linkType]: attrs.href };
+            this.urlData = { [this.linkType]: this.getUrlDataForUrl(attrs.href) };
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
 
             this.title = attrs.title;
@@ -404,7 +450,35 @@ export default {
 
         getLinkTypeForUrl(url) {
             const { type } = this.parseDataUrl(url);
-            return type || 'url';
+            if (type) {
+                return type;
+            }
+
+            try {
+                const data = new URL(url);
+                if (data.protocol === 'mailto:') {
+                    return 'email'; 
+                }
+                if (data.protocol === 'tel:') {
+                    return 'phone'; 
+                }
+            } catch (e) {}
+
+            return 'url';
+        },
+
+        getUrlDataForUrl(url) {
+            try {
+                const data = new URL(url);
+                if (data.protocol === 'mailto:') {
+                    return data.pathname;
+                }
+                if (data.protocol === 'tel:') {
+                    return data.pathname;
+                }
+            } catch (e) {}
+
+            return null;
         },
 
         getItemDataForUrl(url) {
