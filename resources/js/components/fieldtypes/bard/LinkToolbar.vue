@@ -87,13 +87,24 @@
                 </div>
 
                 <!-- Title attribute -->
-                <div class="h-8 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
+                <div class="h-8 p-2 mb-4 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
                     <input
                         type="text"
                         ref="input"
                         v-model="title"
                         class="input h-auto text-sm placeholder-gray-50"
                         :placeholder="`${__('Label')} (${__('Optional')})`"
+                    />
+                </div>
+
+                <!-- Rel attribute -->
+                <div class="h-8 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
+                    <input
+                        type="text"
+                        ref="input"
+                        v-model="rel"
+                        class="input h-auto text-sm placeholder-gray-50"
+                        :placeholder="`${__('Relationship')} (${__('Optional')})`"
                     />
                 </div>
 
@@ -199,6 +210,7 @@ export default {
             urlData: {},
             itemData: {},
             title: null,
+            rel: null,
             targetBlank: null,
             showAssetSelector: false,
             isLoading: false,
@@ -239,7 +251,7 @@ export default {
             return this.sanitizeLink(this.url[this.linkType]);
         },
 
-        rel() {
+        defaultRel() {
             let rel = [];
             if (this.config.link_noopener) rel.push('noopener');
             if (this.config.link_noreferrer) rel.push('noreferrer');
@@ -334,6 +346,9 @@ export default {
             this.itemData = { [this.linkType]: this.getItemDataForUrl(attrs.href) };
 
             this.title = attrs.title;
+            this.rel = attrs.href 
+                ? attrs.rel
+                : this.defaultRel;
             this.targetBlank = attrs.href
                 ? attrs.target === '_blank'
                 : this.config.target_blank;
