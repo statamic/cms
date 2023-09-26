@@ -298,10 +298,10 @@ export default {
             deep: true,
             handler() {
                 if (this.linkType === 'email') {
-                    this.setUrl('email', `mailto:${this.urlData.email}`);
+                    this.setUrl('email', this.urlData.email ? `mailto:${this.urlData.email}` : null);
                 }
                 if (this.linkType === 'phone') {
-                    this.setUrl('phone', `tel:${this.urlData.phone}`);
+                    this.setUrl('phone', this.urlData.phone ? `tel:${this.urlData.phone}` : null);
                 }
             },
         },
