@@ -435,7 +435,6 @@ class RuntimeParser implements Parser
             $bufferContent = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $bufferContent);
         }
 
-
         if (GlobalRuntimeState::$containsLayout && $this->view == GlobalRuntimeState::$shareVariablesTemplateTrigger) {
             // Force the root runtime assignments to be merged into the global state.
             GlobalRuntimeState::$layoutVariables = $this->nodeProcessor->getRuntimeAssignments();
