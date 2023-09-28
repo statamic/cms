@@ -6,12 +6,18 @@ use Statamic\Facades\User;
 
 class TermPolicy
 {
-    public function before($user, $ability)
+    use Concerns\HasMultisitePolicy;
+
+    public function before($user, $ability, $term)
     {
         $user = User::fromUser($user);
 
         if ($user->hasPermission('configure taxonomies')) {
             return true;
+        }
+
+        if ($this->siteIsForbidden($user, $term)) {
+            return false;
         }
     }
 
