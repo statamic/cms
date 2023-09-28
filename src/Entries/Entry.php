@@ -905,6 +905,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         }
 
         return (string) Antlers::parse($format, array_merge($this->routeData(), [
+            'site' => $this->site()->absoluteUrl(),
             'permalink' => $this->absoluteUrl(),
             'locale' => $this->locale(),
         ]));
