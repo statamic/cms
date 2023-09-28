@@ -34,10 +34,10 @@
 
                     <!-- Email input -->
                     <input
-                        v-else-if="linkType === 'email'"
-                        v-model="urlData.email"
+                        v-else-if="linkType === 'mailto'"
+                        v-model="urlData.mailto"
                         type="text"
-                        ref="emailInput"
+                        ref="mailtoInput"
                         class="input h-auto text-sm"
                         placeholder="Email Address"
                         @keydown.enter.prevent="commit"
@@ -45,10 +45,10 @@
 
                     <!-- Phone input -->
                     <input
-                        v-else-if="linkType === 'phone'"
-                        v-model="urlData.phone"
+                        v-else-if="linkType === 'tel'"
+                        v-model="urlData.tel"
                         type="text"
-                        ref="phoneInput"
+                        ref="telInput"
                         class="input h-auto text-sm"
                         placeholder="Phone Number"
                         @keydown.enter.prevent="commit"
@@ -203,8 +203,8 @@ export default {
                 { type: 'url', title: __('URL') },
                 { type: 'entry', title: __('Entry') },
                 { type: 'asset', title: __('Asset') },
-                { type: 'email', title: __('Email') },
-                { type: 'phone', title: __('Phone') },
+                { type: 'mailto', title: __('Email') },
+                { type: 'tel', title: __('Phone') },
             ],
             url: {},
             urlData: {},
@@ -236,10 +236,10 @@ export default {
                     return this.itemData.entry ? this.itemData.entry.title : null;
                 case 'asset':
                     return this.itemData.asset ? this.itemData.asset.basename : null;
-                case 'email':
-                    return this.urlData.email ? this.urlData.email : null;
-                case 'phone':
-                    return this.urlData.phone ? this.urlData.phone : null;
+                case 'mailto':
+                    return this.urlData.mailto ? this.urlData.mailto : null;
+                case 'tel':
+                    return this.urlData.tel ? this.urlData.tel : null;
             }
         },
 
@@ -309,12 +309,13 @@ export default {
         urlData: {
             deep: true,
             handler() {
-                if (this.linkType === 'email') {
-                    this.setUrl('email', this.urlData.email ? `mailto:${this.urlData.email}` : null);
+                const types = ['mailto', 'tel'];
+                if (!types.includes(this.linkType)) {
+                    return;
                 }
-                if (this.linkType === 'phone') {
-                    this.setUrl('phone', this.urlData.phone ? `tel:${this.urlData.phone}` : null);
-                }
+                this.setUrl(this.linkType, this.urlData[this.linkType]
+                    ? `${this.linkType}:${this.urlData[this.linkType]}`
+                    : null);
             },
         },
 
@@ -469,31 +470,21 @@ export default {
                 return type;
             }
 
-            try {
-                const data = new URL(url);
-                if (data.protocol === 'mailto:') {
-                    return 'email'; 
-                }
-                if (data.protocol === 'tel:') {
-                    return 'phone'; 
-                }
-            } catch (e) {}
+            const matches = url.match(/^(mailto|tel):(.*)$/);
+            if (matches) {
+                return matches[1];
+            }
 
             return 'url';
         },
 
         getUrlDataForUrl(url) {
-            try {
-                const data = new URL(url);
-                if (data.protocol === 'mailto:') {
-                    return data.pathname;
-                }
-                if (data.protocol === 'tel:') {
-                    return data.pathname;
-                }
-            } catch (e) {}
+            const matches = url.match(/^(mailto|tel):(.*)$/);
+            if (! matches) {
+                return null;
+            }
 
-            return null;
+            return matches[2];
         },
 
         getItemDataForUrl(url) {
