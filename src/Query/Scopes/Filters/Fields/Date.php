@@ -48,6 +48,7 @@ class Date extends FieldtypeFilter
         if ($operator == 'between') {
             $query->whereDate($handle, '>=', Carbon::parse($values['range_value']['start']));
             $query->whereDate($handle, '<=', Carbon::parse($values['range_value']['end']));
+
             return;
         }
 
