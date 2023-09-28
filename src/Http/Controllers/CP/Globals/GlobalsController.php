@@ -16,23 +16,26 @@ class GlobalsController extends CpController
 {
     public function index()
     {
-        $globals = GlobalSet::all()
-            ->filter(fn ($set) => User::current()->can('edit', $set))
-            ->tap(fn ($set) => $this->authorizeIf($set->isEmpty(), 'create', GlobalSetContract::class))
-            ->reject(fn ($set) => ! $set->inSelectedSite() && User::current()->cant('configure', $set))
-            ->map(function ($set) {
-                $localized = $set->inSelectedSite();
+        $globals = GlobalSet::all()->filter(function ($set) {
+            return User::current()->can('view', $set);
+        })->tap(function ($globals) {
+            $this->authorizeIf($globals->isEmpty(), 'create', GlobalSetContract::class);
+        })->map(function ($set) {
+            $localized = $set->inSelectedSite();
 
-                return [
-                    'id' => $set->id(),
-                    'handle' => $set->handle(),
-                    'title' => $set->title(),
-                    'deleteable' => User::current()->can('delete', $set),
-                    'edit_url' => $localized ? $localized->editUrl() : $set->editUrl(),
-                    'delete_url' => $set->deleteUrl(),
-                ];
-            })
-            ->values();
+            if (! $localized && User::current()->cant('edit', $set)) {
+                return null;
+            }
+
+            return [
+                'id' => $set->id(),
+                'handle' => $set->handle(),
+                'title' => $set->title(),
+                'deleteable' => User::current()->can('delete', $set),
+                'edit_url' => $localized ? $localized->editUrl() : $set->editUrl(),
+                'delete_url' => $set->deleteUrl(),
+            ];
+        })->filter()->values();
 
         return view('statamic::globals.index', [
             'globals' => $globals,
