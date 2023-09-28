@@ -87,7 +87,7 @@
                 </div>
 
                 <!-- Title attribute -->
-                <div class="h-8 p-2 mb-4 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
+                <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
                     <input
                         type="text"
                         ref="input"
