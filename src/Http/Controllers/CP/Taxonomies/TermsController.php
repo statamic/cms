@@ -119,7 +119,7 @@ class TermsController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'permalink' => $term->absoluteUrl(),
-            'localizations' => $taxonomy->sites()->map(function ($handle) use ($term) {
+            'localizations' => $this->getAuthorizedSitesForTaxonomy($taxonomy)->map(function ($handle) use ($term) {
                 $localized = $term->in($handle);
 
                 return [
@@ -358,5 +358,12 @@ class TermsController extends CpController
                 'url' => $taxonomy->showUrl(),
             ],
         ]);
+    }
+
+    protected function getAuthorizedSitesForTaxonomy($taxonomy)
+    {
+        return $taxonomy
+            ->sites()
+            ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
     }
 }
