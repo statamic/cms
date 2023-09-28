@@ -309,8 +309,7 @@ export default {
         urlData: {
             deep: true,
             handler() {
-                const types = ['mailto', 'tel'];
-                if (!types.includes(this.linkType)) {
+                if (!['mailto', 'tel'].includes(this.linkType)) {
                     return;
                 }
                 this.setUrl(this.linkType, this.urlData[this.linkType]
@@ -470,7 +469,7 @@ export default {
                 return type;
             }
 
-            const matches = url.match(/^(mailto|tel):(.*)$/);
+            const matches = url ? url.match(/^(mailto|tel):(.*)$/) : null;
             if (matches) {
                 return matches[1];
             }
@@ -479,7 +478,7 @@ export default {
         },
 
         getUrlDataForUrl(url) {
-            const matches = url.match(/^(mailto|tel):(.*)$/);
+            const matches = url ? url.match(/^(mailto|tel):(.*)$/) : null;
             if (! matches) {
                 return null;
             }
