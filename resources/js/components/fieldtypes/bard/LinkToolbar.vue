@@ -394,7 +394,7 @@ export default {
             this.$emit('updated', {
                 href: this.href,
                 rel: this.rel,
-                target: this.targetBlank ? '_blank' : null,
+                target: (this.canHaveTarget && this.targetBlank) ? '_blank' : null,
                 title: this.title,
             });
         },
