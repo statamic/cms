@@ -189,7 +189,14 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
 
         Blink::put($blink, $blueprint);
 
-        AssetContainerBlueprintFound::dispatch($blueprint, $this, $asset);
+        // Only dispatch the event when there's no asset.
+        // When there is an asset, the event is dispatched from the asset.
+        if (! $asset) {
+            Blink::once(
+                'asset-container-assetcontainerblueprintfound-'.$this->handle(),
+                fn () => AssetContainerBlueprintFound::dispatch($blueprint, $this)
+            );
+        }
 
         return $blueprint;
     }
