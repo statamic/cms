@@ -31,35 +31,20 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
     protected $title;
-
     protected $handle;
-
     protected $disk;
-
     protected $private;
-
     protected $allowUploads;
-
     protected $allowDownloading;
-
     protected $allowMoving;
-
     protected $allowRenaming;
-
     protected $createFolders;
-
     protected $sourcePreset;
-
     protected $warmPresets;
-
     protected $searchIndex;
-
     protected $afterSaveCallbacks = [];
-
     protected $withEvents = true;
-
     protected $sortField;
-
     protected $sortDirection;
 
     public function id($id = null)
