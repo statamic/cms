@@ -19,7 +19,7 @@
 
         @if ($can ?? $user->can('super'))
             @if($button ?? false)
-                {{ $button }}
+                {!! $button !!}
             @else
                 <a href="{{ $route ?? null }}" class="btn-primary btn-lg">{{ __("Create {$resource}") }}</a>
             @endif
