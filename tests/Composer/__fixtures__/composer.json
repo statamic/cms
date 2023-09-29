@@ -1,7 +1,7 @@
 {
     "name": "statamic/composer-test",
     "require": {
-        "composer/composer": "^2.2.12",
+        "composer/composer": "^2.2.22",
         "statamic/composer-test-example-dependency": "1.2.3"
     },
     "require-dev": {
