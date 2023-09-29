@@ -31,20 +31,35 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
     protected $title;
+
     protected $handle;
+
     protected $disk;
+
     protected $private;
+
     protected $allowUploads;
+
     protected $allowDownloading;
+
     protected $allowMoving;
+
     protected $allowRenaming;
+
     protected $createFolders;
+
     protected $sourcePreset;
+
     protected $warmPresets;
+
     protected $searchIndex;
+
     protected $afterSaveCallbacks = [];
+
     protected $withEvents = true;
+
     protected $sortField;
+
     protected $sortDirection;
 
     public function id($id = null)
@@ -173,21 +188,9 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function blueprint($asset = null)
     {
-        if (Blink::has($blink = 'asset-container-blueprint-'.$this->handle())) {
-            return Blink::get($blink);
-        }
-
-        $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
-            'alt' => [
-                'type' => 'text',
-                'display' => __('Alt Text'),
-                'instructions' => __('Description of the image'),
-            ],
-        ])->setHandle($this->handle())->setNamespace('assets');
+        $blueprint = $this->getBaseBlueprint();
 
         $blueprint->setParent($asset ?? $this);
-
-        Blink::put($blink, $blueprint);
 
         // Only dispatch the event when there's no asset.
         // When there is an asset, the event is dispatched from the asset.
@@ -199,6 +202,21 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
         }
 
         return $blueprint;
+    }
+
+    private function getBaseBlueprint()
+    {
+        $blink = 'asset-container-blueprint-'.$this->handle();
+
+        return Blink::once($blink, function () {
+            return Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
+                'alt' => [
+                    'type' => 'text',
+                    'display' => __('Alt Text'),
+                    'instructions' => __('Description of the image'),
+                ],
+            ])->setHandle($this->handle())->setNamespace('assets');
+        });
     }
 
     public function afterSave($callback)
