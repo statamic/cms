@@ -27,7 +27,7 @@
 }
 
 .toggle-container {
-    @apply bg-white cursor-pointer relative border;
+    @apply bg-white cursor-pointer relative border shrink-0;
     height: 22px;
     width: 46px;
     border-radius: 20px;

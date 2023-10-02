@@ -23,7 +23,7 @@ class Impersonate extends Action
             return false;
         }
 
-        return $item instanceof UserContract && $item != User::current();
+        return $item instanceof UserContract && $item->id() != User::current()->id();
     }
 
     public function visibleToBulk($items)
