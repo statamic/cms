@@ -1,5 +1,22 @@
 # Release Notes
 
+## 4.24.0 (2023-10-02)
+
+### What's new
+- Date range filter. [#8779](https://github.com/statamic/cms/issues/8779) by @ryanmitchell
+- Add `site` to preview target variables. [#8780](https://github.com/statamic/cms/issues/8780) by @arcs-
+
+### What's fixed
+- Fix toggle fieldtype shrinkage. [#8790](https://github.com/statamic/cms/issues/8790) by @caseydwyer
+- Ensure we only check that visible fields are filled in filters. [#8778](https://github.com/statamic/cms/issues/8778) by @ryanmitchell
+- Default to first collection's sort config in entries fieldtype. [#8782](https://github.com/statamic/cms/issues/8782) by @ryanmitchell
+- Use autocomplete attribute in the default text template. [#8774](https://github.com/statamic/cms/issues/8774) by @jeroenimpres
+- Propagate save withEvents to the direct descendants on entry save. [#8786](https://github.com/statamic/cms/issues/8786) by @ryanmitchell
+- Fix commands registered by class causing an error in `please`. [#8784](https://github.com/statamic/cms/issues/8784) by @SylvesterDamgaard
+- Bump composer requirement. [#8789](https://github.com/statamic/cms/issues/8789) by @jasonvarga
+
+
+
 ## 4.23.2 (2023-09-25)
 
 ### What's fixed
