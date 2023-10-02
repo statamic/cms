@@ -49,7 +49,7 @@ class GlobalSetPolicy
 
     public function edit($user, $set)
     {
-        // handled by before
+        // handled by before()
     }
 
     public function configure($user, $set)
