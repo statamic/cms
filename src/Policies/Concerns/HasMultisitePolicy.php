@@ -22,11 +22,11 @@ trait HasMultisitePolicy
             return false;
         }
 
-        if (! method_exists($data, 'locale')) {
+        if (! method_exists($data, 'site')) {
             return false;
         }
 
-        return $user->cant("access {$data->locale()} site");
+        return $user->cant('view', $data->site());
     }
 
     private function dataHasNoAuthorizedSite($user, $arguments)
@@ -40,7 +40,8 @@ trait HasMultisitePolicy
         }
 
         return $data->sites()
-            ->filter(fn ($site) => $user->can("access {$site} site"))
+            ->map(fn ($site) => Site::get($site))
+            ->filter(fn ($site) => $user->can('view', $site))
             ->isEmpty();
     }
 
