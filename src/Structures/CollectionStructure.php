@@ -135,15 +135,17 @@ class CollectionStructure extends Structure
 
     public function in($site)
     {
-        $tree = app(CollectionTreeRepository::class)->find($this->collection()->handle(), $site);
+        return Blink::once("collection-{$this->id()}-structure-in-{$site}", function () use ($site) {
+            $tree = app(CollectionTreeRepository::class)->find($this->collection()->handle(), $site);
 
-        if (! $tree && $this->existsIn($site)) {
-            $tree = $this->makeTree($site);
-        }
+            if (! $tree && $this->existsIn($site)) {
+                $tree = $this->makeTree($site);
+            }
 
-        return $tree;
+            return $tree;
+        });
     }
-
+    
     public function existsIn($site)
     {
         return $this->collection()->sites()->contains($site);
