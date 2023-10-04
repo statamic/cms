@@ -145,7 +145,7 @@ class CollectionStructure extends Structure
             return $tree;
         });
     }
-    
+
     public function existsIn($site)
     {
         return $this->collection()->sites()->contains($site);
