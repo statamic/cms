@@ -25,13 +25,13 @@ use Statamic\Events\AssetReuploaded;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Exceptions\FileExtensionMismatch;
-use Statamic\GraphQL\ResolvesValues;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
@@ -41,18 +41,18 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, SearchableContract, ResolvesValuesContract
+class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance, Searchable, TracksQueriedColumns;
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
     use TracksQueriedRelations {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
         data as traitData;
         merge as traitMerge;
-    }
-    use ResolvesValues {
-        resolveGqlValue as traitResolveGqlValue;
     }
 
     protected $container;
