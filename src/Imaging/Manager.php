@@ -79,12 +79,12 @@ class Manager
      */
     public function cpManipulationPresets()
     {
-        $sizes = array_merge(
+        $presets = array_merge(
             ['small' => 400],
-            config('statamic.cp.thumbnail_sizes', [])
+            config('statamic.cp.thumbnail_presets', [])
         );
 
-        return collect($sizes)
+        return collect($presets)
             ->flatMap(fn ($size, $name) => [
                 "cp_thumbnail_{$name}_landscape" => ['w' => $size, 'h' => $size, 'fit' => 'contain'],
                 "cp_thumbnail_{$name}_portrait" => ['h' => $size, 'fit' => 'contain'],

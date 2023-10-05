@@ -131,11 +131,11 @@ return [
     | Thumbnails
     |--------------------------------------------------------------------------
     |
-    | Here you may define additional CP asset thumbnail sizes.
+    | Here you may define additional CP asset thumbnail presets.
     |
     */
 
-    'thumbnail_sizes' => [
+    'thumbnail_presets' => [
         // 'medium' => 800,
     ],
 ];
