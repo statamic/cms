@@ -4,6 +4,7 @@ namespace Statamic\Query\Traits;
 
 use Closure;
 use InvalidArgumentException;
+use Statamic\Support\Str;
 
 trait QueriesRelationships
 {
@@ -45,7 +46,7 @@ trait QueriesRelationships
         $ids = $relationQueryBuilder
             ->where($callback)
             ->get(['id'])
-            ->map(fn ($item) => $item->id())
+            ->map(fn ($item) => Str::after($item->id(), '::'))
             ->all();
 
         if ($maxItems == 1) {

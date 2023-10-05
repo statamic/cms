@@ -176,4 +176,21 @@ class TermQueryBuilder extends Builder
 
         return $items;
     }
+
+    protected function getBlueprintsForRelations()
+    {
+        $taxonomies = empty($this->taxonomies)
+            ? Facades\Taxonomy::handles()
+            : $this->taxonomies;
+
+        return $taxonomies->flatMap(function ($taxonomy) {
+            if (is_string($taxonomy)) {
+                $taxonomy = Facades\Taxonomy::find($taxonomy);
+            }
+
+            return $taxonomy ? $taxonomy->termBlueprints() : false;
+        })
+            ->filter()
+            ->unique();
+    }
 }

@@ -446,4 +446,12 @@ class Terms extends Relationship
 
         return $this->config('max_items') === 1 ? collect([$augmented]) : $augmented->get();
     }
+
+    public function relationshipQueryBuilder()
+    {
+        $taxonomies = $this->taxonomies();
+
+        return Term::query()
+            ->when($taxonomies, fn ($query) => $query->whereIn('taxonomy', $taxonomies));
+    }
 }
