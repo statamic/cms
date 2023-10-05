@@ -17,8 +17,10 @@
 <script>
 var StatamicConfig = @json(array_merge(Statamic::jsonVariables(request()), [
     'wrapperClass' => $__env->getSection('wrapper_class', 'max-w-xl')
-]))
-</script>
+]));
 
 {{-- Deferred to allow Vite modules to load first --}}
-<script src="data:text/javascript;base64,{{ base64_encode('Statamic.config(StatamicConfig); Statamic.start()') }}" defer></script>
+window.addEventListener('DOMContentLoaded', () => {
+    Statamic.config(StatamicConfig); Statamic.start();
+});
+</script>
