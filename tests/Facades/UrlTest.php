@@ -118,6 +118,55 @@ class UrlTest extends TestCase
         ];
     }
 
+    /** @test */
+    public function gets_site_url()
+    {
+        $this->assertEquals('http://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
+
+        \Illuminate\Support\Facades\URL::forceScheme('https');
+        $this->assertEquals('https://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
+
+        \Illuminate\Support\Facades\URL::forceScheme('http');
+        $this->assertEquals('http://absolute-url-resolved-from-request.com/', URL::getSiteUrl());
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider absoluteProvider
+     **/
+    public function it_makes_urls_absolute($url, $expected, $forceScheme = false)
+    {
+        if ($forceScheme) {
+            \Illuminate\Support\Facades\URL::forceScheme($forceScheme);
+        }
+
+        $this->assertSame($expected, URL::makeAbsolute($url));
+    }
+
+    public function absoluteProvider()
+    {
+        return [
+            ['http://example.com', 'http://example.com'],
+            ['http://example.com/', 'http://example.com/'],
+            ['/', 'http://absolute-url-resolved-from-request.com/'],
+            ['/foo', 'http://absolute-url-resolved-from-request.com/foo'],
+            ['/foo/', 'http://absolute-url-resolved-from-request.com/foo/'],
+
+            ['http://example.com', 'http://example.com', 'https'], // absolute url provided, so scheme is left alone.
+            ['http://example.com/', 'http://example.com/', 'https'], // absolute url provided, so scheme is left alone.
+            ['/', 'https://absolute-url-resolved-from-request.com/', 'https'],
+            ['/foo', 'https://absolute-url-resolved-from-request.com/foo', 'https'],
+            ['/foo/', 'https://absolute-url-resolved-from-request.com/foo/', 'https'],
+
+            ['https://example.com', 'https://example.com', 'http'], // absolute url provided, so scheme is left alone.
+            ['https://example.com/', 'https://example.com/', 'http'], // absolute url provided, so scheme is left alone.
+            ['/', 'http://absolute-url-resolved-from-request.com/', 'http'],
+            ['/foo', 'http://absolute-url-resolved-from-request.com/foo', 'http'],
+            ['/foo/', 'http://absolute-url-resolved-from-request.com/foo/', 'http'],
+        ];
+    }
+
     /**
      * @test
      *
@@ -179,5 +228,24 @@ class UrlTest extends TestCase
             ['/foo/bar?bar=baz#fragment', '/foo/bar?bar=baz#fragment'],
             ['/foo/bar/?bar=baz#fragment', '/foo/bar/?bar=baz#fragment'],
         ];
+    }
+
+    /** @test */
+    public function it_can_remove_query_and_fragment()
+    {
+        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?query'));
+        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com#anchor'));
+        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?foo=bar&baz=qux'));
+        $this->assertEquals('https://example.com', URL::removeQueryAndFragment('https://example.com?foo=bar&baz=qux#anchor'));
+
+        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/?query'));
+        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/#anchor'));
+        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/?foo=bar&baz=qux'));
+        $this->assertEquals('https://example.com/', URL::removeQueryAndFragment('https://example.com/?foo=bar&baz=qux#anchor'));
+
+        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?query'));
+        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about#anchor'));
+        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?foo=bar&baz=qux'));
+        $this->assertEquals('https://example.com/about', URL::removeQueryAndFragment('https://example.com/about?foo=bar&baz=qux#anchor'));
     }
 }

@@ -1179,4 +1179,188 @@ EOT;
 
         $this->assertSame($expected, trim($this->renderString($template, [], true)));
     }
+
+    public function test_protected_scopes_are_not_pushed_upwards()
+    {
+        $this->withFakeViews();
+
+        $partial = <<<'PARTIAL'
+---
+param1: "default partial frontmatter value"
+param2: "default param2 value"
+---
+Partial Before: {{ view.param1 }}-{{ view.param2 }}
+{{ view.param2 = "updated param2 value" }}
+{{ view.param2 = "updated param2 value2" }}
+Partial After: {{ view.param1 }}-{{ view.param2 }}
+PARTIAL;
+
+        $this->viewShouldReturnRaw('test', $partial);
+
+        $template = <<<'EOT'
+{{ loop from="0" to="2" }}
+Template Before: {{ view.param1 }}-{{ view.param2 }}
+{{ partial:test param1="test{index}" /}}
+Template After: {{ view.param1 }}-{{ view.param2 }}
+{{ /loop }}
+EOT;
+
+        $expected = <<<'EXPECTED'
+Template Before: -
+Partial Before: test0-default param2 value
+
+
+Partial After: test0-updated param2 value2
+Template After: -
+
+Template Before: -
+Partial Before: test1-default param2 value
+
+
+Partial After: test1-updated param2 value2
+Template After: -
+
+Template Before: -
+Partial Before: test2-default param2 value
+
+
+Partial After: test2-updated param2 value2
+Template After: -
+EXPECTED;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
+
+    public function test_updating_view_scopes_inside_nested_partials()
+    {
+        $this->withFakeViews();
+
+        $partial = <<<'PARTIAL'
+---
+param1: "default partial frontmatter value"
+param2: "default param2 value"
+---
+Partial Before: {{ view.param1 }}-{{ view.param2 }}
+{{ view.param2 = "updated param2 value" }}
+{{ view.param2 = "updated param2 value2" }}
+{{ partial:test_two /}}
+Partial After: {{ view.param1 }}-{{ view.param2 }}
+PARTIAL;
+
+        $partialTwo = <<<'PARTIAL'
+---
+param1: "the inner partial param1"
+param2: "the inner partial param2"
+---
+
+Inner Partial: {{ view.param1 }}-{{ view.param2 }}
+PARTIAL;
+
+        $this->viewShouldReturnRaw('test', $partial);
+        $this->viewShouldReturnRaw('test_two', $partialTwo);
+
+        $template = <<<'EOT'
+{{ loop from="0" to="2" }}
+Template Before: {{ view.param1 }}-{{ view.param2 }}
+{{ partial:test param1="test{index}" /}}
+Template After: {{ view.param1 }}-{{ view.param2 }}
+{{ /loop }}
+EOT;
+
+        $expected = <<<'EXP'
+Template Before: -
+Partial Before: test0-default param2 value
+
+
+Inner Partial: the inner partial param1-the inner partial param2
+Partial After: test0-updated param2 value2
+Template After: -
+
+Template Before: -
+Partial Before: test1-default param2 value
+
+
+Inner Partial: the inner partial param1-the inner partial param2
+Partial After: test1-updated param2 value2
+Template After: -
+
+Template Before: -
+Partial Before: test2-default param2 value
+
+
+Inner Partial: the inner partial param1-the inner partial param2
+Partial After: test2-updated param2 value2
+Template After: -
+EXP;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
+
+    public function test_protected_scopes_dont_allow_trying_to_stuff_values_in_them()
+    {
+        $this->withFakeViews();
+
+        $partial = <<<'PARTIAL'
+---
+param1: "default partial frontmatter value"
+param2: "default param2 value"
+---
+Partial Before: {{ view.param1 }}-{{ view.param2 }}
+Partial Param3: {{ view.param3 }}
+{{ view.param2 = "updated param2 value" }}
+{{ view.param2 = "updated param2 value2" }}
+{{ view.param3 = 'I am the param3.'; }}
+Partial After: {{ view.param1 }}-{{ view.param2 }}-{{ view.param3 }}
+PARTIAL;
+
+        $this->viewShouldReturnRaw('test', $partial);
+
+        $template = <<<'EOT'
+{{ loop from="0" to="2" }}
+{{ view.param1 = 'Hi!'; /}}
+{{ view.param2 = 'Hello'; /}}
+{{ view.param3 = 'I am param3!'; /}}
+Template Before: {{ view.param1 }}-{{ view.param2 }}
+{{ partial:test param1="test{index}" /}}
+Template After: {{ view.param1 }}-{{ view.param2 }}-{{ view.param3 }}
+{{ /loop }}
+EOT;
+
+        $expected = <<<'EXP'
+Template Before: Hi!-Hello
+Partial Before: test0-default param2 value
+Partial Param3: 
+
+
+
+Partial After: test0-updated param2 value2-I am the param3.
+Template After: Hi!-Hello-I am param3!
+
+
+
+
+Template Before: Hi!-Hello
+Partial Before: test1-default param2 value
+Partial Param3: 
+
+
+
+Partial After: test1-updated param2 value2-I am the param3.
+Template After: Hi!-Hello-I am param3!
+
+
+
+
+Template Before: Hi!-Hello
+Partial Before: test2-default param2 value
+Partial Param3: 
+
+
+
+Partial After: test2-updated param2 value2-I am the param3.
+Template After: Hi!-Hello-I am param3!
+EXP;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
 }

@@ -8,8 +8,8 @@ use Tests\TestCase;
 
 class ViewNavigationListingTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use MocksStructures;
+    use PreventSavingStacheItemsToDisk;
 
     /** @test */
     public function it_shows_a_list_of_nav_structures()

@@ -8,7 +8,6 @@ use Statamic\Auth\Protect\Protection;
 use Statamic\Events\ResponseCreated;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
-use Statamic\Tokens\Handlers\LivePreview;
 use Statamic\View\View;
 
 class DataResponse implements Responsable
@@ -99,7 +98,7 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        throw_unless($this->isLivePreview(), new NotFoundHttpException);
+        throw_unless($this->request->isLivePreview(), new NotFoundHttpException);
 
         $this->headers['X-Statamic-Draft'] = true;
 
@@ -116,7 +115,7 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        throw_unless($this->isLivePreview(), new NotFoundHttpException);
+        throw_unless($this->request->isLivePreview(), new NotFoundHttpException);
 
         $this->headers['X-Statamic-Private'] = true;
 
@@ -136,7 +135,7 @@ class DataResponse implements Responsable
     {
         $contents = $this->view()->render();
 
-        if ($this->isLivePreview()) {
+        if ($this->request->isLivePreview()) {
             $contents = $this->versionJavascriptModules($contents);
         }
 
@@ -171,11 +170,6 @@ class DataResponse implements Responsable
         $this->with = $data;
 
         return $this;
-    }
-
-    protected function isLivePreview()
-    {
-        return optional($this->request->statamicToken())->handler() === LivePreview::class;
     }
 
     protected function versionJavascriptModules($contents)

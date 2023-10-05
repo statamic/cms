@@ -15,7 +15,7 @@
             <div class="@container/toolbar flex items-center border-t justify-center py-2 px-2 text-2xs text-white text-center space-x-1 sm:space-x-3">
                 <button v-if="!src" @click="openSelector" type="button" class="flex btn btn-sm px-3 py-1.5">
                     <svg-icon name="folder-image" class="h-4" />
-                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Chose Image') }}</span>
+                    <span class="ml-2 hidden @md/toolbar:inline-block">{{ __('Choose Image') }}</span>
                 </button>
                 <button v-if="src" @click="edit" type="button" class="flex btn btn-sm px-3 py-1.5">
                     <svg-icon name="pencil" class="h-4" />
