@@ -4,16 +4,20 @@
 
 .section-fieldtype {
     @apply border-t border-b bg-gray-200;
-    top: -1px; /*  Avoid adjacent borders just in case they're stacked */
+    @apply -mt-px; /*  Avoid adjacent borders just in case they're stacked */
 
     &.form-group {
         position: relative;
         &:first-child {
-            @apply rounded-t border-t-0;
+            @apply rounded-t-md border-t-0;
+        }
+
+        &:last-child {
+            @apply rounded-b-md mt-0;
         }
 
         .field-inner > label {
-            @apply uppercase text-sm font-bold mt-2;
+            @apply uppercase text-sm font-bold;
         }
     }
 
@@ -33,5 +37,13 @@
 }
 
 .bard-fieldtype .section-fieldtype {
-    top: 0;
+    @apply mt-0;
+}
+
+.publish-section-header + .publish-fields .section-fieldtype {
+    &.form-group {
+        &:first-child {
+            @apply rounded-t-none;
+        }
+    }
 }
