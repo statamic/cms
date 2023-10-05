@@ -134,19 +134,11 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
     protected function getBlueprintsForRelations()
     {
-        $wheres = collect($this->wheres);
+        $collections = empty($this->collections)
+            ? Facades\Collection::all()
+            : $this->collections;
 
-        $collections = $wheres->where('column', 'collection')
-            ->flatMap(function ($where) {
-                return $where['values'] ?? [$where['value']] ?? [];
-            })
-            ->unique();
-
-        if (! $collections->count()) {
-            $collections = Facades\Collection::all();
-        }
-
-        return $collections->flatMap(function ($collection) {
+        return collect($collections)->flatMap(function ($collection) {
             if (is_string($collection)) {
                 $collection = Facades\Collection::find($collection);
             }

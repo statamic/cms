@@ -183,7 +183,7 @@ class TermQueryBuilder extends Builder
             ? Facades\Taxonomy::handles()
             : $this->taxonomies;
 
-        return $taxonomies->flatMap(function ($taxonomy) {
+        return collect($taxonomies)->flatMap(function ($taxonomy) {
             if (is_string($taxonomy)) {
                 $taxonomy = Facades\Taxonomy::find($taxonomy);
             }
