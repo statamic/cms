@@ -81,7 +81,7 @@ return [
     'field_validation_required_instructions' => 'Control whether or not this field is required.',
     'field_validation_sometimes_instructions' => 'Only validate when this field is visible or submitted.',
     'fields_blueprints_description' => 'Blueprints define the fields for content structures like collections, taxonomies, users, and forms.',
-    'fields_default_instructions' => 'Set the default value.',
+    'fields_default_instructions' => 'The value to be inserted whenever this field is empty on all publish forms.',
     'fields_display_instructions' => 'The field\'s label shown in the Control Panel.',
     'fields_duplicate_instructions' => 'Whether this field should be included when duplicating the item.',
     'fields_fieldsets_description' => 'Fieldsets are simple, flexible, and completely optional groupings of fields that help to organize reusable, pre-configured fields.',
