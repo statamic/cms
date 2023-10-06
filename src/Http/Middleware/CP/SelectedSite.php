@@ -10,10 +10,19 @@ class SelectedSite
 {
     public function handle($request, Closure $next)
     {
-        if (User::current()->cant('view', Site::selected())) {
-            Site::setSelected(Site::authorized()->first()->handle());
-        }
+        $this->updateSelectedSite();
 
         return $next($request);
+    }
+
+    private function updateSelectedSite()
+    {
+        if (User::current()->can('view', Site::selected())) {
+            return;
+        }
+
+        if ($first = Site::authorized()->first()) {
+            Site::setSelected($first->handle());
+        }
     }
 }
