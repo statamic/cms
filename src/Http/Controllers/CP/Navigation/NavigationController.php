@@ -65,13 +65,13 @@ class NavigationController extends CpController
     {
         abort_if(! $nav = Nav::find($nav), 404);
 
-        $this->authorize('view', $nav, __('You are not authorized to view navs.'));
-
         $site = $request->site ?? Site::selected()->handle();
 
         if (! $nav->existsIn($site)) {
             return redirect($nav->trees()->first()->showUrl());
         }
+
+        $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));
 
         return view('statamic::navigation.show', [
             'site' => $site,
