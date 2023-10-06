@@ -11,7 +11,7 @@ use Statamic\Facades\Folder;
 
 class FormRepository implements Contract
 {
-    private $redirect;
+    private $redirects = [];
 
     /**
      * Find a form.
@@ -69,16 +69,16 @@ class FormRepository implements Contract
         return $form;
     }
 
-    public function redirect(Closure $callback)
+    public function redirect(string $form, Closure $callback)
     {
-        $this->redirect = $callback;
+        $this->redirects[$form] = $callback;
 
         return $this;
     }
 
     public function getSubmissionRedirect(SubmissionContract $submission)
     {
-        $callback = $this->redirect ?? fn () => null;
+        $callback = $this->redirects[$submission->form()->handle()] ?? fn () => null;
 
         return $callback($submission);
     }
