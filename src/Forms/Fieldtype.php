@@ -31,7 +31,6 @@ class Fieldtype extends Relationship
                 'display' => __('Max Items'),
                 'default' => 1,
                 'instructions' => __('statamic::fieldtypes.form.config.max_items'),
-                'min' => 1,
             ],
             'query_scopes' => [
                 'display' => __('Query Scopes'),

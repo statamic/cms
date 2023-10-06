@@ -73,6 +73,11 @@ abstract class Builder implements Contract
         return $this;
     }
 
+    public function orderByDesc($column)
+    {
+        return $this->orderBy($column, 'desc');
+    }
+
     abstract public function inRandomOrder();
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')

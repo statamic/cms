@@ -433,15 +433,15 @@ class NavTest extends TestCase
         $this->assertFalse($hello->isActive());
         $this->assertFalse($helloWithQueryParams->isActive());
         $this->assertFalse($helloWithAnchor->isActive());
-        $this->assertTrue($hell->isActive());
+        $this->assertFalse($hell->isActive());
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
         $this->assertFalse($externalSecure->isActive());
 
         Request::swap(Request::create('http://localhost/cp/hello/test'));
-        $this->assertTrue($hello->isActive());
-        $this->assertTrue($helloWithQueryParams->isActive());
-        $this->assertTrue($helloWithAnchor->isActive());
+        $this->assertFalse($hello->isActive());
+        $this->assertFalse($helloWithQueryParams->isActive());
+        $this->assertFalse($helloWithAnchor->isActive());
         $this->assertFalse($hell->isActive());
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
@@ -464,6 +464,66 @@ class NavTest extends TestCase
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
         $this->assertFalse($externalSecure->isActive());
+    }
+
+    /** @test */
+    public function it_checks_if_has_active_children()
+    {
+        $collections = Nav::content('Collections')
+            ->url('http://localhost/cp/collections')
+            ->children(function () use (&$pages, &$articles) {
+                return [
+                    $pages = Nav::item('Pages')->url('/cp/collections/pages'),
+                    $articles = Nav::item('Articles')->url('/cp/collections/articles'),
+                ];
+            });
+
+        Request::swap(Request::create('http://localhost/cp/collections/articles'));
+        $this->assertTrue($collections->isActive());
+        $this->assertFalse($pages->isActive());
+        $this->assertTrue($articles->isActive());
+    }
+
+    /** @test */
+    public function it_can_get_has_active_children_status_with_custom_resolve_children_pattern()
+    {
+        $collections = Nav::content('Custom Collections Url')
+            ->url('http://localhost/cp/custom/url')
+            ->active('collections*')
+            ->children(function () use (&$pages, &$articles) {
+                return [
+                    $pages = Nav::item('Pages')->url('/cp/collections/pages'),
+                    $articles = Nav::item('Articles')->url('/cp/collections/articles'),
+                ];
+            });
+
+        Request::swap(Request::create('http://localhost/cp/collections/articles'));
+        $this->assertTrue($collections->isActive());
+        $this->assertFalse($pages->isActive());
+        $this->assertTrue($articles->isActive());
+    }
+
+    /**
+     * @deprecated
+     *
+     * @test
+     */
+    public function it_can_get_has_active_children_status_with_deprecated_active_pattern()
+    {
+        $collections = Nav::content('Custom Collections Url')
+            ->url('http://localhost/cp/custom/url')
+            ->active('collections*')
+            ->children(function () use (&$pages, &$articles) {
+                return [
+                    $pages = Nav::item('Pages')->url('/cp/collections/pages'),
+                    $articles = Nav::item('Articles')->url('/cp/collections/articles'),
+                ];
+            });
+
+        Request::swap(Request::create('http://localhost/cp/collections/articles'));
+        $this->assertTrue($collections->isActive());
+        $this->assertFalse($pages->isActive());
+        $this->assertTrue($articles->isActive());
     }
 
     /** @test */
@@ -502,7 +562,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_automatically_add_an_active_pattern_when_setting_url_if_one_is_already_defined()
+    public function it_does_not_automatically_add_a_resolve_children_pattern_when_setting_url_if_one_is_already_defined()
     {
         $nav = Nav::create('cp-relative')->active('foo.*')->url('foo/bar');
         $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());

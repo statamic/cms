@@ -7,7 +7,7 @@ use Statamic\Extend\RegistersItself;
 
 abstract class Scope
 {
-    use RegistersItself, HasHandle;
+    use HasHandle, RegistersItself;
 
     protected static $binding = 'scopes';
 

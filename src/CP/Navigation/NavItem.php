@@ -2,7 +2,9 @@
 
 namespace Statamic\CP\Navigation;
 
+use Illuminate\Support\Collection;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\URL;
 use Statamic\Statamic;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -132,6 +134,21 @@ class NavItem
     }
 
     /**
+     * Generate active URL pattern to determine when to resolve children for `hasActiveChild()` checks.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    protected function generateActivePatternForCpUrl($url)
+    {
+        $cpUrl = url(config('statamic.cp.route')).'/';
+
+        $relativeUrl = str_replace($cpUrl, '', URL::removeQueryAndFragment($url));
+
+        return $relativeUrl.'(/(.*)?|$)';
+    }
+
+    /**
      * Get editable url for nav builder UI.
      */
     public function editableUrl()
@@ -240,6 +257,32 @@ class NavItem
     }
 
     /**
+     * Active URL pattern to determine when to resolve children for `hasActiveChild()` checks.
+     *
+     * @return $this
+     */
+    public function active($pattern = null)
+    {
+        return $this->fluentlyGetOrSet('active')->value($pattern);
+    }
+
+    /**
+     * Determine when to resolve children for `hasActiveChild()` checks.
+     *
+     * @return bool
+     */
+    protected function shouldResolveChildren()
+    {
+        if (! $this->active) {
+            return false;
+        }
+
+        $pattern = preg_quote(config('statamic.cp.route'), '#').'/'.$this->active;
+
+        return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
+    }
+
+    /**
      * Resolve children closure.
      *
      * @return $this
@@ -300,30 +343,38 @@ class NavItem
     }
 
     /**
-     * Get or set pattern for active state styling.
-     *
-     * @param  string|null  $pattern
-     * @return mixed
-     */
-    public function active($pattern = null)
-    {
-        return $this->fluentlyGetOrSet('active')->value($pattern);
-    }
-
-    /**
      * Get whether the nav item is currently active.
      *
      * @return bool
      */
     public function isActive()
     {
-        if (! $this->active) {
+        if ($this->hasActiveChild()) {
+            return true;
+        }
+
+        return request()->url() === URL::removeQueryAndFragment($this->url);
+    }
+
+    /**
+     * Get whether the nav item has a currently active child.
+     *
+     * @return bool
+     */
+    protected function hasActiveChild()
+    {
+        if ($this->shouldResolveChildren()) {
+            $this->resolveChildren();
+        }
+
+        if (! $this->children() instanceof Collection) {
             return false;
         }
 
-        $pattern = preg_quote(config('statamic.cp.route'), '#').'/'.$this->active;
-
-        return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
+        return $this
+            ->children()
+            ->filter(fn ($item) => $item->isActive())
+            ->isNotEmpty();
     }
 
     /**
@@ -440,23 +491,5 @@ class NavItem
         $string = Str::replace('___colon___', ':', $string);
 
         return $string;
-    }
-
-    /**
-     * Generate active pattern for CP url.
-     *
-     * @param  string  $url
-     * @return string
-     */
-    protected function generateActivePatternForCpUrl($url)
-    {
-        $cpUrl = url(config('statamic.cp.route')).'/';
-
-        $url = Str::before($url, '?'); // Remove query params
-        $url = Str::before($url, '#'); // Remove anchors
-
-        $relativeUrl = str_replace($cpUrl, '', $url);
-
-        return $relativeUrl.'(/(.*)?|$)';
     }
 }

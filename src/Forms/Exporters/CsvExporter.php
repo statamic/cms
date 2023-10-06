@@ -40,9 +40,12 @@ class CsvExporter extends AbstractExporter
      */
     private function insertHeaders()
     {
-        $headers = $this->form()->fields()->keys()->all();
+        $key = config('statamic.forms.csv_headers', 'handle');
 
-        $headers[] = 'date';
+        $headers = $this->form()->fields()
+            ->map(fn ($field) => $key === 'display' ? $field->display() : $field->handle())
+            ->push($key === 'display' ? __('Date') : 'date')
+            ->values()->all();
 
         $this->writer->insertOne($headers);
     }

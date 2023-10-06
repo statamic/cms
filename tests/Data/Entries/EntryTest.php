@@ -2058,16 +2058,16 @@ class EntryTest extends TestCase
             'de' => ['url' => 'http://domain.de/', 'locale' => 'de_DE'],
         ]]);
 
-        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
+        $collection = (new Collection)->dated(true)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',
         ]);
         $collection->save();
 
-        $entryEn = (new Entry)->collection($collection)->locale('en')->slug('foo');
-        $entryFr = (new Entry)->collection($collection)->locale('fr')->slug('le-foo');
-        $entryDe = (new Entry)->collection($collection)->locale('de')->slug('das-foo');
+        $entryEn = (new Entry)->collection($collection)->locale('en')->slug('foo')->date('2014-01-01');
+        $entryFr = (new Entry)->collection($collection)->locale('fr')->slug('le-foo')->date('2015-01-01');
+        $entryDe = (new Entry)->collection($collection)->locale('de')->slug('das-foo')->date('2016-01-01');
 
         $this->assertEquals([
             ['label' => 'Entry', 'format' => '{permalink}', 'url' => 'http://domain.com/blog/foo'],
@@ -2082,23 +2082,23 @@ class EntryTest extends TestCase
         ], $entryDe->previewTargets()->all());
 
         $collection->previewTargets([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'refresh' => true],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'refresh' => true],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'refresh' => true],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'refresh' => true],
         ])->save();
 
         $this->assertEquals([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'url' => 'http://preview.com/en/blog?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'url' => 'http://preview.com/en/blog/foo?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'url' => 'http://preview.com/en/2014/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'url' => 'http://preview.com/en/2014/blog/foo?preview=true'],
         ], $entryEn->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'url' => 'http://preview.com/fr/blog?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'url' => 'http://preview.com/fr/blog/le-foo?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'url' => 'http://preview.com/fr/2015/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'url' => 'http://preview.com/fr/2015/blog/le-foo?preview=true'],
         ], $entryFr->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'url' => 'http://preview.com/de/blog?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'url' => 'http://preview.com/de/blog/das-foo?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'url' => 'http://preview.com/de/2016/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'url' => 'http://preview.com/de/2016/blog/das-foo?preview=true'],
         ], $entryDe->previewTargets()->all());
     }
 
@@ -2204,7 +2204,7 @@ class EntryTest extends TestCase
                 // Ugly. Sorry. ¯\_(ツ)_/¯
                 $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
                 if (
-                    'Statamic\Entries\Entry@save' === $trace[2]['class'].'@'.$trace[2]['function']
+                    $trace[2]['class'].'@'.$trace[2]['function'] === 'Statamic\Entries\Entry@save'
                     && $method === 'forget'
                     && Str::startsWith($args[0], 'origin-Entry-')
                 ) {
@@ -2236,5 +2236,55 @@ class EntryTest extends TestCase
         $this->assertCount(1, $fakeBlink->calls['origin-Entry-1']);
         $this->assertCount(2, $fakeBlink->calls['origin-Entry-2']);
         $this->assertCount(2, $fakeBlink->calls['origin-Entry-3']);
+    }
+
+    /** @test */
+    public function initially_saved_entry_gets_put_into_events()
+    {
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => '/fr/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => '/de/'],
+                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => '/es/'],
+            ],
+        ]);
+
+        // Bunch of localizations of the same entry.
+        $one = EntryFactory::collection('test')->id('1')->locale('en')->data(['foo' => 'root'])->create();
+        $two = EntryFactory::collection('test')->id('2')->origin('1')->locale('fr')->create();
+        $three = EntryFactory::collection('test')->id('3')->origin('2')->locale('de')->create();
+        $four = EntryFactory::collection('test')->id('4')->origin('3')->locale('es')->create();
+
+        // Separate entry with localization.
+        $five = EntryFactory::collection('test')->id('5')->locale('en')->create();
+        $six = EntryFactory::collection('test')->id('6')->origin('5')->locale('fr')->create();
+
+        // Yet another separate entry.
+        $seven = EntryFactory::collection('test')->id('7')->create();
+
+        // Avoid using a fake so we can use a real listener.
+        $events = collect();
+        Event::listen(function (EntrySaved $event) use ($five, &$events) {
+            $events[] = $event;
+
+            // Save unrelated entry during the localization recursion.
+            if ($event->entry->id() === '3') {
+                $five->save();
+            }
+        });
+
+        $two->save();
+        $seven->save();
+
+        $this->assertEquals([
+            ['4', '2'],
+            ['3', '2'],
+            ['6', '5'],
+            ['5', '5'],
+            ['2', '2'],
+            ['7', '7'],
+        ], $events->map(fn ($event) => [$event->entry->id(), $event->initiator->id()])->all());
     }
 }

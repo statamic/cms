@@ -161,7 +161,7 @@ class Entries extends Relationship
         $column = $request->get('sort');
 
         if (! $column && ! $request->search) {
-            $column = 'title'; // todo: get from collection or config
+            $column = $this->getFirstCollectionFromRequest($request)->sortField();
         }
 
         return $column;
@@ -172,7 +172,7 @@ class Entries extends Relationship
         $order = $request->get('order', 'asc');
 
         if (! $request->sort && ! $request->search) {
-            // $order = 'asc'; // todo: get from collection or config
+            $order = $this->getFirstCollectionFromRequest($request)->sortDirection();
         }
 
         return $order;

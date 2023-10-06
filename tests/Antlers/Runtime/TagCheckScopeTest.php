@@ -13,8 +13,8 @@ use Tests\TestCase;
 
 class TagCheckScopeTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesViews;
+    use PreventSavingStacheItemsToDisk;
 
     private function createData()
     {
