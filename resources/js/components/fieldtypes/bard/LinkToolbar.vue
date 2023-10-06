@@ -2,89 +2,92 @@
 
     <div class="bard-link-toolbar">
         <div>
-            <!-- Link type select -->
-            <div class="flex items-center px-4 py-2 border-b">
-
-                <button
-                    class="button-tab"
-                    v-for="visibleLinkType in visibleLinkTypes"
-                    :class="{active: visibleLinkType.type === linkType}"
-                    :for="visibleLinkType.type"
-                    :key="visibleLinkType.type"
-                    :id="visibleLinkType.type"
-                    @click="setLinkType(visibleLinkType.type)"
-                >
-                    {{ visibleLinkType.title }}
-                </button>
-            </div>
-
             <div class="px-4 py-4 border-b">
-                <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center">
 
-                    <!-- URL input -->
-                    <input
-                        v-if="linkType === 'url'"
-                        v-model="url.url"
-                        type="text"
-                        ref="urlInput"
-                        class="input h-auto text-sm"
-                        placeholder="URL"
-                        @keydown.enter.prevent="commit"
-                    />
+                <div class="flex">
 
-                    <!-- Email input -->
-                    <input
-                        v-else-if="linkType === 'mailto'"
-                        v-model="urlData.mailto"
-                        type="text"
-                        ref="mailtoInput"
-                        class="input h-auto text-sm"
-                        placeholder="Email Address"
-                        @keydown.enter.prevent="commit"
-                    />
-
-                    <!-- Phone input -->
-                    <input
-                        v-else-if="linkType === 'tel'"
-                        v-model="urlData.tel"
-                        type="text"
-                        ref="telInput"
-                        class="input h-auto text-sm"
-                        placeholder="Phone Number"
-                        @keydown.enter.prevent="commit"
-                    />
-
-                    <!-- Data input -->
-                    <div
-                        v-else
-                        class="w-full flex items-center justify-between cursor-pointer"
-                        @click="openSelector"
-                    >
-
-                        <loading-graphic v-if="isLoading" :inline="true" />
-
-                        <div v-else class="flex-1 flex items-center mr-2 truncate">
-                            <img
-                                v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
-                                :src="itemData.asset.thumbnail || itemData.asset.url"
-                                class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-2 object-cover lazyloaded"
+                    <div class="h-8 mb-4 p-1 bg-gray-100 text-gray-800 border rounded shadow-inner flex items-center mr-1">
+                        <select
+                            class="input w-auto h-auto text-sm"
+                            v-model="linkType">
+                            <option
+                                v-for="visibleLinkType in visibleLinkTypes"
+                                :value="visibleLinkType.type"
                             >
-                            {{ displayValue }}
-                        </div>
-
-                        <button
-                        class="flex items-center"
-                            v-tooltip="`${__('Browse')}...`"
-                            :aria-label="`${__('Browse')}...`"
-                            @click="openSelector"
-                        >
-                            <svg-icon v-show="linkType === 'asset'" name="folder-image" class="h-4 w-4" />
-                            <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="h-4 w-4" />
-                        </button>
-
+                                {{ visibleLinkType.title }}
+                            </option>
+                        </select>
                     </div>
 
+                    <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center">
+    
+                        <!-- URL input -->
+                        <input
+                            v-if="linkType === 'url'"
+                            v-model="url.url"
+                            type="text"
+                            ref="urlInput"
+                            class="input h-auto text-sm"
+                            placeholder="URL"
+                            @keydown.enter.prevent="commit"
+                        />
+    
+                        <!-- Email input -->
+                        <input
+                            v-else-if="linkType === 'mailto'"
+                            v-model="urlData.mailto"
+                            type="text"
+                            ref="mailtoInput"
+                            class="input h-auto text-sm"
+                            placeholder="Email Address"
+                            @keydown.enter.prevent="commit"
+                        />
+    
+                        <!-- Phone input -->
+                        <input
+                            v-else-if="linkType === 'tel'"
+                            v-model="urlData.tel"
+                            type="text"
+                            ref="telInput"
+                            class="input h-auto text-sm"
+                            placeholder="Phone Number"
+                            @keydown.enter.prevent="commit"
+                        />
+    
+                        <!-- Data input -->
+                        <div
+                            v-else
+                            class="w-full flex items-center justify-between cursor-pointer"
+                            @click="openSelector"
+                        >
+    
+                            <loading-graphic v-if="isLoading" :inline="true" />
+    
+                            <div v-else class="flex-1 flex items-center mr-2 truncate">
+                                <img
+                                    v-if="linkType === 'asset' && itemData.asset && itemData.isImage"
+                                    :src="itemData.asset.thumbnail || itemData.asset.url"
+                                    class="asset-thumbnail max-h-full max-w-full rounded w-6 h-6 mr-2 object-cover lazyloaded"
+                                >
+                                {{ displayValue }}
+                            </div>
+    
+                            <button
+                            class="flex items-center"
+                                v-tooltip="`${__('Browse')}...`"
+                                :aria-label="`${__('Browse')}...`"
+                                @click="openSelector"
+                            >
+                                <svg-icon v-show="linkType === 'asset'" name="folder-image" class="h-4 w-4" />
+                                <svg-icon v-show="linkType !== 'asset'" name="folder-generic" class="h-4 w-4" />
+                            </button>
+    
+                        </div>
+    
+                    </div>
+                    
                 </div>
+
 
                 <!-- Title attribute -->
                 <div class="h-8 mb-4 p-2 bg-gray-100 text-gray-800 w-full border rounded shadow-inner placeholder:text-gray-600 flex items-center" >
@@ -352,10 +355,6 @@ export default {
             this.targetBlank = attrs.href
                 ? attrs.target === '_blank'
                 : this.config.target_blank;
-        },
-
-        setLinkType(type) {
-            this.linkType = type;
         },
 
         autofocus() {
