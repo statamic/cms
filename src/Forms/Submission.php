@@ -230,26 +230,4 @@ class Submission implements Augmentable, SubmissionContract
     {
         return $this->get($key);
     }
-
-    /**
-     * Does your form need to create a redirect URL after it has been saved, you can
-     * create your own binding of the Submission class where you can include some funky
-     * redirect logic - for example, creating a URL to post to a third party like Stripe.
-     */
-    public function buildRedirectUrl(): void
-    {
-        $this->redirect = null;
-    }
-
-    /**
-     * Returns the redirect URL for this Submission
-     */
-    public function getRedirectUrl(): ?string
-    {
-        if (! $this->redirect) {
-            $this->buildRedirectUrl();
-        }
-
-        return $this->redirect;
-    }
 }

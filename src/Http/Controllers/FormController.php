@@ -13,6 +13,7 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
 use Statamic\Forms\SendEmails;
@@ -100,7 +101,7 @@ class FormController extends Controller
     private function formSuccess($params, $submission, $silentFailure = false)
     {
         // get the redirect (or null)
-        $redirect = $submission->getRedirectUrl();
+        $redirect = Form::getSubmissionRedirect($submission);
 
         // did we just get a submission-level redirect?
         $isSubmissionRedirect = $redirect !== null;
