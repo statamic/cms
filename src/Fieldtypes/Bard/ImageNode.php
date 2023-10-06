@@ -33,14 +33,17 @@ class ImageNode extends Node
             'src' => [
                 'renderHTML' => function ($attributes) {
                     $src = $attributes->src;
+
                     if (! isset($src)) {
                         return null;
                     }
 
+                    $alt = $attributes->alt ?? null;
+
                     if (Str::startsWith($src, 'asset::')) {
                         $id = Str::after($src, 'asset::');
                         $src = $this->getUrl($id);
-                        $alt = $attributes->alt ? $attributes->alt : $this->getAlt($id);
+                        $alt = $alt ?? $this->getAlt($id);
                     }
 
                     return [

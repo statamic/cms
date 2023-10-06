@@ -20,6 +20,7 @@ use Statamic\Http\Controllers\CP\Assets\ThumbnailController;
 use Statamic\Http\Controllers\CP\Auth\CsrfTokenController;
 use Statamic\Http\Controllers\CP\Auth\ExtendSessionController;
 use Statamic\Http\Controllers\CP\Auth\ForgotPasswordController;
+use Statamic\Http\Controllers\CP\Auth\ImpersonationController;
 use Statamic\Http\Controllers\CP\Auth\LoginController;
 use Statamic\Http\Controllers\CP\Auth\ResetPasswordController;
 use Statamic\Http\Controllers\CP\Auth\UnauthorizedController;
@@ -111,6 +112,8 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('extend', ExtendSessionController::class)->name('extend');
 
     Route::get('unauthorized', UnauthorizedController::class)->name('unauthorized');
+
+    Route::get('stop-impersonating', [ImpersonationController::class, 'stop'])->name('impersonation.stop');
 });
 
 Route::middleware('statamic.cp.authenticated')->group(function () {

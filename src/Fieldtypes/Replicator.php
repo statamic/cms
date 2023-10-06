@@ -87,7 +87,7 @@ class Replicator extends Fieldtype
     {
         $fields = $this->fields($row['type'])->addValues($row)->process()->values()->all();
 
-        $row = array_merge(['id' => Arr::pull($row, '_id')], $row, $fields);
+        $row = array_merge([RowId::handle() => Arr::pull($row, '_id')], $row, $fields);
 
         return Arr::removeNullValues($row);
     }
@@ -103,7 +103,7 @@ class Replicator extends Fieldtype
     {
         $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values()->all();
 
-        $id = Arr::pull($row, 'id') ?? RowId::generate();
+        $id = Arr::pull($row, RowId::handle()) ?? RowId::generate();
 
         return array_merge($row, $fields, [
             '_id' => $id,
@@ -191,7 +191,7 @@ class Replicator extends Fieldtype
 
             $values = $this->fields($set['type'])->addValues($set)->{$augmentMethod}()->values();
 
-            return new Values($values->merge(['id' => $set['id'] ?? null, 'type' => $set['type']])->all());
+            return new Values($values->merge([RowId::handle() => $set[RowId::handle()] ?? null, 'type' => $set['type']])->all());
         })->values()->all();
     }
 

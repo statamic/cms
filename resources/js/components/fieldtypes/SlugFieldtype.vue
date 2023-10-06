@@ -14,6 +14,7 @@
                 :isReadOnly="isReadOnly"
                 :append="config.show_regenerate && value"
                 :name="slug"
+                :id="fieldId"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             >

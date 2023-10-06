@@ -25,7 +25,7 @@ class StateManager
      */
     public static function track($class)
     {
-        if (class_implements($class, ResetsState::class)) {
+        if (in_array(ResetsState::class, class_implements($class))) {
             self::$resetsState[$class] = 1;
         }
     }

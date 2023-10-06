@@ -31,7 +31,7 @@
                             :active-filter-badges="activeFilterBadges"
                             :active-count="activeFilterCount"
                             :search-query="searchQuery"
-                            @changed="filterChanged"
+                            @changed="filterChanged($event, false)"
                         />
                     </div>
                 </div>
