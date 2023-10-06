@@ -9,16 +9,12 @@ class CollectionPolicy
 {
     use Concerns\HasMultisitePolicy;
 
-    public function before($user, $ability, $collection)
+    public function before($user)
     {
         $user = User::fromUser($user);
 
         if ($user->hasPermission('configure collections')) {
             return true;
-        }
-
-        if ($this->siteIsForbidden($user, $collection)) {
-            return false;
         }
     }
 
@@ -49,7 +45,8 @@ class CollectionPolicy
     {
         $user = User::fromUser($user);
 
-        return $user->hasPermission("view {$collection->handle()} entries");
+        return $user->hasPermission("view {$collection->handle()} entries")
+            && $this->userCanAccessAnySite($user, $collection->sites());
     }
 
     public function edit($user, $collection)

@@ -2,57 +2,25 @@
 
 namespace Statamic\Policies\Concerns;
 
-use Statamic\Facades\Site;
+use Statamic\Facades\Site as Sites;
+use Statamic\Sites\Site;
 
 trait HasMultisitePolicy
 {
-    private function siteIsForbidden($user, ...$arguments)
+    protected function userCanAccessSite($user, Site $site)
     {
-        if (! Site::hasMultiple()) {
-            return false;
-        }
-
-        return $this->dataIsInForbiddenSite($user, $arguments)
-            || $this->dataHasNoAuthorizedSite($user, $arguments);
+        return $user->can('view', $site);
     }
 
-    private function dataIsInForbiddenSite($user, $arguments)
+    protected function userCanAccessAnySite($user, $sites)
     {
-        if (! $data = $this->getDataFromArguments($arguments)) {
-            return false;
+        if (! Sites::hasMultiple()) {
+            return true;
         }
 
-        if (! method_exists($data, 'site')) {
-            return false;
-        }
-
-        return $user->cant('view', $data->site());
-    }
-
-    private function dataHasNoAuthorizedSite($user, $arguments)
-    {
-        if (! $data = $this->getDataFromArguments($arguments)) {
-            return false;
-        }
-
-        if (! method_exists($data, 'sites')) {
-            return false;
-        }
-
-        return $data->sites()
-            ->map(fn ($site) => Site::get($site))
+        return $sites
+            ->map(fn ($site) => Sites::get($site))
             ->filter(fn ($site) => $user->can('view', $site))
-            ->isEmpty();
-    }
-
-    private function getDataFromArguments($arguments)
-    {
-        // If this first argument is a string, that means they are passing a class name
-        // to the policy. We will remove the first argument from this argument array.
-        if (isset($arguments[0]) && is_string($arguments[0])) {
-            array_shift($arguments);
-        }
-
-        return $arguments[0] ?? null;
+            ->isNotEmpty();
     }
 }

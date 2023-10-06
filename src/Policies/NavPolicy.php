@@ -9,16 +9,12 @@ class NavPolicy
 {
     use Concerns\HasMultisitePolicy;
 
-    public function before($user, $ability, $nav)
+    public function before($user)
     {
         $user = User::fromUser($user);
 
         if ($user->hasPermission('configure navs')) {
             return true;
-        }
-
-        if ($this->siteIsForbidden($user, $nav)) {
-            return false;
         }
     }
 
@@ -49,12 +45,21 @@ class NavPolicy
     {
         $user = User::fromUser($user);
 
-        return $user->hasPermission("view {$nav->handle()} nav");
+        if (! $this->userCanAccessAnySite($user, $nav->sites())) {
+            return false;
+        }
+
+        return $this->edit($user, $nav)
+            || $user->hasPermission("view {$nav->handle()} nav");
     }
 
     public function edit($user, $nav)
     {
         $user = User::fromUser($user);
+
+        if (! $this->userCanAccessAnySite($user, $nav->sites())) {
+            return false;
+        }
 
         return $user->hasPermission("edit {$nav->handle()} nav");
     }

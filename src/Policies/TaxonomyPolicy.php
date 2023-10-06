@@ -9,16 +9,12 @@ class TaxonomyPolicy
 {
     use Concerns\HasMultisitePolicy;
 
-    public function before($user, $ability, $taxonomy)
+    public function before($user)
     {
         $user = User::fromUser($user);
 
         if ($user->hasPermission('configure taxonomies')) {
             return true;
-        }
-
-        if ($this->siteIsForbidden($user, $taxonomy)) {
-            return false;
         }
     }
 
@@ -49,7 +45,8 @@ class TaxonomyPolicy
     {
         $user = User::fromUser($user);
 
-        return $user->hasPermission("view {$taxonomy->handle()} terms");
+        return $user->hasPermission("view {$taxonomy->handle()} terms")
+            && $this->userCanAccessAnySite($user, $taxonomy->sites());
     }
 
     public function edit($user, $taxonomy)

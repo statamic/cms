@@ -8,16 +8,12 @@ class EntryPolicy
 {
     use Concerns\HasMultisitePolicy;
 
-    public function before($user, $ability, $entry)
+    public function before($user)
     {
         $user = User::fromUser($user);
 
         if ($user->hasPermission('configure collections')) {
             return true;
-        }
-
-        if ($this->siteIsForbidden($user, $entry)) {
-            return false;
         }
     }
 
@@ -30,6 +26,10 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
+        if (! $this->userCanAccessSite($user, $entry->site())) {
+            return false;
+        }
+
         return $this->edit($user, $entry)
             || $user->hasPermission("view {$entry->collectionHandle()} entries");
     }
@@ -37,6 +37,10 @@ class EntryPolicy
     public function edit($user, $entry)
     {
         $user = User::fromUser($user);
+
+        if (! $this->userCanAccessSite($user, $entry->site())) {
+            return false;
+        }
 
         if ($this->hasAnotherAuthor($user, $entry)) {
             return $user->hasPermission("edit other authors {$entry->collectionHandle()} entries");
@@ -63,16 +67,20 @@ class EntryPolicy
         return $this->edit($user, $entry);
     }
 
-    public function create($user, $collection)
+    public function create($user, $collection, $site = null)
     {
         $user = User::fromUser($user);
+
+        if ($site && (! $collection->sites()->contains($site->handle()) || ! $this->userCanAccessSite($user, $site))) {
+            return false;
+        }
 
         return $user->hasPermission("create {$collection->handle()} entries");
     }
 
-    public function store($user, $collection)
+    public function store($user, $collection, $site = null)
     {
-        return $this->create($user, $collection);
+        return $this->create($user, $collection, $site);
     }
 
     public function delete($user, $entry)
