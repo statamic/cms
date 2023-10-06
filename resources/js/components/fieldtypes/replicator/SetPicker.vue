@@ -24,7 +24,7 @@
                     <span>{{ selectedGroupDisplayText }}</span>
                 </div>
             </div>
-            <div class="p-1 max-h-80 overflow-auto">
+            <div class="p-1 max-h-[21rem] overflow-auto">
                 <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200': selectionIndex === i }" @mouseover="selectionIndex = i">
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
                         <div class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2">

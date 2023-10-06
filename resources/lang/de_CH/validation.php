@@ -108,6 +108,7 @@ return [
     'date_fieldtype_start_date_invalid' => 'Kein gültiges Startdatum.',
     'date_fieldtype_end_date_required' => 'Ein Enddatum ist erforderlich.',
     'date_fieldtype_end_date_invalid' => 'Kein gültiges Enddatum.',
+    'code_fieldtype_rulers' => 'Dies ist ungültig.',
     'custom.attribute-name.rule-name' => 'benutzerdefinierte Nachricht',
     'attributes' => [],
 ];

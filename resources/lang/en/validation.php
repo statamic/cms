@@ -146,6 +146,7 @@ return [
     'date_fieldtype_start_date_invalid' => 'Not a valid start date.',
     'date_fieldtype_end_date_required' => 'End date is required.',
     'date_fieldtype_end_date_invalid' => 'Not a valid end date.',
+    'code_fieldtype_rulers' => 'This is invalid.',
 
     /*
     |--------------------------------------------------------------------------

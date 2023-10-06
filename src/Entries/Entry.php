@@ -339,7 +339,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
         $stack = InitiatorStack::entry($this)->push();
 
-        $this->directDescendants()->each->save();
+        $this->directDescendants()->each->{$withEvents ? 'save' : 'saveQuietly'}();
 
         $this->taxonomize();
 
@@ -904,7 +904,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             }, $format);
         }
 
-        return (string) Antlers::parse($format, $this->augmented()->all());
+        return (string) Antlers::parse($format, array_merge($this->routeData(), [
+            'site' => $this->site(),
+            'permalink' => $this->absoluteUrl(),
+            'locale' => $this->locale(),
+        ]));
     }
 
     public function repository()

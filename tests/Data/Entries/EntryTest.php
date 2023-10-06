@@ -2058,16 +2058,16 @@ class EntryTest extends TestCase
             'de' => ['url' => 'http://domain.de/', 'locale' => 'de_DE'],
         ]]);
 
-        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
+        $collection = (new Collection)->dated(true)->sites(['en', 'fr', 'de'])->handle('blog')->routes([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',
         ]);
         $collection->save();
 
-        $entryEn = (new Entry)->collection($collection)->locale('en')->slug('foo');
-        $entryFr = (new Entry)->collection($collection)->locale('fr')->slug('le-foo');
-        $entryDe = (new Entry)->collection($collection)->locale('de')->slug('das-foo');
+        $entryEn = (new Entry)->collection($collection)->locale('en')->slug('foo')->date('2014-01-01');
+        $entryFr = (new Entry)->collection($collection)->locale('fr')->slug('le-foo')->date('2015-01-01');
+        $entryDe = (new Entry)->collection($collection)->locale('de')->slug('das-foo')->date('2016-01-01');
 
         $this->assertEquals([
             ['label' => 'Entry', 'format' => '{permalink}', 'url' => 'http://domain.com/blog/foo'],
@@ -2082,23 +2082,23 @@ class EntryTest extends TestCase
         ], $entryDe->previewTargets()->all());
 
         $collection->previewTargets([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'refresh' => true],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'refresh' => true],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'refresh' => true],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'refresh' => true],
         ])->save();
 
         $this->assertEquals([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'url' => 'http://preview.com/en/blog?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'url' => 'http://preview.com/en/blog/foo?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'url' => 'http://preview.com/en/2014/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'url' => 'http://preview.com/en/2014/blog/foo?preview=true'],
         ], $entryEn->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'url' => 'http://preview.com/fr/blog?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'url' => 'http://preview.com/fr/blog/le-foo?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'url' => 'http://preview.com/fr/2015/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'url' => 'http://preview.com/fr/2015/blog/le-foo?preview=true'],
         ], $entryFr->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/blog?preview=true', 'url' => 'http://preview.com/de/blog?preview=true'],
-            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/blog/{slug}?preview=true', 'url' => 'http://preview.com/de/blog/das-foo?preview=true'],
+            ['label' => 'Index', 'format' => 'http://preview.com/{locale}/{year}/blog?preview=true', 'url' => 'http://preview.com/de/2016/blog?preview=true'],
+            ['label' => 'Show', 'format' => 'http://preview.com/{locale}/{year}/blog/{slug}?preview=true', 'url' => 'http://preview.com/de/2016/blog/das-foo?preview=true'],
         ], $entryDe->previewTargets()->all());
     }
 
@@ -2204,7 +2204,7 @@ class EntryTest extends TestCase
                 // Ugly. Sorry. ¯\_(ツ)_/¯
                 $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
                 if (
-                    'Statamic\Entries\Entry@save' === $trace[2]['class'].'@'.$trace[2]['function']
+                    $trace[2]['class'].'@'.$trace[2]['function'] === 'Statamic\Entries\Entry@save'
                     && $method === 'forget'
                     && Str::startsWith($args[0], 'origin-Entry-')
                 ) {

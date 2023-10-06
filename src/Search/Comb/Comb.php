@@ -469,7 +469,12 @@ class Comb
         }
 
         foreach ($item as $part) {
-            $output .= (is_array($part)) ? $this->flattenArray($part, $glue) : $glue.$part;
+            if (is_array($part)) {
+                unset($part['id'], $part['type'], $part['attrs']);
+                $output .= $this->flattenArray($part, $glue);
+            } else {
+                $output .= $glue.$part;
+            }
         }
 
         return preg_replace('#\s+#ism', ' ', $output);

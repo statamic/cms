@@ -156,4 +156,25 @@ class SitesTest extends TestCase
         $this->assertEquals('fr', $sites->findByUrl('http://absolute-url-resolved-from-request.com/fr/something')->handle());
         $this->assertNull($sites->findByUrl('http://unknownsite.com'));
     }
+
+    /** @test */
+    public function it_gets_the_selected_site_from_session()
+    {
+        session()->put('statamic.cp.selected-site', 'fr');
+        $this->assertEquals('fr', $this->sites->selected()->handle());
+    }
+
+    /** @test */
+    public function the_selected_site_is_the_default_if_not_set()
+    {
+        session()->put('statamic.cp.selected-site', null);
+        $this->assertEquals('en', $this->sites->selected()->handle());
+    }
+
+    /** @test */
+    public function the_selected_site_is_the_default_if_invalid()
+    {
+        session()->put('statamic.cp.selected-site', 'invalid');
+        $this->assertEquals('en', $this->sites->selected()->handle());
+    }
 }

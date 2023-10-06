@@ -73,8 +73,9 @@ class Entries
             $operator = '<';
         }
 
-        if ($collection->orderable() && $primaryOrderBy->sort === 'order') {
-            $query = $this->query()->where('order', $operator ?? '>', $currentEntry->order());
+        if ($primaryOrderBy->sort === 'order') {
+            throw_if(! $currentOrder = $currentEntry->order(), new \Exception('Current entry does not have an order'));
+            $query = $this->query()->where('order', $operator ?? '>', $currentOrder);
         } elseif ($collection->dated() && $primaryOrderBy->sort === 'date') {
             $query = $this->query()->where('date', $operator ?? '>', $currentEntry->date());
         } else {
@@ -97,8 +98,9 @@ class Entries
             $operator = '>';
         }
 
-        if ($collection->orderable() && $primaryOrderBy->sort === 'order') {
-            $query = $this->query()->where('order', $operator ?? '<', $currentEntry->order());
+        if ($primaryOrderBy->sort === 'order') {
+            throw_if(! $currentOrder = $currentEntry->order(), new \Exception('Current entry does not have an order'));
+            $query = $this->query()->where('order', $operator ?? '<', $currentOrder);
         } elseif ($collection->dated() && $primaryOrderBy->sort === 'date') {
             $query = $this->query()->where('date', $operator ?? '<', $currentEntry->date());
         } else {

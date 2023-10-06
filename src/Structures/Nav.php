@@ -3,6 +3,7 @@
 namespace Statamic\Structures;
 
 use Statamic\Contracts\Structures\Nav as Contract;
+use Statamic\Contracts\Structures\NavTree;
 use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\NavBlueprintFound;
@@ -88,7 +89,7 @@ class Nav extends Structure implements Contract
 
     public function newTreeInstance()
     {
-        return new NavTree;
+        return app(NavTree::class);
     }
 
     public function in($site)
