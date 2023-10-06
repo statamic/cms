@@ -203,7 +203,7 @@ class TermsController extends CpController
 
     public function create(Request $request, $taxonomy, $site)
     {
-        $this->authorize('create', [TermContract::class, $taxonomy]);
+        $this->authorize('create', [TermContract::class, $taxonomy, $site]);
 
         $blueprint = $taxonomy->termBlueprint($request->blueprint);
 

@@ -265,7 +265,7 @@ class EntriesController extends CpController
 
     public function create(Request $request, $collection, $site)
     {
-        $this->authorize('create', [EntryContract::class, $collection]);
+        $this->authorize('create', [EntryContract::class, $collection, $site]);
 
         $blueprint = $collection->entryBlueprint($request->blueprint);
 
