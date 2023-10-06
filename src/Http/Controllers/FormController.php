@@ -100,14 +100,7 @@ class FormController extends Controller
      */
     private function formSuccess($params, $submission, $silentFailure = false)
     {
-        // get the redirect (or null)
-        $redirect = Form::getSubmissionRedirect($submission);
-
-        if (! $redirect) {
-            // if no redirect configured at the submission level
-            // look to see if there is a _redirect param
-            $redirect = Arr::get($params, '_redirect');
-        }
+        $redirect = $this->formSuccessRedirect($params, $submission);
 
         if (request()->ajax() || request()->wantsJson()) {
             return response([
@@ -127,6 +120,15 @@ class FormController extends Controller
         }
 
         return $response;
+    }
+
+    private function formSuccessRedirect($params, $submission)
+    {
+        if (! $redirect = Form::getSubmissionRedirect($submission)) {
+            $redirect = Arr::get($params, '_redirect');
+        }
+
+        return $redirect;
     }
 
     /**
