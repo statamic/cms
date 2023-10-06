@@ -103,9 +103,6 @@ class FormController extends Controller
         // get the redirect (or null)
         $redirect = Form::getSubmissionRedirect($submission);
 
-        // did we just get a submission-level redirect?
-        $isSubmissionRedirect = $redirect !== null;
-
         if (! $redirect) {
             // if no redirect configured at the submission level
             // look to see if there is a _redirect param
@@ -123,8 +120,7 @@ class FormController extends Controller
 
         $response = $redirect ? redirect($redirect) : back();
 
-        // only include session flash information if there is no submission-level redirect
-        if (! $isSubmissionRedirect) {
+        if (! \Statamic\Facades\URL::isExternal($redirect)) {
             session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
             session()->flash("form.{$submission->form()->handle()}.submission_created", ! $silentFailure);
             session()->flash('submission', $submission);
