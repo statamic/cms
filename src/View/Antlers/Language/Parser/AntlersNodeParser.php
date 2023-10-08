@@ -567,6 +567,10 @@ class AntlersNodeParser
                 $parameterNode->value = $content;
                 $parameterNode->startPosition = $node->relativePositionFromOffset($startAt, $nameStart);
 
+                if (in_array($name, ['as', 'scope', 'handle_prefix'])) {
+                    $node->hasScopeAdjustingParameters = true;
+                }
+
                 if ($i + 1 > $charCount) {
                     throw ErrorFactory::makeSyntaxError(
                         AntlersErrorCodes::TYPE_UNEXPECTED_EOI_WHILE_PARSING_NODE_PARAMETER,
