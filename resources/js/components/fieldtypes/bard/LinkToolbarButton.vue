@@ -13,7 +13,7 @@
         </template>
         <template #default>
             <link-toolbar
-                class="w-80"
+                class="w-84"
                 ref="toolbar"
                 v-if="showingToolbar"
                 :link-attrs="linkAttrs"
