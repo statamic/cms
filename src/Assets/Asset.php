@@ -43,16 +43,17 @@ use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
-    use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance, Searchable, TracksQueriedColumns;
+    use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance,
+        Searchable,
+        TracksQueriedColumns, TracksQueriedRelations {
+            set as traitSet;
+            get as traitGet;
+            remove as traitRemove;
+            data as traitData;
+            merge as traitMerge;
+        }
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
-    }
-    use TracksQueriedRelations {
-        set as traitSet;
-        get as traitGet;
-        remove as traitRemove;
-        data as traitData;
-        merge as traitMerge;
     }
 
     protected $container;
