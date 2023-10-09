@@ -1,5 +1,31 @@
 # Release Notes
 
+## 4.25.0 (2023-10-09)
+
+### What's new
+- Support for Submission-specific form redirects. [#8729](https://github.com/statamic/cms/issues/8729) by @martyf
+- Support for additional CP thumbnail presets. [#8811](https://github.com/statamic/cms/issues/8811) by @jacksleight
+- The toggle fieldtype gets an inline label when truthy setting. [#8814](https://github.com/statamic/cms/issues/8814) by @caseydwyer
+- Fieldtypes can define additional renderable data to be available when using front-end forms. [#8730](https://github.com/statamic/cms/issues/8730) by @martyf
+
+### What's improved
+- Validation translations. [#8819](https://github.com/statamic/cms/issues/8819) by @caseydwyer
+- Dutch translations. [#8799](https://github.com/statamic/cms/issues/8799) by @robdekort
+- French translations. [#8792](https://github.com/statamic/cms/issues/8792) by @ebeauchamps
+- Clarify default field instructions. [#8808](https://github.com/statamic/cms/issues/8808) by @caseydwyer
+
+### What's fixed
+- Fix error when saving entry where content is empty array. [#8813](https://github.com/statamic/cms/issues/8813) by @mauricewijnia
+- Antlers: Fix custom variable assignment inside tags. [#8818](https://github.com/statamic/cms/issues/8818) by @JohnathonKoster
+- GraphQL: Fix assets not resolving query builders. [#8809](https://github.com/statamic/cms/issues/8809) by @arcs-
+- Fix the "Set to now" button being visible when read only. [#8816](https://github.com/statamic/cms/issues/8816) by @ryanmitchell
+- Remove requirement of orderable collection from next/prev tags. [#8810](https://github.com/statamic/cms/issues/8810) by @jasonvarga
+- Clean up Section fieldtype styles. [#8807](https://github.com/statamic/cms/issues/8807) by @caseydwyer
+- Fix missing response from `afterRequestCompleted`. [#8801](https://github.com/statamic/cms/issues/8801) by @jacksleight
+- Bump postcss from 8.4.21 to 8.4.31 [#8817](https://github.com/statamic/cms/issues/8817) by @dependabot
+
+
+
 ## 4.24.0 (2023-10-02)
 
 ### What's new
