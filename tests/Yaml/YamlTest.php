@@ -60,7 +60,7 @@ EOT;
     }
 
     /** @test */
-    public function it_explicitly_dumps_front_matter_when_content_is_an_empty_array()
+    public function it_dumps_without_front_matter_when_content_is_an_empty_array()
     {
         $expected = <<<'EOT'
 foo: bar
