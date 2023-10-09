@@ -6,9 +6,9 @@
 
                 <div class="flex">
 
-                    <div class="h-8 mb-4 p-1 bg-gray-100 text-gray-800 border rounded shadow-inner flex items-center mr-1">
+                    <div class="h-8 mb-4 bg-gray-100 text-gray-800 border rounded shadow-inner flex items-center mr-1">
                         <select
-                            class="input w-auto h-auto text-sm"
+                            class="input w-auto text-sm px-1"
                             v-model="linkType">
                             <option
                                 v-for="visibleLinkType in visibleLinkTypes"
