@@ -1,5 +1,22 @@
 # Release Notes
 
+## 4.26.0 (2023-10-10)
+
+### What's new
+- Support for Antlers template-defined variables to be available in the layout. [#8775](https://github.com/statamic/cms/issues/8775) by @JohnathonKoster
+- Add Bard link email, phone and relationship options. [#8777](https://github.com/statamic/cms/issues/8777) by @jacksleight
+
+### What's improved
+- Dutch translations. [#8823](https://github.com/statamic/cms/issues/8823) by @jeroenpeters1986
+- Improve post-save performance with many Bard and Revealer fields. [#8712](https://github.com/statamic/cms/issues/8712) by @jacksleight
+- Improve initial render speed of Replicators with many sets. [#8716](https://github.com/statamic/cms/issues/8716) by @jacksleight
+- Simplify usage of the icon fieldtype with the SVG tag. [#8815](https://github.com/statamic/cms/issues/8815) by @JohnathonKoster
+
+### What's fixed
+- Fix section fieldtype first-child's top margin. [#8822](https://github.com/statamic/cms/issues/8822) by @caseydwyer
+
+
+
 ## 4.25.0 (2023-10-09)
 
 ### What's new
