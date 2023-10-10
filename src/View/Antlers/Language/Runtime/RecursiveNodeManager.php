@@ -111,6 +111,8 @@ class RecursiveNodeManager
                     return;
                 }
             }
+
+            GlobalRuntimeState::$activeTracerCount -= 1;
         }
 
         if (array_key_exists($namedDepthMapping, self::$namedDepthMapping) && self::$namedDepthMapping[$namedDepthMapping] > 1) {

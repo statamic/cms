@@ -58,7 +58,7 @@
                 :should-show="shouldShowSetButton"
                 :is-showing="showAddSetButton"
                 v-if="editor"
-                v-slot="{ x, y }"
+                v-slot="{ y }"
                 @shown="showAddSetButton = true"
                 @hidden="showAddSetButton = false"
             >
@@ -72,7 +72,7 @@
                         <button
                             type="button"
                             class="btn-round group bard-add-set-button"
-                            :style="{ transform: `translate(${x}px, ${y}px)` }"
+                            :style="{ transform: `translateY(${y}px)` }"
                             :aria-label="__('Add Set')"
                             v-tooltip="__('Add Set')"
                             @click="addSetButtonClicked"
@@ -344,6 +344,12 @@ export default {
         this.pageHeader = document.querySelector('.global-header');
 
         this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
+
+        this.$nextTick(() => {
+            document.querySelector(`label[for="${this.fieldId}"]`).addEventListener('click', () => {
+                this.editor.commands.focus();
+            });
+        });
     },
 
     beforeDestroy() {
@@ -403,7 +409,9 @@ export default {
 
         fieldPathPrefix(fieldPathPrefix, oldFieldPathPrefix) {
             this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, oldFieldPathPrefix);
-            this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+            this.$nextTick(() => {
+                this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+            });
         },
 
         fullScreenMode() {
@@ -488,8 +496,8 @@ export default {
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
             const isEmptyTextBlock = $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
-
-            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock;
+            const isAroundInlineImage = state.selection.$to.nodeBefore?.type.name === 'image' || state.selection.$to.nodeAfter?.type.name === 'image'
+            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
             return this.setConfigs.length && (this.config.always_show_set_button || isActive);
         },
 
@@ -640,9 +648,20 @@ export default {
         },
 
         getExtensions() {
+            let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
+            if (this.config.inline === 'break') {
+                modeExts.push(HardBreak.extend({
+                    addKeyboardShortcuts() {
+                        return {
+                            ...this.parent?.(),
+                            'Enter': () => this.editor.commands.setHardBreak(),
+                        }
+                    },
+                }));
+            }
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
-                ...(this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak]),
+                ...modeExts,
                 Dropcursor,
                 Gapcursor,
                 History,

@@ -52,6 +52,7 @@ class FluentTagTest extends TestCase
                         'params' => [
                             'sort' => 'slug:desc',
                             'limit' => 3,
+                            'alfa_bravo' => 'charlie',
                             'title:contains' => 'chewy',
                             'slug:contains' => 'han',
                             'description:contains' => 'luke',
@@ -68,6 +69,7 @@ class FluentTagTest extends TestCase
         $fluentTag = FluentTag::make($usedTag)
             ->sort('slug:desc')
             ->limit(3)
+            ->alfaBravo('charlie')
             ->param('title:contains', 'chewy')
             ->params([
                 'slug:contains' => 'han',

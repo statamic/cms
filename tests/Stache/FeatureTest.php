@@ -34,6 +34,7 @@ class FeatureTest extends TestCase
             $stache->store('entries')->directory($dir.'/content/collections');
             $stache->store('navigation')->directory($dir.'/content/navigation');
             $stache->store('globals')->directory($dir.'/content/globals');
+            $stache->store('global-variables')->directory($dir.'/content/globals');
             $stache->store('asset-containers')->directory($dir.'/content/assets');
             $stache->store('collection-trees')->directory($dir.'/content/structures/collections');
             $stache->store('nav-trees')->directory($dir.'/content/structures/navigation');

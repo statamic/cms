@@ -246,7 +246,7 @@ export default {
         },
 
         createUrl() {
-            return this.createUrls[this.site];
+            return this.createUrls[this.site || this.initialSite];
         }
 
     },

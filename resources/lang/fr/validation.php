@@ -98,6 +98,7 @@ return [
     'unique_uri' => 'Cette URI est déjà prise.',
     'duplicate_uri' => 'URI en doublon :value',
     'reserved' => 'Mot réservé par le système.',
+    'reserved_field_handle' => 'Le champ avec l’identifiant :handle est un mot réservé.',
     'parent_causes_root_children' => 'La page racine aurait alors des enfants.',
     'parent_cannot_be_itself' => 'Ne peut pas être son propre parent.',
     'time' => 'N’est pas un horaire valide.',
@@ -107,6 +108,7 @@ return [
     'date_fieldtype_start_date_invalid' => 'Date de début invalide.',
     'date_fieldtype_end_date_required' => 'Date de fin obligatoire.',
     'date_fieldtype_end_date_invalid' => 'Date de fin invalide.',
+    'code_fieldtype_rulers' => 'Les données saisies sont invalides.',
     'custom.attribute-name.rule-name' => 'message personnalisé',
     'attributes' => [],
 ];

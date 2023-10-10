@@ -117,6 +117,11 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertCount(3, $entries);
         $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->all());
 
+        $entries = Entry::query()->whereMonth('test_date', 9)->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 4'], $entries->map->title->all());
+
         $entries = Entry::query()->whereMonth('test_date', '<', 11)->get();
 
         $this->assertCount(1, $entries);

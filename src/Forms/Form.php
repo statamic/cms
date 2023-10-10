@@ -24,7 +24,7 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Form implements FormContract, Augmentable, Arrayable
+class Form implements Arrayable, Augmentable, FormContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance;
 

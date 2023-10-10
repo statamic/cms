@@ -16,6 +16,7 @@ use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
@@ -160,7 +161,7 @@ class Entries extends Relationship
         $column = $request->get('sort');
 
         if (! $column && ! $request->search) {
-            $column = 'title'; // todo: get from collection or config
+            $column = $this->getFirstCollectionFromRequest($request)->sortField();
         }
 
         return $column;
@@ -171,7 +172,7 @@ class Entries extends Relationship
         $order = $request->get('order', 'asc');
 
         if (! $request->sort && ! $request->search) {
-            // $order = 'asc'; // todo: get from collection or config
+            $order = $this->getFirstCollectionFromRequest($request)->sortDirection();
         }
 
         return $order;
@@ -351,5 +352,10 @@ class Entries extends Relationship
         return $this->config('max_items') === 1
             ? collect([$augmented])
             : $augmented->whereAnyStatus()->get();
+    }
+
+    public function filter()
+    {
+        return new EntriesFilter($this);
     }
 }

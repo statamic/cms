@@ -13,8 +13,8 @@ use Tests\TestCase;
 
 class NoCacheSessionTest extends TestCase
 {
-    use FakesViews;
     use FakesContent;
+    use FakesViews;
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
