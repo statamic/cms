@@ -9,7 +9,7 @@ class AddSitePermissions extends UpdateScript
 {
     public function shouldUpdate($newVersion, $oldVersion)
     {
-        return $this->isUpdatingTo('4.25.0');
+        return $this->isUpdatingTo('4.26.0');
     }
 
     public function update()
