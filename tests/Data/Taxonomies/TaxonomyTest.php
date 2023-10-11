@@ -14,14 +14,17 @@ use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Support\Arr;
 use Statamic\Taxonomies\Taxonomy;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TaxonomyTest extends TestCase
 {
+    use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
@@ -362,6 +365,38 @@ class TaxonomyTest extends TestCase
         $this->assertFalse($return);
 
         Event::assertNotDispatched(TaxonomySaved::class);
+    }
+
+    /** @test */
+    public function it_cannot_view_taxonomies_from_sites_that_the_user_is_not_authorized_to_see()
+    {
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $taxonomy1 = tap(Facades\Taxonomy::make('has_some_french')->sites(['en', 'fr', 'de']))->save();
+        $taxonomy2 = tap(Facades\Taxonomy::make('has_no_french')->sites(['en', 'de']))->save();
+        $taxonomy3 = tap(Facades\Taxonomy::make('has_only_french')->sites(['fr']))->save();
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'view has_some_french terms',
+            'view has_no_french terms',
+            'view has_only_french terms',
+            'access en site',
+            // 'access fr site', // Give them access to all data, but not all sites
+            'access de site',
+        ]]);
+
+        $user = tap(User::make()->assignRole('test'))->save();
+        $this->assertTrue($user->can('view', $taxonomy1));
+        $this->assertTrue($user->can('view', $taxonomy2));
+        $this->assertFalse($user->can('view', $taxonomy3));
     }
 
     public function additionalPreviewTargetProvider()

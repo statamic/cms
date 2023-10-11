@@ -50,7 +50,7 @@ class GlobalVariablesController extends CpController
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
-            'localizations' => $variables->globalSet()->localizations()->map(function ($localized) use ($variables) {
+            'localizations' => $this->getAuthorizedLocalizationsForVariables($variables)->map(function ($localized) use ($variables) {
                 return [
                     'handle' => $localized->locale(),
                     'name' => $localized->site()->name(),
@@ -117,5 +117,13 @@ class GlobalVariablesController extends CpController
             ->preProcess();
 
         return [$fields->values()->all(), $fields->meta()->all()];
+    }
+
+    protected function getAuthorizedLocalizationsForVariables($variables)
+    {
+        return $variables
+            ->globalSet()
+            ->localizations()
+            ->filter(fn ($set) => User::current()->can('edit', $set));
     }
 }
