@@ -104,4 +104,14 @@ class Pattern
     {
         return (bool) preg_match($this->uuid(), $value);
     }
+
+    /**
+     * Quotes (escapes) SQL LIKE syntax.
+     *
+     * Similar to the preg_quote method for regular expressions.
+     */
+    public function sqlLikeQuote(string $string): string
+    {
+        return str_replace(['%', '_'], ['\%', '\_'], $string);
+    }
 }
