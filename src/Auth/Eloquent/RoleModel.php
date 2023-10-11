@@ -21,7 +21,7 @@ class RoleModel extends Eloquent
     {
         parent::__construct($attributes);
 
-        if ($table = config('statamic.users.roles')) {
+        if ($table = config('statamic.users.tables.roles')) {
             $this->setTable($table);
         }
 
