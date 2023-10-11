@@ -14,6 +14,12 @@ class AddSitePermissionsTest extends TestCase
     use PreventSavingStacheItemsToDisk, RunsUpdateScripts;
 
     /** @test */
+    public function it_is_registered()
+    {
+        $this->assertUpdateScriptRegistered(AddSitePermissions::class);
+    }
+
+    /** @test */
     public function it_can_add_site_permissions()
     {
         Site::setConfig(['sites' => [
