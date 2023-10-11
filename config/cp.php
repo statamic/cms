@@ -125,4 +125,17 @@ return [
     'custom_favicon_url' => env('STATAMIC_CUSTOM_FAVICON_URL', null),
 
     'custom_css_url' => env('STATAMIC_CUSTOM_CSS_URL', null),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Thumbnails
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define additional CP asset thumbnail presets.
+    |
+    */
+
+    'thumbnail_presets' => [
+        // 'medium' => 800,
+    ],
 ];

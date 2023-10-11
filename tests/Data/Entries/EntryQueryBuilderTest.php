@@ -669,4 +669,72 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
     }
+
+    /**
+     * @test
+     *
+     * @dataProvider likeProvider
+     */
+    public function entries_are_found_using_like($like, $expected)
+    {
+        Collection::make('posts')->save();
+
+        collect([
+            'on',
+            'only',
+            'foo',
+            'food',
+            'boo',
+            'foo bar',
+            'foo_bar',
+            'foodbar',
+            'hello world',
+            'waterworld',
+            'world of warcraft',
+            '20%',
+            '20% of the time',
+            '20 something',
+            'Pi is 3.14159',
+            'Pi is not 3x14159',
+            'Use a [4.x] prefix for PRs',
+            '/',
+            '/ test',
+            'test /',
+            'test / test',
+        ])->each(function ($val, $i) {
+            EntryFactory::id($i)
+                ->slug('post-'.$i)
+                ->collection('posts')
+                ->data(['title' => $val])
+                ->create();
+        });
+
+        $this->assertEquals($expected, Entry::query()->where('title', 'like', $like)->get()->map->title->all());
+    }
+
+    public function likeProvider()
+    {
+        return collect([
+            'foo' => ['foo'],
+            'foo%' => ['foo', 'food', 'foo bar', 'foo_bar', 'foodbar'],
+            '%world' => ['hello world', 'waterworld'],
+            '%world%' => ['hello world', 'waterworld', 'world of warcraft'],
+            '_oo' => ['foo', 'boo'],
+            'o_' => ['on'],
+            'foo_bar' => ['foo bar', 'foo_bar', 'foodbar'],
+            'foo__bar' => [],
+            'fo__bar' => ['foo bar', 'foo_bar', 'foodbar'],
+            'foo\_bar' => ['foo_bar'],
+            '20\%' => ['20%'],
+            '20\%%' => ['20%', '20% of the time'],
+            '%3.14%' => ['Pi is 3.14159'],
+            '%[4%' => ['Use a [4.x] prefix for PRs'],
+            '/' => ['/'],
+            '%/' => ['/', 'test /'],
+            '/%' => ['/', '/ test'],
+            '%/%' => ['/', '/ test', 'test /', 'test / test'],
+        ])->mapWithKeys(function ($expected, $like) {
+            return [$like => [$like, $expected]];
+        });
+    }
 }
