@@ -1,5 +1,13 @@
 # Release Notes
 
+
+## 4.26.1 (2023-10-11)
+
+### What's fixed
+- Fix assets being deleted when renaming snake_case folder to kebab-case. [#8826](https://github.com/statamic/cms/issues/8826) by @jasonvarga
+
+
+
 ## 4.26.0 (2023-10-10)
 
 ### What's new
