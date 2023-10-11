@@ -1,5 +1,11 @@
 # Release Notes
 
+## 4.27.0 (2023-10-11)
+
+### What's new
+- Multi-site Permissions [#5946](https://github.com/statamic/cms/issues/5946) by @jackmcdade
+
+
 
 ## 4.26.1 (2023-10-11)
 
