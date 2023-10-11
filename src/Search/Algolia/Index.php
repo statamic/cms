@@ -65,7 +65,7 @@ class Index extends BaseIndex
 
     public function getIndex()
     {
-        $index_created = !$this->exists();
+        $index_created = ! $this->exists();
         $index = $this->client->initIndex($this->name);
 
         if ($index_created) {
