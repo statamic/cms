@@ -54,7 +54,9 @@ class Index extends BaseIndex
 
     public function update()
     {
-        $this->getIndex()->clearObjects();
+        $index = $this->getIndex();
+        $index->clearObjects();
+        $index->setSettings($this->config['settings']);
 
         $this->insertMultiple($this->searchables()->all());
 
@@ -63,7 +65,14 @@ class Index extends BaseIndex
 
     public function getIndex()
     {
-        return $this->client->initIndex($this->name);
+        $index_created = !$this->exists();
+        $index = $this->client->initIndex($this->name);
+
+        if ($index_created) {
+            $index->setSettings($this->config['settings']);
+        }
+
+        return $index;
     }
 
     public function searchUsingApi($query, $fields = null)
