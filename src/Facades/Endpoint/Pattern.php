@@ -2,6 +2,8 @@
 
 namespace Statamic\Facades\Endpoint;
 
+use Statamic\Support\Str;
+
 /**
  * Regular expressions, et al.
  */
@@ -110,9 +112,11 @@ class Pattern
      *
      * Similar to the preg_quote method for regular expressions.
      */
-    public function sqlLikeQuote(string $string): string
+    public function sqlLikeQuote(string $like): string
     {
-        return str_replace(['%', '_'], ['\%', '\_'], $string);
+        return Str::of($like)
+            ->replace('%', '\%')
+            ->replace('_', '\_');
     }
 
     /**
@@ -122,13 +126,15 @@ class Pattern
      */
     public function sqlLikeToRegex(string $like): string
     {
-        $pattern = str_replace('\_', $underscore = str_random(), $like);
-        $pattern = str_replace('\%', $percent = str_random(), $pattern);
-        $pattern = preg_quote($pattern, '/');
-        $pattern = str_replace(['%', '_'], ['.*', '.'], $pattern);
-        $pattern = str_replace($underscore, '_', $pattern);
-        $pattern = str_replace($percent, '%', $pattern);
-
-        return '^'.$pattern.'$';
+        return Str::of($like)
+            ->replace('\_', $underscore = Str::random())
+            ->replace('\%', $percent = Str::random())
+            ->pipe(fn ($str) => preg_quote($str, '/'))
+            ->replace('%', '.*')
+            ->replace('_', '.')
+            ->replace($underscore, '_')
+            ->replace($percent, '%')
+            ->prepend('^')
+            ->append('$');
     }
 }
