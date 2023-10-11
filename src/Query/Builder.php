@@ -629,7 +629,11 @@ abstract class Builder implements Contract
 
     protected function filterTestLike($item, $like)
     {
+        $like = str_replace('\_', $underscore = str_random(), $like);
+        $like = str_replace('\%', $percent = str_random(), $like);
         $pattern = '/^'.str_replace(['%', '_'], ['.*', '.'], preg_quote($like, '/')).'$/im';
+        $pattern = str_replace($underscore, '_', $pattern);
+        $pattern = str_replace($percent, '%', $pattern);
 
         if (is_array($item)) {
             $item = json_encode($item);
