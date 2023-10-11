@@ -357,7 +357,8 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
 
         if ($folder !== null) {
             if ($recursive) {
-                $query->where('path', 'like', "{$folder}/%");
+                $like = str_replace('_', '\_', $folder).'/%';
+                $query->where('path', 'like', $like);
             } else {
                 $query->where('folder', $folder);
             }
