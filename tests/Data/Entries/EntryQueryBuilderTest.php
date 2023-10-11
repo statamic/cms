@@ -694,6 +694,13 @@ class EntryQueryBuilderTest extends TestCase
             '20%',
             '20% of the time',
             '20 something',
+            'Pi is 3.14159',
+            'Pi is not 3x14159',
+            'Use a [4.x] prefix for PRs',
+            '/',
+            '/ test',
+            'test /',
+            'test / test',
         ])->each(function ($val, $i) {
             EntryFactory::id($i)
                 ->slug('post-'.$i)
@@ -720,6 +727,12 @@ class EntryQueryBuilderTest extends TestCase
             'foo\_bar' => ['foo_bar'],
             '20\%' => ['20%'],
             '20\%%' => ['20%', '20% of the time'],
+            '%3.14%' => ['Pi is 3.14159'],
+            '%[4%' => ['Use a [4.x] prefix for PRs'],
+            '/' => ['/'],
+            '%/' => ['/', 'test /'],
+            '/%' => ['/', '/ test'],
+            '%/%' => ['/', '/ test', 'test /', 'test / test'],
         ])->mapWithKeys(function ($expected, $like) {
             return [$like => [$like, $expected]];
         });

@@ -114,4 +114,21 @@ class Pattern
     {
         return str_replace(['%', '_'], ['\%', '\_'], $string);
     }
+
+    /**
+     * Converts SQL LIKE syntax to a regular expression.
+     *
+     * @return string  The regular expression without delimiters.
+     */
+    public function sqlLikeToRegex(string $like): string
+    {
+        $pattern = str_replace('\_', $underscore = str_random(), $like);
+        $pattern = str_replace('\%', $percent = str_random(), $pattern);
+        $pattern = preg_quote($pattern, '/');
+        $pattern = str_replace(['%', '_'], ['.*', '.'], $pattern);
+        $pattern = str_replace($underscore, '_', $pattern);
+        $pattern = str_replace($percent, '%', $pattern);
+
+        return '^'.$pattern.'$';
+    }
 }

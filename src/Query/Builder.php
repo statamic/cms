@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Facades\Pattern;
 
 abstract class Builder implements Contract
 {
@@ -629,17 +630,13 @@ abstract class Builder implements Contract
 
     protected function filterTestLike($item, $like)
     {
-        $like = str_replace('\_', $underscore = str_random(), $like);
-        $like = str_replace('\%', $percent = str_random(), $like);
-        $pattern = '/^'.str_replace(['%', '_'], ['.*', '.'], preg_quote($like, '/')).'$/im';
-        $pattern = str_replace($underscore, '_', $pattern);
-        $pattern = str_replace($percent, '%', $pattern);
-
         if (is_array($item)) {
             $item = json_encode($item);
         }
 
-        return preg_match($pattern, (string) $item);
+        $pattern = Pattern::sqlLikeToRegex($like);
+
+        return preg_match('/'.$pattern.'/im', (string) $item);
     }
 
     protected function filterTestNotLike($item, $like)
