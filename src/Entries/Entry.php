@@ -53,6 +53,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 {
     use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
+    use HasDirtyState;
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -60,11 +61,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
     use ResolvesValues {
         resolveGqlValue as traitResolveGqlValue;
     }
+
     use Routable {
         uri as routableUri;
     }
-
-    use HasDirtyState;
     use SyncsOriginalState;
 
     protected $id;
