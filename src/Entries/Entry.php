@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use ArrayAccess;
+use Facades\Statamic\Entries\InitiatorStack;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
@@ -48,19 +49,19 @@ use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Support\Traits\HasDirtyState;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, ContainsQueryableValues, Arrayable, ArrayAccess, SearchableContract
+class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
-    use Routable {
-        uri as routableUri;
-    }
+    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
-    use ContainsData, ContainsComputedData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, Searchable;
-    use ResolvesValues {
-        resolveGqlValue as traitResolveGqlValue;
-    }
     use HasOrigin {
         value as originValue;
         values as originValues;
+    }
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
+    use Routable {
+        uri as routableUri;
     }
 
     use HasDirtyState;
@@ -357,7 +358,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $this->ancestors()->each(fn ($entry) => Blink::forget('entry-descendants-'.$entry->id()));
 
-        $this->directDescendants()->each->save();
+        $stack = InitiatorStack::entry($this)->push();
+
+        $this->directDescendants()->each->{$withEvents ? 'save' : 'saveQuietly'}();
 
         $this->taxonomize();
 
@@ -382,6 +385,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     $this->makeLocalization($siteHandle)->save();
                 });
         }
+
+        $stack->pop();
 
         return true;
     }
@@ -920,7 +925,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             }, $format);
         }
 
-        return (string) Antlers::parse($format, $this->augmented()->all());
+        return (string) Antlers::parse($format, array_merge($this->routeData(), [
+            'site' => $this->site(),
+            'permalink' => $this->absoluteUrl(),
+            'locale' => $this->locale(),
+        ]));
     }
 
     public function repository()

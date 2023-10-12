@@ -238,11 +238,7 @@ class URL
      */
     public function getSiteUrl()
     {
-        if (app()->runningInConsole()) {
-            return config('app.url');
-        }
-
-        $rootUrl = app('request')->root();
+        $rootUrl = url()->to('/');
 
         return Str::ensureRight($rootUrl, '/');
     }
@@ -302,6 +298,20 @@ class URL
         if ($size) {
             $url .= '?s='.$size;
         }
+
+        return $url;
+    }
+
+    /**
+     * Remove query and fragment from end of URL.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function removeQueryAndFragment($url)
+    {
+        $url = Str::before($url, '?'); // Remove query params
+        $url = Str::before($url, '#'); // Remove anchor fragment
 
         return $url;
     }

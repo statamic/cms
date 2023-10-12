@@ -37,9 +37,9 @@ use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\HasDirtyState;
 
-abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, Augmentable, AuthorizableContract, ResolvesValuesContract, HasLocalePreference, ArrayAccess, Arrayable, SearchableContract, ContainsQueryableValues
+abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticatable, AuthorizableContract, CanResetPasswordContract, ContainsQueryableValues, HasLocalePreference, ResolvesValuesContract, SearchableContract, UserContract
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues, ContainsComputedData, HasDirtyState, SyncsOriginalState, Searchable;
+    use Authorizable, CanResetPassword, ContainsComputedData, HasAugmentedInstance, HasAvatar, HasDirtyState, Notifiable, ResolvesValues, Searchable, SyncsOriginalState, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $syncOriginalProperties = [];
     protected $afterSaveCallbacks = [];

@@ -190,7 +190,7 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return $this->{$method}($value->format('m'), $where['value']);
+            return $this->{$method}($value->format('m'), sprintf('%02d', $where['value']));
         });
     }
 

@@ -4,8 +4,8 @@ namespace Tests\Search;
 
 use Mockery;
 use Statamic\Contracts\Search\Searchable;
-use Statamic\Events\EntryDeleted;
-use Statamic\Events\EntrySaved;
+use Statamic\Events\UserDeleted;
+use Statamic\Events\UserSaved;
 use Statamic\Facades\Search;
 use Statamic\Search\UpdateItemIndexes;
 use Tests\TestCase;
@@ -19,7 +19,7 @@ class UpdateItemIndexesTest extends TestCase
 
         Search::shouldReceive('updateWithinIndexes')->with($item)->once();
 
-        $event = new EntrySaved($item);
+        $event = new UserSaved($item);
 
         $listener = new UpdateItemIndexes;
 
@@ -33,7 +33,7 @@ class UpdateItemIndexesTest extends TestCase
 
         Search::shouldReceive('deleteFromIndexes')->with($item)->once();
 
-        $event = new EntryDeleted($item);
+        $event = new UserDeleted($item);
 
         $listener = new UpdateItemIndexes;
 

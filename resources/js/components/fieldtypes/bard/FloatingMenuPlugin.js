@@ -38,9 +38,8 @@ class FloatingMenuView {
         // The dimension from posToDOMRect are relative to the window.
         // But since bard is inside a @container which creates a new stacking
         // context, we need the dimensions relative to the bard editor.
-        const { top: selectionTop, left: selectionLeft } = posToDOMRect(view, from, to);
-        const { top: editorTop, left: editorLeft } = this.editor.options.element.getBoundingClientRect();
-        this.vm.x = Math.round(selectionLeft-editorLeft);
+        const { top: selectionTop } = posToDOMRect(view, from, to);
+        const { top: editorTop } = this.editor.options.element.getBoundingClientRect();
         this.vm.y = Math.round(selectionTop-editorTop);
 
         this.show();

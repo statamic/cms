@@ -10,6 +10,7 @@ use Statamic\Http\Controllers\CP\Utilities\GitController;
 use Statamic\Http\Controllers\CP\Utilities\PhpInfoController;
 use Statamic\Http\Controllers\CP\Utilities\UpdateSearchController;
 use Statamic\Statamic;
+
 use function Statamic\trans as __;
 
 class CoreUtilities

@@ -2,6 +2,8 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View as ViewFactory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
@@ -18,6 +20,7 @@ use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Runtime\Tracing\TraceManager;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\Parser;
+use Statamic\View\Blade\AntlersBladePrecompiler;
 use Statamic\View\Cascade;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceCollector;
 use Statamic\View\Debugbar\AntlersProfiler\PerformanceTracer;
@@ -171,6 +174,12 @@ class ViewServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        ViewFactory::addNamespace('compiled__views', storage_path('framework/views'));
+
+        Blade::precompiler(function ($content) {
+            return AntlersBladePrecompiler::compile($content);
+        });
+
         View::macro('withoutExtractions', function () {
             if ($this->engine instanceof Engine) {
                 $this->engine->withoutExtractions();

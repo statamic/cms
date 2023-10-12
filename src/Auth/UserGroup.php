@@ -14,7 +14,7 @@ use Statamic\Events\UserGroupSaved;
 use Statamic\Facades;
 use Statamic\Facades\Role as RoleAPI;
 
-abstract class UserGroup implements UserGroupContract, Augmentable, ArrayAccess, Arrayable
+abstract class UserGroup implements Arrayable, ArrayAccess, Augmentable, UserGroupContract
 {
     protected $title;
     protected $handle;

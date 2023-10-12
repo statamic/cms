@@ -20,13 +20,14 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Image;
+use Statamic\Facades\Pattern;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess, Arrayable
+class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -357,7 +358,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
 
         if ($folder !== null) {
             if ($recursive) {
-                $query->where('path', 'like', "{$folder}/%");
+                $query->where('path', 'like', Pattern::sqlLikeQuote($folder).'/%');
             } else {
                 $query->where('folder', $folder);
             }
