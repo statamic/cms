@@ -33,6 +33,7 @@ class GitEventTest extends TestCase
 
         $this->actingAs(
             User::make()
+                ->id('chewbacca')
                 ->email('chew@bacca.com')
                 ->data(['name' => 'Chewbacca'])
                 ->makeSuper()

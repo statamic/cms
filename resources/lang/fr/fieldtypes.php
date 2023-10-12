@@ -176,6 +176,7 @@ return [
     'time.config.seconds_enabled' => 'Affichez les secondes dans l’horodateur.',
     'time.title' => 'Time',
     'toggle.config.inline_label' => 'Définissez une étiquette à afficher en ligne à côté du commutateur.',
+    'toggle.config.inline_label_when_true' => 'Définissez une étiquette à afficher en ligne quand la valeur du commutateur est vraie (True).',
     'toggle.title' => 'Toggle',
     'user_groups.title' => 'User Groups',
     'user_roles.title' => 'User Roles',

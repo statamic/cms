@@ -15,13 +15,16 @@ use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Structures\CollectionStructure;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CollectionTest extends TestCase
 {
+    use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
@@ -862,5 +865,37 @@ class CollectionTest extends TestCase
             'through object' => [false],
             'through facade' => [true],
         ];
+    }
+
+    /** @test */
+    public function it_cannot_view_collections_from_sites_that_the_user_is_not_authorized_to_see()
+    {
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection1 = tap(Facades\Collection::make('has_some_french')->sites(['en', 'fr', 'de']))->save();
+        $collection2 = tap(Facades\Collection::make('has_no_french')->sites(['en', 'de']))->save();
+        $collection3 = tap(Facades\Collection::make('has_only_french')->sites(['fr']))->save();
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'view has_some_french entries',
+            'view has_no_french entries',
+            'view has_only_french entries',
+            'access en site',
+            // 'access fr site', // Give them access to all data, but not all sites
+            'access de site',
+        ]]);
+
+        $user = tap(User::make()->assignRole('test'))->save();
+        $this->assertTrue($user->can('view', $collection1));
+        $this->assertTrue($user->can('view', $collection2));
+        $this->assertFalse($user->can('view', $collection3));
     }
 }
