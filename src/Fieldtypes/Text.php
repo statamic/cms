@@ -91,6 +91,8 @@ class Text extends Fieldtype
                             'name',
                             'new-password',
                             'nickname',
+                            'off',
+                            'on',
                             'organization',
                             'organization-title',
                             'photo',

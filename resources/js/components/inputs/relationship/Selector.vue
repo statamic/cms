@@ -31,7 +31,7 @@
                             :active-filter-badges="activeFilterBadges"
                             :active-count="activeFilterCount"
                             :search-query="searchQuery"
-                            @changed="filterChanged"
+                            @changed="filterChanged($event, false)"
                         />
                     </div>
                 </div>
@@ -49,7 +49,7 @@
                             >
                                 <template slot="cell-title" slot-scope="{ row: entry }">
                                     <div class="flex items-center">
-                                        <div class="little-dot mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="! columnShowing('status')" />
+                                        <div class="little-dot mr-2" v-tooltip="getStatusLabel(entry)" :class="getStatusClass(entry)" v-if="entry.status && ! columnShowing('status')" />
                                         {{ entry.title }}
                                     </div>
                                 </template>

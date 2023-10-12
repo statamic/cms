@@ -89,9 +89,9 @@ class Index extends BaseIndex
 
     public function exists()
     {
-        return null !== collect($this->client->listIndices()['items'])->first(function ($index) {
+        return collect($this->client->listIndices()['items'])->first(function ($index) {
             return $index['name'] == $this->name;
-        });
+        }) !== null;
     }
 
     private function handleAlgoliaException($e)

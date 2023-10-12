@@ -89,19 +89,23 @@ class View
 
         if ($this->shouldUseLayout()) {
             GlobalRuntimeState::$containsLayout = true;
-
             $contents = view($this->templateViewName(), $cascade);
 
             if (Str::endsWith($this->layoutViewPath(), Engine::EXTENSIONS)) {
                 $contents = $contents->withoutExtractions();
             }
 
+            GlobalRuntimeState::$shareVariablesTemplateTrigger = $contents->getPath();
+
             $contents = $contents->render();
             GlobalRuntimeState::$containsLayout = false;
+            GlobalRuntimeState::$shareVariablesTemplateTrigger = '';
 
-            $contents = view($this->layoutViewName(), array_merge($cascade, [
+            $contents = view($this->layoutViewName(), array_merge($cascade, GlobalRuntimeState::$layoutVariables, [
                 'template_content' => $contents,
             ]));
+
+            GlobalRuntimeState::$layoutVariables = [];
         } else {
             $contents = view($this->templateViewName(), $cascade);
         }

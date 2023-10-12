@@ -133,6 +133,7 @@ export default {
         return {
             focused: false,
             collapsed: clone(this.meta.collapsed),
+            previews: this.meta.previews,
             fullScreenMode: false,
             provide: {
                 storeName: this.storeName
@@ -141,10 +142,6 @@ export default {
     },
 
     computed: {
-
-        previews() {
-            return this.meta.previews;
-        },
 
         canAddSet() {
             if (this.isReadOnly) return false;
@@ -242,13 +239,7 @@ export default {
         },
 
         updateSetPreviews(id, previews) {
-            this.updateMeta({
-                ...this.meta,
-                previews: {
-                    ...this.meta.previews,
-                    [id]: previews,
-                },
-            });
+            this.previews[id] = previews;
         },
 
         collapseSet(id) {
@@ -312,6 +303,18 @@ export default {
 
         collapsed(collapsed) {
             this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
+        },
+
+        previews: {
+            deep: true,
+            handler(value) {
+                if (JSON.stringify(this.meta.previews) === JSON.stringify(value)) {
+                    return
+                }
+                const meta = this.meta;
+                meta.previews = value;
+                this.updateMeta(meta);
+            }
         },
 
     }

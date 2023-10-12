@@ -181,6 +181,9 @@ export default {
     methods: {
         addValue() {
             this.data.push(this.newSortableValue());
+            this.$nextTick(() => {
+                this.$el.querySelector('tr:last-child input').focus();
+            });
         },
 
         confirmDeleteValue(index) {
