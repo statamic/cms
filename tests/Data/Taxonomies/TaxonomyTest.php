@@ -405,7 +405,7 @@ class TaxonomyTest extends TestCase
         $taxonomy->termTemplate('foo');
         $this->assertEquals('foo', $taxonomy->termTemplate());
     }
-  
+
     /** @test */
     public function it_cannot_view_taxonomies_from_sites_that_the_user_is_not_authorized_to_see()
     {
