@@ -34,6 +34,8 @@ class Submission implements Augmentable, SubmissionContract
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
+    protected ?string $redirect = null;
+
     public function __construct()
     {
         $this->data = collect();

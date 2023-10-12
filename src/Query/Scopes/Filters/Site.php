@@ -51,7 +51,7 @@ class Site extends Filter
 
     protected function options()
     {
-        return Facades\Site::all()->mapWithKeys(function ($site) {
+        return Facades\Site::authorized()->mapWithKeys(function ($site) {
             return [$site->handle() => __($site->name())];
         });
     }

@@ -178,4 +178,55 @@ EOT;
         $this->assertSame('A new title', $content);
         $this->assertSame('Two', $contentTwo);
     }
+
+    public function test_variables_created_in_template_are_shared_with_the_layout()
+    {
+        $this->createBlueprintsAndData();
+        $this->withFakeViews();
+
+        $layout = <<<'LAYOUT'
+Layout 1: {{ _test }}
+{{ partial:test }}
+{{ template_content }}
+Layout 2: {{ _test }}
+Layout 3: {{ _something }}
+LAYOUT;
+
+        $partial = <<<'PARTIAL'
+Partial inside layout: {{ _test }}
+PARTIAL;
+
+        $partial2 = <<<'PARTIAL'
+Partial inside template: {{ _test }}
+{{ _something = "something" }}
+PARTIAL;
+
+        $template = <<<'TEMPLATE'
+{{ _test = "test" }}
+{{ partial:test2 }}
+TEMPLATE;
+
+        $this->viewShouldReturnRaw('layout', $layout);
+        $this->viewShouldReturnRaw('test', $partial);
+        $this->viewShouldReturnRaw('test2', $partial2);
+        $this->viewShouldReturnRaw('default', $template);
+
+        $response = $this->get('bravo/news-2')
+            ->assertOk();
+
+        $result = StringUtilities::normalizeLineEndings(trim($response->content()));
+
+        // The last Layout 3 variable should be empty.
+        $expected = <<<'EXPECTED'
+Layout 1: test
+Partial inside layout: test
+
+Partial inside template: test
+
+Layout 2: test
+Layout 3:
+EXPECTED;
+
+        $this->assertSame($expected, $result);
+    }
 }

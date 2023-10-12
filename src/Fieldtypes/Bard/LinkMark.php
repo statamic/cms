@@ -43,6 +43,13 @@ class LinkMark extends Link
                 },
             ],
             'title' => [],
+            'rel' => [
+                'renderHTML' => function ($attributes) {
+                    return [
+                        'rel' => $attributes->rel ?? '',
+                    ];
+                },
+            ],
         ];
     }
 

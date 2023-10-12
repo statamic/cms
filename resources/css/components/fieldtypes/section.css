@@ -9,11 +9,11 @@
     &.form-group {
         position: relative;
         &:first-child {
-            @apply rounded-t-md border-t-0;
+            @apply mt-0 rounded-t-md border-t-0;
         }
 
         &:last-child {
-            @apply rounded-b-md mt-0;
+            @apply rounded-b-md;
         }
 
         .field-inner > label {
