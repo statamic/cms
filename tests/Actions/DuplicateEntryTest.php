@@ -131,8 +131,8 @@ class DuplicateEntryTest extends TestCase
         $entry->makeLocalization('fr')->id('alfa-id-fr')->data(['title' => 'Alfa (French)'])->save();
 
         $this->assertEquals([
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en'],
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
         ], $this->entryData());
 
         Site::setCurrent('en');
@@ -144,9 +144,9 @@ class DuplicateEntryTest extends TestCase
         ]));
 
         $this->assertEquals([
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en'],
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr'],
-            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en', 'origin' => null],
         ], $this->entryData());
     }
 
@@ -177,10 +177,10 @@ class DuplicateEntryTest extends TestCase
         ]));
 
         $this->assertEquals([
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en'],
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr'],
-            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en'],
-            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (French) (Duplicated)', 'duplicated_from' => 'alfa-id-fr'], 'locale' => 'fr'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (French) (Duplicated)', 'duplicated_from' => 'alfa-id-fr'], 'locale' => 'fr', 'origin' => 'en.alfa-1'],
         ], $this->entryData());
     }
 
@@ -226,6 +226,8 @@ class DuplicateEntryTest extends TestCase
 
             if (Site::hasMultiple()) {
                 $arr['locale'] = $entry->locale();
+                // Use locale.slug string instead of id since we won't always know it in advance
+                $arr['origin'] = $entry->hasOrigin() ? $entry->origin()->locale().'.'.$entry->origin()->slug() : null;
             }
 
             return $arr;
