@@ -9,15 +9,16 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 /** @group graphql */
 class EntriesTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['collections'];
 
@@ -70,6 +71,39 @@ GQL;
                 ['id' => '3', 'title' => 'Event One'],
                 ['id' => '4', 'title' => 'Event Two'],
                 ['id' => '5', 'title' => 'Hamburger'],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_queries_all_entries_in_a_specific_site()
+    {
+        $this->createEntries();
+
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
+        Collection::find('events')->routes('/events/{slug}')->sites(['en', 'fr'])->save();
+
+        EntryFactory::collection('events')->locale('fr')->origin('4')->id('44')->slug('event-two')->create();
+
+        $query = <<<'GQL'
+{
+    entries(site: "fr") {
+        data {
+            id
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '44'],
             ]]]]);
     }
 
@@ -790,13 +824,13 @@ GQL;
 GQL;
 
         $this
-                ->withoutExceptionHandling()
-                ->post('/graphql', ['query' => $query])
-                ->assertGqlOk()
-                ->assertExactJson(['data' => ['entries' => ['data' => [
-                    ['id' => '2', 'title' => 'Art Directed Blog Post'],
-                    ['id' => '4', 'title' => 'Event Two'],
-                ]]]]);
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '2', 'title' => 'Art Directed Blog Post'],
+                ['id' => '4', 'title' => 'Event Two'],
+            ]]]]);
 
         $query = <<<'GQL'
 {
@@ -810,13 +844,13 @@ GQL;
 GQL;
 
         $this
-                ->withoutExceptionHandling()
-                ->post('/graphql', ['query' => $query])
-                ->assertGqlOk()
-                ->assertExactJson(['data' => ['entries' => ['data' => [
-                    ['id' => '2', 'title' => 'Art Directed Blog Post'],
-                    ['id' => '4', 'title' => 'Event Two'],
-                ]]]]);
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '2', 'title' => 'Art Directed Blog Post'],
+                ['id' => '4', 'title' => 'Event Two'],
+            ]]]]);
 
         $query = <<<'GQL'
 {
@@ -830,11 +864,11 @@ GQL;
 GQL;
 
         $this
-                ->withoutExceptionHandling()
-                ->post('/graphql', ['query' => $query])
-                ->assertGqlOk()
-                ->assertExactJson(['data' => ['entries' => ['data' => [
-                    ['id' => '1', 'title' => 'Standard Blog Post'],
-                ]]]]);
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '1', 'title' => 'Standard Blog Post'],
+            ]]]]);
     }
 }

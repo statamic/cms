@@ -16,7 +16,9 @@ use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
+use Statamic\Search\Result;
 use Statamic\Support\Arr;
 
 class Entries extends Relationship
@@ -89,6 +91,11 @@ class Entries extends Relationship
                         'type' => 'collections',
                         'mode' => 'select',
                     ],
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
+                        'type' => 'taggable',
+                    ],
                 ],
             ],
         ];
@@ -114,7 +121,11 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+        $results = ($paginate = $request->boolean('paginate', true)) ? $query->paginate() : $query->get();
+
+        $items = $results->map(fn ($item) => $item instanceof Result ? $item->getSearchable() : $item);
+
+        return $paginate ? $results->setCollection($items) : $items;
     }
 
     public function getResourceCollection($request, $items)
@@ -150,7 +161,7 @@ class Entries extends Relationship
         $column = $request->get('sort');
 
         if (! $column && ! $request->search) {
-            $column = 'title'; // todo: get from collection or config
+            $column = $this->getFirstCollectionFromRequest($request)->sortField();
         }
 
         return $column;
@@ -161,7 +172,7 @@ class Entries extends Relationship
         $order = $request->get('order', 'asc');
 
         if (! $request->sort && ! $request->search) {
-            // $order = 'asc'; // todo: get from collection or config
+            $order = $this->getFirstCollectionFromRequest($request)->sortDirection();
         }
 
         return $order;
@@ -172,7 +183,20 @@ class Entries extends Relationship
         $query = Entry::query();
 
         if ($search = $request->search) {
-            $query->where('title', 'like', '%'.$search.'%');
+            $usingSearchIndex = false;
+            $collections = collect($this->getConfiguredCollections());
+
+            if ($collections->count() == 1) {
+                $collection = Collection::findByHandle($collections->first());
+                if ($collection && $collection->hasSearchIndex()) {
+                    $query = $collection->searchIndex()->ensureExists()->search($search);
+                    $usingSearchIndex = true;
+                }
+            }
+
+            if (! $usingSearchIndex) {
+                $query->where('title', 'like', '%'.$search.'%');
+            }
         }
 
         if ($site = $request->site) {
@@ -182,6 +206,8 @@ class Entries extends Relationship
         if ($request->exclusions) {
             $query->whereNotIn('id', $request->exclusions);
         }
+
+        $this->applyIndexQueryScopes($query, $request->all());
 
         return $query;
     }
@@ -326,5 +352,10 @@ class Entries extends Relationship
         return $this->config('max_items') === 1
             ? collect([$augmented])
             : $augmented->whereAnyStatus()->get();
+    }
+
+    public function filter()
+    {
+        return new EntriesFilter($this);
     }
 }

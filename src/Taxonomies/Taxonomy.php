@@ -18,6 +18,7 @@ use Statamic\Events\TaxonomySaving;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Search;
@@ -28,9 +29,9 @@ use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAccess, Arrayable
+class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract, Responsable
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData, ContainsSupplementalData;
+    use ContainsCascadingData, ContainsSupplementalData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
 
     protected $handle;
     protected $title;
@@ -111,12 +112,21 @@ class Taxonomy implements Contract, Responsable, AugmentableContract, ArrayAcces
 
     public function termBlueprint($blueprint = null, $term = null)
     {
-        $blueprint = $this->getBaseTermBlueprint($blueprint);
+        if (! $blueprint = $this->getBaseTermBlueprint($blueprint)) {
+            return null;
+        }
 
-        $blueprint ? $this->ensureTermBlueprintFields($blueprint) : null;
+        $this->ensureTermBlueprintFields($blueprint);
 
-        if ($blueprint) {
-            TermBlueprintFound::dispatch($blueprint->setParent($term ?? $this), $term);
+        $blueprint->setParent($term ?? $this);
+
+        // Only dispatch the event when there's no term.
+        // When there is a term, the event is dispatched from the term.
+        if (! $term) {
+            Blink::once(
+                'collection-termblueprintfound-'.$this->handle().'-'.$blueprint->handle(),
+                fn () => TermBlueprintFound::dispatch($blueprint)
+            );
         }
 
         return $blueprint;

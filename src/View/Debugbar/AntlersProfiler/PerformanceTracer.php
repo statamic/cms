@@ -59,6 +59,8 @@ class PerformanceTracer implements RuntimeTracerContract
 
     private $firstSampleTime = null;
 
+    protected $foundLayoutTrigger = false;
+
     public function __construct()
     {
         $this->memorySampleBaseline = memory_get_usage();
@@ -89,6 +91,11 @@ class PerformanceTracer implements RuntimeTracerContract
     public function getPathTriggeringOutput()
     {
         return $this->triggeredTemplateContent;
+    }
+
+    public function getDidFindLayoutTrigger()
+    {
+        return $this->foundLayoutTrigger;
     }
 
     public function getPerformanceData()
@@ -142,9 +149,9 @@ class PerformanceTracer implements RuntimeTracerContract
 
         foreach ($files as $file) {
             $fileItems = collect($this->nodePerformanceItems)->where(fn (PerformanceObject $item) => $item->path == $file);
-            $minDepth = $fileItems->min(fn (PerformanceObject $item) => $item->depth);
 
-            $reportItems = $fileItems->where(fn (PerformanceObject $item) => $item->depth == $minDepth)->values()->all();
+            $reportItems = $fileItems->where(fn (PerformanceObject $item) => $item->hasParent == false)->values()->all();
+
             $rootItem = new PerformanceObject($this->firstSampleTime);
             $rootItem->path = $file;
             $rootItem->isNodeObject = false;
@@ -226,6 +233,7 @@ class PerformanceTracer implements RuntimeTracerContract
         if ($node->isClosingTag) {
             $outputClosing = new PerformanceObject($this->firstSampleTime);
             $outputClosing->nodeRefId = $node->refId;
+            $outputClosing->hasParent = $node->parent != null;
 
             $outputClosing->escapedBufferOutput = e($node->rawStart.$node->content.$node->rawEnd);
             $outputClosing->path = $file;
@@ -244,6 +252,7 @@ class PerformanceTracer implements RuntimeTracerContract
 
         if ($node->isClosedBy != null) {
             $openNode = new PerformanceObject($this->firstSampleTime);
+            $openNode->hasParent = $node->parent != null;
             $openNode->nodeRefId = $node->refId;
             $openNode->escapedBufferOutput = e($node->rawStart.$node->content.$node->rawEnd);
             $openNode->isNodeObject = true;
@@ -259,6 +268,7 @@ class PerformanceTracer implements RuntimeTracerContract
         if (! array_key_exists($node->refId, $this->nodePerformanceItems)) {
             $performanceItem = new PerformanceObject($this->firstSampleTime);
             $performanceItem->path = $file;
+            $performanceItem->hasParent = $node->parent != null;
             $performanceItem->fullPath = $fullPath;
 
             $performanceItem->isTag = $node->isTagNode;
@@ -282,11 +292,6 @@ class PerformanceTracer implements RuntimeTracerContract
             $performanceItem->isNodeObject = true;
 
             $performanceItem->line = $node->startPosition->line;
-            $performanceItem->depth = $this->currentDepth;
-
-            if ($node->parent == null) {
-                $performanceItem->depth = 0;
-            }
 
             $this->nodePerformanceItems[$node->refId] = $performanceItem;
         }
@@ -330,6 +335,7 @@ class PerformanceTracer implements RuntimeTracerContract
         if ($node instanceof LiteralNode) {
             if (! array_key_exists($node->refId, $this->sourceViewObjects)) {
                 $literalObject = new PerformanceObject($this->firstSampleTime);
+                $literalObject->hasParent = $node->parent != null;
                 $literalObject->escapedBufferOutput = e($runtimeContent);
                 $literalObject->path = $this->massageFilePath(GlobalRuntimeState::$currentExecutionFile);
                 $literalObject->fullPath = $this->normalizePath(GlobalRuntimeState::$currentExecutionFile);
@@ -361,10 +367,12 @@ class PerformanceTracer implements RuntimeTracerContract
             if (is_bool($runtimeContent) || is_numeric($runtimeContent) || (is_string($runtimeContent)) && ! $node->isTagNode && $node->isClosedBy == null) {
                 $outObject = new PerformanceObject($this->firstSampleTime);
                 $outObject->nodeRefId = $node->refId;
+                $outObject->hasParent = $node->parent != null;
 
                 $outContent = $runtimeContent;
 
                 if (Str::contains($node->content, 'template_content')) {
+                    $this->foundLayoutTrigger = true;
                     $outContent = '****REPLACED_CONTENT****';
                     $this->triggeredTemplateContent = $this->nodePerformanceItems[$node->refId]->path;
                 }

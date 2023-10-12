@@ -20,7 +20,6 @@ class TermReferenceUpdater extends DataReferenceUpdater
     /**
      * Filter by taxonomy.
      *
-     * @param  string  $taxonomy
      * @return $this
      */
     public function filterByTaxonomy(string $taxonomy)

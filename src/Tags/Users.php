@@ -6,11 +6,11 @@ use Statamic\Facades\User;
 
 class Users extends Tags
 {
-    use Concerns\QueriesConditions,
-        Concerns\QueriesScopes,
+    use Concerns\GetsQueryResults,
+        Concerns\OutputsItems,
+        Concerns\QueriesConditions,
         Concerns\QueriesOrderBys,
-        Concerns\GetsQueryResults,
-        Concerns\OutputsItems;
+        Concerns\QueriesScopes;
 
     /**
      * {{ get_content from="" }} ... {{ /get_content }}.

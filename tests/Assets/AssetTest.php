@@ -1655,6 +1655,50 @@ class AssetTest extends TestCase
         $this->assertEquals(15, $meta['height']);
     }
 
+    public function formatParams()
+    {
+        return [['format'], ['fm']];
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider formatParams
+     **/
+    public function it_can_upload_an_image_into_a_container_with_new_extension_format($formatParam)
+    {
+        Event::fake();
+
+        config(['statamic.assets.image_manipulation.presets.enforce_png' => [
+            $formatParam => 'png',
+        ]]);
+
+        $this->container->sourcePreset('enforce_png');
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        ImageValidator::shouldReceive('isValidImage')
+            ->with('jpg', 'image/jpeg')
+            ->andReturnTrue()
+            ->once();
+
+        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 20, 30));
+
+        $this->assertEquals($asset, $return);
+        $this->assertDirectoryExists($glideDir = storage_path('statamic/glide/tmp'));
+        $this->assertEmpty(app('files')->allFiles($glideDir)); // no temp files
+        Storage::disk('test')->assertMissing('path/to/asset.jpg');
+        Storage::disk('test')->assertExists('path/to/asset.png');
+        $this->assertEquals('path/to/asset.png', $asset->path());
+        Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
+        Event::assertDispatched(AssetSaved::class);
+    }
+
     public function nonGlideableFileExtensions()
     {
         return [
@@ -1688,7 +1732,7 @@ class AssetTest extends TestCase
         Storage::disk('test')->assertMissing("path/to/file.{$extension}");
 
         // Ensure a glide server is never instantiated for these extensions...
-        Facades\Glide::shouldReceive('server')->never();
+        Facades\Glide::partialMock()->shouldReceive('server')->never();
 
         $return = $asset->upload(UploadedFile::fake()->create("file.{$extension}"));
 
@@ -1730,7 +1774,8 @@ class AssetTest extends TestCase
         $file = UploadedFile::fake()->image('asset.eps', 20, 30);
 
         // Ensure a glide server is instantiated and `makeImage()` is called...
-        Facades\Glide::shouldReceive('server->makeImage')
+        Facades\Glide::partialMock()
+            ->shouldReceive('server->makeImage')
             ->andReturn($file->getFilename())
             ->once();
 

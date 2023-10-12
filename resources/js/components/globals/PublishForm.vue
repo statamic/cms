@@ -197,6 +197,24 @@ export default {
             this.saving = true;
             this.clearErrors();
 
+            this.runBeforeSaveHook();
+        },
+
+        runBeforeSaveHook() {
+            Statamic.$hooks.run('global-set.saving', {
+                globalSet: this.initialHandle,
+                values: this.values,
+                container: this.$refs.container,
+                storeName: this.publishContainer,
+            })
+            .then(this.performSaveRequest)
+            .catch(error => {
+                this.saving = false
+                this.$toast.error(error || 'Something went wrong');
+            })
+        },
+
+        performSaveRequest() {
             const payload = { ...this.visibleValues, ...{
                 blueprint: this.fieldset.handle,
                 _localized: this.localizedFields,
@@ -206,8 +224,20 @@ export default {
                 this.saving = false;
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
-                this.$nextTick(() => this.$emit('saved', response));
+                this.runAfterSaveHook(response);
             }).catch(e => this.handleAxiosError(e));
+        },
+
+        runAfterSaveHook(response) {
+            Statamic.$hooks
+                .run('global-set.saved', {
+                    globalSet: this.initialHandle,
+                    reference: this.initialReference,
+                    response,
+                })
+                .then(() => {
+                    this.$nextTick(() => this.$emit('saved', response));
+                }).catch(e => {})
         },
 
         handleAxiosError(e) {

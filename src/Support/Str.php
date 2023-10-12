@@ -195,7 +195,6 @@ class Str
             // step 4, re-replace the code from step 1 with spaces
             return str_replace('%###%##%', ' ', $value);
 
-        // otherwise
         } else {
             return preg_replace_callback("/([^\s]\s)([^\s]*\s?){{$words}}$/im", function ($matches) {
                 return preg_replace("/([\s])/", '&nbsp;', rtrim($matches[0]));
@@ -219,7 +218,6 @@ class Str
      *
      * @param  string  $value
      * @param  string  $regex
-     * @param  Closure  $callback
      * @return string
      */
     public static function mapRegex($value, $regex, Closure $callback)
@@ -266,9 +264,6 @@ class Str
 
     /**
      * Output either literal "true" or "false" strings given a boolean.
-     *
-     * @param  bool  $value
-     * @return string
      */
     public static function bool(bool $value): string
     {
@@ -279,7 +274,6 @@ class Str
      * Get an actual boolean from a string based boolean.
      *
      * @param  mixed  $value
-     * @return bool
      */
     public static function toBool($value): bool
     {

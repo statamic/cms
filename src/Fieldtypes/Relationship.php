@@ -311,4 +311,12 @@ abstract class Relationship extends Fieldtype
             ? collect($value)->first()
             : collect($value)->filter()->all();
     }
+
+    protected function applyIndexQueryScopes($query, $params)
+    {
+        collect(Arr::wrap($this->config('query_scopes')))
+            ->map(fn ($handle) => app('statamic.scopes')->get($handle))
+            ->filter()
+            ->each(fn ($class) => app($class)->apply($query, $params));
+    }
 }

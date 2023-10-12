@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes\Bard;
 
 use Closure;
+use Facades\Statamic\Fieldtypes\RowId;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
@@ -91,7 +92,7 @@ class Augmentor
             if ($value['type'] == 'set') {
                 $this->sets[$index] = array_merge(
                     $value['attrs']['values'],
-                    ['id' => $value['attrs']['id'] ?? null]
+                    [RowId::handle() => $value['attrs']['id'] ?? null]
                 );
                 $value['index'] = 'index-'.$index;
             }
@@ -155,7 +156,7 @@ class Augmentor
 
             $values = $this->fieldtype->fields($set['type'])->addValues($set)->{$augmentMethod}()->values()->all();
 
-            return array_merge($values, ['id' => $set['id'] ?? null, 'type' => $set['type']]);
+            return array_merge($values, [RowId::handle() => $set[RowId::handle()] ?? null, 'type' => $set['type']]);
         })->all();
     }
 

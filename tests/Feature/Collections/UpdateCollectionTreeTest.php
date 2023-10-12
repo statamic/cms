@@ -12,8 +12,8 @@ use Tests\TestCase;
 
 class UpdateCollectionTreeTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     /**
      * @test

@@ -135,12 +135,13 @@
         @endif
     @endforeach
 
-    @foreach (Statamic\Facades\Form::all() as $form)
-        @if ($loop->first)
+    @if (Statamic\Facades\User::current()->can('configure form fields'))
+        @foreach (Statamic\Facades\Form::all() as $form)
+            @if ($loop->first)
         <h3 class="little-heading pl-0 mb-2">{{ __('Forms') }}</h3>
-        <div class="card p-0 mb-4">
+        <div class="card p-0 mb-2">
             <table class="data-table">
-        @endif
+            @endif
                 <tr>
                     <td>
                         <div class="flex items-center">
@@ -148,12 +149,13 @@
                             <a href="{{ cp_route('forms.blueprint.edit', $form->handle()) }}">{{ $form->title() }}</a>
                         </div>
                     </td>
-        @if ($loop->last)
+            @if ($loop->last)
                 </tr>
         </table>
-        @endif
+            @endif
     </div>
-    @endforeach
+        @endforeach
+    @endif
 
     <h3 class="little-heading pl-0 mb-2">{{ __('Users') }}</h3>
     <div class="card p-0 mb-4">

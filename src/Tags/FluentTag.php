@@ -6,7 +6,7 @@ use ArrayIterator;
 use Statamic\Support\Str;
 use Traversable;
 
-class FluentTag implements \IteratorAggregate, \ArrayAccess
+class FluentTag implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * @var mixed
@@ -35,8 +35,6 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
 
     /**
      * Instantiate fluent tag helper.
-     *
-     * @param  Loader  $loader
      */
     public function __construct(Loader $loader)
     {
@@ -109,11 +107,11 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
         debugbar()->startMeasure($profileTagName, $tagName);
 
         $tag = app(Loader::class)->load($name, [
-            'parser'     => null,
-            'params'     => $this->params,
-            'content'    => '',
-            'context'    => $this->context,
-            'tag'        => $tagName,
+            'parser' => null,
+            'params' => $this->params,
+            'content' => '',
+            'context' => $this->context,
+            'tag' => $tagName,
             'tag_method' => $originalMethod,
         ]);
 
@@ -185,7 +183,7 @@ class FluentTag implements \IteratorAggregate, \ArrayAccess
      */
     public function __call($param, $args)
     {
-        $this->param($param, $args[0] ?? true);
+        $this->param(Str::snake($param), $args[0] ?? true);
 
         return $this;
     }

@@ -42,6 +42,7 @@
         <tabs
             :single-tab="!useTabs"
             :initial-tabs="tabs"
+            :errors="errors.tabs"
             @updated="tabsUpdated"
         />
 

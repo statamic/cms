@@ -6,7 +6,7 @@ class PerformanceObject
 {
     const ReportPrecision = 2;
     public $nodeRefId = '';
-
+    public $hasParent = false;
     private $cachedChildExecutionTime = null;
     private $cachedTotalExecutionTime = null;
 
@@ -26,7 +26,6 @@ class PerformanceObject
     public $isNodeObject = false;
     public $executionCount = 0;
     public $totalElapsedTime;
-    public $depth = 0;
     public $line = 0;
     public $percentOfExecutionTime = 0;
     public $isConditionNode = false;
