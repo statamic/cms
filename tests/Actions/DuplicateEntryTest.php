@@ -184,6 +184,37 @@ class DuplicateEntryTest extends TestCase
         ], $this->entryData());
     }
 
+    /** @test */
+    public function it_duplicates_an_entry_from_a_non_default_site()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
+        ]]);
+
+        Collection::make('test')->sites(['en', 'fr'])->save();
+
+        EntryFactory::id('alfa-id')->locale('en')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
+        EntryFactory::id('bravo-id')->locale('fr')->collection('test')->slug('bravo')->data(['title' => 'Bravo'])->create();
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'bravo', 'published' => true, 'data' => ['title' => 'Bravo'], 'locale' => 'fr', 'origin' => null],
+        ], $this->entryData());
+
+        (new DuplicateEntry)->run(collect([
+            Entry::find('bravo-id'),
+        ]), collect([
+            'mode' => 'current',
+        ]));
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'bravo', 'published' => true, 'data' => ['title' => 'Bravo'], 'locale' => 'fr', 'origin' => null],
+            ['slug' => 'bravo-1', 'published' => false, 'data' => ['title' => 'Bravo (Duplicated)', 'duplicated_from' => 'bravo-id'], 'locale' => 'fr', 'origin' => null],
+        ], $this->entryData());
+    }
+
     private function entryData()
     {
         return Entry::all()->map(fn ($entry) => [

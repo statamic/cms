@@ -54,7 +54,7 @@ class DuplicateEntry extends Action
                 ])->all();
 
             $entry = Entries::make()
-                ->locale($values['site'] ?? Site::current()->handle())
+                ->locale($original->locale())
                 ->collection($original->collection())
                 ->blueprint($original->blueprint()->handle())
                 ->published(false)
@@ -77,7 +77,6 @@ class DuplicateEntry extends Action
             if (isset($values['mode']) && $values['mode'] === 'all') {
                 $original->descendants()->each(function ($descendant) use ($entry) {
                     $this->run(collect([$descendant]), collect([
-                        'site' => $descendant->locale(),
                         'origin' => $entry,
                     ]));
                 });
