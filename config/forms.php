@@ -91,6 +91,6 @@ return [
             'class' => Statamic\Forms\Exporters\JsonExporter::class,
             'label' => 'Export as JSON',
         ],
-    ]
+    ],
 
 ];
