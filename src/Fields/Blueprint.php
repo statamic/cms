@@ -39,6 +39,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     protected $ensuredFields = [];
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    protected ?Columns $columns = null;
 
     public function setHandle(string $handle)
     {
@@ -359,7 +360,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function columns()
     {
-        $columns = $this->fields()
+        if ($this->columns) {
+            return $this->columns;
+        }
+
+        $fields = $this->fields()
             ->all()
             ->values()
             ->map(function ($field, $index) {
@@ -375,7 +380,12 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             })
             ->keyBy('field');
 
-        return new Columns($columns);
+        $columns = new Columns($fields);
+
+        // Cache columns for a single request
+        $this->columns = $columns;
+
+        return $columns;
     }
 
     public function isEmpty(): bool
