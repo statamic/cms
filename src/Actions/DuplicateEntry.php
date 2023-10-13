@@ -42,53 +42,65 @@ class DuplicateEntry extends Action
 
     public function run($items, $values)
     {
-        $items->each(function (Entry $original) use ($values) {
-            $originalParent = $this->getEntryParentFromStructure($original);
-            [$title, $slug] = $this->generateTitleAndSlug($original);
+        $this->duplicateEntries(
+            $items,
+            isset($values['mode']) && $values['mode'] === 'all'
+        );
+    }
 
-            $data = $original
-                ->data()
-                ->except($original->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
-                ->merge(['title' => $title,
-                    'duplicated_from' => $original->id(),
-                ])->all();
-
-            $entry = Entries::make()
-                ->locale($original->locale())
-                ->collection($original->collection())
-                ->blueprint($original->blueprint()->handle())
-                ->published(false)
-                ->data($data);
-
-            if (isset($values['origin'])) {
-                $entry->origin($values['origin']);
-            }
-
-            if ($original->collection()->requiresSlugs()) {
-                $entry->slug($slug);
-            }
-
-            if ($original->hasDate()) {
-                $entry->date($original->date());
-            }
-
-            $entry->save();
-
-            if (isset($values['mode']) && $values['mode'] === 'all') {
-                $original->descendants()->each(function ($descendant) use ($entry) {
-                    $this->run(collect([$descendant]), [
-                        'origin' => $entry,
-                    ]);
-                });
-            }
-
-            if ($originalParent && $originalParent !== $original->id()) {
-                $entry->structure()
-                    ->in($original->locale())
-                    ->appendTo($originalParent->id(), $entry)
-                    ->save();
-            }
+    private function duplicateEntries($entries, bool $withDescendants, bool $useRoot = true)
+    {
+        $entries->each(function (Entry $original) use ($withDescendants, $useRoot) {
+            $this->duplicateEntry($original, $withDescendants, $useRoot);
         });
+    }
+
+    private function duplicateEntry(Entry $original, bool $withDescendants, bool $useRoot = true, string $origin = null)
+    {
+        if ($useRoot && $original->hasOrigin()) {
+            $original = $original->root();
+        }
+
+        $originalParent = $this->getEntryParentFromStructure($original);
+        [$title, $slug] = $this->generateTitleAndSlug($original);
+
+        $data = $original
+            ->data()
+            ->except($original->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
+            ->merge(['title' => $title,
+                'duplicated_from' => $original->id(),
+            ])->all();
+
+        $entry = Entries::make()
+            ->locale($original->locale())
+            ->collection($original->collection())
+            ->blueprint($original->blueprint()->handle())
+            ->published(false)
+            ->data($data)
+            ->origin($origin);
+
+        if ($original->collection()->requiresSlugs()) {
+            $entry->slug($slug);
+        }
+
+        if ($original->hasDate()) {
+            $entry->date($original->date());
+        }
+
+        $entry->save();
+
+        if ($withDescendants) {
+            $original->descendants()->each(function ($descendant) use ($entry) {
+                $this->duplicateEntry($descendant, withDescendants: true, useRoot: false, origin: $entry->id());
+            });
+        }
+
+        if ($originalParent && $originalParent !== $original->id()) {
+            $entry->structure()
+                ->in($original->locale())
+                ->appendTo($originalParent->id(), $entry)
+                ->save();
+        }
     }
 
     protected function getEntryParentFromStructure(Entry $entry)
