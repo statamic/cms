@@ -7,9 +7,29 @@ use Statamic\Contracts\Forms\Exporter;
 abstract class AbstractExporter implements Exporter
 {
     /**
+     * @var array
+     */
+    private $config;
+
+    /**
      * @var Statamic\Contracts\Forms\Form
      */
     private $form;
+
+    /**
+     * Get or set the config.
+     *
+     * @param  array|null  $config
+     * @return array|void
+     */
+    public function config($config = null)
+    {
+        if (is_null($config)) {
+            return $this->$config;
+        }
+
+        $this->config = $config;
+    }
 
     /**
      * Get or set the form.

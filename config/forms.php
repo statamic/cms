@@ -71,4 +71,26 @@ return [
 
     'csv_headers' => 'handle',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Exporters
+    |--------------------------------------------------------------------------
+    |
+    | The export option you want to provide on your forms under the
+    | Export Submission button. These classes should implement
+    | Statamic\Forms\Exporters\AbstractExporter
+    |
+    */
+
+    'exporters' => [
+        'csv' => [
+            'class' => Statamic\Forms\Exporters\CsvExporter::class,
+            'label' => 'Export as CSV',
+        ],
+        'json' => [
+            'class' => Statamic\Forms\Exporters\JsonExporter::class,
+            'label' => 'Export as JSON',
+        ],
+    ]
+
 ];

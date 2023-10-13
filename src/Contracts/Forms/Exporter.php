@@ -12,10 +12,18 @@ interface Exporter
     public function export();
 
     /**
+     * Get or set the config.
+     *
+     * @param  array|null  $config
+     * @return array|void
+     */
+    public function config($config = null);
+
+    /**
      * Get or set the form.
      *
      * @param  Statamic\Contracts\Forms\Form|null  $form
-     * @return Statamic\Contracts\Forms\Form
+     * @return Statamic\Contracts\Forms\Form|void
      */
     public function form($form = null);
 
