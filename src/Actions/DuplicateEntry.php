@@ -48,19 +48,16 @@ class DuplicateEntry extends Action
         );
     }
 
-    private function duplicateEntries($entries, bool $withDescendants, bool $useRoot = true)
+    private function duplicateEntries($entries, bool $withDescendants)
     {
-        $entries->each(function (Entry $original) use ($withDescendants, $useRoot) {
-            $this->duplicateEntry($original, $withDescendants, $useRoot);
-        });
+        $entries
+            ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
+            ->unique()
+            ->each(fn (Entry $original) => $this->duplicateEntry($original, $withDescendants));
     }
 
-    private function duplicateEntry(Entry $original, bool $withDescendants, bool $useRoot = true, string $origin = null)
+    private function duplicateEntry(Entry $original, bool $withDescendants, string $origin = null)
     {
-        if ($useRoot && $original->hasOrigin()) {
-            $original = $original->root();
-        }
-
         $originalParent = $this->getEntryParentFromStructure($original);
         [$title, $slug] = $this->generateTitleAndSlug($original);
 
@@ -91,7 +88,7 @@ class DuplicateEntry extends Action
 
         if ($withDescendants) {
             $original->descendants()->each(function ($descendant) use ($entry) {
-                $this->duplicateEntry($descendant, withDescendants: true, useRoot: false, origin: $entry->id());
+                $this->duplicateEntry($descendant, withDescendants: true, origin: $entry->id());
             });
         }
 
