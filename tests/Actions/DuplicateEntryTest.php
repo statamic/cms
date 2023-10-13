@@ -34,7 +34,7 @@ class DuplicateEntryTest extends TestCase
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id'),
             Entry::find('charlie-id'),
-        ]), collect());
+        ]), []);
 
         $this->assertEquals([
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa']],
@@ -54,7 +54,7 @@ class DuplicateEntryTest extends TestCase
 
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id'),
-        ]), collect());
+        ]), []);
 
         $this->assertEquals([
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa']],
@@ -102,7 +102,7 @@ class DuplicateEntryTest extends TestCase
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id'),
             Entry::find('charlie-id'),
-        ]), collect());
+        ]), []);
 
         $alfaDuplicate = Entry::query()->where('duplicated_from', 'alfa-id')->first();
 
@@ -137,9 +137,9 @@ class DuplicateEntryTest extends TestCase
 
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id'),
-        ]), collect([
+        ]), [
             'mode' => 'current',
-        ]));
+        ]);
 
         $this->assertEquals([
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
@@ -168,9 +168,9 @@ class DuplicateEntryTest extends TestCase
 
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id'),
-        ]), collect([
+        ]), [
             'mode' => 'all',
-        ]));
+        ]);
 
         $this->assertEquals([
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
@@ -200,9 +200,9 @@ class DuplicateEntryTest extends TestCase
 
         (new DuplicateEntry)->run(collect([
             Entry::find('bravo-id'),
-        ]), collect([
+        ]), [
             'mode' => 'current',
-        ]));
+        ]);
 
         $this->assertEquals([
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],

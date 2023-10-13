@@ -76,9 +76,9 @@ class DuplicateEntry extends Action
 
             if (isset($values['mode']) && $values['mode'] === 'all') {
                 $original->descendants()->each(function ($descendant) use ($entry) {
-                    $this->run(collect([$descendant]), collect([
+                    $this->run(collect([$descendant]), [
                         'origin' => $entry,
-                    ]));
+                    ]);
                 });
             }
 
