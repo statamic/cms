@@ -53,7 +53,6 @@ export default {
     components: { SetField },
 
     data() {
-        console.log(this.config);
         return {
             containerWidth: null,
             focused: false,
