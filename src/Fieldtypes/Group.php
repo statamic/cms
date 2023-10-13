@@ -69,6 +69,7 @@ class Group extends Fieldtype
             return $field->fieldtype()->preProcess($field->defaultValue());
         });
     }
+
     public function augment($value)
     {
         return $this->performAugmentation($value, false);
