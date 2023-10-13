@@ -19,7 +19,7 @@ class FormExportController extends CpController
             throw new FatalException("Exporter of type [$type] is not defined.");
         }
 
-        if (! isset($exporterConfig['class']) && class_exists($exporter['class'])) {
+        if (! (isset($exporterConfig['class']) && class_exists($exporterConfig['class']))) {
             throw new FatalException("Exporter of type [$type] does not exist.");
         }
 
