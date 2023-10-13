@@ -41,12 +41,12 @@ class Group extends Fieldtype
 
     public function process($data)
     {
-        return $this->fields()->addValues($data)->process()->values()->all();
+        return $this->fields()->addValues($data ?? [])->process()->values()->all();
     }
 
     public function preProcess($data)
     {
-        return $this->fields()->addValues($data)->preProcess()->values()->all();
+        return $this->fields()->addValues($data ?? [])->preProcess()->values()->all();
     }
 
     public function fields()
@@ -59,7 +59,7 @@ class Group extends Fieldtype
         return [
             'defaults' => $this->defaultGroupData()->all(),
             'new' => $this->fields()->meta()->all(),
-            'existing' => $this->fields()->addValues($this->field->value())->meta()->toArray(),
+            'existing' => $this->fields()->addValues($this->field->value() ?? [])->meta()->toArray(),
         ];
     }
 
@@ -84,6 +84,6 @@ class Group extends Fieldtype
     {
         $method = $shallow ? 'shallowAugment' : 'augment';
 
-        return $this->fields()->addValues($value)->{$method}()->values()->all();
+        return $this->fields()->addValues($value ?? [])->{$method}()->values()->all();
     }
 }
