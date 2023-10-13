@@ -118,7 +118,7 @@ class DuplicateEntryTest extends TestCase
     }
 
     /** @test */
-    public function it_duplicates_an_entry_into_the_current_site()
+    public function it_duplicates_an_entry_without_localizations()
     {
         Site::setConfig(['sites' => [
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
@@ -134,8 +134,6 @@ class DuplicateEntryTest extends TestCase
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
         ], $this->entryData());
-
-        Site::setCurrent('en');
 
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id'),
@@ -167,8 +165,6 @@ class DuplicateEntryTest extends TestCase
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => ''],
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
         ], $this->entryData());
-
-        Site::setCurrent('en');
 
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id'),
