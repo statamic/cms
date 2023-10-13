@@ -6,7 +6,6 @@ use Statamic\Exceptions\FatalException;
 use Statamic\Facades\File;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class FormExportController extends CpController
 {
