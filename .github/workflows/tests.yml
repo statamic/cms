@@ -52,6 +52,7 @@ jobs:
             tests
             composer.json
             phpunit.xml.dist
+            .github/workflows/tests.yml
             **.php
 
       - name: Determine whether tests should run
