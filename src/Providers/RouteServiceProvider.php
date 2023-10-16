@@ -127,7 +127,7 @@ class RouteServiceProvider extends ServiceProvider
             $term = $field == 'id' ? Term::find($handle)->in($site) : Term::query()->where($field, $handle)->where('site', $site)->when($route->parameter('taxonomy'), fn ($query) => $query->where('taxonomy', $route->parameter('taxonomy')->handle()))->first();
 
             throw_unless(
-                $term && ($route->parameter('taxonomy') && $term->taxonomy()->id() === $route->parameter('taxonomy')->id()),
+                $term || ($route->parameter('taxonomy') && $term->taxonomy()->id() === $route->parameter('taxonomy')->id()),
                 new NotFoundHttpException("Taxonomy term [$handle] not found.")
             );
 
