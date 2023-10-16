@@ -127,6 +127,12 @@ export default {
         }
     },
 
+    data() {
+        return {
+            fieldPreviews: this.previews,
+        }
+    },
+
     computed: {
 
         fields() {
@@ -166,7 +172,7 @@ export default {
         },
 
         previewUpdated(handle, value) {
-            this.$emit('previews-updated', { ...this.previews, [handle]: value });
+            this.$emit('previews-updated', this.fieldPreviews = { ...this.fieldPreviews, [handle]: value });
         },
 
         destroy() {
