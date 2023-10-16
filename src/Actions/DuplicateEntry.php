@@ -19,32 +19,47 @@ class DuplicateEntry extends Action
         return $item instanceof Entry;
     }
 
+    public function warningText()
+    {
+        if ($this->items->contains(fn ($entry) => $entry->hasOrigin())) {
+            return $this->items->count() === 1
+                ? 'duplicate_action_warning_localization'
+                : 'duplicate_action_warning_localizations';
+        }
+    }
+
     protected function fieldItems()
     {
-        if (Site::hasMultiple()) {
-            return [
-                'mode' => [
-                    'display' => __('Duplication Mode'),
-                    'type' => 'button_group',
-                    'instructions' => __('How should this entry be duplicated? If you choose "All Localizations", all localizations will be duplicated. If you choose "Current Localization", only the current localization will be duplicated.'),
-                    'options' => [
-                        'all' => __('All Localizations'),
-                        'current' => __('Current Localization'),
-                    ],
-                    'default' => 'all',
-                    'validate' => 'required',
-                ],
-            ];
+        if (! Site::hasMultiple()) {
+            return [];
         }
 
-        return [];
+        // If none of the selected entries have localizations, don't bother showing the field.
+        $hasLocalizations = $this->items
+            ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
+            ->contains(fn ($entry) => $entry->descendants()->count());
+
+        if (! $hasLocalizations) {
+            return [];
+        }
+
+        return [
+            'descendants' => [
+                'display' => __('statamic::messages.duplicate_action_descendants_display'),
+                'type' => 'toggle',
+                'inline_label' => __('statamic::messages.duplicate_action_descendants_false'),
+                'inline_label_when_true' => __('statamic::messages.duplicate_action_descendants_true'),
+                'default' => true,
+                'validate' => 'required',
+            ],
+        ];
     }
 
     public function run($items, $values)
     {
         $this->duplicateEntries(
             $items,
-            isset($values['mode']) && $values['mode'] === 'all'
+            $values['descendants'] ?? false
         );
     }
 
