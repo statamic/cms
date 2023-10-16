@@ -66,7 +66,7 @@ class Tags extends BaseTags
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
         if (! empty($data['sections'])) {
             // fields have already been rendered in the sections: get from the sections to avoid a re-render
-            $data['fields'] = collect($data['sections'])->map(fn($section) => $section['fields'])
+            $data['fields'] = collect($data['sections'])->map(fn ($section) => $section['fields'])
                 ->flatten(1)
                 ->values()
                 ->all();
