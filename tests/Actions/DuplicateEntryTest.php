@@ -138,7 +138,7 @@ class DuplicateEntryTest extends TestCase
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id'),
         ]), [
-            'mode' => 'current',
+            'descendants' => false,
         ]);
 
         $this->assertEquals([
@@ -169,7 +169,7 @@ class DuplicateEntryTest extends TestCase
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id'),
         ]), [
-            'mode' => 'all',
+            'descendants' => true,
         ]);
 
         $this->assertEquals([
@@ -201,7 +201,7 @@ class DuplicateEntryTest extends TestCase
         (new DuplicateEntry)->run(collect([
             Entry::find('bravo-id'),
         ]), [
-            'mode' => 'current',
+            'descendants' => false,
         ]);
 
         $this->assertEquals([
@@ -232,7 +232,7 @@ class DuplicateEntryTest extends TestCase
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id-fr'),
         ]), [
-            'mode' => 'current',
+            'descendants' => false,
         ]);
 
         $this->assertEquals([
@@ -263,7 +263,7 @@ class DuplicateEntryTest extends TestCase
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id-fr'),
         ]), [
-            'mode' => 'all',
+            'descendants' => true,
         ]);
 
         $this->assertEquals([
@@ -296,7 +296,7 @@ class DuplicateEntryTest extends TestCase
             Entry::find('alfa-id-fr'),
             Entry::find('alfa-id'),
         ]), [
-            'mode' => 'current',
+            'descendants' => false,
         ]);
 
         $this->assertEquals([
