@@ -274,7 +274,7 @@ class RouteServiceProvider extends ServiceProvider
 
     private function isFrontendBindingEnabled()
     {
-        return config('statamic.routes.binding_enabled', false);
+        return config('statamic.routes.bindings', false);
     }
 
     private function isApiRoute(\Illuminate\Routing\Route $route = null)
