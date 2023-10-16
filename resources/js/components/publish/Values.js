@@ -39,6 +39,20 @@ export default class Values {
         return this;
     }
 
+    mergeDottedKeys(dottedKeys, values)  {
+        let decodedValues = new this.constructor(clone(values.values), values.jsonFields)
+            .jsonDecode()
+            .values;
+
+        this.jsonDecode();
+        dottedKeys.forEach(dottedKey => {
+            data_set(this.values, dottedKey, data_get(decodedValues, dottedKey));
+        });
+        this.jsonEncode();
+
+        return this;
+    }
+
     except(dottedKeys) {
         return this.jsonDecode()
             .rejectValuesByKey(dottedKeys)

@@ -58,7 +58,7 @@
                 :should-show="shouldShowSetButton"
                 :is-showing="showAddSetButton"
                 v-if="editor"
-                v-slot="{ x, y }"
+                v-slot="{ y }"
                 @shown="showAddSetButton = true"
                 @hidden="showAddSetButton = false"
             >
@@ -72,7 +72,7 @@
                         <button
                             type="button"
                             class="btn-round group bard-add-set-button"
-                            :style="{ transform: `translate(${x}px, ${y}px)` }"
+                            :style="{ transform: `translateY(${y}px)` }"
                             :aria-label="__('Add Set')"
                             v-tooltip="__('Add Set')"
                             @click="addSetButtonClicked"
@@ -295,7 +295,7 @@ export default {
                 } else if (node.type === 'set') {
                     const handle = node.attrs.values.type;
                     const set = this.setConfigs.find(set => set.handle === handle);
-                    text += ` [${set ? set.display : handle}]`;
+                    text += ` [${__(set ? set.display : handle)}]`;
                 }
                 if (text.length > 150) {
                     break;
@@ -345,8 +345,10 @@ export default {
 
         this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
 
-        document.querySelector(`label[for="${this.fieldId}"]`).addEventListener('click', () => {
-            this.editor.commands.focus();
+        this.$nextTick(() => {
+            document.querySelector(`label[for="${this.fieldId}"]`).addEventListener('click', () => {
+                this.editor.commands.focus();
+            });
         });
     },
 
@@ -407,7 +409,9 @@ export default {
 
         fieldPathPrefix(fieldPathPrefix, oldFieldPathPrefix) {
             this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, oldFieldPathPrefix);
-            this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+            this.$nextTick(() => {
+                this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+            });
         },
 
         fullScreenMode() {
@@ -644,14 +648,25 @@ export default {
         },
 
         getExtensions() {
+            let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
+            if (this.config.inline === 'break') {
+                modeExts.push(HardBreak.extend({
+                    addKeyboardShortcuts() {
+                        return {
+                            ...this.parent?.(),
+                            'Enter': () => this.editor.commands.setHardBreak(),
+                        }
+                    },
+                }));
+            }
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
-                ...(this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak]),
+                ...modeExts,
                 Dropcursor,
                 Gapcursor,
                 History,
                 Paragraph,
-                Placeholder.configure({ placeholder: this.config.placeholder }),
+                Placeholder.configure({ placeholder: __(this.config.placeholder) }),
                 Set.configure({ bard: this }),
                 Text
             ];

@@ -13,7 +13,7 @@ use Statamic\Support\Str;
 
 abstract class Fieldtype implements Arrayable
 {
-    use RegistersItself, HasHandle {
+    use HasHandle, RegistersItself {
         handle as protected traitHandle;
     }
 
@@ -400,5 +400,10 @@ abstract class Fieldtype implements Arrayable
     public function toQueryableValue($value)
     {
         return $value;
+    }
+
+    public function extraRenderableFieldData(): array
+    {
+        return [];
     }
 }

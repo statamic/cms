@@ -34,7 +34,7 @@
                     :aria-selected="isActive(tab.handle)"
                     :tabindex="isActive(tab.handle) ? 0 : -1"
                     @click="setActive(tab.handle)"
-                    v-text="tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`"
+                    v-text="__(tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`)"
                 />
             </div>
             <div class="fade-left" v-if="canScrollLeft" />
@@ -46,7 +46,7 @@
                     v-for="(tab, index) in mainTabs"
                     v-show="shouldShowInDropdown(index)"
                     :key="tab.handle"
-                    :text="tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`"
+                    :text="__(tab.display || `${tab.handle[0].toUpperCase()}${tab.handle.slice(1)}`)"
                     @click.prevent="setActive(tab.handle)"
                 />
             </dropdown-list>
@@ -85,7 +85,7 @@
             <!-- Sidebar(ish) -->
             <div :class="{ 'publish-sidebar': shouldShowSidebar }">
                 <div class="publish-tab">
-                    <div class="publish-tab-actions card p-0 mb-5" :class="{ 'as-sidebar': shouldShowSidebar }">
+                    <div class="publish-tab-actions" :class="{ 'as-sidebar': shouldShowSidebar }">
                         <v-portal :to="actionsPortal" :disabled="shouldShowSidebar">
                             <slot name="actions" :should-show-sidebar="shouldShowSidebar" />
                         </v-portal>

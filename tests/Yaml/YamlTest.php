@@ -60,6 +60,18 @@ EOT;
     }
 
     /** @test */
+    public function it_dumps_without_front_matter_when_content_is_an_empty_array()
+    {
+        $expected = <<<'EOT'
+foo: bar
+content: {  }
+
+EOT;
+
+        $this->assertEquals($expected, YAML::dump(['foo' => 'bar'], []));
+    }
+
+    /** @test */
     public function it_dumps_without_front_matter_when_content_is_null()
     {
         $expected = <<<'EOT'
@@ -110,6 +122,20 @@ content:
 EOT;
 
         $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], ['baz' => 'qux']));
+    }
+
+    /** @test */
+    public function it_explicitly_dumps_front_matter_including_content_when_its_an_empty_array()
+    {
+        $expected = <<<'EOT'
+---
+foo: bar
+content: {  }
+---
+
+EOT;
+
+        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], []));
     }
 
     /** @test */
