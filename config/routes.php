@@ -18,6 +18,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Enable Route Binding
+    |--------------------------------------------------------------------------
+    |
+    | Do you want to enable route binding on Statamic Repositories
+    | (entry, taxonomy, collection etc) on front end routes?
+    |
+    */
+
+    'binding_enabled' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Action Route Prefix
     |--------------------------------------------------------------------------
     |
