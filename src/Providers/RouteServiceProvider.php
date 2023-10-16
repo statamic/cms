@@ -67,10 +67,12 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindEntries()
     {
         Route::bind('entry', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled()) {
-                if ($this->isApiRoute($route) || ! $this->isCpRoute($route)) {
-                    return $handle;
-                }
+            if ($this->isApiRoute($route)) {
+                return $handle;
+            }
+
+            if (! $this->isCpRoute($route) && ! $this->isFrontendBindingEnabled()) {
+                return $handle;
             }
 
             $field = $route->bindingFields()['entry'] ?? 'id';
@@ -109,10 +111,12 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindTerms()
     {
         Route::bind('term', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled()) {
-                if ($this->isApiRoute($route) || ! $this->isCpRoute($route)) {
-                    return $handle;
-                }
+            if ($this->isApiRoute($route)) {
+                return $handle;
+            }
+
+            if (! $this->isCpRoute($route) && ! $this->isFrontendBindingEnabled()) {
+                return $handle;
             }
 
             $field = $route->bindingFields()['term'] ?? 'id';
