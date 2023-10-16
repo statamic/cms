@@ -10,7 +10,7 @@ class UniqueUserValue
     {
         [$except, $column] = array_pad($parameters, 2, null);
 
-        $column = $column ?? $attribute;
+        $column ??= $attribute;
 
         $existing = User::query()
             ->where($column, $value)
