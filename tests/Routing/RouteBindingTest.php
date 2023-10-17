@@ -329,11 +329,9 @@ class RouteBindingTest extends TestCase
                 'cp/custom/taxonomies/invalid/terms/bravo',
             ],
 
-            // 'cp taxonomy and missing term' => [
-            //     // this current throws a 500 but should be a 404.
-            //     // it's a problem on the 4.x branch too.
-            //     'cp/custom/taxonomies/tags/terms/invalid',
-            // ],
+            'cp taxonomy and missing term' => [
+                'cp/custom/taxonomies/tags/terms/invalid',
+            ],
 
             'api taxonomy and term' => [
                 'api/custom/taxonomies/tags/terms/bravo',
@@ -416,12 +414,9 @@ class RouteBindingTest extends TestCase
                 },
             ],
 
-            // 'cp missing global' => [
-            //     // this current throws a 500 but should be a 404.
-            //     // it's a problem on the 4.x branch too.
-            //     // (the cp doesnt even really use {globals} binding - it uses the unbound {global_set} binding, but might as well just fix it anyway)
-            //     'cp/custom/globals/invalid',
-            // ],
+            'cp missing global' => [
+                'cp/custom/globals/invalid',
+            ],
 
             'api global' => [
                 'api/custom/globals/seo',
@@ -430,11 +425,9 @@ class RouteBindingTest extends TestCase
                 },
             ],
 
-            // 'api missing global' => [
-            //     // this current throws a 500 but should be a 404.
-            //     // it's a problem on the 4.x branch too.
-            //     'api/custom/globals/invalid',
-            // ],
+            'api missing global' => [
+                'api/custom/globals/invalid',
+            ],
 
             // sites
 
@@ -488,31 +481,31 @@ class RouteBindingTest extends TestCase
                 'cp/custom/revisions/1',
             ],
 
-            // 'api entry revision' => [
-            //     // doesnt work for revisions because entry binding isnt used in api routes
-            //     'api/custom/entries/blog/123/revisions/1',
-            //     function (Collection $collection, Entry $entry, Revision $revision) {
-            //         return $collection->handle() === 'blog' && $entry->id() === '123' && $revision->id() === '1';
-            //     },
-            // ],
+            'api entry revision' => [
+                // doesnt work for revisions because entry binding isnt used in api routes
+                'api/custom/entries/blog/123/revisions/1',
+                function (Collection $collection, Entry $entry, Revision $revision) {
+                    return $collection->handle() === 'blog' && $entry->id() === '123' && $revision->id() === '1';
+                },
+            ],
 
-            // 'api entry missing revision' => [
-            //     // doesnt work for revisions because entry binding isnt used in api routes
-            //     'api/custom/entries/blog/123/revisions/invalid',
-            // ],
+            'api entry missing revision' => [
+                // doesnt work for revisions because entry binding isnt used in api routes
+                'api/custom/entries/blog/123/revisions/invalid',
+            ],
 
-            // 'api term revision' => [
-            //     // doesnt work for revisions because term binding isnt used in api routes
-            //     'api/custom/terms/tags/bravo/revisions/2',
-            //     function (Taxonomy $taxonomy, Term $term, Revision $revision) {
-            //         return $taxonomy->handle() === 'tags' && $term->id() === 'tags::bravo' && $revision->id() === '2';
-            //     },
-            // ],
+            'api term revision' => [
+                // doesnt work for revisions because term binding isnt used in api routes
+                'api/custom/terms/tags/bravo/revisions/2',
+                function (Taxonomy $taxonomy, Term $term, Revision $revision) {
+                    return $taxonomy->handle() === 'tags' && $term->id() === 'tags::bravo' && $revision->id() === '2';
+                },
+            ],
 
-            // 'api term missing revision' => [
-            //     // doesnt work for revisions because term binding isnt used in api routes
-            //     'api/custom/terms/tags/bravo/revisions/invalid',
-            // ],
+            'api term missing revision' => [
+                // doesnt work for revisions because term binding isnt used in api routes
+                'api/custom/terms/tags/bravo/revisions/invalid',
+            ],
 
             'api invalid content revision' => [
                 'api/custom/revisions/1',
@@ -673,15 +666,13 @@ class RouteBindingTest extends TestCase
                 },
             ],
 
-            // 'missing term' => [
-            //     'custom/terms/tags::invalid',
-            //     // this current throws a 500 but should be a 404.
-            //     // it's a problem on the 4.x branch too in the cp logic.
-            //     null,
-            //     function (string $term) {
-            //         return $term === 'tags::invalid';
-            //     },
-            // ],
+            'missing term' => [
+                'custom/terms/tags::invalid',
+                null,
+                function (string $term) {
+                    return $term === 'tags::invalid';
+                },
+            ],
 
             'taxonomy and term' => [
                 'custom/taxonomies/tags/terms/bravo',
@@ -701,15 +692,13 @@ class RouteBindingTest extends TestCase
                 },
             ],
 
-            // 'taxonomy and missing term' => [
-            //     'custom/taxonomies/tags/terms/invalid',
-            //     // this current throws a 500 but should be a 404.
-            //     // it's a problem on the 4.x branch too in the cp logic.
-            //     null,
-            //     function (string $taxonomy, string $term) {
-            //         return $taxonomy === 'tags' && $term === 'invalid';
-            //     },
-            // ],
+            'taxonomy and missing term' => [
+                'custom/taxonomies/tags/terms/invalid',
+                null,
+                function (string $taxonomy, string $term) {
+                    return $taxonomy === 'tags' && $term === 'invalid';
+                },
+            ],
 
             'term with custom binding' => [
                 'custom/terms/slug/bravo',
@@ -809,15 +798,13 @@ class RouteBindingTest extends TestCase
                 },
             ],
 
-            // 'missing global' => [
-            //     // this current throws a 500 but should be a 404.
-            //     // it's a problem on the 4.x branch too in the cp logic.
-            //     'custom/globals/invalid',
-            //     null,
-            //     function (string $global) {
-            //         return $global === 'invalid';
-            //     },
-            // ],
+            'missing global' => [
+                'custom/globals/invalid',
+                null,
+                function (string $global) {
+                    return $global === 'invalid';
+                },
+            ],
 
             // sites
 
