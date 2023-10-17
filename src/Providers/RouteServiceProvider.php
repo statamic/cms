@@ -169,7 +169,7 @@ class RouteServiceProvider extends ServiceProvider
 
             $handle = ($field == 'id' && $route->parameter('asset_container') ? $route->parameter('asset_container')->handle().'::' : '').$handle;
 
-            $asset = $field == 'id' ? Asset::find($handle) : Asset::query()->where($field, $handle)->when($route->parameter('asset_container'), fn ($query) => $query->where('container', $route->parameter('container')->handle()))->first();
+            $asset = $field == 'id' ? Asset::find($handle) : Asset::query()->where($field, $handle)->when($route->parameter('asset_container'), fn ($query) => $query->where('container', $route->parameter('asset_container')->handle()))->first();
 
             throw_unless(
                 $asset,
