@@ -28,7 +28,7 @@ class FormExportController extends CpController
         }
 
         $exporter = new $exporterConfig['class'];
-        $exporter->config(Arr::except($exporterConfig, ['class']));
+        $exporter->config(Arr::except($exporterConfig, ['class', 'forms']));
         $exporter->form($form);
 
         $content = $exporter->export();
