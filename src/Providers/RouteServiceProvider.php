@@ -46,14 +46,15 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindCollections()
     {
         Route::bind('collection', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled()) {
-                if (! $this->isCpOrApiRoute($route)) {
-                    return $handle;
-                }
+            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+                return $handle;
             }
 
-            $field = $route->bindingFields()['collection'] ?? 'handle';
-            $collection = $field == 'handle' ? Collection::findByHandle($handle) : Collection::all()->firstWhere($field, $handle);
+            $field = $route->bindingFieldFor('collection') ?? 'handle';
+
+            $collection = $field == 'handle'
+                ? Collection::findByHandle($handle)
+                : Collection::all()->firstWhere($field, $handle);
 
             throw_unless(
                 $collection,
@@ -75,11 +76,16 @@ class RouteServiceProvider extends ServiceProvider
                 return $handle;
             }
 
-            $field = $route->bindingFields()['entry'] ?? 'id';
-            $entry = $field == 'id' ? Entry::find($handle) : Entry::query()->where($field, $handle)->first();
+            $field = $route->bindingFieldFor('entry') ?? 'id';
+
+            $entry = $field == 'id'
+                ? Entry::find($handle)
+                : Entry::query()->where($field, $handle)->first();
+
+            $collection = $route->parameter('collection');
 
             throw_if(
-                ! ($entry) || ($route->parameter('collection') && ($entry->collection()->id() !== $route->parameter('collection')->id())),
+                ! $entry || ($collection && $entry->collection()->id() !== $collection->id()),
                 new NotFoundHttpException("Entry [$handle] not found.")
             );
 
@@ -90,14 +96,15 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindTaxonomies()
     {
         Route::bind('taxonomy', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled()) {
-                if (! $this->isCpOrApiRoute($route)) {
-                    return $handle;
-                }
+            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+                return $handle;
             }
 
-            $field = $route->bindingFields()['taxonomy'] ?? 'handle';
-            $taxonomy = $field == 'handle' ? Taxonomy::findByHandle($handle) : Taxonomy::all()->firstWhere($field, $handle);
+            $field = $route->bindingFieldFor('taxonomy' ?? 'handle');
+
+            $taxonomy = $field == 'handle'
+                ? Taxonomy::findByHandle($handle)
+                : Taxonomy::all()->firstWhere($field, $handle);
 
             throw_unless(
                 $taxonomy,
@@ -119,15 +126,26 @@ class RouteServiceProvider extends ServiceProvider
                 return $handle;
             }
 
-            $field = $route->bindingFields()['term'] ?? 'id';
+            $field = $route->bindingFieldFor('term') ?? 'id';
 
-            $handle = ($field == 'id' && $route->parameter('taxonomy') ? $route->parameter('taxonomy')->handle().'::' : '').$handle;
+            $taxonomy = $route->parameter('taxonomy');
+
+            if ($field == 'id' && $taxonomy) {
+                $handle = $taxonomy->handle().'::'.$handle;
+            }
+
             $site = $route->parameter('site') ?? Site::default()->handle();
 
-            $term = $field == 'id' ? Term::find($handle)->in($site) : Term::query()->where($field, $handle)->where('site', $site)->when($route->parameter('taxonomy'), fn ($query) => $query->where('taxonomy', $route->parameter('taxonomy')->handle()))->first();
+            $term = $field == 'id'
+                ? Term::find($handle)->in($site)
+                : Term::query()
+                    ->where($field, $handle)
+                    ->where('site', $site)
+                    ->when($taxonomy, fn ($query) => $query->where('taxonomy', $taxonomy->handle()))
+                    ->first();
 
             throw_unless(
-                $term || ($route->parameter('taxonomy') && $term->taxonomy()->id() === $route->parameter('taxonomy')->id()),
+                $term || ($taxonomy && $term->taxonomy()->id() === $taxonomy->id()),
                 new NotFoundHttpException("Taxonomy term [$handle] not found.")
             );
 
@@ -138,14 +156,15 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindAssetContainers()
     {
         Route::bind('asset_container', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled()) {
-                if (! $this->isCpOrApiRoute($route)) {
-                    return $handle;
-                }
+            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+                return $handle;
             }
 
-            $field = $route->bindingFields()['asset_container'] ?? 'handle';
-            $container = $field == 'handle' ? AssetContainer::findByHandle($handle) : AssetContainer::all()->firstWhere($field, $handle);
+            $field = $route->bindingFieldFor('asset_container') ?? 'handle';
+
+            $container = $field == 'handle'
+                ? AssetContainer::findByHandle($handle)
+                : AssetContainer::all()->firstWhere($field, $handle);
 
             throw_unless(
                 $container,
@@ -159,17 +178,24 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindAssets()
     {
         Route::bind('asset', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled()) {
-                if (! $this->isCpOrApiRoute($route)) {
-                    return $handle;
-                }
+            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+                return $handle;
             }
 
             $field = $route->bindingFields()['asset'] ?? 'id';
 
-            $handle = ($field == 'id' && $route->parameter('asset_container') ? $route->parameter('asset_container')->handle().'::' : '').$handle;
+            $container = $route->parameter('asset_container');
 
-            $asset = $field == 'id' ? Asset::find($handle) : Asset::query()->where($field, $handle)->when($route->parameter('asset_container'), fn ($query) => $query->where('container', $route->parameter('asset_container')->handle()))->first();
+            if ($field == 'id' && $container) {
+                $handle = $container->handle().'::'.$handle;
+            }
+
+            $asset = $field == 'id'
+                ? Asset::find($handle)
+                : Asset::query()
+                    ->where($field, $handle)
+                    ->when($container, fn ($query) => $query->where('container', $container->handle()))
+                    ->first();
 
             throw_unless(
                 $asset,
@@ -183,13 +209,12 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindGlobalSets()
     {
         Route::bind('global', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled()) {
-                if (! $this->isCpOrApiRoute($route)) {
-                    return $handle;
-                }
+            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+                return $handle;
             }
 
-            $field = $route->bindingFields()['global'] ?? 'handle';
+            $field = $route->bindingFieldFor('global') ?? 'handle';
+
             $global = $field == 'handle'
                 ? GlobalSet::findByHandle($handle)
                 : GlobalSet::all()->first(fn ($set) => $set->$field($handle));
@@ -208,14 +233,15 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindSites()
     {
         Route::bind('site', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled()) {
-                if (! $this->isCpOrApiRoute($route)) {
-                    return $handle;
-                }
+            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+                return $handle;
             }
 
-            $field = $route->bindingFields()['site'] ?? 'handle';
-            $site = $field == 'handle' ? Site::get($handle) : Site::all()->firstWhere($field, $handle);
+            $field = $route->bindingFieldFor('site') ?? 'handle';
+
+            $site = $field == 'handle'
+                ? Site::get($handle)
+                : Site::all()->firstWhere($field, $handle);
 
             throw_unless(
                 $site,
@@ -229,10 +255,8 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindRevisions()
     {
         Route::bind('revision', function ($reference, $route = null) {
-            if (! $this->isFrontendBindingEnabled()) {
-                if (! $this->isCpOrApiRoute($route)) {
-                    return $reference;
-                }
+            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+                return $reference;
             }
 
             if ($route->hasParameter('entry')) {
@@ -262,8 +286,11 @@ class RouteServiceProvider extends ServiceProvider
                 }
             }
 
-            $field = $route->bindingFields()['form'] ?? 'handle';
-            $form = $field == 'handle' ? Form::find($handle) : Form::all()->firstWhere($field, $handle);
+            $field = $route->bindingFieldFor('form') ?? 'handle';
+
+            $form = $field == 'handle'
+                ? Form::find($handle)
+                : Form::all()->firstWhere($field, $handle);
 
             throw_unless(
                 $form,
