@@ -169,7 +169,7 @@ class RouteServiceProvider extends ServiceProvider
             $site = $route->parameter('site') ?? Site::default()->handle();
 
             $term = $field == 'id'
-                ? Term::find($handle)->in($site)
+                ? Term::find($handle)?->in($site)
                 : Term::query()
                     ->where($field, $handle)
                     ->where('site', $site)
@@ -177,7 +177,7 @@ class RouteServiceProvider extends ServiceProvider
                     ->first();
 
             throw_unless(
-                $term || ($taxonomy && $term->taxonomy()->id() === $taxonomy->id()),
+                $term || ($term && $taxonomy && $term->taxonomy()->id() === $taxonomy->id()),
                 new NotFoundHttpException("Taxonomy term [$handle] not found.")
             );
 
@@ -294,7 +294,7 @@ class RouteServiceProvider extends ServiceProvider
             $site = Site::default()->handle();
 
             throw_unless(
-                $globalSet = $global->in($site),
+                $globalSet = $global?->in($site),
                 new NotFoundHttpException("Global set [$handle] not found.")
             );
 
