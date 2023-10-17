@@ -190,7 +190,9 @@ class RouteServiceProvider extends ServiceProvider
             }
 
             $field = $route->bindingFields()['global'] ?? 'handle';
-            $global = $field == 'handle' ? GlobalSet::findByHandle($handle) : GlobalSet::all()->firstWhere($field, $handle);
+            $global = $field == 'handle'
+                ? GlobalSet::findByHandle($handle)
+                : GlobalSet::all()->first(fn ($set) => $set->$field($handle));
 
             $site = Site::default()->handle();
 
