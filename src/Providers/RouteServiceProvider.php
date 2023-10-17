@@ -186,16 +186,13 @@ class RouteServiceProvider extends ServiceProvider
 
             $container = $route->parameter('asset_container');
 
-            if ($field == 'id' && $container) {
+            if ($field == 'id') {
                 $handle = $container->handle().'::'.$handle;
             }
 
             $asset = $field == 'id'
                 ? Asset::find($handle)
-                : Asset::query()
-                    ->where($field, $handle)
-                    ->when($container, fn ($query) => $query->where('container', $container->handle()))
-                    ->first();
+                : $container->queryAssets()->where($field, $handle)->first();
 
             throw_unless(
                 $asset,
