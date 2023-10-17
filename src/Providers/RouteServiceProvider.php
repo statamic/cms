@@ -2,7 +2,8 @@
 
 namespace Statamic\Providers;
 
-use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route as Routes;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
@@ -29,7 +30,7 @@ class RouteServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        Route::mixin(new Router);
+        Routes::mixin(new Router);
 
         $this->bindCollections();
         $this->bindEntries();
@@ -45,8 +46,8 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindCollections()
     {
-        Route::bind('collection', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+        Routes::bind('collection', function ($handle, $route = null) {
+            if (! $this->needsCollectionBinding($route)) {
                 return $handle;
             }
 
@@ -65,14 +66,15 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsCollectionBinding(Route $route): bool
+    {
+        return $this->isCpOrApiRoute($route) || $this->isFrontendBindingEnabled();
+    }
+
     protected function bindEntries()
     {
-        Route::bind('entry', function ($handle, $route = null) {
-            if ($this->isApiRoute($route)) {
-                return $handle;
-            }
-
-            if (! $this->isCpRoute($route) && ! $this->isFrontendBindingEnabled()) {
+        Routes::bind('entry', function ($handle, $route = null) {
+            if (! $this->needsEntryBinding($route)) {
                 return $handle;
             }
 
@@ -93,10 +95,23 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsEntryBinding(Route $route): bool
+    {
+        if ($this->isCpRoute($route)) {
+            return true;
+        }
+
+        if ($this->isApiRoute($route)) {
+            return false;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindTaxonomies()
     {
-        Route::bind('taxonomy', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+        Routes::bind('taxonomy', function ($handle, $route = null) {
+            if (! $this->needsTaxonomyBinding($route)) {
                 return $handle;
             }
 
@@ -115,14 +130,19 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsTaxonomyBinding(Route $route): bool
+    {
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindTerms()
     {
-        Route::bind('term', function ($handle, $route = null) {
-            if ($this->isApiRoute($route)) {
-                return $handle;
-            }
-
-            if (! $this->isCpRoute($route) && ! $this->isFrontendBindingEnabled()) {
+        Routes::bind('term', function ($handle, $route = null) {
+            if (! $this->needsTermBinding($route)) {
                 return $handle;
             }
 
@@ -153,10 +173,23 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsTermBinding(Route $route): bool
+    {
+        if ($this->isCpRoute($route)) {
+            return true;
+        }
+
+        if ($this->isApiRoute($route)) {
+            return false;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindAssetContainers()
     {
-        Route::bind('asset_container', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+        Routes::bind('asset_container', function ($handle, $route = null) {
+            if (! $this->needsAssetContainerBinding($route)) {
                 return $handle;
             }
 
@@ -175,10 +208,19 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsAssetContainerBinding(Route $route): bool
+    {
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindAssets()
     {
-        Route::bind('asset', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+        Routes::bind('asset', function ($handle, $route = null) {
+            if (! $this->needsAssetBinding($route)) {
                 return $handle;
             }
 
@@ -203,10 +245,19 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsAssetBinding(Route $route): bool
+    {
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindGlobalSets()
     {
-        Route::bind('global', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+        Routes::bind('global', function ($handle, $route = null) {
+            if (! $this->needsGlobalsBinding($route)) {
                 return $handle;
             }
 
@@ -227,10 +278,19 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsGlobalsBinding(Route $route): bool
+    {
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindSites()
     {
-        Route::bind('site', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+        Routes::bind('site', function ($handle, $route = null) {
+            if (! $this->needsSiteBinding($route)) {
                 return $handle;
             }
 
@@ -249,10 +309,19 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsSiteBinding(Route $route): bool
+    {
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindRevisions()
     {
-        Route::bind('revision', function ($reference, $route = null) {
-            if (! $this->isFrontendBindingEnabled() && ! $this->isCpOrApiRoute($route)) {
+        Routes::bind('revision', function ($reference, $route = null) {
+            if (! $this->needsRevisionBinding($route)) {
                 return $reference;
             }
 
@@ -273,14 +342,20 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsRevisionBinding(Route $route): bool
+    {
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        return $this->isFrontendBindingEnabled();
+    }
+
     protected function bindForms()
     {
-        Route::bind('form', function ($handle, $route = null) {
-            if (! $this->isFrontendBindingEnabled()) {
-                if (! $this->isCpOrApiRoute($route)
-                    && ! Str::startsWith($route->uri(), config('statamic.routes.action').'/forms/')) {
-                    return $handle;
-                }
+        Routes::bind('form', function ($handle, $route = null) {
+            if (! $this->needsFormBinding($route)) {
+                return $handle;
             }
 
             $field = $route->bindingFieldFor('form') ?? 'handle';
@@ -298,12 +373,25 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    private function needsFormBinding(Route $route): bool
+    {
+        if ($this->isCpOrApiRoute($route)) {
+            return true;
+        }
+
+        if ($this->isFrontendBindingEnabled()) {
+            return true;
+        }
+
+        return Str::startsWith($route->uri(), config('statamic.routes.action').'/forms/');
+    }
+
     private function isFrontendBindingEnabled()
     {
         return config('statamic.routes.bindings', false);
     }
 
-    private function isApiRoute(\Illuminate\Routing\Route $route = null)
+    private function isApiRoute(Route $route = null)
     {
         if (is_null($route)) {
             return false;
@@ -318,7 +406,7 @@ class RouteServiceProvider extends ServiceProvider
         return Str::startsWith($route->uri(), $api);
     }
 
-    private function isCpRoute(\Illuminate\Routing\Route $route = null)
+    private function isCpRoute(Route $route = null)
     {
         if (is_null($route)) {
             return false;
@@ -333,7 +421,7 @@ class RouteServiceProvider extends ServiceProvider
         return Str::startsWith($route->uri(), $cp);
     }
 
-    private function isCpOrApiRoute(\Illuminate\Routing\Route $route = null)
+    private function isCpOrApiRoute(Route $route = null)
     {
         if (is_null($route)) {
             return false;
