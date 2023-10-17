@@ -1,6 +1,7 @@
 <?php
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Contracts\Routing\BindingRegistrar;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -925,5 +926,57 @@ class RouteBindingTest extends TestCase
             ],
 
         ];
+    }
+
+    /**
+     * @test
+     *
+     * @define-env bindingsDisabled
+     *
+     * @dataProvider bypassForBroadcastingProvider
+     */
+    public function it_bypasses_binding_for_broadcasting($binding)
+    {
+        $this->bypassForBroadcasting($binding);
+    }
+
+    /**
+     * @test
+     *
+     * @define-env bindingsEnabled
+     *
+     * @dataProvider bypassForBroadcastingProvider
+     */
+    public function it_bypasses_binding_for_broadcasting_with_bindings_enabled($binding)
+    {
+        $this->bypassForBroadcasting($binding);
+    }
+
+    public function bypassForBroadcasting(string $binding)
+    {
+        $binder = app(BindingRegistrar::class);
+
+        // Evaluate the binding closure, passing in the value.
+        // e.g. If you hit /something/{entry} then the closure will receive literally "entry" as the first argument.
+        $value = call_user_func($binder->getBindingCallback($binding), 'test');
+
+        // We want to make sure it just spits the value right back without any errors.
+        $this->assertEquals('test', $value);
+    }
+
+    public function bypassForBroadcastingProvider()
+    {
+        return collect([
+            'collection',
+            'entry',
+            'taxonomy',
+            'term',
+            'asset_container',
+            'asset',
+            'global',
+            'site',
+            'revision',
+            'form',
+        ])->mapWithKeys(fn ($key) => [$key => [$key]])->all();
     }
 }
