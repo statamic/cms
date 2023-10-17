@@ -276,7 +276,7 @@ class RoutesTest extends TestCase
     /** @test */
     public function it_loads_entry_by_binding()
     {
-        Config::set('statamic.routes.binding_enabled', true);
+        Config::set('statamic.routes.bindings', true);
 
         $collection = Collection::make('pages')->save();
         EntryFactory::id('pages-blog')->collection($collection)->slug('blog')->data(['title' => 'Blog'])->create();
@@ -296,7 +296,7 @@ class RoutesTest extends TestCase
     /** @test */
     public function it_loads_term_by_binding()
     {
-        Config::set('statamic.routes.binding_enabled', true);
+        Config::set('statamic.routes.bindings', true);
 
         $taxonomy = Taxonomy::make('pages')->save();
         Term::make()->taxonomy('pages')->slug('blog')->data(['title' => 'Blog'])->save();
