@@ -53,9 +53,9 @@ class Session
         throw new RegionNotFound($key);
     }
 
-    public function pushRegion($contents, $context, $extension): StringRegion
+    public function pushRegion($contents, $context, $extension, $key = ''): StringRegion
     {
-        $region = new StringRegion($this, trim($contents), $context, $extension);
+        $region = new StringRegion($this, trim($contents), $context, $extension, $key ?? '');
 
         return $this->regions[$region->key()] = $region;
     }

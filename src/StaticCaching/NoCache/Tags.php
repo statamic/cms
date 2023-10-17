@@ -21,7 +21,7 @@ class Tags extends \Statamic\Tags\Tags
     {
         return $this
             ->nocache
-            ->pushRegion($this->content, $this->context->all(), 'antlers.html')
+            ->pushRegion($this->content, $this->context->all(), 'antlers.html', $this->params->get('key'))
             ->placeholder();
     }
 }
