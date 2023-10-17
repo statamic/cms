@@ -81,7 +81,7 @@ return [
     'field_validation_required_instructions' => 'Steuert, ob dieses Feld erforderlich ist oder nicht.',
     'field_validation_sometimes_instructions' => 'Dieses Feld wird nur validiert, wenn es sichtbar ist oder abgeschickt wird.',
     'fields_blueprints_description' => 'Blueprints definieren die Felder für den inhaltlichen Aufbau von Sammlungen, Taxonomien, Benutzer:innen und Formularen.',
-    'fields_default_instructions' => 'Standardwert festlegen.',
+    'fields_default_instructions' => 'Diesen Wert immer dann einfügen, wenn das Feld in einem Veröffentlichungsformular leer ist.',
     'fields_display_instructions' => 'Name des Feldes im Control Panel.',
     'fields_duplicate_instructions' => 'Soll dieses Feld beim Duplizieren des Eintrags berücksichtigt werden?',
     'fields_fieldsets_description' => 'Fieldsets sind einfache, flexible und völlig optionale Gruppen von Feldern, mit deren Hilfe wiederverwendbare, vorkonfigurierte Blöcke organisiert werden können.',
