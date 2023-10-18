@@ -355,7 +355,7 @@ abstract class Fieldtype implements Arrayable
         return $value;
     }
 
-    public function extraRenderableFieldData($form = null): array
+    public function extraRenderableFieldData($field, $form = null): array
     {
         return [];
     }
