@@ -282,7 +282,7 @@ class TaxonomiesController extends CpController
                 'fields' => [
                     'routes' => [
                         'display' => __('Route'),
-                        'instructions' => __('statamic::messages.collections_route_instructions'),
+                        'instructions' => __('statamic::messages.taxonomies_route_instructions'),
                         'type' => 'collection_routes',
                     ],
                     'preview_targets' => [
