@@ -127,6 +127,10 @@ trait RendersForms
     {
         $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
 
+        if (method_exists($this, 'form')) {
+            $field->setForm($this->form());
+        }
+
         $missing = str_random();
         $old = old($field->handle(), $missing);
         $default = $field->value() ?? $field->defaultValue();

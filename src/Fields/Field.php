@@ -20,6 +20,7 @@ class Field implements Arrayable
     protected $parent;
     protected $parentField;
     protected $validationContext;
+    protected $form;
 
     public function __construct($handle, array $config)
     {
@@ -408,5 +409,17 @@ class Field implements Arrayable
     public function isRelationship(): bool
     {
         return $this->fieldtype()->isRelationship();
+    }
+
+    public function setForm($form)
+    {
+        $this->form = $form;
+
+        return $this;
+    }
+
+    public function form()
+    {
+        return $this->form;
     }
 }
