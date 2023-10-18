@@ -482,33 +482,38 @@ class RouteBindingTest extends TestCase
             ],
 
             'api entry revision' => [
-                // doesnt work for revisions because entry binding isnt used in api routes
                 'api/custom/entries/blog/123/revisions/1',
-                function (Collection $collection, Entry $entry, Revision $revision) {
-                    return $collection->handle() === 'blog' && $entry->id() === '123' && $revision->id() === '1';
+                function (Collection $collection, string $entry, string $revision) {
+                    return $collection->handle() === 'blog' && $entry === '123' && $revision === '1';
                 },
             ],
 
             'api entry missing revision' => [
-                // doesnt work for revisions because entry binding isnt used in api routes
                 'api/custom/entries/blog/123/revisions/invalid',
+                function (Collection $collection, string $entry, string $revision) {
+                    return $collection->handle() === 'blog' && $entry === '123' && $revision === 'invalid';
+                },
             ],
 
             'api term revision' => [
-                // doesnt work for revisions because term binding isnt used in api routes
                 'api/custom/terms/tags/bravo/revisions/2',
-                function (Taxonomy $taxonomy, Term $term, Revision $revision) {
-                    return $taxonomy->handle() === 'tags' && $term->id() === 'tags::bravo' && $revision->id() === '2';
+                function (Taxonomy $taxonomy, string $term, $revision) {
+                    return $taxonomy->handle() === 'tags' && $term === 'bravo' && $revision === '2';
                 },
             ],
 
             'api term missing revision' => [
-                // doesnt work for revisions because term binding isnt used in api routes
                 'api/custom/terms/tags/bravo/revisions/invalid',
+                function (Taxonomy $taxonomy, string $term, string $revision) {
+                    return $taxonomy->handle() === 'tags' && $term === 'bravo' && $revision === 'invalid';
+                },
             ],
 
             'api invalid content revision' => [
                 'api/custom/revisions/1',
+                function (string $revision) {
+                    return $revision === '1';
+                },
             ],
 
             // forms
