@@ -29,6 +29,7 @@ return [
             'driver' => 'local',
             'searchables' => 'all',
             'fields' => ['title'],
+            'autocreate_on_save' => true,
         ],
 
         // 'blog' => [

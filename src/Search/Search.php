@@ -47,17 +47,39 @@ class Search
     public function updateWithinIndexes(Searchable $searchable)
     {
         $this->indexes()->each(function ($index) use ($searchable) {
-            $shouldIndex = $index->shouldIndex($searchable);
-            $exists = $index->exists();
-
-            if ($shouldIndex && $exists) {
-                $index->insert($searchable);
-            } elseif ($shouldIndex && ! $exists) {
-                $index->update();
-            } elseif ($exists) {
-                $index->delete($searchable);
-            }
+            $this->updateWithinIndex($index, $searchable);
         });
+    }
+
+    private function updateWithinIndex(Index $index, Searchable $searchable): void
+    {
+        $shouldIndex = $index->shouldIndex($searchable);
+        $exists = $index->exists();
+
+        // The index already exists and the entry should be indexed: insert the entry
+        // into the existing index.
+        if ($shouldIndex && $exists) {
+            $index->insert($searchable);
+
+            return;
+        }
+
+        // The index does not already exist but the entry should be indexed: In this case, the autocreate_on_save
+        // setting governs whether the index should be created and fully indexed or not.
+        // Setting autocreate_on_save to false can be useful if the site contains a lot of data.
+        if ($shouldIndex && ! $exists) {
+            $config = $index->config();
+            if ($config['autocreate_on_save'] ?? true) {
+                $index->update();
+            }
+
+            return;
+        }
+
+        // The index already exists but the entry should not be indexed: delete the entry from the index.
+        if ($exists) {
+            $index->delete($searchable);
+        }
     }
 
     public function deleteFromIndexes(Searchable $searchable)
