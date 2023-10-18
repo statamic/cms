@@ -15,7 +15,7 @@ class LicensingController extends CpController
             'addons' => $addons = $licenses->addons()->filter->existsOnMarketplace(),
             'unlistedAddons' => $licenses->addons()->reject->existsOnMarketplace(),
             'configCached' => app()->configurationIsCached(),
-            'addToCartUrl' => $this->addToCartUrl($site, $statamic, $addons),
+            'manageLicensesUrl' => $this->manageLicensesUrl($site),
         ]);
     }
 
@@ -28,19 +28,14 @@ class LicensingController extends CpController
             ->with('success', __('Data updated'));
     }
 
-    public function addToCartUrl($site, $statamic, $addons)
+    public function manageLicensesUrl($site): string
     {
-        return 'https://statamic.com/cart/bulk-add?'.http_build_query([
-            'site' => $site->key(),
-            'statamic' => ! $statamic->valid(),
-            'products' => $addons->reject->valid()->map->addon()->map(function ($addon) {
-                $product = $addon->marketplaceId();
-                if ($edition = $addon->edition()) {
-                    $product .= ':'.$edition;
-                }
+        $url = 'https://statamic.com/account/manage-licenses';
 
-                return $product;
-            })->implode(','),
-        ]);
+        if ($site->key()) {
+            $url .= "?site={$site->key()}";
+        }
+
+        return $url;
     }
 }
