@@ -380,8 +380,12 @@ class RouteServiceProvider extends ServiceProvider
             return false;
         }
 
-        if ($this->isCpOrApiRoute($route)) {
+        if ($this->isCpRoute($route)) {
             return true;
+        }
+
+        if ($this->isApiRoute($route)) {
+            return false;
         }
 
         return $this->isFrontendBindingEnabled();
