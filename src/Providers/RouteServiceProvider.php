@@ -123,7 +123,7 @@ class RouteServiceProvider extends ServiceProvider
                 return $handle;
             }
 
-            $field = $route->bindingFieldFor('taxonomy' ?? 'handle');
+            $field = $route->bindingFieldFor('taxonomy') ?? 'handle';
 
             $taxonomy = $field == 'handle'
                 ? Taxonomy::findByHandle($handle)
@@ -244,7 +244,7 @@ class RouteServiceProvider extends ServiceProvider
                 return $handle;
             }
 
-            $field = $route->bindingFields()['asset'] ?? 'id';
+            $field = $route->bindingFieldFor('asset') ?? 'id';
 
             $container = $route->parameter('asset_container');
 
