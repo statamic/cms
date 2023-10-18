@@ -64,7 +64,9 @@ class Tags extends BaseTags
         $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
-        $data['fields'] = $this->getFields($this->sessionHandle(), $jsDriver);
+
+        $data['fields'] = collect($data['sections'])->flatMap->fields->all();
+
         $data['honeypot'] = $form->honeypot();
 
         if ($jsDriver) {
