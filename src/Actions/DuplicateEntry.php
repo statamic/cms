@@ -5,7 +5,7 @@ namespace Statamic\Actions;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Entry as Entries;
-use Statamic\Facades\Site;
+use Statamic\Facades\User;
 
 class DuplicateEntry extends Action
 {
@@ -28,50 +28,15 @@ class DuplicateEntry extends Action
         }
     }
 
-    protected function fieldItems()
-    {
-        if (! Site::hasMultiple()) {
-            return [];
-        }
-
-        // If none of the selected entries have localizations, don't bother showing the field.
-        $hasLocalizations = $this->items
-            ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
-            ->contains(fn ($entry) => $entry->descendants()->count());
-
-        if (! $hasLocalizations) {
-            return [];
-        }
-
-        return [
-            'descendants' => [
-                'display' => __('statamic::messages.duplicate_action_descendants_display'),
-                'type' => 'toggle',
-                'inline_label' => __('statamic::messages.duplicate_action_descendants_false'),
-                'inline_label_when_true' => __('statamic::messages.duplicate_action_descendants_true'),
-                'default' => true,
-                'validate' => 'required',
-            ],
-        ];
-    }
-
     public function run($items, $values)
     {
-        $this->duplicateEntries(
-            $items,
-            $values['descendants'] ?? false
-        );
-    }
-
-    private function duplicateEntries($entries, bool $withDescendants)
-    {
-        $entries
+        $items
             ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
             ->unique()
-            ->each(fn (Entry $original) => $this->duplicateEntry($original, $withDescendants));
+            ->each(fn (Entry $original) => $this->duplicateEntry($original));
     }
 
-    private function duplicateEntry(Entry $original, bool $withDescendants, string $origin = null)
+    private function duplicateEntry(Entry $original, string $origin = null)
     {
         $originalParent = $this->getEntryParentFromStructure($original);
         [$title, $slug] = $this->generateTitleAndSlug($original);
@@ -101,11 +66,12 @@ class DuplicateEntry extends Action
 
         $entry->save();
 
-        if ($withDescendants) {
-            $original->descendants()->each(function ($descendant) use ($entry) {
-                $this->duplicateEntry($descendant, withDescendants: true, origin: $entry->id());
+        $original
+            ->directDescendants()
+            ->filter(fn ($entry) => User::current()->can('create', [Entry::class, $entry->collection(), $entry->site()]))
+            ->each(function ($descendant) use ($entry) {
+                $this->duplicateEntry($descendant, origin: $entry->id());
             });
-        }
 
         if ($originalParent && $originalParent !== $original->id()) {
             $entry->structure()

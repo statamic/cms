@@ -118,65 +118,184 @@ class DuplicateEntryTest extends TestCase
     }
 
     /** @test */
-    public function it_duplicates_an_entry_without_localizations()
+    public function it_duplicates_an_entry_with_localizations()
     {
         Site::setConfig(['sites' => [
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
             'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
+            'de' => ['url' => 'http://domain.com/de/', 'locale' => 'de'], // Add additional site that the entry doesn't exist in, to ensure it doesn't get duplicated into it.
+            'es' => ['url' => 'http://domain.com/es/', 'locale' => 'es'],
         ]]);
 
-        Collection::make('test')->sites(['en', 'fr'])->save();
+        Collection::make('test')->sites(['en', 'fr', 'de', 'es'])->save();
 
         $entry = EntryFactory::id('alfa-id')->locale('en')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
         $entry->makeLocalization('fr')->id('alfa-id-fr')->data(['title' => 'Alfa (French)'])->save();
-
-        $this->assertEquals([
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
-        ], $this->entryData());
-
-        (new DuplicateEntry)->run(collect([
-            Entry::find('alfa-id'),
-        ]), [
-            'descendants' => false,
-        ]);
-
-        $this->assertEquals([
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
-            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en', 'origin' => null],
-        ], $this->entryData());
-    }
-
-    /** @test */
-    public function it_duplicates_an_entry_with_all_its_localizations()
-    {
-        Site::setConfig(['sites' => [
-            'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
-            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
-        ]]);
-
-        Collection::make('test')->sites(['en', 'fr'])->save();
-
-        $entry = EntryFactory::id('alfa-id')->locale('en')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
-        $entry->makeLocalization('fr')->id('alfa-id-fr')->data(['title' => 'Alfa (French)'])->save();
+        $entry->makeLocalization('es')->id('alfa-id-es')->data(['title' => 'Alfa (Spanish)'])->save();
 
         $this->assertEquals([
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => ''],
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (Spanish)'], 'locale' => 'es', 'origin' => 'en.alfa'],
         ], $this->entryData());
+
+        // Make super user since this test isn't concerned with permissions.
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id'),
-        ]), [
-            'descendants' => true,
-        ]);
+        ]), []);
 
         $this->assertEquals([
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (Spanish)'], 'locale' => 'es', 'origin' => 'en.alfa'],
             ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en', 'origin' => null],
             ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (French) (Duplicated)', 'duplicated_from' => 'alfa-id-fr'], 'locale' => 'fr', 'origin' => 'en.alfa-1'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Spanish) (Duplicated)', 'duplicated_from' => 'alfa-id-es'], 'locale' => 'es', 'origin' => 'en.alfa-1'],
+        ], $this->entryData());
+    }
+
+    /** @test */
+    public function it_duplicates_an_entry_with_nested_localizations()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
+            'fr_ca' => ['url' => 'http://domain.com/fr-ca/', 'locale' => 'fr_CA'],
+            'es' => ['url' => 'http://domain.com/es/', 'locale' => 'es'],
+        ]]);
+
+        Collection::make('test')->sites(['en', 'fr', 'fr_ca', 'es'])->save();
+
+        $entry = EntryFactory::id('alfa-id')->locale('en')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
+        $entry->makeLocalization('es')->id('alfa-id-es')->data(['title' => 'Alfa (Spanish)'])->save();
+        $french = tap($entry->makeLocalization('fr')->id('alfa-id-fr')->data(['title' => 'Alfa (French)']))->save();
+        $french->makeLocalization('fr_ca')->id('alfa-id-fr-ca')->data(['title' => 'Alfa (French Canadian)'])->save();
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => ''],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (Spanish)'], 'locale' => 'es', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French Canadian)'], 'locale' => 'fr_ca', 'origin' => 'fr.alfa'],
+        ], $this->entryData());
+
+        $this->setTestRoles(['test' => [
+            'create test entries',
+            'access en site',
+            'access es site',
+            'access fr site',
+            'access fr_ca site',
+        ]]);
+
+        $this->actingAs(tap(User::make()->assignRole('test'))->save());
+
+        (new DuplicateEntry)->run(collect([
+            Entry::find('alfa-id'),
+        ]), []);
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (Spanish)'], 'locale' => 'es', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French Canadian)'], 'locale' => 'fr_ca', 'origin' => 'fr.alfa'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Spanish) (Duplicated)', 'duplicated_from' => 'alfa-id-es'], 'locale' => 'es', 'origin' => 'en.alfa-1'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (French) (Duplicated)', 'duplicated_from' => 'alfa-id-fr'], 'locale' => 'fr', 'origin' => 'en.alfa-1'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (French Canadian) (Duplicated)', 'duplicated_from' => 'alfa-id-fr-ca'], 'locale' => 'fr_ca', 'origin' => 'fr.alfa-1'],
+        ], $this->entryData());
+    }
+
+    /** @test */
+    public function it_only_duplicates_authorized_localizations()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
+            'es' => ['url' => 'http://domain.com/es/', 'locale' => 'es'],
+        ]]);
+
+        Collection::make('test')->sites(['en', 'fr', 'es'])->save();
+
+        $entry = EntryFactory::id('alfa-id')->locale('en')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
+        $entry->makeLocalization('fr')->id('alfa-id-fr')->data(['title' => 'Alfa (French)'])->save();
+        $entry->makeLocalization('es')->id('alfa-id-es')->data(['title' => 'Alfa (Spanish)'])->save();
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => ''],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (Spanish)'], 'locale' => 'es', 'origin' => 'en.alfa'],
+        ], $this->entryData());
+
+        $this->setTestRoles(['test' => [
+            'create test entries',
+            'access en site',
+            'access es site',
+        ]]);
+
+        $this->actingAs(tap(User::make()->assignRole('test'))->save());
+
+        (new DuplicateEntry)->run(collect([
+            Entry::find('alfa-id'),
+        ]), []);
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (Spanish)'], 'locale' => 'es', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Spanish) (Duplicated)', 'duplicated_from' => 'alfa-id-es'], 'locale' => 'es', 'origin' => 'en.alfa-1'],
+        ], $this->entryData());
+    }
+
+    /** @test */
+    public function it_doesnt_duplicate_authorized_descendants_of_unauthorized_localizations()
+    {
+        // 🤯
+
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
+            'fr_ca' => ['url' => 'http://domain.com/fr-ca/', 'locale' => 'fr_CA'],
+            'es' => ['url' => 'http://domain.com/es/', 'locale' => 'es'],
+        ]]);
+
+        Collection::make('test')->sites(['en', 'fr', 'fr_ca', 'es'])->save();
+
+        $entry = EntryFactory::id('alfa-id')->locale('en')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
+        $entry->makeLocalization('es')->id('alfa-id-es')->data(['title' => 'Alfa (Spanish)'])->save();
+        $french = tap($entry->makeLocalization('fr')->id('alfa-id-fr')->data(['title' => 'Alfa (French)']))->save();
+        $french->makeLocalization('fr_ca')->id('alfa-id-fr-ca')->data(['title' => 'Alfa (French Canadian)'])->save();
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => ''],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (Spanish)'], 'locale' => 'es', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French Canadian)'], 'locale' => 'fr_ca', 'origin' => 'fr.alfa'],
+        ], $this->entryData());
+
+        $this->setTestRoles(['test' => [
+            'create test entries',
+            'access en site',
+            'access es site',
+            // 'access fr site', // no permission for fr
+            'access fr_ca site',
+        ]]);
+
+        $this->actingAs(tap(User::make()->assignRole('test'))->save());
+
+        (new DuplicateEntry)->run(collect([
+            Entry::find('alfa-id'),
+        ]), []);
+
+        $this->assertEquals([
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (Spanish)'], 'locale' => 'es', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
+            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa (French Canadian)'], 'locale' => 'fr_ca', 'origin' => 'fr.alfa'],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Spanish) (Duplicated)', 'duplicated_from' => 'alfa-id-es'], 'locale' => 'es', 'origin' => 'en.alfa-1'],
+            // No french *or* french canadian, even though french canadian is authorized.
         ], $this->entryData());
     }
 
@@ -198,11 +317,12 @@ class DuplicateEntryTest extends TestCase
             ['slug' => 'bravo', 'published' => true, 'data' => ['title' => 'Bravo'], 'locale' => 'fr', 'origin' => null],
         ], $this->entryData());
 
+        // Make super user since this test isn't concerned with permissions.
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
         (new DuplicateEntry)->run(collect([
             Entry::find('bravo-id'),
-        ]), [
-            'descendants' => false,
-        ]);
+        ]), []);
 
         $this->assertEquals([
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
@@ -212,7 +332,7 @@ class DuplicateEntryTest extends TestCase
     }
 
     /** @test */
-    public function if_an_entry_has_an_origin_it_duplicates_the_root_origin_without_localizations()
+    public function if_an_entry_has_an_origin_it_duplicates_the_root_origin()
     {
         Site::setConfig(['sites' => [
             'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
@@ -229,42 +349,12 @@ class DuplicateEntryTest extends TestCase
             ['slug' => 'alfa-fr', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
         ], $this->entryData());
 
-        (new DuplicateEntry)->run(collect([
-            Entry::find('alfa-id-fr'),
-        ]), [
-            'descendants' => false,
-        ]);
-
-        $this->assertEquals([
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
-            ['slug' => 'alfa-fr', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
-            ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en', 'origin' => null],
-        ], $this->entryData());
-    }
-
-    /** @test */
-    public function if_an_entry_has_an_origin_it_duplicates_the_root_origin_with_localizations()
-    {
-        Site::setConfig(['sites' => [
-            'en' => ['url' => 'http://domain.com/', 'locale' => 'en'],
-            'fr' => ['url' => 'http://domain.com/fr/', 'locale' => 'fr'],
-        ]]);
-
-        Collection::make('test')->sites(['en', 'fr'])->save();
-
-        $entry = EntryFactory::id('alfa-id')->locale('en')->collection('test')->slug('alfa')->data(['title' => 'Alfa'])->create();
-        $entry->makeLocalization('fr')->id('alfa-id-fr')->slug('alfa-fr')->data(['title' => 'Alfa (French)'])->save();
-
-        $this->assertEquals([
-            ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
-            ['slug' => 'alfa-fr', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
-        ], $this->entryData());
+        // Make super user since this test isn't concerned with permissions.
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id-fr'),
-        ]), [
-            'descendants' => true,
-        ]);
+        ]), []);
 
         $this->assertEquals([
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
@@ -292,17 +382,19 @@ class DuplicateEntryTest extends TestCase
             ['slug' => 'alfa-fr', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
         ], $this->entryData());
 
+        // Make super user since this test isn't concerned with permissions.
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
         (new DuplicateEntry)->run(collect([
             Entry::find('alfa-id-fr'),
             Entry::find('alfa-id'),
-        ]), [
-            'descendants' => false,
-        ]);
+        ]), []);
 
         $this->assertEquals([
             ['slug' => 'alfa', 'published' => true, 'data' => ['title' => 'Alfa'], 'locale' => 'en', 'origin' => null],
             ['slug' => 'alfa-fr', 'published' => true, 'data' => ['title' => 'Alfa (French)'], 'locale' => 'fr', 'origin' => 'en.alfa'],
             ['slug' => 'alfa-1', 'published' => false, 'data' => ['title' => 'Alfa (Duplicated)', 'duplicated_from' => 'alfa-id'], 'locale' => 'en', 'origin' => null],
+            ['slug' => 'alfa-fr-1', 'published' => false, 'data' => ['title' => 'Alfa (French) (Duplicated)', 'duplicated_from' => 'alfa-id-fr'], 'locale' => 'fr', 'origin' => 'en.alfa-1'],
         ], $this->entryData());
     }
 
