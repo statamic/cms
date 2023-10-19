@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -90,6 +91,10 @@ class UserController extends Controller
         }
 
         try {
+            if ($honeypot = config('statamic.users.registration_form_honeypot_field')) {
+                throw_if(Arr::get($request->input(), $honeypot), new SilentFormFailureException);
+            }
+
             throw_if(UserRegistering::dispatch($user) === false, new SilentFormFailureException);
         } catch (ValidationException $e) {
             return $this->userRegistrationFailure($e->errors());

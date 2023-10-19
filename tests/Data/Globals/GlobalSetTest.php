@@ -10,13 +10,16 @@ use Statamic\Events\GlobalSetSaving;
 use Statamic\Facades\GlobalSet as GlobalSetFacade;
 use Statamic\Facades\GlobalVariables;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Globals\GlobalSet;
 use Statamic\Globals\VariablesCollection;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class GlobalSetTest extends TestCase
 {
+    use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
@@ -333,5 +336,70 @@ EOT;
         $this->assertEquals('root updated', $global->in('en')->foo);
         $this->assertEquals('fr updated', $global->in('fr')->foo);
         $this->assertEquals('fr updated', $global->in('de')->foo);
+    }
+
+    /** @test */
+    public function it_gets_available_sites_from_localizations()
+    {
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $set = GlobalSet::make('test');
+        $set->addLocalization($set->makeLocalization('en'));
+        $set->addLocalization($set->makeLocalization('fr'));
+        $set->save();
+
+        $this->assertEquals(\Illuminate\Support\Collection::class, get_class($set->sites()));
+        $this->assertEquals(['en', 'fr'], $set->sites()->all());
+    }
+
+    /** @test */
+    public function it_cannot_view_global_sets_from_sites_that_the_user_is_not_authorized_to_see()
+    {
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $set1 = GlobalSet::make('has_some_french');
+        $set1->addLocalization($set1->makeLocalization('en'));
+        $set1->addLocalization($set1->makeLocalization('fr'));
+        $set1->addLocalization($set1->makeLocalization('de'));
+        $set1->save();
+
+        $set2 = GlobalSet::make('has_no_french');
+        $set2->addLocalization($set2->makeLocalization('en'));
+        $set2->addLocalization($set2->makeLocalization('de'));
+        $set2->save();
+
+        $set3 = GlobalSet::make('has_only_french');
+        $set3->addLocalization($set3->makeLocalization('fr'));
+        $set3->save();
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'edit has_some_french globals',
+            'edit has_no_french globals',
+            'edit has_only_french globals',
+            'access en site',
+            // 'access fr site', // Give them access to all data, but not all sites
+            'access de site',
+        ]]);
+
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this->assertTrue($user->can('view', $set1));
+        $this->assertTrue($user->can('view', $set2));
+        $this->assertFalse($user->can('view', $set3));
     }
 }

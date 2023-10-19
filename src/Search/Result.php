@@ -9,7 +9,7 @@ use Statamic\Contracts\Search\Result as Contract;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Data\HasAugmentedInstance;
 
-class Result implements Contract, ContainsQueryableValues
+class Result implements ContainsQueryableValues, Contract
 {
     use HasAugmentedInstance {
         toAugmentedCollection as traitToAugmentedCollection;

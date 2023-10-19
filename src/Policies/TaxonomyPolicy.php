@@ -7,7 +7,9 @@ use Statamic\Facades\User;
 
 class TaxonomyPolicy
 {
-    public function before($user, $ability)
+    use Concerns\HasMultisitePolicy;
+
+    public function before($user)
     {
         $user = User::fromUser($user);
 
@@ -43,7 +45,8 @@ class TaxonomyPolicy
     {
         $user = User::fromUser($user);
 
-        return $user->hasPermission("view {$taxonomy->handle()} terms");
+        return $user->hasPermission("view {$taxonomy->handle()} terms")
+            && $this->userCanAccessAnySite($user, $taxonomy->sites());
     }
 
     public function edit($user, $taxonomy)

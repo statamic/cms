@@ -17,7 +17,7 @@ use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Submission implements SubmissionContract, Augmentable
+class Submission implements Augmentable, SubmissionContract
 {
     use ContainsData, FluentlyGetsAndSets, HasAugmentedData;
 
@@ -33,6 +33,8 @@ class Submission implements SubmissionContract, Augmentable
 
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+
+    protected ?string $redirect = null;
 
     public function __construct()
     {

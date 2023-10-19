@@ -21,7 +21,7 @@
                                 v-model="element.value"
                                 :readonly="isReadOnly"
                                 @blur="focused = false"
-                                @focus="editItem(index)"
+                                @focus="editItemWithoutFocusing(index)"
                                 @keydown.enter.prevent="nextItem"
                                 @keyup.up="previousItem"
                                 @keyup.down="nextItem"
@@ -117,8 +117,12 @@ export default {
         },
 
         editItem(index) {
-            this.editing = index;
+            this.editItemWithoutFocusing(index);
             this.$refs.listItem[index].focus();
+        },
+
+        editItemWithoutFocusing(index) {
+            this.editing = index;
         },
 
         newItemInputPaste(event) {

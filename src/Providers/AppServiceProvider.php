@@ -13,6 +13,7 @@ use Statamic\Facades\Preference;
 use Statamic\Facades\Token;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
+use Statamic\Tokens\Handlers\LivePreview;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,7 +37,8 @@ class AppServiceProvider extends ServiceProvider
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\DisableFloc::class);
+            ->pushMiddleware(\Statamic\Http\Middleware\DisableFloc::class)
+            ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -83,6 +85,10 @@ class AppServiceProvider extends ServiceProvider
             if ($token = $this->token ?? $this->header('X-Statamic-Token')) {
                 return Token::find($token);
             }
+        });
+
+        Request::macro('isLivePreview', function () {
+            return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
         $this->addAboutCommandInfo();

@@ -47,19 +47,19 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract, ContainsQueryableValues, Arrayable, ArrayAccess, SearchableContract
+class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
 {
-    use Routable {
-        uri as routableUri;
-    }
+    use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
-    use ContainsData, ContainsComputedData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksQueriedRelations, TracksLastModified, Searchable;
-    use ResolvesValues {
-        resolveGqlValue as traitResolveGqlValue;
-    }
     use HasOrigin {
         value as originValue;
         values as originValues;
+    }
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
+    }
+    use Routable {
+        uri as routableUri;
     }
 
     protected $id;
@@ -339,7 +339,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $stack = InitiatorStack::entry($this)->push();
 
-        $this->directDescendants()->each->save();
+        $this->directDescendants()->each->{$withEvents ? 'save' : 'saveQuietly'}();
 
         $this->taxonomize();
 
@@ -904,7 +904,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             }, $format);
         }
 
-        return (string) Antlers::parse($format, $this->augmented()->all());
+        return (string) Antlers::parse($format, array_merge($this->routeData(), [
+            'site' => $this->site(),
+            'permalink' => $this->absoluteUrl(),
+            'locale' => $this->locale(),
+        ]));
     }
 
     public function repository()

@@ -45,6 +45,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Actions\ReuploadAsset::class,
         Actions\MoveAssetFolder::class,
         Actions\RenameAssetFolder::class,
+        Actions\Impersonate::class,
     ];
 
     protected $fieldtypes = [
@@ -225,6 +226,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Updates\AddGraphQLPermission::class,
         Updates\AddAssignRolesAndGroupsPermissions::class,
         Updates\AddDefaultPreferencesToGitConfig::class,
+        Updates\AddConfigureFormFieldsPermission::class,
+        Updates\AddSitePermissions::class,
     ];
 
     public function register()

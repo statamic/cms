@@ -295,7 +295,7 @@ export default {
                 } else if (node.type === 'set') {
                     const handle = node.attrs.values.type;
                     const set = this.setConfigs.find(set => set.handle === handle);
-                    text += ` [${set ? set.display : handle}]`;
+                    text += ` [${__(set ? set.display : handle)}]`;
                 }
                 if (text.length > 150) {
                     break;
@@ -345,8 +345,10 @@ export default {
 
         this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
 
-        document.querySelector(`label[for="${this.fieldId}"]`).addEventListener('click', () => {
-            this.editor.commands.focus();
+        this.$nextTick(() => {
+            document.querySelector(`label[for="${this.fieldId}"]`).addEventListener('click', () => {
+                this.editor.commands.focus();
+            });
         });
     },
 
@@ -664,7 +666,7 @@ export default {
                 Gapcursor,
                 History,
                 Paragraph,
-                Placeholder.configure({ placeholder: this.config.placeholder }),
+                Placeholder.configure({ placeholder: __(this.config.placeholder) }),
                 Set.configure({ bard: this }),
                 Text
             ];
