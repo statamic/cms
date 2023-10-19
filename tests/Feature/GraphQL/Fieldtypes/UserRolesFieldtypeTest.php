@@ -14,9 +14,9 @@ use Tests\TestCase;
 /** @group graphql */
 class UserRolesFieldtypeTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
-    use FakesRoles;
     use EnablesQueries;
+    use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['collections'];
 

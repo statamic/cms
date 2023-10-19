@@ -58,7 +58,7 @@
                 :should-show="shouldShowSetButton"
                 :is-showing="showAddSetButton"
                 v-if="editor"
-                v-slot="{ x, y }"
+                v-slot="{ y }"
                 @shown="showAddSetButton = true"
                 @hidden="showAddSetButton = false"
             >
@@ -72,7 +72,7 @@
                         <button
                             type="button"
                             class="btn-round group bard-add-set-button"
-                            :style="{ transform: `translate(${x}px, ${y}px)` }"
+                            :style="{ transform: `translateY(${y}px)` }"
                             :aria-label="__('Add Set')"
                             v-tooltip="__('Add Set')"
                             @click="addSetButtonClicked"
@@ -87,11 +87,10 @@
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
-        <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.character_limit)">
+        <div class="bard-footer-toolbar" v-if="editor && (config.reading_time || config.character_limit || config.word_count)">
             <div v-if="config.reading_time">{{ readingTime }} {{ __('Reading Time') }}</div>
             <div v-else />
-
-            <div v-if="config.character_limit">{{ editor.storage.characterCount.characters() }}/{{ config.character_limit }}</div>
+            <div v-if="config.character_limit || config.word_count" v-text="characterAndWordCountText" />
         </div>
     </div>
 </div>
@@ -216,6 +215,24 @@ export default {
             }
         },
 
+        characterAndWordCountText() {
+            const showWordCount = this.config.word_count;
+            const wordCount = this.editor.storage.characterCount.words();
+            const wordCountText = `${__n(':count word|:count words', wordCount)}`;
+            const charLimit = this.config.character_limit;
+            const showCharLimit = charLimit > 0;
+            const charCount = this.editor.storage.characterCount.characters();
+
+            // If both are enabled, show a more verbose combined string.
+            if (showCharLimit && showWordCount) {
+                return `${wordCountText}, ${__(':count/:total characters', { count: charCount, total: charLimit })}`;
+            }
+
+            // Otherwise show one or the other.
+            if (showCharLimit) return `${charCount}/${charLimit}`;
+            if (showWordCount) return wordCountText;
+        },
+
         isFirstCreation() {
             return !this.$config.get('bard.meta').hasOwnProperty(this.id);
         },
@@ -278,7 +295,7 @@ export default {
                 } else if (node.type === 'set') {
                     const handle = node.attrs.values.type;
                     const set = this.setConfigs.find(set => set.handle === handle);
-                    text += ` [${set ? set.display : handle}]`;
+                    text += ` [${__(set ? set.display : handle)}]`;
                 }
                 if (text.length > 150) {
                     break;
@@ -327,6 +344,12 @@ export default {
         this.pageHeader = document.querySelector('.global-header');
 
         this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, this.fieldPathPrefix || this.handle);
+
+        this.$nextTick(() => {
+            document.querySelector(`label[for="${this.fieldId}"]`).addEventListener('click', () => {
+                this.editor.commands.focus();
+            });
+        });
     },
 
     beforeDestroy() {
@@ -386,7 +409,9 @@ export default {
 
         fieldPathPrefix(fieldPathPrefix, oldFieldPathPrefix) {
             this.$store.commit(`publish/${this.storeName}/unsetFieldSubmitsJson`, oldFieldPathPrefix);
-            this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+            this.$nextTick(() => {
+                this.$store.commit(`publish/${this.storeName}/setFieldSubmitsJson`, fieldPathPrefix);
+            });
         },
 
         fullScreenMode() {
@@ -471,8 +496,8 @@ export default {
             const { $anchor, empty } = selection;
             const isRootDepth = $anchor.depth === 1;
             const isEmptyTextBlock = $anchor.parent.isTextblock && !$anchor.parent.type.spec.code && !$anchor.parent.textContent;
-
-            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock;
+            const isAroundInlineImage = state.selection.$to.nodeBefore?.type.name === 'image' || state.selection.$to.nodeAfter?.type.name === 'image'
+            const isActive = view.hasFocus() && empty && isRootDepth && isEmptyTextBlock && !isAroundInlineImage;
             return this.setConfigs.length && (this.config.always_show_set_button || isActive);
         },
 
@@ -623,14 +648,25 @@ export default {
         },
 
         getExtensions() {
+            let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
+            if (this.config.inline === 'break') {
+                modeExts.push(HardBreak.extend({
+                    addKeyboardShortcuts() {
+                        return {
+                            ...this.parent?.(),
+                            'Enter': () => this.editor.commands.setHardBreak(),
+                        }
+                    },
+                }));
+            }
             let exts = [
                 CharacterCount.configure({ limit: this.config.character_limit }),
-                ...(this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak]),
+                ...modeExts,
                 Dropcursor,
                 Gapcursor,
                 History,
                 Paragraph,
-                Placeholder.configure({ placeholder: this.config.placeholder }),
+                Placeholder.configure({ placeholder: __(this.config.placeholder) }),
                 Set.configure({ bard: this }),
                 Text
             ];

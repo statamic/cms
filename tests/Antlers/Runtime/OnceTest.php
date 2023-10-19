@@ -11,9 +11,9 @@ use Tests\PreventSavingStacheItemsToDisk;
 
 class OnceTest extends ParserTestCase
 {
-    use FakesViews,
-        PreventSavingStacheItemsToDisk,
-        FakesContent;
+    use FakesContent,
+        FakesViews,
+        PreventSavingStacheItemsToDisk;
 
     public function test_once_block_evaluates_once_inside_a_loop_and_tag_contexts()
     {

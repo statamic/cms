@@ -6,7 +6,7 @@
         :close-on-select="false"
         :disabled="config.disabled || isReadOnly"
         :multiple="true"
-        :placeholder="config.placeholder"
+        :placeholder="__(config.placeholder)"
         :searchable="true"
         :select-on-key-codes="[9, 13, 188]"
         :taggable="true"

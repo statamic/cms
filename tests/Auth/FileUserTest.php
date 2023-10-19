@@ -15,7 +15,7 @@ use Tests\TestCase;
 /** @group user */
 class FileUserTest extends TestCase
 {
-    use UserContractTests, PermissibleContractTests, PreventSavingStacheItemsToDisk;
+    use PermissibleContractTests, PreventSavingStacheItemsToDisk, UserContractTests;
 
     public function makeUser()
     {

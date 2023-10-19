@@ -5,7 +5,6 @@ namespace Statamic\Tags\Collection;
 use Closure;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as IlluminateCollection;
-use InvalidArgumentException;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
@@ -18,10 +17,11 @@ use Statamic\Tags\Concerns;
 
 class Entries
 {
-    use Concerns\QueriesScopes,
+    use Concerns\GetsQueryResults,
+        Concerns\GetsQuerySelectKeys,
         Concerns\QueriesOrderBys,
-        Concerns\GetsQueryResults,
-        Concerns\GetsQuerySelectKeys;
+        Concerns\QueriesScopes,
+        Concerns\QueriesTaxonomyTerms;
     use Concerns\QueriesConditions {
         queryableConditionParams as traitQueryableConditionParams;
     }
@@ -73,8 +73,9 @@ class Entries
             $operator = '<';
         }
 
-        if ($collection->orderable() && $primaryOrderBy->sort === 'order') {
-            $query = $this->query()->where('order', $operator ?? '>', $currentEntry->order());
+        if ($primaryOrderBy->sort === 'order') {
+            throw_if(! $currentOrder = $currentEntry->order(), new \Exception('Current entry does not have an order'));
+            $query = $this->query()->where('order', $operator ?? '>', $currentOrder);
         } elseif ($collection->dated() && $primaryOrderBy->sort === 'date') {
             $query = $this->query()->where('date', $operator ?? '>', $currentEntry->date());
         } else {
@@ -97,8 +98,9 @@ class Entries
             $operator = '>';
         }
 
-        if ($collection->orderable() && $primaryOrderBy->sort === 'order') {
-            $query = $this->query()->where('order', $operator ?? '<', $currentEntry->order());
+        if ($primaryOrderBy->sort === 'order') {
+            throw_if(! $currentOrder = $currentEntry->order(), new \Exception('Current entry does not have an order'));
+            $query = $this->query()->where('order', $operator ?? '<', $currentOrder);
         } elseif ($collection->dated() && $primaryOrderBy->sort === 'date') {
             $query = $this->query()->where('date', $operator ?? '<', $currentEntry->date());
         } else {
@@ -305,7 +307,7 @@ class Entries
             return $key === 'taxonomy' || Str::startsWith($key, 'taxonomy:');
         })->each(function ($values, $param) use ($query) {
             $taxonomy = substr($param, 9);
-            [$taxonomy, $modifier] = array_pad(explode(':', $taxonomy), 2, 'any');
+            [$taxonomy, $modifier] = array_pad(explode(':', $taxonomy), 2, null);
 
             if (Compare::isQueryBuilder($values)) {
                 $values = $values->get();
@@ -327,19 +329,7 @@ class Entries
                 return Str::contains($term, '::') ? $term : $taxonomy.'::'.$term;
             });
 
-            if ($modifier === 'all') {
-                $values->each(function ($value) use ($query) {
-                    $query->whereTaxonomy($value);
-                });
-            } elseif ($modifier === 'not') {
-                $query->whereTaxonomyNotIn($values->all());
-            } elseif ($modifier === 'any') {
-                $query->whereTaxonomyIn($values->all());
-            } else {
-                throw new InvalidArgumentException(
-                    'Unknown taxonomy query modifier ['.$modifier.']. Valid values are "any", "not", and "all".'
-                );
-            }
+            $this->queryTaxonomyTerms($query, $modifier, $values);
         });
     }
 

@@ -23,7 +23,7 @@ class FormCreateTest extends FormTestCase
 
         foreach ($forms as $output) {
             $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/forms/contact">', $output);
-            $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
+            $this->assertStringContainsString(csrf_field(), $output);
             $this->assertStringEndsWith('</form>', $output);
         }
     }
@@ -500,6 +500,53 @@ EOT
         // Even though the fields are all nested within sections,
         // we should still be able to get them via `{{ fields }}` array at top level...
         $this->assertStringContainsString('<div class="fields">alpha,bravo,charlie,delta,echo,fox</div>', $output);
+    }
+
+    /** @test */
+    public function it_renders_section_instructions_without_cascading_into_field_instructions()
+    {
+        $this->createForm([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'display' => 'One',
+                            'instructions' => 'One Instructions',
+                            'fields' => [
+                                ['handle' => 'alpha', 'field' => ['type' => 'text']],
+                                ['handle' => 'bravo', 'field' => ['type' => 'text', 'instructions' => 'This field has instructions!']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], 'survey');
+
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
+{{ form:survey }}
+    {{ sections }}
+        <div class="section">{{ display }}{{ if instructions }} ({{ instructions }}){{ /if }}
+            {{ fields }}
+                <div class="field-in-section">{{ handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
+            {{ /fields }}
+        </div>
+    {{ /sections }}
+    <div class="fields">
+        {{ fields }}
+            <div class="field-by-itself">{{ handle }}{{ if instructions }} ({{ instructions }}){{ /if }}</div>
+        {{ /fields }}
+    </div>
+{{ /form:survey }}
+EOT
+        ));
+
+        $this->assertStringContainsString('<div class="section">One (One Instructions)', $output);
+
+        // Section instructions should NOT cascade down into field instructions...
+        $this->assertStringContainsString('<div class="field-in-section">alpha</div>', $output);
+        $this->assertStringContainsString('<div class="field-by-itself">alpha</div>', $output);
+        $this->assertStringContainsString('<div class="field-in-section">bravo (This field has instructions!)</div>', $output);
+        $this->assertStringContainsString('<div class="field-by-itself">bravo (This field has instructions!)</div>', $output);
     }
 
     /** @test */
