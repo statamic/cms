@@ -288,4 +288,38 @@ class TermTest extends TestCase
             ['label' => 'Show', 'format' => 'http://preview.com/{locale}/tags/{slug}?preview=true', 'url' => 'http://preview.com/de/tags/das-foo?preview=true'],
         ], $termDe->previewTargets()->all());
     }
+
+    /** @test */
+    public function it_gets_routes()
+    {
+        Facades\Site::setConfig(['default' => 'en', 'sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.de/'],
+        ]]);
+
+        $taxonomy = tap(Taxonomy::make('tags')->sites(['en', 'fr', 'de'])->routes('tags'))->save();
+
+        $term = (new Term)->taxonomy('tags');
+
+        $termEn = $term->in('en')->slug('foo');
+        $termFr = $term->in('fr')->slug('le-foo');
+        $termDe = $term->in('de')->slug('das-foo');
+
+        $this->assertEquals('/tags/{slug}', $termEn->route());
+        $this->assertEquals('/tags/{slug}', $termFr->route());
+        $this->assertEquals('/tags/{slug}', $termDe->route());
+
+        $taxonomy->routes([
+            'en' => 'blog',
+            'fr' => 'le-blog',
+            'de' => 'das-blog',
+        ]);
+
+        $taxonomy->save();
+
+        $this->assertEquals('/blog/{slug}', $termEn->route());
+        $this->assertEquals('/le-blog/{slug}', $termFr->route());
+        $this->assertEquals('/das-blog/{slug}', $termDe->route());
+    }
 }
