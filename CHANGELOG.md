@@ -1,5 +1,24 @@
 # Release Notes
 
+## 4.29.0 (2023-10-19)
+
+### What's new
+- Add form reference to field during render. [#8862](https://github.com/statamic/cms/issues/8862) by @martyf
+- Add config to enable frontend route binding and support binding by field. [#8853](https://github.com/statamic/cms/issues/8853) by @ryanmitchell
+- Allow overwriting the column for `unique_user_value` validation. [#8852](https://github.com/statamic/cms/issues/8852) by @marcorieser
+
+### What's improved
+- German translations [#8857](https://github.com/statamic/cms/issues/8857) by @helloDanuk
+- French translations [#8848](https://github.com/statamic/cms/issues/8848) by @ebeauchamps
+
+### What's fixed
+- Remove double-render of fields in Form tag. [#8861](https://github.com/statamic/cms/issues/8861) by @martyf
+- Fix navigation 'Save Changes' button state. [#8864](https://github.com/statamic/cms/issues/8864) by @duncanmcclean
+- Fix missing replicator set previews. [#8855](https://github.com/statamic/cms/issues/8855) by @jacksleight
+- Bump @babel/traverse from 7.21.3 to 7.23.2 [#8870](https://github.com/statamic/cms/issues/8870) by @dependabot
+
+
+
 ## 4.28.0 (2023-10-13)
 
 ### What's new
