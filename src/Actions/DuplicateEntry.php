@@ -33,7 +33,7 @@ class DuplicateEntry extends Action
         $items
             ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
             ->unique()
-            ->each(fn (Entry $original) => $this->duplicateEntry($original));
+            ->each(fn ($original) => $this->duplicateEntry($original));
     }
 
     private function duplicateEntry(Entry $original, string $origin = null)
