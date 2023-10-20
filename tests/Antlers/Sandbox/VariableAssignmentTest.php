@@ -5,6 +5,7 @@ namespace Tests\Antlers\Sandbox;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
+use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;
@@ -195,6 +196,83 @@ Count: 4
 EXP;
 
         $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
+
+    public function test_tags_returning_associative_arrays_do_not_cause_variable_leakage()
+    {
+        (new class extends Tags
+        {
+            public static $handle = 'the_tag';
+
+            public function index()
+            {
+                // What this is doesn't matter, just that it's an associative array.
+                return [
+                    'title' => 'The Title',
+                    'content' => 'The Content',
+                ];
+            }
+        })::register();
+
+        $template = <<<'EOT'
+{{ the_tag }}
+    {{ title }}
+    {{ content }}
+    
+    {{ items = ['a', 'b', 'c'] }}
+{{ /the_tag }}
+
+{{ items }}
+    {{ value }}
+{{ /items }}
+EOT;
+
+        $expected = <<<'EXP'
+The Title
+    The Content
+    
+    
+
+
+
+    d
+
+    e
+
+    f
+EXP;
+
+        $this->assertSame($expected, trim($this->renderString($template, ['items' => ['d', 'e', 'f']], true)));
+
+        $template = <<<'EOT'
+Before: {{ items }}{{ value }}{{ /items }}
+{{# This should trigger a scope reassignment. #}}
+{{ items = [] /}}
+{{ the_tag }}
+    {{ title }}
+    {{ content }}
+    
+    {{ items = ['a', 'b', 'c'] }}
+{{ /the_tag }}
+
+{{ items }}{{ value }}{{ /items }}
+EOT;
+
+        $expected = <<<'EXP'
+Before: def
+
+
+
+    The Title
+    The Content
+    
+    
+
+
+abc
+EXP;
+
+        $this->assertSame($expected, trim($this->renderString($template, ['items' => ['d', 'e', 'f']], true)));
     }
 
     public function test_assignments_are_traced_from_nested_arrays_and_tags()

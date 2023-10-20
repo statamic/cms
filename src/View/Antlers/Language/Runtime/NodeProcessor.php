@@ -1756,7 +1756,7 @@ class NodeProcessor
                                 // Only revert to parseLoop behavior if the tag contains
                                 // parameters that are likely to dramatically change
                                 // the scope or overall output of the tag result.
-                                if (Arr::isAssoc($output) || $node->hasScopeAdjustingParameters) {
+                                if ($node->hasScopeAdjustingParameters) {
                                     $tagAssocOutput = $output;
                                     $output = Arr::assoc($output) ? (string) $tag->parse($output) : (string) $tag->parseLoop($this->addLoopIterationVariables($output));
                                     $tagCallbackResult = null;
@@ -2260,6 +2260,8 @@ class NodeProcessor
                                         }
                                     }
 
+                                    $beforeAssignments = $this->runtimeAssignments;
+
                                     $evalData = $val + $tmpArrayData;
                                     $this->pushScope($node, $evalData);
 
@@ -2280,9 +2282,16 @@ class NodeProcessor
 
                                     $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($assocOutput));
 
-                                    $runtimeAssignmentsToProcess = $processor->getRuntimeAssignments();
+                                    $runtimeAssignmentsToProcess = [];
 
                                     $this->popScope($node->refId);
+
+                                    // Ensure we don't leak variables.
+                                    foreach ($processor->getRuntimeAssignments() as $assignVar => $assignValue) {
+                                        if (array_key_exists($assignVar, $beforeAssignments)) {
+                                            $runtimeAssignmentsToProcess[$assignVar] = $assignValue;
+                                        }
+                                    }
 
                                     if (! empty($runtimeAssignmentsToProcess)) {
                                         $this->data = $lockData;
