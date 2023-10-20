@@ -19,6 +19,20 @@ class DuplicateEntry extends Action
         return $item instanceof Entry;
     }
 
+    public function confirmationText()
+    {
+        $hasDescendants = $this->items
+            ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
+            ->unique()
+            ->contains(fn ($entry) => $entry->descendants()->count());
+
+        if ($hasDescendants) {
+            return 'duplicate_action_localizations_confirmation';
+        }
+
+        return parent::confirmationText();
+    }
+
     public function warningText()
     {
         if ($this->items->contains(fn ($entry) => $entry->hasOrigin())) {
