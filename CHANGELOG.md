@@ -1,5 +1,19 @@
 # Release Notes
 
+## 4.30.0 (2023-10-20)
+
+### What's new
+- Multi-site Duplicator Support. [#8665](https://github.com/statamic/cms/issues/8665) by @duncanmcclean
+- Add `EntryDeleting` to allow you to prevent items being deleted [#8833](https://github.com/statamic/cms/issues/8833) by @ryanmitchell
+
+### What's improved
+- Cache Blueprint columns. [#8840](https://github.com/statamic/cms/issues/8840) by @jonassiewertsen
+
+### What's fixed
+- Default to using the CP broker when multiple are available. [#8872](https://github.com/statamic/cms/issues/8872) by @ryanmitchell
+
+
+
 ## 4.29.0 (2023-10-19)
 
 ### What's new
