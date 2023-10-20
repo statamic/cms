@@ -380,12 +380,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             })
             ->keyBy('field');
 
-        $columns = new Columns($fields);
-
-        // Cache columns for a single request
-        $this->columns = $columns;
-
-        return $columns;
+        return $this->columns = new Columns($fields);
     }
 
     public function isEmpty(): bool
