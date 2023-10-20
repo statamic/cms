@@ -364,7 +364,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             return $this->columns;
         }
 
-        $fields = $this->fields()
+        $columns = $this->fields()
             ->all()
             ->values()
             ->map(function ($field, $index) {
@@ -380,7 +380,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             })
             ->keyBy('field');
 
-        return $this->columns = new Columns($fields);
+        return $this->columns = new Columns($columns);
     }
 
     public function isEmpty(): bool
