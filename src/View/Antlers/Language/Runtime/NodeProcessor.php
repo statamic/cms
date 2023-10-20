@@ -1755,8 +1755,8 @@ class NodeProcessor
 
                                 // Only revert to parseLoop behavior if the tag contains
                                 // parameters that are likely to dramatically change
-                                // the scope or overall output of the tag result
-                                if ($node->hasScopeAdjustingParameters) {
+                                // the scope or overall output of the tag result.
+                                if (Arr::isAssoc($output) || $node->hasScopeAdjustingParameters) {
                                     $tagAssocOutput = $output;
                                     $output = Arr::assoc($output) ? (string) $tag->parse($output) : (string) $tag->parseLoop($this->addLoopIterationVariables($output));
                                     $tagCallbackResult = null;
