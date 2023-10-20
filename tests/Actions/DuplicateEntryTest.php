@@ -63,26 +63,132 @@ class DuplicateEntryTest extends TestCase
         ], $this->entryData());
     }
 
-    /** @test */
-    public function user_with_create_permission_is_authorized()
+    /**
+     * @test
+     *
+     * @dataProvider authorizationProvider
+     */
+    public function it_authorizes(
+        bool $isMultisite,
+        array $permissions,
+        bool $expectedToBeAuthorized
+    ) {
+        $this->setTestRoles(['test' => $permissions]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = Collection::make('test');
+
+        if ($isMultisite) {
+            Site::setConfig(['sites' => [
+                'en' => ['url' => '/', 'locale' => 'en'],
+                'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+            ]]);
+
+            $collection->sites(['en', 'fr']);
+        }
+
+        $collection->save();
+
+        $item = EntryFactory::collection('test')->slug('alfa')->locale('en')->create();
+
+        $this->assertEquals($expectedToBeAuthorized, (new DuplicateEntry)->authorize($user, $item));
+    }
+
+    public function authorizationProvider()
     {
-        $this->setTestRoles([
-            'access' => ['create test entries'],
-            'noaccess' => [],
-        ]);
+        return [
+            'no permission' => [
+                $multisite = false,
+                $permissions = [],
+                $expectedToBeAuthorized = false,
+            ],
+            'permission to create, access to no sites, but not using multisite' => [
+                $multisite = false,
+                $permissions = ['create test entries'],
+                $expectedToBeAuthorized = true,
+            ],
+            'permission to create, access to site' => [
+                $multisite = true,
+                $permissions = ['create test entries', 'access en site'],
+                $expectedToBeAuthorized = true,
+            ],
+            'permission to create, access to no sites' => [
+                $multisite = true,
+                $permissions = ['create test entries'],
+                $expectedToBeAuthorized = false,
+            ],
+            'permission to create, access to a different site' => [
+                $multisite = true,
+                $permissions = ['create test entries', 'access fr site'],
+                $expectedToBeAuthorized = false,
+            ],
+        ];
+    }
 
-        Collection::make('test')->save();
-        $userWithPermission = tap(User::make()->assignRole('access'))->save();
-        $userWithoutPermission = tap(User::make()->assignRole('noaccess'))->save();
+    /**
+     * @test
+     *
+     * @dataProvider bulkAuthorizationProvider
+     */
+    public function it_authorizes_in_bulk(
+        bool $isMultisite,
+        array $permissions,
+        bool $expectedToBeAuthorized
+    ) {
+        $this->setTestRoles(['test' => $permissions]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $collection = Collection::make('test');
+
+        if ($isMultisite) {
+            Site::setConfig(['sites' => [
+                'en' => ['url' => '/', 'locale' => 'en'],
+                'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+                'de' => ['url' => '/de/', 'locale' => 'de'],
+            ]]);
+
+            $collection->sites(['en', 'fr', 'de']);
+        }
+
+        $collection->save();
+
         $items = collect([
-            EntryFactory::collection('test')->slug('alfa')->create(),
-            EntryFactory::collection('test')->slug('bravo')->create(),
+            EntryFactory::collection('test')->slug('alfa')->locale('en')->create(),
+            EntryFactory::collection('test')->slug('bravo')->locale($isMultisite ? 'fr' : 'en')->create(),
         ]);
 
-        $this->assertTrue((new DuplicateEntry)->authorize($userWithPermission, $items->first()));
-        $this->assertTrue((new DuplicateEntry)->authorizeBulk($userWithPermission, $items));
-        $this->assertFalse((new DuplicateEntry)->authorize($userWithoutPermission, $items->first()));
-        $this->assertFalse((new DuplicateEntry)->authorizeBulk($userWithoutPermission, $items));
+        $this->assertEquals($expectedToBeAuthorized, (new DuplicateEntry)->authorizeBulk($user, $items));
+    }
+
+    public function bulkAuthorizationProvider()
+    {
+        return [
+            'no permission' => [
+                $multisite = false,
+                $permissions = [],
+                $expectedToBeAuthorized = false,
+            ],
+            'permission to create, access to no sites, but not using multisite' => [
+                $multisite = false,
+                $permissions = ['create test entries'],
+                $expectedToBeAuthorized = true,
+            ],
+            'permission to create, access to all sites' => [
+                $multisite = true,
+                $permissions = ['create test entries', 'access en site', 'access fr site'],
+                $expectedToBeAuthorized = true,
+            ],
+            'permission to create, access to no sites' => [
+                $multisite = true,
+                $permissions = ['create test entries'],
+                $expectedToBeAuthorized = false,
+            ],
+            'permission to create, access to a site that the entries arent in' => [
+                $multisite = true,
+                $permissions = ['create test entries', 'access de site'],
+                $expectedToBeAuthorized = false,
+            ],
+        ];
     }
 
     /** @test */
