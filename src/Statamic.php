@@ -443,6 +443,7 @@ class Statamic
 
                 // Add the version to the path.
                 $path = str_finish($path, "?v={$version}");
+
             }
 
             return $path;
