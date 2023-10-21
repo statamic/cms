@@ -3,6 +3,7 @@
 namespace Statamic\CP\Navigation;
 
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
@@ -10,6 +11,9 @@ use Statamic\Support\Str;
 
 class NavBuilder
 {
+    const ALL_URLS_CACHE_KEY = 'cp-nav-urls-all';
+    const CHILDREN_URLS_CACHE_KEY = 'cp-nav-urls-children';
+
     protected $items = [];
     protected $pendingItems = [];
     protected $withHidden = false;
@@ -55,6 +59,7 @@ class NavBuilder
             ->trackOriginalSectionItems()
             ->applyPreferenceOverrides($preferences)
             ->buildSections()
+            ->ensureCachedUrls()
             ->get();
     }
 
@@ -882,6 +887,39 @@ class NavBuilder
     protected function generateNewItemId($section, $name)
     {
         return (new NavItem)->display($name)->section($section)->id();
+    }
+
+    /**
+     * Ensure urls are cached for `isActive()` checks.
+     *
+     * @return $this
+     */
+    protected function ensureCachedUrls()
+    {
+        if (Cache::has(static::ALL_URLS_CACHE_KEY) && Cache::has(static::CHILDREN_URLS_CACHE_KEY)) {
+            return $this;
+        }
+
+        $items = $this->built
+            ->flatMap(fn ($section) => $section['items'])
+            ->each(fn ($item) => $item->resolveChildren());
+
+        $allUrls = $items
+            ->flatMap(function ($item) {
+                return array_merge([$item->url()], $item->children()?->map->url()->all() ?? []);
+            })
+            ->unique()
+            ->values();
+
+        $childrenUrls = $items
+            ->mapWithKeys(function ($item) {
+                return [$item->id() => $item->children()?->map->url()->all() ?? []];
+            });
+
+        Cache::put(static::ALL_URLS_CACHE_KEY, $allUrls);
+        Cache::put(static::CHILDREN_URLS_CACHE_KEY, $childrenUrls);
+
+        return $this;
     }
 
     /**
