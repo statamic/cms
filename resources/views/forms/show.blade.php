@@ -43,7 +43,7 @@
             <dropdown-list>
                 <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
                 @foreach ($exporters as $type => $exporter)
-                <dropdown-item :text="__('{{ $exporter['label'] ?? __('Export as '.strtoupper($type)) }}')" redirect="{{ cp_route('forms.export', ['type' => $type, 'form' => $form->handle()]) }}?download=true"></dropdown-item>
+                <dropdown-item :text="__('{{ $exporter['class']::title() }}')" redirect="{{ cp_route('forms.export', ['type' => $type, 'form' => $form->handle()]) }}?download=true"></dropdown-item>
                 @endforeach
             </dropdown-list>
             @endif

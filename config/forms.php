@@ -85,11 +85,9 @@ return [
     'exporters' => [
         'csv' => [
             'class' => Statamic\Forms\Exporters\CsvExporter::class,
-            'label' => 'Export as CSV',
         ],
         'json' => [
             'class' => Statamic\Forms\Exporters\JsonExporter::class,
-            'label' => 'Export as JSON',
         ],
     ],
 

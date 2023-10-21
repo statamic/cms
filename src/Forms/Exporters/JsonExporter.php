@@ -4,6 +4,8 @@ namespace Statamic\Forms\Exporters;
 
 class JsonExporter extends AbstractExporter
 {
+    protected static $title = 'JSON';
+
     /**
      * Perform the export.
      *
@@ -24,5 +26,15 @@ class JsonExporter extends AbstractExporter
     public function contentType()
     {
         return 'application/json';
+    }
+
+    /**
+     * Get the extension.
+     *
+     * @return string
+     */
+    public function extension()
+    {
+        return 'json';
     }
 }

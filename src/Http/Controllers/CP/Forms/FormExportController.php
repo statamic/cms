@@ -27,14 +27,13 @@ class FormExportController extends CpController
             throw new FatalException("Exporter of type [$type] does not exist.");
         }
 
-        $exporter = new $exporterConfig['class'];
-        $exporter->config(Arr::except($exporterConfig, ['class', 'forms']));
+        $exporter = new $exporterConfig['class'](Arr::except($exporterConfig, ['class', 'forms']));
         $exporter->form($form);
 
         $content = $exporter->export();
 
         if ($this->request->has('download')) {
-            $path = storage_path('statamic/tmp/forms/'.$form->handle().'-'.time().'.'.$type);
+            $path = storage_path('statamic/tmp/forms/'.$form->handle().'-'.time().'.'.$exporter->extension());
             File::put($path, $content);
             $response = response()->download($path)->deleteFileAfterSend(true);
         } else {

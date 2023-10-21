@@ -9,7 +9,7 @@ abstract class AbstractExporter implements Exporter
     /**
      * @var array
      */
-    private $config;
+    public $config;
 
     /**
      * @var Statamic\Contracts\Forms\Form
@@ -17,17 +17,18 @@ abstract class AbstractExporter implements Exporter
     private $form;
 
     /**
-     * Get or set the config.
-     *
-     * @param  array|null  $config
-     * @return array|void
+     * @var string
      */
-    public function config($config = null)
-    {
-        if (is_null($config)) {
-            return $this->$config;
-        }
+    protected static $title;
 
+    /**
+     * Create the exporter
+     *
+     * @param  array  $config
+     * @return self
+     */
+    public function __construct($config = [])
+    {
         $this->config = $config;
     }
 
@@ -54,5 +55,25 @@ abstract class AbstractExporter implements Exporter
     public function contentType()
     {
         return 'text/plain';
+    }
+
+    /**
+     * Get the extension.
+     *
+     * @return string
+     */
+    public function extension()
+    {
+        return 'txt';
+    }
+
+    /**
+     * Get the title.
+     *
+     * @return string
+     */
+    public static function title()
+    {
+        return __(static::$title);
     }
 }
