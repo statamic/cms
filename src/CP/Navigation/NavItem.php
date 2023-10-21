@@ -2,7 +2,7 @@
 
 namespace Statamic\CP\Navigation;
 
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
@@ -343,7 +343,7 @@ class NavItem
     }
 
     /**
-     * Get whether the nav item is currently active.
+     * Determine whether the nav item is currently active.
      *
      * @return bool
      */
@@ -353,28 +353,45 @@ class NavItem
             return true;
         }
 
+        // If the current url is not explicitly referenced in CP nav,
+        // check if active descendant using regex pattern instead.
+        if (! Cache::get(NavBuilder::ALL_URLS_CACHE_KEY)?->contains(request()->url())) {
+            return $this->isActiveByPattern();
+        }
+
         return request()->url() === URL::removeQueryAndFragment($this->url);
     }
 
     /**
-     * Get whether the nav item has a currently active child.
+     * Determine whether the nav item has a currently active child.
      *
      * @return bool
      */
     protected function hasActiveChild()
     {
-        if ($this->shouldResolveChildren()) {
-            $this->resolveChildren();
-        }
-
-        if (! $this->children() instanceof Collection) {
+        if (! $childrenUrls = Cache::get(NavBuilder::CHILDREN_URLS_CACHE_KEY)?->get($this->id())) {
             return false;
         }
 
-        return $this
-            ->children()
-            ->filter(fn ($item) => $item->isActive())
-            ->isNotEmpty();
+        return collect($childrenUrls)
+            ->map(fn ($url) => URL::removeQueryAndFragment($url))
+            ->contains(request()->url());
+    }
+
+    /**
+     * Determine whether the nav item is currently active using the regex technique for deeply nested hierarchical urls.
+     *
+     * @return bool
+     */
+    public function isActiveByPattern()
+    {
+        if (! $this->active) {
+            return false;
+        }
+
+        $pattern = preg_quote(config('statamic.cp.route'), '#').'/'.$this->active;
+
+        return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
     }
 
     /**
