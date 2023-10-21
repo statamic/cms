@@ -267,22 +267,6 @@ class NavItem
     }
 
     /**
-     * Determine when to resolve children for `hasActiveChild()` checks.
-     *
-     * @return bool
-     */
-    protected function shouldResolveChildren()
-    {
-        if (! $this->active) {
-            return false;
-        }
-
-        $pattern = preg_quote(config('statamic.cp.route'), '#').'/'.$this->active;
-
-        return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
-    }
-
-    /**
      * Resolve children closure.
      *
      * @return $this
