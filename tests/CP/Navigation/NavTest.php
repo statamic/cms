@@ -401,8 +401,11 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    public function it_checks_if_active()
+    public function it_checks_various_active_patterns()
     {
+        // Ensure urls are not cached so that we can test regex based isActive() checks
+        Nav::clearCachedUrls();
+
         $hello = Nav::create('hello')->url('http://localhost/cp/hello');
         $helloWithQueryParams = Nav::create('helloWithAnchor')->url('http://localhost/cp/hello?params');
         $helloWithAnchor = Nav::create('helloWithAnchor')->url('http://localhost/cp/hello#anchor');
@@ -433,15 +436,15 @@ class NavTest extends TestCase
         $this->assertFalse($hello->isActive());
         $this->assertFalse($helloWithQueryParams->isActive());
         $this->assertFalse($helloWithAnchor->isActive());
-        $this->assertFalse($hell->isActive());
+        $this->assertTrue($hell->isActive());
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
         $this->assertFalse($externalSecure->isActive());
 
         Request::swap(Request::create('http://localhost/cp/hello/test'));
-        $this->assertFalse($hello->isActive());
-        $this->assertFalse($helloWithQueryParams->isActive());
-        $this->assertFalse($helloWithAnchor->isActive());
+        $this->assertTrue($hello->isActive());
+        $this->assertTrue($helloWithQueryParams->isActive());
+        $this->assertTrue($helloWithAnchor->isActive());
         $this->assertFalse($hell->isActive());
         $this->assertFalse($localNotCp->isActive());
         $this->assertFalse($external->isActive());
@@ -471,14 +474,28 @@ class NavTest extends TestCase
     {
         $collections = Nav::content('Collections')
             ->url('http://localhost/cp/collections')
-            ->children(function () use (&$pages, &$articles) {
-                return [
-                    $pages = Nav::item('Pages')->url('/cp/collections/pages'),
-                    $articles = Nav::item('Articles')->url('/cp/collections/articles'),
-                ];
-            });
+            ->children([
+                $pages = Nav::item('Pages')->url('/cp/collections/pages'),
+                $articles = Nav::item('Articles')->url('/cp/collections/articles'),
+            ]);
 
         Request::swap(Request::create('http://localhost/cp/collections/articles'));
+        $this->assertTrue($collections->isActive());
+        $this->assertFalse($pages->isActive());
+        $this->assertTrue($articles->isActive());
+    }
+
+    /** @test */
+    public function it_can_get_has_active_children_status_with_nested_url_hierarchy()
+    {
+        $collections = Nav::content('Custom Collections Url')
+            ->url('http://localhost/cp/collections')
+            ->children([
+                $pages = Nav::item('Pages')->url('/cp/collections/pages'),
+                $articles = Nav::item('Articles')->url('/cp/collections/articles'),
+            ]);
+
+        Request::swap(Request::create('http://localhost/cp/collections/articles/nested-article'));
         $this->assertTrue($collections->isActive());
         $this->assertFalse($pages->isActive());
         $this->assertTrue($articles->isActive());
@@ -489,18 +506,115 @@ class NavTest extends TestCase
     {
         $collections = Nav::content('Custom Collections Url')
             ->url('http://localhost/cp/custom/url')
-            ->active('collections*')
-            ->children(function () use (&$pages, &$articles) {
-                return [
-                    $pages = Nav::item('Pages')->url('/cp/collections/pages'),
-                    $articles = Nav::item('Articles')->url('/cp/collections/articles'),
-                ];
-            });
+            ->active('collections/.*')
+            ->children([
+                $pages = Nav::item('Pages')->url('/cp/collections/pages'),
+                $articles = Nav::item('Articles')->url('/cp/collections/articles'),
+            ]);
 
         Request::swap(Request::create('http://localhost/cp/collections/articles'));
         $this->assertTrue($collections->isActive());
         $this->assertFalse($pages->isActive());
         $this->assertTrue($articles->isActive());
+    }
+
+    /** @test */
+    public function it_can_get_has_active_children_status_with_multiple_custom_is_active_patterns()
+    {
+        // TODO
+        $this->markTestSkipped();
+
+        $collections = Nav::content('Custom Collections Url')
+            ->url('http://localhost/cp/custom/url')
+            ->active([
+                'collections',
+            ])
+            ->children([
+                $pages = Nav::item('Pages')->url('/cp/collections/pages'),
+                $articles = Nav::item('Articles')->url('/cp/collections/articles'),
+                $categories = Nav::item('Categories')->url('/cp/taxonomies/categories'),
+            ]);
+
+        Request::swap(Request::create('http://localhost/cp/collections/pages'));
+        $this->assertTrue($collections->isActive());
+        $this->assertTrue($pages->isActive());
+        $this->assertFalse($articles->isActive());
+        $this->assertFalse($categories->isActive());
+
+        Request::swap(Request::create('http://localhost/cp/collections/articles'));
+        $this->assertTrue($collections->isActive());
+        $this->assertFalse($pages->isActive());
+        $this->assertTrue($articles->isActive());
+        $this->assertFalse($categories->isActive());
+
+        Request::swap(Request::create('http://localhost/cp/taxonomies/categories'));
+        $this->assertTrue($collections->isActive());
+        $this->assertFalse($pages->isActive());
+        $this->assertFalse($articles->isActive());
+        $this->assertTrue($categories->isActive());
+    }
+
+    /** @test */
+    public function it_can_get_has_active_children_status_with_custom_is_active_url()
+    {
+        // TODO
+        $this->markTestSkipped();
+
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get('/cp/collections/articles')
+            ->assertStatus(200);
+
+        $collections = Nav::content('Custom Collections Url')
+            ->url('http://localhost/cp/custom/url')
+            ->active('http://localhost/cp/collections')
+            ->children([
+                $pages = Nav::item('Pages')->url('/cp/collections/pages'),
+                $articles = Nav::item('Articles')->url('/cp/collections/articles'),
+            ]);
+
+        $this->assertTrue($collections->isActive());
+        $this->assertFalse($pages->isActive());
+        $this->assertTrue($articles->isActive());
+    }
+
+    /** @test */
+    public function it_can_get_has_active_children_status_with_multiple_custom_is_active_urls()
+    {
+        // TODO
+        $this->markTestSkipped();
+
+        $collections = Nav::content('Custom Collections Url')
+            ->url('http://localhost/cp/custom/url')
+            ->active([
+                'collections/.*',
+            ])
+            ->children([
+                $pages = Nav::item('Pages')->url('/cp/collections/pages'),
+                $articles = Nav::item('Articles')->url('/cp/collections/articles'),
+                $categories = Nav::item('Categories')->url('/cp/taxonomies/categories'),
+            ]);
+
+        Request::swap(Request::create('http://localhost/cp/collections/pages'));
+        $this->assertTrue($collections->isActive());
+        $this->assertTrue($pages->isActive());
+        $this->assertFalse($articles->isActive());
+        $this->assertFalse($categories->isActive());
+
+        Request::swap(Request::create('http://localhost/cp/collections/articles'));
+        $this->assertTrue($collections->isActive());
+        $this->assertFalse($pages->isActive());
+        $this->assertTrue($articles->isActive());
+        $this->assertFalse($categories->isActive());
+
+        Request::swap(Request::create('http://localhost/cp/taxonomies/categories'));
+        $this->assertTrue($collections->isActive());
+        $this->assertFalse($pages->isActive());
+        $this->assertFalse($articles->isActive());
+        $this->assertTrue($categories->isActive());
     }
 
     /** @test */
