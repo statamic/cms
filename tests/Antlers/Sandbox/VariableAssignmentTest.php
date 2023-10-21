@@ -198,6 +198,151 @@ EXP;
         $this->assertSame($expected, trim($this->renderString($template, [], true)));
     }
 
+    public function test_tags_with_modifier_names_that_return_associative_arrays_use_old_behavior()
+    {
+        (new class extends Tags
+        {
+            public static $handle = 'the_tag';
+
+            public function index()
+            {
+                // What this is doesn't matter, just that it's an associative array.
+                return [
+                    'title' => 'The Title',
+                    'content' => 'The Content',
+                ];
+            }
+        })::register();
+
+        $template = <<<'EOT'
+{{ the_tag :url="title" }}
+    {{ title }}
+    {{ content }}
+    
+    {{ items = ['a', 'b', 'c'] }}
+    {{ items }}{{ value }}{{ /items }}
+    
+    {{ the_tag :url="title" }}
+        {{ title }}
+        {{ content }}
+        
+        {{ items = ['a', 'b', 'c'] }}
+        {{ items }}{{ value }}{{ /items }}
+        
+    {{ /the_tag }}
+{{ /the_tag }}
+
+{{ items }}
+    {{ value }}
+{{ /items }}
+EOT;
+
+        // The final 'a b c' at the end is arguably wrong, but it's the old behavior.
+        $expected = <<<'EXP'
+The Title
+    The Content
+    
+    
+    abc
+    
+    
+        The Title
+        The Content
+        
+        
+        abc
+        
+    
+
+
+
+    a
+
+    b
+
+    c
+EXP;
+
+        $this->assertSame($expected, $this->renderString(trim($this->renderString($template, ['items' => ['d', 'e', 'f']], true))));
+
+        // Removing the modifier name from the tag will make the assignment not leak, matching old behavior.
+        $template = <<<'EOT'
+{{ the_tag }}
+    {{ title }}
+    {{ content }}
+    
+    {{ items = ['a', 'b', 'c'] }}
+    {{ items }}{{ value }}{{ /items }}
+    
+    {{ the_tag :url="title" }}
+        {{ title }}
+        {{ content }}
+        
+        {{ items = ['a', 'b', 'c'] }}
+        {{ items }}{{ value }}{{ /items }}
+        
+    {{ /the_tag }}
+{{ /the_tag }}
+
+{{ items }}
+    {{ value }}
+{{ /items }}
+EOT;
+
+        $expected = <<<'EXP'
+The Title
+    The Content
+    
+    
+    abc
+    
+    
+        The Title
+        The Content
+        
+        
+        abc
+        
+    
+
+
+
+    d
+
+    e
+
+    f
+EXP;
+
+        $this->assertSame($expected, $this->renderString(trim($this->renderString($template, ['items' => ['d', 'e', 'f']], true))));
+
+        // No collisions anywhere.
+        $template = <<<'EOT'
+{{ the_tag }}
+    {{ title }}
+    {{ content }}
+    
+    {{ items = ['a', 'b', 'c'] }}
+    {{ items }}{{ value }}{{ /items }}
+    
+    {{ the_tag }}
+        {{ title }}
+        {{ content }}
+        
+        {{ items = ['a', 'b', 'c'] }}
+        {{ items }}{{ value }}{{ /items }}
+        
+    {{ /the_tag }}
+{{ /the_tag }}
+
+{{ items }}
+    {{ value }}
+{{ /items }}
+EOT;
+
+        $this->assertSame($expected, $this->renderString(trim($this->renderString($template, ['items' => ['d', 'e', 'f']], true))));
+    }
+
     public function test_tags_returning_associative_arrays_do_not_cause_variable_leakage()
     {
         (new class extends Tags
