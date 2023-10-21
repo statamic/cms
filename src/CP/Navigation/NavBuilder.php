@@ -931,4 +931,13 @@ class NavBuilder
     {
         return $this->built;
     }
+
+    /**
+     * Clear cached urls.
+     */
+    public static function clearCachedUrls()
+    {
+        Cache::forget(static::ALL_URLS_CACHE_KEY);
+        Cache::forget(static::CHILDREN_URLS_CACHE_KEY);
+    }
 }
