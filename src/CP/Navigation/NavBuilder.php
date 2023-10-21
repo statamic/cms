@@ -57,9 +57,9 @@ class NavBuilder
             ->syncOriginal()
             ->trackCoreSections()
             ->trackOriginalSectionItems()
+            ->ensureCachedUrls()
             ->applyPreferenceOverrides($preferences)
             ->buildSections()
-            ->ensureCachedUrls()
             ->get();
     }
 
@@ -900,8 +900,7 @@ class NavBuilder
             return $this;
         }
 
-        $items = $this->built
-            ->flatMap(fn ($section) => $section['items'])
+        $items = collect($this->items)
             ->each(fn ($item) => $item->resolveChildren());
 
         $allUrls = $items

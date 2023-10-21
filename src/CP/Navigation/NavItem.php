@@ -2,6 +2,7 @@
 
 namespace Statamic\CP\Navigation;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\URL;
@@ -353,13 +354,22 @@ class NavItem
      */
     protected function hasActiveChild()
     {
-        if (! $childrenUrls = Cache::get(NavBuilder::CHILDREN_URLS_CACHE_KEY)?->get($this->id())) {
-            return false;
+        // If children are already resolved to a collection, just check `isActive()` on each child item.
+        if ($this->children() instanceof Collection) {
+            return $this
+                ->children()
+                ->filter(fn ($item) => $item->isActive())
+                ->isNotEmpty();
         }
 
-        return collect($childrenUrls)
-            ->map(fn ($url) => URL::removeQueryAndFragment($url))
-            ->contains(request()->url());
+        // If children closure has not been resolved, and children urls are cached, check against cached children.
+        if ($childrenUrls = Cache::get(NavBuilder::CHILDREN_URLS_CACHE_KEY)?->get($this->id())) {
+            return collect($childrenUrls)
+                ->map(fn ($url) => URL::removeQueryAndFragment($url))
+                ->contains(request()->url());
+        }
+
+        return false;
     }
 
     /**
