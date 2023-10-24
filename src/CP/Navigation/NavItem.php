@@ -3,7 +3,6 @@
 namespace Statamic\CP\Navigation;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
@@ -340,7 +339,7 @@ class NavItem
 
         // If the current url is not explicitly referenced in CP nav,
         // check if active descendant using regex pattern instead.
-        if (! Cache::get(NavBuilder::ALL_URLS_CACHE_KEY)?->contains(request()->url())) {
+        if (! NavBuilder::getAllUrls()->contains(request()->url())) {
             return $this->isActiveByPattern();
         }
 
@@ -363,7 +362,7 @@ class NavItem
         }
 
         // If children closure has not been resolved, and children urls are cached, check against cached children.
-        if ($childrenUrls = Cache::get(NavBuilder::CHILDREN_URLS_CACHE_KEY)?->get($this->id())) {
+        if ($childrenUrls = NavBuilder::getUnresolvedChildrenUrlsForItem($this)) {
             return collect($childrenUrls)
                 ->map(fn ($url) => URL::removeQueryAndFragment($url))
                 ->contains(request()->url());
