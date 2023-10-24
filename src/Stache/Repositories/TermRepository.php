@@ -68,7 +68,10 @@ class TermRepository implements RepositoryContract
 
         $uri = Str::removeLeft($uri, '/');
 
-        [$taxonomy, $slug] = array_pad(explode('/', $uri), 2, null);
+        $uriParts = array_pad(explode('/', $uri), 2, null);
+
+        $slug = array_pop($uriParts);
+        $taxonomy = implode('/', $uriParts);
 
         if (! $slug) {
             return null;
@@ -151,7 +154,7 @@ class TermRepository implements RepositoryContract
 
     private function findTaxonomyHandleByUri($uri, $site)
     {
-        $routes = $this->stache->store('taxonomies')->index('routes')->items()->map(fn ($item) => $item->get($site))->flip();
+        $routes = $this->stache->store('taxonomies')->index('routes')->items()->map(fn ($item) => $item->get($site))->filter()->flip();
 
         if ($handle = $routes->get($uri)) {
             return $handle;
