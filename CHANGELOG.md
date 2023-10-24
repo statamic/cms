@@ -1,5 +1,15 @@
 # Release Notes
 
+## 3.4.12 (2023-10-24)
+
+### What's improved
+- French translations. [#8105](https://github.com/statamic/cms/issues/8105) by @ebeauchamps
+
+### What's fixed
+- SVG tag sanitization. [#8875](https://github.com/statamic/cms/issues/8875) by @jasonvarga
+
+
+
 ## 3.4.11 (2023-05-06)
 
 ### What's fixed
