@@ -383,9 +383,9 @@ export default {
         },
 
         treeSaved(response) {
-            this.changed = false;
-
             this.replaceGeneratedIds(response.data.generatedIds);
+
+            this.changed = false;
         },
 
         replaceGeneratedIds(ids) {

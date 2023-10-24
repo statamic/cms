@@ -295,7 +295,7 @@ export default {
                 } else if (node.type === 'set') {
                     const handle = node.attrs.values.type;
                     const set = this.setConfigs.find(set => set.handle === handle);
-                    text += ` [${set ? set.display : handle}]`;
+                    text += ` [${__(set ? set.display : handle)}]`;
                 }
                 if (text.length > 150) {
                     break;
@@ -666,7 +666,7 @@ export default {
                 Gapcursor,
                 History,
                 Paragraph,
-                Placeholder.configure({ placeholder: this.config.placeholder }),
+                Placeholder.configure({ placeholder: __(this.config.placeholder) }),
                 Set.configure({ bard: this }),
                 Text
             ];

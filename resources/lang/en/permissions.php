@@ -15,6 +15,9 @@ return [
     'manage_preferences' => 'Manage Preferences',
     'manage_preferences_desc' => 'Ability to customize global and role-specific preferences.',
 
+    'group_sites' => 'Sites',
+    'access_{site}_site' => 'Access :site site',
+
     'group_collections' => 'Collections',
     'configure_collections' => 'Configure Collections',
     'configure_collections_desc' => 'Grants access to all collection related permissions',
