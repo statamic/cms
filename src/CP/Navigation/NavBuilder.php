@@ -4,6 +4,7 @@ namespace Statamic\CP\Navigation;
 
 use Exception;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
@@ -11,8 +12,8 @@ use Statamic\Support\Str;
 
 class NavBuilder
 {
+    const UNRESOLVED_CHILDREN_URLS_CACHE_KEY = 'cp-nav-urls-unresolved-children';
     const ALL_URLS_CACHE_KEY = 'cp-nav-urls-all';
-    const CHILDREN_URLS_CACHE_KEY = 'cp-nav-urls-children';
 
     protected $items = [];
     protected $pendingItems = [];
@@ -22,6 +23,8 @@ class NavBuilder
     protected $sectionsManipulations = [];
     protected $sectionsOrder = [];
     protected $sectionsWithReorderedItems = [];
+    protected $urlsUnresolvedChildren = [];
+    protected $urlsAll = [];
     protected $built;
 
     /**
@@ -57,9 +60,10 @@ class NavBuilder
             ->syncOriginal()
             ->trackCoreSections()
             ->trackOriginalSectionItems()
-            ->ensureCachedUrls()
+            ->trackUrls()
             ->applyPreferenceOverrides($preferences)
             ->buildSections()
+            ->blinkUrls()
             ->get();
     }
 
@@ -810,6 +814,12 @@ class NavBuilder
             return;
         }
 
+        if ($this->urlsUnresolvedChildren->has($parent->id())) {
+            $this->urlsUnresolvedChildren[$parent->id()] = collect($this->urlsUnresolvedChildren[$parent->id()])
+                ->reject(fn ($url) => $url === $item->url())
+                ->all();
+        }
+
         if ($parent->resolveChildren()->children()) {
             $parent->children(
                 $parent->children()->reject(function ($child) use ($item) {
@@ -890,35 +900,93 @@ class NavBuilder
     }
 
     /**
-     * Ensure urls are cached for `isActive()` checks.
+     * Track URLs for `isActive` checks on nav items.
      *
      * @return $this
      */
-    protected function ensureCachedUrls()
+    protected function trackUrls()
     {
-        if (Cache::has(static::ALL_URLS_CACHE_KEY) && Cache::has(static::CHILDREN_URLS_CACHE_KEY)) {
+        // If URLs are already cached, get them from cache so that we don't have to
+        // resolve children closures on every request for performance reasons.
+        if ($this->hasCachedUrls()) {
+            $this->urlsUnresolvedChildren = Cache::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY);
+            $this->urlsAll = Cache::get(static::ALL_URLS_CACHE_KEY);
+
             return $this;
         }
 
-        $items = collect($this->items)
-            ->each(fn ($item) => $item->resolveChildren());
+        $this->urlsUnresolvedChildren = collect($this->items)
+            ->filter(fn ($item) => is_callable($item->children()))
+            ->mapWithKeys(function ($item) {
+                return [$item->id() => $item->resolveChildren()->children()?->map->url()->all() ?? []];
+            });
 
-        $allUrls = $items
+        $this->urlsAll = collect($this->items)
             ->flatMap(function ($item) {
-                return array_merge([$item->url()], $item->children()?->map->url()->all() ?? []);
+                return array_merge([$item->url()], $item->resolveChildren()->children()?->map->url()->all() ?? []);
             })
             ->unique()
             ->values();
 
-        $childrenUrls = $items
-            ->mapWithKeys(function ($item) {
-                return [$item->id() => $item->children()?->map->url()->all() ?? []];
-            });
-
-        Cache::put(static::ALL_URLS_CACHE_KEY, $allUrls);
-        Cache::put(static::CHILDREN_URLS_CACHE_KEY, $childrenUrls);
+        Cache::put(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY, $this->urlsUnresolvedChildren);
+        Cache::put(static::ALL_URLS_CACHE_KEY, $this->urlsAll);
 
         return $this;
+    }
+
+    /**
+     * Check if cache has URLs.
+     *
+     * @return bool
+     */
+    protected function hasCachedUrls()
+    {
+        return Cache::has(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)
+            && Cache::has(static::ALL_URLS_CACHE_KEY);
+    }
+
+    /**
+     * Blink URLs for `isActive` checks during this request.
+     *
+     * @return $this
+     */
+    protected function blinkUrls()
+    {
+        Blink::put(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY, $this->urlsUnresolvedChildren);
+        Blink::put(static::ALL_URLS_CACHE_KEY, $this->urlsAll);
+
+        return $this;
+    }
+
+    /**
+     * Get all unresolved children URLs for an item's `isActive` checks.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getUnresolvedChildrenUrlsForItem($item)
+    {
+        return Blink::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)?->get($item->id());
+    }
+
+    /**
+     * Get all URLs explicitly used in nav for `isActive` checks.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getAllUrls()
+    {
+        return Blink::get(static::ALL_URLS_CACHE_KEY) ?? collect();
+    }
+
+    /**
+     * Clear cached urls. Important when saving/deleting CP nav preferences, etc.
+     */
+    public static function clearCachedUrls()
+    {
+        Cache::forget(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY);
+        Blink::forget(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY);
+        Cache::forget(static::ALL_URLS_CACHE_KEY);
+        Blink::forget(static::ALL_URLS_CACHE_KEY);
     }
 
     /**
@@ -929,14 +997,5 @@ class NavBuilder
     protected function get()
     {
         return $this->built;
-    }
-
-    /**
-     * Clear cached urls.
-     */
-    public static function clearCachedUrls()
-    {
-        Cache::forget(static::ALL_URLS_CACHE_KEY);
-        Cache::forget(static::CHILDREN_URLS_CACHE_KEY);
     }
 }
