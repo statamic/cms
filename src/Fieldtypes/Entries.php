@@ -96,6 +96,16 @@ class Entries extends Relationship
                         'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
                         'type' => 'taggable',
                     ],
+                    'link_by' => [
+                        'display' => __('Link By'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.link_by'),
+                        'type' => 'select',
+                        'default' => 'id',
+                        'options' => [
+                            'id' => __('ID'),
+                            'slug' => __('Slug'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -278,6 +288,10 @@ class Entries extends Relationship
             $site = $parent->locale();
         }
 
+        if ($this->config('link_by') == 'slug') {
+            $values = $this->replaceSlugsWithIds($values);
+        }
+
         $ids = (new OrderedQueryBuilder(Entry::query(), $ids = Arr::wrap($values)))
             ->whereIn('id', $ids)
             ->get()
@@ -357,5 +371,40 @@ class Entries extends Relationship
     public function filter()
     {
         return new EntriesFilter($this);
+    }
+
+    public function process($data)
+    {
+        $data = parent::process($data);
+
+        if ($this->config('link_by') == 'slug') {
+            $data = collect($data)->map(function ($item) {
+                if ($entry = Entry::find($item)) {
+                    return $entry->slug();
+                }
+            })->filter()->all();
+        }
+
+        return $data;
+    }
+
+    public function preProcess($data)
+    {
+        $data = parent::preProcess($data);
+
+        if ($this->config('link_by') == 'slug') {
+            $data = $this->replaceSlugsWithIds($data);
+        }
+
+        return $data;
+    }
+
+    private function replaceSlugsWithIds($data)
+    {
+        return collect($data)->map(function ($item) {
+            if ($entry = Entry::query()->whereIn('collection', $this->getConfiguredCollections())->where('slug', $item)->first()) {
+                return $entry->id();
+            }
+        })->filter()->all();
     }
 }

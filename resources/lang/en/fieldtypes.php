@@ -73,6 +73,7 @@ return [
     'date.title' => 'Date',
     'entries.config.create' => 'Allow creation of new entries.',
     'entries.config.collections' => 'Choose which collections the user can select from.',
+    'entries.config.link_by' => 'Choose what field to use to link items. If you choose slug make sure slugs are unique in your linked collection(s).',
     'entries.config.query_scopes' => 'Choose which query scopes should be applied when retrieving selectable entries.',
     'entries.title' => 'Entries',
     'float.title' => 'Float',
