@@ -72,6 +72,10 @@ trait QueriesConditions
                 return $this->queryInCondition($query, $field, $value);
             case 'not_in':
                 return $this->queryNotInCondition($query, $field, $value);
+            case 'includes':
+                return $this->queryIncludesCondition($query, $field, $value);
+            case 'doesnt_include':
+                return $this->queryDoesntIncludeCondition($query, $field, $value);
             case 'starts_with':
             case 'begins_with':
                 return $this->queryStartsWithCondition($query, $field, $value);
@@ -159,6 +163,16 @@ trait QueriesConditions
         }
 
         return $query->whereNotIn($field, $value);
+    }
+
+    protected function queryIncludesCondition($query, $field, $value)
+    {
+        return $query->whereJsonContains($field, $value);
+    }
+
+    protected function queryDoesntIncludeCondition($query, $field, $value)
+    {
+        return $query->whereJsonDoesntContain($field, $value);
     }
 
     protected function queryStartsWithCondition($query, $field, $value)
