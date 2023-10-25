@@ -337,7 +337,8 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, ContainsQuer
 
     public function route()
     {
-        $route = '/'.$this->taxonomy()->routes()->get($this->locale()).'/{{ slug }}';
+        $route = '/'.$this->taxonomy()->routes()->get($this->locale()).'/';
+        $route .= Str::contains($route, '{{') ? '{{ slug }}' : '{slug}';
 
         if ($this->collection()) {
             $collectionUrl = $this->collection()->uri($this->locale()) ?? $this->collection()->handle();
