@@ -345,6 +345,41 @@ class NavTest extends TestCase
     }
 
     /** @test */
+    public function it_can_remove_a_specific_nav_child_item()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::ships('Y-Wing')
+            ->url('/y-wing')
+            ->icon('y-wing')
+            ->children(function () {
+                return [
+                    Nav::item('Foo'),
+                    Nav::item('Bar'),
+                ];
+            });
+
+        Nav::ships('A-Wing')
+            ->url('/a-wing')
+            ->icon('a-wing')
+            ->children(function () {
+                return [
+                    Nav::item('Foo'),
+                    Nav::item('Bar'),
+                ];
+            });
+
+        $this->assertCount(2, $this->build()->get('Ships'));
+
+        Nav::remove('Ships', 'Y-Wing', 'Foo');
+
+        $this->assertCount(2, $ships = $this->build()->get('Ships'));
+
+        $this->assertEquals(['Bar'], $ships->first()->resolveChildren()->children()->map->display()->all());
+        $this->assertEquals(['Foo', 'Bar'], $ships->last()->resolveChildren()->children()->map->display()->all());
+    }
+
+    /** @test */
     public function it_can_use_extend_to_defer_until_after_statamic_core_nav_items_are_built()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -376,6 +411,33 @@ class NavTest extends TestCase
         });
 
         $this->assertNotContains('Collections', $this->build()->get('Content')->map->display());
+    }
+
+    /** @test */
+    public function it_can_use_extend_to_remove_a_default_statamic_child_nav_item()
+    {
+        Facades\Collection::make('articles')->save();
+        Facades\Collection::make('pages')->save();
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $nav = Nav::build();
+
+        $collectionsChildren = function () {
+            return $this->build()
+                ->get('Content')
+                ->first(fn ($item) => $item->display() === 'Collections')
+                ->resolveChildren()
+                ->children();
+        };
+
+        $this->assertEquals(['Articles', 'Pages'], $collectionsChildren()->map->display()->all());
+
+        Nav::extend(function ($nav) {
+            $nav->remove('Content', 'Collections', 'Articles');
+        });
+
+        $this->assertEquals(['Pages'], $collectionsChildren()->map->display()->all());
     }
 
     /** @test */
