@@ -259,6 +259,12 @@ class NavItem
     /**
      * Active URL pattern to determine when to resolve children for `hasActiveChild()` checks.
      *
+     * Though we still check active patterns for nested URLs internally, having to manually
+     * use this method should not be needed anymore, not to mention it is confusing for
+     * addon devs to know when they even need to use it, thus we are deprecating it.
+     *
+     * @deprecated
+     *
      * @return $this
      */
     public function active($pattern = null)
