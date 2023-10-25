@@ -167,11 +167,19 @@ trait QueriesConditions
 
     protected function queryIncludesCondition($query, $field, $value)
     {
+        if (is_string($value)) {
+            $value = $this->getPipedValues($value);
+        }
+
         return $query->whereJsonContains($field, $value);
     }
 
     protected function queryDoesntIncludeCondition($query, $field, $value)
     {
+        if (is_string($value)) {
+            $value = $this->getPipedValues($value);
+        }
+
         return $query->whereJsonDoesntContain($field, $value);
     }
 
