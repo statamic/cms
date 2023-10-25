@@ -18,6 +18,7 @@ class NavBuilder
     protected $items = [];
     protected $pendingItems = [];
     protected $withHidden = false;
+    protected $itemsWithChildrenClosures = [];
     protected $sections = [];
     protected $sectionsOriginalItemIds = [];
     protected $sectionsManipulations = [];
@@ -52,7 +53,8 @@ class NavBuilder
         }
 
         return $this
-            ->buildChildren()
+            ->trackChildrenClosures()
+            ->resolveChildrenClosures()
             ->validateNesting()
             ->validateViews()
             ->authorizeItems()
@@ -68,11 +70,25 @@ class NavBuilder
     }
 
     /**
-     * Build children closures.
+     * Track children closures.
      *
      * @return $this
      */
-    protected function buildChildren()
+    protected function trackChildrenClosures()
+    {
+        collect($this->items)
+            ->filter(fn ($item) => is_callable($item->children()))
+            ->each(fn ($item) => $this->itemsWithChildrenClosures[] = $item->id());
+
+        return $this;
+    }
+
+    /**
+     * Resolve children closures.
+     *
+     * @return $this
+     */
+    protected function resolveChildrenClosures()
     {
         collect($this->items)
             ->filter(fn ($item) => $item->isActive() || $this->withHidden)
@@ -911,12 +927,13 @@ class NavBuilder
         if ($this->hasCachedUrls()) {
             $this->urlsUnresolvedChildren = Cache::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY);
             $this->urlsAll = Cache::get(static::ALL_URLS_CACHE_KEY);
+            $this->ensureUrlCachesAreUpToDate();
 
             return $this;
         }
 
         $this->urlsUnresolvedChildren = collect($this->items)
-            ->filter(fn ($item) => is_callable($item->children()))
+            ->filter(fn ($item) => collect($this->itemsWithChildrenClosures)->contains($item->id()))
             ->mapWithKeys(function ($item) {
                 return [$item->id() => $item->resolveChildren()->children()?->map->url()->all() ?? []];
             });
@@ -928,10 +945,38 @@ class NavBuilder
             ->unique()
             ->values();
 
-        Cache::put(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY, $this->urlsUnresolvedChildren);
-        Cache::put(static::ALL_URLS_CACHE_KEY, $this->urlsAll);
+        $this->cacheUrls();
 
         return $this;
+    }
+
+    /**
+     * Cache tracked URLs.
+     */
+    protected function cacheUrls()
+    {
+        Cache::put(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY, $this->urlsUnresolvedChildren);
+        Cache::put(static::ALL_URLS_CACHE_KEY, $this->urlsAll);
+    }
+
+    /**
+     * Ensure URL caches are up to date.
+     */
+    protected function ensureUrlCachesAreUpToDate()
+    {
+        $needsUpdating = collect($this->items)
+            ->filter(fn ($item) => collect($this->itemsWithChildrenClosures)->contains($item->id()))
+            ->filter(fn ($item) => $item->isActive() || $this->withHidden)
+            ->mapWithKeys(fn ($item) => [$item->id() => $item->children()?->map->url()->all() ?? []])
+            ->filter(fn ($urls, $id) => $this->urlsUnresolvedChildren->get($id) != $urls)
+            ->each(function ($urls, $id) {
+                $this->urlsUnresolvedChildren->put($id, $urls);
+            })
+            ->isNotEmpty();
+
+        if ($needsUpdating) {
+            $this->cacheUrls();
+        }
     }
 
     /**
@@ -959,7 +1004,7 @@ class NavBuilder
     }
 
     /**
-     * Get all unresolved children URLs for an item's `isActive` checks.
+     * Get unresolved children URLs for an item's `isActive` checks.
      *
      * @return \Illuminate\Support\Collection
      */
