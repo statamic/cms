@@ -306,9 +306,9 @@ class TermTest extends TestCase
         $termFr = $term->in('fr')->slug('le-foo');
         $termDe = $term->in('de')->slug('das-foo');
 
-        $this->assertEquals('/tags/{{ slug }}', $termEn->route());
-        $this->assertEquals('/tags/{{ slug }}', $termFr->route());
-        $this->assertEquals('/tags/{{ slug }}', $termDe->route());
+        $this->assertEquals('/tags/{slug}', $termEn->route());
+        $this->assertEquals('/tags/{slug}', $termFr->route());
+        $this->assertEquals('/tags/{slug}', $termDe->route());
 
         $taxonomy->routes([
             'en' => 'blog',
@@ -318,8 +318,8 @@ class TermTest extends TestCase
 
         $taxonomy->save();
 
-        $this->assertEquals('/blog/{{ slug }}', $termEn->route());
-        $this->assertEquals('/le-blog/{{ slug }}', $termFr->route());
-        $this->assertEquals('/das-blog/{{ slug }}', $termDe->route());
+        $this->assertEquals('/blog/{slug}', $termEn->route());
+        $this->assertEquals('/le-blog/{slug}', $termFr->route());
+        $this->assertEquals('/das-blog/{slug}', $termDe->route());
     }
 }
