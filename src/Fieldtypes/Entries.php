@@ -19,6 +19,7 @@ use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 use Statamic\Query\Scopes\Filters\Fields\Entries as EntriesFilter;
 use Statamic\Query\StatusQueryBuilder;
+use Statamic\Search\Index;
 use Statamic\Search\Result;
 use Statamic\Support\Arr;
 
@@ -209,21 +210,41 @@ class Entries extends Relationship
             return $query;
         }
 
-        if ($searchIndex = $this->config('search_index')) {
-            return Search::in($searchIndex)->ensureExists()->search($search);
-        }
-
-        $collections = collect($this->getConfiguredCollections());
-
-        if ($collections->count() == 1) {
-            $collection = Collection::findByHandle($collections->first());
-
-            if ($collection && $collection->hasSearchIndex()) {
-                return $collection->searchIndex()->ensureExists()->search($search);
-            }
+        if ($index = $this->getSearchIndex($request)) {
+            return $index->search($search);
         }
 
         return $query->where('title', 'like', '%'.$search.'%');
+    }
+
+    private function getSearchIndex($request): ?Index
+    {
+        $index = $this->getExplicitSearchIndex() ?? $this->getCollectionSearchIndex($request);
+
+        return $index?->ensureExists();
+    }
+
+    private function getExplicitSearchIndex(): ?Index
+    {
+        return ($explicit = $this->config('search_index'))
+            ? Search::in($explicit)
+            : null;
+    }
+
+    private function getCollectionSearchIndex($request): ?Index
+    {
+        // Use the collections being filtered, or the configured collections.
+        $collections = collect(
+            $request->input('filters.collection.collections') ?? $this->getConfiguredCollections()
+        );
+
+        $indexes = $collections->map(fn ($handle) => Collection::findByHandle($handle)->searchIndex());
+
+        // If all the collections use the same index, return it.
+        // Even if they're all null, that's fine. It'll just return null.
+        return $indexes->unique()->count() === 1
+            ? $indexes->first()
+            : null;
     }
 
     protected function getCreatables()
