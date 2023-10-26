@@ -188,25 +188,7 @@ class Entries extends Relationship
     {
         $query = Entry::query();
 
-        if ($search = $request->search) {
-            $usingSearchIndex = false;
-            $collections = collect($this->getConfiguredCollections());
-
-            if ($searchIndex = $this->config('search_index')) {
-                $query = Search::in($searchIndex)->ensureExists()->search($search);
-                $usingSearchIndex = true;
-            } elseif ($collections->count() == 1) {
-                $collection = Collection::findByHandle($collections->first());
-                if ($collection && $collection->hasSearchIndex()) {
-                    $query = $collection->searchIndex()->ensureExists()->search($search);
-                    $usingSearchIndex = true;
-                }
-            }
-
-            if (! $usingSearchIndex) {
-                $query->where('title', 'like', '%'.$search.'%');
-            }
-        }
+        $query = $this->toSearchQuery($query, $request);
 
         if ($site = $request->site) {
             $query->where('site', $site);
@@ -219,6 +201,29 @@ class Entries extends Relationship
         $this->applyIndexQueryScopes($query, $request->all());
 
         return $query;
+    }
+
+    private function toSearchQuery($query, $request)
+    {
+        if (! $search = $request->search) {
+            return $query;
+        }
+
+        if ($searchIndex = $this->config('search_index')) {
+            return Search::in($searchIndex)->ensureExists()->search($search);
+        }
+
+        $collections = collect($this->getConfiguredCollections());
+
+        if ($collections->count() == 1) {
+            $collection = Collection::findByHandle($collections->first());
+
+            if ($collection && $collection->hasSearchIndex()) {
+                return $collection->searchIndex()->ensureExists()->search($search);
+            }
+        }
+
+        return $query->where('title', 'like', '%'.$search.'%');
     }
 
     protected function getCreatables()
