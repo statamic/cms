@@ -10,6 +10,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
+use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
@@ -90,6 +91,11 @@ class Entries extends Relationship
                         'instructions' => __('statamic::fieldtypes.entries.config.collections'),
                         'type' => 'collections',
                         'mode' => 'select',
+                    ],
+                    'search_index' => [
+                        'display' => __('Search Index'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.search_index'),
+                        'type' => 'text',
                     ],
                     'query_scopes' => [
                         'display' => __('Query Scopes'),
@@ -186,7 +192,10 @@ class Entries extends Relationship
             $usingSearchIndex = false;
             $collections = collect($this->getConfiguredCollections());
 
-            if ($collections->count() == 1) {
+            if ($searchIndex = $this->config('search_index')) {
+                $query = Search::in($searchIndex)->ensureExists()->search($search);
+                $usingSearchIndex = true;
+            } elseif ($collections->count() == 1) {
                 $collection = Collection::findByHandle($collections->first());
                 if ($collection && $collection->hasSearchIndex()) {
                     $query = $collection->searchIndex()->ensureExists()->search($search);
