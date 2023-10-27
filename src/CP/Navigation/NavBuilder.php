@@ -964,19 +964,30 @@ class NavBuilder
      */
     protected function ensureUrlCachesAreUpToDate()
     {
-        $needsUpdating = collect($this->items)
+        $updated = collect($this->items)
             ->filter(fn ($item) => collect($this->itemsWithChildrenClosures)->contains($item->id()))
             ->filter(fn ($item) => $item->isActive() || $this->withHidden)
             ->mapWithKeys(fn ($item) => [$item->id() => $item->children()?->map->url()->all() ?? []])
             ->filter(fn ($urls, $id) => $this->urlsUnresolvedChildren->get($id) != $urls)
-            ->each(function ($urls, $id) {
-                $this->urlsUnresolvedChildren->put($id, $urls);
-            })
+            ->each(fn ($urls, $id) => $this->trackChangedChildren($id, $urls))
             ->isNotEmpty();
 
-        if ($needsUpdating) {
+        if ($updated) {
             $this->cacheUrls();
         }
+    }
+
+    /**
+     * Track changed children URLs.
+     */
+    protected function trackChangedChildren($id, $urls)
+    {
+        $this->urlsUnresolvedChildren->put($id, $urls);
+
+        $this->urlsAll = $this->urlsAll
+            ->merge($urls)
+            ->unique()
+            ->values();
     }
 
     /**
@@ -1010,7 +1021,8 @@ class NavBuilder
      */
     public static function getUnresolvedChildrenUrlsForItem($item)
     {
-        return Blink::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)?->get($item->id());
+        return Blink::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)?->get($item->id())
+            ?? Cache::get(static::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)?->get($item->id());
     }
 
     /**
@@ -1020,7 +1032,9 @@ class NavBuilder
      */
     public static function getAllUrls()
     {
-        return Blink::get(static::ALL_URLS_CACHE_KEY) ?? collect();
+        return Blink::get(static::ALL_URLS_CACHE_KEY)
+            ?? Cache::get(static::ALL_URLS_CACHE_KEY)
+            ?? collect();
     }
 
     /**
