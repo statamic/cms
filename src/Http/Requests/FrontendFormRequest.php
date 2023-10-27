@@ -2,9 +2,11 @@
 
 namespace Statamic\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Traits\Localizable;
+use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
 
 class FrontendFormRequest extends FormRequest
@@ -71,6 +73,24 @@ class FrontendFormRequest extends FormRequest
         }
 
         return $url->previous();
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        if (request()->ajax()) {
+            $errors = $validator->errors();
+
+            $response = response([
+                'errors' => $errors->all(),
+                'error' => collect($errors->messages())->map(function ($errors, $field) {
+                    return $errors[0];
+                })->all(),
+            ], 400);
+
+            throw (new ValidationException($validator, $response));
+        }
+
+        return parent::failedValidation($validator);
     }
 
     protected function getValidatorInstance()
