@@ -11,6 +11,8 @@ class FrontendFormRequest extends FormRequest
 {
     use Localizable;
 
+    private $validator;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -54,9 +56,7 @@ class FrontendFormRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = $this->getValidator($fields)->rules();
-
-        return $rules;
+        return $this->getValidator()->rules();
     }
 
     /**
@@ -109,13 +109,13 @@ class FrontendFormRequest extends FormRequest
         return $fields;
     }
 
-    private function getValidator($fields = null)
+    private function getValidator()
     {
-        if (! $fields) {
-            $fields = $this->getFormFields();
+        if (! $this->validator) {
+            $this->validator = $this->getFormFields()->validator()->withRules($this->extraRules($fields));
         }
 
-        return $fields->validator()->withRules($this->extraRules($fields));
+        return $this->validator;
     }
 
     protected function normalizeAssetsValues($fields, $request)
