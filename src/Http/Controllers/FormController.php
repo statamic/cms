@@ -31,7 +31,7 @@ class FormController extends Controller
         $site = Site::findByUrl(URL::previous()) ?? Site::default();
         $fields = $form->blueprint()->fields();
         $this->validateContentType($request, $form);
-        $values = array_merge($request->all(), $assets = $this->normalizeAssetsValues($fields, $request));
+        $values = array_merge($request->all(), $assets = $request->assets());
         $params = collect($request->all())->filter(function ($value, $key) {
             return Str::startsWith($key, '_');
         })->all();
@@ -120,18 +120,5 @@ class FormController extends Controller
         }
 
         return $redirect;
-    }
-
-    protected function normalizeAssetsValues($fields, $request)
-    {
-        // The assets fieldtype is expecting an array, even for `max_files: 1`, but we don't want to force that on the front end.
-        return $fields->all()
-            ->filter(function ($field) {
-                return $field->fieldtype()->handle() === 'assets' && request()->hasFile($field->handle());
-            })
-            ->map(function ($field) use ($request) {
-                return Arr::wrap($request->file($field->handle()));
-            })
-            ->all();
     }
 }

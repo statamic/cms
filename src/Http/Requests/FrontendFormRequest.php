@@ -13,7 +13,16 @@ class FrontendFormRequest extends FormRequest
 {
     use Localizable;
 
+    private $assets = [];
     private $cachedValidator;
+
+    /**
+     * Get any assets in the request
+     */
+    public function assets(): array
+    {
+        return $this->assets;
+    }
 
     /**
      * Determine if the user is authorized to make this request.
@@ -122,7 +131,9 @@ class FrontendFormRequest extends FormRequest
 
         $fields = $form->blueprint()->fields();
 
-        $values = array_merge($request->all(), $assets = $this->normalizeAssetsValues($fields, $request));
+        $this->assets = $this->normalizeAssetsValues($fields, $request);
+
+        $values = array_merge($request->all(), $this->assets);
 
         $fields = $fields->addValues($values);
 
