@@ -39,11 +39,14 @@
                     return in_array($form->handle(), $limits);
                 })->all();
             @endphp
-            @if (count($exporters))
+            @if ($exporters = $form->exporters())
             <dropdown-list>
                 <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
-                @foreach ($exporters as $type => $exporter)
-                <dropdown-item :text="__('{{ $exporter['class']::title() }}')" redirect="{{ cp_route('forms.export', ['type' => $type, 'form' => $form->handle()]) }}?download=true"></dropdown-item>
+                @foreach ($exporters as $exporter)
+                    <dropdown-item
+                        text="{{ $exporter->title() }}"
+                        redirect="{{ $exporter->downloadUrl() }}"
+                    ></dropdown-item>
                 @endforeach
             </dropdown-list>
             @endif

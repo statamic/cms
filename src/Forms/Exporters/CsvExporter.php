@@ -6,21 +6,12 @@ use League\Csv\Writer;
 use SplTempFileObject;
 use Statamic\Support\Arr;
 
-class CsvExporter extends AbstractExporter
+class CsvExporter extends Exporter
 {
-    /**
-     * @var Writer
-     */
-    private $writer;
+    private Writer $writer;
+    protected static string $title = 'CSV';
 
-    protected static $title = 'CSV';
-
-    /**
-     * Perform the export.
-     *
-     * @return string
-     */
-    public function export()
+    public function export(): string
     {
         $this->writer = Writer::createFromFileObject(new SplTempFileObject);
         $this->writer->setDelimiter(Arr::get($this->config, 'delimiter', config('statamic.forms.csv_delimiter', ',')));
@@ -32,14 +23,11 @@ class CsvExporter extends AbstractExporter
         return (string) $this->writer;
     }
 
-    /**
-     * Insert the headers into the CSV.
-     */
     private function insertHeaders()
     {
         $key = Arr::get($this->config, 'headers', config('statamic.forms.csv_headers', 'handle'));
 
-        $headers = $this->form()->fields()
+        $headers = $this->form->fields()
             ->map(fn ($field) => $key === 'display' ? $field->display() : $field->handle())
             ->push($key === 'display' ? __('Date') : 'date')
             ->values()->all();
@@ -47,12 +35,9 @@ class CsvExporter extends AbstractExporter
         $this->writer->insertOne($headers);
     }
 
-    /**
-     * Insert the submission data into the CSV.
-     */
     private function insertData()
     {
-        $data = $this->form()->submissions()->map(function ($submission) {
+        $data = $this->form->submissions()->map(function ($submission) {
             $submission = $submission->toArray();
 
             $submission['date'] = (string) $submission['date'];
@@ -67,12 +52,7 @@ class CsvExporter extends AbstractExporter
         $this->writer->insertAll($data);
     }
 
-    /**
-     * Get the extension.
-     *
-     * @return string
-     */
-    public function extension()
+    public function extension(): string
     {
         return 'csv';
     }
