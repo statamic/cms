@@ -11,7 +11,7 @@ class FrontendFormRequest extends FormRequest
 {
     use Localizable;
 
-    private $validator;
+    private $cachedValidator;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -30,7 +30,7 @@ class FrontendFormRequest extends FormRequest
 
         $messages = [];
         $this->withLocale($site->lang(), function () use (&$messages) {
-            $messages = $this->getValidator()
+            $messages = $this->getCustomValidator()
                 ->validator()
                 ->messages()
                 ->getMessages();
@@ -56,7 +56,7 @@ class FrontendFormRequest extends FormRequest
      */
     public function rules(): array
     {
-        return $this->getValidator()->rules();
+        return $this->getCustomValidator()->rules();
     }
 
     /**
@@ -75,7 +75,7 @@ class FrontendFormRequest extends FormRequest
 
     protected function getValidatorInstance()
     {
-        return $this->getValidator()->validator();
+        return $this->getCustomValidator()->validator();
     }
 
     public function extraRules($fields)
@@ -109,13 +109,13 @@ class FrontendFormRequest extends FormRequest
         return $fields;
     }
 
-    private function getValidator()
+    private function getCustomValidator()
     {
-        if (! $this->validator) {
-            $this->validator = $this->getFormFields()->validator()->withRules($this->extraRules($fields));
+        if (! $this->cachedValidator) {
+            $this->cachedValidator = $this->getFormFields()->validator()->withRules($this->extraRules($fields));
         }
 
-        return $this->validator;
+        return $this->cachedValidator;
     }
 
     protected function normalizeAssetsValues($fields, $request)
