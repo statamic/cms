@@ -384,13 +384,16 @@ class NavTest extends TestCase
         // Ensure urls are not cached so that we can test regex based isActive() checks
         Nav::clearCachedUrls();
 
-        $hello = Nav::create('hello')->url('http://localhost/cp/hello');
-        $helloWithQueryParams = Nav::create('helloWithAnchor')->url('http://localhost/cp/hello?params');
-        $helloWithAnchor = Nav::create('helloWithAnchor')->url('http://localhost/cp/hello#anchor');
-        $hell = Nav::create('hell')->url('http://localhost/cp/hell');
-        $localNotCp = Nav::create('localNotCp')->url('/dashboard');
-        $external = Nav::create('external')->url('http://external.com');
-        $externalSecure = Nav::create('externalSecure')->url('https://external.com');
+        // These patterns are only intended to check against descendants of child items, since we have explicit child URLs.
+        Nav::create('parent')->section('test')->children([
+            $hello = Nav::create('hello')->url('http://localhost/cp/hello'),
+            $helloWithQueryParams = Nav::create('helloWithAnchor')->url('http://localhost/cp/hello?params'),
+            $helloWithAnchor = Nav::create('helloWithAnchor')->url('http://localhost/cp/hello#anchor'),
+            $hell = Nav::create('hell')->url('http://localhost/cp/hell'),
+            $localNotCp = Nav::create('localNotCp')->url('/dashboard'),
+            $external = Nav::create('external')->url('http://external.com'),
+            $externalSecure = Nav::create('externalSecure')->url('https://external.com'),
+        ]);
 
         Request::swap(Request::create('http://localhost/cp/hell'));
         $this->assertFalse($hello->isActive());
