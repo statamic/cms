@@ -27,7 +27,7 @@ class FrontendFormRequest extends FormRequest
         $site = Site::findByUrl(URL::previous()) ?? Site::default();
 
         $messages = [];
-        $this->withLocale($site->lang(), function () use ($fields, &$messages) {
+        $this->withLocale($site->lang(), function () use (&$messages) {
             $messages = $this->getValidator()
                 ->validator()
                 ->messages()

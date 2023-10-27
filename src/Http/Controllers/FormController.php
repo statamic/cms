@@ -2,10 +2,8 @@
 
 namespace Statamic\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\MessageBag;
 use Illuminate\Support\Traits\Localizable;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
