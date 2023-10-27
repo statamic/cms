@@ -112,7 +112,8 @@ class FrontendFormRequest extends FormRequest
     private function getCustomValidator()
     {
         if (! $this->cachedValidator) {
-            $this->cachedValidator = $this->getFormFields()->validator()->withRules($this->extraRules($fields));
+            $fields = $this->getFormFields();
+            $this->cachedValidator = $fields->validator()->withRules($this->extraRules($fields));
         }
 
         return $this->cachedValidator;
