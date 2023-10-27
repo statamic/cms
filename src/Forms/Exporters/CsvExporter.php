@@ -23,7 +23,7 @@ class CsvExporter extends AbstractExporter
     public function export()
     {
         $this->writer = Writer::createFromFileObject(new SplTempFileObject);
-        $this->writer->setDelimiter(Arr::get($this->config, 'csv_delimiter', config('statamic.forms.csv_delimiter', ',')));
+        $this->writer->setDelimiter(Arr::get($this->config, 'delimiter', config('statamic.forms.csv_delimiter', ',')));
 
         $this->insertHeaders();
 
@@ -37,7 +37,7 @@ class CsvExporter extends AbstractExporter
      */
     private function insertHeaders()
     {
-        $key = Arr::get($this->config, 'csv_headers', config('statamic.forms.csv_headers', 'handle'));
+        $key = Arr::get($this->config, 'headers', config('statamic.forms.csv_headers', 'handle'));
 
         $headers = $this->form()->fields()
             ->map(fn ($field) => $key === 'display' ? $field->display() : $field->handle())
