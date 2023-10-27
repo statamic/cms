@@ -21,6 +21,7 @@ class NavItem
     protected $icon;
     protected $children;
     protected $isChild;
+    protected $wasOriginallyChild;
     protected $authorization;
     protected $active;
     protected $view;
@@ -149,6 +150,21 @@ class NavItem
     }
 
     /**
+     * Generate active URL patterns for this item's children.
+     *
+     * @return Collection
+     */
+    protected function generateActivePatternsForChildren()
+    {
+        if (! $this->children()) {
+            return collect();
+        }
+
+        return collect(NavBuilder::getUnresolvedChildrenUrlsForItem($this) ?? [])
+            ->map(fn ($url) => $this->generateActivePatternForCpUrl($url));
+    }
+
+    /**
      * Get editable url for nav builder UI.
      */
     public function editableUrl()
@@ -253,7 +269,23 @@ class NavItem
             ->getter(function ($value) {
                 return (bool) $value;
             })
+            ->afterSetter(function ($value) {
+                if ($value === true && ! isset($this->wasOriginallyChild)) {
+                    $this->wasOriginallyChild = $value;
+                }
+            })
             ->value($isChild);
+    }
+
+    /**
+     * Check if this nav item was ever a child before user preferences were applied.
+     *
+     * @param  bool|null  $isChild
+     * @return mixed
+     */
+    protected function wasOriginallyChild()
+    {
+        return (bool) $this->wasOriginallyChild;
     }
 
     /**
@@ -343,10 +375,11 @@ class NavItem
             return true;
         }
 
-        // If the current url is not explicitly referenced in CP nav,
-        // check if active descendant using regex pattern instead.
-        if (! NavBuilder::getAllUrls()->contains(request()->url())) {
-            return $this->isActiveByPattern();
+        // If the current URL is not explicitly referenced in the CP nav,
+        // and if this item is/was ever a child nav item,
+        // then check against URL heirarchy conventions using regex pattern.
+        if ($this->currentUrlIsNotExplicitlyReferencedInNav() && $this->wasOriginallyChild()) {
+            return $this->isActiveByPattern($this->active);
         }
 
         return request()->url() === URL::removeQueryAndFragment($this->url);
@@ -367,6 +400,13 @@ class NavItem
                 ->isNotEmpty();
         }
 
+        // If the current URL is not explicitly referenced in the CP nav,
+        // and if this item has children to check against,
+        // then check against URL heirarchy conventions using regex pattern.
+        if ($this->currentUrlIsNotExplicitlyReferencedInNav() && $this->children()) {
+            return $this->isActiveByPattern($this->generateActivePatternsForChildren());
+        }
+
         // If children closure has not been resolved, and children urls are cached, check against cached children.
         if ($childrenUrls = NavBuilder::getUnresolvedChildrenUrlsForItem($this)) {
             return collect($childrenUrls)
@@ -378,19 +418,31 @@ class NavItem
     }
 
     /**
-     * Determine whether the nav item is currently active using the regex technique for deeply nested hierarchical urls.
+     * Determine whether the current URL is explicitly referenced in nav.
      *
      * @return bool
      */
-    public function isActiveByPattern()
+    protected function currentUrlIsNotExplicitlyReferencedInNav()
     {
-        if (! $this->active) {
+        return ! NavBuilder::getAllUrls()->contains(request()->url());
+    }
+
+    /**
+     * Determine whether the nav item is currently active using the regex technique for deeply nested hierarchical urls.
+     *
+     * @param  string|array  $active
+     * @return bool
+     */
+    protected function isActiveByPattern($active)
+    {
+        if (! $active) {
             return false;
         }
 
-        $pattern = preg_quote(config('statamic.cp.route'), '#').'/'.$this->active;
-
-        return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
+        return collect($active)
+            ->map(fn ($pattern) => preg_quote(config('statamic.cp.route'), '#').'/'.$pattern)
+            ->filter(fn ($pattern) => preg_match('#'.$pattern.'#', request()->decodedPath()) === 1)
+            ->isNotEmpty();
     }
 
     /**
