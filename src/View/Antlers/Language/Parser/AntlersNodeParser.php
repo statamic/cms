@@ -443,7 +443,7 @@ class AntlersNodeParser
 
             if ($hasFoundName == false && $current == DocumentParser::Punctuation_Equals) {
                 if (! empty($currentChars)) {
-                    if ((ctype_alpha($currentChars[0]) || ctype_digit($currentChars[0]) || $currentChars[0] == DocumentParser::Punctuation_Colon || $currentChars[0] == DocumentParser::AtChar) == false) {
+                    if (! (ctype_alpha($currentChars[0]) || ctype_digit($currentChars[0]) || $currentChars[0] == DocumentParser::Punctuation_Colon || $currentChars[0] == DocumentParser::AtChar || $currentChars[0] == DocumentParser::String_EscapeCharacter)) {
                         $currentChars = [];
 
                         continue;
@@ -558,9 +558,16 @@ class AntlersNodeParser
 
                 $parameterNode = new ParameterNode();
 
+                $parameterNode->originalName = $name;
+
                 if (Str::startsWith($name, DocumentParser::Punctuation_Colon)) {
                     $parameterNode->isVariableReference = true;
                     $name = StringUtilities::substr($name, 1);
+                }
+
+                if (Str::startsWith($name, DocumentParser::String_EscapeCharacter)) {
+                    $parameterNode->containsEscapedContent = true;
+                    $name = mb_substr($name, 1);
                 }
 
                 $parameterNode->name = $name;

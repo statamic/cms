@@ -265,4 +265,42 @@ EOT;
         $this->assertSame(' <div class="list-of-classes">     ', $nodes[0]->content);
         $this->assertSame('FINAL_LITERAL </div> ', $nodes[2]->content);
     }
+
+    public function test_curly_braces_inside_a_parameter_can_be_ignored_entirely()
+    {
+        $template = <<<'EOT'
+{{ form \x-data="{ open: false }" \attr:x-bind="..." \x-init="() => { open = true }" x-show="open" }}
+EOT;
+
+        $nodes = $this->parseNodes($template);
+
+        $this->assertCount(1, $nodes);
+        $this->assertInstanceOf(AntlersNode::class, $nodes[0]);
+
+        /** @var AntlersNode $antlersNode */
+        $antlersNode = $nodes[0];
+
+        $this->assertTrue($antlersNode->hasParameters);
+        $this->assertCount(4, $antlersNode->parameters);
+
+        $pXData = $antlersNode->parameters[0];
+        $this->assertSame('x-data', $pXData->name);
+        $this->assertSame('\x-data', $pXData->originalName);
+        $this->assertSame('{ open: false }', $pXData->value);
+
+        $pXBind = $antlersNode->parameters[1];
+        $this->assertSame('attr:x-bind', $pXBind->name);
+        $this->assertSame('\attr:x-bind', $pXBind->originalName);
+        $this->assertSame('...', $pXBind->value);
+
+        $pXInit = $antlersNode->parameters[2];
+        $this->assertSame('x-init', $pXInit->name);
+        $this->assertSame('\x-init', $pXInit->originalName);
+        $this->assertSame('() => { open = true }', $pXInit->value);
+
+        $pXShow = $antlersNode->parameters[3];
+        $this->assertSame('x-show', $pXShow->name);
+        $this->assertSame('x-show', $pXShow->originalName);
+        $this->assertSame('open', $pXShow->value);
+    }
 }
