@@ -63,7 +63,7 @@ return [
     'collections_mount_instructions' => 'Choisissez une entrée sur laquelle cette collection doit être montée. Apprenez-en plus dans la [documentation](https://statamic.dev/collections#mounting).',
     'collections_orderable_instructions' => 'Activez le réordonnancement manuel par glisser-déposer.',
     'collections_past_date_behavior_instructions' => 'Conditions d’accès aux entrées datées ayant expiré.',
-    'collections_preview_target_refresh_instructions' => 'Rafraîchi automatiquement l’Aperçu pendant la modification. Désactiver cela entraînera l’utilisation de postMessage.',
+    'collections_preview_target_refresh_instructions' => 'Rafraîchit automatiquement l’Aperçu pendant la modification. Désactiver cela entraînera l’utilisation de postMessage.',
     'collections_preview_targets_instructions' => 'Les URLs qui seront visibles dans l’Aperçu en direct. Apprenez-en plus dans la [documentation](https://statamic.dev/live-preview#preview-targets).',
     'collections_route_instructions' => 'La route contrôle le modèle d’URL des entrées. Apprenez-en plus dans la [documentation](https://statamic.dev/collections#routing).',
     'collections_sort_direction_instructions' => 'Le sens de tri par défaut.',
