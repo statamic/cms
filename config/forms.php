@@ -48,37 +48,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | CSV Export Delimiter
-    |--------------------------------------------------------------------------
-    |
-    | Statamic will use this character as delimiter for csv exports.
-    |
-    */
-
-    'csv_delimiter' => ',',
-
-    /*
-    |--------------------------------------------------------------------------
-    | CSV Export Headings
-    |--------------------------------------------------------------------------
-    |
-    | The values to be used in the csv export header rows.
-    | Can be the field handle or the field display text.
-    |
-    | Supported values: "handle", "display"
-    |
-    */
-
-    'csv_headers' => 'handle',
-
-    /*
-    |--------------------------------------------------------------------------
     | Exporters
     |--------------------------------------------------------------------------
     |
-    | The export option you want to provide on your forms under the
-    | Export Submission button. These classes should implement
-    | Statamic\Forms\Exporters\AbstractExporter
+    | Here you may define all the available form submission exporters.
+    | You may customize the options within each exporter's array.
     |
     */
 
