@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
+use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\GraphQL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -20,6 +21,7 @@ class Field implements Arrayable
     protected $parent;
     protected $parentField;
     protected $validationContext;
+    protected ?Form $form = null;
 
     public function __construct($handle, array $config)
     {
@@ -408,5 +410,17 @@ class Field implements Arrayable
     public function isRelationship(): bool
     {
         return $this->fieldtype()->isRelationship();
+    }
+
+    public function setForm(Form $form)
+    {
+        $this->form = $form;
+
+        return $this;
+    }
+
+    public function form(): ?Form
+    {
+        return $this->form;
     }
 }

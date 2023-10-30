@@ -108,10 +108,13 @@
     .v-select { @apply h-full }
     .vs__dropdown-toggle { @apply border-none bg-none }
     .vs__actions { @apply hidden }
-    .vs__search { @apply hidden }
+    .vs__search { @apply p-0 }
     .vs__selected-options { @apply border-none shadow-none p-0 bg-none }
     .vs__selected { @apply flex }
-    .vs__dropdown-toggle { @apply h-full rounded-none bg-transparent }
+    .vs__dropdown-toggle {
+        @apply h-full rounded-none bg-transparent;
+        box-shadow: none;
+    }
 
     .vs--single.vs--unsearchable .vs__selected-options { @apply bg-none }
 }

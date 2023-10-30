@@ -29,6 +29,7 @@ use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
 use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
@@ -166,6 +167,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
 
     public function delete()
     {
+        if (EntryDeleting::dispatch($this) === false) {
+            return false;
+        }
+
         if ($this->descendants()->map->fresh()->filter()->isNotEmpty()) {
             throw new \Exception('Cannot delete an entry with localizations.');
         }

@@ -5,7 +5,7 @@ namespace Statamic\Actions;
 use Illuminate\Support\Str;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Entry as Entries;
-use Statamic\Facades\Site;
+use Statamic\Facades\User;
 
 class DuplicateEntry extends Action
 {
@@ -16,45 +16,83 @@ class DuplicateEntry extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof Entry && ! Site::hasMultiple();
+        return $item instanceof Entry;
+    }
+
+    public function confirmationText()
+    {
+        $hasDescendants = $this->items
+            ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
+            ->unique()
+            ->contains(fn ($entry) => $entry->descendants()->count());
+
+        if ($hasDescendants) {
+            return 'duplicate_action_localizations_confirmation';
+        }
+
+        return parent::confirmationText();
+    }
+
+    public function warningText()
+    {
+        if ($this->items->contains(fn ($entry) => $entry->hasOrigin())) {
+            return $this->items->count() === 1
+                ? 'duplicate_action_warning_localization'
+                : 'duplicate_action_warning_localizations';
+        }
     }
 
     public function run($items, $values)
     {
-        $items->each(function (Entry $original) {
-            $originalParent = $this->getEntryParentFromStructure($original);
-            [$title, $slug] = $this->generateTitleAndSlug($original);
+        $items
+            ->map(fn ($entry) => $entry->hasOrigin() ? $entry->root() : $entry)
+            ->unique()
+            ->each(fn ($original) => $this->duplicateEntry($original));
+    }
 
-            $data = $original
-                ->data()
-                ->except($original->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
-                ->merge(['title' => $title,
-                    'duplicated_from' => $original->id(),
-                ])->all();
+    private function duplicateEntry(Entry $original, string $origin = null)
+    {
+        $originalParent = $this->getEntryParentFromStructure($original);
+        [$title, $slug] = $this->generateTitleAndSlug($original);
 
-            $entry = Entries::make()
-                ->collection($original->collection())
-                ->blueprint($original->blueprint()->handle())
-                ->published(false)
-                ->data($data);
+        $data = $original
+            ->data()
+            ->except($original->blueprint()->fields()->all()->reject->shouldBeDuplicated()->keys())
+            ->merge(['title' => $title,
+                'duplicated_from' => $original->id(),
+            ])->all();
 
-            if ($original->collection()->requiresSlugs()) {
-                $entry->slug($slug);
-            }
+        $entry = Entries::make()
+            ->locale($original->locale())
+            ->collection($original->collection())
+            ->blueprint($original->blueprint()->handle())
+            ->published(false)
+            ->data($data)
+            ->origin($origin);
 
-            if ($original->hasDate()) {
-                $entry->date($original->date());
-            }
+        if ($original->collection()->requiresSlugs()) {
+            $entry->slug($slug);
+        }
 
-            $entry->save();
+        if ($original->hasDate()) {
+            $entry->date($original->date());
+        }
 
-            if ($originalParent && $originalParent !== $original->id()) {
-                $entry->structure()
-                    ->in($original->locale())
-                    ->appendTo($originalParent->id(), $entry)
-                    ->save();
-            }
-        });
+        $entry->save();
+
+        $original
+            ->directDescendants()
+            ->filter(fn ($entry) => User::current()->can('create', [Entry::class, $entry->collection(), $entry->site()]))
+            ->each(function ($descendant) use ($entry) {
+                $this->duplicateEntry($descendant, origin: $entry->id());
+            });
+
+        if ($originalParent && $originalParent !== $original->id()) {
+            $entry->structure()
+                ->in($original->locale())
+                ->appendTo($originalParent->id(), $entry)
+                ->save();
+        }
     }
 
     protected function getEntryParentFromStructure(Entry $entry)
@@ -82,7 +120,7 @@ class DuplicateEntry extends Action
 
     protected function generateTitleAndSlug(Entry $entry, $attempt = 1)
     {
-        $title = $entry->get('title');
+        $title = $entry->value('title');
         $slug = $entry->slug();
         $suffix = ' ('.__('Duplicated').')';
 
@@ -101,7 +139,7 @@ class DuplicateEntry extends Action
         $slug .= '-'.$attempt;
 
         // If the slug we've just built already exists, we'll try again, recursively.
-        if ($entry->collection()->queryEntries()->where('slug', $slug)->count()) {
+        if ($entry->collection()->queryEntries()->where('locale', $entry->locale())->where('slug', $slug)->count()) {
             [$title, $slug] = $this->generateTitleAndSlug($entry, $attempt + 1);
         }
 
@@ -110,6 +148,6 @@ class DuplicateEntry extends Action
 
     public function authorize($user, $item)
     {
-        return $user->can('create', [Entry::class, $item->collection()]);
+        return $user->can('create', [Entry::class, $item->collection(), $item->site()]);
     }
 }
