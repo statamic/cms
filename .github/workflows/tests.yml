@@ -63,8 +63,7 @@ jobs:
       - name: Update apt sources
         if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
         run: |
-          sudo gem install apt-spy2
-          sudo apt-spy2 fix --commit --launchpad --country=US
+          sudo apt-get check || sudo apt --fix-broken install -y
           sudo apt-get update
 
       - name: Install French Locale
