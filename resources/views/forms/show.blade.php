@@ -30,15 +30,6 @@
                 @endcan
             </dropdown-list>
 
-            @php
-                $exporters = collect(config('statamic.forms.exporters', []))->filter(function ($exporter) use ($form) {
-                    if (! $limits = $exporter['forms'] ?? []) {
-                        return true;
-                    }
-
-                    return in_array($form->handle(), $limits);
-                })->all();
-            @endphp
             @if ($exporters = $form->exporters())
             <dropdown-list>
                 <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
