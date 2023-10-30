@@ -426,7 +426,6 @@ class Statamic
 
     private static function createVersionedAssetPath($name, $path, $extension)
     {
-
         // If passing a path versioned by laravel mix, it will contain ?id=
         // Do nothing and return that path.
         if (Str::contains($path, '?id=')) {
@@ -444,7 +443,6 @@ class Statamic
 
                 // Add the version to the path.
                 $path = str_finish($path, "?v={$version}");
-
             }
 
             return $path;
