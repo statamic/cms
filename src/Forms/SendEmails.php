@@ -6,8 +6,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Bus;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Facades\Antlers;
-use Statamic\Facades\GlobalSet;
 use Statamic\Sites\Site;
 
 class SendEmails
