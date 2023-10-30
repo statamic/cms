@@ -48,6 +48,10 @@
                     @removed="pageRemoved"
                     @children-orphaned="childrenOrphaned"
                 >
+                    <template #branch-drag="props">
+                        <slot name="branch-drag" v-bind="{ ...props, vm }" />
+                    </template>
+
                     <template #branch-icon="props">
                         <slot name="branch-icon" v-bind="{ ...props, vm }" />
                     </template>

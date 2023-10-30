@@ -76,6 +76,7 @@
                     :search="search"
                     :exclusions="exclusions"
                     :type="config.type"
+                    :config="config"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />

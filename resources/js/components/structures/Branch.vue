@@ -1,7 +1,9 @@
 <template>
 
     <div class="flex">
-        <div class="page-move w-6" />
+        <slot name="branch-drag" :branch="page">
+            <div class="page-move w-6" />
+        </slot>
         <div class="flex items-center flex-1 p-2 ml-2 text-xs leading-normal">
             <div class="flex items-center flex-1">
                 <div class="little-dot mr-2" :class="getStatusClass()" v-tooltip="getStatusTooltip()" />

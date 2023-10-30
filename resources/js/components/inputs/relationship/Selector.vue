@@ -7,7 +7,7 @@
         </div>
 
         <data-list
-            v-if="!initializing"
+            v-if="!initializing && view === 'list'"
             ref="dataList"
             :rows="items"
             :columns="columns"
@@ -20,8 +20,16 @@
         >
             <div slot-scope="{}" class="flex flex-col h-full">
                 <div class="bg-white bg-gray-200">
-                    <div class="p-2">
+                    <div class="p-2 flex items-center justify-between">
                         <data-list-search class="h-8 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
+                        <div class="btn-group ml-4" v-if="type === 'entries'">
+                            <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
+                                <svg-icon name="light/structures" class="h-4 w-4"/>
+                            </button>
+                            <button class="btn flex items-center px-4" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
+                                <svg-icon name="assets-mode-table" class="h-4 w-4" />
+                            </button>
+                        </div>
                     </div>
                     <div>
                         <data-list-filters
@@ -97,18 +105,100 @@
 
             </div>
         </data-list>
+
+        <template v-if="!initializing && view === 'tree'">
+            <div class="flex flex-col h-full">
+                <div class="bg-white bg-gray-200">
+                    <div class="p-2 flex items-center justify-end">
+                        <div class="btn-group ml-4">
+                            <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
+                                <svg-icon name="light/structures" class="h-4 w-4"/>
+                            </button>
+                            <button class="btn flex items-center px-4" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
+                                <svg-icon name="assets-mode-table" class="h-4 w-4" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col min-h-0">
+                    <div class="flex flex-col h-full justify-start">
+                        <div class="flex-1 overflow-scroll bg-gray-200 p-4">
+                            <page-tree
+                                ref="tree"
+                                :has-collection="true"
+                                :collections="['pages']"
+                                pages-url="https://sandbox.test/cp/collections/pages/tree"
+                                submit-url="https://sandbox.test/cp/collections/pages/tree"
+                                :show-slugs="true"
+                                :site="site"
+                                :preferences-prefix="`collections.pages`"
+                            >
+                                <template #branch-drag="{ branch, index }">
+                                    <input
+                                        type="checkbox"
+                                        class="mx-2"
+                                        :value="branch.id"
+                                        :checked="isSelected(branch.id)"
+                                        :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
+                                        :id="`checkbox-${branch.id}`"
+                                        @click="checkboxClicked(branch, index, $event)"
+                                    />
+                                </template>
+
+                                <template #branch-icon="{ branch }">
+                                    <svg-icon v-if="isRedirectBranch(branch)"
+                                        class="inline-block w-4 h-4 text-gray-500"
+                                        name="light/external-link"
+                                        v-tooltip="__('Redirect')" />
+                                </template>
+                            </page-tree>
+                        </div>
+
+                        <div class="p-4 border-t flex items-center justify-between bg-gray-200">
+                            <div class="text-sm text-gray-700"
+                                v-text="hasMaxSelections
+                                    ? __n(':count/:max selected', selections, { max: maxSelections })
+                                    : __n(':count item selected|:count items selected', selections)" />
+
+                            <div>
+                                <button
+                                    type="button"
+                                    class="btn"
+                                    @click="close">
+                                    {{ __('Cancel') }}
+                                </button>
+
+                                <button
+                                    v-if="! hasMaxSelections || maxSelections > 1"
+                                    type="button"
+                                    class="btn-primary ml-2"
+                                    @click="select">
+                                    {{ __('Select') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
     </div>
 
 </template>
 
 <script>
 import HasFilters from '../../data-list/HasFilters';
+import PageTree from '../../structures/PageTree.vue';
 
 export default {
 
     mixins: [
         HasFilters,
     ],
+
+    components: {
+        PageTree,
+    },
 
     props: {
         filtersUrl: String,
@@ -127,7 +217,8 @@ export default {
         initialColumns: {
             type: Array,
             default: () => []
-        }
+        },
+        config: Object,
     },
 
     data() {
@@ -144,6 +235,8 @@ export default {
             selections: _.clone(this.initialSelections),
             columns: this.initialColumns,
             visibleColumns: this.initialColumns.filter(column => column.visible),
+            view: 'list',
+            lastItemClicked: null
         }
     },
 
@@ -163,7 +256,15 @@ export default {
 
         hasMaxSelections() {
             return (this.maxSelections === Infinity) ? false : Boolean(this.maxSelections);
-        }
+        },
+
+        reachedSelectionLimit() {
+            return this.selections.length === this.maxSelections;
+        },
+
+        singleSelect() {
+            return this.maxSelections === 1;
+        },
 
     },
 
@@ -310,6 +411,48 @@ export default {
         columnShowing(column) {
             return this.visibleColumns.find(c => c.field === column);
         },
+
+        isRedirectBranch(branch) {
+            return branch.redirect != null;
+        },
+
+        isSelected(id) {
+            return this.selections.includes(id);
+        },
+
+        toggleSelection(id) {
+            const i = this.selections.indexOf(id);
+
+            if (i > -1) {
+                this.selections.splice(i, 1);
+
+                return;
+            }
+
+            if (this.singleSelect) {
+                this.selections.pop();
+            }
+
+            if (! this.reachedSelectionLimit) {
+                this.selections.push(id);
+            }
+        },
+
+        checkboxClicked(row, index, $event) {
+            // this.$refs.table.focus();
+            if ($event.shiftKey && this.lastItemClicked !== null) {
+                this.selectRange(
+                    Math.min(this.lastItemClicked, index),
+                    Math.max(this.lastItemClicked, index)
+                );
+            } else {
+                this.toggleSelection(row.id, index)
+            }
+
+            if ($event.target.checked) {
+                this.lastItemClicked = index
+            }
+        }
 
     }
 
