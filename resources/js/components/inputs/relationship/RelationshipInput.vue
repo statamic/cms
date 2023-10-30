@@ -69,8 +69,6 @@
                     :selections-url="selectionsUrl"
                     :site="site"
                     :initial-columns="columns"
-                    initial-sort-column="title"
-                    initial-sort-direction="asc"
                     :initial-selections="value"
                     :max-selections="maxItems"
                     :search="search"
