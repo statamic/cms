@@ -165,13 +165,13 @@ class Entries extends Relationship
 
     public function getSortColumn($request)
     {
-        $column = $request->get('sort');
+        $column = $request->get('sort', 'title');
 
-        if (! $column && ! $request->search && count($this->config('collections')) < 2) {
+        if (! $request->sort && ! $request->search && count($this->config('collections')) < 2) {
             $column = $this->getFirstCollectionFromRequest($request)->sortField();
         }
 
-        return $column ?? 'title';
+        return $column;
     }
 
     public function getSortDirection($request)
