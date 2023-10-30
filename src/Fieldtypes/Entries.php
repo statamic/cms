@@ -167,7 +167,7 @@ class Entries extends Relationship
     {
         $column = $request->get('sort', 'title');
 
-        if (! $request->sort && ! $request->search && count($this->config('collections')) < 2) {
+        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
             $column = $this->getFirstCollectionFromRequest($request)->sortField();
         }
 
@@ -178,7 +178,7 @@ class Entries extends Relationship
     {
         $order = $request->get('order', 'asc');
 
-        if (! $request->sort && ! $request->search && count($this->config('collections')) < 2) {
+        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
             $order = $this->getFirstCollectionFromRequest($request)->sortDirection();
         }
 
