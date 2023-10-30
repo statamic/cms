@@ -53,6 +53,8 @@ export default {
         InlineEditForm
     },
 
+    inject: ['storeName'],
+
     props: {
         item: Object,
         config: Object,
@@ -83,6 +85,8 @@ export default {
             this.item.published = responseData.published;
             this.item.private = responseData.private;
             this.item.status = responseData.status;
+
+            this.$events.$emit(`live-preview.${this.storeName}.refresh`);
         },
 
     }
