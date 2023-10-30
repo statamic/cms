@@ -12,6 +12,9 @@ export default {
             // Remove apostrophes in all languages
             custom["'"] = "";
 
+            // Remove smart single quotes
+            custom["’"] = "";
+
             return getSlug(text, {
                 separator: glue || '-',
                 lang,
