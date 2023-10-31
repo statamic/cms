@@ -19,8 +19,8 @@
             @selections-updated="selectionsUpdated"
         >
             <div slot-scope="{}" class="flex flex-col h-full">
-                <div class="bg-white bg-gray-200">
-                    <div class="p-2 flex items-center justify-between">
+                <div class="bg-white z-1">
+                    <div class="py-2 px-4 flex items-center justify-between">
                         <data-list-search class="h-8 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
                         <div class="btn-group ml-4" v-if="canUseStructureTree">
                             <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
@@ -108,16 +108,15 @@
 
         <template v-if="!initializing && canUseStructureTree && view === 'tree'">
             <div class="flex flex-col h-full">
-                <div class="bg-white bg-gray-200">
-                    <div class="p-2 flex items-center justify-end">
-                        <div class="btn-group ml-4">
-                            <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
-                                <svg-icon name="light/structures" class="h-4 w-4"/>
-                            </button>
-                            <button class="btn flex items-center px-4" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
-                                <svg-icon name="assets-mode-table" class="h-4 w-4" />
-                            </button>
-                        </div>
+                <div class="bg-white bg-gray-200 shadow px-4 py-2 z-1 h-13 flex items-center justify-end">
+                    <h1 class="flex-1 flex items-center text-xl">Collection Name</h1>
+                    <div class="btn-group ml-4">
+                        <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
+                            <svg-icon name="light/structures" class="h-4 w-4"/>
+                        </button>
+                        <button class="btn flex items-center px-4" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
+                            <svg-icon name="assets-mode-table" class="h-4 w-4" />
+                        </button>
                     </div>
                 </div>
 
@@ -138,7 +137,7 @@
                                 <template #branch-action="{ branch, index }">
                                     <input
                                         type="checkbox"
-                                        class="mx-2"
+                                        class="ml-2"
                                         :value="branch.id"
                                         :checked="isSelected(branch.id)"
                                         :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
