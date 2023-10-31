@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
 use Statamic\CP\Navigation\NavBuilder;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
@@ -33,8 +34,21 @@ class ActiveNavItemTest extends TestCase
         Facades\Form::shouldReceive('all')->andReturn(collect());
     }
 
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+
+        // Set up test routes for fake SEO Pro extension
+        $app->booted(function () {
+            Route::get('cp/seo-pro', fn () => 'test');
+            Route::get('cp/seo-pro/section-defaults', fn () => 'test');
+            Route::get('cp/seo-pro/section-defaults/pages', fn () => 'test');
+            Route::get('cp/seo-pro/section-defaults/articles', fn () => 'test');
+        });
+    }
+
     /** @test */
-    public function it_renders_core_children_closure_when_not_active()
+    public function it_builds_core_children_closure_when_not_active()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
         Facades\Collection::make('articles')->title('Articles')->save();
@@ -105,6 +119,188 @@ class ActiveNavItemTest extends TestCase
         $this->assertInstanceOf(Collection::class, $collections->children());
         $this->assertFalse($collections->children()->keyBy->display()->get('Pages')->isActive());
         $this->assertTrue($collections->children()->keyBy->display()->get('Articles')->isActive());
+    }
+
+    /** @test */
+    public function it_can_check_if_parent_extension_item_is_active()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->tools('SEO Pro')
+                ->url('/cp/seo-pro')
+                ->children([
+                    $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
+                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                ]);
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/seo-pro')
+            ->assertStatus(200);
+
+        $seoPro = $this->buildAndGetItem('Tools', 'SEO Pro');
+
+        $this->assertTrue($seoPro->isActive());
+        $this->assertInstanceOf(Collection::class, $seoPro->children());
+        $this->assertFalse($this->getItemByDisplay($seoPro->children(), 'Reports')->isActive());
+        $this->assertFalse($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
+    }
+
+    /** @test */
+    public function it_can_check_when_parent_and_child_extension_items_are_active()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->tools('SEO Pro')
+                ->url('/cp/seo-pro')
+                ->children([
+                    $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
+                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                ]);
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/seo-pro/section-defaults')
+            ->assertStatus(200);
+
+        $seoPro = $this->buildAndGetItem('Tools', 'SEO Pro');
+
+        $this->assertTrue($seoPro->isActive());
+        $this->assertInstanceOf(Collection::class, $seoPro->children());
+        $this->assertFalse($this->getItemByDisplay($seoPro->children(), 'Reports')->isActive());
+        $this->assertTrue($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
+    }
+
+    /** @test */
+    public function it_can_check_when_parent_and_descendant_of_child_extension_item_is_active()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->tools('SEO Pro')
+                ->url('/cp/seo-pro')
+                ->children([
+                    $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
+                    $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                ]);
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/seo-pro/section-defaults/pages')
+            ->assertStatus(200);
+
+        $seoPro = $this->buildAndGetItem('Tools', 'SEO Pro');
+
+        $this->assertTrue($seoPro->isActive());
+        $this->assertInstanceOf(Collection::class, $seoPro->children());
+        $this->assertFalse($this->getItemByDisplay($seoPro->children(), 'Reports')->isActive());
+        $this->assertTrue($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
+    }
+
+    /** @test */
+    public function it_builds_extension_children_closure_when_not_active()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->tools('SEO Pro')
+                ->url('/cp/seo-pro')
+                ->children(function () use ($nav) {
+                    return [
+                        $nav->item('Reports')->url('/cp/seo-pro/')->can('view seo reports'),
+                        $nav->item('Site Defaults')->url('/cp/seo-pro/site-defaults')->can('edit seo site defaults'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    ];
+                });
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/dashboard')
+            ->assertStatus(200);
+
+        $seoPro = $this->buildAndGetItem('Tools', 'SEO Pro');
+
+        $this->assertFalse($seoPro->isActive());
+        $this->assertInstanceOf(Closure::class, $seoPro->children());
+    }
+
+    /** @test */
+    public function it_resolves_extension_children_closure_and_can_check_when_parent_item_is_active()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->tools('SEO Pro')
+                ->url('/cp/seo-pro')
+                ->children(function () use ($nav) {
+                    return [
+                        $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    ];
+                });
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/seo-pro')
+            ->assertStatus(200);
+
+        $seoPro = $this->buildAndGetItem('Tools', 'SEO Pro');
+
+        $this->assertTrue($seoPro->isActive());
+        $this->assertInstanceOf(Collection::class, $seoPro->children());
+        $this->assertFalse($this->getItemByDisplay($seoPro->children(), 'Reports')->isActive());
+        $this->assertFalse($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
+    }
+
+    /** @test */
+    public function it_resolves_extension_children_closure_and_can_check_when_parent_and_child_item_are_active()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->tools('SEO Pro')
+                ->url('/cp/seo-pro')
+                ->children(function () use ($nav) {
+                    return [
+                        $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    ];
+                });
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/seo-pro/section-defaults')
+            ->assertStatus(200);
+
+        $seoPro = $this->buildAndGetItem('Tools', 'SEO Pro');
+
+        $this->assertTrue($seoPro->isActive());
+        $this->assertInstanceOf(Collection::class, $seoPro->children());
+        $this->assertFalse($this->getItemByDisplay($seoPro->children(), 'Reports')->isActive());
+        $this->assertTrue($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
+    }
+
+    /** @test */
+    public function it_resolves_extension_children_closure_and_can_check_when_parent_and_descendant_of_child_item_is_active()
+    {
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->tools('SEO Pro')
+                ->url('/cp/seo-pro')
+                ->children(function () use ($nav) {
+                    return [
+                        $nav->item('Reports')->url('/cp/seo-pro/reports')->can('view seo reports'),
+                        $nav->item('Section Defaults')->url('/cp/seo-pro/section-defaults')->can('edit seo section defaults'),
+                    ];
+                });
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/seo-pro/section-defaults/pages')
+            ->assertStatus(200);
+
+        $seoPro = $this->buildAndGetItem('Tools', 'SEO Pro');
+
+        $this->assertTrue($seoPro->isActive());
+        $this->assertInstanceOf(Collection::class, $seoPro->children());
+        $this->assertFalse($this->getItemByDisplay($seoPro->children(), 'Reports')->isActive());
+        $this->assertTrue($this->getItemByDisplay($seoPro->children(), 'Section Defaults')->isActive());
     }
 
     /** @test */
