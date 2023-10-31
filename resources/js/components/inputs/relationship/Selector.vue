@@ -131,6 +131,7 @@
                                 pages-url="https://sandbox.test/cp/collections/pages/tree"
                                 submit-url="https://sandbox.test/cp/collections/pages/tree"
                                 :show-slugs="true"
+                                :expects-root="true"
                                 :site="site"
                                 :preferences-prefix="`collections.pages`"
                             >
@@ -219,6 +220,7 @@ export default {
             default: () => []
         },
         config: Object,
+        fieldtypeMeta: Object,
     },
 
     data() {
@@ -271,12 +273,26 @@ export default {
 
             if (this.config.collections.length !== 1) return false;
 
-            return this.meta.structuredCollections.includes(this.config.collections[0]);
+            if (! this.fieldtypeMeta?.structuredCollections) {
+                return
+            }
+
+            return this.fieldtypeMeta.structuredCollections.includes(this.collection);
+        },
+
+        collection() {
+            if (this.type !== 'entries') return false;
+
+            if (this.config.collections.length !== 1) return false;
+
+            return this.config.collections[0];
         },
 
     },
 
     mounted() {
+        this.view = this.initialView();
+
         this.getFilters().then(() => {
             this.autoApplyFilters(this.filters);
             this.initialRequest();
@@ -312,6 +328,12 @@ export default {
         selections() {
             if (this.maxSelections === 1 && this.selections.length === 1) {
                 this.select();
+            }
+        },
+
+        view(view) {
+            if (this.type === 'entries') {
+                localStorage.setItem('statamic.collection-view.'+this.collection, view);
             }
         },
 
@@ -447,7 +469,6 @@ export default {
         },
 
         checkboxClicked(row, index, $event) {
-            // this.$refs.table.focus();
             if ($event.shiftKey && this.lastItemClicked !== null) {
                 this.selectRange(
                     Math.min(this.lastItemClicked, index),
@@ -460,7 +481,15 @@ export default {
             if ($event.target.checked) {
                 this.lastItemClicked = index
             }
-        }
+        },
+
+        initialView() {
+            if (!this.canUseStructureTree) return 'list';
+
+            const fallback = this.canUseStructureTree ? 'tree' : 'list';
+
+            return localStorage.getItem('statamic.collection-view.'+this.collection) || fallback;
+        },
 
     }
 

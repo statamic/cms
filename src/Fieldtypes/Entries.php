@@ -142,10 +142,6 @@ class Entries extends Relationship
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
             ->additional(['meta' => [
                 'activeFilterBadges' => $this->activeFilterBadges,
-                'structuredCollections' => Collection::all()
-                    ->filter->hasStructure()
-                    ->pluck('handle')
-                    ->toArray(),
             ]]);
     }
 
@@ -396,5 +392,15 @@ class Entries extends Relationship
     public function filter()
     {
         return new EntriesFilter($this);
+    }
+
+    public function preload()
+    {
+        return array_merge(parent::preload(), [
+            'structuredCollections' => Collection::all()
+                ->filter->hasStructure()
+                ->pluck('handle')
+                ->toArray(),
+        ]);
     }
 }

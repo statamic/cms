@@ -7,6 +7,7 @@
         :mode="config.mode"
         :can-edit="canEdit"
         :config="config"
+        :fieldtype-meta="meta"
         :can-create="canCreate"
         :can-reorder="canReorder"
         :site="site"

@@ -77,6 +77,7 @@
                     :exclusions="exclusions"
                     :type="config.type"
                     :config="config"
+                    :fieldtype-meta="fieldtypeMeta"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
@@ -101,6 +102,7 @@ export default {
         name: String,
         value: { required: true },
         config: Object,
+        fieldtypeMeta: Object,
         data: Array,
         maxItems: Number,
         itemComponent: {
@@ -129,7 +131,7 @@ export default {
         columns: {
             type: Array,
             default: () => []
-        }
+        },
     },
 
     components: {
