@@ -3,6 +3,8 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Facades\Event;
+use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
@@ -290,6 +292,20 @@ class FileCacherTest extends TestCase
         $writer->shouldHaveReceived('delete')->with($cacher->getFilePath('/two', 'de'));
         $this->assertEquals(['two' => '/two', 'un' => '/fr/un'], $cacher->getUrls('http://domain.com')->all());
         $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://domain.de')->all());
+    }
+
+    /** @test */
+    public function invalidating_a_url_fires_url_invalidated_event()
+    {
+        Event::fake();
+
+        $cacher = $this->fileCacher();
+
+        $cacher->invalidateUrl('/test');
+
+        Event::assertDispatched(UrlInvalidated::class, function ($event) {
+            return $event->url === '/test';
+        });
     }
 
     private function cacheKey($domain)

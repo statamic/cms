@@ -4,6 +4,8 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
+use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Tests\TestCase;
 
@@ -55,6 +57,8 @@ class ApplicationCacherTest extends TestCase
     /** @test */
     public function invalidating_a_url_removes_the_html_and_the_url()
     {
+        Event::fake();
+
         $cache = app(Repository::class);
         $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
         $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
@@ -75,11 +79,17 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:one'));
         $this->assertNotNull($cache->get('static-cache:responses:onemore'));
         $this->assertNotNull($cache->get('static-cache:responses:two'));
+
+        Event::assertDispatched(UrlInvalidated::class, function ($event) {
+            return $event->url === '/one';
+        });
     }
 
     /** @test */
     public function invalidating_a_url_will_invalidate_all_query_string_versions_too()
     {
+        Event::fake();
+
         $cache = app(Repository::class);
         $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
         $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
@@ -103,6 +113,10 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:oneqs'));
         $this->assertNotNull($cache->get('static-cache:responses:onemore'));
         $this->assertNotNull($cache->get('static-cache:responses:two'));
+
+        Event::assertDispatched(UrlInvalidated::class, function ($event) {
+            return $event->url === '/one';
+        });
     }
 
     /** @test */
