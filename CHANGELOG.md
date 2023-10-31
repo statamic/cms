@@ -1,5 +1,27 @@
 # Release Notes
 
+## 4.31.0 (2023-10-30)
+
+### What's new
+- PHP 8.3 support [#8845](https://github.com/statamic/cms/issues/8845) by @jasonvarga
+- Custom form submission exporters. [#8837](https://github.com/statamic/cms/issues/8837) by @ryanmitchell
+- Add `RevisionSaving` event. [#8551](https://github.com/statamic/cms/issues/8551) by @ryanmitchell
+- Allow using globals in form email configs. [#8892](https://github.com/statamic/cms/issues/8892) by @duncanmcclean
+- Improve Entries fieldtype search index logic, and add option to define an explicit one. [#8885](https://github.com/statamic/cms/issues/8885) by @edalzell
+
+### What's improved
+- Improve UI of link fieldtype in smaller spaces. [#8882](https://github.com/statamic/cms/issues/8882) by @godismyjudge95
+- French translations. [#8889](https://github.com/statamic/cms/issues/8889) by @ebeauchamps
+
+### What's fixed
+- Fix status column moving when resetting columns on entry listing. [#8896](https://github.com/statamic/cms/issues/8896) by @duncanmcclean
+- Ignore single smart quotes when slugifying entries. [#8895](https://github.com/statamic/cms/issues/8895) by @duncanmcclean
+- Fix Live Preview not updating when relationship items are updated. [#8893](https://github.com/statamic/cms/issues/8893) by @duncanmcclean
+- Fix global site selector not closing when clicking outside. [#8888](https://github.com/statamic/cms/issues/8888) by @o1y
+- Fix Bard text align when no headings are enabled. [#8878](https://github.com/statamic/cms/issues/8878) by @jacksleight
+
+
+
 ## 4.30.0 (2023-10-20)
 
 ### What's new
