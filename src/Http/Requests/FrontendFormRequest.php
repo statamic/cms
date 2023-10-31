@@ -42,13 +42,14 @@ class FrontendFormRequest extends FormRequest
 
         $messages = [];
         $this->withLocale($site->lang(), function () use (&$messages) {
-            $messages = $this->getCustomValidator()
+            $messages = $this->getFormFields()
+                ->validator()
                 ->validator()
                 ->messages()
                 ->getMessages();
         });
 
-        return $messages;
+        return collect($messages)->flatten(1)->all();
     }
 
     /**
@@ -142,7 +143,7 @@ class FrontendFormRequest extends FormRequest
 
         $values = array_merge($request->all(), $this->assets);
 
-        return ($this->cachedFields = $fields->addValues($values));
+        return $this->cachedFields = $fields->addValues($values);
     }
 
     private function getCustomValidator()
@@ -152,8 +153,8 @@ class FrontendFormRequest extends FormRequest
         }
 
         $fields = $this->getFormFields();
-        return ($this->cachedValidator = $fields->validator()
-            ->withRules($this->extraRules($fields)));
+
+        return $this->cachedValidator = $fields->validator()->withRules($this->extraRules($fields));
     }
 
     protected function normalizeAssetsValues($fields, $request)
