@@ -109,7 +109,7 @@
         <template v-if="!initializing && canUseStructureTree && view === 'tree'">
             <div class="flex flex-col h-full">
                 <div class="bg-white bg-gray-200 shadow px-4 py-2 z-1 h-13 flex items-center justify-end">
-                    <h1 class="flex-1 flex items-center text-xl">Collection Name</h1>
+                    <h1 class="flex-1 flex items-center text-xl">{{ collection.title }}</h1>
                     <div class="btn-group ml-4">
                         <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
                             <svg-icon name="light/structures" class="h-4 w-4"/>
@@ -126,12 +126,12 @@
                             <page-tree
                                 ref="tree"
                                 :has-collection="true"
-                                :collections="[collection]"
+                                :collections="[collection.handle]"
                                 :pages-url="fieldtypeMeta.structurePagesUrl"
                                 :show-slugs="fieldtypeMeta.structureShowSlugs"
                                 :expects-root="fieldtypeMeta.structureExpectsRoot"
                                 :site="site"
-                                :preferences-prefix="`collections.${collection}`"
+                                :preferences-prefix="`collections.${collection.handle}`"
                                 :editable="false"
                             >
                                 <template #branch-action="{ branch, index }">
@@ -269,22 +269,18 @@ export default {
 
         canUseStructureTree() {
             if (this.type !== 'entries') return false;
-
             if (this.config.collections.length !== 1) return false;
+            if (! this.fieldtypeMeta?.collections) return;
 
-            if (! this.fieldtypeMeta?.structuredCollections) {
-                return
-            }
-
-            return this.fieldtypeMeta.structuredCollections.includes(this.collection);
+            return this.fieldtypeMeta.collections.filter((collection) => this.config.collections[0] === collection.handle).length > 0;
         },
 
         collection() {
             if (this.type !== 'entries') return false;
-
             if (this.config.collections.length !== 1) return false;
+            if (! this.fieldtypeMeta?.collections) return;
 
-            return this.config.collections[0];
+            return this.fieldtypeMeta.collections.find((collection) => this.config.collections[0] === collection.handle);
         },
 
     },
@@ -332,7 +328,7 @@ export default {
 
         view(view) {
             if (this.type === 'entries') {
-                localStorage.setItem('statamic.collection-view.'+this.collection, view);
+                localStorage.setItem('statamic.collection-view.'+this.collection.handle, view);
             }
         },
 
@@ -487,7 +483,7 @@ export default {
 
             const fallback = this.canUseStructureTree ? 'tree' : 'list';
 
-            return localStorage.getItem('statamic.collection-view.'+this.collection) || fallback;
+            return localStorage.getItem('statamic.collection-view.'+this.collection.handle) || fallback;
         },
 
     }

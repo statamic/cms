@@ -404,7 +404,13 @@ class Entries extends Relationship
             'structurePagesUrl' => $collection?->hasStructure() ? cp_route('collections.tree.index', $collection) : null,
             'structureExpectsRoot' => $collection?->hasStructure() ? $collection->structure()->expectsRoot() : null,
             'structureShowSlugs' => $collection?->hasStructure() ? $collection->structure()->showSlugs() : null,
-            'structuredCollections' => Collection::all()->filter->hasStructure()->pluck('handle')->toArray(),
+            'collections' => Collection::all()
+                ->map(fn ($collection) => [
+                    'handle' => $collection->handle(),
+                    'title' => $collection->title(),
+                    'hasStructure' => $collection->hasStructure(),
+                ])
+                ->toArray(),
         ]);
     }
 }
