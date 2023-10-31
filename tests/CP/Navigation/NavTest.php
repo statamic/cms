@@ -123,7 +123,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_and_modify_an_existing_item()
+    public function it_can_find_and_modify_an_existing_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -131,6 +131,27 @@ class NavTest extends TestCase
             ->url('/pit-droid')
             ->icon('<svg>...</svg>');
 
+        Nav::find('Droids', 'WAC-47')
+            ->url('/d-squad');
+
+        $item = $this->build()->get('Droids')->first();
+
+        $this->assertEquals('Droids', $item->section());
+        $this->assertEquals('WAC-47', $item->display());
+        $this->assertEquals('<svg>...</svg>', $item->icon());
+        $this->assertEquals('http://localhost/d-squad', $item->url());
+    }
+
+    /** @test */
+    public function it_can_find_and_modify_an_existing_item_using_magic_constructor()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::droids('WAC-47')
+            ->url('/pit-droid')
+            ->icon('<svg>...</svg>');
+
+        // Callign the same constructor does a `findOrCreate()` under the hood...
         Nav::droids('WAC-47')
             ->url('/d-squad');
 
@@ -341,6 +362,41 @@ class NavTest extends TestCase
 
         $this->assertCount(1, $ships = $this->build()->get('Ships'));
         $this->assertEquals('A-Wing', $ships->first()->display());
+    }
+
+    /** @test */
+    public function it_can_remove_a_specific_nav_child_item()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::ships('Y-Wing')
+            ->url('/y-wing')
+            ->icon('y-wing')
+            ->children(function () {
+                return [
+                    Nav::item('Foo'),
+                    Nav::item('Bar'),
+                ];
+            });
+
+        Nav::ships('A-Wing')
+            ->url('/a-wing')
+            ->icon('a-wing')
+            ->children(function () {
+                return [
+                    Nav::item('Foo'),
+                    Nav::item('Bar'),
+                ];
+            });
+
+        $this->assertCount(2, $this->build()->get('Ships'));
+
+        Nav::remove('Ships', 'Y-Wing', 'Foo');
+
+        $this->assertCount(2, $ships = $this->build()->get('Ships'));
+
+        $this->assertEquals(['Bar'], $ships->first()->resolveChildren()->children()->map->display()->all());
+        $this->assertEquals(['Foo', 'Bar'], $ships->last()->resolveChildren()->children()->map->display()->all());
     }
 
     /** @test */
