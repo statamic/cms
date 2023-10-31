@@ -135,7 +135,7 @@
                                 :preferences-prefix="`collections.${collection}`"
                                 :editable="false"
                             >
-                                <template #branch-drag="{ branch, index }">
+                                <template #branch-action="{ branch, index }">
                                     <input
                                         type="checkbox"
                                         class="mx-2"
