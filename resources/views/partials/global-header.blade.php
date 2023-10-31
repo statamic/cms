@@ -22,7 +22,7 @@
 
     <div class="head-link h-full md:pr-6 flex items-center justify-end">
 
-        @if (Statamic\Facades\Site::hasMultiple())
+        @if (Statamic\Facades\Site::authorized()->count() > 1)
             <global-site-selector>
                 <template slot="icon">@cp_svg('icons/light/sites')</template>
             </global-site-selector>

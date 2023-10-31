@@ -170,6 +170,11 @@ class GlobalSet implements Contract
         return $this;
     }
 
+    public function sites()
+    {
+        return $this->localizations()->map->locale()->values()->toBase();
+    }
+
     public function in($locale)
     {
         return $this->localizations()->get($locale);

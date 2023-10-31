@@ -72,7 +72,7 @@ class JavascriptComposer
 
     protected function sites()
     {
-        return Site::all()->map(function ($site) {
+        return Site::authorized()->map(function ($site) {
             return [
                 'name' => $site->name(),
                 'handle' => $site->handle(),

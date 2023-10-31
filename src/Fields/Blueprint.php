@@ -39,6 +39,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     protected $ensuredFields = [];
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    private ?Columns $columns = null;
 
     public function setHandle(string $handle)
     {
@@ -359,6 +360,10 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
     public function columns()
     {
+        if ($this->columns) {
+            return $this->columns;
+        }
+
         $columns = $this->fields()
             ->all()
             ->values()
@@ -375,7 +380,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             })
             ->keyBy('field');
 
-        return new Columns($columns);
+        return $this->columns = new Columns($columns);
     }
 
     public function isEmpty(): bool

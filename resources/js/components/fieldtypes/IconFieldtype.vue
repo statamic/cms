@@ -9,7 +9,7 @@
             :name="name"
             :disabled="config.disabled || isReadOnly"
             :options="options"
-            :placeholder="config.placeholder || 'Search ...'"
+            :placeholder="__(config.placeholder || 'Search ...')"
             :searchable="true"
             :multiple="false"
             :close-on-select="true"
@@ -22,14 +22,14 @@
                 <div class="flex items-center">
                     <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="w-5 h-5" />
                     <div v-if="option.html" v-html="option.html" class="w-5 h-5" />
-                    <span class="text-xs ml-4 text-gray-800 truncate">{{ option.label }}</span>
+                    <span class="text-xs ml-4 text-gray-800 truncate">{{ __(option.label) }}</span>
                 </div>
             </template>
             <template slot="selected-option" slot-scope="option">
                 <div class="flex items-center">
                     <svg-icon v-if="!option.html" :name="`${meta.set}/${option.label}`" class="w-5 h-5 flex items-center" />
                     <div v-if="option.html" v-html="option.html" class="w-5 h-5" />
-                    <span class="text-xs ml-4 text-gray-800 truncate">{{ option.label }}</span>
+                    <span class="text-xs ml-4 text-gray-800 truncate">{{ __(option.label) }}</span>
                 </div>
             </template>
         </v-select>

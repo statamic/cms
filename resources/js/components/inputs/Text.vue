@@ -3,7 +3,7 @@
         <div class="input-group">
             <slot name="prepend" v-if="prepend">
                 <div class="input-group-prepend">
-                    {{ prepend }}
+                    {{ __(prepend) }}
                 </div>
             </slot>
             <input
@@ -27,7 +27,7 @@
             >
             <slot name="append" v-if="append">
                 <div class="input-group-append">
-                    {{ append }}
+                    {{ __(append) }}
                 </div>
             </slot>
         </div>

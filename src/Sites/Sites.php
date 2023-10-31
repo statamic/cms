@@ -2,6 +2,7 @@
 
 namespace Statamic\Sites;
 
+use Statamic\Facades\User;
 use Statamic\Support\Str;
 
 class Sites
@@ -18,6 +19,11 @@ class Sites
     public function all()
     {
         return $this->sites;
+    }
+
+    public function authorized()
+    {
+        return $this->sites->filter(fn ($site) => User::current()->can('view', $site));
     }
 
     public function default()
@@ -60,6 +66,11 @@ class Sites
     public function selected()
     {
         return $this->get(session('statamic.cp.selected-site')) ?? $this->default();
+    }
+
+    public function setSelected($site)
+    {
+        session()->put('statamic.cp.selected-site', $site);
     }
 
     public function setConfig($key, $value = null)
