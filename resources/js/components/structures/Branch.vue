@@ -26,7 +26,7 @@
                     <svg-icon name="micro/chevron-down-xs" class="h-1.5" />
                 </button>
 
-                <div v-if="page.collection" class="ml-4 flex items-center">
+                <div v-if="page.collection && editable" class="ml-4 flex items-center">
                     <svg-icon name="light/content-writing" class="w-4 h-4" />
                     <div class="ml-1">
                         <a :href="page.collection.create_url" v-text="__('Add')" />
@@ -39,7 +39,7 @@
             <div class="pr-2 flex items-center">
                 <slot name="branch-icon" :branch="page" />
 
-                <dropdown-list class="ml-4" v-if="!isRoot">
+                <dropdown-list class="ml-4" v-if="!isRoot && editable">
                     <slot name="branch-options"
                         :branch="page"
                         :depth="depth"
@@ -68,7 +68,8 @@ export default {
         hasCollection: Boolean,
         isOpen: Boolean,
         hasChildren: Boolean,
-        showSlugs: Boolean
+        showSlugs: Boolean,
+        editable: Boolean,
     },
 
     data() {

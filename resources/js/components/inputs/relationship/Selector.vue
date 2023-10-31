@@ -133,6 +133,7 @@
                                 :expects-root="fieldtypeMeta.structureExpectsRoot"
                                 :site="site"
                                 :preferences-prefix="`collections.${collection}`"
+                                :editable="false"
                             >
                                 <template #branch-drag="{ branch, index }">
                                     <input
