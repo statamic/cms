@@ -108,12 +108,12 @@ class ActiveNavItemTest extends TestCase
     }
 
     /** @test */
-    public function it_properly_handles_various_descendant_edge_cases_when_checking_is_active_on_nav_children()
+    public function it_properly_handles_various_edge_cases_when_checking_is_active_on_descendants_of_nav_children()
     {
         // Ensure urls are not cached so that we can test regex based isActive() checks
         Nav::clearCachedUrls();
 
-        // These patterns are only intended to check against descendants of child items, since we have explicit child URLs.
+        // These patterns are only intended to check against descendants of child items, since we have explicit child URLs
         $parent = Nav::create('parent')
             ->section('test')
             ->url('http://localhost/cp/parent')
