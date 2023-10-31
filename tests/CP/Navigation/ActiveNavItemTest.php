@@ -470,6 +470,12 @@ class ActiveNavItemTest extends TestCase
         // Ensure the new `Products` child under `Schopify` is active
         $this->assertTrue($this->getItemByDisplay($schopify->children(), 'Products')->isActive());
         $this->assertFalse($this->getItemByDisplay($schopify->children(), 'Categories')->isActive());
+
+        // Ensure hijacked items were properly removed from original parents
+        $this->assertInstanceOf(Collection::class, $collections->children());
+        $this->assertEquals(['Articles', 'Pages'], $collections->children()->map->display()->all());
+        $this->assertInstanceOf(Collection::class, $taxonomies->children());
+        $this->assertEquals(['Tags'], $taxonomies->children()->map->display()->all());
     }
 
     /** @test */
