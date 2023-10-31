@@ -127,13 +127,12 @@
                             <page-tree
                                 ref="tree"
                                 :has-collection="true"
-                                :collections="['pages']"
-                                pages-url="https://sandbox.test/cp/collections/pages/tree"
-                                submit-url="https://sandbox.test/cp/collections/pages/tree"
-                                :show-slugs="true"
-                                :expects-root="true"
+                                :collections="[collection]"
+                                :pages-url="fieldtypeMeta.structurePagesUrl"
+                                :show-slugs="fieldtypeMeta.structureShowSlugs"
+                                :expects-root="fieldtypeMeta.structureExpectsRoot"
                                 :site="site"
-                                :preferences-prefix="`collections.pages`"
+                                :preferences-prefix="`collections.${collection}`"
                             >
                                 <template #branch-drag="{ branch, index }">
                                     <input

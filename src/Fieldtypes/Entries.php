@@ -396,11 +396,15 @@ class Entries extends Relationship
 
     public function preload()
     {
+        $collection = count($this->getConfiguredCollections()) === 1
+            ? Collection::findByHandle($this->getConfiguredCollections()[0])
+            : null;
+
         return array_merge(parent::preload(), [
-            'structuredCollections' => Collection::all()
-                ->filter->hasStructure()
-                ->pluck('handle')
-                ->toArray(),
+            'structurePagesUrl' => $collection?->hasStructure() ? cp_route('collections.tree.index', $collection) : null,
+            'structureExpectsRoot' => $collection?->hasStructure() ? $collection->structure()->expectsRoot() : null,
+            'structureShowSlugs' => $collection?->hasStructure() ? $collection->structure()->showSlugs() : null,
+            'structuredCollections' => Collection::all()->filter->hasStructure()->pluck('handle')->toArray(),
         ]);
     }
 }
