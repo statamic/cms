@@ -142,6 +142,10 @@ class Entries extends Relationship
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
             ->additional(['meta' => [
                 'activeFilterBadges' => $this->activeFilterBadges,
+                'structuredCollections' => Collection::all()
+                    ->filter->hasStructure()
+                    ->pluck('handle')
+                    ->toArray(),
             ]]);
     }
 

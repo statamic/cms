@@ -22,7 +22,7 @@
                 <div class="bg-white bg-gray-200">
                     <div class="p-2 flex items-center justify-between">
                         <data-list-search class="h-8 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
-                        <div class="btn-group ml-4" v-if="type === 'entries'">
+                        <div class="btn-group ml-4" v-if="canUseStructureTree">
                             <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
                                 <svg-icon name="light/structures" class="h-4 w-4"/>
                             </button>
@@ -106,7 +106,7 @@
             </div>
         </data-list>
 
-        <template v-if="!initializing && view === 'tree'">
+        <template v-if="!initializing && canUseStructureTree && view === 'tree'">
             <div class="flex flex-col h-full">
                 <div class="bg-white bg-gray-200">
                     <div class="p-2 flex items-center justify-end">
@@ -264,6 +264,14 @@ export default {
 
         singleSelect() {
             return this.maxSelections === 1;
+        },
+
+        canUseStructureTree() {
+            if (this.type !== 'entries') return false;
+
+            if (this.config.collections.length !== 1) return false;
+
+            return this.meta.structuredCollections.includes(this.config.collections[0]);
         },
 
     },
