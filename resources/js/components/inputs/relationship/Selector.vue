@@ -272,7 +272,7 @@ export default {
             if (this.config.collections.length !== 1) return false;
             if (! this.fieldtypeMeta?.collections) return;
 
-            return this.fieldtypeMeta.collections.filter((collection) => this.config.collections[0] === collection.handle).length > 0;
+            return this.fieldtypeMeta.collections.filter((collection) => collection.hasStructure && this.config.collections[0] === collection.handle).length > 0;
         },
 
         collection() {
