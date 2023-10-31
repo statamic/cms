@@ -122,7 +122,7 @@ class ActiveNavItemTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_if_parent_extension_item_is_active()
+    public function it_can_check_if_parent_extension_with_array_based_children_item_is_active()
     {
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
@@ -147,7 +147,7 @@ class ActiveNavItemTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_when_parent_and_child_extension_items_are_active()
+    public function it_can_check_when_parent_and_array_based_child_extension_items_are_active()
     {
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
@@ -172,7 +172,7 @@ class ActiveNavItemTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_when_parent_and_descendant_of_child_extension_item_is_active()
+    public function it_can_check_when_parent_and_array_based_descendant_of_child_extension_item_is_active()
     {
         Facades\CP\Nav::extend(function ($nav) {
             $nav->tools('SEO Pro')
