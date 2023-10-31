@@ -44,6 +44,8 @@ class ActiveNavItemTest extends TestCase
             Route::get('cp/seo-pro/section-defaults', fn () => 'test');
             Route::get('cp/seo-pro/section-defaults/pages', fn () => 'test');
             Route::get('cp/seo-pro/section-defaults/articles', fn () => 'test');
+            Route::get('cp/totally-custom-url', fn () => 'test');
+            Route::get('cp/totally-custom-url/deeper/descendant', fn () => 'test');
         });
     }
 
@@ -515,6 +517,49 @@ class ActiveNavItemTest extends TestCase
         // Ensure the new `Products` child under `Schopify` is active, because the current URL is a descendant of this item
         $this->assertTrue($this->getItemByDisplay($schopify->children(), 'Products')->isActive());
         $this->assertFalse($this->getItemByDisplay($schopify->children(), 'Categories')->isActive());
+    }
+
+    /** @test */
+    public function active_nav_descendant_with_unrelated_url_still_functions_properly_when_custom_nav_extension_hijacks_a_core_item_child()
+    {
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+        Facades\Collection::make('products')->title('Products')->save();
+
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+        Facades\Taxonomy::make('categories')->title('Categories')->save();
+
+        // Remove `Products` and `Categories` from core parents, and add to `Schopify` extension item as children
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->remove('Content', 'Collections', 'Products');
+            $nav->remove('Content', 'Taxonomies', 'Categories');
+
+            $nav->tools('Schopify')
+                ->url('/cp/collections/products')
+                ->children(function () use ($nav) {
+                    return [
+                        $nav->item('Products')->url('/cp/collections/products'),
+                        $nav->item('Categories')->url('/cp/taxonomies/categories'),
+                        $nav->item('Unrelated')->url('/cp/totally-custom-url'),
+                    ];
+                });
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/totally-custom-url/deeper/descendant')
+            ->assertStatus(200);
+
+        $schopify = $this->buildAndGetItem('Tools', 'Schopify');
+
+        // Ensure only the `Schopify` nav item is active and children are resolved
+        $this->assertTrue($schopify->isActive());
+        $this->assertInstanceOf(Collection::class, $schopify->children());
+
+        // Ensure our `Unrelated` totally custom URL item is considered active as well, based on URL hierarchy
+        $this->assertFalse($this->getItemByDisplay($schopify->children(), 'Products')->isActive());
+        $this->assertFalse($this->getItemByDisplay($schopify->children(), 'Categories')->isActive());
+        $this->assertTrue($this->getItemByDisplay($schopify->children(), 'Unrelated')->isActive());
     }
 
     protected function prepareNavCaches()
