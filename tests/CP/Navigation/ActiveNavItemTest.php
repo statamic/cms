@@ -423,6 +423,100 @@ class ActiveNavItemTest extends TestCase
         $this->assertFalse($externalSecure->isActive());
     }
 
+    /** @test */
+    public function active_nav_check_still_functions_properly_when_custom_nav_extension_hijacks_a_core_item_child()
+    {
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+        Facades\Collection::make('products')->title('Products')->save();
+
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+        Facades\Taxonomy::make('categories')->title('Categories')->save();
+
+        // Remove `Products` and `Categories` from core parents, and add to `Schopify` extension item as children
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->remove('Content', 'Collections', 'Products');
+            $nav->remove('Content', 'Taxonomies', 'Categories');
+
+            $nav->tools('Schopify')
+                ->url('/cp/collections/products')
+                ->children(function () use ($nav) {
+                    return [
+                        $nav->item('Products')->url('/cp/collections/products'),
+                        $nav->item('Categories')->url('/cp/taxonomies/categories'),
+                    ];
+                });
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/collections/products')
+            ->assertStatus(200);
+
+        $nav = $this->build();
+
+        $collections = $this->getItemByDisplay($nav->get('Content'), 'Collections');
+        $taxonomies = $this->getItemByDisplay($nav->get('Content'), 'Taxonomies');
+        $schopify = $this->getItemByDisplay($nav->get('Tools'), 'Schopify');
+
+        // Ensure only the `Schopify` nav item is active, since we moved the current url (ie. `Products`) to this item
+        $this->assertFalse($collections->isActive());
+        $this->assertFalse($taxonomies->isActive());
+        $this->assertTrue($schopify->isActive());
+        $this->assertInstanceOf(Collection::class, $schopify->children());
+
+        // Ensure the new `Products` child under `Schopify` is active
+        $this->assertTrue($this->getItemByDisplay($schopify->children(), 'Products')->isActive());
+        $this->assertFalse($this->getItemByDisplay($schopify->children(), 'Categories')->isActive());
+    }
+
+    /** @test */
+    public function active_nav_descendant_check_still_functions_properly_when_custom_nav_extension_hijacks_a_core_item_child()
+    {
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+        Facades\Collection::make('products')->title('Products')->save();
+
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+        Facades\Taxonomy::make('categories')->title('Categories')->save();
+
+        // Remove `Products` and `Categories` from core parents, and add to `Schopify` extension item as children
+        Facades\CP\Nav::extend(function ($nav) {
+            $nav->remove('Content', 'Collections', 'Products');
+            $nav->remove('Content', 'Taxonomies', 'Categories');
+
+            $nav->tools('Schopify')
+                ->url('/cp/collections/products')
+                ->children(function () use ($nav) {
+                    return [
+                        $nav->item('Products')->url('/cp/collections/products'),
+                        $nav->item('Categories')->url('/cp/taxonomies/categories'),
+                    ];
+                });
+        });
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/collections/products/entries/create/en')
+            ->assertStatus(200);
+
+        $nav = $this->build();
+
+        $collections = $this->getItemByDisplay($nav->get('Content'), 'Collections');
+        $taxonomies = $this->getItemByDisplay($nav->get('Content'), 'Taxonomies');
+        $schopify = $this->getItemByDisplay($nav->get('Tools'), 'Schopify');
+
+        // Ensure only the `Schopify` nav item is active, since we moved the current url (ie. `Products`) to this item
+        $this->assertFalse($collections->isActive());
+        $this->assertFalse($taxonomies->isActive());
+        $this->assertTrue($schopify->isActive());
+        $this->assertInstanceOf(Collection::class, $schopify->children());
+
+        // Ensure the new `Products` child under `Schopify` is active, because the current URL is a descendant of this item
+        $this->assertTrue($this->getItemByDisplay($schopify->children(), 'Products')->isActive());
+        $this->assertFalse($this->getItemByDisplay($schopify->children(), 'Categories')->isActive());
+    }
+
     protected function prepareNavCaches()
     {
         // Clear caches
