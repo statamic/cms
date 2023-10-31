@@ -13,6 +13,7 @@ use Statamic\Facades\Config;
 use Statamic\Facades\Glide as GlideManager;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
+use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
@@ -199,7 +200,9 @@ class Glide extends Tags
             return;
         }
 
-        $url = ($this->params->bool('absolute', $this->useAbsoluteUrls())) ? URL::makeAbsolute($url) : URL::makeRelative($url);
+        if (Str::startsWith($url, Site::current()->absoluteUrl())) {
+            $url = ($this->params->bool('absolute', $this->useAbsoluteUrls())) ? URL::makeAbsolute($url) : URL::makeRelative($url);
+        }
 
         return $url;
     }
