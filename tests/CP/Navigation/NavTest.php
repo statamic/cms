@@ -434,6 +434,33 @@ class NavTest extends TestCase
     }
 
     /** @test */
+    public function it_can_use_extend_to_remove_a_default_statamic_child_nav_item()
+    {
+        Facades\Collection::make('articles')->save();
+        Facades\Collection::make('pages')->save();
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $nav = Nav::build();
+
+        $collectionsChildren = function () {
+            return $this->build()
+                ->get('Content')
+                ->first(fn ($item) => $item->display() === 'Collections')
+                ->resolveChildren()
+                ->children();
+        };
+
+        $this->assertEquals(['Articles', 'Pages'], $collectionsChildren()->map->display()->all());
+
+        Nav::extend(function ($nav) {
+            $nav->remove('Content', 'Collections', 'Articles');
+        });
+
+        $this->assertEquals(['Pages'], $collectionsChildren()->map->display()->all());
+    }
+
+    /** @test */
     public function it_sets_the_url()
     {
         tap(Nav::create('external-absolute')->url('http://domain.com'), function ($nav) {
