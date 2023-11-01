@@ -24,7 +24,7 @@ class ButtonGroup extends Fieldtype
                         'value_header' => __('Label').' ('.__('Optional').')',
                         'add_button' => __('Add Option'),
                         'validate' => [function ($attribute, $value, $fail) {
-                            $optionsWithoutKeys = collect($value)->keys()->filter(fn ($key) => empty($key) === 'null');
+                            $optionsWithoutKeys = collect($value)->keys()->filter(fn ($key) => empty($key) || $key === 'null');
 
                             if ($optionsWithoutKeys->isNotEmpty()) {
                                 $fail(__('Please ensure all options have keys.'));
