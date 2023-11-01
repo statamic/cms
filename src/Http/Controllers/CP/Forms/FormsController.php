@@ -8,6 +8,7 @@ use Statamic\CP\Column;
 use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Str;
@@ -69,7 +70,13 @@ class FormsController extends CpController
             ->rejectUnlisted()
             ->values();
 
-        return view('statamic::forms.show', compact('form', 'columns'));
+        $viewData = array_merge(compact('form', 'columns'), [
+            'filters' => Scope::filters('forms', [
+                'form' => $form->handle(),
+            ])
+        ]);
+
+        return view('statamic::forms.show', $viewData);
     }
 
     /**
