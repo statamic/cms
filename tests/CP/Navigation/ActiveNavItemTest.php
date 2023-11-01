@@ -568,6 +568,170 @@ class ActiveNavItemTest extends TestCase
         $this->assertTrue($this->getItemByDisplay($schopify->children(), 'Unrelated')->isActive());
     }
 
+    /** @test */
+    public function active_nav_check_still_functions_properly_on_moved_items()
+    {
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+        Facades\Taxonomy::make('categories')->title('Categories')->save();
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/collections/articles')
+            ->assertStatus(200);
+
+        $nav = $this->build([
+            'top_level' => [
+                'content::collections::articles' => [
+                    'action' => '@move',
+                    'children' => [
+                        'content::taxonomies::categories' => '@move',
+                    ],
+                ],
+            ],
+        ]);
+
+        $articles = $this->getItemByDisplay($nav->get('Top Level'), 'Articles');
+        $categories = $this->getItemByDisplay($articles->children(), 'Categories');
+        $collections = $this->getItemByDisplay($nav->get('Content'), 'Collections');
+        $taxonomies = $this->getItemByDisplay($nav->get('Content'), 'Taxonomies');
+
+        // Ensure old parents are not active
+        $this->assertFalse($collections->isActive());
+        $this->assertFalse($taxonomies->isActive());
+
+        // Ensure moved item is active
+        $this->assertTrue($articles->isActive());
+
+        // Child should not be active in this case though
+        $this->assertFalse($categories->isActive());
+    }
+
+    /** @test */
+    public function active_nav_check_still_functions_properly_on_explicit_child_within_moved_items()
+    {
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+        Facades\Taxonomy::make('categories')->title('Categories')->save();
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/taxonomies/categories')
+            ->assertStatus(200);
+
+        $nav = $this->build([
+            'top_level' => [
+                'content::collections::articles' => [
+                    'action' => '@move',
+                    'children' => [
+                        'content::taxonomies::categories' => '@move',
+                    ],
+                ],
+            ],
+        ]);
+
+        $articles = $this->getItemByDisplay($nav->get('Top Level'), 'Articles');
+        $categories = $this->getItemByDisplay($articles->children(), 'Categories');
+        $collections = $this->getItemByDisplay($nav->get('Content'), 'Collections');
+        $taxonomies = $this->getItemByDisplay($nav->get('Content'), 'Taxonomies');
+
+        // Ensure old parents are not active
+        $this->assertFalse($collections->isActive());
+        $this->assertFalse($taxonomies->isActive());
+
+        // Ensure moved item is active
+        $this->assertTrue($articles->isActive());
+
+        // Ensure child of moved item is now active
+        $this->assertTrue($categories->isActive());
+    }
+
+    /** @test */
+    public function active_nav_check_still_functions_properly_on_descendant_of_moved_items()
+    {
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+        Facades\Taxonomy::make('categories')->title('Categories')->save();
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/collections/articles/entries/create/en')
+            ->assertStatus(200);
+
+        $nav = $this->build([
+            'top_level' => [
+                'content::collections::articles' => [
+                    'action' => '@move',
+                    'children' => [
+                        'content::taxonomies::categories' => '@move',
+                    ],
+                ],
+            ],
+        ]);
+
+        $articles = $this->getItemByDisplay($nav->get('Top Level'), 'Articles');
+        $categories = $this->getItemByDisplay($articles->children(), 'Categories');
+        $collections = $this->getItemByDisplay($nav->get('Content'), 'Collections');
+        $taxonomies = $this->getItemByDisplay($nav->get('Content'), 'Taxonomies');
+
+        // Ensure old parents are not active
+        $this->assertFalse($collections->isActive());
+        $this->assertFalse($taxonomies->isActive());
+
+        // Ensure moved item is active, due to URL hierarchy of current URL being a descendant
+        $this->assertTrue($articles->isActive());
+
+        // Child should not be active in this case though
+        $this->assertFalse($categories->isActive());
+    }
+
+    /** @test */
+    public function active_nav_check_still_functions_properly_on_descendant_of_child_within_moved_item()
+    {
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+        Facades\Taxonomy::make('categories')->title('Categories')->save();
+
+        $this
+            ->prepareNavCaches()
+            ->get('http://localhost/cp/taxonomies/categories/terms/create/en')
+            ->assertStatus(200);
+
+        $nav = $this->build([
+            'top_level' => [
+                'content::collections::articles' => [
+                    'action' => '@move',
+                    'children' => [
+                        'content::taxonomies::categories' => '@move',
+                    ],
+                ],
+            ],
+        ]);
+
+        $articles = $this->getItemByDisplay($nav->get('Top Level'), 'Articles');
+        $categories = $this->getItemByDisplay($articles->children(), 'Categories');
+        $collections = $this->getItemByDisplay($nav->get('Content'), 'Collections');
+        $taxonomies = $this->getItemByDisplay($nav->get('Content'), 'Taxonomies');
+
+        // Ensure old parents are not active
+        $this->assertFalse($collections->isActive());
+        $this->assertFalse($taxonomies->isActive());
+
+        // Ensure moved item is active
+        $this->assertTrue($articles->isActive());
+
+        // Child should not be active in this case, due to URL hierarchy of current URL being a descendant
+        $this->assertTrue($categories->isActive());
+    }
+
     protected function prepareNavCaches()
     {
         // Clear caches
@@ -587,9 +751,9 @@ class ActiveNavItemTest extends TestCase
         return $this;
     }
 
-    protected function build()
+    protected function build($preferences = null)
     {
-        return Nav::build()->pluck('items', 'display');
+        return Nav::build($preferences)->pluck('items', 'display');
     }
 
     protected function buildAndGetItem($sectionDisplay, $itemDisplay)
