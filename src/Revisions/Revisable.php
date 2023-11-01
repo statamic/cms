@@ -135,7 +135,7 @@ trait Revisable
 
     public function revisionsEnabled()
     {
-        return config('statamic.revisions.enabled') || ! Statamic::pro();
+        return config('statamic.revisions.enabled') && Statamic::pro();
     }
 
     abstract protected function revisionKey();
