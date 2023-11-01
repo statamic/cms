@@ -135,15 +135,17 @@
                                 :editable="false"
                             >
                                 <template #branch-action="{ branch, index }">
-                                    <input
-                                        type="checkbox"
-                                        class="ml-2"
-                                        :value="branch.id"
-                                        :checked="isSelected(branch.id)"
-                                        :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
-                                        :id="`checkbox-${branch.id}`"
-                                        @click="checkboxClicked(branch, index, $event)"
-                                    />
+                                    <div>
+                                        <input
+                                            type="checkbox"
+                                            class="mt-3 ml-3"
+                                            :value="branch.id"
+                                            :checked="isSelected(branch.id)"
+                                            :disabled="reachedSelectionLimit && !singleSelect && !isSelected(branch.id)"
+                                            :id="`checkbox-${branch.id}`"
+                                            @click="checkboxClicked(branch, index, $event)"
+                                        />
+                                    </div>
                                 </template>
 
                                 <template #branch-icon="{ branch }">
