@@ -23,6 +23,13 @@ class ButtonGroup extends Fieldtype
                         'type' => 'array',
                         'value_header' => __('Label').' ('.__('Optional').')',
                         'add_button' => __('Add Option'),
+                        'validate' => [function ($attribute, $value, $fail) {
+                            $optionsWithoutKeys = collect($value)->keys()->filter(fn ($key) => empty($key));
+
+                            if ($optionsWithoutKeys->isNotEmpty()) {
+                                $fail(__('Please ensure all options have keys.'));
+                            }
+                        }],
                     ],
                     'default' => [
                         'display' => __('Default Value'),
