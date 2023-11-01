@@ -50,6 +50,97 @@ class ActiveNavItemTest extends TestCase
     }
 
     /** @test */
+    public function it_resolves_all_children_only_once_to_build_caches_for_is_active_checks()
+    {
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        Facades\Taxonomy::make('tags')->title('Tags')->save();
+        Facades\Taxonomy::make('categories')->title('Categories')->save();
+
+        // Clear caches
+        Nav::clearCachedUrls();
+        $this->assertFalse(Cache::has(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
+        $this->assertFalse(Blink::has(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
+        $this->assertFalse(Cache::has(NavBuilder::ALL_URLS_CACHE_KEY));
+        $this->assertFalse(Blink::has(NavBuilder::ALL_URLS_CACHE_KEY));
+
+        // Ensure that all children are resolved and URLs are cached for `isActive()` checks on first build
+        $nav = Nav::build()->pluck('items', 'display');
+        $this->assertTrue(Cache::has(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
+        $this->assertTrue(Blink::has(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
+        $this->assertTrue(Cache::has(NavBuilder::ALL_URLS_CACHE_KEY));
+        $this->assertTrue(Blink::has(NavBuilder::ALL_URLS_CACHE_KEY));
+        $this->assertInstanceOf(Collection::class, $this->getItemByDisplay($nav->get('Content'), 'Collections')->children());
+        $this->assertInstanceOf(Collection::class, $this->getItemByDisplay($nav->get('Content'), 'Taxonomies')->children());
+
+        // Ensure that it builds children as unresolved closures on second build
+        $nav = Nav::build()->pluck('items', 'display');
+        $this->assertTrue(Cache::has(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
+        $this->assertTrue(Blink::has(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY));
+        $this->assertTrue(Cache::has(NavBuilder::ALL_URLS_CACHE_KEY));
+        $this->assertTrue(Blink::has(NavBuilder::ALL_URLS_CACHE_KEY));
+        $this->assertInstanceOf(Closure::class, $this->getItemByDisplay($nav->get('Content'), 'Collections')->children());
+        $this->assertInstanceOf(Closure::class, $this->getItemByDisplay($nav->get('Content'), 'Taxonomies')->children());
+    }
+
+    /** @test */
+    public function it_updates_caches_when_new_child_urls_are_detected_after_resolving_children()
+    {
+        Facades\Collection::make('pages')->title('Pages')->save();
+        Facades\Collection::make('articles')->title('Articles')->save();
+
+        // Ensure we clear cached URLs and build nav cache
+        Nav::clearCachedUrls();
+        Nav::build();
+
+        // Assert that our collection children are properly cached
+        $collectionsChildrenUrls = [
+            'http://localhost/cp/collections/articles',
+            'http://localhost/cp/collections/pages',
+        ];
+        $this->assertEquals($collectionsChildrenUrls, Cache::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)->get('content::collections'));
+        $this->assertEquals($collectionsChildrenUrls, Blink::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)->get('content::collections'));
+        collect($collectionsChildrenUrls)->each(function ($url) {
+            $this->assertTrue(Cache::get(NavBuilder::ALL_URLS_CACHE_KEY)->contains($url));
+            $this->assertTrue(Blink::get(NavBuilder::ALL_URLS_CACHE_KEY)->contains($url));
+        });
+
+        // Now let's create a new collection
+        Facades\Collection::make('products')->title('Products')->save();
+
+        // Simply building the nav should change what is cached
+        $collectionsChildrenUrls = [
+            'http://localhost/cp/collections/articles',
+            'http://localhost/cp/collections/pages',
+        ];
+        $this->assertEquals($collectionsChildrenUrls, Cache::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)->get('content::collections'));
+        $this->assertEquals($collectionsChildrenUrls, Blink::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)->get('content::collections'));
+        collect($collectionsChildrenUrls)->each(function ($url) {
+            $this->assertTrue(Cache::get(NavBuilder::ALL_URLS_CACHE_KEY)->contains($url));
+            $this->assertTrue(Blink::get(NavBuilder::ALL_URLS_CACHE_KEY)->contains($url));
+        });
+
+        // But if we build the nav again by hitting collections url to resolve its' children, the caches should get updated
+        $this
+            ->get('http://localhost/cp/collections')
+            ->assertStatus(200);
+
+        // Assert that our collection children caches are properly updated
+        $updatedChildrenUrls = [
+            'http://localhost/cp/collections/articles',
+            'http://localhost/cp/collections/pages',
+            'http://localhost/cp/collections/products',
+        ];
+        $this->assertEquals($updatedChildrenUrls, Cache::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)->get('content::collections'));
+        $this->assertEquals($updatedChildrenUrls, Blink::get(NavBuilder::UNRESOLVED_CHILDREN_URLS_CACHE_KEY)->get('content::collections'));
+        collect($updatedChildrenUrls)->each(function ($url) {
+            $this->assertTrue(Cache::get(NavBuilder::ALL_URLS_CACHE_KEY)->contains($url));
+            $this->assertTrue(Blink::get(NavBuilder::ALL_URLS_CACHE_KEY)->contains($url));
+        });
+    }
+
+    /** @test */
     public function it_builds_core_children_closure_when_not_active()
     {
         Facades\Collection::make('pages')->title('Pages')->save();
