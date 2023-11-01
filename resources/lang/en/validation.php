@@ -175,6 +175,7 @@ return [
     'date_fieldtype_end_date_required' => 'End date is required.',
     'date_fieldtype_end_date_invalid' => 'Not a valid end date.',
     'code_fieldtype_rulers' => 'This is invalid.',
+    'options_require_keys' => 'All options must have keys.',
 
     /*
     |--------------------------------------------------------------------------
