@@ -144,6 +144,14 @@ class Nav
     }
 
     /**
+     * Clear cached urls.
+     */
+    public function clearCachedUrls()
+    {
+        return NavBuilder::clearCachedUrls();
+    }
+
+    /**
      * Make base items.
      *
      * @return $this
