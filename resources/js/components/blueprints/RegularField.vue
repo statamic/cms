@@ -24,6 +24,9 @@
                     >
                         <svg-icon name="light/earth" class="h-4 w-4" />
                     </button>
+                    <button @click.prevent="$emit('duplicate')" class="text-gray-600 hover:text-gray-950 flex items-center mr-2">
+                        Duplicate
+                    </button>
                     <button @click.prevent="$emit('deleted')" class="text-gray-600 hover:text-gray-950 flex items-center">
                         <svg-icon name="micro/trash" class="h-4 w-4" />
                     </button>

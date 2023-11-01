@@ -21,6 +21,7 @@
                 @updated="$emit('field-updated', i, $event)"
                 @deleted="$emit('field-deleted', i)"
                 @editor-closed="$emit('editor-closed')"
+                @duplicate="duplicateField(field)"
             />
         </div>
 
@@ -140,7 +141,30 @@ export default {
 
             this.$toast.success(__('Field added'));
             this.pendingCreatedField = null;
-        }
+        },
+
+        duplicateField(field) {
+            let handle = `${field.handle}-duplicate`;
+            let counter = 0;
+
+            do {
+                counter++;
+                handle = `${field.handle}_duplicate${counter > 1 ? `_${counter}` : ''}`;
+            } while (this.suggestableConditionFields.includes(handle));
+
+            let duplicate = {
+                ...field,
+                _id: uniqid(),
+                handle: handle,
+                config: {
+                    ...field.config,
+                    display: field.config.display ? `${field.config.display} (Duplicate)` : `${field.handle} (Duplicate)`,
+                }
+            };
+
+            this.$emit('field-created', duplicate);
+            this.$toast.success(__('Field duplicated'));
+        },
 
     }
 
