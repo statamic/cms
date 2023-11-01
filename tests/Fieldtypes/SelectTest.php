@@ -49,7 +49,7 @@ class SelectTest extends TestCase
 
         $fields = $blueprint
             ->fields()
-            ->addValues([
+            ->addValues($values = [
                 'options' => [
                     'one' => 'One',
                     'two' => 'Two',
@@ -57,6 +57,6 @@ class SelectTest extends TestCase
                 ],
             ]);
 
-        $fields->validate();
+        $this->assertEquals($values, $fields->validate());
     }
 }
