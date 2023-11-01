@@ -197,27 +197,27 @@ class LocalizeEntryTest extends TestCase
         ], Collection::findByHandle('pages')->structure()->in('fr')->tree());
     }
 
-        /** @test */
-        public function it_localizes_an_entry_with_revisions()
-        {
-            config(['statamic.revisions.enabled' => true]);
+    /** @test */
+    public function it_localizes_an_entry_with_revisions()
+    {
+        config(['statamic.revisions.enabled' => true]);
 
-            $user = $this->user();
-            $entry = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(true))->save())->slug('test')->create();
-            $this->assertNull($entry->in('fr'));
+        $user = $this->user();
+        $entry = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(true))->save())->slug('test')->create();
+        $this->assertNull($entry->in('fr'));
 
-            $response = $this
-                ->actingAs($user)
-                ->localize($entry, ['site' => 'fr'])
-                ->assertOk();
+        $response = $this
+            ->actingAs($user)
+            ->localize($entry, ['site' => 'fr'])
+            ->assertOk();
 
-            $localized = $entry->fresh()->in('fr');
-            $this->assertNotNull($localized);
-            $this->assertEquals($user, $localized->lastModifiedBy());
-            $response->assertJson(['handle' => 'fr', 'url' => $localized->editUrl()]);
+        $localized = $entry->fresh()->in('fr');
+        $this->assertNotNull($localized);
+        $this->assertEquals($user, $localized->lastModifiedBy());
+        $response->assertJson(['handle' => 'fr', 'url' => $localized->editUrl()]);
 
-            $this->assertCount(1, $entry->in('fr')->revisions());
-        }
+        $this->assertCount(1, $entry->in('fr')->revisions());
+    }
 
     private function localize($entry, $params = [])
     {
