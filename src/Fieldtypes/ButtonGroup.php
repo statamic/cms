@@ -27,7 +27,7 @@ class ButtonGroup extends Fieldtype
                             $optionsWithoutKeys = collect($value)->keys()->filter(fn ($key) => empty($key) || $key === 'null');
 
                             if ($optionsWithoutKeys->isNotEmpty()) {
-                                $fail(__('Please ensure all options have keys.'));
+                                $fail(__('statamic::validation.options_require_keys'));
                             }
                         }],
                     ],
