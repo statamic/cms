@@ -73,7 +73,7 @@ class FormsController extends CpController
         $viewData = array_merge(compact('form', 'columns'), [
             'filters' => Scope::filters('forms', [
                 'form' => $form->handle(),
-            ])
+            ]),
         ]);
 
         return view('statamic::forms.show', $viewData);
