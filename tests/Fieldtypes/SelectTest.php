@@ -4,10 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Validation\ValidationException;
-use Statamic\Facades\Blueprint;
 use Statamic\Fields\Field;
-use Statamic\Fields\Fields;
-use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\Select;
 use Tests\TestCase;
 
@@ -39,7 +36,7 @@ class SelectTest extends TestCase
             ]);
 
         $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage("Please ensure all options have keys.");
+        $this->expectExceptionMessage('Please ensure all options have keys.');
 
         $fields->validate();
     }
