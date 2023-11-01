@@ -39,11 +39,13 @@ class Icon extends Fieldtype
                         'display' => __('Directory'),
                         'instructions' => __('statamic::fieldtypes.icon.config.directory'),
                         'type' => 'text',
+                        'placeholder' => 'vendor/statamic/cms/resources/svg/icons',
                     ],
                     'folder' => [
                         'display' => __('Folder'),
                         'instructions' => __('statamic::fieldtypes.icon.config.folder'),
                         'type' => 'text',
+                        'placeholder' => static::DEFAULT_FOLDER,
                     ],
                     'default' => [
                         'display' => __('Default Value'),
