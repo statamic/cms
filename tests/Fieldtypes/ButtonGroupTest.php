@@ -36,7 +36,7 @@ class ButtonGroupTest extends TestCase
             ]);
 
         $this->expectException(ValidationException::class);
-        $this->expectExceptionMessage('Please ensure all options have keys.');
+        $this->expectExceptionMessage(__('statamic::validation.options_require_keys'));
 
         $fields->validate();
     }
