@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use Facades\Statamic\Routing\ResolveRedirect;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Collection;
@@ -54,8 +53,6 @@ class Link extends Fieldtype
         if (is_null($item = $this->resolve($value))) {
             return null;
         }
-
-        // $redirect = ResolveRedirect::resolve($value, $this->field->parent(), true);
 
         return new ArrayableLink($item);
     }
@@ -246,7 +243,11 @@ class Link extends Fieldtype
 
 class ArrayableLink extends ArrayableString
 {
-    public function value()
+    // public function value()
+    // {
+    // }
+
+    public function __toString()
     {
         if (is_string($this->value)) {
             return $this->value;
