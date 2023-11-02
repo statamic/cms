@@ -44,13 +44,11 @@ class Link extends Fieldtype
 
     public function augment($value)
     {
-        if (! $value) {
-            return new ArrayableLink(null);
-        }
-
-        $item = ResolveRedirect::item($value, $this->field->parent(), true);
-
-        return new ArrayableLink($item);
+        return new ArrayableLink(
+            $value
+                ? ResolveRedirect::item($value, $this->field->parent(), true)
+                : null
+        );
     }
 
     public function preload()
