@@ -7,7 +7,7 @@
             <breadcrumb :url="breadcrumbUrl" :title="__('Collections')" />
 
             <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
+                <h1 class="flex-1" v-text="__(title)" />
 
                 <dropdown-list class="mr-2" v-if="!!this.$scopedSlots.twirldown">
                     <slot name="twirldown" />
