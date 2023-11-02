@@ -3,6 +3,7 @@
 namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
+use Facades\Tests\Factories\EntryFactory;
 
 /** @group graphql */
 class LinkFieldtypeTest extends FieldtypeTestCase
@@ -17,8 +18,6 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->never();
-
         $this->assertGqlEntryHas('link', ['link' => null]);
     }
 
@@ -32,22 +31,20 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->once()->with('/hardcoded', $entry, true)->andReturn('/hardcoded');
-
         $this->assertGqlEntryHas('link', ['link' => '/hardcoded']);
     }
 
     /** @test */
     public function it_gets_an_entry()
     {
+        EntryFactory::collection('test')->id(2)->slug('the-entry-url')->create();
+
         $entry = $this->createEntryWithFields([
             'link' => [
-                'value' => 'entry::123',
+                'value' => 'entry::2',
                 'field' => ['type' => 'link'],
             ],
         ]);
-
-        ResolveRedirect::shouldReceive('resolve')->once()->with('entry::123', $entry, true)->andReturn('/the-entry-url');
 
         $this->assertGqlEntryHas('link', ['link' => '/the-entry-url']);
     }
@@ -76,8 +73,6 @@ class LinkFieldtypeTest extends FieldtypeTestCase
                 'field' => ['type' => 'link'],
             ],
         ]);
-
-        ResolveRedirect::shouldReceive('resolve')->once()->with('entry::unknown', $entry, true)->andReturn(404);
 
         $this->assertGqlEntryHas('link', ['link' => null]);
     }
