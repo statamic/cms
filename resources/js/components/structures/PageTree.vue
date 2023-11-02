@@ -39,7 +39,6 @@
                     :depth="vm.level"
                     :vm="vm"
                     :first-page-is-root="expectsRoot"
-                    :has-collection="hasCollection"
                     :is-open="page.open"
                     :has-children="page.children.length > 0"
                     :show-slugs="showSlugs"
@@ -91,7 +90,6 @@ export default {
         maxDepth: { type: Number, default: Infinity, },
         expectsRoot: { type: Boolean, required: true },
         showSlugs: { type: Boolean, default: false },
-        hasCollection: { type: Boolean, required: true },
         preferencesPrefix: { type: String },
         editable: { type: Boolean, default: true },
     },

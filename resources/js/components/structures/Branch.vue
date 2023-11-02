@@ -65,7 +65,6 @@ export default {
         root: Boolean,
         vm: Object,
         firstPageIsRoot: Boolean,
-        hasCollection: Boolean,
         isOpen: Boolean,
         hasChildren: Boolean,
         showSlugs: Boolean,

@@ -125,7 +125,6 @@
                         <div class="flex-1 overflow-scroll bg-gray-200 p-4">
                             <page-tree
                                 ref="tree"
-                                :has-collection="true"
                                 :collections="[collection.handle]"
                                 :pages-url="fieldtypeMeta.structurePagesUrl"
                                 :show-slugs="fieldtypeMeta.structureShowSlugs"
