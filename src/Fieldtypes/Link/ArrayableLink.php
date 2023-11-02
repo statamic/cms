@@ -13,11 +13,9 @@ class ArrayableLink extends ArrayableString
 
     public function toArray()
     {
-        if (is_string($this->value)) {
-            return ['url' => $this->value];
-        }
-
-        return $this->value?->toAugmentedArray();
+        return is_object($this->value)
+            ? $this->value->toAugmentedArray()
+            : ['url' => $this->url()];
     }
 
     #[\ReturnTypeWillChange]
@@ -28,10 +26,6 @@ class ArrayableLink extends ArrayableString
 
     private function url()
     {
-        if (is_string($this->value)) {
-            return $this->value;
-        }
-
-        return $this->value?->url();
+        return is_object($this->value) ? $this->value?->url() : $this->value;
     }
 }

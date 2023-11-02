@@ -31,6 +31,7 @@ class LinkTest extends TestCase
         $augmented = $fieldtype->augment('/foo');
         $this->assertInstanceOf(ArrayableString::class, $augmented);
         $this->assertEquals('/foo', $augmented->value());
+        $this->assertEquals(['url' => '/foo'], $augmented->toArray());
     }
 
     /** @test */
@@ -38,6 +39,7 @@ class LinkTest extends TestCase
     {
         $entry = Mockery::mock(Entry::class);
         $entry->shouldReceive('url')->once()->andReturn('/the-entry-url');
+        $entry->shouldReceive('toAugmentedArray')->once()->andReturn('augmented entry array');
 
         ResolveRedirect::shouldReceive('item')
             ->with('entry::test', $parent = new Entry, true)
@@ -52,6 +54,7 @@ class LinkTest extends TestCase
         $this->assertInstanceOf(ArrayableString::class, $augmented);
         $this->assertEquals($entry, $augmented->value());
         $this->assertEquals('/the-entry-url', (string) $augmented);
+        $this->assertEquals('augmented entry array', $augmented->toArray());
     }
 
     /** @test */
@@ -69,6 +72,7 @@ class LinkTest extends TestCase
         $augmented = $fieldtype->augment('entry::invalid');
         $this->assertInstanceOf(ArrayableString::class, $augmented);
         $this->assertNull($augmented->value());
+        $this->assertEquals(['url' => null], $augmented->toArray());
     }
 
     /** @test */
@@ -76,6 +80,7 @@ class LinkTest extends TestCase
     {
         $asset = Mockery::mock(Asset::class);
         $asset->shouldReceive('url')->once()->andReturn('/the-asset-url');
+        $asset->shouldReceive('toAugmentedArray')->once()->andReturn('augmented asset array');
 
         ResolveRedirect::shouldReceive('item')
             ->with('asset::test', $parent = new Entry, true)
@@ -90,6 +95,7 @@ class LinkTest extends TestCase
         $this->assertInstanceOf(ArrayableString::class, $augmented);
         $this->assertEquals($asset, $augmented->value());
         $this->assertEquals('/the-asset-url', (string) $augmented);
+        $this->assertEquals('augmented asset array', $augmented->toArray());
     }
 
     /** @test */
@@ -107,6 +113,7 @@ class LinkTest extends TestCase
         $augmented = $fieldtype->augment('asset::invalid');
         $this->assertInstanceOf(ArrayableString::class, $augmented);
         $this->assertNull($augmented->value());
+        $this->assertEquals(['url' => null], $augmented->toArray());
     }
 
     /** @test */
@@ -123,5 +130,6 @@ class LinkTest extends TestCase
         $augmented = $fieldtype->augment(null);
         $this->assertInstanceOf(ArrayableString::class, $augmented);
         $this->assertNull($augmented->value());
+        $this->assertEquals(['url' => null], $augmented->toArray());
     }
 }
