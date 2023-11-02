@@ -189,14 +189,16 @@ class EntriesController extends CpController
             ->fields()
             ->addValues($data);
 
-        $fields
-            ->validator()
-            ->withRules(Entry::updateRules($collection, $entry))
-            ->withReplacements([
-                'id' => $entry->id(),
-                'collection' => $collection->handle(),
-                'site' => $entry->locale(),
-            ])->validate();
+        if ($fields->get('published')->value() || ! $collection->draftWithoutValidation()) {
+            $fields
+                ->validator()
+                ->withRules(Entry::updateRules($collection, $entry))
+                ->withReplacements([
+                    'id' => $entry->id(),
+                    'collection' => $collection->handle(),
+                    'site' => $entry->locale(),
+                ])->validate();
+        }
 
         $values = $fields->process()->values();
 
@@ -349,13 +351,15 @@ class EntriesController extends CpController
             ->fields()
             ->addValues($data);
 
-        $fields
-            ->validator()
-            ->withRules(Entry::createRules($collection, $site))
-            ->withReplacements([
-                'collection' => $collection->handle(),
-                'site' => $site->handle(),
-            ])->validate();
+        if ($fields->get('published')->value() || ! $collection->draftWithoutValidation()) {
+            $fields
+                ->validator()
+                ->withRules(Entry::createRules($collection, $site))
+                ->withReplacements([
+                    'collection' => $collection->handle(),
+                    'site' => $site->handle(),
+                ])->validate();
+        }
 
         $values = $fields->process()->values()->except(['slug', 'blueprint', 'published']);
 

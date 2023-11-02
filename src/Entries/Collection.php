@@ -59,6 +59,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
     protected $titleFormats = [];
     protected $previewTargets = [];
     protected $autosave;
+    protected $draftWithoutValidation = false;
 
     public function __construct()
     {
@@ -850,5 +851,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
+    }
+
+    public function draftWithoutValidation($draftWithoutValidation = null)
+    {
+        return $this->fluentlyGetOrSet('draftWithoutValidation')->args(func_get_args());
     }
 }

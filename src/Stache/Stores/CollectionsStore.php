@@ -57,7 +57,8 @@ class CollectionsStore extends BasicStore
             ->taxonomies(array_get($data, 'taxonomies'))
             ->propagate(array_get($data, 'propagate'))
             ->previewTargets($this->normalizePreviewTargets(array_get($data, 'preview_targets', [])))
-            ->autosaveInterval(array_get($data, 'autosave'));
+            ->autosaveInterval(array_get($data, 'autosave'))
+            ->draftWithoutValidation(array_get($data, 'draft_without_validation', false));
 
         if ($dateBehavior = array_get($data, 'date_behavior')) {
             $collection
