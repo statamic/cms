@@ -102,6 +102,8 @@ class UserController extends Controller
 
     public function password(UserPasswordRequest $request)
     {
+        $user = User::current();
+
         $user->password($request->password);
 
         $user->save();

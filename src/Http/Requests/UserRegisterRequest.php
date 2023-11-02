@@ -23,6 +23,20 @@ class UserRegisterRequest extends FormRequest
         return true;
     }
 
+    public function attributes(): array
+    {
+        $site = Site::findByUrl(URL::previous()) ?? Site::default();
+
+        $attributes = [];
+        $this->withLocale($site->lang(), function () use (&$attributes) {
+            $attributes = $this->blueprintFields
+                ->validator()
+                ->attributes();
+        });
+
+        return $attributes;
+    }
+
     public function messages(): array
     {
         $site = Site::findByUrl(URL::previous()) ?? Site::default();
