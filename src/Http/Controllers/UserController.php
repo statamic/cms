@@ -36,6 +36,7 @@ class UserController extends Controller
         $this->incrementLoginAttempts($request);
 
         $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
+
         return $errorResponse->withInput()->withErrors(__('Invalid credentials.'));
     }
 
