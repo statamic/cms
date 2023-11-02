@@ -400,17 +400,15 @@ class Entries extends Relationship
             ? Collection::findByHandle($this->getConfiguredCollections()[0])
             : null;
 
-        return array_merge(parent::preload(), [
-            'structurePagesUrl' => $collection?->hasStructure() ? cp_route('collections.tree.index', $collection) : null,
-            'structureExpectsRoot' => $collection?->hasStructure() ? $collection->structure()->expectsRoot() : null,
-            'structureShowSlugs' => $collection?->hasStructure() ? $collection->structure()->showSlugs() : null,
-            'collections' => Collection::all()
-                ->map(fn ($collection) => [
-                    'handle' => $collection->handle(),
-                    'title' => $collection->title(),
-                    'hasStructure' => $collection->hasStructure(),
-                ])
-                ->toArray(),
-        ]);
+        if (! $collection || ! $collection->hasStructure()) {
+            return parent::preload();
+        }
+
+        return array_merge(parent::preload(), ['tree' => [
+            'title' => $collection->title(),
+            'url' => cp_route('collections.tree.index', $collection),
+            'showSlugs' => $collection->structure()->showSlugs(),
+            'expectsRoot' => $collection->structure()->expectsRoot(),
+        ]]);
     }
 }

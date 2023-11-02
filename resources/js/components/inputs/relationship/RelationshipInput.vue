@@ -65,6 +65,7 @@
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
                 <item-selector
                     slot-scope="{ close }"
+                    :name="name"
                     :filters-url="filtersUrl"
                     :selections-url="selectionsUrl"
                     :site="site"
@@ -76,8 +77,7 @@
                     :search="search"
                     :exclusions="exclusions"
                     :type="config.type"
-                    :config="config"
-                    :fieldtype-meta="fieldtypeMeta"
+                    :tree="tree"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
@@ -102,7 +102,6 @@ export default {
         name: String,
         value: { required: true },
         config: Object,
-        fieldtypeMeta: Object,
         data: Array,
         maxItems: Number,
         itemComponent: {
@@ -132,6 +131,7 @@ export default {
             type: Array,
             default: () => []
         },
+        tree: Object,
     },
 
     components: {

@@ -22,7 +22,7 @@
                 <div class="bg-white z-1">
                     <div class="py-2 px-4 flex items-center justify-between">
                         <data-list-search class="h-8 min-w-[240px] w-full" ref="search" v-model="searchQuery" :placeholder="searchPlaceholder" />
-                        <div class="btn-group ml-4" v-if="canUseStructureTree">
+                        <div class="btn-group ml-4" v-if="canUseTree">
                             <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
                                 <svg-icon name="light/structures" class="h-4 w-4"/>
                             </button>
@@ -106,10 +106,10 @@
             </div>
         </data-list>
 
-        <template v-if="!initializing && canUseStructureTree && view === 'tree'">
+        <template v-if="!initializing && canUseTree && view === 'tree'">
             <div class="flex flex-col h-full">
                 <div class="bg-white bg-gray-200 shadow px-4 py-2 z-1 h-13 flex items-center justify-end">
-                    <h1 class="flex-1 flex items-center text-xl">{{ collection.title }}</h1>
+                    <h1 class="flex-1 flex items-center text-xl">{{ tree.title }}</h1>
                     <div class="btn-group ml-4">
                         <button class="btn flex items-center px-4" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
                             <svg-icon name="light/structures" class="h-4 w-4"/>
@@ -125,12 +125,11 @@
                         <div class="flex-1 overflow-scroll bg-gray-200 p-4">
                             <page-tree
                                 ref="tree"
-                                :collections="[collection.handle]"
-                                :pages-url="fieldtypeMeta.structurePagesUrl"
-                                :show-slugs="fieldtypeMeta.structureShowSlugs"
-                                :expects-root="fieldtypeMeta.structureExpectsRoot"
+                                :pages-url="tree.url"
+                                :show-slugs="tree.showSlugs"
+                                :expects-root="tree.expectsRoot"
                                 :site="site"
-                                :preferences-prefix="`collections.${collection.handle}`"
+                                :preferences-prefix="`selector-field.${name}`"
                                 :editable="false"
                             >
                                 <template #branch-action="{ branch, index }">
@@ -211,6 +210,7 @@ export default {
         site: String,
         search: Boolean,
         type: String,
+        name: String,
         exclusions: {
             type: Array,
             default: () => []
@@ -219,8 +219,7 @@ export default {
             type: Array,
             default: () => []
         },
-        config: Object,
-        fieldtypeMeta: Object,
+        tree: Object,
     },
 
     data() {
@@ -268,26 +267,26 @@ export default {
             return this.maxSelections === 1;
         },
 
-        canUseStructureTree() {
-            if (this.type !== 'entries') return false;
-            if (this.config.collections.length !== 1) return false;
-            if (! this.fieldtypeMeta?.collections) return;
-
-            return this.fieldtypeMeta.collections.filter((collection) => collection.hasStructure && this.config.collections[0] === collection.handle).length > 0;
+        canUseTree() {
+            return !! this.tree;
         },
 
-        collection() {
-            if (this.type !== 'entries') return false;
-            if (this.config.collections.length !== 1) return false;
-            if (! this.fieldtypeMeta?.collections) return;
+        initialView() {
+            if (!this.canUseTree) return 'list';
 
-            return this.fieldtypeMeta.collections.find((collection) => this.config.collections[0] === collection.handle);
+            const fallback = this.canUseTree ? 'tree' : 'list';
+
+            return localStorage.getItem(this.viewLocalStorageKey) || fallback;
         },
+
+        viewLocalStorageKey() {
+            return `statamic.selector.field.${this.name}`;
+        }
 
     },
 
     mounted() {
-        this.view = this.initialView();
+        this.view = this.initialView;
 
         this.getFilters().then(() => {
             this.autoApplyFilters(this.filters);
@@ -328,9 +327,7 @@ export default {
         },
 
         view(view) {
-            if (this.type === 'entries') {
-                localStorage.setItem('statamic.collection-view.'+this.collection.handle, view);
-            }
+            localStorage.setItem(this.viewLocalStorageKey, view);
         },
 
     },
@@ -477,14 +474,6 @@ export default {
             if ($event.target.checked) {
                 this.lastItemClicked = index
             }
-        },
-
-        initialView() {
-            if (!this.canUseStructureTree) return 'list';
-
-            const fallback = this.canUseStructureTree ? 'tree' : 'list';
-
-            return localStorage.getItem('statamic.collection-view.'+this.collection.handle) || fallback;
         },
 
     }
