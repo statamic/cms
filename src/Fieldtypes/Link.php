@@ -243,10 +243,6 @@ class Link extends Fieldtype
 
 class ArrayableLink extends ArrayableString
 {
-    // public function value()
-    // {
-    // }
-
     public function __toString()
     {
         if (is_string($this->value)) {
