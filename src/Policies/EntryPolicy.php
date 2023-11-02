@@ -26,10 +26,6 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
-        if ($entry->slug === '2019-year-in-review') {
-            return false;
-        }
-
         if (! $this->userCanAccessSite($user, $entry->site())) {
             return false;
         }
