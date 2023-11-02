@@ -28,7 +28,7 @@
             />
 
             <div class="flex items-center flex-1 justify-end">
-                <div v-if="item.collection" v-text="item.collection.title" class="text-4xs text-gray-600 uppercase whitespace-nowrap mr-2 hidden @sm:block" />
+                <div v-if="item.collection" v-text="__(item.collection.title)" class="text-4xs text-gray-600 uppercase whitespace-nowrap mr-2 hidden @sm:block" />
 
                 <div class="flex items-center" v-if="!readOnly">
                     <dropdown-list>
