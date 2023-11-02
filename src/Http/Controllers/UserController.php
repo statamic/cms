@@ -2,18 +2,18 @@
 
 namespace Statamic\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Events\UserRegistered;
 use Statamic\Events\UserRegistering;
 use Statamic\Exceptions\SilentFormFailureException;
-use Statamic\Exceptions\UnauthorizedHttpException;
 use Statamic\Facades\User;
+use Statamic\Http\Requests\UserLoginRequest;
+use Statamic\Http\Requests\UserPasswordRequest;
+use Statamic\Http\Requests\UserProfileRequest;
+use Statamic\Http\Requests\UserRegisterRequest;
 
 class UserController extends Controller
 {
@@ -21,29 +21,21 @@ class UserController extends Controller
 
     private $request;
 
-    public function login(Request $request)
+    public function login(UserLoginRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required',
-            'password' => 'required',
-        ]);
+        if ($this->hasTooManyLoginAttempts($request)) {
+            $this->fireLockoutEvent($request);
 
-        if ($validator->passes()) {
-            if ($this->hasTooManyLoginAttempts($request)) {
-                $this->fireLockoutEvent($request);
-
-                return $this->sendLockoutResponse($request);
-            }
-
-            if (Auth::attempt($request->only('email', 'password'), $request->has('remember'))) {
-                return redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'));
-            }
-
-            $this->incrementLoginAttempts($request);
+            return $this->sendLockoutResponse($request);
         }
 
-        $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
+        if (Auth::attempt($request->only('email', 'password'), $request->has('remember'))) {
+            return redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'));
+        }
 
+        $this->incrementLoginAttempts($request);
+
+        $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
         return $errorResponse->withInput()->withErrors(__('Invalid credentials.'));
     }
 
@@ -54,33 +46,12 @@ class UserController extends Controller
         return redirect(request()->get('redirect', '/'));
     }
 
-    public function register(Request $request)
+    public function register(UserRegisterRequest $request)
     {
-        $blueprint = User::blueprint();
-
-        $fields = $blueprint->fields();
-        $values = $this->valuesWithoutAssetFields($fields, $request);
-        $fields = $fields->addValues($values);
-
-        $fieldRules = $fields->validator()->withRules([
-            'email' => ['required', 'email', 'unique_user_value'],
-            'password' => ['required', 'confirmed', Password::default()],
-        ])->rules();
-
-        $validator = Validator::make($values, $fieldRules);
-
-        if ($validator->fails()) {
-            return $this->userRegistrationFailure($validator->errors());
-        }
-
-        $values = $fields->process()->values()
-            ->only(array_keys($values))
-            ->except(['email', 'groups', 'roles', 'super']);
-
         $user = User::make()
             ->email($request->email)
             ->password($request->password)
-            ->data($values);
+            ->data($request->processedValues());
 
         if ($roles = config('statamic.users.new_user_roles')) {
             $user->roles($roles);
@@ -111,36 +82,14 @@ class UserController extends Controller
         return $this->userRegistrationSuccess();
     }
 
-    public function profile(Request $request)
+    public function profile(UserProfileRequest $request)
     {
-        throw_unless($user = User::current(), new UnauthorizedHttpException(403));
-
-        $blueprint = User::blueprint();
-
-        $fields = $blueprint->fields();
-        $values = $this->valuesWithoutAssetFields($fields, $request);
-        $fields = $fields->addValues($values);
-
-        try {
-            $fields
-                ->validator()
-                ->withRules([
-                    'email' => ['required', 'email', 'unique_user_value:{id}'],
-                ])->withReplacements([
-                    'id' => $user->id(),
-                ])->validate();
-        } catch (ValidationException $e) {
-            return $this->userProfileFailure($e->validator->errors());
-        }
-
-        $values = $fields->process()->values()
-            ->only(array_keys($values))
-            ->except(['email', 'password', 'groups', 'roles', 'super']);
+        $user = User::current();
 
         if ($request->email) {
             $user->email($request->email);
         }
-        foreach ($values as $key => $value) {
+        foreach ($request->processedValues() as $key => $value) {
             $user->set($key, $value);
         }
 
@@ -151,19 +100,8 @@ class UserController extends Controller
         return $this->userProfileSuccess();
     }
 
-    public function password(Request $request)
+    public function password(UserPasswordRequest $request)
     {
-        throw_unless($user = User::current(), new UnauthorizedHttpException(403));
-
-        $validator = Validator::make($request->all(), [
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', Password::default()],
-        ]);
-
-        if ($validator->fails()) {
-            return $this->userPasswordFailure($validator->errors());
-        }
-
         $user->password($request->password);
 
         $user->save();
@@ -195,13 +133,6 @@ class UserController extends Controller
         return $response;
     }
 
-    private function userProfileFailure($errors = null)
-    {
-        $errorResponse = request()->has('_error_redirect') ? redirect(request()->input('_error_redirect')) : back();
-
-        return $errorResponse->withInput()->withErrors($errors, 'user.profile');
-    }
-
     private function userProfileSuccess(bool $silentFailure = false)
     {
         $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
@@ -211,13 +142,6 @@ class UserController extends Controller
         return $response;
     }
 
-    private function userPasswordFailure($errors = null)
-    {
-        $errorResponse = request()->has('_error_redirect') ? redirect(request()->input('_error_redirect')) : back();
-
-        return $errorResponse->withInput()->withErrors($errors, 'user.password');
-    }
-
     private function userPasswordSuccess(bool $silentFailure = false)
     {
         $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
@@ -225,14 +149,5 @@ class UserController extends Controller
         session()->flash('user.password.success', __('Change successful.'));
 
         return $response;
-    }
-
-    private function valuesWithoutAssetFields($fields, $request)
-    {
-        $assets = $fields->all()
-            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets')
-            ->keys()->all();
-
-        return $request->except($assets);
     }
 }
