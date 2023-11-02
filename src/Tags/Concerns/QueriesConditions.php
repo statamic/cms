@@ -27,9 +27,9 @@ trait QueriesConditions
 
     protected function queryableConditionParams()
     {
-        return $this->params->filter(function ($value, $param) {
-            return Str::contains($param, ':');
-        });
+        return $this->params
+            ->filter(fn ($value, $param) => Str::contains($param, ':'))
+            ->reject(fn ($value, $param) => $value === '');
     }
 
     protected function isQueryingCondition($field)
@@ -125,37 +125,21 @@ trait QueriesConditions
 
     protected function queryIsCondition($query, $field, $value)
     {
-        if (is_null($value) || $value === '') {
-            return;
-        }
-
         return $query->where($field, $value);
     }
 
     protected function queryNotCondition($query, $field, $value)
     {
-        if (is_null($value) || $value === '') {
-            return;
-        }
-
         return $query->where($field, '!=', $value);
     }
 
     protected function queryContainsCondition($query, $field, $value)
     {
-        if (is_null($value) || $value === '') {
-            return;
-        }
-
         return $query->where($field, 'like', "%{$value}%");
     }
 
     protected function queryDoesntContainCondition($query, $field, $value)
     {
-        if (is_null($value) || $value === '') {
-            return;
-        }
-
         return $query->where($field, 'not like', "%{$value}%");
     }
 
