@@ -4,7 +4,6 @@ namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
 use Mockery;
-use Statamic\Contracts\Assets\Asset;
 use Statamic\Entries\Entry;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Field;
@@ -35,9 +34,9 @@ class LinkTest extends TestCase
     }
 
     /** @test */
-    public function it_augments_to_entry()
+    public function it_augments_reference_to_object()
     {
-        $entry = Mockery::mock(Entry::class);
+        $entry = Mockery::mock();
         $entry->shouldReceive('url')->once()->andReturn('/the-entry-url');
         $entry->shouldReceive('toAugmentedArray')->once()->andReturn('augmented entry array');
 
@@ -58,7 +57,7 @@ class LinkTest extends TestCase
     }
 
     /** @test */
-    public function it_augments_invalid_entry_to_null()
+    public function it_augments_invalid_object_to_null()
     {
         ResolveRedirect::shouldReceive('item')
             ->with('entry::invalid', $parent = new Entry, true)
@@ -70,47 +69,6 @@ class LinkTest extends TestCase
         $fieldtype = (new Link)->setField($field);
 
         $augmented = $fieldtype->augment('entry::invalid');
-        $this->assertInstanceOf(ArrayableString::class, $augmented);
-        $this->assertNull($augmented->value());
-        $this->assertEquals(['url' => null], $augmented->toArray());
-    }
-
-    /** @test */
-    public function it_augments_to_asset()
-    {
-        $asset = Mockery::mock(Asset::class);
-        $asset->shouldReceive('url')->once()->andReturn('/the-asset-url');
-        $asset->shouldReceive('toAugmentedArray')->once()->andReturn('augmented asset array');
-
-        ResolveRedirect::shouldReceive('item')
-            ->with('asset::test', $parent = new Entry, true)
-            ->once()
-            ->andReturn($asset);
-
-        $field = new Field('test', ['type' => 'link']);
-        $field->setParent($parent);
-        $fieldtype = (new Link)->setField($field);
-
-        $augmented = $fieldtype->augment('asset::test');
-        $this->assertInstanceOf(ArrayableString::class, $augmented);
-        $this->assertEquals($asset, $augmented->value());
-        $this->assertEquals('/the-asset-url', (string) $augmented);
-        $this->assertEquals('augmented asset array', $augmented->toArray());
-    }
-
-    /** @test */
-    public function it_augments_invalid_asset_to_null()
-    {
-        ResolveRedirect::shouldReceive('item')
-            ->with('asset::invalid', $parent = new Entry, true)
-            ->once()
-            ->andReturnNull();
-
-        $field = new Field('test', ['type' => 'link']);
-        $field->setParent($parent);
-        $fieldtype = (new Link)->setField($field);
-
-        $augmented = $fieldtype->augment('asset::invalid');
         $this->assertInstanceOf(ArrayableString::class, $augmented);
         $this->assertNull($augmented->value());
         $this->assertEquals(['url' => null], $augmented->toArray());
