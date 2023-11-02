@@ -24,6 +24,7 @@
         :search="canSearch"
         :read-only="isReadOnly"
         :taggable="taggable"
+        :tree="meta.tree"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
         @input="update"

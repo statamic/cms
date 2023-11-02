@@ -103,7 +103,6 @@
         <page-tree
             v-if="canUseStructureTree && view === 'tree'"
             ref="tree"
-            :has-collection="true"
             :collections="[handle]"
             :create-url="createUrl"
             :pages-url="structurePagesUrl"

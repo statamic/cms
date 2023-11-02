@@ -48,7 +48,6 @@
 
         <page-tree
             ref="tree"
-            :has-collection="false"
             :pages-url="pagesUrl"
             :submit-url="submitUrl"
             :submit-parameters="{ data: submissionData }"
