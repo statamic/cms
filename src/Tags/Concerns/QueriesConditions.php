@@ -125,21 +125,37 @@ trait QueriesConditions
 
     protected function queryIsCondition($query, $field, $value)
     {
+        if (is_null($value) || $value === '') {
+            return;
+        }
+
         return $query->where($field, $value);
     }
 
     protected function queryNotCondition($query, $field, $value)
     {
+        if (is_null($value) || $value === '') {
+            return;
+        }
+
         return $query->where($field, '!=', $value);
     }
 
     protected function queryContainsCondition($query, $field, $value)
     {
+        if (is_null($value) || $value === '') {
+            return;
+        }
+
         return $query->where($field, 'like', "%{$value}%");
     }
 
     protected function queryDoesntContainCondition($query, $field, $value)
     {
+        if (is_null($value) || $value === '') {
+            return;
+        }
+
         return $query->where($field, 'not like', "%{$value}%");
     }
 
