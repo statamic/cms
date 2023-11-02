@@ -3,7 +3,8 @@
 namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
-use Facades\Tests\Factories\EntryFactory;
+use Mockery;
+use Statamic\Contracts\Entries\Entry;
 
 /** @group graphql */
 class LinkFieldtypeTest extends FieldtypeTestCase
@@ -31,20 +32,25 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
+        ResolveRedirect::shouldReceive('item')->once()->with('/hardcoded', $entry, true)->andReturn('/hardcoded');
+
         $this->assertGqlEntryHas('link', ['link' => '/hardcoded']);
     }
 
     /** @test */
     public function it_gets_an_entry()
     {
-        EntryFactory::collection('test')->id(2)->slug('the-entry-url')->create();
-
         $entry = $this->createEntryWithFields([
             'link' => [
-                'value' => 'entry::2',
+                'value' => 'entry::123',
                 'field' => ['type' => 'link'],
             ],
         ]);
+
+        $another = Mockery::mock(Entry::class);
+        $another->shouldReceive('url')->once()->andReturn('/the-entry-url');
+
+        ResolveRedirect::shouldReceive('item')->once()->with('entry::123', $entry, true)->andReturn($another);
 
         $this->assertGqlEntryHas('link', ['link' => '/the-entry-url']);
     }
@@ -59,7 +65,10 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->once()->with('@child', $entry, true)->andReturn('/the-first-child');
+        $another = Mockery::mock(Entry::class);
+        $another->shouldReceive('url')->once()->andReturn('/the-first-child');
+
+        ResolveRedirect::shouldReceive('item')->once()->with('@child', $entry, true)->andReturn($another);
 
         $this->assertGqlEntryHas('link', ['link' => '/the-first-child']);
     }
@@ -73,6 +82,8 @@ class LinkFieldtypeTest extends FieldtypeTestCase
                 'field' => ['type' => 'link'],
             ],
         ]);
+
+        ResolveRedirect::shouldReceive('item')->once()->with('entry::unknown', $entry, true)->andReturnNull();
 
         $this->assertGqlEntryHas('link', ['link' => null]);
     }

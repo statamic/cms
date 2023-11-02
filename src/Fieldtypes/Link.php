@@ -2,18 +2,16 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Contracts\Assets\Asset as AssetContract;
-use Statamic\Contracts\Data\Localization;
+use Facades\Statamic\Routing\ResolveRedirect;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
-use Statamic\Facades\Asset;
 use Statamic\Facades\Blink;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
-use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
-use Statamic\Structures\Page;
+use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\Support\Str;
 
 class Link extends Fieldtype
@@ -47,12 +45,10 @@ class Link extends Fieldtype
     public function augment($value)
     {
         if (! $value) {
-            return null;
+            return new ArrayableLink(null);
         }
 
-        if (is_null($item = $this->resolve($value))) {
-            return null;
-        }
+        $item = ResolveRedirect::item($value, $this->field->parent(), true);
 
         return new ArrayableLink($item);
     }
@@ -181,83 +177,19 @@ class Link extends Fieldtype
         return $this->config('container') !== null;
     }
 
-    private function resolve($value): string|Entry|AssetContract|null
+    public function toGqlType()
     {
-        if ($value === '@child') {
-            return $this->firstChildUrl($this->field->parent());
-        }
+        return [
+            'type' => GraphQL::string(),
+            'resolve' => function ($item, $args, $context, $info) {
+                if (! $augmented = $item->resolveGqlValue($info->fieldName)) {
+                    return null;
+                }
 
-        if (Str::startsWith($value, 'entry::')) {
-            return $this->findEntry(
-                Str::after($value, 'entry::'),
-                $this->field->parent(),
-                true
-            );
-        }
+                $item = $augmented->value();
 
-        if (Str::startsWith($value, 'asset::')) {
-            return Asset::find(Str::after($value, 'asset::'));
-        }
-
-        return $value;
-    }
-
-    private function findEntry($id, $parent, $localize)
-    {
-        if (! ($entry = Facades\Entry::find($id))) {
-            return null;
-        }
-
-        if (! $localize) {
-            return $entry;
-        }
-
-        $site = $parent instanceof Localization
-            ? $parent->locale()
-            : Site::current()->handle();
-
-        return $entry->in($site) ?? $entry;
-    }
-
-    private function firstChildUrl($parent)
-    {
-        if (! $parent || ! $parent instanceof Entry) {
-            throw new \Exception("Cannot resolve a page's child redirect without providing a page.");
-        }
-
-        if (! $parent instanceof Page && $parent instanceof Entry) {
-            $parent = $parent->page();
-        }
-
-        $children = $parent->isRoot()
-            ? $parent->structure()->in($parent->locale())->pages()->all()->slice(1, 1)
-            : $parent->pages()->all();
-
-        if ($children->isEmpty()) {
-            return 404;
-        }
-
-        return $children->first()->url();
-    }
-}
-
-class ArrayableLink extends ArrayableString
-{
-    public function __toString()
-    {
-        if (is_string($this->value)) {
-            return $this->value;
-        }
-
-        return $this->value->url();
-    }
-
-    public function toArray()
-    {
-        if (is_string($this->value)) {
-            return ['url' => $this->value];
-        }
-
-        return $this->value->toAugmentedArray();
+                return is_object($item) ? $item->url() : $item;
+            },
+        ];
     }
 }

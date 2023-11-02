@@ -2,12 +2,11 @@
 
 namespace Tests\Fieldtypes;
 
-use Facades\Statamic\Fields\BlueprintRepository;
-use Illuminate\Support\Facades\Storage;
-use Statamic\Assets\Asset;
+use Facades\Statamic\Routing\ResolveRedirect;
+use Mockery;
+use Statamic\Contracts\Assets\Asset;
 use Statamic\Entries\Entry;
-use Statamic\Facades;
-use Statamic\Facades\AssetContainer;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Link;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -17,120 +16,112 @@ class LinkTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    public function setup(): void
-    {
-        parent::setUp();
-
-        $collection = tap(Facades\Collection::make('pages'))->routes('/{slug}')->save();
-
-        $blueprint = Facades\Blueprint::make('article')
-            ->setNamespace('collections.pages')
-            ->setContents([
-                'fields' => [
-                    [
-                        'handle' => 'link',
-                        'field' => [
-                            'type' => 'link',
-                            'collections' => ['pages'],
-                        ],
-                    ],
-                ],
-            ]);
-
-        BlueprintRepository::shouldReceive('in')->with('collections/pages')->andReturn(collect([$blueprint]));
-
-        Storage::fake('test', ['url' => '/assets']);
-        Storage::disk('test')->put('foo/one.txt', '');
-        Storage::disk('test')->put('bar/two.txt', '');
-
-        AssetContainer::make('test')->disk('test')->save();
-    }
-
     /** @test */
     public function it_augments_string_to_string()
     {
-        $parent = tap(new Entry)->collection('pages')->slug('the-redirect')->id('test')->save();
+        ResolveRedirect::shouldReceive('item')
+            ->with('/foo', $parent = new Entry, true)
+            ->once()
+            ->andReturn('/foo');
+
         $field = new Field('test', ['type' => 'link']);
         $field->setParent($parent);
         $fieldtype = (new Link)->setField($field);
 
-        $this->assertEquals('/foo', $fieldtype->augment('/foo'));
+        $augmented = $fieldtype->augment('/foo');
+        $this->assertInstanceOf(ArrayableString::class, $augmented);
+        $this->assertEquals('/foo', $augmented->value());
     }
 
     /** @test */
-    public function it_augments_entry_to_url()
+    public function it_augments_to_entry()
     {
-        $parent = tap(new Entry)->collection('pages')->slug('the-redirect')->id('test')->save();
+        $entry = Mockery::mock(Entry::class);
+        $entry->shouldReceive('url')->once()->andReturn('/the-entry-url');
+
+        ResolveRedirect::shouldReceive('item')
+            ->with('entry::test', $parent = new Entry, true)
+            ->once()
+            ->andReturn($entry);
+
         $field = new Field('test', ['type' => 'link']);
         $field->setParent($parent);
         $fieldtype = (new Link)->setField($field);
 
-        $this->assertEquals('/the-redirect', $fieldtype->augment('entry::test'));
-    }
-
-    /** @test */
-    public function it_augments_entry_to_entry()
-    {
-        $parent = tap(new Entry)->collection('pages')->slug('the-redirect')->id('test')->save();
-        $field = new Field('test', ['type' => 'link']);
-        $field->setParent($parent);
-        $fieldtype = (new Link)->setField($field);
-
-        $this->assertTrue($fieldtype->augment('entry::test')->value() instanceof Entry);
+        $augmented = $fieldtype->augment('entry::test');
+        $this->assertInstanceOf(ArrayableString::class, $augmented);
+        $this->assertEquals($entry, $augmented->value());
+        $this->assertEquals('/the-entry-url', (string) $augmented);
     }
 
     /** @test */
     public function it_augments_invalid_entry_to_null()
     {
-        $parent = tap(new Entry)->collection('pages')->slug('the-redirect')->id('test')->save();
+        ResolveRedirect::shouldReceive('item')
+            ->with('entry::invalid', $parent = new Entry, true)
+            ->once()
+            ->andReturnNull();
+
         $field = new Field('test', ['type' => 'link']);
         $field->setParent($parent);
         $fieldtype = (new Link)->setField($field);
 
-        $this->assertNull($fieldtype->augment('entry::foo'));
+        $augmented = $fieldtype->augment('entry::invalid');
+        $this->assertInstanceOf(ArrayableString::class, $augmented);
+        $this->assertNull($augmented->value());
     }
 
     /** @test */
-    public function it_augments_asset_to_url()
+    public function it_augments_to_asset()
     {
-        $parent = tap(new Entry)->collection('pages')->slug('the-redirect')->id('test')->save();
+        $asset = Mockery::mock(Asset::class);
+        $asset->shouldReceive('url')->once()->andReturn('/the-asset-url');
+
+        ResolveRedirect::shouldReceive('item')
+            ->with('asset::test', $parent = new Entry, true)
+            ->once()
+            ->andReturn($asset);
+
         $field = new Field('test', ['type' => 'link']);
         $field->setParent($parent);
         $fieldtype = (new Link)->setField($field);
 
-        $this->assertEquals('/assets/foo/one.txt', $fieldtype->augment('asset::test::foo/one.txt'));
-    }
-
-    /** @test */
-    public function it_augments_asset_to_asset()
-    {
-        $parent = tap(new Entry)->collection('pages')->slug('the-redirect')->id('test')->save();
-        $field = new Field('test', ['type' => 'link']);
-        $field->setParent($parent);
-        $fieldtype = (new Link)->setField($field);
-
-        $this->assertTrue($fieldtype->augment('asset::test::foo/one.txt')->value() instanceof Asset);
+        $augmented = $fieldtype->augment('asset::test');
+        $this->assertInstanceOf(ArrayableString::class, $augmented);
+        $this->assertEquals($asset, $augmented->value());
+        $this->assertEquals('/the-asset-url', (string) $augmented);
     }
 
     /** @test */
     public function it_augments_invalid_asset_to_null()
     {
-        $parent = tap(new Entry)->collection('pages')->slug('the-redirect')->id('test')->save();
+        ResolveRedirect::shouldReceive('item')
+            ->with('asset::invalid', $parent = new Entry, true)
+            ->once()
+            ->andReturnNull();
+
         $field = new Field('test', ['type' => 'link']);
         $field->setParent($parent);
         $fieldtype = (new Link)->setField($field);
 
-        $this->assertNull($fieldtype->augment('asset::test::foo/three.txt'));
+        $augmented = $fieldtype->augment('asset::invalid');
+        $this->assertInstanceOf(ArrayableString::class, $augmented);
+        $this->assertNull($augmented->value());
     }
 
     /** @test */
     public function it_augments_null_to_null()
     {
-        $parent = tap(new Entry)->collection('pages')->slug('the-redirect')->id('test')->save();
+        // null could technically be passed to the ResolveRedirect class, where it would
+        // just return null, but we'll just avoid calling it for a little less overhead.
+        ResolveRedirect::shouldReceive('resolve')->never();
+
         $field = new Field('test', ['type' => 'link']);
         $field->setParent(new Entry);
         $fieldtype = (new Link)->setField($field);
 
-        $this->assertNull($fieldtype->augment(null));
+        $augmented = $fieldtype->augment(null);
+        $this->assertInstanceOf(ArrayableString::class, $augmented);
+        $this->assertNull($augmented->value());
     }
 }
