@@ -366,7 +366,9 @@ class CollectionTest extends TestCase
         $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
 
         $this->assertEquals(['Danish'], $this->runTagAndGetTitles('previous'));
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('newer')); // Alias of prev when date:desc
         $this->assertEquals(['Banana'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Banana'], $this->runTagAndGetTitles('older')); // Alias of next when date:desc
     }
 
     /** @test */
@@ -431,7 +433,9 @@ class CollectionTest extends TestCase
         $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
 
         $this->assertEquals(['Banana'], $this->runTagAndGetTitles('previous'));
+        $this->assertEquals(['Banana'], $this->runTagAndGetTitles('older')); // Alias of previous when date:desc
         $this->assertEquals(['Danish'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('newer')); // Alias of next when date:asc
     }
 
     /** @test */
