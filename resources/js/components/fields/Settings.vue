@@ -226,6 +226,10 @@ export default {
 
         updateAlwaysSave(alwaysSave) {
             this.values.always_save = alwaysSave;
+
+            if (this.editedFields.indexOf('always_save') === -1) {
+                this.editedFields.push('always_save');
+            }
         },
 
         markFieldEdited(handle) {
