@@ -118,11 +118,11 @@ export default {
         },
 
         iconDirectory() {
-            return this.$config.get('bard_set_icons_directory');
+            return this.$config.get('set_icons_directory');
         },
 
         iconFolder() {
-            return this.$config.get('bard_set_icons_folder') || 'plump';
+            return this.$config.get('set_icons_folder') || 'plump';
         },
 
     },
