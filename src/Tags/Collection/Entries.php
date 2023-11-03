@@ -28,19 +28,12 @@ class Entries
     }
 
     protected $ignoredParams = ['as'];
-
     protected $params;
-
     protected $collections;
-
     protected $site;
-
     protected $showPublished;
-
     protected $showUnpublished;
-
     protected $since;
-
     protected $until;
 
     public function __construct($params)
