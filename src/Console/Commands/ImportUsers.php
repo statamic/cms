@@ -4,7 +4,6 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Support\Facades\Schema;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\User as FileUser;
 use Statamic\Auth\UserRepositoryManager;
