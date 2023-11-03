@@ -359,11 +359,12 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->foods, 'c')->date('2023-02-05')->set('title', 'Carrot')->save();
         $this->makeEntry($this->foods, 'd')->date('2023-03-07')->set('title', 'Danish')->save();
 
-        $currentId = $this->findEntryByTitle('Carrot')->id();
-
-        $orderBy = 'date:desc|title:desc';
-
-        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
+        $this->setTagParameters([
+            'in' => 'foods',
+            'current' => $this->findEntryByTitle('Carrot')->id(),
+            'order_by' => 'date:desc|title:desc',
+            'limit' => 1,
+        ]);
 
         $this->assertEquals(['Danish'], $this->runTagAndGetTitles('previous'));
         $this->assertEquals(['Danish'], $this->runTagAndGetTitles('newer')); // Alias of prev when date:desc
@@ -426,11 +427,12 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->foods, 'c')->date('2023-02-05')->set('title', 'Carrot')->save();
         $this->makeEntry($this->foods, 'd')->date('2023-03-07')->set('title', 'Danish')->save();
 
-        $currentId = $this->findEntryByTitle('Carrot')->id();
-
-        $orderBy = 'date:asc|title:asc';
-
-        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
+        $this->setTagParameters([
+            'in' => 'foods',
+            'current' => $this->findEntryByTitle('Carrot')->id(),
+            'order_by' => 'date:asc|title:asc',
+            'limit' => 1,
+        ]);
 
         $this->assertEquals(['Banana'], $this->runTagAndGetTitles('previous'));
         $this->assertEquals(['Banana'], $this->runTagAndGetTitles('older')); // Alias of previous when date:desc
