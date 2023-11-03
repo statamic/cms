@@ -67,14 +67,14 @@ export default {
             if (! this.generate) return;
 
             const field = this.config.from || 'title';
+            let key = field;
 
             if (this.fieldPathPrefix) {
                 let dottedPrefix = this.fieldPathPrefix.replace(new RegExp('\.'+this.handle+'$'), '');
-
-                return data_get(this.$store.state.publish[this.store].values, dottedPrefix + '.' + field);
+                key = dottedPrefix + '.' + field;
             }
 
-            return this.$store.state.publish[this.store].values[field];
+            return data_get(this.$store.state.publish[this.store].values, key);
         },
 
         language() {
