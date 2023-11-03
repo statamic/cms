@@ -24,7 +24,10 @@
                     >
                         <svg-icon name="light/earth" class="h-4 w-4" />
                     </button>
-                    <button @click.prevent="$emit('deleted')" class="text-gray-600 hover:text-gray-950 flex items-center">
+                    <button @click.prevent="$emit('duplicate')" class="text-gray-600 hover:text-gray-950 flex items-center mr-2" v-tooltip="__('Duplicate')">
+                        <svg-icon name="light/duplicate" class="h-4 w-4" />
+                    </button>
+                    <button @click.prevent="$emit('deleted')" class="text-gray-600 hover:text-gray-950 flex items-center" v-tooltip="__('Remove')">
                         <svg-icon name="micro/trash" class="h-4 w-4" />
                     </button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
