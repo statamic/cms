@@ -189,7 +189,7 @@ class EntriesController extends CpController
             ->fields()
             ->addValues($data);
 
-        if ($fields->get('published')->value() || ! $collection->draftWithoutValidation()) {
+        if (($fields->get('published')->value() && ! $entry->revisionsEnabled()) || ! $collection->draftWithoutValidation()) {
             $fields
                 ->validator()
                 ->withRules(Entry::updateRules($collection, $entry))

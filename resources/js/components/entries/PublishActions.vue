@@ -205,6 +205,14 @@ export default {
 
         handleAxiosError(e) {
             this.saving = false;
+
+            if (e.response && e.response.status === 422) {
+                const { message, errors } = e.response.data;
+                this.$store.commit(`publish/${this.publishContainer}/setErrors`, errors);
+                this.$toast.error(message);
+                return;
+            }
+
             this.$toast.error(e || __('Something went wrong'));
         }
 
