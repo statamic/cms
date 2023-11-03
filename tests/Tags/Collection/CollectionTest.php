@@ -20,13 +20,9 @@ class CollectionTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     private $music;
-
     private $art;
-
     private $books;
-
     private $foods;
-
     private $collectionTag;
 
     public function setUp(): void
