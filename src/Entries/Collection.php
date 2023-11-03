@@ -849,6 +849,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         return [
             'title' => $this->title(),
             'handle' => $this->handle(),
+            'mount' => $this->mount(),
         ];
     }
 }
