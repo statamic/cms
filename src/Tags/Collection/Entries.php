@@ -29,12 +29,19 @@ class Entries
     }
 
     protected $ignoredParams = ['as'];
+
     protected $params;
+
     protected $collections;
+
     protected $site;
+
     protected $showPublished;
+
     protected $showUnpublished;
+
     protected $since;
+
     protected $until;
 
     public function __construct($params)
@@ -68,16 +75,16 @@ class Entries
         throw_if($this->params->has('offset'), new \Exception('collection:next is not compatible with [offset] parameter'));
         throw_if($this->collections->count() > 1, new \Exception('collection:next is not compatible with multiple collections'));
 
+        if ($this->orderBys->count() === 1) {
+            $this->orderBys[] = new OrderBy('title', 'asc');
+        }
+
         $collection = $this->collections->first();
         $primaryOrderBy = $this->orderBys->first();
         $secondaryOrderBy = $this->orderBys->get(1);
 
-        if (! $secondaryOrderBy) {
-            $this->orderBys[] = new OrderBy('title', 'asc');
-        }
-
         $primaryOperator = $primaryOrderBy->direction === 'desc' ? '<' : '>';
-        $secondaryOperator = $secondaryOrderBy?->direction === 'desc' ? '<' : '>';
+        $secondaryOperator = $secondaryOrderBy->direction === 'desc' ? '<' : '>';
 
         if ($primaryOrderBy->sort === 'order') {
             throw_if(! $currentOrder = $currentEntry->order(), new \Exception('Current entry does not have an order'));
@@ -97,16 +104,16 @@ class Entries
         throw_if($this->params->has('offset'), new \Exception('collection:previous is not compatible with [offset] parameter'));
         throw_if($this->collections->count() > 1, new \Exception('collection:previous is not compatible with multiple collections'));
 
+        if ($this->orderBys->count() === 1) {
+            $this->orderBys[] = new OrderBy('title', 'asc');
+        }
+
         $collection = $this->collections->first();
         $primaryOrderBy = $this->orderBys->first();
         $secondaryOrderBy = $this->orderBys->get(1);
 
-        if (! $secondaryOrderBy) {
-            $this->orderBys[] = new OrderBy('title', 'asc');
-        }
-
         $primaryOperator = $primaryOrderBy->direction === 'desc' ? '>' : '<';
-        $secondaryOperator = $secondaryOrderBy?->direction === 'desc' ? '>' : '<';
+        $secondaryOperator = $secondaryOrderBy->direction === 'desc' ? '>' : '<';
 
         if ($primaryOrderBy->sort === 'order') {
             throw_if(! $currentOrder = $currentEntry->order(), new \Exception('Current entry does not have an order'));
