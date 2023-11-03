@@ -170,7 +170,7 @@ class Entries
         $previousOfSame = $this->query()
             ->where('date', $currentEntryDate)
             ->orderBy($secondaryOrderBy->sort, $secondaryOrderBy->direction)
-            ->where('title', $secondaryOperator, $currentEntry->get('title'))
+            ->where($secondaryOrderBy->sort, $secondaryOperator, $currentEntry->value($secondaryOrderBy->sort))
             ->get()
             ->pluck('id')
             ->toArray();
