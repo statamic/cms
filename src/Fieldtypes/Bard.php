@@ -232,6 +232,32 @@ class Bard extends Replicator
                     ],
                 ],
             ],
+            [
+                'display' => __('Set Icons'),
+                'fields' => [
+                    'set_icons_directory' => [
+                        'display' => __('Directory'),
+                        'instructions' => __('statamic::fieldtypes.icon.config.directory'),
+                        'type' => 'text',
+                        'placeholder' => 'vendor/statamic/cms/resources/svg/icons',
+                    ],
+                    'set_icons_folder' => [
+                        'display' => __('Folder'),
+                        'instructions' => __('statamic::fieldtypes.icon.config.folder'),
+                        'type' => 'text',
+                        'placeholder' => 'plump',
+                    ],
+                    'merge_with_default_set_icons' => [
+                        'display' => __('Merge With Defaults'),
+                        'instructions' => __('Merge with default set icons.'), // TODO: translate
+                        'type' => 'toggle',
+                        'default' => true,
+                        'if' => [
+                            'set_icons_directory' => 'not empty',
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
