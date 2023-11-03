@@ -12,6 +12,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Compare;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Query\OrderBy;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
@@ -71,6 +72,10 @@ class Entries
         $primaryOrderBy = $this->orderBys->first();
         $secondaryOrderBy = $this->orderBys->get(1);
 
+        if (! $secondaryOrderBy) {
+            $this->orderBys[] = new OrderBy('title', 'asc');
+        }
+
         $primaryOperator = $primaryOrderBy->direction === 'desc' ? '<' : '>';
         $secondaryOperator = $secondaryOrderBy?->direction === 'desc' ? '<' : '>';
 
@@ -95,6 +100,10 @@ class Entries
         $collection = $this->collections->first();
         $primaryOrderBy = $this->orderBys->first();
         $secondaryOrderBy = $this->orderBys->get(1);
+
+        if (! $secondaryOrderBy) {
+            $this->orderBys[] = new OrderBy('title', 'asc');
+        }
 
         $primaryOperator = $primaryOrderBy->direction === 'desc' ? '>' : '<';
         $secondaryOperator = $secondaryOrderBy?->direction === 'desc' ? '>' : '<';
@@ -130,6 +139,18 @@ class Entries
             : $this->next($currentEntry);
     }
 
+    public function newer($currentEntry)
+    {
+        $collection = $this->collections->first();
+        $primaryOrderBy = $this->orderBys->first();
+
+        throw_unless($collection->dated(), new \Exception('collection:newer requires a dated collection'));
+
+        return $primaryOrderBy->direction === 'asc'
+            ? $this->next($currentEntry)
+            : $this->previous($currentEntry);
+    }
+
     protected function queryPreviousNextByDate($currentEntry, string $primaryOperator, string $secondaryOperator): QueryBuilder
     {
         $primaryOrderBy = $this->orderBys->first();
@@ -154,18 +175,6 @@ class Entries
             )
             ->orderBy('date', $primaryOrderBy->direction)
             ->orderBy($secondaryOrderBy->sort, $secondaryOrderBy->direction);
-    }
-
-    public function newer($currentEntry)
-    {
-        $collection = $this->collections->first();
-        $primaryOrderBy = $this->orderBys->first();
-
-        throw_unless($collection->dated(), new \Exception('collection:newer requires a dated collection'));
-
-        return $primaryOrderBy->direction === 'asc'
-            ? $this->next($currentEntry)
-            : $this->previous($currentEntry);
     }
 
     protected function query()
