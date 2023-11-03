@@ -122,7 +122,7 @@ export default {
         },
 
         iconFolder() {
-            return this.$config.get('set_icons_folder') || 'plump';
+            return this.$config.get('set_icons_folder');
         },
 
     },
