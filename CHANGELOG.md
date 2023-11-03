@@ -1,5 +1,29 @@
 # Release Notes
 
+## 4.32.0 (2023-11-03)
+
+### What's new
+- Entries fieldtype gets a tree view in the stack selector. [#8899](https://github.com/statamic/cms/issues/8899) by @duncanmcclean
+- Link fieldtype supports array syntax for getting underlying entry, asset, etc. [#8911](https://github.com/statamic/cms/issues/8911) by @edalzell
+- Ability to duplicate fields in blueprint/fieldset builders. [#8916](https://github.com/statamic/cms/issues/8916) by @duncanmcclean
+- Support paste events in Taggable Fieldtype. [#8903](https://github.com/statamic/cms/issues/8903) by @duncanmcclean
+- Add helper to more easily remove child item in CP navigation. [#8883](https://github.com/statamic/cms/issues/8883) by @jesseleite
+
+### What's fixed
+- Fix entries on the same date being ignored by collection previous/next tags. [#8921](https://github.com/statamic/cms/issues/8921) by @duncanmcclean
+- Remove schema check on import users command. [#8909](https://github.com/statamic/cms/issues/8909) by @ryanmitchell
+- Fix slugify when using hyphens surrounded by spaces. [#8923](https://github.com/statamic/cms/issues/8923) by @duncanmcclean
+- Fix collection listing's sort direction on reorder. [#8910](https://github.com/statamic/cms/issues/8910) by @o1y
+- Prevent root entries being deleted in listing view. [#8912](https://github.com/statamic/cms/issues/8912) by @ryanmitchell
+- Handle unauthorized response in Inline Publish Form. [#8918](https://github.com/statamic/cms/issues/8918) by @duncanmcclean
+- Hide publish action fields when saving. [#8917](https://github.com/statamic/cms/issues/8917) by @ryanmitchell
+- Handle empty values in collection tag filters. [#8915](https://github.com/statamic/cms/issues/8915) by @duncanmcclean
+- Fix missing translation of some user defined strings. [#8914](https://github.com/statamic/cms/issues/8914) by @ryanmitchell
+- Fix CP nav item active status regressions. [#8880](https://github.com/statamic/cms/issues/8880) by @jesseleite
+- Validate that Select & Button Group options have keys. [#8905](https://github.com/statamic/cms/issues/8905) by @duncanmcclean
+
+
+
 ## 4.31.0 (2023-10-30)
 
 ### What's new
