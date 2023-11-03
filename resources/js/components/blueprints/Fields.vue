@@ -144,26 +144,20 @@ export default {
         },
 
         duplicateField(field) {
-            let handle = `${field.handle}-duplicate`;
-            let counter = 0;
+            let handle = `${field.handle}_duplicate`;
+            let display = field.config.display ? `${field.config.display} (Duplicate)` : `${field.handle} (Duplicate)`;
 
-            do {
-                counter++;
-                handle = `${field.handle}_duplicate${counter > 1 ? `_${counter}` : ''}`;
-            } while (this.suggestableConditionFields.includes(handle));
-
-            let duplicate = {
+            let pending = {
                 ...field,
                 _id: uniqid(),
                 handle: handle,
                 config: {
                     ...field.config,
-                    display: field.config.display ? `${field.config.display} (Duplicate)` : `${field.handle} (Duplicate)`,
+                    display,
                 }
             };
 
-            this.$emit('field-created', duplicate);
-            this.$toast.success(__('Field duplicated'));
+            this.$nextTick(() => this.pendingCreatedField = pending);
         },
 
     }
