@@ -20,9 +20,13 @@ class CollectionTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     private $music;
+
     private $art;
+
     private $books;
+
     private $foods;
+
     private $collectionTag;
 
     public function setUp(): void
@@ -343,6 +347,37 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_can_get_previous_and_next_entries_in_a_dated_desc_collection_when_multiple_entries_share_the_same_date()
+    {
+        $this->foods->dated(true)->save();
+        Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
+
+        // 1st January: Apple
+        // 5th February: Banana
+        // 5th February: Carrot
+        // 7th March: Danish
+
+        $this->makeEntry($this->foods, 'a')->date('2023-01-01')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->date('2023-02-05')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->date('2023-02-05')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->date('2023-03-07')->set('title', 'Danish')->save();
+
+        $currentId = $this->findEntryByTitle('Carrot')->id();
+
+        $orderBy = 'date:desc|title:asc';
+
+        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
+
+        // Carrot
+        // Prev: Banana
+        // 2nd prev: Apple
+        // Next: Danish
+
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('previous'));
+        $this->assertEquals(['Banana'], $this->runTagAndGetTitles('next'));
+    }
+
+    /** @test */
     public function it_can_get_previous_and_next_entries_in_a_dated_asc_collection()
     {
         $this->foods->dated(true)->save();
@@ -382,6 +417,37 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Fig', 'Hummus', 'Grape'], $this->runTagAndGetTitles('newer')); // Alias of next when date:desc
         $this->assertEquals(['Carrot', 'Banana', 'Danish'], $this->runTagAndGetTitles('previous'));
         $this->assertEquals(['Carrot', 'Banana', 'Danish'], $this->runTagAndGetTitles('older')); // Alias of prev when date:desc
+    }
+
+    /** @test */
+    public function it_can_get_previous_and_next_entries_in_a_dated_asc_collection_when_multiple_entries_share_the_same_date()
+    {
+        $this->foods->dated(true)->save();
+        Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
+
+        // 1st January: Apple
+        // 5th February: Banana
+        // 5th February: Carrot
+        // 7th March: Danish
+
+        $this->makeEntry($this->foods, 'a')->date('2023-01-01')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->date('2023-02-05')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->date('2023-02-05')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->date('2023-03-07')->set('title', 'Danish')->save();
+
+        $currentId = $this->findEntryByTitle('Carrot')->id();
+
+        $orderBy = 'date:asc|title:asc';
+
+        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
+
+        // Carrot
+        // Prev: Banana
+        // 2nd prev: Apple
+        // Next: Danish
+
+        $this->assertEquals(['Banana'], $this->runTagAndGetTitles('previous'));
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('next'));
     }
 
     /** @test */
