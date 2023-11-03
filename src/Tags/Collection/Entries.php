@@ -350,8 +350,8 @@ class Entries
 
     protected function queryableConditionParams()
     {
-        return $this->traitQueryableConditionParams()->reject(function ($value, $key) {
-            return Str::startsWith($key, 'taxonomy:');
-        });
+        return $this->traitQueryableConditionParams()
+            ->reject(fn ($value, $key) => Str::startsWith($key, 'taxonomy:'))
+            ->reject(fn ($value, $key) => $value === '');
     }
 }

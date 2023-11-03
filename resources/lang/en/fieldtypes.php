@@ -75,6 +75,7 @@ return [
     'entries.config.collections' => 'Choose which collections the user can select from.',
     'entries.config.link_by' => 'Choose what field to use to link items. If you choose slug make sure slugs are unique in your linked collection(s).',
     'entries.config.query_scopes' => 'Choose which query scopes should be applied when retrieving selectable entries.',
+    'entries.config.search_index' => 'An appropriate search index will be used automatically where possible, but you may define an explicit one.',
     'entries.title' => 'Entries',
     'float.title' => 'Float',
     'form.config.max_items' => 'Set a maximum number of selectable forms.',
