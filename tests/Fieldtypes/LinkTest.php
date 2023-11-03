@@ -8,13 +8,10 @@ use Statamic\Entries\Entry;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Link;
-use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class LinkTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
-
     /** @test */
     public function it_augments_string_to_string()
     {
