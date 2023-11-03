@@ -667,7 +667,7 @@ class CollectionTest extends TestCase
         $this->assertCount(3, $augmentedArray = $collection->toAugmentedArray());
         $this->assertEquals('Test', $augmentedArray['title']);
         $this->assertEquals('test', $augmentedArray['handle']);
-        $this->assertEquals('Blog', $augmentedArray['mount']->value()->get('title'));
+        $this->assertEquals($mountedEntry, $augmentedArray['mount']->value());
     }
 
     /** @test */
