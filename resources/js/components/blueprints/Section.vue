@@ -42,7 +42,7 @@
                     <div class="form-group w-full" v-if="showHandleField">
                         <label v-text="__('Icon')" />
                         <publish-field-meta
-                            :config="{ handle: 'icon', type: 'icon', folder: 'plump' }"
+                            :config="{ handle: 'icon', type: 'icon', directory: this.iconDirectory, folder: this.iconFolder }"
                             :initial-value="editingSection.icon"
                             v-slot="{ meta, value, loading }"
                         >
@@ -122,9 +122,19 @@ export default {
     },
 
     computed: {
+
         suggestableConditionFields() {
             return this.suggestableConditionFieldsProvider?.suggestableFields || [];
-        }
+        },
+
+        iconDirectory() {
+            return this.$config.get('bard_set_icons_directory');
+        },
+
+        iconFolder() {
+            return this.$config.get('bard_set_icons_folder') || 'plump';
+        },
+
     },
 
     watch: {

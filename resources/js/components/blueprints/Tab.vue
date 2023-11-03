@@ -58,7 +58,7 @@
                 <div class="form-group w-full" v-if="showInstructions">
                     <label v-text="__('Icon')" />
                     <publish-field-meta
-                        :config="{ handle: 'icon', type: 'icon', folder: 'plump' }"
+                        :config="{ handle: 'icon', type: 'icon', directory: this.iconDirectory, folder: this.iconFolder }"
                         :initial-value="icon"
                         v-slot="{ meta, value, loading }"
                     >
@@ -115,6 +115,14 @@ export default {
 
         isActive() {
             return this.currentTab === this.tab._id;
+        },
+
+        iconDirectory() {
+            return this.$config.get('bard_set_icons_directory');
+        },
+
+        iconFolder() {
+            return this.$config.get('bard_set_icons_folder') || 'plump';
         },
 
     },
