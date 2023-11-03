@@ -15,7 +15,6 @@ use Statamic\GraphQL\Types\BardSetsType;
 use Statamic\GraphQL\Types\BardTextType;
 use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
-use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -714,13 +713,5 @@ class Bard extends Replicator
     private function unwrapInlineValue($value)
     {
         return $value[0]['content'] ?? [];
-    }
-
-    public static function setIcons($directory = null, $folder = null)
-    {
-        Statamic::provideToScript([
-            'bard_set_icons_directory' => $directory,
-            'bard_set_icons_folder' => $folder,
-        ]);
     }
 }

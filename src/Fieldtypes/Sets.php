@@ -2,14 +2,20 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\File;
+use Statamic\Facades\Path;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 
 class Sets extends Fieldtype
 {
     protected $selectable = false;
+
+    protected static $iconsDirectory = 'vendor/statamic/cms/resources/svg/icons';
+    protected static $iconsFolder = 'plump';
 
     /**
      * Converts the "sets" array of a Replicator (or Bard) field into what the
@@ -83,13 +89,16 @@ class Sets extends Fieldtype
         return collect($sets)->map(function ($group, $groupHandle) {
             return array_merge($group, [
                 'handle' => $groupHandle,
-                'sets' => collect($group['sets'])->map(function ($config, $name) {
-                    return array_merge($config, [
-                        'handle' => $name,
-                        'id' => $name,
-                        'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
-                    ]);
-                })
+                'icon' => $this->getIconHtml(Arr::get($group, 'icon'), 'regular/folder-generic'),
+                'sets' => collect($group['sets'])
+                    ->map(function ($config, $name) {
+                        return array_merge($config, [
+                            'handle' => $name,
+                            'id' => $name,
+                            'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
+                            'icon' => $this->getIconHtml(Arr::get($config, 'icon'), 'light/add'),
+                        ]);
+                    })
                     ->values()
                     ->all(),
             ]);
@@ -125,5 +134,52 @@ class Sets extends Fieldtype
             ];
         })
             ->all();
+    }
+
+    /**
+     * Allow the user to set custom location for SVG set icons.
+     */
+    public static function iconConfig($directory = null, $folder = null)
+    {
+        // If they are specifying new base directory, ensure we do not assume sub-folder
+        if ($directory) {
+            static::$iconsDirectory = $directory;
+            static::$iconsFolder = null;
+        }
+
+        // Of if they are specifying just a sub-folder, use that with original base directory
+        elseif ($folder) {
+            static::$iconsFolder = $folder;
+        }
+
+        // Then provide to script for <icon-fieldtype> selectors in blueprint config
+        Statamic::provideToScript([
+            'set_icons_directory' => static::$iconsDirectory,
+            'set_icons_folder' => static::$iconsFolder,
+        ]);
+    }
+
+    /**
+     * Get icon HTML, because our <svg-icon> component with Vite reference custom user paths.
+     *
+     * @param  string|null  $configuredIcon
+     * @param  string  $fallbackVendorIcon
+     * @return string
+     */
+    protected function getIconHtml($configuredIcon, $fallbackVendorIcon)
+    {
+        $fallbackPath = base_path(static::$iconsDirectory."/{$fallbackVendorIcon}.svg");
+
+        $iconPath = collect([static::$iconsDirectory, static::$iconsFolder, $configuredIcon])
+            ->filter()
+            ->implode('/').'.svg';
+
+        $absoluteIconPath = Path::isAbsolute($iconPath) ? $iconPath : Path::makeFull($iconPath);
+
+        ray($absoluteIconPath);
+
+        return $configuredIcon && File::exists($absoluteIconPath)
+            ? File::get($iconPath)
+            : File::get($fallbackPath);
     }
 }
