@@ -68,16 +68,34 @@ class Entries
 
         $collection = $this->collections->first();
         $primaryOrderBy = $this->orderBys->first();
+        $secondaryOrderBy = $this->orderBys->get(1);
 
-        if ($primaryOrderBy->direction === 'desc') {
-            $operator = '<';
-        }
+        $operator = $primaryOrderBy->direction === 'desc' ? '<' : '>';
+        $secondaryOperator = $secondaryOrderBy?->direction === 'desc' ? '<' : '>';
 
         if ($primaryOrderBy->sort === 'order') {
             throw_if(! $currentOrder = $currentEntry->order(), new \Exception('Current entry does not have an order'));
-            $query = $this->query()->where('order', $operator ?? '>', $currentOrder);
+            $query = $this->query()->where('order', $operator, $currentOrder);
         } elseif ($collection->dated() && $primaryOrderBy->sort === 'date') {
-            $query = $this->query()->where('date', $operator ?? '>', $currentEntry->date());
+            $currentEntryDate = $currentEntry->date();
+
+            // Get the IDs of any items that have the same date as the current entry,
+            // but come before the current entry sorted by the second column.
+            $nextOfSame = $this->query()
+                ->where('date', $currentEntryDate)
+                ->orderBy($secondaryOrderBy->sort, $secondaryOrderBy->direction)
+                ->where('title', $secondaryOperator, $currentEntry->get('title'))
+                ->get()
+                ->pluck('id')
+                ->toArray();
+
+            $query = $this->query()
+                ->where(fn ($query) => $query
+                    ->where('date', $operator, $currentEntryDate)
+                    ->orWhereIn('id', $nextOfSame)
+                )
+                ->orderBy('date', $primaryOrderBy->direction)
+                ->orderBy($secondaryOrderBy->sort, $secondaryOrderBy->direction);
         } else {
             throw new \Exception('collection:next requires ordered or dated collection');
         }
@@ -93,16 +111,34 @@ class Entries
 
         $collection = $this->collections->first();
         $primaryOrderBy = $this->orderBys->first();
+        $secondaryOrderBy = $this->orderBys->get(1);
 
-        if ($primaryOrderBy->direction === 'desc') {
-            $operator = '>';
-        }
+        $operator = $primaryOrderBy->direction === 'desc' ? '>' : '<';
+        $secondaryOperator = $secondaryOrderBy?->direction === 'desc' ? '>' : '<';
 
         if ($primaryOrderBy->sort === 'order') {
             throw_if(! $currentOrder = $currentEntry->order(), new \Exception('Current entry does not have an order'));
-            $query = $this->query()->where('order', $operator ?? '<', $currentOrder);
+            $query = $this->query()->where('order', $operator, $currentOrder);
         } elseif ($collection->dated() && $primaryOrderBy->sort === 'date') {
-            $query = $this->query()->where('date', $operator ?? '<', $currentEntry->date());
+            $currentEntryDate = $currentEntry->date();
+
+            // Get the IDs of any items that have the same date as the current entry,
+            // but come after the current entry sorted by the second column.
+            $previousOfSame = $this->query()
+                ->where('date', $currentEntryDate)
+                ->orderBy($secondaryOrderBy->sort, $secondaryOrderBy->direction)
+                ->where('title', $secondaryOperator, $currentEntry->get('title'))
+                ->get()
+                ->pluck('id')
+                ->toArray();
+
+            $query = $this->query()
+                ->where(fn ($query) => $query
+                    ->where('date', $operator, $currentEntryDate)
+                    ->orWhereIn('id', $previousOfSame)
+                )
+                ->orderBy('date', $primaryOrderBy->direction)
+                ->orderBy($secondaryOrderBy->sort, $secondaryOrderBy->direction);
         } else {
             throw new \Exception('collection:previous requires ordered or dated collection');
         }
