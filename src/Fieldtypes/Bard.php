@@ -716,7 +716,7 @@ class Bard extends Replicator
         return $value[0]['content'] ?? [];
     }
 
-    public static function setIcons($directory, $folder = null)
+    public static function setIcons($directory = null, $folder = null)
     {
         Statamic::provideToScript([
             'bard_set_icons_directory' => $directory,
