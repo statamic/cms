@@ -29,9 +29,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->booted(function () {
             Statamic::runBootedCallbacks();
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
+            $this->registerMiddlewareGroup();
         });
-
-        $this->registerMiddlewareGroup();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
@@ -166,14 +165,13 @@ class AppServiceProvider extends ServiceProvider
 
     protected function registerMiddlewareGroup()
     {
-        $this->app->make(Router::class)->middlewareGroup('statamic.web', [
-            \Statamic\Http\Middleware\StacheLock::class,
-            \Statamic\Http\Middleware\HandleToken::class,
-            \Statamic\Http\Middleware\Localize::class,
-            \Statamic\Http\Middleware\AddViewPaths::class,
-            \Statamic\Http\Middleware\AuthGuard::class,
-            \Statamic\StaticCaching\Middleware\Cache::class,
-        ]);
+        $this->app->make(Router::class)
+            ->pushMiddlewareToGroup('statamic.web', \Statamic\Http\Middleware\StacheLock::class)
+            ->pushMiddlewareToGroup('statamic.web', \Statamic\Http\Middleware\HandleToken::class)
+            ->pushMiddlewareToGroup('statamic.web', \Statamic\Http\Middleware\Localize::class)
+            ->pushMiddlewareToGroup('statamic.web', \Statamic\Http\Middleware\AddViewPaths::class)
+            ->pushMiddlewareToGroup('statamic.web', \Statamic\Http\Middleware\AuthGuard::class)
+            ->pushMiddlewareToGroup('statamic.web', \Statamic\StaticCaching\Middleware\Cache::class);
     }
 
     protected function addAboutCommandInfo()
