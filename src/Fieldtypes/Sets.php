@@ -154,8 +154,8 @@ class Sets extends Fieldtype
 
         // Then provide to script for <icon-fieldtype> selector components in blueprint config
         Statamic::provideToScript([
-            'set_icons_directory' => static::$iconsDirectory,
-            'set_icons_folder' => static::$iconsFolder,
+            'setIconsDirectory' => static::$iconsDirectory,
+            'setIconsFolder' => static::$iconsFolder,
         ]);
     }
 

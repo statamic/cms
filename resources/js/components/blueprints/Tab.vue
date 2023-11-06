@@ -118,11 +118,11 @@ export default {
         },
 
         iconDirectory() {
-            return this.$config.get('set_icons_directory');
+            return this.$config.get('setIconsDirectory');
         },
 
         iconFolder() {
-            return this.$config.get('set_icons_folder');
+            return this.$config.get('setIconsFolder');
         },
 
     },
