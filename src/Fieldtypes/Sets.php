@@ -160,26 +160,32 @@ class Sets extends Fieldtype
     }
 
     /**
-     * Get icon HTML, because our <svg-icon> component with Vite reference custom user paths.
+     * Get icon HTML, because our <svg-icon> component cannot reference custom paths at runtime without a Vite re-build.
      *
      * @param  string|null  $configuredIcon
-     * @param  string  $fallbackVendorIcon
-     * @return string
+     * @param  string|null  $fallbackVendorIcon
+     * @return string|null
      */
-    protected function getIconHtml($configuredIcon, $fallbackVendorIcon)
+    protected function getIconHtml($configuredIcon, $fallbackVendorIcon = null)
     {
-        $fallbackPath = base_path(static::$iconsDirectory."/{$fallbackVendorIcon}.svg");
-
         $iconPath = collect([static::$iconsDirectory, static::$iconsFolder, $configuredIcon])
             ->filter()
             ->implode('/').'.svg';
 
-        $absoluteIconPath = Path::isAbsolute($iconPath) ? $iconPath : Path::makeFull($iconPath);
+        $absoluteIconPath = Path::isAbsolute($iconPath)
+            ? $iconPath
+            : Path::makeFull($iconPath);
 
-        ray($absoluteIconPath);
+        if ($configuredIcon && File::exists($absoluteIconPath)) {
+            return File::get($absoluteIconPath);
+        }
 
-        return $configuredIcon && File::exists($absoluteIconPath)
-            ? File::get($iconPath)
-            : File::get($fallbackPath);
+        $absoluteFallbackIconPath = base_path(static::$iconsDirectory."/{$fallbackVendorIcon}.svg");
+
+        if ($fallbackVendorIcon && File::exists($absoluteFallbackIconPath)) {
+            return File::get($absoluteFallbackIconPath);
+        }
+
+        return null;
     }
 }
