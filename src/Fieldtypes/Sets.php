@@ -54,7 +54,7 @@ class Sets extends Fieldtype
                         'handle' => $setHandle,
                         'display' => $set['display'] ?? null,
                         'instructions' => $set['instructions'] ?? null,
-                        'icon' => $this->getIconHtml(Arr::get($set, 'icon')),
+                        'icon' => $this->getIconHtml(Arr::get($set, 'icon'), 'regular/folder-generic'),
                         'fields' => collect($set['fields'])->map(function ($field, $i) use ($setId) {
                             return array_merge(FieldTransformer::toVue($field), ['_id' => $setId.'-'.$i]);
                         })->all(),
