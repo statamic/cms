@@ -47,14 +47,14 @@ class Sets extends Fieldtype
                 'handle' => $groupHandle,
                 'display' => $group['display'] ?? null,
                 'instructions' => $group['instructions'] ?? null,
-                'icon' => $group['icon'] ?? null,
+                'icon' => $this->getIconHtml(Arr::get($group, 'icon')),
                 'sections' => collect($group['sets'] ?? [])->map(function ($set, $setHandle) use ($groupId) {
                     return [
                         '_id' => $setId = $groupId.'-section-'.$setHandle,
                         'handle' => $setHandle,
                         'display' => $set['display'] ?? null,
                         'instructions' => $set['instructions'] ?? null,
-                        'icon' => $set['icon'] ?? null,
+                        'icon' => $this->getIconHtml(Arr::get($set, 'icon')),
                         'fields' => collect($set['fields'])->map(function ($field, $i) use ($setId) {
                             return array_merge(FieldTransformer::toVue($field), ['_id' => $setId.'-'.$i]);
                         })->all(),
