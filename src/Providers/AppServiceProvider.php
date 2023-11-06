@@ -165,13 +165,16 @@ class AppServiceProvider extends ServiceProvider
 
     protected function registerMiddlewareGroup()
     {
-        $this->app->make(Router::class)
-            ->pushMiddlewareToGroup('statamic.web', \Statamic\Http\Middleware\StacheLock::class)
-            ->pushMiddlewareToGroup('statamic.web', \Statamic\Http\Middleware\HandleToken::class)
-            ->pushMiddlewareToGroup('statamic.web', \Statamic\Http\Middleware\Localize::class)
-            ->pushMiddlewareToGroup('statamic.web', \Statamic\Http\Middleware\AddViewPaths::class)
-            ->pushMiddlewareToGroup('statamic.web', \Statamic\Http\Middleware\AuthGuard::class)
-            ->pushMiddlewareToGroup('statamic.web', \Statamic\StaticCaching\Middleware\Cache::class);
+        $router = $this->app->make(Router::class);
+
+        collect([
+            \Statamic\Http\Middleware\StacheLock::class,
+            \Statamic\Http\Middleware\HandleToken::class,
+            \Statamic\Http\Middleware\Localize::class,
+            \Statamic\Http\Middleware\AddViewPaths::class,
+            \Statamic\Http\Middleware\AuthGuard::class,
+            \Statamic\StaticCaching\Middleware\Cache::class,
+        ])->each(fn ($middleware) => $router->pushMiddlewareToGroup('statamic.web', $middleware));
     }
 
     protected function addAboutCommandInfo()
