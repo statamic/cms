@@ -11,7 +11,7 @@
         @click="$emit('selected')"
         @mouseenter="$emit('mouseenter')"
     >
-        <svg-icon v-if="tab.icon" :name="`plump/${tab.icon}`" class="w-4 h-4 mr-1" />
+        <div v-if="tab.icon" v-html="tab.icon" class="w-4 h-4 mr-1" />
 
         {{ tab.display }}
 
