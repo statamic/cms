@@ -2813,8 +2813,8 @@ class CoreModifiers extends Modifier
         }
 
         if (is_array($value)) {
-            return array_map(function ($value) use ($params) {
-                return $this->wrap($value, $params);
+            return array_map(function ($item) use ($params) {
+                return $this->wrap($item, $params);
             }, $value);
         }
 
