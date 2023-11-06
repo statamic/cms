@@ -2812,6 +2812,12 @@ class CoreModifiers extends Modifier
             return $value;
         }
 
+        if (is_array($value)) {
+            return array_map(function ($value) use ($params) {
+                return $this->wrap($value, $params);
+            }, $value);
+        }
+
         $attributes = '';
         $tag = Arr::get($params, 0);
 
