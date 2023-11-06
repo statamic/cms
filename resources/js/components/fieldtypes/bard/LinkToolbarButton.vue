@@ -71,8 +71,17 @@ export default {
             this.close();
             this.editor.view.dom.focus();
         }
+    },
 
+    mounted() {
+        this.$keys.bindGlobal('esc', this.close)
+
+        this.$keys.bindGlobal(['mod+k'], e => {
+            console.log('nice cmd+k you got there')
+
+            // why you no work?
+            this.toggleLinkToolbar();
+        });
     }
-
 }
 </script>
