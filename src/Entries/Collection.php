@@ -851,7 +851,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
             'handle' => $this->handle(),
         ];
 
-        if (! Statamic::isApiRoute()) {
+        if (! Statamic::isApiRoute() && ! Statamic::isCpRoute()) {
             $data['mount'] = $this->mount();
         }
 
