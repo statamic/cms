@@ -45,15 +45,10 @@ export const translateChoice = function (key, count, replacements) {
  */
 const getLine = function (key) {
     const translations = Statamic.$config.get('translations');
-    const fallbackTranslations = Statamic.$config.get('fallbackTranslations');
 
     return translations[`*.${key}`]
         || translations[key]
         || translations[`statamic::${key}`]
         || translations[`statamic::messages.${key}`]
-        || fallbackTranslations[`*.${key}`]
-        || fallbackTranslations[key]
-        || fallbackTranslations[`statamic::${key}`]
-        || fallbackTranslations[`statamic::messages.${key}`]
         || key;
 }

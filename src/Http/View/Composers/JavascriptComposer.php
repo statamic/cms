@@ -40,7 +40,6 @@ class JavascriptComposer
             'toasts' => Toast::toArray(),
             'translationLocale' => app('translator')->locale(),
             'translations' => app('translator')->toJson(),
-            'fallbackTranslations' => tap(app('translator'))->setLocale(app('translator')->getFallback())->toJson(),
             'locale' => config('app.locale'),
             'asciiReplaceExtraSymbols' => $replaceSymbols = config('statamic.system.ascii_replace_extra_symbols'),
             'charmap' => ASCII::charsArray($replaceSymbols),
