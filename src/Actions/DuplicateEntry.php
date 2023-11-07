@@ -40,10 +40,10 @@ class DuplicateEntry extends Action
             if ($this->items->count() === 1) {
                 /** @translation */
                 return 'statamic::messages.duplicate_action_warning_localization';
-            } else {
-                /** @translation */
-                return 'statamic::messages.duplicate_action_warning_localizations';
             }
+
+            /** @translation */
+            return 'statamic::messages.duplicate_action_warning_localizations';
         }
     }
 
