@@ -39,7 +39,7 @@ class JavascriptComposer
             'flash' => Statamic::flash(),
             'toasts' => Toast::toArray(),
             'translationLocale' => app('translator')->locale(),
-            'translations' => app('translator')->toJson(),
+            'translations' => $this->translations(),
             'locale' => config('app.locale'),
             'asciiReplaceExtraSymbols' => $replaceSymbols = config('statamic.system.ascii_replace_extra_symbols'),
             'charmap' => ASCII::charsArray($replaceSymbols),
@@ -98,5 +98,13 @@ class JavascriptComposer
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
         ])->toArray();
+    }
+
+    protected function translations(): array
+    {
+        $translations = app('translator')->toJson();
+        $fallbackTranslations = tap(app('translator'))->setLocale(app('translator')->getFallback())->toJson();
+
+        return array_merge($fallbackTranslations, $translations);
     }
 }
