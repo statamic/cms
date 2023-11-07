@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\CP\Column;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -385,6 +386,22 @@ class Entries extends Relationship
 
     public function getColumns()
     {
+        if (count($this->getConfiguredCollections()) === 1) {
+            $columns = $this->getBlueprint()->columns();
+
+            $status = Column::make('status')
+                ->listable(true)
+                ->visible(true)
+                ->defaultVisibility(true)
+                ->sortable(false);
+
+            $columns->put('status', $status);
+
+            $columns->setPreferred("collections.{$this->getConfiguredCollections()[0]}.columns");
+
+            return $columns->rejectUnlisted()->values();
+        }
+
         return $this->getBlueprint()->columns()->values()->all();
     }
 
@@ -402,5 +419,23 @@ class Entries extends Relationship
     public function filter()
     {
         return new EntriesFilter($this);
+    }
+
+    public function preload()
+    {
+        $collection = count($this->getConfiguredCollections()) === 1
+            ? Collection::findByHandle($this->getConfiguredCollections()[0])
+            : null;
+
+        if (! $collection || ! $collection->hasStructure()) {
+            return parent::preload();
+        }
+
+        return array_merge(parent::preload(), ['tree' => [
+            'title' => $collection->title(),
+            'url' => cp_route('collections.tree.index', $collection),
+            'showSlugs' => $collection->structure()->showSlugs(),
+            'expectsRoot' => $collection->structure()->expectsRoot(),
+        ]]);
     }
 }

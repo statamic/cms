@@ -65,6 +65,7 @@
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
                 <item-selector
                     slot-scope="{ close }"
+                    :name="name"
                     :filters-url="filtersUrl"
                     :selections-url="selectionsUrl"
                     :site="site"
@@ -76,6 +77,7 @@
                     :search="search"
                     :exclusions="exclusions"
                     :type="config.type"
+                    :tree="tree"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
@@ -129,6 +131,7 @@ export default {
             type: Array,
             default: () => []
         },
+		tree: Object,
         initialSortColumn: {
             type: String,
             default: 'title'

@@ -74,6 +74,7 @@ return [
     'entries.config.collections' => 'Choisissez les collections à partir desquelles l’utilisateur pourra sélectionner.',
     'entries.config.create' => 'Autorisez la création de nouvelles entrées.',
     'entries.config.query_scopes' => 'Choisissez les étendues de requête à appliquer lors de la récupération des entrées sélectionnables.',
+    'entries.config.search_index' => 'Un index de recherche approprié sera automatiquement utilisé dès que possible, mais vous pouvez en définir un de manière explicite.',
     'entries.title' => 'Entries',
     'float.title' => 'Float',
     'form.config.max_items' => 'Le nombre maximal de formulaires sélectionnables.',

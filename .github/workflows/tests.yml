@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.0, 8.1, 8.2]
+        php: [8.0, 8.1, 8.2, 8.3]
         laravel: [9.*, 10.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
@@ -29,6 +29,8 @@ jobs:
         exclude:
           - php: 8.0
             laravel: 10.*
+          - php: 8.3
+            laravel: 9.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -50,6 +52,7 @@ jobs:
             tests
             composer.json
             phpunit.xml.dist
+            .github/workflows/tests.yml
             **.php
 
       - name: Determine whether tests should run
@@ -60,8 +63,7 @@ jobs:
       - name: Update apt sources
         if: steps.should-run-tests.outputs.result == 'true' && matrix.os == 'ubuntu-latest'
         run: |
-          sudo gem install apt-spy2
-          sudo apt-spy2 fix --commit --launchpad --country=US
+          sudo apt-get check || sudo apt --fix-broken install -y
           sudo apt-get update
 
       - name: Install French Locale
