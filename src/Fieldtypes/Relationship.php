@@ -134,6 +134,8 @@ abstract class Relationship extends Fieldtype
             'formComponent' => $this->getFormComponent(),
             'formComponentProps' => $this->getFormComponentProps(),
             'taggable' => $this->getTaggable(),
+            'initialSortColumn' => $this->initialSortColumn(),
+            'initialSortDirection' => $this->initialSortDirection(),
         ];
     }
 
@@ -294,6 +296,16 @@ abstract class Relationship extends Fieldtype
     public function getSortDirection($request)
     {
         return $request->get('order', 'asc');
+    }
+
+    public function initialSortColumn()
+    {
+        return 'title';
+    }
+
+    public function initialSortDirection()
+    {
+        return 'asc';
     }
 
     protected function getTaggable()

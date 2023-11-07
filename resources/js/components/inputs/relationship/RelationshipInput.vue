@@ -69,6 +69,8 @@
                     :selections-url="selectionsUrl"
                     :site="site"
                     :initial-columns="columns"
+                    :initial-sort-column="initialSortColumn"
+                    :initial-sort-direction="initialSortDirection"
                     :initial-selections="value"
                     :max-selections="maxItems"
                     :search="search"
@@ -126,6 +128,14 @@ export default {
         columns: {
             type: Array,
             default: () => []
+        },
+        initialSortColumn: {
+            type: String,
+            default: 'title'
+        },
+        initialSortDirection: {
+            type: String,
+            default: 'asc'
         }
     },
 
