@@ -131,7 +131,7 @@ export default {
             type: Array,
             default: () => []
         },
-		tree: Object,
+        tree: Object,
         initialSortColumn: {
             type: String,
             default: 'title'
