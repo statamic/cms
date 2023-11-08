@@ -166,9 +166,9 @@ class Entries extends Relationship
 
     public function getSortColumn($request)
     {
-        $column = $request->get('sort');
+        $column = $request->sort ?? 'title';
 
-        if (! $column && ! $request->search) {
+        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
             $column = $this->getFirstCollectionFromRequest($request)->sortField();
         }
 
@@ -177,13 +177,23 @@ class Entries extends Relationship
 
     public function getSortDirection($request)
     {
-        $order = $request->get('order', 'asc');
+        $order = $request->order ?? 'asc';
 
-        if (! $request->sort && ! $request->search) {
+        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
             $order = $this->getFirstCollectionFromRequest($request)->sortDirection();
         }
 
         return $order;
+    }
+
+    public function initialSortColumn()
+    {
+        return $this->getSortColumn(optional());
+    }
+
+    public function initialSortDirection()
+    {
+        return $this->getSortDirection(optional());
     }
 
     protected function getIndexQuery($request)

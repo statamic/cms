@@ -25,6 +25,8 @@
         :read-only="isReadOnly"
         :taggable="taggable"
         :tree="meta.tree"
+        :initial-sort-column="meta.initialSortColumn"
+        :initial-sort-direction="meta.initialSortDirection"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
         @input="update"
