@@ -165,4 +165,18 @@ return [
 
     'row_id_handle' => 'id',
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Max Concurrent Tasks
+    |--------------------------------------------------------------------------
+    |
+    | If `spatie/fork` is available, some resource-intensive tasks may
+    | be run concurrently, e.g. when warming the Stache. You may customize the
+    | number of possible concurrent tasks.
+    |
+    */
+
+    'max_concurrent_tasks' => env('STATAMIC_MAX_CONCURRENT_TASKS', null),
+
 ];

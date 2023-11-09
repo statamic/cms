@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Stores;
 
 use Closure;
+use Statamic\Facades\Task;
 
 abstract class AggregateStore extends Store
 {
@@ -72,7 +73,16 @@ abstract class AggregateStore extends Store
 
     public function warm()
     {
-        $this->discoverStores()->each->warm();
+        Task::run(...$this->warmClosures());
+    }
+
+    protected function warmClosures()
+    {
+        return $this->stores()->map(function ($store) {
+            return function () use ($store) {
+                $store->warm();
+            };
+        })->values()->all();
     }
 
     public function paths()

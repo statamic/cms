@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Extensions\FileStore;
 use Statamic\Facades\File;
+use Statamic\Facades\Task;
 use Statamic\Stache\Stores\Store;
 use Statamic\Support\Str;
 use Symfony\Component\Lock\LockFactory;
@@ -106,11 +107,20 @@ class Stache
 
         $this->startTimer();
 
-        $this->stores()->each->warm();
+        Task::run(...$this->warmClosures());
 
         $this->stopTimer();
 
         $lock->release();
+    }
+
+    protected function warmClosures()
+    {
+        return $this->stores()->map(function ($store) {
+            return function () use ($store) {
+                $store->warm();
+            };
+        })->values()->all();
     }
 
     public function instance()
