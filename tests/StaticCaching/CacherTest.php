@@ -5,13 +5,20 @@ namespace Tests\StaticCaching;
 use Illuminate\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Statamic\Facades\Site;
+use Statamic\Facades\Token;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
+use Tests\FakesContent;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CacherTest extends TestCase
 {
+    use FakesContent;
+    use PreventSavingStacheItemsToDisk;
+
     /** @test */
     public function gets_config_values()
     {
@@ -304,8 +311,34 @@ class CacherTest extends TestCase
         ]);
     }
 
+    /**
+     * @test
+     */
+    public function it_bypasses_cache_when_using_a_non_cacheable_token()
+    {
+        optional(Token::find('test-token'))->delete(); // garbage collection
+        Token::make('test-token', TestTokenHandler::class)->save();
+        // Token::make('test-token', TestTokenHandler::class, [], false)->save();
+
+        $this->createPage('about');
+
+        $this->assertNull(Cache::get('static-cache:urls'));
+
+        $this->get('/about');
+
+        $this->assertNull(Cache::get('static-cache:urls'));
+    }
+
     private function cacher($config = [])
     {
         return Mockery::mock(AbstractCacher::class, [app(Repository::class), $config])->makePartial();
+    }
+}
+
+class TestTokenHandler
+{
+    public function handle($token, $request, $next)
+    {
+        return $next($request);
     }
 }
