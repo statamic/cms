@@ -128,17 +128,17 @@ EOT
         $this->assertFalse(auth()->check());
 
         User::make()
-             ->email('san@holo.com')
-             ->password('chewy')
-             ->save();
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
 
         $this
-             ->post('/!/auth/login', [
-                 'token' => 'test-token',
-                 'email' => 'san@holo.com',
-                 'password' => 'chewy',
-             ])
-             ->assertLocation('/');
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+            ])
+            ->assertLocation('/');
 
         $this->assertTrue(auth()->check());
 
