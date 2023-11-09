@@ -19,6 +19,7 @@ class Token extends AbstractToken
             'handler' => $this->handler,
             'expires_at' => $this->expiry->timestamp,
             'data' => $this->data->all(),
+            'cacheable' => $this->cacheable,
         ];
     }
 }

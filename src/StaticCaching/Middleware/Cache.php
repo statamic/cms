@@ -50,6 +50,7 @@ class Cache
         }
 
         try {
+            ray('attemptToGetCachedResponse');
             if ($response = $this->attemptToGetCachedResponse($request)) {
                 return $response;
             }
@@ -59,6 +60,7 @@ class Cache
 
         $response = $next($request);
 
+        ray('checking shouldBeCached');
         if ($this->shouldBeCached($request, $response)) {
             $lock->acquire(true);
 
@@ -116,11 +118,13 @@ class Cache
             return false;
         }
 
-        if ($request->isLivePreview()) {
-            return false;
-        }
+        // if ($request->isLivePreview()) {
+        //     return false;
+        // }
 
-        return true;
+        ray('canBeCached', $request->cacheable());
+
+        return $request->cacheable();
     }
 
     private function shouldBeCached($request, $response)
@@ -141,11 +145,13 @@ class Cache
             return false;
         }
 
-        if ($request->isLivePreview()) {
-            return false;
-        }
+        // if ($request->isLivePreview()) {
+        //     return false;
+        // }
 
-        return true;
+        ray('canBeCached', $request->cacheable());
+
+        return $request->cacheable();
     }
 
     private function createLock($request)

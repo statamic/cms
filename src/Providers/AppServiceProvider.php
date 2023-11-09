@@ -90,6 +90,17 @@ class AppServiceProvider extends ServiceProvider
             return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
+        Request::macro('cacheable', function () {
+            if ($this->isLivePreview()) {
+                return false;
+            }
+
+            ray($this->statamicToken());
+            ray($this->statamicToken()?->cacheable());
+
+            return $this->statamicToken()?->cacheable();
+        });
+
         $this->addAboutCommandInfo();
     }
 

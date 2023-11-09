@@ -12,16 +12,22 @@ use Statamic\Facades\Token;
 class AbstractToken implements Contract
 {
     protected $token;
+
     protected $handler;
+
     protected $data;
+
     protected $expiry;
 
-    public function __construct(?string $token, string $handler, array $data = [])
+    protected $cacheable;
+
+    public function __construct(?string $token, string $handler, array $data = [], bool $cacheable = true)
     {
         $this->token = $token ?? Generator::generate();
         $this->handler = $handler;
         $this->data = collect($data);
         $this->expiry = Carbon::now()->addHour();
+        $this->cacheable = $cacheable;
     }
 
     public function token(): string
@@ -74,5 +80,10 @@ class AbstractToken implements Contract
     public function hasExpired(): bool
     {
         return $this->expiry->isPast();
+    }
+
+    public function cacheable(): bool
+    {
+        return $this->cacheable;
     }
 }

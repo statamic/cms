@@ -8,9 +8,9 @@ use Statamic\Facades\YAML;
 
 class TokenRepository
 {
-    public function make(?string $token, string $handler, array $data = []): Token
+    public function make(?string $token, string $handler, array $data = [], bool $cacheable = true): Token
     {
-        return new Token($token, $handler, $data);
+        return new Token($token, $handler, $data, $cacheable);
     }
 
     public function find(string $token)
@@ -53,7 +53,7 @@ class TokenRepository
         $token = basename($path, '.yaml');
 
         return $this
-            ->make($token, $yaml['handler'], $yaml['data'] ?? [])
+            ->make($token, $yaml['handler'], $yaml['data'] ?? [], $yaml['cacheable'] ?? true)
             ->expireAt(Carbon::createFromTimestamp($yaml['expires_at']));
     }
 }
