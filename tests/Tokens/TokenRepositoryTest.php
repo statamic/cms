@@ -35,6 +35,7 @@ class TokenRepositoryTest extends TestCase
         $this->assertEquals('bar', $token->get('foo'));
         $this->assertEquals('qux', $token->get('baz'));
         $this->assertEquals('test-token', $token->token());
+        $this->assertTrue($token->cacheable());
     }
 
     /** @test */
@@ -62,6 +63,7 @@ expires_at: 1577840400
 data:
   foo: bar
   baz: qux
+cacheable: true
 
 YAML;
 
