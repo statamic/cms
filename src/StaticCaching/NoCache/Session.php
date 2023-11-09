@@ -41,12 +41,12 @@ class Session
      */
     public function regions(): Collection
     {
-        return $this->regions;
+        return $this->regions->mapWithKeys(fn ($key) => [$key => $this->region($key)]);
     }
 
     public function region(string $key): Region
     {
-        if ($region = $this->regions[$key] ?? null) {
+        if ($this->regions->contains($key) && ($region = Cache::get('nocache::region.'.$key))) {
             return $region;
         }
 
@@ -57,14 +57,22 @@ class Session
     {
         $region = new StringRegion($this, trim($contents), $context, $extension);
 
-        return $this->regions[$region->key()] = $region;
+        $region->write();
+
+        $this->regions[] = $region->key();
+
+        return $region;
     }
 
     public function pushView($view, $context): ViewRegion
     {
         $region = new ViewRegion($this, $view, $context);
 
-        return $this->regions[$region->key()] = $region;
+        $region->write();
+
+        $this->regions[] = $region->key();
+
+        return $region;
     }
 
     public function cascade()
