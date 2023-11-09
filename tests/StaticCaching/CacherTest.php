@@ -324,7 +324,7 @@ class CacherTest extends TestCase
 
         $this->assertNull(Cache::get('static-cache:urls'));
 
-        $this->get('/about');
+        $this->get('/about?token=test-token');
 
         $this->assertNull(Cache::get('static-cache:urls'));
     }
