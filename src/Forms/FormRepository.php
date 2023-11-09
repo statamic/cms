@@ -2,14 +2,18 @@
 
 namespace Statamic\Forms;
 
+use Closure;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\FormRepository as Contract;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
+use Statamic\Forms\Exporters\ExporterRepository;
 
 class FormRepository implements Contract
 {
+    private $redirects = [];
+
     /**
      * Find a form.
      *
@@ -64,6 +68,25 @@ class FormRepository implements Contract
         }
 
         return $form;
+    }
+
+    public function redirect(string $form, Closure $callback)
+    {
+        $this->redirects[$form] = $callback;
+
+        return $this;
+    }
+
+    public function getSubmissionRedirect(SubmissionContract $submission)
+    {
+        $callback = $this->redirects[$submission->form()->handle()] ?? fn () => null;
+
+        return $callback($submission);
+    }
+
+    public function exporters()
+    {
+        return app(ExporterRepository::class);
     }
 
     public static function bindings(): array

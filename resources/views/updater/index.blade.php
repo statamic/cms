@@ -61,17 +61,19 @@
             </table>
         </div>
 
-        <h6 class="mt-8">{{ __('Unlisted Addons') }}</h6>
-        <div class="card p-0 mt-2">
-            <table class="data-table">
-                @foreach ($unlistedAddons as $addon)
-                    <tr>
-                        <td class="w-64">{{ $addon->name() }}</td>
-                        <td>{{ $addon->version() }}</td>
-                    </tr>
-                @endforeach
-            </table>
-        </div>
+        @if($unlistedAddons->count())
+            <h6 class="mt-8">{{ __('Unlisted Addons') }}</h6>
+            <div class="card p-0 mt-2">
+                <table class="data-table">
+                    @foreach ($unlistedAddons as $addon)
+                        <tr>
+                            <td class="w-64">{{ $addon->name() }}</td>
+                            <td>{{ $addon->version() }}</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
+        @endif
 
         @include('statamic::partials.docs-callout', [
             'topic' => __('Updates'),

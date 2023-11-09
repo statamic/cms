@@ -71,6 +71,7 @@ export default {
 
         uploads(uploads) {
             this.$emit('updated', uploads);
+            this.processUploadQueue();
         }
 
     },
@@ -127,14 +128,8 @@ export default {
                 basename: file.name,
                 extension: file.name.split('.').pop(),
                 percent: 0,
-                errorMessage: null
-            });
-
-            upload.upload().then(response => {
-                const json = JSON.parse(response.data);
-                response.status === 200
-                    ? this.handleUploadSuccess(id, json)
-                    : this.handleUploadError(id, status, json);
+                errorMessage: null,
+                instance: upload
             });
         },
 
@@ -172,6 +167,20 @@ export default {
             }
 
             return form;
+        },
+
+        processUploadQueue() {
+            if (this.uploads.length === 0) return;
+
+            const upload = this.uploads[0];
+            const id = upload.id;
+
+            upload.instance.upload().then(response => {
+                const json = JSON.parse(response.data);
+                response.status === 200
+                    ? this.handleUploadSuccess(id, json)
+                    : this.handleUploadError(id, status, json);
+            });
         },
 
         handleUploadSuccess(id, response) {

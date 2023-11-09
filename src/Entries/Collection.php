@@ -29,9 +29,9 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayable
+class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contract
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
+    use ContainsCascadingData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
 
     protected $handle;
     protected $routes = [];
@@ -158,6 +158,11 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
             ->args(func_get_args());
     }
 
+    public function customSortField()
+    {
+        return $this->sortField;
+    }
+
     public function sortDirection($dir = null)
     {
         return $this
@@ -183,6 +188,11 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
                 return 'asc';
             })
             ->args(func_get_args());
+    }
+
+    public function customSortDirection()
+    {
+        return $this->sortDirection;
     }
 
     public function title($title = null)
@@ -285,7 +295,14 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
         $blueprint->setParent($entry ?? $this);
 
-        $this->dispatchEntryBlueprintFoundEvent($blueprint, $entry);
+        // Only dispatch the event when there's no entry.
+        // When there is an entry, the event is dispatched from the entry.
+        if (! $entry) {
+            Blink::once(
+                'collection-entryblueprintfound-'.$this->handle().'-'.$blueprint->handle(),
+                fn () => EntryBlueprintFound::dispatch($blueprint)
+            );
+        }
 
         return $blueprint;
     }
@@ -304,17 +321,6 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         });
     }
 
-    private function dispatchEntryBlueprintFoundEvent($blueprint, $entry)
-    {
-        $id = optional($entry)->id() ?? 'null';
-
-        $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint->handle().'-'.$id;
-
-        Blink::once($blink, function () use ($blueprint, $entry) {
-            EntryBlueprintFound::dispatch($blueprint, $entry);
-        });
-    }
-
     public function fallbackEntryBlueprint()
     {
         $blueprint = (clone Blueprint::find('default'))
@@ -330,20 +336,22 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function ensureEntryBlueprintFields($blueprint)
     {
-        $blueprint->ensureFieldPrepended('title', [
-            'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
-            'required' => ! $auto,
-        ]);
+        if (! $blueprint->hasField('title')) {
+            $blueprint->ensureFieldPrepended('title', [
+                'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
+                'required' => ! $auto,
+            ]);
+        }
 
-        if ($this->requiresSlugs()) {
+        if ($this->requiresSlugs() && ! $blueprint->hasField('slug')) {
             $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true], 'sidebar');
         }
 
-        if ($this->dated()) {
+        if ($this->dated() && ! $blueprint->hasField('date')) {
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true, 'default' => 'now'], 'sidebar');
         }
 
-        if ($this->hasStructure() && ! $this->orderable()) {
+        if ($this->hasStructure() && ! $this->orderable() && ! $blueprint->hasField('parent')) {
             $blueprint->ensureField('parent', [
                 'type' => 'entries',
                 'collections' => [$this->handle()],
@@ -354,6 +362,10 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
         }
 
         foreach ($this->taxonomies() as $taxonomy) {
+            if ($blueprint->hasField($taxonomy->handle())) {
+                continue;
+            }
+
             $blueprint->ensureField($taxonomy->handle(), [
                 'type' => 'terms',
                 'taxonomies' => [$taxonomy->handle()],
@@ -840,9 +852,15 @@ class Collection implements Contract, AugmentableContract, ArrayAccess, Arrayabl
 
     public function augmentedArrayData()
     {
-        return [
+        $data = [
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
+
+        if (! Statamic::isApiRoute() && ! Statamic::isCpRoute()) {
+            $data['mount'] = $this->mount();
+        }
+
+        return $data;
     }
 }

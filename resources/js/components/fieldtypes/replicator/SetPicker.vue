@@ -24,15 +24,15 @@
                     <span>{{ selectedGroupDisplayText }}</span>
                 </div>
             </div>
-            <div class="p-1 max-h-80 overflow-auto">
+            <div class="p-1 max-h-[21rem] overflow-auto">
                 <div v-for="(item, i) in items" :key="item.handle" class="cursor-pointer rounded" :class="{ 'bg-gray-200': selectionIndex === i }" @mouseover="selectionIndex = i">
                     <div v-if="item.type === 'group'" @click="selectGroup(item.handle)" class="flex items-center group px-2 py-1.5 rounded-md">
                         <div class="h-9 w-9 rounded bg-white border border-gray-600 mr-2 p-2">
                             <svg-icon :name="item.icon ? `plump/${item.icon}` : 'folder-generic'" class="text-gray-800" />
                         </div>
                         <div class="flex-1">
-                            <div class="text-md font-medium text-gray-800 truncate w-52">{{ item.display || item.handle }}</div>
-                            <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ item.instructions }}</div>
+                            <div class="text-md font-medium text-gray-800 truncate w-52">{{ __(item.display || item.handle) }}</div>
+                            <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ __(item.instructions) }}</div>
                         </div>
                         <svg-icon name="micro/chevron-right-thin" class="text-gray-600 group-hover:text-gray-800" />
                     </div>
@@ -41,8 +41,8 @@
                             <svg-icon :name="item.icon ? `plump/${item.icon}` : 'light/add'" class="text-gray-800" />
                         </div>
                         <div class="flex-1">
-                            <div class="text-md font-medium text-gray-800 truncate w-52">{{ item.display || item.handle }}</div>
-                            <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ item.instructions }}</div>
+                            <div class="text-md font-medium text-gray-800 truncate w-52">{{ __(item.display || item.handle) }}</div>
+                            <div v-if="item.instructions" class="text-2xs text-gray-700 truncate w-52">{{ __(item.instructions) }}</div>
                         </div>
                     </div>
                 </div>
@@ -100,7 +100,7 @@ export default {
         },
 
         selectedGroupDisplayText() {
-            return this.selectedGroup ? this.selectedGroup.display || this.selectedGroup.handle : null;
+            return this.selectedGroup ? __(this.selectedGroup.display || this.selectedGroup.handle) : null;
         },
 
         visibleSets() {
@@ -112,7 +112,7 @@ export default {
 
             if (this.search) {
                 return sets.filter(set => {
-                    return set.display.toLowerCase().includes(this.search.toLowerCase())
+                    return __(set.display).toLowerCase().includes(this.search.toLowerCase())
                         || set.handle.toLowerCase().includes(this.search.toLowerCase());
                 });
             }

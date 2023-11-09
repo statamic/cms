@@ -9,6 +9,8 @@ use Statamic\Fields\Fieldtype;
 
 class Icon extends Fieldtype
 {
+    public const DEFAULT_FOLDER = 'regular';
+
     protected $categories = ['media'];
     protected $icon = 'icon_picker';
 
@@ -55,12 +57,6 @@ class Icon extends Fieldtype
 
     public function augment($value)
     {
-        // If a directory has not been configured, it's a Statamic Control Panel icon.
-        // We don't want to allow them on the front-end due to licensing restrictions.
-        if (! $this->config('directory')) {
-            return $value;
-        }
-
         [$path] = $this->resolveParts();
 
         return File::get($path.'/'.$value.'.svg');
@@ -77,7 +73,7 @@ class Icon extends Fieldtype
 
         $folder = $this->config(
             'folder',
-            $hasConfiguredDirectory ? null : 'regular' // Only apply a default folder if using Statamic icons.
+            $hasConfiguredDirectory ? null : self::DEFAULT_FOLDER // Only apply a default folder if using Statamic icons.
         );
 
         $path = Path::tidy($directory.'/'.$folder);

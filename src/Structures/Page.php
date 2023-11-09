@@ -23,9 +23,9 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\GraphQL\ResolvesValues;
 
-class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializable, ResolvesValuesContract, ArrayAccess, Arrayable
+class Page implements Arrayable, ArrayAccess, Augmentable, Entry, JsonSerializable, Protectable, ResolvesValuesContract, Responsable
 {
-    use HasAugmentedInstance, ForwardsCalls, TracksQueriedColumns, ResolvesValues, ContainsSupplementalData;
+    use ContainsSupplementalData, ForwardsCalls, HasAugmentedInstance, ResolvesValues, TracksQueriedColumns;
 
     protected $tree;
     protected $reference;

@@ -18,7 +18,7 @@
                     @click.prevent="changeSortColumn(column.field)"
                 >
                     <span v-text="column.label" />
-                    <svg :class="[sharedState.sortDirection, {'opacity-100 pointer-events-none': sharedState.sortColumn === column.field}]" height="8" width="8" viewBox="0 0 10 6.5" class="ml-1 opacity-0 group-hover:opacity-100">
+                    <svg v-if="column.sortable" :class="[sharedState.sortDirection, {'opacity-100 pointer-events-none': sharedState.sortColumn === column.field}]" height="8" width="8" viewBox="0 0 10 6.5" class="ml-1 opacity-0 group-hover:opacity-100">
                         <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor"/>
                     </svg>
                 </th>
@@ -67,8 +67,8 @@
                 </td>
                 <td class="type-column" v-if="type">
                     <span v-if="type === 'entries' || type === 'terms'" class="rounded px-1 py-px text-2xs uppercase bg-gray-200 text-gray">
-                        <template v-if="type === 'entries'">{{ row.collection.title }}</template>
-                        <template v-if="type === 'terms'">{{ row.taxonomy.title }}</template>
+                        <template v-if="type === 'entries'">{{ __(row.collection.title) }}</template>
+                        <template v-if="type === 'terms'">{{ __(row.taxonomy.title) }}</template>
                     </span>
                 </td>
                 <th class="actions-column">

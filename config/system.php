@@ -152,4 +152,17 @@ return [
 
     'update_references' => true,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Row ID handle
+    |--------------------------------------------------------------------------
+    |
+    | Rows in Grid, Replicator, and Bard fields will be given a unique ID using
+    | the "id" field. You may need your own field named "id", in which case
+    | you may customize the handle of the field that Statamic will use.
+    |
+    */
+
+    'row_id_handle' => 'id',
+
 ];

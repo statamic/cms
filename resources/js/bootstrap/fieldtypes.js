@@ -36,7 +36,8 @@ import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
 import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
 import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
 import ListFieldtype from '../components/fieldtypes/ListFieldtype.vue';
-import MarkdownFieldtype from '../components/fieldtypes/MarkdownFieldtype.vue';
+import MarkdownFieldtype from '../components/fieldtypes/markdown/MarkdownFieldtype.vue';
+import MarkdownButtonsSettingFieldtype from '../components/fieldtypes/markdown/MarkdownButtonsSettingFieldtype.vue';
 import RadioFieldtype from '../components/fieldtypes/RadioFieldtype.vue';
 import RangeFieldtype from '../components/fieldtypes/RangeFieldtype.vue';
 import RelationshipFieldtype from '../components/fieldtypes/relationship/RelationshipFieldtype.vue';
@@ -56,6 +57,8 @@ import ToggleIndexFieldtype from '../components/fieldtypes/ToggleIndexFieldtype.
 import WidthFieldtype from '../components/fieldtypes/WidthFieldtype.vue';
 import VideoFieldtype from '../components/fieldtypes/VideoFieldtype.vue';
 import YamlFieldtype from '../components/fieldtypes/YamlFieldtype.vue';
+import SetPicker from '../components/fieldtypes/replicator/SetPicker.vue';
+import SetField from '../components/fieldtypes/replicator/Field.vue';
 
 Vue.component('select-input', Select);
 Vue.component('text-input', Text);
@@ -92,6 +95,7 @@ Vue.component('integer-fieldtype', IntegerFieldtype);
 Vue.component('link-fieldtype', LinkFieldtype);
 Vue.component('list-fieldtype', ListFieldtype);
 Vue.component('markdown-fieldtype', MarkdownFieldtype);
+Vue.component('markdown_buttons_setting-fieldtype', MarkdownButtonsSettingFieldtype);
 Vue.component('radio-fieldtype', RadioFieldtype);
 Vue.component('range-fieldtype', RangeFieldtype);
 Vue.component('relationship-fieldtype', RelationshipFieldtype);
@@ -111,6 +115,8 @@ Vue.component('toggle-fieldtype-index', ToggleIndexFieldtype);
 Vue.component('width-fieldtype', WidthFieldtype);
 Vue.component('video-fieldtype', VideoFieldtype);
 Vue.component('yaml-fieldtype', YamlFieldtype);
+Vue.component('set-picker', SetPicker);
+Vue.component('set-field', SetField);
 
 
 Vue.component('revealer-fieldtype', RevealerFieldtype);

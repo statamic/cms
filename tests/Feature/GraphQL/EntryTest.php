@@ -16,9 +16,9 @@ use Tests\TestCase;
 /** @group graphql */
 class EntryTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['collections'];
 
@@ -697,13 +697,13 @@ GQL;
 GQL;
 
         $this
-                ->withoutExceptionHandling()
-                ->post('/graphql', ['query' => $query])
-                ->assertGqlOk()
-                ->assertExactJson(['data' => ['entry' => [
-                    'id' => '6',
-                    'title' => 'That was so rad!',
-                ]]]);
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entry' => [
+                'id' => '6',
+                'title' => 'That was so rad!',
+            ]]]);
 
         $query = <<<'GQL'
 {

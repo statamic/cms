@@ -2,6 +2,7 @@
 
 namespace Statamic\Validation;
 
+use Carbon\Carbon;
 use DateTime;
 use Statamic\Support\Arr;
 
@@ -16,6 +17,10 @@ class DateFieldtype
 
     public function __invoke($value)
     {
+        if (is_null($value) || $value instanceof Carbon) {
+            return;
+        }
+
         if (! is_array($value)) {
             return __('statamic::validation.array');
         }
@@ -37,6 +42,11 @@ class DateFieldtype
         }
 
         if ($this->fieldtype->config('mode') === 'range') {
+            if (isset($value['start'])) {
+                // It was already processed.
+                return;
+            }
+
             $date = $value['date'];
 
             if (! $date && $this->fieldtype->isRequired()) {

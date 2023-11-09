@@ -10,8 +10,8 @@ use Statamic\View\View;
 
 class MiscTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesViews;
+    use PreventSavingStacheItemsToDisk;
 
     /**
      * @test

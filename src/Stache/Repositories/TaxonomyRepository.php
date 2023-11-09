@@ -54,7 +54,7 @@ class TaxonomyRepository implements RepositoryContract
         $this->store->delete($taxonomy);
     }
 
-    public function make(?string $handle = null): Taxonomy
+    public function make(string $handle = null): Taxonomy
     {
         return app(Taxonomy::class)->handle($handle);
     }

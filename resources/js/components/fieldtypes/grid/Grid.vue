@@ -6,7 +6,7 @@
     <div class="grid-fieldtype-container" :class="{'grid-fullscreen bg-white': fullScreenMode }">
 
         <header class="bg-gray-200 border-b py-3 pl-3 flex items-center justify-between relative" v-if="fullScreenMode">
-            <h2 v-text="config.display" />
+            <h2 v-text="__(config.display)" />
             <button class="btn-close absolute top-2 right-5" @click="fullScreenMode = false" :aria-label="__('Exit Fullscreen Mode')">&times;</button>
         </header>
 
@@ -40,7 +40,7 @@
             <button
                 class="btn"
                 v-if="canAddRows"
-                v-text="addRowButtonLabel"
+                v-text="__(addRowButtonLabel)"
                 @click.prevent="addRow" />
 
         </section>
@@ -115,7 +115,7 @@ export default {
         },
 
         addRowButtonLabel() {
-            return this.config.add_row || __('Add Row');
+            return __(this.config.add_row) || __('Add Row');
         },
 
         hasMaxRows() {
@@ -135,7 +135,7 @@ export default {
         },
 
         replicatorPreview() {
-            return `${this.config.display}: ${__n(':count row|:count rows', this.value.length)}`;
+            return `${__(this.config.display)}: ${__n(':count row|:count rows', this.value.length)}`;
         }
 
     },

@@ -439,6 +439,7 @@ class BlueprintTest extends TestCase
                                     'visibility' => 'visible',
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'autocomplete' => null,
                                 ],
                             ],
                         ],
@@ -552,6 +553,7 @@ class BlueprintTest extends TestCase
                                     'visibility' => 'visible',
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'autocomplete' => null,
                                 ],
                                 [
                                     'handle' => 'nested_deeper_two',
@@ -571,6 +573,7 @@ class BlueprintTest extends TestCase
                                     'visibility' => 'visible',
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'autocomplete' => null,
                                 ],
                             ],
                         ],
@@ -855,7 +858,7 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('existing'));
         $this->assertEquals(['tabs' => [
             'tab_one' => [
-                'sections'=> [
+                'sections' => [
                     [
                         'fields' => [
                             ['handle' => 'first', 'field' => ['type' => 'text']],
@@ -1038,7 +1041,7 @@ class BlueprintTest extends TestCase
             'title' => 'Test',
             'tabs' => [
                 'tab_one' => [
-                    'sections'=> [
+                    'sections' => [
                         [
                             'fields' => [
                                 ['handle' => 'one', 'field' => ['type' => 'text']],

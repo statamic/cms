@@ -90,8 +90,8 @@ class Sets extends Fieldtype
                         'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
                     ]);
                 })
-                ->values()
-                ->all(),
+                    ->values()
+                    ->all(),
             ]);
         })->values()->all();
     }
@@ -124,6 +124,6 @@ class Sets extends Fieldtype
                 ],
             ];
         })
-        ->all();
+            ->all();
     }
 }

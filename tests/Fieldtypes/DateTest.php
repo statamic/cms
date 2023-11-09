@@ -137,6 +137,11 @@ class DateTest extends TestCase
                 ['date' => null, 'time' => null],
                 null,
             ],
+            'object with missing time' => [
+                [],
+                ['date' => null],
+                null,
+            ],
             'date with default format' => [
                 [],
                 ['date' => '2012-08-29', 'time' => null],
@@ -146,6 +151,11 @@ class DateTest extends TestCase
                 ['format' => 'Y--m--d'],
                 ['date' => '2012-08-29', 'time' => null],
                 '2012--08--29',
+            ],
+            'date with missing time' => [
+                [],
+                ['date' => '2012-08-29'],
+                '2012-08-29',
             ],
             'date with time' => [
                 ['time_enabled' => true],
@@ -171,6 +181,11 @@ class DateTest extends TestCase
                 ['mode' => 'range', 'format' => 'Y--m--d'],
                 ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
                 ['start' => '2012--08--29', 'end' => '2013--09--27'],
+            ],
+            'range with format containing time has end date at end of day' => [
+                ['mode' => 'range', 'format' => 'Y-m-d H:i:s'],
+                ['date' => ['start' => '2012-08-29', 'end' => '2013-09-27'], 'time' => null],
+                ['start' => '2012-08-29 00:00:00', 'end' => '2013-09-27 23:59:59'],
             ],
         ];
     }
@@ -458,6 +473,11 @@ class DateTest extends TestCase
         // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
 
         return [
+            'null' => [
+                [],
+                null,
+                null,
+            ],
             'null date when not required' => [
                 [],
                 ['date' => null, 'time' => null],
@@ -481,6 +501,13 @@ class DateTest extends TestCase
             'null time' => [
                 ['time_enabled' => true],
                 ['date' => '2012-01-29', 'time' => null],
+                '2012-01-29 00:00:00',
+            ],
+            // A carbon instance would be passed in if it was already processed.
+            // e.g. if it was nested inside a Replicator.
+            'carbon instance' => [
+                [],
+                Carbon::parse('2012-01-29'),
                 '2012-01-29 00:00:00',
             ],
         ];
@@ -513,6 +540,11 @@ class DateTest extends TestCase
         // This only contains valid values. Invalid ones would throw a validation exception, tested in "it_validates" below.
 
         return [
+            'null' => [
+                ['mode' => 'range'],
+                null,
+                null,
+            ],
             'valid date range' => [
                 ['mode' => 'range'],
                 ['date' => ['start' => '2012-01-29', 'end' => '2012-01-30']],
@@ -530,6 +562,16 @@ class DateTest extends TestCase
                 ['mode' => 'range'],
                 ['date' => ['start' => null, 'end' => null]],
                 null,
+            ],
+            // Start/end array with carbon instances would be passed in if it was already processed.
+            // e.g. if it was nested inside a Replicator.
+            'carbon instances' => [
+                ['mode' => 'range'],
+                ['start' => Carbon::parse('2012-01-29'), 'end' => Carbon::parse('2012-02-14')],
+                [
+                    'start' => '2012-01-29 00:00:00',
+                    'end' => '2012-02-14 00:00:00',
+                ],
             ],
         ];
     }
@@ -560,6 +602,11 @@ class DateTest extends TestCase
             'valid date' => [
                 [],
                 ['date' => '2012-01-29', 'time' => null],
+                [],
+            ],
+            'null' => [
+                [],
+                null,
                 [],
             ],
             'not an array' => [

@@ -36,9 +36,10 @@ class Entries extends ResourceCollection
             ->listable(true)
             ->visible(true)
             ->defaultVisibility(true)
+            ->defaultOrder($columns->count() + 1)
             ->sortable(false);
 
-        $columns->prepend($status, 'status');
+        $columns->put('status', $status);
 
         if ($key = $this->columnPreferenceKey) {
             $columns->setPreferred($key);
