@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
@@ -88,6 +89,10 @@ class AppServiceProvider extends ServiceProvider
 
         Request::macro('isLivePreview', function () {
             return optional($this->statamicToken())->handler() === LivePreview::class;
+        });
+
+        TrimStrings::skipWhen(function (Request $request) {
+            return $request->is(config('statamic.cp.route').'/*');
         });
 
         $this->addAboutCommandInfo();
