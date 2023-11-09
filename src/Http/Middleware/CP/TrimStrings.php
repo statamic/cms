@@ -3,7 +3,6 @@
 namespace Statamic\Http\Middleware\CP;
 
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
-use Statamic\Support\Str;
 
 class TrimStrings extends TransformsRequest
 {
@@ -25,7 +24,7 @@ class TrimStrings extends TransformsRequest
      */
     protected function cleanArray(array $data, $keyPrefix = '')
     {
-        if ($this->isBardTextNode($data, $keyPrefix)) {
+        if ($this->isTextNode($data, $keyPrefix)) {
             $this->except[] = $keyPrefix.'text';
         }
 
@@ -33,19 +32,18 @@ class TrimStrings extends TransformsRequest
     }
 
     /**
-     * Check if the data is a bard text node.
+     * Check if the data is a text node.
      *
      * @param  array  $data
      * @return array
      */
-    protected function isBardTextNode(array $data, $keyPrefix = '')
+    protected function isTextNode(array $data, $keyPrefix = '')
     {
         return
             array_key_exists('text', $data) &&
             array_key_exists('type', $data) &&
             is_string($data['text']) &&
-            $data['type'] === 'text' &&
-            Str::is('*.content.*', $keyPrefix);
+            $data['type'] === 'text';
     }
 
     /**
