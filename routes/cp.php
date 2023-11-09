@@ -102,13 +102,14 @@ Route::group(['prefix' => 'auth'], function () {
     if (config('statamic.cp.auth', true)) {
         Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
         Route::post('login', [LoginController::class, 'login']);
-        Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
         Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
         Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
         Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
         Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.action');
     }
+
+    Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
     Route::get('token', CsrfTokenController::class)->name('token');
     Route::get('extend', ExtendSessionController::class)->name('extend');
