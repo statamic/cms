@@ -18,7 +18,6 @@ class TrimStrings extends TransformsRequest
     /**
      * Clean the data in the given array.
      *
-     * @param  array  $data
      * @param  string  $keyPrefix
      * @return array
      */
@@ -34,7 +33,6 @@ class TrimStrings extends TransformsRequest
     /**
      * Check if the data is a text node.
      *
-     * @param  array  $data
      * @return array
      */
     protected function isTextNode(array $data, $keyPrefix = '')
