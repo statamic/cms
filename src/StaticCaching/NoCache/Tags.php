@@ -2,6 +2,9 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
+use Statamic\View\Antlers\Language\Parser\DocumentParser;
+use Statamic\View\Antlers\Language\Parser\VariableNameFinder;
+
 class Tags extends \Statamic\Tags\Tags
 {
     public static $handle = 'nocache';
@@ -19,9 +22,16 @@ class Tags extends \Statamic\Tags\Tags
 
     public function index()
     {
+        if ($this->params->has('select')) {
+            $fields = $this->params->explode('select');
+        } else {
+            $finder = new VariableNameFinder(new DocumentParser);
+            $fields = $finder->getIdentifiers($this->content);
+        }
+
         return $this
             ->nocache
-            ->pushRegion($this->content, $this->context->all(), 'antlers.html')
+            ->pushRegion($this->content, $this->context->only($fields)->all(), 'antlers.html')
             ->placeholder();
     }
 }
