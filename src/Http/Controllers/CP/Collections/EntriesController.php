@@ -245,6 +245,9 @@ class EntriesController extends CpController
                 ->makeWorkingCopy()
                 ->user(User::current())
                 ->save();
+
+            // catch any changes through RevisionSaving event
+            $entry = $entry->fromWorkingCopy();
         } else {
             if (! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
                 $entry->published($request->published);
