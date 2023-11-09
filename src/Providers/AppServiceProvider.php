@@ -95,8 +95,11 @@ class AppServiceProvider extends ServiceProvider
                 return false;
             }
 
+            if ($token = $this->statamicToken()) {
+                return $token->cacheable();
+            }
 
-            return $this->statamicToken()?->cacheable();
+            return true;
         });
 
         $this->addAboutCommandInfo();
