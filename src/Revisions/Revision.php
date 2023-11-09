@@ -8,6 +8,7 @@ use Statamic\Contracts\Revisions\Revision as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Events\RevisionDeleted;
 use Statamic\Events\RevisionSaved;
+use Statamic\Events\RevisionSaving;
 use Statamic\Facades;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -130,6 +131,10 @@ class Revision implements Arrayable, Contract
 
     public function save()
     {
+        if (RevisionSaving::dispatch($this) === false) {
+            return false;
+        }
+
         Revisions::save($this);
 
         RevisionSaved::dispatch($this);

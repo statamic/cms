@@ -703,12 +703,15 @@ export default {
             if (btns.includes('h6')) levels.push(6);
             if (levels.length) exts.push(Heading.configure({ levels }));
 
+            let alignmentTypes = ['paragraph'];
+            if (levels.length) alignmentTypes.push('heading');
+
             let alignments = [];
             if (btns.includes('alignleft')) alignments.push('left');
             if (btns.includes('aligncenter')) alignments.push('center');
             if (btns.includes('alignright')) alignments.push('right');
             if (btns.includes('alignjustify')) alignments.push('justify');
-            if (alignments.length) exts.push(TextAlign.configure({ types: ['heading', 'paragraph'], alignments }));
+            if (alignments.length) exts.push(TextAlign.configure({ types: alignmentTypes, alignments }));
 
             if (btns.includes('table')) {
                 exts.push(

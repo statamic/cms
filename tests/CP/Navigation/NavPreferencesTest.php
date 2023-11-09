@@ -503,8 +503,8 @@ class NavPreferencesTest extends TestCase
             ],
         ]);
         $this->assertEquals(['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals', 'Pages'], $nav->get('Content')->map->display()->all());
-        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
-        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
     }
 
     /** @test */
@@ -596,8 +596,8 @@ class NavPreferencesTest extends TestCase
             ],
         ]);
         $this->assertEquals(['Dashboard', 'Pages'], $nav->get('Top Level')->map->display()->all());
-        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
-        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Pages', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
+        $this->assertArrayHasKey('Articles', $nav->get('Content')->keyBy->display()->get('Collections')->resolveChildren()->children()->keyBy->display()->all());
 
         // Aliasing in same section should just copy the item...
         $nav = $this->buildNavWithPreferences([
