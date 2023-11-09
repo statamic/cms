@@ -5,6 +5,7 @@ namespace Tests\Preferences;
 use Statamic\Facades\File;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
+use Statamic\Facades\UserGroup;
 use Statamic\Preferences\Preferences;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -19,6 +20,7 @@ class PreferencesTest extends TestCase
 
         File::delete(resource_path('preferences.yaml'));
         Role::all()->each->delete();
+        UserGroup::all()->each->delete();
     }
 
     /** @test */
@@ -166,6 +168,19 @@ class PreferencesTest extends TestCase
             'alfa' => 'bravo',
             'charlie' => 'delta',
         ], $preferences->all());
+    }
+
+    /** @test */
+    public function it_uses_fresh_role_preferences_via_group()
+    {
+        $preferences = new Preferences;
+
+        tap(Role::make('role')->setPreference('alfa', 'bravo'))->save();
+        tap(UserGroup::make()->handle('group')->assignRole('role'))->save();
+
+        $this->actingAs(User::make()->addToGroup('group'));
+
+        $this->assertEquals(['alfa' => 'bravo'], $preferences->all());
     }
 
     /** @test */
