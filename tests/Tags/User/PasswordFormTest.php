@@ -205,7 +205,7 @@ EOT
     /** @test */
     public function it_will_update_password_and_render_success_even_when_cp_auth_is_disabled()
     {
-        Config::set('statamic.cp.auth', false);
+        Config::set('statamic.cp.auth', ['enabled' => false]);
 
         $this->actingAs(User::make()->password('mypassword')->save());
 

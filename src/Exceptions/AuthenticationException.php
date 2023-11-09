@@ -11,6 +11,17 @@ class AuthenticationException extends Exception implements Responsable
     {
         return $request->expectsJson()
             ? response()->json(['message' => $this->getMessage()], 401)
-            : (config('statamic.cp.auth', true) ? redirect()->route('statamic.cp.login') : abort(401));
+            : $this->handleRedirect();
+    }
+
+    protected function handleRedirect()
+    {
+        if (! config('statamic.cp.auth.enabled', true)) {
+            return config('statamic.cp.auth.redirect_to')
+                ? redirect(config('statamic.cp.auth.redirect_to'))
+                : abort(401);
+        }
+
+        return redirect()->route('statamic.cp.login');
     }
 }

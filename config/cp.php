@@ -15,7 +15,20 @@ return [
 
     'route' => env('CP_ROUTE', 'cp'),
 
-    'auth' => true,
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Whether the Control Panel's authentication pages should be enabled,
+    | or if users should be redirected elsewhere.
+    |
+    */
+
+    'auth' => [
+        'enabled' => true,
+        'redirect_to' => null,
+    ],
 
     /*
     |--------------------------------------------------------------------------

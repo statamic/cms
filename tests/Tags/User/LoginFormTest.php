@@ -123,7 +123,7 @@ EOT
     /** @test */
     public function it_will_log_user_in_and_render_success_even_when_cp_auth_is_disabled()
     {
-        Config::set('statamic.cp.auth', false);
+        Config::set('statamic.cp.auth', ['enabled' => false]);
 
         $this->assertFalse(auth()->check());
 
