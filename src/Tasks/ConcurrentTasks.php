@@ -13,7 +13,7 @@ class ConcurrentTasks implements Tasks
     public function __construct(Fork $fork)
     {
         $this->fork = $fork;
-        $this->concurrent = Config::get('statamic.system.max_concurrent_tasks', 1);
+        $this->concurrent = Config::get('statamic.system.max_concurrent_tasks', null);
     }
 
     public function run(...$closures)
