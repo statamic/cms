@@ -11,12 +11,14 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Token;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
 use Tests\FakesContent;
+use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CacherTest extends TestCase
 {
     use FakesContent;
+    use FakesViews;
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
@@ -316,6 +318,7 @@ class CacherTest extends TestCase
      */
     public function it_bypasses_cache_when_using_a_non_cacheable_token()
     {
+        $this->withStandardFakeViews();
         optional(Token::find('test-token'))->delete(); // garbage collection
         Token::make('test-token', TestTokenHandler::class)->save();
         // Token::make('test-token', TestTokenHandler::class, [], false)->save();
@@ -324,7 +327,8 @@ class CacherTest extends TestCase
 
         $this->assertNull(Cache::get('static-cache:urls'));
 
-        $this->get('/about?token=test-token');
+        $this->get('/about?token=test-token')
+            ->assertOK();
 
         $this->assertNull(Cache::get('static-cache:urls'));
     }
