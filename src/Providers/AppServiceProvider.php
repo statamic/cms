@@ -95,8 +95,6 @@ class AppServiceProvider extends ServiceProvider
                 return false;
             }
 
-            ray($this->statamicToken());
-            ray($this->statamicToken()?->cacheable());
 
             return $this->statamicToken()?->cacheable();
         });
