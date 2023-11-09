@@ -50,7 +50,6 @@ class Cache
         }
 
         try {
-            ray('attemptToGetCachedResponse');
             if ($response = $this->attemptToGetCachedResponse($request)) {
                 return $response;
             }
@@ -60,7 +59,6 @@ class Cache
 
         $response = $next($request);
 
-        ray('checking shouldBeCached');
         if ($this->shouldBeCached($request, $response)) {
             $lock->acquire(true);
 
@@ -118,12 +116,6 @@ class Cache
             return false;
         }
 
-        // if ($request->isLivePreview()) {
-        //     return false;
-        // }
-
-        ray('canBeCached', $request->cacheable());
-
         return $request->cacheable();
     }
 
@@ -144,12 +136,6 @@ class Cache
         if ($response->getStatusCode() !== 200 || $response->getContent() == '') {
             return false;
         }
-
-        // if ($request->isLivePreview()) {
-        //     return false;
-        // }
-
-        ray('canBeCached', $request->cacheable());
 
         return $request->cacheable();
     }
