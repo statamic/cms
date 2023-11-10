@@ -62,7 +62,7 @@ Statamic.booting(Statamic => {
 Alpine.start()
 
 Alpine.magic('field', (el, { Alpine }) => {
-    const vm = el.closest('.html-fieldtype-wrapper').__vue__;
+    const vm = el.closest('.html-fieldtype-wrapper')?.__vue__;
     if (!vm) {
         return;
     }
