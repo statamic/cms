@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.4.13 (2023-11-10)
+
+### What's fixed
+- Front-end form asset field php file validation. [#8971](https://github.com/statamic/cms/issues/8971) by @jasonvarga
+
+
+
 ## 3.4.12 (2023-10-24)
 
 ### What's improved
