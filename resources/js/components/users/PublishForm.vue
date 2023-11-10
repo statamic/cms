@@ -13,6 +13,7 @@
                     <change-password
                         v-if="canEditPassword"
                         :save-url="actions.password"
+                        :requires-current-password="requiresCurrentPassword"
                         class="mr-4"
                     />
 
@@ -75,7 +76,8 @@ export default {
         actions: Object,
         method: String,
         canEditPassword: Boolean,
-        canEditBlueprint: Boolean
+        canEditBlueprint: Boolean,
+        requiresCurrentPassword: Boolean,
     },
 
     data() {
