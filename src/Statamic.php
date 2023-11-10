@@ -6,10 +6,10 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Vite;
 use Laravel\Nova\Nova;
 use Statamic\Facades\File;
 use Statamic\Facades\Preference;
-use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\Arr;
@@ -27,6 +27,7 @@ class Statamic
     protected static $externalScripts = [];
     protected static $styles = [];
     protected static $externalStyles = [];
+    protected static $vites = [];
     protected static $cpRoutes = [];
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
@@ -105,6 +106,25 @@ class Statamic
         static::$externalStyles[] = $url;
 
         return new static;
+    }
+
+    public static function vite($name, $config)
+    {
+        if (is_string($config) || ! Arr::isAssoc($config)) {
+            $config = ['input' => $config];
+        }
+
+        static::$vites[$name] = array_merge([
+            'hotFile' => null,
+            'buildDirectory' => 'build',
+        ], $config);
+
+        return new static;
+    }
+
+    public static function availableVites(Request $request)
+    {
+        return static::$vites;
     }
 
     public static function pushWebRoutes(Closure $routes)
@@ -203,19 +223,6 @@ class Statamic
         return $route;
     }
 
-    public static function isAmpRequest()
-    {
-        if (! config('statamic.amp.enabled')) {
-            return false;
-        }
-
-        $url = Site::current()->relativePath(
-            str_finish(request()->getUri(), '/')
-        );
-
-        return starts_with($url, '/'.config('statamic.amp.route'));
-    }
-
     public static function jsonVariables(Request $request)
     {
         return collect(static::$jsonVariables)->map(function ($variable) use ($request) {
@@ -261,6 +268,26 @@ class Statamic
     public static function cpAssetUrl($url = '/')
     {
         return static::vendorPackageAssetUrl('statamic/cp', $url);
+    }
+
+    public static function cpViteAsset($asset)
+    {
+        return static::cpVite()->asset('resources/'.$asset);
+    }
+
+    public static function cpViteScripts()
+    {
+        return static::cpVite()->withEntryPoints([
+            'resources/js/app.js',
+            'resources/css/tailwind.css',
+        ]);
+    }
+
+    private static function cpVite()
+    {
+        return Vite::getFacadeRoot()
+            ->useHotFile('vendor/statamic/cp/hot')
+            ->useBuildDirectory('vendor/statamic/cp/build');
     }
 
     public static function cpDateFormat()
@@ -394,7 +421,7 @@ class Statamic
             return false;
         }
 
-        return Str::startsWith(Arr::get(request()->server(), 'argv.1'), ['queue:', 'horizon:']);
+        return Str::startsWith(Arr::get(request()->server(), 'argv.1') ?? '', ['queue:', 'horizon:']);
     }
 
     private static function createVersionedAssetPath($name, $path, $extension)

@@ -12,8 +12,8 @@ use Tests\PreventSavingStacheItemsToDisk;
 
 class RecursiveNodesTest extends ParserTestCase
 {
-    use PreventSavingStacheItemsToDisk,
-        FakesViews;
+    use FakesViews,
+        PreventSavingStacheItemsToDisk;
 
     private function makeNavTree()
     {
@@ -1024,7 +1024,7 @@ EOT;
     {{ /children }}
 {{ /records }}
 EOT
-);
+        );
 
         // The parseNodes will throw an exception if it fails to parse correctly.
         // We will just assert true is true to shut up the risky assertions warning.
@@ -1435,5 +1435,359 @@ EOT;
         $this->assertStringContainsString('<li><a class="" href="leadership">Second: Leadership</a></li>', $result);
         $this->assertStringContainsString('<a href="projects">Second: Projects</a>', $result);
         $this->assertStringContainsString('<a href="contact">Second: Contact</a>', $result);
+    }
+
+    public function test_arbitrary_arrays_can_be_used_in_recursion()
+    {
+        $data = [
+            'parent_data' => [
+                'records' => [
+                    [
+                        'title' => 'One',
+                        'records' => [
+                            [
+                                'title' => 'Two',
+                                'records' => [
+                                    [
+                                        'title' => 'Three',
+                                        'records' => [
+                                            [
+                                                'title' => 'Four',
+                                                'records' => [
+                                                    [
+                                                        'title' => 'Five',
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $template = <<<'EOT'
+{{ parent_data }}
+    <ul class="parent">
+    {{ records }}
+        <li>
+            <span>{{ title }} -- {{ depth }}</span>
+            {{ if records }}
+                <ul class="depth-{{ depth }}">
+                    {{*recursive records*}}
+                </ul>
+            {{ /if }}
+        </li>
+    {{ /records }}
+    </ul>
+{{ /parent_data }}
+EOT;
+
+        $expected = <<<'EXP'
+<ul class="parent">
+    
+        <li>
+            <span>One -- 1</span>
+            
+                <ul class="depth-1">
+                    
+        <li>
+            <span>Two -- 2</span>
+            
+                <ul class="depth-2">
+                    
+        <li>
+            <span>Three -- 3</span>
+            
+                <ul class="depth-3">
+                    
+        <li>
+            <span>Four -- 4</span>
+            
+                <ul class="depth-4">
+                    
+        <li>
+            <span>Five -- 5</span>
+            
+        </li>
+    
+                </ul>
+            
+        </li>
+    
+                </ul>
+            
+        </li>
+    
+                </ul>
+            
+        </li>
+    
+                </ul>
+            
+        </li>
+    
+    </ul>
+EXP;
+
+        $result = trim($this->renderString($template, $data));
+
+        $this->assertSame($expected, $result);
+    }
+
+    public function testRecursiveNavigationWithCustomVariables()
+    {
+        // In this scenario, the custom variable should be
+        // updated and persisted after each iteration
+        // of the main nav loop. The value should
+        // be the same at all recursive levels.
+        $this->makeNavTree();
+
+        $template = <<<'EOT'
+{{ _custom_var = 'a' /}}
+{{ nav handle="main" }}
+
+DEPTH {{ depth }}
+TITLE {{ title }}
+VAR {{ _custom_var }}
+
+    {{ if children }}
+        CHILDREN
+        {{ *recursive children* }}
+        END_CHILDREN
+    {{ /if }}
+{{ _custom_var += "a" }}
+====
+{{ /nav }}
+AFTER: {{ _custom_var}}
+EOT;
+
+        $expected = <<<'EXPECTED'
+DEPTH 1
+TITLE Home
+VAR a
+
+    
+
+====
+
+
+DEPTH 1
+TITLE About
+VAR aa
+
+    
+        CHILDREN
+        
+
+DEPTH 2
+TITLE Team
+VAR aa
+
+    
+
+====
+
+
+DEPTH 2
+TITLE Leadership
+VAR aa
+
+    
+
+====
+
+        END_CHILDREN
+    
+
+====
+
+
+DEPTH 1
+TITLE Projects
+VAR aaa
+
+    
+        CHILDREN
+        
+
+DEPTH 2
+TITLE Project-1
+VAR aaa
+
+    
+
+====
+
+
+DEPTH 2
+TITLE Project-2
+VAR aaa
+
+    
+        CHILDREN
+        
+
+DEPTH 3
+TITLE Project 2 Nested
+VAR aaaa
+
+    
+
+====
+
+        END_CHILDREN
+    
+
+====
+
+        END_CHILDREN
+    
+
+====
+
+
+DEPTH 1
+TITLE Contact
+VAR aaaa
+
+    
+
+====
+
+AFTER: aaaaa
+EXPECTED;
+
+        $this->assertSame(
+            StringUtilities::normalizeLineEndings($expected),
+            StringUtilities::normalizeLineEndings(trim($this->renderString($template, [], true)))
+        );
+    }
+
+    public function testRecursiveNavigationWithCustomVariablesBeforeChildLoop()
+    {
+        // In this scenario, the custom variable is updated before
+        // the child loop, and will be different at each level
+        // of recursion. The value will be the same for the
+        // last child of the current recursive level and
+        // the beginning of the next recursive loop.
+        $this->makeNavTree();
+
+        $template = <<<'EOT'
+{{ _custom_var = 'a' /}}
+{{ nav handle="main" }}
+
+DEPTH {{ depth }}
+TITLE {{ title }}
+VAR {{ _custom_var }}
+
+    {{ if children }}
+        CHILDREN
+        {{ _custom_var += "a" }}
+        {{ *recursive children* }}
+        END_CHILDREN
+    {{ /if }}
+====
+{{ /nav }}
+AFTER: {{ _custom_var}}
+EOT;
+
+        $expected = <<<'EXPECTED'
+DEPTH 1
+TITLE Home
+VAR a
+
+    
+====
+
+
+DEPTH 1
+TITLE About
+VAR a
+
+    
+        CHILDREN
+        
+        
+
+DEPTH 2
+TITLE Team
+VAR aa
+
+    
+====
+
+
+DEPTH 2
+TITLE Leadership
+VAR aa
+
+    
+====
+
+        END_CHILDREN
+    
+====
+
+
+DEPTH 1
+TITLE Projects
+VAR aa
+
+    
+        CHILDREN
+        
+        
+
+DEPTH 2
+TITLE Project-1
+VAR aaa
+
+    
+====
+
+
+DEPTH 2
+TITLE Project-2
+VAR aaa
+
+    
+        CHILDREN
+        
+        
+
+DEPTH 3
+TITLE Project 2 Nested
+VAR aaaa
+
+    
+====
+
+        END_CHILDREN
+    
+====
+
+        END_CHILDREN
+    
+====
+
+
+DEPTH 1
+TITLE Contact
+VAR aaaa
+
+    
+====
+
+AFTER: aaaa
+EXPECTED;
+
+        $this->assertSame(
+            StringUtilities::normalizeLineEndings($expected),
+            StringUtilities::normalizeLineEndings(trim($this->renderString($template, [], true)))
+        );
     }
 }

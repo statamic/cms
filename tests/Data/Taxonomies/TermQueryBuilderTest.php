@@ -20,14 +20,31 @@ class TermQueryBuilderTest extends TestCase
     /** @test */
     public function it_gets_terms()
     {
-        Taxonomy::make('tags')->save();
-        Term::make('a')->taxonomy('tags')->data([])->save();
-        Term::make('b')->taxonomy('tags')->data([])->save();
-        Term::make('c')->taxonomy('tags')->data([])->save();
+        Site::setConfig(['sites' => [
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
+        ]]);
+
+        Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+        Term::make('a')->taxonomy('tags')->dataForLocale('en', ['title' => 'Alfa'])->dataForLocale('fr', ['title' => 'Le Alfa'])->save();
+        Term::make('b')->taxonomy('tags')->dataForLocale('en', ['title' => 'Bravo'])->dataForLocale('fr', ['title' => 'Le Bravo'])->save();
+        Term::make('c')->taxonomy('tags')->dataForLocale('en', ['title' => 'Charlie'])->save(); // intentionally no french translation
 
         $terms = Term::query()->get();
         $this->assertInstanceOf(TermCollection::class, $terms);
+        $this->assertCount(6, $terms);
         $this->assertEveryItemIsInstanceOf(LocalizedTerm::class, $terms);
+        $this->assertEquals([
+            'en Alfa',
+            'fr Le Alfa',
+            'en Bravo',
+            'fr Le Bravo',
+            'en Charlie',
+            'fr Charlie', // term still exists in fr site, just not translated
+        ], $terms
+            ->sortBy->slug()
+            ->map(fn ($t) => $t->locale().' '.$t->title())
+            ->values()->all());
     }
 
     /** @test */
@@ -187,6 +204,9 @@ class TermQueryBuilderTest extends TestCase
 
         $terms = Term::query()->orderBy('test')->get();
         $this->assertEquals(['c', 'b', 'e', 'a', 'd'], $terms->map->slug()->all());
+
+        $terms = Term::query()->orderByDesc('test')->get();
+        $this->assertEquals(['d', 'a', 'e', 'b', 'c'], $terms->map->slug()->all());
     }
 
     /** @test **/
@@ -558,13 +578,13 @@ class TermQueryBuilderTest extends TestCase
         Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
         Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
         Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
-        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4', 'taxonomy-5']])->save();
         Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
 
-        $entries = Term::query()->whereJsonLength('test_taxonomy', 1)->get();
+        $entries = Term::query()->whereJsonLength('test_taxonomy', 1)->orWhereJsonLength('test_taxonomy', 3)->get();
 
-        $this->assertCount(2, $entries);
-        $this->assertEquals(['2', '5'], $entries->map->slug()->all());
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['2', '5', '4'], $entries->map->slug()->all());
     }
 
     /** @test */

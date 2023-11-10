@@ -7,11 +7,14 @@ use Facades\Statamic\Assets\Attributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
+use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
@@ -28,25 +31,29 @@ use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
+use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues
+class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
-    TracksQueriedRelations,
-    ContainsData {
-        set as traitSet;
-        get as traitGet;
-        remove as traitRemove;
-        data as traitData;
-        merge as traitMerge;
+    use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance,
+        Searchable,
+        TracksQueriedColumns, TracksQueriedRelations {
+            set as traitSet;
+            get as traitGet;
+            remove as traitRemove;
+            data as traitData;
+            merge as traitMerge;
+        }
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
     }
 
     protected $container;
@@ -518,6 +525,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Get the file download url.
+     *
+     * @return string
+     */
+    public function cpDownloadUrl()
+    {
+        return cp_route('assets.download', base64_encode($this->id()));
+    }
+
+    /**
      * Get the file extension of the asset.
      *
      * @return string
@@ -678,7 +695,7 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
      */
     public function move($folder, $filename = null)
     {
-        $filename = $this->getSafeFilename($filename ?: $this->filename());
+        $filename = Uploader::getSafeFilename($filename ?: $this->filename());
         $oldPath = $this->path();
         $oldMetaPath = $this->metaPath();
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.'.'.pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
@@ -692,12 +709,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $this->path($newPath);
         $this->save();
 
-        $isFlysystemV1 = method_exists($this->disk()->filesystem()->getDriver(), 'getTimestamp');
-
-        if ($isFlysystemV1) {
-            $this->disk()->delete($this->metaPath());
-        }
-
         $this->disk()->rename($oldMetaPath, $this->metaPath());
 
         return $this;
@@ -706,7 +717,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     /**
      * Replace an asset and/or its references where necessary.
      *
-     * @param  Asset  $originalAsset
      * @param  bool  $deleteOriginal
      * @return $this
      */
@@ -797,8 +807,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
     /**
      * Get the asset's ratio.
-     *
-     * @return
      */
     public function ratio()
     {
@@ -839,34 +847,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     /**
      * Upload a file.
      *
-     * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
      * @return $this
      */
     public function upload(UploadedFile $file)
     {
-        $ext = $file->getClientOriginalExtension();
-        $filename = $this->getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $path = Uploader::asset($this)->upload($file);
 
-        $directory = $this->folder();
-        $directory = ($directory === '.') ? '/' : $directory;
-        $path = Path::tidy($directory.'/'.$filename.'.'.$ext);
-        $path = ltrim($path, '/');
-
-        // If the file exists, we'll append a timestamp to prevent overwriting.
-        if ($this->disk()->exists($path)) {
-            $basename = $filename.'-'.Carbon::now()->timestamp.'.'.$ext;
-            $path = Str::removeLeft(Path::assemble($directory, $basename), '/');
-        }
-
-        $stream = fopen($file->getRealPath(), 'r');
-        $this->disk()->put($path, $stream);
-        if (is_resource($stream)) {
-            fclose($stream);
-        }
-
-        $this->path($path)->syncOriginal();
-
-        $this->save();
+        $this
+            ->path($path)
+            ->syncOriginal()
+            ->save();
 
         AssetUploaded::dispatch($this);
 
@@ -907,32 +897,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     public function stream()
     {
         return $this->disk()->filesystem()->readStream($this->path());
-    }
-
-    /**
-     * Ensure safe filename string.
-     *
-     * @param  string  $string
-     * @return string
-     */
-    private function getSafeFilename($string)
-    {
-        $replacements = [
-            ' ' => '-',
-            '#' => '-',
-        ];
-
-        $str = Stringy::create(urldecode($string))->toAscii();
-
-        foreach ($replacements as $from => $to) {
-            $str = $str->replace($from, $to);
-        }
-
-        if (config('statamic.assets.lowercase')) {
-            $str = strtolower($str);
-        }
-
-        return (string) $str;
     }
 
     /**
@@ -1065,5 +1029,23 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    public function getCpSearchResultBadge(): string
+    {
+        return $this->container()->title();
+    }
+
+    public function warmPresets()
+    {
+        if (! $this->isImage()) {
+            return [];
+        }
+
+        $cpPresets = config('statamic.cp.enabled') ? [
+            'cp_thumbnail_small_'.$this->orientation(),
+        ] : [];
+
+        return array_merge($this->container->warmPresets(), $cpPresets);
     }
 }

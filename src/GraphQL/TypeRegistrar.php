@@ -68,6 +68,7 @@ class TypeRegistrar
         TermInterface::addTypes();
         AssetInterface::addTypes();
         GlobalSetInterface::addTypes();
+        UserType::addTypes();
 
         $this->registered = true;
     }

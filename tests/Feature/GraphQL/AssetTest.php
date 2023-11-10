@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -15,8 +17,8 @@ use Tests\TestCase;
 /** @group graphql */
 class AssetTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['assets'];
 
@@ -27,12 +29,13 @@ class AssetTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
-    /**
-     * @test
-     * @environment-setup disableQueries
-     **/
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{asset}'])
@@ -40,7 +43,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    public function it_queries_an_asset_by_id()
+    public function it_cannot_query_against_non_allowed_sub_resource_with_container_arg()
     {
         Carbon::setTestNow(Carbon::parse('2012-01-02 5:00pm'));
         Storage::fake('test', ['url' => '/assets']);
@@ -52,6 +55,94 @@ class AssetTest extends TestCase
         $container->makeAsset('sub/image.jpg')->data(['potato' => 'baked'])->save();
         $blueprint = Blueprint::makeFromFields(['potato' => ['type' => 'text']]);
         BlueprintRepository::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
+
+        $query = <<<'GQL'
+{
+    asset(container: "test", path: "sub/image.jpg") {
+        id
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn([])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'container' => ['Forbidden: test'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'asset' => null,
+                ],
+            ]);
+    }
+
+    /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource_with_id_arg()
+    {
+        Carbon::setTestNow(Carbon::parse('2012-01-02 5:00pm'));
+        Storage::fake('test', ['url' => '/assets']);
+        $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
+        Storage::disk('test')->putFileAs('sub', $file, 'image.jpg');
+        $realFilePath = Storage::disk('test')->path('sub/image.jpg');
+        touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
+        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
+        $container->makeAsset('sub/image.jpg')->data(['potato' => 'baked'])->save();
+        $blueprint = Blueprint::makeFromFields(['potato' => ['type' => 'text']]);
+        BlueprintRepository::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
+
+        $query = <<<'GQL'
+{
+    asset(id: "test::sub/image.jpg") {
+        id
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn([])->twice();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'container' => ['Forbidden: test'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'asset' => null,
+                ],
+            ]);
+    }
+
+    /** @test */
+    public function it_queries_an_asset_by_id()
+    {
+        Carbon::setTestNow(Carbon::parse('2012-01-02 5:00pm'));
+        Storage::fake('test', ['url' => '/assets']);
+        $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
+        Storage::disk('test')->putFileAs('sub', $file, 'image.jpg');
+        $realFilePath = Storage::disk('test')->path('sub/image.jpg');
+        touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
+        $blueprint = Blueprint::makeFromFields(['potato' => ['type' => 'text']]);
+        BlueprintRepository::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
+        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
+        $container->makeAsset('sub/image.jpg')->data(['potato' => 'baked'])->save();
 
         $query = <<<'GQL'
 {
@@ -85,12 +176,17 @@ class AssetTest extends TestCase
         width
         orientation
         ratio
+        duration
         ... on Asset_Test {
             potato
         }
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(AssetContainer::all()->map->handle()->all())->twice();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()
@@ -125,6 +221,7 @@ GQL;
                     'orientation' => 'portrait',
                     'ratio' => 0.5,
                     'potato' => 'baked',
+                    'duration' => null,
                 ],
             ]]);
     }
@@ -145,6 +242,10 @@ GQL;
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'assets')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'assets')->andReturn(AssetContainer::all()->map->handle()->all())->twice();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()
@@ -297,5 +398,59 @@ GQL;
             ->assertJson(['errors' => [[
                 'message' => 'Cannot query field "one" on type "AssetInterface". Did you mean to use an inline fragment on "Asset_Test"?',
             ]]]);
+    }
+
+    /** @test */
+    public function it_resolves_query_builders()
+    {
+        config(['app.debug' => true]);
+        BlueprintRepository::partialMock();
+
+        $blueprint = Blueprint::makeFromFields([])->setHandle('test');
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
+        EntryFactory::collection('test')->id('bravo')->data(['title' => 'Bravo'])->create();
+        EntryFactory::collection('test')->id('charlie')->data(['title' => 'Charlie'])->create();
+
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']])->setHandle('tags');
+        BlueprintRepository::shouldReceive('find')->with('assets/test')->andReturn($blueprint);
+
+        Storage::fake('test', ['url' => '/assets']);
+        Storage::disk('test')->put('a.txt', '');
+        tap($container = AssetContainer::make('test')->disk('test')->title('Test'))->save();
+        $container->makeAsset('a.txt')->data(['entries_field' => ['bravo', 'charlie']])->save();
+
+        $query = <<<'GQL'
+{
+    asset(id: "test::a.txt") {
+        path
+        ... on Asset_Test {
+            entries_field {
+                id
+                title
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'asset' => [
+                    'path' => 'a.txt',
+                    'entries_field' => [
+                        [
+                            'id' => 'bravo',
+                            'title' => 'Bravo',
+                        ],
+                        [
+                            'id' => 'charlie',
+                            'title' => 'Charlie',
+                        ],
+                    ],
+                ],
+            ]]);
     }
 }

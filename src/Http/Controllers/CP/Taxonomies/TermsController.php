@@ -42,13 +42,19 @@ class TermsController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $terms = $query->paginate(request('perPage'));
+        $paginator = $query->paginate(request('perPage'));
 
-        $terms->setCollection(
-            $terms->getCollection()->map->in(Site::selected()->handle())
-        );
+        $terms = $paginator->getCollection();
 
-        return (new Terms($terms))
+        if (request('search') && $taxonomy->hasSearchIndex()) {
+            $terms = $terms->map->getSearchable();
+        }
+
+        $terms = $terms->map->in(Site::selected()->handle());
+
+        $paginator->setCollection($terms);
+
+        return (new Terms($paginator))
             ->blueprint($taxonomy->termBlueprint())
             ->columnPreferenceKey("taxonomies.{$taxonomy->handle()}.columns")
             ->additional(['meta' => [
@@ -113,7 +119,7 @@ class TermsController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'permalink' => $term->absoluteUrl(),
-            'localizations' => $taxonomy->sites()->map(function ($handle) use ($term) {
+            'localizations' => $this->getAuthorizedSitesForTaxonomy($taxonomy)->map(function ($handle) use ($term) {
                 $localized = $term->in($handle);
 
                 return [
@@ -197,7 +203,7 @@ class TermsController extends CpController
 
     public function create(Request $request, $taxonomy, $site)
     {
-        $this->authorize('create', [TermContract::class, $taxonomy]);
+        $this->authorize('create', [TermContract::class, $taxonomy, $site]);
 
         $blueprint = $taxonomy->termBlueprint($request->blueprint);
 
@@ -226,7 +232,7 @@ class TermsController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $taxonomy->defaultPublishState(),
             'locale' => $site->handle(),
-            'localizations' => $taxonomy->sites()->map(function ($handle) use ($taxonomy, $site) {
+            'localizations' => $this->getAuthorizedSitesForTaxonomy($taxonomy)->map(function ($handle) use ($taxonomy, $site) {
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -236,7 +242,7 @@ class TermsController extends CpController
                     'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle]),
                     'livePreviewUrl' => cp_route('taxonomies.terms.preview.create', [$taxonomy->handle(), $handle]),
                 ];
-            })->all(),
+            })->values()->all(),
             'breadcrumbs' => $this->breadcrumbs($taxonomy),
             'previewTargets' => $taxonomy->previewTargets()->all(),
         ];
@@ -352,5 +358,12 @@ class TermsController extends CpController
                 'url' => $taxonomy->showUrl(),
             ],
         ]);
+    }
+
+    protected function getAuthorizedSitesForTaxonomy($taxonomy)
+    {
+        return $taxonomy
+            ->sites()
+            ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
     }
 }

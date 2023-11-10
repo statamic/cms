@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password as PasswordRules;
 use Illuminate\Validation\ValidationException;
-use Statamic\Auth\Passwords\PasswordDefaults;
 
 /**
  * A copy of Illuminate\Auth\ResetsPasswords.
@@ -28,7 +29,6 @@ trait ResetsPasswords
      *
      * If no token is present, display the link request form.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string|null  $token
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
@@ -42,12 +42,21 @@ trait ResetsPasswords
     /**
      * Reset the given user's password.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function reset(Request $request)
     {
-        $request->validate($this->rules(), $this->validationErrorMessages());
+        $validator = Validator::make($request->all(), $this->rules(), $this->validationErrorMessages());
+
+        if (! $validator->passes()) {
+            $redirect = $request->has('_error_redirect')
+                ? redirect($request->input('_error_redirect'))
+                : back();
+
+            return $redirect
+                ->withInput($request->only('email'))
+                ->withErrors($validator->errors());
+        }
 
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
@@ -76,7 +85,7 @@ trait ResetsPasswords
         return [
             'token' => 'required',
             'email' => ['required', 'email'],
-            'password' => ['required', 'confirmed', PasswordDefaults::rules()],
+            'password' => ['required', 'confirmed', PasswordRules::default()],
         ];
     }
 
@@ -93,7 +102,6 @@ trait ResetsPasswords
     /**
      * Get the password reset credentials from the request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     protected function credentials(Request $request)
@@ -138,7 +146,6 @@ trait ResetsPasswords
     /**
      * Get the response for a successful password reset.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string  $response
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
@@ -149,13 +156,12 @@ trait ResetsPasswords
         }
 
         return redirect($this->redirectPath())
-                            ->with('status', trans($response));
+            ->with('status', trans($response));
     }
 
     /**
      * Get the response for a failed password reset.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string  $response
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
@@ -167,9 +173,13 @@ trait ResetsPasswords
             ]);
         }
 
-        return redirect()->back()
-                    ->withInput($request->only('email'))
-                    ->withErrors(['email' => trans($response)]);
+        $redirect = $request->has('_error_redirect')
+            ? redirect($request->input('_error_redirect'))
+            : back();
+
+        return $redirect
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => trans($response)]);
     }
 
     /**

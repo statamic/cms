@@ -23,7 +23,7 @@ class LoginFormTest extends TestCase
         $output = $this->tag('{{ user:login_form }}{{ /user:login_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/login">', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
+        $this->assertStringContainsString(csrf_field(), $output);
         $this->assertStringEndsWith('</form>', $output);
     }
 

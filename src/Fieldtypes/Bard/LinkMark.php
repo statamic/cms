@@ -2,19 +2,55 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use ProseMirrorToHtml\Marks\Link;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Data;
+use Statamic\Facades\Site;
 use Statamic\Support\Str;
+use Tiptap\Marks\Link;
 
 class LinkMark extends Link
 {
-    public function tag()
+    public function addOptions()
     {
-        $tag = parent::tag();
+        return [
+            'HTMLAttributes' => [
+                'rel' => '',
+                'target' => '_blank',
+            ],
+        ];
+    }
 
-        $tag[0]['attrs']['href'] = $this->convertHref($tag[0]['attrs']['href']);
+    public function addAttributes()
+    {
+        return [
+            'href' => [
+                'renderHTML' => function ($attributes) {
+                    $href = $attributes->href;
+                    if (! isset($href)) {
+                        return null;
+                    }
 
-        return $tag;
+                    return [
+                        'href' => $this->convertHref($href) ?? '',
+                    ];
+                },
+            ],
+            'target' => [
+                'renderHTML' => function ($attributes) {
+                    return [
+                        'target' => $attributes->target ?? '',
+                    ];
+                },
+            ],
+            'title' => [],
+            'rel' => [
+                'renderHTML' => function ($attributes) {
+                    return [
+                        'rel' => $attributes->rel ?? '',
+                    ];
+                },
+            ],
+        ];
     }
 
     protected function convertHref($href)
@@ -27,6 +63,10 @@ class LinkMark extends Link
 
         if (! $item = Data::find($ref)) {
             return '';
+        }
+
+        if ($item instanceof Entry) {
+            return ($item->in(Site::current()->handle()) ?? $item)->url();
         }
 
         return $item->url();

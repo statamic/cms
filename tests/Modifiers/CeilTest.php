@@ -24,6 +24,7 @@ class CeilTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider numbersPool
      */
     public function it_rounds_a_number_up_to_next_whole_number($expected, $input): void

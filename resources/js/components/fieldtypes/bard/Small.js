@@ -1,26 +1,33 @@
-import { Mark } from 'tiptap'
-import { toggleMark } from 'tiptap-commands'
+import { Mark, mergeAttributes } from '@tiptap/core';
 
-export default class Small extends Mark {
+export const Small = Mark.create({
 
-    get name() {
-        return 'small'
-    }
+    name: 'small',
 
-    get schema() {
+    addOptions() {
         return {
-            parseDOM: [
-                {
-                    tag: 'small',
-                },
-            ],
-            toDOM: () => ['small', 0],
+            HTMLAttributes: {},
         }
-    }
+    },
 
-    commands({ type }) {
-        // console.log(type);
-        return () => toggleMark(type)
-    }
+    parseHTML() {
+        return [
+            {
+                tag: 'small',
+            }
+        ]
+    },
 
-}
+    renderHTML({ HTMLAttributes }) {
+        return ['small', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0]
+    },
+
+    addCommands() {
+        return {
+            toggleSmall: () => ({ commands }) => {
+                return commands.toggleMark(this.name)
+            },
+        }
+    },
+
+})

@@ -8,6 +8,7 @@ use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Permission;
+use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Utility;
 
@@ -18,7 +19,13 @@ class CorePermissions
         $this->group('cp', function () {
             $this->register('access cp');
             $this->register('configure fields');
+            $this->register('configure form fields');
             $this->register('configure addons');
+            $this->register('manage preferences');
+        });
+
+        $this->group('sites', function () {
+            $this->registerSites();
         });
 
         $this->group('collections', function () {
@@ -59,6 +66,21 @@ class CorePermissions
 
         $this->register('resolve duplicate ids');
         $this->register('view graphql');
+    }
+
+    protected function registerSites()
+    {
+        if (! Site::hasMultiple()) {
+            return;
+        }
+
+        $this->register('access {site} site', function ($permission) {
+            $permission->replacements('site', function () {
+                return Site::all()->map(function ($site) {
+                    return ['value' => $site->handle(), 'label' => $site->name().' ('.$site->handle().')', 'handle' => $site->handle()];
+                });
+            });
+        });
     }
 
     protected function registerCollections()
@@ -153,11 +175,7 @@ class CorePermissions
 
     protected function registerUpdates()
     {
-        $this->register('view updates', function ($permission) {
-            $this->permission($permission)->children([
-                $this->permission('perform updates'),
-            ]);
-        });
+        $this->register('view updates');
     }
 
     protected function registerUsers()
@@ -176,6 +194,7 @@ class CorePermissions
 
         $this->register('edit user groups');
         $this->register('edit roles');
+        $this->register('impersonate users');
     }
 
     protected function registerForms()

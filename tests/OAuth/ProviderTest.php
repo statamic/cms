@@ -11,6 +11,8 @@ class ProviderTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private $tempDir;
+
     public function setUp(): void
     {
         parent::setUp();

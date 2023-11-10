@@ -130,7 +130,7 @@ export default {
                 if (this.shouldRequestFirstPage) return this.request();
                 this.loading = false;
                 this.initializing = false;
-                this.afterRequestCompleted();
+                this.afterRequestCompleted(response);
             }).catch(e => {
                 if (this.$axios.isCancel(e)) return;
                 this.loading = false;

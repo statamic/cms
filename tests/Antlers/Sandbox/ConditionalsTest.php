@@ -136,4 +136,13 @@ EOT;
         ]);
         $this->assertSame('inner truth', $result);
     }
+
+    public function test_numeric_values_inside_conditions()
+    {
+        $this->assertSame('Yes', $this->renderString('{{ if -1 }}Yes{{ else }}No{{ /if }}'));
+        $this->assertSame('Yes', $this->renderString('{{ if 1 }}Yes{{ else }}No{{ /if }}'));
+        $this->assertSame('Yes', $this->renderString('{{ if 1.0 }}Yes{{ else }}No{{ /if }}'));
+        $this->assertSame('No', $this->renderString('{{ if 0 }}Yes{{ else }}No{{ /if }}'));
+        $this->assertSame('No', $this->renderString('{{ if 0.0 }}Yes{{ else }}No{{ /if }}'));
+    }
 }

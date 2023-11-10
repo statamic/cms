@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Rebing\GraphQL\Support\Contracts\ConfigConvertible;
 use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Middleware\CacheResponse;
@@ -63,8 +64,8 @@ class DefaultSchema implements ConfigConvertible
             'forms' => [FormsQuery::class, FormQuery::class],
             'sites' => [SitesQuery::class],
             'users' => [UsersQuery::class, UserQuery::class],
-        ])->each(function ($qs, $key) use (&$queries) {
-            $queries = $queries->merge(config('statamic.graphql.resources.'.$key) ? $qs : []);
+        ])->each(function ($qs, $resource) use (&$queries) {
+            $queries = $queries->merge(ResourceAuthorizer::isAllowed('graphql', $resource) ? $qs : []);
         });
 
         return $queries

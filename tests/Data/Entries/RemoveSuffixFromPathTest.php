@@ -9,6 +9,7 @@ class RemoveSuffixFromPathTest extends TestCase
 {
     /**
      * @test
+     *
      * @dataProvider paths
      **/
     public function it_removes_the_suffix_from_a_path($expected, $path)

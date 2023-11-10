@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
@@ -49,6 +48,10 @@ class EntriesController extends CpController
 
         $entries = $query->paginate(request('perPage'));
 
+        if (request('search') && $collection->hasSearchIndex()) {
+            $entries->setCollection($entries->getCollection()->map->getSearchable());
+        }
+
         return (new Entries($entries))
             ->blueprint($collection->entryBlueprint())
             ->columnPreferenceKey("collections.{$collection->handle()}.columns")
@@ -67,6 +70,10 @@ class EntriesController extends CpController
             }
 
             $query->where('title', 'like', '%'.$search.'%');
+        }
+
+        if (Site::hasMultiple()) {
+            $query->whereIn('site', Site::authorized()->map->handle()->all());
         }
 
         return $query;
@@ -123,7 +130,7 @@ class EntriesController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'permalink' => $entry->absoluteUrl(),
-            'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
+            'localizations' => $this->getAuthorizedSitesForCollection($collection)->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
 
@@ -139,13 +146,14 @@ class EntriesController extends CpController
                     'url' => $exists ? $localized->editUrl() : null,
                     'livePreviewUrl' => $exists ? $localized->livePreviewUrl() : null,
                 ];
-            })->all(),
+            })->values()->all(),
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish', $entry),
             'previewTargets' => $collection->previewTargets()->all(),
+            'autosaveInterval' => $collection->autosaveInterval(),
         ];
 
         if ($request->wantsJson()) {
@@ -198,16 +206,16 @@ class EntriesController extends CpController
             $entry->blueprint($explicitBlueprint);
         }
 
-        $values = $values->except(['slug', 'date', 'published']);
+        $values = $values->except(['slug', 'published']);
+
+        if ($entry->collection()->dated()) {
+            $entry->date($entry->blueprint()->field('date')->fieldtype()->augment($values->pull('date')));
+        }
 
         if ($entry->hasOrigin()) {
             $entry->data($values->only($request->input('_localized')));
         } else {
             $entry->merge($values);
-        }
-
-        if ($entry->collection()->dated()) {
-            $entry->date($this->toCarbonInstanceForSaving($request->date));
         }
 
         $entry->slug($this->resolveSlug($request));
@@ -220,7 +228,7 @@ class EntriesController extends CpController
             $this->validateParent($entry, $tree, $parent);
 
             $entry->afterSave(function ($entry) use ($parent, $tree) {
-                if ($parent && optional($tree->page($parent))->isRoot()) {
+                if ($parent && optional($tree->find($parent))->isRoot()) {
                     $parent = null;
                 }
 
@@ -257,7 +265,7 @@ class EntriesController extends CpController
 
     public function create(Request $request, $collection, $site)
     {
-        $this->authorize('create', [EntryContract::class, $collection]);
+        $this->authorize('create', [EntryContract::class, $collection, $site]);
 
         $blueprint = $collection->entryBlueprint($request->blueprint);
 
@@ -286,10 +294,6 @@ class EntriesController extends CpController
             'published' => $collection->defaultPublishState(),
         ])->merge($fields->values());
 
-        if ($collection->dated()) {
-            $values['date'] = substr(now()->toDateTimeString(), 0, 10);
-        }
-
         $viewData = [
             'title' => $collection->createLabel(),
             'actions' => [
@@ -303,7 +307,7 @@ class EntriesController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
-            'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site, $blueprint) {
+            'localizations' => $this->getAuthorizedSitesForCollection($collection)->map(function ($handle) use ($collection, $site, $blueprint) {
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -313,11 +317,12 @@ class EntriesController extends CpController
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle, 'blueprint' => $blueprint->handle()]),
                     'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
                 ];
-            })->all(),
+            })->values()->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
             'previewTargets' => $collection->previewTargets()->all(),
+            'autosaveInterval' => $collection->autosaveInterval(),
         ];
 
         if ($request->wantsJson()) {
@@ -352,19 +357,20 @@ class EntriesController extends CpController
                 'site' => $site->handle(),
             ])->validate();
 
-        $values = $fields->process()->values()->except(['slug', 'date', 'blueprint', 'published']);
+        $values = $fields->process()->values()->except(['slug', 'blueprint', 'published']);
 
         $entry = Entry::make()
             ->collection($collection)
             ->blueprint($request->_blueprint)
             ->locale($site->handle())
             ->published($request->get('published'))
-            ->slug($this->resolveSlug($request))
-            ->data($values);
+            ->slug($this->resolveSlug($request));
 
         if ($collection->dated()) {
-            $entry->date($this->toCarbonInstanceForSaving($request->date));
+            $entry->date($blueprint->field('date')->fieldtype()->augment($values->pull('date')));
         }
+
+        $entry->data($values);
 
         if ($structure = $collection->structure()) {
             $tree = $structure->in($site->handle());
@@ -373,7 +379,7 @@ class EntriesController extends CpController
         if ($structure && ! $collection->orderable()) {
             $parent = $values['parent'] ?? null;
             $entry->afterSave(function ($entry) use ($parent, $tree) {
-                if ($parent && optional($tree->page($parent))->isRoot()) {
+                if ($parent && optional($tree->find($parent))->isRoot()) {
                     $parent = null;
                 }
 
@@ -403,7 +409,7 @@ class EntriesController extends CpController
             }
 
             if ($entry->blueprint()->hasField('slug')) {
-                return Str::slug($request->title ?? $entry->autoGeneratedTitle());
+                return Str::slug($request->title ?? $entry->autoGeneratedTitle(), '-', $entry->site()->lang());
             }
 
             return null;
@@ -440,7 +446,7 @@ class EntriesController extends CpController
         }
 
         if ($entry->collection()->dated()) {
-            $datetime = substr($entry->date()->toDateTimeString(), 0, 16);
+            $datetime = substr($entry->date()->toDateTimeString(), 0, 19);
             $datetime = ($entry->hasTime()) ? $datetime : substr($datetime, 0, 10);
             $values['date'] = $datetime;
         }
@@ -477,12 +483,6 @@ class EntriesController extends CpController
             })
             ->filter()
             ->values();
-    }
-
-    protected function toCarbonInstanceForSaving($date): Carbon
-    {
-        // Since assume `Y-m-d ...` format, we can use `parse` here.
-        return Carbon::parse($date);
     }
 
     private function validateParent($entry, $tree, $parent)
@@ -531,7 +531,7 @@ class EntriesController extends CpController
             return $entry->uri();
         }
 
-        $parent = $parent ? $tree->page($parent) : null;
+        $parent = $parent ? $tree->find($parent) : null;
 
         return app(\Statamic\Contracts\Routing\UrlBuilder::class)
             ->content($entry)
@@ -556,5 +556,12 @@ class EntriesController extends CpController
                 'url' => $collection->showUrl(),
             ],
         ]);
+    }
+
+    protected function getAuthorizedSitesForCollection($collection)
+    {
+        return $collection
+            ->sites()
+            ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
     }
 }

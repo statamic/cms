@@ -14,8 +14,10 @@ use Tests\TestCase;
 
 class DuplicateAssetTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
+
+    private $container;
 
     public function setUp(): void
     {

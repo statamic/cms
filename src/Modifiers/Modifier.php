@@ -11,5 +11,5 @@ use Statamic\Extend\RegistersItself;
  */
 class Modifier
 {
-    use HasHandle, RegistersItself, HasAliases;
+    use HasAliases, HasHandle, RegistersItself;
 }

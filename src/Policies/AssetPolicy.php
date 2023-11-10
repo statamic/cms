@@ -62,4 +62,10 @@ class AssetPolicy
             && $this->store($user, $asset->container())
             && $this->delete($user, $asset);
     }
+
+    public function reupload($user, $asset)
+    {
+        return $this->edit($user, $asset)
+            && $this->store($user, $asset->container());
+    }
 }

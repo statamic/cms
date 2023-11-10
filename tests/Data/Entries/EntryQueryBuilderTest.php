@@ -117,6 +117,11 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertCount(3, $entries);
         $this->assertEquals(['Post 1', 'Post 2', 'Post 3'], $entries->map->title->all());
 
+        $entries = Entry::query()->whereMonth('test_date', 9)->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 4'], $entries->map->title->all());
+
         $entries = Entry::query()->whereMonth('test_date', '<', 11)->get();
 
         $this->assertCount(1, $entries);
@@ -449,13 +454,13 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->create();
         EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_taxonomy' => ['taxonomy-3']])->create();
         EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->create();
-        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4', 'taxonomy-5']])->create();
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
 
-        $entries = Entry::query()->whereJsonLength('test_taxonomy', 1)->get();
+        $entries = Entry::query()->whereJsonLength('test_taxonomy', 1)->orWhereJsonLength('test_taxonomy', 3)->get();
 
-        $this->assertCount(2, $entries);
-        $this->assertEquals(['Post 2', 'Post 5'], $entries->map->title->all());
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 2', 'Post 5', 'Post 4'], $entries->map->title->all());
     }
 
     /** @test **/
@@ -663,5 +668,73 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider likeProvider
+     */
+    public function entries_are_found_using_like($like, $expected)
+    {
+        Collection::make('posts')->save();
+
+        collect([
+            'on',
+            'only',
+            'foo',
+            'food',
+            'boo',
+            'foo bar',
+            'foo_bar',
+            'foodbar',
+            'hello world',
+            'waterworld',
+            'world of warcraft',
+            '20%',
+            '20% of the time',
+            '20 something',
+            'Pi is 3.14159',
+            'Pi is not 3x14159',
+            'Use a [4.x] prefix for PRs',
+            '/',
+            '/ test',
+            'test /',
+            'test / test',
+        ])->each(function ($val, $i) {
+            EntryFactory::id($i)
+                ->slug('post-'.$i)
+                ->collection('posts')
+                ->data(['title' => $val])
+                ->create();
+        });
+
+        $this->assertEquals($expected, Entry::query()->where('title', 'like', $like)->get()->map->title->all());
+    }
+
+    public function likeProvider()
+    {
+        return collect([
+            'foo' => ['foo'],
+            'foo%' => ['foo', 'food', 'foo bar', 'foo_bar', 'foodbar'],
+            '%world' => ['hello world', 'waterworld'],
+            '%world%' => ['hello world', 'waterworld', 'world of warcraft'],
+            '_oo' => ['foo', 'boo'],
+            'o_' => ['on'],
+            'foo_bar' => ['foo bar', 'foo_bar', 'foodbar'],
+            'foo__bar' => [],
+            'fo__bar' => ['foo bar', 'foo_bar', 'foodbar'],
+            'foo\_bar' => ['foo_bar'],
+            '20\%' => ['20%'],
+            '20\%%' => ['20%', '20% of the time'],
+            '%3.14%' => ['Pi is 3.14159'],
+            '%[4%' => ['Use a [4.x] prefix for PRs'],
+            '/' => ['/'],
+            '%/' => ['/', 'test /'],
+            '/%' => ['/', '/ test'],
+            '%/%' => ['/', '/ test', 'test /', 'test / test'],
+        ])->mapWithKeys(function ($expected, $like) {
+            return [$like => [$like, $expected]];
+        });
     }
 }

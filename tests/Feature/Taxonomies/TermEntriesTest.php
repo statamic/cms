@@ -107,15 +107,15 @@ class TermEntriesTest extends TestCase
         Taxonomy::make('colors')->save();
         tap(Term::make()->taxonomy('colors'), function ($term) {
             $term->in('en')->slug('red')->data(['hex' => 'f00'])->save();
-            $term->in('fr')->slug('rouge')->data([])->save();
+            $term->in('fr')->slug('rouge')->save();
         });
         tap(Term::make()->taxonomy('colors'), function ($term) {
             $term->in('en')->slug('black')->data(['hex' => '000'])->save();
-            $term->in('fr')->slug('noir')->data([])->save();
+            $term->in('fr')->slug('noir')->save();
         });
         tap(Term::make()->taxonomy('colors'), function ($term) {
             $term->in('en')->slug('yellow')->data(['hex' => 'ff0'])->save();
-            $term->in('fr')->slug('jaune')->data([])->save();
+            $term->in('fr')->slug('jaune')->save();
         });
 
         Collection::make('animals')->taxonomies(['colors'])->save();
@@ -171,15 +171,15 @@ class TermEntriesTest extends TestCase
         Taxonomy::make('colors')->save();
         tap(Term::make()->taxonomy('colors'), function ($term) {
             $term->in('en')->slug('red')->data(['hex' => 'f00'])->save();
-            $term->in('fr')->slug('rouge')->data([])->save();
+            $term->in('fr')->slug('rouge')->save();
         });
         tap(Term::make()->taxonomy('colors'), function ($term) {
             $term->in('en')->slug('black')->data(['hex' => '000'])->save();
-            $term->in('fr')->slug('noir')->data([])->save();
+            $term->in('fr')->slug('noir')->save();
         });
         tap(Term::make()->taxonomy('colors'), function ($term) {
             $term->in('en')->slug('yellow')->data(['hex' => 'ff0'])->save();
-            $term->in('fr')->slug('jaune')->data([])->save();
+            $term->in('fr')->slug('jaune')->save();
         });
 
         $animals = tap(Collection::make('animals')->taxonomies(['colors']))->save();

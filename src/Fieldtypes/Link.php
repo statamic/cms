@@ -7,9 +7,11 @@ use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\Support\Str;
 
 class Link extends Fieldtype
@@ -19,31 +21,34 @@ class Link extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'collections' => [
-                'display' => __('Collections'),
-                'instructions' => __('statamic::fieldtypes.link.config.collections'),
-                'type' => 'collections',
-                'mode' => 'select',
-            ],
-            'container' => [
-                'display' => __('Container'),
-                'instructions' => __('statamic::fieldtypes.link.config.container'),
-                'type' => 'asset_container',
-                'mode' => 'select',
-                'max_items' => 1,
+            [
+                'display' => __('Behavior'),
+                'fields' => [
+                    'collections' => [
+                        'display' => __('Collections'),
+                        'instructions' => __('statamic::fieldtypes.link.config.collections'),
+                        'type' => 'collections',
+                        'mode' => 'select',
+                    ],
+                    'container' => [
+                        'display' => __('Container'),
+                        'instructions' => __('statamic::fieldtypes.link.config.container'),
+                        'type' => 'asset_container',
+                        'mode' => 'select',
+                        'max_items' => 1,
+                    ],
+                ],
             ],
         ];
     }
 
     public function augment($value)
     {
-        if (! $value) {
-            return null;
-        }
-
-        $redirect = ResolveRedirect::resolve($value, $this->field->parent(), true);
-
-        return $redirect === 404 ? null : $redirect;
+        return new ArrayableLink(
+            $value
+                ? ResolveRedirect::item($value, $this->field->parent(), true)
+                : null
+        );
     }
 
     public function preload()
@@ -168,5 +173,21 @@ class Link extends Fieldtype
     private function showAssetOption()
     {
         return $this->config('container') !== null;
+    }
+
+    public function toGqlType()
+    {
+        return [
+            'type' => GraphQL::string(),
+            'resolve' => function ($item, $args, $context, $info) {
+                if (! $augmented = $item->resolveGqlValue($info->fieldName)) {
+                    return null;
+                }
+
+                $item = $augmented->value();
+
+                return is_object($item) ? $item->url() : $item;
+            },
+        ];
     }
 }

@@ -15,19 +15,20 @@ class GlideManager
     /**
      * Create glide server.
      *
+     * @param  array  $config  Config overrides
      * @return \League\Glide\Server
      */
-    public function server()
+    public function server(array $config = [])
     {
-        return ServerFactory::create([
-            'source'   => base_path(), // this gets overridden on the fly by the image generator
-            'cache'    => $this->cacheDisk()->getDriver(),
+        return ServerFactory::create(array_merge([
+            'source' => base_path(), // this gets overridden on the fly by the image generator
+            'cache' => $this->cacheDisk()->getDriver(),
             'response' => new LaravelResponseFactory(app('request')),
-            'driver'   => Config::get('statamic.assets.image_manipulation.driver'),
+            'driver' => Config::get('statamic.assets.image_manipulation.driver'),
             'cache_with_file_extensions' => true,
             'presets' => Image::manipulationPresets(),
             'watermarks' => public_path(),
-        ]);
+        ], $config));
     }
 
     public function cacheDisk()

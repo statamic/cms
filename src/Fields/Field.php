@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
+use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\GraphQL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -20,6 +21,7 @@ class Field implements Arrayable
     protected $parent;
     protected $parentField;
     protected $validationContext;
+    protected ?Form $form = null;
 
     public function __construct($handle, array $config)
     {
@@ -199,14 +201,6 @@ class Field implements Arrayable
         return ! in_array($this->get('listable'), [false, 'hidden'], true);
     }
 
-    /**
-     * @deprecated  Use isVisibleOnListing() instead.
-     */
-    public function isVisible()
-    {
-        return $this->isVisibleOnListing();
-    }
-
     public function isSortable()
     {
         if (is_null($this->get('sortable'))) {
@@ -247,20 +241,6 @@ class Field implements Arrayable
             'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
             'always_save' => $this->alwaysSave(),
         ]);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function toBlueprintArray()
-    {
-        return [
-            'handle' => $this->handle,
-            'type' => $this->type(),
-            'display' => $this->display(),
-            'instructions' => $this->instructions(),
-            'config' => array_except($this->preProcessedConfig(), 'type'),
-        ];
     }
 
     public function setValue($value)
@@ -430,5 +410,17 @@ class Field implements Arrayable
     public function isRelationship(): bool
     {
         return $this->fieldtype()->isRelationship();
+    }
+
+    public function setForm(Form $form)
+    {
+        $this->form = $form;
+
+        return $this;
+    }
+
+    public function form(): ?Form
+    {
+        return $this->form;
     }
 }

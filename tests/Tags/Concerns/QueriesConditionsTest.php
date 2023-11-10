@@ -4,6 +4,7 @@ namespace Tests\Tags\Concerns;
 
 use Illuminate\Support\Carbon;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Fields\LabeledValue;
 use Statamic\Query\Builder;
 use Statamic\Tags\Collection\Entries;
@@ -16,6 +17,8 @@ use Tests\TestCase;
 class QueriesConditionsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    private $collection;
 
     public function setUp(): void
     {
@@ -58,6 +61,16 @@ class QueriesConditionsTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_filter_by_is_condition_when_value_is_empty()
+    {
+        $this->makeEntry('a')->set('author', 'john-doe')->save();
+        $this->makeEntry('b')->set('author', 'david-hasselhoff')->save();
+        $this->makeEntry('c')->set('author', 'josiah-bartlet')->save();
+
+        $this->assertCount(3, $this->getEntries(['author:is' => '']));
+    }
+
+    /** @test */
     public function it_filters_by_not_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog')->save();
@@ -76,6 +89,16 @@ class QueriesConditionsTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_filter_by_not_condition_when_value_is_empty()
+    {
+        $this->makeEntry('a')->set('author', 'john-doe')->save();
+        $this->makeEntry('b')->set('author', 'david-hasselhoff')->save();
+        $this->makeEntry('c')->set('author', 'josiah-bartlet')->save();
+
+        $this->assertCount(3, $this->getEntries(['author:not' => '']));
+    }
+
+    /** @test */
     public function it_filters_by_contains_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
@@ -87,6 +110,16 @@ class QueriesConditionsTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_filter_by_contains_condition_when_value_is_empty()
+    {
+        $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
+        $this->makeEntry('cat')->set('title', 'Cat Fables')->save();
+        $this->makeEntry('tiger')->set('title', 'Tiger Tales')->save();
+
+        $this->assertCount(3, $this->getEntries(['title:contains' => '']));
+    }
+
+    /** @test */
     public function it_filters_by_doesnt_contain_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
@@ -95,6 +128,16 @@ class QueriesConditionsTest extends TestCase
 
         $this->assertCount(3, $this->getEntries());
         $this->assertCount(2, $this->getEntries(['title:doesnt_contain' => 'sto']));
+    }
+
+    /** @test */
+    public function it_does_not_filter_by_doesnt_contains_condition_when_value_is_empty()
+    {
+        $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
+        $this->makeEntry('cat')->set('title', 'Cat Fables')->save();
+        $this->makeEntry('tiger')->set('title', 'Tiger Tales')->save();
+
+        $this->assertCount(3, $this->getEntries(['title:doesnt_contain' => '']));
     }
 
     /** @test */
@@ -321,6 +364,9 @@ class QueriesConditionsTest extends TestCase
     public function it_filters_by_is_after_or_before_date_conditions()
     {
         $this->collection->dated(true)->save();
+        $blueprint = Blueprint::makeFromFields(['date' => ['type' => 'date', 'time_enabled' => true, 'time_seconds_enabled' => true]])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/test')->once()->andReturn(collect([$blueprint]));
+
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
 
         $this->makeEntry('a')->date('2019-03-09')->save(); // definitely in past
@@ -517,7 +563,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($value)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($value)
             {
@@ -550,7 +596,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($values)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($values)
             {
@@ -583,7 +629,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($values)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($values)
             {
@@ -610,7 +656,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($value)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($value)
             {
@@ -639,7 +685,7 @@ class QueriesConditionsTest extends TestCase
         $class = new class($value)
         {
             use QueriesConditions;
-            protected $parameters;
+            protected $params;
 
             public function __construct($value)
             {

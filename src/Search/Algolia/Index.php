@@ -15,11 +15,11 @@ class Index extends BaseIndex
 {
     protected $client;
 
-    public function __construct(SearchClient $client, $name, $config)
+    public function __construct(SearchClient $client, $name, $config, $locale)
     {
         $this->client = $client;
 
-        parent::__construct($name, $config);
+        parent::__construct($name, $config, $locale);
     }
 
     public function search($query)
@@ -44,7 +44,7 @@ class Index extends BaseIndex
 
     public function delete($document)
     {
-        $this->getIndex()->deleteObject($document->reference());
+        $this->getIndex()->deleteObject($document->getSearchReference());
     }
 
     public function deleteIndex()
@@ -89,9 +89,9 @@ class Index extends BaseIndex
 
     public function exists()
     {
-        return null !== collect($this->client->listIndices()['items'])->first(function ($index) {
+        return collect($this->client->listIndices()['items'])->first(function ($index) {
             return $index['name'] == $this->name;
-        });
+        }) !== null;
     }
 
     private function handleAlgoliaException($e)

@@ -9,16 +9,18 @@
                     :class="{ 'bg-white': !isReadOnly }"
                     :id="fieldId"
                     :readonly="isReadOnly"
-                    :placeholder="config.placeholder || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
+                    :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
                     @focus="$emit('focus')"
                     @blur="$emit('blur')" />
             </div>
         </div>
 
         <div class="video-preview-wrapper" v-if="isEmbeddable || isVideo">
-            <div class="video-preview">
-                <iframe v-if="isEmbeddable && canShowIframe" width="560" height="315" :src="embed" frameborder="0" allow="fullscreen"></iframe>
-                <video controls v-if="isVideo" :src="embed" width="560" height="315"></video>
+            <div class="embed-video" v-if="isEmbeddable && canShowIframe">
+                <iframe :src="embedUrl" frameborder="0" allow="fullscreen"></iframe>
+            </div>
+            <div class="native-video" v-else-if="isVideo">
+                <video controls :src="embedUrl"></video>
             </div>
         </div>
     </div>
@@ -54,7 +56,7 @@ export default {
     },
 
     computed: {
-        embed() {
+        embedUrl() {
             let embed_url = this.data;
 
             if (embed_url.includes('youtube')) {
@@ -69,6 +71,10 @@ export default {
 
             if (embed_url.includes('vimeo')) {
                 embed_url = embed_url.replace('/vimeo.com', '/player.vimeo.com/video');
+                if (embed_url.split('/').length > 5) {
+                    let hash = embed_url.substr(embed_url.lastIndexOf('/') + 1);
+                    embed_url = embed_url.substr(0, embed_url.lastIndexOf('/')) + '?h=' + hash.replace('?', '&');
+                }
             }
 
             // Make sure additional query parameters are included.

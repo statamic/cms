@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Facades\Pattern;
 
 abstract class Builder implements Contract
 {
@@ -71,6 +72,11 @@ abstract class Builder implements Contract
         $this->orderBys[] = new OrderBy($column, $direction);
 
         return $this;
+    }
+
+    public function orderByDesc($column)
+    {
+        return $this->orderBy($column, 'desc');
     }
 
     abstract public function inRandomOrder();
@@ -150,13 +156,15 @@ abstract class Builder implements Contract
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
+        $loweredOperator = strtolower($operator);
+
         if ($useDefault) {
             return [$operator, '='];
-        } elseif ($this->invalidOperatorAndValue($operator, $value)) {
+        } elseif ($this->invalidOperatorAndValue($loweredOperator, $value)) {
             throw new InvalidArgumentException('Illegal operator and value combination.');
         }
 
-        return [$value, $operator];
+        return [$value, $loweredOperator];
     }
 
     protected function invalidOperatorAndValue($operator, $value)
@@ -271,9 +279,9 @@ abstract class Builder implements Contract
         return $this;
     }
 
-    public function orWhereJsonLength($column, $operator, $value)
+    public function orWhereJsonLength($column, $operator, $value = null)
     {
-        return $this->whereJsonLength($column, $operator, $value = null, 'or');
+        return $this->whereJsonLength($column, $operator, $value, 'or');
     }
 
     public function whereNull($column, $boolean = 'and', $not = false)
@@ -622,13 +630,13 @@ abstract class Builder implements Contract
 
     protected function filterTestLike($item, $like)
     {
-        $pattern = '/^'.str_replace(['%', '_'], ['.*', '.'], preg_quote($like, '/')).'$/im';
-
         if (is_array($item)) {
             $item = json_encode($item);
         }
 
-        return preg_match($pattern, (string) $item);
+        $pattern = Pattern::sqlLikeToRegex($like);
+
+        return preg_match('/'.$pattern.'/im', (string) $item);
     }
 
     protected function filterTestNotLike($item, $like)

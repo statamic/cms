@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class PasswordFormTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk, NormalizesHtml;
+    use NormalizesHtml, PreventSavingStacheItemsToDisk;
 
     private function tag($tag)
     {
@@ -25,7 +25,7 @@ class PasswordFormTest extends TestCase
         $output = $this->tag('{{ user:password_form }}{{ /user:password_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/password">', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
+        $this->assertStringContainsString(csrf_field(), $output);
         $this->assertStringEndsWith('</form>', $output);
     }
 
@@ -67,7 +67,7 @@ class PasswordFormTest extends TestCase
     {{ /fields }}
 {{ /user:password_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 

@@ -8,10 +8,14 @@ use Statamic\Globals\GlobalCollection;
 use Statamic\Stache\Repositories\GlobalRepository;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\GlobalsStore;
+use Statamic\Stache\Stores\GlobalVariablesStore;
 use Tests\TestCase;
 
 class GlobalRepositoryTest extends TestCase
 {
+    private $directory;
+    private $repo;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -20,6 +24,7 @@ class GlobalRepositoryTest extends TestCase
         $this->app->instance(Stache::class, $stache);
         $this->directory = __DIR__.'/../__fixtures__/content/globals';
         $stache->registerStore((new GlobalsStore($stache, app('files')))->directory($this->directory));
+        $stache->registerStore((new GlobalVariablesStore($stache, app('files')))->directory($this->directory));
 
         $this->repo = new GlobalRepository($stache);
     }

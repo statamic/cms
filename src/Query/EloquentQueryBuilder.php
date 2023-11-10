@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Facades\Blink;
 use Statamic\Support\Arr;
 
 abstract class EloquentQueryBuilder implements Builder
@@ -101,6 +102,13 @@ abstract class EloquentQueryBuilder implements Builder
             return $this->whereNested($column, $boolean);
         }
 
+        if (strtolower($operator) == 'like') {
+            $grammar = $this->builder->getConnection()->getQueryGrammar();
+            $this->builder->whereRaw('LOWER('.$grammar->wrap($this->column($column)).') LIKE ?', strtolower($value), $boolean);
+
+            return $this;
+        }
+
         $this->builder->where($this->column($column), $operator, $value, $boolean);
 
         return $this;
@@ -181,9 +189,9 @@ abstract class EloquentQueryBuilder implements Builder
         return $this;
     }
 
-    public function orWhereJsonLength($column, $operator, $value)
+    public function orWhereJsonLength($column, $operator, $value = null)
     {
-        return $this->whereJsonLength($column, $operator, $value = null, 'or');
+        return $this->whereJsonLength($column, $operator, $value, 'or');
     }
 
     public function whereNull($column, $boolean = 'and', $not = false)
@@ -394,7 +402,12 @@ abstract class EloquentQueryBuilder implements Builder
             // exception. Stripping out invalid columns is fine here. They
             // will still be sent through and used for augmentation.
             $model = $this->builder->getModel();
-            $schema = $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
+            $table = $model->getTable();
+
+            $schema = Blink::once("eloquent-schema-{$table}", function () use ($model, $table) {
+                return $model->getConnection()->getSchemaBuilder()->getColumnListing($table);
+            });
+
             $selected = array_intersect($schema, $columns);
         }
 

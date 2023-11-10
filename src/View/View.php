@@ -2,8 +2,8 @@
 
 namespace Statamic\View;
 
-use Facades\Statamic\View\Cascade;
 use InvalidArgumentException;
+use Statamic\Facades\Cascade;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Engine;
@@ -57,6 +57,7 @@ class View
     {
         return array_merge($this->cascade(), $this->data, [
             'current_template' => $this->template(),
+            'current_layout' => $this->layout(),
         ]);
     }
 
@@ -88,19 +89,23 @@ class View
 
         if ($this->shouldUseLayout()) {
             GlobalRuntimeState::$containsLayout = true;
-
             $contents = view($this->templateViewName(), $cascade);
 
             if (Str::endsWith($this->layoutViewPath(), Engine::EXTENSIONS)) {
                 $contents = $contents->withoutExtractions();
             }
 
+            GlobalRuntimeState::$shareVariablesTemplateTrigger = $contents->getPath();
+
             $contents = $contents->render();
             GlobalRuntimeState::$containsLayout = false;
+            GlobalRuntimeState::$shareVariablesTemplateTrigger = '';
 
-            $contents = view($this->layoutViewName(), array_merge($cascade, [
+            $contents = view($this->layoutViewName(), array_merge($cascade, GlobalRuntimeState::$layoutVariables, [
                 'template_content' => $contents,
             ]));
+
+            GlobalRuntimeState::$layoutVariables = [];
         } else {
             $contents = view($this->templateViewName(), $cascade);
         }
