@@ -137,6 +137,7 @@
     "Before": "Bevor",
     "Behavior": "Verhalten",
     "Below": "Unterhalb",
+    "Between": "Zwischen",
     "Blockquote": "Blockzitat",
     "Blueprint": "Blueprint",
     "Blueprint created": "Blueprint erstellt",
@@ -497,6 +498,7 @@
     "Inline": "Inline",
     "Inline Code": "Inline-Code",
     "Inline Label": "Inline Beschriftung",
+    "Inline Label when True": "Inline Beschriftung wenn aktiv",
     "Input Behavior": "Eingabeverhalten",
     "Input Label": "Beschriftung",
     "Input Type": "Eingabetyp",
@@ -659,6 +661,7 @@
     "Per Page": "Pro Seite",
     "Per-site": "Pro Website",
     "Permissions": "Berechtigungen",
+    "Phone": "Telefon",
     "PHP Info": "PHP Info",
     "Pick Color": "Farbe wählen",
     "Pin to Favorites": "Als Favorit speichern",
@@ -1010,6 +1013,7 @@
     "You are not authorized to view collections.": "Du bist nicht berechtigt, Sammlungen anzuzeigen.",
     "You are not authorized to view navs.": "Du bist nicht berechtigt, Navigationen anzuzeigen.",
     "You are not authorized to view this collection.": "Du bist nicht berechtigt, diese Sammlung anzuzeigen.",
+    "You are now impersonating": "Du gibst dich jetzt aus als",
     "Your Favorites": "Meine Favoriten",
     "Your working copy will be replaced by the contents of this revision.": "Deine Arbeitskopie wird durch den Inhalt dieser Überarbeitung ersetzt."
 }

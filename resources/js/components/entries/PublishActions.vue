@@ -18,48 +18,52 @@
                     <loading-graphic text="" />
                 </div>
 
-                <select-input
-                    class="mb-6"
-                    v-model="action"
-                    :options="options"
-                />
+                <template v-else>
 
-                <div v-if="action">
-
-                    <date-fieldtype
-                        v-if="action == 'schedule'"
+                    <select-input
                         class="mb-6"
-                        name="publishTime"
-                        :value="publishTime" />
-
-                    <textarea-input
-                        class="mb-6 text-sm"
-                        v-model="revisionMessage"
-                        :placeholder="__('Notes about this revision')"
-                        @keydown.enter="submit"
-                        :focus="true" />
-
-                    <button
-                        class="btn-primary w-full mb-6"
-                        v-text="submitButtonText"
-                        @click="submit"
+                        v-model="action"
+                        :options="options"
                     />
 
-                    <div class="text-gray text-xs flex mb-6">
-                        <div class="pt-px w-4 mr-2">
-                            <svg-icon name="info-circle" class="pt-px" />
+                    <div v-if="action">
+
+                        <date-fieldtype
+                            v-if="action == 'schedule'"
+                            class="mb-6"
+                            name="publishTime"
+                            :value="publishTime" />
+
+                        <textarea-input
+                            class="mb-6 text-sm"
+                            v-model="revisionMessage"
+                            :placeholder="__('Notes about this revision')"
+                            @keydown.enter="submit"
+                            :focus="true" />
+
+                        <button
+                            class="btn-primary w-full mb-6"
+                            v-text="submitButtonText"
+                            @click="submit"
+                        />
+
+                        <div class="text-gray text-xs flex mb-6">
+                            <div class="pt-px w-4 mr-2">
+                                <svg-icon name="info-circle" class="pt-px" />
+                            </div>
+                            <div class="flex-1" v-text="actionInfoText" />
                         </div>
-                        <div class="flex-1" v-text="actionInfoText" />
+
+                        <div class="text-gray text-xs flex mb-6 text-red-500" v-if="action === 'schedule'">
+                            <div class="pt-px w-4 mr-2">
+                                <svg-icon name="info-circle" class="pt-px" />
+                            </div>
+                            <div class="flex-1" v-text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
+                        </div>
+
                     </div>
 
-                    <div class="text-gray text-xs flex mb-6 text-red-500" v-if="action === 'schedule'">
-                        <div class="pt-px w-4 mr-2">
-                            <svg-icon name="info-circle" class="pt-px" />
-                        </div>
-                        <div class="flex-1" v-text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
-                    </div>
-
-                </div>
+                </template>
 
             </div>
         </div>

@@ -233,12 +233,20 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
     {
         $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_RESETS);
 
+        if (is_array($broker)) {
+            $broker = $broker['cp'];
+        }
+
         return Password::broker($broker)->createToken($this);
     }
 
     public function generateActivateAccountToken()
     {
         $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
+
+        if (is_array($broker)) {
+            $broker = $broker['cp'];
+        }
 
         return Password::broker($broker)->createToken($this);
     }

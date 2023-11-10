@@ -66,6 +66,7 @@ class ResolveRedirectTest extends TestCase
         $parent->shouldReceive('pages')->andReturn($children);
 
         $this->assertEquals('/parent/first-child', $resolver('@child', $parent));
+        $this->assertEquals($child, $resolver->item('@child', $parent));
     }
 
     /** @test */
@@ -87,6 +88,7 @@ class ResolveRedirectTest extends TestCase
         $parent->shouldReceive('page')->andReturn($parentPage);
 
         $this->assertEquals('/parent/first-child', $resolver('@child', $parent));
+        $this->assertEquals($child, $resolver->item('@child', $parent));
     }
 
     /** @test */
@@ -116,6 +118,7 @@ class ResolveRedirectTest extends TestCase
         $root->shouldReceive('structure')->andReturn($structure);
 
         $this->assertEquals('/parent/first-child', $resolver('@child', $root));
+        $this->assertEquals($child, $resolver->item('@child', $root));
     }
 
     /** @test */
@@ -131,6 +134,7 @@ class ResolveRedirectTest extends TestCase
         $parent->shouldReceive('pages')->andReturn($pages);
 
         $this->assertSame(404, $resolver('@child', $parent));
+        $this->assertSame(null, $resolver->item('@child', $parent));
     }
 
     /** @test */
@@ -139,9 +143,10 @@ class ResolveRedirectTest extends TestCase
         $resolver = new ResolveRedirect;
 
         $entry = Mockery::mock(Entry::class)->shouldReceive('url')->once()->andReturn('/the-entry')->getMock();
-        Facades\Entry::shouldReceive('find')->with('123')->once()->andReturn($entry);
+        Facades\Entry::shouldReceive('find')->with('123')->twice()->andReturn($entry);
 
         $this->assertEquals('/the-entry', $resolver('entry::123'));
+        $this->assertEquals($entry, $resolver->item('entry::123'));
     }
 
     /** @test */
@@ -151,10 +156,11 @@ class ResolveRedirectTest extends TestCase
 
         $parentEntry = Mockery::mock(Entry::class);
         $frenchEntry = Mockery::mock(Entry::class)->shouldReceive('url')->once()->andReturn('/le-entry')->getMock();
-        $defaultEntry = Mockery::mock(Entry::class)->shouldReceive('in')->once()->andReturn($frenchEntry)->getMock();
-        Facades\Entry::shouldReceive('find')->with('123')->once()->andReturn($defaultEntry);
+        $defaultEntry = Mockery::mock(Entry::class)->shouldReceive('in')->twice()->andReturn($frenchEntry)->getMock();
+        Facades\Entry::shouldReceive('find')->with('123')->twice()->andReturn($defaultEntry);
 
         $this->assertEquals('/le-entry', $resolver('entry::123', $parentEntry, true));
+        $this->assertEquals($frenchEntry, $resolver->item('entry::123', $parentEntry, true));
     }
 
     /** @test */
@@ -164,11 +170,12 @@ class ResolveRedirectTest extends TestCase
 
         $parentEntry = Mockery::mock(Entry::class);
         $entry = Mockery::mock(Entry::class);
-        $entry->shouldReceive('in')->once()->andReturn(null);
+        $entry->shouldReceive('in')->twice()->andReturn(null);
         $entry->shouldReceive('url')->once()->andReturn('/the-entry');
-        Facades\Entry::shouldReceive('find')->with('123')->once()->andReturn($entry);
+        Facades\Entry::shouldReceive('find')->with('123')->twice()->andReturn($entry);
 
         $this->assertEquals('/the-entry', $resolver('entry::123', $parentEntry, true));
+        $this->assertEquals($entry, $resolver->item('entry::123', $parentEntry, true));
     }
 
     /** @test */
@@ -177,9 +184,10 @@ class ResolveRedirectTest extends TestCase
         $resolver = new ResolveRedirect;
 
         $asset = Mockery::mock(Asset::class)->shouldReceive('url')->once()->andReturn('/assets/foo/bar/baz.jpg')->getMock();
-        Facades\Asset::shouldReceive('find')->with('foo::bar/baz.jpg')->once()->andReturn($asset);
+        Facades\Asset::shouldReceive('find')->with('foo::bar/baz.jpg')->twice()->andReturn($asset);
 
         $this->assertEquals('/assets/foo/bar/baz.jpg', $resolver('asset::foo::bar/baz.jpg'));
+        $this->assertEquals($asset, $resolver->item('asset::foo::bar/baz.jpg'));
     }
 
     /** @test */
@@ -187,9 +195,10 @@ class ResolveRedirectTest extends TestCase
     {
         $resolver = new ResolveRedirect;
 
-        Facades\Entry::shouldReceive('find')->with('123')->once()->andReturnNull();
+        Facades\Entry::shouldReceive('find')->with('123')->twice()->andReturnNull();
 
         $this->assertSame(404, $resolver('entry::123'));
+        $this->assertSame(null, $resolver->item('entry::123'));
     }
 
     /** @test */

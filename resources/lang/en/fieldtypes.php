@@ -74,6 +74,7 @@ return [
     'entries.config.create' => 'Allow creation of new entries.',
     'entries.config.collections' => 'Choose which collections the user can select from.',
     'entries.config.query_scopes' => 'Choose which query scopes should be applied when retrieving selectable entries.',
+    'entries.config.search_index' => 'An appropriate search index will be used automatically where possible, but you may define an explicit one.',
     'entries.title' => 'Entries',
     'float.title' => 'Float',
     'form.config.max_items' => 'Set a maximum number of selectable forms.',

@@ -21,6 +21,8 @@ use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
+use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
@@ -1854,6 +1856,40 @@ class EntryTest extends TestCase
         $return = $entry->delete();
 
         $this->assertTrue($return);
+    }
+
+    /** @test */
+    public function it_fires_a_deleting_event()
+    {
+        Event::fake();
+
+        $entry = EntryFactory::collection('test')->create();
+
+        $entry->delete();
+
+        Event::assertDispatched(EntryDeleting::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
+    }
+
+    /** @test */
+    public function it_does_not_delete_when_a_deleting_event_returns_false()
+    {
+        Facades\Entry::spy();
+        Event::fake([EntryDeleted::class]);
+
+        Event::listen(EntryDeleting::class, function () {
+            return false;
+        });
+
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection);
+
+        $return = $entry->delete();
+
+        $this->assertFalse($return);
+        Facades\Entry::shouldNotHaveReceived('delete');
+        Event::assertNotDispatched(EntryDeleted::class);
     }
 
     /** @test */

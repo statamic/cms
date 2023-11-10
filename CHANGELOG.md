@@ -1,5 +1,100 @@
 # Release Notes
 
+## 4.32.0 (2023-11-03)
+
+### What's new
+- Entries fieldtype gets a tree view in the stack selector. [#8899](https://github.com/statamic/cms/issues/8899) by @duncanmcclean
+- Link fieldtype supports array syntax for getting underlying entry, asset, etc. [#8911](https://github.com/statamic/cms/issues/8911) by @edalzell
+- Ability to duplicate fields in blueprint/fieldset builders. [#8916](https://github.com/statamic/cms/issues/8916) by @duncanmcclean
+- Support paste events in Taggable Fieldtype. [#8903](https://github.com/statamic/cms/issues/8903) by @duncanmcclean
+- Add helper to more easily remove child item in CP navigation. [#8883](https://github.com/statamic/cms/issues/8883) by @jesseleite
+
+### What's fixed
+- Fix entries on the same date being ignored by collection previous/next tags. [#8921](https://github.com/statamic/cms/issues/8921) by @duncanmcclean
+- Remove schema check on import users command. [#8909](https://github.com/statamic/cms/issues/8909) by @ryanmitchell
+- Fix slugify when using hyphens surrounded by spaces. [#8923](https://github.com/statamic/cms/issues/8923) by @duncanmcclean
+- Fix collection listing's sort direction on reorder. [#8910](https://github.com/statamic/cms/issues/8910) by @o1y
+- Prevent root entries being deleted in listing view. [#8912](https://github.com/statamic/cms/issues/8912) by @ryanmitchell
+- Handle unauthorized response in Inline Publish Form. [#8918](https://github.com/statamic/cms/issues/8918) by @duncanmcclean
+- Hide publish action fields when saving. [#8917](https://github.com/statamic/cms/issues/8917) by @ryanmitchell
+- Handle empty values in collection tag filters. [#8915](https://github.com/statamic/cms/issues/8915) by @duncanmcclean
+- Fix missing translation of some user defined strings. [#8914](https://github.com/statamic/cms/issues/8914) by @ryanmitchell
+- Fix CP nav item active status regressions. [#8880](https://github.com/statamic/cms/issues/8880) by @jesseleite
+- Validate that Select & Button Group options have keys. [#8905](https://github.com/statamic/cms/issues/8905) by @duncanmcclean
+- Fix permissions for asset upload and folder creation buttons in CP [#8925](https://github.com/statamic/cms/issues/8925) by @joshuablum
+
+
+
+## 4.31.0 (2023-10-30)
+
+### What's new
+- PHP 8.3 support [#8845](https://github.com/statamic/cms/issues/8845) by @jasonvarga
+- Custom form submission exporters. [#8837](https://github.com/statamic/cms/issues/8837) by @ryanmitchell
+- Add `RevisionSaving` event. [#8551](https://github.com/statamic/cms/issues/8551) by @ryanmitchell
+- Allow using globals in form email configs. [#8892](https://github.com/statamic/cms/issues/8892) by @duncanmcclean
+- Improve Entries fieldtype search index logic, and add option to define an explicit one. [#8885](https://github.com/statamic/cms/issues/8885) by @edalzell
+
+### What's improved
+- Improve UI of link fieldtype in smaller spaces. [#8882](https://github.com/statamic/cms/issues/8882) by @godismyjudge95
+- French translations. [#8889](https://github.com/statamic/cms/issues/8889) by @ebeauchamps
+
+### What's fixed
+- Fix status column moving when resetting columns on entry listing. [#8896](https://github.com/statamic/cms/issues/8896) by @duncanmcclean
+- Ignore single smart quotes when slugifying entries. [#8895](https://github.com/statamic/cms/issues/8895) by @duncanmcclean
+- Fix Live Preview not updating when relationship items are updated. [#8893](https://github.com/statamic/cms/issues/8893) by @duncanmcclean
+- Fix global site selector not closing when clicking outside. [#8888](https://github.com/statamic/cms/issues/8888) by @o1y
+- Fix Bard text align when no headings are enabled. [#8878](https://github.com/statamic/cms/issues/8878) by @jacksleight
+
+
+
+## 4.30.0 (2023-10-20)
+
+### What's new
+- Multi-site Duplicator Support. [#8665](https://github.com/statamic/cms/issues/8665) by @duncanmcclean
+- Add `EntryDeleting` to allow you to prevent items being deleted [#8833](https://github.com/statamic/cms/issues/8833) by @ryanmitchell
+
+### What's improved
+- Cache Blueprint columns. [#8840](https://github.com/statamic/cms/issues/8840) by @jonassiewertsen
+
+### What's fixed
+- Default to using the CP broker when multiple are available. [#8872](https://github.com/statamic/cms/issues/8872) by @ryanmitchell
+
+
+
+## 4.29.0 (2023-10-19)
+
+### What's new
+- Add form reference to field during render. [#8862](https://github.com/statamic/cms/issues/8862) by @martyf
+- Add config to enable frontend route binding and support binding by field. [#8853](https://github.com/statamic/cms/issues/8853) by @ryanmitchell
+- Allow overwriting the column for `unique_user_value` validation. [#8852](https://github.com/statamic/cms/issues/8852) by @marcorieser
+
+### What's improved
+- German translations [#8857](https://github.com/statamic/cms/issues/8857) by @helloDanuk
+- French translations [#8848](https://github.com/statamic/cms/issues/8848) by @ebeauchamps
+
+### What's fixed
+- Remove double-render of fields in Form tag. [#8861](https://github.com/statamic/cms/issues/8861) by @martyf
+- Fix navigation 'Save Changes' button state. [#8864](https://github.com/statamic/cms/issues/8864) by @duncanmcclean
+- Fix missing replicator set previews. [#8855](https://github.com/statamic/cms/issues/8855) by @jacksleight
+- Bump @babel/traverse from 7.21.3 to 7.23.2 [#8870](https://github.com/statamic/cms/issues/8870) by @dependabot
+
+
+
+## 4.28.0 (2023-10-13)
+
+### What's new
+- Allow user defined fields in the CP to be translatable. [#8664](https://github.com/statamic/cms/issues/8664) by @ryanmitchell
+
+### What's improved
+- French translations. [#8835](https://github.com/statamic/cms/issues/8835) [#8831](https://github.com/statamic/cms/issues/8831) by @ebeauchamps
+
+### What's fixed
+- Fix lowercasing of asset filenames to include file extension. [#8842](https://github.com/statamic/cms/issues/8842) by @joshuablum
+- Only show status indicator in stack view if item has a status. [#8832](https://github.com/statamic/cms/issues/8832) by @ryanmitchell
+- Fix console warning generated by invalid tabulator config. [#8834](https://github.com/statamic/cms/issues/8834) by @joseph-d
+
+
+
 ## 4.27.0 (2023-10-11)
 
 ### What's new

@@ -16,9 +16,11 @@ class AssetContainerContents
     protected $filteredFiles;
     protected $filteredDirectories;
 
-    public function __construct($container)
+    public function container($container)
     {
         $this->container = $container;
+
+        return $this;
     }
 
     /**

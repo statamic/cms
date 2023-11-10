@@ -72,7 +72,7 @@ abstract class Relationship extends Fieldtype
         return $this->getItemsForPreProcessIndex($data)->map(function ($item) {
             return [
                 'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
-                'title' => method_exists($item, 'title') ? $item->title() : $item->get('title'),
+                'title' => method_exists($item, 'title') ? $item->title() : $item->value('title'),
                 'edit_url' => $item->editUrl(),
                 'published' => $this->statusIcons ? $item->published() : null,
             ];
@@ -134,6 +134,8 @@ abstract class Relationship extends Fieldtype
             'formComponent' => $this->getFormComponent(),
             'formComponentProps' => $this->getFormComponentProps(),
             'taggable' => $this->getTaggable(),
+            'initialSortColumn' => $this->initialSortColumn(),
+            'initialSortDirection' => $this->initialSortDirection(),
         ];
     }
 
@@ -294,6 +296,16 @@ abstract class Relationship extends Fieldtype
     public function getSortDirection($request)
     {
         return $request->get('order', 'asc');
+    }
+
+    public function initialSortColumn()
+    {
+        return 'title';
+    }
+
+    public function initialSortDirection()
+    {
+        return 'asc';
     }
 
     protected function getTaggable()
