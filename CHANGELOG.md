@@ -1,5 +1,23 @@
 # Release Notes
 
+## 4.33.0 (2023-11-10)
+
+### What's new
+- Bard supports cmd+k for links. [#8950](https://github.com/statamic/cms/issues/8950) by @o1y
+- The Entries fieldtype use columns from preferences in the stack selector. [#8900](https://github.com/statamic/cms/issues/8900) by @duncanmcclean
+- Bind `AssetContainerContents` to the service provider. [#8954](https://github.com/statamic/cms/issues/8954) by @ryanmitchell
+- Require `pint` in dev. [#8955](https://github.com/statamic/cms/issues/8955) by @ryanmitchell
+
+### What's fixed
+- Front-end form asset field php file validation. [#8968](https://github.com/statamic/cms/issues/8968) by @jasonvarga
+- Fix entries fieldtype not respecting collection sort column & direction. [#8894](https://github.com/statamic/cms/issues/8894) by @duncanmcclean
+- Fix duplicate entry action translation. [#8946](https://github.com/statamic/cms/issues/8946) by @jasonvarga
+- Fix SortableList not reacting to disabled prop changes. [#8949](https://github.com/statamic/cms/issues/8949) by @duncanmcclean
+- Remove debounce when renaming assets & folders. [#8953](https://github.com/statamic/cms/issues/8953) by @duncanmcclean
+- Use translations from fallback locale when primary locale is missing translations. [#8940](https://github.com/statamic/cms/issues/8940) by @duncanmcclean
+
+
+
 ## 4.32.0 (2023-11-03)
 
 ### What's new
