@@ -6,7 +6,13 @@
 - Bard supports cmd+k for links. [#8950](https://github.com/statamic/cms/issues/8950) by @o1y
 - The Entries fieldtype use columns from preferences in the stack selector. [#8900](https://github.com/statamic/cms/issues/8900) by @duncanmcclean
 - Bind `AssetContainerContents` to the service provider. [#8954](https://github.com/statamic/cms/issues/8954) by @ryanmitchell
+- Support arrays in wrap modifier [#8942](https://github.com/statamic/cms/issues/8942) by @jacksleight
+- Add `mount` to augmented collection. [#8928](https://github.com/statamic/cms/issues/8928) by @duncanmcclean
 - Require `pint` in dev. [#8955](https://github.com/statamic/cms/issues/8955) by @ryanmitchell
+
+### What's improved
+- French translations. [#8945](https://github.com/statamic/cms/issues/8945) [#8934](https://github.com/statamic/cms/issues/8934) by @ebeauchamps
+- German translations. [#8939](https://github.com/statamic/cms/issues/8939) by @doriengr
 
 ### What's fixed
 - Front-end form asset field php file validation. [#8968](https://github.com/statamic/cms/issues/8968) by @jasonvarga
@@ -15,6 +21,12 @@
 - Fix SortableList not reacting to disabled prop changes. [#8949](https://github.com/statamic/cms/issues/8949) by @duncanmcclean
 - Remove debounce when renaming assets & folders. [#8953](https://github.com/statamic/cms/issues/8953) by @duncanmcclean
 - Use translations from fallback locale when primary locale is missing translations. [#8940](https://github.com/statamic/cms/issues/8940) by @duncanmcclean
+- Fix missing title on relationship fields in multi-site. [#8936](https://github.com/statamic/cms/issues/8936) by @duncanmcclean
+- Prevent ensuring fields on entries if they already exist. [#8926](https://github.com/statamic/cms/issues/8926) by @duncanmcclean
+- Fix `statamic.web` middleware not being merged. [#8935](https://github.com/statamic/cms/issues/8935) by @duncanmcclean
+- Fix infinite loop on listing table of mounted collection. [#8937](https://github.com/statamic/cms/issues/8937) by @duncanmcclean
+- Fix "Always Save" toggle not being saved when used on linked field. [#8927](https://github.com/statamic/cms/issues/8927) by @duncanmcclean
+- Fix slug field not targeting sibling fields inside a replicator. [#8929](https://github.com/statamic/cms/issues/8929) by @duncanmcclean
 
 
 
