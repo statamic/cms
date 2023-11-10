@@ -233,6 +233,7 @@ class UsersController extends CpController
                 'editBlueprint' => cp_route('users.blueprint.edit'),
             ],
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
+            'requiresCurrentPassword' => $request->user()->id === $user->id(),
         ];
 
         if ($request->wantsJson()) {
