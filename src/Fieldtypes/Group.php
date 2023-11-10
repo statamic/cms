@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Fieldtypes;
+namespace App\Fieldtypes;
 
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
@@ -19,7 +19,7 @@ class Group extends Fieldtype
                 'fields' => [
                     'fields' => [
                         'display' => __('Fields'),
-                        'instructions' => __(''),
+                        'instructions' => '',
                         'type' => 'fields',
                         'full_width_setting' => true,
                     ],
@@ -56,11 +56,7 @@ class Group extends Fieldtype
 
     public function preload()
     {
-        return [
-            'defaults' => $this->defaultGroupData()->all(),
-            'new' => $this->fields()->meta()->all(),
-            'existing' => $this->fields()->addValues($this->field->value() ?? [])->meta()->toArray(),
-        ];
+        return $this->fields()->addValues($this->field->value() ?? $this->defaultGroupData())->meta()->toArray();
     }
 
     protected function defaultGroupData()
