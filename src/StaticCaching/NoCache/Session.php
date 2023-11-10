@@ -57,7 +57,7 @@ class Session
     {
         $region = new StringRegion($this, trim($contents), $context, $extension);
 
-        $region->write();
+        $this->cacheRegion($region);
 
         $this->regions[] = $region->key();
 
@@ -68,7 +68,7 @@ class Session
     {
         $region = new ViewRegion($this, $view, $context);
 
-        $region->write();
+        $this->cacheRegion($region);
 
         $this->regions[] = $region->key();
 
@@ -122,5 +122,10 @@ class Session
             ->withContent(Data::findByRequestUrl($this->url))
             ->hydrate()
             ->toArray();
+    }
+
+    private function cacheRegion(Region $region)
+    {
+        Cache::forever('nocache::region.'.$region->key(), $region);
     }
 }

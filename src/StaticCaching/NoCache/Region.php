@@ -2,7 +2,6 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Support\Arr;
 
 abstract class Region
@@ -63,11 +62,6 @@ abstract class Region
         }
 
         return $data;
-    }
-
-    public function write()
-    {
-        Cache::forever('nocache::region.'.$this->key, $this);
     }
 
     public function __serialize(): array
