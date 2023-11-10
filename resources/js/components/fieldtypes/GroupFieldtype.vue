@@ -50,7 +50,7 @@
                                 :key="field.handle"
                                 v-show="showField(field, fieldPath(field.handle))"
                                 :field="field"
-                                :meta="meta"
+                                :meta="meta[field.handle]"
                                 :value="value[field.handle]"
                                 :parent-name="name"
                                 :set-index="index"
@@ -58,7 +58,7 @@
                                 :field-path="fieldPath(field.handle)"
                                 :read-only="isReadOnly"
                                 @updated="updated(field.handle, $event)"
-                                @meta-updated="$emit('meta-updated', $event)"
+                                @meta-updated="updateMeta(field.handle, $event)"
                                 @focus="$emit('focus')"
                                 @blur="$emit('blur')"
                                 class="p-4"
@@ -71,9 +71,9 @@
     </portal>
 </template>
 <script>
-import FieldType from '@/../../vendor/statamic/cms/resources/js/components/fieldtypes/Fieldtype.vue';
-import SetField from '@/../../vendor/statamic/cms/resources/js/components/fieldtypes/replicator/Field.vue';
-import { ValidatesFieldConditions } from '@/../../vendor/statamic/cms/resources/js/components/field-conditions/FieldConditions.js';
+import FieldType from './Fieldtype.vue';
+import SetField from './replicator/Field.vue';
+import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
     mixins: [
@@ -93,9 +93,6 @@ export default {
         };
     },
     inject: ['storeName'],
-    onMounted() {
-        console.log({ meta: this.meta });
-    },
     computed: {
         fields() {
             return this.config.fields;
@@ -147,6 +144,10 @@ export default {
                 ...this.value,
                 [handle]: value,
             });
+        },
+
+        updateMeta(handle, value) {
+            this.$emit('meta-updated', { ...this.meta, [handle]: value });
         },
 
         fieldPath(handle) {
