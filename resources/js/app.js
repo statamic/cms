@@ -61,44 +61,43 @@ Statamic.booting(Statamic => {
 
 Alpine.start()
 
-Alpine.magic('store', (el, { Alpine }) => {
-    let vm, node = el;
-    while (!vm) {
-        node = node.parentNode;
-        if (node === document.documentElement) return null;
-        vm = node.__vue__;
+Alpine.magic('field', (el, { Alpine }) => {
+    const vm = el.closest('.html-fieldtype-wrapper').__vue__;
+    if (!vm) {
+        return;
     }
-    const $root = vm.$root;
-    while (vm.$options.name !== 'publish-container') {
-        vm = vm.$parent;
-        if (vm === $root) return null;
-    }
-    const { $store, name } = vm;
-    const data = Alpine.reactive({
-        values: { ...vm.values },
-        meta: { ...vm.meta },
+    const { $store, storeName } = vm;
+    const storeState = $store.state.publish[storeName] || [];
+    const storeAlpine = Alpine.reactive({
+        values: { ...storeState.values },
+        meta: { ...storeState.meta },
     });
     $store.subscribe((mutation) => {
-        if (mutation.type === `publish/${name}/setFieldValue`) {
-            data.values = { ...vm.values };
-        }
-        if (mutation.type === `publish/${name}/setFieldMeta`) {
-            data.meta = { ...vm.meta };
+        if ([
+            `publish/${storeName}/setFieldValue`,
+            `publish/${storeName}/setFieldMeta`,
+        ].includes(mutation.type)) {
+            storeAlpine.values = { ...storeState.values };
+            storeAlpine.meta = { ...storeState.meta };
         }
     });
     return {
-        state: data,
-        setFieldValue(handle, value) {
-            $store.dispatch(`publish/${name}/setFieldValue`, {
-                handle, value,
-                user: Statamic.user.id
-            });
-        },
-        setFieldMeta(handle, value) {
-            $store.dispatch(`publish/${name}/setFieldMeta`, {
-                handle, value,
-                user: Statamic.user.id
-            });
+        value: vm.value,
+        update: vm.update,
+        updateDebounced: vm.updateDebounced,
+        updateMeta: vm.updateMeta,
+        store: {
+            state: storeAlpine,
+            setFieldValue(handle, value) {
+                $store.dispatch(`publish/${storeName}/setFieldValue`, {
+                    handle, value, user: Statamic.user.id
+                });
+            },
+            setFieldMeta(handle, value) {
+                $store.dispatch(`publish/${storeName}/setFieldMeta`, {
+                    handle, value, user: Statamic.user.id
+                });
+            },
         },
     };
 });

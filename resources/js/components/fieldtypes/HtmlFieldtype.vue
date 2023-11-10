@@ -1,9 +1,13 @@
 <template>
-    <div v-html="config.html" />
+    <div class="html-fieldtype-wrapper" v-html="config.html" />
 </template>
 
 <script>
 export default {
-    mixins: [Fieldtype]
+
+    mixins: [Fieldtype],
+
+    inject: ['storeName'],
+  
 };
 </script>
