@@ -2,8 +2,7 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
-use Statamic\View\Antlers\Language\Parser\DocumentParser;
-use Statamic\View\Antlers\Language\Parser\VariableNameFinder;
+use Statamic\Facades\Antlers;
 
 class Tags extends \Statamic\Tags\Tags
 {
@@ -25,8 +24,7 @@ class Tags extends \Statamic\Tags\Tags
         if ($this->params->has('select')) {
             $fields = $this->params->explode('select');
         } else {
-            $finder = new VariableNameFinder(new DocumentParser);
-            $fields = $finder->getIdentifiers($this->content);
+            $fields = Antlers::identifiers($this->content);
         }
 
         return $this
