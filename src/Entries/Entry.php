@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use ArrayAccess;
+use Closure;
 use Facades\Statamic\Entries\InitiatorStack;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
@@ -720,8 +721,11 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             ->origin($this)
             ->locale($site)
             ->published($this->published)
-            ->slug($this->slug())
-            ->addToStructure($this->parent());
+            ->slug($this->slug());
+
+        if ($callback = $this->addToStructure($site, $this->parent())) {
+            $localization->afterSave($callback);
+        }
 
         if ($this->collection()->dated()) {
             $localization->date($this->date());
@@ -730,20 +734,22 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         return $localization;
     }
 
-    public function addToStructure($parent = null)
+    private function addToStructure($site, $parent = null): ?Closure
     {
+        // If it's orderable (linear - a max depth of 1) then don't add it.
         if ($this->collection()->orderable()) {
-            return $this;
+            return null;
         }
 
+        // Collection not structured? Don't add it.
         if (! $structure = $this->collection()->structure()) {
-            return $this;
+            return null;
         }
 
-        $tree = $structure->in($this->locale());
-        $parent = optional($parent)->in($this->locale());
+        $tree = $structure->in($site);
+        $parent = optional($parent)->in($site);
 
-        $this->afterSave(function ($entry) use ($parent, $tree) {
+        return function ($entry) use ($parent, $tree) {
             if (! $parent || $parent->isRoot()) {
                 $tree->append($entry);
             } else {
@@ -751,9 +757,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             }
 
             $tree->save();
-        });
-
-        return $this;
+        };
     }
 
     public function supplementTaxonomies()
