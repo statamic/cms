@@ -20,13 +20,14 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Image;
+use Statamic\Facades\Pattern;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess, Arrayable
+class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, Augmentable
 {
     use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -173,6 +174,10 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function blueprint()
     {
+        if (Blink::has($blink = 'asset-container-blueprint-'.$this->handle())) {
+            return Blink::get($blink);
+        }
+
         $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
             'alt' => [
                 'type' => 'text',
@@ -180,6 +185,8 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
                 'instructions' => __('Description of the image'),
             ],
         ])->setHandle($this->handle())->setNamespace('assets');
+
+        Blink::put($blink, $blueprint);
 
         AssetContainerBlueprintFound::dispatch($blueprint, $this);
 
@@ -275,7 +282,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     public function contents()
     {
         return Blink::once('asset-listing-cache-'.$this->handle(), function () {
-            return new AssetContainerContents($this);
+            return app(AssetContainerContents::class)->container($this);
         });
     }
 
@@ -351,7 +358,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
 
         if ($folder !== null) {
             if ($recursive) {
-                $query->where('path', 'like', "{$folder}/%");
+                $query->where('path', 'like', Pattern::sqlLikeQuote($folder).'/%');
             } else {
                 $query->where('folder', $folder);
             }
@@ -429,15 +436,7 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
      */
     public function accessible()
     {
-        $config = $this->disk()->filesystem()->getConfig();
-
-        // If Flysystem 1.x, it will be an array, so wrap it with `collect()` so it can `get()` values;
-        // Otherwise it will already be a `ReadOnlyConfiguration` object with a `get()` method.
-        if (is_array($config)) {
-            $config = collect($config);
-        }
-
-        return $config->get('url') !== null;
+        return Arr::get($this->disk()->filesystem()->getConfig(), 'url') !== null;
     }
 
     /**
@@ -625,5 +624,10 @@ class AssetContainer implements AssetContainerContract, Augmentable, ArrayAccess
     public static function __callStatic($method, $parameters)
     {
         return Facades\AssetContainer::{$method}(...$parameters);
+    }
+
+    public function __toString()
+    {
+        return $this->handle();
     }
 }

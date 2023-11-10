@@ -78,6 +78,7 @@ class GlobalRuntimeState
      * @var bool
      */
     public static $isEvaluatingUserData = false;
+
     public static $isEvaluatingData = false;
 
     /**
@@ -100,6 +101,13 @@ class GlobalRuntimeState
      * @var array
      */
     public static $tracedRuntimeAssignments = [];
+
+    /**
+     * A list of IDs of all abandoned nodes.
+     *
+     * @var array
+     */
+    public static $abandonedNodes = [];
 
     /**
      * Updates the global state with the provided Antlers runtime tag assignments.
@@ -184,8 +192,12 @@ class GlobalRuntimeState
     public static $prefixState = [];
 
     public static $containsLayout = false;
+    public static $shareVariablesTemplateTrigger = '';
+    public static $layoutVariables = [];
 
     public static $requiresRuntimeIsolation = false;
+
+    public static $evaulatingTagContents = false;
 
     public static $userContentEvalState = null;
 
@@ -199,14 +211,19 @@ class GlobalRuntimeState
      */
     public static $peekCallbacks = [];
 
+    public static $isCacheEnabled = false;
+
     public static function resetGlobalState()
     {
+        self::$shareVariablesTemplateTrigger = '';
+        self::$layoutVariables = [];
         self::$containsLayout = false;
         self::$tracedRuntimeAssignments = [];
         self::$traceTagAssignments = false;
         self::$environmentId = StringUtilities::uuidv4();
         self::$yieldCount = 0;
         self::$yieldStacks = [];
+        self::$abandonedNodes = [];
 
         StackReplacementManager::clearStackState();
         LiteralReplacementManager::resetLiteralState();

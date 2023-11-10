@@ -13,12 +13,12 @@
         <div>
             <breadcrumbs v-if="breadcrumbs" :crumbs="breadcrumbs" />
 
-            <div class="flex items-center mb-3">
+            <div class="flex items-center mb-6">
                 <h1 class="flex-1">{{ title }}</h1>
 
-                <div class="ml-2 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
+                <div class="ml-4 text-left" :class="{ 'btn-group': hasSaveAsOptions }">
                     <button
-                        class="btn-primary pl-2"
+                        class="btn-primary pl-4"
                         :class="{ 'disabled': !isDirty }"
                         :disabled="!isDirty"
                         @click="save"
@@ -27,13 +27,13 @@
                     <dropdown-list v-if="hasSaveAsOptions" class="ml-0">
                         <template #trigger>
                             <button class="btn-primary rounded-l-none flex items-center">
-                                <svg-icon name="chevron-down-xs" class="w-2" />
+                                <svg-icon name="micro/chevron-down-xs" class="w-2" />
                             </button>
                         </template>
-                        <h6 class="p-1">{{ __('Save to') }}...</h6>
+                        <h6 class="p-2">{{ __('Save to') }}...</h6>
                         <dropdown-item v-for="option in saveAsOptions" :key="option.url" @click="saveAs(option.url)">
-                            <div class="flex items-start pr-2">
-                                <svg-icon :name="option.icon" class="text-grey flex-shrink-0 mr-1 w-4 group-hover:text-white" />
+                            <div class="flex items-start pr-4">
+                                <svg-icon :name="option.icon" class="text-gray shrink-0 mr-2 w-4 group-hover:text-white" />
                                 <span class="whitespace-normal">{{ option.label }}</span>
                             </div>
                         </dropdown-item>
@@ -41,10 +41,9 @@
                 </div>
             </div>
 
-            <publish-sections
+            <publish-tabs
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
-                :can-toggle-labels="canToggleLabels"
                 :enable-sidebar="hasSidebar"
                 :read-only="readOnly" />
         </div>
@@ -63,7 +62,6 @@ export default {
         name: { type: String, default: 'base' },
         breadcrumbs: Array,
         action: String,
-        canToggleLabels: { type: Boolean, default: true },
         readOnly: { type: Boolean, default: false },
         reloadOnSave: { type: Boolean, default: false },
         saveAsOptions: { type: Array, default: () => [] },
@@ -75,7 +73,7 @@ export default {
             currentValues: this.values,
             error: null,
             errors: {},
-            hasSidebar: this.blueprint.sections.map(section => section.handle).includes('sidebar'),
+            hasSidebar: this.blueprint.tabs.map(tab => tab.handle).includes('sidebar'),
         }
     },
 

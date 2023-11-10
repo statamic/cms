@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -11,18 +13,11 @@ use Tests\TestCase;
 /** @group graphql */
 class UserTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['users'];
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        BlueprintRepository::partialMock();
-    }
 
     private function createUsers()
     {
@@ -35,12 +30,13 @@ class UserTest extends TestCase
         User::make()->id('7')->email('g@example.com')->set('name', 'Fred Armisen')->save();
     }
 
-    /**
-     * @test
-     * @environment-setup disableQueries
-     **/
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'users')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'users')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{user}'])
@@ -48,7 +44,7 @@ class UserTest extends TestCase
     }
 
     /** @test */
-    public function it_queries_an_user_by_id()
+    public function it_queries_a_user_by_id()
     {
         $this->createUsers();
 
@@ -63,6 +59,10 @@ class UserTest extends TestCase
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'users')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'users')->never();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()
@@ -80,7 +80,7 @@ GQL;
     }
 
     /** @test */
-    public function it_queries_an_user_by_email()
+    public function it_queries_a_user_by_email()
     {
         $this->createUsers();
 
@@ -160,6 +160,58 @@ GQL;
                     'one' => 'first',
                     'two' => 'second',
                     'name' => 'the overridden name',
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_can_register_custom_types()
+    {
+        $this->createUsers();
+
+        $blueprint = Blueprint::makeFromFields([
+            'grid_field' => [
+                'type' => 'grid',
+                'fields' => [
+                    ['handle' => 'test', 'field' => ['type' => 'text']],
+                ],
+            ],
+        ]);
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        User::find(3)->set('grid_field', [['test' => 'Hulk Hogan']])->save();
+
+        $query = <<<'GQL'
+{
+    user(id: "3") {
+        id
+        email
+        name
+        initials
+        edit_url
+        grid_field {
+            test
+        }
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'users')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'users')->never();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'user' => [
+                    'id' => '3',
+                    'email' => 'c@example.com',
+                    'name' => 'Burt Wonderstone',
+                    'initials' => 'BW',
+                    'edit_url' => 'http://localhost/cp/users/3/edit',
+                    'grid_field' => [['test' => 'Hulk Hogan']],
                 ],
             ]]);
     }

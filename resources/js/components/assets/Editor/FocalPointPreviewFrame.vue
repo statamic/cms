@@ -1,5 +1,5 @@
 <template>
-    <div class="frame-image" ref="frame" :style="{ backgroundImage: `url(${encodeURI(imageUrl)})`, backgroundPosition: backgroundPosition, transform: `scale(${z})`, transformOrigin: transformOrigin }"
+    <div class="frame-image" ref="frame" :style="{ backgroundImage: `url('${encodeURI(imageUrl)}')`, backgroundPosition: backgroundPosition, transform: `scale(${z})`, transformOrigin: transformOrigin }"
     />
 </template>
 

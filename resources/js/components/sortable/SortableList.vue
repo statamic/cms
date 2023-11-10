@@ -26,6 +26,10 @@ export default {
         handleClass: {
             default: 'sortable-handle',
         },
+        mirror: {
+            type: Boolean,
+            default: true
+        },
         appendTo: {
             default: null,
         },
@@ -38,21 +42,43 @@ export default {
         constrainDimensions: {
             type: Boolean
         },
+        delay: {
+            type: Number,
+            default: 0
+        },
+        distance: {
+            type: Number,
+            default: 0
+        },
         disabled: {
             type: Boolean,
             default: false
         },
+        animate: {
+            type: Boolean,
+            default: true
+        }
+    },
+
+    data() {
+        return {
+            sortable: null,
+        }
     },
 
     computed: {
 
         computedOptions() {
+            let plugins = [];
+            if (this.animate) plugins.push(Plugins.SwapAnimation);
+
             let options = Object.assign({}, {
                 draggable: `.${CSS.escape(this.itemClass)}`,
                 handle: `.${CSS.escape(this.handleClass)}`,
-                delay: 200,
+                delay: this.delay,
+                distance: this.distance,
                 swapAnimation: { vertical: this.vertical, horizontal: !this.vertical },
-                plugins: [Plugins.SwapAnimation],
+                plugins,
                 mirror: {
                     constrainDimensions: this.constrainDimensions
                 },
@@ -89,19 +115,39 @@ export default {
             return;
         }
 
-        const sortable = new Sortable(this.$el, this.computedOptions);
+        this.setupSortableList();
+    },
 
-        sortable.on('drag:start', () => this.$emit('dragstart'));
-        sortable.on('drag:stop', () => this.$emit('dragend'));
+    methods: {
+        setupSortableList() {
+            this.sortable = new Sortable(this.$el, this.computedOptions);
 
-        sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
-            this.$emit('input', move(this.value, oldIndex, newIndex))
-        })
+            this.sortable.on('drag:start', () => this.$emit('dragstart'));
+            this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
-        this.$on('hook:destroyed', () => {
-            sortable.destroy()
-        })
-    }
+            this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
+                this.$emit('input', move(this.value, oldIndex, newIndex))
+            })
+
+            this.$on('hook:destroyed', () => {
+                this.sortable.destroy()
+            })
+
+            if (this.mirror === false) {
+                this.sortable.on('mirror:create', (e) => e.cancel());
+            }
+        },
+
+        destroySortableList() {
+            this.sortable.destroy()
+        },
+    },
+
+    watch: {
+        disabled(disabled) {
+            disabled ? this.destroySortableList() : this.setupSortableList();
+        },
+    },
 
 }
 </script>

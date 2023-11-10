@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class RegisterFormTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk, NormalizesHtml;
+    use NormalizesHtml, PreventSavingStacheItemsToDisk;
 
     private function tag($tag)
     {
@@ -27,8 +27,8 @@ class RegisterFormTest extends TestCase
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/register">', $output);
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/register">', $aliased);
-        $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $aliased);
+        $this->assertStringContainsString(csrf_field(), $output);
+        $this->assertStringContainsString(csrf_field(), $aliased);
         $this->assertStringEndsWith('</form>', $output);
         $this->assertStringEndsWith('</form>', $aliased);
     }
@@ -62,7 +62,7 @@ class RegisterFormTest extends TestCase
     {{ /fields }}
 {{ /user:register_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
@@ -88,7 +88,7 @@ EOT
     {{ /fields }}
 {{ /user:register_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
@@ -190,10 +190,9 @@ EOT
         preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
-        // TODO: It seems
         $expected = [
-            'The password must be at least 8 characters.',
-            'The age field is required.',
+            trans('validation.min.string', ['attribute' => 'password', 'min' => 8]), // 'The password must be at least 8 characters.',
+            trans('validation.required', ['attribute' => 'age']), // 'The age field is required.',
         ];
 
         $this->assertEmpty($success[1]);
@@ -392,5 +391,74 @@ EOT
         $this->assertEquals($form['attrs']['method'], 'POST');
 
         $this->assertArrayHasKey('_token', $form['params']);
+    }
+
+    /** @test */
+    public function it_wont_register_user_when_honeypot_is_present()
+    {
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
+
+        config()->set('statamic.users.registration_form_honeypot_field', 'honeypot');
+
+        $response = $this
+            ->post('/!/auth/register', [
+                'email' => 'san@holo.com',
+                'password' => 'chewbacca',
+                'password_confirmation' => 'chewbacca',
+                'honeypot' => 'falcon',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
+
+        $output = $this->tag(<<<'EOT'
+{{ user:register_form }}
+    <p class="success">{{ success }}</p>
+{{ /user:register_form }}
+EOT
+        );
+
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+
+        $this->assertEquals(['Registration successful.'], $success[1]);
+
+        config()->set('statamic.users.registration_form_honeypot_field', null);
+    }
+
+    /** @test */
+    public function it_will_register_user_when_honeypot_is_not_present()
+    {
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
+
+        config()->set('statamic.users.registration_form_honeypot_field', 'honeypot');
+
+        $response = $this
+            ->post('/!/auth/register', [
+                'email' => 'san@holo.com',
+                'password' => 'chewbacca',
+                'password_confirmation' => 'chewbacca',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $this->assertNotNull(User::findByEmail('san@holo.com'));
+        $this->assertTrue(auth()->check());
+
+        $output = $this->tag(<<<'EOT'
+{{ user:register_form }}
+    <p class="success">{{ success }}</p>
+{{ /user:register_form }}
+EOT
+        );
+
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+
+        $this->assertEquals(['Registration successful.'], $success[1]);
+
+        config()->set('statamic.users.registration_form_honeypot_field', null);
     }
 }

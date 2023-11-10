@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\API\ResourceAuthorizer;
 use Statamic\Facades\Taxonomy;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -9,17 +10,26 @@ use Tests\TestCase;
 /** @group graphql */
 class TaxonomyTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['taxonomies'];
 
-    /**
-     * @test
-     * @environment-setup disableQueries
-     **/
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Taxonomy::make('tags')->title('Tags')->save();
+        Taxonomy::make('categories')->title('Categories')->save();
+    }
+
+    /** @test */
     public function query_only_works_if_enabled()
     {
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'taxonomies')->andReturnFalse()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'taxonomies')->never();
+        ResourceAuthorizer::makePartial();
+
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{taxonomy}'])
@@ -29,9 +39,6 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_queries_a_taxonomy_by_handle()
     {
-        Taxonomy::make('tags')->title('Tags')->save();
-        Taxonomy::make('categories')->title('Categories')->save();
-
         $query = <<<'GQL'
 {
     taxonomy(handle: "categories") {
@@ -40,6 +47,10 @@ class TaxonomyTest extends TestCase
     }
 }
 GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'taxonomies')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'taxonomies')->andReturn(Taxonomy::all()->map->handle()->all())->once();
+        ResourceAuthorizer::makePartial();
 
         $this
             ->withoutExceptionHandling()
@@ -51,5 +62,39 @@ GQL;
                     'title' => 'Categories',
                 ],
             ]]);
+    }
+
+    /** @test */
+    public function it_cannot_query_against_non_allowed_sub_resource()
+    {
+        $query = <<<'GQL'
+{
+    taxonomy(handle: "categories") {
+        handle
+        title
+    }
+}
+GQL;
+
+        ResourceAuthorizer::shouldReceive('isAllowed')->with('graphql', 'taxonomies')->andReturnTrue()->once();
+        ResourceAuthorizer::shouldReceive('allowedSubResources')->with('graphql', 'taxonomies')->andReturn([])->once();
+        ResourceAuthorizer::makePartial();
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson([
+                'errors' => [[
+                    'message' => 'validation',
+                    'extensions' => [
+                        'validation' => [
+                            'handle' => ['Forbidden: categories'],
+                        ],
+                    ],
+                ]],
+                'data' => [
+                    'taxonomy' => null,
+                ],
+            ]);
     }
 }

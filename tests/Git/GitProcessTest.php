@@ -3,6 +3,7 @@
 namespace Tests\Git;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Log;
 use Statamic\Console\Processes\Git;
 use Statamic\Console\Processes\Process;
 use Statamic\Facades\Path;
@@ -36,6 +37,7 @@ class GitProcessTest extends TestCase
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_can_get_git_root()
@@ -58,6 +60,7 @@ class GitProcessTest extends TestCase
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_can_check_if_folder_is_in_git_repo()
@@ -74,6 +77,7 @@ class GitProcessTest extends TestCase
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_can_get_git_status_of_parent_repo()
@@ -97,6 +101,7 @@ EOT;
 
     /**
      * @group integration
+     *
      * @test
      */
     public function it_can_get_git_status_of_specific_sub_paths()
@@ -125,6 +130,23 @@ EOT;
         $this->assertEquals($expectedCombinedStatus, Git::create($this->basePath('temp/content'))->status(['collections', 'taxonomies']));
     }
 
+    /** @test */
+    public function it_logs_error_output()
+    {
+        Log::shouldReceive('error')->once();
+
+        $this->simulateLoggableErrorOutput('fatal: The current branch master has no upstream branch.');
+    }
+
+    /** @test */
+    public function it_doesnt_log_resolving_deltas_as_error_output()
+    {
+        Log::shouldReceive('error')->never();
+
+        $this->simulateLoggableErrorOutput('remote: Resolving deltas');
+        $this->simulateLoggableErrorOutput('remote: Resolving deltas: 0% (0/6)\nremote: Resolving deltas: 16% (1/6)\nremote: Resolving deltas: 33% (2/6)\nremote: Resolving deltas: 50% (3/6)\nremote: Resolving deltas: 66% (4/6)\nremote: Resolving deltas: 83% (5/6)\nremote: Resolving deltas: 100% (6/6)\nremote: Resolving deltas: 100% (6/6), completed with 5 local objects.');
+    }
+
     private function showLastCommit($path)
     {
         return Process::create($path)->run('git show');
@@ -133,5 +155,32 @@ EOT;
     private function basePath($path = null)
     {
         return __DIR__.'/__fixtures__/'.$path;
+    }
+
+    private function simulateLoggableErrorOutput($output)
+    {
+        $process = new class($output) extends Git
+        {
+            private $simulatedOutput;
+
+            public function __construct($output)
+            {
+                $this->simulatedOutput = $output;
+            }
+
+            public function getCommandLine()
+            {
+                return 'TestGitClass';
+            }
+
+            public function run($command, $cacheKey = null)
+            {
+                $this->prepareErrorOutput('err', $this->simulatedOutput);
+
+                $this->logErrorOutput($this);
+            }
+        };
+
+        $process->run('test');
     }
 }

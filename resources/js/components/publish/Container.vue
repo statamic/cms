@@ -138,6 +138,12 @@ export default {
                             state.revealerFields.push(dottedKey);
                         }
                     },
+                    unsetRevealerField(state, dottedKey) {
+                        const index = state.revealerFields.indexOf(dottedKey);
+                        if (index !== -1) {
+                            state.revealerFields.splice(index, 1);
+                        }
+                    },
                     setMeta(state, meta) {
                         state.meta = meta;
                     },
@@ -211,6 +217,11 @@ export default {
         emitUpdatedEvent(values) {
             this.$emit('updated', values);
             this.dirty();
+        },
+
+        saving() {
+            // Let fieldtypes do any pre-save work, like triggering a "change" event for the focused field.
+            this.$events.$emit(`container.${this.name}.saving`);
         },
 
         saved() {

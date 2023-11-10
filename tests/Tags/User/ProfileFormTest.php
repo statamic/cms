@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class ProfileFormTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk, NormalizesHtml;
+    use NormalizesHtml, PreventSavingStacheItemsToDisk;
 
     private function tag($tag)
     {
@@ -26,7 +26,7 @@ class ProfileFormTest extends TestCase
         $output = $this->tag('{{ user:profile_form }}{{ /user:profile_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/profile">', $output);
-        $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
+        $this->assertStringContainsString(csrf_field(), $output);
         $this->assertStringEndsWith('</form>', $output);
     }
 
@@ -68,7 +68,7 @@ class ProfileFormTest extends TestCase
     {{ /fields }}
 {{ /user:profile_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
@@ -83,11 +83,12 @@ EOT
     /** @test */
     public function it_renders_form_with_fields_array_and_custom_blueprint()
     {
+        $this->useCustomBlueprint();
+
         $this->actingAs(User::make()
             ->email('test@example.com')
             ->data(['name' => 'Test User', 'phone' => '12345'])
             ->save());
-        $this->useCustomBlueprint();
 
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ user:profile_form }}
@@ -96,7 +97,7 @@ EOT
     {{ /fields }}
 {{ /user:profile_form }}
 EOT
-));
+        ));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
@@ -141,7 +142,7 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The email field is required.',
+            'The Email Address field is required.',
         ];
 
         $this->assertEmpty($success[1]);
@@ -240,7 +241,7 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The email field is required.',
+            'The Email Address field is required.',
         ];
 
         $this->assertEmpty($success[1]);

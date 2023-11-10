@@ -3,10 +3,11 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
-use Statamic\Auth\Passwords\PasswordDefaults;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Events\UserRegistered;
 use Statamic\Events\UserRegistering;
@@ -63,7 +64,7 @@ class UserController extends Controller
 
         $fieldRules = $fields->validator()->withRules([
             'email' => ['required', 'email', 'unique_user_value'],
-            'password' => ['required', 'confirmed', PasswordDefaults::rules()],
+            'password' => ['required', 'confirmed', Password::default()],
         ])->rules();
 
         $validator = Validator::make($values, $fieldRules);
@@ -90,6 +91,10 @@ class UserController extends Controller
         }
 
         try {
+            if ($honeypot = config('statamic.users.registration_form_honeypot_field')) {
+                throw_if(Arr::get($request->input(), $honeypot), new SilentFormFailureException);
+            }
+
             throw_if(UserRegistering::dispatch($user) === false, new SilentFormFailureException);
         } catch (ValidationException $e) {
             return $this->userRegistrationFailure($e->errors());
@@ -116,14 +121,16 @@ class UserController extends Controller
         $values = $this->valuesWithoutAssetFields($fields, $request);
         $fields = $fields->addValues($values);
 
-        $fieldRules = $fields->validator()->withRules([
-            'email' => ['required', 'email', 'unique_user_value:'.$user->id()],
-        ])->rules();
-
-        $validator = Validator::make($values, $fieldRules);
-
-        if ($validator->fails()) {
-            return $this->userProfileFailure($validator->errors());
+        try {
+            $fields
+                ->validator()
+                ->withRules([
+                    'email' => ['required', 'email', 'unique_user_value:{id}'],
+                ])->withReplacements([
+                    'id' => $user->id(),
+                ])->validate();
+        } catch (ValidationException $e) {
+            return $this->userProfileFailure($e->validator->errors());
         }
 
         $values = $fields->process()->values()
@@ -150,7 +157,7 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'current_password' => ['required', 'current_password'],
-            'password'         => ['required', 'confirmed', PasswordDefaults::rules()],
+            'password' => ['required', 'confirmed', Password::default()],
         ]);
 
         if ($validator->fails()) {

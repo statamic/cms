@@ -434,8 +434,8 @@ class Comb
                 array_push($output, $record);
             }
 
-            // find categorized data
         } else {
+            // find categorized data
             foreach ($this->haystack as $category => $records) {
                 foreach ($records as $item) {
                     $record = (array) $item;
@@ -469,7 +469,12 @@ class Comb
         }
 
         foreach ($item as $part) {
-            $output .= (is_array($part)) ? $this->flattenArray($part, $glue) : $glue.$part;
+            if (is_array($part)) {
+                unset($part['id'], $part['type'], $part['attrs']);
+                $output .= $this->flattenArray($part, $glue);
+            } else {
+                $output .= $glue.$part;
+            }
         }
 
         return preg_replace('#\s+#ism', ' ', $output);
@@ -493,8 +498,8 @@ class Comb
             // search return that no results were found
             if ($params['required']) {
                 throw new NoResultsFound('No results found.');
-            // otherwise, the haystack is empty and that's an error
             } else {
+                // otherwise, the haystack is empty and that's an error
                 throw new CombException('Empty haystack.');
             }
         }
@@ -528,7 +533,7 @@ class Comb
 
             // loop over each query chunk
             foreach ($params['chunks'] as $j => $chunk) {
-                $escaped_chunk = str_replace('#', '\#', $chunk);
+                $escaped_chunk = preg_quote($chunk, '#');
                 $regex = [
                     'whole' => '#^'.$escaped_chunk.'$#i',
                     'partial' => '#'.$escaped_chunk.'#i',
@@ -667,8 +672,9 @@ class Comb
 
             $output = $categorized_output;
 
-        // or trim outputs to limit if it was set
         } elseif ($this->limit) {
+            // or trim outputs to limit if it was set
+
             // if we do not want more results than the limit
             if ($this->enable_too_many_results && count($output) > $this->limit) {
                 throw new TooManyResults('Too many results found.');
@@ -677,8 +683,8 @@ class Comb
             $output = array_slice($output, 0, $this->limit);
             $output_length = count($output);
 
-        // otherwise, the size is the size
         } else {
+            // otherwise, the size is the size
             $output_length = count($output);
         }
 
@@ -870,8 +876,8 @@ class Comb
                 array_push($parts['chunks'], $query);
             }
 
-            // perform a boolean search -- require words, disallow words
         } elseif ($this->query_mode === self::QUERY_BOOLEAN) {
+            // perform a boolean search -- require words, disallow words
             $words = preg_split("/\s+/i", $query);
 
             if ($this->use_alternates) {
@@ -903,8 +909,8 @@ class Comb
                 array_push($parts['chunks'], $query);
             }
 
-            // search for the entire query as one thing
         } else {
+            // search for the entire query as one thing
             $parts['chunks'] = [strtolower($query)];
         }
 
@@ -949,29 +955,34 @@ class Comb
         foreach ($words as $word) {
             if (strtolower($word) == 'and') {
                 array_push($output, '&');
+
                 continue;
             }
 
             if ($word == '&') {
                 array_push($output, 'and');
+
                 continue;
             }
 
             if (strpos($word, "'") !== false) {
                 array_push($output, preg_replace("/'/", '‘', $word));
                 array_push($output, preg_replace("/'/", '’', $word));
+
                 continue;
             }
 
             if (strpos($word, '’') !== false) {
                 array_push($output, preg_replace('/’/', '‘', $word));
                 array_push($output, preg_replace('/’/', "'", $word));
+
                 continue;
             }
 
             if (strpos($word, '‘') !== false) {
                 array_push($output, preg_replace('/‘/', "'", $word));
                 array_push($output, preg_replace('/‘/', '’', $word));
+
                 continue;
             }
         }
@@ -1043,7 +1054,7 @@ class Comb
         $length = $this->snippet_length;
 
         $escaped_chunks = collect($chunks)
-            ->map(fn ($chunk) => str_replace('#', '\#', $chunk))
+            ->map(fn ($chunk) => preg_quote($chunk, '#'))
             ->join('|');
         $regex = '#(.*?)('.$escaped_chunks.')(.{0,'.$length.'}(?:\s|$))#i';
         if (! preg_match_all($regex, $value, $matches, PREG_SET_ORDER)) {

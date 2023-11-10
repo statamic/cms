@@ -27,7 +27,7 @@ class TaxonomyType extends \Rebing\GraphQL\Support\Type
 
             return $arr;
         })
-        ->all();
+            ->all();
     }
 
     private function resolver()

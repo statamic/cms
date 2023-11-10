@@ -5,7 +5,7 @@
 
     @unless($groups->isEmpty())
 
-        <div class="flex mb-3">
+        <div class="flex mb-6">
             <h1 class="flex-1">
                 {{ __('User Groups') }}
             </h1>

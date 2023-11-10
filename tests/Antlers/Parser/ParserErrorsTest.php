@@ -112,12 +112,12 @@ class ParserErrorsTest extends ParserTestCase
     {
         $this->assertThrowsParserError(<<<'EOT'
 {{
-    datetime:parse("October 12, 2001"):
+    datetime:parse("October 12, 2001")::
             addDays(10):
             toAtomString()
 }}
 EOT
-);
+        );
     }
 
     public function test_incorrectly_chained_methods_throws_error_dot_syntax()
@@ -148,7 +148,7 @@ EOT
         $this->assertThrowsParserError(<<<'EOT'
 {{ some_value | modifier: "string" "string" }}
 EOT
-);
+        );
     }
 
     public function test_neighboring_numeric_throws_parser_error_in_modifiers()

@@ -1,5 +1,5 @@
 import { Mark, getAttributes, getMarkRange, markPasteRule } from '@tiptap/core';
-import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
+import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
 
 export const Link = Mark.create({
 
@@ -55,13 +55,19 @@ export const Link = Mark.create({
     addPasteRules() {
         return [
             markPasteRule({
-                find: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g,
+                find: /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_+.~#?&//=]*)/g,
                 type: this.type,
                 getAttributes: url => ({
                     href: url[0]
                 }),
             }),
         ]
+    },
+
+    addKeyboardShortcuts() {
+        return {
+            'Mod-k': () => this.options.vm.$emit('link-toggle'),
+        }
     },
 
     addProseMirrorPlugins() {

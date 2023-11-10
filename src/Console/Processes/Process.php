@@ -135,7 +135,7 @@ class Process
             $this->output .= $operateOnOutput($buffer);
         }, $this->env);
 
-        $this->logErrorOutput();
+        $this->logErrorOutput($process);
 
         if ($this->throwOnFailure && $process->getExitCode() > 0) {
             $this->throwException($this->output);
@@ -186,7 +186,7 @@ class Process
             $this->output .= $buffer;
         }, $this->env);
 
-        $this->logErrorOutput();
+        $this->logErrorOutput($process);
 
         return $this->normalizeOutput($this->output);
     }
@@ -210,7 +210,7 @@ class Process
             $this->appendOutputToCache($cacheKey, $buffer);
         }, $this->env);
 
-        $this->logErrorOutput();
+        $this->logErrorOutput($process);
 
         $this->setCompletedOnCache($cacheKey);
     }
@@ -221,7 +221,7 @@ class Process
      * @param  string  $type
      * @param  string  $buffer
      */
-    private function prepareErrorOutput($type, $buffer)
+    protected function prepareErrorOutput($type, $buffer)
     {
         if ($type !== 'err') {
             return;
@@ -236,8 +236,10 @@ class Process
 
     /**
      * Log error output.
+     *
+     * @param  SymfonyProcess  $process
      */
-    private function logErrorOutput()
+    protected function logErrorOutput($process)
     {
         if (! $this->logErrorOutput) {
             return;
@@ -247,11 +249,19 @@ class Process
             return;
         }
 
-        $process = (new \ReflectionClass($this))->getShortName();
+        $processClass = (new \ReflectionClass($this))->getShortName();
+
+        $command = $process->getCommandLine();
 
         $error = collect($this->errorOutput)->implode("\n");
 
-        Log::error("{$process} Process: {$error}");
+        $output = collect([
+            "Process Class: {$processClass}",
+            "Command: {$command}",
+            "Error: {$error}",
+        ])->implode("\n");
+
+        Log::error($output);
     }
 
     /**
@@ -284,7 +294,6 @@ class Process
     /**
      * Get cached output.
      *
-     * @param  string  $cacheKey
      * @return array
      */
     public function cachedOutput(string $cacheKey)
@@ -299,7 +308,6 @@ class Process
     /**
      * Get cached output for last completed process.
      *
-     * @param  string  $cacheKey
      * @return array
      */
     public function lastCompletedCachedOutput(string $cacheKey)
@@ -405,7 +413,6 @@ class Process
     /**
      * Throw exception.
      *
-     * @param  string  $output
      *
      * @throws ProcessException
      */

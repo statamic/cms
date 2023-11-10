@@ -21,45 +21,58 @@ class Grid extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'fields' => [
+            [
                 'display' => __('Fields'),
-                'instructions' => __('statamic::fieldtypes.grid.config.fields'),
-                'type' => 'fields',
-            ],
-            'mode' => [
-                'display' => __('Mode'),
-                'instructions' => __('statamic::fieldtypes.grid.config.mode'),
-                'type' => 'select',
-                'options' => [
-                    'table' => __('Table'),
-                    'stacked' => __('Stacked'),
+                'fields' => [
+                    'fields' => [
+                        'display' => __('Fields'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.fields'),
+                        'type' => 'fields',
+                        'full_width_setting' => true,
+                    ],
                 ],
-                'default' => 'table',
             ],
-            'max_rows' => [
-                'display' => __('Maximum Rows'),
-                'instructions' => __('statamic::fieldtypes.grid.config.max_rows'),
-                'type' => 'integer',
-                'width' => '50',
-            ],
-            'min_rows' => [
-                'display' => __('Minimum Rows'),
-                'instructions' => __('statamic::fieldtypes.grid.config.min_rows'),
-                'type' => 'integer',
-                'width' => '50',
-            ],
-            'add_row' => [
-                'display' => __('Add Row Label'),
-                'instructions' => __('statamic::fieldtypes.grid.config.add_row'),
-                'type' => 'text',
-                'width' => '50',
-            ],
-            'reorderable' => [
-                'display' => __('Reorderable'),
-                'instructions' => __('statamic::fieldtypes.grid.config.reorderable'),
-                'type' => 'toggle',
-                'default' => true,
-                'width' => '50',
+            [
+                'display' => __('Appearance & Behavior'),
+                'fields' => [
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.mode'),
+                        'type' => 'select',
+                        'options' => [
+                            'table' => __('Table'),
+                            'stacked' => __('Stacked'),
+                        ],
+                        'default' => 'table',
+                    ],
+                    'max_rows' => [
+                        'display' => __('Maximum Rows'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.max_rows'),
+                        'type' => 'integer',
+                    ],
+                    'min_rows' => [
+                        'display' => __('Minimum Rows'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.min_rows'),
+                        'type' => 'integer',
+                    ],
+                    'add_row' => [
+                        'display' => __('Add Row Label'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.add_row'),
+                        'type' => 'text',
+                    ],
+                    'reorderable' => [
+                        'display' => __('Reorderable'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.reorderable'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                    'fullscreen' => [
+                        'display' => __('Allow Fullscreen Mode'),
+                        'instructions' => __('statamic::fieldtypes.grid.config.fullscreen'),
+                        'type' => 'toggle',
+                        'default' => true,
+                    ],
+                ],
             ],
         ];
     }
@@ -80,7 +93,7 @@ class Grid extends Fieldtype
     {
         $fields = $this->fields()->addValues($row)->process()->values()->all();
 
-        $row = array_merge(['id' => Arr::pull($row, '_id')], $row, $fields);
+        $row = array_merge([RowId::handle() => Arr::pull($row, '_id')], $row, $fields);
 
         return Arr::removeNullValues($row);
     }
@@ -102,7 +115,7 @@ class Grid extends Fieldtype
     {
         $fields = $this->fields()->addValues($row)->preProcess()->values()->all();
 
-        $id = Arr::pull($row, 'id') ?? RowId::generate();
+        $id = Arr::pull($row, RowId::handle()) ?? RowId::generate();
 
         return array_merge($row, $fields, [
             '_id' => $id,
@@ -207,7 +220,7 @@ class Grid extends Fieldtype
         return collect($value)->map(function ($row) use ($method) {
             $values = $this->fields()->addValues($row)->{$method}()->values();
 
-            return new Values($values->merge(['id' => $row['id'] ?? null])->all());
+            return new Values($values->merge([RowId::handle() => $row[RowId::handle()] ?? null])->all());
         })->all();
     }
 

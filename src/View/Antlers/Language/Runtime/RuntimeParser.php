@@ -351,6 +351,8 @@ class RuntimeParser implements Parser
             $cacheSlug = md5($parseText);
 
             if (! array_key_exists($cacheSlug, self::$standardRenderNodeCache)) {
+                $this->documentParser->setIsVirtual($this->view == '');
+
                 if (strlen($this->view) > 0) {
                     $seedStartLine = $this->getFrontMatterLineOffset($this->view);
                     $this->documentParser->setStartLineSeed($seedStartLine);
@@ -431,6 +433,11 @@ class RuntimeParser implements Parser
 
             $bufferContent = str_replace(DocumentParser::getLeftBraceEscape(), DocumentParser::LeftBrace, $bufferContent);
             $bufferContent = str_replace(DocumentParser::getRightBraceEscape(), DocumentParser::RightBrace, $bufferContent);
+        }
+
+        if (GlobalRuntimeState::$containsLayout && $this->view == GlobalRuntimeState::$shareVariablesTemplateTrigger) {
+            // Force the root runtime assignments to be merged into the global state.
+            GlobalRuntimeState::$layoutVariables = $this->nodeProcessor->getRuntimeAssignments();
         }
 
         return new AntlersString($bufferContent, $this);
@@ -669,11 +676,20 @@ INFO;
 
     private function cloneRuntimeParser()
     {
-        return (new RuntimeParser(
+        $parser = (new RuntimeParser(
             $this->documentParser,
             $this->nodeProcessor->cloneProcessor(),
             $this->antlersLexer, $this->antlersParser
         ))->allowPhp($this->allowPhp);
+
+        // If we are evaluating a tag's scope, we still
+        // want the overall parser instances to be
+        // isolated, but we also need the Cascade.
+        if (GlobalRuntimeState::$evaulatingTagContents) {
+            $parser->cascade($this->cascade);
+        }
+
+        return $parser;
     }
 
     private function shouldIsolate()
@@ -825,7 +841,6 @@ INFO;
      * array or object.
      *
      * @param  string  $key  Dot-notated key to find
-     * @param $context
      * @param  mixed  $default  Default value to use if not found
      * @return mixed
      *
@@ -877,7 +892,6 @@ INFO;
     /**
      * Sets a render callback.
      *
-     * @param $callback
      * @return Parser
      */
     public function callback($callback)

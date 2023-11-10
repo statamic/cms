@@ -261,6 +261,7 @@ class Parser implements ParserContract
                 // conflict with local scope variables in the next step.
                 // Also, treat it like a callback if it's a query builder so it can be sent through the query tag.
                 $text = $this->createExtraction('callback_blocks', $match[0][0], $match[0][0], $text);
+
                 continue;
             }
 
@@ -320,15 +321,15 @@ class Parser implements ParserContract
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".
             if (! is_array($value)) {
-                $value = ['value' => $value, 'name'  => $value];
+                $value = ['value' => $value, 'name' => $value];
             }
 
             $value = array_merge($value, [
-                'count'         => $index + 1,
-                'index'         => $index,
+                'count' => $index + 1,
+                'index' => $index,
                 'total_results' => $total,
-                'first'         => ($index === 0),
-                'last'          => ($index === $total - 1),
+                'first' => ($index === 0),
+                'last' => ($index === $total - 1),
             ]);
 
             $index++;
@@ -592,12 +593,10 @@ class Parser implements ParserContract
 
             // look for tag pairs and (plugin) callbacks
             if ($name != 'content' && ! $replacement) {
-
                 // is the callback a variable in our data set?
                 [$exists, $values] = $this->getVariableExistenceAndValue($name, $data);
 
                 if ($exists) {
-
                     // is this a tag-pair?
                     if ($this->isLoopable($values)) {
                         // yes it is
@@ -759,8 +758,8 @@ class Parser implements ParserContract
                     // Slide it on back into the template
                     $text = str_replace($match[0], $output, $text);
 
-                // Regular old ternary
                 } else {
+                    // Regular old ternary
 
                     // Split the tag up
                     $bits = explode('? ', $match[1]);
@@ -1435,10 +1434,6 @@ class Parser implements ParserContract
     /**
      * Manipulate data with the use of Modifiers.
      *
-     * @param $modifier
-     * @param $data
-     * @param $parameters
-     * @param $context
      * @return mixed
      */
     protected function runModifier($modifier, $data, $parameters, $context = [])

@@ -5,6 +5,7 @@ namespace Tests\Antlers\Sandbox;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
+use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\ParserTestCase;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -158,6 +159,42 @@ EOT;
 EOT;
 
         $this->assertSame('6', trim($this->renderString($template, [], true)));
+    }
+
+    public function test_assignments_are_processed_when_tags_contain_parameters_that_conflict_with_modifier_names()
+    {
+        EntryFactory::collection('blog')->id('1')->create();
+        EntryFactory::collection('blog')->id('2')->create();
+        EntryFactory::collection('blog')->id('3')->create();
+        EntryFactory::collection('blog')->id('4')->create();
+
+        $template = <<<'EOT'
+{{ $theCount = 0; }}
+
+{{ collection:blog limit="4" }}
+{{ $theCount += 1; }}
+
+Count: {{ $theCount }}
+{{ /collection:blog }}
+EOT;
+
+        $expected = <<<'EXP'
+Count: 1
+
+
+
+Count: 2
+
+
+
+Count: 3
+
+
+
+Count: 4
+EXP;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
     }
 
     public function test_assignments_are_traced_from_nested_arrays_and_tags()
@@ -1061,5 +1098,305 @@ EOT;
 EOT;
 
         $this->assertSame('<Zero><One><Two><Three><Four>', trim($this->renderString($template)));
+    }
+
+    public function test_updated_arrays_are_not_reset_by_tags()
+    {
+        Collection::make('pages')->routes(['en' => '{slug}'])->save();
+        EntryFactory::collection('pages')->id('1')->slug('one')->data(['title' => 'One', 'template' => 'template'])->create();
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+
+        $template = <<<'EOT'
+{{ the_array = ['One', 10, 30, 40, 50, 60]; }}
+Value: {{ the_array.0 }}
+{{ the_array.0 = 'Two'; }}
+{{ the_array.1 *= 5; }}
+{{ the_array.2 -= 5; }}
+{{ the_array.3 %= 2; }}
+{{ the_array.4 /= 5; }}
+{{ the_array.5 += 10; }}
+Value: {{ the_array.0 }}
+{{ loop from="0" to="3" }}{{ index }}{{ /loop }}
+Value0: {{ the_array.0 }}
+Value1: {{ the_array.1 }}
+Value2: {{ the_array.2 }}
+Value3: {{ the_array.3 }}
+Value4: {{ the_array.4 }}
+Value5: {{ the_array.5 }}
+EOT;
+
+        $this->viewShouldReturnRaw('template', $template);
+
+        $responseOne = $this->get('one')->assertOk();
+
+        $expected = <<<'EXPECTED'
+Value: One
+
+
+
+
+
+
+Value: Two
+0123
+Value0: Two
+Value1: 50
+Value2: 25
+Value3: 0
+Value4: 10
+Value5: 70
+EXPECTED;
+
+        $this->assertSame($expected, StringUtilities::normalizeLineEndings(trim($responseOne->getContent())));
+    }
+
+    public function test_assignments_are_processed_after_associative_arrays()
+    {
+        $template = <<<'EOT'
+{{ _value = 'One'; }}
+
+{{ data }}
+    {{ _value = 'Two'; }}
+{{ /data }}
+
+The value: {{ _value }}.
+EOT;
+
+        $this->assertSame('The value: Two.', trim($this->renderString($template, ['data' => ['foo' => 'bar']])));
+    }
+
+    public function test_variable_assignment_and_tag_aliasing()
+    {
+        EntryFactory::collection('blog')->id('1')->data(['title' => '1-One'])->create();
+        EntryFactory::collection('blog')->id('2')->data(['title' => '2-Two'])->create();
+        EntryFactory::collection('blog')->id('3')->data(['title' => '3-Three'])->create();
+
+        $template = <<<'EOT'
+{{ entries = {collection:blog limit="1"} }}
+A: {{ entries }}{{ title }}{{ /entries }}
+{{ collection:blog as="entries" }}
+B: {{ entries }}{{ title }}{{ /entries }}
+{{ /collection:blog }}
+C: {{ entries }}{{ title }}{{ /entries }}
+EOT;
+
+        $expected = <<<'EOT'
+A: 1-One
+
+B: 1-One2-Two3-Three
+
+C: 1-One
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+
+        $template = <<<'EOT'
+{{ entries = {collection:blog limit="1"} }}
+A: {{ entries }}{{ title }}{{ /entries }}
+{{ collection:blog as="entries" }}
+B: {{ entries }}{{ title }}{{ /entries }}
+
+{{ entries = [['title' => 'Five'], ['title' => 'Six']] /}}
+{{ /collection:blog }}
+C: {{ entries }}{{ title }}{{ /entries }}
+EOT;
+
+        $expected = <<<'EOT'
+A: 1-One
+
+B: 1-One2-Two3-Three
+
+
+
+C: FiveSix
+EOT;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
+
+    public function test_protected_scopes_are_not_pushed_upwards()
+    {
+        $this->withFakeViews();
+
+        $partial = <<<'PARTIAL'
+---
+param1: "default partial frontmatter value"
+param2: "default param2 value"
+---
+Partial Before: {{ view.param1 }}-{{ view.param2 }}
+{{ view.param2 = "updated param2 value" }}
+{{ view.param2 = "updated param2 value2" }}
+Partial After: {{ view.param1 }}-{{ view.param2 }}
+PARTIAL;
+
+        $this->viewShouldReturnRaw('test', $partial);
+
+        $template = <<<'EOT'
+{{ loop from="0" to="2" }}
+Template Before: {{ view.param1 }}-{{ view.param2 }}
+{{ partial:test param1="test{index}" /}}
+Template After: {{ view.param1 }}-{{ view.param2 }}
+{{ /loop }}
+EOT;
+
+        $expected = <<<'EXPECTED'
+Template Before: -
+Partial Before: test0-default param2 value
+
+
+Partial After: test0-updated param2 value2
+Template After: -
+
+Template Before: -
+Partial Before: test1-default param2 value
+
+
+Partial After: test1-updated param2 value2
+Template After: -
+
+Template Before: -
+Partial Before: test2-default param2 value
+
+
+Partial After: test2-updated param2 value2
+Template After: -
+EXPECTED;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
+
+    public function test_updating_view_scopes_inside_nested_partials()
+    {
+        $this->withFakeViews();
+
+        $partial = <<<'PARTIAL'
+---
+param1: "default partial frontmatter value"
+param2: "default param2 value"
+---
+Partial Before: {{ view.param1 }}-{{ view.param2 }}
+{{ view.param2 = "updated param2 value" }}
+{{ view.param2 = "updated param2 value2" }}
+{{ partial:test_two /}}
+Partial After: {{ view.param1 }}-{{ view.param2 }}
+PARTIAL;
+
+        $partialTwo = <<<'PARTIAL'
+---
+param1: "the inner partial param1"
+param2: "the inner partial param2"
+---
+
+Inner Partial: {{ view.param1 }}-{{ view.param2 }}
+PARTIAL;
+
+        $this->viewShouldReturnRaw('test', $partial);
+        $this->viewShouldReturnRaw('test_two', $partialTwo);
+
+        $template = <<<'EOT'
+{{ loop from="0" to="2" }}
+Template Before: {{ view.param1 }}-{{ view.param2 }}
+{{ partial:test param1="test{index}" /}}
+Template After: {{ view.param1 }}-{{ view.param2 }}
+{{ /loop }}
+EOT;
+
+        $expected = <<<'EXP'
+Template Before: -
+Partial Before: test0-default param2 value
+
+
+Inner Partial: the inner partial param1-the inner partial param2
+Partial After: test0-updated param2 value2
+Template After: -
+
+Template Before: -
+Partial Before: test1-default param2 value
+
+
+Inner Partial: the inner partial param1-the inner partial param2
+Partial After: test1-updated param2 value2
+Template After: -
+
+Template Before: -
+Partial Before: test2-default param2 value
+
+
+Inner Partial: the inner partial param1-the inner partial param2
+Partial After: test2-updated param2 value2
+Template After: -
+EXP;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
+    }
+
+    public function test_protected_scopes_dont_allow_trying_to_stuff_values_in_them()
+    {
+        $this->withFakeViews();
+
+        $partial = <<<'PARTIAL'
+---
+param1: "default partial frontmatter value"
+param2: "default param2 value"
+---
+Partial Before: {{ view.param1 }}-{{ view.param2 }}
+Partial Param3: {{ view.param3 }}
+{{ view.param2 = "updated param2 value" }}
+{{ view.param2 = "updated param2 value2" }}
+{{ view.param3 = 'I am the param3.'; }}
+Partial After: {{ view.param1 }}-{{ view.param2 }}-{{ view.param3 }}
+PARTIAL;
+
+        $this->viewShouldReturnRaw('test', $partial);
+
+        $template = <<<'EOT'
+{{ loop from="0" to="2" }}
+{{ view.param1 = 'Hi!'; /}}
+{{ view.param2 = 'Hello'; /}}
+{{ view.param3 = 'I am param3!'; /}}
+Template Before: {{ view.param1 }}-{{ view.param2 }}
+{{ partial:test param1="test{index}" /}}
+Template After: {{ view.param1 }}-{{ view.param2 }}-{{ view.param3 }}
+{{ /loop }}
+EOT;
+
+        $expected = <<<'EXP'
+Template Before: Hi!-Hello
+Partial Before: test0-default param2 value
+Partial Param3: 
+
+
+
+Partial After: test0-updated param2 value2-I am the param3.
+Template After: Hi!-Hello-I am param3!
+
+
+
+
+Template Before: Hi!-Hello
+Partial Before: test1-default param2 value
+Partial Param3: 
+
+
+
+Partial After: test1-updated param2 value2-I am the param3.
+Template After: Hi!-Hello-I am param3!
+
+
+
+
+Template Before: Hi!-Hello
+Partial Before: test2-default param2 value
+Partial Param3: 
+
+
+
+Partial After: test2-updated param2 value2-I am the param3.
+Template After: Hi!-Hello-I am param3!
+EXP;
+
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
     }
 }

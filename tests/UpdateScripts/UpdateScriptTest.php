@@ -206,7 +206,7 @@ class UpdateScriptTest extends TestCase
 
         Manager::runAll();
 
-        $this->assertFileNotExists($this->previousLockPath);
+        $this->assertFileDoesNotExist($this->previousLockPath);
     }
 
     /** @test */
@@ -313,7 +313,7 @@ class UpdateScriptTest extends TestCase
             'statamic/seo-pro' => '2.1.0',
         ], $this->lockPath);
 
-        $this->assertFileNotExists($this->previousLockPath);
+        $this->assertFileDoesNotExist($this->previousLockPath);
 
         $this->register(UpdateTaxonomies::class);
         $this->register(SeoProUpdate::class, 'statamic/seo-pro');
@@ -328,7 +328,7 @@ class UpdateScriptTest extends TestCase
 
         $this->assertTrue(cache()->has('taxonomies-update-successful'));
         $this->assertFalse(cache()->has('seo-pro-update-successful'));
-        $this->assertFileNotExists($this->previousLockPath);
+        $this->assertFileDoesNotExist($this->previousLockPath);
 
         cache()->forget('taxonomies-update-successful');
 
@@ -336,7 +336,7 @@ class UpdateScriptTest extends TestCase
 
         $this->assertFalse(cache()->has('taxonomies-update-successful'));
         $this->assertTrue(cache()->has('seo-pro-update-successful'));
-        $this->assertFileNotExists($this->previousLockPath);
+        $this->assertFileDoesNotExist($this->previousLockPath);
     }
 
     private function register($class, $package = 'statamic/cms')

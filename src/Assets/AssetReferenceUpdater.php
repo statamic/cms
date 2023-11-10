@@ -16,7 +16,6 @@ class AssetReferenceUpdater extends DataReferenceUpdater
     /**
      * Filter by container.
      *
-     * @param  string  $container
      * @return $this
      */
     public function filterByContainer(string $container)

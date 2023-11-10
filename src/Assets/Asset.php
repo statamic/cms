@@ -12,6 +12,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Search\Searchable as SearchableContract;
 use Statamic\Data\ContainsData;
@@ -30,6 +31,7 @@ use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Listeners\UpdateAssetReferences as UpdateAssetReferencesSubscriber;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
@@ -39,16 +41,19 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\MimeTypes;
 
-class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, ContainsQueryableValues, SearchableContract
+class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, ContainsQueryableValues, ResolvesValuesContract, SearchableContract
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns,
-    TracksQueriedRelations,
-    Searchable, ContainsData {
-        set as traitSet;
-        get as traitGet;
-        remove as traitRemove;
-        data as traitData;
-        merge as traitMerge;
+    use ContainsData, FluentlyGetsAndSets, HasAugmentedInstance,
+        Searchable,
+        TracksQueriedColumns, TracksQueriedRelations {
+            set as traitSet;
+            get as traitGet;
+            remove as traitRemove;
+            data as traitData;
+            merge as traitMerge;
+        }
+    use ResolvesValues {
+        resolveGqlValue as traitResolveGqlValue;
     }
 
     protected $container;
@@ -520,6 +525,16 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     }
 
     /**
+     * Get the file download url.
+     *
+     * @return string
+     */
+    public function cpDownloadUrl()
+    {
+        return cp_route('assets.download', base64_encode($this->id()));
+    }
+
+    /**
      * Get the file extension of the asset.
      *
      * @return string
@@ -694,12 +709,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
         $this->path($newPath);
         $this->save();
 
-        $isFlysystemV1 = method_exists($this->disk()->filesystem()->getDriver(), 'getTimestamp');
-
-        if ($isFlysystemV1) {
-            $this->disk()->delete($this->metaPath());
-        }
-
         $this->disk()->rename($oldMetaPath, $this->metaPath());
 
         return $this;
@@ -708,7 +717,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     /**
      * Replace an asset and/or its references where necessary.
      *
-     * @param  Asset  $originalAsset
      * @param  bool  $deleteOriginal
      * @return $this
      */
@@ -799,8 +807,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
 
     /**
      * Get the asset's ratio.
-     *
-     * @return
      */
     public function ratio()
     {
@@ -841,7 +847,6 @@ class Asset implements AssetContract, Augmentable, ArrayAccess, Arrayable, Conta
     /**
      * Upload a file.
      *
-     * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
      * @return $this
      */
     public function upload(UploadedFile $file)

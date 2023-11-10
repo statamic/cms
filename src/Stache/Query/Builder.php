@@ -190,7 +190,7 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return $this->{$method}($value->format('m'), $where['value']);
+            return $this->{$method}($value->format('m'), sprintf('%02d', $where['value']));
         });
     }
 
@@ -243,23 +243,23 @@ abstract class Builder extends BaseBuilder
             case '<>':
             case '!=':
                 $method = 'neq';
-            break;
+                break;
 
             case '>':
                 $method = 'gt';
-            break;
+                break;
 
             case '>=':
                 $method = 'gte';
-            break;
+                break;
 
             case '<':
                 $method = 'lt';
-            break;
+                break;
 
             case '<=':
                 $method = 'lte';
-            break;
+                break;
         }
 
         return $method;

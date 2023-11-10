@@ -10,7 +10,7 @@ use Statamic\Support\Arr;
 
 abstract class Tags
 {
-    use HasHandle, HasAliases, RegistersItself;
+    use HasAliases, HasHandle, RegistersItself;
 
     protected static $binding = 'tags';
 
@@ -197,9 +197,11 @@ abstract class Tags
      */
     public function parseNoResults($data = [])
     {
-        return $this->parse(array_merge($data, [
+        $data = array_merge($data, [
             'no_results' => true,
             'total_results' => 0,
-        ]));
+        ]);
+
+        return $this->parser ? $this->parse($data) : $data;
     }
 }

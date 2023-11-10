@@ -63,7 +63,10 @@ class Tags extends BaseTags
 
         $jsDriver = $this->parseJsParamDriverAndOptions($this->params->get('js'), $form);
 
-        $data['fields'] = $this->getFields($this->sessionHandle(), $jsDriver);
+        $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
+
+        $data['fields'] = collect($data['sections'])->flatMap->fields->all();
+
         $data['honeypot'] = $form->honeypot();
 
         if ($jsDriver) {
@@ -210,15 +213,39 @@ class Tags extends BaseTags
     }
 
     /**
-     * Get fields with extra data for looping over and rendering.
+     * Get sections of fields, using sections defined in blueprint.
      *
      * @param  string  $sessionHandle
      * @param  JsDriver  $jsDriver
      * @return array
      */
-    protected function getFields($sessionHandle, $jsDriver)
+    protected function getSections($sessionHandle, $jsDriver)
     {
-        return $this->form()->fields()
+        return $this->form()->blueprint()->tabs()->first()->sections()
+            ->map(function ($section) use ($sessionHandle, $jsDriver) {
+                return [
+                    'display' => $section->display(),
+                    'instructions' => $section->instructions(),
+                    'fields' => $this->getFields($sessionHandle, $jsDriver, $section->fields()->all()),
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * Get fields with extra data for looping over and rendering.
+     *
+     * @param  string  $sessionHandle
+     * @param  JsDriver  $jsDriver
+     * @param  array|null  $fields
+     * @return array
+     */
+    protected function getFields($sessionHandle, $jsDriver, $fields = null)
+    {
+        $form = $this->form();
+
+        return collect($fields ?? $form->fields())
+            ->each(fn ($field) => $field->setForm($form))
             ->map(function ($field) use ($sessionHandle, $jsDriver) {
                 return $this->getRenderableField($field, $sessionHandle, function ($data, $field) use ($jsDriver) {
                     return $jsDriver

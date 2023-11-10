@@ -9,18 +9,22 @@ use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Events\TaxonomyCreated;
 use Statamic\Events\TaxonomySaved;
 use Statamic\Events\TaxonomySaving;
+use Statamic\Events\TermBlueprintFound;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Support\Arr;
 use Statamic\Taxonomies\Taxonomy;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TaxonomyTest extends TestCase
 {
+    use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
@@ -114,6 +118,28 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
+    public function it_dispatches_an_event_when_getting_entry_blueprint()
+    {
+        Event::fake();
+
+        $taxonomy = (new Taxonomy)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/blog')->andReturn(collect([
+            'blueprint' => $blueprint = (new Blueprint)->setHandle('blueprint'),
+        ]));
+
+        // Do it twice so we can check the event is only dispatched once.
+        $taxonomy->termBlueprint();
+        $taxonomy->termBlueprint();
+
+        Event::assertDispatchedTimes(TermBlueprintFound::class, 1);
+        Event::assertDispatched(TermBlueprintFound::class, function ($event) use ($blueprint) {
+            return $event->blueprint === $blueprint
+                && $event->term === null;
+        });
+    }
+
+    /** @test */
     public function it_gets_the_url()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
@@ -179,65 +205,74 @@ class TaxonomyTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider additionalPreviewTargetProvider
      */
     public function it_gets_and_sets_preview_targets($throughFacade)
     {
-        $taxonomy = (new Taxonomy)->handle('tags');
+        $taxonomy = (new Taxonomy)->handle('test');
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->previewTargets());
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->basePreviewTargets());
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->additionalPreviewTargets());
 
         $this->assertEquals([
-            ['label' => 'Term', 'format' => '{permalink}'],
+            ['label' => 'Term', 'format' => '{permalink}', 'refresh' => true],
         ], $taxonomy->basePreviewTargets()->all());
 
         $return = $taxonomy->previewTargets([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}'], // no explicit refresh should imply its enabled
         ]);
 
         $this->assertSame($taxonomy, $return);
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
         ], $taxonomy->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
         ], $taxonomy->basePreviewTargets()->all());
 
         $this->assertEquals([], $taxonomy->additionalPreviewTargets()->all());
 
         $extra = [
-            ['label' => 'Baz', 'format' => '{baz}'],
-            ['label' => 'Qux', 'format' => '{qux}'],
+            ['label' => 'Qux', 'format' => '{qux}', 'refresh' => true],
+            ['label' => 'Quux', 'format' => '{quux}', 'refresh' => false],
+            ['label' => 'Flux', 'format' => '{flux}'], // no explicit refresh should imply its enabled
         ];
 
         if ($throughFacade) {
-            \Statamic\Facades\Taxonomy::addPreviewTargets('tags', $extra);
+            \Statamic\Facades\Taxonomy::addPreviewTargets('test', $extra);
         } else {
             $taxonomy->addPreviewTargets($extra);
         }
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
-            ['label' => 'Baz', 'format' => '{baz}'],
-            ['label' => 'Qux', 'format' => '{qux}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
+            ['label' => 'Qux', 'format' => '{qux}', 'refresh' => true],
+            ['label' => 'Quux', 'format' => '{quux}', 'refresh' => false],
+            ['label' => 'Flux', 'format' => '{flux}', 'refresh' => true],
         ], $taxonomy->previewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Foo', 'format' => '{foo}'],
-            ['label' => 'Bar', 'format' => '{bar}'],
+            ['label' => 'Foo', 'format' => '{foo}', 'refresh' => true],
+            ['label' => 'Bar', 'format' => '{bar}', 'refresh' => false],
+            ['label' => 'Baz', 'format' => '{baz}', 'refresh' => true],
         ], $taxonomy->basePreviewTargets()->all());
 
         $this->assertEquals([
-            ['label' => 'Baz', 'format' => '{baz}'],
-            ['label' => 'Qux', 'format' => '{qux}'],
+            ['label' => 'Qux', 'format' => '{qux}', 'refresh' => true],
+            ['label' => 'Quux', 'format' => '{quux}', 'refresh' => false],
+            ['label' => 'Flux', 'format' => '{flux}', 'refresh' => true],
         ], $taxonomy->additionalPreviewTargets()->all());
     }
 
@@ -330,6 +365,38 @@ class TaxonomyTest extends TestCase
         $this->assertFalse($return);
 
         Event::assertNotDispatched(TaxonomySaved::class);
+    }
+
+    /** @test */
+    public function it_cannot_view_taxonomies_from_sites_that_the_user_is_not_authorized_to_see()
+    {
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $taxonomy1 = tap(Facades\Taxonomy::make('has_some_french')->sites(['en', 'fr', 'de']))->save();
+        $taxonomy2 = tap(Facades\Taxonomy::make('has_no_french')->sites(['en', 'de']))->save();
+        $taxonomy3 = tap(Facades\Taxonomy::make('has_only_french')->sites(['fr']))->save();
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'view has_some_french terms',
+            'view has_no_french terms',
+            'view has_only_french terms',
+            'access en site',
+            // 'access fr site', // Give them access to all data, but not all sites
+            'access de site',
+        ]]);
+
+        $user = tap(User::make()->assignRole('test'))->save();
+        $this->assertTrue($user->can('view', $taxonomy1));
+        $this->assertTrue($user->can('view', $taxonomy2));
+        $this->assertFalse($user->can('view', $taxonomy3));
     }
 
     public function additionalPreviewTargetProvider()

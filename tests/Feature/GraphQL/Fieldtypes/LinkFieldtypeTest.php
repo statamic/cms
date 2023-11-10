@@ -3,6 +3,8 @@
 namespace Tests\Feature\GraphQL\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
+use Mockery;
+use Statamic\Contracts\Entries\Entry;
 
 /** @group graphql */
 class LinkFieldtypeTest extends FieldtypeTestCase
@@ -17,7 +19,7 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->never();
+        ResolveRedirect::shouldReceive('item')->never();
 
         $this->assertGqlEntryHas('link', ['link' => null]);
     }
@@ -32,7 +34,7 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->once()->with('/hardcoded', $entry, true)->andReturn('/hardcoded');
+        ResolveRedirect::shouldReceive('item')->once()->with('/hardcoded', $entry, true)->andReturn('/hardcoded');
 
         $this->assertGqlEntryHas('link', ['link' => '/hardcoded']);
     }
@@ -47,7 +49,10 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->once()->with('entry::123', $entry, true)->andReturn('/the-entry-url');
+        $another = Mockery::mock(Entry::class);
+        $another->shouldReceive('url')->once()->andReturn('/the-entry-url');
+
+        ResolveRedirect::shouldReceive('item')->once()->with('entry::123', $entry, true)->andReturn($another);
 
         $this->assertGqlEntryHas('link', ['link' => '/the-entry-url']);
     }
@@ -62,7 +67,10 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->once()->with('@child', $entry, true)->andReturn('/the-first-child');
+        $another = Mockery::mock(Entry::class);
+        $another->shouldReceive('url')->once()->andReturn('/the-first-child');
+
+        ResolveRedirect::shouldReceive('item')->once()->with('@child', $entry, true)->andReturn($another);
 
         $this->assertGqlEntryHas('link', ['link' => '/the-first-child']);
     }
@@ -77,7 +85,7 @@ class LinkFieldtypeTest extends FieldtypeTestCase
             ],
         ]);
 
-        ResolveRedirect::shouldReceive('resolve')->once()->with('entry::unknown', $entry, true)->andReturn(404);
+        ResolveRedirect::shouldReceive('item')->once()->with('entry::unknown', $entry, true)->andReturnNull();
 
         $this->assertGqlEntryHas('link', ['link' => null]);
     }
