@@ -282,7 +282,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     public function contents()
     {
         return Blink::once('asset-listing-cache-'.$this->handle(), function () {
-            return new AssetContainerContents($this);
+            return app(AssetContainerContents::class)->container($this);
         });
     }
 

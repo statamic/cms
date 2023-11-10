@@ -1,5 +1,82 @@
 # Release Notes
 
+## 4.33.0 (2023-11-10)
+
+### What's new
+- Bard supports cmd+k for links. [#8950](https://github.com/statamic/cms/issues/8950) by @o1y
+- The Entries fieldtype use columns from preferences in the stack selector. [#8900](https://github.com/statamic/cms/issues/8900) by @duncanmcclean
+- Bind `AssetContainerContents` to the service provider. [#8954](https://github.com/statamic/cms/issues/8954) by @ryanmitchell
+- Support arrays in wrap modifier [#8942](https://github.com/statamic/cms/issues/8942) by @jacksleight
+- Add `mount` to augmented collection. [#8928](https://github.com/statamic/cms/issues/8928) by @duncanmcclean
+- Require `pint` in dev. [#8955](https://github.com/statamic/cms/issues/8955) by @ryanmitchell
+
+### What's improved
+- French translations. [#8945](https://github.com/statamic/cms/issues/8945) [#8934](https://github.com/statamic/cms/issues/8934) by @ebeauchamps
+- German translations. [#8939](https://github.com/statamic/cms/issues/8939) by @doriengr
+
+### What's fixed
+- Front-end form asset field php file validation. [#8968](https://github.com/statamic/cms/issues/8968) by @jasonvarga
+- Fix entries fieldtype not respecting collection sort column & direction. [#8894](https://github.com/statamic/cms/issues/8894) by @duncanmcclean
+- Fix duplicate entry action translation. [#8946](https://github.com/statamic/cms/issues/8946) by @jasonvarga
+- Fix SortableList not reacting to disabled prop changes. [#8949](https://github.com/statamic/cms/issues/8949) by @duncanmcclean
+- Remove debounce when renaming assets & folders. [#8953](https://github.com/statamic/cms/issues/8953) by @duncanmcclean
+- Use translations from fallback locale when primary locale is missing translations. [#8940](https://github.com/statamic/cms/issues/8940) by @duncanmcclean
+- Fix missing title on relationship fields in multi-site. [#8936](https://github.com/statamic/cms/issues/8936) by @duncanmcclean
+- Prevent ensuring fields on entries if they already exist. [#8926](https://github.com/statamic/cms/issues/8926) by @duncanmcclean
+- Fix `statamic.web` middleware not being merged. [#8935](https://github.com/statamic/cms/issues/8935) by @duncanmcclean
+- Fix infinite loop on listing table of mounted collection. [#8937](https://github.com/statamic/cms/issues/8937) by @duncanmcclean
+- Fix "Always Save" toggle not being saved when used on linked field. [#8927](https://github.com/statamic/cms/issues/8927) by @duncanmcclean
+- Fix slug field not targeting sibling fields inside a replicator. [#8929](https://github.com/statamic/cms/issues/8929) by @duncanmcclean
+
+
+
+## 4.32.0 (2023-11-03)
+
+### What's new
+- Entries fieldtype gets a tree view in the stack selector. [#8899](https://github.com/statamic/cms/issues/8899) by @duncanmcclean
+- Link fieldtype supports array syntax for getting underlying entry, asset, etc. [#8911](https://github.com/statamic/cms/issues/8911) by @edalzell
+- Ability to duplicate fields in blueprint/fieldset builders. [#8916](https://github.com/statamic/cms/issues/8916) by @duncanmcclean
+- Support paste events in Taggable Fieldtype. [#8903](https://github.com/statamic/cms/issues/8903) by @duncanmcclean
+- Add helper to more easily remove child item in CP navigation. [#8883](https://github.com/statamic/cms/issues/8883) by @jesseleite
+
+### What's fixed
+- Fix entries on the same date being ignored by collection previous/next tags. [#8921](https://github.com/statamic/cms/issues/8921) by @duncanmcclean
+- Remove schema check on import users command. [#8909](https://github.com/statamic/cms/issues/8909) by @ryanmitchell
+- Fix slugify when using hyphens surrounded by spaces. [#8923](https://github.com/statamic/cms/issues/8923) by @duncanmcclean
+- Fix collection listing's sort direction on reorder. [#8910](https://github.com/statamic/cms/issues/8910) by @o1y
+- Prevent root entries being deleted in listing view. [#8912](https://github.com/statamic/cms/issues/8912) by @ryanmitchell
+- Handle unauthorized response in Inline Publish Form. [#8918](https://github.com/statamic/cms/issues/8918) by @duncanmcclean
+- Hide publish action fields when saving. [#8917](https://github.com/statamic/cms/issues/8917) by @ryanmitchell
+- Handle empty values in collection tag filters. [#8915](https://github.com/statamic/cms/issues/8915) by @duncanmcclean
+- Fix missing translation of some user defined strings. [#8914](https://github.com/statamic/cms/issues/8914) by @ryanmitchell
+- Fix CP nav item active status regressions. [#8880](https://github.com/statamic/cms/issues/8880) by @jesseleite
+- Validate that Select & Button Group options have keys. [#8905](https://github.com/statamic/cms/issues/8905) by @duncanmcclean
+- Fix permissions for asset upload and folder creation buttons in CP [#8925](https://github.com/statamic/cms/issues/8925) by @joshuablum
+
+
+
+## 4.31.0 (2023-10-30)
+
+### What's new
+- PHP 8.3 support [#8845](https://github.com/statamic/cms/issues/8845) by @jasonvarga
+- Custom form submission exporters. [#8837](https://github.com/statamic/cms/issues/8837) by @ryanmitchell
+- Add `RevisionSaving` event. [#8551](https://github.com/statamic/cms/issues/8551) by @ryanmitchell
+- Allow using globals in form email configs. [#8892](https://github.com/statamic/cms/issues/8892) by @duncanmcclean
+- Improve Entries fieldtype search index logic, and add option to define an explicit one. [#8885](https://github.com/statamic/cms/issues/8885) by @edalzell
+
+### What's improved
+- Improve UI of link fieldtype in smaller spaces. [#8882](https://github.com/statamic/cms/issues/8882) by @godismyjudge95
+- French translations. [#8889](https://github.com/statamic/cms/issues/8889) by @ebeauchamps
+
+### What's fixed
+- Fix status column moving when resetting columns on entry listing. [#8896](https://github.com/statamic/cms/issues/8896) by @duncanmcclean
+- Ignore single smart quotes when slugifying entries. [#8895](https://github.com/statamic/cms/issues/8895) by @duncanmcclean
+- Fix Live Preview not updating when relationship items are updated. [#8893](https://github.com/statamic/cms/issues/8893) by @duncanmcclean
+- Fix global site selector not closing when clicking outside. [#8888](https://github.com/statamic/cms/issues/8888) by @o1y
+- Fix Bard text align when no headings are enabled. [#8878](https://github.com/statamic/cms/issues/8878) by @jacksleight
+
+
+
 ## 4.30.0 (2023-10-20)
 
 ### What's new
