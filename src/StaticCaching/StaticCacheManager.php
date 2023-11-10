@@ -57,7 +57,7 @@ class StaticCacheManager extends Manager
 
         collect(Cache::get('nocache::urls', []))->each(function ($url) {
             $session = Cache::get($sessionKey = 'nocache::session.'.md5($url));
-            collect($session['regions'])->each(fn ($region) => Cache::forget('nocache::region.'.$region));
+            collect($session['regions'] ?? [])->each(fn ($region) => Cache::forget('nocache::region.'.$region));
             Cache::forget($sessionKey);
         });
 
