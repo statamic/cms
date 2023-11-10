@@ -61,6 +61,48 @@ Statamic.booting(Statamic => {
 
 Alpine.start()
 
+Alpine.magic('store', (el, { Alpine }) => {
+    let vm, node = el;
+    while (!vm) {
+        node = node.parentNode;
+        if (node === document.documentElement) return null;
+        vm = node.__vue__;
+    }
+    const $root = vm.$root;
+    while (vm.$options.name !== 'publish-container') {
+        vm = vm.$parent;
+        if (vm === $root) return null;
+    }
+    const { $store, name } = vm;
+    const data = Alpine.reactive({
+        values: { ...vm.values },
+        meta: { ...vm.meta },
+    });
+    $store.subscribe((mutation) => {
+        if (mutation.type === `publish/${name}/setFieldValue`) {
+            data.values = { ...vm.values };
+        }
+        if (mutation.type === `publish/${name}/setFieldMeta`) {
+            data.meta = { ...vm.meta };
+        }
+    });
+    return {
+        state: data,
+        setFieldValue(handle, value) {
+            $store.dispatch(`publish/${name}/setFieldValue`, {
+                handle, value,
+                user: Statamic.user.id
+            });
+        },
+        setFieldMeta(handle, value) {
+            $store.dispatch(`publish/${name}/setFieldMeta`, {
+                handle, value,
+                user: Statamic.user.id
+            });
+        },
+    };
+});
+
 Vue.prototype.$axios = axios;
 Vue.prototype.$events = new Vue();
 Vue.prototype.$echo = Statamic.$echo;
