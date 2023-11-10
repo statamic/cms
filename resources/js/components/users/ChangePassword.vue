@@ -12,7 +12,7 @@
             <form-group
                 v-if="requiresCurrentPassword"
                 handle="password"
-                :display="__('Your Password')"
+                :display="__('Current Password')"
                 v-model="currentPassword"
                 :errors="errors.current_password"
                 class="p-0 mb-6"
