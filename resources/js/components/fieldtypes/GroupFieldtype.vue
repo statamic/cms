@@ -13,7 +13,7 @@
                     v-if="fullScreenMode"
                     class="relative flex items-center justify-between py-3 pl-3 bg-gray-200 border-b"
                 >
-                    <h2 v-text="config.display" />
+                    <h2 v-text="__(config.display)" />
                     <button
                         @click="fullScreenMode = false"
                         class="absolute btn-close top-2 right-5"
@@ -53,7 +53,7 @@
                                 :meta="meta[field.handle]"
                                 :value="value[field.handle]"
                                 :parent-name="name"
-                                :set-index="index"
+                                :set-index="0"
                                 :errors="errors(field.handle)"
                                 :field-path="fieldPath(field.handle)"
                                 :read-only="isReadOnly"
@@ -71,9 +71,9 @@
     </portal>
 </template>
 <script>
-import FieldType from './Fieldtype.vue';
-import SetField from './replicator/Field.vue';
-import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
+import FieldType from '@/../../vendor/statamic/cms/resources/js/components/fieldtypes/Fieldtype.vue';
+import SetField from '@/../../vendor/statamic/cms/resources/js/components/fieldtypes/replicator/Field.vue';
+import { ValidatesFieldConditions } from '@/../../vendor/statamic/cms/resources/js/components/field-conditions/FieldConditions.js';
 
 export default {
     mixins: [
@@ -94,6 +94,9 @@ export default {
     },
     inject: ['storeName'],
     computed: {
+        values() {
+            return this.value;
+        },
         fields() {
             return this.config.fields;
         },
@@ -151,7 +154,7 @@ export default {
         },
 
         fieldPath(handle) {
-            return `${this.fieldPathPrefix}.${handle}`;
+            return (this.fieldPathPrefix || this.handle) + '.' + handle;
         },
 
         errors(handle) {
