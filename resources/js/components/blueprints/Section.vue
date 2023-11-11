@@ -7,7 +7,7 @@
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
                 <div class="p-2 flex-1 flex items-center">
                     <a class="flex items-center flex-1 group" @click="edit">
-                        <svg-icon v-if="section.icon" :name="section.icon" :custom-directory="iconPath" class="h-4 w-4 mr-2 text-gray-700 group-hover:text-blue-500" />
+                        <svg-icon v-if="section.icon" :name="section.icon" :directory="iconDirectory" class="h-4 w-4 mr-2 text-gray-700 group-hover:text-blue-500" />
                         <div class="mr-2" v-text="section.display" />
                     </a>
                     <button class="flex items-center text-gray-700 hover:text-gray-950 mr-3" @click="edit">
@@ -42,7 +42,7 @@
                     <div class="form-group w-full" v-if="showHandleField">
                         <label v-text="__('Icon')" />
                         <publish-field-meta
-                            :config="{ handle: 'icon', type: 'icon', directory: this.iconDirectory, folder: this.iconFolder }"
+                            :config="{ handle: 'icon', type: 'icon', directory: this.iconBaseDirectory, folder: this.iconSubFolder }"
                             :initial-value="editingSection.icon"
                             v-slot="{ meta, value, loading }"
                         >
@@ -127,22 +127,22 @@ export default {
             return this.suggestableConditionFieldsProvider?.suggestableFields || [];
         },
 
-        iconDirectory() {
+        iconBaseDirectory() {
             return this.$config.get('setIconsDirectory');
         },
 
-        iconFolder() {
+        iconSubFolder() {
             return this.$config.get('setIconsFolder');
         },
 
-        iconPath() {
-            let path = this.iconDirectory;
+        iconDirectory() {
+            let dir = this.iconBaseDirectory;
 
-            if (this.iconFolder) {
-                path = path+'/'+this.iconFolder;
+            if (this.iconSubFolder) {
+                dir = dir+'/'+this.iconSubFolder;
             }
 
-            return path;
+            return dir;
         },
 
     },

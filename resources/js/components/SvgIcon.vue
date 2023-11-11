@@ -11,7 +11,7 @@ export default {
     props: {
         name: String,
         default: String,
-        customDirectory: String,
+        directory: String,
     },
 
     data() {
@@ -28,15 +28,15 @@ export default {
 
     computed: {
         customIcon() {
-            if (! this.customDirectory) return;
+            if (! this.directory) return;
 
-            return data_get(this.$config.get('customSvgIcons') || {}, `${this.customDirectory}.${this.name}`);
+            return data_get(this.$config.get('customSvgIcons') || {}, `${this.directory}.${this.name}`);
         },
     },
 
     methods: {
         evaluateIcon() {
-            if (this.customIcon) {
+            if (this.directory) {
                 return defineAsyncComponent(() => {
                     return new Promise(resolve => resolve({ template: this.customIcon }));
                 });

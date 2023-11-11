@@ -11,7 +11,7 @@
         @click="$emit('selected')"
         @mouseenter="$emit('mouseenter')"
     >
-        <svg-icon v-if="tab.icon" :name="tab.icon" :custom-directory="iconPath" class="w-4 h-4 mr-1" />
+        <svg-icon v-if="tab.icon" :name="tab.icon" :directory="iconDirectory" class="w-4 h-4 mr-1" />
 
         {{ tab.display }}
 
@@ -58,7 +58,7 @@
                 <div class="form-group w-full" v-if="showInstructions">
                     <label v-text="__('Icon')" />
                     <publish-field-meta
-                        :config="{ handle: 'icon', type: 'icon', directory: this.iconDirectory, folder: this.iconFolder }"
+                        :config="{ handle: 'icon', type: 'icon', directory: this.iconBaseDirectory, folder: this.iconSubFolder }"
                         :initial-value="icon"
                         v-slot="{ meta, value, loading }"
                     >
@@ -117,22 +117,22 @@ export default {
             return this.currentTab === this.tab._id;
         },
 
-        iconDirectory() {
+        iconBaseDirectory() {
             return this.$config.get('setIconsDirectory');
         },
 
-        iconFolder() {
+        iconSubFolder() {
             return this.$config.get('setIconsFolder');
         },
 
-        iconPath() {
-            let path = this.iconDirectory;
+        iconDirectory() {
+            let dir = this.iconBaseDirectory;
 
-            if (this.iconFolder) {
-                path = path+'/'+this.iconFolder;
+            if (this.iconSubFolder) {
+                dir = dir+'/'+this.iconSubFolder;
             }
 
-            return path;
+            return dir;
         },
 
     },
