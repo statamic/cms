@@ -77,14 +77,14 @@ class SetsTest extends TestCase
                 'handle' => 'bravo',
                 'display' => null,
                 'instructions' => null,
-                'icon' => null,
+                'icon' => 'regular/folder-generic',
                 'sections' => [
                     [
                         '_id' => 'group-bravo-section-two',
                         'handle' => 'two',
                         'display' => null,
                         'instructions' => null,
-                        'icon' => null,
+                        'icon' => 'regular/folder-generic',
                         'fields' => [
                             [
                                 '_id' => 'group-bravo-section-two-0',
@@ -127,7 +127,7 @@ class SetsTest extends TestCase
                 'handle' => 'main',
                 'display' => 'Main',
                 'instructions' => null,
-                'icon' => null,
+                'icon' => 'regular/folder-generic',
                 'sections' => [
                     [
                         '_id' => 'group-main-section-one',
@@ -238,10 +238,12 @@ class SetsTest extends TestCase
             ],
             [
                 'handle' => 'bravo',
+                'icon' => 'regular/folder-generic',
                 'sets' => [
                     [
                         'id' => 'two',
                         'handle' => 'two',
+                        'icon' => 'light/add',
                         'fields' => [
                             [
                                 'display' => 'Field Two',
@@ -289,6 +291,7 @@ class SetsTest extends TestCase
         $this->assertEquals([
             [
                 'handle' => 'main',
+                'icon' => 'regular/folder-generic',
                 'sets' => [
                     [
                         'id' => 'one',
