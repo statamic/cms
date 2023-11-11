@@ -3,7 +3,6 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\File;
-use Statamic\Facades\Path;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;
@@ -47,14 +46,14 @@ class Sets extends Fieldtype
                 'handle' => $groupHandle,
                 'display' => $group['display'] ?? null,
                 'instructions' => $group['instructions'] ?? null,
-                'icon' => $this->getIconHtml(Arr::get($group, 'icon')),
+                'icon' => $group['icon'] ?? null,
                 'sections' => collect($group['sets'] ?? [])->map(function ($set, $setHandle) use ($groupId) {
                     return [
                         '_id' => $setId = $groupId.'-section-'.$setHandle,
                         'handle' => $setHandle,
                         'display' => $set['display'] ?? null,
                         'instructions' => $set['instructions'] ?? null,
-                        'icon' => $this->getIconHtml(Arr::get($set, 'icon'), 'regular/folder-generic'),
+                        'icon' => $set['icon'] ?? 'regular/folder-generic',
                         'fields' => collect($set['fields'])->map(function ($field, $i) use ($setId) {
                             return array_merge(FieldTransformer::toVue($field), ['_id' => $setId.'-'.$i]);
                         })->all(),
@@ -89,14 +88,14 @@ class Sets extends Fieldtype
         return collect($sets)->map(function ($group, $groupHandle) {
             return array_merge($group, [
                 'handle' => $groupHandle,
-                'icon' => $this->getIconHtml(Arr::get($group, 'icon'), 'regular/folder-generic'),
+                'icon' => $group['icon'] ?? 'regular/folder-generic',
                 'sets' => collect($group['sets'])
                     ->map(function ($config, $name) {
                         return array_merge($config, [
                             'handle' => $name,
                             'id' => $name,
                             'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
-                            'icon' => $this->getIconHtml(Arr::get($config, 'icon'), 'light/add'),
+                            'icon' => $config['icon'] ?? 'light/add',
                         ]);
                     })
                     ->values()
@@ -160,35 +159,12 @@ class Sets extends Fieldtype
             'setIconsDirectory' => static::$iconsDirectory,
             'setIconsFolder' => static::$iconsFolder,
         ]);
-    }
 
-    /**
-     * Get icon HTML, because our <svg-icon> component cannot reference custom paths at runtime without a Vite re-build.
-     *
-     * @param  string|null  $configuredIcon
-     * @param  string|null  $fallbackVendorIcon
-     * @return string|null
-     */
-    protected function getIconHtml($configuredIcon, $fallbackVendorIcon = null)
-    {
-        $iconPath = collect([static::$iconsDirectory, static::$iconsFolder, $configuredIcon])
-            ->filter()
-            ->implode('/').'.svg';
-
-        $absoluteIconPath = Path::isAbsolute($iconPath)
-            ? $iconPath
-            : Path::makeFull($iconPath);
-
-        if ($configuredIcon && File::exists($absoluteIconPath)) {
-            return File::get($absoluteIconPath);
+        // And finally, provide the file contents of all custom svg icons to script,
+        // but only if custom directory because our <svg-icon> component cannot
+        // reference custom paths at runtime without a full Vite re-build
+        if ($directory) {
+            Icon::provideCustomSvgIconsToScript($directory, $folder);
         }
-
-        $absoluteFallbackIconPath = base_path(static::$iconsDirectory."/{$fallbackVendorIcon}.svg");
-
-        if ($fallbackVendorIcon && File::exists($absoluteFallbackIconPath)) {
-            return File::get($absoluteFallbackIconPath);
-        }
-
-        return null;
     }
 }
