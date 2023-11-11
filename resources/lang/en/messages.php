@@ -93,6 +93,7 @@ return [
     'fields_instructions_position_instructions' => 'Show instructions above or below the field.',
     'fields_listable_instructions' => 'Control the listing column visibility.',
     'fields_visibility_instructions' => 'Control field visibility on publish forms.',
+    'fields_hide_display_instructions' => 'Control whether the field\'s display label is shown',
     'fields_replicator_preview_instructions' => 'Control preview visibility in Replicator/Bard sets.',
     'fieldset_import_fieldset_instructions' => 'The fieldset to be imported.',
     'fieldset_import_prefix_instructions' => 'The prefix that should be applied to each field when they are imported. eg. hero_',
