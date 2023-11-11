@@ -7,7 +7,7 @@
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
                 <div class="p-2 flex-1 flex items-center">
                     <a class="flex items-center flex-1 group" @click="edit">
-                        <svg-icon v-if="section.icon" :name="section.icon" :directory="iconDirectory" class="h-4 w-4 mr-2 text-gray-700 group-hover:text-blue-500" />
+                        <svg-icon :name="section.icon" :directory="iconDirectory" class="h-4 w-4 mr-2 text-gray-700 group-hover:text-blue-500" />
                         <div class="mr-2" v-text="section.display" />
                     </a>
                     <button class="flex items-center text-gray-700 hover:text-gray-950 mr-3" @click="edit">

@@ -11,7 +11,7 @@
         @click="$emit('selected')"
         @mouseenter="$emit('mouseenter')"
     >
-        <svg-icon v-if="tab.icon" :name="tab.icon" :directory="iconDirectory" class="w-4 h-4 mr-1" />
+        <svg-icon :name="tab.icon" :directory="iconDirectory" class="w-4 h-4 mr-1" />
 
         {{ tab.display }}
 
