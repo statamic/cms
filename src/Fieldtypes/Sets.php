@@ -46,7 +46,7 @@ class Sets extends Fieldtype
                 'handle' => $groupHandle,
                 'display' => $group['display'] ?? null,
                 'instructions' => $group['instructions'] ?? null,
-                'icon' => $group['icon'] ?? null,
+                'icon' => $group['icon'] ?? 'regular/folder-generic',
                 'sections' => collect($group['sets'] ?? [])->map(function ($set, $setHandle) use ($groupId) {
                     return [
                         '_id' => $setId = $groupId.'-section-'.$setHandle,
