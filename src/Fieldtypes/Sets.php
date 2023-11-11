@@ -147,7 +147,7 @@ class Sets extends Fieldtype
         // If they are specifying new base directory, ensure we do not assume sub-folder
         if ($directory) {
             static::$iconsDirectory = $directory;
-            static::$iconsFolder = null;
+            static::$iconsFolder = $folder;
         }
 
         // Of if they are specifying just a sub-folder, use that with original base directory
