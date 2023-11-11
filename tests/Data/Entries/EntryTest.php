@@ -1550,6 +1550,74 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_adds_propagated_entry_to_structure()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'es' => ['name' => 'Spanish', 'locale' => 'es_ES', 'url' => 'http://test.com/es/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->sites(['en', 'fr', 'es'])
+            ->propagate(false)
+            ->save();
+
+        (new Entry)->locale('en')->id('en-1')->collection($collection)->save();
+        (new Entry)->locale('en')->id('en-2')->collection($collection)->save();
+        (new Entry)->locale('en')->id('en-3')->collection($collection)->save();
+
+        (new Entry)->locale('fr')->id('fr-1')->collection($collection)->origin('en-1')->save();
+        (new Entry)->locale('fr')->id('fr-2')->collection($collection)->origin('en-2')->save();
+
+        (new Entry)->locale('es')->id('es-1')->collection($collection)->origin('en-1')->save();
+        (new Entry)->locale('es')->id('es-3')->collection($collection)->origin('en-3')->save();
+
+        $collection->structureContents(['expects_root' => false])->save();
+        $collection->structure()->in('en')->tree([['entry' => 'en-1'], ['entry' => 'en-2'], ['entry' => 'en-3']])->save();
+        $collection->structure()->in('fr')->tree([['entry' => 'fr-1'], ['entry' => 'fr-2']])->save();
+        $collection->structure()->in('es')->tree([['entry' => 'es-1'], ['entry' => 'es-3']])->save();
+
+        $collection->propagate(true);
+
+        $en = (new Entry)
+            ->id('en-2-1')
+            ->locale('en')
+            ->collection($collection)
+            ->afterSave(function ($entry) {
+                $entry->collection()->structure()->in('en')->appendTo('en-2', $entry)->save();
+            });
+
+        $en->save();
+
+        $this->assertIsObject($fr = $en->descendants()->get('fr'));
+        $this->assertIsObject($es = $en->descendants()->get('es'));
+
+        $this->assertEquals([
+            ['entry' => 'en-1'],
+            ['entry' => 'en-2', 'children' => [['entry' => $en->id()]]],
+            ['entry' => 'en-3'],
+        ], $collection->structure()->in('en')->tree());
+
+        $this->assertEquals([
+            ['entry' => 'fr-1'],
+            ['entry' => 'fr-2', 'children' => [['entry' => $fr->id()]]],
+        ], $collection->structure()->in('fr')->tree());
+
+        $this->assertEquals([
+            ['entry' => 'es-1'],
+            ['entry' => 'es-3'],
+            ['entry' => $es->id()],
+        ], $collection->structure()->in('es')->tree());
+    }
+
+    /** @test */
     public function if_saving_event_returns_false_the_entry_doesnt_save()
     {
         Facades\Entry::spy();
