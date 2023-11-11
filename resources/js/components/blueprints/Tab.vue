@@ -11,7 +11,7 @@
         @click="$emit('selected')"
         @mouseenter="$emit('mouseenter')"
     >
-        <div v-if="tab.icon" v-html="tab.icon" class="w-4 h-4 mr-1" />
+        <svg-icon v-if="tab.icon" :name="tab.icon" :custom-directory="iconPath" class="w-4 h-4 mr-1" />
 
         {{ tab.display }}
 
@@ -123,6 +123,16 @@ export default {
 
         iconFolder() {
             return this.$config.get('setIconsFolder');
+        },
+
+        iconPath() {
+            let path = this.iconDirectory;
+
+            if (this.iconFolder) {
+                path = path+'/'+this.iconFolder;
+            }
+
+            return path;
         },
 
     },
