@@ -4,24 +4,44 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
+import { data_get } from  '../bootstrap/globals.js'
 
 export default {
+
     props: {
         name: String,
         default: String,
+        customDirectory: String,
     },
+
     data() {
         return {
             icon: this.evaluateIcon(),
         }
     },
+
     watch: {
         name() {
             this.icon = this.evaluateIcon();
         }
     },
+
+    computed: {
+        customIcon() {
+            if (! this.customDirectory) return;
+
+            return data_get(this.$config.get('customSvgIcons') || {}, `${this.customDirectory}.${this.name}`);
+        },
+    },
+
     methods: {
         evaluateIcon() {
+            if (this.customIcon) {
+                return defineAsyncComponent(() => {
+                    return new Promise(resolve => resolve({ template: this.customIcon }));
+                });
+            }
+
             if (this.name.startsWith('<svg')) {
                 return defineAsyncComponent(() => {
                     return new Promise(resolve => resolve({ template: this.name }));
