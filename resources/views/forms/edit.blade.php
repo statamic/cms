@@ -5,6 +5,7 @@
 
     <collection-edit-form
         initial-title="{{ $form->title() }}"
+        edit-title="Edit Form"
         :blueprint="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
         :meta="{{ json_encode($meta) }}"
