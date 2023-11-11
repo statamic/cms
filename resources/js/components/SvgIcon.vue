@@ -16,8 +16,12 @@ export default {
 
     data() {
         return {
-            icon: this.evaluateIcon(),
+            icon: null,
         }
+    },
+
+    created() {
+        this.$nextTick(() => this.icon = this.evaluateIcon());
     },
 
     watch: {
@@ -36,7 +40,7 @@ export default {
 
     methods: {
         evaluateIcon() {
-            if (this.directory) {
+            if (this.customIcon) {
                 return defineAsyncComponent(() => {
                     return new Promise(resolve => resolve({ template: this.customIcon }));
                 });
