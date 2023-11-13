@@ -30,6 +30,7 @@ import './bootstrap/components';
 import './bootstrap/fieldtypes';
 import './bootstrap/directives';
 import './bootstrap/tooltips';
+import './bootstrap/alpine';
 
 import axios from 'axios';
 import PortalVue from "portal-vue";
@@ -57,49 +58,6 @@ vSelect.props.components.default = () => ({
 Statamic.booting(Statamic => {
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     axios.defaults.headers.common['X-CSRF-TOKEN'] = Statamic.$config.get('csrfToken');
-});
-
-Alpine.start()
-
-Alpine.magic('field', (el, { Alpine }) => {
-    const vm = el.closest('.html-fieldtype-wrapper')?.__vue__;
-    if (!vm) {
-        return;
-    }
-    const { $store, storeName } = vm;
-    const storeState = $store.state.publish[storeName] || [];
-    const storeAlpine = Alpine.reactive({
-        values: { ...storeState.values },
-        meta: { ...storeState.meta },
-    });
-    $store.subscribe((mutation) => {
-        if ([
-            `publish/${storeName}/setFieldValue`,
-            `publish/${storeName}/setFieldMeta`,
-        ].includes(mutation.type)) {
-            storeAlpine.values = { ...storeState.values };
-            storeAlpine.meta = { ...storeState.meta };
-        }
-    });
-    return {
-        value: vm.value,
-        update: vm.update,
-        updateDebounced: vm.updateDebounced,
-        updateMeta: vm.updateMeta,
-        store: {
-            state: storeAlpine,
-            setFieldValue(handle, value) {
-                $store.dispatch(`publish/${storeName}/setFieldValue`, {
-                    handle, value, user: Statamic.user.id
-                });
-            },
-            setFieldMeta(handle, value) {
-                $store.dispatch(`publish/${storeName}/setFieldMeta`, {
-                    handle, value, user: Statamic.user.id
-                });
-            },
-        },
-    };
 });
 
 Vue.prototype.$axios = axios;
