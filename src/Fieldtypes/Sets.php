@@ -13,7 +13,7 @@ class Sets extends Fieldtype
 {
     protected $selectable = false;
 
-    protected static $iconsDirectory = 'vendor/statamic/cms/resources/svg/icons';
+    protected static $iconsDirectory = null;
     protected static $iconsFolder = 'plump';
 
     /**
