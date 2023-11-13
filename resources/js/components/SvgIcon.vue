@@ -20,8 +20,8 @@ export default {
         }
     },
 
-    created() {
-        this.$nextTick(() => this.icon = this.evaluateIcon());
+    mounted() {
+        this.icon = this.evaluateIcon();
     },
 
     watch: {
