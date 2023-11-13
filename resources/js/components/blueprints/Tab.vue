@@ -167,6 +167,8 @@ export default {
         },
 
         iconName(name) {
+            if (! name) return null;
+
             return this.iconSubFolder
                 ? this.iconSubFolder+'/'+name
                 : name;

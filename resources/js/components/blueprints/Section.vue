@@ -204,6 +204,8 @@ export default {
         },
 
         iconName(name) {
+            if (! name) return 'folder-generic';
+
             return this.iconSubFolder
                 ? this.iconSubFolder+'/'+name
                 : name;
