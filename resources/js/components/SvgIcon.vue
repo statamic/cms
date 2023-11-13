@@ -34,7 +34,16 @@ export default {
         customIcon() {
             if (! this.directory) return;
 
-            return data_get(this.$config.get('customSvgIcons') || {}, `${this.directory}.${this.name}`);
+            let directory = this.directory;
+            let folder = null;
+            let file = this.name;
+
+            if (this.name.includes('/')) {
+                [folder, file] = this.name.split('/');
+                directory = directory+'/'+folder;
+            }
+
+            return data_get(this.$config.get('customSvgIcons') || {}, `${directory}.${file}`);
         },
     },
 
