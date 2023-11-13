@@ -33,6 +33,7 @@ use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
+use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
@@ -141,6 +142,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
                 }
 
                 $blueprint = $this->collection()->entryBlueprint($blueprint, $this);
+
+                if (! $blueprint) {
+                    throw new BlueprintNotFoundException($this->value('blueprint'), 'collections/'.$this->collection()->handle());
+                }
 
                 Blink::put($key, $blueprint);
 
