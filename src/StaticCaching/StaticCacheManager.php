@@ -9,6 +9,7 @@ use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\Cachers\Writer;
+use Statamic\StaticCaching\NoCache\UrlManifest;
 use Statamic\Support\Manager;
 
 class StaticCacheManager extends Manager
@@ -55,13 +56,15 @@ class StaticCacheManager extends Manager
     {
         $this->driver()->flush();
 
-        collect(Cache::get('nocache::urls', []))->each(function ($url) {
+        $manifest = app(UrlManifest::class);
+
+        $manifest->all()->each(function (string $url) {
             $session = Cache::get($sessionKey = 'nocache::session.'.md5($url));
             collect($session['regions'] ?? [])->each(fn ($region) => Cache::forget('nocache::region.'.$region));
             Cache::forget($sessionKey);
         });
 
-        Cache::forget('nocache::urls');
+        $manifest->flush();
     }
 
     public function nocacheJs(string $js)
