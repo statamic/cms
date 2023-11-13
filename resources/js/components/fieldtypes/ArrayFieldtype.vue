@@ -61,7 +61,7 @@
                             <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
                                 <td class="sortable-handle table-drag-handle" v-if="!isReadOnly"></td>
                                 <td>
-                                    <input type="text" class="input-text font-bold" v-model="element.key" :readonly="isReadOnly" />
+                                    <input type="text" class="input-text font-bold" v-model="element.key" :readonly="isReadOnly" @blur="keyUpdated(element)" />
                                 </td>
                                 <td>
                                     <input type="text" class="input-text" v-model="element.value" :readonly="isReadOnly" />
@@ -117,9 +117,17 @@ export default {
     watch: {
         data: {
             deep: true,
-            handler (data) {
-                this.updateDebounced(this.sortableToObject(data));
-            }
+            handler: _.debounce(function (data) {
+                // data = data.map(element => {
+                //     if (element.key !== null && element.value === null) {
+                //         element.value = element.key;
+                //     }
+
+                //     return element;
+                // })
+
+                this.update(this.sortableToObject(data));
+            }, 150),
         },
 
         value(value) {
@@ -210,7 +218,21 @@ export default {
 
         setKey(key) {
             this.selectedKey = key
-        }
+        },
+
+        keyUpdated(element) {
+            if (element.key === null || element.value !== null) {
+                return null;
+            }
+
+            let value = element.key.charAt(0).toUpperCase() + element.key.slice(1);
+
+            this.data.find((item, index) => {
+                if (item._id === element._id) {
+                    this.data[index].value = value;
+                }
+            })
+        },
     }
 
 }
