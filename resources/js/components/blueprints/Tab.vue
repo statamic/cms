@@ -11,7 +11,7 @@
         @click="$emit('selected')"
         @mouseenter="$emit('mouseenter')"
     >
-        <svg-icon :name="tab.icon" :directory="iconDirectory" class="w-4 h-4 mr-1" />
+        <svg-icon v-if="tab.icon" :name="iconName(tab.icon)" :directory="iconBaseDirectory" class="w-4 h-4 mr-1" />
 
         {{ tab.display }}
 
@@ -125,16 +125,6 @@ export default {
             return this.$config.get('setIconsFolder');
         },
 
-        iconDirectory() {
-            let dir = this.iconBaseDirectory;
-
-            if (this.iconSubFolder) {
-                dir = dir+'/'+this.iconSubFolder;
-            }
-
-            return dir;
-        },
-
     },
 
     methods: {
@@ -174,7 +164,13 @@ export default {
 
         remove() {
             this.$emit('removed');
-        }
+        },
+
+        iconName(name) {
+            return this.iconSubFolder
+                ? this.iconSubFolder+'/'+name
+                : name;
+        },
 
     }
 
