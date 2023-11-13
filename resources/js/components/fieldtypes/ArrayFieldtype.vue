@@ -120,6 +120,7 @@ export default {
             handler (data) {
                 this.updateDebounced(this.sortableToObject(data));
             }
+        },
 
         value(value) {
             if (JSON.stringify(value) == JSON.stringify(this.sortableToObject(this.data))) return;
