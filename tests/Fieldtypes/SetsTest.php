@@ -79,14 +79,14 @@ class SetsTest extends TestCase
                 'handle' => 'bravo',
                 'display' => null,
                 'instructions' => null,
-                'icon' => 'regular/folder-generic',
+                'icon' => null,
                 'sections' => [
                     [
                         '_id' => 'group-bravo-section-two',
                         'handle' => 'two',
                         'display' => null,
                         'instructions' => null,
-                        'icon' => 'regular/folder-generic',
+                        'icon' => null,
                         'fields' => [
                             [
                                 '_id' => 'group-bravo-section-two-0',
@@ -129,7 +129,7 @@ class SetsTest extends TestCase
                 'handle' => 'main',
                 'display' => 'Main',
                 'instructions' => null,
-                'icon' => 'regular/folder-generic',
+                'icon' => null,
                 'sections' => [
                     [
                         '_id' => 'group-main-section-one',
@@ -240,12 +240,10 @@ class SetsTest extends TestCase
             ],
             [
                 'handle' => 'bravo',
-                'icon' => 'regular/folder-generic',
                 'sets' => [
                     [
                         'id' => 'two',
                         'handle' => 'two',
-                        'icon' => 'light/add',
                         'fields' => [
                             [
                                 'display' => 'Field Two',
@@ -293,7 +291,6 @@ class SetsTest extends TestCase
         $this->assertEquals([
             [
                 'handle' => 'main',
-                'icon' => 'regular/folder-generic',
                 'sets' => [
                     [
                         'id' => 'one',
@@ -401,7 +398,7 @@ class SetsTest extends TestCase
     {
         $jsonVariables = Statamic::jsonVariables(request());
 
-        $this->assertEquals('vendor/statamic/cms/resources/svg/icons', $jsonVariables['setIconsDirectory']);
+        $this->assertNull($jsonVariables['setIconsDirectory']);
         $this->assertEquals('plump', $jsonVariables['setIconsFolder']);
     }
 
@@ -412,7 +409,7 @@ class SetsTest extends TestCase
 
         $jsonVariables = Statamic::jsonVariables(request());
 
-        $this->assertEquals('vendor/statamic/cms/resources/svg/icons', $jsonVariables['setIconsDirectory']);
+        $this->assertNull($jsonVariables['setIconsDirectory']);
         $this->assertEquals('light', $jsonVariables['setIconsFolder']);
     }
 
