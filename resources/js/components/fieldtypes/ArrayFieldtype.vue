@@ -117,18 +117,9 @@ export default {
     watch: {
         data: {
             deep: true,
-            handler: _.debounce(function (data) {
-                // data = data.map(element => {
-                //     if (element.key !== null && element.value === null) {
-                //         element.value = element.key;
-                //     }
-
-                //     return element;
-                // })
-
-                this.update(this.sortableToObject(data));
-            }, 150),
-        },
+            handler (data) {
+                this.updateDebounced(this.sortableToObject(data));
+            }
 
         value(value) {
             if (JSON.stringify(value) == JSON.stringify(this.sortableToObject(this.data))) return;
