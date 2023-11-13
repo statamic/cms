@@ -88,14 +88,12 @@ class Sets extends Fieldtype
         return collect($sets)->map(function ($group, $groupHandle) {
             return array_merge($group, [
                 'handle' => $groupHandle,
-                'icon' => $group['icon'] ?? 'regular/folder-generic',
                 'sets' => collect($group['sets'])
                     ->map(function ($config, $name) {
                         return array_merge($config, [
                             'handle' => $name,
                             'id' => $name,
                             'fields' => (new NestedFields)->preProcessConfig(array_get($config, 'fields', [])),
-                            'icon' => $config['icon'] ?? 'light/add',
                         ]);
                     })
                     ->values()
