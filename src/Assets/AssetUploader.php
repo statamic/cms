@@ -27,6 +27,11 @@ class AssetUploader extends Uploader
     protected function uploadPath(UploadedFile $file)
     {
         $ext = $this->getNewExtension() ?? $file->getClientOriginalExtension();
+
+        if (config('statamic.assets.lowercase')) {
+            $ext = strtolower($ext);
+        }
+
         $filename = self::getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
 
         $directory = $this->asset->folder();

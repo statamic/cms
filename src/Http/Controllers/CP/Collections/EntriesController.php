@@ -72,6 +72,10 @@ class EntriesController extends CpController
             $query->where('title', 'like', '%'.$search.'%');
         }
 
+        if (Site::hasMultiple()) {
+            $query->whereIn('site', Site::authorized()->map->handle()->all());
+        }
+
         return $query;
     }
 
@@ -126,7 +130,7 @@ class EntriesController extends CpController
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
             'permalink' => $entry->absoluteUrl(),
-            'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
+            'localizations' => $this->getAuthorizedSitesForCollection($collection)->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
 
@@ -142,7 +146,7 @@ class EntriesController extends CpController
                     'url' => $exists ? $localized->editUrl() : null,
                     'livePreviewUrl' => $exists ? $localized->livePreviewUrl() : null,
                 ];
-            })->all(),
+            })->values()->all(),
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
@@ -261,7 +265,7 @@ class EntriesController extends CpController
 
     public function create(Request $request, $collection, $site)
     {
-        $this->authorize('create', [EntryContract::class, $collection]);
+        $this->authorize('create', [EntryContract::class, $collection, $site]);
 
         $blueprint = $collection->entryBlueprint($request->blueprint);
 
@@ -303,7 +307,7 @@ class EntriesController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
-            'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site, $blueprint) {
+            'localizations' => $this->getAuthorizedSitesForCollection($collection)->map(function ($handle) use ($collection, $site, $blueprint) {
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -313,7 +317,7 @@ class EntriesController extends CpController
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle, 'blueprint' => $blueprint->handle()]),
                     'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
                 ];
-            })->all(),
+            })->values()->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
             'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
@@ -552,5 +556,12 @@ class EntriesController extends CpController
                 'url' => $collection->showUrl(),
             ],
         ]);
+    }
+
+    protected function getAuthorizedSitesForCollection($collection)
+    {
+        return $collection
+            ->sites()
+            ->filter(fn ($handle) => User::current()->can('view', Site::get($handle)));
     }
 }

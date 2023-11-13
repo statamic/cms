@@ -8,6 +8,7 @@ use Statamic\Contracts\Forms\FormRepository as Contract;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
+use Statamic\Forms\Exporters\ExporterRepository;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -115,6 +116,11 @@ class FormRepository implements Contract
         $callback = $this->redirects[$submission->form()->handle()] ?? fn () => null;
 
         return $callback($submission);
+    }
+
+    public function exporters()
+    {
+        return app(ExporterRepository::class);
     }
 
     public static function bindings(): array

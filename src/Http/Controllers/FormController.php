@@ -177,7 +177,11 @@ class FormController extends Controller
                 return $field->fieldtype()->handle() === 'assets';
             })
             ->mapWithKeys(function ($field) {
-                return [$field->handle().'.*' => 'file'];
+                return [$field->handle().'.*' => ['file', function ($attribute, $value, $fail) {
+                    if (in_array(trim(strtolower($value->getClientOriginalExtension())), ['php', 'php3', 'php4', 'php5', 'phtml'])) {
+                        $fail(__('validation.uploaded'));
+                    }
+                }]];
             })
             ->all();
 

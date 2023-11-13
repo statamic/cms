@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\Forms\Form;
 use Tests\TestCase;
 
 class FieldTest extends TestCase
@@ -617,5 +618,18 @@ class FieldTest extends TestCase
         $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
 
         $this->assertTrue($field->isRelationship());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_the_form()
+    {
+        $field = new Field('test', ['type' => 'text']);
+
+        $this->assertNull($field->form());
+
+        $return = $field->setForm($form = new Form);
+
+        $this->assertEquals($field, $return);
+        $this->assertEquals($form, $field->form());
     }
 }

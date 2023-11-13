@@ -4,30 +4,18 @@ namespace Statamic\Forms\Exporters;
 
 use League\Csv\Writer;
 use SplTempFileObject;
+use Statamic\Support\Arr;
 
-class CsvExporter extends AbstractExporter
+class CsvExporter extends Exporter
 {
-    /**
-     * @var Writer
-     */
-    private $writer;
+    private Writer $writer;
+    protected static string $title = 'CSV';
 
-    /**
-     * Create a new CsvExporter.
-     */
-    public function __construct()
+    public function export(): string
     {
         $this->writer = Writer::createFromFileObject(new SplTempFileObject);
-        $this->writer->setDelimiter(config('statamic.forms.csv_delimiter', ','));
-    }
+        $this->writer->setDelimiter(Arr::get($this->config, 'delimiter', config('statamic.forms.csv_delimiter', ',')));
 
-    /**
-     * Perform the export.
-     *
-     * @return string
-     */
-    public function export()
-    {
         $this->insertHeaders();
 
         $this->insertData();
@@ -35,14 +23,11 @@ class CsvExporter extends AbstractExporter
         return (string) $this->writer;
     }
 
-    /**
-     * Insert the headers into the CSV.
-     */
     private function insertHeaders()
     {
-        $key = config('statamic.forms.csv_headers', 'handle');
+        $key = Arr::get($this->config, 'headers', config('statamic.forms.csv_headers', 'handle'));
 
-        $headers = $this->form()->fields()
+        $headers = $this->form->fields()
             ->map(fn ($field) => $key === 'display' ? $field->display() : $field->handle())
             ->push($key === 'display' ? __('Date') : 'date')
             ->values()->all();
@@ -50,12 +35,9 @@ class CsvExporter extends AbstractExporter
         $this->writer->insertOne($headers);
     }
 
-    /**
-     * Insert the submission data into the CSV.
-     */
     private function insertData()
     {
-        $data = $this->form()->submissions()->map(function ($submission) {
+        $data = $this->form->submissions()->map(function ($submission) {
             $submission = $submission->toArray();
 
             $submission['date'] = (string) $submission['date'];
@@ -68,5 +50,10 @@ class CsvExporter extends AbstractExporter
         })->all();
 
         $this->writer->insertAll($data);
+    }
+
+    public function extension(): string
+    {
+        return 'csv';
     }
 }

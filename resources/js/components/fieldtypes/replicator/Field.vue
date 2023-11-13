@@ -84,12 +84,12 @@ export default {
         },
 
         display() {
-            return this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1)
+            return __(this.field.display || this.field.handle[0].toUpperCase() + this.field.handle.slice(1))
         },
 
         instructions() {
             return this.field.instructions
-                ? this.$options.filters.markdown(this.field.instructions)
+                ? this.$options.filters.markdown(__(this.field.instructions))
                 : null
         },
 
