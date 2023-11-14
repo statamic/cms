@@ -178,6 +178,86 @@ class FieldsetTest extends TestCase
     }
 
     /** @test */
+    public function gets_blueprints_importing_fieldset_inside_grid()
+    {
+        $fieldset = Fieldset::make('seo')->save();
+
+        tap(Collection::make('one'))->save();
+        $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'title', 'field' => ['type' => 'text']],
+                                ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                                [
+                                    'handle' => 'grid',
+                                    'field' => [
+                                        'type' => 'grid',
+                                        'fields' => [
+                                            ['import' => 'seo'],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ]
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['blueprints']);
+        $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_blueprints_importing_fieldset_inside_replicator()
+    {
+        $fieldset = Fieldset::make('seo')->save();
+
+        tap(Collection::make('one'))->save();
+        $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'title', 'field' => ['type' => 'text']],
+                                ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                                [
+                                    'handle' => 'replicator',
+                                    'field' => [
+                                        'type' => 'replicator',
+                                        'sets' => [
+                                            'set_group' => [
+                                                'sets' => [
+                                                    'set' => [
+                                                        'fields' => [
+                                                            ['import' => 'seo'],
+                                                        ],
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ]
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['blueprints']);
+        $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
+    }
+
+    /** @test */
     public function gets_blueprints_importing_single_field_from_fieldset()
     {
         $fieldset = Fieldset::make('seo')->setContents(['fields' => [['handle' => 'meta_title', 'field' => ['type' => 'text']]]])->save();
@@ -213,8 +293,69 @@ class FieldsetTest extends TestCase
         $fieldsetA = Fieldset::make('one')
             ->setContents([
                 'fields' => [
-                    ['handle' => 'slug', 'field' => ['type' => 'slug']],
                     ['import' => 'seo'],
+                ],
+            ])
+            ->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['fieldsets']);
+        $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
+    }
+
+     /** @test */
+     public function gets_fieldsets_importing_fieldset_inside_grid()
+     {
+         $fieldset = Fieldset::make('seo')->save();
+
+         $fieldsetA = Fieldset::make('one')
+             ->setContents([
+                 'fields' => [
+                    [
+                        'handle' => 'grid',
+                        'field' => [
+                            'type' => 'grid',
+                            'fields' => [
+                                ['import' => 'seo'],
+                            ],
+                        ],
+                    ],
+                 ],
+             ])
+             ->save();
+
+         $importedBy = $fieldset->importedBy();
+
+         $this->assertCount(1, $importedBy['fieldsets']);
+         $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
+     }
+
+    /** @test */
+    public function gets_fieldsets_importing_fieldset_inside_replicator()
+    {
+        $fieldset = Fieldset::make('seo')->save();
+
+        $fieldsetA = Fieldset::make('one')
+            ->setContents([
+                'fields' => [
+                    [
+                        'handle' => 'replicator',
+                        'field' => [
+                            'type' => 'replicator',
+                            'sets' => [
+                                'set_group' => [
+                                    'sets' => [
+                                        'set' => [
+                                            'fields' => [
+                                                ['import' => 'seo'],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
             ])
             ->save();
@@ -233,7 +374,6 @@ class FieldsetTest extends TestCase
         $fieldsetA = Fieldset::make('one')
             ->setContents([
                 'fields' => [
-                    ['handle' => 'slug', 'field' => ['type' => 'slug']],
                     ['handle' => 'meta_title', 'field' => 'seo.meta_title'],
                 ],
             ])

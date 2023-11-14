@@ -153,6 +153,25 @@ class Fieldset
             return Str::before($field['field'], '.') === $this->handle();
         }
 
+        if (isset($field['field']['fields'])) {
+            return collect($field['field']['fields'])
+                ->filter(fn ($field) => $this->fieldImportsFieldset($field))
+                ->isNotEmpty();
+        }
+
+        if (isset($field['field']['sets'])) {
+            return collect($field['field']['sets'])
+                ->filter(fn ($setGroup) => isset($setGroup['sets']))
+                ->filter(function ($setGroup) {
+                    return collect($setGroup['sets'])->filter(function ($set) {
+                        return collect($set['fields'])
+                            ->filter(fn ($field) => $this->fieldImportsFieldset($field))
+                            ->isNotEmpty();
+                    });
+                })
+                ->isNotEmpty();
+        }
+
         return false;
     }
 
