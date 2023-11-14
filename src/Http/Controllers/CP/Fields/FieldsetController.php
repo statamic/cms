@@ -33,20 +33,20 @@ class FieldsetController extends CpController
                         'imported_by' => collect($fieldset->importedBy())->flatten(1)->mapToGroups(function ($item) {
                             if ($item instanceof Blueprint) {
                                 $group = match (Str::before($item->namespace(), '.')) {
-                                     'collections' => __('Collections'),
-                                     'taxonomies' => __('Taxonomies'),
-                                     'navigation' => __('Navigation'),
-                                     'globals' => __('Globals'),
-                                     'assets' => __('Asset Containers'),
-                                     'forms' => __('Forms'),
-                                     'user' => __('Users'),
-                                     'user_group' => __('User Group'),
+                                    'collections' => __('Collections'),
+                                    'taxonomies' => __('Taxonomies'),
+                                    'navigation' => __('Navigation'),
+                                    'globals' => __('Globals'),
+                                    'assets' => __('Asset Containers'),
+                                    'forms' => __('Forms'),
+                                    'user' => __('Users'),
+                                    'user_group' => __('User Group'),
                                 };
                             } else {
                                 $group = __('Fieldsets');
                             }
 
-                            return [$group => ['handle' => $item->handle()]];
+                            return [$group => ['handle' => $item->handle(), 'url' => $item]];
                         }),
                         'is_deletable' => $fieldset->isDeletable(),
                         'title' => $fieldset->title(),
