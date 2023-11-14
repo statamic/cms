@@ -12,7 +12,7 @@
             <template v-if="Object.keys(resource.imported_by).length > 0">
                 <p class="mb-2">{{ __(`Before you can delete this fieldset, you need to remove references to it in blueprints and fieldsets:`) }}</p>
 
-                <div v-for="(items, group) in resource.imported_by" class="mb-4">
+                <div v-for="(items, group) in resource.imported_by">
                     <h3 class="little-heading pl-0 mb-2">{{ group }}</h3>
 
                     <ul>
