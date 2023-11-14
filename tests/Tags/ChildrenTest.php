@@ -50,13 +50,13 @@ class ChildrenTest extends TestCase
 
         $collection->structure()->in('en')->tree([
             ['entry' => 'foo', 'url' => '/foo', 'children' => [
-                ['entry' => 'bar', 'url' => '/foo/bar',],
+                ['entry' => 'bar', 'url' => '/foo/bar'],
             ]],
         ])->save();
 
         $collection->structure()->in('fr')->tree([
             ['entry' => 'fr-foo', 'url' => '/fr-foo', 'children' => [
-                ['entry' => 'fr-bar', 'url' => '/fr-foo/fr-bar',],
+                ['entry' => 'fr-bar', 'url' => '/fr-foo/fr-bar'],
             ]],
         ])->save();
     }
