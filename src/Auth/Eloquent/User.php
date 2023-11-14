@@ -243,9 +243,7 @@ class User extends BaseUser
 
     public function saveToDatabase()
     {
-        $model = $this->model();
-        $model->super = $this->super ?? false;
-        $model->save();
+        $model = $this->model()->save();
 
         $this->saveRoles();
 
@@ -358,6 +356,10 @@ class User extends BaseUser
     {
         if ($key === 'timestamps') {
             return $this->model()->timestamps = $value;
+        }
+
+        if ($key === 'super') {
+            return $this->model()->super = $value;
         }
 
         return $this->$key = $value;
