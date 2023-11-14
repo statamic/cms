@@ -24,8 +24,6 @@ class FieldsetNotFoundException extends Exception implements ProvidesSolution
 
     public function getSolution(): Solution
     {
-        dd($this->getSuggestedFieldset());
-
         $description = ($suggestedFieldset = $this->getSuggestedFieldset())
             ? "Did you mean `$suggestedFieldset`?"
             : 'Are you sure the fieldset exists?';
