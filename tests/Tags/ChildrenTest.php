@@ -91,6 +91,8 @@ class ChildrenTest extends TestCase
         $mock = Mockery::mock(Children::class);
         $mock->shouldNotReceive('index');
 
+        $this->app['statamic.tags']['children'] = $mock;
+
         $this->get('/foo');
 
         $this->assertEquals('the bar entry', $this->tag('{{ nav }}{{ children }}{{ title }}{{ /children }}{{ /nav }}'));
