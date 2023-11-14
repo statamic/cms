@@ -243,7 +243,7 @@ class User extends BaseUser
 
     public function saveToDatabase()
     {
-        $model = $this->model()->save();
+        $this->model()->save();
 
         $this->saveRoles();
 
