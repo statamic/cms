@@ -31,7 +31,20 @@ class FieldsetController extends CpController
                         'edit_url' => $fieldset->editUrl(),
                         'fields' => $fieldset->fields()->all()->count(),
                         'imported_by' => collect($fieldset->importedBy())->flatten(1)->mapToGroups(function ($item) {
-                            $group = $item instanceof Blueprint ? $item->namespace() : 'fieldsets';
+                            if ($item instanceof Blueprint) {
+                                $group = match (Str::before($item->namespace(), '.')) {
+                                     'collections' => __('Collections'),
+                                     'taxonomies' => __('Taxonomies'),
+                                     'navigation' => __('Navigation'),
+                                     'globals' => __('Globals'),
+                                     'assets' => __('Asset Containers'),
+                                     'forms' => __('Forms'),
+                                     'user' => __('Users'),
+                                     'user_group' => __('User Group'),
+                                };
+                            } else {
+                                $group = __('Fieldsets');
+                            }
 
                             return [$group => ['handle' => $item->handle()]];
                         }),
