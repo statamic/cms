@@ -96,5 +96,4 @@ class ChildrenTest extends TestCase
         $this->assertEquals('the bar entry', $this->tag('{{ nav }}{{ children }}{{ title }}{{ /children }}{{ /nav }}'));
 
     }
-
 }
