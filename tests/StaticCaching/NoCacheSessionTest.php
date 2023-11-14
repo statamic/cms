@@ -92,26 +92,17 @@ class NoCacheSessionTest extends TestCase
         // ...and that the urls are tracked in the cache.
 
         Cache::shouldReceive('get')
-            ->with('nocache::batches', [])
-            ->times(4)
-            ->andReturn([]);
-
-        Cache::shouldReceive('get')
-            ->with('nocache::urls.20140215', [])
+            ->with('nocache::urls', [])
             ->times(2)
             ->andReturn([], ['/']);
 
         Cache::shouldReceive('forever')
-            ->with('nocache::urls.20140215', ['/'])
+            ->with('nocache::urls', ['/'])
             ->once();
 
         Cache::shouldReceive('forever')
-            ->with('nocache::urls.20140215', ['/', '/foo'])
+            ->with('nocache::urls', ['/', '/foo'])
             ->once();
-
-        Cache::shouldReceive('forever')
-            ->with('nocache::batches', ['20140215'])
-            ->times(2);
 
         // When pushing regions, they will get written too...
         Cache::shouldReceive('forever')

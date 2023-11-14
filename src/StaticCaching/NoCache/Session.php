@@ -18,13 +18,10 @@ class Session
 
     protected $url;
 
-    private UrlManifest $urls;
-
     public function __construct($url)
     {
         $this->url = $url;
         $this->regions = new Collection;
-        $this->urls = app(UrlManifest::class);
     }
 
     public function url()
@@ -102,7 +99,7 @@ class Session
             return;
         }
 
-        $this->urls->add($this->url);
+        Cache::forever('nocache::urls', collect(Cache::get('nocache::urls', []))->push($this->url)->unique()->all());
 
         Cache::forever('nocache::session.'.md5($this->url), [
             'regions' => $this->regions,
