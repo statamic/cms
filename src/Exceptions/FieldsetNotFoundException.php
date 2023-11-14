@@ -24,14 +24,16 @@ class FieldsetNotFoundException extends Exception implements ProvidesSolution
 
     public function getSolution(): Solution
     {
+        dd($this->getSuggestedFieldset());
+
         $description = ($suggestedFieldset = $this->getSuggestedFieldset())
-            ? "Did you mean `$suggestedBlueprint`?"
+            ? "Did you mean `$suggestedFieldset`?"
             : 'Are you sure the fieldset exists?';
 
         return BaseSolution::create("The {$this->fieldsetHandle} fieldset was not found.")
             ->setSolutionDescription($description)
             ->setDocumentationLinks([
-                'Read the blueprints guide' => Statamic::docsUrl('/blueprints'),
+                'Read the fieldsets guide' => Statamic::docsUrl('/fieldsets'),
             ]);
     }
 
