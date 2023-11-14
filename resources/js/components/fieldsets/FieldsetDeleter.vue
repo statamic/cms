@@ -19,8 +19,8 @@
                         <li
                             v-for="item in items"
                             :key="item.handle"
-                            class="font-mono text-sm mb-1"
-                            v-text="item.handle"
+                            class="font-mono text-sm mb-1.5"
+                            v-text="item.title"
                         ></li>
                     </ul>
                 </div>

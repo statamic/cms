@@ -46,7 +46,7 @@ class FieldsetController extends CpController
                                 $group = __('Fieldsets');
                             }
 
-                            return [$group => ['handle' => $item->handle(), 'url' => $item]];
+                            return [$group => ['handle' => $item->handle(), 'title' => $item->title()]];
                         }),
                         'is_deletable' => $fieldset->isDeletable(),
                         'title' => $fieldset->title(),
