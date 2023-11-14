@@ -154,7 +154,7 @@ class FieldsetTest extends TestCase
     {
         $fieldset = Fieldset::make('seo')->save();
 
-        $collectionA = tap(Collection::make('one'))->save();
+        tap(Collection::make('one'))->save();
         $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
             'tabs' => [
                 'main' => [
@@ -171,8 +171,19 @@ class FieldsetTest extends TestCase
             ],
         ])->save();
 
-        $collectionB = tap(Collection::make('two'))->save();
-        $blueprintB = Blueprint::make('two')->setNamespace('collections.two')->setContents([
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['blueprints']);
+        $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_blueprints_importing_single_field_from_fieldset()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [['handle' => 'meta_title', 'field' => ['type' => 'text']]]])->save();
+
+        tap(Collection::make('one'))->save();
+        $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
             'tabs' => [
                 'main' => [
                     'sections' => [
@@ -180,6 +191,7 @@ class FieldsetTest extends TestCase
                             'fields' => [
                                 ['handle' => 'title', 'field' => ['type' => 'text']],
                                 ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                                ['handle' => 'meta_title', 'field' => 'seo.meta_title'],
                             ],
                         ]
                     ],
@@ -207,10 +219,22 @@ class FieldsetTest extends TestCase
             ])
             ->save();
 
-        $fieldsetB = Fieldset::make('two')
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['fieldsets']);
+        $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_fieldsets_importing_single_field_from_fieldset()
+    {
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [['handle' => 'meta_title', 'field' => ['type' => 'text']]]])->save();
+
+        $fieldsetA = Fieldset::make('one')
             ->setContents([
                 'fields' => [
                     ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                    ['handle' => 'meta_title', 'field' => 'seo.meta_title'],
                 ],
             ])
             ->save();

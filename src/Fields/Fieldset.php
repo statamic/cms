@@ -130,17 +130,30 @@ class Fieldset
                 ->flatten(1)
                 ->pluck('fields')
                 ->flatten(1)
-                ->filter(fn ($field) => isset($field['import']) && $field['import'] === $this->handle())
+                ->filter(fn ($field) => $this->fieldImportsFieldset($field))
                 ->isNotEmpty();
         })->values();
 
         $fieldsets = \Statamic\Facades\Fieldset::all()->filter(function (Fieldset $fieldset) {
             return collect($fieldset->contents()['fields'])
-                ->filter(fn ($field) => isset($field['import']) && $field['import'] === $this->handle())
+                ->filter(fn ($field) => $this->fieldImportsFieldset($field))
                 ->isNotEmpty();
         })->values();
 
         return ['blueprints' => $blueprints, 'fieldsets' => $fieldsets];
+    }
+
+    protected function fieldImportsFieldset(array $field): bool
+    {
+        if (isset($field['import'])) {
+            return $field['import'] === $this->handle();
+        }
+
+        if (is_string($field['field'])) {
+            return Str::before($field['field'], '.') === $this->handle();
+        }
+
+        return false;
     }
 
     public function isDeletable()
