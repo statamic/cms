@@ -1810,6 +1810,14 @@ class CoreModifiers extends Modifier
      */
     public function readTime($value, $params)
     {
+        if (is_array($value)) {
+            $value = collect($value)
+                ->map(fn (Values $values) => $values->all())
+                ->where('type', 'text')
+                ->map(fn ($item) => $item['text']->raw())
+                ->implode(' ');
+        }
+
         $words = $this->wordCount(strip_tags($value));
 
         return ceil($words / Arr::get($params, 0, 200));
