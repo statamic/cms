@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
 use Statamic\Facades;
+use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
@@ -29,8 +30,10 @@ class FieldsetController extends CpController
                         'delete_url' => $fieldset->deleteUrl(),
                         'edit_url' => $fieldset->editUrl(),
                         'fields' => $fieldset->fields()->all()->count(),
-                        'imported_by' => collect($fieldset->importedBy())->flatten(1)->map(function ($item) {
-                            return ['handle' => $item->handle(), 'path' => Str::after($item->path(), base_path())];
+                        'imported_by' => collect($fieldset->importedBy())->flatten(1)->mapToGroups(function ($item) {
+                            $group = $item instanceof Blueprint ? $item->namespace() : 'fieldsets';
+
+                            return [$group => ['handle' => $item->handle()]];
                         }),
                         'is_deletable' => $fieldset->isDeletable(),
                         'title' => $fieldset->title(),

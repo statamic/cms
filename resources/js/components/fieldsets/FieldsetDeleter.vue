@@ -9,17 +9,21 @@
         @cancel="cancel"
     >
         <template slot="body">
-            <template v-if="resource.imported_by.length > 0">
+            <template v-if="Object.keys(resource.imported_by).length > 0">
                 <p class="mb-4">{{ __(`Before you can delete this fieldset, you need to remove references to it in blueprints and fieldsets:`) }}</p>
 
-                <ul>
-                    <li
-                        v-for="item in resource.imported_by"
-                        :key="item.path"
-                        class="font-mono text-sm mb-1"
-                        v-text="item.path"
-                    ></li>
-                </ul>
+                <div v-for="(items, group) in resource.imported_by" class="mb-4">
+                    <h3 class="font-semibold">{{ group }}</h3>
+
+                    <ul>
+                        <li
+                            v-for="item in items"
+                            :key="item.handle"
+                            class="font-mono text-sm mb-1"
+                            v-text="item.handle"
+                        ></li>
+                    </ul>
+                </div>
             </template>
 
             <template v-else>
