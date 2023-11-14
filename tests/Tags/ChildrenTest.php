@@ -3,9 +3,11 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use Mockery;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Site;
+use Statamic\Tags\Children;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -80,4 +82,19 @@ class ChildrenTest extends TestCase
 
         $this->assertEquals('the french bar entry', $this->tag('{{ children }}{{ title }}{{ /children }}'));
     }
+
+    /** @test */
+    public function it_doesnt_affect_children_in_nav()
+    {
+        $this->setUpEntries();
+
+        $mock = Mockery::mock(Children::class);
+        $mock->shouldNotReceive('index');
+
+        $this->get('/foo');
+
+        $this->assertEquals('the bar entry', $this->tag('{{ nav }}{{ children }}{{ title }}{{ /children }}{{ /nav }}'));
+
+    }
+
 }
