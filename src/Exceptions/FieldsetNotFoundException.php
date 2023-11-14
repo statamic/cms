@@ -7,7 +7,6 @@ use Facade\Ignition\Support\StringComparator;
 use Facade\IgnitionContracts\BaseSolution;
 use Facade\IgnitionContracts\ProvidesSolution;
 use Facade\IgnitionContracts\Solution;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
 use Statamic\Statamic;
 
