@@ -178,7 +178,7 @@ class FormController extends Controller
             })
             ->mapWithKeys(function ($field) {
                 return [$field->handle().'.*' => ['file', function ($attribute, $value, $fail) {
-                    if (in_array(trim(strtolower($value->getClientOriginalExtension())), ['php', 'php3', 'php4', 'php5', 'phtml'])) {
+                    if (in_array(trim(strtolower($value->getClientOriginalExtension())), ['php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'phar'])) {
                         $fail(__('validation.uploaded'));
                     }
                 }]];
