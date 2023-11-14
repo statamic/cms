@@ -7,8 +7,12 @@ use Statamic\Events\FieldsetDeleted;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
 use Statamic\Facades;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Path;
+use Statamic\Facades\Taxonomy;
 use Statamic\Support\Str;
 
 class Fieldset
@@ -108,6 +112,35 @@ class Fieldset
     public function deleteUrl()
     {
         return cp_route('fieldsets.destroy', $this->handle());
+    }
+
+    public function importedBy(): array
+    {
+        // TODO: Support Replicator/Grid/Bard sets...
+
+        $blueprints = collect([
+            ...Collection::all()->flatMap->entryBlueprints(),
+            ...Taxonomy::all()->flatMap->termBlueprints(),
+            ...GlobalSet::all()->map->blueprint(),
+            ...AssetContainer::all()->map->blueprint(),
+            ...Blueprint::in('')->values(),
+        ])->filter(function (Blueprint $blueprint) {
+            return collect($blueprint->contents()['tabs'])
+                ->pluck('sections')
+                ->flatten(1)
+                ->pluck('fields')
+                ->flatten(1)
+                ->filter(fn ($field) => isset($field['import']) && $field['import'] === $this->handle())
+                ->isNotEmpty();
+        })->values();
+
+        $fieldsets = \Statamic\Facades\Fieldset::all()->filter(function (Fieldset $fieldset) {
+            return collect($fieldset->contents()['fields'])
+                ->filter(fn ($field) => isset($field['import']) && $field['import'] === $this->handle())
+                ->isNotEmpty();
+        })->values();
+
+        return ['blueprints' => $blueprints, 'fieldsets' => $fieldsets];
     }
 
     public function isDeletable()

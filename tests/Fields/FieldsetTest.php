@@ -6,14 +6,19 @@ use Illuminate\Support\Facades\Event;
 use Statamic\Events\FieldsetCreated;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class FieldsetTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     /** @test */
     public function it_gets_the_handle()
     {
@@ -142,6 +147,78 @@ class FieldsetTest extends TestCase
         $this->assertEquals('textarea', $field->type());
 
         $this->assertNull($fieldset->field('unknown'));
+    }
+
+    /** @test */
+    public function gets_blueprints_importing_fieldset()
+    {
+        $fieldset = Fieldset::make('seo')->save();
+
+        $collectionA = tap(Collection::make('one'))->save();
+        $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'title', 'field' => ['type' => 'text']],
+                                ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                                ['import' => 'seo'],
+                            ],
+                        ]
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $collectionB = tap(Collection::make('two'))->save();
+        $blueprintB = Blueprint::make('two')->setNamespace('collections.two')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'title', 'field' => ['type' => 'text']],
+                                ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                            ],
+                        ]
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['blueprints']);
+        $this->assertEquals($blueprintA->handle(), $importedBy['blueprints']->first()->handle());
+    }
+
+    /** @test */
+    public function gets_fieldsets_importing_fieldset()
+    {
+        $fieldset = Fieldset::make('seo')->save();
+
+        $fieldsetA = Fieldset::make('one')
+            ->setContents([
+                'fields' => [
+                    ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                    ['import' => 'seo'],
+                ],
+            ])
+            ->save();
+
+        $fieldsetB = Fieldset::make('two')
+            ->setContents([
+                'fields' => [
+                    ['handle' => 'slug', 'field' => ['type' => 'slug']],
+                ],
+            ])
+            ->save();
+
+        $importedBy = $fieldset->importedBy();
+
+        $this->assertCount(1, $importedBy['fieldsets']);
+        $this->assertEquals($fieldsetA->handle(), $importedBy['fieldsets']->first()->handle());
     }
 
     /** @test */
