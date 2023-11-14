@@ -29,6 +29,9 @@ class FieldsetController extends CpController
                         'delete_url' => $fieldset->deleteUrl(),
                         'edit_url' => $fieldset->editUrl(),
                         'fields' => $fieldset->fields()->all()->count(),
+                        'imported_by' => collect($fieldset->importedBy())->flatten(1)->map(function ($item) {
+                            return ['handle' => $item->handle(), 'path' => Str::after($item->path(), base_path())];
+                        }),
                         'is_deletable' => $fieldset->isDeletable(),
                         'title' => $fieldset->title(),
                     ],
