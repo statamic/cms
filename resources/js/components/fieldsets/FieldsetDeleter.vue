@@ -4,7 +4,7 @@
         :title="modalTitle"
         :buttonText="__('Delete')"
         :danger="true"
-        :disabled="resource.imported_by.length > 0"
+        :disabled="Object.keys(resource.imported_by).length > 0"
         @confirm="confirmed"
         @cancel="cancel"
     >
