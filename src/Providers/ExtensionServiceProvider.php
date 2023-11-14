@@ -150,6 +150,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Assets::class,
         Tags\Cache::class,
         Tags\Can::class,
+        Tags\Children::class,
         Tags\Collection\Collection::class,
         Tags\Cookie::class,
         Tags\Dd::class,
