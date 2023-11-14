@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use ArrayAccess;
+use Closure;
 use Facades\Statamic\Entries\InitiatorStack;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
@@ -722,11 +723,41 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
             ->published($this->published)
             ->slug($this->slug());
 
+        if ($callback = $this->addToStructure($site, $this->parent())) {
+            $localization->afterSave($callback);
+        }
+
         if ($this->collection()->dated()) {
             $localization->date($this->date());
         }
 
         return $localization;
+    }
+
+    private function addToStructure($site, $parent = null): ?Closure
+    {
+        // If it's orderable (linear - a max depth of 1) then don't add it.
+        if ($this->collection()->orderable()) {
+            return null;
+        }
+
+        // Collection not structured? Don't add it.
+        if (! $structure = $this->collection()->structure()) {
+            return null;
+        }
+
+        $tree = $structure->in($site);
+        $parent = optional($parent)->in($site);
+
+        return function ($entry) use ($parent, $tree) {
+            if (! $parent || $parent->isRoot()) {
+                $tree->append($entry);
+            } else {
+                $tree->appendTo($parent->id(), $entry);
+            }
+
+            $tree->save();
+        };
     }
 
     public function supplementTaxonomies()
