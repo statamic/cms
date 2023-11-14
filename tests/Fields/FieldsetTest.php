@@ -260,7 +260,9 @@ class FieldsetTest extends TestCase
     /** @test */
     public function gets_blueprints_importing_single_field_from_fieldset()
     {
-        $fieldset = Fieldset::make('seo')->setContents(['fields' => [['handle' => 'meta_title', 'field' => ['type' => 'text']]]])->save();
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']]
+        ]])->save();
 
         tap(Collection::make('one'))->save();
         $blueprintA = Blueprint::make('one')->setNamespace('collections.one')->setContents([
@@ -369,7 +371,9 @@ class FieldsetTest extends TestCase
     /** @test */
     public function gets_fieldsets_importing_single_field_from_fieldset()
     {
-        $fieldset = Fieldset::make('seo')->setContents(['fields' => [['handle' => 'meta_title', 'field' => ['type' => 'text']]]])->save();
+        $fieldset = Fieldset::make('seo')->setContents(['fields' => [
+            ['handle' => 'meta_title', 'field' => ['type' => 'text']]
+        ]])->save();
 
         $fieldsetA = Fieldset::make('one')
             ->setContents([
