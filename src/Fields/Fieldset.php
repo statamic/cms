@@ -168,7 +168,7 @@ class Fieldset
                         return collect($set['fields'])
                             ->filter(fn ($field) => $this->fieldImportsFieldset($field))
                             ->isNotEmpty();
-                    });
+                    })->isNotEmpty();
                 })
                 ->isNotEmpty();
         }
