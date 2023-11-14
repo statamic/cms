@@ -132,11 +132,14 @@ class Fieldset
                 ->isNotEmpty();
         })->values();
 
-        $fieldsets = \Statamic\Facades\Fieldset::all()->filter(function (Fieldset $fieldset) {
-            return collect($fieldset->contents()['fields'])
-                ->filter(fn ($field) => $this->fieldImportsFieldset($field))
-                ->isNotEmpty();
-        })->values();
+        $fieldsets = \Statamic\Facades\Fieldset::all()
+            ->filter(fn (Fieldset $fieldset) => isset($fieldset->contents()['fields']))
+            ->filter(function (Fieldset $fieldset) {
+                return collect($fieldset->contents()['fields'])
+                    ->filter(fn ($field) => $this->fieldImportsFieldset($field))
+                    ->isNotEmpty();
+            })
+            ->values();
 
         return ['blueprints' => $blueprints, 'fieldsets' => $fieldsets];
     }
