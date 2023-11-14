@@ -30,7 +30,7 @@
                 @endcan
             </dropdown-list>
 
-            @if ($exporters = $form->exporters())
+            @if (($exporters = $form->exporters()) && $exporters->count())
             <dropdown-list>
                 <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
                 @foreach ($exporters as $exporter)
