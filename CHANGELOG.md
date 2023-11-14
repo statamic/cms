@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.4.14 (2023-11-14)
+
+### What's fixed
+- More php file validation [#8992](https://github.com/statamic/cms/issues/8992) by @jasonvarga
+
+
+
 ## 3.4.13 (2023-11-10)
 
 ### What's fixed
