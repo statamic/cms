@@ -18,6 +18,7 @@ class Outpost
     const ENDPOINT = 'https://outpost.statamic.com/v3/query';
     const REQUEST_TIMEOUT = 5;
     const CACHE_KEY = 'statamic.outpost.response';
+    const LOCK_KEY = 'statamic.outpost.lock';
 
     private $response;
     private $client;
@@ -44,17 +45,31 @@ class Outpost
             return $this->getCachedResponse();
         }
 
-        try {
-            return $this->performAndCacheRequest();
-        } catch (ConnectException $e) {
-            return $this->cacheAndReturnErrorResponse($e);
-        } catch (RequestException $e) {
-            return $this->handleRequestException($e);
+        $lock = $this->cache()->lock(static::LOCK_KEY, 5);
+
+        if ($lock->get()) {
+            // If we have a cached response from a previous lock, we can just return it.
+            if ($this->hasCachedResponse()) {
+                $lock->release();
+                return $this->getCachedResponse();
+            }
+
+            try {
+                return $this->performAndCacheRequest();
+            } catch (ConnectException $e) {
+                return $this->cacheAndReturnErrorResponse($e);
+            } catch (RequestException $e) {
+                return $this->handleRequestException($e);
+            } finally {
+                $lock->release();
+            }
         }
     }
 
     private function performAndCacheRequest()
     {
+        ray('performAndCacheRequest');
+
         return $this->cacheResponse(now()->addHour(), $this->performRequest());
     }
 
