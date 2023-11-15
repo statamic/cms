@@ -42,14 +42,14 @@ class Outpost
 
     private function request()
     {
-        if ($this->hasCachedResponse()) {
-            return $this->getCachedResponse();
-        }
-
         $lock = $this->cache()->lock(static::LOCK_KEY, 10);
 
         try {
             $lock->block(5);
+
+            if ($this->hasCachedResponse()) {
+                return $this->getCachedResponse();
+            }
 
             return $this->performAndCacheRequest();
         } catch (ConnectException $e) {
