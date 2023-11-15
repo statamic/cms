@@ -314,7 +314,7 @@ class TermTest extends TestCase
         $taxonomy = tap(Taxonomy::make('tags'))->save();
         $term = (new Term)->taxonomy('tags');
 
-        // defaults to layout
+        // defaults to taxonomy.show
         $this->assertEquals('tags.show', $term->template());
 
         // taxonomy level overrides the default

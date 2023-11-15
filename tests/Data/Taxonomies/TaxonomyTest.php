@@ -385,7 +385,7 @@ class TaxonomyTest extends TestCase
     {
         $taxonomy = (new Taxonomy)->handle('tags');
 
-        // defaults to layout
+        // defaults to taxonomy.index
         $this->assertEquals('tags.index', $taxonomy->template());
 
         // taxonomy level overrides the default
@@ -398,7 +398,7 @@ class TaxonomyTest extends TestCase
     {
         $taxonomy = (new Taxonomy)->handle('tags');
 
-        // defaults to layout
+        // defaults to taxonomy.show
         $this->assertEquals('tags.show', $taxonomy->termTemplate());
 
         // taxonomy level overrides the default
