@@ -49,17 +49,17 @@ class PerformanceTracer implements RuntimeTracerContract
     /**
      * @var PerformanceObject[]
      */
-    private array $sourceViewObjects = [];
+    private $sourceViewObjects = [];
 
-    private string $triggeredTemplateContent = '';
+    private $triggeredTemplateContent = '';
 
-    private array $runtimeSamples = [];
+    private $runtimeSamples = [];
 
-    private int $memorySampleBaseline = 0;
+    private $memorySampleBaseline = 0;
 
     private $firstSampleTime = null;
 
-    protected bool $foundLayoutTrigger = false;
+    protected $foundLayoutTrigger = false;
 
     public function __construct()
     {

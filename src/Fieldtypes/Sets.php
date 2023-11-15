@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;
 use Statamic\Support\Arr;

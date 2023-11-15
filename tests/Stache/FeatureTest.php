@@ -12,6 +12,7 @@ use Statamic\Facades\Nav as NavRepository;
 use Statamic\Facades\Structure;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
+use Statamic\Stache\Stache;
 use Tests\TestCase;
 
 class FeatureTest extends TestCase
