@@ -64,7 +64,7 @@ class FrontendFormRequest extends FormRequest
         return parent::failedValidation($validator);
     }
 
-    public function extraRules($fields)
+    private function extraRules($fields)
     {
         $assetFieldRules = $fields->all()
             ->filter(function ($field) {
@@ -103,7 +103,7 @@ class FrontendFormRequest extends FormRequest
         return $this->cachedFields = $fields->addValues($values);
     }
 
-    protected function normalizeAssetsValues($fields, $request)
+    private function normalizeAssetsValues($fields, $request)
     {
         // The assets fieldtype is expecting an array, even for `max_files: 1`, but we don't want to force that on the front end.
         return $fields->all()
