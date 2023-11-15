@@ -336,20 +336,22 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function ensureEntryBlueprintFields($blueprint)
     {
-        $blueprint->ensureFieldPrepended('title', [
-            'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
-            'required' => ! $auto,
-        ]);
+        if (! $blueprint->hasField('title')) {
+            $blueprint->ensureFieldPrepended('title', [
+                'type' => ($auto = $this->autoGeneratesTitles()) ? 'hidden' : 'text',
+                'required' => ! $auto,
+            ]);
+        }
 
-        if ($this->requiresSlugs()) {
+        if ($this->requiresSlugs() && ! $blueprint->hasField('slug')) {
             $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true], 'sidebar');
         }
 
-        if ($this->dated()) {
+        if ($this->dated() && ! $blueprint->hasField('date')) {
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true, 'default' => 'now'], 'sidebar');
         }
 
-        if ($this->hasStructure() && ! $this->orderable()) {
+        if ($this->hasStructure() && ! $this->orderable() && ! $blueprint->hasField('parent')) {
             $blueprint->ensureField('parent', [
                 'type' => 'entries',
                 'collections' => [$this->handle()],
@@ -360,6 +362,10 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         }
 
         foreach ($this->taxonomies() as $taxonomy) {
+            if ($blueprint->hasField($taxonomy->handle())) {
+                continue;
+            }
+
             $blueprint->ensureField($taxonomy->handle(), [
                 'type' => 'terms',
                 'taxonomies' => [$taxonomy->handle()],
@@ -846,9 +852,15 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
 
     public function augmentedArrayData()
     {
-        return [
+        $data = [
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
+
+        if (! Statamic::isApiRoute() && ! Statamic::isCpRoute()) {
+            $data['mount'] = $this->mount();
+        }
+
+        return $data;
     }
 }

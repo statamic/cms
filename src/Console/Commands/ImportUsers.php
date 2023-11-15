@@ -4,7 +4,6 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Support\Facades\Schema;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 use Statamic\Auth\File\User as FileUser;
 use Statamic\Auth\UserRepositoryManager;
@@ -58,12 +57,6 @@ class ImportUsers extends Command
 
         if (! in_array(HasUuids::class, class_uses_recursive($model))) {
             $this->error('Your user model must use the HasUuids trait for this migration to run');
-
-            return;
-        }
-
-        if (! in_array(Schema::getColumnType('users', 'id'), ['guid', 'string'])) {
-            $this->error('Your users table must use UUIDs for ids in order for this migration to run');
 
             return;
         }

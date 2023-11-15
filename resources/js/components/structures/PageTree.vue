@@ -24,7 +24,7 @@
 
         <div v-if="!loading" class="page-tree w-full">
             <draggable-tree
-                draggable
+                :draggable="editable"
                 ref="tree"
                 :data="treeData"
                 :space="1"
@@ -39,15 +39,19 @@
                     :depth="vm.level"
                     :vm="vm"
                     :first-page-is-root="expectsRoot"
-                    :has-collection="hasCollection"
                     :is-open="page.open"
                     :has-children="page.children.length > 0"
                     :show-slugs="showSlugs"
+                    :editable="editable"
                     @edit="$emit('edit-page', page, vm, store, $event)"
                     @toggle-open="store.toggleOpen(page)"
                     @removed="pageRemoved"
                     @children-orphaned="childrenOrphaned"
                 >
+                    <template #branch-action="props">
+                        <slot name="branch-action" v-bind="{ ...props, vm }" />
+                    </template>
+
                     <template #branch-icon="props">
                         <slot name="branch-icon" v-bind="{ ...props, vm }" />
                     </template>
@@ -78,7 +82,7 @@ export default {
 
     props: {
         pagesUrl: { type: String, required: true },
-        submitUrl: { type: String, required: true },
+        submitUrl: { type: String },
         submitParameters: { type: Object, default: () => ({}) },
         createUrl: { type: String },
         site: { type: String, required: true },
@@ -86,8 +90,8 @@ export default {
         maxDepth: { type: Number, default: Infinity, },
         expectsRoot: { type: Boolean, required: true },
         showSlugs: { type: Boolean, default: false },
-        hasCollection: { type: Boolean, required: true },
         preferencesPrefix: { type: String },
+        editable: { type: Boolean, default: true },
     },
 
     data() {
@@ -180,6 +184,10 @@ export default {
         },
 
         save() {
+            if (! this.editable) {
+                return;
+            }
+
             this.saving = true;
 
             const payload = {

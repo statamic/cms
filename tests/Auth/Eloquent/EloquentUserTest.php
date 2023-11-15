@@ -139,4 +139,24 @@ class EloquentUserTest extends TestCase
 
         $this->assertFalse($user->timestamps);
     }
+
+    /** @test */
+    public function it_gets_super_correctly_on_the_model()
+    {
+        $user = $this->makeUser();
+
+        $this->assertNull($user->super);
+
+        $user->super = true;
+        $user->save();
+
+        $this->assertTrue($user->super);
+        $this->assertTrue($user->model()->super);
+
+        $user->super = false;
+        $user->save();
+
+        $this->assertFalse($user->super);
+        $this->assertFalse($user->model()->super);
+    }
 }
