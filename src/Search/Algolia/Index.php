@@ -65,10 +65,10 @@ class Index extends BaseIndex
 
     public function getIndex()
     {
-        $index_created = ! $this->exists();
+        $indexCreated = ! $this->exists();
         $index = $this->client->initIndex($this->name);
 
-        if ($index_created) {
+        if ($indexCreated) {
             $index->setSettings($this->config['settings']);
         }
 
