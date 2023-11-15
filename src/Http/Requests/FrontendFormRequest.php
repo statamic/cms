@@ -78,9 +78,7 @@ class FrontendFormRequest extends FormRequest
     private function extraRules($fields)
     {
         return $fields->all()
-            ->filter(function ($field) {
-                return $field->fieldtype()->handle() === 'assets';
-            })
+            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets')
             ->mapWithKeys(function ($field) {
                 return [$field->handle().'.*' => ['file', function ($attribute, $value, $fail) {
                     if (in_array(trim(strtolower($value->getClientOriginalExtension())), ['php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml'])) {
@@ -116,12 +114,8 @@ class FrontendFormRequest extends FormRequest
     {
         // The assets fieldtype is expecting an array, even for `max_files: 1`, but we don't want to force that on the front end.
         return $fields->all()
-            ->filter(function ($field) {
-                return $field->fieldtype()->handle() === 'assets' && request()->hasFile($field->handle());
-            })
-            ->map(function ($field) use ($request) {
-                return Arr::wrap($request->file($field->handle()));
-            })
+            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets' && request()->hasFile($field->handle()))
+            ->map(fn ($field) => Arr::wrap($request->file($field->handle())))
             ->all();
     }
 
