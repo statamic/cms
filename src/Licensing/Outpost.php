@@ -42,11 +42,11 @@ class Outpost
 
     private function request()
     {
-        $lock = $this->cache()->lock(static::LOCK_KEY, 10);
-
         if ($this->hasCachedResponse()) {
             return $this->getCachedResponse();
         }
+
+        $lock = $this->cache()->lock(static::LOCK_KEY, 10);
 
         try {
             $lock->block(5);
