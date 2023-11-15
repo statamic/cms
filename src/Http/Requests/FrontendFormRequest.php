@@ -46,6 +46,16 @@ class FrontendFormRequest extends FormRequest
         return $url->previous();
     }
 
+    public function validator()
+    {
+        $fields = $this->getFormFields();
+
+        return $fields
+            ->validator()
+            ->withRules($this->extraRules($fields))
+            ->validator();
+    }
+
     protected function failedValidation(Validator $validator)
     {
         if (request()->ajax()) {
@@ -112,16 +122,6 @@ class FrontendFormRequest extends FormRequest
                 return Arr::wrap($request->file($field->handle()));
             })
             ->all();
-    }
-
-    public function validator()
-    {
-        $fields = $this->getFormFields();
-
-        return $fields
-            ->validator()
-            ->withRules($this->extraRules($fields))
-            ->validator();
     }
 
     public function validateResolved()
