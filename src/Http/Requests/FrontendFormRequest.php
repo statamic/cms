@@ -14,6 +14,7 @@ class FrontendFormRequest extends FormRequest
     use Localizable;
 
     private $assets = [];
+    private $cachedFields;
 
     /**
      * Get any assets in the request
