@@ -6,6 +6,7 @@ use Carbon\CarbonInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
@@ -41,23 +42,22 @@ class Outpost
 
     private function request()
     {
-        $lock = $this->cache()->lock(static::LOCK_KEY, 5);
+        try {
+            return Cache::lock(static::LOCK_KEY)->block(5, function () {
+                if ($this->hasCachedResponse()) {
+                    return $this->getCachedResponse();
+                }
 
-        if ($lock->get()) {
-            if ($this->hasCachedResponse()) {
-                $lock->release();
-                return $this->getCachedResponse();
-            }
-
-            try {
-                return $this->performAndCacheRequest();
-            } catch (ConnectException $e) {
-                return $this->cacheAndReturnErrorResponse($e);
-            } catch (RequestException $e) {
-                return $this->handleRequestException($e);
-            } finally {
-                $lock->release();
-            }
+                try {
+                    return $this->performAndCacheRequest();
+                } catch (ConnectException $e) {
+                    return $this->cacheAndReturnErrorResponse($e);
+                } catch (RequestException $e) {
+                    return $this->handleRequestException($e);
+                }
+            });
+        } catch (LockTimeoutException $e) {
+            return $this->cacheAndReturnErrorResponse($e);
         }
     }
 
