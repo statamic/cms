@@ -51,6 +51,7 @@ class Outpost
             // If we have a cached response from a previous lock, we can just return it.
             if ($this->hasCachedResponse()) {
                 $lock->release();
+
                 return $this->getCachedResponse();
             }
 
