@@ -45,7 +45,7 @@ class Outpost
         $lock = $this->cache()->lock(static::LOCK_KEY, 10);
 
         try {
-            $lock->block(5);
+            $lock->block(static::REQUEST_TIMEOUT);
 
             if ($this->hasCachedResponse()) {
                 return $this->getCachedResponse();
