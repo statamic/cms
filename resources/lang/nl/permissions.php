@@ -12,6 +12,8 @@ return [
     'configure_addons_desc' => 'Toegang tot addons, met de mogelijkheid om addons te installeren en te verwijderen.',
     'manage_preferences' => 'Beheer Instellingen',
     'manage_preferences_desc' => 'Mogelijkheid om globale en rol specifieke voorkeuren aan te passen.',
+    'group_sites' => 'Sites',
+    'access_{site}_site' => 'Toegang tot site :site',
     'group_collections' => 'Collecties',
     'configure_collections' => 'Configureer collecties',
     'configure_collections_desc' => 'Geeft toegang tot alle collectiegerelateerde rechten',

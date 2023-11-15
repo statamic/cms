@@ -1,8 +1,14 @@
-import { Mark } from '@tiptap/core';
+import { Mark, mergeAttributes } from '@tiptap/core';
 
 export const Small = Mark.create({
 
     name: 'small',
+
+    addOptions() {
+        return {
+            HTMLAttributes: {},
+        }
+    },
 
     parseHTML() {
         return [
@@ -12,8 +18,8 @@ export const Small = Mark.create({
         ]
     },
 
-    renderHTML() {
-        return ['small', 0]
+    renderHTML({ HTMLAttributes }) {
+        return ['small', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0]
     },
 
     addCommands() {

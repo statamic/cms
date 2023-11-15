@@ -2,6 +2,7 @@
 
 namespace Tests\StaticCaching;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Statamic\StaticCaching\NoCache\Session;
@@ -75,6 +76,8 @@ class NoCacheSessionTest extends TestCase
     /** @test */
     public function it_writes()
     {
+        Carbon::setTestNow('2014-02-15');
+
         // Testing that the cache key used is unique to the url.
         // The contents aren't really important.
 
@@ -101,6 +104,11 @@ class NoCacheSessionTest extends TestCase
             ->with('nocache::urls', ['/', '/foo'])
             ->once();
 
+        // When pushing regions, they will get written too...
+        Cache::shouldReceive('forever')
+            ->withArgs(fn ($arg) => str_starts_with($arg, 'nocache::region.'))
+            ->twice();
+
         tap(new Session('/'), function ($session) {
             $session->pushRegion('test', [], '.html');
         })->write();
@@ -113,11 +121,10 @@ class NoCacheSessionTest extends TestCase
     /** @test */
     public function it_restores_from_cache()
     {
+        Cache::forever('nocache::region.abc', $regionOne = Mockery::mock(StringRegion::class));
+        Cache::forever('nocache::region.def', $regionTwo = Mockery::mock(StringRegion::class));
         Cache::forever('nocache::session.'.md5('http://localhost/test'), [
-            'regions' => [
-                $regionOne = Mockery::mock(StringRegion::class),
-                $regionTwo = Mockery::mock(StringRegion::class),
-            ],
+            'regions' => ['abc', 'def'],
         ]);
 
         $this->createPage('/test', [
@@ -130,7 +137,7 @@ class NoCacheSessionTest extends TestCase
 
         $session->restore();
 
-        $this->assertEquals([$regionOne, $regionTwo], $session->regions()->all());
+        $this->assertEquals(['abc' => $regionOne, 'def' => $regionTwo], $session->regions()->all());
         $this->assertNotEquals([], $cascade = $session->cascade());
         $this->assertEquals('/test', $cascade['url']);
         $this->assertEquals('Test page', $cascade['title']);
@@ -202,10 +209,9 @@ class NoCacheSessionTest extends TestCase
         $this->viewShouldReturnRendered('default', 'Hello <span class="nocache" data-nocache="abc">NOCACHE_PLACEHOLDER</span>');
         $this->createPage('test');
 
+        Cache::forever('nocache::region.abc', $region = Mockery::mock(StringRegion::class));
         Cache::put('nocache::session.'.md5('http://localhost/test'), [
-            'regions' => [
-                'abc' => $region = Mockery::mock(StringRegion::class),
-            ],
+            'regions' => ['abc'],
         ]);
 
         $region->shouldReceive('render')->andReturn('world');

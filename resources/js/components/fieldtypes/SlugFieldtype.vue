@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { data_get } from '../../bootstrap/globals';
 import Fieldtype from './Fieldtype.vue';
 
 export default {
@@ -66,8 +67,14 @@ export default {
             if (! this.generate) return;
 
             const field = this.config.from || 'title';
+            let key = field;
 
-            return this.$store.state.publish[this.store].values[field];
+            if (this.fieldPathPrefix) {
+                let dottedPrefix = this.fieldPathPrefix.replace(new RegExp('\.'+this.handle+'$'), '');
+                key = dottedPrefix + '.' + field;
+            }
+
+            return data_get(this.$store.state.publish[this.store].values, key);
         },
 
         language() {

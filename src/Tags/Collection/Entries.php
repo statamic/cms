@@ -5,12 +5,14 @@ namespace Statamic\Tags\Collection;
 use Closure;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as IlluminateCollection;
+use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Compare;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Query\OrderBy;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
@@ -66,18 +68,22 @@ class Entries
         throw_if($this->params->has('offset'), new \Exception('collection:next is not compatible with [offset] parameter'));
         throw_if($this->collections->count() > 1, new \Exception('collection:next is not compatible with multiple collections'));
 
+        if ($this->orderBys->count() === 1) {
+            $this->orderBys[] = new OrderBy('title', 'asc');
+        }
+
         $collection = $this->collections->first();
         $primaryOrderBy = $this->orderBys->first();
+        $secondaryOrderBy = $this->orderBys->get(1);
 
-        if ($primaryOrderBy->direction === 'desc') {
-            $operator = '<';
-        }
+        $primaryOperator = $primaryOrderBy->direction === 'desc' ? '<' : '>';
+        $secondaryOperator = $secondaryOrderBy->direction === 'desc' ? '<' : '>';
 
         if ($primaryOrderBy->sort === 'order') {
             throw_if(! $currentOrder = $currentEntry->order(), new \Exception('Current entry does not have an order'));
-            $query = $this->query()->where('order', $operator ?? '>', $currentOrder);
+            $query = $this->query()->where('order', $primaryOperator, $currentOrder);
         } elseif ($collection->dated() && $primaryOrderBy->sort === 'date') {
-            $query = $this->query()->where('date', $operator ?? '>', $currentEntry->date());
+            $query = $this->queryPreviousNextByDate($currentEntry, $primaryOperator, $secondaryOperator);
         } else {
             throw new \Exception('collection:next requires ordered or dated collection');
         }
@@ -91,18 +97,22 @@ class Entries
         throw_if($this->params->has('offset'), new \Exception('collection:previous is not compatible with [offset] parameter'));
         throw_if($this->collections->count() > 1, new \Exception('collection:previous is not compatible with multiple collections'));
 
+        if ($this->orderBys->count() === 1) {
+            $this->orderBys[] = new OrderBy('title', 'asc');
+        }
+
         $collection = $this->collections->first();
         $primaryOrderBy = $this->orderBys->first();
+        $secondaryOrderBy = $this->orderBys->get(1);
 
-        if ($primaryOrderBy->direction === 'desc') {
-            $operator = '>';
-        }
+        $primaryOperator = $primaryOrderBy->direction === 'desc' ? '>' : '<';
+        $secondaryOperator = $secondaryOrderBy->direction === 'desc' ? '>' : '<';
 
         if ($primaryOrderBy->sort === 'order') {
             throw_if(! $currentOrder = $currentEntry->order(), new \Exception('Current entry does not have an order'));
-            $query = $this->query()->where('order', $operator ?? '<', $currentOrder);
+            $query = $this->query()->where('order', $primaryOperator, $currentOrder);
         } elseif ($collection->dated() && $primaryOrderBy->sort === 'date') {
-            $query = $this->query()->where('date', $operator ?? '<', $currentEntry->date());
+            $query = $this->queryPreviousNextByDate($currentEntry, $primaryOperator, $secondaryOperator);
         } else {
             throw new \Exception('collection:previous requires ordered or dated collection');
         }
@@ -139,6 +149,32 @@ class Entries
         return $primaryOrderBy->direction === 'asc'
             ? $this->next($currentEntry)
             : $this->previous($currentEntry);
+    }
+
+    protected function queryPreviousNextByDate($currentEntry, string $primaryOperator, string $secondaryOperator): QueryBuilder
+    {
+        $primaryOrderBy = $this->orderBys->first();
+        $secondaryOrderBy = $this->orderBys->get(1);
+
+        $currentEntryDate = $currentEntry->date();
+
+        // Get the IDs of any items that have the same date as the current entry,
+        // but come before/after the current entry sorted by the second column.
+        $previousOfSame = $this->query()
+            ->where('date', $currentEntryDate)
+            ->orderBy($secondaryOrderBy->sort, $secondaryOrderBy->direction)
+            ->where($secondaryOrderBy->sort, $secondaryOperator, $currentEntry->value($secondaryOrderBy->sort))
+            ->get()
+            ->pluck('id')
+            ->toArray();
+
+        return $this->query()
+            ->where(fn ($query) => $query
+                ->where('date', $primaryOperator, $currentEntryDate)
+                ->orWhereIn('id', $previousOfSame)
+            )
+            ->orderBy('date', $primaryOrderBy->direction)
+            ->orderBy($secondaryOrderBy->sort, $secondaryOrderBy->direction);
     }
 
     protected function query()
@@ -350,8 +386,8 @@ class Entries
 
     protected function queryableConditionParams()
     {
-        return $this->traitQueryableConditionParams()->reject(function ($value, $key) {
-            return Str::startsWith($key, 'taxonomy:');
-        });
+        return $this->traitQueryableConditionParams()
+            ->reject(fn ($value, $key) => Str::startsWith($key, 'taxonomy:'))
+            ->reject(fn ($value, $key) => $value === '');
     }
 }

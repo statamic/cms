@@ -342,6 +342,32 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Grape', 'Hummus', 'Fig'], $this->runTagAndGetTitles('newer')); // Alias of prev when date:desc
     }
 
+    /**
+     * @test
+     * https://github.com/statamic/cms/issues/1831
+     */
+    public function it_can_get_previous_and_next_entries_in_a_dated_desc_collection_when_multiple_entries_share_the_same_date()
+    {
+        $this->foods->dated(true)->save();
+
+        $this->makeEntry($this->foods, 'a')->date('2023-01-01')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->date('2023-02-05')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->date('2023-02-05')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->date('2023-03-07')->set('title', 'Danish')->save();
+
+        $this->setTagParameters([
+            'in' => 'foods',
+            'current' => $this->findEntryByTitle('Carrot')->id(),
+            'order_by' => 'date:desc|title:desc',
+            'limit' => 1,
+        ]);
+
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('previous'));
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('newer')); // Alias of prev when date:desc
+        $this->assertEquals(['Banana'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Banana'], $this->runTagAndGetTitles('older')); // Alias of next when date:desc
+    }
+
     /** @test */
     public function it_can_get_previous_and_next_entries_in_a_dated_asc_collection()
     {
@@ -382,6 +408,32 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Fig', 'Hummus', 'Grape'], $this->runTagAndGetTitles('newer')); // Alias of next when date:desc
         $this->assertEquals(['Carrot', 'Banana', 'Danish'], $this->runTagAndGetTitles('previous'));
         $this->assertEquals(['Carrot', 'Banana', 'Danish'], $this->runTagAndGetTitles('older')); // Alias of prev when date:desc
+    }
+
+    /**
+     * @test
+     * https://github.com/statamic/cms/issues/1831
+     */
+    public function it_can_get_previous_and_next_entries_in_a_dated_asc_collection_when_multiple_entries_share_the_same_date()
+    {
+        $this->foods->dated(true)->save();
+
+        $this->makeEntry($this->foods, 'a')->date('2023-01-01')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->date('2023-02-05')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->date('2023-02-05')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->date('2023-03-07')->set('title', 'Danish')->save();
+
+        $this->setTagParameters([
+            'in' => 'foods',
+            'current' => $this->findEntryByTitle('Carrot')->id(),
+            'order_by' => 'date:asc|title:asc',
+            'limit' => 1,
+        ]);
+
+        $this->assertEquals(['Banana'], $this->runTagAndGetTitles('previous'));
+        $this->assertEquals(['Banana'], $this->runTagAndGetTitles('older')); // Alias of previous when date:desc
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('newer')); // Alias of next when date:asc
     }
 
     /** @test */

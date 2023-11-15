@@ -295,7 +295,7 @@ export default {
                 } else if (node.type === 'set') {
                     const handle = node.attrs.values.type;
                     const set = this.setConfigs.find(set => set.handle === handle);
-                    text += ` [${set ? set.display : handle}]`;
+                    text += ` [${__(set ? set.display : handle)}]`;
                 }
                 if (text.length > 150) {
                     break;
@@ -666,7 +666,7 @@ export default {
                 Gapcursor,
                 History,
                 Paragraph,
-                Placeholder.configure({ placeholder: this.config.placeholder }),
+                Placeholder.configure({ placeholder: __(this.config.placeholder) }),
                 Set.configure({ bard: this }),
                 Text
             ];
@@ -703,12 +703,15 @@ export default {
             if (btns.includes('h6')) levels.push(6);
             if (levels.length) exts.push(Heading.configure({ levels }));
 
+            let alignmentTypes = ['paragraph'];
+            if (levels.length) alignmentTypes.push('heading');
+
             let alignments = [];
             if (btns.includes('alignleft')) alignments.push('left');
             if (btns.includes('aligncenter')) alignments.push('center');
             if (btns.includes('alignright')) alignments.push('right');
             if (btns.includes('alignjustify')) alignments.push('justify');
-            if (alignments.length) exts.push(TextAlign.configure({ types: ['heading', 'paragraph'], alignments }));
+            if (alignments.length) exts.push(TextAlign.configure({ types: alignmentTypes, alignments }));
 
             if (btns.includes('table')) {
                 exts.push(
