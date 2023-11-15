@@ -66,7 +66,7 @@ class FrontendFormRequest extends FormRequest
 
     private function extraRules($fields)
     {
-        $assetFieldRules = $fields->all()
+        return $fields->all()
             ->filter(function ($field) {
                 return $field->fieldtype()->handle() === 'assets';
             })
@@ -78,8 +78,6 @@ class FrontendFormRequest extends FormRequest
                 }]];
             })
             ->all();
-
-        return $assetFieldRules;
     }
 
     private function getFormFields()
