@@ -645,9 +645,11 @@ export default {
                 'Invalid text node in JSON': 'Invalid content, text values must be strings',
                 'Empty text nodes are not allowed': 'Invalid content, text values cannot be empty',
             };
+
             if (messages[error.message]) {
                 return __(messages[error.message]);
             }
+
             let match;
             if (match = error.message.match(/^(?:There is no|Unknown) (?:node|mark) type:? (\w*)(?: in this schema)?$/)) {
                 if (match[1]) {
