@@ -14,8 +14,6 @@ class FrontendFormRequest extends FormRequest
     use Localizable;
 
     private $assets = [];
-    private $cachedFields;
-    private $cachedValidator;
 
     /**
      * Get any assets in the request
@@ -31,45 +29,6 @@ class FrontendFormRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
-    }
-
-    /**
-     * Get the validation messages
-     */
-    public function messages(): array
-    {
-        $site = Site::findByUrl(URL::previous()) ?? Site::default();
-
-        $messages = [];
-        $this->withLocale($site->lang(), function () use (&$messages) {
-            $messages = $this->getFormFields()
-                ->validator()
-                ->validator()
-                ->messages()
-                ->getMessages();
-        });
-
-        return collect($messages)->flatten(1)->all();
-    }
-
-    /**
-     * Get the validation attributes that apply to the request.
-     */
-    public function attributes()
-    {
-        $attributes = $this->getFormFields()->preProcessValidatables()->all()->reduce(function ($carry, $field) {
-            return $carry->merge($field->validationAttributes());
-        }, collect())->all();
-
-        return $attributes;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     */
-    public function rules(): array
-    {
-        return $this->getCustomValidator()->rules();
     }
 
     /**
@@ -102,13 +61,6 @@ class FrontendFormRequest extends FormRequest
         }
 
         return parent::failedValidation($validator);
-    }
-
-    protected function getValidatorInstance()
-    {
-        return $this->getCustomValidator()
-            ->withMessages($this->messages())
-            ->validator();
     }
 
     public function extraRules($fields)
@@ -150,17 +102,6 @@ class FrontendFormRequest extends FormRequest
         return $this->cachedFields = $fields->addValues($values);
     }
 
-    private function getCustomValidator()
-    {
-        if ($this->cachedValidator) {
-            return $this->cachedValidator;
-        }
-
-        $fields = $this->getFormFields();
-
-        return $this->cachedValidator = $fields->validator()->withRules($this->extraRules($fields));
-    }
-
     protected function normalizeAssetsValues($fields, $request)
     {
         // The assets fieldtype is expecting an array, even for `max_files: 1`, but we don't want to force that on the front end.
@@ -172,5 +113,24 @@ class FrontendFormRequest extends FormRequest
                 return Arr::wrap($request->file($field->handle()));
             })
             ->all();
+    }
+
+    public function validator()
+    {
+        $fields = $this->getFormFields();
+
+        return $fields
+            ->validator()
+            ->withRules($this->extraRules($fields))
+            ->validator();
+    }
+
+    public function validateResolved()
+    {
+        $site = Site::findByUrl(URL::previous()) ?? Site::default();
+
+        return $this->withLocale($site->lang(), function () {
+            return parent::validateResolved();
+        });
     }
 }

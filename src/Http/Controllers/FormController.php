@@ -19,8 +19,6 @@ use Statamic\Support\Str;
 
 class FormController extends Controller
 {
-    use Localizable;
-
     /**
      * Handle a form submission request.
      *
