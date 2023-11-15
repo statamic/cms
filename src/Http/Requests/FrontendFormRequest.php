@@ -40,7 +40,7 @@ class FrontendFormRequest extends FormRequest
     {
         $url = $this->redirector->getUrlGenerator();
 
-        if ($redirect = request()->input('_error_redirect')) {
+        if ($redirect = $this->input('_error_redirect')) {
             return $url->to($redirect);
         }
 
@@ -59,7 +59,7 @@ class FrontendFormRequest extends FormRequest
 
     protected function failedValidation(Validator $validator)
     {
-        if (request()->ajax()) {
+        if ($this->ajax()) {
             $errors = $validator->errors();
 
             $response = response([
@@ -95,27 +95,25 @@ class FrontendFormRequest extends FormRequest
             return $this->cachedFields;
         }
 
-        $request = request();
-
         $form = $this->route()->parameter('form');
 
         $this->errorBag = 'form.'.$form->handle();
 
         $fields = $form->blueprint()->fields();
 
-        $this->assets = $this->normalizeAssetsValues($fields, $request);
+        $this->assets = $this->normalizeAssetsValues($fields);
 
-        $values = array_merge($request->all(), $this->assets);
+        $values = array_merge($this->all(), $this->assets);
 
         return $this->cachedFields = $fields->addValues($values);
     }
 
-    private function normalizeAssetsValues($fields, $request)
+    private function normalizeAssetsValues($fields)
     {
         // The assets fieldtype is expecting an array, even for `max_files: 1`, but we don't want to force that on the front end.
         return $fields->all()
-            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets' && request()->hasFile($field->handle()))
-            ->map(fn ($field) => Arr::wrap($request->file($field->handle())))
+            ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets' && $this->hasFile($field->handle()))
+            ->map(fn ($field) => Arr::wrap($this->file($field->handle())))
             ->all();
     }
 
