@@ -4,7 +4,6 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Traits\Localizable;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
