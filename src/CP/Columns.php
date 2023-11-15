@@ -7,7 +7,7 @@ use Statamic\Facades\Preference;
 
 class Columns extends Collection
 {
-    private $items;
+    protected $items;
     /**
      * Ensure has column.
      *
