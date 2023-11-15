@@ -43,4 +43,14 @@ trait FakesRoles
         app()->instance(RepositoryContract::class, $fake);
         Role::swap($fake);
     }
+
+    protected function setTestRole(string $handle, array $permissions)
+    {
+        $this->setTestRoles(array_merge(
+            Role::all()->mapWithKeys(function ($role) {
+                return [$role->handle() => $role->permissions()];
+            })->toArray(),
+            [$handle => $permissions]
+        ));
+    }
 }

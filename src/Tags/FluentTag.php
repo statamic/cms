@@ -183,7 +183,7 @@ class FluentTag implements \ArrayAccess, \IteratorAggregate
      */
     public function __call($param, $args)
     {
-        $this->param($param, $args[0] ?? true);
+        $this->param(Str::snake($param), $args[0] ?? true);
 
         return $this;
     }

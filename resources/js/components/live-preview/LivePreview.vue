@@ -215,6 +215,10 @@ export default {
         this.keybinding = this.$keys.bindGlobal('mod+shift+p', () => {
             this.previewing ? this.close() : this.$emit('opened-via-keyboard');
         });
+
+        this.$events.$on(`live-preview.${this.name}.refresh`, () => {
+            this.update();
+        });
     },
 
     beforeDestroy() {

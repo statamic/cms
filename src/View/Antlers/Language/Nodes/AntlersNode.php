@@ -280,6 +280,8 @@ class AntlersNode extends AbstractNode
      */
     private $hasModifierParametersCache = null;
 
+    public $hasScopeAdjustingParameters = false;
+
     /**
      * Returns a new AntlersNode with basic details copied.
      *

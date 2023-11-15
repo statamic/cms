@@ -61,6 +61,16 @@ class QueriesConditionsTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_filter_by_is_condition_when_value_is_empty()
+    {
+        $this->makeEntry('a')->set('author', 'john-doe')->save();
+        $this->makeEntry('b')->set('author', 'david-hasselhoff')->save();
+        $this->makeEntry('c')->set('author', 'josiah-bartlet')->save();
+
+        $this->assertCount(3, $this->getEntries(['author:is' => '']));
+    }
+
+    /** @test */
     public function it_filters_by_not_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog')->save();
@@ -79,6 +89,16 @@ class QueriesConditionsTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_filter_by_not_condition_when_value_is_empty()
+    {
+        $this->makeEntry('a')->set('author', 'john-doe')->save();
+        $this->makeEntry('b')->set('author', 'david-hasselhoff')->save();
+        $this->makeEntry('c')->set('author', 'josiah-bartlet')->save();
+
+        $this->assertCount(3, $this->getEntries(['author:not' => '']));
+    }
+
+    /** @test */
     public function it_filters_by_contains_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
@@ -90,6 +110,16 @@ class QueriesConditionsTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_filter_by_contains_condition_when_value_is_empty()
+    {
+        $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
+        $this->makeEntry('cat')->set('title', 'Cat Fables')->save();
+        $this->makeEntry('tiger')->set('title', 'Tiger Tales')->save();
+
+        $this->assertCount(3, $this->getEntries(['title:contains' => '']));
+    }
+
+    /** @test */
     public function it_filters_by_doesnt_contain_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
@@ -98,6 +128,16 @@ class QueriesConditionsTest extends TestCase
 
         $this->assertCount(3, $this->getEntries());
         $this->assertCount(2, $this->getEntries(['title:doesnt_contain' => 'sto']));
+    }
+
+    /** @test */
+    public function it_does_not_filter_by_doesnt_contains_condition_when_value_is_empty()
+    {
+        $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
+        $this->makeEntry('cat')->set('title', 'Cat Fables')->save();
+        $this->makeEntry('tiger')->set('title', 'Tiger Tales')->save();
+
+        $this->assertCount(3, $this->getEntries(['title:doesnt_contain' => '']));
     }
 
     /** @test */

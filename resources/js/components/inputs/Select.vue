@@ -15,7 +15,7 @@
 
             <option
                 v-if="placeholder"
-                v-text="placeholder"
+                v-text="__(placeholder)"
                 value=""
                 disabled
                 :selected="value === null" />
@@ -23,7 +23,7 @@
             <option
                 v-for="option in options"
                 :key="option.value"
-                v-text="option.label"
+                v-text="__(option.label)"
                 :value="option.value"
                 :selected="isOptionSelected(option)" />
 

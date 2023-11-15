@@ -23,7 +23,7 @@ class FormCreateTest extends FormTestCase
 
         foreach ($forms as $output) {
             $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/forms/contact">', $output);
-            $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
+            $this->assertStringContainsString(csrf_field(), $output);
             $this->assertStringEndsWith('</form>', $output);
         }
     }

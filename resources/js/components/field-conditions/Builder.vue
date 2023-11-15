@@ -139,7 +139,19 @@ export default {
         },
 
         operatorOptions() {
-            return this.normalizeInputOptions(OPERATORS);
+            return this.normalizeInputOptions({
+                'equals': __('equals'),
+                'not': __('not'),
+                'contains': __('contains'),
+                'contains_any': __('contains any'),
+                '===': '===',
+                '!==': '!==',
+                '>': '>',
+                '>=': '>=',
+                '<': '<',
+                '<=': '<=',
+                'custom': __('custom'),
+            });
         },
 
         hasConditions() {

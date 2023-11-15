@@ -97,10 +97,6 @@ code.parent-url {
     margin-left: 20px;
     width: 300px;
 
-    .publish-tab-actions {
-        @apply border-b;
-    }
-
     .publish-fields .form-group {
         @apply p-4;
     }

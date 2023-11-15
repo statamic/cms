@@ -824,6 +824,20 @@ class AssetContainerTest extends TestCase
     /**
      * @test
      *
+     * @see https://github.com/statamic/cms/issues/8825
+     * @see https://github.com/statamic/cms/pull/8826
+     **/
+    public function it_doesnt_get_kebab_case_folder_assets_when_querying_snake_case_folder()
+    {
+        tap($this->containerWithDisk('snake-kebab')->assets('foo_bar', true), function ($assets) {
+            $this->assertCount(1, $assets);
+            $this->assertEquals('foo_bar/alfa.txt', $assets->first()->path());
+        });
+    }
+
+    /**
+     * @test
+     *
      * @see https://github.com/statamic/cms/issues/5405
      * @see https://github.com/statamic/cms/pull/5433
      **/
@@ -954,11 +968,11 @@ class AssetContainerTest extends TestCase
             });
     }
 
-    private function containerWithDisk()
+    private function containerWithDisk($fixture = 'container')
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
-            'root' => __DIR__.'/__fixtures__/container',
+            'root' => __DIR__.'/__fixtures__/'.$fixture,
         ]]);
 
         $container = (new AssetContainer)->handle('test')->disk('test');

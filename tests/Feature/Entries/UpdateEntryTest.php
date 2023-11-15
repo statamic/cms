@@ -9,6 +9,7 @@ use Statamic\Events\EntrySaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -21,11 +22,37 @@ class UpdateEntryTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    public function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_edit_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $collection = tap(Collection::make('test'))->save();
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry'])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->update($entry)
+            ->assertForbidden();
+
+        $this->assertCount(1, Entry::all());
+        $this->assertEquals('Existing Entry', $entry->fresh()->value('title'));
+    }
+
+    /** @test */
+    public function it_denies_access_if_you_dont_have_site_permission()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
+            'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
+        ]]);
+
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->sites(['en', 'fr'])->save();
+        Role::find('test')->removePermission('access en site');
 
         $entry = EntryFactory::collection($collection)
             ->slug('existing-entry')
@@ -342,7 +369,12 @@ class UpdateEntryTest extends TestCase
 
     private function seedUserAndCollection()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit test entries']]);
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'edit test entries',
+            'access en site',
+            'access fr site',
+        ]]);
         $user = tap(User::make()->assignRole('test'))->save();
         $collection = tap(Collection::make('test'))->save();
 
