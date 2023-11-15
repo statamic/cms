@@ -8,6 +8,7 @@ use Statamic\Facades\Preference;
 class Columns extends Collection
 {
     protected $items;
+
     /**
      * Ensure has column.
      *
