@@ -165,15 +165,14 @@ class TaxonomiesController extends CpController
 
         $taxonomy
             ->title($values['title'])
-            ->previewTargets($values['preview_targets']);
+            ->previewTargets($values['preview_targets'])
+            ->termTemplate($values['term_template'] ?? null)
+            ->template($values['template'] ?? null)
+            ->layout($values['layout'] ?? null);
 
         if ($sites = array_get($values, 'sites')) {
             $taxonomy->sites($sites);
         }
-
-        $taxonomy->termTemplate($values['term_template'] ?? null);
-        $taxonomy->template($values['template'] ?? null);
-        $taxonomy->layout($values['layout'] ?? null);
 
         $taxonomy->save();
 
