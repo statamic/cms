@@ -129,8 +129,6 @@ class FrontendFormRequest extends FormRequest
     {
         $site = Site::findByUrl(URL::previous()) ?? Site::default();
 
-        return $this->withLocale($site->lang(), function () {
-            return parent::validateResolved();
-        });
+        return $this->withLocale($site->lang(), fn () => parent::validateResolved());
     }
 }
