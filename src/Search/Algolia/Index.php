@@ -56,7 +56,10 @@ class Index extends BaseIndex
     {
         $index = $this->getIndex();
         $index->clearObjects();
-        $index->setSettings($this->config['settings']);
+
+        if (isset($this->config['settings'])) {
+            $index->setSettings($this->config['settings']);
+        }
 
         $this->insertMultiple($this->searchables()->all());
 
@@ -68,7 +71,7 @@ class Index extends BaseIndex
         $indexCreated = ! $this->exists();
         $index = $this->client->initIndex($this->name);
 
-        if ($indexCreated) {
+        if ($indexCreated && isset($this->config['settings'])) {
             $index->setSettings($this->config['settings']);
         }
 
