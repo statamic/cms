@@ -14,6 +14,7 @@ class NavEntryPageType extends \Rebing\GraphQL\Support\Type
     protected $nav;
     protected $collection;
     protected $blueprint;
+    protected $attributes;
 
     public function __construct($nav, $collection, $blueprint)
     {

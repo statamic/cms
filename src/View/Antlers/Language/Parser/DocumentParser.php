@@ -66,8 +66,8 @@ class DocumentParser
      * @var AntlersNodeParser|null
      */
     private $nodeParser = null;
-    private $chars = [];
-    private $charLen = 0;
+    private array $chars = [];
+    private int $charLen = 0;
 
     /**
      * Maintains a reference to the last produced AntlersNode to reduce lookups.

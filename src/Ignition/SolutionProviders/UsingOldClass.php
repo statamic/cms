@@ -10,6 +10,7 @@ use Throwable;
 
 class UsingOldClass implements HasSolutionsForThrowable
 {
+    protected $oldClass;
     protected $class;
 
     public function canSolve(Throwable $throwable): bool

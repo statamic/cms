@@ -8,6 +8,7 @@ use Statamic\Facades\GraphQL;
 class GridItemType extends Type
 {
     protected $fieldtype;
+    protected $attributes;
 
     public function __construct($fieldtype, $name)
     {

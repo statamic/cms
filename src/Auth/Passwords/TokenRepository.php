@@ -15,6 +15,7 @@ class TokenRepository extends DatabaseTokenRepository
     protected $hasher;
     protected $hashKey;
     protected $expires;
+    protected $throttle;
     protected $path;
 
     public function __construct(Filesystem $files, HasherContract $hasher, $table, $hashKey, $expires = 60, $throttle = 60)

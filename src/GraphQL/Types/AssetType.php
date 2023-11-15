@@ -11,6 +11,7 @@ class AssetType extends \Rebing\GraphQL\Support\Type
 {
     private $container;
     private $blueprint;
+    private array $attributes;
 
     public function __construct($container)
     {
