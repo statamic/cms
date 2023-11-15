@@ -69,8 +69,6 @@ class Outpost
 
     private function performAndCacheRequest()
     {
-        ray('performAndCacheRequest');
-
         return $this->cacheResponse(now()->addHour(), $this->performRequest());
     }
 
