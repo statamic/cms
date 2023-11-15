@@ -12,7 +12,6 @@ class TermType extends \Rebing\GraphQL\Support\Type
 {
     private $taxonomy;
     private $blueprint;
-    protected $attributes;
 
     public function __construct($taxonomy, $blueprint)
     {

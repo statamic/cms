@@ -9,7 +9,6 @@ use Statamic\Support\Str;
 class NavPageInterface extends InterfaceType
 {
     protected $nav;
-    protected $attributes;
 
     public function __construct(Nav $nav)
     {

@@ -9,7 +9,6 @@ use Statamic\Support\Str;
 class GlobalSetType extends \Rebing\GraphQL\Support\Type
 {
     private $globals;
-    protected $attributes;
 
     public function __construct($globals)
     {

@@ -9,7 +9,6 @@ use Statamic\Support\Str;
 class ReplicatorSetsType extends UnionType
 {
     protected $fieldtype;
-    protected $attributes;
     protected $types;
     protected $typeMap;
 

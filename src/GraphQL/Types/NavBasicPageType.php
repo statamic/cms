@@ -10,7 +10,6 @@ use Statamic\Support\Str;
 class NavBasicPageType extends \Rebing\GraphQL\Support\Type
 {
     protected $nav;
-    protected $attributes;
 
     public function __construct($nav)
     {

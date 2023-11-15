@@ -8,7 +8,6 @@ class ReplicatorSetType extends \Rebing\GraphQL\Support\Type
 {
     protected $fieldtype;
     protected $handle;
-    protected $attributes;
 
     public function __construct($fieldtype, $name, $handle)
     {

@@ -11,8 +11,6 @@ use Statamic\Support\Str;
 
 class Manifest extends PackageManifest
 {
-    public $manifest;
-
     public function build()
     {
         $this->manifest = null;

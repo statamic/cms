@@ -6,8 +6,6 @@ use Statamic\Facades\GraphQL;
 
 abstract class TreeBranchType extends \Rebing\GraphQL\Support\Type
 {
-    protected $attributes;
-
     public function __construct()
     {
         $this->attributes['name'] = static::NAME;

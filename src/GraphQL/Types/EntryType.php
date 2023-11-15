@@ -12,7 +12,6 @@ class EntryType extends \Rebing\GraphQL\Support\Type
 {
     protected $collection;
     protected $blueprint;
-    protected $attributes;
 
     public function __construct($collection, $blueprint)
     {
