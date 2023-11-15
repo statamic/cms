@@ -46,6 +46,7 @@ class Outpost
         if ($lock->get()) {
             if ($this->hasCachedResponse()) {
                 $lock->release();
+
                 return $this->getCachedResponse();
             }
 
