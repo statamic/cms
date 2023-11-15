@@ -1,5 +1,30 @@
 # Release Notes
 
+## 4.34.0 (2023-11-14)
+
+### What's new
+- Auto-populate `array` fieldtype options. [#8980](https://github.com/statamic/cms/issues/8980) by @duncanmcclean
+- Add Bard support to `read_time` modifier. [#8976](https://github.com/statamic/cms/issues/8976) by @duncanmcclean
+- Antlers identifier finder. [#8965](https://github.com/statamic/cms/issues/8965) by @jasonvarga
+
+### What's improved
+- Nocache performance improvements. [#8956](https://github.com/statamic/cms/issues/8956) by @jasonvarga
+- French translations. [#8977](https://github.com/statamic/cms/issues/8977) by @ebeauchamps
+
+### What's fixed
+- More php file validation. [#8991](https://github.com/statamic/cms/issues/8991) by @jasonvarga
+- Fix super not saving on eloquent users. [#8979](https://github.com/statamic/cms/issues/8979) by @ryanmitchell
+- Hide export submissions button when there are no valid exporters. [#8985](https://github.com/statamic/cms/issues/8985) by @ryanmitchell
+- Only namespace asset validation attributes when on a CP route. [#8987](https://github.com/statamic/cms/issues/8987) by @ryanmitchell
+- Fix for edit form page saying edit collection. [#8967](https://github.com/statamic/cms/issues/8967) by @ryanmitchell
+- Fix new child entries not propagating to appropriate position in other sites trees. [#7302](https://github.com/statamic/cms/issues/7302) by @arthurperton
+- Fix impersonation redirect. [#8973](https://github.com/statamic/cms/issues/8973) by @jasonvarga
+- Fix error when getting alt on bard image when asset is missing. [#8959](https://github.com/statamic/cms/issues/8959) by @morphsteve
+- Prevent requiring current password when changing another user's password. [#8966](https://github.com/statamic/cms/issues/8966) by @duncanmcclean
+- Fix global attribute support on bard's small mark. [#8969](https://github.com/statamic/cms/issues/8969) by @jacksleight
+
+
+
 ## 4.33.0 (2023-11-10)
 
 ### What's new
