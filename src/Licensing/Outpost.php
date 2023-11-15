@@ -41,17 +41,11 @@ class Outpost
 
     private function request()
     {
-        if ($this->hasCachedResponse()) {
-            return $this->getCachedResponse();
-        }
-
         $lock = $this->cache()->lock(static::LOCK_KEY, 5);
 
         if ($lock->get()) {
-            // If we have a cached response from a previous lock, we can just return it.
             if ($this->hasCachedResponse()) {
                 $lock->release();
-
                 return $this->getCachedResponse();
             }
 
