@@ -375,7 +375,7 @@ class TaxonomyTest extends TestCase
         // defaults to layout
         $this->assertEquals('layout', $taxonomy->layout());
 
-        // collection level overrides the default
+        // taxonomy level overrides the default
         $taxonomy->layout('foo');
         $this->assertEquals('foo', $taxonomy->layout());
     }
@@ -388,7 +388,7 @@ class TaxonomyTest extends TestCase
         // defaults to layout
         $this->assertEquals('tags.index', $taxonomy->template());
 
-        // collection level overrides the default
+        // taxonomy level overrides the default
         $taxonomy->template('foo');
         $this->assertEquals('foo', $taxonomy->template());
     }
@@ -401,7 +401,7 @@ class TaxonomyTest extends TestCase
         // defaults to layout
         $this->assertEquals('tags.show', $taxonomy->termTemplate());
 
-        // collection level overrides the default
+        // taxonomy level overrides the default
         $taxonomy->termTemplate('foo');
         $this->assertEquals('foo', $taxonomy->termTemplate());
     }

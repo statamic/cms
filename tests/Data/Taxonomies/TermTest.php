@@ -298,11 +298,11 @@ class TermTest extends TestCase
         // defaults to layout
         $this->assertEquals('layout', $term->layout());
 
-        // collection level overrides the default
+        // taxonomy level overrides the default
         $taxonomy->layout('foo');
         $this->assertEquals('foo', $term->layout());
 
-        // entry level overrides the origin
+        // term level overrides the origin
         $return = $term->layout('baz');
         $this->assertEquals($term, $return);
         $this->assertEquals('baz', $term->layout());
@@ -317,11 +317,11 @@ class TermTest extends TestCase
         // defaults to layout
         $this->assertEquals('tags.show', $term->template());
 
-        // collection level overrides the default
+        // taxonomy level overrides the default
         $taxonomy->termTemplate('foo');
         $this->assertEquals('foo', $term->template());
 
-        // entry level overrides the origin
+        // term level overrides the origin
         $return = $term->template('baz');
         $this->assertEquals($term, $return);
         $this->assertEquals('baz', $term->template());
