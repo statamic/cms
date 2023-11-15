@@ -51,12 +51,13 @@ class Outpost
 
         try {
             $lock->block(5);
-
             return $this->performAndCacheRequest();
         } catch (ConnectException $e) {
             return $this->cacheAndReturnErrorResponse($e);
         } catch (RequestException $e) {
             return $this->handleRequestException($e);
+        } catch(LockTimeoutException $e) {
+            return $this->cacheAndReturnErrorResponse($e);
         } finally {
             $lock->release();
         }
