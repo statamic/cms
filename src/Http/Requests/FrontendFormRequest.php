@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
+use Statamic\Support\Arr;
 
 class FrontendFormRequest extends FormRequest
 {
