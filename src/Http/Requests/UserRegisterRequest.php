@@ -5,6 +5,7 @@ namespace Statamic\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
@@ -23,38 +24,6 @@ class UserRegisterRequest extends FormRequest
         return true;
     }
 
-    public function messages(): array
-    {
-        $site = Site::findByUrl(URL::previous()) ?? Site::default();
-
-        $messages = [];
-        $this->withLocale($site->lang(), function () use (&$messages) {
-            $messages = $this->blueprintFields
-                ->validator()
-                ->validator()
-                ->messages()
-                ->getMessages();
-        });
-
-        return collect($messages)->flatten(1)->all();
-    }
-
-    public function rules(): array
-    {
-        $blueprint = User::blueprint();
-
-        $fields = $blueprint->fields();
-        $this->submittedValues = $this->valuesWithoutAssetFields($fields);
-        $this->blueprintFields = $fields->addValues($this->submittedValues);
-
-        $rules = $this->blueprintFields->validator()->withRules([
-            'email' => ['required', 'email', 'unique_user_value'],
-            'password' => ['required', 'confirmed', Password::default()],
-        ])->rules();
-
-        return $rules;
-    }
-
     protected function failedValidation(Validator $validator)
     {
         $errorResponse = $this->has('_error_redirect') ? redirect($this->input('_error_redirect')) : back();
@@ -67,6 +36,34 @@ class UserRegisterRequest extends FormRequest
         return $this->blueprintFields->process()->values()
             ->only(array_keys($this->submittedValues))
             ->except(['email', 'groups', 'roles', 'super']);
+    }
+
+    public function validator()
+    {
+        $blueprint = User::blueprint();
+
+        $fields = $blueprint->fields();
+        $this->submittedValues = $this->valuesWithoutAssetFields($fields);
+        $this->blueprintFields = $fields->addValues($this->submittedValues);
+
+        $fieldRules = $this->blueprintFields
+            ->validator()
+            ->withRules([
+                'email' => ['required', 'email', 'unique_user_value'],
+                'password' => ['required', 'confirmed', Password::default()],
+            ])
+            ->rules();
+
+        // should this not return ->validator() from fieldrules?
+        // tests would need updated to expect labels instead of handles
+        return ValidatorFacade::make($this->submittedValues, $fieldRules);
+    }
+
+    public function validateResolved()
+    {
+        $site = Site::findByUrl(URL::previous()) ?? Site::default();
+
+        return $this->withLocale($site->lang(), fn () => parent::validateResolved());
     }
 
     private function valuesWithoutAssetFields($fields)

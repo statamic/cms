@@ -4,10 +4,15 @@ namespace Statamic\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
+use Statamic\Facades\Site;
 
 class UserLoginRequest extends FormRequest
 {
+    use Localizable;
+
     public function authorize(): bool
     {
         return true;
@@ -27,5 +32,12 @@ class UserLoginRequest extends FormRequest
 
         throw (new ValidationException($validator, $errorResponse->withInput()->withErrors(__('Invalid credentials.'))))
             ->errorBag($this->errorBag);
+    }
+
+    public function validateResolved()
+    {
+        $site = Site::findByUrl(URL::previous()) ?? Site::default();
+
+        return $this->withLocale($site->lang(), fn () => parent::validateResolved());
     }
 }
