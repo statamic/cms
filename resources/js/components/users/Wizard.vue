@@ -151,6 +151,28 @@
             </div>
         </div>
 
+        <!-- Step: Additional Information -->
+        <div v-if="!completed && onAdditionalStep">
+            <div class="max-w-md mx-auto px-4 py-16 text-center">
+                <h1 class="mb-6">{{ __('Additional Information') }}</h1>
+            </div>
+
+            <publish-container
+                :name="storeName"
+                :meta="{}"
+                :blueprint="blueprint"
+                :values="extraValues"
+                :track-dirty-state="false"
+                class="max-w-md mx-auto px-4"
+                :class="requiredFields.length > 0 ? 'pb-20' : 'pb-10'"
+            >
+                <publish-fields
+                    :fields="requiredFields"
+                    @updated="(handle, value) => updateField(handle, value)"
+                />
+            </publish-container>
+        </div>
+
         <!-- Post creation -->
         <div v-if="completed">
             <div class="max-w-md mx-auto px-4 py-16 text-center">
@@ -214,6 +236,7 @@ export default {
         activationExpiry: { type: Number },
         separateNameFields: { type: Boolean },
         canSendInvitation: { type: Boolean },
+        blueprint: { type: Object },
     },
 
     data() {
@@ -224,6 +247,7 @@ export default {
                 roles: [],
                 groups: []
             },
+            extraValues: {},
             invitation: {
                 send: this.canSendInvitation,
                 subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
@@ -233,6 +257,9 @@ export default {
             completed: false,
             activationUrl: null,
             editUrl: null,
+            errors: {},
+            error: null,
+            storeName: 'userwizard',
         }
     },
 
@@ -241,6 +268,7 @@ export default {
             let steps = [__('User Information')];
             if (this.canAssignPermissions) steps.push(__('Roles & Groups'));
             if (this.canSendInvitation) steps.push(__('Customize Invitation'));
+            if (this.requiredFields.length) steps.push(__('Additional Information'));
 
             return steps;
         },
@@ -256,11 +284,19 @@ export default {
         onInvitationStep() {
             return this.canAssignPermissions ? this.currentStep === 2 : this.currentStep === 1;
         },
+        onAdditionalStep() {
+            return this.canAssignPermissions && (this.requiredFields.length > 0) ? this.currentStep === 3 : this.currentStep === 2;
+        },
         finishButtonText() {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
         },
         isValidEmail() {
             return this.user.email && isEmail(this.user.email)
+        },
+        requiredFields() {
+            return this.blueprint.tabs
+                .flatMap(tab => tab.sections.flatMap(section => section.fields.filter(field => field.required)))
+                .filter((field) => ! ['email', 'name', 'first_name', 'last_name', 'roles', 'groups'].includes(field.handle));
         }
     },
 
@@ -282,7 +318,9 @@ export default {
             });
         },
         submit() {
-            let payload = {...this.user, invitation: this.invitation};
+            let payload = {...this.user, ...this.extraValues, invitation: this.invitation};
+
+            this.clearErrors();
 
             this.$axios.post(this.route, payload).then(response => {
                 if (this.invitation.send) {
@@ -292,10 +330,26 @@ export default {
                     this.editUrl = response.data.redirect;
                     this.activationUrl = response.data.activationUrl;
                 }
-            }).catch(error => {
-                this.$toast.error(error.response.data.message);
-            });
-        }
+            }).catch(e => this.handleAxiosError(e));
+        },
+        handleAxiosError(e) {
+            if (e.response && e.response.status === 422) {
+                const { message, errors } = e.response.data;
+                this.error = message;
+                this.errors = errors;
+                this.$toast.error(message);
+                this.$store.commit(`publish/${this.storeName}/setErrors`, errors);
+            } else {
+                this.$toast.error(__(e.response.data.message));
+            }
+        },
+        updateField(handle, value) {
+            this.extraValues[handle] = value;
+        },
+        clearErrors() {
+            this.error = null;
+            this.errors = {};
+        },
     },
 
     watch: {

@@ -149,7 +149,12 @@ class UsersController extends CpController
 
         $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields()->only(['email', 'name', 'first_name', 'last_name'])->addValues($request->all());
+        $requiredFields = collect($blueprint->fields()->all()->filter->isRequired()->keys()->all())
+            ->merge(['email', 'name', 'first_name', 'last_name'])
+            ->unique()
+            ->all();
+
+        $fields = $blueprint->fields()->only($requiredFields)->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
 
