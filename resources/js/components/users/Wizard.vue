@@ -163,8 +163,7 @@
                 :blueprint="blueprint"
                 :values="extraValues"
                 :track-dirty-state="false"
-                class="max-w-md mx-auto px-4"
-                :class="requiredFields.length > 0 ? 'pb-20' : 'pb-10'"
+                class="max-w-md mx-auto px-4 pb-20"
             >
                 <publish-fields
                     :fields="requiredFields"
