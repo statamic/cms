@@ -86,7 +86,7 @@ return [
 
         'users' => [
             'class' => Stores\UsersStore::class,
-            'directory' => base_path('users'),
+            'directory' => config('statamic.users.repository') === 'file' ? base_path('users') : null,
         ],
 
     ],
