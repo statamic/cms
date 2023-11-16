@@ -4,8 +4,8 @@ namespace Statamic\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Traits\Localizable;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
