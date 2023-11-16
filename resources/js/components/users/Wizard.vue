@@ -284,7 +284,11 @@ export default {
             return this.canAssignPermissions ? this.currentStep === 2 : this.currentStep === 1;
         },
         onAdditionalStep() {
-            return this.canAssignPermissions && (this.requiredFields.length > 0) ? this.currentStep === 3 : this.currentStep === 2;
+            if (this.requiredFields.length < 1) {
+                return false;
+            }
+
+            return this.canAssignPermissions ? this.currentStep === 3 : this.currentStep === 2;
         },
         finishButtonText() {
             return this.invitation.send ? __('Create and Send Email') : __('Create User');
@@ -337,7 +341,6 @@ export default {
                 this.error = message;
                 this.errors = errors;
                 this.$toast.error(message);
-                this.$store.commit(`publish/${this.storeName}/setErrors`, errors);
             } else {
                 this.$toast.error(__(e.response.data.message));
             }
@@ -356,6 +359,10 @@ export default {
             if (this.isValidEmail) {
                 this.checkIfUserExists()
             }
+        },
+
+        'errors': function (errors) {
+            this.$store.commit(`publish/${this.storeName}/setErrors`, errors);
         }
     },
 
