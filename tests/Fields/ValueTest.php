@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Statamic\Facades\Blueprint;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Tests\TestCase;
@@ -152,6 +153,20 @@ class ValueTest extends TestCase
         ], null, $fieldtype);
 
         $this->assertEquals('{"foo":"BAR!","baz":{"id":"123","title":"Title for 123"},"qux":[{"id":"456","title":"Title for 456"},{"id":"789","title":"Title for 789"}]}', json_encode($value));
+    }
+
+    /** @test */
+    public function it_gets_the_default_if_the_value_is_empty()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+        };
+
+        $fieldtype->setField(new Field('search_engine_url', ['default' => 'https://google.com']));
+
+        $value = new Value(null, null, $fieldtype);
+
+        $this->assertEquals('https://google.com', $value->value());
     }
 }
 
