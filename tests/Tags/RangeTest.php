@@ -17,6 +17,7 @@ class RangeTest extends TestCase
     {
         $this->assertEquals('123', $this->tag('{{ range to="3" }}{{ value }}{{ /range }}'));
         $this->assertEquals('23', $this->tag('{{ range from="2" to="3" }}{{ value }}{{ /range }}'));
+        $this->assertEquals('543210', $this->tag('{{ range from="5" to="0" }}{{ value }}{{ /range }}'));
     }
 
     /** @test */
