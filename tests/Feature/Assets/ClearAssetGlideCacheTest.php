@@ -3,7 +3,6 @@
 namespace Tests\Feature\Assets;
 
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Events\AssetDeleted;
