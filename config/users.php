@@ -152,19 +152,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Username Key
-    |--------------------------------------------------------------------------
-    |
-    | By default, Statamic will use `email` as key. However,
-    | if you want to use a different auth guard, which needs
-    | a different key you can customize it here.
-    |
-    */
-
-    'username_key' => 'email',
-
-    /*
-    |--------------------------------------------------------------------------
     | Impersonation
     |--------------------------------------------------------------------------
     |
@@ -172,8 +159,23 @@ return [
     | redirect to after impersonation begins
     |
     */
+
     'impersonate' => [
         'enabled' => env('STATAMIC_IMPERSONATE_ENABLED', true),
         'redirect' => env('STATAMIC_IMPERSONATE_REDIRECT', null),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Username Key
+    |--------------------------------------------------------------------------
+    |
+    | By default, Statamic will use `email` as the username key. However, if
+    | you're using a different auth guard which needs a different key, you
+    | can change it here.
+    |
+    */
+
+    'username_key' => 'email',
+
 ];
