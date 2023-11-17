@@ -39,7 +39,7 @@ class LoginController extends CpController
             'providers' => $enabled ? OAuth::providers() : [],
             'referer' => $this->getReferrer($request),
             'hasError' => $this->hasError(),
-            'username_key' => $this->username(),
+            'username_key' => $this->usernameKey(),
         ];
 
         $view = view('statamic::auth.login', $data);
@@ -54,7 +54,7 @@ class LoginController extends CpController
     public function login(Request $request)
     {
         $request->validate([
-            $this->username() => 'required|string',
+            $this->usernameKey() => 'required|string',
             'password' => 'required|string',
         ]);
 
@@ -91,7 +91,7 @@ class LoginController extends CpController
     protected function sendFailedLoginResponse(Request $request)
     {
         throw ValidationException::withMessages([
-            $this->username() => [trans('auth.failed')],
+            $this->usernameKey() => [trans('auth.failed')],
         ]);
     }
 
@@ -117,7 +117,7 @@ class LoginController extends CpController
     protected function credentials(Request $request)
     {
         $credentials = [
-            $this->username() => strtolower($request->get($this->username())),
+            $this->usernameKey() => strtolower($request->get($this->usernameKey())),
             'password' => $request->get('password'),
         ];
 
@@ -142,7 +142,7 @@ class LoginController extends CpController
         return $referrer === cp_route('unauthorized') ? cp_route('index') : $referrer;
     }
 
-    public function username()
+    protected function usernameKey(): string
     {
         return config('statamic.users.username_key', 'email');
     }
