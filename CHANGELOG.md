@@ -1,5 +1,30 @@
 # Release Notes
 
+## 4.35.0 (2023-11-16)
+
+### What's new
+- Ability to set settings on Algolia indexes. [#8830](https://github.com/statamic/cms/issues/8830) by @godismyjudge95
+- Ability to customize Bard/Replicator set icons directory. [#8931](https://github.com/statamic/cms/issues/8931) by @jesseleite
+
+### What's improved
+- Improve Bard invalid content error reporting. [#8580](https://github.com/statamic/cms/issues/8580) by @jacksleight
+- Dutch translations. [#8993](https://github.com/statamic/cms/issues/8993) by @jeroenpeters1986
+
+### What's fixed
+- Fix nocache tag error when using the regex antlers parser. [#9009](https://github.com/statamic/cms/issues/9009) by @jasonvarga
+- Fix error when using Eloquent users but you still have user files. [#9006](https://github.com/statamic/cms/issues/9006) by @duncanmcclean
+- Fix missing cursor when editing inline code in Bard. [#9002](https://github.com/statamic/cms/issues/9002) by @o1y
+- Fix modified revision values not being shown on save. [#8961](https://github.com/statamic/cms/issues/8961) by @ryanmitchell
+- Check if user roles and groups exist before creating. [#8998](https://github.com/statamic/cms/issues/8998) by @ryanmitchell
+- Check if navigation exists before creating. [#8995](https://github.com/statamic/cms/issues/8995) by @ryanmitchell
+- Check if global exists before creating. [#8996](https://github.com/statamic/cms/issues/8996) by @ryanmitchell
+- Check if fieldset exists before creating. [#8994](https://github.com/statamic/cms/issues/8994) by @ryanmitchell
+- Show error when there is a duplicate taxonomy blueprint name. [#8997](https://github.com/statamic/cms/issues/8997) by @ryanmitchell
+- Prevent concurrent requests to the Outpost. [#9000](https://github.com/statamic/cms/issues/9000) by @duncanmcclean
+- Resolve dynamically declared properties. [#8999](https://github.com/statamic/cms/issues/8999) by @martinoak
+
+
+
 ## 4.34.0 (2023-11-14)
 
 ### What's new
