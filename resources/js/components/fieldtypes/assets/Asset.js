@@ -77,6 +77,10 @@ export default {
         },
 
         open() {
+            if (! this.asset.url && this.asset.downloadUrl) {
+                return this.download();
+            }
+
             window.open(this.asset.url, '_blank');
         },
 
