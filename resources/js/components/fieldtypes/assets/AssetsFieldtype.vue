@@ -62,7 +62,7 @@
                         @dragend="$emit('blur')"
                         :constrain-dimensions="true"
                         :disabled="isReadOnly"
-                        :distance="10"
+                        :distance="5"
                         :animate="false"
                         append-to="body"
                     >
@@ -73,6 +73,7 @@
                                 :asset="asset"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
+                                :show-set-alt="showSetAlt"
                                 @updated="assetUpdated"
                                 @removed="assetRemoved"
                                 @id-changed="idChanged(asset.id, $event)">
@@ -88,7 +89,7 @@
                                 handle-class="asset-row"
                                 :vertical="true"
                                 :disabled="isReadOnly"
-                                :distance="10"
+                                :distance="5"
                                 :mirror="false"
                             >
                                 <tbody ref="assets">
@@ -99,7 +100,7 @@
                                         :asset="asset"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
-                                        :show-set-alt="config.show_set_alt"
+                                        :show-set-alt="showSetAlt"
                                         @updated="assetUpdated"
                                         @removed="assetRemoved"
                                         @id-changed="idChanged(asset.id, $event)">
@@ -344,7 +345,11 @@ export default {
 
         isFullWidth() {
             return ! (this.config.width && this.config.width < 100)
-        }
+        },
+
+        showSetAlt() {
+            return this.config.show_set_alt && ! this.isReadOnly;
+        },
 
     },
 
@@ -386,8 +391,8 @@ export default {
 
             this.loading = true;
 
-            this.$axios.get(cp_url('assets-fieldtype'), {
-                params: { assets }
+            this.$axios.post(cp_url('assets-fieldtype'), {
+                assets
             }).then(response => {
                 this.assets = response.data;
                 this.loading = false;

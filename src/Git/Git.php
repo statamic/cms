@@ -256,7 +256,6 @@ class Git
     /**
      * Shell escape string for use in git commands.
      *
-     * @param  string  $string
      * @return string
      */
     protected function shellEscape(string $string)

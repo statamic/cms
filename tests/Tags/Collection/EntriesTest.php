@@ -66,12 +66,19 @@ class EntriesTest extends TestCase
 
         $params = Parameters::make($params, new Context);
 
-        return (new Entries($params))->get();
+        $entries = (new Entries($params))->get();
+
+        // If paginated result set...
+        if (method_exists($entries, 'items')) {
+            $entries = $entries->items();
+        }
+
+        return $entries;
     }
 
     protected function getEntryIds($params = [])
     {
-        return collect($this->getEntries($params)->items())->map->id()->all();
+        return collect($this->getEntries($params))->map->id()->all();
     }
 
     /** @test */
@@ -450,29 +457,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    public function it_filters_by_a_single_taxonomy_term()
-    {
-        $this->makeEntry('1')->data(['tags' => ['rad']])->save();
-        $this->makeEntry('2')->data(['tags' => ['rad']])->save();
-        $this->makeEntry('3')->data(['tags' => ['meh']])->save();
-
-        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags' => 'rad'])->map->slug()->all());
-        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags' => TermCollection::make([Term::make('rad')->taxonomy('tags')])])->map->slug()->all());
-    }
-
-    /** @test */
-    public function it_filters_out_a_single_taxonomy_term()
-    {
-        $this->makeEntry('1')->data(['tags' => ['rad']])->save();
-        $this->makeEntry('2')->data(['tags' => ['rad']])->save();
-        $this->makeEntry('3')->data(['tags' => ['meh']])->save();
-
-        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags:not' => 'meh'])->map->slug()->all());
-        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags:not' => TermCollection::make([Term::make('meh')->taxonomy('tags')])])->map->slug()->all());
-    }
-
-    /** @test */
-    public function it_filters_out_multiple_taxonomy_terms()
+    public function it_filters_by_taxonomy_terms()
     {
         $this->makeEntry('1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
         $this->makeEntry('2')->data(['tags' => ['awesome'], 'categories' => ['events']])->save();
@@ -480,33 +465,45 @@ class EntriesTest extends TestCase
         $this->makeEntry('4')->data(['tags' => ['meh']])->save();
         $this->makeEntry('5')->data([])->save();
 
-        $this->assertEquals([4, 5], $this->getEntries(['taxonomy:tags:not' => 'rad|awesome'])->map->slug()->all());
-        $this->assertEquals([4, 5], $this->getEntries(['taxonomy:tags:not' => ['rad', 'awesome']])->map->slug()->all());
-        $this->assertEquals([2, 5], $this->getEntries(['taxonomy:tags:not' => 'rad|meh'])->map->slug()->all());
-        $this->assertEquals([2, 5], $this->getEntries(['taxonomy:tags:not' => ['rad', 'meh']])->map->slug()->all());
+        // Where term in
+        $this->assertEquals([1, 3], $this->getEntryIds(['taxonomy:tags:in' => 'rad']));
+        $this->assertEquals([1, 3], $this->getEntryIds(['taxonomy:tags:any' => 'rad']));
+        $this->assertEquals([1, 3], $this->getEntryIds(['taxonomy:tags' => 'rad'])); // shorthand
 
-        // Ensure `whereIn` and `whereNot` logic intersect results properly.
-        $this->assertEquals([1, 3], $this->getEntries(['taxonomy:tags' => ['rad', 'meh'], 'taxonomy:tags:not' => ['meh']])->map->slug()->all());
-    }
+        // Where any of these terms in
+        $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy:tags:in' => 'rad|meh']));
+        $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy:tags:in' => ['rad', 'meh']]));
+        $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy:tags:any' => 'rad|meh']));
+        $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy:tags:any' => ['rad', 'meh']]));
+        $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy:tags' => 'rad|meh'])); // shorthand
+        $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy:tags' => ['rad', 'meh']])); // shorthand
 
-    /** @test */
-    public function it_filters_by_in_multiple_taxonomy_terms()
-    {
-        $this->makeEntry('1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
-        $this->makeEntry('2')->data(['tags' => ['awesome'], 'categories' => ['events']])->save();
-        $this->makeEntry('3')->data(['tags' => ['rad', 'awesome']])->save();
-        $this->makeEntry('4')->data(['tags' => ['meh']])->save();
+        // Where term not in
+        $this->assertEquals([2, 4, 5], $this->getEntryIds(['taxonomy:tags:not_in' => 'rad']));
+        $this->assertEquals([2, 4, 5], $this->getEntryIds(['taxonomy:tags:not' => 'rad']));
 
-        $this->assertEquals([3], $this->getEntries(['taxonomy:tags:all' => 'rad|awesome'])->map->slug()->all());
-        $this->assertEquals([3], $this->getEntries(['taxonomy:tags:all' => ['rad', 'awesome']])->map->slug()->all());
-        $this->assertEquals([1], $this->getEntries(['taxonomy:tags' => 'rad', 'taxonomy:categories' => 'news'])->map->slug()->all());
-        $this->assertEquals(0, $this->getEntries(['taxonomy:tags' => 'rad', 'taxonomy:categories' => 'events'])->count());
-        $this->assertEquals([1, 3, 4], $this->getEntries(['taxonomy:tags' => 'rad|meh'])->map->slug()->all());
-        $this->assertEquals([1, 3, 4], $this->getEntries(['taxonomy:tags' => ['rad', 'meh']])->map->slug()->all());
-        $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy' => 'tags::rad|categories::events'])->map->slug()->all());
-        $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy' => ['tags::rad', 'categories::events']])->map->slug()->all());
-        $this->assertEquals([3], $this->getEntries(['taxonomy' => 'tags::rad|tags::meh', 'taxonomy:tags' => 'awesome'])->map->slug()->all());
-        $this->assertEquals([2], $this->getEntries(['taxonomy' => 'tags::meh|categories::events', 'taxonomy:tags' => 'awesome'])->map->slug()->all());
+        // Where terms not in
+        $this->assertEquals([4, 5], $this->getEntryIds(['taxonomy:tags:not_in' => 'rad|awesome']));
+        $this->assertEquals([4, 5], $this->getEntryIds(['taxonomy:tags:not_in' => ['rad', 'awesome']]));
+        $this->assertEquals([4, 5], $this->getEntryIds(['taxonomy:tags:not' => 'rad|awesome']));
+        $this->assertEquals([4, 5], $this->getEntryIds(['taxonomy:tags:not' => ['rad', 'awesome']]));
+
+        // Where all of these terms in
+        $this->assertEquals([3], $this->getEntryIds(['taxonomy:tags:all' => 'rad|awesome']));
+        $this->assertEquals([3], $this->getEntryIds(['taxonomy:tags:all' => ['rad', 'awesome']]));
+
+        // Ensure in and not logic intersect properly
+        $this->assertEquals([1, 3], $this->getEntryIds(['taxonomy:tags:in' => 'rad|meh', 'taxonomy:tags:not' => 'meh']));
+
+        // Ensure in logic intersects properly across multiple taxonomies
+        $this->assertEquals([1], $this->getEntryIds(['taxonomy:tags:in' => 'rad|meh', 'taxonomy:categories:in' => 'news']));
+
+        // Passing IDs into generic taxonomy param
+        $this->assertEquals([1, 3], $this->getEntryIds(['taxonomy' => 'tags::rad']));
+        $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy' => 'tags::rad|tags::meh']));
+        $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy' => 'tags::rad|tags::meh|categories::news']));
+        $this->assertEquals([1], $this->getEntryIds(['taxonomy::all' => 'tags::rad|categories::news'])); // modifier still expected to be 3rd segment
+        $this->assertEquals([1], $this->getEntryIds(['taxonomy' => 'tags::rad|tags::meh', 'taxonomy:categories' => 'news'])); // mix and match
     }
 
     /** @test */
@@ -527,6 +524,17 @@ class EntriesTest extends TestCase
 
         $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy:tags' => ''])->map->slug()->all());
         $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy:tags' => '|'])->map->slug()->all());
+        $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy:tags' => []])->map->slug()->all());
+    }
+
+    /** @test */
+    public function it_accepts_a_term_collection_to_filter_by_taxonomy()
+    {
+        $this->makeEntry('1')->data(['tags' => ['rad']])->save();
+        $this->makeEntry('2')->data(['tags' => ['rad']])->save();
+        $this->makeEntry('3')->data(['tags' => ['meh']])->save();
+
+        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags' => TermCollection::make([Term::make('rad')->taxonomy('tags')])])->map->slug()->all());
     }
 
     /** @test */

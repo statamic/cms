@@ -46,6 +46,7 @@ class RenameAssetFolder extends Action
                 'validate' => 'required|alpha_dash',
                 'classes' => 'mousetrap',
                 'focus' => true,
+                'debounce' => false,
             ],
         ];
     }

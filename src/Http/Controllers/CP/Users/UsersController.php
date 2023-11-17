@@ -15,6 +15,7 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
+use Statamic\Search\Result;
 
 class UsersController extends CpController
 {
@@ -69,6 +70,10 @@ class UsersController extends CpController
             ->orderBy(request('sort', 'email'), request('order', 'asc'))
             ->paginate(request('perPage'));
 
+        if ($users->getCollection()->first() instanceof Result) {
+            $users->setCollection($users->getCollection()->map->getSearchable());
+        }
+
         return (new Users($users))
             ->blueprint(User::blueprint())
             ->columnPreferenceKey('users.columns')
@@ -87,9 +92,11 @@ class UsersController extends CpController
             $query
                 ->where('email', 'like', '%'.$search.'%')
                 ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
-                    $query
-                        ->orWhere('first_name', 'like', '%'.$search.'%')
-                        ->orWhere('last_name', 'like', '%'.$search.'%');
+                    foreach (explode(' ', $search) as $word) {
+                        $query
+                            ->orWhere('first_name', 'like', '%'.$word.'%')
+                            ->orWhere('last_name', 'like', '%'.$word.'%');
+                    }
                 }, function ($query) use ($search) {
                     $query->orWhere('name', 'like', '%'.$search.'%');
                 });
@@ -226,6 +233,7 @@ class UsersController extends CpController
                 'editBlueprint' => cp_route('users.blueprint.edit'),
             ],
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
+            'requiresCurrentPassword' => $request->user()->id === $user->id(),
         ];
 
         if ($request->wantsJson()) {
@@ -243,7 +251,11 @@ class UsersController extends CpController
 
         $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
 
-        $fields->validate(['email' => 'required|unique_user_value:'.$user->id()]);
+        $fields
+            ->validator()
+            ->withRules(['email' => 'required|unique_user_value:{id}'])
+            ->withReplacements(['id' => $user->id()])
+            ->validate();
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 

@@ -6,6 +6,7 @@ use Carbon\CarbonInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
@@ -18,6 +19,7 @@ class Outpost
     const ENDPOINT = 'https://outpost.statamic.com/v3/query';
     const REQUEST_TIMEOUT = 5;
     const CACHE_KEY = 'statamic.outpost.response';
+    const LOCK_KEY = 'statamic.outpost.lock';
 
     private $response;
     private $client;
@@ -40,16 +42,24 @@ class Outpost
 
     private function request()
     {
-        if ($this->hasCachedResponse()) {
-            return $this->getCachedResponse();
-        }
+        $lock = $this->cache()->lock(static::LOCK_KEY, 10);
 
         try {
+            $lock->block(static::REQUEST_TIMEOUT);
+
+            if ($this->hasCachedResponse()) {
+                return $this->getCachedResponse();
+            }
+
             return $this->performAndCacheRequest();
         } catch (ConnectException $e) {
             return $this->cacheAndReturnErrorResponse($e);
         } catch (RequestException $e) {
             return $this->handleRequestException($e);
+        } catch (LockTimeoutException $e) {
+            return $this->cacheAndReturnErrorResponse($e);
+        } finally {
+            $lock->release();
         }
     }
 
@@ -139,11 +149,9 @@ class Outpost
             return $this->cacheAndReturnValidationResponse($e);
         } elseif ($code == 429) {
             return $this->cacheAndReturnRateLimitResponse($e);
-        } elseif ($code >= 500 && $code < 600) {
-            return $this->cacheAndReturnErrorResponse($e);
         }
 
-        throw $e;
+        return $this->cacheAndReturnErrorResponse($e);
     }
 
     private function cacheAndReturnValidationResponse($e)
@@ -167,7 +175,7 @@ class Outpost
     {
         Log::debug('Error contacting Outpost: '.$e->getMessage());
 
-        return $this->cacheResponse(now()->addMinutes(5), ['error' => 500]);
+        return $this->cacheResponse(now()->addMinutes(5), ['error' => $e->getCode()]);
     }
 
     private function cache()

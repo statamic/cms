@@ -14,7 +14,6 @@ use Statamic\Exceptions\NotBootedException;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Fieldset;
-use Statamic\Facades\File;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
@@ -604,7 +603,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             return $this;
         }
 
-        if (empty($this->scripts) && empty($this->stylesheets) && empty($this->vite)) {
+        if (empty($this->scripts) && empty($this->stylesheets) && empty($this->vite) && empty($this->publishables)) {
             return $this;
         }
 

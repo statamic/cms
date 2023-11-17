@@ -77,6 +77,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Registration form honeypot field
+    |--------------------------------------------------------------------------
+    |
+    | When registering new users through the user:register_form tag,
+    | specify the field to act as a honeypot for bots
+    |
+    */
+
+    'registration_form_honeypot_field' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | User Wizard Invitation Email
     |--------------------------------------------------------------------------
     |
@@ -151,4 +163,17 @@ return [
 
     'usernameKey' => 'email',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Impersonation
+    |--------------------------------------------------------------------------
+    |
+    | Here you can configure if impersonation is available, and what URL to
+    | redirect to after impersonation begins
+    |
+    */
+    'impersonate' => [
+        'enabled' => env('STATAMIC_IMPERSONATE_ENABLED', true),
+        'redirect' => env('STATAMIC_IMPERSONATE_REDIRECT', null),
+    ],
 ];

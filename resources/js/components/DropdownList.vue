@@ -1,5 +1,5 @@
 <template>
-    <popover class="dropdown-list" :disabled="disabled" :placement="placement" :autoclose="autoclose">
+    <popover class="dropdown-list" :disabled="disabled" :placement="placement" :autoclose="autoclose" @opened="$emit('opened')" @closed="$emit('closed')">
         <template #trigger>
             <slot name="trigger">
                 <button class="rotating-dots-button" :aria-label="__('Open Dropdown')">

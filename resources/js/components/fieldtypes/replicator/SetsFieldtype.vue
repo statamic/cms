@@ -22,11 +22,12 @@
 </template>
 
 <script>
+import SuggestsConditionalFields from '../../blueprints/SuggestsConditionalFields';
 import Tabs from '../../blueprints/Tabs.vue';
 
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, SuggestsConditionalFields],
 
     components: {
         Tabs

@@ -4,8 +4,10 @@
             ref="input"
             :name="name"
             @input="update"
+            append-to-body
+            :calculate-position="positionOptions"
             :clearable="config.clearable"
-            :placeholder="config.placeholder"
+            :placeholder="__(config.placeholder)"
             :disabled="isReadOnly"
             :options="options"
             :reduce="selection => selection.value"
@@ -21,9 +23,12 @@
 </template>
 
 <script>
+import PositionsSelectOptions from '../../mixins/PositionsSelectOptions';
+
+
 export default {
 
-    mixins: [Fieldtype],
+    mixins: [Fieldtype, PositionsSelectOptions],
 
     data: function() {
         return {

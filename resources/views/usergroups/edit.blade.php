@@ -3,18 +3,16 @@
 
 @section('content')
 
-    <collection-edit-form>
-    </collection-edit-form>
-
     <user-group-publish-form
-        action="{{ cp_route('user-groups.update', $group->handle()) }}"
+        :actions="{{ json_encode($actions) }}"
         method="patch"
-        initial-title="{{ $group->title() }}"
-        initial-handle="{{ $group->handle() }}"
-        :initial-roles="{{ json_encode($roles) }}"
-        :creating="false"
-        breadcrumb-url="{{ cp_route('user-groups.show', $group->handle()) }}"
-        v-cloak
+        publish-container="base"
+        initial-title="{{ $title }}"
+        initial-reference="{{ $reference }}"
+        :initial-fieldset="{{ json_encode($blueprint) }}"
+        :initial-values="{{ json_encode($values) }}"
+        :initial-meta="{{ json_encode($meta) }}"
+        :can-edit-blueprint="{{ Statamic\Support\Str::bool($user->can('configure fields')) }}"
     ></user-group-publish-form>
 
 @endsection

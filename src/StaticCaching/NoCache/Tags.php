@@ -2,6 +2,8 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
+use Statamic\Facades\Antlers;
+
 class Tags extends \Statamic\Tags\Tags
 {
     public static $handle = 'nocache';
@@ -19,9 +21,15 @@ class Tags extends \Statamic\Tags\Tags
 
     public function index()
     {
+        if ($this->params->has('select')) {
+            $fields = $this->params->explode('select');
+        } elseif (config('statamic.antlers.version') === 'runtime') {
+            $fields = Antlers::identifiers($this->content);
+        }
+
         return $this
             ->nocache
-            ->pushRegion($this->content, $this->context->all(), 'antlers.html')
+            ->pushRegion($this->content, $this->context->only($fields ?? null)->all(), 'antlers.html')
             ->placeholder();
     }
 }

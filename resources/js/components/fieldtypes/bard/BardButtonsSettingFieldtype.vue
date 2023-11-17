@@ -43,9 +43,12 @@ export default {
         buttons: {
             deep: true,
             handler(buttons) {
-                this.data = buttons
+                const enabledButtonNames = buttons
                     .filter(button => button.enabled)
                     .map(button => button.name);
+                if (JSON.stringify(enabledButtonNames) !== JSON.stringify(this.data)) {
+                    this.data = enabledButtonNames;
+                }
             }
         },
 

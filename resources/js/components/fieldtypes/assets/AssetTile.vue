@@ -83,7 +83,7 @@
             <button
                 class="text-blue border-l px-2 py-1 hover:bg-gray-200"
                 @click="edit"
-                v-if="needsAlt"
+                v-if="showSetAlt && needsAlt"
             >
                 {{ asset.values.alt ? "✅" : __("Set Alt") }}
             </button>
@@ -117,10 +117,6 @@ export default {
         isInBardField() {
             return this.$parent.isInBardField;
         },
-
-        needsAlt() {
-            return (this.asset.isImage || this.asset.isSvg) && !this.asset.values.alt;
-        }
     }
 };
 </script>

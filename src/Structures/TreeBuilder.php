@@ -86,23 +86,23 @@ class TreeBuilder
             $collection = $page->collection();
 
             return [
-                'id'          => $page->id(),
-                'entry'       => $page->reference(),
-                'title'       => $page->hasCustomTitle() ? $page->title() : null,
+                'id' => $page->id(),
+                'entry' => $page->reference(),
+                'title' => $page->hasCustomTitle() ? $page->title() : null,
                 'entry_title' => $page->referenceExists() ? $page->entry()->value('title') : null,
-                'url'         => $page->referenceExists() ? null : $page->url(),
-                'edit_url'    => $page->editUrl(),
-                'can_delete'  => $page->referenceExists() ? User::current()->can('delete', $page->entry()) : true,
-                'slug'        => $page->slug(),
-                'status'      => $page->referenceExists() ? $page->status() : null,
-                'redirect'    => $page->referenceExists() ? $page->entry()->get('redirect') : null,
-                'collection'  => ! $collection ? null : [
+                'url' => $page->referenceExists() ? null : $page->url(),
+                'edit_url' => $page->editUrl(),
+                'can_delete' => $page->referenceExists() ? User::current()->can('delete', $page->entry()) : true,
+                'slug' => $page->slug(),
+                'status' => $page->referenceExists() ? $page->status() : null,
+                'redirect' => $page->referenceExists() ? $page->entry()->get('redirect') : null,
+                'collection' => ! $collection ? null : [
                     'handle' => $collection->handle(),
                     'title' => $collection->title(),
                     'edit_url' => $collection->showUrl(),
                     'create_url' => $collection->createEntryUrl(),
                 ],
-                'children'    => (! empty($item['children'])) ? $this->transformTreeForController($item['children']) : [],
+                'children' => (! empty($item['children'])) ? $this->transformTreeForController($item['children']) : [],
             ];
         })->values()->all();
     }

@@ -21,7 +21,7 @@
             </div>
 
             @if($emailLoginEnabled)
-                <div class="text-center text-sm text-gray-700 py-6">&mdash; or &mdash;</div>
+                <div class="text-center text-sm text-gray-700 py-6">&mdash; {{ __('or') }} &mdash;</div>
 
                 <div class="login-with-email" v-if="! showEmailLogin">
                     <a class="btn w-full" @click.prevent="showEmailLogin = true">
@@ -58,7 +58,7 @@
     </div>
     </login>
 </div>
-@if (! $oauth)
+@if ($emailLoginEnabled)
     <div class="w-full text-center mt-4">
         <a href="{{ cp_route('password.request') }}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
             {{ __('Forgot password?') }}

@@ -34,8 +34,6 @@ class FileCacher extends AbstractCacher
     private $nocachePlaceholder;
 
     /**
-     * @param  Writer  $writer
-     * @param  Repository  $cache
      * @param  array  $config
      */
     public function __construct(Writer $writer, Repository $cache, $config)
@@ -71,7 +69,6 @@ class FileCacher extends AbstractCacher
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
      * @return string
      */
     public function getCachedPage(Request $request)
@@ -158,7 +155,6 @@ class FileCacher extends AbstractCacher
     /**
      * Get the path to the cached file.
      *
-     * @param $url
      * @return string
      */
     public function getFilePath($url, $site = null)
@@ -225,9 +221,17 @@ class FileCacher extends AbstractCacher
         for (const meta of document.querySelectorAll('meta[content="$csrfPlaceholder"]')) {
             meta.content = data.csrf;
         }
-        
+
+        for (const input of document.querySelectorAll('script[data-csrf="$csrfPlaceholder"]')) {
+            input.setAttribute('data-csrf', data.csrf);
+        }
+
         if (window.hasOwnProperty('livewire_token')) {
             window.livewire_token = data.csrf
+        }
+
+        if (window.hasOwnProperty('livewireScriptConfig')) {
+            window.livewireScriptConfig.csrf = data.csrf
         }
 
         document.dispatchEvent(new CustomEvent('statamic:nocache.replaced'));

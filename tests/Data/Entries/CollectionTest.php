@@ -3,6 +3,7 @@
 namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
@@ -10,17 +11,21 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\Collection;
 use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionSaved;
+use Statamic\Events\EntryBlueprintFound;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Structures\CollectionStructure;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CollectionTest extends TestCase
 {
+    use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
@@ -376,23 +381,53 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_dispatches_an_event_when_getting_entry_blueprint()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'blueprint' => $blueprint = (new Blueprint)->setHandle('blueprint'),
+        ]));
+
+        // Do it twice so we can check the event is only dispatched once.
+        $collection->entryBlueprint();
+        $collection->entryBlueprint();
+
+        Event::assertDispatchedTimes(EntryBlueprintFound::class, 1);
+        Event::assertDispatched(EntryBlueprintFound::class, function ($event) use ($blueprint) {
+            return $event->blueprint === $blueprint
+                && $event->entry === null;
+        });
+    }
+
+    /** @test */
     public function it_gets_sort_field_and_direction()
     {
         $alpha = new Collection;
         $this->assertEquals('title', $alpha->sortField());
         $this->assertEquals('asc', $alpha->sortDirection());
+        $this->assertNull($alpha->customSortField());
+        $this->assertNull($alpha->customSortDirection());
 
         $dated = (new Collection)->dated(true);
         $this->assertEquals('date', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
+        $this->assertNull($dated->customSortField());
+        $this->assertNull($dated->customSortDirection());
 
         $ordered = (new Collection)->structureContents(['max_depth' => 1]);
         $this->assertEquals('order', $ordered->sortField());
         $this->assertEquals('asc', $ordered->sortDirection());
+        $this->assertNull($ordered->customSortField());
+        $this->assertNull($ordered->customSortDirection());
 
         $datedAndOrdered = (new Collection)->dated(true)->structureContents(['max_depth' => 1]);
         $this->assertEquals('order', $datedAndOrdered->sortField());
         $this->assertEquals('asc', $datedAndOrdered->sortDirection());
+        $this->assertNull($datedAndOrdered->customSortField());
+        $this->assertNull($datedAndOrdered->customSortDirection());
 
         $alpha->structureContents(['max_depth' => 99]);
         $this->assertEquals('title', $alpha->sortField());
@@ -401,7 +436,33 @@ class CollectionTest extends TestCase
         $this->assertEquals('date', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
-        // TODO: Ability to control sort direction
+        // Custom sort field and direction should override any other logic.
+        foreach ([$alpha, $dated, $ordered, $datedAndOrdered] as $collection) {
+            $collection->sortField('foo');
+            $this->assertEquals('foo', $collection->sortField());
+            $this->assertEquals('asc', $collection->sortDirection());
+            $this->assertEquals('foo', $collection->customSortField());
+            $this->assertNull($collection->customSortDirection());
+            $collection->sortDirection('desc');
+            $this->assertEquals('desc', $collection->sortDirection());
+            $this->assertEquals('desc', $collection->customSortDirection());
+        }
+    }
+
+    /** @test */
+    public function setting_custom_sort_field_will_set_the_sort_direction_to_asc_when_not_explicitly_set()
+    {
+        // Use a date collection to test this because its default sort direction is desc.
+
+        $dated = (new Collection)->dated(true);
+        $this->assertEquals('date', $dated->sortField());
+        $this->assertEquals('desc', $dated->sortDirection());
+        $this->assertNull($dated->customSortField());
+
+        $dated->sortField('foo');
+        $this->assertEquals('foo', $dated->sortField());
+        $this->assertEquals('asc', $dated->sortDirection());
+        $this->assertEquals('foo', $dated->customSortField());
     }
 
     /** @test */
@@ -598,13 +659,15 @@ class CollectionTest extends TestCase
     /** @test */
     public function it_augments()
     {
-        $collection = (new Collection)->handle('test');
+        $mountedEntry = EntryFactory::collection('pages')->id('blog')->slug('blog')->data(['title' => 'Blog'])->create();
+
+        $collection = (new Collection)->mount('blog')->handle('test');
 
         $this->assertInstanceof(Augmentable::class, $collection);
-        $this->assertEquals([
-            'title' => 'Test',
-            'handle' => 'test',
-        ], $collection->toAugmentedArray());
+        $this->assertCount(3, $augmentedArray = $collection->toAugmentedArray());
+        $this->assertEquals('Test', $augmentedArray['title']);
+        $this->assertEquals('test', $augmentedArray['handle']);
+        $this->assertEquals($mountedEntry, $augmentedArray['mount']->value());
     }
 
     /** @test */
@@ -805,5 +868,37 @@ class CollectionTest extends TestCase
             'through object' => [false],
             'through facade' => [true],
         ];
+    }
+
+    /** @test */
+    public function it_cannot_view_collections_from_sites_that_the_user_is_not_authorized_to_see()
+    {
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection1 = tap(Facades\Collection::make('has_some_french')->sites(['en', 'fr', 'de']))->save();
+        $collection2 = tap(Facades\Collection::make('has_no_french')->sites(['en', 'de']))->save();
+        $collection3 = tap(Facades\Collection::make('has_only_french')->sites(['fr']))->save();
+
+        $this->setTestRoles(['test' => [
+            'access cp',
+            'view has_some_french entries',
+            'view has_no_french entries',
+            'view has_only_french entries',
+            'access en site',
+            // 'access fr site', // Give them access to all data, but not all sites
+            'access de site',
+        ]]);
+
+        $user = tap(User::make()->assignRole('test'))->save();
+        $this->assertTrue($user->can('view', $collection1));
+        $this->assertTrue($user->can('view', $collection2));
+        $this->assertFalse($user->can('view', $collection3));
     }
 }

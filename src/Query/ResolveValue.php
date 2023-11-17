@@ -4,12 +4,17 @@ namespace Statamic\Query;
 
 use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Query\QueryableValue;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class ResolveValue
 {
     public function __invoke($item, $name)
     {
+        if (Str::startsWith($name, 'data->')) {
+            return $this->directlyAccessData($item, $name);
+        }
+
         $nameExploded = explode('->', $name);
 
         while (! empty($nameExploded)) {
@@ -56,5 +61,17 @@ class ResolveValue
         }
 
         return $item->get($name);
+    }
+
+    private function directlyAccessData($item, $name)
+    {
+        $name = Str::after($name, 'data->');
+        $exploded = explode('->', $name);
+        $top = array_shift($exploded);
+        $value = $item->get($top);
+
+        return empty($exploded)
+            ? $value
+            : Arr::get($value, implode('.', $exploded));
     }
 }
