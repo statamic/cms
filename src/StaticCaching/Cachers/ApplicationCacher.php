@@ -3,6 +3,10 @@
 namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Events\ResponsePrepared;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Event;
 
 class ApplicationCacher extends AbstractCacher
 {
@@ -37,14 +41,24 @@ class ApplicationCacher extends AbstractCacher
         // Keep track of the URL and key the response content is about to be stored within.
         $this->cacheUrl($key, ...$this->getPathAndDomain($url));
 
-        $key = $this->normalizeKey('responses:'.$key);
+        $responseKey = $this->normalizeKey('responses:'.$key);
+        $headersKey = $this->normalizeKey('headers:'.$key);
         $value = $this->normalizeContent($content);
 
         if ($expiration = $this->getDefaultExpiration()) {
-            $this->cache->put($key, $value, now()->addMinutes($expiration));
+            $this->cache->put($responseKey, $value, now()->addMinutes($expiration));
         } else {
-            $this->cache->forever($key, $value);
+            $this->cache->forever($responseKey, $value);
         }
+
+        Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($headersKey, $expiration) {
+            $headers = collect($event->response->headers->all())
+                ->reject(fn ($value, $key) => in_array($key, ['date', 'x-powered-by', 'cache-control', 'expires', 'set-cookie']))
+                ->mapWithKeys(fn ($value, $key) => [$key => Arr::first($value)])
+                ->all();
+
+            $this->cache->put($headersKey, $headers, $expiration);
+        });
     }
 
     /**
@@ -64,7 +78,18 @@ class ApplicationCacher extends AbstractCacher
      */
     public function getCachedPage(Request $request)
     {
-        return $this->cached ?? $this->getFromCache($request);
+        $cachedPage = $this->cached ?? $this->getFromCache($request);
+
+        return $cachedPage;
+    }
+
+    public function getCachedHeaders(Request $request)
+    {
+        $url = $this->getUrl($request);
+
+        $key = $this->makeHash($url);
+
+        return $this->cache->get($this->normalizeKey('headers:'.$key));
     }
 
     private function getFromCache(Request $request)

@@ -3,12 +3,14 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
@@ -76,8 +78,9 @@ class Cache
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
             $cachedPage = $this->cacher->getCachedPage($request);
+            $cachedHeaders = $this->cacher->getCachedHeaders($request);
 
-            $response = response($cachedPage->content())->withHeaders($cachedPage->headers);
+            $response = response($cachedPage, 200, $cachedHeaders);
 
             $this->makeReplacements($response);
 
