@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Log;
 use Statamic\Facades\File;
 use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
-use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
 use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;

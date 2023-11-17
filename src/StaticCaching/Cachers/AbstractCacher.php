@@ -5,7 +5,6 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Response as FacadesResponse;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\UrlExcluder;
