@@ -37,7 +37,7 @@
             <input type="hidden" name="referer" value="{{ $referer }}" />
 
             <div class="mb-8">
-                <label class="mb-2" for="input-{{ $usernameKey }}">{{ __('Email') }}</label>
+                <label class="mb-2" for="input-{{ $usernameKey }}">{{ __(\Statamic\Support\Str::slugToTitle($usernameKey)) }}</label>
                 <input type="text" class="input-text input-text" name="{{ $usernameKey }}" value="{{ old($usernameKey) }}" autofocus id="input-{{ $usernameKey }}">
                 @if ($hasError($usernameKey))<div class="text-red-500 text-xs mt-2">{{ $errors->first($usernameKey) }}</div>@endif
             </div>
