@@ -75,7 +75,9 @@ class Cache
     private function attemptToGetCachedResponse($request)
     {
         if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
-            $response = response($this->cacher->getCachedPage($request));
+            $cachedPage = $this->cacher->getCachedPage($request);
+
+            $response = response($cachedPage->content())->withHeaders($cachedPage->headers);
 
             $this->makeReplacements($response);
 
