@@ -253,19 +253,14 @@ class EntriesController extends CpController
                 $entry->published($request->published);
             }
 
-            $save = $entry->updateLastModified(User::current())->save();
-
-            if (! $save) {
-                return response([
-                    'message' => __("Couldn't save entry"),
-                ], 401);
-            }
+            $saved = $entry->updateLastModified(User::current())->save();
         }
 
         [$values] = $this->extractFromFields($entry, $blueprint);
 
         return (new EntryResource($entry->fresh()))
             ->additional([
+                'saved' => $saved ?? false,
                 'data' => [
                     'values' => $values,
                 ],
@@ -404,16 +399,11 @@ class EntriesController extends CpController
                 'user' => User::current(),
             ]);
         } else {
-            $save = $entry->updateLastModified(User::current())->save();
-
-            if (! $save) {
-                return response([
-                    'message' => __("Couldn't save entry"),
-                ], 401);
-            }
+            $saved = $entry->updateLastModified(User::current())->save();
         }
 
-        return new EntryResource($entry);
+        return (new EntryResource($entry))
+            ->additional(['saved' => $saved ?? false]);
     }
 
     private function resolveSlug($request)
