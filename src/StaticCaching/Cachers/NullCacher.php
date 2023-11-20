@@ -22,6 +22,11 @@ class NullCacher implements Cacher
         //
     }
 
+    public function getCachedHeaders(Request $request)
+    {
+        return [];
+    }
+
     public function flush()
     {
         //
