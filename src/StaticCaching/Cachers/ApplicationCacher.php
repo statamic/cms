@@ -94,7 +94,7 @@ class ApplicationCacher extends AbstractCacher
 
         $key = $this->makeHash($url);
 
-        return $this->cache->get($this->normalizeKey('headers:'.$key));
+        return $this->cache->get($this->normalizeKey('headers:'.$key)) ?? [];
     }
 
     private function getFromCache(Request $request)
