@@ -51,6 +51,14 @@ class GlideTest extends TestCase
         $this->assertEquals('https://localhost/glide/paths/bar.jpg/689e9cd88cc1d852c9a4d3a1e27d68c2.jpg', $this->absoluteTestTag(true));
     }
 
+    /** @test */
+    public function it_outputs_an_absolute_url_when_the_url_does_not_have_a_valid_extension()
+    {
+        $parse = (string) Parse::template('{{ glide src="https://statamic.com/foo" }}');
+
+        $this->assertSame('https://statamic.com/foo', $parse);
+    }
+
     /**
      * @test
      */

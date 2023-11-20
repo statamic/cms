@@ -199,7 +199,7 @@ class Glide extends Tags
             return;
         }
 
-        $url = ($this->params->bool('absolute', $this->useAbsoluteUrls())) ? URL::makeAbsolute($url) : URL::makeRelative($url);
+        $url = ($this->params->bool('absolute', $this->useAbsoluteUrls($url))) ? URL::makeAbsolute($url) : URL::makeRelative($url);
 
         return $url;
     }
@@ -340,8 +340,12 @@ class Glide extends Tags
         return ImageValidator::isValidExtension(Path::extension($item));
     }
 
-    private function useAbsoluteUrls()
+    private function useAbsoluteUrls(string $url): bool
     {
+        if (! $this->isValidExtension($url) && Str::startsWith($url, ['http://', 'https://'])) {
+            return true;
+        }
+
         return Str::startsWith(GlideManager::url(), ['http://', 'https://']);
     }
 }
