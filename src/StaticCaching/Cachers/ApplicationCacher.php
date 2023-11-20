@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Events\ResponsePrepared;
@@ -44,6 +45,10 @@ class ApplicationCacher extends AbstractCacher
         $responseKey = $this->normalizeKey('responses:'.$key);
         $headersKey = $this->normalizeKey('headers:'.$key);
         $value = $this->normalizeContent($content);
+
+        if ($value instanceof JsonResponse) {
+            $value = $value->getContent();
+        }
 
         if ($expiration = $this->getDefaultExpiration()) {
             $this->cache->put($responseKey, $value, now()->addMinutes($expiration));
