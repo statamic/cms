@@ -116,6 +116,7 @@ class ApplicationCacher extends AbstractCacher
         $this->getDomains()->each(function ($domain) {
             $this->getUrls($domain)->keys()->each(function ($key) {
                 $this->cache->forget($this->normalizeKey('responses:'.$key));
+                $this->cache->forget($this->normalizeKey('headers:'.$key));
             });
         });
 
@@ -136,6 +137,7 @@ class ApplicationCacher extends AbstractCacher
             ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
             ->each(function ($value, $key) {
                 $this->cache->forget($this->normalizeKey('responses:'.$key));
+                $this->cache->forget($this->normalizeKey('headers:'.$key));
                 $this->forgetUrl($key);
             });
     }
