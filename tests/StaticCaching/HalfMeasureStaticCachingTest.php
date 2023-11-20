@@ -2,7 +2,9 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Route;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\FakesContent;
@@ -28,6 +30,12 @@ class HalfMeasureStaticCachingTest extends TestCase
         $app['config']->set('statamic.static_caching.replacers', array_merge($app['config']->get('statamic.static_caching.replacers'), [
             'test' => TestReplacer::class,
         ]));
+
+        $app->booted(function () {
+            Route::get('/sitemap', function () {
+                return response('<title>Sitemap</title>')->withHeaders(['Content-Type' => 'application/xml']);
+            });
+        });
     }
 
     /** @test */
@@ -56,6 +64,24 @@ class HalfMeasureStaticCachingTest extends TestCase
             ->get('/about')
             ->assertOk()
             ->assertSee('<h1>The About Page</h1> <p>This is the about page.</p>', false);
+    }
+
+    /** @test */
+    public function it_includes_custom_headers_in_cached_response()
+    {
+        // The sitemap route is defined in the `getEnvironmentSetUp` method.
+
+        $this
+            ->get('/sitemap')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/xml')
+            ->assertSee('<title>Sitemap</title>', false);
+
+        $this
+            ->get('/sitemap')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/xml')
+            ->assertSee('<title>Sitemap</title>', false);
     }
 
     /** @test */

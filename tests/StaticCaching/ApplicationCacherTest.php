@@ -53,6 +53,19 @@ class ApplicationCacherTest extends TestCase
     }
 
     /** @test */
+    public function gets_cached_headers()
+    {
+        $key = 'static-cache:headers:'.md5('http://example.com/sitemap.xml');
+        $cache = $this->mock(Repository::class);
+        $cache->shouldReceive('get')->with($key)->once()->andReturn('text/xml');
+
+        $cacher = new ApplicationCacher($cache, []);
+        $request = Request::create('http://example.com/sitemap.xml', 'GET');
+
+        $this->assertEquals('text/xml', $cacher->getCachedHeaders($request));
+    }
+
+    /** @test */
     public function invalidating_a_url_removes_the_html_and_the_url()
     {
         $cache = app(Repository::class);
