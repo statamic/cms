@@ -83,7 +83,7 @@ class GlideUrlBuilderTest extends TestCase
 
     public function testConfigAddsFilename()
     {
-        Config::set('statamic.assets.image_manipulation.append_original_filename', 'true');
+        Config::set('statamic.assets.image_manipulation.append_original_filename', true);
 
         $asset = new Asset;
         $asset->container((new AssetContainer)->handle('main'));
