@@ -195,16 +195,11 @@ class TermsController extends CpController
                 $term->published($request->published);
             }
 
-            $save = $term->updateLastModified(User::current())->save();
-
-            if (! $save) {
-                return response([
-                    'message' => __("Couldn't save term"),
-                ], 401);
-            }
+            $saved = $term->updateLastModified(User::current())->save();
         }
 
-        return new TermResource($term);
+        return (new TermResource($term))
+            ->additional(['saved' => $saved]);
     }
 
     public function create(Request $request, $taxonomy, $site)
@@ -305,16 +300,11 @@ class TermsController extends CpController
                 'user' => User::current(),
             ]);
         } else {
-            $save = $term->updateLastModified(User::current())->save();
-
-            if (! $save) {
-                return response([
-                    'message' => __("Couldn't save term"),
-                ], 401);
-            }
+            $saved = $term->updateLastModified(User::current())->save();
         }
 
-        return new TermResource($term);
+        return (new TermResource($term))
+            ->additional(['saved' => $saved]);
     }
 
     protected function extractFromFields($term, $blueprint)
