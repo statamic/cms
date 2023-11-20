@@ -2,11 +2,10 @@
 
 namespace Statamic\Validation;
 
-use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Http\UploadedFile;
 
-class AllowedFile implements ValidationRule
+class AllowedFile implements InvokableRule
 {
     private array $extensions = [
         '7z',
@@ -109,7 +108,7 @@ class AllowedFile implements ValidationRule
         'zip',
     ];
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
+    public function __invoke($attribute, $value, $fail): void
     {
         if (! $this->isAllowed($value)) {
             $fail(__('validation.uploaded'));
