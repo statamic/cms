@@ -195,7 +195,13 @@ class TermsController extends CpController
                 $term->published($request->published);
             }
 
-            $term->updateLastModified(User::current())->save();
+            $save = $term->updateLastModified(User::current())->save();
+
+            if (! $save) {
+                return response([
+                    'message' => __("Couldn't save term"),
+                ], 401);
+            }
         }
 
         return new TermResource($term);
@@ -299,7 +305,13 @@ class TermsController extends CpController
                 'user' => User::current(),
             ]);
         } else {
-            $term->updateLastModified(User::current())->save();
+            $save = $term->updateLastModified(User::current())->save();
+
+            if (! $save) {
+                return response([
+                    'message' => __("Couldn't save term"),
+                ], 401);
+            }
         }
 
         return new TermResource($term);
