@@ -34,6 +34,21 @@ class HtmlTest extends TestCase
 
     /**
      * @test
+     * https://github.com/statamic/cms/issues/5233
+     */
+    public function it_returns_list_with_nesting()
+    {
+        $list = ['foo', 'bar', 'baz' => ['foo', 'bar', 'baz']];
+
+        $attributes = ['class' => 'example'];
+
+        $ol = Html::ol($list, $attributes);
+
+        $this->assertEquals('<ol class="example"><li>foo</li><li>bar</li><li>baz<ol><li>foo</li><li>bar</li><li>baz</li></ol></li></ol>', $ol);
+    }
+
+    /**
+     * @test
      */
     public function it_returns_empty_string_when_no_list_items_given(): void
     {

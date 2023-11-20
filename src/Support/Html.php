@@ -191,6 +191,23 @@ class Html
     }
 
     /**
+     * Create the HTML for a nested listing attribute.
+     *
+     * @param  mixed  $key
+     * @param  string  $type
+     * @param  mixed  $value
+     * @return string
+     */
+    protected static function nestedListing($key, $type, $value)
+    {
+        if (is_int($key)) {
+            return static::listing($type, $value);
+        } else {
+            return '<li>'.$key.static::listing($type, $value).'</li>';
+        }
+    }
+
+    /**
      * Obfuscate a string to prevent spam-bots from sniffing it.
      *
      * @param  string  $value
