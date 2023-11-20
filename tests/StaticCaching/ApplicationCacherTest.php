@@ -57,12 +57,12 @@ class ApplicationCacherTest extends TestCase
     {
         $key = 'static-cache:headers:'.md5('http://example.com/sitemap.xml');
         $cache = $this->mock(Repository::class);
-        $cache->shouldReceive('get')->with($key)->once()->andReturn('text/xml');
+        $cache->shouldReceive('get')->with($key)->once()->andReturn(['Content-Type' => 'application/xml']);
 
         $cacher = new ApplicationCacher($cache, []);
         $request = Request::create('http://example.com/sitemap.xml', 'GET');
 
-        $this->assertEquals('text/xml', $cacher->getCachedHeaders($request));
+        $this->assertEquals(['Content-Type' => 'application/xml'], $cacher->getCachedHeaders($request));
     }
 
     /** @test */
