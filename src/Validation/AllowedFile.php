@@ -44,6 +44,7 @@ class AllowedFile implements ValidationRule
         'm4a',
         'm4v',
         'mcc',
+        'md',
         'mid',
         'mov',
         'mp3',
