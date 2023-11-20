@@ -253,7 +253,13 @@ class EntriesController extends CpController
                 $entry->published($request->published);
             }
 
-            $entry->updateLastModified(User::current())->save();
+            $save = $entry->updateLastModified(User::current())->save();
+
+            if (! $save) {
+                return response([
+                    'message' => __("Couldn't save entry"),
+                ], 401);
+            }
         }
 
         [$values] = $this->extractFromFields($entry, $blueprint);
@@ -398,7 +404,13 @@ class EntriesController extends CpController
                 'user' => User::current(),
             ]);
         } else {
-            $entry->updateLastModified(User::current())->save();
+            $save = $entry->updateLastModified(User::current())->save();
+
+            if (! $save) {
+                return response([
+                    'message' => __("Couldn't save entry"),
+                ], 401);
+            }
         }
 
         return new EntryResource($entry);
