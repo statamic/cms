@@ -9,6 +9,7 @@ use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
+use Statamic\Validation\AllowedFile;
 
 class FrontendFormRequest extends FormRequest
 {
@@ -80,11 +81,7 @@ class FrontendFormRequest extends FormRequest
         return $fields->all()
             ->filter(fn ($field) => $field->fieldtype()->handle() === 'assets')
             ->mapWithKeys(function ($field) {
-                return [$field->handle().'.*' => ['file', function ($attribute, $value, $fail) {
-                    if (in_array(trim(strtolower($value->getClientOriginalExtension())), ['php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml'])) {
-                        $fail(__('validation.uploaded'));
-                    }
-                }]];
+                return [$field->handle().'.*' => ['file', new AllowedFile]];
             })
             ->all();
     }
