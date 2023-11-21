@@ -1,5 +1,13 @@
 # Release Notes
 
+## 3.4.15 (2023-11-21)
+
+### What's fixed
+- Only allow uploading certain file extensions. [#9049](https://github.com/statamic/cms/issues/9049) by @jasonvarga
+- Apply appropriate file extension when uploading. [#9048](https://github.com/statamic/cms/issues/9048) by @jasonvarga
+
+
+
 ## 3.4.14 (2023-11-14)
 
 ### What's fixed
