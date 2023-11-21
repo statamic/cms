@@ -211,6 +211,6 @@ class Outpost
             };
         }
 
-        return $this->cache()->lock(static::LOCK_KEY, 10);
+        return $this->cache()->lock($key, $seconds);
     }
 }
