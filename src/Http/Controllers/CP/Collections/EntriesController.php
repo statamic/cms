@@ -241,7 +241,7 @@ class EntriesController extends CpController
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled() && $entry->published()) {
-            $entry
+            $saved = $entry
                 ->makeWorkingCopy()
                 ->user(User::current())
                 ->save();
@@ -260,7 +260,7 @@ class EntriesController extends CpController
 
         return (new EntryResource($entry->fresh()))
             ->additional([
-                'saved' => $saved ?? false,
+                'saved' => $saved,
                 'data' => [
                     'values' => $values,
                 ],
@@ -394,7 +394,7 @@ class EntriesController extends CpController
         $this->validateUniqueUri($entry, $tree ?? null, $parent ?? null);
 
         if ($entry->revisionsEnabled()) {
-            $entry->store([
+            $saved = $entry->store([
                 'message' => $request->message,
                 'user' => User::current(),
             ]);
@@ -403,7 +403,7 @@ class EntriesController extends CpController
         }
 
         return (new EntryResource($entry))
-            ->additional(['saved' => $saved ?? false]);
+            ->additional(['saved' => $saved]);
     }
 
     private function resolveSlug($request)
