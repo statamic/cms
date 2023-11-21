@@ -23,13 +23,13 @@ class Tags extends \Statamic\Tags\Tags
     {
         if ($this->params->has('select')) {
             $fields = $this->params->explode('select');
-        } else {
+        } elseif (config('statamic.antlers.version') === 'runtime') {
             $fields = Antlers::identifiers($this->content);
         }
 
         return $this
             ->nocache
-            ->pushRegion($this->content, $this->context->only($fields)->all(), 'antlers.html')
+            ->pushRegion($this->content, $this->context->only($fields ?? null)->all(), 'antlers.html')
             ->placeholder();
     }
 }

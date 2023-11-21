@@ -4,6 +4,8 @@ namespace Tests\Fieldtypes;
 
 use Statamic\Fields\ConfigField;
 use Statamic\Fields\Field;
+use Statamic\Fieldtypes\Sets;
+use Statamic\Statamic;
 use Tests\TestCase;
 
 class SetsTest extends TestCase
@@ -389,5 +391,47 @@ class SetsTest extends TestCase
                 ],
             ],
         ], $field->process()->value());
+    }
+
+    /** @test */
+    public function it_provides_statamic_plump_icons_to_script_by_default()
+    {
+        $jsonVariables = Statamic::jsonVariables(request());
+
+        $this->assertNull($jsonVariables['setIconsDirectory']);
+        $this->assertEquals('plump', $jsonVariables['setIconsFolder']);
+    }
+
+    /** @test */
+    public function it_can_provide_custom_user_icons_subfolder()
+    {
+        Sets::setIconsDirectory(folder: 'light');
+
+        $jsonVariables = Statamic::jsonVariables(request());
+
+        $this->assertNull($jsonVariables['setIconsDirectory']);
+        $this->assertEquals('light', $jsonVariables['setIconsFolder']);
+    }
+
+    /** @test */
+    public function it_can_provide_custom_user_icons_directory()
+    {
+        Sets::setIconsDirectory($customDir = resource_path());
+
+        $jsonVariables = Statamic::jsonVariables(request());
+
+        $this->assertEquals($customDir, $jsonVariables['setIconsDirectory']);
+        $this->assertEquals(null, $jsonVariables['setIconsFolder']);
+    }
+
+    /** @test */
+    public function it_can_provide_custom_user_icons_directory_and_sub_folder()
+    {
+        Sets::setIconsDirectory($customDir = base_path(), $customSubFolder = 'resources');
+
+        $jsonVariables = Statamic::jsonVariables(request());
+
+        $this->assertEquals($customDir, $jsonVariables['setIconsDirectory']);
+        $this->assertEquals($customSubFolder, $jsonVariables['setIconsFolder']);
     }
 }

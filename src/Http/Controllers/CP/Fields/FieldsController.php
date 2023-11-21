@@ -99,7 +99,7 @@ class FieldsController extends CpController
                 'type' => 'slug',
                 'from' => 'display',
                 'separator' => '_',
-                'validate' => 'required|not_in:'.implode(',', $reserved),
+                'validate' => 'required|regex:/^[a-zA-Z][a-zA-Z0-9_]*$/|not_in:'.implode(',', $reserved),
                 'show_regenerate' => true,
             ],
             'instructions' => [
