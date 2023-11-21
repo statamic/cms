@@ -18,9 +18,6 @@ export default {
             // Prevent `Block - Hero` turning into `block_-_hero`
             custom[" - "] = " ";
 
-            // Limit to 200 characters.
-            text = text.substr(0, 200);
-
             return getSlug(text, {
                 separator: glue || '-',
                 lang,
