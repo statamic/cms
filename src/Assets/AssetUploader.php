@@ -24,7 +24,7 @@ class AssetUploader extends Uploader
 
     protected function uploadPath(UploadedFile $file)
     {
-        $ext = $file->getClientOriginalExtension();
+        $ext = $this->getFileExtension($file);
         $filename = self::getSafeFilename(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
 
         $directory = $this->asset->folder();
@@ -49,6 +49,17 @@ class AssetUploader extends Uploader
     protected function disk()
     {
         return $this->asset->container()->disk();
+    }
+
+    private function getFileExtension(UploadedFile $file)
+    {
+        $extension = $file->getClientOriginalExtension();
+        $guessed = $file->guessExtension();
+
+        // Only use the guessed extension if it's different than the original.
+        // This allows us to maintain the casing of the original extension
+        // if the the "lowercase filenames" config option is disabled.
+        return strtolower($extension) === strtolower($guessed) ? $extension : $guessed;
     }
 
     public static function getSafeFilename($string)
