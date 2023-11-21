@@ -10,7 +10,6 @@ use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
@@ -364,7 +363,6 @@ class EntriesController extends CpController
         $values = $fields->process()->values()->except(['slug', 'blueprint', 'published']);
 
         $entry = Entry::make()
-            ->id(Stache::generateId())
             ->collection($collection)
             ->blueprint($request->_blueprint)
             ->locale($site->handle())
