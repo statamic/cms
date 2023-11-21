@@ -162,6 +162,7 @@ import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
+import PreviewHtml from '../replicator/PreviewHtml';
 
 export default {
 
@@ -328,11 +329,11 @@ export default {
         },
 
         replicatorPreview() {
-            return _.map(this.assets, (asset) => {
+            return new PreviewHtml(_.map(this.assets, (asset) => {
                 return (asset.isImage || asset.isSvg) ?
                     `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
                     : asset.basename;
-            }).join(', ');
+            }).join(', '));
         },
 
         showPicker() {
