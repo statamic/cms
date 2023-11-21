@@ -201,7 +201,7 @@ class Html
     protected static function nestedListing($key, $type, $value)
     {
         if (is_int($key)) {
-            return static::listing($type, $value);
+            return '<li>'.static::listing($type, $value).'</li>';
         } else {
             return '<li>'.$key.static::listing($type, $value).'</li>';
         }
