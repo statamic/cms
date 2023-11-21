@@ -1,5 +1,22 @@
 # Release Notes
 
+## 4.36.0 (2023-11-20)
+
+### What's new
+- Add `href` attribute to relationship item links. [#9030](https://github.com/statamic/cms/issues/9030) by @jacksleight
+- Only allow uploading certain file extensions, with an option to add more. [#9037](https://github.com/statamic/cms/issues/9037) by @jasonvarga
+
+### What's fixed
+- Fix nocache tag when URL ends with a question mark. [#9016](https://github.com/statamic/cms/issues/9016) by @duncanmcclean
+- Fix missing globals and asset container translations. [#9024](https://github.com/statamic/cms/issues/9024) by @ryanmitchell
+- Validate that field handles are in snake case. [#9039](https://github.com/statamic/cms/issues/9039) by @duncanmcclean
+- Appropriate file extension are applied when uploading. [#9033](https://github.com/statamic/cms/issues/9033) by @jasonvarga
+- Don't prompt user to select search index when there's only 1 configured. [#9036](https://github.com/statamic/cms/issues/9036) by @duncanmcclean
+- Fix `range` tag with `times="0"` parameter outputting incorrectly. [#9022](https://github.com/statamic/cms/issues/9022) by @ryanmitchell
+- Fix error in collection entry listing that occurs on certain server setups (i.e Vapor and AWS function URLs). [#9028](https://github.com/statamic/cms/issues/9028) by @duncanmcclean
+
+
+
 ## 4.35.0 (2023-11-16)
 
 ### What's new
