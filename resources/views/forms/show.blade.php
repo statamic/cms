@@ -30,11 +30,17 @@
                 @endcan
             </dropdown-list>
 
+            @if (($exporters = $form->exporters()) && $exporters->isNotEmpty())
             <dropdown-list>
                 <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
-                <dropdown-item :text="__('Export as CSV')" redirect="{{ cp_route('forms.export', ['type' => 'csv', 'form' => $form->handle()]) }}?download=true"></dropdown-item>
-                <dropdown-item :text="__('Export as JSON')" redirect="{{ cp_route('forms.export', ['type' => 'json', 'form' => $form->handle()]) }}?download=true"></dropdown-item>
+                @foreach ($exporters as $exporter)
+                    <dropdown-item
+                        text="{{ $exporter->title() }}"
+                        redirect="{{ $exporter->downloadUrl() }}"
+                    ></dropdown-item>
+                @endforeach
             </dropdown-list>
+            @endif
         </div>
     </header>
 

@@ -222,6 +222,7 @@ export default {
 
             this.page = 1;
             this.sortColumn = 'order';
+            this.sortDirection = 'asc';
         },
 
         cancelReordering() {

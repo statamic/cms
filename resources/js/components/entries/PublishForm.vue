@@ -98,7 +98,7 @@
                             @blur="container.$emit('blur', $event)"
                         >
                             <template #actions="{ shouldShowSidebar }">
-                            <div :class="{'card p-0': !shouldShowSidebar}">
+                            <div class="card p-0 mb-5">
 
                                 <div v-if="collectionHasRoutes" :class="{ 'hi': !shouldShowSidebar }">
 
@@ -558,6 +558,7 @@ export default {
                 .then(() => {
                     // If revisions are enabled, just emit event.
                     if (this.revisionsEnabled) {
+                        this.values = this.resetValuesFromResponse(response.data.data.values);
                         this.$nextTick(() => this.$emit('saved', response));
                         return;
                     }

@@ -22,6 +22,7 @@ class Email extends Mailable
     protected $submissionData;
     protected $config;
     protected $site;
+    private $globalData;
 
     public function __construct(Submission $submission, array $config, Site $site)
     {
@@ -160,6 +161,10 @@ class Email extends Mailable
 
     private function getGlobalsData()
     {
+        if (! is_null($this->globalData)) {
+            return $this->globalData;
+        }
+
         $data = [];
 
         foreach (GlobalSet::all() as $global) {
@@ -172,7 +177,7 @@ class Email extends Mailable
             $data[$global->handle()] = $global->toAugmentedArray();
         }
 
-        return array_merge($data, $data['global'] ?? []);
+        return $this->globalData = array_merge($data, $data['global'] ?? []);
     }
 
     protected function addresses($addresses)
@@ -203,7 +208,7 @@ class Email extends Mailable
         return collect($config)->map(function ($value) {
             $value = Parse::env($value); // deprecated
 
-            return (string) Antlers::parse($value, $this->submissionData);
+            return (string) Antlers::parse($value, array_merge($this->submissionData, $this->getGlobalsData()));
         });
     }
 }

@@ -13,6 +13,7 @@ use Statamic\Facades\Preference;
 use Statamic\Facades\Token;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
+use Statamic\Tokens\Handlers\LivePreview;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,15 +29,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->booted(function () {
             Statamic::runBootedCallbacks();
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
+            $this->registerMiddlewareGroup();
         });
-
-        $this->registerMiddlewareGroup();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckComposerJsonScripts::class)
             ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\DisableFloc::class);
+            ->pushMiddleware(\Statamic\Http\Middleware\DisableFloc::class)
+            ->pushMiddleware(\Statamic\Http\Middleware\StopImpersonating::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -83,6 +84,10 @@ class AppServiceProvider extends ServiceProvider
             if ($token = $this->token ?? $this->header('X-Statamic-Token')) {
                 return Token::find($token);
             }
+        });
+
+        Request::macro('isLivePreview', function () {
+            return optional($this->statamicToken())->handler() === LivePreview::class;
         });
 
         $this->addAboutCommandInfo();
@@ -160,14 +165,16 @@ class AppServiceProvider extends ServiceProvider
 
     protected function registerMiddlewareGroup()
     {
-        $this->app->make(Router::class)->middlewareGroup('statamic.web', [
+        $router = $this->app->make(Router::class);
+
+        collect([
             \Statamic\Http\Middleware\StacheLock::class,
             \Statamic\Http\Middleware\HandleToken::class,
             \Statamic\Http\Middleware\Localize::class,
             \Statamic\Http\Middleware\AddViewPaths::class,
             \Statamic\Http\Middleware\AuthGuard::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
-        ]);
+        ])->each(fn ($middleware) => $router->pushMiddlewareToGroup('statamic.web', $middleware));
     }
 
     protected function addAboutCommandInfo()

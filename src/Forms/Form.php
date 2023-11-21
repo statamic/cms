@@ -20,11 +20,12 @@ use Statamic\Facades\Folder;
 use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
+use Statamic\Forms\Exporters\Exporter;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Form implements FormContract, Augmentable, Arrayable
+class Form implements Arrayable, Augmentable, FormContract
 {
     use FluentlyGetsAndSets, HasAugmentedInstance;
 
@@ -393,5 +394,18 @@ class Form implements FormContract, Augmentable, Arrayable
     public function actionUrl()
     {
         return route('statamic.forms.submit', $this->handle());
+    }
+
+    public function exporters()
+    {
+        return FormFacade::exporters()
+            ->all()
+            ->filter->allowedOnForm($this)
+            ->each->setForm($this);
+    }
+
+    public function exporter(string $handle): ?Exporter
+    {
+        return $this->exporters()->get($handle);
     }
 }

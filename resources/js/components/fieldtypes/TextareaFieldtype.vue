@@ -3,7 +3,7 @@
         :name="name"
         :isReadOnly="isReadOnly"
         :limit="config.character_limit || null"
-        :placeholder="config.placeholder"
+        :placeholder="__(config.placeholder)"
         :value="value"
         :id="fieldId"
         @blur="$emit('blur')"

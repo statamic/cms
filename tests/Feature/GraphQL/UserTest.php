@@ -13,9 +13,9 @@ use Tests\TestCase;
 /** @group graphql */
 class UserTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
     use EnablesQueries;
+    use PreventSavingStacheItemsToDisk;
 
     protected $enabledQueries = ['users'];
 

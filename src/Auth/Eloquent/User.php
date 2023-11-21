@@ -358,6 +358,10 @@ class User extends BaseUser
             return $this->model()->timestamps = $value;
         }
 
+        if ($key === 'super') {
+            return $this->model()->super = $value;
+        }
+
         return $this->$key = $value;
     }
 }

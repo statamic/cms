@@ -36,9 +36,9 @@ use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 
-abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, Augmentable, AuthorizableContract, ResolvesValuesContract, HasLocalePreference, ArrayAccess, Arrayable, SearchableContract, ContainsQueryableValues
+abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticatable, AuthorizableContract, CanResetPasswordContract, ContainsQueryableValues, HasLocalePreference, ResolvesValuesContract, SearchableContract, UserContract
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, TracksQueriedRelations, HasAvatar, ResolvesValues, ContainsComputedData, Searchable;
+    use Authorizable, CanResetPassword, ContainsComputedData, HasAugmentedInstance, HasAvatar, Notifiable, ResolvesValues, Searchable, TracksQueriedColumns, TracksQueriedRelations;
 
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
@@ -238,12 +238,20 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
     {
         $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_RESETS);
 
+        if (is_array($broker)) {
+            $broker = $broker['cp'];
+        }
+
         return Password::broker($broker)->createToken($this);
     }
 
     public function generateActivateAccountToken()
     {
         $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
+
+        if (is_array($broker)) {
+            $broker = $broker['cp'];
+        }
 
         return Password::broker($broker)->createToken($this);
     }

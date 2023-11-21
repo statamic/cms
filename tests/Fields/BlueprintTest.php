@@ -440,6 +440,7 @@ class BlueprintTest extends TestCase
                                     'visibility' => 'visible',
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'autocomplete' => null,
                                 ],
                             ],
                         ],
@@ -553,6 +554,7 @@ class BlueprintTest extends TestCase
                                     'visibility' => 'visible',
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'autocomplete' => null,
                                 ],
                                 [
                                     'handle' => 'nested_deeper_two',
@@ -572,6 +574,7 @@ class BlueprintTest extends TestCase
                                     'visibility' => 'visible',
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'autocomplete' => null,
                                 ],
                             ],
                         ],

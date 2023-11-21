@@ -25,9 +25,9 @@ use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
+class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 {
-    use HasAugmentedData, ExistsAsFile;
+    use ExistsAsFile, HasAugmentedData;
 
     protected $handle;
     protected $namespace;
@@ -40,6 +40,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
     protected $ensuredFields = [];
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    private ?Columns $columns = null;
 
     public function setHandle(string $handle)
     {
@@ -360,6 +361,10 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
 
     public function columns()
     {
+        if ($this->columns) {
+            return $this->columns;
+        }
+
         $columns = $this->fields()
             ->all()
             ->values()
@@ -376,7 +381,7 @@ class Blueprint implements Augmentable, QueryableValue, ArrayAccess, Arrayable
             })
             ->keyBy('field');
 
-        return new Columns($columns);
+        return $this->columns = new Columns($columns);
     }
 
     public function isEmpty(): bool
