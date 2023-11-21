@@ -196,7 +196,7 @@ class Outpost
 
     private function acquireLock(string $key, int $seconds = 10)
     {
-        $cacheSupportsLocking = in_array(LockProvider::class, class_implements($this->cache()->getStore()));
+        $cacheSupportsLocking = $this->cache()->getStore() instanceof LockProvider;
 
         if (! $cacheSupportsLocking) {
             return new class
