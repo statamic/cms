@@ -42,7 +42,7 @@
                 <span>{{ __('Maximum items selected:')}}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
-            <div v-if="canSelectOrCreate" class="relationship-input-buttons relative" :class="{ 'mt-4': items.length > 0 }" >
+            <div v-if="canSelectOrCreate" class="relationship-input-buttons relative @container" :class="{ 'mt-4': items.length > 0 }" >
                 <div class="flex flex-wrap items-center text-sm -mb-2">
                     <div class="relative mb-2">
                         <create-button
@@ -56,7 +56,8 @@
                     </div>
                     <button ref="existing" class="text-blue hover:text-gray-800 flex items-center mb-2 outline-none" @click.prevent="isSelecting = true">
                         <svg-icon name="light/hyperlink" class="mr-1 h-4 w-4 flex items-center"></svg-icon>
-                        {{ __('Link Existing Item') }}
+                        <span class="hidden @sm:block" v-text="__('Link Existing Item')" />
+                        <span class="@sm:hidden" v-text="__('Link')" />
                     </button>
                 </div>
             </div>
@@ -64,17 +65,19 @@
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
                 <item-selector
                     slot-scope="{ close }"
+                    :name="name"
                     :filters-url="filtersUrl"
                     :selections-url="selectionsUrl"
                     :site="site"
                     :initial-columns="columns"
-                    initial-sort-column="title"
-                    initial-sort-direction="asc"
+                    :initial-sort-column="initialSortColumn"
+                    :initial-sort-direction="initialSortDirection"
                     :initial-selections="value"
                     :max-selections="maxItems"
                     :search="search"
                     :exclusions="exclusions"
                     :type="config.type"
+                    :tree="tree"
                     @selected="selectionsUpdated"
                     @closed="close"
                 />
@@ -127,6 +130,15 @@ export default {
         columns: {
             type: Array,
             default: () => []
+        },
+        tree: Object,
+        initialSortColumn: {
+            type: String,
+            default: 'title'
+        },
+        initialSortDirection: {
+            type: String,
+            default: 'asc'
         }
     },
 

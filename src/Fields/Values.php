@@ -12,7 +12,7 @@ use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesGqlValues;
 use Statamic\Facades\Compare;
 use Traversable;
 
-class Values implements ArrayAccess, Arrayable, IteratorAggregate, JsonSerializable, ResolvesGqlValues
+class Values implements Arrayable, ArrayAccess, IteratorAggregate, JsonSerializable, ResolvesGqlValues
 {
     protected $instance;
 

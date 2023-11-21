@@ -76,7 +76,7 @@
 }
 
 .nav-toggle {
-    @apply block h-6 p-1 w-6 mr-3 rounded;
+    @apply flex items-center justify-center h-6 p-1 w-6 mr-3 rounded;
     outline: none !important;
 
     &:hover {

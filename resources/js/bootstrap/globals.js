@@ -1,5 +1,7 @@
 import { marked } from 'marked';
 import { translate, translateChoice } from '../translations/translator';
+import uid from 'uniqid';
+import PreviewHtml from '../components/fieldtypes/replicator/PreviewHtml';
 
 export function cp_url(url) {
     url = Statamic.$config.get('cpUrl') + '/' + url;
@@ -83,4 +85,26 @@ export function utf8btoa(stringToEncode) {
 
     // return base64 encoded string
     return btoa(utf8String);
+}
+
+export function uniqid() {
+    return uid();
+}
+
+export function truncate(string, length, ending='...') {
+    if (string.length <= length) return string;
+
+    return string.substring(0, length - ending.length) + ending;
+}
+
+export function escapeHtml(string) {
+     return string.replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
+export function replicatorPreviewHtml(html) {
+    return new PreviewHtml(html);
 }

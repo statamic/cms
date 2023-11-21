@@ -10,6 +10,7 @@ use Statamic\Facades\GlobalSet as GlobalsAPI;
 use Statamic\Facades\Path;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\GlobalsStore;
+use Statamic\Stache\Stores\GlobalVariablesStore;
 use Tests\TestCase;
 
 class GlobalsStoreTest extends TestCase
@@ -26,6 +27,7 @@ class GlobalsStoreTest extends TestCase
         $stache = (new Stache)->sites(['en']);
         $this->app->instance(Stache::class, $stache);
         $stache->registerStore($this->store = (new GlobalsStore($stache, app('files')))->directory($this->tempDir));
+        $stache->registerStore((new GlobalVariablesStore($stache, app('files')))->directory($this->tempDir));
     }
 
     public function tearDown(): void
@@ -67,7 +69,6 @@ class GlobalsStoreTest extends TestCase
         $this->assertEquals('example', $item->id());
         $this->assertEquals('example', $item->handle());
         $this->assertEquals('Example', $item->title());
-        $this->assertEquals(['foo' => 'bar'], $item->in('en')->data()->all());
     }
 
     /** @test */

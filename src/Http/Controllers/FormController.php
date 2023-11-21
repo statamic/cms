@@ -13,11 +13,13 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
 use Statamic\Forms\SendEmails;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Validation\AllowedFile;
 
 class FormController extends Controller
 {
@@ -99,23 +101,35 @@ class FormController extends Controller
      */
     private function formSuccess($params, $submission, $silentFailure = false)
     {
+        $redirect = $this->formSuccessRedirect($params, $submission);
+
         if (request()->ajax() || request()->wantsJson()) {
             return response([
                 'success' => true,
                 'submission_created' => ! $silentFailure,
                 'submission' => $submission->data(),
+                'redirect' => $redirect,
             ]);
         }
 
-        $redirect = Arr::get($params, '_redirect');
-
         $response = $redirect ? redirect($redirect) : back();
 
-        session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
-        session()->flash("form.{$submission->form()->handle()}.submission_created", ! $silentFailure);
-        session()->flash('submission', $submission);
+        if (! \Statamic\Facades\URL::isExternal($redirect)) {
+            session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
+            session()->flash("form.{$submission->form()->handle()}.submission_created", ! $silentFailure);
+            session()->flash('submission', $submission);
+        }
 
         return $response;
+    }
+
+    private function formSuccessRedirect($params, $submission)
+    {
+        if (! $redirect = Form::getSubmissionRedirect($submission)) {
+            $redirect = Arr::get($params, '_redirect');
+        }
+
+        return $redirect;
     }
 
     /**
@@ -164,7 +178,7 @@ class FormController extends Controller
                 return $field->fieldtype()->handle() === 'assets';
             })
             ->mapWithKeys(function ($field) {
-                return [$field->handle().'.*' => 'file'];
+                return [$field->handle().'.*' => ['file', new AllowedFile]];
             })
             ->all();
 

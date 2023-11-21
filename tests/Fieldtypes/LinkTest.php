@@ -3,7 +3,9 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
+use Mockery;
 use Statamic\Entries\Entry;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Link;
 use Tests\TestCase;
@@ -11,35 +13,62 @@ use Tests\TestCase;
 class LinkTest extends TestCase
 {
     /** @test */
-    public function it_augments_to_url()
+    public function it_augments_string_to_string()
     {
-        ResolveRedirect::shouldReceive('resolve')
-            ->with('entry::test', $parent = new Entry, true)
+        ResolveRedirect::shouldReceive('item')
+            ->with('/foo', $parent = new Entry, true)
             ->once()
-            ->andReturn('/the-redirect');
+            ->andReturn('/foo');
 
         $field = new Field('test', ['type' => 'link']);
         $field->setParent($parent);
         $fieldtype = (new Link)->setField($field);
 
-        $this->assertEquals('/the-redirect', $fieldtype->augment('entry::test'));
+        $augmented = $fieldtype->augment('/foo');
+        $this->assertInstanceOf(ArrayableString::class, $augmented);
+        $this->assertEquals('/foo', $augmented->value());
+        $this->assertEquals(['url' => '/foo'], $augmented->toArray());
     }
 
     /** @test */
-    public function it_augments_invalid_entry_to_null()
+    public function it_augments_reference_to_object()
     {
-        // invalid entries come back from the ResolveRedirect class as a 404 integer
+        $entry = Mockery::mock();
+        $entry->shouldReceive('url')->once()->andReturn('/the-entry-url');
+        $entry->shouldReceive('toAugmentedArray')->once()->andReturn('augmented entry array');
 
-        ResolveRedirect::shouldReceive('resolve')
+        ResolveRedirect::shouldReceive('item')
             ->with('entry::test', $parent = new Entry, true)
             ->once()
-            ->andReturn(404);
+            ->andReturn($entry);
 
         $field = new Field('test', ['type' => 'link']);
         $field->setParent($parent);
         $fieldtype = (new Link)->setField($field);
 
-        $this->assertNull($fieldtype->augment('entry::test'));
+        $augmented = $fieldtype->augment('entry::test');
+        $this->assertInstanceOf(ArrayableString::class, $augmented);
+        $this->assertEquals($entry, $augmented->value());
+        $this->assertEquals('/the-entry-url', (string) $augmented);
+        $this->assertEquals('augmented entry array', $augmented->toArray());
+    }
+
+    /** @test */
+    public function it_augments_invalid_object_to_null()
+    {
+        ResolveRedirect::shouldReceive('item')
+            ->with('entry::invalid', $parent = new Entry, true)
+            ->once()
+            ->andReturnNull();
+
+        $field = new Field('test', ['type' => 'link']);
+        $field->setParent($parent);
+        $fieldtype = (new Link)->setField($field);
+
+        $augmented = $fieldtype->augment('entry::invalid');
+        $this->assertInstanceOf(ArrayableString::class, $augmented);
+        $this->assertNull($augmented->value());
+        $this->assertEquals(['url' => null], $augmented->toArray());
     }
 
     /** @test */
@@ -53,6 +82,9 @@ class LinkTest extends TestCase
         $field->setParent(new Entry);
         $fieldtype = (new Link)->setField($field);
 
-        $this->assertNull($fieldtype->augment(null));
+        $augmented = $fieldtype->augment(null);
+        $this->assertInstanceOf(ArrayableString::class, $augmented);
+        $this->assertNull($augmented->value());
+        $this->assertEquals(['url' => null], $augmented->toArray());
     }
 }

@@ -6,7 +6,7 @@
             <breadcrumb :url="breadcrumbUrl" :title="__('Navigation')" />
 
             <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
+                <h1 class="flex-1" v-text="__(title)" />
 
                 <dropdown-list class="mr-2">
                     <slot name="twirldown" />
@@ -48,7 +48,6 @@
 
         <page-tree
             ref="tree"
-            :has-collection="false"
             :pages-url="pagesUrl"
             :submit-url="submitUrl"
             :submit-parameters="{ data: submissionData }"
@@ -383,9 +382,9 @@ export default {
         },
 
         treeSaved(response) {
-            this.changed = false;
-
             this.replaceGeneratedIds(response.data.generatedIds);
+
+            this.changed = false;
         },
 
         replaceGeneratedIds(ids) {

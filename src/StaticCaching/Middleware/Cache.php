@@ -116,6 +116,10 @@ class Cache
             return false;
         }
 
+        if ($request->isLivePreview()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -134,6 +138,10 @@ class Cache
         }
 
         if ($response->getStatusCode() !== 200 || $response->getContent() == '') {
+            return false;
+        }
+
+        if ($request->isLivePreview()) {
             return false;
         }
 

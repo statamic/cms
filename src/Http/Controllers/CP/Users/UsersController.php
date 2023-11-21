@@ -92,9 +92,11 @@ class UsersController extends CpController
             $query
                 ->where('email', 'like', '%'.$search.'%')
                 ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
-                    $query
-                        ->orWhere('first_name', 'like', '%'.$search.'%')
-                        ->orWhere('last_name', 'like', '%'.$search.'%');
+                    foreach (explode(' ', $search) as $word) {
+                        $query
+                            ->orWhere('first_name', 'like', '%'.$word.'%')
+                            ->orWhere('last_name', 'like', '%'.$word.'%');
+                    }
                 }, function ($query) use ($search) {
                     $query->orWhere('name', 'like', '%'.$search.'%');
                 });
@@ -231,6 +233,7 @@ class UsersController extends CpController
                 'editBlueprint' => cp_route('users.blueprint.edit'),
             ],
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
+            'requiresCurrentPassword' => $request->user()->id === $user->id(),
         ];
 
         if ($request->wantsJson()) {

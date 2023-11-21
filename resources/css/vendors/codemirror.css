@@ -8,10 +8,6 @@
     min-height: 80px;
   }
 
-  .code-mode {
-      @apply select-none z-10 opacity-25 absolute right-0 p-2 text-white text-2xs uppercase;
-  }
-
   /* PADDING */
 
   .CodeMirror-lines {
@@ -21,7 +17,7 @@
     padding: 0 16px; /* Horizontal padding of content */
   }
   .CodeMirror-wrap {
-    @apply py-2 rounded;
+    @apply rounded-b;
   }
 
   .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
@@ -345,13 +341,24 @@
   span.CodeMirror-selectedtext { background: none; }
 
 
+  .CodeMirror-fullscreen {
+      @apply fixed h-auto inset-0 top-12 rounded-none;
+  }
+
+  .CodeMirror-rulers {
+      @apply absolute left-0 right-0 overflow-hidden;
+      top: -50px;
+      bottom: -20px;
+  }
+
+  .CodeMirror-ruler {
+      @apply top-0 bottom-0;
+  }
+
+
   /* Light Theme
   ========================================================================== */
   .code-fieldtype .theme-light {
-
-    .code-mode {
-        @apply text-gray-900;
-    }
 
     .CodeMirror {
         @apply border p-0

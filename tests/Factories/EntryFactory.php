@@ -17,6 +17,7 @@ class EntryFactory
     protected $locale;
     protected $origin;
     protected $collection;
+    protected $blueprint;
 
     public function __construct()
     {
@@ -79,6 +80,13 @@ class EntryFactory
         return $this;
     }
 
+    public function blueprint($blueprint)
+    {
+        $this->blueprint = $blueprint;
+
+        return $this;
+    }
+
     public function make()
     {
         $entry = Entry::make()
@@ -87,7 +95,8 @@ class EntryFactory
             ->slug($this->slug)
             ->data($this->data)
             ->origin($this->origin)
-            ->published($this->published);
+            ->published($this->published)
+            ->blueprint($this->blueprint);
 
         if ($collection->dated()) {
             $entry->date($this->date);
@@ -130,5 +139,6 @@ class EntryFactory
         $this->locale = 'en';
         $this->origin = null;
         $this->collection = null;
+        $this->blueprint = null;
     }
 }
