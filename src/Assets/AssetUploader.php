@@ -59,7 +59,20 @@ class AssetUploader extends Uploader
         // Only use the guessed extension if it's different than the original.
         // This allows us to maintain the casing of the original extension
         // if the the "lowercase filenames" config option is disabled.
-        return strtolower($extension) === strtolower($guessed) ? $extension : $guessed;
+        return $this->isEqualExtension($extension, $guessed) ? $extension : $guessed;
+    }
+
+    private function isEqualExtension($a, $b)
+    {
+        $a = strtolower($a);
+        $b = strtolower($b);
+
+        // In earlier versions of Symfony, the guessed extension for JPEGs was "jpeg".
+        // We'll consider them equal so we don't need to tweak any tests.
+        // They're technically equal anyway.
+        return $a === $b
+            || ($a == 'jpeg' && $b == 'jpg')
+            || ($a == 'jpg' && $b == 'jpeg');
     }
 
     public static function getSafeFilename($string)
