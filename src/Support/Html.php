@@ -200,11 +200,13 @@ class Html
      */
     protected static function nestedListing($key, $type, $value)
     {
-        if (is_int($key)) {
-            return '<li>'.static::listing($type, $value).'</li>';
-        } else {
-            return '<li>'.$key.static::listing($type, $value).'</li>';
+        $html = '<li>';
+
+        if (! is_int($key)) {
+            $html .= $key;
         }
+
+        return $html.static::listing($type, $value).'</li>';
     }
 
     /**
