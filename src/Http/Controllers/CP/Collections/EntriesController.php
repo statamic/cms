@@ -10,6 +10,7 @@ use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
@@ -531,7 +532,12 @@ class EntriesController extends CpController
         }
 
         if (! $tree) {
-            return $entry->uri();
+            return app(\Statamic\Contracts\Routing\UrlBuilder::class)
+                ->content($entry)
+                ->merge([
+                    'id' => $entry->id() ?? Stache::generateId(),
+                ])
+                ->build($entry->route());
         }
 
         $parent = $parent ? $tree->find($parent) : null;
