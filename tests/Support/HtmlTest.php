@@ -37,13 +37,13 @@ class HtmlTest extends TestCase
     {
         $list = [
             'foo',
-            'bar',
-            'baz' => ['alfa', 'bravo'],
+            'bar' => ['alfa', 'bravo'],
+            'baz',
         ];
 
         $ol = Html::ol($list);
 
-        $this->assertEquals('<ol><li>foo</li><li>bar</li><li>baz<ol><li>alfa</li><li>bravo</li></ol></li></ol>', $ol);
+        $this->assertEquals('<ol><li>foo</li><li>bar<ol><li>alfa</li><li>bravo</li></ol></li><li>baz</li></ol>', $ol);
     }
 
     /** @test */
