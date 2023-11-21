@@ -6,6 +6,7 @@ use Carbon\CarbonInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Cache\NoLock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
@@ -43,7 +44,7 @@ class Outpost
 
     private function request()
     {
-        $lock = $this->acquireLock(static::LOCK_KEY, 10);
+        $lock = $this->lock(static::LOCK_KEY, 10);
 
         try {
             $lock->block(static::REQUEST_TIMEOUT);
@@ -194,23 +195,10 @@ class Outpost
         return $this->store = $store;
     }
 
-    private function acquireLock(string $key, int $seconds = 10)
+    private function lock(string $key, int $seconds)
     {
-        $cacheSupportsLocking = $this->cache()->getStore() instanceof LockProvider;
-
-        if (! $cacheSupportsLocking) {
-            return new class
-            {
-                public function block(int $timeout): void
-                {
-                }
-
-                public function release(): void
-                {
-                }
-            };
-        }
-
-        return $this->cache()->lock($key, $seconds);
+        return $this->cache()->getStore() instanceof LockProvider
+            ? $this->cache()->lock($key, $seconds)
+            : new NoLock($key, $seconds);
     }
 }
