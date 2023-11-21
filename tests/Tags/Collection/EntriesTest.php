@@ -508,7 +508,7 @@ class EntriesTest extends TestCase
         // Ensure it works when passing terms (eg from a term fieldtype)
         $this->assertEquals([1, 3, 4], $this->getEntryIds(['taxonomy:tags:in' => Term::query()->whereIn('slug', ['rad', 'meh'])->get()]));
         $this->assertEquals([1, 3], $this->getEntryIds(['taxonomy:tags:in' => Term::find('tags::rad')]));
-     }
+    }
 
     /** @test */
     public function it_throws_an_exception_when_using_an_unknown_taxonomy_query_modifier()
