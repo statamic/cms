@@ -32,19 +32,19 @@ class HtmlTest extends TestCase
         $this->assertEquals('<ol class="example"><li>foo</li><li>bar</li><li>&amp;</li></ol>', $ol);
     }
 
-    /**
-     * @test
-     * https://github.com/statamic/cms/issues/5233
-     */
-    public function it_returns_list_with_nesting()
+    /** @test */
+    public function nested_listing_with_keyed_sub_array()
     {
-        $list = ['foo', 'bar', 'baz' => ['foo', 'bar', 'baz']];
+        $list = [
+            'foo',
+            'bar',
+            'baz' => ['alfa', 'bravo'],
+        ];
 
-        $attributes = ['class' => 'example'];
+        $ol = Html::ol($list);
 
-        $ol = Html::ol($list, $attributes);
+        $this->assertEquals('<ol><li>foo</li><li>bar</li><li>baz<ol><li>alfa</li><li>bravo</li></ol></li></ol>', $ol);
 
-        $this->assertEquals('<ol class="example"><li>foo</li><li>bar</li><li>baz<ol><li>foo</li><li>bar</li><li>baz</li></ol></li></ol>', $ol);
     }
 
     /**
