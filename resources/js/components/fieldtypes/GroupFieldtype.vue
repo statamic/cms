@@ -70,14 +70,15 @@
         </element-container>
     </portal>
 </template>
+
 <script>
-import FieldType from '@/../../vendor/statamic/cms/resources/js/components/fieldtypes/Fieldtype.vue';
-import SetField from '@/../../vendor/statamic/cms/resources/js/components/fieldtypes/replicator/Field.vue';
-import { ValidatesFieldConditions } from '@/../../vendor/statamic/cms/resources/js/components/field-conditions/FieldConditions.js';
+import Fieldtype from './Fieldtype.vue';
+import SetField from './replicator/Field.vue';
+import { ValidatesFieldConditions } from '../field-conditions/FieldConditions.js';
 
 export default {
     mixins: [
-        FieldType,
+        Fieldtype,
         ValidatesFieldConditions,
     ],
     components: { SetField },
