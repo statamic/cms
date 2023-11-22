@@ -77,7 +77,7 @@ export default {
         },
 
         open() {
-            if (! this.asset.url && this.asset.downloadUrl) {
+            if (! this.asset.url) {
                 return this.download();
             }
 
