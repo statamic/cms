@@ -10,9 +10,7 @@ class UrlInvalidated extends Event
 
     public function __construct($url, $domain = null)
     {
-        if (! $domain) {
-            $domain = app(Cacher::class)->getBaseUrl();
-        }
+        $domain ??= app(Cacher::class)->getBaseUrl();
 
         $this->url = $domain.$url;
     }
