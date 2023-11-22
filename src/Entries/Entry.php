@@ -29,6 +29,7 @@ use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
 use Statamic\Events\EntryBlueprintFound;
 use Statamic\Events\EntryCreated;
+use Statamic\Events\EntryCreating;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntryDeleting;
 use Statamic\Events\EntrySaved;
@@ -317,6 +318,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableVal
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && EntryCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (EntrySaving::dispatch($this) === false) {
                 return false;
             }

@@ -5,6 +5,7 @@ namespace Tests\Data\Globals;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\GlobalSetCreated;
+use Statamic\Events\GlobalSetCreating;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Events\GlobalSetSaving;
 use Statamic\Facades\GlobalSet as GlobalSetFacade;
@@ -112,6 +113,10 @@ EOT;
         });
 
         $set->save();
+
+        Event::assertDispatched(GlobalSetCreating::class, function ($event) use ($set) {
+            return $event->globals === $set;
+        });
 
         Event::assertDispatched(GlobalSetSaving::class, function ($event) use ($set) {
             return $event->globals === $set;
@@ -259,8 +264,42 @@ EOT;
 
         $set->saveQuietly();
 
+        Event::assertNotDispatched(GlobalSetCreating::class);
         Event::assertNotDispatched(GlobalSetSaving::class);
         Event::assertNotDispatched(GlobalSetSaved::class);
+        Event::assertNotDispatched(GlobalSetCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_global_set_doesnt_save()
+    {
+        Event::fake([GlobalSetCreated::class]);
+
+        Event::listen(GlobalSetCreating::class, function () {
+            return false;
+        });
+
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $set = (new GlobalSet)->title('SEO Settings');
+
+        $set->in('en', function ($loc) {
+            $loc->data([
+                'array' => ['first one', 'second one'],
+                'string' => 'The string',
+            ]);
+        });
+
+        $return = $set->save();
+
+        $this->assertFalse($return);
         Event::assertNotDispatched(GlobalSetCreated::class);
     }
 

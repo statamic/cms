@@ -12,6 +12,7 @@ use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\TaxonomyCreated;
+use Statamic\Events\TaxonomyCreating;
 use Statamic\Events\TaxonomyDeleted;
 use Statamic\Events\TaxonomySaved;
 use Statamic\Events\TaxonomySaving;
@@ -207,6 +208,10 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && TaxonomyCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (TaxonomySaving::dispatch($this) === false) {
                 return false;
             }

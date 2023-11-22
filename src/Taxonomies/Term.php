@@ -7,6 +7,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\SyncsOriginalState;
 use Statamic\Events\TermBlueprintFound;
 use Statamic\Events\TermCreated;
+use Statamic\Events\TermCreating;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 use Statamic\Events\TermSaving;
@@ -211,6 +212,10 @@ class Term implements TermContract
         $this->afterSaveCallbacks = [];
 
         if ($withEvents) {
+            if ($isNew && TermCreating::dispatch($this) === false) {
+                return false;
+            }
+
             if (TermSaving::dispatch($this) === false) {
                 return false;
             }

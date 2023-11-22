@@ -12,6 +12,7 @@ use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
 use Statamic\Events\BlueprintCreated;
+use Statamic\Events\BlueprintCreating;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\BlueprintSaving;
 use Statamic\Facades;
@@ -598,6 +599,10 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals($blueprint, $return);
 
+        Event::assertDispatched(BlueprintCreating::class, function ($event) use ($blueprint) {
+            return $event->blueprint === $blueprint;
+        });
+
         Event::assertDispatched(BlueprintSaving::class, function ($event) use ($blueprint) {
             return $event->blueprint === $blueprint;
         });
@@ -643,8 +648,26 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals($blueprint, $return);
 
+        Event::assertNotDispatched(BlueprintCreating::class);
         Event::assertNotDispatched(BlueprintSaving::class);
         Event::assertNotDispatched(BlueprintSaved::class);
+        Event::assertNotDispatched(BlueprintCreated::class);
+    }
+
+    /** @test */
+    public function if_creating_event_returns_false_the_blueprint_doesnt_save()
+    {
+        Event::fake([BlueprintCreated::class]);
+
+        Event::listen(BlueprintCreating::class, function () {
+            return false;
+        });
+
+        $blueprint = new Blueprint;
+
+        $return = $blueprint->save();
+
+        $this->assertFalse($return);
         Event::assertNotDispatched(BlueprintCreated::class);
     }
 
