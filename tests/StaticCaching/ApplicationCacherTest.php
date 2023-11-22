@@ -4,6 +4,9 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
+use Statamic\Events\UrlInvalidated;
+use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Tests\TestCase;
 
@@ -103,6 +106,37 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:oneqs'));
         $this->assertNotNull($cache->get('static-cache:responses:onemore'));
         $this->assertNotNull($cache->get('static-cache:responses:two'));
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider invalidateEventProvider
+     */
+    public function invalidating_a_url_dispatches_event($domain, $expectedUrl)
+    {
+        Event::fake();
+
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://base.com']);
+
+        // Put it in the container so that the event can resolve it.
+        $this->instance(Cacher::class, $cacher);
+
+        $cacher->invalidateUrl('/foo', $domain);
+
+        Event::assertDispatched(UrlInvalidated::class, function ($event) use ($expectedUrl) {
+            return $event->url === $expectedUrl;
+        });
+    }
+
+    public function invalidateEventProvider()
+    {
+        return [
+            'no domain' => [null, 'http://base.com/foo'],
+            'configured base domain' => ['http://base.com', 'http://base.com/foo'],
+            'another domain' => ['http://another.com', 'http://another.com/foo'],
+        ];
     }
 
     /** @test */
