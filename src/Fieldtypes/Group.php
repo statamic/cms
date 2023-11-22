@@ -19,7 +19,7 @@ class Group extends Fieldtype
                 'fields' => [
                     'fields' => [
                         'display' => __('Fields'),
-                        'instructions' => '',
+                        'instructions' => __('statamic::fieldtypes.group.config.fields'),
                         'type' => 'fields',
                         'full_width_setting' => true,
                     ],
