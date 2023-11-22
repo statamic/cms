@@ -104,7 +104,7 @@ trait HasSelectOptions
             $value = $this->castFromBoolean($value);
         }
 
-        return $this->isOption($value)
+        return $this->isOption($value) && Arr::get($this->config('options'), $value)
             ? Arr::get($this->config('options'), $value, $value)
             : $actualValue;
     }
