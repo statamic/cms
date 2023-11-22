@@ -37,6 +37,10 @@ class Update extends Command
             return $this->indexes();
         }
 
+        if ($this->indexes()->count() === 1) {
+            return $this->indexes();
+        }
+
         $selection = $this->choice(
             'Select an index to update',
             collect(['all'])->merge($this->indexes()->keys())->all(),

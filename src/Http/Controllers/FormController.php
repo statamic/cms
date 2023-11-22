@@ -19,6 +19,7 @@ use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
 use Statamic\Forms\SendEmails;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\Validation\AllowedFile;
 
 class FormController extends Controller
 {
@@ -177,11 +178,7 @@ class FormController extends Controller
                 return $field->fieldtype()->handle() === 'assets';
             })
             ->mapWithKeys(function ($field) {
-                return [$field->handle().'.*' => ['file', function ($attribute, $value, $fail) {
-                    if (in_array(trim(strtolower($value->getClientOriginalExtension())), ['php', 'php3', 'php4', 'php5', 'phtml'])) {
-                        $fail(__('validation.uploaded'));
-                    }
-                }]];
+                return [$field->handle().'.*' => ['file', new AllowedFile]];
             })
             ->all();
 

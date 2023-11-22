@@ -2,6 +2,8 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
+use Statamic\Statamic;
+
 class MaxRule extends SizeBasedRule
 {
     /**
@@ -22,6 +24,6 @@ class MaxRule extends SizeBasedRule
      */
     public function message()
     {
-        return str_replace(':max', $this->parameters[0], __('statamic::validation.max.file'));
+        return str_replace(':max', $this->parameters[0], __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.max.file'));
     }
 }

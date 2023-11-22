@@ -12,6 +12,7 @@ class Entries extends ResourceCollection
 
     public $collects = ListedEntry::class;
     protected $blueprint;
+    protected $columns;
     protected $columnPreferenceKey;
 
     public function blueprint($blueprint)

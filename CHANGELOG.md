@@ -1,5 +1,72 @@
 # Release Notes
 
+## 4.36.0 (2023-11-20)
+
+### What's new
+- Add `href` attribute to relationship item links. [#9030](https://github.com/statamic/cms/issues/9030) by @jacksleight
+- Only allow uploading certain file extensions, with an option to add more. [#9037](https://github.com/statamic/cms/issues/9037) by @jasonvarga
+
+### What's fixed
+- Fix nocache tag when URL ends with a question mark. [#9016](https://github.com/statamic/cms/issues/9016) by @duncanmcclean
+- Fix missing globals and asset container translations. [#9024](https://github.com/statamic/cms/issues/9024) by @ryanmitchell
+- Validate that field handles are in snake case. [#9039](https://github.com/statamic/cms/issues/9039) by @duncanmcclean
+- Appropriate file extension are applied when uploading. [#9033](https://github.com/statamic/cms/issues/9033) by @jasonvarga
+- Don't prompt user to select search index when there's only 1 configured. [#9036](https://github.com/statamic/cms/issues/9036) by @duncanmcclean
+- Fix `range` tag with `times="0"` parameter outputting incorrectly. [#9022](https://github.com/statamic/cms/issues/9022) by @ryanmitchell
+- Fix error in collection entry listing that occurs on certain server setups (i.e Vapor and AWS function URLs). [#9028](https://github.com/statamic/cms/issues/9028) by @duncanmcclean
+
+
+
+## 4.35.0 (2023-11-16)
+
+### What's new
+- Ability to set settings on Algolia indexes. [#8830](https://github.com/statamic/cms/issues/8830) by @godismyjudge95
+- Ability to customize Bard/Replicator set icons directory. [#8931](https://github.com/statamic/cms/issues/8931) by @jesseleite
+
+### What's improved
+- Improve Bard invalid content error reporting. [#8580](https://github.com/statamic/cms/issues/8580) by @jacksleight
+- Dutch translations. [#8993](https://github.com/statamic/cms/issues/8993) by @jeroenpeters1986
+
+### What's fixed
+- Fix nocache tag error when using the regex antlers parser. [#9009](https://github.com/statamic/cms/issues/9009) by @jasonvarga
+- Fix error when using Eloquent users but you still have user files. [#9006](https://github.com/statamic/cms/issues/9006) by @duncanmcclean
+- Fix missing cursor when editing inline code in Bard. [#9002](https://github.com/statamic/cms/issues/9002) by @o1y
+- Fix modified revision values not being shown on save. [#8961](https://github.com/statamic/cms/issues/8961) by @ryanmitchell
+- Check if user roles and groups exist before creating. [#8998](https://github.com/statamic/cms/issues/8998) by @ryanmitchell
+- Check if navigation exists before creating. [#8995](https://github.com/statamic/cms/issues/8995) by @ryanmitchell
+- Check if global exists before creating. [#8996](https://github.com/statamic/cms/issues/8996) by @ryanmitchell
+- Check if fieldset exists before creating. [#8994](https://github.com/statamic/cms/issues/8994) by @ryanmitchell
+- Show error when there is a duplicate taxonomy blueprint name. [#8997](https://github.com/statamic/cms/issues/8997) by @ryanmitchell
+- Prevent concurrent requests to the Outpost. [#9000](https://github.com/statamic/cms/issues/9000) by @duncanmcclean
+- Resolve dynamically declared properties. [#8999](https://github.com/statamic/cms/issues/8999) by @martinoak
+
+
+
+## 4.34.0 (2023-11-14)
+
+### What's new
+- Auto-populate `array` fieldtype options. [#8980](https://github.com/statamic/cms/issues/8980) by @duncanmcclean
+- Add Bard support to `read_time` modifier. [#8976](https://github.com/statamic/cms/issues/8976) by @duncanmcclean
+- Antlers identifier finder. [#8965](https://github.com/statamic/cms/issues/8965) by @jasonvarga
+
+### What's improved
+- Nocache performance improvements. [#8956](https://github.com/statamic/cms/issues/8956) by @jasonvarga
+- French translations. [#8977](https://github.com/statamic/cms/issues/8977) by @ebeauchamps
+
+### What's fixed
+- More php file validation. [#8991](https://github.com/statamic/cms/issues/8991) by @jasonvarga
+- Fix super not saving on eloquent users. [#8979](https://github.com/statamic/cms/issues/8979) by @ryanmitchell
+- Hide export submissions button when there are no valid exporters. [#8985](https://github.com/statamic/cms/issues/8985) by @ryanmitchell
+- Only namespace asset validation attributes when on a CP route. [#8987](https://github.com/statamic/cms/issues/8987) by @ryanmitchell
+- Fix for edit form page saying edit collection. [#8967](https://github.com/statamic/cms/issues/8967) by @ryanmitchell
+- Fix new child entries not propagating to appropriate position in other sites trees. [#7302](https://github.com/statamic/cms/issues/7302) by @arthurperton
+- Fix impersonation redirect. [#8973](https://github.com/statamic/cms/issues/8973) by @jasonvarga
+- Fix error when getting alt on bard image when asset is missing. [#8959](https://github.com/statamic/cms/issues/8959) by @morphsteve
+- Prevent requiring current password when changing another user's password. [#8966](https://github.com/statamic/cms/issues/8966) by @duncanmcclean
+- Fix global attribute support on bard's small mark. [#8969](https://github.com/statamic/cms/issues/8969) by @jacksleight
+
+
+
 ## 4.33.0 (2023-11-10)
 
 ### What's new

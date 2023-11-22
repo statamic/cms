@@ -2,6 +2,8 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
+use Statamic\Statamic;
+
 class MinRule extends SizeBasedRule
 {
     /**
@@ -22,6 +24,6 @@ class MinRule extends SizeBasedRule
      */
     public function message()
     {
-        return str_replace(':min', $this->parameters[0], __('statamic::validation.min.file'));
+        return str_replace(':min', $this->parameters[0], __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.min.file'));
     }
 }
