@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Fieldtypes;
+namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
