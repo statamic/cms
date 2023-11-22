@@ -54,16 +54,44 @@ class Group extends Fieldtype
         return new Fields($this->config('fields'), $this->field()->parent(), $this->field());
     }
 
+    public function rules(): array
+    {
+        return ['array'];
+    }
+
+    public function extraRules(): array
+    {
+        $rules = $this
+            ->fields()
+            ->addValues((array) $this->field->value())
+            ->validator()
+            ->withContext([
+                'prefix' => $this->field->handle() . '.',
+            ])
+            ->rules();
+
+        return collect($rules)->mapWithKeys(function ($rules, $handle) {
+            return [$this->field->handle() . '.' . $handle => $rules];
+        })->all();
+    }
+
+    public function extraValidationAttributes(): array
+    {
+        return collect($this->fields()->validator()->attributes())->mapWithKeys(function ($attribute, $handle) {
+            return [$this->field->handle() . '.' . $handle => $attribute];
+        })->all();
+    }
+
     public function preload()
     {
-        return $this->fields()->addValues((array) ($this->field->value() ?? $this->defaultGroupData()))->meta()->toArray();
+        return $this->fields()->addValues($this->field->value() ?? $this->defaultGroupData())->meta()->toArray();
     }
 
     protected function defaultGroupData()
     {
         return $this->fields()->all()->map(function ($field) {
             return $field->fieldtype()->preProcess($field->defaultValue());
-        });
+        })->all();
     }
 
     public function augment($value)
@@ -81,5 +109,17 @@ class Group extends Fieldtype
         $method = $shallow ? 'shallowAugment' : 'augment';
 
         return $this->fields()->addValues($value ?? [])->{$method}()->values()->all();
+    }
+
+    public function preProcessValidatable($value)
+    {
+        return array_merge(
+            $value ?? [],
+            $this->fields()
+                ->addValues($value ?? [])
+                ->preProcessValidatables()
+                ->values()
+                ->all(),
+        );
     }
 }
