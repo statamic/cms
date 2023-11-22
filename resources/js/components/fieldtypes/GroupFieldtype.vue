@@ -23,23 +23,17 @@
                 <section :class="{ 'p-4': fullScreenMode }">
                     <div
                         v-if="!fullScreenMode"
-                        class="flex justify-end absolute top-3 right-3 @md:right-6"
+                        class="flex justify-end absolute top-7 right-0 @md:right-6"
                     >
                         <button
                             v-if="config.fullscreen"
                             @click="toggleFullScreen"
                             v-tooltip="__('Toggle Fullscreen Mode')"
-                            class="flex items-center btn btn-icon"
+                            class="flex items-center group"
                         >
                             <svg-icon
-                                v-show="!fullScreenMode"
                                 name="expand-bold"
-                                class="h-3.5 px-0.5 text-gray-750"
-                            />
-                            <svg-icon
-                                v-show="fullScreenMode"
-                                name="shrink-all"
-                                class="h-3.5 px-0.5 text-gray-750"
+                                class="h-3.5 px-0.5 text-gray-750 group-hover:text-black"
                             />
                         </button>
                     </div>
