@@ -89,7 +89,8 @@ code.parent-url {
 }
 
 .publish-section-header-inner {
-    @apply px-3 @sm:px-4 @lg:px-6 pt-4 pb-3;
+    @apply px-4 @lg:px-6 pt-4 pb-3;
+
 }
 
 .publish-sidebar {
