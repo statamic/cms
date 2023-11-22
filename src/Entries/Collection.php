@@ -344,7 +344,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contrac
         }
 
         if ($this->requiresSlugs() && ! $blueprint->hasField('slug')) {
-            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true], 'sidebar');
+            $blueprint->ensureField('slug', ['type' => 'slug', 'localizable' => true, 'validate' => 'max:200'], 'sidebar');
         }
 
         if ($this->dated() && ! $blueprint->hasField('date')) {

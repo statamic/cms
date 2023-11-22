@@ -143,7 +143,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, Contract,
     {
         $blueprint
             ->ensureFieldPrepended('title', ['type' => 'text', 'required' => true])
-            ->ensureField('slug', ['type' => 'slug', 'required' => true], 'sidebar');
+            ->ensureField('slug', ['type' => 'slug', 'required' => true, 'validate' => 'max:200'], 'sidebar');
 
         return $blueprint;
     }
