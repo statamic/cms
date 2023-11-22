@@ -66,19 +66,19 @@ class Group extends Fieldtype
             ->addValues((array) $this->field->value())
             ->validator()
             ->withContext([
-                'prefix' => $this->field->handle() . '.',
+                'prefix' => $this->field->handle().'.',
             ])
             ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) {
-            return [$this->field->handle() . '.' . $handle => $rules];
+            return [$this->field->handle().'.'.$handle => $rules];
         })->all();
     }
 
     public function extraValidationAttributes(): array
     {
         return collect($this->fields()->validator()->attributes())->mapWithKeys(function ($attribute, $handle) {
-            return [$this->field->handle() . '.' . $handle => $attribute];
+            return [$this->field->handle().'.'.$handle => $attribute];
         })->all();
     }
 
