@@ -56,7 +56,7 @@ class Group extends Fieldtype
 
     public function preload()
     {
-        return $this->fields()->addValues($this->field->value() ?? $this->defaultGroupData())->meta()->toArray();
+        return $this->fields()->addValues((array) ($this->field->value() ?? $this->defaultGroupData()))->meta()->toArray();
     }
 
     protected function defaultGroupData()
