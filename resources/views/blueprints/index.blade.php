@@ -187,7 +187,7 @@
             <tr>
                 <td>
                     <div class="flex items-center">
-                        <div class="w-4 h-4 mr-4">@cp_svg('icons/light/users')</div>
+                        <div class="w-4 h-4 mr-4">@cp_svg('icons/light/blueprint')</div>
                         <a href="{{ cp_route('blueprints.edit', [$blueprint['namespace'], $blueprint['handle']]) }}">{{ $blueprint['title'] }}</a>
                     </div>
                 </td>
