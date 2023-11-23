@@ -19,7 +19,7 @@ class RedirectIfAuthorized
     {
         if ($user = User::current()) {
             if ($user->can('access cp')) {
-                Toast::error(__('You can\'t do this while logged in'));
+                Toast::error(__("You can't do this while logged in"));
 
                 return redirect(cp_route('index'));
             }
