@@ -158,6 +158,12 @@ export default {
             return this.meta.displayFormat;
         },
 
+        replicatorPreview() {
+            return this.hasTime
+                ? `${this.value.date} ${this.value.time}`
+                : this.value.date;
+        },
+
     },
 
     created() {
