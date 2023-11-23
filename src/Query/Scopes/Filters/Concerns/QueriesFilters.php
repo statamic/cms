@@ -23,7 +23,7 @@ trait QueriesFilters
                     'values' => $values,
                 ];
             })
-            ->filter(fn($filter) => $filter->filterInstance != null)
+            ->filter(fn ($filter) => $filter->filterInstance != null)
             ->each(function ($filter) use ($query) {
                 $filter->filterInstance->apply($query, $filter->values);
             })
