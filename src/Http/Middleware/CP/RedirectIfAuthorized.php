@@ -16,8 +16,8 @@ class RedirectIfAuthorized
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if (User::current()) {
-            return redirect(cp_route('index'));
+        if ($user = User::current()) {
+            return redirect($user->can('access cp') ? cp_route('index') : '/');
         }
 
         return $next($request);
