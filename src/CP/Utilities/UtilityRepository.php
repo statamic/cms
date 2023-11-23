@@ -10,6 +10,7 @@ class UtilityRepository
 {
     protected $utilities;
     protected $extensions = [];
+    protected $booted = false;
 
     public function __construct()
     {
@@ -23,6 +24,8 @@ class UtilityRepository
         foreach ($this->extensions as $callback) {
             $callback($this);
         }
+
+        $this->booted = true;
     }
 
     public function extend($callback)
@@ -48,6 +51,10 @@ class UtilityRepository
 
     public function all()
     {
+        if (! $this->booted) {
+            $this->boot();
+        }
+
         return $this->utilities;
     }
 
