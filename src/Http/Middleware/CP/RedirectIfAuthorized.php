@@ -3,6 +3,7 @@
 namespace Statamic\Http\Middleware\CP;
 
 use Closure;
+use Statamic\Facades\CP\Toast;
 use Statamic\Facades\User;
 
 class RedirectIfAuthorized
@@ -17,7 +18,13 @@ class RedirectIfAuthorized
     public function handle($request, Closure $next, $guard = null)
     {
         if ($user = User::current()) {
-            return redirect($user->can('access cp') ? cp_route('index') : '/');
+            if ($user->can('access cp')) {
+                Toast::error(__('You can\'t do this while logged in'));
+
+                return redirect(cp_route('index'));
+            }
+
+            return redirect('/');
         }
 
         return $next($request);
