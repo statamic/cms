@@ -75,6 +75,7 @@
                             class="border-t shadow-lg"
                             :resource-meta="meta"
                             :inline="true"
+                            :scroll-to-top="false"
                             @page-selected="setPage" />
 
                         <div class="p-4 border-t flex items-center justify-between bg-gray-200">
