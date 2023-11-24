@@ -3,7 +3,6 @@
 namespace Tests;
 
 use Facades\Statamic\CP\LivePreview;
-use Facades\Statamic\Routing\ResolveRedirect;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
