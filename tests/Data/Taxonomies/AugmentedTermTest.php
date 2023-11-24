@@ -4,9 +4,11 @@ namespace Tests\Data\Taxonomies;
 
 use Carbon\Carbon;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Contracts\Query\Builder as BuilderContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -66,6 +68,7 @@ class AugmentedTermTest extends AugmentedTestCase
             'locale' => ['type' => 'string', 'value' => 'en'],
             'updated_at' => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
             'updated_by' => ['type' => UserContract::class, 'value' => 'test-user'],
+            'collection' => ['type' => 'null', 'value' => null],
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
@@ -89,5 +92,27 @@ class AugmentedTermTest extends AugmentedTestCase
         $title = $augmented->get('title');
         $this->assertInstanceOf(Value::class, $title);
         $this->assertEquals('Supplemented Title', $title->value());
+    }
+
+    /** @test */
+    public function collection_is_present_when_taxonomy_is_mounted()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        tap(Taxonomy::make('test'))->save();
+
+        $term = Term::make()
+            ->taxonomy('test')
+            ->collection($collection)
+            ->blueprint('test')
+            ->in('en')
+            ->slug('term-slug')
+            ->data(['title' => 'Actual Title']);
+
+        $augmented = new AugmentedTerm($term);
+
+        $value = $augmented->get('collection')->value();
+
+        $this->assertInstanceOf(CollectionContract::class, $value);
+        $this->assertEquals($collection->handle(), $value->handle());
     }
 }
