@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Facades\Statamic\CP\LivePreview;
+use Facades\Statamic\Routing\ResolveRedirect;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
@@ -815,6 +816,33 @@ class FrontendTest extends TestCase
         }
     }
 
+    /**
+     * @test
+     *
+     * @dataProvider redirectProviderNoBlueprint
+     */
+    public function redirect_is_followed_when_no_field_is_present_in_blueprint($dataValue, $expectedStatus, $expectedLocation)
+    {
+        $entry = $this->createPage('about', [
+            'with' => [
+                'title' => 'About',
+                'redirect' => $dataValue, // this should not be used - the augmented value should.
+            ],
+        ])->save();
+
+        $response = $this->get('/about');
+
+        if ($expectedStatus === 302) {
+            $response->assertRedirect($expectedLocation);
+        } elseif ($expectedStatus === 200) {
+            $response->assertOk();
+        } elseif ($expectedStatus === 404) {
+            $response->assertNotFound();
+        } else {
+            throw new \Exception('Test not set up to handle status code: '.$expectedStatus);
+        }
+    }
+
     public function redirectProvider()
     {
         return [
@@ -824,7 +852,7 @@ class FrontendTest extends TestCase
                 302,                   // its a redirect
                 '/target',             // to here
             ],
-            'invalid redirect' => [
+            'child redirect' => [
                 'something',           // its got a value
                 null,                  // the fieldtype will augment to this because its an invalid reference
                 404,                   // so it should 404
@@ -833,6 +861,22 @@ class FrontendTest extends TestCase
             'missing redirect' => [
                 null,                  // its got no value
                 null,                  // the fieldtype will augment to this (although it wouldn't even be called)
+                200,                   // since there's no redirect, its a successful response
+                null,                  // and not a redirect
+            ],
+        ];
+    }
+
+    public function redirectProviderNoBlueprint()
+    {
+        return [
+            'valid redirect' => [
+                '/target',             // its got a value
+                302,                   // its a redirect
+                '/target',             // to here
+            ],
+            'missing redirect' => [
+                null,                  // its got a value
                 200,                   // since there's no redirect, its a successful response
                 null,                  // and not a redirect
             ],

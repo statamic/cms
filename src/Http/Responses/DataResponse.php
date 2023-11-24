@@ -8,6 +8,7 @@ use Statamic\Auth\Protect\Protection;
 use Statamic\Events\ResponseCreated;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
+use Statamic\Routing\ResolveRedirect;
 use Statamic\View\View;
 
 class DataResponse implements Responsable
@@ -74,6 +75,10 @@ class DataResponse implements Responsable
 
         if (! $redirect = $this->data->redirect) {
             throw new NotFoundHttpException;
+        }
+
+        if ($redirect === '@child') {
+            $redirect = (new ResolveRedirect)($redirect, $this->data);
         }
 
         return redirect($redirect);
