@@ -17,7 +17,7 @@ class Attributes
         if ($source->getAdapter() instanceof LocalFilesystemAdapter) {
             $this->cacheDisk = $source;
         } else {
-            $manager = $this->mountManager($source->getDriver(), $this->cacheDisk()->getDriver());
+            $manager = $this->mountManager($source->getDriver(), $this->cacheDisk()->getDriver(), $source->getConfig());
 
             if ($manager->has($destination = "cache://{$path}")) {
                 $manager->delete($destination);
@@ -68,12 +68,12 @@ class Attributes
         return ['width' => 300, 'height' => 150];
     }
 
-    private function mountManager($source, $cache)
+    private function mountManager($source, $cache, $config)
     {
         return new MountManager([
             'source' => $source,
             'cache' => $cache,
-        ]);
+        ], $config);
     }
 
     private function cacheDisk()
