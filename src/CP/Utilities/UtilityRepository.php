@@ -18,6 +18,10 @@ class UtilityRepository
 
     public function boot()
     {
+        if ($this->utilities->isNotEmpty()) {
+            return;
+        }
+
         CoreUtilities::boot();
 
         foreach ($this->extensions as $callback) {
