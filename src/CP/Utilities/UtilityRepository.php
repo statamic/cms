@@ -76,8 +76,6 @@ class UtilityRepository
 
     public function routes()
     {
-        $this->boot();
-
         Route::namespace('\\')->prefix('utilities')->name('utilities.')->group(function () {
             $this->all()->each(function ($utility) {
                 if ($utility->action()) {
