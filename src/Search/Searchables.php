@@ -4,6 +4,7 @@ namespace Statamic\Search;
 
 use Closure;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Searchables\Providers;
@@ -41,6 +42,15 @@ class Searchables
     public function all(): Collection
     {
         return $this->providers->flatMap->provide();
+    }
+
+    public function lazy(): LazyCollection
+    {
+        return LazyCollection::make(function () {
+            foreach ($this->providers as $provider) {
+                yield $provider->provide();
+            }
+        });
     }
 
     public function contains($searchable)

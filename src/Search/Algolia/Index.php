@@ -61,7 +61,7 @@ class Index extends BaseIndex
             $index->setSettings($this->config['settings']);
         }
 
-        $this->insertMultiple($this->searchables()->all());
+        $this->insertLazily($this->searchables()->lazy());
 
         return $this;
     }
