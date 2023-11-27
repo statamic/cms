@@ -90,9 +90,7 @@ abstract class Index
 
     public function insertLazily(LazyCollection $providers)
     {
-        foreach ($providers as $documents) {
-            $this->insertMultiple($documents);
-        }
+        $providers->each(fn ($documents) => $this->insertMultiple($documents));
 
         return $this;
     }
