@@ -23,7 +23,7 @@ class Attributes
                 $manager->delete($destination);
             }
 
-            $manager->copy("source://{$path}", $destination, ['visibility' => 'public']);
+            $manager->copy("source://{$path}", $destination, ['visibility' => 'private']);
         }
 
         $svg = Str::endsWith($path, '.svg');
