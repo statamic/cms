@@ -8,7 +8,6 @@ use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Asset;
-use Statamic\Facades\Cp\Toast;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -587,8 +586,7 @@ class EntriesController extends CpController
     {
         if (Site::hasMultiple()) {
             if (! $collection->sites()->contains($site->handle)) {
-                Toast::error(__('Collection is not available on this site (:handle)', ['handle' => $site->handle]));
-                return redirect()->back();
+                return redirect()->back()->with('error', __('Collection is not available on this site (:handle)', ['handle' => $site->handle]));
             }
         }
     }
