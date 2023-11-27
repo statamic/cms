@@ -214,6 +214,8 @@ class CorePermissions
 
     protected function registerUtilities()
     {
+        Utility::boot();
+
         Utility::all()->each(function ($utility) {
             Permission::register("access {$utility->handle()} utility", function ($perm) use ($utility) {
                 return $perm
