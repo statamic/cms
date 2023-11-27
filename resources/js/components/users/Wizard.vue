@@ -161,7 +161,7 @@
                 :name="storeName"
                 :meta="{}"
                 :blueprint="blueprint"
-                :values="extraValues"
+                :values="additionalValues"
                 :track-dirty-state="false"
                 class="max-w-md mx-auto px-4 pb-20"
             >
@@ -246,7 +246,7 @@ export default {
                 roles: [],
                 groups: []
             },
-            extraValues: {},
+            additionalValues: {},
             invitation: {
                 send: this.canSendInvitation,
                 subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
@@ -321,7 +321,7 @@ export default {
             });
         },
         submit() {
-            let payload = {...this.user, ...this.extraValues, invitation: this.invitation};
+            let payload = {...this.user, ...this.additionalValues, invitation: this.invitation};
 
             this.clearErrors();
 
@@ -346,7 +346,7 @@ export default {
             }
         },
         updateField(handle, value) {
-            this.extraValues[handle] = value;
+            this.additionalValues[handle] = value;
         },
         clearErrors() {
             this.error = null;
