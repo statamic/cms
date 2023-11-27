@@ -159,15 +159,18 @@
 
             <publish-container
                 :name="storeName"
-                :meta="{}"
                 :blueprint="blueprint"
                 :values="additionalValues"
+                :meta="additionalMeta"
                 :track-dirty-state="false"
                 class="max-w-md mx-auto px-4 pb-20"
+                @updated="additionalValues = $event"
             >
                 <publish-fields
-                    :fields="requiredFields"
-                    @updated="(handle, value) => updateField(handle, value)"
+                    slot-scope="{ setFieldValue, setFieldMeta }"
+                    :fields="additionalFields"
+                    @updated="setFieldValue"
+                    @meta-updated="setFieldMeta"
                 />
             </publish-container>
         </div>
@@ -236,6 +239,9 @@ export default {
         separateNameFields: { type: Boolean },
         canSendInvitation: { type: Boolean },
         blueprint: { type: Object },
+        initialAdditionalValues: { type: Object },
+        additionalFields: { type: Array },
+        additionalMeta: { type: Object }
     },
 
     data() {
@@ -246,7 +252,6 @@ export default {
                 roles: [],
                 groups: []
             },
-            additionalValues: {},
             invitation: {
                 send: this.canSendInvitation,
                 subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
@@ -259,6 +264,7 @@ export default {
             errors: {},
             error: null,
             storeName: 'userwizard',
+            additionalValues: this.initialAdditionalValues,
         }
     },
 
@@ -267,7 +273,7 @@ export default {
             let steps = [__('User Information')];
             if (this.canAssignPermissions) steps.push(__('Roles & Groups'));
             if (this.canSendInvitation) steps.push(__('Customize Invitation'));
-            if (this.requiredFields.length) steps.push(__('Additional Information'));
+            if (this.additionalFields.length) steps.push(__('Additional Information'));
 
             return steps;
         },
@@ -284,7 +290,7 @@ export default {
             return this.canAssignPermissions ? this.currentStep === 2 : this.currentStep === 1;
         },
         onAdditionalStep() {
-            if (this.requiredFields.length < 1) {
+            if (this.additionalFields.length < 1) {
                 return false;
             }
 
@@ -295,11 +301,6 @@ export default {
         },
         isValidEmail() {
             return this.user.email && isEmail(this.user.email)
-        },
-        requiredFields() {
-            return this.blueprint.tabs
-                .flatMap(tab => tab.sections.flatMap(section => section.fields.filter(field => field.required)))
-                .filter((field) => ! ['email', 'name', 'first_name', 'last_name', 'roles', 'groups'].includes(field.handle));
         }
     },
 
@@ -344,9 +345,6 @@ export default {
             } else {
                 this.$toast.error(__(e.response.data.message));
             }
-        },
-        updateField(handle, value) {
-            this.additionalValues[handle] = value;
         },
         clearErrors() {
             this.error = null;

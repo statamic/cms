@@ -122,14 +122,15 @@ class UsersController extends CpController
         $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
         $expiry = config("auth.passwords.{$broker}.expire") / 60;
 
+        $additional = $fields->all()
+            ->reject(fn ($field) => in_array($field->handle(), ['email', 'name', 'first_name', 'last_name', 'roles', 'groups']))
+            ->keys();
+
         $viewData = [
-            'title' => __('Create'),
-            'values' => $fields->values()->all(),
-            'meta' => $fields->meta(),
+            'values' => (object) $fields->values()->only($additional)->all(),
+            'meta' => (object) $fields->meta()->only($additional)->all(),
+            'fields' => collect($fields->toPublishArray())->filter(fn ($field) => $additional->contains($field['handle']))->values()->ray()->all(),
             'blueprint' => $blueprint->toPublishArray(),
-            'actions' => [
-                'save' => cp_route('users.store'),
-            ],
             'expiry' => $expiry,
             'separateNameFields' => $blueprint->hasField('first_name'),
             'canSendInvitation' => config('statamic.users.wizard_invitation'),
@@ -149,12 +150,7 @@ class UsersController extends CpController
 
         $blueprint = User::blueprint();
 
-        $requiredFields = collect($blueprint->fields()->all()->filter->isRequired()->keys()->all())
-            ->merge(['email', 'name', 'first_name', 'last_name'])
-            ->unique()
-            ->all();
-
-        $fields = $blueprint->fields()->only($requiredFields)->addValues($request->all());
+        $fields = $blueprint->fields()->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
 

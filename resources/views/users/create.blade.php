@@ -14,6 +14,9 @@
         :separate-name-fields="{{ $str::bool($separateNameFields) }}"
         :can-send-invitation="{{ $str::bool($canSendInvitation) }}"
         :blueprint="{{ json_encode($blueprint) }}"
+        :additional-fields="{{ json_encode($fields) }}"
+        :additional-meta="{{ json_encode($meta) }}"
+        :initial-additional-values="{{ json_encode($values) }}"
     >
     </user-wizard>
 @stop
