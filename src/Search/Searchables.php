@@ -4,8 +4,8 @@ namespace Statamic\Search;
 
 use Closure;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Search\Searchables\Providers;
 use Statamic\Support\Arr;
