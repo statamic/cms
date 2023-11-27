@@ -1794,11 +1794,11 @@ class CoreModifiers extends Modifier
      *
      * @return void
      */
-    public function ray($value)
+    public function ray($value, $params)
     {
         throw_unless(function_exists('ray'), new \Exception('Ray is not installed. Run `composer require spatie/laravel-ray --dev`'));
 
-        ray($value);
+        ray($value)->color(Arr::get($params, 0, 'gray'));
 
         return $value;
     }
