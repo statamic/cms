@@ -2,13 +2,13 @@
 
 namespace Statamic\Http\Responses;
 
+use Facades\Statamic\Routing\ResolveRedirect;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Str;
 use Statamic\Auth\Protect\Protection;
 use Statamic\Events\ResponseCreated;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
-use Statamic\Routing\ResolveRedirect;
 use Statamic\View\View;
 
 class DataResponse implements Responsable
@@ -77,7 +77,7 @@ class DataResponse implements Responsable
             throw new NotFoundHttpException;
         }
 
-        return redirect((new ResolveRedirect)($redirect, $this->data));
+        return redirect(ResolveRedirect::resolve($redirect, $this->data));
     }
 
     protected function protect()
