@@ -15,15 +15,16 @@ class Fields
     protected $fields;
     protected $parent;
     protected $parentField;
+    protected $parentIndex;
     protected $filled = [];
     protected $withValidatableValues = false;
     protected $withComputedValues = false;
 
-    public function __construct($items = [], $parent = null, $parentField = null)
+    public function __construct($items = [], $parent = null, $parentField = null, $parentIndex = null)
     {
         $this
             ->setParent($parent)
-            ->setParentField($parentField)
+            ->setParentField($parentField, $parentIndex)
             ->setItems($items);
     }
 
@@ -58,12 +59,13 @@ class Fields
         return $this;
     }
 
-    public function setParentField($field)
+    public function setParentField($field, $index = null)
     {
         $this->parentField = $field;
+        $this->parentIndex = $index;
 
         if ($this->fields) {
-            $this->fields->each(fn ($f) => $f->setParentField($field));
+            $this->fields->each(fn ($f) => $f->setParentField($field, $index));
         }
 
         return $this;
@@ -114,7 +116,7 @@ class Fields
     {
         return (new static)
             ->setParent($this->parent)
-            ->setParentField($this->parentField)
+            ->setParentField($this->parentField, $this->parentIndex)
             ->setItems($this->items)
             ->setFields($this->fields)
             ->setFilled($this->filled);
@@ -244,7 +246,7 @@ class Fields
     {
         return (new Field($handle, $config))
             ->setParent($this->parent)
-            ->setParentField($this->parentField);
+            ->setParentField($this->parentField, $this->parentIndex);
     }
 
     private function getReferencedField(array $config): Field

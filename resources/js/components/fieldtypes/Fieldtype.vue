@@ -59,6 +59,12 @@ export default {
             return this.value;
         },
 
+        fieldPath() {
+            const prefix = this.fieldPathPrefix || this.handle;
+
+            return prefix.split('.');
+        },
+
         fieldId() {
             let prefix = this.fieldPathPrefix ? this.fieldPathPrefix+'.' : '';
 

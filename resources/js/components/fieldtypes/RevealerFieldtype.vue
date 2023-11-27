@@ -35,7 +35,7 @@ export default {
             return data_get(this.config, 'mode') === 'toggle';
         },
 
-        fieldPath() {
+        prefix() {
             return this.fieldPathPrefix || this.handle;
         },
 
