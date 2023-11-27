@@ -28,7 +28,7 @@ class EntriesController extends CpController
     {
         $this->authorize('view', $collection);
 
-        if ($response = $this->ensureCollectionIsAvailableOnSite($collection, $site)) {
+        if ($response = $this->ensureCollectionIsAvailableOnSite($collection, Site::current())) {
             return $response;
         }
 
