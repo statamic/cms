@@ -17,13 +17,13 @@ class Attributes
         if ($source->getAdapter() instanceof LocalFilesystemAdapter) {
             $this->cacheDisk = $source;
         } else {
-            $manager = $this->mountManager($source->getDriver(), $this->cacheDisk()->getDriver(), $source->getConfig());
+            $manager = $this->mountManager($source->getDriver(), $this->cacheDisk()->getDriver());
 
             if ($manager->has($destination = "cache://{$path}")) {
                 $manager->delete($destination);
             }
 
-            $manager->copy("source://{$path}", $destination);
+            $manager->copy("source://{$path}", $destination, ['visibility' => 'public']);
         }
 
         $svg = Str::endsWith($path, '.svg');
@@ -68,12 +68,12 @@ class Attributes
         return ['width' => 300, 'height' => 150];
     }
 
-    private function mountManager($source, $cache, $config)
+    private function mountManager($source, $cache)
     {
         return new MountManager([
             'source' => $source,
             'cache' => $cache,
-        ], $config);
+        ]);
     }
 
     private function cacheDisk()
