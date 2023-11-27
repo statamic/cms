@@ -18,10 +18,6 @@ class UtilityRepository
 
     public function boot()
     {
-        if ($this->utilities->isNotEmpty()) {
-            return;
-        }
-
         CoreUtilities::boot();
 
         foreach ($this->extensions as $callback) {
@@ -52,8 +48,6 @@ class UtilityRepository
 
     public function all()
     {
-        $this->boot();
-
         return $this->utilities;
     }
 
@@ -76,6 +70,8 @@ class UtilityRepository
 
     public function routes()
     {
+        $this->boot();
+
         Route::namespace('\\')->prefix('utilities')->name('utilities.')->group(function () {
             $this->all()->each(function ($utility) {
                 if ($utility->action()) {
