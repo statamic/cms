@@ -52,6 +52,8 @@ class UtilityRepository
 
     public function all()
     {
+        $this->boot();
+
         return $this->utilities;
     }
 
