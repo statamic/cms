@@ -77,11 +77,7 @@ class DataResponse implements Responsable
             throw new NotFoundHttpException;
         }
 
-        if ($redirect === '@child') {
-            $redirect = (new ResolveRedirect)($redirect, $this->data);
-        }
-
-        return redirect($redirect);
+        return redirect((new ResolveRedirect)($redirect, $this->data));
     }
 
     protected function protect()
