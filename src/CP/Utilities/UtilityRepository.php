@@ -66,12 +66,12 @@ class UtilityRepository
 
     public function find($handle)
     {
-        return $this->utilities->get($handle);
+        return $this->all()->get($handle);
     }
 
     public function findBySlug($slug)
     {
-        return $this->utilities->first(fn ($utility) => $utility->slug() === $slug);
+        return $this->all()->first(fn ($utility) => $utility->slug() === $slug);
     }
 
     public function routes()
